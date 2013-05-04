@@ -92,8 +92,14 @@
             <artifactId>juli</artifactId>
             <version>6.0.26</version>
         </dependency>
-                    
-        <!--<dependency>
+        <!-- Logging -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <!--
+        <dependency>
             <groupId>org.glassfish.distributions</groupId>
             <artifactId>web-all</artifactId>
             <version>10.0-build-20080430</version>
@@ -104,7 +110,8 @@
             <artifactId>gf-embedded-api</artifactId>
             <version>1.0-alpha-4</version>
             <scope>test</scope>
-        </dependency>-->
+        </dependency>
+        -->
     </dependencies>
     <properties>
         <jersey-version>1.8</jersey-version>
