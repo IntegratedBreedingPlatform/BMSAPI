@@ -85,51 +85,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                 }
             }
 
-            /*VariableType mat50VariableType = variableTypeListVariates.findByLocalName("MAT50");
-            VariableType mat50MeansVariableType = cloner.deepClone(mat50VariableType);
-            mat50MeansVariableType.setLocalName("MAT50_Means");
-            String definition = mat50MeansVariableType.getStandardVariable().getMethod().getDefinition();
-            Term term = ontologyDataManagerV2.addMethod("LS MEAN", definition);
-            mat50MeansVariableType.getStandardVariable().setMethod(term);  //correct method for setting term?????
-            variableTypeList.add(mat50MeansVariableType);
-
-            VariableType mat50UnitErrorsVariableType = cloner.deepClone(mat50VariableType);
-            mat50UnitErrorsVariableType.setLocalName("MAT50_UnitErrors");
-            definition = mat50UnitErrorsVariableType.getStandardVariable().getMethod().getDefinition();
-            term = ontologyDataManagerV2.addMethod("ERROR ESTIMATE", definition);
-            mat50UnitErrorsVariableType.getStandardVariable().setMethod(term);  //correct method for setting term?????
-            variableTypeList.add(mat50UnitErrorsVariableType);
-
-            VariableType podwtVariableType = variableTypeListVariates.findByLocalName("PODWT");
-            VariableType podwtMeansVariableType = cloner.deepClone(podwtVariableType);
-            podwtMeansVariableType.setLocalName("PODWT_Means");
-            definition = podwtMeansVariableType.getStandardVariable().getMethod().getDefinition();
-            term = ontologyDataManagerV2.addMethod("LS MEAN", definition);
-            podwtMeansVariableType.getStandardVariable().setMethod(term);  //correct method for setting term?????
-            variableTypeList.add(podwtMeansVariableType);
-
-            VariableType podwtUnitErrorsVariableType = cloner.deepClone(podwtVariableType);
-            podwtUnitErrorsVariableType.setLocalName("PODWT_UnitErrors");
-            definition = podwtUnitErrorsVariableType.getStandardVariable().getMethod().getDefinition();
-            term = ontologyDataManagerV2.addMethod("ERROR ESTIMATE", definition);
-            podwtUnitErrorsVariableType.getStandardVariable().setMethod(term);  //correct method for setting term?????
-            variableTypeList.add(podwtUnitErrorsVariableType);
-
-            VariableType seedwtVariableType = variableTypeListVariates.findByLocalName("SEEDWT");
-            VariableType seedwtMeansVariableType = cloner.deepClone(seedwtVariableType);
-            seedwtMeansVariableType.setLocalName("SEEDWT_Means");
-            definition = seedwtMeansVariableType.getStandardVariable().getMethod().getDefinition();
-            term = ontologyDataManagerV2.addMethod("LS MEAN", definition);
-            seedwtMeansVariableType.getStandardVariable().setMethod(term);  //correct method for setting term?????
-            variableTypeList.add(seedwtMeansVariableType);
-
-            VariableType seedwtUnitErrorsVariableType = cloner.deepClone(seedwtVariableType);
-            seedwtUnitErrorsVariableType.setLocalName("SEEDWT_UnitErrors");
-            definition = seedwtUnitErrorsVariableType.getStandardVariable().getMethod().getDefinition();
-            term = ontologyDataManagerV2.addMethod("ERROR ESTIMATE", definition);
-            seedwtUnitErrorsVariableType.getStandardVariable().setMethod(term);  //correct method for setting term?????
-            variableTypeList.add(seedwtUnitErrorsVariableType);*/
-
             int studyId = Integer.valueOf(params.get(WebAPIConstants.STUDY_ID.getParamValue()));
 
             //please make sure that the study name is unique and does not exist in the db.
@@ -165,29 +120,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                         studyDataManagerV2.addExperiment(newDataset.getId(), ExperimentType.AVERAGE, experimentValues);
                     }
                 }
-                /*experimentValues = createExperimentValues(newDataset,
-                        traitsAndMeans.get("MAT50_Means").get(i), ndLocationId, stockId);
-                studyDataManagerV2.addExperiment(newDataset.getId(), ExperimentType.AVERAGE, experimentValues);
-
-                experimentValues = createExperimentValues(newDataset,
-                        traitsAndMeans.get("MAT50_UnitErrors").get(i), ndLocationId, stockId);
-                studyDataManagerV2.addExperiment(newDataset.getId(), ExperimentType.AVERAGE, experimentValues);
-
-                experimentValues = createExperimentValues(newDataset,
-                        traitsAndMeans.get("PODWT_Means").get(i), ndLocationId, stockId);
-                studyDataManagerV2.addExperiment(newDataset.getId(), ExperimentType.AVERAGE, experimentValues);
-
-                experimentValues = createExperimentValues(newDataset,
-                        traitsAndMeans.get("PODWT_UnitErrors").get(i), ndLocationId, stockId);
-                studyDataManagerV2.addExperiment(newDataset.getId(), ExperimentType.AVERAGE, experimentValues);
-
-                experimentValues = createExperimentValues(newDataset,
-                        traitsAndMeans.get("SEEDWT_Means").get(i), ndLocationId, stockId);
-                studyDataManagerV2.addExperiment(newDataset.getId(), ExperimentType.AVERAGE, experimentValues);
-
-                experimentValues = createExperimentValues(newDataset,
-                        traitsAndMeans.get("SEEDWT_UnitErrors").get(i), ndLocationId, stockId);
-                studyDataManagerV2.addExperiment(newDataset.getId(), ExperimentType.AVERAGE, experimentValues);*/
             }
 
         } else {
