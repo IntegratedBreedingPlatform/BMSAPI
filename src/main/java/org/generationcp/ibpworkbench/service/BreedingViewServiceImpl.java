@@ -54,8 +54,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             TrialEnvironment trialEnv = trialEnvironments.findOnlyOneByLocalName(header[0], traitsAndMeans.get(header[0]).get(0));
             ndLocationId = trialEnv.getId();
             Stocks stocks = studyDataManagerV2.getStocksInDataset(inputDatasetId);
-            Stock stock = stocks.findOnlyOneByLocalName(header[1], traitsAndMeans.get(header[1]).get(0));    //???
-            stockId = stock.getId();      //germPlasmId
 
             DataSet dataSet = studyDataManagerV2.getDataSet(inputDatasetId);
             VariableTypeList variableTypeList = dataSet.getVariableTypes();
@@ -91,7 +89,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             VariableList variableList = new VariableList();
             Variable variable = createVariable(TermId.DATASET_NAME.getId(), fileName + "_" + workbenchProjectId + "_" + studyId , 1);
             variableTypeList.add(variable.getVariableType());
-            updateVariableType(variable.getVariableType(), "DATASET_NAME", "Dataset name (local)");
+            updateVariableType(variable.getVariableType(), fileName + "_" + workbenchProjectId + "_" + studyId, "Dataset name (local)");
             variableList.add(variable);
 
             variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", 2);
@@ -115,6 +113,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             for(int i = 0; i < environments.size(); i++) {
                 for(int j = 2; j < header.length; j++) {   //means and errors are in pair, so just get the word before _
                     if(header[j] != null) {
+                        Stock stock = stocks.findOnlyOneByLocalName(header[1], traitsAndMeans.get(header[1]).get(i));    //???
+                        stockId = stock.getId();      //germPlasmId
                         experimentValues = createExperimentValues(newDataset,
                                 traitsAndMeans.get(header[j]).get(i), ndLocationId, stockId);
                         studyDataManagerV2.addExperiment(newDataset.getId(), ExperimentType.AVERAGE, experimentValues);
