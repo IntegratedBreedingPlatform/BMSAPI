@@ -64,20 +64,25 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             for(int i = 2; i < header.length; i += 2) {   //means and errors are in pair, so just get the word before _
                 String root = header[i] != null ? header[i].split("_")[0] : "";
                 if(!"".equals(root)) {
+                    //Means
                     mat50VariableType = variableTypeListVariates.findByLocalName(root);
                     VariableType mat50MeansVariableType = cloner.deepClone(mat50VariableType);
                     mat50MeansVariableType.setLocalName(root + "_Means");
-                    //String definition = mat50MeansVariableType.getStandardVariable().getMethod().getDefinition();
-                    //Term term = ontologyDataManagerV2.addMethod("LS MEAN", definition);
-                    Term term = ontologyDataManagerV2.getTermById(16090);
+                    Term term = ontologyDataManagerV2.findMethodByName("LS MEAN");
+                    if(term == null) {
+                        String definitionMeans = mat50MeansVariableType.getStandardVariable().getMethod().getDefinition();
+                        term = ontologyDataManagerV2.addMethod("LS MEAN", definitionMeans);
+                    }
                     mat50MeansVariableType.getStandardVariable().setMethod(term);
                     variableTypeList.add(mat50MeansVariableType);
-
+                    //Unit Errors
                     mat50UnitErrorsVariableType = cloner.deepClone(mat50VariableType);
                     mat50UnitErrorsVariableType.setLocalName(root + "_UnitErrors");
-                    //definition = mat50UnitErrorsVariableType.getStandardVariable().getMethod().getDefinition();
-                    //term = ontologyDataManagerV2.addMethod("ERROR ESTIMATE", definition);
-                    term = ontologyDataManagerV2.getTermById(16095);
+                    term = ontologyDataManagerV2.findMethodByName("ERROR ESTIMATE");
+                    if(term == null) {
+                        String definitionUErrors = mat50UnitErrorsVariableType.getStandardVariable().getMethod().getDefinition();
+                        term = ontologyDataManagerV2.addMethod("ERROR ESTIMATE", definitionUErrors);
+                    }
                     mat50UnitErrorsVariableType.getStandardVariable().setMethod(term);  //correct method for setting term?????
                     variableTypeList.add(mat50UnitErrorsVariableType);
                 }
