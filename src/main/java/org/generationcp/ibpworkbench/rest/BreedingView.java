@@ -61,7 +61,12 @@ public class BreedingView {
             }
             if(studyId == null || studyId.isEmpty()) {
                 errors.add("StudyId is a required field!");
+            } else {
+                if(Integer.parseInt(studyId) > 0) {
+                    errors.add("StudyId must a be a negative value!");
+                }
             }
+
             if(inputDataSetId == null || inputDataSetId.isEmpty()) {
                 errors.add("InputDataSetId is a required field!");
             }
