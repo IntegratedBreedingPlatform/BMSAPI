@@ -74,6 +74,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                         term = ontologyDataManagerV2.addMethod("LS MEAN", definitionMeans);
                     }
                     mat50MeansVariableType.getStandardVariable().setMethod(term);
+                    variableTypeList.makeRoom(1);
+                    mat50MeansVariableType.setRank(1);
                     variableTypeList.add(mat50MeansVariableType);
                     //Unit Errors
                     mat50UnitErrorsVariableType = cloner.deepClone(mat50VariableType);
@@ -84,6 +86,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                         term = ontologyDataManagerV2.addMethod("ERROR ESTIMATE", definitionUErrors);
                     }
                     mat50UnitErrorsVariableType.getStandardVariable().setMethod(term);  //correct method for setting term?????
+                    variableTypeList.makeRoom(1);
+                    mat50UnitErrorsVariableType.setRank(1);
                     variableTypeList.add(mat50UnitErrorsVariableType);
                 }
             }
@@ -93,16 +97,22 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             //please make sure that the study name is unique and does not exist in the db.
             VariableList variableList = new VariableList();
             Variable variable = createVariable(TermId.DATASET_NAME.getId(), fileName + "_" + workbenchProjectId + "_" + studyId , 1);
+            variableTypeList.makeRoom(1);
+            variable.getVariableType().setRank(1);
             variableTypeList.add(variable.getVariableType());
             updateVariableType(variable.getVariableType(), fileName + "_" + workbenchProjectId + "_" + studyId, "Dataset name (local)");
             variableList.add(variable);
 
             variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", 2);
+            variableTypeList.makeRoom(1);
+            variable.getVariableType().setRank(1);
             variableTypeList.add(variable.getVariableType());
             updateVariableType(variable.getVariableType(), "DATASET_TITLE", "Dataset title (local)");
             variableList.add(variable);
 
             variable = createVariable(TermId.DATASET_TYPE.getId(), "10070", 3);
+            variableTypeList.makeRoom(1);
+            variable.getVariableType().setRank(1);
             variableTypeList.add(variable.getVariableType());
             updateVariableType(variable.getVariableType(), "DATASET_TYPE", "Dataset type (local)");
             variableList.add(variable);
