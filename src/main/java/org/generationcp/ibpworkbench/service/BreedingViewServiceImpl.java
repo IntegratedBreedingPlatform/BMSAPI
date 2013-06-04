@@ -118,11 +118,20 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             variableList.add(variable);
             DatasetValues datasetValues = new DatasetValues();
             datasetValues.setVariables(variableList);
-            DatasetReference datasetReference = studyDataManagerV2.addDataSet(studyId, variableTypeList, datasetValues);
-
-            //save data
-            //get dataset using new datasetid
-            DataSet newDataset = studyDataManagerV2.getDataSet(datasetReference.getId());
+            
+            DataSet newDataset = null;
+            if (params.get(WebAPIConstants.OUTPUT_DATASET_ID.getParamValue()) != "" || params.get(WebAPIConstants.OUTPUT_DATASET_ID.getParamValue()) != null){
+            	newDataset = studyDataManagerV2.getDataSet(Integer.parseInt(params.get(WebAPIConstants.OUTPUT_DATASET_ID.getParamValue())));
+            }
+            
+            DatasetReference datasetReference = null;
+            if (newDataset == null){
+            	//save data
+                //get dataset using new datasetid
+            	datasetReference = studyDataManagerV2.addDataSet(studyId, variableTypeList, datasetValues);
+            	newDataset = studyDataManagerV2.getDataSet(datasetReference.getId());
+            }
+            
             ExperimentValues experimentValues = null;
             ArrayList<String> environments = traitsAndMeans.get(header[0]);
             for(int i = 0; i < environments.size(); i++) {
