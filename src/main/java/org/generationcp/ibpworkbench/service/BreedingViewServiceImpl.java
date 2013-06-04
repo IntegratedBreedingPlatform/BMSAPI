@@ -139,7 +139,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                     if(header[j] != null) {
                         Stock stock = stocks.findOnlyOneByLocalName(header[1], traitsAndMeans.get(header[1]).get(i));    //???
                         stockId = stock.getId();      //germPlasmId
-                        experimentValues = createExperimentValues(newDataset,
+                        experimentValues = createExperimentValues(newDataset, header[j],
                                 traitsAndMeans.get(header[j]).get(i), ndLocationId, stockId);
                         studyDataManagerV2.addExperiment(newDataset.getId(), ExperimentType.AVERAGE, experimentValues);
                     }
@@ -151,12 +151,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
         }
     }
 
-    private ExperimentValues createExperimentValues(DataSet newDataset, String cellValue, int locationId, int stockId) {
+    private ExperimentValues createExperimentValues(DataSet newDataset, String variateHeader, String cellValue, int locationId, int stockId) {
         ExperimentValues experimentValues = new ExperimentValues();
         experimentValues.setLocationId(locationId);
         experimentValues.setGermplasmId(stockId);
         VariableTypeList newVariableTypeList = newDataset.getVariableTypes();
-        VariableType variableType = newVariableTypeList.findByLocalName("MAT50_Means");
+        VariableType variableType = newVariableTypeList.findByLocalName(variateHeader);
         List<Variable> varList = new ArrayList<Variable>();
         Variable variable = new Variable(variableType, cellValue);
         varList.add(variable);
