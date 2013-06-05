@@ -138,10 +138,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                 for(int j = 2; j < header.length; j++) {   //means and errors are in pair, so just get the word before _
                     if(header[j] != null) {
                         Stock stock = stocks.findOnlyOneByLocalName(header[1], traitsAndMeans.get(header[1]).get(i));    //???
-                        stockId = stock.getId();      //germPlasmId
-                        experimentValues = createExperimentValues(newDataset, header[j],
-                                traitsAndMeans.get(header[j]).get(i), ndLocationId, stockId);
-                        studyDataManagerV2.addExperiment(newDataset.getId(), ExperimentType.AVERAGE, experimentValues);
+                        if (stock != null) {
+	                        stockId = stock.getId();      //germPlasmId
+	                        experimentValues = createExperimentValues(newDataset, header[j],
+	                                traitsAndMeans.get(header[j]).get(i), ndLocationId, stockId);
+	                        studyDataManagerV2.addExperiment(newDataset.getId(), ExperimentType.AVERAGE, experimentValues);
+                        }
                     }
                 }
             }
