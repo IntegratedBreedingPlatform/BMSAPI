@@ -61,80 +61,81 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             VariableTypeList variableTypeList = dataSet.getVariableTypes();
             //get variates only
             VariableTypeList variableTypeListVariates = variableTypeList.getVariates();
-            VariableType mat50VariableType = null;
-            VariableType mat50UnitErrorsVariableType = null;
+            VariableType originalVariableType = null;
+            VariableType meansVariableType = null;
+            VariableType unitErrorsVariableType = null;
             
             Integer numOfFactorsAndVariates = variableTypeList.getFactors().getVariableTypes().size()+variableTypeList.getVariates().getVariableTypes().size()+1;
             for(int i = 2; i < header.length; i += 2) {   //means and errors are in pair, so just get the word before _
                 String root = header[i] != null ? header[i].split("_")[0] : "";
                 if(!"".equals(root)) {
                     //Means
-                    mat50VariableType = variableTypeListVariates.findByLocalName(root);
-                    VariableType mat50MeansVariableType = cloner.deepClone(mat50VariableType);
-                    mat50MeansVariableType.setLocalName(root + "_Means");
+                    originalVariableType = variableTypeListVariates.findByLocalName(root);
+                    meansVariableType = cloner.deepClone(originalVariableType);
+                    meansVariableType.setLocalName(root + "_Means");
                     Term termLSMean = ontologyDataManagerV2.findMethodByName("LS MEAN");
                     if(termLSMean == null) {
-                        String definitionMeans = mat50MeansVariableType.getStandardVariable().getMethod().getDefinition();
+                        String definitionMeans = meansVariableType.getStandardVariable().getMethod().getDefinition();
                         termLSMean = ontologyDataManagerV2.addMethod("LS MEAN", definitionMeans);
                     }
                     
                     Integer stdVariableId = ontologyDataManagerV2.getStandadardVariableIdByPropertyScaleMethod(
-                    		mat50MeansVariableType.getStandardVariable().getProperty().getId()
-                    		,mat50MeansVariableType.getStandardVariable().getScale().getId()
+                            meansVariableType.getStandardVariable().getProperty().getId()
+                    		,meansVariableType.getStandardVariable().getScale().getId()
                     		,termLSMean.getId()
                     		);
                     
                     if (stdVariableId == null){
                     	StandardVariable stdVariable = new StandardVariable();
-                        stdVariable = cloner.deepClone(mat50MeansVariableType.getStandardVariable());
+                        stdVariable = cloner.deepClone(meansVariableType.getStandardVariable());
                         stdVariable.setId(0);
-                        stdVariable.setName(mat50MeansVariableType.getLocalName());
+                        stdVariable.setName(meansVariableType.getLocalName());
                         stdVariable.setMethod(termLSMean);
                         
                         ontologyDataManagerV2.addStandardVariable(stdVariable);
-                        mat50MeansVariableType.setStandardVariable(stdVariable);
+                        meansVariableType.setStandardVariable(stdVariable);
                     	
                     }else{
-                    	mat50MeansVariableType.setStandardVariable(ontologyDataManagerV2.getStandardVariable(stdVariableId));
+                        meansVariableType.setStandardVariable(ontologyDataManagerV2.getStandardVariable(stdVariableId));
                     }
                     
                     variableTypeList.makeRoom(numOfFactorsAndVariates);
-                    mat50MeansVariableType.setRank(numOfFactorsAndVariates);
-                    variableTypeList.add(mat50MeansVariableType);
+                    meansVariableType.setRank(numOfFactorsAndVariates);
+                    variableTypeList.add(meansVariableType);
                     
                     stdVariableId = null;
                     //Unit Errors
-                    mat50UnitErrorsVariableType = cloner.deepClone(mat50VariableType);
-                    mat50UnitErrorsVariableType.setLocalName(root + "_UnitErrors");
+                    unitErrorsVariableType = cloner.deepClone(originalVariableType);
+                    unitErrorsVariableType.setLocalName(root + "_UnitErrors");
                     Term termErrorEstimate = ontologyDataManagerV2.findMethodByName("ERROR ESTIMATE");
                     if(termErrorEstimate == null) {
-                        String definitionUErrors = mat50UnitErrorsVariableType.getStandardVariable().getMethod().getDefinition();
+                        String definitionUErrors = unitErrorsVariableType.getStandardVariable().getMethod().getDefinition();
                         termErrorEstimate = ontologyDataManagerV2.addMethod("ERROR ESTIMATE", definitionUErrors);
                     }
                     
                      stdVariableId = ontologyDataManagerV2.getStandadardVariableIdByPropertyScaleMethod(
-                    		 mat50UnitErrorsVariableType.getStandardVariable().getProperty().getId()
-                    		,mat50UnitErrorsVariableType.getStandardVariable().getScale().getId()
+                             unitErrorsVariableType.getStandardVariable().getProperty().getId()
+                    		,unitErrorsVariableType.getStandardVariable().getScale().getId()
                     		,termErrorEstimate.getId()
                     		);
                     
                     if (stdVariableId == null){
                     	StandardVariable stdVariable = new StandardVariable();
-                        stdVariable = cloner.deepClone(mat50UnitErrorsVariableType.getStandardVariable());
+                        stdVariable = cloner.deepClone(unitErrorsVariableType.getStandardVariable());
                         stdVariable.setId(0);
-                        stdVariable.setName(mat50UnitErrorsVariableType.getLocalName());
+                        stdVariable.setName(unitErrorsVariableType.getLocalName());
                         stdVariable.setMethod(termErrorEstimate);
                         
                         ontologyDataManagerV2.addStandardVariable(stdVariable);
-                        mat50UnitErrorsVariableType.setStandardVariable(stdVariable);
+                        unitErrorsVariableType.setStandardVariable(stdVariable);
                     	
                     }else{
-                    	mat50UnitErrorsVariableType.setStandardVariable(ontologyDataManagerV2.getStandardVariable(stdVariableId));
+                        unitErrorsVariableType.setStandardVariable(ontologyDataManagerV2.getStandardVariable(stdVariableId));
                     }
                    
                     variableTypeList.makeRoom(numOfFactorsAndVariates);
-                    mat50UnitErrorsVariableType.setRank(numOfFactorsAndVariates);
-                    variableTypeList.add(mat50UnitErrorsVariableType);
+                    unitErrorsVariableType.setRank(numOfFactorsAndVariates);
+                    variableTypeList.add(unitErrorsVariableType);
                 }
             }
 
