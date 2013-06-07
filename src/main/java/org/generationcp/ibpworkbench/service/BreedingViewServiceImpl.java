@@ -224,21 +224,22 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             for(int i = 0; i < environments.size(); i++) {
                
             	Stock stock = stocks.findOnlyOneByLocalName(csvHeader[1], traitsAndMeans.get(csvHeader[1]).get(i));
-            	ExperimentValues experimentRow = new ExperimentValues();
-            	experimentRow.setGermplasmId(stock.getId());
-            	experimentRow.setLocationId(ndLocationId);
-            		
-	            	List<Variable> list = new ArrayList<Variable>();
-	                for(int j = 2; j < csvHeader.length; j++) {
-	                	Variable var = new Variable( meansDataSet.getVariableTypes().findByLocalName(csvHeader[j]), traitsAndMeans.get(csvHeader[j]).get(i));
-	                	list.add(var);
-	                }
-	            VariableList variableList1 = new VariableList();
-	            variableList1.setVariables(list);
-                experimentRow.setVariableList(variableList1);
-                
-                
-                studyDataManagerV2.addExperiment(meansDataSet.getId(), ExperimentType.AVERAGE, experimentRow);
+            	if (stock != null){
+	            	ExperimentValues experimentRow = new ExperimentValues();
+	            	experimentRow.setGermplasmId(stock.getId());
+	            	experimentRow.setLocationId(ndLocationId);
+	            		
+		            	List<Variable> list = new ArrayList<Variable>();
+		                for(int j = 2; j < csvHeader.length; j++) {
+		                	Variable var = new Variable( meansDataSet.getVariableTypes().findByLocalName(csvHeader[j]), traitsAndMeans.get(csvHeader[j]).get(i));
+		                	list.add(var);
+		                }
+		            VariableList variableList1 = new VariableList();
+		            variableList1.setVariables(list);
+	                experimentRow.setVariableList(variableList1);
+	                
+	                studyDataManagerV2.addExperiment(meansDataSet.getId(), ExperimentType.AVERAGE, experimentRow);
+            	}
             }
 
         } else {
