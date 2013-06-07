@@ -82,14 +82,13 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             VariableTypeList variableTypeList = new VariableTypeList();
             
             //Get only the trial environment and germplasm factors
-            int factorCount = dataSet.getVariableTypes().getFactors().getVariableTypes().size();
+            
             for (VariableType factorFromDataSet : dataSet.getVariableTypes().getFactors().getVariableTypes()){
             	if (factorFromDataSet.getStandardVariable().getFactorType() == FactorType.TRIAL_ENVIRONMENT
             			|| factorFromDataSet.getStandardVariable().getFactorType() == FactorType.GERMPLASM) {
-            		variableTypeList.makeRoom(factorCount);
-            		factorFromDataSet.setRank(factorCount);
+            		variableTypeList.makeRoom(1);
+            		factorFromDataSet.setRank(1);
             		variableTypeList.add(factorFromDataSet);
-            		factorCount--;
             	}
             }
             //get variates only
