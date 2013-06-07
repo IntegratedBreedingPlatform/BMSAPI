@@ -1,20 +1,36 @@
 package org.generationcp.ibpworkbench.service;
 
-import au.com.bytecode.opencsv.CSVReader;
-import com.rits.cloning.Cloner;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import org.generationcp.ibpworkbench.constants.WebAPIConstants;
-import org.generationcp.ibpworkbench.model.TraitsAndMeans;
-import org.generationcp.ibpworkbench.util.TraitsAndMeansCSVUtil;
 import org.generationcp.ibpworkbench.util.TraitsAndMeansCSVUtil2;
-import org.generationcp.middleware.v2.domain.*;
-import org.generationcp.middleware.v2.domain.saver.StandardVariableSaver;
+import org.generationcp.middleware.v2.domain.DataSet;
+import org.generationcp.middleware.v2.domain.DatasetReference;
+import org.generationcp.middleware.v2.domain.DatasetValues;
+import org.generationcp.middleware.v2.domain.ExperimentType;
+import org.generationcp.middleware.v2.domain.ExperimentValues;
+import org.generationcp.middleware.v2.domain.FactorType;
+import org.generationcp.middleware.v2.domain.StandardVariable;
+import org.generationcp.middleware.v2.domain.Stock;
+import org.generationcp.middleware.v2.domain.Stocks;
+import org.generationcp.middleware.v2.domain.Term;
+import org.generationcp.middleware.v2.domain.TermId;
+import org.generationcp.middleware.v2.domain.TrialEnvironment;
+import org.generationcp.middleware.v2.domain.TrialEnvironments;
+import org.generationcp.middleware.v2.domain.Variable;
+import org.generationcp.middleware.v2.domain.VariableList;
+import org.generationcp.middleware.v2.domain.VariableType;
+import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.v2.manager.StudyDataManagerImpl;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.File;
-import java.util.*;
+import com.rits.cloning.Cloner;
 
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
@@ -47,7 +63,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
         System.out.println("Traits and Means: " + traitsAndMeans);
 
         int ndLocationId;
-        int stockId;
 
         //call middleware api and save
         if(!traitsAndMeans.isEmpty()) {

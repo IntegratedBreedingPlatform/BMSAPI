@@ -13,7 +13,7 @@ package org.generationcp.ibpworkbench.constants;
  *******************************************************************************/
 
 public enum WebAPIConstants {
-    FILENAME("Filename"),
+    FILENAME("outfile"),
     STUDY_ID("StudyId"),
     WORKBENCH_PROJECT_ID("WorkbenchProjectId"),
     INPUT_DATASET_ID("InputDataSetId"),
