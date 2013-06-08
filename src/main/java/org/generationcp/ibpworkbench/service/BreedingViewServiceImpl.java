@@ -252,19 +252,22 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	            	experimentRow.setLocationId(ndLocationId);
 	            		
 		            	List<Variable> list = new ArrayList<Variable>();
-		                for(int j = 2; j < csvHeader.length; j++) {
+		            	Boolean variateHasValue = false;
+		                for(int j = 4; j < csvHeader.length; j++) {
 		                	if (meansDataSetExists){
 		                		if (meansDataSet.getVariableTypes().getVariates().findByLocalName(csvHeader[j]) == null) continue;
 		                	}
 		                	
-		                	Variable var = new Variable( meansDataSet.getVariableTypes().findByLocalName(csvHeader[j]), traitsAndMeans.get(csvHeader[j]).get(i));
+		                	String variableValue = traitsAndMeans.get(csvHeader[j]).get(i).trim();
+		                	if (!variableValue.trim().isEmpty()) variateHasValue = true;
+		                	Variable var = new Variable( meansDataSet.getVariableTypes().findByLocalName(csvHeader[j]), variableValue);
 		                	list.add(var);
 		                }
 		            VariableList variableList1 = new VariableList();
 		            variableList1.setVariables(list);
 	                experimentRow.setVariableList(variableList1);
-	                
-	                studyDataManagerV2.addExperiment(meansDataSet.getId(), ExperimentType.AVERAGE, experimentRow);
+	                if (variateHasValue) studyDataManagerV2.addExperiment(meansDataSet.getId(), ExperimentType.AVERAGE, experimentRow);
+	               
             	}
             }
 
