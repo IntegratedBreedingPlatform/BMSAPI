@@ -83,12 +83,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                     }
             		
             		if (meansDataSet != null) {
-	            		if (this.checkColumnsChanged(csvHeader, meansDataSet)){
-	            				studyDataManagerV2.deleteDataSet(meansDataSet.getId());
-	            				meansDataSet = null;
-	            		}else{
+	            		//if (this.checkColumnsChanged(csvHeader, meansDataSet)){
+	            		//		studyDataManagerV2.deleteDataSet(meansDataSet.getId());
+	            		//		meansDataSet = null;
+	            		//}else{
 	            			meansDataSetExists = true;
-	            		}
+	            		//}
 	            		
 	            	}
             	}
@@ -253,6 +253,10 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	            		
 		            	List<Variable> list = new ArrayList<Variable>();
 		                for(int j = 2; j < csvHeader.length; j++) {
+		                	if (meansDataSetExists){
+		                		if (meansDataSet.getVariableTypes().getVariates().findByLocalName(csvHeader[j]) == null) continue;
+		                	}
+		                	
 		                	Variable var = new Variable( meansDataSet.getVariableTypes().findByLocalName(csvHeader[j]), traitsAndMeans.get(csvHeader[j]).get(i));
 		                	list.add(var);
 		                }
