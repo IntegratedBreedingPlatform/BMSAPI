@@ -10,6 +10,7 @@ import java.util.Map;
 import org.generationcp.ibpworkbench.constants.WebAPIConstants;
 import org.generationcp.ibpworkbench.util.TraitsAndMeansCSVUtil2;
 import org.generationcp.middleware.v2.domain.DataSet;
+import org.generationcp.middleware.v2.domain.DataSetType;
 import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.DatasetValues;
 import org.generationcp.middleware.v2.domain.ExperimentType;
@@ -67,25 +68,31 @@ public class BreedingViewServiceImpl implements BreedingViewService {
         //call middleware api and save
         if(!traitsAndMeans.isEmpty()) {
         	DataSet meansDataSet = null;
-            String[] csvHeader = traitsAndMeans.keySet().toArray(new String[0]) ;         //csv header
-            
-           
-            if (params.get(WebAPIConstants.OUTPUT_DATASET_ID.getParamValue()) != "" || params.get(WebAPIConstants.OUTPUT_DATASET_ID.getParamValue()) != null){
-            	meansDataSet = studyDataManagerV2.getDataSet(Integer.parseInt(params.get(WebAPIConstants.OUTPUT_DATASET_ID.getParamValue())));
-            	if (meansDataSet != null) {
-            		
-            		if (this.checkColumnsChanged(csvHeader, meansDataSet)){
-            				studyDataManagerV2.deleteDataSet(meansDataSet.getId());
-            				meansDataSet = null;
-            		}else{
-            			meansDataSetExists = true;
-            		}
-            		
-            	}
-            }
-            
-           
+            String[] csvHeader = traitsAndMeans.keySet().toArray(new String[0]) ;  //csv header
+            int studyId = Integer.valueOf(params.get(WebAPIConstants.STUDY_ID.getParamValue()));
+            int outputDataSetId = Integer.valueOf(params.get(WebAPIConstants.OUTPUT_DATASET_ID.getParamValue()));
             int inputDatasetId = Integer.valueOf(params.get(WebAPIConstants.INPUT_DATASET_ID.getParamValue()));
+            
+            	
+            	List<DataSet> ds = studyDataManagerV2.getDataSetsByType(studyId, DataSetType.MEANS_DATA);
+            	if (ds != null){
+            		if (ds.size() > 0){
+            			meansDataSet = ds.get(0);
+            		}else if (outputDataSetId != 0){
+                    	meansDataSet = studyDataManagerV2.getDataSet(outputDataSetId);
+                    }
+            		
+            		if (meansDataSet != null) {
+	            		if (this.checkColumnsChanged(csvHeader, meansDataSet)){
+	            				studyDataManagerV2.deleteDataSet(meansDataSet.getId());
+	            				meansDataSet = null;
+	            		}else{
+	            			meansDataSetExists = true;
+	            		}
+	            		
+	            	}
+            	}
+            	
             
             TrialEnvironments trialEnvironments = studyDataManagerV2.getTrialEnvironmentsInDataset(inputDatasetId);
             //environment, env value
@@ -113,7 +120,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             VariableType unitErrorsVariableType = null;
             
             Integer numOfFactorsAndVariates = variableTypeList.getFactors().getVariableTypes().size()+variableTypeList.getVariates().getVariableTypes().size()+1;
-            for(int i = 2; i < csvHeader.length; i += 2) {   //means and errors are in pair, so just get the word before _
+            for(int i = 4; i < csvHeader.length; i += 2) {   //means and errors are in pair, so just get the word before _
                 String root = csvHeader[i] != null ? csvHeader[i].split("_")[0] : "";
                 if(!"".equals(root)) {
                     //Means
@@ -186,7 +193,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                 }
             }
 
-            int studyId = Integer.valueOf(params.get(WebAPIConstants.STUDY_ID.getParamValue()));
+            
 
             fileName = new File(fileName).getName();
             //please make sure that the study name is unique and does not exist in the db.
@@ -238,7 +245,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             ArrayList<String> environments = traitsAndMeans.get(csvHeader[0]);
             for(int i = 0; i < environments.size(); i++) {
                
-            	Stock stock = stocks.findOnlyOneByLocalName(csvHeader[1], traitsAndMeans.get(csvHeader[1]).get(i));
+            	Stock stock = stocks.findOnlyOneByLocalName(csvHeader[2], traitsAndMeans.get(csvHeader[2]).get(i));
             	if (stock != null){
 	            	ExperimentValues experimentRow = new ExperimentValues();
 	            	experimentRow.setGermplasmId(stock.getId());
@@ -262,20 +269,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
         }
     }
 
-    private ExperimentValues createExperimentValues(DataSet newDataset, String variateHeader, String cellValue, int locationId, int stockId) {
-        ExperimentValues experimentValues = new ExperimentValues();
-        experimentValues.setLocationId(locationId);
-        experimentValues.setGermplasmId(stockId);
-        VariableTypeList newVariableTypeList = newDataset.getVariableTypes();
-        VariableType variableType = newVariableTypeList.findByLocalName(variateHeader);
-        List<Variable> varList = new ArrayList<Variable>();
-        Variable variable = new Variable(variableType, cellValue);
-        varList.add(variable);
-        VariableList list = new VariableList();
-        list.setVariables(varList);
-        experimentValues.setVariableList(list);
-        return experimentValues;
-    }
 
     private Variable createVariable(int termId, String value, int rank) throws Exception {
         StandardVariable stVar = ontologyDataManagerV2.getStandardVariable(termId);
@@ -300,7 +293,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
         for (int i=0; i<csvHeaderTemp.length; ++i)
         	csvHeaderTemp[i] = csvHeaderTemp[i].toLowerCase();
        
-    	List<String> header1 = Arrays.asList(Arrays.copyOfRange(csvHeaderTemp, 2, csvHeaderTemp.length));
+    	List<String> header1 = Arrays.asList(Arrays.copyOfRange(csvHeaderTemp, 4, csvHeaderTemp.length));
     	List<String> header2 = new ArrayList<String>();
     	for (VariableType var : ds.getVariableTypes().getVariates().getVariableTypes()){
     		header2.add(var.getLocalName().toLowerCase());
@@ -311,4 +304,10 @@ public class BreedingViewServiceImpl implements BreedingViewService {
     	return !header2.equals(header1);
     	
     }
+
+	
+	public void deleteDataSet(Integer dataSetId) throws Exception {
+		// TODO Auto-generated method stub
+		studyDataManagerV2.deleteDataSet(dataSetId);
+	}
 }

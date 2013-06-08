@@ -17,4 +17,5 @@ import java.util.Map;
 
 public interface BreedingViewService {
     public void execute(Map<String, String> params, List<String> errors) throws Exception;
+    public void deleteDataSet(Integer dataSetId) throws Exception;
 }

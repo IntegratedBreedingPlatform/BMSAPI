@@ -44,7 +44,7 @@ public class BreedingView {
     @GET
     @Path("/ssa/save_result")
     @Produces(MediaType.TEXT_XML)
-    public DataResponse saveSsaResult(@QueryParam("Filename") String fileName,
+    public DataResponse saveSsaResult(@QueryParam("outfile") String fileName,
                                       @QueryParam("WorkbenchProjectId") String workbenchProjectId,
                                       @QueryParam("StudyId") String studyId,
                                       @QueryParam("InputDataSetId") String inputDataSetId,
@@ -92,6 +92,21 @@ public class BreedingView {
         return response;
     }
 
+    @GET
+    @Path("/ssa/delete_dataset")
+    @Produces(MediaType.TEXT_XML)
+    public DataResponse deleteDataSet(@QueryParam("dataSetId") Integer dataSetId) {
+    	try {
+			breedingViewService.deleteDataSet(dataSetId);
+			 return new DataResponse(true, "Successfully deleted the dataset");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new DataResponse(false, "Dataset not deleted: " + e.toString());
+		}
+       
+    }
+    
     @GET
     @Path("/test")
     @Produces("text/plain")
