@@ -120,7 +120,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             VariableType unitErrorsVariableType = null;
             
             Integer numOfFactorsAndVariates = variableTypeList.getFactors().getVariableTypes().size()+variableTypeList.getVariates().getVariableTypes().size()+1;
-            for(int i = 4; i < csvHeader.length; i += 2) {   //means and errors are in pair, so just get the word before _
+            for(int i = 3; i < csvHeader.length; i += 2) {   //means and errors are in pair, so just get the word before _
                 String root = csvHeader[i] != null ? csvHeader[i].split("_")[0] : "";
                 if(!"".equals(root)) {
                     //Means
@@ -245,7 +245,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             ArrayList<String> environments = traitsAndMeans.get(csvHeader[0]);
             for(int i = 0; i < environments.size(); i++) {
                
-            	Stock stock = stocks.findOnlyOneByLocalName(csvHeader[2], traitsAndMeans.get(csvHeader[2]).get(i));
+            	Stock stock = stocks.findOnlyOneByLocalName(csvHeader[1], traitsAndMeans.get(csvHeader[1]).get(i));
             	if (stock != null){
 	            	ExperimentValues experimentRow = new ExperimentValues();
 	            	experimentRow.setGermplasmId(stock.getId());
@@ -253,7 +253,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	            		
 		            	List<Variable> list = new ArrayList<Variable>();
 		            	Boolean variateHasValue = false;
-		                for(int j = 4; j < csvHeader.length; j++) {
+		                for(int j = 3; j < csvHeader.length; j++) {
 		                	if (meansDataSetExists){
 		                		if (meansDataSet.getVariableTypes().getVariates().findByLocalName(csvHeader[j]) == null) continue;
 		                	}
