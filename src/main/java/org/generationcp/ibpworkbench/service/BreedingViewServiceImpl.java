@@ -259,9 +259,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 		                	}
 		                	
 		                	String variableValue = traitsAndMeans.get(csvHeader[j]).get(i).trim();
-		                	if (!variableValue.trim().isEmpty()) variateHasValue = true;
-		                	Variable var = new Variable( meansDataSet.getVariableTypes().findByLocalName(csvHeader[j]), variableValue);
-		                	list.add(var);
+		                	if (!variableValue.trim().isEmpty()) {
+		                		variateHasValue = true;
+		                		Variable var = new Variable( meansDataSet.getVariableTypes().findByLocalName(csvHeader[j]), variableValue);
+			                	list.add(var);
+		                	}
+		                	
 		                }
 		            VariableList variableList1 = new VariableList();
 		            variableList1.setVariables(list);
