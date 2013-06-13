@@ -121,7 +121,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             
             Integer numOfFactorsAndVariates = variableTypeList.getFactors().getVariableTypes().size()+variableTypeList.getVariates().getVariableTypes().size()+1;
             for(int i = 3; i < csvHeader.length; i += 2) {   //means and errors are in pair, so just get the word before _
-                String root = csvHeader[i] != null ? csvHeader[i].split("_")[0] : "";
+                String root = csvHeader[i] != null ? csvHeader[i].substring(0, csvHeader[i].lastIndexOf("_")) : "";
                 if(!"".equals(root)) {
                     //Means
                     originalVariableType = variableTypeListVariates.findByLocalName(root);
