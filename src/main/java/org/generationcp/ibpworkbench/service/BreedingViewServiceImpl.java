@@ -4,11 +4,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.generationcp.ibpworkbench.constants.WebAPIConstants;
 import org.generationcp.ibpworkbench.util.TraitsAndMeansCSVUtil2;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DataSetType;
 import org.generationcp.middleware.v2.domain.DatasetReference;
@@ -83,12 +85,9 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                     }
             		
             		if (meansDataSet != null) {
-	            		//if (this.checkColumnsChanged(csvHeader, meansDataSet)){
-	            		//		studyDataManagerV2.deleteDataSet(meansDataSet.getId());
-	            		//		meansDataSet = null;
-	            		//}else{
-	            			meansDataSetExists = true;
-	            		//}
+	            		
+            			meansDataSet = additionalVariableTypes(csvHeader ,studyDataManagerV2.getDataSet(inputDatasetId), meansDataSet );
+            			meansDataSetExists = true;
 	            		
 	            	}
             	}
@@ -297,21 +296,116 @@ public class BreedingViewServiceImpl implements BreedingViewService {
         type.setLocalDescription(description);
     }
     
-    private boolean checkColumnsChanged(String[] csvHeader, DataSet ds){
+ private DataSet additionalVariableTypes(String[] csvHeader,DataSet inputDataSet,DataSet meansDataSet) throws MiddlewareQueryException{
     	
-    	String[] csvHeaderTemp = Arrays.copyOf(csvHeader, csvHeader.length);
-        for (int i=0; i<csvHeaderTemp.length; ++i)
-        	csvHeaderTemp[i] = csvHeaderTemp[i].toLowerCase();
-       
-    	List<String> header1 = Arrays.asList(Arrays.copyOfRange(csvHeaderTemp, 4, csvHeaderTemp.length));
-    	List<String> header2 = new ArrayList<String>();
-    	for (VariableType var : ds.getVariableTypes().getVariates().getVariableTypes()){
-    		header2.add(var.getLocalName().toLowerCase());
+    	List<Integer> numericTypes = new ArrayList<Integer>();
+        numericTypes.add(TermId.NUMERIC_VARIABLE.getId());
+        numericTypes.add(TermId.MIN_VALUE.getId());
+        numericTypes.add(TermId.MAX_VALUE.getId());
+        numericTypes.add(TermId.DATE_VARIABLE.getId());
+        numericTypes.add(TermId.NUMERIC_DBID_VARIABLE.getId());
+    	
+        int rank = meansDataSet.getVariableTypes().getVariableTypes().get(meansDataSet.getVariableTypes().getVariableTypes().size()-1).getRank()+1;
+        
+    	List<String> inputDataSetVariateNames = new ArrayList<String>( Arrays.asList(Arrays.copyOfRange(csvHeader, 3, csvHeader.length)));
+    	List<String> meansDataSetVariateNames = new ArrayList<String>();
+    	
+    	Iterator<String> iterator = inputDataSetVariateNames.iterator();
+    	while (iterator.hasNext()){
+    		 if (iterator.next().contains("_UnitErrors")) iterator.remove();
     	}
-    	Collections.sort(header1);
-    	Collections.sort(header2);
     	
-    	return !header2.equals(header1);
+    	for (VariableType var : meansDataSet.getVariableTypes().getVariates().getVariableTypes()){
+    		if (!var.getStandardVariable().getMethod().getName().equalsIgnoreCase("error estimate"))
+    			meansDataSetVariateNames.add(var.getLocalName().trim());
+    	}
+    	
+    	if (meansDataSetVariateNames.size() < inputDataSetVariateNames.size()){
+    		
+    		inputDataSetVariateNames.removeAll(meansDataSetVariateNames);
+    		
+    		for (String variateName : inputDataSetVariateNames){
+    			 String root = variateName.substring(0, variateName.lastIndexOf("_"));
+                 if(!"".equals(root)) {
+                     
+                     VariableType meansVariableType = cloner.deepClone(inputDataSet.getVariableTypes().findByLocalName(root));
+                     meansVariableType.setLocalName(root + "_Means");
+                     Term termLSMean = ontologyDataManagerV2.findMethodByName("LS MEAN");
+                     if(termLSMean == null) {
+                         String definitionMeans = meansVariableType.getStandardVariable().getMethod().getDefinition();
+                         termLSMean = ontologyDataManagerV2.addMethod("LS MEAN", definitionMeans);
+                     }
+                     
+                     Integer stdVariableId = ontologyDataManagerV2.getStandadardVariableIdByPropertyScaleMethod(
+                             meansVariableType.getStandardVariable().getProperty().getId()
+                     		,meansVariableType.getStandardVariable().getScale().getId()
+                     		,termLSMean.getId()
+                     		);
+                     
+                     if (stdVariableId == null){
+                     	StandardVariable stdVariable = new StandardVariable();
+                         stdVariable = cloner.deepClone(meansVariableType.getStandardVariable());
+                         stdVariable.setId(0);
+                         stdVariable.setName(meansVariableType.getLocalName());
+                         stdVariable.setMethod(termLSMean);
+                         
+                         ontologyDataManagerV2.addStandardVariable(stdVariable);
+                         meansVariableType.setStandardVariable(stdVariable);
+                     	
+                     }else{
+                         meansVariableType.setStandardVariable(ontologyDataManagerV2.getStandardVariable(stdVariableId));
+                     }
+                     
+                    
+                     meansVariableType.setRank(rank);
+                     try{ studyDataManagerV2.addDataSetVariableType(meansDataSet.getId(), meansVariableType); rank++;}
+                     	catch(MiddlewareQueryException e ) {  }
+                    
+                     
+                     stdVariableId = null;
+                     //Unit Errors
+                     VariableType unitErrorsVariableType = cloner.deepClone(inputDataSet.getVariableTypes().findByLocalName(root));
+                     unitErrorsVariableType.setLocalName(root + "_UnitErrors");
+                     Term termErrorEstimate = ontologyDataManagerV2.findMethodByName("ERROR ESTIMATE");
+                     if(termErrorEstimate == null) {
+                         String definitionUErrors = unitErrorsVariableType.getStandardVariable().getMethod().getDefinition();
+                         termErrorEstimate = ontologyDataManagerV2.addMethod("ERROR ESTIMATE", definitionUErrors);
+                     }
+                     
+                      stdVariableId = ontologyDataManagerV2.getStandadardVariableIdByPropertyScaleMethod(
+                              unitErrorsVariableType.getStandardVariable().getProperty().getId()
+                     		,unitErrorsVariableType.getStandardVariable().getScale().getId()
+                     		,termErrorEstimate.getId()
+                     		);
+                     
+                     if (stdVariableId == null){
+                     	StandardVariable stdVariable = new StandardVariable();
+                         stdVariable = cloner.deepClone(unitErrorsVariableType.getStandardVariable());
+                         stdVariable.setId(0);
+                         stdVariable.setName(unitErrorsVariableType.getLocalName());
+                         stdVariable.setMethod(termErrorEstimate);
+                         
+                         ontologyDataManagerV2.addStandardVariable(stdVariable);
+                         unitErrorsVariableType.setStandardVariable(stdVariable);
+                     	
+                     }else{
+                         unitErrorsVariableType.setStandardVariable(ontologyDataManagerV2.getStandardVariable(stdVariableId));
+                     }
+                    
+                   
+                     unitErrorsVariableType.setRank(rank);
+                     try{ studyDataManagerV2.addDataSetVariableType(meansDataSet.getId(), unitErrorsVariableType); rank++;}
+                  		catch(MiddlewareQueryException e ) {  }
+                     
+                 }
+    			
+    		}//end of for
+    		
+    		return studyDataManagerV2.getDataSet(meansDataSet.getId());
+    	}
+    	
+    	return meansDataSet;
+    	
     	
     }
 
