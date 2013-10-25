@@ -3,34 +3,33 @@ package org.generationcp.ibpworkbench.service;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.generationcp.ibpworkbench.constants.WebAPIConstants;
 import org.generationcp.ibpworkbench.util.TraitsAndMeansCSVUtil2;
+import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.DatasetValues;
+import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.dms.ExperimentValues;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.Stock;
+import org.generationcp.middleware.domain.dms.Stocks;
+import org.generationcp.middleware.domain.dms.TrialEnvironment;
+import org.generationcp.middleware.domain.dms.TrialEnvironments;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableType;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.v2.domain.DataSet;
-import org.generationcp.middleware.v2.domain.DataSetType;
-import org.generationcp.middleware.v2.domain.DatasetReference;
-import org.generationcp.middleware.v2.domain.DatasetValues;
-import org.generationcp.middleware.v2.domain.ExperimentType;
-import org.generationcp.middleware.v2.domain.ExperimentValues;
-import org.generationcp.middleware.v2.domain.FactorType;
-import org.generationcp.middleware.v2.domain.StandardVariable;
-import org.generationcp.middleware.v2.domain.Stock;
-import org.generationcp.middleware.v2.domain.Stocks;
-import org.generationcp.middleware.v2.domain.Term;
-import org.generationcp.middleware.v2.domain.TermId;
-import org.generationcp.middleware.v2.domain.TrialEnvironment;
-import org.generationcp.middleware.v2.domain.TrialEnvironments;
-import org.generationcp.middleware.v2.domain.Variable;
-import org.generationcp.middleware.v2.domain.VariableList;
-import org.generationcp.middleware.v2.domain.VariableType;
-import org.generationcp.middleware.v2.domain.VariableTypeList;
-import org.generationcp.middleware.v2.manager.OntologyDataManagerImpl;
-import org.generationcp.middleware.v2.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.OntologyDataManagerImpl;
+import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.rits.cloning.Cloner;
@@ -105,8 +104,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             //Get only the trial environment and germplasm factors
             
             for (VariableType factorFromDataSet : dataSet.getVariableTypes().getFactors().getVariableTypes()){
-            	if (factorFromDataSet.getStandardVariable().getFactorType() == FactorType.TRIAL_ENVIRONMENT
-            			|| factorFromDataSet.getStandardVariable().getFactorType() == FactorType.GERMPLASM) {
+            	if (factorFromDataSet.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT
+            			|| factorFromDataSet.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
             		variableTypeList.makeRoom(1);
             		factorFromDataSet.setRank(1);
             		variableTypeList.add(factorFromDataSet);
@@ -132,7 +131,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                         termLSMean = ontologyDataManagerV2.addMethod("LS MEAN", definitionMeans);
                     }
                     
-                    Integer stdVariableId = ontologyDataManagerV2.getStandadardVariableIdByPropertyScaleMethod(
+                    Integer stdVariableId = ontologyDataManagerV2.getStandardVariableIdByPropertyScaleMethod(
                             meansVariableType.getStandardVariable().getProperty().getId()
                     		,meansVariableType.getStandardVariable().getScale().getId()
                     		,termLSMean.getId()
@@ -166,7 +165,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                         termErrorEstimate = ontologyDataManagerV2.addMethod("ERROR ESTIMATE", definitionUErrors);
                     }
                     
-                     stdVariableId = ontologyDataManagerV2.getStandadardVariableIdByPropertyScaleMethod(
+                     stdVariableId = ontologyDataManagerV2.getStandardVariableIdByPropertyScaleMethod(
                              unitErrorsVariableType.getStandardVariable().getProperty().getId()
                     		,unitErrorsVariableType.getStandardVariable().getScale().getId()
                     		,termErrorEstimate.getId()
@@ -336,7 +335,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                          termLSMean = ontologyDataManagerV2.addMethod("LS MEAN", definitionMeans);
                      }
                      
-                     Integer stdVariableId = ontologyDataManagerV2.getStandadardVariableIdByPropertyScaleMethod(
+                     Integer stdVariableId = ontologyDataManagerV2.getStandardVariableIdByPropertyScaleMethod(
                              meansVariableType.getStandardVariable().getProperty().getId()
                      		,meansVariableType.getStandardVariable().getScale().getId()
                      		,termLSMean.getId()
@@ -372,7 +371,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                          termErrorEstimate = ontologyDataManagerV2.addMethod("ERROR ESTIMATE", definitionUErrors);
                      }
                      
-                      stdVariableId = ontologyDataManagerV2.getStandadardVariableIdByPropertyScaleMethod(
+                      stdVariableId = ontologyDataManagerV2.getStandardVariableIdByPropertyScaleMethod(
                               unitErrorsVariableType.getStandardVariable().getProperty().getId()
                      		,unitErrorsVariableType.getStandardVariable().getScale().getId()
                      		,termErrorEstimate.getId()
