@@ -8,7 +8,7 @@
     <name>IBPWebService Jersey Webapp</name>
     <properties>
         <jersey-version>1.8</jersey-version>
-        <middleware.version>1.8.1</middleware.version>
+        <middleware.version>2.1.0</middleware.version>
         <spring.version>3.1.1.RELEASE</spring.version>
     </properties>
 
