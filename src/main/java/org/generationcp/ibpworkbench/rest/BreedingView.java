@@ -21,6 +21,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  *
@@ -34,6 +38,7 @@ import org.springframework.stereotype.Component;
  *******************************************************************************/
 
 @Component
+@Api(value = "/breeding_view", description = "Web Services to process the Breeding View output")
 @Path("/breeding_view")
 public class BreedingView {
     private final static Logger log = LoggerFactory.getLogger(BreedingView.class);
@@ -43,11 +48,18 @@ public class BreedingView {
 
     @GET
     @Path("/ssa/save_result")
+    @ApiOperation(value = "Save the Single-Site Analysis CSV output file", notes = "", response = DataResponse.class)
     @Produces(MediaType.TEXT_XML)
-    public DataResponse saveSsaResult(@QueryParam("outfile") String fileName,
-                                      @QueryParam("WorkbenchProjectId") String workbenchProjectId,
+    public DataResponse saveSsaResult(
+    		 						  @ApiParam(value = "Path and filename of the SSA output file", required = true)
+    								  @QueryParam("outfile") String fileName,
+    								  @ApiParam(value = "Current Project ID", required = true)
+    								  @QueryParam("WorkbenchProjectId") String workbenchProjectId,
+    								  @ApiParam(value = "Study ID", required = true)
                                       @QueryParam("StudyId") String studyId,
+                                      @ApiParam(value = "Input Dataset ID", required = true)
                                       @QueryParam("InputDataSetId") String inputDataSetId,
+                                      @ApiParam(value = "Output Dataset ID", required = true)
                                       @QueryParam("OutputDataSetId") String outputDataSetId) {
         DataResponse response;
         try {
@@ -94,6 +106,7 @@ public class BreedingView {
 
     @GET
     @Path("/ssa/delete_dataset")
+    @ApiOperation(value = "Delete the dataset", notes = "", response = DataResponse.class)
     @Produces(MediaType.TEXT_XML)
     public DataResponse deleteDataSet(@QueryParam("dataSetId") Integer dataSetId) {
     	try {

@@ -36,11 +36,11 @@
     <bean id="breedingViewService" class="org.generationcp.ibpworkbench.service.BreedingViewServiceImpl">
     </bean>
 
-    <bean id="studyDataManagerV2" class="org.generationcp.middleware.v2.manager.StudyDataManagerImpl">
+    <bean id="studyDataManagerV2" class="org.generationcp.middleware.manager.StudyDataManagerImpl">
         <property name="sessionProviderForLocal" ref="localIbdbHibernateSessionProvider"/>
         <property name="sessionProviderForCentral" ref="centralHibernateSessionProvider"/>
     </bean>
-    <bean id="ontologyDataManagerV2" class="org.generationcp.middleware.v2.manager.OntologyDataManagerImpl">
+    <bean id="ontologyDataManagerV2" class="org.generationcp.middleware.manager.OntologyDataManagerImpl">
         <property name="sessionProviderForLocal" ref="localIbdbHibernateSessionProvider"/>
         <property name="sessionProviderForCentral" ref="centralHibernateSessionProvider"/>
     </bean>
@@ -66,17 +66,17 @@
 
     <bean id="localSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
         <property name="dataSource" ref="localDataSource"/>
-        <property name="configLocation" value="classpath:ibpworkbench_hib.cfg.xml"/>
+        <property name="configLocation" value="classpath:ibpmidware_hib.cfg.xml"/>
     </bean>
 
     <bean id="centralSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
         <property name="dataSource" ref="centralDataSource"/>
-        <property name="configLocation" value="classpath:ibpworkbench_hib.cfg.xml"/>
+        <property name="configLocation" value="classpath:ibpmidware_hib.cfg.xml"/>
     </bean>
 
     <bean id="localIbdbSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
         <property name="dataSource" ref="localIbdbDataSource"/>
-        <property name="configLocation" value="classpath:ibpworkbench_hib.cfg.xml"/>
+        <property name="configLocation" value="classpath:ibpmidware_hib.cfg.xml"/>
     </bean>
 
     <bean id="localDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
