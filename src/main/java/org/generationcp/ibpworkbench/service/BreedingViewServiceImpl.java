@@ -59,11 +59,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
     private boolean meansDataSetExists = false;
 
     public void execute(Map<String, String> params, List<String> errors) throws Exception {
-        String fileName = params.get(WebAPIConstants.FILENAME.getParamValue());
+        String mainOutputFilePath = params.get(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue());
+        String heritabilityOutputFilePath = params.get(WebAPIConstants.HERITABILITY_OUTPUT_FILE_PATH.getParamValue());
         String workbenchProjectId = params.get(WebAPIConstants.WORKBENCH_PROJECT_ID.getParamValue());
-        Map<String, ArrayList<String>> traitsAndMeans = traitsAndMeansCSVUtil2.csvToMap(fileName);
+        Map<String, ArrayList<String>> traitsAndMeans = traitsAndMeansCSVUtil2.csvToMap(mainOutputFilePath);
         System.out.println("Traits and Means: " + traitsAndMeans);
-
+        
         int ndLocationId;
 
         //call middleware api and save
@@ -75,21 +76,21 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             int inputDatasetId = Integer.valueOf(params.get(WebAPIConstants.INPUT_DATASET_ID.getParamValue()));
             
             	
-            	List<DataSet> ds = studyDataManagerV2.getDataSetsByType(studyId, DataSetType.MEANS_DATA);
-            	if (ds != null){
-            		if (ds.size() > 0){
-            			meansDataSet = ds.get(0);
-            		}else if (outputDataSetId != 0){
-                    	meansDataSet = studyDataManagerV2.getDataSet(outputDataSetId);
-                    }
+        	List<DataSet> ds = studyDataManagerV2.getDataSetsByType(studyId, DataSetType.MEANS_DATA);
+        	if (ds != null){
+        		if (ds.size() > 0){
+        			meansDataSet = ds.get(0);
+        		}else if (outputDataSetId != 0){
+                	meansDataSet = studyDataManagerV2.getDataSet(outputDataSetId);
+                }
+        		
+        		if (meansDataSet != null) {
             		
-            		if (meansDataSet != null) {
-	            		
-            			meansDataSet = additionalVariableTypes(csvHeader ,studyDataManagerV2.getDataSet(inputDatasetId), meansDataSet );
-            			meansDataSetExists = true;
-	            		
-	            	}
+        			meansDataSet = additionalVariableTypes(csvHeader ,studyDataManagerV2.getDataSet(inputDatasetId), meansDataSet );
+        			meansDataSetExists = true;
+            		
             	}
+        	}
             	
             
             TrialEnvironments trialEnvironments = studyDataManagerV2.getTrialEnvironmentsInDataset(inputDatasetId);
@@ -193,7 +194,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
             
 
-            fileName = new File(fileName).getName();
             //please make sure that the study name is unique and does not exist in the db.
             VariableList variableList = new VariableList();
             Variable variable = createVariable(TermId.DATASET_NAME.getId(), "RESULTS_TRAIT_MEANS" + "_" + workbenchProjectId + "_" + studyId , 1);
