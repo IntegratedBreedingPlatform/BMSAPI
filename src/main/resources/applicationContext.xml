@@ -12,7 +12,7 @@
                         http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
     <!-- Declare property file locations -->
-    <context:property-placeholder location="classpath:workbench.properties" />
+    <context:property-placeholder location="classpath:IBPDatasource.properties" />
 
     <context:component-scan base-package="org.generationcp.ibpworkbench.rest" />
 
@@ -37,36 +37,25 @@
     </bean>
 
     <bean id="studyDataManagerV2" class="org.generationcp.middleware.manager.StudyDataManagerImpl">
-        <property name="sessionProviderForLocal" ref="localIbdbHibernateSessionProvider"/>
+        <property name="sessionProviderForLocal" ref="localHibernateSessionProvider"/>
         <property name="sessionProviderForCentral" ref="centralHibernateSessionProvider"/>
     </bean>
     <bean id="ontologyDataManagerV2" class="org.generationcp.middleware.manager.OntologyDataManagerImpl">
-        <property name="sessionProviderForLocal" ref="localIbdbHibernateSessionProvider"/>
+        <property name="sessionProviderForLocal" ref="localHibernateSessionProvider"/>
         <property name="sessionProviderForCentral" ref="centralHibernateSessionProvider"/>
     </bean>
 
-    <bean id="localHibernateSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider" scope="request" destroy-method="close">
-        <property name="sessionFactory" ref="localSessionFactory"/>
-
-        <!-- JDK Standard Proxy around this request scoped bean, so we can use it on longer scoped beans -->
-        <aop:scoped-proxy proxy-target-class="false"/>
-    </bean>
     <bean id="centralHibernateSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider" scope="request" destroy-method="close">
         <property name="sessionFactory" ref="centralSessionFactory"/>
 
         <!-- JDK Standard Proxy around this request scoped bean, so we can use it on longer scoped beans -->
         <aop:scoped-proxy proxy-target-class="false"/>
     </bean>
-    <bean id="localIbdbHibernateSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider" scope="request" destroy-method="close">
-        <property name="sessionFactory" ref="localIbdbSessionFactory"/>
+    <bean id="localHibernateSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider" scope="request" destroy-method="close">
+        <property name="sessionFactory" ref="localSessionFactory"/>
 
         <!-- JDK Standard Proxy around this request scoped bean, so we can use it on longer scoped beans -->
         <aop:scoped-proxy proxy-target-class="false"/>
-    </bean>
-
-    <bean id="localSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
-        <property name="dataSource" ref="localDataSource"/>
-        <property name="configLocation" value="classpath:ibpmidware_hib.cfg.xml"/>
     </bean>
 
     <bean id="centralSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
@@ -74,29 +63,22 @@
         <property name="configLocation" value="classpath:ibpmidware_hib.cfg.xml"/>
     </bean>
 
-    <bean id="localIbdbSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
-        <property name="dataSource" ref="localIbdbDataSource"/>
+    <bean id="localSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <property name="dataSource" ref="localDataSource"/>
         <property name="configLocation" value="classpath:ibpmidware_hib.cfg.xml"/>
     </bean>
 
-    <bean id="localDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="${workbench.driver}"/>
-        <property name="url" value="${workbench.url}"/>
-        <property name="username" value="${workbench.username}"/>
-        <property name="password" value="${workbench.password}"/>
-    </bean>
-
     <bean id="centralDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="${workbench.driver}"/>
-        <property name="url" value="${central.url}"/>
-        <property name="username" value="${workbench.username}"/>
-        <property name="password" value="${workbench.password}"/>
+        <property name="driverClassName"    value="${central.driver}"/>
+        <property name="url"                value="${central.url}"/>
+        <property name="username"           value="${central.username}"/>
+        <property name="password"           value="${central.password}"/>
     </bean>
 
-    <bean id="localIbdbDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="${workbench.driver}"/>
-        <property name="url" value="${local.url}"/>
-        <property name="username" value="${workbench.username}"/>
-        <property name="password" value="${workbench.password}"/>
+    <bean id="localDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName"    value="${local.driver}"/>
+        <property name="url"                value="${local.url}"/>
+        <property name="username"           value="${local.username}"/>
+        <property name="password"           value="${local.password}"/>
     </bean>
 </beans>
