@@ -1,13 +1,14 @@
 package org.generationcp.ibpworkbench.service;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.ibpworkbench.constants.WebAPIConstants;
+import org.generationcp.ibpworkbench.util.HeritabilityCSVUtil;
 import org.generationcp.ibpworkbench.util.TraitsAndMeansCSVUtil2;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
@@ -30,6 +31,8 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.rits.cloning.Cloner;
@@ -49,6 +52,8 @@ import com.rits.cloning.Cloner;
 public class BreedingViewServiceImpl implements BreedingViewService {
     @Autowired
     private TraitsAndMeansCSVUtil2 traitsAndMeansCSVUtil2;
+    @Autowired
+    private HeritabilityCSVUtil heritabilityCSVUtil;
     @Autowired
     private StudyDataManagerImpl studyDataManagerV2;
     @Autowired
@@ -247,7 +252,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             	if (stock != null){
 	            	ExperimentValues experimentRow = new ExperimentValues();
 	            	experimentRow.setGermplasmId(stock.getId());
-	            	experimentRow.setLocationId(ndLocationId);
+	            	experimentRow.setLocationId(ndLocationId);//TODO - i believe this should be changed as ssa will now support multiple environments
 	            		
 		            	List<Variable> list = new ArrayList<Variable>();
 		            	Boolean variateHasValue = false;
@@ -271,6 +276,13 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	               
             	}
             }
+            
+            //GCP-6209
+            if(heritabilityOutputFilePath!=null && !heritabilityOutputFilePath.equals("")) {
+            	uploadAndSaveHeritabilitiesToDB(heritabilityOutputFilePath, studyId, trialEnvironments, dataSet);
+            }
+            
+            
 
         } else {
             throw new Exception("Input data is empty. No data was processed.");
@@ -278,7 +290,9 @@ public class BreedingViewServiceImpl implements BreedingViewService {
     }
 
 
-    private Variable createVariable(int termId, String value, int rank) throws Exception {
+    
+
+	private Variable createVariable(int termId, String value, int rank) throws Exception {
         StandardVariable stVar = ontologyDataManagerV2.getStandardVariable(termId);
 
         VariableType vtype = new VariableType();
@@ -413,4 +427,104 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 		// TODO Auto-generated method stub
 		studyDataManagerV2.deleteDataSet(dataSetId);
 	}
+	
+	private void uploadAndSaveHeritabilitiesToDB(
+			String heritabilityOutputFilePath, int studyId, 
+			TrialEnvironments trialEnvironments, DataSet dataSet) throws Exception {
+    	
+		Map<String, ArrayList<Map<String,String>>> environmentAndHeritability = heritabilityCSVUtil.csvToMap(heritabilityOutputFilePath);
+    	
+    	int trialDatasetId = studyId-1;//assumption: the id of the trial dataset is always lower by 1 
+    	DataSet trialDataSet = studyDataManagerV2.getDataSet(trialDatasetId);
+    	
+ 
+        VariableTypeList variableTypeListVariates = dataSet.getVariableTypes().getVariates();//used in getting the new project properties
+        VariableType originalVariableType = null;
+        VariableType heritabilityVariableType = null;
+        Term termHeritability = ontologyDataManagerV2.findMethodByName("Heritability");
+        if(termHeritability == null) {
+            throw new Exception("Heritability Method does not exist.");
+        }
+        
+        Set<String> environments = environmentAndHeritability.keySet();
+        List<ExperimentValues> experimentValues = new ArrayList<ExperimentValues>();
+        VariableTypeList variableTypeList = new VariableTypeList();//list that will contain all heritability project properties
+        List<Integer> locationIds = new ArrayList<Integer>();
+        int i = 0;
+    	for(String env : environments) {
+    		
+            String[] siteAndTrialInstance = env.split("\\|");
+        	String site = siteAndTrialInstance[0];
+        	String trial = siteAndTrialInstance[1];
+        	
+        	//--------- prepare experiment values per location ------------------------------------------------------//
+            TrialEnvironment trialEnv = trialEnvironments.findOnlyOneByLocalName(site, trial);
+            int ndLocationId = trialEnv.getId();
+            locationIds.add(ndLocationId);
+            List<Variable> traits = new ArrayList<Variable>();
+            VariableList variableList = new VariableList();
+            variableList.setVariables(traits);
+            ExperimentValues e = new ExperimentValues();
+            e.setVariableList(variableList);
+            e.setLocationId(ndLocationId);
+            experimentValues.add(e);
+            
+        	//---------- prepare the heritability project properties if necessary-------------------------------------//
+            List<Map<String,String>> heritabilityTraitList = environmentAndHeritability.get(env);
+            int lastRank = trialDataSet.getVariableTypes().size();
+            for(Map<String,String> traitHeritability : heritabilityTraitList) {
+            	String trait = traitHeritability.keySet().iterator().next();
+            	String heritability = traitHeritability.get(trait);
+            	String localName = trait + "_Heritability";
+            	
+            	//check if the heritablity trait is already existing 
+            	heritabilityVariableType = trialDataSet.findVariableTypeByLocalName(localName);
+            	
+            	if(i == 0 && heritabilityVariableType==null) {//this means we need to append the traits in the dataset project properties
+        			originalVariableType = variableTypeListVariates.findByLocalName(trait);
+    	            heritabilityVariableType = cloner.deepClone(originalVariableType);
+    	            heritabilityVariableType.setLocalName(localName);
+    	            
+    	            Integer stdVariableId = ontologyDataManagerV2.getStandardVariableIdByPropertyScaleMethod(
+    	            		heritabilityVariableType.getStandardVariable().getProperty().getId(),
+    	            		heritabilityVariableType.getStandardVariable().getScale().getId(),
+    	            		termHeritability.getId());
+    	            
+    	            if (stdVariableId == null){
+    	            	StandardVariable stdVariable = new StandardVariable();
+    	                stdVariable = cloner.deepClone(heritabilityVariableType.getStandardVariable());
+    	                stdVariable.setId(0);
+    	                stdVariable.setName(heritabilityVariableType.getLocalName());
+    	                stdVariable.setMethod(termHeritability);
+    	                
+    	                ontologyDataManagerV2.addStandardVariable(stdVariable);
+    	                heritabilityVariableType.setStandardVariable(stdVariable);
+    	            	
+    	            }else{
+    	            	heritabilityVariableType.setStandardVariable(ontologyDataManagerV2.getStandardVariable(stdVariableId));
+    	            }
+    	            heritabilityVariableType.setRank(++lastRank);
+    	            variableTypeList.add(heritabilityVariableType);
+    	            trialDataSet.getVariableTypes().add(heritabilityVariableType);//this will add the newly added variable
+            	}
+            	
+            	//---------- prepare experiments -------------------------------------//
+            	if(heritabilityVariableType!=null) {
+            		Variable var = new Variable(heritabilityVariableType,heritability);
+            		e.getVariableList().getVariables().add(var);
+            	}
+            }
+            
+
+        }
+    	
+    	//------------ save project properties and experiments ----------------------------------//
+        DmsProject project = new DmsProject();
+        project.setProjectId(trialDatasetId);
+        studyDataManagerV2.saveTrialDatasetSummary(project,variableTypeList, experimentValues, locationIds);
+        
+	}
+	
+	
+
 }

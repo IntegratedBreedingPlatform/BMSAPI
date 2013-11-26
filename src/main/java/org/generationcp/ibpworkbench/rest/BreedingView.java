@@ -107,7 +107,7 @@ public class BreedingView {
     @Path("/ssa/save_result_summary")
     @ApiOperation(value = "Save the Single-Site Analysis CSV output file with heritability", notes = "", response = DataResponse.class)
     @Produces(MediaType.TEXT_XML)
-    public DataResponse saveSsaResultWithHeritability(
+    public DataResponse saveSsaResultSummary(
 		  @ApiParam(value = "Path and filename of the SSA output file", required = true)
 		  @QueryParam("mainOutputFilePath") String mainOutputFilePath,
 		  @ApiParam(value = "Path and filename of the heritability output file", required = true)
