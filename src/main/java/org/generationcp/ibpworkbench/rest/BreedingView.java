@@ -159,7 +159,7 @@ public class BreedingView {
                 breedingViewService.execute(params, errors);
                 response = new DataResponse(true, "Successfully invoked service.");
             } else {
-                response = new DataResponse(true, "Errors invoking we service: " + errors);
+                response = new DataResponse(false, "Errors invoking we service: " + errors);
             }
         } catch (Exception e) {
             response = new DataResponse(false, "Failed to invoke service: " + e.toString());
