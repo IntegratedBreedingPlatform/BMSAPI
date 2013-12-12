@@ -433,16 +433,39 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	
 	private void uploadAndSaveHeritabilitiesToDB(
 			String heritabilityOutputFilePath, int studyId, 
-			TrialEnvironments trialEnvironments, DataSet dataSet) throws Exception {
+			TrialEnvironments trialEnvironments, DataSet measurementDataSet) throws Exception {
     	
 		try {
         	Map<String, ArrayList<Map<String,String>>> environmentAndHeritability = heritabilityCSVUtil.csvToMap(heritabilityOutputFilePath);
     	
-	    	int trialDatasetId = studyId-1;//assumption: the id of the trial dataset is always lower by 1 
+	    	int trialDatasetId = studyId-1;//default
+	    	List<DatasetReference> datasets = studyDataManagerV2.getDatasetReferences(studyId);
+	    	for (DatasetReference datasetReference : datasets) {
+	    		String name = datasetReference.getName();
+	    		int id = datasetReference.getId();
+	    		if(measurementDataSet.getId()!=id){
+	    			if(name!=null && (name.startsWith("TRIAL_") || name.startsWith("NURSERY_"))) {
+	    				trialDatasetId = id;
+		    			break;
+	    			} else {
+		    			DataSet ds = studyDataManagerV2.getDataSet(id);
+		    			if(ds!=null && ds.getVariableTypes().getVariableTypes()!=null) {
+		    				for (VariableType variableType: ds.getVariableTypes().getVariableTypes()) {
+								if(variableType.getStandardVariable().getPhenotypicType()!=PhenotypicType.TRIAL_ENVIRONMENT) {
+									break;
+								}
+							}
+		    				trialDatasetId = id;
+		    				break;
+		    			}
+		    		}
+	    			
+	    		}
+			}
 	    	DataSet trialDataSet = studyDataManagerV2.getDataSet(trialDatasetId);
 	    	
 	 
-	        VariableTypeList variableTypeListVariates = dataSet.getVariableTypes().getVariates();//used in getting the new project properties
+	        VariableTypeList variableTypeListVariates = measurementDataSet.getVariableTypes().getVariates();//used in getting the new project properties
 	        VariableType originalVariableType = null;
 	        VariableType heritabilityVariableType = null;
 	        Term termHeritability = ontologyDataManagerV2.findMethodByName("Heritability");
