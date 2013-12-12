@@ -2,9 +2,11 @@ package org.generationcp.ibpworkbench.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.generationcp.ibpworkbench.constants.WebAPIConstants;
@@ -72,9 +74,9 @@ public class BreedingViewServiceImpl implements BreedingViewService {
         String heritabilityOutputFilePath = params.get(WebAPIConstants.HERITABILITY_OUTPUT_FILE_PATH.getParamValue());
         String workbenchProjectId = params.get(WebAPIConstants.WORKBENCH_PROJECT_ID.getParamValue());
         Map<String, ArrayList<String>> traitsAndMeans = traitsAndMeansCSVUtil2.csvToMap(mainOutputFilePath);
+        Map<String, Integer> ndGeolocationIds = new HashMap<String, Integer>();
         log.info("Traits and Means: " + traitsAndMeans);
-        
-        int ndLocationId;
+       
 
         //call middleware api and save
         if(!traitsAndMeans.isEmpty()) {
@@ -101,11 +103,13 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             	}
         	}
             	
-            
+        	//environment, env value
+            //TrialEnvironment trialEnv = trialEnvironments.findOnlyOneByLocalName(csvHeader[0], traitsAndMeans.get(csvHeader[0]).get(0));
             TrialEnvironments trialEnvironments = studyDataManagerV2.getTrialEnvironmentsInDataset(inputDatasetId);
-            //environment, env value
-            TrialEnvironment trialEnv = trialEnvironments.findOnlyOneByLocalName(csvHeader[0], traitsAndMeans.get(csvHeader[0]).get(0));
-            ndLocationId = trialEnv.getId();
+            for (TrialEnvironment trialEnv : trialEnvironments.getTrialEnvironments()){
+            	ndGeolocationIds.put(trialEnv.getVariables().findByLocalName(csvHeader[0]).getValue(), trialEnv.getId());
+            }
+            
             Stocks stocks = studyDataManagerV2.getStocksInDataset(inputDatasetId);
 
             DataSet dataSet = studyDataManagerV2.getDataSet(inputDatasetId);
@@ -243,9 +247,13 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             
             if (meansDataSetExists){
             	//TrialEnvironment env = studyDataManagerV2.getTrialEnvironmentsInDataset(meansDataSet.getId()).findOnlyOneByLocalName(csvHeader[0], traitsAndMeans.get(csvHeader[0]).get(0));
-            	if (studyDataManagerV2.getDataSet(meansDataSet.getId()).getLocationIds().contains(ndLocationId)){
-                		studyDataManagerV2.deleteExperimentsByLocation(meansDataSet.getId(), ndLocationId);
+            	for (Entry<String, Integer> entry : ndGeolocationIds.entrySet()){
+            		if (studyDataManagerV2.getDataSet(meansDataSet.getId()).getLocationIds().contains(entry.getValue())){
+                		studyDataManagerV2.deleteExperimentsByLocation(meansDataSet.getId(), entry.getValue());
+            		}
             	}
+            	
+            	
             }
             
    
@@ -256,7 +264,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             	if (stock != null){
 	            	ExperimentValues experimentRow = new ExperimentValues();
 	            	experimentRow.setGermplasmId(stock.getId());
-	            	experimentRow.setLocationId(ndLocationId);//TODO - i believe this should be changed as ssa will now support multiple environments
+	            	Integer ndLocationId = ndGeolocationIds.get(traitsAndMeans.get(csvHeader[0]).get(i));
+	            	experimentRow.setLocationId(ndLocationId);
 	            		
 		            	List<Variable> list = new ArrayList<Variable>();
 		            	Boolean variateHasValue = false;
@@ -427,7 +436,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 	
 	public void deleteDataSet(Integer dataSetId) throws Exception {
-		// TODO Auto-generated method stub
 		studyDataManagerV2.deleteDataSet(dataSetId);
 	}
 	
