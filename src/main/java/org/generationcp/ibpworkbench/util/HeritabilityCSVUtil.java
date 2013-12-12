@@ -29,9 +29,9 @@ public class HeritabilityCSVUtil {
 	/*
      * CSV Format: 
      * 
-     *  Site       Trial          Trait             Heritability
-	 *	Site1      1              Pant_Height       0.5
-	 *	Site1      1              Yield             0.8
+     *  <TRIAL NAME>   Trait             Heritability
+	 *	1              Plant_Height      0.5
+	 *	1              Yield             0.8
 	 *
 	 * Map format
 	 * 
@@ -40,23 +40,25 @@ public class HeritabilityCSVUtil {
     public Map<String, ArrayList<Map<String,String>>> csvToMap(String fileName) throws Exception {
         CSVReader reader = new CSVReader(new FileReader(fileName));
         Map<String, ArrayList<Map<String,String>>> csvMap = new LinkedHashMap<String, ArrayList<Map<String,String>>>();
-        reader.readNext();//skip headers - not needed
+        String[] header = reader.readNext();
+        String envName = header[0].trim();
         String[] nextLine;
         while ((nextLine = reader.readNext()) != null) {
-            String env = nextLine[0].trim() + "|" + nextLine[1].trim();
+            String env = envName + "|" + nextLine[0].trim();
         	if(!csvMap.containsKey(env)) {
         		csvMap.put(env, new ArrayList<Map<String,String>>());
         	}
         	Map<String,String> traitHeritabilityMap = new HashMap<String, String>();
-        	traitHeritabilityMap.put(nextLine[2].trim(), nextLine[3].trim());
+        	traitHeritabilityMap.put(nextLine[1].trim(), nextLine[2].trim());
             csvMap.get(env).add(traitHeritabilityMap);
         }
         System.out.println("Environment and Heritability: " + csvMap);
+        reader.close();
         return csvMap;
     }
     
     public static void main(String[] args) {
-    	String fileName = "D:/gcp/workspace/3/breeding_view/output/heritability.csv";
+    	String fileName = "C:/BV/IBWSSummary_6_1.csv";
     	try {
     		
     		Map<String, ArrayList<Map<String,String>>> environmentAndHeritability = new HeritabilityCSVUtil().csvToMap(fileName);			
