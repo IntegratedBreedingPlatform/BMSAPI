@@ -258,7 +258,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             if (meansDataSetExists){
             	//TrialEnvironment env = studyDataManagerV2.getTrialEnvironmentsInDataset(meansDataSet.getId()).findOnlyOneByLocalName(csvHeader[0], traitsAndMeans.get(csvHeader[0]).get(0));
             	for (Entry<String, Integer> entry : ndGeolocationIds.entrySet()){
-            		if (studyDataManagerV2.getDataSet(meansDataSet.getId()).getLocationIds().contains(entry.getValue())){
+            		if (meansDataSet.getLocationIds().contains(entry.getValue())){
                 		studyDataManagerV2.deleteExperimentsByLocation(meansDataSet.getId(), entry.getValue());
             		}
             	}
