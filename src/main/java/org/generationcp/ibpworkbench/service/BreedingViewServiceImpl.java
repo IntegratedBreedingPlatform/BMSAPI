@@ -157,7 +157,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                         stdVariable.setId(0);
                         stdVariable.setName(meansVariableType.getLocalName());
                         stdVariable.setMethod(termLSMean);
-                        
+                        //check if name is already used
+    	                Term existingStdVar = ontologyDataManagerV2.findTermByName(stdVariable.getName(), CvId.VARIABLES);
+    	                if (existingStdVar != null){
+    	                	//rename 
+    	                	stdVariable.setName(stdVariable.getName()+"_1");
+    	                }
                         ontologyDataManagerV2.addStandardVariable(stdVariable);
                         meansVariableType.setStandardVariable(stdVariable);
                     	
@@ -191,7 +196,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                         stdVariable.setId(0);
                         stdVariable.setName(unitErrorsVariableType.getLocalName());
                         stdVariable.setMethod(termErrorEstimate);
-                        
+                        //check if name is already used
+    	                Term existingStdVar = ontologyDataManagerV2.findTermByName(stdVariable.getName(), CvId.VARIABLES);
+    	                if (existingStdVar != null){
+    	                	//rename 
+    	                	stdVariable.setName(stdVariable.getName()+"_1");
+    	                }
                         ontologyDataManagerV2.addStandardVariable(stdVariable);
                         unitErrorsVariableType.setStandardVariable(stdVariable);
                     	
@@ -373,7 +383,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                          stdVariable.setId(0);
                          stdVariable.setName(meansVariableType.getLocalName());
                          stdVariable.setMethod(termLSMean);
-                         
+                         //check if name is already used
+    	                 Term existingStdVar = ontologyDataManagerV2.findTermByName(stdVariable.getName(), CvId.VARIABLES);
+    	                 if (existingStdVar != null){
+    	                	//rename 
+    	                	stdVariable.setName(stdVariable.getName()+"_1");
+    	                 }
                          ontologyDataManagerV2.addStandardVariable(stdVariable);
                          meansVariableType.setStandardVariable(stdVariable);
                      	
@@ -409,7 +424,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                          stdVariable.setId(0);
                          stdVariable.setName(unitErrorsVariableType.getLocalName());
                          stdVariable.setMethod(termErrorEstimate);
-                         
+                         //check if name is already used
+    	                 Term existingStdVar = ontologyDataManagerV2.findTermByName(stdVariable.getName(), CvId.VARIABLES);
+    	                 if (existingStdVar != null){
+    	                	//rename 
+    	                	stdVariable.setName(stdVariable.getName()+"_1");
+    	                 }
                          ontologyDataManagerV2.addStandardVariable(stdVariable);
                          unitErrorsVariableType.setStandardVariable(stdVariable);
                      	
@@ -458,18 +478,22 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	    			} else {
 		    			DataSet ds = studyDataManagerV2.getDataSet(id);
 		    			if(ds!=null && ds.getVariableTypes().getVariableTypes()!=null) {
+		    				boolean aTrialDataset = true;
 		    				for (VariableType variableType: ds.getVariableTypes().getVariableTypes()) {
-								if(variableType.getStandardVariable().getPhenotypicType()!=PhenotypicType.TRIAL_ENVIRONMENT) {
+								if(variableType.getStandardVariable().getPhenotypicType()==PhenotypicType.GERMPLASM) {
+									aTrialDataset = false;
 									break;
 								}
 							}
-		    				trialDatasetId = id;
+		    				if(aTrialDataset) {
+		    					trialDatasetId = id;
+		    				}
 		    				break;
 		    			}
 		    		}
-	    			
 	    		}
 			}
+	    	log.info("Trial dataset id = "+trialDatasetId);
 	    	DataSet trialDataSet = studyDataManagerV2.getDataSet(trialDatasetId);
 	    	
 	 
@@ -542,7 +566,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	    	                Term existingStdVar = ontologyDataManagerV2.findTermByName(stdVariable.getName(), CvId.VARIABLES);
 	    	                if (existingStdVar != null){
 	    	                	//rename 
-	    	                	stdVariable.setName(heritabilityVariableType.getLocalName()+"_1");
+	    	                	stdVariable.setName(stdVariable.getName()+"_1");
 	    	                }
 	    	                ontologyDataManagerV2.addStandardVariable(stdVariable);
 	    	                heritabilityVariableType.setStandardVariable(stdVariable);
