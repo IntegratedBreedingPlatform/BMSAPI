@@ -33,6 +33,8 @@
     </bean>
     <bean id="traitsAndMeansCVSUtil2" class="org.generationcp.ibpworkbench.util.TraitsAndMeansCSVUtil2">
     </bean>
+    <bean id="heritabilityCSVUtil" class="org.generationcp.ibpworkbench.util.HeritabilityCSVUtil">
+    </bean>
     <bean id="breedingViewService" class="org.generationcp.ibpworkbench.service.BreedingViewServiceImpl">
     </bean>
 

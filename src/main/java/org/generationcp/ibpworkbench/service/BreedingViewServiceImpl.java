@@ -1,13 +1,16 @@
 package org.generationcp.ibpworkbench.service;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.generationcp.ibpworkbench.constants.WebAPIConstants;
+import org.generationcp.ibpworkbench.util.HeritabilityCSVUtil;
 import org.generationcp.ibpworkbench.util.TraitsAndMeansCSVUtil2;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
@@ -25,11 +28,15 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.rits.cloning.Cloner;
@@ -50,6 +57,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
     @Autowired
     private TraitsAndMeansCSVUtil2 traitsAndMeansCSVUtil2;
     @Autowired
+    private HeritabilityCSVUtil heritabilityCSVUtil;
+    @Autowired
     private StudyDataManagerImpl studyDataManagerV2;
     @Autowired
     private OntologyDataManagerImpl ontologyDataManagerV2;
@@ -57,15 +66,17 @@ public class BreedingViewServiceImpl implements BreedingViewService {
     private Cloner cloner;
     
     private boolean meansDataSetExists = false;
+    
+    private final static Logger log = LoggerFactory.getLogger(BreedingViewServiceImpl.class);
 
     public void execute(Map<String, String> params, List<String> errors) throws Exception {
         String mainOutputFilePath = params.get(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue());
         String heritabilityOutputFilePath = params.get(WebAPIConstants.HERITABILITY_OUTPUT_FILE_PATH.getParamValue());
         String workbenchProjectId = params.get(WebAPIConstants.WORKBENCH_PROJECT_ID.getParamValue());
         Map<String, ArrayList<String>> traitsAndMeans = traitsAndMeansCSVUtil2.csvToMap(mainOutputFilePath);
-        System.out.println("Traits and Means: " + traitsAndMeans);
-        
-        int ndLocationId;
+        Map<String, Integer> ndGeolocationIds = new HashMap<String, Integer>();
+        log.info("Traits and Means: " + traitsAndMeans);
+       
 
         //call middleware api and save
         if(!traitsAndMeans.isEmpty()) {
@@ -92,11 +103,13 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             	}
         	}
             	
-            
+        	//environment, env value
+            //TrialEnvironment trialEnv = trialEnvironments.findOnlyOneByLocalName(csvHeader[0], traitsAndMeans.get(csvHeader[0]).get(0));
             TrialEnvironments trialEnvironments = studyDataManagerV2.getTrialEnvironmentsInDataset(inputDatasetId);
-            //environment, env value
-            TrialEnvironment trialEnv = trialEnvironments.findOnlyOneByLocalName(csvHeader[0], traitsAndMeans.get(csvHeader[0]).get(0));
-            ndLocationId = trialEnv.getId();
+            for (TrialEnvironment trialEnv : trialEnvironments.getTrialEnvironments()){
+            	ndGeolocationIds.put(trialEnv.getVariables().findByLocalName(csvHeader[0]).getValue(), trialEnv.getId());
+            }
+            
             Stocks stocks = studyDataManagerV2.getStocksInDataset(inputDatasetId);
 
             DataSet dataSet = studyDataManagerV2.getDataSet(inputDatasetId);
@@ -144,7 +157,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                         stdVariable.setId(0);
                         stdVariable.setName(meansVariableType.getLocalName());
                         stdVariable.setMethod(termLSMean);
-                        
+                        //check if name is already used
+    	                Term existingStdVar = ontologyDataManagerV2.findTermByName(stdVariable.getName(), CvId.VARIABLES);
+    	                if (existingStdVar != null){
+    	                	//rename 
+    	                	stdVariable.setName(stdVariable.getName()+"_1");
+    	                }
                         ontologyDataManagerV2.addStandardVariable(stdVariable);
                         meansVariableType.setStandardVariable(stdVariable);
                     	
@@ -178,7 +196,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                         stdVariable.setId(0);
                         stdVariable.setName(unitErrorsVariableType.getLocalName());
                         stdVariable.setMethod(termErrorEstimate);
-                        
+                        //check if name is already used
+    	                Term existingStdVar = ontologyDataManagerV2.findTermByName(stdVariable.getName(), CvId.VARIABLES);
+    	                if (existingStdVar != null){
+    	                	//rename 
+    	                	stdVariable.setName(stdVariable.getName()+"_1");
+    	                }
                         ontologyDataManagerV2.addStandardVariable(stdVariable);
                         unitErrorsVariableType.setStandardVariable(stdVariable);
                     	
@@ -234,9 +257,13 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             
             if (meansDataSetExists){
             	//TrialEnvironment env = studyDataManagerV2.getTrialEnvironmentsInDataset(meansDataSet.getId()).findOnlyOneByLocalName(csvHeader[0], traitsAndMeans.get(csvHeader[0]).get(0));
-            	if (studyDataManagerV2.getDataSet(meansDataSet.getId()).getLocationIds().contains(ndLocationId)){
-                		studyDataManagerV2.deleteExperimentsByLocation(meansDataSet.getId(), ndLocationId);
+            	for (Entry<String, Integer> entry : ndGeolocationIds.entrySet()){
+            		if (meansDataSet.getLocationIds().contains(entry.getValue())){
+                		studyDataManagerV2.deleteExperimentsByLocation(meansDataSet.getId(), entry.getValue());
+            		}
             	}
+            	
+            	
             }
             
    
@@ -247,6 +274,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             	if (stock != null){
 	            	ExperimentValues experimentRow = new ExperimentValues();
 	            	experimentRow.setGermplasmId(stock.getId());
+	            	Integer ndLocationId = ndGeolocationIds.get(traitsAndMeans.get(csvHeader[0]).get(i));
 	            	experimentRow.setLocationId(ndLocationId);
 	            		
 		            	List<Variable> list = new ArrayList<Variable>();
@@ -271,6 +299,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	               
             	}
             }
+            
+            //GCP-6209
+            if(heritabilityOutputFilePath!=null && !heritabilityOutputFilePath.equals("")) {
+            	uploadAndSaveHeritabilitiesToDB(heritabilityOutputFilePath, studyId, trialEnvironments, dataSet);
+            }
+            
 
         } else {
             throw new Exception("Input data is empty. No data was processed.");
@@ -278,7 +312,9 @@ public class BreedingViewServiceImpl implements BreedingViewService {
     }
 
 
-    private Variable createVariable(int termId, String value, int rank) throws Exception {
+    
+
+	private Variable createVariable(int termId, String value, int rank) throws Exception {
         StandardVariable stVar = ontologyDataManagerV2.getStandardVariable(termId);
 
         VariableType vtype = new VariableType();
@@ -347,7 +383,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                          stdVariable.setId(0);
                          stdVariable.setName(meansVariableType.getLocalName());
                          stdVariable.setMethod(termLSMean);
-                         
+                         //check if name is already used
+    	                 Term existingStdVar = ontologyDataManagerV2.findTermByName(stdVariable.getName(), CvId.VARIABLES);
+    	                 if (existingStdVar != null){
+    	                	//rename 
+    	                	stdVariable.setName(stdVariable.getName()+"_1");
+    	                 }
                          ontologyDataManagerV2.addStandardVariable(stdVariable);
                          meansVariableType.setStandardVariable(stdVariable);
                      	
@@ -383,7 +424,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                          stdVariable.setId(0);
                          stdVariable.setName(unitErrorsVariableType.getLocalName());
                          stdVariable.setMethod(termErrorEstimate);
-                         
+                         //check if name is already used
+    	                 Term existingStdVar = ontologyDataManagerV2.findTermByName(stdVariable.getName(), CvId.VARIABLES);
+    	                 if (existingStdVar != null){
+    	                	//rename 
+    	                	stdVariable.setName(stdVariable.getName()+"_1");
+    	                 }
                          ontologyDataManagerV2.addStandardVariable(stdVariable);
                          unitErrorsVariableType.setStandardVariable(stdVariable);
                      	
@@ -410,7 +456,155 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 	
 	public void deleteDataSet(Integer dataSetId) throws Exception {
-		// TODO Auto-generated method stub
 		studyDataManagerV2.deleteDataSet(dataSetId);
 	}
+	
+	private void uploadAndSaveHeritabilitiesToDB(
+			String heritabilityOutputFilePath, int studyId, 
+			TrialEnvironments trialEnvironments, DataSet measurementDataSet) throws Exception {
+    	
+		try {
+        	Map<String, ArrayList<Map<String,String>>> environmentAndHeritability = heritabilityCSVUtil.csvToMap(heritabilityOutputFilePath);
+    	
+	    	int trialDatasetId = studyId-1;//default
+	    	List<DatasetReference> datasets = studyDataManagerV2.getDatasetReferences(studyId);
+	    	for (DatasetReference datasetReference : datasets) {
+	    		String name = datasetReference.getName();
+	    		int id = datasetReference.getId();
+	    		if(measurementDataSet.getId()!=id){
+	    			if(name!=null && (name.startsWith("TRIAL_") || name.startsWith("NURSERY_"))) {
+	    				trialDatasetId = id;
+		    			break;
+	    			} else {
+		    			DataSet ds = studyDataManagerV2.getDataSet(id);
+		    			if(ds!=null && ds.getVariableTypes().getVariableTypes()!=null) {
+		    				boolean aTrialDataset = true;
+		    				for (VariableType variableType: ds.getVariableTypes().getVariableTypes()) {
+								if(variableType.getStandardVariable().getPhenotypicType()==PhenotypicType.GERMPLASM) {
+									aTrialDataset = false;
+									break;
+								}
+							}
+		    				if(aTrialDataset) {
+		    					trialDatasetId = id;
+		    				}
+		    				break;
+		    			}
+		    		}
+	    		}
+			}
+	    	log.info("Trial dataset id = "+trialDatasetId);
+	    	DataSet trialDataSet = studyDataManagerV2.getDataSet(trialDatasetId);
+	    	
+	 
+	        VariableTypeList variableTypeListVariates = measurementDataSet.getVariableTypes().getVariates();//used in getting the new project properties
+	        VariableType originalVariableType = null;
+	        VariableType heritabilityVariableType = null;
+	        Term termHeritability = ontologyDataManagerV2.findMethodByName("Heritability");
+	        if(termHeritability == null) {
+	            throw new Exception("Heritability Method does not exist.");
+	        }
+	        
+	        Set<String> environments = environmentAndHeritability.keySet();
+	        List<ExperimentValues> experimentValues = new ArrayList<ExperimentValues>();
+	        VariableTypeList variableTypeList = new VariableTypeList();//list that will contain all heritability project properties
+	        List<Integer> locationIds = new ArrayList<Integer>();
+	        int i = 0;
+	    	for(String env : environments) {
+	    		
+	            String[] siteAndTrialInstance = env.split("\\|");
+	        	String site = siteAndTrialInstance[0];
+	        	String trial = siteAndTrialInstance[1];
+	        	
+	        	log.info("prepare experiment values per location, "+site+"="+trial);
+	        	//--------- prepare experiment values per location ------------------------------------------------------//
+	            TrialEnvironment trialEnv = trialEnvironments.findOnlyOneByLocalName(site, trial);
+	            int ndLocationId = trialEnv.getId();
+	            log.info("ndLocationId ="+ndLocationId);
+	            locationIds.add(ndLocationId);
+	            List<Variable> traits = new ArrayList<Variable>();
+	            VariableList variableList = new VariableList();
+	            variableList.setVariables(traits);
+	            ExperimentValues e = new ExperimentValues();
+	            e.setVariableList(variableList);
+	            e.setLocationId(ndLocationId);
+	            experimentValues.add(e);
+	            
+	            log.info("prepare the heritability project properties if necessary");
+	        	//---------- prepare the heritability project properties if necessary-------------------------------------//
+	            List<Map<String,String>> heritabilityTraitList = environmentAndHeritability.get(env);
+	            int lastRank = trialDataSet.getVariableTypes().size();
+	            for(Map<String,String> traitHeritability : heritabilityTraitList) {
+	            	String trait = traitHeritability.keySet().iterator().next();
+	            	String heritability = traitHeritability.get(trait);
+	            	String localName = trait + "_Heritability";
+	            	
+	            	//check if the heritablity trait is already existing 
+	            	heritabilityVariableType = trialDataSet.findVariableTypeByLocalName(localName);
+	            	
+	            	if(i == 0 && heritabilityVariableType==null) {//this means we need to append the traits in the dataset project properties
+	            		log.info("heritability project property not found.. need to add "+localName);
+	        			originalVariableType = variableTypeListVariates.findByLocalName(trait);
+	    	            heritabilityVariableType = cloner.deepClone(originalVariableType);
+	    	            heritabilityVariableType.setLocalName(localName);
+	    	            
+	    	            
+	    	            
+	    	            Integer stdVariableId = ontologyDataManagerV2.getStandardVariableIdByPropertyScaleMethod(
+	    	            		heritabilityVariableType.getStandardVariable().getProperty().getId(),
+	    	            		heritabilityVariableType.getStandardVariable().getScale().getId(),
+	    	            		termHeritability.getId());
+	    	            
+	    	            if (stdVariableId == null){
+	    	            	StandardVariable stdVariable = new StandardVariable();
+	    	                stdVariable = cloner.deepClone(heritabilityVariableType.getStandardVariable());
+	    	                stdVariable.setId(0);
+	    	                stdVariable.setName(heritabilityVariableType.getLocalName());
+	    	                stdVariable.setMethod(termHeritability);
+	    	                
+	    	                //check if localname is already used
+	    	                Term existingStdVar = ontologyDataManagerV2.findTermByName(stdVariable.getName(), CvId.VARIABLES);
+	    	                if (existingStdVar != null){
+	    	                	//rename 
+	    	                	stdVariable.setName(stdVariable.getName()+"_1");
+	    	                }
+	    	                ontologyDataManagerV2.addStandardVariable(stdVariable);
+	    	                heritabilityVariableType.setStandardVariable(stdVariable);
+	    	                log.info("added standard variable "+heritabilityVariableType.getStandardVariable().getName());
+	    	            }else{
+	    	            	heritabilityVariableType.setStandardVariable(ontologyDataManagerV2.getStandardVariable(stdVariableId));
+	    	            	log.info("reused standard variable "+heritabilityVariableType.getStandardVariable().getName());	    	            	
+	    	            }
+	    	            
+	    	            heritabilityVariableType.setRank(++lastRank);
+	    	            variableTypeList.add(heritabilityVariableType);
+	    	            trialDataSet.getVariableTypes().add(heritabilityVariableType);//this will add the newly added variable
+	            	}
+	            	
+	            	//---------- prepare experiments -------------------------------------//
+	            	if(heritabilityVariableType!=null) {
+	            		Variable var = new Variable(heritabilityVariableType,heritability);
+	            		e.getVariableList().getVariables().add(var);
+	            		log.info("preparing experiment variable "+heritabilityVariableType.getLocalName()+ 
+	            				" with value "+heritability);
+	            	}
+	            }
+	            
+	            i++;
+	        }
+	    	
+	    	//------------ save project properties and experiments ----------------------------------//
+	        DmsProject project = new DmsProject();
+	        project.setProjectId(trialDatasetId);
+	        studyDataManagerV2.saveTrialDatasetSummary(project,variableTypeList, experimentValues, locationIds);
+	        
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+        
+	}
+	
+	
+
 }

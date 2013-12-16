@@ -107,7 +107,7 @@ public class BreedingView {
     @Path("/ssa/save_result_summary")
     @ApiOperation(value = "Save the Single-Site Analysis CSV output file with heritability", notes = "", response = DataResponse.class)
     @Produces(MediaType.TEXT_XML)
-    public DataResponse saveSsaResultWithHeritability(
+    public DataResponse saveSsaResultSummary(
 		  @ApiParam(value = "Path and filename of the SSA output file", required = true)
 		  @QueryParam("mainOutputFilePath") String mainOutputFilePath,
 		  @ApiParam(value = "Path and filename of the heritability output file", required = true)
@@ -159,7 +159,7 @@ public class BreedingView {
                 breedingViewService.execute(params, errors);
                 response = new DataResponse(true, "Successfully invoked service.");
             } else {
-                response = new DataResponse(true, "Errors invoking we service: " + errors);
+                response = new DataResponse(false, "Errors invoking we service: " + errors);
             }
         } catch (Exception e) {
             response = new DataResponse(false, "Failed to invoke service: " + e.toString());

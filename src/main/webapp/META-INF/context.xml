@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context antiJARLocking="true" reloadable="true" path="/IBPWebService">
     <!-- Default set of monitored resources -->
-    <WatchedResource>WEB-INF/classes/workbench.properties</WatchedResource>
+    
 </Context>
