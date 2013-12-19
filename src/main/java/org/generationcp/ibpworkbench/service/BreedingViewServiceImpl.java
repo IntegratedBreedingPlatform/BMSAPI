@@ -255,7 +255,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             }
             
             
-            if (meansDataSetExists){
+            /**if (meansDataSetExists){
             	//TrialEnvironment env = studyDataManagerV2.getTrialEnvironmentsInDataset(meansDataSet.getId()).findOnlyOneByLocalName(csvHeader[0], traitsAndMeans.get(csvHeader[0]).get(0));
             	for (Entry<String, Integer> entry : ndGeolocationIds.entrySet()){
             		if (meansDataSet.getLocationIds().contains(entry.getValue())){
@@ -264,11 +264,17 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             	}
             	
             	
-            }
+            }**/
             
+            List<String> uniqueEnvList = new ArrayList<String>();
    
             ArrayList<String> environments = traitsAndMeans.get(csvHeader[0]);
             for(int i = 0; i < environments.size(); i++) {
+            	
+            	if (!uniqueEnvList.contains(csvHeader[0]) && meansDataSetExists){
+            		studyDataManagerV2.deleteExperimentsByLocation(meansDataSet.getId(), ndGeolocationIds.get(traitsAndMeans.get(csvHeader[0]).get(i)));
+            		uniqueEnvList.add(csvHeader[0]);
+            	}
                
             	Stock stock = stocks.findOnlyOneByLocalName(csvHeader[1], traitsAndMeans.get(csvHeader[1]).get(i));
             	if (stock != null){
