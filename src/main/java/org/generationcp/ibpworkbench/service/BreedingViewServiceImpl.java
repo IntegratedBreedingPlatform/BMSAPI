@@ -271,9 +271,9 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             ArrayList<String> environments = traitsAndMeans.get(csvHeader[0]);
             for(int i = 0; i < environments.size(); i++) {
             	
-            	if (!uniqueEnvList.contains(csvHeader[0]) && meansDataSetExists){
+            	if (!uniqueEnvList.contains(traitsAndMeans.get(csvHeader[0]).get(i)) && meansDataSetExists){
             		studyDataManagerV2.deleteExperimentsByLocation(meansDataSet.getId(), ndGeolocationIds.get(traitsAndMeans.get(csvHeader[0]).get(i)));
-            		uniqueEnvList.add(csvHeader[0]);
+            		uniqueEnvList.add(traitsAndMeans.get(csvHeader[0]).get(i));
             	}
                
             	Stock stock = stocks.findOnlyOneByLocalName(csvHeader[1], traitsAndMeans.get(csvHeader[1]).get(i));
