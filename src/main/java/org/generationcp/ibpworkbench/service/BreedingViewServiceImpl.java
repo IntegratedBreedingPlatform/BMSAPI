@@ -511,12 +511,56 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	            throw new Exception("Heritability Method does not exist.");
 	        }
 	        
+	        log.info("prepare the heritability project properties if necessary");
+	        VariableTypeList variableTypeList = new VariableTypeList();//list that will contain all heritability project properties
+	        int lastRank = trialDataSet.getVariableTypes().size();
+	        for(VariableType variate : variableTypeListVariates.getVariableTypes()) {
+	        	//check if the heritablity trait is already existing
+	        	String trait = variate.getLocalName();
+	        	String localName = trait + "_Heritability";
+	        	heritabilityVariableType = trialDataSet.findVariableTypeByLocalName(localName);
+	        	if(heritabilityVariableType==null) {//this means we need to append the traits in the dataset project properties
+            		log.info("heritability project property not found.. need to add "+localName);
+        			originalVariableType = variableTypeListVariates.findByLocalName(trait);
+    	            heritabilityVariableType = cloner.deepClone(originalVariableType);
+    	            heritabilityVariableType.setLocalName(localName);
+    	            
+    	            Integer stdVariableId = ontologyDataManagerV2.getStandardVariableIdByPropertyScaleMethod(
+    	            		heritabilityVariableType.getStandardVariable().getProperty().getId(),
+    	            		heritabilityVariableType.getStandardVariable().getScale().getId(),
+    	            		termHeritability.getId());
+    	            
+    	            if (stdVariableId == null){
+    	            	StandardVariable stdVariable = new StandardVariable();
+    	                stdVariable = cloner.deepClone(heritabilityVariableType.getStandardVariable());
+    	                stdVariable.setId(0);
+    	                stdVariable.setName(heritabilityVariableType.getLocalName());
+    	                stdVariable.setMethod(termHeritability);
+    	                
+    	                //check if localname is already used
+    	                Term existingStdVar = ontologyDataManagerV2.findTermByName(stdVariable.getName(), CvId.VARIABLES);
+    	                if (existingStdVar != null){
+    	                	//rename 
+    	                	stdVariable.setName(stdVariable.getName()+"_1");
+    	                }
+    	                ontologyDataManagerV2.addStandardVariable(stdVariable);
+    	                heritabilityVariableType.setStandardVariable(stdVariable);
+    	                log.info("added standard variable "+heritabilityVariableType.getStandardVariable().getName());
+    	            }else{
+    	            	heritabilityVariableType.setStandardVariable(ontologyDataManagerV2.getStandardVariable(stdVariableId));
+    	            	log.info("reused standard variable "+heritabilityVariableType.getStandardVariable().getName());	    	            	
+    	            }
+    	            
+    	            heritabilityVariableType.setRank(++lastRank);
+    	            variableTypeList.add(heritabilityVariableType);
+    	            trialDataSet.getVariableTypes().add(heritabilityVariableType);//this will add the newly added variable
+            	}
+	        }
+        	
 	        Set<String> environments = environmentAndHeritability.keySet();
 	        List<ExperimentValues> experimentValues = new ArrayList<ExperimentValues>();
-	        VariableTypeList variableTypeList = new VariableTypeList();//list that will contain all heritability project properties
 	        List<Integer> locationIds = new ArrayList<Integer>();
-	        int i = 0;
-	    	for(String env : environments) {
+	        for(String env : environments) {
 	    		
 	            String[] siteAndTrialInstance = env.split("\\|");
 	        	String site = siteAndTrialInstance[0];
@@ -536,56 +580,14 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	            e.setLocationId(ndLocationId);
 	            experimentValues.add(e);
 	            
-	            log.info("prepare the heritability project properties if necessary");
-	        	//---------- prepare the heritability project properties if necessary-------------------------------------//
 	            List<Map<String,String>> heritabilityTraitList = environmentAndHeritability.get(env);
-	            int lastRank = trialDataSet.getVariableTypes().size();
 	            for(Map<String,String> traitHeritability : heritabilityTraitList) {
 	            	String trait = traitHeritability.keySet().iterator().next();
 	            	String heritability = traitHeritability.get(trait);
 	            	String localName = trait + "_Heritability";
 	            	
-	            	//check if the heritablity trait is already existing 
+	            	//get heritability trait
 	            	heritabilityVariableType = trialDataSet.findVariableTypeByLocalName(localName);
-	            	
-	            	if(i == 0 && heritabilityVariableType==null) {//this means we need to append the traits in the dataset project properties
-	            		log.info("heritability project property not found.. need to add "+localName);
-	        			originalVariableType = variableTypeListVariates.findByLocalName(trait);
-	    	            heritabilityVariableType = cloner.deepClone(originalVariableType);
-	    	            heritabilityVariableType.setLocalName(localName);
-	    	            
-	    	            
-	    	            
-	    	            Integer stdVariableId = ontologyDataManagerV2.getStandardVariableIdByPropertyScaleMethod(
-	    	            		heritabilityVariableType.getStandardVariable().getProperty().getId(),
-	    	            		heritabilityVariableType.getStandardVariable().getScale().getId(),
-	    	            		termHeritability.getId());
-	    	            
-	    	            if (stdVariableId == null){
-	    	            	StandardVariable stdVariable = new StandardVariable();
-	    	                stdVariable = cloner.deepClone(heritabilityVariableType.getStandardVariable());
-	    	                stdVariable.setId(0);
-	    	                stdVariable.setName(heritabilityVariableType.getLocalName());
-	    	                stdVariable.setMethod(termHeritability);
-	    	                
-	    	                //check if localname is already used
-	    	                Term existingStdVar = ontologyDataManagerV2.findTermByName(stdVariable.getName(), CvId.VARIABLES);
-	    	                if (existingStdVar != null){
-	    	                	//rename 
-	    	                	stdVariable.setName(stdVariable.getName()+"_1");
-	    	                }
-	    	                ontologyDataManagerV2.addStandardVariable(stdVariable);
-	    	                heritabilityVariableType.setStandardVariable(stdVariable);
-	    	                log.info("added standard variable "+heritabilityVariableType.getStandardVariable().getName());
-	    	            }else{
-	    	            	heritabilityVariableType.setStandardVariable(ontologyDataManagerV2.getStandardVariable(stdVariableId));
-	    	            	log.info("reused standard variable "+heritabilityVariableType.getStandardVariable().getName());	    	            	
-	    	            }
-	    	            
-	    	            heritabilityVariableType.setRank(++lastRank);
-	    	            variableTypeList.add(heritabilityVariableType);
-	    	            trialDataSet.getVariableTypes().add(heritabilityVariableType);//this will add the newly added variable
-	            	}
 	            	
 	            	//---------- prepare experiments -------------------------------------//
 	            	if(heritabilityVariableType!=null) {
@@ -595,8 +597,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	            				" with value "+heritability);
 	            	}
 	            }
-	            
-	            i++;
 	        }
 	    	
 	    	//------------ save project properties and experiments ----------------------------------//
