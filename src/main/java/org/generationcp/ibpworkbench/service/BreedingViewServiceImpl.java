@@ -494,7 +494,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 		    				if(aTrialDataset) {
 		    					trialDatasetId = id;
 		    				}
-		    				break;
 		    			}
 		    		}
 	    		}
