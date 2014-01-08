@@ -271,16 +271,18 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             ArrayList<String> environments = traitsAndMeans.get(csvHeader[0]);
             for(int i = 0; i < environments.size(); i++) {
             	
-            	if (!uniqueEnvList.contains(traitsAndMeans.get(csvHeader[0]).get(i)) && meansDataSetExists){
-            		studyDataManagerV2.deleteExperimentsByLocation(meansDataSet.getId(), ndGeolocationIds.get(traitsAndMeans.get(csvHeader[0]).get(i)));
-            		uniqueEnvList.add(traitsAndMeans.get(csvHeader[0]).get(i));
+            	String envName = traitsAndMeans.get(csvHeader[0]).get(i).replace(";", ",");
+            	
+            	if (!uniqueEnvList.contains(envName) && meansDataSetExists){
+            		studyDataManagerV2.deleteExperimentsByLocation(meansDataSet.getId(), ndGeolocationIds.get(envName));
+            		uniqueEnvList.add(envName);
             	}
                
             	Stock stock = stocks.findOnlyOneByLocalName(csvHeader[1], traitsAndMeans.get(csvHeader[1]).get(i));
             	if (stock != null){
 	            	ExperimentValues experimentRow = new ExperimentValues();
 	            	experimentRow.setGermplasmId(stock.getId());
-	            	Integer ndLocationId = ndGeolocationIds.get(traitsAndMeans.get(csvHeader[0]).get(i));
+	            	Integer ndLocationId = ndGeolocationIds.get(envName);
 	            	experimentRow.setLocationId(ndLocationId);
 	            		
 		            	List<Variable> list = new ArrayList<Variable>();
@@ -563,7 +565,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	    		
 	            String[] siteAndTrialInstance = env.split("\\|");
 	        	String site = siteAndTrialInstance[0];
-	        	String trial = siteAndTrialInstance[1];
+	        	String trial = siteAndTrialInstance[1].replace(";", ",");
 	        	
 	        	log.info("prepare experiment values per location, "+site+"="+trial);
 	        	//--------- prepare experiment values per location ------------------------------------------------------//
