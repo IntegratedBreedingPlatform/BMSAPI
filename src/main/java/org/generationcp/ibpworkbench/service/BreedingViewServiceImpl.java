@@ -271,12 +271,14 @@ public class BreedingViewServiceImpl implements BreedingViewService {
             ArrayList<String> environments = traitsAndMeans.get(csvHeader[0]);
             for(int i = 0; i < environments.size(); i++) {
             	
+            	
             	String envName = traitsAndMeans.get(csvHeader[0]).get(i).replace(";", ",");
             	
+            	/**
             	if (!uniqueEnvList.contains(envName) && meansDataSetExists){
             		studyDataManagerV2.deleteExperimentsByLocation(meansDataSet.getId(), ndGeolocationIds.get(envName));
             		uniqueEnvList.add(envName);
-            	}
+            	}**/
                
             	Stock stock = stocks.findOnlyOneByLocalName(csvHeader[1], traitsAndMeans.get(csvHeader[1]).get(i));
             	if (stock != null){
@@ -303,7 +305,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 		            VariableList variableList1 = new VariableList();
 		            variableList1.setVariables(list);
 	                experimentRow.setVariableList(variableList1);
-	                if (variateHasValue) studyDataManagerV2.addExperiment(meansDataSet.getId(), ExperimentType.AVERAGE, experimentRow);
+	                if (variateHasValue) studyDataManagerV2.addOrUpdateExperiment(meansDataSet.getId(), ExperimentType.AVERAGE, experimentRow);
 	               
             	}
             }
