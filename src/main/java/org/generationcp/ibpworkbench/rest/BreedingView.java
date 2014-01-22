@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ *
+ * Generation Challenge Programme (GCP)
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
+ *******************************************************************************/
 package org.generationcp.ibpworkbench.rest;
 
 import java.util.ArrayList;
@@ -23,24 +34,13 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 
-/*******************************************************************************
- * Copyright (c) 2012, All Rights Reserved.
- *
- * Generation Challenge Programme (GCP)
- *
- *
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
- *******************************************************************************/
 
 @Component
 @Api(value = "/breeding_view", description = "Web Services to process the Breeding View output")
 @Path("/breeding_view")
 public class BreedingView {
-    @SuppressWarnings("unused")
-	private final static Logger log = LoggerFactory.getLogger(BreedingView.class);
+
+	private final static Logger LOG = LoggerFactory.getLogger(BreedingView.class);
 
     @Autowired
     private BreedingViewService breedingViewService;
@@ -50,16 +50,16 @@ public class BreedingView {
     @ApiOperation(value = "Save the Single-Site Analysis CSV output file", notes = "", response = DataResponse.class)
     @Produces(MediaType.TEXT_XML)
     public DataResponse saveSsaResult(
-    		 						  @ApiParam(value = "Path and filename of the SSA output file", required = true)
-    								  @QueryParam("mainOutputFilePath") String fileName,
-    								  @ApiParam(value = "Current Project ID", required = true)
-    								  @QueryParam("WorkbenchProjectId") String workbenchProjectId,
-    								  @ApiParam(value = "Study ID", required = true)
-                                      @QueryParam("StudyId") String studyId,
-                                      @ApiParam(value = "Input Dataset ID", required = true)
-                                      @QueryParam("InputDataSetId") String inputDataSetId,
-                                      @ApiParam(value = "Output Dataset ID", required = true)
-                                      @QueryParam("OutputDataSetId") String outputDataSetId) {
+ 						  @ApiParam(value = "Path and filename of the SSA output file", required = true)
+						  @QueryParam("mainOutputFilePath") String fileName,
+						  @ApiParam(value = "Current Project ID", required = true)
+						  @QueryParam("WorkbenchProjectId") String workbenchProjectId,
+						  @ApiParam(value = "Study ID", required = true)
+                          @QueryParam("StudyId") String studyId,
+                          @ApiParam(value = "Input Dataset ID", required = true)
+                          @QueryParam("InputDataSetId") String inputDataSetId,
+                          @ApiParam(value = "Output Dataset ID", required = true)
+                          @QueryParam("OutputDataSetId") String outputDataSetId) {
         DataResponse response;
         try {
             Map<String, String> params = new HashMap<String, String>();
@@ -150,7 +150,8 @@ public class BreedingView {
 
             if(errors.size() == 0) {
             	params.put(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue(), mainOutputFilePath);
-                params.put(WebAPIConstants.HERITABILITY_OUTPUT_FILE_PATH.getParamValue(), heritabilityOutputFilePath);
+                params.put(WebAPIConstants.HERITABILITY_OUTPUT_FILE_PATH.getParamValue()
+                        , heritabilityOutputFilePath);
                 params.put(WebAPIConstants.WORKBENCH_PROJECT_ID.getParamValue(), workbenchProjectId);
                 params.put(WebAPIConstants.STUDY_ID.getParamValue(), studyId);
                 params.put(WebAPIConstants.INPUT_DATASET_ID.getParamValue(), inputDataSetId);
@@ -176,8 +177,7 @@ public class BreedingView {
 			breedingViewService.deleteDataSet(dataSetId);
 			 return new DataResponse(true, "Successfully deleted the dataset");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		    LOG.debug(e.getMessage(), e);
 			return new DataResponse(false, "Dataset not deleted: " + e.toString());
 		}
        

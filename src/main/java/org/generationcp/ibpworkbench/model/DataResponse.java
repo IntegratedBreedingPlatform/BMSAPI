@@ -1,9 +1,3 @@
-package org.generationcp.ibpworkbench.model;
-
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  *
@@ -15,10 +9,16 @@ import javax.xml.bind.annotation.XmlType;
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *
  *******************************************************************************/
+package org.generationcp.ibpworkbench.model;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "Response")
 @XmlType(propOrder = {"successful", "message"})
 public class DataResponse {
+    
     private boolean successful;
     private String message;
 

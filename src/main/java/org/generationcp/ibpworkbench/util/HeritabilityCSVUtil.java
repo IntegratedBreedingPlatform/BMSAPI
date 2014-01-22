@@ -1,18 +1,3 @@
-package org.generationcp.ibpworkbench.util;
-
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.generationcp.middleware.domain.dms.ExperimentValues;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
-
-import au.com.bytecode.opencsv.CSVReader;
-
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  *
@@ -24,8 +9,24 @@ import au.com.bytecode.opencsv.CSVReader;
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *
  *******************************************************************************/
+package org.generationcp.ibpworkbench.util;
+
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 public class HeritabilityCSVUtil {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(HeritabilityCSVUtil.class);
+    
 	/*
      * CSV Format: 
      * 
@@ -39,7 +40,8 @@ public class HeritabilityCSVUtil {
      */
     public Map<String, ArrayList<Map<String,String>>> csvToMap(String fileName) throws Exception {
         CSVReader reader = new CSVReader(new FileReader(fileName));
-        Map<String, ArrayList<Map<String,String>>> csvMap = new LinkedHashMap<String, ArrayList<Map<String,String>>>();
+        Map<String, ArrayList<Map<String,String>>> csvMap = 
+                new LinkedHashMap<String, ArrayList<Map<String,String>>>();
         String[] header = reader.readNext();
         String envName = header[0].trim();
         String[] nextLine;
@@ -52,7 +54,8 @@ public class HeritabilityCSVUtil {
         	traitHeritabilityMap.put(nextLine[1].trim(), nextLine[2].trim());
             csvMap.get(env).add(traitHeritabilityMap);
         }
-        System.out.println("Environment and Heritability: " + csvMap);
+        //System.out.println("Environment and Heritability: " + csvMap);
+        LOG.debug("Environment and Heritability: " + csvMap);
         reader.close();
         return csvMap;
     }
@@ -61,18 +64,19 @@ public class HeritabilityCSVUtil {
     	String fileName = "C:/BV/IBWSSummary_6_1.csv";
     	try {
     		
-    		Map<String, ArrayList<Map<String,String>>> environmentAndHeritability = new HeritabilityCSVUtil().csvToMap(fileName);			
+    		Map<String, ArrayList<Map<String,String>>> environmentAndHeritability = 
+    		        new HeritabilityCSVUtil().csvToMap(fileName);			
 			Set<String> environments = environmentAndHeritability.keySet();
 	        for(String env : environments) {
 	    		
 	            String[] siteAndTrialInstance = env.split("\\|");
 	        	String site = siteAndTrialInstance[0];
 	        	String trial = siteAndTrialInstance[1];
-	        	System.out.println(site+" = "+trial);
+	        	// System.out.println(site+" = "+trial);
+                LOG.debug(site+" = "+trial);
 	    	}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		    LOG.error(e.getMessage(), e);
 		}
     }
 }

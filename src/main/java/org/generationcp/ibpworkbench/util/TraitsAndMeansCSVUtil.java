@@ -1,17 +1,3 @@
-package org.generationcp.ibpworkbench.util;
-
-import au.com.bytecode.opencsv.bean.CsvToBean;
-import au.com.bytecode.opencsv.bean.HeaderColumnNameTranslateMappingStrategy;
-import org.generationcp.ibpworkbench.model.TraitsAndMeans;
-import org.springframework.beans.factory.annotation.Configurable;
-
-import java.io.FileReader;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  *
@@ -23,6 +9,18 @@ import java.util.Map;
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *
  *******************************************************************************/
+package org.generationcp.ibpworkbench.util;
+
+import au.com.bytecode.opencsv.bean.CsvToBean;
+import au.com.bytecode.opencsv.bean.HeaderColumnNameTranslateMappingStrategy;
+import org.generationcp.ibpworkbench.model.TraitsAndMeans;
+import org.springframework.beans.factory.annotation.Configurable;
+
+import java.io.FileReader;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
+
 
 @Configurable
 public class TraitsAndMeansCSVUtil {
@@ -37,10 +35,10 @@ public class TraitsAndMeansCSVUtil {
     }
 
     /*
-         * @param fileName name of the file located in the classpath
-         * @return List<TraitsAndMeans> list of rows in csv, list is empty if no data
-         * List contains a map with column header as key
-         */
+     * @param fileName name of the file located in the classpath
+     * @return List<TraitsAndMeans> list of rows in csv, list is empty if no
+     * data List contains a map with column header as key
+     */
     public List<TraitsAndMeans> csvToList(String fileName)throws Exception {
         URL url = TraitsAndMeansCSVUtil.class.getClassLoader().getResource(fileName);
         CsvToBean<TraitsAndMeans> bean = new CsvToBean<TraitsAndMeans>();

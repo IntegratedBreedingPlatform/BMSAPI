@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ *
+ * Generation Challenge Programme (GCP)
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
+ *******************************************************************************/
 package org.generationcp.ibpworkbench.rest;
 
 /*import java.io.InputStream;
@@ -17,17 +28,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.multipart.FormDataMultiPart;*/
 
-/*******************************************************************************
- * Copyright (c) 2012, All Rights Reserved.
- *
- * Generation Challenge Programme (GCP)
- *
- *
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
- *******************************************************************************/
 
 public class IBSampleClient {
     /*Server server;

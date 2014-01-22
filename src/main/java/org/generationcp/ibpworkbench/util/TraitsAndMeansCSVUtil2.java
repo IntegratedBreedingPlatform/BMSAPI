@@ -1,12 +1,3 @@
-package org.generationcp.ibpworkbench.util;
-
-import au.com.bytecode.opencsv.CSVReader;
-import com.Ostermiller.util.CSVParser;
-
-import java.io.FileReader;
-import java.net.URL;
-import java.util.*;
-
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  *
@@ -18,6 +9,12 @@ import java.util.*;
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *
  *******************************************************************************/
+package org.generationcp.ibpworkbench.util;
+
+import au.com.bytecode.opencsv.CSVReader;
+
+import java.io.FileReader;
+import java.util.*;
 
 public class TraitsAndMeansCSVUtil2 {
     public Map<String, ArrayList<String>> csvToMap(String fileName) throws Exception {
@@ -36,6 +33,7 @@ public class TraitsAndMeansCSVUtil2 {
                 }
             }
         }
+        //TODO: ADD reader.close();
         return csvMap;
     }
 }

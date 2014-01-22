@@ -1,5 +1,3 @@
-package org.generationcp.ibpworkbench.constants;
-
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  *
@@ -11,8 +9,11 @@ package org.generationcp.ibpworkbench.constants;
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *
  *******************************************************************************/
+package org.generationcp.ibpworkbench.constants;
+
 
 public enum WebAPIConstants {
+    
 	MAIN_OUTPUT_FILE_PATH("mainOutputFilePath"),
     HERITABILITY_OUTPUT_FILE_PATH("heritabilityOutputFilePath"),
     STUDY_ID("StudyId"),

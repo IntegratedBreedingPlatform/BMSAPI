@@ -1,8 +1,3 @@
-package org.generationcp.ibpworkbench.service;
-
-import java.util.List;
-import java.util.Map;
-
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  *
@@ -14,8 +9,14 @@ import java.util.Map;
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *
  *******************************************************************************/
+package org.generationcp.ibpworkbench.service;
+
+import java.util.List;
+import java.util.Map;
 
 public interface BreedingViewService {
-    public void execute(Map<String, String> params, List<String> errors) throws Exception;
-    public void deleteDataSet(Integer dataSetId) throws Exception;
+
+    void execute(Map<String, String> params, List<String> errors) throws Exception;
+
+    void deleteDataSet(Integer dataSetId) throws Exception;
 }
