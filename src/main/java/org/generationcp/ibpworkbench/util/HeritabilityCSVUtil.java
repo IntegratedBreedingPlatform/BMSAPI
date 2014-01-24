@@ -8,10 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 
 import au.com.bytecode.opencsv.CSVReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
@@ -36,7 +39,12 @@ public class HeritabilityCSVUtil {
 	 * Map format
 	 * 
 	 *  <site | trial > = list of <heritabilty traits map <key = trait name, value = value>>
+	 *      
+	 *      
      */
+    
+    private final static Logger LOG = LoggerFactory.getLogger(HeritabilityCSVUtil.class); 
+    
     public Map<String, ArrayList<Map<String,String>>> csvToMap(String fileName) throws Exception {
         CSVReader reader = new CSVReader(new FileReader(fileName));
         Map<String, ArrayList<Map<String,String>>> csvMap = new LinkedHashMap<String, ArrayList<Map<String,String>>>();
@@ -52,7 +60,7 @@ public class HeritabilityCSVUtil {
         	traitHeritabilityMap.put(nextLine[1].trim(), nextLine[2].trim());
             csvMap.get(env).add(traitHeritabilityMap);
         }
-        System.out.println("Environment and Heritability: " + csvMap);
+        LOG.debug("Environment and Heritability: " + csvMap);
         reader.close();
         return csvMap;
     }
@@ -68,7 +76,7 @@ public class HeritabilityCSVUtil {
 	            String[] siteAndTrialInstance = env.split("\\|");
 	        	String site = siteAndTrialInstance[0];
 	        	String trial = siteAndTrialInstance[1];
-	        	System.out.println(site+" = "+trial);
+	        	LOG.debug(site+" = "+trial);
 	    	}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
