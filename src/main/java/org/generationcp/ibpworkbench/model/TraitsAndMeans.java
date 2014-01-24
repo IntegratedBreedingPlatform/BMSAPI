@@ -1,7 +1,3 @@
-package org.generationcp.ibpworkbench.model;
-
-import java.math.BigDecimal;
-
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  *
@@ -13,8 +9,11 @@ import java.math.BigDecimal;
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *
  *******************************************************************************/
+package org.generationcp.ibpworkbench.model;
+
 
 public class TraitsAndMeans {
+    
     private String environments;
     private String genotypes;
     private String mat50Means;
