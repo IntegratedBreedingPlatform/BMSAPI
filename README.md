@@ -5,6 +5,9 @@ Overview
 ----------
 IBPWebService provides services for the Breeding View application to upload and save report results to the Breeding Management System. 
 
+For API Documentation, run the IBPWebService and go to the following URL:
+http:/localhost:18080/IBPWebService/rest/index
+
 
 Checkout this project
 -----------------------
@@ -58,7 +61,6 @@ The following are links to developer guides and eclipse setup guide. (Note the l
 - [Developer Guide][dev_guide_link]
 - [Eclipse Setup][dev_eclipse_link]
 
-###Other relevant Workbench documentation can be found [here][workbench_conf_link].
 
 [ibpcommons_git_link]: https://github.com/digitalabs/IBPCommons
 [ibpmiddleware_git_link]: https://github.com/digitalabs/IBPMiddleware
