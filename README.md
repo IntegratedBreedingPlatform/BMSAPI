@@ -3,7 +3,7 @@ IBPWebService
 
 Overview
 ----------
-IBPWebService is a RESTful web service that aims to integrate Breeding View application to the Breeding Management System (BMS). It provides services for saving the analysis result to the BMS's database. 
+IBPWebService is a RESTful web service that aims to integrate Breeding View application with the Breeding Management System (BMS). It provides services for saving the analysis result to the BMS's database. 
 
 For API Documentation, run the IBPWebService and go to the following URL:
 <pre>http:/localhost:18080/IBPWebService/rest/index</pre>
