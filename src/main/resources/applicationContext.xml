@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:p="http://www.springframework.org/schema/p"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:aop="http://www.springframework.org/schema/aop"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
-                        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
-                        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
-
+<beans  xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:p="http://www.springframework.org/schema/p"
+        xmlns:util="http://www.springframework.org/schema/util"
+        xmlns:aop="http://www.springframework.org/schema/aop"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+                            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+                            http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd"
+>
     <!-- Declare property file locations -->
-    <context:property-placeholder location="classpath:IBPDatasource.properties" />
+    <context:property-placeholder location="classpath:workbench.properties" />
 
     <context:component-scan base-package="org.generationcp.ibpworkbench.rest" />
+    
+    <context:annotation-config />
+    
+    <context:load-time-weaver />
 
     <bean id="cloner" class="com.rits.cloning.Cloner"/>
     <bean id="traitsAndMeansCVSUtil" class="org.generationcp.ibpworkbench.util.TraitsAndMeansCSVUtil">
@@ -37,50 +41,58 @@
     </bean>
     <bean id="breedingViewService" class="org.generationcp.ibpworkbench.service.BreedingViewServiceImpl">
     </bean>
-
-    <bean id="studyDataManagerV2" class="org.generationcp.middleware.manager.StudyDataManagerImpl">
-        <property name="sessionProviderForLocal" ref="localHibernateSessionProvider"/>
-        <property name="sessionProviderForCentral" ref="centralHibernateSessionProvider"/>
+    
+     <bean id="workbenchDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${workbench.driver}"/>
+        <property name="url" value="${workbench.url}"/>
+        <property name="username" value="${workbench.username}"/>
+        <property name="password" value="${workbench.password}"/>
     </bean>
-    <bean id="ontologyDataManagerV2" class="org.generationcp.middleware.manager.OntologyDataManagerImpl">
-        <property name="sessionProviderForLocal" ref="localHibernateSessionProvider"/>
-        <property name="sessionProviderForCentral" ref="centralHibernateSessionProvider"/>
+    
+    <bean id="workbenchSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <property name="dataSource" ref="workbenchDataSource"/>
+        <property name="configLocation" value="classpath:ibpworkbench_hib.cfg.xml"/>
     </bean>
-
-    <bean id="centralHibernateSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider" scope="request" destroy-method="close">
-        <property name="sessionFactory" ref="centralSessionFactory"/>
-
+    
+    <bean id="workbenchHibernateSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider" scope="request">
+        <property name="sessionFactory" ref="workbenchSessionFactory"/>
+        
         <!-- JDK Standard Proxy around this request scoped bean, so we can use it on longer scoped beans -->
         <aop:scoped-proxy proxy-target-class="false"/>
     </bean>
-    <bean id="localHibernateSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider" scope="request" destroy-method="close">
-        <property name="sessionFactory" ref="localSessionFactory"/>
-
-        <!-- JDK Standard Proxy around this request scoped bean, so we can use it on longer scoped beans -->
-        <aop:scoped-proxy proxy-target-class="false"/>
+    
+     <bean id="workbenchDataManager"
+        class="org.generationcp.middleware.manager.WorkbenchDataManagerImpl">
+        <constructor-arg ref="workbenchHibernateSessionProvider" />
+    </bean>
+    
+     <bean id="managerFactoryProvider" 
+    	class="org.generationcp.commons.hibernate.DynamicManagerFactoryProvider">
+    	<constructor-arg ref="workbenchDataManager" />
+    	<property name="maxCachedLocalSessionFactories" value="1" />
+    </bean>
+    
+    <bean id="managerFactory" name="managerFactory"
+    	factory-bean="managerFactoryProvider"
+    	factory-method="createInstance"
+    	scope="request" destroy-method="close">
+    	<aop:scoped-proxy/>
     </bean>
 
-    <bean id="centralSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
-        <property name="dataSource" ref="centralDataSource"/>
-        <property name="configLocation" value="classpath:ibpmidware_hib.cfg.xml"/>
+    <bean id="studyDataManager" 
+    	factory-bean="managerFactory"
+    	factory-method="getNewStudyDataManager" 
+    	scope="request">
+    	<aop:scoped-proxy/>
     </bean>
-
-    <bean id="localSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
-        <property name="dataSource" ref="localDataSource"/>
-        <property name="configLocation" value="classpath:ibpmidware_hib.cfg.xml"/>
+    
+    <bean id="ontologyDataManager" 
+    	factory-bean="managerFactory"
+    	factory-method="getNewOntologyDataManager"
+    	scope="request">
+    	<aop:scoped-proxy/>
     </bean>
-
-    <bean id="centralDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName"    value="${central.driver}"/>
-        <property name="url"                value="${central.url}"/>
-        <property name="username"           value="${central.username}"/>
-        <property name="password"           value="${central.password}"/>
-    </bean>
-
-    <bean id="localDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName"    value="${local.driver}"/>
-        <property name="url"                value="${local.url}"/>
-        <property name="username"           value="${local.username}"/>
-        <property name="password"           value="${local.password}"/>
-    </bean>
+    
+   
+    
 </beans>

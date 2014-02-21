@@ -22,6 +22,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.generationcp.commons.hibernate.DynamicManagerFactoryProvider;
 import org.generationcp.ibpworkbench.constants.WebAPIConstants;
 import org.generationcp.ibpworkbench.model.DataResponse;
 import org.generationcp.ibpworkbench.service.BreedingViewService;
@@ -44,6 +45,9 @@ public class BreedingView {
 
     @Autowired
     private BreedingViewService breedingViewService;
+    
+    @Autowired
+    private DynamicManagerFactoryProvider managerFactoryProvider;
 
     @GET
     @Path("/ssa/save_result")
@@ -99,6 +103,12 @@ public class BreedingView {
             }
         } catch (Exception e) {
             response = new DataResponse(false, "Failed to invoke service: " + e.toString());
+        }
+        
+        try{
+        	managerFactoryProvider.close();
+        }catch(Exception e){
+        	e.printStackTrace();
         }
         return response;
     }
@@ -165,6 +175,12 @@ public class BreedingView {
         } catch (Exception e) {
             response = new DataResponse(false, "Failed to invoke service: " + e.toString());
         }
+        
+        try{
+        	managerFactoryProvider.close();
+        }catch(Exception e){
+        	e.printStackTrace();
+        }
         return response;
     }
 
@@ -175,11 +191,20 @@ public class BreedingView {
     public DataResponse deleteDataSet(@QueryParam("dataSetId") Integer dataSetId) {
     	try {
 			breedingViewService.deleteDataSet(dataSetId);
+			
+			try{
+	        	managerFactoryProvider.close();
+	        }catch(Exception e){
+	        	e.printStackTrace();
+	        }
+			
 			 return new DataResponse(true, "Successfully deleted the dataset");
 		} catch (Exception e) {
 		    LOG.debug(e.getMessage(), e);
 			return new DataResponse(false, "Dataset not deleted: " + e.toString());
 		}
+    	
+    	
        
     }
     
