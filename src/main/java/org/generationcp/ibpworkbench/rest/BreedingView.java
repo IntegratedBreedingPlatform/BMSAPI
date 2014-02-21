@@ -26,6 +26,9 @@ import org.generationcp.commons.hibernate.DynamicManagerFactoryProvider;
 import org.generationcp.ibpworkbench.constants.WebAPIConstants;
 import org.generationcp.ibpworkbench.model.DataResponse;
 import org.generationcp.ibpworkbench.service.BreedingViewService;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +46,9 @@ public class BreedingView {
 
 	private final static Logger LOG = LoggerFactory.getLogger(BreedingView.class);
 
+	@Autowired
+    private WorkbenchDataManager workbenchDataManager;
+	
     @Autowired
     private BreedingViewService breedingViewService;
     
@@ -65,6 +71,14 @@ public class BreedingView {
                           @ApiParam(value = "Output Dataset ID", required = true)
                           @QueryParam("OutputDataSetId") String outputDataSetId) {
         DataResponse response;
+        
+        if (!checkIfProjectMatched(Long.valueOf(workbenchProjectId))){
+            LOG.trace("Errors invoking web service: The current project for this request is not active in Workbench");
+          	response = new DataResponse(true, "Errors invoking web service: The current project for this request is not active in Workbench");
+          	return response;
+          }
+        
+  
         try {
             Map<String, String> params = new HashMap<String, String>();
             List<String> errors = new ArrayList<String>();
@@ -99,7 +113,7 @@ public class BreedingView {
                 breedingViewService.execute(params, errors);
                 response = new DataResponse(true, "Successfully invoked service.");
             } else {
-                response = new DataResponse(true, "Errors invoking we service: " + errors);
+                response = new DataResponse(true, "Errors invoking web service: " + errors);
             }
         } catch (Exception e) {
             response = new DataResponse(false, "Failed to invoke service: " + e.toString());
@@ -131,6 +145,13 @@ public class BreedingView {
 	      @ApiParam(value = "Output Dataset ID", required = true)
 	      @QueryParam("OutputDataSetId") String outputDataSetId) {
         DataResponse response;
+        
+       if (!checkIfProjectMatched(Long.valueOf(workbenchProjectId))){
+         LOG.trace("Errors invoking web service: The current project for this request is not active in Workbench");
+       	 response = new DataResponse(true, "Errors invoking web service: The current project for this request is not active in Workbench");
+       	 return response;
+       }
+        
         try {
             Map<String, String> params = new HashMap<String, String>();
             List<String> errors = new ArrayList<String>();
@@ -170,7 +191,7 @@ public class BreedingView {
                 breedingViewService.execute(params, errors);
                 response = new DataResponse(true, "Successfully invoked service.");
             } else {
-                response = new DataResponse(false, "Errors invoking we service: " + errors);
+                response = new DataResponse(false, "Errors invoking web service: " + errors);
             }
         } catch (Exception e) {
             response = new DataResponse(false, "Failed to invoke service: " + e.toString());
@@ -213,5 +234,22 @@ public class BreedingView {
     @Produces("text/plain")
     public String test() {
         return "WebService for BreedingView has been setup properly.";
+    }
+    
+    private boolean checkIfProjectMatched(Long workbenchProjectId){
+    	
+    	try {
+			Project project = workbenchDataManager.getLastOpenedProjectAnyUser();
+			if (project.getProjectId().equals(workbenchProjectId)){
+				
+				return true;
+			}
+			
+		} catch (MiddlewareQueryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return false;
     }
 }
