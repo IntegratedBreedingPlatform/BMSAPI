@@ -153,10 +153,11 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                     }
                     
                     Integer stdVariableId = 
-                        ontologyDataManagerV2.getStandardVariableIdByPropertyScaleMethod(
+                        ontologyDataManagerV2.getStandardVariableIdByPropertyScaleMethodRole(
                             meansVariableType.getStandardVariable().getProperty().getId()
                     		,meansVariableType.getStandardVariable().getScale().getId()
                     		,termLSMean.getId()
+                    		,PhenotypicType.VARIATE
                     		);
                     
                     if (stdVariableId == null){
@@ -196,10 +197,11 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                                 .addMethod("ERROR ESTIMATE", definitionUErrors);
                     }
                     
-                     stdVariableId = ontologyDataManagerV2.getStandardVariableIdByPropertyScaleMethod(
+                     stdVariableId = ontologyDataManagerV2.getStandardVariableIdByPropertyScaleMethodRole(
                              unitErrorsVariableType.getStandardVariable().getProperty().getId()
                     		,unitErrorsVariableType.getStandardVariable().getScale().getId()
                     		,termErrorEstimate.getId()
+                    		,PhenotypicType.VARIATE
                     		);
                     
                     if (stdVariableId == null){
@@ -414,10 +416,11 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                      }
                      
                      Integer stdVariableId = ontologyDataManagerV2
-                             .getStandardVariableIdByPropertyScaleMethod(
+                             .getStandardVariableIdByPropertyScaleMethodRole(
                                  meansVariableType.getStandardVariable().getProperty().getId()
                          		,meansVariableType.getStandardVariable().getScale().getId()
                          		,termLSMean.getId()
+                         		,PhenotypicType.VARIATE
                          		);
                      
                      if (stdVariableId == null){
@@ -463,10 +466,11 @@ public class BreedingViewServiceImpl implements BreedingViewService {
                                  .addMethod("ERROR ESTIMATE", definitionUErrors);
                      }
                      
-                      stdVariableId = ontologyDataManagerV2.getStandardVariableIdByPropertyScaleMethod(
+                      stdVariableId = ontologyDataManagerV2.getStandardVariableIdByPropertyScaleMethodRole(
                               unitErrorsVariableType.getStandardVariable().getProperty().getId()
                      		,unitErrorsVariableType.getStandardVariable().getScale().getId()
                      		,termErrorEstimate.getId()
+                     		,PhenotypicType.VARIATE
                      		);
                      
                      if (stdVariableId == null){
@@ -579,10 +583,11 @@ public class BreedingViewServiceImpl implements BreedingViewService {
     	            heritabilityVariableType.setLocalName(localName);
     	            
     	            Integer stdVariableId = ontologyDataManagerV2
-    	                    .getStandardVariableIdByPropertyScaleMethod(
+    	                    .getStandardVariableIdByPropertyScaleMethodRole(
         	            		heritabilityVariableType.getStandardVariable().getProperty().getId(),
         	            		heritabilityVariableType.getStandardVariable().getScale().getId(),
-        	            		termHeritability.getId());
+        	            		termHeritability.getId(),
+        	            		PhenotypicType.VARIATE);
     	            
     	            if (stdVariableId == null){
     	            	StandardVariable stdVariable = new StandardVariable();
