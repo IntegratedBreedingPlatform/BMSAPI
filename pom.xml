@@ -99,6 +99,17 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+					<version>1.0.1.RELEASE</version>
+				<configuration>
+			    	<mainClass>org.generationcp.bms.Main</mainClass>
+			  	</configuration>
+			  	<executions>
+			    	<execution>
+			      		<goals>
+			        		<goal>repackage</goal>
+			      		</goals>
+			    	</execution>
+			  </executions>
 			</plugin>
 		</plugins>
 	</build>

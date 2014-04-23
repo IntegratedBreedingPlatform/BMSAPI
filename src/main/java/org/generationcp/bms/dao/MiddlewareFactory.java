@@ -24,8 +24,21 @@ public class MiddlewareFactory {
 	@Bean
 	public StudyDataManager getStudyDataManager() throws ConfigException, URISyntaxException, IOException {
 	
-		DatabaseConnectionParameters central = new DatabaseConnectionParameters("application.properties", "central");
-		DatabaseConnectionParameters local = new DatabaseConnectionParameters("application.properties", "local");
+		String centralHost = environment.getProperty("central.host");
+		String centralPort = environment.getProperty("central.port");
+		String centralDbname = environment.getProperty("central.dbname");
+		String centralUsername = environment.getProperty("central.username");
+		String centralPassword = environment.getProperty("central.password");
+
+		String localHost = environment.getProperty("local.host");
+		String localPort = environment.getProperty("local.port");
+		String localDbname = environment.getProperty("local.dbname");
+		String localUsername = environment.getProperty("local.username");
+		String localPassword = environment.getProperty("local.password");
+				
+		
+		DatabaseConnectionParameters central = new DatabaseConnectionParameters(centralHost, centralPort, centralDbname, centralUsername, centralPassword);
+		DatabaseConnectionParameters local = new DatabaseConnectionParameters(localHost, localPort, localDbname, localUsername, localPassword);
 		
 		SessionFactory centralSessionFactory = SessionFactoryUtil.openSessionFactory(central);
 		SessionFactory localSessionFactory = SessionFactoryUtil.openSessionFactory(local);
