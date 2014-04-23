@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>bms-api</artifactId>
 	<packaging>${packaging.type}</packaging>
-	<version>1.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>Breeding Management System API</name>
 	
 	<profiles>
@@ -33,16 +33,11 @@
 		</repository>
 	</repositories>
 
-	<properties>
-		<middleware.version>2.1.0-SNAPSHOT</middleware.version>
-	</properties>
-
 	<dependencies>
-
 		<dependency>
 			<groupId>org.generationcp</groupId>
 			<artifactId>middleware</artifactId>
-			<version>2.1.0</version>
+			<version>2.1.0-SNAPSHOT</version>
 			<exclusions>
                 <exclusion>
                     <artifactId>slf4j-jdk14</artifactId>
@@ -88,22 +83,21 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 			<version>1.9.5</version>
-			 <scope>test</scope>
+			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
 
 	<scm>
     	<developerConnection>scm:git:https://github.com/naymesh/BMSAPI</developerConnection>
-  	  <tag>HEAD</tag>
-  </scm>
+  	  	<tag>HEAD</tag>
+  	</scm>
   	
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-					<version>1.0.1.RELEASE</version>
+				<version>1.0.1.RELEASE</version>
 				<configuration>
 			    	<mainClass>org.generationcp.bms.Main</mainClass>
 			  	</configuration>
@@ -113,7 +107,7 @@
 			        		<goal>repackage</goal>
 			      		</goals>
 			    	</execution>
-			  </executions>
+			  	</executions>
 			</plugin>
 			<plugin>
 			    <groupId>org.apache.maven.plugins</groupId>
