@@ -15,8 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/study")
 public class StudyResource {
 
+	private final StudyDataManager studyDataManager;
+	
 	@Autowired
-	private StudyDataManager studyDataManager;
+	public StudyResource(StudyDataManager studyDataManager) {
+		if(studyDataManager == null) {
+			throw new IllegalArgumentException(StudyDataManager.class.getSimpleName() + " is required to instantiate " + StudyResource.class.getSimpleName());
+		}
+		this.studyDataManager = studyDataManager;
+	}
 
 	@RequestMapping(value="/summary/{id}", method = RequestMethod.GET)
 	public StudySummary getStudySummary(@PathVariable Integer id)
