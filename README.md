@@ -10,7 +10,7 @@ BMS API is a RESTful services prototyping project built on top of the [Middlewar
 * BMS databases. [IBPDevUtils] is one option for setting them up.
 
 ### Setup ###
-* Checkout the project: `git checkout https://github.com/naymesh/BMSAPI`.
+* Checkout the project: `git clone https://github.com/naymesh/BMSAPI`.
 * Configure `src/main/resources/application.properties` to point to your environment specific values for MySQL central and local crop databases and the port (server.port) you want embedded tomcat to run at.
 
 ### Run ###
