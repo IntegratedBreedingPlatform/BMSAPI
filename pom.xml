@@ -29,7 +29,7 @@
 		<repository>
 			<id>efficio-nexus</id>
 			<name>Efficio Nexus Repositoty</name>
-			<url>http://gcp.efficio.us.com:8081/nexus/content/repositories/MiddlewareSnapshots/</url>
+			<url>http://gcp.efficio.us.com:8081/nexus/content/repositories/snapshots/</url>
 		</repository>
 	</repositories>
 
