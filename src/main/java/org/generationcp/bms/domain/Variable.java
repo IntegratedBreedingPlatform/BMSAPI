@@ -20,6 +20,10 @@ public class Variable {
 		this.standardVariable = standardVariable;
 	}
 	
+	public int getId() {
+		return standardVariable.getId();
+	}
+	
 	public TermSummary getProperty() {
 		return new TermSummary(standardVariable.getProperty().getId(), 
 				standardVariable.getProperty().getName(), 
@@ -36,6 +40,12 @@ public class Variable {
 		return new TermSummary(standardVariable.getScale().getId(), 
 				standardVariable.getScale().getName(), 
 				standardVariable.getScale().getDefinition());
+	}
+	
+	public TermSummary getDataType() {
+		return new TermSummary(standardVariable.getDataType().getId(), 
+				standardVariable.getDataType().getName(), 
+				standardVariable.getDataType().getDefinition());
 	}
 
 	public String getLocalName() {

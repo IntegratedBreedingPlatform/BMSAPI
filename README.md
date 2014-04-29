@@ -31,7 +31,7 @@ To build a war that can be deployed on external Tomcat:
 * Copy this war (perhaps after renaming to somethig simpler) to the `webapps` directory of your Tomcat installation.
 * The example resource above will be available at `http://localhost:18080/<name_of_war>/study/5715/summary` in this case.
 
-### Within Eclipse ###
+#### Within Eclipse ####
 * Import the BMSAPI Maven project from the checkout.
 * Run Main.java as a java application.
 
