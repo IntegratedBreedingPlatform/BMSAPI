@@ -23,7 +23,7 @@ public class SelectionResourceTest {
 	@Before
 	public void setUpMocks() {
 		simpleDao = Mockito.mock(SimpleDao.class);
-		mockObs = new ArrayList<>();
+		mockObs = new ArrayList<Observation>();
 		// trait amylose content
 		mockObs.add(new Observation(new ObservationKey(21735, 1, 5765), "22"));
 		mockObs.add(new Observation(new ObservationKey(21735, 2, 5765), "24"));

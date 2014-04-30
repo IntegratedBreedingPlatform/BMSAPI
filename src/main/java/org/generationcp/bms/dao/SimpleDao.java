@@ -88,14 +88,14 @@ public class SimpleDao {
 						+ " group by stdvar_id;");
 
 		for (Map<String, Object> row : queryResults) {
-			Trait trait = new Trait((int) row.get("stdvar_id"));
+			Trait trait = new Trait((Integer) row.get("stdvar_id"));
 			trait.setName((String) row.get("stdvar_name"));
 			trait.setDescription((String) row.get("stdvar_definition"));
 			trait.setProperty((String) row.get("property"));
 			trait.setMethod((String) row.get("method"));
 			trait.setScale((String) row.get("scale"));
 			trait.setType((String) row.get("type"));
-			trait.setNumberOfMeasurements((long) row.get("total_observations"));
+			trait.setNumberOfMeasurements((Long) row.get("total_observations"));
 			measuredTraits.add(trait);
 		}
 		return measuredTraits;
