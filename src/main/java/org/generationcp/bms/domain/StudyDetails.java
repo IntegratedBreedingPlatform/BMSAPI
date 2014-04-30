@@ -5,7 +5,7 @@ import java.util.List;
 
 public class StudyDetails extends StudySummary {
 	
-	private final List<Trait> measuredTraits = new ArrayList<>();
+	private final List<Trait> measuredTraits = new ArrayList<Trait>();
 	
 	private final List<Variable> factors = new ArrayList<Variable>();
 		

@@ -28,7 +28,7 @@ public class SimpleDao {
     }
 	
 	/**
-	 * Reads summay of a standard variable from a database view <strong>standard_variable_summary</strong>.
+	 * Reads summary of a standard variable from a database view <strong>standard_variable_summary</strong>.
 	 * 
 	 *  Note: view definition is in src/main/resources/sql/View_Standard_Variable_Summary.sql, make sure the view exists before using this method. 
 	 * 
