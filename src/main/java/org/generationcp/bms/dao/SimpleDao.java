@@ -2,7 +2,11 @@ package org.generationcp.bms.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
+import org.generationcp.bms.domain.Trait;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.oms.TermSummary;
@@ -23,7 +27,7 @@ public class SimpleDao {
     }
 	
 	/**
-	 * Reads summay of a standard variable from a database view standard_variable_summary.
+	 * Reads summay of a standard variable from a database view <strong>standard_variable_summary</strong>.
 	 * 
 	 *  Note: view definition is in src/main/resources/sql/View_Standard_Variable_Summary.sql, make sure the view exists before using this method. 
 	 * 
@@ -61,5 +65,38 @@ public class SimpleDao {
 		
     }
 
+	/**
+	 * Returns a list of traits for the given study (identified by the {@code studyId})
+	 * where measurements are avaibale. If study design intended for traits but
+	 * no measurements are avaibale for those traits, they are not included.
+	 * 
+	 * Relies on the database views <strong>germplasm_trial_details</strong> and <strong>standard_variable_details</strong>.
+	 * 
+	 * @param studyId the identifier of the study
+	 * @return matching traits with measurement count for each. Empty list if no such match is found. Never returns {@code null}
+	 */
+	public List<Trait> getMeasuredTraits(int studyId) {
 
+		List<Trait> measuredTraits = new ArrayList<Trait>();
+		List<Map<String, Object>> queryResults = this.jdbcTemplate
+				.queryForList(""
+						+ "select gtd.stdvar_id, svd.stdvar_name, svd.stdvar_definition, svd.property, svd.method, svd.scale, svd.type, count(gtd.observed_value) as total_observations "
+						+ " from germplasm_trial_details gtd "
+						+ " inner join standard_variable_details svd on svd.cvterm_id =  gtd.stdvar_id"
+						+ " where study_id = " + studyId
+						+ " group by stdvar_id;");
+
+		for (Map<String, Object> row : queryResults) {
+			Trait trait = new Trait((int) row.get("stdvar_id"));
+			trait.setName((String) row.get("stdvar_name"));
+			trait.setDescription((String) row.get("stdvar_definition"));
+			trait.setProperty((String) row.get("property"));
+			trait.setMethod((String) row.get("method"));
+			trait.setScale((String) row.get("scale"));
+			trait.setType((String) row.get("type"));
+			trait.setNumberOfMeasurements((long) row.get("total_observations"));
+			measuredTraits.add(trait);
+		}
+		return measuredTraits;
+	}
 }

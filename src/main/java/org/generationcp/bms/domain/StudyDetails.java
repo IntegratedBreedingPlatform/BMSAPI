@@ -5,33 +5,32 @@ import java.util.List;
 
 public class StudyDetails extends StudySummary {
 	
-	//Better name? metaData, studyInfo, properties?
+	private final List<Trait> measuredTraits = new ArrayList<>();
+	
 	private final List<Variable> factors = new ArrayList<Variable>();
-	
-	private final List<Variable> traits = new ArrayList<Variable>();
-	
+		
 	public StudyDetails(int id) {
 		super(id);
 	}
 	
+	public List<Trait> getMeasuredTraits() {
+		return measuredTraits;
+	}
+	
+	public List<Variable> getFactors() {
+		return factors;
+	}
+
 	public void addFactor(Variable factor) {
 		if(factor != null) {
 			factors.add(factor);
 		}
 	}
-	
-	public void addTrait(Variable trait) {
-		if(trait != null) {
-			traits.add(trait);
+		
+	public void addMeasuredTraits(List<Trait> traits) {
+		if(traits != null) {
+			measuredTraits.addAll(traits);
 		}
-	}
-
-	public List<Variable> getFactors() {
-		return factors;
-	}
-
-	public List<Variable> getTraits() {
-		return traits;
 	}
 }
 

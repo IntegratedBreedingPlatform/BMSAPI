@@ -43,6 +43,5 @@
     
     <!-- Set the log levels -->
     <logger name="org.hibernate" level="WARN"/>
-    <logger name="org.hibernate.SQL" level="DEBUG"/>
     <logger name="org.springframework" level="WARN"/>
 </configuration>

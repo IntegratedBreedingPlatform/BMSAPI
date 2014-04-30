@@ -4,12 +4,12 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.generationcp.bms.dao.SimpleDao;
 import org.generationcp.bms.domain.StudyDetails;
 import org.generationcp.bms.domain.StudySummary;
 import org.generationcp.bms.exception.NotFoundException;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -26,12 +26,18 @@ public class StudyResource {
 
 	private final StudyDataManager studyDataManager;
 	
+	private final SimpleDao simpleDao;
+	
 	@Autowired
-	public StudyResource(StudyDataManager studyDataManager) {
+	public StudyResource(StudyDataManager studyDataManager, SimpleDao simpleDao) {
 		if(studyDataManager == null) {
 			throw new IllegalArgumentException(StudyDataManager.class.getSimpleName() + " is required to instantiate " + StudyResource.class.getSimpleName());
 		}
+		if(simpleDao == null) {
+			throw new IllegalArgumentException(SimpleDao.class.getSimpleName() + " is required to instantiate " + StudyResource.class.getSimpleName());
+		}
 		this.studyDataManager = studyDataManager;
+		this.simpleDao = simpleDao;
 	}
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
@@ -94,28 +100,9 @@ public class StudyResource {
             factor.setLocalDescription(factorDetail.getLocalDescription());
             studyDetails.addFactor(factor);      
         }
-              
-        //Traits/constants/variates - What all was measured?
         
-        List<Variable> constants = study.getConstants().getVariables();
-        VariableTypeList variates = studyDataManager.getAllStudyVariates(Integer.valueOf(id));
-        List<VariableType> variateDetails = variates.getVariableTypes(); 
-        for(VariableType variateDetail : variateDetails){
-            String value = null;           
-            for(Variable constant : constants){
-                String constantName = constant.getVariableType().getLocalName();
-                if(variateDetail.getLocalName().equals(constantName)){
-                    value = constant.getDisplayValue();
-                }
-            }        
-            org.generationcp.bms.domain.Variable trait = new org.generationcp.bms.domain.Variable(variateDetail.getStandardVariable());
-            trait.setValue(value);
-            trait.setLocalName(variateDetail.getLocalName());
-            trait.setLocalDescription(variateDetail.getLocalDescription());
-            studyDetails.addTrait(trait);            
-        }
+        studyDetails.addMeasuredTraits(simpleDao.getMeasuredTraits(id));
         
-        return studyDetails;      
-            
+        return studyDetails;    
 	}
 }
