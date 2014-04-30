@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.generationcp</groupId>
@@ -6,24 +7,24 @@
 	<packaging>${packaging.type}</packaging>
 	<version>1.0.0-SNAPSHOT</version>
 	<name>Breeding Management System API</name>
-	
+
 	<profiles>
-       <profile>
-           <id>standalone</id>
-           <activation>
-               <activeByDefault>true</activeByDefault>
-           </activation>
-           <properties>
-               <packaging.type>jar</packaging.type>
-           </properties>
-       </profile>
-       <profile>
-           <id>webapp</id>
-           <properties>
-               <packaging.type>war</packaging.type>
-           </properties>
-       </profile>
-    </profiles>
+		<profile>
+			<id>standalone</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<packaging.type>jar</packaging.type>
+			</properties>
+		</profile>
+		<profile>
+			<id>webapp</id>
+			<properties>
+				<packaging.type>war</packaging.type>
+			</properties>
+		</profile>
+	</profiles>
 
 	<repositories>
 		<repository>
@@ -39,47 +40,47 @@
 			<artifactId>middleware</artifactId>
 			<version>2.1.0-SNAPSHOT</version>
 			<exclusions>
-                <exclusion>
-                    <artifactId>slf4j-jdk14</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-                <exclusion>
-                     <groupId>org.slf4j</groupId>
-            		<artifactId>slf4j-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-            		<artifactId>logback-classic</artifactId>
-                </exclusion>
-            </exclusions>
+				<exclusion>
+					<artifactId>slf4j-jdk14</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-	
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 			<version>1.0.1.RELEASE</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
 			<version>1.0.1.RELEASE</version>
 		</dependency>
-				
+
 		<dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.6</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
-        </dependency>
-        
-        <dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 			<version>1.9.5</version>
@@ -88,10 +89,10 @@
 	</dependencies>
 
 	<scm>
-    	<developerConnection>scm:git:https://github.com/naymesh/BMSAPI</developerConnection>
-  	  	<tag>HEAD</tag>
-  	</scm>
-  	
+		<developerConnection>scm:git:https://github.com/naymesh/BMSAPI</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -99,21 +100,28 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>1.0.1.RELEASE</version>
 				<configuration>
-			    	<mainClass>org.generationcp.bms.Main</mainClass>
-			  	</configuration>
-			  	<executions>
-			    	<execution>
-			      		<goals>
-			        		<goal>repackage</goal>
-			      		</goals>
-			    	</execution>
-			  	</executions>
+					<mainClass>org.generationcp.bms.Main</mainClass>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-release-plugin</artifactId>
-			    <version>2.5</version>
-			</plugin>			
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5</version>
+			</plugin>
 		</plugins>
 	</build>
 

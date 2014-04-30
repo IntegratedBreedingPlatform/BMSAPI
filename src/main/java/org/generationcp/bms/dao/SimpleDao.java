@@ -9,6 +9,7 @@ import java.util.Map;
 import org.generationcp.bms.domain.Trait;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
+import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,5 +99,9 @@ public class SimpleDao {
 			measuredTraits.add(trait);
 		}
 		return measuredTraits;
+	}
+
+	public List<Observation> getTraitObservationsForTrial(Integer trialEnvironmentId) {
+		return new ArrayList<Observation>();
 	}
 }
