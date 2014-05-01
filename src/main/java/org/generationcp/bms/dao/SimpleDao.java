@@ -3,14 +3,18 @@ package org.generationcp.bms.dao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.bms.domain.GermplasmScoreCard;
 import org.generationcp.bms.domain.Trait;
 import org.generationcp.bms.domain.TraitObservation;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.h2h.Observation;
+import org.generationcp.middleware.domain.h2h.ObservationKey;
+import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,8 +108,31 @@ public class SimpleDao {
 		return measuredTraits;
 	}
 
-	public List<Observation> getTraitObservationsForTrial(Integer trialEnvironmentId) {
-		return new ArrayList<Observation>();
+	public List<GermplasmScoreCard> getTraitObservationsForTrial(Integer trialEnvironmentId, List<TraitInfo> traits) {
+		
+		StringBuilder traitQuery = new StringBuilder();
+		for (TraitInfo traitInfo : traits) {
+			traitQuery.append(traitInfo.getId());
+			traitQuery.append(",");
+		}
+		
+		Map<Integer, GermplasmScoreCard> scoreMap = new HashMap<Integer, GermplasmScoreCard>();
+		List<Map<String, Object>> queryResults = jdbcTemplate.queryForList("select gtd.stdvar_id, gtd.envt_id, gtd.gid, gtd.entry_designation, gtd.observed_value from germplasm_trial_details gtd "
+				+ "where gtd.envt_id = " + trialEnvironmentId 
+				+ " and stdvar_id in (" + traitQuery.substring(0, traitQuery.toString().lastIndexOf(",")) + ");");
+		
+		for (Map<String, Object> row : queryResults) {
+			ObservationKey obsKey = new ObservationKey(
+					((Integer) row.get("stdvar_id")).intValue(), 
+					((Integer)row.get("gid")).intValue(), 
+					((Integer) row.get("envt_id")).intValue());
+			Observation observation = new Observation(obsKey, (String) row.get("observed_value"));
+			if (!scoreMap.containsKey(observation.getId().getGermplasmId())) {
+				scoreMap.put(observation.getId().getGermplasmId(), new GermplasmScoreCard((Integer)row.get("gid"), (String) row.get("entry_designation")));
+			}
+			scoreMap.get(observation.getId().getGermplasmId()).addObservation(observation);
+		}
+		return new ArrayList<GermplasmScoreCard>(scoreMap.values());
 	}
 	
 	public List<TraitObservation> getTraitObservations(int studyId, int traitId) {

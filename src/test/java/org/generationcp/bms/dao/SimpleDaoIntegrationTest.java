@@ -2,12 +2,16 @@ package org.generationcp.bms.dao;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.generationcp.bms.domain.GermplasmScoreCard;
 import org.generationcp.bms.domain.Trait;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
+import org.generationcp.middleware.domain.h2h.Observation;
+import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -42,7 +46,7 @@ public class SimpleDaoIntegrationTest {
 		dao = new SimpleDao(jdbcTemplate);
 	}
 	
-	@Test
+	// @Test
 	public void testLoadPlantHeightFromView() throws MiddlewareQueryException {
 
 		StandardVariableSummary summary = dao.getStandardVariableSummary(PLANT_HEIGHT_ID);
@@ -63,5 +67,20 @@ public class SimpleDaoIntegrationTest {
 	public void testGetMeasuredTraits() {
 		List<Trait> measuredTraits = dao.getMeasuredTraits(BON2005DS_STUDY_ID);		
 		Assert.assertTrue(measuredTraits.size() == 8);		
+	}
+	
+	@Test
+	public void testGetTraitObservationsForTrials() {
+		
+		ArrayList<TraitInfo> interestingTraits = new ArrayList<TraitInfo>();
+		interestingTraits.add(new TraitInfo(21735)); // amylose
+		interestingTraits.add(new TraitInfo(21726)); // plant height
+		interestingTraits.add(new TraitInfo(20826)); // grain density
+		
+		List<GermplasmScoreCard> result = dao.getTraitObservationsForTrial(5765, interestingTraits);
+		
+		Assert.assertTrue(result.size() > 0);
+		Assert.assertTrue(result.size() == 220);
+		
 	}
 }
