@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.generationcp.bms.dao.SimpleDao;
 import org.generationcp.bms.domain.StudyDetails;
 import org.generationcp.bms.domain.StudySummary;
+import org.generationcp.bms.domain.TraitObservation;
+import org.generationcp.bms.domain.TraitObservationDetails;
 import org.generationcp.bms.exception.NotFoundException;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -45,11 +47,11 @@ public class StudyResource {
 		return "Please provide the id of the study you want to GET to. e.g. http://host:port/study/10010 where 10010 is the study id.";
 	}
 
-	@RequestMapping(value="/{id}/summary", method = RequestMethod.GET)
-	public StudySummary getStudySummary(@PathVariable Integer id)
+	@RequestMapping(value="/{studyId}/summary", method = RequestMethod.GET)
+	public StudySummary getStudySummary(@PathVariable Integer studyId)
 			throws MiddlewareQueryException {
 
-		Study study = studyDataManager.getStudy(id);
+		Study study = studyDataManager.getStudy(studyId);
 
 		if (study == null) {
 			throw new NotFoundException();
@@ -70,10 +72,10 @@ public class StudyResource {
 		studySummary.setEndDate(String.valueOf(study.getEndDate()));
 	}
 	
-	@RequestMapping(value="/{id}", method = RequestMethod.GET)
-	public StudyDetails getStudyDetails(@PathVariable Integer id) throws MiddlewareQueryException {
+	@RequestMapping(value="/{studyId}", method = RequestMethod.GET)
+	public StudyDetails getStudyDetails(@PathVariable Integer studyId) throws MiddlewareQueryException {
 		
-        Study study = studyDataManager.getStudy(id);
+        Study study = studyDataManager.getStudy(studyId);
         if (study == null) {
 			throw new NotFoundException();
 		}
@@ -84,7 +86,7 @@ public class StudyResource {
         //factors/metadaa/properties/information/conditions of the study        
         
         List<Variable> conditions = study.getConditions().getVariables();
-        VariableTypeList factors = studyDataManager.getAllStudyFactors(Integer.valueOf(id));
+        VariableTypeList factors = studyDataManager.getAllStudyFactors(Integer.valueOf(studyId));
         List<VariableType> factorDetails = factors.getVariableTypes();
         for(VariableType factorDetail : factorDetails){
             String value = null;           
@@ -101,8 +103,21 @@ public class StudyResource {
             studyDetails.addFactor(factor);      
         }
         
-        studyDetails.addMeasuredTraits(simpleDao.getMeasuredTraits(id));
+        studyDetails.addMeasuredTraits(simpleDao.getMeasuredTraits(studyId));
         
         return studyDetails;    
+	}
+	
+	@RequestMapping(value="/{studyId}/trait/{traitId}", method = RequestMethod.GET)
+	public TraitObservationDetails getTraitObservationDetails(@PathVariable Integer studyId, @PathVariable Integer traitId) {
+		
+		List<TraitObservation> traitObservations = simpleDao.getTraitObservations(studyId, traitId);
+		
+		if(!traitObservations.isEmpty()) {
+			TraitObservationDetails details = new TraitObservationDetails(traitId, studyId);
+			details.addObservations(traitObservations);
+			return details;
+		}
+		throw new NotFoundException();
 	}
 }

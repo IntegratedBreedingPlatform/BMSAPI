@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.bms.domain.Trait;
+import org.generationcp.bms.domain.TraitObservation;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.h2h.Observation;
@@ -67,14 +68,16 @@ public class SimpleDao {
     }
 
 	/**
-	 * Returns a list of traits for the given study (identified by the {@code studyId})
-	 * where measurements are avaibale. If study design intended for traits but
-	 * no measurements are avaibale for those traits, they are not included.
+	 * Returns a list of traits for the given study (identified by the {@code studyId}). 
+	 * Study design may have many traits "intended" to be measured (defined as variates of the study). 
+	 * However, not all traits are measured for all plants/germplasm necessarily.
+	 *  
+	 * This method returns only those traits for which measurements are avaibale. 
 	 * 
 	 * Relies on the database views <strong>germplasm_trial_details</strong> and <strong>standard_variable_details</strong>.
 	 * 
 	 * @param studyId the identifier of the study
-	 * @return matching traits with measurement count for each. Empty list if no such match is found. Never returns {@code null}
+	 * @return matching traits with measurement count for each. Empty list if no such match is found. Never returns {@code null}.
 	 */
 	public List<Trait> getMeasuredTraits(int studyId) {
 
@@ -84,8 +87,8 @@ public class SimpleDao {
 						+ "select gtd.stdvar_id, svd.stdvar_name, svd.stdvar_definition, svd.property, svd.method, svd.scale, svd.type, count(gtd.observed_value) as total_observations "
 						+ " from germplasm_trial_details gtd "
 						+ " inner join standard_variable_details svd on svd.cvterm_id =  gtd.stdvar_id"
-						+ " where study_id = " + studyId
-						+ " group by stdvar_id;");
+						+ " where gtd.study_id = " + studyId
+						+ " group by gtd.stdvar_id;");
 
 		for (Map<String, Object> row : queryResults) {
 			Trait trait = new Trait((Integer) row.get("stdvar_id"));
@@ -103,5 +106,30 @@ public class SimpleDao {
 
 	public List<Observation> getTraitObservationsForTrial(Integer trialEnvironmentId) {
 		return new ArrayList<Observation>();
+	}
+	
+	public List<TraitObservation> getTraitObservations(int studyId, int traitId) {
+		
+		List<TraitObservation> traitObservations = new ArrayList<TraitObservation>();
+		List<Map<String, Object>> queryResults = this.jdbcTemplate
+				.queryForList("select gtd.experiment_id, gtd.observed_value, gtd.envt_id, gtd.entry_designation, gtd.gid from germplasm_trial_details gtd "
+						+ " where gtd.study_id =" + studyId
+						+ " and "
+						+ " gtd.stdvar_id = " + traitId + ";");
+
+		for (Map<String, Object> row : queryResults) {
+			int experimentId = (Integer) row.get("experiment_id");
+			int germplasmId = (Integer) row.get("gid");
+			int environmentId = (Integer) row.get("envt_id");
+			String observedValue = (String) row.get("observed_value");	
+			String designation = (String) row.get("entry_designation");
+
+			TraitObservation obs = new TraitObservation(experimentId, germplasmId, environmentId);
+			obs.setDesignation(designation);
+			obs.setValue(observedValue);
+			traitObservations.add(obs);
+		}
+		
+		return traitObservations;
 	}
 }

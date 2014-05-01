@@ -1,9 +1,6 @@
 package org.generationcp.bms.resource;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 
 import org.generationcp.bms.dao.SimpleDao;
 import org.generationcp.bms.domain.StudyDetails;
