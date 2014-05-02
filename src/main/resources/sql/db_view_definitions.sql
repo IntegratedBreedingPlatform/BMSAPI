@@ -60,3 +60,20 @@ drop view if exists standard_variable_summary;
 	where cvt.cv_id = 1040
 		group by cvt.cvterm_id, cvt.name
 		order by id;
+		
+-- view for germplasm search
+		
+drop view if exists germplasm_summary;
+
+	create view germplasm_summary as
+	
+		select gp.gid, group_concat(n.nval) as names, ld.listid
+		
+		from germplsm gp 
+			
+			inner join names n on n.gid = gp.gid
+			left outer join listdata ld on ld.gid = n.gid
+		
+		where gp.gid != gp.grplce and n.nstat != 9
+		group by gid
+	;

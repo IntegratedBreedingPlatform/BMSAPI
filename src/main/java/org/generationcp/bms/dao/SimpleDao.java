@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.bms.domain.GermplasmScoreCard;
+import org.generationcp.bms.domain.GermplasmSearchResult;
 import org.generationcp.bms.domain.Trait;
 import org.generationcp.bms.domain.TraitObservation;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -18,6 +19,7 @@ import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -35,7 +37,7 @@ public class SimpleDao {
 	/**
 	 * Reads summary of a standard variable from a database view <strong>standard_variable_summary</strong>.
 	 * 
-	 *  Note: view definition is in src/main/resources/sql/View_Standard_Variable_Summary.sql, make sure the view exists before using this method. 
+	 *  Note: view definition is in src/main/resources/sql/db_view_definitions.sql, make sure the view exists before using this method. 
 	 * 
 	 * @param standardVariableId
 	 * @return
@@ -158,5 +160,13 @@ public class SimpleDao {
 		}
 		
 		return traitObservations;
+	}
+	
+	public List<GermplasmSearchResult> searchGermplasm(String queryString) {
+		
+		BeanPropertyRowMapper<GermplasmSearchResult> rowMapper = new BeanPropertyRowMapper<GermplasmSearchResult>();
+		rowMapper.setMappedClass(GermplasmSearchResult.class);
+		
+		return this.jdbcTemplate.query("select * from germplasm_summary where names like '%" + queryString + "%'", rowMapper);
 	}
 }
