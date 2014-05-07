@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.domain.h2h.ObservationKey;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,7 +91,7 @@ public class SimpleDao {
 		List<Trait> measuredTraits = new ArrayList<Trait>();
 		List<Map<String, Object>> queryResults = this.jdbcTemplate
 				.queryForList(""
-						+ "select gtd.stdvar_id, svd.stdvar_name, svd.stdvar_definition, svd.property, svd.method, svd.scale, svd.type, count(gtd.observed_value) as total_observations "
+						+ "select gtd.stdvar_id, svd.stdvar_name, svd.stdvar_definition, svd.property, svd.method, svd.scale, svd.type, svd.has_type, count(gtd.observed_value) as total_observations "
 						+ " from germplasm_trial_details gtd "
 						+ " inner join standard_variable_details svd on svd.cvterm_id =  gtd.stdvar_id"
 						+ " where gtd.study_id = " + studyId
@@ -105,6 +106,9 @@ public class SimpleDao {
 			trait.setScale((String) row.get("scale"));
 			trait.setType((String) row.get("type"));
 			trait.setNumberOfMeasurements((Long) row.get("total_observations"));
+			//TODO the query for some reason returns the has_type (which is the dataType id) as String type, fix later.
+			Integer dataTypeId = Integer.valueOf((String) row.get("has_type"));
+			trait.setNumeric(dataTypeId.equals(TermId.NUMERIC_VARIABLE.getId()));
 			measuredTraits.add(trait);
 		}
 		return measuredTraits;

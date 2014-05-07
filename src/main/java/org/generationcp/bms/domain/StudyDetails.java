@@ -13,6 +13,22 @@ public class StudyDetails extends StudySummary {
 		super(id);
 	}
 	
+	/**
+	 * Traits with numeric measurement values only.
+	 */
+	public List<Trait> getNumericTraits() {
+		List<Trait> numericTraits = new ArrayList<Trait>();
+		for(Trait trait : measuredTraits) {
+			if(trait.isNumeric()) {
+				numericTraits.add(trait);
+			}
+		}
+		return numericTraits;
+	}
+	
+	/**
+	 * All traits that have measurements recorded.
+	 */
 	public List<Trait> getMeasuredTraits() {
 		return measuredTraits;
 	}

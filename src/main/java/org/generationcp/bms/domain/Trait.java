@@ -10,6 +10,8 @@ public class Trait {
 	private String scale;
 	private String type;
 	
+	private boolean numeric;
+	
 	private long numberOfMeasurements;
 
 	public Trait(int id) {
@@ -74,6 +76,14 @@ public class Trait {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public boolean isNumeric() {
+		return numeric;
+	}
+
+	public void setNumeric(boolean numeric) {
+		this.numeric = numeric;
 	}
 
 	@Override

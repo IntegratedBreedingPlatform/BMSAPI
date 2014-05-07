@@ -66,7 +66,16 @@ public class SimpleDaoIntegrationTest {
 	@Test
 	public void testGetMeasuredTraits() {
 		List<Trait> measuredTraits = dao.getMeasuredTraits(BON2005DS_STUDY_ID);		
-		Assert.assertTrue(measuredTraits.size() == 8);		
+		Assert.assertTrue(measuredTraits.size() == 8);
+		
+		List<Trait> numericTraits = new ArrayList<Trait>();
+		for(Trait trait : measuredTraits) {
+			if(trait.isNumeric()) {
+				numericTraits.add(trait);
+			}
+		}
+		// There are two numeric traits in our test study : FLW and MAT85
+		Assert.assertTrue(numericTraits.size() == 2);	
 	}
 	
 	@Test
