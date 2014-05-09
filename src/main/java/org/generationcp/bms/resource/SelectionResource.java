@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -51,8 +52,8 @@ public class SelectionResource {
 		
 	}
 	
-	@RequestMapping(value="/top/trial/{studyId}/{selectionIntensity}/{traits}", method = RequestMethod.GET)
-	public List<GermplasmScoreCard> selectTopPerformersForTrial(@PathVariable Integer studyId, @PathVariable int selectionIntensity, @PathVariable String traits) {
+	@RequestMapping(value="/trial/{studyId}/top", method = RequestMethod.GET)
+	public List<GermplasmScoreCard> selectTopPerformersForTrial(@PathVariable Integer studyId, @RequestParam int si, @RequestParam String traits) {
 		
 		List<TraitInfo> traitList = new ArrayList<TraitInfo>();
 		String[] traitsIds = traits.split(",");
@@ -64,7 +65,7 @@ public class SelectionResource {
 		Collections.sort(scoreCards);
 		
 		//select the top designated percentage of the sorted collection
-		int selectionThreshold = (int) (scoreCards.size()*selectionIntensity/100);
+		int selectionThreshold = (int) (scoreCards.size()*si/100);
 		return scoreCards.subList(0, selectionThreshold);
 		
 	}
