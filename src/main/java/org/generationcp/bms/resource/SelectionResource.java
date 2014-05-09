@@ -33,8 +33,8 @@ public class SelectionResource {
 		return "Please provide parameters for selection in format host:port/selection/top/{trialId}/{selectionIntensity}";
 	}
 	
-	@RequestMapping(value="/top/{trialId}/{selectionIntensity}/{traits}", method = RequestMethod.GET)
-	public List<GermplasmScoreCard> selectTopPerformers(@PathVariable Integer trialId, @PathVariable int selectionIntensity, @PathVariable String traits) {
+	@RequestMapping(value="/top/trial/instance/{trialId}/{selectionIntensity}/{traits}", method = RequestMethod.GET)
+	public List<GermplasmScoreCard> selectTopPerformersForTrialInstance(@PathVariable Integer trialId, @PathVariable int selectionIntensity, @PathVariable String traits) {
 		
 		List<TraitInfo> traitList = new ArrayList<TraitInfo>();
 		String[] traitsIds = traits.split(",");
@@ -43,6 +43,24 @@ public class SelectionResource {
 		}
 		
 		List<GermplasmScoreCard> scoreCards = simpleDao.getTraitObservationsForTrial(trialId, traitList);
+		Collections.sort(scoreCards);
+		
+		//select the top designated percentage of the sorted collection
+		int selectionThreshold = (int) (scoreCards.size()*selectionIntensity/100);
+		return scoreCards.subList(0, selectionThreshold);
+		
+	}
+	
+	@RequestMapping(value="/top/trial/{studyId}/{selectionIntensity}/{traits}", method = RequestMethod.GET)
+	public List<GermplasmScoreCard> selectTopPerformersForTrial(@PathVariable Integer studyId, @PathVariable int selectionIntensity, @PathVariable String traits) {
+		
+		List<TraitInfo> traitList = new ArrayList<TraitInfo>();
+		String[] traitsIds = traits.split(",");
+		for (int i = 0; i < traitsIds.length; i++) {
+			traitList.add(new TraitInfo(Integer.valueOf(traitsIds[i]).intValue()));
+		}
+		
+		List<GermplasmScoreCard> scoreCards = simpleDao.getTraitObservationsForStudy(studyId, traitList);
 		Collections.sort(scoreCards);
 		
 		//select the top designated percentage of the sorted collection

@@ -114,6 +114,23 @@ public class SimpleDao {
 		return measuredTraits;
 	}
 
+	public List<GermplasmScoreCard> getTraitObservationsForStudy(Integer studyId, List<TraitInfo> traits) {
+		
+		StringBuilder traitQuery = new StringBuilder();
+		for (TraitInfo traitInfo : traits) {
+			traitQuery.append(traitInfo.getId());
+			traitQuery.append(",");
+		}
+		
+		Map<Integer, GermplasmScoreCard> scoreMap = new HashMap<Integer, GermplasmScoreCard>();
+		List<Map<String, Object>> queryResults = jdbcTemplate.queryForList("select gtd.study_id, gtd.stdvar_id, gtd.envt_id, gtd.gid, gtd.entry_designation, gtd.observed_value from germplasm_trial_details gtd "
+				+ "where gtd.study_id = " + studyId 
+				+ " and stdvar_id in (" + traitQuery.substring(0, traitQuery.toString().lastIndexOf(",")) + ");");
+		
+		return evaluateScoreCards("study_id", scoreMap, queryResults);
+		
+	}
+	
 	public List<GermplasmScoreCard> getTraitObservationsForTrial(Integer trialEnvironmentId, List<TraitInfo> traits) {
 		
 		StringBuilder traitQuery = new StringBuilder();
@@ -127,11 +144,17 @@ public class SimpleDao {
 				+ "where gtd.envt_id = " + trialEnvironmentId 
 				+ " and stdvar_id in (" + traitQuery.substring(0, traitQuery.toString().lastIndexOf(",")) + ");");
 		
+		return evaluateScoreCards("envt_id", scoreMap, queryResults);
+		
+	}
+
+	private List<GermplasmScoreCard> evaluateScoreCards(String trialKeyType, Map<Integer, GermplasmScoreCard> scoreMap,
+			List<Map<String, Object>> queryResults) {
 		for (Map<String, Object> row : queryResults) {
 			ObservationKey obsKey = new ObservationKey(
 					((Integer) row.get("stdvar_id")).intValue(), 
 					((Integer)row.get("gid")).intValue(), 
-					((Integer) row.get("envt_id")).intValue());
+					((Integer) row.get(trialKeyType)).intValue());
 			Observation observation = new Observation(obsKey, (String) row.get("observed_value"));
 			if (!scoreMap.containsKey(observation.getId().getGermplasmId())) {
 				scoreMap.put(observation.getId().getGermplasmId(), new GermplasmScoreCard((Integer)row.get("gid"), (String) row.get("entry_designation")));

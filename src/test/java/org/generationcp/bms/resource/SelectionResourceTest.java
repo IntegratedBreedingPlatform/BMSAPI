@@ -89,7 +89,7 @@ public class SelectionResourceTest {
 		Mockito.when(simpleDao.getTraitObservationsForTrial(Mockito.anyInt(), Mockito.anyList())).thenReturn(mockObs);
 		
 		//select
-		List<GermplasmScoreCard> topPerformers = selector.selectTopPerformers(trialEnvironmentId, selectionIntensity, traits);
+		List<GermplasmScoreCard> topPerformers = selector.selectTopPerformersForTrialInstance(trialEnvironmentId, selectionIntensity, traits);
 		
 		assertTrue(topPerformers.size() > 0);
 		assertTrue(topPerformers.size() == 3);
