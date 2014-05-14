@@ -1,8 +1,8 @@
 package org.generationcp.bms.domain;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.generationcp.middleware.domain.h2h.Observation;
 
@@ -13,8 +13,8 @@ public class GermplasmScoreCard implements Comparable<GermplasmScoreCard> {
 	private final Integer gid;
 	private final String name;
 	private List<Observation> observations = new ArrayList<Observation>();
-	private Map<Observation, Integer> weightings;
-	//private int score = 0;
+	//private Map<Observation, Integer> weightings;
+	private List<String> inventoryLocations = Arrays.asList(new String[] {"Shed 5, Bin 2", "Lab 32, Shelf 5, Bag 36", "Storage Room 34, Drawer 25", "Lab 23, Shelf 2, Canister 5"});
 	
 	public GermplasmScoreCard(Integer gid, String name) {
 		this.gid = gid;
@@ -35,12 +35,20 @@ public class GermplasmScoreCard implements Comparable<GermplasmScoreCard> {
 		return total;
 	}
 
-	public Integer getGid() {
+	public Integer getGermplasmId() {
 		return gid;
 	}
 
-	public String getName() {
+	public String getGermplasmName() {
 		return name;
+	}
+	
+	public List<Observation> getIndividualObservations() {
+		return observations;
+	}
+	
+	public String getInventoryLocation() {
+		return inventoryLocations.get((int)(Math.random()*inventoryLocations.size()));
 	}
 	
 	public void addObservation(Observation o) {
