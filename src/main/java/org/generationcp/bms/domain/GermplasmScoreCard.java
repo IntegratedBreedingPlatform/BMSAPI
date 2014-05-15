@@ -27,10 +27,10 @@ public class GermplasmScoreCard implements Comparable<GermplasmScoreCard> {
 		this.observations = observations;
 	}
 	
-	public int getScore() {
+	public double getScore() {
 		int total = 0;
 		for (Observation observation : observations) {
-			total += Integer.parseInt(observation.getValue());
+			total += Double.parseDouble(observation.getValue());
 		}
 		return total;
 	}
@@ -57,7 +57,7 @@ public class GermplasmScoreCard implements Comparable<GermplasmScoreCard> {
 
 	@Override
 	public int compareTo(GermplasmScoreCard other) {
-		return other.getScore() - this.getScore();
+		return Double.compare(other.getScore(), this.getScore());
 	}
 
 	@Override
