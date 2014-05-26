@@ -16,7 +16,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import java.io.FileReader;
 import java.util.*;
 
-public class TraitsAndMeansCSVUtil2 {
+public class MeansUtil {
     public Map<String, ArrayList<String>> csvToMap(String fileName) throws Exception {
         CSVReader reader = new CSVReader(new FileReader(fileName));
         Map<String, ArrayList<String>> csvMap = new LinkedHashMap<String, ArrayList<String>>();
