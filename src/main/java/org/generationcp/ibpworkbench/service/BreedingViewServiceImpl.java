@@ -70,7 +70,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 	public void execute(Map<String, String> params, List<String> errors) throws Exception {
 		String mainOutputFilePath = params.get(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue());
-		String heritabilityOutputFilePath = params.get(WebAPIConstants.HERITABILITY_OUTPUT_FILE_PATH.getParamValue());
+		String summaryStatsOutputFilePath = params.get(WebAPIConstants.HERITABILITY_OUTPUT_FILE_PATH.getParamValue());
 		String workbenchProjectId = params.get(WebAPIConstants.WORKBENCH_PROJECT_ID.getParamValue());
 		Map<String, ArrayList<String>> traitsAndMeans = meansUtil.csvToMap(mainOutputFilePath);
 		Map<String, Integer> ndGeolocationIds = new HashMap<String, Integer>();
@@ -263,8 +263,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			DatasetValues datasetValues = new DatasetValues();
 			datasetValues.setVariables(variableList);
 
-
-
 			DatasetReference datasetReference = null;
 			if (meansDataSet == null){
 				//save data
@@ -273,34 +271,11 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 				meansDataSet = studyDataManager.getDataSet(datasetReference.getId());
 			}
 
-
-			/**if (meansDataSetExists){
-            	//TrialEnvironment env = 
-            	//  studyDataManagerV2.getTrialEnvironmentsInDataset(meansDataSet.getId())
-            	//         .findOnlyOneByLocalName(csvHeader[0], traitsAndMeans.get(csvHeader[0]).get(0));
-            	for (Entry<String, Integer> entry : ndGeolocationIds.entrySet()){
-            		if (meansDataSet.getLocationIds().contains(entry.getValue())){
-                		studyDataManagerV2.deleteExperimentsByLocation(meansDataSet.getId(), entry.getValue());
-            		}
-            	}
-
-
-            }**/
-
-			List<String> uniqueEnvList = new ArrayList<String>();
-
+			ArrayList<ExperimentValues> experimentValuesList = new ArrayList<ExperimentValues>();
 			ArrayList<String> environments = traitsAndMeans.get(csvHeader[0]);
 			for(int i = 0; i < environments.size(); i++) {
 
-
 				String envName = traitsAndMeans.get(csvHeader[0]).get(i).replace(";", ",");
-
-				/**
-            	if (!uniqueEnvList.contains(envName) && meansDataSetExists){
-            		studyDataManagerV2.deleteExperimentsByLocation(
-            		        meansDataSet.getId(), ndGeolocationIds.get(envName));
-            		uniqueEnvList.add(envName);
-            	}**/
 
 				Stock stock = stocks.findOnlyOneByLocalName(
 						csvHeader[1], traitsAndMeans.get(csvHeader[1]).get(i));
@@ -332,16 +307,20 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 					VariableList variableList1 = new VariableList();
 					variableList1.setVariables(list);
 					experimentRow.setVariableList(variableList1);
-					if (variateHasValue) studyDataManager.addOrUpdateExperiment(
-							meansDataSet.getId(), ExperimentType.AVERAGE, experimentRow);
-
+					if (variateHasValue) experimentValuesList.add(experimentRow);
+						
 				}
+				
+				
 			}
+			
+			studyDataManager.addOrUpdateExperiment(
+					meansDataSet.getId(), ExperimentType.AVERAGE, experimentValuesList);
 
 			//GCP-6209
-			if(heritabilityOutputFilePath!=null && !heritabilityOutputFilePath.equals("")) {
+			if(summaryStatsOutputFilePath!=null && !summaryStatsOutputFilePath.equals("")) {
 				uploadAndSaveSummaryStatsToDB(
-						heritabilityOutputFilePath, studyId, trialEnvironments, dataSet);
+						summaryStatsOutputFilePath, studyId, trialEnvironments, dataSet);
 			}
 
 
@@ -521,13 +500,13 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	}
 
 	private void uploadAndSaveSummaryStatsToDB(
-			String heritabilityOutputFilePath, int studyId, 
+			String summaryStatsOutputFilePath, int studyId, 
 			TrialEnvironments trialEnvironments, DataSet measurementDataSet) 
 					throws Exception {
 
 		try {
 
-			SummaryStatsCSV summaryStatsCSV = new SummaryStatsCSV(heritabilityOutputFilePath);
+			SummaryStatsCSV summaryStatsCSV = new SummaryStatsCSV(summaryStatsOutputFilePath);
 
 			Map<String, Map<String, ArrayList<String>>> summaryStatsData = 
 					summaryStatsCSV.getData();
@@ -568,7 +547,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 			VariableTypeList variableTypeList = new VariableTypeList();//list that will contain all summary stats project properties
 			
-			
 			List<String> summaryStatsList = summaryStatsCSV.getHeaderStats();
 			String trialLocalName =  summaryStatsCSV.getTrialHeader();
 			
@@ -583,6 +561,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 			LOG.info("prepare the summary stats project properties if necessary");
 			int lastRank = trialDataSet.getVariableTypes().size();
+			
 			for (String summaryStatName : summaryStatsList){
 
 				for(VariableType variate : variableTypeListVariates.getVariableTypes()) {
