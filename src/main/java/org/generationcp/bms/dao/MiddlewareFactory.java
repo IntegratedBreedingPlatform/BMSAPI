@@ -1,14 +1,16 @@
 package org.generationcp.bms.dao;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.io.FileNotFoundException;
 
-import org.generationcp.middleware.exceptions.ConfigException;
+import javax.annotation.PostConstruct;
+
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.SessionFactoryUtil;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.FieldbookServiceImpl;
+import org.generationcp.middleware.service.api.FieldbookService;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -21,9 +23,12 @@ public class MiddlewareFactory {
 	@Autowired
 	private Environment environment;
 	
-	@Bean
-	public StudyDataManager getStudyDataManager() throws ConfigException, URISyntaxException, IOException {
+	private SessionFactory centralSessionFactory;
+	private SessionFactory localSessionFactory;
 	
+	@PostConstruct  
+	public void postConstruct() throws FileNotFoundException {
+		
 		String centralHost = environment.getProperty("central.host");
 		String centralPort = environment.getProperty("central.port");
 		String centralDbname = environment.getProperty("central.dbname");
@@ -37,15 +42,25 @@ public class MiddlewareFactory {
 		String localPassword = environment.getProperty("local.password");
 				
 		
-		DatabaseConnectionParameters central = new DatabaseConnectionParameters(centralHost, centralPort, centralDbname, centralUsername, centralPassword);
-		DatabaseConnectionParameters local = new DatabaseConnectionParameters(localHost, localPort, localDbname, localUsername, localPassword);
+		DatabaseConnectionParameters centralConnectionParameters 
+					= new DatabaseConnectionParameters(centralHost, centralPort, centralDbname, centralUsername, centralPassword);
 		
-		SessionFactory centralSessionFactory = SessionFactoryUtil.openSessionFactory(central);
-		SessionFactory localSessionFactory = SessionFactoryUtil.openSessionFactory(local);
+		DatabaseConnectionParameters localConnectionParameters 
+					= new DatabaseConnectionParameters(localHost, localPort, localDbname, localUsername, localPassword);	
 		
-		StudyDataManagerImpl impl = new StudyDataManagerImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
+		centralSessionFactory = SessionFactoryUtil.openSessionFactory(centralConnectionParameters);
+		localSessionFactory = SessionFactoryUtil.openSessionFactory(localConnectionParameters);
+	}
+	
+	@Bean
+	public StudyDataManager getStudyDataManager() throws FileNotFoundException {		
+		return new StudyDataManagerImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
 				new HibernateSessionPerRequestProvider(centralSessionFactory));
-		
-		return impl;
+	}
+	
+	@Bean
+	public FieldbookService getFieldbookService() {
+		return new FieldbookServiceImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
+				new HibernateSessionPerRequestProvider(centralSessionFactory));
 	}
 }
