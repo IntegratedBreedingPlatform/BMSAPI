@@ -21,8 +21,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.generationcp.ibpworkbench.constants.WebAPIConstants;
+import org.generationcp.ibpworkbench.util.OutlierCSV;
 import org.generationcp.ibpworkbench.util.SummaryStatsCSV;
-import org.generationcp.ibpworkbench.util.MeansUtil;
+import org.generationcp.ibpworkbench.util.CSVUtil;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -43,11 +44,10 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.OntologyDataManagerImpl;
-import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +56,7 @@ import com.rits.cloning.Cloner;
 
 public class BreedingViewServiceImpl implements BreedingViewService {
 	@Autowired
-	private MeansUtil meansUtil;
+	private CSVUtil csvUtil;
 	@Autowired
 	private StudyDataManager studyDataManager;
 	@Autowired
@@ -71,8 +71,9 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	public void execute(Map<String, String> params, List<String> errors) throws Exception {
 		String mainOutputFilePath = params.get(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue());
 		String summaryStatsOutputFilePath = params.get(WebAPIConstants.HERITABILITY_OUTPUT_FILE_PATH.getParamValue());
+		String outlierDataOutputFilePath = params.get(WebAPIConstants.OUTLIER_OUTPUT_FILE_PATH.getParamValue());
 		String workbenchProjectId = params.get(WebAPIConstants.WORKBENCH_PROJECT_ID.getParamValue());
-		Map<String, ArrayList<String>> traitsAndMeans = meansUtil.csvToMap(mainOutputFilePath);
+		Map<String, ArrayList<String>> traitsAndMeans = csvUtil.csvToMap(mainOutputFilePath);
 		Map<String, Integer> ndGeolocationIds = new HashMap<String, Integer>();
 		LOG.info("Traits and Means: " + traitsAndMeans);
 
@@ -317,6 +318,11 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			studyDataManager.addOrUpdateExperiment(
 					meansDataSet.getId(), ExperimentType.AVERAGE, experimentValuesList);
 
+			if(outlierDataOutputFilePath!=null && !outlierDataOutputFilePath.equals("")) {
+				uploadAndSaveOutlierDataToDB(
+						outlierDataOutputFilePath, studyId, ndGeolocationIds, dataSet);
+			}
+			
 			//GCP-6209
 			if(summaryStatsOutputFilePath!=null && !summaryStatsOutputFilePath.equals("")) {
 				uploadAndSaveSummaryStatsToDB(
@@ -497,6 +503,65 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 	public void deleteDataSet(Integer dataSetId) throws Exception {
 		studyDataManager.deleteDataSet(dataSetId);
+	}
+	
+	private void uploadAndSaveOutlierDataToDB(
+			String outlierDataOutputFilePath, int studyId, 
+			Map<String, Integer> ndGeolocationIds, DataSet measurementDataSet) 
+					throws Exception{
+		
+		OutlierCSV outlierCSV = new OutlierCSV(outlierDataOutputFilePath);
+
+		Map<String, Map<String, ArrayList<String>>> outlierData = 
+				outlierCSV.getData();
+		
+		
+		Map<Integer, Integer> stdVariableIds = new HashMap<Integer, Integer>();
+		Integer i = 0;
+		for (String traitLocalName : outlierCSV.getHeaderTraits()){
+			Integer traitId = measurementDataSet.getVariableTypes().findByLocalName(traitLocalName).getId();
+			stdVariableIds.put(i, traitId);
+			i++;
+		}
+		
+		
+		Set<String> environments = outlierData.keySet();
+        for(String env : environments) {
+        	
+        	List<PhenotypeOutlier> outliers = new ArrayList<PhenotypeOutlier>();
+        	Integer ndGeolocationId = ndGeolocationIds.get(env);
+        	
+        	for (Entry<String, ArrayList<String>> plot : outlierData.get(env).entrySet()){
+        		
+        		List<Integer> cvTermIds = new ArrayList<Integer>();
+        		Integer plotNo = Integer.valueOf(plot.getKey());
+        		Map<Integer, String> plotMap = new HashMap<Integer, String>();
+        		
+        		for (int x = 0; x < plot.getValue().size(); x++){
+        			String traitValue = plot.getValue().get(x);
+        			if (!traitValue.isEmpty()){
+        				cvTermIds.add(stdVariableIds.get(x));
+        				plotMap.put(stdVariableIds.get(x), traitValue);
+        			}
+        			
+        		}
+        		
+        		List<Object[]> list = studyDataManager.getPhenotypeIdsByLocationAndPlotNo(measurementDataSet.getId(), ndGeolocationId, plotNo, cvTermIds);
+    			for (Object[] object : list){
+    				PhenotypeOutlier outlier = new PhenotypeOutlier();
+    				outlier.setPhenotypeId(Integer.valueOf(object[2].toString()));
+    				outlier.setObservableId(Integer.valueOf(object[1].toString()));
+    				outlier.setPlotNo(plotNo);
+    				outlier.setProjectId(measurementDataSet.getId());
+    				outlier.setValue(plotMap.get(Integer.valueOf(object[1].toString())));
+    				outliers.add(outlier);
+    			}
+        		
+        	}
+        	
+        	studyDataManager.saveOrUpdatePhenotypeOutliers(outliers);
+    	}
+		
 	}
 
 	private void uploadAndSaveSummaryStatsToDB(

@@ -19,7 +19,8 @@ public enum WebAPIConstants {
     STUDY_ID("StudyId"),
     WORKBENCH_PROJECT_ID("WorkbenchProjectId"),
     INPUT_DATASET_ID("InputDataSetId"),
-    OUTPUT_DATASET_ID("OutputDataSetId");
+    OUTPUT_DATASET_ID("OutputDataSetId"), 
+    OUTLIER_OUTPUT_FILE_PATH("OutlierFilePath");
 
     private String paramValue;
 

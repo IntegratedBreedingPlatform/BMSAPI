@@ -134,14 +134,22 @@ public class BreedingView {
     public DataResponse saveSsaResultSummary(
 		  @ApiParam(value = "Path and filename of the SSA output file", required = true)
 		  @QueryParam("mainOutputFilePath") String mainOutputFilePath,
-		  @ApiParam(value = "Path and filename of the heritability output file", required = true)
+		  
+		  @ApiParam(value = "Path and filename of the Summary output file", required = true)
 		  @QueryParam("heritabilityOutputFilePath") String heritabilityOutputFilePath,
+		  
+		  @ApiParam(value = "Path and filename of the Outlier output file", required = false)
+		  @QueryParam("OutlierOutputFilePath") String OutlierOutputFilePath,
+		  
 		  @ApiParam(value = "Current Project ID", required = true)
 		  @QueryParam("WorkbenchProjectId") String workbenchProjectId,
+		  
 		  @ApiParam(value = "Study ID", required = true)
 	      @QueryParam("StudyId") String studyId,
+	      
 	      @ApiParam(value = "Input Dataset ID", required = true)
 	      @QueryParam("InputDataSetId") String inputDataSetId,
+	      
 	      @ApiParam(value = "Output Dataset ID", required = true)
 	      @QueryParam("OutputDataSetId") String outputDataSetId) {
         DataResponse response;

@@ -22,7 +22,7 @@
 
     <bean id="cloner" class="com.rits.cloning.Cloner"/>
 
-    <bean id="meansUtil" class="org.generationcp.ibpworkbench.util.MeansUtil">
+    <bean id="meansUtil" class="org.generationcp.ibpworkbench.util.CSVUtil">
     </bean>
 
     <bean id="breedingViewService" class="org.generationcp.ibpworkbench.service.BreedingViewServiceImpl">
