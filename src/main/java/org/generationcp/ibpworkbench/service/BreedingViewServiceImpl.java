@@ -51,6 +51,8 @@ import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StopWatch;
+import org.springframework.util.StopWatch.TaskInfo;
 
 import com.rits.cloning.Cloner;
 
@@ -70,8 +72,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 	public void execute(Map<String, String> params, List<String> errors) throws Exception {
 		String mainOutputFilePath = params.get(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue());
-		String summaryStatsOutputFilePath = params.get(WebAPIConstants.HERITABILITY_OUTPUT_FILE_PATH.getParamValue());
-		String outlierDataOutputFilePath = params.get(WebAPIConstants.OUTLIER_OUTPUT_FILE_PATH.getParamValue());
+		String summaryOutputFilePath = params.get(WebAPIConstants.SUMMARY_OUTPUT_FILE_PATH.getParamValue());
+		String outlierOutputFilePath = params.get(WebAPIConstants.OUTLIER_OUTPUT_FILE_PATH.getParamValue());
 		String workbenchProjectId = params.get(WebAPIConstants.WORKBENCH_PROJECT_ID.getParamValue());
 		Map<String, ArrayList<String>> traitsAndMeans = csvUtil.csvToMap(mainOutputFilePath);
 		Map<String, Integer> ndGeolocationIds = new HashMap<String, Integer>();
@@ -318,15 +320,15 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			studyDataManager.addOrUpdateExperiment(
 					meansDataSet.getId(), ExperimentType.AVERAGE, experimentValuesList);
 
-			if(outlierDataOutputFilePath!=null && !outlierDataOutputFilePath.equals("")) {
+			if(outlierOutputFilePath!=null && !outlierOutputFilePath.equals("")) {
 				uploadAndSaveOutlierDataToDB(
-						outlierDataOutputFilePath, studyId, ndGeolocationIds, dataSet);
+						outlierOutputFilePath, studyId, ndGeolocationIds, dataSet);
 			}
 			
 			//GCP-6209
-			if(summaryStatsOutputFilePath!=null && !summaryStatsOutputFilePath.equals("")) {
+			if(summaryOutputFilePath!=null && !summaryOutputFilePath.equals("")) {
 				uploadAndSaveSummaryStatsToDB(
-						summaryStatsOutputFilePath, studyId, trialEnvironments, dataSet);
+						summaryOutputFilePath, studyId, trialEnvironments, dataSet);
 			}
 
 
@@ -500,17 +502,16 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 	}
 
-
 	public void deleteDataSet(Integer dataSetId) throws Exception {
 		studyDataManager.deleteDataSet(dataSetId);
 	}
 	
 	private void uploadAndSaveOutlierDataToDB(
-			String outlierDataOutputFilePath, int studyId, 
+			String outlierOutputFilePath, int studyId, 
 			Map<String, Integer> ndGeolocationIds, DataSet measurementDataSet) 
 					throws Exception{
 		
-		OutlierCSV outlierCSV = new OutlierCSV(outlierDataOutputFilePath);
+		OutlierCSV outlierCSV = new OutlierCSV(outlierOutputFilePath);
 
 		Map<String, Map<String, ArrayList<String>>> outlierData = 
 				outlierCSV.getData();
@@ -539,7 +540,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
         		
         		for (int x = 0; x < plot.getValue().size(); x++){
         			String traitValue = plot.getValue().get(x);
-        			if (!traitValue.isEmpty()){
+        			if (traitValue.isEmpty()){
         				cvTermIds.add(stdVariableIds.get(x));
         				plotMap.put(stdVariableIds.get(x), traitValue);
         			}
@@ -568,6 +569,9 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			String summaryStatsOutputFilePath, int studyId, 
 			TrialEnvironments trialEnvironments, DataSet measurementDataSet) 
 					throws Exception {
+		
+		Double determineTrialDataset;
+		
 
 		try {
 
@@ -575,6 +579,9 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 			Map<String, Map<String, ArrayList<String>>> summaryStatsData = 
 					summaryStatsCSV.getData();
+			
+			StopWatch stopWatch = new StopWatch();
+			stopWatch.start("Determine the TRIAL Dataset");
 
 			int trialDatasetId = studyId-1;//default
 			List<DatasetReference> datasets = studyDataManager.getDatasetReferences(studyId);
@@ -605,7 +612,10 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			}
 			LOG.info("Trial dataset id = "+trialDatasetId);
 			DataSet trialDataSet = studyDataManager.getDataSet(trialDatasetId);
+			
+			stopWatch.stop();
 
+			stopWatch.start("prepare the summary stats project properties if necessary");
 
 			VariableTypeList variableTypeListVariates = 
 					measurementDataSet.getVariableTypes().getVariates();//used in getting the new project properties
@@ -622,10 +632,13 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 					//throw new Exception(String.format("[%s] Method does not exist.", summaryStatName));
 				}
 			}
-			
+	
 
 			LOG.info("prepare the summary stats project properties if necessary");
 			int lastRank = trialDataSet.getVariableTypes().size();
+			
+			List<StandardVariable> stdVariableList =  new ArrayList<StandardVariable>();
+			
 			
 			for (String summaryStatName : summaryStatsList){
 
@@ -666,24 +679,32 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 								//rename 
 								stdVariable.setName(stdVariable.getName()+"_1");
 							}
-							ontologyDataManager.addStandardVariable(stdVariable);
+							
+							stdVariableList.add(stdVariable);
 							summaryStatVariableType.setStandardVariable(stdVariable);
 							LOG.info("added standard variable "+summaryStatVariableType
 									.getStandardVariable().getName());
 						}else{
-							summaryStatVariableType.setStandardVariable(ontologyDataManager
-									.getStandardVariable(stdVariableId));
+							StandardVariable stdVar = ontologyDataManager
+									.getStandardVariable(stdVariableId);
+							stdVariableList.add(stdVar);
+							summaryStatVariableType.setStandardVariable(stdVar);
 							LOG.info("reused standard variable "
 									+ summaryStatVariableType.getStandardVariable().getName());	    	            	
 						}
 
 						summaryStatVariableType.setRank(++lastRank);
 						variableTypeList.add(summaryStatVariableType);
-						trialDataSet.getVariableTypes()
-						.add(summaryStatVariableType);//this will add the newly added variable
+						//trialDataSet.getVariableTypes()
+						//.add(summaryStatVariableType);//this will add the newly added variable
 					}
+					
+					
 				}
 			}
+			
+			ontologyDataManager.addStandardVariable(stdVariableList);
+			trialDataSet.getVariableTypes().addAll(variableTypeList);
 
 			Set<String> environments = summaryStatsData.keySet();
 			List<ExperimentValues> experimentValues = new ArrayList<ExperimentValues>();
@@ -734,11 +755,20 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			}//end of while  while (summaryStatsIterator.hasNext()){
 
 
+			stopWatch.stop();
+			
+			stopWatch.start("Save the DMS Project");
+			
 			//------------ save project properties and experiments ----------------------------------//
 			DmsProject project = new DmsProject();
 			project.setProjectId(trialDatasetId);
 			studyDataManager.saveTrialDatasetSummary(project,variableTypeList, experimentValues, locationIds);
 
+			stopWatch.stop();
+			
+			for (TaskInfo task : stopWatch.getTaskInfo()){
+				LOG.info("stopWatch: " + task.getTaskName() + ":" + task.getTimeSeconds());
+			}
 
 
 		} catch (Exception e) {

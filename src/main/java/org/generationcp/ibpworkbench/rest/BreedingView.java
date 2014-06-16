@@ -20,7 +20,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 import org.generationcp.commons.hibernate.DynamicManagerFactoryProvider;
 import org.generationcp.ibpworkbench.constants.WebAPIConstants;
@@ -136,10 +138,10 @@ public class BreedingView {
 		  @QueryParam("mainOutputFilePath") String mainOutputFilePath,
 		  
 		  @ApiParam(value = "Path and filename of the Summary output file", required = true)
-		  @QueryParam("heritabilityOutputFilePath") String heritabilityOutputFilePath,
+		  @QueryParam("SummaryOutputFilePath") String summaryOutputFilePath,
 		  
 		  @ApiParam(value = "Path and filename of the Outlier output file", required = false)
-		  @QueryParam("OutlierOutputFilePath") String OutlierOutputFilePath,
+		  @QueryParam("OutlierFilePath") String outlierOutputFilePath,
 		  
 		  @ApiParam(value = "Current Project ID", required = true)
 		  @QueryParam("WorkbenchProjectId") String workbenchProjectId,
@@ -151,9 +153,10 @@ public class BreedingView {
 	      @QueryParam("InputDataSetId") String inputDataSetId,
 	      
 	      @ApiParam(value = "Output Dataset ID", required = true)
-	      @QueryParam("OutputDataSetId") String outputDataSetId) {
+	      @QueryParam("OutputDataSetId") String outputDataSetId, @Context UriInfo info) {
         DataResponse response;
         
+ 
        if (!checkIfProjectMatched(Long.valueOf(workbenchProjectId))){
          LOG.trace("Errors invoking web service: The current project for this request is not active in Workbench");
        	 response = new DataResponse(true, "Errors invoking web service: The current project for this request is not active in Workbench");
@@ -166,8 +169,8 @@ public class BreedingView {
             if(mainOutputFilePath == null || mainOutputFilePath.isEmpty()) {
                 errors.add("mainOutputFilePath is a required field!");
             }
-            if(heritabilityOutputFilePath == null || heritabilityOutputFilePath.isEmpty()) {
-                errors.add("heritabilityOutputFilePath is a required field!");
+            if(summaryOutputFilePath == null || summaryOutputFilePath.isEmpty()) {
+                errors.add("summaryOutputFilePath is a required field!");
             }
             if(workbenchProjectId == null || workbenchProjectId.isEmpty()) {
                 errors.add("WorkbenchProjectId is a required field!");
@@ -189,8 +192,8 @@ public class BreedingView {
 
             if(errors.size() == 0) {
             	params.put(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue(), mainOutputFilePath);
-                params.put(WebAPIConstants.HERITABILITY_OUTPUT_FILE_PATH.getParamValue()
-                        , heritabilityOutputFilePath);
+                params.put(WebAPIConstants.SUMMARY_OUTPUT_FILE_PATH.getParamValue(), summaryOutputFilePath);
+                params.put(WebAPIConstants.OUTLIER_OUTPUT_FILE_PATH.getParamValue(), outlierOutputFilePath);
                 params.put(WebAPIConstants.WORKBENCH_PROJECT_ID.getParamValue(), workbenchProjectId);
                 params.put(WebAPIConstants.STUDY_ID.getParamValue(), studyId);
                 params.put(WebAPIConstants.INPUT_DATASET_ID.getParamValue(), inputDataSetId);
