@@ -567,9 +567,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			TrialEnvironments trialEnvironments, DataSet measurementDataSet) 
 					throws Exception {
 		
-		Double determineTrialDataset;
-		
-
 		try {
 
 			SummaryStatsCSV summaryStatsCSV = new SummaryStatsCSV(summaryStatsOutputFilePath);
@@ -577,8 +574,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			Map<String, Map<String, ArrayList<String>>> summaryStatsData = 
 					summaryStatsCSV.getData();
 			
-			StopWatch stopWatch = new StopWatch();
-			stopWatch.start("Determine the TRIAL Dataset");
 
 			int trialDatasetId = studyId-1;//default
 			List<DatasetReference> datasets = studyDataManager.getDatasetReferences(studyId);
@@ -609,10 +604,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			}
 			LOG.info("Trial dataset id = "+trialDatasetId);
 			DataSet trialDataSet = studyDataManager.getDataSet(trialDatasetId);
-			
-			stopWatch.stop();
-
-			stopWatch.start("prepare the summary stats project properties if necessary");
+	
 
 			VariableTypeList variableTypeListVariates = 
 					measurementDataSet.getVariableTypes().getVariates();//used in getting the new project properties
@@ -633,9 +625,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 			LOG.info("prepare the summary stats project properties if necessary");
 			int lastRank = trialDataSet.getVariableTypes().size();
-			
-			List<StandardVariable> stdVariableList =  new ArrayList<StandardVariable>();
-			
 			
 			for (String summaryStatName : summaryStatsList){
 
@@ -676,32 +665,24 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 								//rename 
 								stdVariable.setName(stdVariable.getName()+"_1");
 							}
-							
-							stdVariableList.add(stdVariable);
+							ontologyDataManager.addStandardVariable(stdVariable);
 							summaryStatVariableType.setStandardVariable(stdVariable);
 							LOG.info("added standard variable "+summaryStatVariableType
 									.getStandardVariable().getName());
 						}else{
-							StandardVariable stdVar = ontologyDataManager
-									.getStandardVariable(stdVariableId);
-							stdVariableList.add(stdVar);
-							summaryStatVariableType.setStandardVariable(stdVar);
+							summaryStatVariableType.setStandardVariable(ontologyDataManager
+									.getStandardVariable(stdVariableId));
 							LOG.info("reused standard variable "
 									+ summaryStatVariableType.getStandardVariable().getName());	    	            	
 						}
 
 						summaryStatVariableType.setRank(++lastRank);
 						variableTypeList.add(summaryStatVariableType);
-						//trialDataSet.getVariableTypes()
-						//.add(summaryStatVariableType);//this will add the newly added variable
+						trialDataSet.getVariableTypes()
+						.add(summaryStatVariableType);//this will add the newly added variable
 					}
-					
-					
 				}
 			}
-			
-			ontologyDataManager.addStandardVariable(stdVariableList);
-			trialDataSet.getVariableTypes().addAll(variableTypeList);
 
 			Set<String> environments = summaryStatsData.keySet();
 			List<ExperimentValues> experimentValues = new ArrayList<ExperimentValues>();
@@ -751,21 +732,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 			}//end of while  while (summaryStatsIterator.hasNext()){
 
-
-			stopWatch.stop();
-			
-			stopWatch.start("Save the DMS Project");
 			
 			//------------ save project properties and experiments ----------------------------------//
 			DmsProject project = new DmsProject();
 			project.setProjectId(trialDatasetId);
 			studyDataManager.saveTrialDatasetSummary(project,variableTypeList, experimentValues, locationIds);
 
-			stopWatch.stop();
-			
-			for (TaskInfo task : stopWatch.getTaskInfo()){
-				LOG.info("stopWatch: " + task.getTaskName() + ":" + task.getTimeSeconds());
-			}
 
 
 		} catch (Exception e) {
