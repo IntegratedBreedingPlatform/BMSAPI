@@ -551,9 +551,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
     			for (Object[] object : list){
     				PhenotypeOutlier outlier = new PhenotypeOutlier();
     				outlier.setPhenotypeId(Integer.valueOf(object[2].toString()));
-    				outlier.setObservableId(Integer.valueOf(object[1].toString()));
-    				outlier.setPlotNo(plotNo);
-    				outlier.setProjectId(measurementDataSet.getId());
     				outlier.setValue(plotMap.get(Integer.valueOf(object[1].toString())));
     				outliers.add(outlier);
     			}

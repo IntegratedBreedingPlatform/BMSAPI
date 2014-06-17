@@ -87,6 +87,6 @@
     	<aop:scoped-proxy/>
     </bean>
     
-   
+    <bean id="springAppContextProvider" class="org.generationcp.commons.util.SpringAppContextProvider"></bean>
     
 </beans>
