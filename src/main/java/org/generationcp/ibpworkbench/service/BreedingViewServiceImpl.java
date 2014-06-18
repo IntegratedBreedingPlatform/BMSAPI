@@ -626,6 +626,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			LOG.info("prepare the summary stats project properties if necessary");
 			int lastRank = trialDataSet.getVariableTypes().size();
 			
+			List<StandardVariable> list = new ArrayList<StandardVariable>();
+			
 			for (String summaryStatName : summaryStatsList){
 
 				for(VariableType variate : variableTypeListVariates.getVariableTypes()) {
@@ -665,7 +667,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 								//rename 
 								stdVariable.setName(stdVariable.getName()+"_1");
 							}
-							ontologyDataManager.addStandardVariable(stdVariable);
+							//ontologyDataManager.addStandardVariable(stdVariable);
+							list.add(stdVariable);
 							summaryStatVariableType.setStandardVariable(stdVariable);
 							LOG.info("added standard variable "+summaryStatVariableType
 									.getStandardVariable().getName());
@@ -683,6 +686,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 					}
 				}
 			}
+			
+			ontologyDataManager.addStandardVariable(list);
 
 			Set<String> environments = summaryStatsData.keySet();
 			List<ExperimentValues> experimentValues = new ArrayList<ExperimentValues>();
