@@ -34,6 +34,7 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Stock;
 import org.generationcp.middleware.domain.dms.Stocks;
+import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -239,15 +240,15 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 			//please make sure that the study name is unique and does not exist in the db.
 			VariableList variableList = new VariableList();
+			Study study = studyDataManager.getStudy(studyId);
 			Variable variable = createVariable(TermId.DATASET_NAME.getId()
-					, "RESULTS_TRAIT_MEANS" + "_" + workbenchProjectId + "_" + studyId , 1);
+					, study.getName() + "-MEANS"  , 1);
 			variableTypeList.makeRoom(1);
 			variable.getVariableType().setRank(1);
 			variableTypeList.add(variable.getVariableType());
 
-			//name of dataset Results_trait_means_<wproject_id>_<study_id>
-			updateVariableType(variable.getVariableType(), "RESULTS_TRAIT_MEANS" + "_" 
-					+ workbenchProjectId + "_" + studyId, "Dataset name (local)");
+			//name of dataset [STUDY NAME]-MEANS
+			updateVariableType(variable.getVariableType(), study.getName() + "-MEANS", "Dataset name (local)");
 			variableList.add(variable);
 
 			variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", 2);
@@ -581,7 +582,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 				String name = datasetReference.getName();
 				int id = datasetReference.getId();
 				if(measurementDataSet.getId()!=id){
-					if(name!=null && (name.startsWith("TRIAL_") || name.startsWith("NURSERY_"))) {
+					if(name!=null && (name.startsWith("TRIAL_") || name.startsWith("NURSERY_") || name.endsWith("-ENVIRONMENT"))) {
 						trialDatasetId = id;
 						break;
 					} else {
