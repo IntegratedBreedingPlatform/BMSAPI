@@ -7,7 +7,9 @@ import javax.annotation.PostConstruct;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.SessionFactoryUtil;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -61,6 +63,12 @@ public class MiddlewareFactory {
 	@Bean
 	public FieldbookService getFieldbookService() {
 		return new FieldbookServiceImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
+				new HibernateSessionPerRequestProvider(centralSessionFactory));
+	}
+	
+	@Bean
+	public GenotypicDataManager getGenotypicDataManager() {
+		return new GenotypicDataManagerImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
 				new HibernateSessionPerRequestProvider(centralSessionFactory));
 	}
 }

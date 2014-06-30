@@ -196,4 +196,16 @@ public class SimpleDao {
 		
 		return this.jdbcTemplate.query("select * from germplasm_summary where names like '%" + queryString + "%'", rowMapper);
 	}
+	
+	public List<Integer> getAllGDMSDatasetIDs() {
+		
+		ArrayList<Integer> datasetIds = new ArrayList<Integer>();
+		List<Map<String, Object>> queryResult = this.jdbcTemplate.queryForList("select dataset_id from gdms_dataset");
+		
+		for (Map<String, Object> row : queryResult) {
+			datasetIds.add((Integer) row.get("dataset_id"));
+		}
+		
+		return datasetIds;
+	}
 }
