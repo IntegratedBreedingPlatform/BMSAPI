@@ -28,6 +28,7 @@ public class Main extends WebMvcConfigurerAdapter {
         templateResolver.setPrefix("/WEB-INF/html/");
         templateResolver.setSuffix(".html");
         templateResolver.setTemplateMode("HTML5");
+        templateResolver.setCacheable(false);
 
         return templateResolver;
     }
