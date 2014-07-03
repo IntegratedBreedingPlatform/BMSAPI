@@ -1,8 +1,7 @@
 <configuration>
-    <!-- properties -->
+
     <property name="log-dir" value="logs"/>
 
-    <!-- console appender -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
         <encoder>
@@ -10,14 +9,9 @@
         </encoder>
     </appender>
   
-    <!-- rolling file appender for system logs -->
-    <!--
-    NOTE: You can use ${HOSTNAME} property to separate logs of each host.
-    -->
+    <!-- Rolling file appender for system logs. You can use ${HOSTNAME} property to separate logs of each host.-->
     <appender name="SYSTEM-LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!-- Enable prudent mode if log file will be written from multiple JVMs -->
-        <!--
-        -->
         <prudent>true</prudent>
         <append>true</append>
         
@@ -44,4 +38,5 @@
     <!-- Set the log levels -->
     <logger name="org.hibernate" level="WARN"/>
     <logger name="org.springframework" level="WARN"/>
+    <logger name="org.generationcp.bms" level="DEBUG"/>
 </configuration>
