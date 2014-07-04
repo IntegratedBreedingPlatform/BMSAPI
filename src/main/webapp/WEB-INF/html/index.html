@@ -4,16 +4,28 @@
     <title>BMS API - Home</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" 	/>
-    
     <link th:href="@{/static/css/lib/bootstrap.min.css}" rel="stylesheet"/>
     <script th:src="@{/static/js/lib/jquery.min.js}" type="text/javascript"></script>
     <script th:src="@{/static/js/lib/bootstrap.min.js}" type="text/javascript"></script>    
-    
+    <script type="text/javascript">
+    	$(document).ready(function() {
+    		$('#selectedCropDB').change(function(){
+ 			   	$("#cropSelectionForm").trigger('submit');
+ 			});
+    	});
+    </script>
 </head>
 <body>
 	<div class="container">	
-		<h1>Hi!!</h1>
-		<p th:text="'Hello, ' + ${name} + '! Welcome to BMS API!'" />
+		<h1>Hi!</h1>
+		<h4>Welcome to BMS API!</h4>
+		<p>Currently selected crop database is: <strong th:text="${session.selectedCropDB}"></strong></p>
+		<form id="cropSelectionForm" action="/web/selectCrop" method="POST">
+			<select id="selectedCropDB" name="selectedCropDB">
+				<option th:each="centralDB : ${availableCentralDBs}" th:value="${centralDB}" th:text="${centralDB}" 
+					th:selected="${session.selectedCropDB == centralDB}"/>
+			</select>
+		</form>
 	</div>
 </body>
 </html>

@@ -199,7 +199,7 @@ public class SimpleDao {
 	
 	public List<Integer> getAllGDMSDatasetIDs() {
 		
-		ArrayList<Integer> datasetIds = new ArrayList<Integer>();
+		List<Integer> datasetIds = new ArrayList<Integer>();
 		List<Map<String, Object>> queryResult = this.jdbcTemplate.queryForList("select dataset_id from gdms_dataset");
 		
 		for (Map<String, Object> row : queryResult) {
@@ -207,5 +207,19 @@ public class SimpleDao {
 		}
 		
 		return datasetIds;
+	}
+	
+	public List<String> getAllCentralCropSchemaNames() {
+		
+		List<Map<String, Object>> queryResults = this.jdbcTemplate.queryForList(
+				"SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA where SCHEMA_NAME like 'ibdbv2_%_central'");
+		
+		List<String> schemaNames = new ArrayList<String>();
+		
+		for (Map<String, Object> row : queryResults) {
+			schemaNames.add((String) row.get("SCHEMA_NAME"));
+		}
+		
+		return schemaNames;
 	}
 }
