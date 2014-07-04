@@ -10,6 +10,7 @@ import javax.servlet.http.HttpSession;
 
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.SessionFactoryUtil;
+import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
@@ -57,8 +58,10 @@ public class MiddlewareFactory {
 		this.dbNameLocal = environment.getProperty("db.crop.local");
 		this.dbNameCentralDefault = environment.getProperty("db.crop.central.default");
 		
-		localSessionFactory = SessionFactoryUtil.openSessionFactory(null, this.dbHost, this.dbPort,
-				this.dbUsername, this.dbPassword, this.dbNameLocal);
+		DatabaseConnectionParameters localConnectionParams = new DatabaseConnectionParameters(
+				this.dbHost, this.dbPort, this.dbNameLocal, this.dbUsername, this.dbPassword);
+		
+		localSessionFactory = SessionFactoryUtil.openSessionFactory(localConnectionParams);
 		
 	}
 	
@@ -68,8 +71,9 @@ public class MiddlewareFactory {
 		SessionFactory sessionFactory;
 
 		if (this.sessionFactoryCache.get(selectedCentralDB) == null) {
-			sessionFactory = SessionFactoryUtil.openSessionFactory(null, this.dbHost, this.dbPort,
-					this.dbUsername, this.dbPassword, selectedCentralDB);
+			DatabaseConnectionParameters centralConnectionParams = new DatabaseConnectionParameters(
+					this.dbHost, this.dbPort, selectedCentralDB, this.dbUsername, this.dbPassword);
+			sessionFactory = SessionFactoryUtil.openSessionFactory(centralConnectionParams);
 			sessionFactoryCache.put(selectedCentralDB, sessionFactory);
 		} else {
 			sessionFactory = this.sessionFactoryCache.get(selectedCentralDB);
