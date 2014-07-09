@@ -290,7 +290,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 					experimentRow.setLocationId(ndLocationId);
 
 					List<Variable> list = new ArrayList<Variable>();
-					Boolean variateHasValue = false;
+					
 					for(int j = 3; j < csvHeader.length; j++) {
 						if (meansDataSetExists){
 							if (meansDataSet.getVariableTypes().getVariates()
@@ -301,7 +301,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 						String variableValue = traitsAndMeans.get(csvHeader[j]).get(i).trim();
 						if (!variableValue.trim().isEmpty()) {
-							variateHasValue = true;
 							Variable var = new Variable(meansDataSet.getVariableTypes()
 									.findByLocalName(csvHeader[j]), variableValue);
 							list.add(var);
@@ -311,7 +310,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 					VariableList variableList1 = new VariableList();
 					variableList1.setVariables(list);
 					experimentRow.setVariableList(variableList1);
-					if (variateHasValue) experimentValuesList.add(experimentRow);
+					experimentValuesList.add(experimentRow);
+					
 						
 				}
 				
