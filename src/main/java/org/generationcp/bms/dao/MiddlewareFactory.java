@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -12,8 +13,10 @@ import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.SessionFactoryUtil;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
+import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -65,6 +68,14 @@ public class MiddlewareFactory {
 		
 	}
 	
+	@PreDestroy
+	public void preDestroy() {
+		localSessionFactory.close();
+		for(String key : sessionFactoryCache.keySet()) {
+			sessionFactoryCache.get(key).close();
+		}
+	}
+	
 	private SessionFactory getCentralSessionFactory() throws FileNotFoundException {
 
 		String selectedCentralDB = getCurrentlySelectedCropDBName();
@@ -110,6 +121,13 @@ public class MiddlewareFactory {
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GenotypicDataManager getGenotypicDataManager() throws FileNotFoundException {
 		return new GenotypicDataManagerImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
+				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
+	}
+	
+	@Bean
+	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyDataManager getOntologyDataManager() throws FileNotFoundException {
+		return new OntologyDataManagerImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
 				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
 	}
 
