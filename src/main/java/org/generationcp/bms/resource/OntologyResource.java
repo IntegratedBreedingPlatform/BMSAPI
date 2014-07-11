@@ -1,9 +1,11 @@
 package org.generationcp.bms.resource;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.generationcp.bms.dao.MongoDao;
 import org.generationcp.bms.exception.NotFoundException;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
@@ -21,6 +23,9 @@ public class OntologyResource {
 	
 	@Autowired
 	private OntologyDataManager ontologyDataManager;
+	
+	@Autowired
+	private MongoDao mongoDao;
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String home(HttpServletRequest request) throws MiddlewareQueryException {
@@ -49,5 +54,9 @@ public class OntologyResource {
 	public Set<StandardVariable> getAllDetailed() throws MiddlewareQueryException {
 		return ontologyDataManager.getAllStandardVariables();
 	}
-
+	
+	@RequestMapping(value = "/var/all/mongo")
+	public List<StandardVariable> getAllMongo() throws MiddlewareQueryException {
+		return mongoDao.getAllStandardVariables();
+	}
 }
