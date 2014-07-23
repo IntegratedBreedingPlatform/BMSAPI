@@ -83,7 +83,7 @@ public class SummaryStatsCSV {
     
     public String getTrialHeader() throws Exception{
     	
-    	return getHeader().get(0);
+    	return nameToAliasMapping.get(getHeader().get(0));
     }
     
     public Map<String, Map<String, ArrayList<String> >> getData() throws Exception {
