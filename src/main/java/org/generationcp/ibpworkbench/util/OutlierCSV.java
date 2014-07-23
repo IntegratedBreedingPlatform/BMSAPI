@@ -26,6 +26,8 @@ import java.util.Set;
 
 
 
+
+
 import javassist.bytecode.Descriptor.Iterator;
 
 import org.generationcp.middleware.domain.dms.ExperimentValues;
@@ -54,13 +56,18 @@ public class OutlierCSV {
     private final static Logger LOG = LoggerFactory.getLogger(OutlierCSV.class); 
     private String fileName;
     private Map<String, Map<String, ArrayList<String> >> data;
+    private HashMap<String, String> nameToAliasMapping;
     private String[] header;
     
-    public OutlierCSV(String fileName) throws FileNotFoundException{
-    	this.fileName = fileName;
-    }
     
-    public List<String> getHeader() throws Exception{
+    
+    public OutlierCSV(String fileName,
+			HashMap<String, String> nameToAliasMapping) {
+    	this.fileName = fileName;
+    	this.nameToAliasMapping = nameToAliasMapping;
+	}
+
+	public List<String> getHeader() throws Exception{
     	
     	data = getData();
     	
@@ -88,7 +95,15 @@ public class OutlierCSV {
     	
     	CSVReader reader = new CSVReader(new FileReader(fileName));
         data = new LinkedHashMap<String, Map<String, ArrayList<String>>>();
-        this.header = reader.readNext();
+        
+        ArrayList<String> list = new ArrayList<String>();
+        for (String h : reader.readNext()){
+        	String actualLocalName = nameToAliasMapping.get(h);
+        	list.add(actualLocalName);
+        }
+        
+        this.header = list.toArray(new String[0]);
+        
         String[] nextLine;
         while ((nextLine = reader.readNext()) != null) {
             String environment = nextLine[0].trim();
@@ -112,27 +127,5 @@ public class OutlierCSV {
         return data;
     }
     
-    public static void main(String[] args) {
-    	String fileName = "C:/outlier.csv";
-    	
-    	
-    	try {
-    		OutlierCSV summaryStatsCSV = new OutlierCSV(fileName);
-    		Map<String, Map<String, ArrayList<String>>> data = new OutlierCSV(fileName).getData();	
-    		
-    		System.out.println(summaryStatsCSV.getHeader().toString());
-    		System.out.println(summaryStatsCSV.getHeaderTraits().toString());
-    		
-    		
-			Set<String> environments = data.keySet();
-	        for(String env : environments) {
-	        	for (Entry<String, ArrayList<String>> traits : data.get(env).entrySet()){
-	        		System.out.println(traits.getKey() + ":" +traits.getValue().toString());
-	        	}
-	    	}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
+ 
 }

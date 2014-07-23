@@ -73,13 +73,7 @@ public class BreedingView {
                           @ApiParam(value = "Output Dataset ID", required = true)
                           @QueryParam("OutputDataSetId") String outputDataSetId) {
         DataResponse response;
-        
-        if (!checkIfProjectMatched(Long.valueOf(workbenchProjectId))){
-            LOG.trace("Errors invoking web service: The current project for this request is not active in Workbench");
-          	response = new DataResponse(true, "Errors invoking web service: The current project for this request is not active in Workbench");
-          	return response;
-          }
-        
+       
   
         try {
             Map<String, String> params = new HashMap<String, String>();
@@ -155,13 +149,7 @@ public class BreedingView {
 	      @ApiParam(value = "Output Dataset ID", required = true)
 	      @QueryParam("OutputDataSetId") String outputDataSetId, @Context UriInfo info) {
         DataResponse response;
-        
- 
-       if (!checkIfProjectMatched(Long.valueOf(workbenchProjectId))){
-         LOG.trace("Errors invoking web service: The current project for this request is not active in Workbench");
-       	 response = new DataResponse(true, "Errors invoking web service: The current project for this request is not active in Workbench");
-       	 return response;
-       }
+
         
         try {
             Map<String, String> params = new HashMap<String, String>();
@@ -247,20 +235,5 @@ public class BreedingView {
         return "WebService for BreedingView has been setup properly.";
     }
     
-    private boolean checkIfProjectMatched(Long workbenchProjectId){
-    	
-    	try {
-			Project project = workbenchDataManager.getLastOpenedProjectAnyUser();
-			if (project.getProjectId().equals(workbenchProjectId)){
-				
-				return true;
-			}
-			
-		} catch (MiddlewareQueryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	
-    	return false;
-    }
+   
 }

@@ -26,6 +26,7 @@ import java.util.Set;
 
 
 
+
 import javassist.bytecode.Descriptor.Iterator;
 
 import org.generationcp.middleware.domain.dms.ExperimentValues;
@@ -54,13 +55,16 @@ public class SummaryStatsCSV {
     private final static Logger LOG = LoggerFactory.getLogger(SummaryStatsCSV.class); 
     private String fileName;
     private Map<String, Map<String, ArrayList<String> >> data;
+    private HashMap<String, String> nameToAliasMapping;
     private String[] header;
     
-    public SummaryStatsCSV(String fileName) throws FileNotFoundException{
+    public SummaryStatsCSV(String fileName,
+			HashMap<String, String> nameToAliasMapping) {
     	this.fileName = fileName;
-    }
-    
-    public List<String> getHeader() throws Exception{
+    	this.nameToAliasMapping = nameToAliasMapping;
+	}
+
+	public List<String> getHeader() throws Exception{
     	
     	data = getData();
     	
@@ -91,10 +95,10 @@ public class SummaryStatsCSV {
         this.header = reader.readNext();
         String[] nextLine;
         while ((nextLine = reader.readNext()) != null) {
-            String environment = nextLine[0].trim();
-            String trait = nextLine[1].trim();
             
-
+        	String environment = nextLine[0].trim();
+            String trait = nameToAliasMapping.get(nextLine[1]).trim();
+            
         	if(!data.containsKey(environment)) {
         		data.put(environment, new LinkedHashMap<String, ArrayList<String>>());
         	}
@@ -112,27 +116,4 @@ public class SummaryStatsCSV {
         return data;
     }
     
-    public static void main(String[] args) {
-    	String fileName = "C:/IBWSSummary.csv";
-    	
-    	
-    	try {
-    		SummaryStatsCSV summaryStatsCSV = new SummaryStatsCSV(fileName);
-    		Map<String, Map<String, ArrayList<String>>> data = new SummaryStatsCSV(fileName).getData();	
-    		
-    		System.out.println(summaryStatsCSV.getHeader().toString());
-    		System.out.println(summaryStatsCSV.getHeaderStats().toString());
-    		
-    		
-			Set<String> environments = data.keySet();
-	        for(String env : environments) {
-	        	for (Entry<String, ArrayList<String>> traits : data.get(env).entrySet()){
-	        		System.out.println(traits.getValue().toString());
-	        	}
-	    	}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
 }

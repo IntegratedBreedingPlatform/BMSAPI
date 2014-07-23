@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.generationcp.commons.util.ObjectUtil;
 import org.generationcp.ibpworkbench.constants.WebAPIConstants;
 import org.generationcp.ibpworkbench.util.OutlierCSV;
 import org.generationcp.ibpworkbench.util.SummaryStatsCSV;
@@ -47,48 +48,55 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StopWatch;
-import org.springframework.util.StopWatch.TaskInfo;
+import org.springframework.beans.factory.annotation.Configurable;
 
 import com.rits.cloning.Cloner;
 
+@Configurable
 public class BreedingViewServiceImpl implements BreedingViewService {
-	@Autowired
-	private CSVUtil csvUtil;
+
 	@Autowired
 	private StudyDataManager studyDataManager;
 	@Autowired
 	private OntologyDataManager ontologyDataManager;
 	@Autowired
+    private WorkbenchDataManager workbenchDataManager;
+	@Autowired
 	private Cloner cloner;
 
+	private HashMap<String, String> nameToAliasMapping;
 	private boolean meansDataSetExists = false;
 
 	private final static Logger LOG = LoggerFactory.getLogger(BreedingViewServiceImpl.class);
 
 	public void execute(Map<String, String> params, List<String> errors) throws Exception {
+
+		nameToAliasMapping = getNameToAliasMapping();
+		
+		CSVUtil csvUtil = new CSVUtil(nameToAliasMapping);
+
 		String mainOutputFilePath = params.get(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue());
 		String summaryOutputFilePath = params.get(WebAPIConstants.SUMMARY_OUTPUT_FILE_PATH.getParamValue());
 		String outlierOutputFilePath = params.get(WebAPIConstants.OUTLIER_OUTPUT_FILE_PATH.getParamValue());
-		String workbenchProjectId = params.get(WebAPIConstants.WORKBENCH_PROJECT_ID.getParamValue());
+
 		Map<String, ArrayList<String>> traitsAndMeans = csvUtil.csvToMap(mainOutputFilePath);
 		Map<String, Integer> ndGeolocationIds = new HashMap<String, Integer>();
 		LOG.info("Traits and Means: " + traitsAndMeans);
 
 
-		//call middleware api and save
 		if(!traitsAndMeans.isEmpty()) {
+
 			DataSet meansDataSet = null;
-			String[] csvHeader = traitsAndMeans.keySet().toArray(new String[0]) ;  //csv header
+			String[] csvHeader = traitsAndMeans.keySet().toArray(new String[0]);
 			int studyId = Integer.valueOf(params.get(WebAPIConstants.STUDY_ID.getParamValue()));
 			int outputDataSetId = Integer.valueOf(params.get(WebAPIConstants.OUTPUT_DATASET_ID.getParamValue()));
 			int inputDatasetId = Integer.valueOf(params.get(WebAPIConstants.INPUT_DATASET_ID.getParamValue()));
-
 
 			List<DataSet> ds = studyDataManager.getDataSetsByType(studyId, DataSetType.MEANS_DATA);
 			if (ds != null){
@@ -106,8 +114,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 				}
 			}
 
-			//environment, env value
-			//TrialEnvironment trialEnv = trialEnvironments.findOnlyOneByLocalName(csvHeader[0], traitsAndMeans.get(csvHeader[0]).get(0));
+
 			TrialEnvironments trialEnvironments = 
 					studyDataManager.getTrialEnvironmentsInDataset(inputDatasetId);
 			for (TrialEnvironment trialEnv : trialEnvironments.getTrialEnvironments()){
@@ -290,7 +297,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 					experimentRow.setLocationId(ndLocationId);
 
 					List<Variable> list = new ArrayList<Variable>();
-					
+
 					for(int j = 3; j < csvHeader.length; j++) {
 						if (meansDataSetExists){
 							if (meansDataSet.getVariableTypes().getVariates()
@@ -311,13 +318,13 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 					variableList1.setVariables(list);
 					experimentRow.setVariableList(variableList1);
 					experimentValuesList.add(experimentRow);
-					
-						
+
+
 				}
-				
-				
+
+
 			}
-			
+
 			studyDataManager.addOrUpdateExperiment(
 					meansDataSet.getId(), ExperimentType.AVERAGE, experimentValuesList);
 
@@ -325,7 +332,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 				uploadAndSaveOutlierDataToDB(
 						outlierOutputFilePath, studyId, ndGeolocationIds, dataSet);
 			}
-			
+
 			//GCP-6209
 			if(summaryOutputFilePath!=null && !summaryOutputFilePath.equals("")) {
 				uploadAndSaveSummaryStatsToDB(
@@ -337,8 +344,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			throw new Exception("Input data is empty. No data was processed.");
 		}
 	}
-
-
 
 
 	private Variable createVariable(int termId, String value, int rank) throws Exception {
@@ -506,75 +511,75 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	public void deleteDataSet(Integer dataSetId) throws Exception {
 		studyDataManager.deleteDataSet(dataSetId);
 	}
-	
+
 	private void uploadAndSaveOutlierDataToDB(
 			String outlierOutputFilePath, int studyId, 
 			Map<String, Integer> ndGeolocationIds, DataSet measurementDataSet) 
 					throws Exception{
-		
-		OutlierCSV outlierCSV = new OutlierCSV(outlierOutputFilePath);
+
+		OutlierCSV outlierCSV = new OutlierCSV(outlierOutputFilePath, nameToAliasMapping);
 
 		Map<String, Map<String, ArrayList<String>>> outlierData = 
 				outlierCSV.getData();
-		
-		
+
+
 		Map<Integer, Integer> stdVariableIds = new HashMap<Integer, Integer>();
 		Integer i = 0;
-		for (String traitLocalName : outlierCSV.getHeaderTraits()){
-			Integer traitId = measurementDataSet.getVariableTypes().findByLocalName(traitLocalName).getId();
+		for (String l : outlierCSV.getHeaderTraits()){
+			Integer traitId = measurementDataSet.getVariableTypes().findByLocalName(l).getId();
 			stdVariableIds.put(i, traitId);
 			i++;
 		}
-		
-		
+
+
 		Set<String> environments = outlierData.keySet();
-        for(String env : environments) {
-        	
-        	List<PhenotypeOutlier> outliers = new ArrayList<PhenotypeOutlier>();
-        	Integer ndGeolocationId = ndGeolocationIds.get(env);
-        	
-        	for (Entry<String, ArrayList<String>> plot : outlierData.get(env).entrySet()){
-        		
-        		List<Integer> cvTermIds = new ArrayList<Integer>();
-        		Integer plotNo = Integer.valueOf(plot.getKey());
-        		Map<Integer, String> plotMap = new HashMap<Integer, String>();
-        		
-        		for (int x = 0; x < plot.getValue().size(); x++){
-        			String traitValue = plot.getValue().get(x);
-        			if (traitValue.isEmpty()){
-        				cvTermIds.add(stdVariableIds.get(x));
-        				plotMap.put(stdVariableIds.get(x), traitValue);
-        			}
-        			
-        		}
-        		
-        		List<Object[]> list = studyDataManager.getPhenotypeIdsByLocationAndPlotNo(measurementDataSet.getId(), ndGeolocationId, plotNo, cvTermIds);
-    			for (Object[] object : list){
-    				PhenotypeOutlier outlier = new PhenotypeOutlier();
-    				outlier.setPhenotypeId(Integer.valueOf(object[2].toString()));
-    				outlier.setValue(plotMap.get(Integer.valueOf(object[1].toString())));
-    				outliers.add(outlier);
-    			}
-        		
-        	}
-        	
-        	studyDataManager.saveOrUpdatePhenotypeOutliers(outliers);
-    	}
-		
+		for(String env : environments) {
+
+			List<PhenotypeOutlier> outliers = new ArrayList<PhenotypeOutlier>();
+			Integer ndGeolocationId = ndGeolocationIds.get(env);
+
+			for (Entry<String, ArrayList<String>> plot : outlierData.get(env).entrySet()){
+
+				List<Integer> cvTermIds = new ArrayList<Integer>();
+				Integer plotNo = Integer.valueOf(plot.getKey());
+				Map<Integer, String> plotMap = new HashMap<Integer, String>();
+
+				for (int x = 0; x < plot.getValue().size(); x++){
+					String traitValue = plot.getValue().get(x);
+					if (traitValue.isEmpty()){
+						cvTermIds.add(stdVariableIds.get(x));
+						plotMap.put(stdVariableIds.get(x), traitValue);
+					}
+
+				}
+
+				List<Object[]> list = studyDataManager.getPhenotypeIdsByLocationAndPlotNo(measurementDataSet.getId(), ndGeolocationId, plotNo, cvTermIds);
+				for (Object[] object : list){
+					PhenotypeOutlier outlier = new PhenotypeOutlier();
+					outlier.setPhenotypeId(Integer.valueOf(object[2].toString()));
+					outlier.setValue(plotMap.get(Integer.valueOf(object[1].toString())));
+					outliers.add(outlier);
+				}
+
+			}
+
+			studyDataManager.saveOrUpdatePhenotypeOutliers(outliers);
+		}
+
 	}
 
 	private void uploadAndSaveSummaryStatsToDB(
 			String summaryStatsOutputFilePath, int studyId, 
 			TrialEnvironments trialEnvironments, DataSet measurementDataSet) 
 					throws Exception {
-		
+
 		try {
 
-			SummaryStatsCSV summaryStatsCSV = new SummaryStatsCSV(summaryStatsOutputFilePath);
+			SummaryStatsCSV summaryStatsCSV = new SummaryStatsCSV(summaryStatsOutputFilePath, nameToAliasMapping);
 
 			Map<String, Map<String, ArrayList<String>>> summaryStatsData = 
 					summaryStatsCSV.getData();
-			
+
 
 			int trialDatasetId = studyId-1;//default
 			List<DatasetReference> datasets = studyDataManager.getDatasetReferences(studyId);
@@ -605,30 +610,29 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			}
 			LOG.info("Trial dataset id = "+trialDatasetId);
 			DataSet trialDataSet = studyDataManager.getDataSet(trialDatasetId);
-	
+
 
 			VariableTypeList variableTypeListVariates = 
 					measurementDataSet.getVariableTypes().getVariates();//used in getting the new project properties
 
 			VariableTypeList variableTypeList = new VariableTypeList();//list that will contain all summary stats project properties
-			
+
 			List<String> summaryStatsList = summaryStatsCSV.getHeaderStats();
 			String trialLocalName =  summaryStatsCSV.getTrialHeader();
-			
+
 			for (String summaryStatName : summaryStatsList){
 				Term termSummaryStat = ontologyDataManager.findMethodByName(summaryStatName);
 				if(termSummaryStat == null) {
 					termSummaryStat = ontologyDataManager.addMethod(summaryStatName, summaryStatName + "  (system generated method)");
-					//throw new Exception(String.format("[%s] Method does not exist.", summaryStatName));
 				}
 			}
-	
+
 
 			LOG.info("prepare the summary stats project properties if necessary");
 			int lastRank = trialDataSet.getVariableTypes().size();
-			
+
 			List<StandardVariable> list = new ArrayList<StandardVariable>();
-			
+
 			for (String summaryStatName : summaryStatsList){
 
 				for(VariableType variate : variableTypeListVariates.getVariableTypes()) {
@@ -663,7 +667,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 							//check if localname is already used
 							Term existingStdVar = ontologyDataManager
-							.findTermByName(stdVariable.getName(), CvId.VARIABLES);
+									.findTermByName(stdVariable.getName(), CvId.VARIABLES);
 							if (existingStdVar != null){
 								//rename 
 								stdVariable.setName(stdVariable.getName()+"_1");
@@ -687,7 +691,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 					}
 				}
 			}
-			
+
 			ontologyDataManager.addStandardVariable(list);
 
 			Set<String> environments = summaryStatsData.keySet();
@@ -738,7 +742,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 			}//end of while  while (summaryStatsIterator.hasNext()){
 
-			
+
 			//------------ save project properties and experiments ----------------------------------//
 			DmsProject project = new DmsProject();
 			project.setProjectId(trialDatasetId);
@@ -751,6 +755,25 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			throw e;
 		}
 
+	}
+	
+	
+	private HashMap<String, String> getNameToAliasMapping() throws Exception {
+		
+		HashMap<String, String> map = new HashMap<String, String>();
+		
+		String fileName = String.format("%s\\Temp\\%s", 
+				workbenchDataManager.getWorkbenchSetting().getInstallationDirectory()
+				, "mapping.ser" );
+		
+		try{
+			map = new ObjectUtil<HashMap<String, String>>().deserializeFromFile(fileName);
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}
+		
+		return map;
 	}
 
 
