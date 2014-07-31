@@ -27,6 +27,7 @@ import java.util.Set;
 
 
 
+
 import javassist.bytecode.Descriptor.Iterator;
 
 import org.generationcp.middleware.domain.dms.ExperimentValues;
@@ -97,8 +98,11 @@ public class SummaryStatsCSV {
         while ((nextLine = reader.readNext()) != null) {
             
         	String environment = nextLine[0].trim();
-            String trait = nameToAliasMapping.get(nextLine[1]).trim();
-            
+            String trait = null;
+			
+			trait = nameToAliasMapping.get(nextLine[1]).trim();
+			if (trait == null) trait = nextLine[1].trim();
+			
         	if(!data.containsKey(environment)) {
         		data.put(environment, new LinkedHashMap<String, ArrayList<String>>());
         	}

@@ -31,10 +31,12 @@ public class CSVUtil {
 		String[] header = reader.readNext();
 		for(String headerCol : header) {
 			String aliasLocalName = headerCol.trim().replace("_Means", "").replace("_UnitErrors", "");
-			String actualLocalName = nameToAliasMapping.get(aliasLocalName);
-			if (actualLocalName != null){
-				csvMap.put(headerCol.trim().replace(aliasLocalName, actualLocalName), new ArrayList<String>());
-			}
+			String actualLocalName = null;
+			
+			actualLocalName = nameToAliasMapping.get(aliasLocalName);
+				if (actualLocalName == null) actualLocalName = aliasLocalName;
+			csvMap.put(headerCol.trim().replace(aliasLocalName, actualLocalName), new ArrayList<String>());
+			
 		}
 		String[] trimHeader = csvMap.keySet().toArray(new String[0]);
 		String[] nextLine;

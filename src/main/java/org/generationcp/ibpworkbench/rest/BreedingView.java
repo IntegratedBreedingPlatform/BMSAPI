@@ -193,6 +193,7 @@ public class BreedingView {
                 response = new DataResponse(false, "Errors invoking web service: " + errors);
             }
         } catch (Exception e) {
+        	e.printStackTrace();
             response = new DataResponse(false, "Failed to invoke service: " + e.toString());
         }
         

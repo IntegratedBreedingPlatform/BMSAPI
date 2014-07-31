@@ -28,6 +28,7 @@ import java.util.Set;
 
 
 
+
 import javassist.bytecode.Descriptor.Iterator;
 
 import org.generationcp.middleware.domain.dms.ExperimentValues;
@@ -97,8 +98,10 @@ public class OutlierCSV {
         data = new LinkedHashMap<String, Map<String, ArrayList<String>>>();
         
         ArrayList<String> list = new ArrayList<String>();
-        for (String h : reader.readNext()){
-        	String actualLocalName = nameToAliasMapping.get(h);
+        for (String aliasLocalName : reader.readNext()){
+        	String actualLocalName = null;
+        	actualLocalName = nameToAliasMapping.get(aliasLocalName);
+				if (actualLocalName == null) actualLocalName = aliasLocalName;
         	list.add(actualLocalName);
         }
         
