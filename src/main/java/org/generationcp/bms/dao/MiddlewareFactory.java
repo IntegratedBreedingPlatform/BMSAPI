@@ -19,7 +19,9 @@ import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
+import org.generationcp.middleware.service.OntologyServiceImpl;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.OntologyService;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -128,6 +130,13 @@ public class MiddlewareFactory {
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public OntologyDataManager getOntologyDataManager() throws FileNotFoundException {
 		return new OntologyDataManagerImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
+				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
+	}
+	
+	@Bean
+	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyService getOntologyService() throws FileNotFoundException {
+		return new OntologyServiceImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
 				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
 	}
 
