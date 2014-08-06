@@ -21,24 +21,7 @@
     <context:load-time-weaver />
 
     <bean id="cloner" class="com.rits.cloning.Cloner"/>
-    <bean id="traitsAndMeansCVSUtil" class="org.generationcp.ibpworkbench.util.TraitsAndMeansCSVUtil">
-        <property name="columnMapping">
-            <map>
-                <entry key="Environments!" value="environments" />
-                <entry key="Genotypes!" value="genotypes" />
-                <entry key="MAT50_Means" value="mat50Means" />
-                <entry key="MAT50_UnitErrors" value="mat50UnitErrors" />
-                <entry key="PODWT_Means" value="podwtMeans" />
-                <entry key="PODWT_UnitErrors" value="podwtUnitErrors" />
-                <entry key="SEEDWT_Means" value="seedwtMeans" />
-                <entry key="SEEDWT_UnitErrors" value="seedwtUnitErrors" />
-            </map>
-        </property>
-    </bean>
-    <bean id="traitsAndMeansCVSUtil2" class="org.generationcp.ibpworkbench.util.TraitsAndMeansCSVUtil2">
-    </bean>
-    <bean id="heritabilityCSVUtil" class="org.generationcp.ibpworkbench.util.HeritabilityCSVUtil">
-    </bean>
+
     <bean id="breedingViewService" class="org.generationcp.ibpworkbench.service.BreedingViewServiceImpl">
     </bean>
     
@@ -54,7 +37,7 @@
         <property name="configLocation" value="classpath:ibpworkbench_hib.cfg.xml"/>
     </bean>
     
-    <bean id="workbenchHibernateSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider" scope="request">
+    <bean id="workbenchHibernateSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider" scope="request"  destroy-method="close">
         <property name="sessionFactory" ref="workbenchSessionFactory"/>
         
         <!-- JDK Standard Proxy around this request scoped bean, so we can use it on longer scoped beans -->
@@ -67,7 +50,7 @@
     </bean>
     
      <bean id="managerFactoryProvider" 
-    	class="org.generationcp.commons.hibernate.DynamicManagerFactoryProvider">
+    	class="org.generationcp.commons.hibernate.DynamicManagerFactoryProvider"  destroy-method="closeAllSessionFactories">
     	<constructor-arg ref="workbenchDataManager" />
     	<property name="maxCachedLocalSessionFactories" value="1" />
     	<property name="localPort" value="${workbench.port}" />
@@ -101,6 +84,6 @@
     	<aop:scoped-proxy/>
     </bean>
     
-   
+    <bean id="springAppContextProvider" class="org.generationcp.commons.util.SpringAppContextProvider"></bean>
     
 </beans>
