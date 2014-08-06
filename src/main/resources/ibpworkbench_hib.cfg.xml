@@ -35,6 +35,7 @@
 		<mapping class="org.generationcp.middleware.pojos.workbench.ProjectBackup"/>
 		<mapping class="org.generationcp.middleware.pojos.workbench.IbdbUserMap"/>
 		<mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData"/>
+		<mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSetting"/>
         <mapping class="org.generationcp.middleware.pojos.Person"/> 
         <mapping class="org.generationcp.middleware.pojos.User"/>
         

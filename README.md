@@ -45,8 +45,6 @@ To run JUnit tests using the command line, issue the following commands in the I
 2. To run a specific test class: <pre>mvn clean test -Dtest=TestClassName</pre>
 3. To run a specific test function: <pre>mvn clean test -Dtest=TestClassName#testFunctionName</pre>
 
-You need to specify the IBDB database to connect to in the `IBPDatasource.properties` file. 
-
 All JUnit test suites require the rice database, except for `GenotypicDataManager` that uses the groundnut crop in testing.
 
 Similar to building `IBPWebService`, add the `-DenvConfig` parameter to use a specific configuration.
