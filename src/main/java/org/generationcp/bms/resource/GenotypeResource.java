@@ -50,5 +50,17 @@ public class GenotypeResource {
 	
 		return result;
 	}
+	
+	
+	@RequestMapping(value = "/{gid}")
+	public String getGenotypeData(@PathVariable Integer gid,
+			@RequestParam(required = false) Integer runId,
+			@RequestParam(required = false) String method,
+			@RequestParam(required = false) Integer pageSize,
+			@RequestParam(required = false) Integer pageNumber) {
+
+		
+		return "TODO";
+	}
 
 }
