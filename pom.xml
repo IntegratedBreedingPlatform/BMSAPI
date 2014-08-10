@@ -7,6 +7,11 @@
 	<packaging>${packaging.type}</packaging>
 	<version>1.0.0-SNAPSHOT</version>
 	<name>Breeding Management System API</name>
+	
+	<properties>
+		<spring-boot-version>1.0.1.RELEASE</spring-boot-version>
+		<middleware-version>2.1.0-SNAPSHOT</middleware-version>		
+	</properties>
 
 	<profiles>
 		<profile>
@@ -38,13 +43,7 @@
 		<dependency>
 			<groupId>org.generationcp</groupId>
 			<artifactId>middleware</artifactId>
-			<version>2.1.0-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<groupId>ch.qos.logback</groupId>
-					<artifactId>logback-core</artifactId>
-				</exclusion>
-			</exclusions>
+			<version>${middleware-version}</version>
 		</dependency>
 		
 		<dependency>
@@ -56,25 +55,25 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-			<version>1.0.1.RELEASE</version>
+			<version>${spring-boot-version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-			<version>1.0.1.RELEASE</version>
+			<version>${spring-boot-version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
-			<version>1.0.1.RELEASE</version>
+			<version>${spring-boot-version}</version>
 		</dependency>
 		
 		<dependency>
         	<groupId>org.springframework.boot</groupId>
         	<artifactId>spring-boot-starter-data-mongodb</artifactId>
-        	<version>1.0.1.RELEASE</version>
+        	<version>${spring-boot-version}</version>
     	</dependency>
 
 		<dependency>
@@ -108,7 +107,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>1.0.1.RELEASE</version>
+				<version>${spring-boot-version}</version>
 				<configuration>
 					<mainClass>org.generationcp.bms.Main</mainClass>
 				</configuration>
