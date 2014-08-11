@@ -437,7 +437,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 		Iterator<String> iterator = inputDataSetVariateNames.iterator();
 		while (iterator.hasNext()){
-			if (iterator.next().contains("_UnitErrors")) iterator.remove();
+			if (iterator.next().contains("_UnitErrors") || iterator.next().contains("_UnitErr")) iterator.remove();
 		}
 
 		for (VariableType var : meansDataSet.getVariableTypes().getVariates().getVariableTypes()){
