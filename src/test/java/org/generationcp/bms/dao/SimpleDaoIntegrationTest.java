@@ -10,7 +10,6 @@ import org.generationcp.bms.domain.GermplasmScoreCard;
 import org.generationcp.bms.domain.Trait;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
-import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.junit.Assert;
@@ -46,7 +45,7 @@ public class SimpleDaoIntegrationTest {
 		dao = new SimpleDao(jdbcTemplate);
 	}
 	
-	// @Test
+	@Test
 	public void testLoadPlantHeightFromView() throws MiddlewareQueryException {
 
 		StandardVariableSummary summary = dao.getStandardVariableSummary(PLANT_HEIGHT_ID);

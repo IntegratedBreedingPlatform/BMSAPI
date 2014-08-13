@@ -13,11 +13,17 @@ import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.SessionFactoryUtil;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
+import org.generationcp.middleware.manager.InventoryDataManagerImpl;
+import org.generationcp.middleware.manager.LocationDataManagerImpl;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.UserDataManagerImpl;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
+import org.generationcp.middleware.manager.api.InventoryDataManager;
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.OntologyServiceImpl;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -137,6 +143,27 @@ public class MiddlewareFactory {
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public OntologyService getOntologyService() throws FileNotFoundException {
 		return new OntologyServiceImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
+				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
+	}
+	
+	@Bean
+	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public InventoryDataManager getInventoryDataManager() throws FileNotFoundException {
+		return new InventoryDataManagerImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
+				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
+	}
+	
+	@Bean
+	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public LocationDataManager getLocationDataManager() throws FileNotFoundException {
+		return new LocationDataManagerImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
+				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
+	}
+	
+	@Bean
+	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public UserDataManager getUserDataManager() throws FileNotFoundException {
+		return new UserDataManagerImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
 				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
 	}
 

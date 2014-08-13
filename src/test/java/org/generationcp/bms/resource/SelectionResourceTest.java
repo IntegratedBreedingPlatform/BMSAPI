@@ -86,7 +86,7 @@ public class SelectionResourceTest {
 		// selection intensity : the percentage of plants we like to keep - generally a percentage
 		int selectionIntensity = 50;
 		
-		Mockito.when(simpleDao.getTraitObservationsForTrial(Mockito.anyInt(), Mockito.anyList())).thenReturn(mockObs);
+		Mockito.when(simpleDao.getTraitObservationsForTrial(Mockito.anyInt(), Mockito.anyListOf(TraitInfo.class))).thenReturn(mockObs);
 		
 		//select
 		List<GermplasmScoreCard> topPerformers = selector.selectTopPerformersForTrialInstance(trialEnvironmentId, selectionIntensity, traits);
