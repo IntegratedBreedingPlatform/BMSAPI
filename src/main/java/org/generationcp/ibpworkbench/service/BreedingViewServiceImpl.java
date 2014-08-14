@@ -29,6 +29,7 @@ import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.DatasetValues;
+import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -202,6 +203,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 							if (stdVariableId == null){
 								StandardVariable stdVariable = new StandardVariable();
 								stdVariable = cloner.deepClone(meansVariableType.getStandardVariable());
+								stdVariable.setEnumerations(null);
+								stdVariable.setConstraints(null);
 								stdVariable.setId(0);
 								stdVariable.setName(meansVariableType.getLocalName());
 								stdVariable.setMethod(termLSMean);
@@ -216,8 +219,16 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 								meansVariableType.setStandardVariable(stdVariable);
 
 							}else{
-								meansVariableType.setStandardVariable(
-										ontologyDataManager.getStandardVariable(stdVariableId));
+								StandardVariable stdVar = ontologyDataManager
+										.getStandardVariable(stdVariableId);
+											if (stdVar.getEnumerations() != null){
+												for (Enumeration enumeration : stdVar.getEnumerations()){
+													ontologyDataManager.deleteStandardVariableEnumeration(stdVariableId, enumeration.getId());
+												}
+											}
+										stdVar.setEnumerations(null);
+										ontologyDataManager.deleteStandardVariableLocalConstraints(stdVariableId);
+								meansVariableType.setStandardVariable(stdVar);
 							}
 
 							variableTypeList.makeRoom(numOfFactorsAndVariates);
@@ -271,6 +282,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 							if (stdVariableId == null){
 								StandardVariable stdVariable = new StandardVariable();
 								stdVariable = cloner.deepClone(unitErrorsVariableType.getStandardVariable());
+								stdVariable.setEnumerations(null);
+								stdVariable.setConstraints(null);
 								stdVariable.setId(0);
 								stdVariable.setName(unitErrorsVariableType.getLocalName());
 								stdVariable.setMethod(termErrorEstimate);
@@ -285,8 +298,16 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 								unitErrorsVariableType.setStandardVariable(stdVariable);
 
 							}else{
-								unitErrorsVariableType.setStandardVariable(
-										ontologyDataManager.getStandardVariable(stdVariableId));
+								StandardVariable stdVar = ontologyDataManager
+										.getStandardVariable(stdVariableId);
+											if (stdVar.getEnumerations() != null) {
+												for (Enumeration enumeration : stdVar.getEnumerations()){
+													ontologyDataManager.deleteStandardVariableEnumeration(stdVariableId, enumeration.getId());
+												}
+											}
+										stdVar.setEnumerations(null);
+										ontologyDataManager.deleteStandardVariableLocalConstraints(stdVariableId);
+								unitErrorsVariableType.setStandardVariable(stdVar);
 							}
 
 							variableTypeList.makeRoom(numOfFactorsAndVariates);
@@ -498,6 +519,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 					if (stdVariableId == null){
 						StandardVariable stdVariable = new StandardVariable();
 						stdVariable = cloner.deepClone(meansVariableType.getStandardVariable());
+						stdVariable.setEnumerations(null);
+						stdVariable.setConstraints(null);
 						stdVariable.setId(0);
 						stdVariable.setName(meansVariableType.getLocalName());
 						stdVariable.setMethod(termLSMean);
@@ -512,8 +535,16 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 						meansVariableType.setStandardVariable(stdVariable);
 						standardVariableIdTracker.add(stdVariable.getId());
 					}else{
-						meansVariableType.setStandardVariable(
-								ontologyDataManager.getStandardVariable(stdVariableId));
+						StandardVariable stdVar = ontologyDataManager
+								.getStandardVariable(stdVariableId);
+									if (stdVar.getEnumerations() != null){
+										for (Enumeration enumeration : stdVar.getEnumerations()){
+											ontologyDataManager.deleteStandardVariableEnumeration(stdVariableId, enumeration.getId());
+										}
+									}
+								stdVar.setEnumerations(null);
+								ontologyDataManager.deleteStandardVariableLocalConstraints(stdVariableId);
+						meansVariableType.setStandardVariable(stdVar);
 						standardVariableIdTracker.add(stdVariableId);
 					}
 
@@ -573,6 +604,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 					if (stdVariableId == null){
 						StandardVariable stdVariable = new StandardVariable();
 						stdVariable = cloner.deepClone(unitErrorsVariableType.getStandardVariable());
+						stdVariable.setEnumerations(null);
+						stdVariable.setConstraints(null);
 						stdVariable.setId(0);
 						stdVariable.setName(unitErrorsVariableType.getLocalName());
 						stdVariable.setMethod(termErrorEstimate);
@@ -587,8 +620,16 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 						unitErrorsVariableType.setStandardVariable(stdVariable);
 						standardVariableIdTracker.add(stdVariable.getId());
 					}else{
-						unitErrorsVariableType.setStandardVariable(
-								ontologyDataManager.getStandardVariable(stdVariableId));
+						StandardVariable stdVar = ontologyDataManager
+								.getStandardVariable(stdVariableId);
+									if (stdVar.getEnumerations() != null){
+										for (Enumeration enumeration : stdVar.getEnumerations()){
+											ontologyDataManager.deleteStandardVariableEnumeration(stdVariableId, enumeration.getId());
+										}
+									}
+								stdVar.setEnumerations(null);
+								ontologyDataManager.deleteStandardVariableLocalConstraints(stdVariableId);
+						unitErrorsVariableType.setStandardVariable(stdVar);
 						standardVariableIdTracker.add(stdVariableId);
 					}
 
@@ -765,6 +806,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 						if (stdVariableId == null){
 							StandardVariable stdVariable = new StandardVariable();
 							stdVariable = cloner.deepClone(summaryStatVariableType.getStandardVariable());
+							stdVariable.setEnumerations(null);
+							stdVariable.setConstraints(null);
 							stdVariable.setId(0);
 							stdVariable.setName(summaryStatVariableType.getLocalName());
 							stdVariable.setMethod(termSummaryStat);
@@ -782,8 +825,17 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 							LOG.info("added standard variable "+summaryStatVariableType
 									.getStandardVariable().getName());
 						}else{
-							summaryStatVariableType.setStandardVariable(ontologyDataManager
-									.getStandardVariable(stdVariableId));
+							StandardVariable stdVar = ontologyDataManager
+							.getStandardVariable(stdVariableId);
+								if (stdVar.getEnumerations() != null){
+									for (Enumeration enumeration : stdVar.getEnumerations()){
+										ontologyDataManager.deleteStandardVariableEnumeration(stdVariableId, enumeration.getId());
+									}
+								}
+							stdVar.setEnumerations(null);
+							stdVar.setConstraints(null);
+							ontologyDataManager.deleteStandardVariableLocalConstraints(stdVariableId);
+							summaryStatVariableType.setStandardVariable(stdVar);
 							LOG.info("reused standard variable "
 									+ summaryStatVariableType.getStandardVariable().getName());	    	            	
 						}
