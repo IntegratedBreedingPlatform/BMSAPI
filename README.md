@@ -29,29 +29,20 @@ To build a war that can be deployed on external Tomcat:
 * At the root of the checkout directory run `mvn package -Pwebapp`
 * This will create `bms-api-1.0-SNAPSHOT.war` under Maven `target` folder.
 * Copy this war (perhaps after renaming to somethig simpler) to the `webapps` directory of your Tomcat installation.
-* The example resource above will be available at `http://localhost:18080/<name_of_war>/study/5715/summary` in this case.
 
 #### Within Eclipse ####
 * Import the BMSAPI Maven project from the checkout.
 * Run Main.java as a java application.
 
-### Resource Access Examples ###
+### Explore the API ###
+Explore and try out the live API documentation at `http://<host>:<port>/apidoc/index.html`. 
 
-#### The study resource ####
-* *Get Study Summary*: `GET http://localhost:18080/study/5715/summary` where 5715 is an identifier of a Rice central study. It should return a response that looks like:
-```
-{
- "id": 5715,
- "name": "RYT2000DS",
- "title": "Replicated Yield Trial 2000  Dry Season",
- "objective": null,
- "type": "RYT",
- "startDate": "20000101",
- "endDate": "null"
-}
-```
-* *Get Study Details*: `GET http://localhost:18080/study/5715` where 5715 is an identifier of a Rice central study. Response will be the extended version of the study summary information with details such as factors and traits etc.
+Public deployment of the api is available at: [api.leadnode.io]. 
+
+To change the central crop datatbase go to ``http://<host>:<port>/web`. Once a crop database is selected on this page, all API calls operate against the selected database.
+
 
 [IBPDevUtils]:https://github.com/naymesh/IBPDevUtil
 [Middleware]:https://github.com/naymesh/IBPDevUtilIBPMiddleware
+[api.leadnode.io]:http://api.leafnode.io:18080/apidoc/index.html
 
