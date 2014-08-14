@@ -35,14 +35,12 @@ To build a war that can be deployed on external Tomcat:
 * Run Main.java as a java application.
 
 ### Explore the API ###
-Explore and try out the live API documentation at `http://<host>:<port>/apidoc/index.html`. 
+Explore and try out the live API documentation at the home page `http://<host>:<port>/`. Selection of crop central database can be done on this page using the dropdown on top right corner. Once a crop database is selected, all API calls operate against the selected central database.
 
-Public deployment of the api is available at: [api.leadnode.io]. 
-
-To change the central crop datatbase go to ``http://<host>:<port>/web`. Once a crop database is selected on this page, all API calls operate against the selected database.
+Public deployment of the BMS API is available at: [api.leadnode.io]. 
 
 
 [IBPDevUtils]:https://github.com/naymesh/IBPDevUtil
 [Middleware]:https://github.com/naymesh/IBPDevUtilIBPMiddleware
-[api.leadnode.io]:http://api.leafnode.io:18080/apidoc/index.html
+[api.leadnode.io]:http://api.leafnode.io:18080/
 

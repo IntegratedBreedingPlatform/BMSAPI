@@ -60,7 +60,7 @@ public class Main extends WebMvcConfigurerAdapter {
 				"Try out the Breeding Management System API methods listed below!",
 				"http://bit.ly/KQX1nL", 
 				"naymesh@leafnode.io",
-				"GNU General Public License.", 
+				"GNU General Public License", 
 				"http://bit.ly/8Ztv8M");
 		return apiInfo;
 	}

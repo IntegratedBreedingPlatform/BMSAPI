@@ -11,13 +11,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
+
 @Controller
-@RequestMapping("/web")
+@RequestMapping("/")
 public class WebContentController {
 
 	@Autowired
 	private SimpleDao simpleDao;
 	
+	/**
+	 * The home page.
+	 */
+    @ApiIgnore
     @RequestMapping("/")
     public String home(Model model) {
         
@@ -26,9 +32,10 @@ public class WebContentController {
     }
     
     @RequestMapping(value = "/selectCrop", method = RequestMethod.POST)
+    @ApiIgnore
     public String selectCrop(HttpServletRequest request, HttpSession session, @RequestParam String selectedCropDB) {
     	session.setAttribute("selectedCropDB", selectedCropDB);
-    	return "redirect:/web/";
+    	return "redirect:/";
     }
 
 }
