@@ -18,8 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping("/inventory")
+@Api(value = "Inventory")
 public class InventoryResource {
 	
 	@Autowired
@@ -32,6 +36,7 @@ public class InventoryResource {
 	private UserDataManager userDataManager;
 	
 	@RequestMapping(value = "/germplasm/{gid}", method = RequestMethod.GET)
+	@ApiOperation(value = "Get Inventory Information", notes = "Returns information about all inventory lots available for the given germplasm id (gid).")
 	public List<GermplasmInventoryInfo> getInventoryLotInfoForGermplasm(@PathVariable Integer gid) throws MiddlewareQueryException {
 		
 		List<GermplasmInventoryInfo> germplasmInventoryInfo = new ArrayList<GermplasmInventoryInfo>();

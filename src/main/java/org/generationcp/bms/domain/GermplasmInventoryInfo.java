@@ -3,6 +3,9 @@ package org.generationcp.bms.domain;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 
+import com.wordnik.swagger.annotations.ApiModel;
+
+@ApiModel("Germplasm Inventory Information")
 public class GermplasmInventoryInfo {
 
 	private final Integer gid;

@@ -1,5 +1,8 @@
 package org.generationcp.bms.domain;
 
+import com.wordnik.swagger.annotations.ApiModel;
+
+@ApiModel("Location Information")
 public class LocationInfo {
 
 	private final Integer id;
