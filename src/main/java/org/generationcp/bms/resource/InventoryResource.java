@@ -1,30 +1,40 @@
 package org.generationcp.bms.resource;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.generationcp.bms.domain.GermplasmInventoryInfo;
 import org.generationcp.bms.domain.LocationInfo;
+import org.generationcp.bms.domain.TermSummary;
 import org.generationcp.middleware.domain.inventory.LotDetails;
-import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.ims.EntityType;
+import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.LotStatus;
+import org.generationcp.middleware.pojos.ims.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("/inventory")
-@Api(value = "Inventory")
 public class InventoryResource {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(InventoryResource.class);
 	
 	@Autowired
 	private InventoryDataManager inventoryDataManager;
@@ -50,6 +60,7 @@ public class InventoryResource {
 				gpInverntory.setLotId(lotDetail.getLotId());
 				gpInverntory.setQuantityAvailable(lotDetail.getAvailableLotBalance());
 				gpInverntory.setQuantityReserved(lotDetail.getReservedTotal());
+				gpInverntory.setQuantityTotal(lotDetail.getAvailableLotBalance() + lotDetail.getReservedTotal());
 				gpInverntory.setQuantityUnit(new TermSummary(lotDetail.getScaleOfLot().getId(), lotDetail.getScaleOfLot().getName(), lotDetail.getScaleOfLot().getDefinition()));
 				gpInverntory.setComments(lotDetail.getCommentOfLot());
 				
@@ -66,16 +77,64 @@ public class InventoryResource {
 				
 				gpInverntory.setLocation(locationOfLot);
 				
-				//lotStatus
-				//lotUser
+				//TODO Fields not available in LotDetails are hard coded for now. Good enough for demo.
+				gpInverntory.setLotStatus(LotStatus.ACTIVE);
+				gpInverntory.setUserId(-1);
+				gpInverntory.setUserName("Mr. Plant Breeder");
 				
-				germplasmInventoryInfo.add(gpInverntory);
-				
+				germplasmInventoryInfo.add(gpInverntory);			
 			}
 		
 		}
 		
 		return germplasmInventoryInfo;
+	}
+	
+	@RequestMapping(value = "/germplasm/{gid}", method = RequestMethod.PUT)
+	public String createInverntory(@RequestBody GermplasmInventoryInfo inventoryInfo, @PathVariable Integer gid) throws MiddlewareQueryException {
+		LOGGER.debug(inventoryInfo.toString());
+		
+		Lot lot = new Lot();
+		lot.setUserId(inventoryInfo.getUserId());
+		lot.setEntityType(EntityType.GERMPLSM.name());
+		lot.setEntityId(gid);
+		lot.setLocationId(inventoryInfo.getLocation().getId());
+		lot.setScaleId(inventoryInfo.getQuantityUnit().getId());
+		lot.setComments(inventoryInfo.getComments());		
+		lot.setStatus(LotStatus.ACTIVE.getIntValue());
+		Integer lotId = inventoryDataManager.addLot(lot);
+		
+		Transaction trans = new Transaction();
+		trans.setLot(lot);
+		trans.setUserId(inventoryInfo.getUserId());
+		trans.setTransactionDate(getCurrentDateInt());
+		trans.setStatus(0);
+		trans.setQuantity(inventoryInfo.getQuantityTotal());
+		trans.setComments(inventoryInfo.getComments());
+		trans.setSourceType("?");
+		trans.setPersonId(-1);
+		trans.setCommitmentDate(0);
+		trans.setPreviousAmount(Double.valueOf(0));
+		Integer transId = inventoryDataManager.addTransaction(trans);
+		
+		return String.format("Inventory lot created successfully. Lot ID: %d. Transaction ID: %d.", lotId, transId);		
+	}
+	
+    private static Integer getCurrentDateInt(){
+        return Integer.valueOf(new SimpleDateFormat("yyyyMMdd").format(Calendar.getInstance().getTime()));
+    }
+	
+	@RequestMapping(value = "/germplasm/{gid}", method = RequestMethod.POST)
+	public String updateInverntory(@RequestBody GermplasmInventoryInfo inventoryInfo, @PathVariable Integer gid) {
+		LOGGER.debug(inventoryInfo.toString());
+		return "This operation has not yet been implemented.";
+		
+	}
+	
+	@RequestMapping(value = "/germplasm/{gid}", method = RequestMethod.DELETE)
+	public String deleteInverntory(@PathVariable Integer gid) {
+		LOGGER.debug(gid.toString());
+		return "This operation has not yet been implemented.";
 	}
 
 }

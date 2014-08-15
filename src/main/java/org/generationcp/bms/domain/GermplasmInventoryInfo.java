@@ -1,6 +1,5 @@
 package org.generationcp.bms.domain;
 
-import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 
 import com.wordnik.swagger.annotations.ApiModel;
@@ -8,23 +7,19 @@ import com.wordnik.swagger.annotations.ApiModel;
 @ApiModel("Germplasm Inventory Information")
 public class GermplasmInventoryInfo {
 
-	private final Integer gid;
-	
+	private Integer gid;
 	private Integer lotId;
-
 	private Double quantityAvailable;
 	private Double quantityReserved;
-
+	private Double quantityTotal;
 	private TermSummary quantityUnit;
-
 	private Integer userId;
 	private String userName;
-
 	private LocationInfo location;
-
 	private LotStatus lotStatus;
-
 	private String comments;
+
+	public GermplasmInventoryInfo() { }
 
 	public GermplasmInventoryInfo(Integer gid) {
 		this.gid = gid;
@@ -34,6 +29,10 @@ public class GermplasmInventoryInfo {
 		return gid;
 	}
 	
+	public void setGid(Integer gid) {
+		this.gid = gid;
+	}
+
 	public Integer getLotId() {
 		return lotId;
 	}
@@ -59,7 +58,11 @@ public class GermplasmInventoryInfo {
 	}
 	
 	public Double getQuantityTotal() {
-		return quantityAvailable + quantityReserved;
+		return quantityTotal;
+	}
+
+	public void setQuantityTotal(Double quantityTotal) {
+		this.quantityTotal = quantityTotal;
 	}
 
 	public TermSummary getQuantityUnit() {
@@ -108,6 +111,14 @@ public class GermplasmInventoryInfo {
 
 	public void setComments(String comments) {
 		this.comments = comments;
+	}
+
+	@Override
+	public String toString() {
+		return "GermplasmInventoryInfo [gid=" + gid + ", lotId=" + lotId + ", quantityAvailable="
+				+ quantityAvailable + ", quantityReserved=" + quantityReserved + ", quantityUnit="
+				+ quantityUnit + ", userId=" + userId + ", userName=" + userName + ", location="
+				+ location + ", lotStatus=" + lotStatus + ", comments=" + comments + "]";
 	}
 
 }

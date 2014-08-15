@@ -5,13 +5,15 @@ import com.wordnik.swagger.annotations.ApiModel;
 @ApiModel("Location Information")
 public class LocationInfo {
 
-	private final Integer id;
-	private final String name;
+	private Integer id;
+	private String name;
 
 	private String label1;
 	private String label2;
 	private String label3;
 
+	public LocationInfo() {}
+	
 	public LocationInfo(Integer locationId, String locationName) {
 
 		this.id = locationId;
@@ -24,6 +26,14 @@ public class LocationInfo {
 
 	public String getName() {
 		return name;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getLabel1() {
