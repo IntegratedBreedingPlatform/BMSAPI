@@ -122,7 +122,7 @@ public class MiddlewareFactory {
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public FieldbookService getFieldbookService() throws FileNotFoundException {
 		return new FieldbookServiceImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
-				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
+				new HibernateSessionPerRequestProvider(getCentralSessionFactory()), this.dbNameLocal, getCurrentlySelectedCropDBName());
 	}
 	
 	@Bean
