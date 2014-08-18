@@ -4,6 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.generationcp.bms.dao.SimpleDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +18,8 @@ import com.mangofactory.swagger.annotations.ApiIgnore;
 @Controller
 @RequestMapping("/")
 public class WebContentController {
+	
+	private Logger LOGGER = LoggerFactory.getLogger(WebContentController.class); 
 
 	@Autowired
 	private SimpleDao simpleDao;
@@ -35,6 +39,7 @@ public class WebContentController {
     @ApiIgnore
     public String selectCrop(HttpServletRequest request, HttpSession session, @RequestParam String selectedCropDB) {
     	session.setAttribute("selectedCropDB", selectedCropDB);
+    	LOGGER.info("Selected crop DB is: " + selectedCropDB);
     	return "redirect:/";
     }
 
