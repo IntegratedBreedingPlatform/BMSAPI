@@ -1,3 +1,4 @@
+
 package org.generationcp.bms.dao;
 
 import java.io.FileNotFoundException;
@@ -13,12 +14,16 @@ import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.SessionFactoryUtil;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
+import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
+import org.generationcp.middleware.manager.GermplasmListManagerImpl;
 import org.generationcp.middleware.manager.InventoryDataManagerImpl;
 import org.generationcp.middleware.manager.LocationDataManagerImpl;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.UserDataManagerImpl;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -29,6 +34,8 @@ import org.generationcp.middleware.service.OntologyServiceImpl;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,6 +49,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Configuration
 public class MiddlewareFactory {
+	
+	private Logger LOGGER = LoggerFactory.getLogger(MiddlewareFactory.class); 
 	
 	@Autowired
 	private Environment environment;
@@ -78,6 +87,7 @@ public class MiddlewareFactory {
 	
 	@PreDestroy
 	public void preDestroy() {
+		LOGGER.info("Closing cached session factories.");
 		localSessionFactory.close();
 		for(String key : sessionFactoryCache.keySet()) {
 			sessionFactoryCache.get(key).close();
@@ -165,6 +175,20 @@ public class MiddlewareFactory {
 	public UserDataManager getUserDataManager() throws FileNotFoundException {
 		return new UserDataManagerImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
 				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
+	}
+	
+	@Bean
+	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public GermplasmListManager getGermplasmListManager() throws FileNotFoundException {
+		return new GermplasmListManagerImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
+				new HibernateSessionPerRequestProvider(getCentralSessionFactory()), this.dbNameLocal, getCurrentlySelectedCropDBName());
+	}
+	
+	@Bean
+	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public GermplasmDataManager getGermplasmDataManager() throws FileNotFoundException {
+		return new GermplasmDataManagerImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
+				new HibernateSessionPerRequestProvider(getCentralSessionFactory()), this.dbNameLocal, getCurrentlySelectedCropDBName());
 	}
 
 	@Bean
