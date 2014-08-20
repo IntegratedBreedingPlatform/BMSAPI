@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import org.generationcp.bms.domain.GermplasmInventoryInfo;
+import org.generationcp.bms.domain.InventoryOperationResponse;
 import org.generationcp.bms.domain.LocationInfo;
 import org.generationcp.bms.domain.TermSummary;
 import org.generationcp.middleware.domain.inventory.LotDetails;
@@ -21,7 +22,6 @@ import org.generationcp.middleware.pojos.ims.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -90,8 +90,8 @@ public class InventoryResource {
 		return germplasmInventoryInfo;
 	}
 	
-	@RequestMapping(value = "/germplasm/{gid}", method = RequestMethod.PUT, produces = MediaType.TEXT_PLAIN_VALUE)
-	public String createInverntory(@RequestBody GermplasmInventoryInfo inventoryInfo, @PathVariable Integer gid) throws MiddlewareQueryException {
+	@RequestMapping(value = "/germplasm/{gid}", method = RequestMethod.PUT)
+	public InventoryOperationResponse createInverntory(@RequestBody GermplasmInventoryInfo inventoryInfo, @PathVariable Integer gid) throws MiddlewareQueryException {
 		LOGGER.debug(inventoryInfo.toString());
 		
 		Lot lot = new Lot();
@@ -117,7 +117,12 @@ public class InventoryResource {
 		trans.setPreviousAmount(Double.valueOf(0));
 		Integer transId = inventoryDataManager.addTransaction(trans);
 		
-		return String.format("Inventory lot created successfully. Lot ID: %d. Transaction ID: %d.", lotId, transId);		
+		InventoryOperationResponse response = new InventoryOperationResponse();
+		response.setMessage("Inventory lot created successfully.");
+		response.setLotId(lotId);
+		response.setTransactionId(transId);
+		
+		return response;		
 	}
 	
     private static Integer getCurrentDateInt(){
@@ -127,14 +132,14 @@ public class InventoryResource {
 	@RequestMapping(value = "/germplasm/{gid}", method = RequestMethod.POST)
 	public String updateInverntory(@RequestBody GermplasmInventoryInfo inventoryInfo, @PathVariable Integer gid) {
 		LOGGER.debug(inventoryInfo.toString());
-		return "This operation has not yet been implemented.";
+		return "\"This operation has not yet been implemented.\"";
 		
 	}
 	
 	@RequestMapping(value = "/germplasm/{gid}", method = RequestMethod.DELETE)
 	public String deleteInverntory(@PathVariable Integer gid) {
 		LOGGER.debug(gid.toString());
-		return "This operation has not yet been implemented.";
+		return "\"This operation has not yet been implemented.\"";
 	}
 
 }
