@@ -2,6 +2,8 @@ package org.generationcp.bms.resource;
 
 import java.util.Arrays;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.generationcp.bms.dao.SimpleDao;
 import org.generationcp.bms.domain.StudyDetails;
 import org.generationcp.bms.domain.StudySummary;
@@ -49,7 +51,7 @@ public class StudyResourceTest {
 		int studyId = 123;
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(null);
 		
-		resource.getStudySummary(studyId);
+		resource.getStudySummary(studyId, Mockito.mock(HttpServletRequest.class));
 	}
 	
 	@Test(expected = NotFoundException.class)
@@ -58,7 +60,7 @@ public class StudyResourceTest {
 		int studyId = 123;
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(null);
 		
-		resource.getStudyDetails(studyId);
+		resource.getStudyDetails(studyId, Mockito.mock(HttpServletRequest.class));
 	}
 	
 	@Test
@@ -70,7 +72,7 @@ public class StudyResourceTest {
 		
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
 		
-		StudySummary studySummary = resource.getStudySummary(studyId);
+		StudySummary studySummary = resource.getStudySummary(studyId, Mockito.mock(HttpServletRequest.class));
 		Assert.assertNotNull(studySummary);
 		Assert.assertEquals(study.getId(), studySummary.getId());
 	}
@@ -86,7 +88,7 @@ public class StudyResourceTest {
 		Mockito.when(studyDataManager.getAllStudyFactors(studyId)).thenReturn(new VariableTypeList());
 		Mockito.when(simpleDao.getMeasuredTraits(studyId)).thenReturn(Arrays.asList(new Trait(1)));
 		
-		StudyDetails studyDetails = resource.getStudyDetails(studyId);
+		StudyDetails studyDetails = resource.getStudyDetails(studyId, Mockito.mock(HttpServletRequest.class));
 		Assert.assertNotNull(studyDetails);
 		Assert.assertEquals(study.getId(), studyDetails.getId());
 		Assert.assertTrue(studyDetails.getMeasuredTraits().size() == 1);
