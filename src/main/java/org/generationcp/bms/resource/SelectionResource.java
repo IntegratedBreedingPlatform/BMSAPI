@@ -4,22 +4,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.generationcp.bms.dao.SimpleDao;
 import org.generationcp.bms.domain.GermplasmScoreCard;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 
-@RestController
+@Controller
 @RequestMapping("/selection")
 public class SelectionResource {	
 	
@@ -29,13 +26,14 @@ public class SelectionResource {
 	public SelectionResource(SimpleDao simpleDao){
 		this.simpleDao = simpleDao;
 	}
-
-	@RequestMapping(value = "/", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
-	public String home(HttpServletRequest request) throws MiddlewareQueryException {
-		return "Please provide parameters for selection in format host:port/selection/top/{trialId}/{selectionIntensity}";
+	
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public String home() {
+		return "redirect:/api-docs/default/selection-resource";
 	}
 	
 	@RequestMapping(value="/top/trial/instance/{trialId}/{selectionIntensity}/{traits}", method = RequestMethod.GET)
+	@ResponseBody
 	public List<GermplasmScoreCard> selectTopPerformersForTrialInstance(@PathVariable Integer trialId, @PathVariable int selectionIntensity, @PathVariable String traits) {
 		
 		List<TraitInfo> traitList = new ArrayList<TraitInfo>();
@@ -54,6 +52,7 @@ public class SelectionResource {
 	}
 	
 	@RequestMapping(value="/trial/{studyId}/top", method = RequestMethod.GET)
+	@ResponseBody
 	public List<GermplasmScoreCard> selectTopPerformersForTrial(@PathVariable Integer studyId, @RequestParam int si, @RequestParam String traits) {
 		
 		List<TraitInfo> traitList = new ArrayList<TraitInfo>();
