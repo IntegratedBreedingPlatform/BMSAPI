@@ -52,7 +52,7 @@ public class GenotypeResource {
 	}
 	
 	
-	@RequestMapping(value = "/{gid}")
+	@RequestMapping(value = "/{gid}", method = RequestMethod.GET)
 	public String getGenotypeData(@PathVariable Integer gid,
 			@RequestParam(required = false) Integer runId,
 			@RequestParam(required = false) String method,

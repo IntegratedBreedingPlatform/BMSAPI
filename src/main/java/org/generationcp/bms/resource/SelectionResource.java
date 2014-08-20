@@ -11,6 +11,7 @@ import org.generationcp.bms.domain.GermplasmScoreCard;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,7 +30,7 @@ public class SelectionResource {
 		this.simpleDao = simpleDao;
 	}
 
-	@RequestMapping(value = "/", method = RequestMethod.GET)
+	@RequestMapping(value = "/", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
 	public String home(HttpServletRequest request) throws MiddlewareQueryException {
 		return "Please provide parameters for selection in format host:port/selection/top/{trialId}/{selectionIntensity}";
 	}
