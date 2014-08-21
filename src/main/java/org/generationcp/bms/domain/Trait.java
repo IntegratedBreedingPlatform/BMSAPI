@@ -13,6 +13,8 @@ public class Trait {
 	private boolean numeric;
 	
 	private long numberOfMeasurements;
+	
+	private String observationDetailsUrl;
 
 	public Trait(int id) {
 		this.id = id;
@@ -84,6 +86,14 @@ public class Trait {
 
 	public void setNumeric(boolean numeric) {
 		this.numeric = numeric;
+	}
+
+	public String getObservationDetailsUrl() {
+		return observationDetailsUrl;
+	}
+
+	public void setObservationDetailsUrl(String observationDetailsUrl) {
+		this.observationDetailsUrl = observationDetailsUrl;
 	}
 
 	@Override

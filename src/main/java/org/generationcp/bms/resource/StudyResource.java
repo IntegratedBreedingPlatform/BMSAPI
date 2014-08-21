@@ -9,6 +9,7 @@ import org.generationcp.bms.domain.DatasetDetails;
 import org.generationcp.bms.domain.DatasetSummary;
 import org.generationcp.bms.domain.StudyDetails;
 import org.generationcp.bms.domain.StudySummary;
+import org.generationcp.bms.domain.Trait;
 import org.generationcp.bms.domain.TraitObservation;
 import org.generationcp.bms.domain.TraitObservationDetails;
 import org.generationcp.bms.exception.NotFoundException;
@@ -129,7 +130,17 @@ public class StudyResource {
         
         studyDetails.addMeasuredTraits(simpleDao.getMeasuredTraitsForStudy(studyId));
         
+        setTraitObservationDetailsUrl(httpRequest, studyDetails.getId(), studyDetails.getMeasuredTraits());
+        
         return studyDetails;    
+	}
+
+	private void setTraitObservationDetailsUrl(HttpServletRequest httpRequest, Integer studyId, List<Trait> traits) {
+		
+		String baseUrl = Utils.getBaseUrl(httpRequest);
+        for(Trait trait : traits) {
+			trait.setObservationDetailsUrl(String.format("%s/study/%s/%s", baseUrl, studyId, trait.getId()));
+		}
 	}
 	
 	@RequestMapping(value = "/dataset/{dataSetId}", method = RequestMethod.GET)
@@ -149,6 +160,8 @@ public class StudyResource {
 		details.setStudySummaryUrl(String.format("%s/study/%s", baseUrl, dataSet.getStudyId()));
 		details.addMeasuredTraits(simpleDao.getMeasuredTraitsForDataset(dataSetId));
 		details.setDatasetDetailUrl(String.format("%s/study/dataset/%s", baseUrl, dataSet.getId()));
+		
+		setTraitObservationDetailsUrl(httpRequest, dataSet.getStudyId(), details.getMeasuredTraits());
 		
 		return details;
 	}
