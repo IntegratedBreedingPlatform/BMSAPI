@@ -12,6 +12,7 @@ import org.generationcp.bms.domain.StudySummary;
 import org.generationcp.bms.domain.TraitObservation;
 import org.generationcp.bms.domain.TraitObservationDetails;
 import org.generationcp.bms.exception.NotFoundException;
+import org.generationcp.bms.util.Utils;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Study;
@@ -78,7 +79,8 @@ public class StudyResource {
 		studySummary.setStartDate(String.valueOf(study.getStartDate()));
 		studySummary.setEndDate(String.valueOf(study.getEndDate()));
 		
-		String baseUrl = String.format("http://%s:%s", httpRequest.getServerName(), httpRequest.getServerPort());			
+		String baseUrl = Utils.getBaseUrl(httpRequest);	
+		studySummary.setStudyDetailsUrl(String.format("%s/%s/details", baseUrl, study.getId()));
 		
 		List<DatasetReference> datasetReferences = studyDataManager.getDatasetReferences(study.getId());
 		if(datasetReferences != null && !datasetReferences.isEmpty()) {
@@ -87,7 +89,7 @@ public class StudyResource {
 				dsSummary.setId(dsRef.getId());
 				dsSummary.setName(dsRef.getName());
 				dsSummary.setDescription(dsRef.getDescription());
-				dsSummary.setDatasetDetailUrl(String.format("%s/study/%s/%s", baseUrl, study.getId(), dsRef.getId()));
+				dsSummary.setDatasetDetailUrl(String.format("%s/study/dataset/%s", baseUrl, dsRef.getId()));
 				studySummary.addDatasetSummary(dsSummary);
 			}
 		}
@@ -125,25 +127,28 @@ public class StudyResource {
             studyDetails.addFactor(factor);      
         }
         
-        studyDetails.addMeasuredTraits(simpleDao.getMeasuredTraits(studyId));
+        studyDetails.addMeasuredTraits(simpleDao.getMeasuredTraitsForStudy(studyId));
         
         return studyDetails;    
 	}
 	
-	@RequestMapping(value = "/{studyId}/{dataSetId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/dataset/{dataSetId}", method = RequestMethod.GET)
 	@ResponseBody
-	public DatasetDetails getStudyDatasetDetails(@PathVariable Integer studyId, @PathVariable Integer dataSetId) throws MiddlewareQueryException {
+	public DatasetDetails getDatasetDetails(@PathVariable Integer dataSetId, HttpServletRequest httpRequest) throws MiddlewareQueryException {
 		
 		DataSet dataSet = studyDataManager.getDataSet(dataSetId);		
 		if(dataSet == null) {
 			throw new NotFoundException();
 		}
+		String baseUrl = Utils.getBaseUrl(httpRequest);	
 		
 		DatasetDetails details = new DatasetDetails();
 		details.setId(dataSet.getId());
 		details.setName(dataSet.getName());
 		details.setDescription(dataSet.getDescription());
-		//TODO figure out structure of the dataset, extract and populate details from it.
+		details.setStudySummaryUrl(String.format("%s/study/%s", baseUrl, dataSet.getStudyId()));
+		details.addMeasuredTraits(simpleDao.getMeasuredTraitsForDataset(dataSetId));
+		details.setDatasetDetailUrl(String.format("%s/study/dataset/%s", baseUrl, dataSet.getId()));
 		
 		return details;
 	}

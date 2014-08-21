@@ -86,7 +86,7 @@ public class StudyResourceTest {
 		
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
 		Mockito.when(studyDataManager.getAllStudyFactors(studyId)).thenReturn(new VariableTypeList());
-		Mockito.when(simpleDao.getMeasuredTraits(studyId)).thenReturn(Arrays.asList(new Trait(1)));
+		Mockito.when(simpleDao.getMeasuredTraitsForStudy(studyId)).thenReturn(Arrays.asList(new Trait(1)));
 		
 		StudyDetails studyDetails = resource.getStudyDetails(studyId, Mockito.mock(HttpServletRequest.class));
 		Assert.assertNotNull(studyDetails);

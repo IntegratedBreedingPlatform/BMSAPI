@@ -22,6 +22,8 @@ import org.generationcp.middleware.pojos.ims.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 
 @RestController
 @RequestMapping("/inventory")
@@ -47,7 +51,8 @@ public class InventoryResource {
 	
 	@RequestMapping(value = "/germplasm/{gid}", method = RequestMethod.GET)
 	@ApiOperation(value = "Get Inventory Information", notes = "Returns information about all inventory lots available for the given germplasm id (gid).")
-	public List<GermplasmInventoryInfo> getInventoryLotInfoForGermplasm(@PathVariable Integer gid) throws MiddlewareQueryException {
+	public List<GermplasmInventoryInfo> getInventoryLotInfoForGermplasm(@PathVariable Integer gid)
+			throws MiddlewareQueryException {
 		
 		List<GermplasmInventoryInfo> germplasmInventoryInfo = new ArrayList<GermplasmInventoryInfo>();
 		
@@ -91,7 +96,11 @@ public class InventoryResource {
 	}
 	
 	@RequestMapping(value = "/germplasm/{gid}", method = RequestMethod.PUT)
-	public InventoryOperationResponse createInverntory(@RequestBody GermplasmInventoryInfo inventoryInfo, @PathVariable Integer gid) throws MiddlewareQueryException {
+	@ApiResponses(value = { @ApiResponse(code = 201, message = "Created")})
+	public ResponseEntity<InventoryOperationResponse> createInverntory(
+			@RequestBody GermplasmInventoryInfo inventoryInfo, @PathVariable Integer gid)
+			throws MiddlewareQueryException {
+		
 		LOGGER.debug(inventoryInfo.toString());
 		
 		Lot lot = new Lot();
@@ -121,8 +130,8 @@ public class InventoryResource {
 		response.setMessage("Inventory lot created successfully.");
 		response.setLotId(lotId);
 		response.setTransactionId(transId);
-		
-		return response;		
+				
+		return new ResponseEntity<InventoryOperationResponse>(response, HttpStatus.CREATED);		
 	}
 	
     private static Integer getCurrentDateInt(){

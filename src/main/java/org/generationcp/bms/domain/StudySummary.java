@@ -14,6 +14,7 @@ public class StudySummary {
 	private String type;
 	private String startDate;
 	private String endDate;
+	private String studyDetailsUrl;
 	private final Set<DatasetSummary> datasetInfo = new HashSet<DatasetSummary>();
 
 	public StudySummary(int id) {
@@ -76,6 +77,14 @@ public class StudySummary {
 		return datasetInfo;
 	}
 	
+	public String getStudyDetailsUrl() {
+		return studyDetailsUrl;
+	}
+
+	public void setStudyDetailsUrl(String studyDetailsUrl) {
+		this.studyDetailsUrl = studyDetailsUrl;
+	}
+
 	public void addDatasetSummary(DatasetSummary datasetSummary) {
 		if(datasetSummary != null) {
 			this.datasetInfo.add(datasetSummary);

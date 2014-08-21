@@ -27,6 +27,8 @@ public class SimpleDaoIntegrationTest {
 	
 	private static final Integer BON2005DS_STUDY_ID = 10010;
 	
+	private static final Integer BON2005DS_DATASET_ID = 10015;
+	
 	private static JdbcTemplate jdbcTemplate;
 	
 	private static SimpleDao dao; 
@@ -63,8 +65,8 @@ public class SimpleDaoIntegrationTest {
 	}
 	
 	@Test
-	public void testGetMeasuredTraits() {
-		List<Trait> measuredTraits = dao.getMeasuredTraits(BON2005DS_STUDY_ID);		
+	public void testGetMeasuredTraitsForStudy() {
+		List<Trait> measuredTraits = dao.getMeasuredTraitsForStudy(BON2005DS_STUDY_ID);		
 		Assert.assertTrue(measuredTraits.size() == 8);
 		
 		List<Trait> numericTraits = new ArrayList<Trait>();
@@ -74,6 +76,21 @@ public class SimpleDaoIntegrationTest {
 			}
 		}
 		// There are two numeric traits in our test study : FLW and MAT85
+		Assert.assertTrue(numericTraits.size() == 2);	
+	}
+	
+	@Test
+	public void testGetMeasuredTraitsForDataset() {
+		List<Trait> measuredTraits = dao.getMeasuredTraitsForDataset(BON2005DS_DATASET_ID);		
+		Assert.assertTrue(measuredTraits.size() == 8);
+		
+		List<Trait> numericTraits = new ArrayList<Trait>();
+		for(Trait trait : measuredTraits) {
+			if(trait.isNumeric()) {
+				numericTraits.add(trait);
+			}
+		}
+		// There are two numeric traits in test dataset : FLW and MAT85
 		Assert.assertTrue(numericTraits.size() == 2);	
 	}
 	

@@ -11,6 +11,7 @@ import org.generationcp.bms.domain.GermplasmListSummary;
 import org.generationcp.bms.domain.GermplasmSearchResult;
 import org.generationcp.bms.domain.GermplasmSummary;
 import org.generationcp.bms.exception.NotFoundException;
+import org.generationcp.bms.util.Utils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -55,7 +56,7 @@ public class GermplasmResource {
 				res.setDescription(gpList.getDescription());
 				res.setNotes(gpList.getNotes());
 				res.setListSize(gpList.getListData().size());			
-				String baseUrl = String.format("http://%s:%s", httpRequest.getServerName(), httpRequest.getServerPort());			
+				String baseUrl = Utils.getBaseUrl(httpRequest);			
 				res.setListDataUrl(String.format("%s/germplasm/list/%s", baseUrl, gpList.getId()));
 				results.add(res);			
 			}		
@@ -77,7 +78,7 @@ public class GermplasmResource {
 			listDetails.setDescription(gpList.getDescription());
 			listDetails.setNotes(gpList.getNotes());
 			listDetails.setListSize(gpList.getListData().size());		
-			String baseUrl = String.format("http://%s:%s", httpRequest.getServerName(), httpRequest.getServerPort());			
+			String baseUrl = Utils.getBaseUrl(httpRequest);			
 			listDetails.setListDataUrl(String.format("%s/germplasm/list/%s", baseUrl, gpList.getId()));
 			
 			for(GermplasmListData gpListData : gpList.getListData()) {

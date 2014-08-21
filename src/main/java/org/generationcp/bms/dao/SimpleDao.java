@@ -86,9 +86,7 @@ public class SimpleDao {
 	 * @param studyId the identifier of the study
 	 * @return matching traits with measurement count for each. Empty list if no such match is found. Never returns {@code null}.
 	 */
-	public List<Trait> getMeasuredTraits(int studyId) {
-
-		List<Trait> measuredTraits = new ArrayList<Trait>();
+	public List<Trait> getMeasuredTraitsForStudy(int studyId) {
 		List<Map<String, Object>> queryResults = this.jdbcTemplate
 				.queryForList(""
 						+ "select gtd.stdvar_id, svd.stdvar_name, svd.stdvar_definition, svd.property, svd.method, svd.scale, svd.type, svd.has_type, count(gtd.observed_value) as total_observations "
@@ -97,6 +95,36 @@ public class SimpleDao {
 						+ " where gtd.study_id = " + studyId
 						+ " group by gtd.stdvar_id;");
 
+		return mapResults(queryResults);
+	}
+	
+	/**
+	 * Returns a list of traits for the given dataset (identified by the {@code datasetId}). 
+	 * Study design may have many traits "intended" to be measured (defined as variates of the study). 
+	 * However, not all traits are measured for all plants/germplasm necessarily.
+	 *  
+	 * This method returns only those traits for which measurements are avaibale. 
+	 * 
+	 * Relies on the database views <strong>germplasm_trial_details</strong> and <strong>standard_variable_details</strong>.
+	 * 
+	 * @param datasetId the identifier of the dataset
+	 * @return matching traits with measurement count for each. Empty list if no such match is found. Never returns {@code null}.
+	 */
+	public List<Trait> getMeasuredTraitsForDataset(int datasetId) {
+		
+		List<Map<String, Object>> queryResults = this.jdbcTemplate
+				.queryForList(""
+						+ "select gtd.stdvar_id, svd.stdvar_name, svd.stdvar_definition, svd.property, svd.method, svd.scale, svd.type, svd.has_type, count(gtd.observed_value) as total_observations "
+						+ " from germplasm_trial_details gtd "
+						+ " inner join standard_variable_details svd on svd.cvterm_id =  gtd.stdvar_id"
+						+ " where gtd.project_id = " + datasetId
+						+ " group by gtd.stdvar_id;");
+
+		return mapResults(queryResults);
+	}
+
+	private List<Trait> mapResults(List<Map<String, Object>> queryResults) {
+		List<Trait> measuredTraits = new ArrayList<Trait>();
 		for (Map<String, Object> row : queryResults) {
 			Trait trait = new Trait((Integer) row.get("stdvar_id"));
 			trait.setName((String) row.get("stdvar_name"));
@@ -106,7 +134,7 @@ public class SimpleDao {
 			trait.setScale((String) row.get("scale"));
 			trait.setType((String) row.get("type"));
 			trait.setNumberOfMeasurements((Long) row.get("total_observations"));
-			//TODO the query for some reason returns the has_type (which is the dataType id) as String type, fix later.
+			//FIXME the query for some reason returns the has_type (which is the dataType id) as String type.
 			Integer dataTypeId = Integer.valueOf((String) row.get("has_type"));
 			trait.setNumeric(dataTypeId.equals(TermId.NUMERIC_VARIABLE.getId()));
 			measuredTraits.add(trait);
