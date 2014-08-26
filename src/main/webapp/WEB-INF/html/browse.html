@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>BMS API - Home</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link th:href="@{/static/css/lib/bootstrap.min.css}" rel="stylesheet" />
+<script th:src="@{/static/js/lib/jquery.min.js}" type="text/javascript"></script>
+<script th:src="@{/static/js/lib/bootstrap.min.js}" type="text/javascript"></script>
+
+<script type="text/javascript" th:inline="javascript">
+    
+    /*<![CDATA[*/    
+    	$(document).ready(function() {
+    		
+    		// Following variables are hard coded with API server specific parameters for demo only.
+    		// Map of central db names to program IDs on spi server deployment.
+    		var programCropDBMap = {
+    			"ibdbv2_maize_central" : 1,
+    			"ibdbv2_rice_central" : 2,
+    			"ibdbv2_bean_central" : 3,
+    			"ibdbv2_cassava_central" : 4,
+    			"ibdbv2_chickpea_central" : 5,
+    			"ibdbv2_cowpea_central" : 6,
+    			"ibdbv2_groundnut_central" : 7,
+    			"ibdbv2_lentil_central" : 8,
+    			"ibdbv2_pearlmillet_central" : 9,
+    			"ibdbv2_sorghum_central" : 10,
+    			"ibdbv2_soybean_central" : 11,
+    			"ibdbv2_wheat_central" : 12,
+    			"ibdbv2_phaseolus_central" : 13    			
+    		}   		
+    		var baseURL = "http://api.leafnode.io:18080", loggedInUserId = 1;
+    		
+    		$('#selectedCropDB').change(function() {
+ 			   	$("#cropSelectionForm").trigger('submit');
+ 			});
+    		
+    		$('.browse-studies').click(function() {  			
+    			$("#appFrame").attr("src", baseURL + "/GermplasmStudyBrowser/main/study?selectedProjectId=" + programCropDBMap[$('#selectedCropDB').val()] + "&loggedInUserId=" + loggedInUserId);
+    		});
+    		
+    		$('.browse-ontology').click(function() {
+    			$("#appFrame").attr("src", baseURL + "/Fieldbook/OntologyBrowser?selectedProjectId=" + programCropDBMap[$('#selectedCropDB').val()] + "&loggedInUserId" + loggedInUserId);
+    		});    		
+    	});
+    
+    /*]]>*/	
+    </script>
+</head>
+
+<body>
+	<nav class="navbar navbar-default" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" th:href="@{/}">BMS API</a>
+			</div>
+			<div class="navbar-collapse collapse">
+				<form class="navbar-form navbar-right" role="form" id="cropSelectionForm" action="/selectCrop" method="POST">
+					<div class="form-group">
+						<label>Select Crop Database:</label>
+					</div>
+					<div class="form-group">
+						<select id="selectedCropDB" name="selectedCropDB" class="form-control">
+							<option th:each="centralDB : ${availableCentralDBs}" th:value="${centralDB}" th:text="${centralDB}" th:selected="${session.selectedCropDB == centralDB}" />
+						</select>
+						<input type="hidden" name="redirectURL" value="/browse" />
+					</div>
+				</form>
+				<div class="navbar-form navbar-right">
+					<button type="button" class="btn btn-default browse-studies">Browse Studies</button>
+					<button type="button" class="btn btn-default browse-ontology">Browse Ontology</button>
+				</div>
+			</div>
+		</div>
+	</nav>
+	<div style="height: 100%; width: 100%;">
+		<iframe id="appFrame" style="height: 100%; width: 100%; border: none;" height="100%" width="100%"></iframe>
+	</div>
+</body>
+</html>

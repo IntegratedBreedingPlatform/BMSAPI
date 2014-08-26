@@ -35,12 +35,19 @@ public class WebContentController {
         return "index";
     }
     
+    @ApiIgnore
+    @RequestMapping("/browse")
+    public String browse(Model model, HttpServletRequest request) {       
+        model.addAttribute("availableCentralDBs", simpleDao.getAllCentralCropSchemaNames());
+        return "browse";
+    }
+    
     @RequestMapping(value = "/selectCrop", method = RequestMethod.POST)
     @ApiIgnore
-    public String selectCrop(HttpServletRequest request, HttpSession session, @RequestParam String selectedCropDB) {
+    public String selectCrop(HttpServletRequest request, HttpSession session, @RequestParam String selectedCropDB, @RequestParam String redirectURL) {
     	session.setAttribute("selectedCropDB", selectedCropDB);
     	LOGGER.info("Selected crop DB is: " + selectedCropDB);
-    	return "redirect:/";
+    	return "redirect:" + redirectURL;
     }
 
 }

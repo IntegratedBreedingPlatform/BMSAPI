@@ -77,27 +77,30 @@
 <body>
 	<nav class="navbar navbar-default" role="navigation">
 		<div class="container-fluid">
-	        <div class="navbar-header">
-	          <a class="navbar-brand" th:href="@{/}">BMS API</a>
-	        </div>
-	    	<div class="navbar-collapse collapse">        
-	          <form class="navbar-form navbar-right" role="form" id="cropSelectionForm" action="/selectCrop" method="POST">
+			<div class="navbar-header">
+				<a class="navbar-brand" th:href="@{/}">BMS API</a>
+			</div>
+			<div class="navbar-collapse collapse">
+				<div class="navbar-form navbar-right">
+					<a th:href="@{/browse}" class="btn btn-default" role="button">Browse Historic Data</a>
+				</div>
+				<form class="navbar-form navbar-right" role="form" id="cropSelectionForm" action="/selectCrop" method="POST">
 					<div class="form-group">
 						<label>Select Crop Database:</label>
-	            	</div>
+					</div>
 					<div class="form-group">
 						<select id="selectedCropDB" name="selectedCropDB" class="form-control">
-							<option th:each="centralDB : ${availableCentralDBs}" th:value="${centralDB}" th:text="${centralDB}" 
-								th:selected="${session.selectedCropDB == centralDB}"/>
+							<option th:each="centralDB : ${availableCentralDBs}" th:value="${centralDB}" th:text="${centralDB}" th:selected="${session.selectedCropDB == centralDB}" />
 						</select>
 					</div>
-				</form>			
-	        </div>
-    	</div>
-    </nav>
-    <div class="container swagger-section">
+					<input type="hidden" name="redirectURL" value="/" />
+				</form>
+			</div>
+		</div>
+	</nav>
+	<div class="container swagger-section">
 		<div id="message-bar" class="swagger-ui-wrap">&nbsp;</div>
 		<div id="swagger-ui-container" class="swagger-ui-wrap"></div>
-    </div>
+	</div>
 </body>
 </html>
