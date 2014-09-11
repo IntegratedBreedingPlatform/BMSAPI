@@ -34,11 +34,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class StudyResource {
 
 	private final StudyDataManager studyDataManager;
-	
 	private final SimpleDao simpleDao;
 	
+	private HttpServletRequest httpRequest;
+	
 	@Autowired
-	public StudyResource(StudyDataManager studyDataManager, SimpleDao simpleDao) {
+	public StudyResource(StudyDataManager studyDataManager, SimpleDao simpleDao, HttpServletRequest httpRequest) {
 		if(studyDataManager == null) {
 			throw new IllegalArgumentException(StudyDataManager.class.getSimpleName() + " is required to instantiate " + StudyResource.class.getSimpleName());
 		}
@@ -47,6 +48,7 @@ public class StudyResource {
 		}
 		this.studyDataManager = studyDataManager;
 		this.simpleDao = simpleDao;
+		this.httpRequest = httpRequest;
 	}
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
@@ -56,7 +58,7 @@ public class StudyResource {
 	
 	@RequestMapping(value="/{studyId}", method = RequestMethod.GET)
 	@ResponseBody
-	public StudySummary getStudySummary(@PathVariable Integer studyId, HttpServletRequest httpRequest)
+	public StudySummary getStudySummary(@PathVariable Integer studyId)
 			throws MiddlewareQueryException {
 
 		Study study = studyDataManager.getStudy(studyId);
@@ -66,27 +68,31 @@ public class StudyResource {
 		}
 	
 		StudySummary studySummary = new StudySummary(study.getId());
-		populateSummary(studySummary, study, httpRequest);
+		populateSummary(studySummary, study);
 
 		return studySummary;
 
 	}
 	
-	private void populateSummary(StudySummary studySummary, Study study, HttpServletRequest httpRequest) throws MiddlewareQueryException {
+	private void populateSummary(StudySummary studySummary, Study study) throws MiddlewareQueryException {
 		studySummary.setName(study.getName());
 		studySummary.setTitle(study.getTitle());
 		studySummary.setObjective(study.getObjective());
 		studySummary.setType(study.getType());
 		studySummary.setStartDate(String.valueOf(study.getStartDate()));
-		studySummary.setEndDate(String.valueOf(study.getEndDate()));
-		
-		String baseUrl = Utils.getBaseUrl(httpRequest);	
-		studySummary.setStudyDetailsUrl(String.format("%s/study/%s/details", baseUrl, study.getId()));
+		studySummary.setEndDate(String.valueOf(study.getEndDate()));		
+		studySummary.setStudyDetailsUrl(getStudyDetailsUrl(study.getId()));
+	}
+	
+
+	private String getStudyDetailsUrl(Integer studyId) {
+		String baseUrl = Utils.getBaseUrl(this.httpRequest);	
+		return String.format("%s/study/%s/details", baseUrl, studyId);
 	}
 	
 	@RequestMapping(value="/{studyId}/details", method = RequestMethod.GET)
 	@ResponseBody
-	public StudyDetails getStudyDetails(@PathVariable Integer studyId, HttpServletRequest httpRequest) throws MiddlewareQueryException {
+	public StudyDetails getStudyDetails(@PathVariable Integer studyId) throws MiddlewareQueryException {
 		
         Study study = studyDataManager.getStudy(studyId);
         if (study == null) {
@@ -94,9 +100,9 @@ public class StudyResource {
 		}
         
         StudyDetails studyDetails = new StudyDetails(study.getId());
-        populateSummary(studyDetails, study, httpRequest);
+        populateSummary(studyDetails, study);
         
-        String baseUrl = Utils.getBaseUrl(httpRequest);
+        String baseUrl = Utils.getBaseUrl(this.httpRequest);
 		List<DatasetReference> datasetReferences = studyDataManager.getDatasetReferences(study.getId());
 		if(datasetReferences != null && !datasetReferences.isEmpty()) {
 			for(DatasetReference dsRef : datasetReferences) {
@@ -131,14 +137,14 @@ public class StudyResource {
         
         studyDetails.addMeasuredTraits(simpleDao.getMeasuredTraitsForStudy(studyId));
         
-        setTraitObservationDetailsUrl(httpRequest, studyDetails.getId(), studyDetails.getMeasuredTraits());
+        setTraitObservationDetailsUrl(studyDetails.getId(), studyDetails.getMeasuredTraits());
         
         return studyDetails;    
 	}
 
-	private void setTraitObservationDetailsUrl(HttpServletRequest httpRequest, Integer studyId, List<Trait> traits) {
+	private void setTraitObservationDetailsUrl(Integer studyId, List<Trait> traits) {
 		
-		String baseUrl = Utils.getBaseUrl(httpRequest);
+		String baseUrl = Utils.getBaseUrl(this.httpRequest);
         for(Trait trait : traits) {
 			trait.setObservationDetailsUrl(String.format("%s/study/%s/trait/%s", baseUrl, studyId, trait.getId()));
 		}
@@ -146,13 +152,13 @@ public class StudyResource {
 	
 	@RequestMapping(value = "/dataset/{dataSetId}", method = RequestMethod.GET)
 	@ResponseBody
-	public DatasetDetails getDatasetDetails(@PathVariable Integer dataSetId, HttpServletRequest httpRequest) throws MiddlewareQueryException {
+	public DatasetDetails getDatasetDetails(@PathVariable Integer dataSetId) throws MiddlewareQueryException {
 		
 		DataSet dataSet = studyDataManager.getDataSet(dataSetId);		
 		if(dataSet == null) {
 			throw new NotFoundException();
 		}
-		String baseUrl = Utils.getBaseUrl(httpRequest);	
+		String baseUrl = Utils.getBaseUrl(this.httpRequest);	
 		
 		DatasetDetails details = new DatasetDetails();
 		details.setId(dataSet.getId());
@@ -162,7 +168,7 @@ public class StudyResource {
 		details.addMeasuredTraits(simpleDao.getMeasuredTraitsForDataset(dataSetId));
 		details.setDatasetDetailUrl(String.format("%s/study/dataset/%s", baseUrl, dataSet.getId()));
 		
-		setTraitObservationDetailsUrl(httpRequest, dataSet.getStudyId(), details.getMeasuredTraits());
+		setTraitObservationDetailsUrl(dataSet.getStudyId(), details.getMeasuredTraits());
 		
 		return details;
 	}
