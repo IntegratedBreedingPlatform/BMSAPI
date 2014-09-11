@@ -1,5 +1,6 @@
 package org.generationcp.bms.resource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,6 +55,28 @@ public class StudyResource {
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String home() {
 		return "redirect:/api-docs/default/study-resource";
+	}
+	
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	@ResponseBody
+	public List<StudySummary> getStudySummaries() throws MiddlewareQueryException {
+		
+		List<StudySummary> studySummaries = new ArrayList<StudySummary>();		
+		List<org.generationcp.middleware.domain.etl.StudyDetails> nurseriesAndTrials = studyDataManager.getAllNurseryAndTrialStudyDetails();
+		
+		for(org.generationcp.middleware.domain.etl.StudyDetails studyDetails : nurseriesAndTrials) {
+			StudySummary summary = new StudySummary(studyDetails.getId());
+			summary.setName(studyDetails.getStudyName());
+			summary.setTitle(studyDetails.getTitle());
+			summary.setObjective(studyDetails.getObjective());
+			summary.setStartDate(studyDetails.getStartDate());
+			summary.setEndDate(studyDetails.getEndDate());
+			summary.setType(studyDetails.getStudyType().getName());		
+			summary.setStudyDetailsUrl(getStudyDetailsUrl(studyDetails.getId()));
+			studySummaries.add(summary);			
+		}
+		
+		return studySummaries;
 	}
 	
 	@RequestMapping(value="/{studyId}", method = RequestMethod.GET)
