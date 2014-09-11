@@ -81,7 +81,7 @@ public class StudyResource {
 		studySummary.setEndDate(String.valueOf(study.getEndDate()));
 		
 		String baseUrl = Utils.getBaseUrl(httpRequest);	
-		studySummary.setStudyDetailsUrl(String.format("%s/%s/details", baseUrl, study.getId()));
+		studySummary.setStudyDetailsUrl(String.format("%s/study/%s/details", baseUrl, study.getId()));
 	}
 	
 	@RequestMapping(value="/{studyId}/details", method = RequestMethod.GET)
@@ -140,7 +140,7 @@ public class StudyResource {
 		
 		String baseUrl = Utils.getBaseUrl(httpRequest);
         for(Trait trait : traits) {
-			trait.setObservationDetailsUrl(String.format("%s/study/%s/%s", baseUrl, studyId, trait.getId()));
+			trait.setObservationDetailsUrl(String.format("%s/study/%s/trait/%s", baseUrl, studyId, trait.getId()));
 		}
 	}
 	
