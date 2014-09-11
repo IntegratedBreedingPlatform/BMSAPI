@@ -82,18 +82,6 @@ public class StudyResource {
 		
 		String baseUrl = Utils.getBaseUrl(httpRequest);	
 		studySummary.setStudyDetailsUrl(String.format("%s/%s/details", baseUrl, study.getId()));
-		
-		List<DatasetReference> datasetReferences = studyDataManager.getDatasetReferences(study.getId());
-		if(datasetReferences != null && !datasetReferences.isEmpty()) {
-			for(DatasetReference dsRef : datasetReferences) {
-				DatasetSummary dsSummary = new DatasetSummary();
-				dsSummary.setId(dsRef.getId());
-				dsSummary.setName(dsRef.getName());
-				dsSummary.setDescription(dsRef.getDescription());
-				dsSummary.setDatasetDetailUrl(String.format("%s/study/dataset/%s", baseUrl, dsRef.getId()));
-				studySummary.addDatasetSummary(dsSummary);
-			}
-		}
 	}
 	
 	@RequestMapping(value="/{studyId}/details", method = RequestMethod.GET)
@@ -108,6 +96,19 @@ public class StudyResource {
         StudyDetails studyDetails = new StudyDetails(study.getId());
         populateSummary(studyDetails, study, httpRequest);
         
+        String baseUrl = Utils.getBaseUrl(httpRequest);
+		List<DatasetReference> datasetReferences = studyDataManager.getDatasetReferences(study.getId());
+		if(datasetReferences != null && !datasetReferences.isEmpty()) {
+			for(DatasetReference dsRef : datasetReferences) {
+				DatasetSummary dsSummary = new DatasetSummary();
+				dsSummary.setId(dsRef.getId());
+				dsSummary.setName(dsRef.getName());
+				dsSummary.setDescription(dsRef.getDescription());
+				dsSummary.setDatasetDetailUrl(String.format("%s/study/dataset/%s", baseUrl, dsRef.getId()));
+				studyDetails.addDatasetSummary(dsSummary);
+			}
+		}
+		    
         //factors/metadaa/properties/information/conditions of the study        
         
         List<Variable> conditions = study.getConditions().getVariables();
