@@ -55,7 +55,7 @@ public class StudyResource {
 		}
 		if (fieldbookService == null) {
 			throw new IllegalArgumentException(FieldbookService.class.getSimpleName()
-					+ " is required to instantiate " + FieldbookService.class.getSimpleName());
+					+ " is required to instantiate " + StudyResource.class.getSimpleName());
 		}
 		this.studyDataManager = studyDataManager;
 		this.fieldbookService = fieldbookService;
