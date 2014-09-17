@@ -67,7 +67,7 @@ public class SimpleDaoIntegrationTest {
 	@Test
 	public void testGetMeasuredTraitsForStudy() {
 		List<Trait> measuredTraits = dao.getMeasuredTraitsForStudy(BON2005DS_STUDY_ID);		
-		Assert.assertTrue(measuredTraits.size() == 8);
+		Assert.assertEquals("Number of measured traits do not match.", 8, measuredTraits.size());
 		
 		List<Trait> numericTraits = new ArrayList<Trait>();
 		for(Trait trait : measuredTraits) {
@@ -76,13 +76,13 @@ public class SimpleDaoIntegrationTest {
 			}
 		}
 		// There are two numeric traits in our test study : FLW and MAT85
-		Assert.assertTrue(numericTraits.size() == 2);	
+		Assert.assertEquals("Number of numeric traits do not match.", 2, numericTraits.size());		
 	}
 	
 	@Test
 	public void testGetMeasuredTraitsForDataset() {
 		List<Trait> measuredTraits = dao.getMeasuredTraitsForDataset(BON2005DS_DATASET_ID);		
-		Assert.assertTrue(measuredTraits.size() == 8);
+		Assert.assertEquals("Number of measured traits do not match.", 8, measuredTraits.size());
 		
 		List<Trait> numericTraits = new ArrayList<Trait>();
 		for(Trait trait : measuredTraits) {
@@ -91,7 +91,7 @@ public class SimpleDaoIntegrationTest {
 			}
 		}
 		// There are two numeric traits in test dataset : FLW and MAT85
-		Assert.assertTrue(numericTraits.size() == 2);	
+		Assert.assertEquals("Number of numeric traits do not match.", 2, numericTraits.size());	
 	}
 	
 	@Test
@@ -102,10 +102,7 @@ public class SimpleDaoIntegrationTest {
 		interestingTraits.add(new TraitInfo(21726)); // plant height
 		interestingTraits.add(new TraitInfo(20826)); // grain density
 		
-		List<GermplasmScoreCard> result = dao.getTraitObservationsForTrial(5765, interestingTraits);
-		
-		Assert.assertTrue(result.size() > 0);
-		Assert.assertTrue(result.size() == 220);
-		
+		List<GermplasmScoreCard> result = dao.getTraitObservationsForTrial(5765, interestingTraits);	
+		Assert.assertEquals("Expected number of GermplasmScoreCard entries do not match.", 220, result.size());	
 	}
 }
