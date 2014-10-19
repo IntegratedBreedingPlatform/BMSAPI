@@ -2,7 +2,7 @@ package org.generationcp.bms.domain;
 
 public class StudySummary {
 
-	private final int id;
+	private int id;
 
 	private String name;
 	private String title;
@@ -13,12 +13,20 @@ public class StudySummary {
 
 	private String studyDetailsUrl;
 
+	public StudySummary() { 
+		
+	}
+	
 	public StudySummary(int id) {
 		this.id = id;
 	}
 
 	public int getId() {
 		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getName() {
@@ -75,5 +83,12 @@ public class StudySummary {
 
 	public void setStudyDetailsUrl(String studyDetailsUrl) {
 		this.studyDetailsUrl = studyDetailsUrl;
+	}
+
+	@Override
+	public String toString() {
+		return "StudySummary [id=" + id + ", name=" + name + ", title=" + title + ", objective="
+				+ objective + ", type=" + type + ", startDate=" + startDate + ", endDate="
+				+ endDate + "]";
 	}
 }

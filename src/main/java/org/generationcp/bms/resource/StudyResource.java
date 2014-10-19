@@ -22,28 +22,41 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 
 @Controller
 @RequestMapping("/study")
 public class StudyResource {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(StudyResource.class);
+	
 	private StudyDataManager studyDataManager;
 	private SimpleDao simpleDao;
 	private FieldbookService fieldbookService;
+	private DataImportService dataImportService;
 	private HttpServletRequest httpRequest;	
 
 	@Autowired
 	public StudyResource(StudyDataManager studyDataManager, SimpleDao simpleDao,
-			FieldbookService fieldbookService, HttpServletRequest httpRequest) {
+			FieldbookService fieldbookService, DataImportService dataImportService, HttpServletRequest httpRequest) {
 		
 		if (studyDataManager == null) {
 			throw new IllegalArgumentException(StudyDataManager.class.getSimpleName()
@@ -57,8 +70,13 @@ public class StudyResource {
 			throw new IllegalArgumentException(FieldbookService.class.getSimpleName()
 					+ " is required to instantiate " + StudyResource.class.getSimpleName());
 		}
+		if (dataImportService == null) {
+			throw new IllegalArgumentException(DataImportService.class.getSimpleName()
+					+ " is required to instantiate " + StudyResource.class.getSimpleName());
+		}
 		this.studyDataManager = studyDataManager;
 		this.fieldbookService = fieldbookService;
+		this.dataImportService = dataImportService;
 		this.simpleDao = simpleDao;
 		this.httpRequest = httpRequest;
 	}
@@ -103,6 +121,28 @@ public class StudyResource {
 		populateSummary(studySummary, study);
 
 		return studySummary;
+	}
+	
+	@RequestMapping(method = RequestMethod.PUT)
+	@ApiResponses(value = { @ApiResponse(code = 201, message = "Created")})
+	public ResponseEntity<StudySummary> createStudy(@RequestBody StudySummary studySummary) throws MiddlewareQueryException {
+		LOGGER.info(studySummary.toString());
+		
+		Workbook workbook = new Workbook();
+    	// Basic Details
+    	org.generationcp.middleware.domain.etl.StudyDetails studyDetails = new org.generationcp.middleware.domain.etl.StudyDetails();
+    	studyDetails.setStudyType(StudyType.N);
+    	studyDetails.setStudyName(studySummary.getName());
+    	studyDetails.setObjective(studySummary.getObjective());
+    	studyDetails.setTitle(studySummary.getTitle());
+    	studyDetails.setStartDate(studySummary.getStartDate());
+    	studyDetails.setEndDate(studySummary.getEndDate());
+    	studyDetails.setParentFolderId(1);    	
+    	workbook.setStudyDetails(studyDetails);
+    	
+    	int studyId = dataImportService.saveDataset(workbook);    	
+    	studySummary.setId(studyId);    	
+		return new ResponseEntity<StudySummary>(studySummary, HttpStatus.CREATED);
 	}
 
 	private void populateSummary(StudySummary studySummary, Study study)

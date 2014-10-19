@@ -29,8 +29,10 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.OntologyServiceImpl;
+import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.hibernate.SessionFactory;
@@ -189,6 +191,13 @@ public class MiddlewareFactory {
 	public GermplasmDataManager getGermplasmDataManager() throws FileNotFoundException {
 		return new GermplasmDataManagerImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
 				new HibernateSessionPerRequestProvider(getCentralSessionFactory()), this.dbNameLocal, getCurrentlySelectedCropDBName());
+	}
+	
+	@Bean
+	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public DataImportService getDataImportService() throws FileNotFoundException {
+		return new DataImportServiceImpl(new HibernateSessionPerRequestProvider(localSessionFactory), 
+				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
 	}
 
 	@Bean
