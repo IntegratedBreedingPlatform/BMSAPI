@@ -260,7 +260,7 @@ public class StudyResource {
 		throw new NotFoundException();
 	}
 
-	@RequestMapping(value = "/workbook/{nurseryId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/workbook/N/{nurseryId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Workbook getNurseryWorkbook(@PathVariable Integer nurseryId) throws MiddlewareQueryException {
 
@@ -271,7 +271,7 @@ public class StudyResource {
 		return workbook;
 	}
 	
-	@RequestMapping(value = "/workbook/{trialId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/workbook/T/{trialId}", method = RequestMethod.GET)
 	@ResponseBody
 	public Workbook getTrialWorkbook(@PathVariable Integer trialId) throws MiddlewareQueryException {
 
