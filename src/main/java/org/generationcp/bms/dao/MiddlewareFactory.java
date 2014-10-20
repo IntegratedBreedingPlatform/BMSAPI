@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -47,7 +46,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -58,27 +56,13 @@ public class MiddlewareFactory {
 	
 	private Logger LOGGER = LoggerFactory.getLogger(MiddlewareFactory.class); 
 	
-	@Autowired
-	private Environment environment;
-	
-	private String dbHost;
-	private String dbPort;
-	private String dbUsername;
-	private String dbPassword;
-	
 	private final Map<String, SessionFactory> sessionFactoryCache = new HashMap<String, SessionFactory>();
 	
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private ApiEnvironmentConfiguration config;
 	
-	@PostConstruct  
-	public void postConstruct() throws FileNotFoundException {
-		
-		this.dbHost = environment.getProperty("db.host");
-		this.dbPort = environment.getProperty("db.port");
-		this.dbUsername = environment.getProperty("db.username");
-		this.dbPassword = environment.getProperty("db.password");		
-	}
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
 	
 	@PreDestroy
 	public void preDestroy() {
@@ -94,7 +78,7 @@ public class MiddlewareFactory {
 
 		if (this.sessionFactoryCache.get(selectedCentralDB) == null) {
 			DatabaseConnectionParameters centralConnectionParams = new DatabaseConnectionParameters(
-					this.dbHost, this.dbPort, selectedCentralDB, this.dbUsername, this.dbPassword);
+					config.getDbHost(), config.getDbPort(), selectedCentralDB, config.getDbUsername(), config.getDbPassword());
 			sessionFactory = SessionFactoryUtil.openSessionFactory(centralConnectionParams);
 			sessionFactoryCache.put(selectedCentralDB, sessionFactory);
 		} else {
@@ -109,7 +93,7 @@ public class MiddlewareFactory {
 
 		if (this.sessionFactoryCache.get(selectedLocalDB) == null) {
 			DatabaseConnectionParameters localConnectionParams = new DatabaseConnectionParameters(
-					this.dbHost, this.dbPort, selectedLocalDB, this.dbUsername, this.dbPassword);
+					config.getDbHost(), config.getDbPort(), selectedLocalDB, config.getDbUsername(), config.getDbPassword());
 			sessionFactory = SessionFactoryUtil.openSessionFactory(localConnectionParams);
 			sessionFactoryCache.put(selectedLocalDB, sessionFactory);
 		} else {
@@ -223,9 +207,8 @@ public class MiddlewareFactory {
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public JdbcTemplate getJDBCTemplate() throws MiddlewareQueryException {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource(
-				String.format("jdbc:mysql://%s:%s/%s", this.dbHost, this.dbPort, getCurrentlySelectedCentralDBName()), 
-				this.dbUsername, 
-				this.dbPassword);
+				String.format("jdbc:mysql://%s:%s/%s", config.getDbHost(), config.getDbPort(), getCurrentlySelectedCentralDBName()), 
+				config.getDbUsername(), config.getDbPassword());
 		
 		return new JdbcTemplate(dataSource);
 	}
