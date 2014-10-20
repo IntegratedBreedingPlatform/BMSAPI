@@ -29,6 +29,7 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.OntologyServiceImpl;
@@ -68,6 +69,9 @@ public class MiddlewareFactory {
 	private String dbNameCentralDefault;
 	
 	private final Map<String, SessionFactory> sessionFactoryCache = new HashMap<String, SessionFactory>();
+	
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
 	
 	@PostConstruct  
 	public void postConstruct() throws FileNotFoundException {
