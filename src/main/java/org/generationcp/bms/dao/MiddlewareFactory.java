@@ -6,11 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PreDestroy;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
-import org.generationcp.bms.Constants;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.bms.context.ContextResolver;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.SessionFactoryUtil;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
@@ -30,8 +27,6 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.OntologyServiceImpl;
@@ -48,13 +43,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Configuration
 public class MiddlewareFactory {
 	
-	private Logger LOGGER = LoggerFactory.getLogger(MiddlewareFactory.class); 
+	private static final Logger LOGGER = LoggerFactory.getLogger(MiddlewareFactory.class); 
 	
 	private final Map<String, SessionFactory> sessionFactoryCache = new HashMap<String, SessionFactory>();
 	
@@ -62,7 +55,7 @@ public class MiddlewareFactory {
 	private ApiEnvironmentConfiguration config;
 	
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private ContextResolver contextResolver;
 	
 	@PreDestroy
 	public void preDestroy() {
@@ -72,7 +65,7 @@ public class MiddlewareFactory {
 		}
 	}
 	
-	private SessionFactory getCentralSessionFactory() throws FileNotFoundException, MiddlewareQueryException {
+	private SessionFactory getCentralSessionFactory() throws FileNotFoundException {
 		String selectedCentralDB = getCurrentlySelectedCentralDBName();
 		SessionFactory sessionFactory;
 
@@ -87,7 +80,7 @@ public class MiddlewareFactory {
 		return sessionFactory;
 	}
 	
-	private SessionFactory getLocalSessionFactory() throws FileNotFoundException, MiddlewareQueryException {
+	private SessionFactory getLocalSessionFactory() throws FileNotFoundException {
 		String selectedLocalDB = getCurrentlySelectedLocalDBName();
 		SessionFactory sessionFactory;
 
@@ -102,110 +95,94 @@ public class MiddlewareFactory {
 		return sessionFactory;
 	}
 	
-	private String getCurrentlySelectedCentralDBName() throws MiddlewareQueryException {
-		return resolveProgram().getCentralDbName();
+	private String getCurrentlySelectedCentralDBName() {
+		return this.contextResolver.resolveProgram().getCentralDbName();
 	}
 	
-	private String getCurrentlySelectedLocalDBName() throws MiddlewareQueryException {
-		return resolveProgram().getLocalDbName();
-	}
-	
-	private Project resolveProgram() throws MiddlewareQueryException {
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-		HttpSession session = request.getSession();
-		Project selectedProgram = (Project) session.getAttribute(Constants.PARAM_SELECTED_PROGRAM);
-		if(selectedProgram != null) {
-			return selectedProgram; 
-		}
-		else {
-			Project lastOpenedProgram = this.workbenchDataManager.getLastOpenedProjectAnyUser();
-			if (lastOpenedProgram != null) {
-				return lastOpenedProgram;
-			}
-		}
-		throw new RuntimeException("Unable to resolve program in context.");
+	private String getCurrentlySelectedLocalDBName() {
+		return this.contextResolver.resolveProgram().getLocalDbName();
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public StudyDataManager getStudyDataManager() throws FileNotFoundException, MiddlewareQueryException {		
+	public StudyDataManager getStudyDataManager() throws FileNotFoundException {		
 		return new StudyDataManagerImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
 				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public FieldbookService getFieldbookService() throws FileNotFoundException, MiddlewareQueryException {
+	public FieldbookService getFieldbookService() throws FileNotFoundException {
 		return new FieldbookServiceImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
 				new HibernateSessionPerRequestProvider(getCentralSessionFactory()), getCurrentlySelectedLocalDBName(), getCurrentlySelectedCentralDBName());
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public GenotypicDataManager getGenotypicDataManager() throws FileNotFoundException, MiddlewareQueryException {
+	public GenotypicDataManager getGenotypicDataManager() throws FileNotFoundException {
 		return new GenotypicDataManagerImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
 				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public OntologyDataManager getOntologyDataManager() throws FileNotFoundException, MiddlewareQueryException {
+	public OntologyDataManager getOntologyDataManager() throws FileNotFoundException {
 		return new OntologyDataManagerImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
 				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public OntologyService getOntologyService() throws FileNotFoundException, MiddlewareQueryException {
+	public OntologyService getOntologyService() throws FileNotFoundException {
 		return new OntologyServiceImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
 				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public InventoryDataManager getInventoryDataManager() throws FileNotFoundException, MiddlewareQueryException {
+	public InventoryDataManager getInventoryDataManager() throws FileNotFoundException {
 		return new InventoryDataManagerImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
 				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public LocationDataManager getLocationDataManager() throws FileNotFoundException, MiddlewareQueryException {
+	public LocationDataManager getLocationDataManager() throws FileNotFoundException {
 		return new LocationDataManagerImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
 				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public UserDataManager getUserDataManager() throws FileNotFoundException, MiddlewareQueryException {
+	public UserDataManager getUserDataManager() throws FileNotFoundException {
 		return new UserDataManagerImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
 				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public GermplasmListManager getGermplasmListManager() throws FileNotFoundException, MiddlewareQueryException {
+	public GermplasmListManager getGermplasmListManager() throws FileNotFoundException {
 		return new GermplasmListManagerImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
 				new HibernateSessionPerRequestProvider(getCentralSessionFactory()), getCurrentlySelectedLocalDBName(), getCurrentlySelectedCentralDBName());
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public GermplasmDataManager getGermplasmDataManager() throws FileNotFoundException, MiddlewareQueryException {
+	public GermplasmDataManager getGermplasmDataManager() throws FileNotFoundException {
 		return new GermplasmDataManagerImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
 				new HibernateSessionPerRequestProvider(getCentralSessionFactory()), getCurrentlySelectedLocalDBName(), getCurrentlySelectedCentralDBName());
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public DataImportService getDataImportService() throws FileNotFoundException, MiddlewareQueryException {
+	public DataImportService getDataImportService() throws FileNotFoundException {
 		return new DataImportServiceImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
 				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
 	}
 
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public JdbcTemplate getJDBCTemplate() throws MiddlewareQueryException {
+	public JdbcTemplate getJDBCTemplate() {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource(
 				String.format("jdbc:mysql://%s:%s/%s", config.getDbHost(), config.getDbPort(), getCurrentlySelectedCentralDBName()), 
 				config.getDbUsername(), config.getDbPassword());
