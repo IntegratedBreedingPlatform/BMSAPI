@@ -67,8 +67,8 @@
     
     <script type="text/javascript">
     	$(document).ready(function() {
-    		$('#selectedCropDB').change(function(){
- 			   	$("#cropSelectionForm").trigger('submit');
+    		$('#selectedProgramId').change(function(){
+ 			   	$("#programSelectionForm").trigger('submit');
  			});
     	});
     </script>
@@ -81,13 +81,21 @@
 				<a class="navbar-brand" th:href="@{/}">BMS API</a>
 			</div>
 			<div class="navbar-collapse collapse">
-				<form class="navbar-form navbar-right" role="form" id="cropSelectionForm" action="/selectCrop" method="POST">
+				<div class="navbar-form navbar-right">
 					<div class="form-group">
-						<label>Select Crop Database:</label>
+						<div th:if="${session.selectedProgram}" th:text="${session.selectedProgram.cropType.cropName}"></div>
+						<div th:if="${session.selectedProgram}" th:text="${session.selectedProgram.centralDbName}"></div>
+						<div th:if="${session.selectedProgram}" th:text="${session.selectedProgram.localDbName}"></div>
+					</div>				
+				</div>
+				<form class="navbar-form navbar-right" role="form" id="programSelectionForm" action="/selectProgram" method="POST">
+					<div class="form-group">
+						<label>Select Program:</label>
 					</div>
 					<div class="form-group">
-						<select id="selectedCropDB" name="selectedCropDB" class="form-control">
-							<option th:each="centralDB : ${availableCentralDBs}" th:value="${centralDB}" th:text="${centralDB}" th:selected="${session.selectedCropDB == centralDB}" />
+						<select id="selectedProgramId" name="selectedProgramId" class="form-control">
+							<option th:each="program : ${availablePrograms}" th:value="${program.projectId}" th:text="${program.projectName}" 
+								th:selected="${program.getProjectId().equals(#httpSession.getAttribute('selectedProgram').getProjectId())}" />
 						</select>
 					</div>
 					<input type="hidden" name="redirectURL" value="/" />
