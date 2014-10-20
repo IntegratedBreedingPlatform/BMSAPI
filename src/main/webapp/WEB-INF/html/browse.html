@@ -32,16 +32,16 @@
     		}   		
     		var baseURL = "http://api.leafnode.io:18080", loggedInUserId = 1;
     		
-    		$('#selectedCropDB').change(function() {
- 			   	$("#cropSelectionForm").trigger('submit');
+    		$('#selectedCentralCropDB').change(function() {
+ 			   	$("#centralCropDBSelectionForm").trigger('submit');
  			});
     		
     		$('.browse-studies').click(function() {  			
-    			$("#appFrame").attr("src", baseURL + "/GermplasmStudyBrowser/main/study?selectedProjectId=" + programCropDBMap[$('#selectedCropDB').val()] + "&loggedInUserId=" + loggedInUserId);
+    			$("#appFrame").attr("src", baseURL + "/GermplasmStudyBrowser/main/study?selectedProjectId=" + programCropDBMap[$('#selectedCentralCropDB').val()] + "&loggedInUserId=" + loggedInUserId);
     		});
     		
     		$('.browse-ontology').click(function() {
-    			$("#appFrame").attr("src", baseURL + "/Fieldbook/OntologyBrowser?selectedProjectId=" + programCropDBMap[$('#selectedCropDB').val()] + "&loggedInUserId" + loggedInUserId);
+    			$("#appFrame").attr("src", baseURL + "/Fieldbook/OntologyBrowser?selectedProjectId=" + programCropDBMap[$('#selectedCentralCropDB').val()] + "&loggedInUserId" + loggedInUserId);
     		});    		
     	});
     
@@ -56,13 +56,13 @@
 				<a class="navbar-brand" th:href="@{/}">BMS API</a>
 			</div>
 			<div class="navbar-collapse collapse">
-				<form class="navbar-form navbar-right" role="form" id="cropSelectionForm" action="/selectCrop" method="POST">
+				<form class="navbar-form navbar-right" role="form" id="centralCropDBSelectionForm" action="/selectCentralCropDB" method="POST">
 					<div class="form-group">
 						<label>Select Crop Database:</label>
 					</div>
 					<div class="form-group">
-						<select id="selectedCropDB" name="selectedCropDB" class="form-control">
-							<option th:each="centralDB : ${availableCentralDBs}" th:value="${centralDB}" th:text="${centralDB}" th:selected="${session.selectedCropDB == centralDB}" />
+						<select id="selectedCentralCropDB" name="selectedCentralCropDB" class="form-control">
+							<option th:each="centralDB : ${availableCentralDBs}" th:value="${centralDB}" th:text="${centralDB}" th:selected="${session.selectedCentralCropDB == centralDB}" />
 						</select>
 						<input type="hidden" name="redirectURL" value="/browse" />
 					</div>

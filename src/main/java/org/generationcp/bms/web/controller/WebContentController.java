@@ -56,11 +56,11 @@ public class WebContentController {
         return "browse";
     }
     
-    @RequestMapping(value = "/selectCrop", method = RequestMethod.POST)
+    @RequestMapping(value = "/selectCentralCropDB", method = RequestMethod.POST)
     @ApiIgnore
-    public String selectCrop(HttpServletRequest request, HttpSession session, @RequestParam String selectedCropDB, @RequestParam String redirectURL) {
-    	session.setAttribute("selectedCropDB", selectedCropDB);
-    	LOGGER.info("Selected crop DB is: " + selectedCropDB);
+    public String selectCentralCropDB(HttpServletRequest request, HttpSession session, @RequestParam String selectedCentralCropDB, @RequestParam String redirectURL) {
+    	session.setAttribute(Constants.PARAM_SELECTED_CENTRAL_CROP_DB, selectedCentralCropDB);
+    	LOGGER.debug("Selected central crop DB is: " + selectedCentralCropDB);
     	return "redirect:" + redirectURL;
     }
      
@@ -69,7 +69,7 @@ public class WebContentController {
     public String selectProgramPost(HttpServletRequest request, HttpSession session, @RequestParam String selectedProgramId, @RequestParam String redirectURL) throws NumberFormatException, MiddlewareQueryException {
     	Project selectedProgram = this.workbenchDataManager.getProjectById(Long.valueOf(selectedProgramId));
     	session.setAttribute(Constants.PARAM_SELECTED_PROGRAM, selectedProgram);
-    	LOGGER.info("Selected program ID is: " + selectedProgramId);
+    	LOGGER.debug("Selected program is: " + selectedProgram);
     	return "redirect:" + redirectURL;
     }
     
