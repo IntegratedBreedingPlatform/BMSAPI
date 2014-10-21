@@ -3,15 +3,13 @@ package org.generationcp.bms.resource;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.generationcp.bms.dao.SimpleDao;
 import org.generationcp.bms.domain.GermplasmListDetails;
 import org.generationcp.bms.domain.GermplasmListSummary;
 import org.generationcp.bms.domain.GermplasmSearchResult;
 import org.generationcp.bms.domain.GermplasmSummary;
 import org.generationcp.bms.exception.NotFoundException;
-import org.generationcp.bms.util.Utils;
+import org.generationcp.bms.web.UrlComposer;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -34,6 +32,9 @@ public class GermplasmResource {
 	@Autowired
 	private GermplasmListManager germplasmListManager;
 	
+	@Autowired
+	private UrlComposer urlComposer;
+	
 	
 	@RequestMapping(value="/search", method = RequestMethod.GET)
 	public List<GermplasmSearchResult> search(@RequestParam String q) {
@@ -41,9 +42,7 @@ public class GermplasmResource {
 	}
 	
 	@RequestMapping(value = "/list/search", method = RequestMethod.GET)
-	public List<GermplasmListSummary> searchGermplasmLists(
-			@RequestParam String q, HttpServletRequest httpRequest)
-			throws MiddlewareQueryException {
+	public List<GermplasmListSummary> searchGermplasmLists(@RequestParam String q) throws MiddlewareQueryException {
 		
 		List<GermplasmListSummary> results = new ArrayList<GermplasmListSummary>();
 		List<GermplasmList> matchingLists = this.germplasmListManager.searchForGermplasmList(q, Operation.LIKE, true);			
@@ -56,8 +55,7 @@ public class GermplasmResource {
 				res.setDescription(gpList.getDescription());
 				res.setNotes(gpList.getNotes());
 				res.setListSize(gpList.getListData().size());			
-				String baseUrl = Utils.getBaseUrl(httpRequest);			
-				res.setListDataUrl(String.format("%s/germplasm/list/%s", baseUrl, gpList.getId()));
+				res.setListDetailsUrl(this.urlComposer.getListDetailsUrl(gpList.getId()));
 				results.add(res);			
 			}		
 		}
@@ -65,9 +63,7 @@ public class GermplasmResource {
 	}
 	
 	@RequestMapping(value = "/list/{listId}", method = RequestMethod.GET)
-	public GermplasmListDetails getGermplasmListDetails(
-			@PathVariable Integer listId,
-			HttpServletRequest httpRequest) throws MiddlewareQueryException {
+	public GermplasmListDetails getGermplasmListDetails(@PathVariable Integer listId) throws MiddlewareQueryException {
 		
 		GermplasmListDetails listDetails = new GermplasmListDetails();
 		GermplasmList gpList = this.germplasmListManager.getGermplasmListById(listId);
@@ -78,8 +74,7 @@ public class GermplasmResource {
 			listDetails.setDescription(gpList.getDescription());
 			listDetails.setNotes(gpList.getNotes());
 			listDetails.setListSize(gpList.getListData().size());		
-			String baseUrl = Utils.getBaseUrl(httpRequest);			
-			listDetails.setListDataUrl(String.format("%s/germplasm/list/%s", baseUrl, gpList.getId()));
+			listDetails.setListDetailsUrl(this.urlComposer.getListDetailsUrl(gpList.getId()));
 			
 			for(GermplasmListData gpListData : gpList.getListData()) {
 				GermplasmSummary gp = new GermplasmSummary();

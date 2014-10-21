@@ -3,8 +3,6 @@ package org.generationcp.bms.resource;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.generationcp.bms.dao.SimpleDao;
 import org.generationcp.bms.domain.DatasetDetails;
 import org.generationcp.bms.domain.DatasetSummary;
@@ -14,7 +12,7 @@ import org.generationcp.bms.domain.Trait;
 import org.generationcp.bms.domain.TraitObservation;
 import org.generationcp.bms.domain.TraitObservationDetails;
 import org.generationcp.bms.exception.NotFoundException;
-import org.generationcp.bms.util.Utils;
+import org.generationcp.bms.web.UrlComposer;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Study;
@@ -54,7 +52,7 @@ public class StudyResource {
 	private DataImportService dataImportService;
 	
 	@Autowired
-	private HttpServletRequest httpRequest;	
+	private UrlComposer urlComposer;
 
 	@Autowired
 	public StudyResource(StudyDataManager studyDataManager, SimpleDao simpleDao,
@@ -87,7 +85,7 @@ public class StudyResource {
 			summary.setStartDate(studyDetails.getStartDate());
 			summary.setEndDate(studyDetails.getEndDate());
 			summary.setType(studyDetails.getStudyType().getName());
-			summary.setStudyDetailsUrl(getStudyDetailsUrl(studyDetails.getId()));
+			summary.setStudyDetailsUrl(this.urlComposer.getStudyDetailsUrl(studyDetails.getId()));
 			studySummaries.add(summary);
 		}
 		return studySummaries;
@@ -139,12 +137,7 @@ public class StudyResource {
 		studySummary.setType(study.getType());
 		studySummary.setStartDate(String.valueOf(study.getStartDate()));
 		studySummary.setEndDate(String.valueOf(study.getEndDate()));
-		studySummary.setStudyDetailsUrl(getStudyDetailsUrl(study.getId()));
-	}
-
-	private String getStudyDetailsUrl(Integer studyId) {
-		String baseUrl = Utils.getBaseUrl(this.httpRequest);
-		return String.format("%s/study/%s/details", baseUrl, studyId);
+		studySummary.setStudyDetailsUrl(this.urlComposer.getStudyDetailsUrl(study.getId()));
 	}
 
 	@RequestMapping(value = "/{studyId}/details", method = RequestMethod.GET)
@@ -160,17 +153,14 @@ public class StudyResource {
 		StudyDetails studyDetails = new StudyDetails(study.getId());
 		populateSummary(studyDetails, study);
 
-		String baseUrl = Utils.getBaseUrl(this.httpRequest);
-		List<DatasetReference> datasetReferences = studyDataManager.getDatasetReferences(study
-				.getId());
+		List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(study.getId());
 		if (datasetReferences != null && !datasetReferences.isEmpty()) {
 			for (DatasetReference dsRef : datasetReferences) {
 				DatasetSummary dsSummary = new DatasetSummary();
 				dsSummary.setId(dsRef.getId());
 				dsSummary.setName(dsRef.getName());
 				dsSummary.setDescription(dsRef.getDescription());
-				dsSummary.setDatasetDetailUrl(String.format("%s/study/dataset/%s", baseUrl,
-						dsRef.getId()));
+				dsSummary.setDatasetDetailUrl(this.urlComposer.getDataSetDetailsUrl(dsRef.getId()));
 				studyDetails.addDatasetSummary(dsSummary);
 			}
 		}
@@ -201,11 +191,8 @@ public class StudyResource {
 	}
 
 	private void setTraitObservationDetailsUrl(Integer studyId, List<Trait> traits) {
-
-		String baseUrl = Utils.getBaseUrl(this.httpRequest);
 		for (Trait trait : traits) {
-			trait.setObservationDetailsUrl(String.format("%s/study/%s/trait/%s", baseUrl, studyId,
-					trait.getId()));
+			trait.setObservationDetailsUrl(this.urlComposer.getObservationDetailsUrl(studyId, trait.getId()));
 		}
 	}
 
@@ -218,15 +205,13 @@ public class StudyResource {
 		if (dataSet == null) {
 			throw new NotFoundException();
 		}
-		String baseUrl = Utils.getBaseUrl(this.httpRequest);
-
 		DatasetDetails details = new DatasetDetails();
 		details.setId(dataSet.getId());
 		details.setName(dataSet.getName());
 		details.setDescription(dataSet.getDescription());
-		details.setStudySummaryUrl(String.format("%s/study/%s", baseUrl, dataSet.getStudyId()));
-		details.addMeasuredTraits(simpleDao.getMeasuredTraitsForDataset(dataSetId));
-		details.setDatasetDetailUrl(String.format("%s/study/dataset/%s", baseUrl, dataSet.getId()));
+		details.setStudySummaryUrl(this.urlComposer.getStudySummaryUrl(dataSet.getStudyId()));
+		details.addMeasuredTraits(this.simpleDao.getMeasuredTraitsForDataset(dataSetId));
+		details.setDatasetDetailUrl(this.urlComposer.getDataSetDetailsUrl(dataSet.getId()));
 		setTraitObservationDetailsUrl(dataSet.getStudyId(), details.getMeasuredTraits());
 		return details;
 	}

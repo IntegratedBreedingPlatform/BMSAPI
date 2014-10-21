@@ -9,7 +9,7 @@ public class GermplasmListSummary {
 	private String notes;
 	
 	private int listSize;
-	private String listDataUrl;
+	private String listDetailsUrl;
 	
 	public Integer getListId() {
 		return listId;
@@ -51,12 +51,11 @@ public class GermplasmListSummary {
 		this.listSize = listSize;
 	}
 
-	public String getListDataUrl() {
-		return listDataUrl;
+	public String getListDetailsUrl() {
+		return listDetailsUrl;
 	}
 
-	public void setListDataUrl(String listDataUrl) {
-		this.listDataUrl = listDataUrl;
+	public void setListDetailsUrl(String listDetailsUrl) {
+		this.listDetailsUrl = listDetailsUrl;
 	}
-
 }
