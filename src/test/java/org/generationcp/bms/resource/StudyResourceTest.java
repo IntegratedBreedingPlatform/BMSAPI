@@ -2,8 +2,6 @@ package org.generationcp.bms.resource;
 
 import java.util.Arrays;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.generationcp.bms.dao.SimpleDao;
 import org.generationcp.bms.domain.StudyDetails;
 import org.generationcp.bms.domain.StudySummary;
@@ -27,40 +25,18 @@ public class StudyResourceTest {
 	private SimpleDao simpleDao;
 	private FieldbookService fieldbookService;
 	private DataImportService dataImportService;
-	private HttpServletRequest httpRequest;
 	
 	@Before
 	public void beforeEachTest() {
 		this.studyDataManager = Mockito.mock(StudyDataManager.class);
 		this.simpleDao = Mockito.mock(SimpleDao.class);
 		this.fieldbookService = Mockito.mock(FieldbookService.class);
-		this.httpRequest = Mockito.mock(HttpServletRequest.class);
 		this.dataImportService = Mockito.mock(DataImportService.class);
 	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testCreateFailure1() {
-		new StudyResource(null, simpleDao, fieldbookService, dataImportService, httpRequest);
-	}
-	
-	@Test(expected = IllegalArgumentException.class)
-	public void testCreateFailure2() {
-		new StudyResource(studyDataManager, null, fieldbookService, dataImportService, httpRequest);
-	}
-	
-	@Test(expected = IllegalArgumentException.class)
-	public void testCreateFailure3() {
-		new StudyResource(studyDataManager, simpleDao, null, dataImportService, httpRequest);
-	}
-	
-	@Test
-	public void testCreateSuccess() {
-		new StudyResource(studyDataManager, simpleDao, fieldbookService, dataImportService, httpRequest);
-	}
-	
+		
 	@Test(expected = NotFoundException.class)
 	public void testGetStudySummaryNotFound() throws MiddlewareQueryException {
-		StudyResource resource = new StudyResource(studyDataManager, simpleDao, fieldbookService, dataImportService, httpRequest);
+		StudyResource resource = new StudyResource(studyDataManager, simpleDao, fieldbookService, dataImportService);
 		int studyId = 123;
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(null);
 		
@@ -69,7 +45,7 @@ public class StudyResourceTest {
 	
 	@Test(expected = NotFoundException.class)
 	public void testGetStudyDetailsNotFound() throws MiddlewareQueryException {
-		StudyResource resource = new StudyResource(studyDataManager, simpleDao, fieldbookService, dataImportService, httpRequest);
+		StudyResource resource = new StudyResource(studyDataManager, simpleDao, fieldbookService, dataImportService);
 		int studyId = 123;
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(null);
 		
@@ -78,7 +54,7 @@ public class StudyResourceTest {
 	
 	@Test
 	public void testGetStudySummaryFound() throws MiddlewareQueryException {
-		StudyResource resource = new StudyResource(studyDataManager, simpleDao, fieldbookService, dataImportService, httpRequest);
+		StudyResource resource = new StudyResource(studyDataManager, simpleDao, fieldbookService, dataImportService);
 		int studyId = 123;
 		
 		Study study = new Study(studyId, new VariableList(), new VariableList());
@@ -92,7 +68,7 @@ public class StudyResourceTest {
 	
 	@Test
 	public void testGetStudyDetailsFound() throws MiddlewareQueryException {
-		StudyResource resource = new StudyResource(studyDataManager, simpleDao, fieldbookService, dataImportService, httpRequest);
+		StudyResource resource = new StudyResource(studyDataManager, simpleDao, fieldbookService, dataImportService);
 		int studyId = 123;
 		
 		Study study = new Study(studyId, new VariableList(), new VariableList());

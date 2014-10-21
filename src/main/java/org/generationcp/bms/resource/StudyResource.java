@@ -52,33 +52,18 @@ public class StudyResource {
 	private SimpleDao simpleDao;
 	private FieldbookService fieldbookService;
 	private DataImportService dataImportService;
+	
+	@Autowired
 	private HttpServletRequest httpRequest;	
 
 	@Autowired
 	public StudyResource(StudyDataManager studyDataManager, SimpleDao simpleDao,
-			FieldbookService fieldbookService, DataImportService dataImportService, HttpServletRequest httpRequest) {
-		
-		if (studyDataManager == null) {
-			throw new IllegalArgumentException(StudyDataManager.class.getSimpleName()
-					+ " is required to instantiate " + StudyResource.class.getSimpleName());
-		}
-		if (simpleDao == null) {
-			throw new IllegalArgumentException(SimpleDao.class.getSimpleName()
-					+ " is required to instantiate " + StudyResource.class.getSimpleName());
-		}
-		if (fieldbookService == null) {
-			throw new IllegalArgumentException(FieldbookService.class.getSimpleName()
-					+ " is required to instantiate " + StudyResource.class.getSimpleName());
-		}
-		if (dataImportService == null) {
-			throw new IllegalArgumentException(DataImportService.class.getSimpleName()
-					+ " is required to instantiate " + StudyResource.class.getSimpleName());
-		}
+			FieldbookService fieldbookService, DataImportService dataImportService) {
+
 		this.studyDataManager = studyDataManager;
 		this.fieldbookService = fieldbookService;
 		this.dataImportService = dataImportService;
 		this.simpleDao = simpleDao;
-		this.httpRequest = httpRequest;
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
