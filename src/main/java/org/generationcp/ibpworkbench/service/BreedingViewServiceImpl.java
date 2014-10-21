@@ -862,7 +862,10 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 					LOG.info("prepare experiment values per location, "+trialLocalName+"="+env);
 					//--------- prepare experiment values per location ------------------------------------------------------//
-					TrialEnvironment trialEnv = trialEnvironments.findOnlyOneByLocalName(trialLocalName, env);
+					TrialEnvironment trialEnv = trialEnvironments.findOnlyOneByLocalName(trialLocalName, env.replace(";", ","));
+					if (trialEnv == null) {
+						trialEnv = trialEnvironments.findOnlyOneByLocalName(trialLocalName, env);
+					}
 					int ndLocationId = trialEnv.getId();
 					LOG.info("ndLocationId ="+ndLocationId);
 					locationIds.add(ndLocationId);
