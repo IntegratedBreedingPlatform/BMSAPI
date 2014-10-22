@@ -67,31 +67,31 @@ public class SimpleDaoIntegrationTest {
 	@Test
 	public void testGetMeasuredTraitsForStudy() {
 		List<Trait> measuredTraits = dao.getMeasuredTraitsForStudy(BON2005DS_STUDY_ID);		
-		Assert.assertEquals("Number of measured traits do not match.", 8, measuredTraits.size());
+		Assert.assertEquals("Number of measured traits do not match.", 7, measuredTraits.size());
 		
-		List<Trait> numericTraits = new ArrayList<Trait>();
+		List<Trait> measuredNumericTraits = new ArrayList<Trait>();
 		for(Trait trait : measuredTraits) {
 			if(trait.isNumeric()) {
-				numericTraits.add(trait);
+				measuredNumericTraits.add(trait);
 			}
 		}
-		// There are two numeric traits in our test study : FLW and MAT85
-		Assert.assertEquals("Number of numeric traits do not match.", 2, numericTraits.size());		
+		// There are two numeric traits (FLW and MATURITY) but only FLW has measurements
+		Assert.assertEquals("Number of measured numeric traits do not match.", 1, measuredNumericTraits.size());		
 	}
 	
 	@Test
 	public void testGetMeasuredTraitsForDataset() {
 		List<Trait> measuredTraits = dao.getMeasuredTraitsForDataset(BON2005DS_DATASET_ID);		
-		Assert.assertEquals("Number of measured traits do not match.", 8, measuredTraits.size());
+		Assert.assertEquals("Number of measured traits do not match.", 7, measuredTraits.size());
 		
-		List<Trait> numericTraits = new ArrayList<Trait>();
+		List<Trait> measuredNumericTraits = new ArrayList<Trait>();
 		for(Trait trait : measuredTraits) {
 			if(trait.isNumeric()) {
-				numericTraits.add(trait);
+				measuredNumericTraits.add(trait);
 			}
 		}
-		// There are two numeric traits in test dataset : FLW and MAT85
-		Assert.assertEquals("Number of numeric traits do not match.", 2, numericTraits.size());	
+		// There are two numeric traits (FLW and MATURITY) but only FLW has measurements
+		Assert.assertEquals("Number of measured numeric traits do not match.", 1, measuredNumericTraits.size());	
 	}
 	
 	@Test

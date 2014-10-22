@@ -14,7 +14,7 @@ public class StudyDetails extends StudySummary {
 	}
 
 	/**
-	 * Traits with numeric measurement values only.
+	 * Traits that are numeric and have measurements recorded.
 	 */
 	public List<Trait> getNumericTraits() {
 		List<Trait> numericTraits = new ArrayList<Trait>();
