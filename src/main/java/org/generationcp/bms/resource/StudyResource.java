@@ -50,18 +50,17 @@ public class StudyResource {
 	private SimpleDao simpleDao;
 	private FieldbookService fieldbookService;
 	private DataImportService dataImportService;
-	
-	@Autowired
 	private UrlComposer urlComposer;
 
 	@Autowired
 	public StudyResource(StudyDataManager studyDataManager, SimpleDao simpleDao,
-			FieldbookService fieldbookService, DataImportService dataImportService) {
+			FieldbookService fieldbookService, DataImportService dataImportService, UrlComposer urlComposer) {
 
 		this.studyDataManager = studyDataManager;
 		this.fieldbookService = fieldbookService;
 		this.dataImportService = dataImportService;
 		this.simpleDao = simpleDao;
+		this.urlComposer = urlComposer;
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
@@ -71,13 +70,15 @@ public class StudyResource {
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	@ResponseBody
-	public List<StudySummary> getStudySummaries() throws MiddlewareQueryException {
+	public List<StudySummary> listStudySummaries() throws MiddlewareQueryException {
 
 		List<StudySummary> studySummaries = new ArrayList<StudySummary>();
-		List<org.generationcp.middleware.domain.etl.StudyDetails> nurseriesAndTrials = studyDataManager
-				.getAllNurseryAndTrialStudyDetails();
+		List<org.generationcp.middleware.domain.etl.StudyDetails> allStudies = new ArrayList<org.generationcp.middleware.domain.etl.StudyDetails>();
+		for(StudyType studyType : StudyType.values()) {
+			allStudies.addAll(this.studyDataManager.getAllStudyDetails(studyType));
+		}
 
-		for (org.generationcp.middleware.domain.etl.StudyDetails studyDetails : nurseriesAndTrials) {
+		for (org.generationcp.middleware.domain.etl.StudyDetails studyDetails : allStudies) {
 			StudySummary summary = new StudySummary(studyDetails.getId());
 			summary.setName(studyDetails.getStudyName());
 			summary.setTitle(studyDetails.getTitle());
@@ -86,27 +87,13 @@ public class StudyResource {
 			summary.setEndDate(studyDetails.getEndDate());
 			summary.setType(studyDetails.getStudyType().getName());
 			summary.setStudyDetailsUrl(this.urlComposer.getStudyDetailsUrl(studyDetails.getId()));
+			populateDatasetSummary(summary, studyDetails.getId());
 			studySummaries.add(summary);
 		}
 		return studySummaries;
 	}
 
-	@RequestMapping(value = "/{studyId}", method = RequestMethod.GET)
-	@ResponseBody
-	public StudySummary getStudySummary(@PathVariable Integer studyId)
-			throws MiddlewareQueryException {
-
-		Study study = studyDataManager.getStudy(studyId);
-		if (study == null) {
-			throw new NotFoundException();
-		}
-		StudySummary studySummary = new StudySummary(study.getId());
-		populateSummary(studySummary, study);
-
-		return studySummary;
-	}
-	
-	@RequestMapping(method = RequestMethod.PUT)
+	@RequestMapping(value = "/", method = RequestMethod.PUT)
 	@ApiResponses(value = { @ApiResponse(code = 201, message = "Created")})
 	public ResponseEntity<StudySummary> createStudy(@RequestBody StudySummary studySummary) throws MiddlewareQueryException {
 		LOGGER.info(studySummary.toString());
@@ -128,8 +115,7 @@ public class StudyResource {
 		return new ResponseEntity<StudySummary>(studySummary, HttpStatus.CREATED);
 	}
 
-	private void populateSummary(StudySummary studySummary, Study study)
-			throws MiddlewareQueryException {
+	private void populateStudySummary(StudySummary studySummary, Study study) throws MiddlewareQueryException {
 		
 		studySummary.setName(study.getName());
 		studySummary.setTitle(study.getTitle());
@@ -137,10 +123,25 @@ public class StudyResource {
 		studySummary.setType(study.getType());
 		studySummary.setStartDate(String.valueOf(study.getStartDate()));
 		studySummary.setEndDate(String.valueOf(study.getEndDate()));
-		studySummary.setStudyDetailsUrl(this.urlComposer.getStudyDetailsUrl(study.getId()));
+		studySummary.setStudyDetailsUrl(this.urlComposer.getStudyDetailsUrl(study.getId()));	
 	}
 
-	@RequestMapping(value = "/{studyId}/details", method = RequestMethod.GET)
+	private void populateDatasetSummary(StudySummary studySummary, int studyId) throws MiddlewareQueryException {
+
+		List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(studyId);
+		if (datasetReferences != null && !datasetReferences.isEmpty()) {
+			for (DatasetReference dsRef : datasetReferences) {
+				DatasetSummary dsSummary = new DatasetSummary();
+				dsSummary.setId(dsRef.getId());
+				dsSummary.setName(dsRef.getName());
+				dsSummary.setDescription(dsRef.getDescription());
+				dsSummary.setDatasetDetailUrl(this.urlComposer.getDataSetDetailsUrl(dsRef.getId()));
+				studySummary.addDatasetSummary(dsSummary);
+			}
+		}
+	}
+
+	@RequestMapping(value = "/{studyId}", method = RequestMethod.GET)
 	@ResponseBody
 	public StudyDetails getStudyDetails(@PathVariable Integer studyId)
 			throws MiddlewareQueryException {
@@ -151,19 +152,8 @@ public class StudyResource {
 		}
 
 		StudyDetails studyDetails = new StudyDetails(study.getId());
-		populateSummary(studyDetails, study);
-
-		List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(study.getId());
-		if (datasetReferences != null && !datasetReferences.isEmpty()) {
-			for (DatasetReference dsRef : datasetReferences) {
-				DatasetSummary dsSummary = new DatasetSummary();
-				dsSummary.setId(dsRef.getId());
-				dsSummary.setName(dsRef.getName());
-				dsSummary.setDescription(dsRef.getDescription());
-				dsSummary.setDatasetDetailUrl(this.urlComposer.getDataSetDetailsUrl(dsRef.getId()));
-				studyDetails.addDatasetSummary(dsSummary);
-			}
-		}
+		populateStudySummary(studyDetails, study);
+		populateDatasetSummary(studyDetails, study.getId());
 
 		// factors/metadaa/properties/information/conditions of the study
 
@@ -209,7 +199,7 @@ public class StudyResource {
 		details.setId(dataSet.getId());
 		details.setName(dataSet.getName());
 		details.setDescription(dataSet.getDescription());
-		details.setStudySummaryUrl(this.urlComposer.getStudySummaryUrl(dataSet.getStudyId()));
+		details.setStudyDetailsUrl(this.urlComposer.getStudyDetailsUrl(dataSet.getStudyId()));
 		details.addMeasuredTraits(this.simpleDao.getMeasuredTraitsForDataset(dataSetId));
 		details.setDatasetDetailUrl(this.urlComposer.getDataSetDetailsUrl(dataSet.getId()));
 		setTraitObservationDetailsUrl(dataSet.getStudyId(), details.getMeasuredTraits());
@@ -228,27 +218,5 @@ public class StudyResource {
 			return details;
 		}
 		throw new NotFoundException();
-	}
-
-	@RequestMapping(value = "/workbook/N/{nurseryId}", method = RequestMethod.GET)
-	@ResponseBody
-	public Workbook getNurseryWorkbook(@PathVariable Integer nurseryId) throws MiddlewareQueryException {
-
-		Workbook workbook = fieldbookService.getNurseryDataSet(nurseryId);
-		if (workbook == null) {
-			throw new NotFoundException();
-		}
-		return workbook;
-	}
-	
-	@RequestMapping(value = "/workbook/T/{trialId}", method = RequestMethod.GET)
-	@ResponseBody
-	public Workbook getTrialWorkbook(@PathVariable Integer trialId) throws MiddlewareQueryException {
-
-		Workbook workbook = fieldbookService.getTrialDataSet(trialId);
-		if (workbook == null) {
-			throw new NotFoundException();
-		}
-		return workbook;
 	}
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class DatasetDetails extends DatasetSummary {
 	
-	private String studySummaryUrl;
+	private String studyDetailsUrl;
 	
 	private final List<Trait> measuredTraits = new ArrayList<Trait>();
 	
@@ -35,12 +35,11 @@ public class DatasetDetails extends DatasetSummary {
 		}
 	}
 
-	public String getStudySummaryUrl() {
-		return studySummaryUrl;
+	public String getStudyDetailsUrl() {
+		return studyDetailsUrl;
 	}
 
-	public void setStudySummaryUrl(String studySummaryUrl) {
-		this.studySummaryUrl = studySummaryUrl;
+	public void setStudyDetailsUrl(String studyDetailsUrl) {
+		this.studyDetailsUrl = studyDetailsUrl;
 	}
-
 }

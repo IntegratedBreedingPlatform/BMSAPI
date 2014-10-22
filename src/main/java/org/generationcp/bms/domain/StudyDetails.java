@@ -1,17 +1,13 @@
 package org.generationcp.bms.domain;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class StudyDetails extends StudySummary {
 
 	private final List<Trait> measuredTraits = new ArrayList<Trait>();
 
 	private final List<Variable> factors = new ArrayList<Variable>();
-
-	private final Set<DatasetSummary> datasetInfo = new HashSet<DatasetSummary>();
 
 	public StudyDetails(int id) {
 		super(id);
@@ -50,16 +46,6 @@ public class StudyDetails extends StudySummary {
 	public void addMeasuredTraits(List<Trait> traits) {
 		if (traits != null) {
 			measuredTraits.addAll(traits);
-		}
-	}
-
-	public Set<DatasetSummary> getDatasetInfo() {
-		return datasetInfo;
-	}
-
-	public void addDatasetSummary(DatasetSummary datasetSummary) {
-		if (datasetSummary != null) {
-			this.datasetInfo.add(datasetSummary);
 		}
 	}
 }

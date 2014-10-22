@@ -1,5 +1,8 @@
 package org.generationcp.bms.domain;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class StudySummary {
 
 	private int id;
@@ -12,6 +15,8 @@ public class StudySummary {
 	private String endDate;
 
 	private String studyDetailsUrl;
+	
+	private final Set<DatasetSummary> datasetInfo = new HashSet<DatasetSummary>();
 
 	public StudySummary() { 
 		
@@ -85,6 +90,16 @@ public class StudySummary {
 		this.studyDetailsUrl = studyDetailsUrl;
 	}
 
+	public Set<DatasetSummary> getDatasetInfo() {
+		return datasetInfo;
+	}
+
+	public void addDatasetSummary(DatasetSummary datasetSummary) {
+		if (datasetSummary != null) {
+			this.datasetInfo.add(datasetSummary);
+		}
+	}
+	
 	@Override
 	public String toString() {
 		return "StudySummary [id=" + id + ", name=" + name + ", title=" + title + ", objective="

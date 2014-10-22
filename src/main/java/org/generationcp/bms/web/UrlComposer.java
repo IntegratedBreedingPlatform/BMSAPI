@@ -18,12 +18,8 @@ public class UrlComposer {
 		return String.format("%s://%s:%s", httpServletRequest.getScheme(), httpServletRequest.getServerName(), httpServletRequest.getServerPort());	
 	}
 	
-	public String getStudySummaryUrl(Integer studyId) {
-		return String.format("%s/study/%s", getBaseUrl(), studyId);
-	}
-	
 	public String getStudyDetailsUrl(Integer studyId) {
-		return String.format("%s/study/%s/details", getBaseUrl(), studyId);
+		return String.format("%s/study/%s", getBaseUrl(), studyId);
 	}
 	
 	public String getDataSetDetailsUrl(Integer dataSetId) {
