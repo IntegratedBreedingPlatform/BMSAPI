@@ -782,68 +782,70 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 				for(VariableType variate : variableTypeListVariates.getVariableTypes()) {
 
-					VariableType originalVariableType = null;
-					VariableType summaryStatVariableType = null;	
-					Term termSummaryStat = ontologyDataManager.findMethodByName(summaryStatName);
+					if (nameToAliasMapping.containsValue(variate.getLocalName())){
+						VariableType originalVariableType = null;
+						VariableType summaryStatVariableType = null;	
+						Term termSummaryStat = ontologyDataManager.findMethodByName(summaryStatName);
 
-					//check if the summary stat trait is already existing
-					String trait = variate.getLocalName();
-					String localName = trait + "_" + summaryStatName;
-					summaryStatVariableType = trialDataSet.findVariableTypeByLocalName(localName);
-					if(summaryStatVariableType == null) {//this means we need to append the traits in the dataset project properties
-						LOG.info(localName + " project property not found.. need to add "+localName);
-						originalVariableType = variableTypeListVariates.findByLocalName(trait);
-						summaryStatVariableType = cloner.deepClone(originalVariableType);
-						summaryStatVariableType.setLocalName(localName);
+						//check if the summary stat trait is already existing
+						String trait = variate.getLocalName();
+						String localName = trait + "_" + summaryStatName;
+						summaryStatVariableType = trialDataSet.findVariableTypeByLocalName(localName);
+						if(summaryStatVariableType == null) {//this means we need to append the traits in the dataset project properties
+							LOG.info(localName + " project property not found.. need to add "+localName);
+							originalVariableType = variableTypeListVariates.findByLocalName(trait);
+							summaryStatVariableType = cloner.deepClone(originalVariableType);
+							summaryStatVariableType.setLocalName(localName);
 
-						Integer stdVariableId = ontologyDataManager
-								.getStandardVariableIdByPropertyScaleMethodRole(
-										summaryStatVariableType.getStandardVariable().getProperty().getId(),
-										summaryStatVariableType.getStandardVariable().getScale().getId(),
-										termSummaryStat.getId(),
-										PhenotypicType.VARIATE);
+							Integer stdVariableId = ontologyDataManager
+									.getStandardVariableIdByPropertyScaleMethodRole(
+											summaryStatVariableType.getStandardVariable().getProperty().getId(),
+											summaryStatVariableType.getStandardVariable().getScale().getId(),
+											termSummaryStat.getId(),
+											PhenotypicType.VARIATE);
 
-						if (stdVariableId == null){
-							StandardVariable stdVariable = new StandardVariable();
-							stdVariable = cloner.deepClone(summaryStatVariableType.getStandardVariable());
-							stdVariable.setEnumerations(null);
-							stdVariable.setConstraints(null);
-							stdVariable.setId(0);
-							stdVariable.setName(summaryStatVariableType.getLocalName());
-							stdVariable.setMethod(termSummaryStat);
+							if (stdVariableId == null){
+								StandardVariable stdVariable = new StandardVariable();
+								stdVariable = cloner.deepClone(summaryStatVariableType.getStandardVariable());
+								stdVariable.setEnumerations(null);
+								stdVariable.setConstraints(null);
+								stdVariable.setId(0);
+								stdVariable.setName(summaryStatVariableType.getLocalName());
+								stdVariable.setMethod(termSummaryStat);
 
-							//check if localname is already used
-							Term existingStdVar = ontologyDataManager
-									.findTermByName(stdVariable.getName(), CvId.VARIABLES);
-							if (existingStdVar != null){
-								//rename 
-								stdVariable.setName(stdVariable.getName()+"_1");
-							}
-							//ontologyDataManager.addStandardVariable(stdVariable);
-							list.add(stdVariable);
-							summaryStatVariableType.setStandardVariable(stdVariable);
-							LOG.info("added standard variable "+summaryStatVariableType
-									.getStandardVariable().getName());
-						}else{
-							StandardVariable stdVar = ontologyDataManager
-							.getStandardVariable(stdVariableId);
-								if (stdVar.getEnumerations() != null){
-									for (Enumeration enumeration : stdVar.getEnumerations()){
-										ontologyDataManager.deleteStandardVariableEnumeration(stdVariableId, enumeration.getId());
-									}
+								//check if localname is already used
+								Term existingStdVar = ontologyDataManager
+										.findTermByName(stdVariable.getName(), CvId.VARIABLES);
+								if (existingStdVar != null){
+									//rename 
+									stdVariable.setName(stdVariable.getName()+"_1");
 								}
-							stdVar.setEnumerations(null);
-							stdVar.setConstraints(null);
-							ontologyDataManager.deleteStandardVariableLocalConstraints(stdVariableId);
-							summaryStatVariableType.setStandardVariable(stdVar);
-							LOG.info("reused standard variable "
-									+ summaryStatVariableType.getStandardVariable().getName());	    	            	
-						}
+								//ontologyDataManager.addStandardVariable(stdVariable);
+								list.add(stdVariable);
+								summaryStatVariableType.setStandardVariable(stdVariable);
+								LOG.info("added standard variable "+summaryStatVariableType
+										.getStandardVariable().getName());
+							}else{
+								StandardVariable stdVar = ontologyDataManager
+								.getStandardVariable(stdVariableId);
+									if (stdVar.getEnumerations() != null){
+										for (Enumeration enumeration : stdVar.getEnumerations()){
+											ontologyDataManager.deleteStandardVariableEnumeration(stdVariableId, enumeration.getId());
+										}
+									}
+								stdVar.setEnumerations(null);
+								stdVar.setConstraints(null);
+								ontologyDataManager.deleteStandardVariableLocalConstraints(stdVariableId);
+								summaryStatVariableType.setStandardVariable(stdVar);
+								LOG.info("reused standard variable "
+										+ summaryStatVariableType.getStandardVariable().getName());	    	            	
+							}
 
-						summaryStatVariableType.setRank(++lastRank);
-						variableTypeList.add(summaryStatVariableType);
-						trialDataSet.getVariableTypes()
-						.add(summaryStatVariableType);//this will add the newly added variable
+							summaryStatVariableType.setRank(++lastRank);
+							variableTypeList.add(summaryStatVariableType);
+							trialDataSet.getVariableTypes()
+							.add(summaryStatVariableType);//this will add the newly added variable
+						}
 					}
 				}
 			}
