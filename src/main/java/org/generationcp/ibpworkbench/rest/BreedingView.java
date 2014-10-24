@@ -28,9 +28,6 @@ import org.generationcp.commons.hibernate.DynamicManagerFactoryProvider;
 import org.generationcp.ibpworkbench.constants.WebAPIConstants;
 import org.generationcp.ibpworkbench.model.DataResponse;
 import org.generationcp.ibpworkbench.service.BreedingViewService;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.workbench.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,10 +43,7 @@ import com.wordnik.swagger.annotations.ApiParam;
 @Path("/breeding_view")
 public class BreedingView {
 
-	private final static Logger LOG = LoggerFactory.getLogger(BreedingView.class);
-
-	@Autowired
-    private WorkbenchDataManager workbenchDataManager;
+	private static final Logger LOG = LoggerFactory.getLogger(BreedingView.class);
 	
     @Autowired
     private BreedingViewService breedingViewService;
@@ -99,7 +93,7 @@ public class BreedingView {
                 errors.add("OutputDataSetId is a required field!");
             }
 
-            if(errors.size() == 0) {
+            if(errors.isEmpty()) {
                 params.put(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue(), fileName);
                 params.put(WebAPIConstants.WORKBENCH_PROJECT_ID.getParamValue(), workbenchProjectId);
                 params.put(WebAPIConstants.STUDY_ID.getParamValue(), studyId);
@@ -112,14 +106,16 @@ public class BreedingView {
                 response = new DataResponse(true, "Errors invoking web service: " + errors);
             }
         } catch (Exception e) {
+        	LOG.debug(e.getMessage(), e);
             response = new DataResponse(false, "Failed to invoke service: " + e.toString());
         }
         
         try{
         	managerFactoryProvider.close();
         }catch(Exception e){
-        	e.printStackTrace();
+        	LOG.debug(e.getMessage(), e);
         }
+        
         return response;
     }
     
@@ -178,7 +174,7 @@ public class BreedingView {
                 errors.add("OutputDataSetId is a required field!");
             }
 
-            if(errors.size() == 0) {
+            if(errors.isEmpty()) {
             	params.put(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue(), mainOutputFilePath);
                 params.put(WebAPIConstants.SUMMARY_OUTPUT_FILE_PATH.getParamValue(), summaryOutputFilePath);
                 params.put(WebAPIConstants.OUTLIER_OUTPUT_FILE_PATH.getParamValue(), outlierOutputFilePath);
@@ -193,14 +189,14 @@ public class BreedingView {
                 response = new DataResponse(false, "Errors invoking web service: " + errors);
             }
         } catch (Exception e) {
-        	e.printStackTrace();
+        	LOG.debug(e.getMessage(), e);
             response = new DataResponse(false, "Failed to invoke service: " + e.toString());
         }
         
         try{
         	managerFactoryProvider.close();
         }catch(Exception e){
-        	e.printStackTrace();
+        	LOG.debug(e.getMessage(), e);
         }
         return response;
     }
@@ -211,14 +207,10 @@ public class BreedingView {
     @Produces(MediaType.TEXT_XML)
     public DataResponse deleteDataSet(@QueryParam("dataSetId") Integer dataSetId) {
     	try {
+    		
 			breedingViewService.deleteDataSet(dataSetId);
-			
-			try{
-	        	managerFactoryProvider.close();
-	        }catch(Exception e){
-	        	e.printStackTrace();
-	        }
-			
+			managerFactoryProvider.close();
+	       
 			 return new DataResponse(true, "Successfully deleted the dataset");
 		} catch (Exception e) {
 		    LOG.debug(e.getMessage(), e);

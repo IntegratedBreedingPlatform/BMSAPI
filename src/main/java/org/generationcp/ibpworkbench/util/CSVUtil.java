@@ -14,17 +14,18 @@ package org.generationcp.ibpworkbench.util;
 import au.com.bytecode.opencsv.CSVReader;
 
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 public class CSVUtil {
 
-	private HashMap<String, String> nameToAliasMapping;
+	private Map<String, String> nameToAliasMapping;
 
-	public CSVUtil(HashMap<String, String> nameToAliasMapping) {
+	public CSVUtil(Map<String, String> nameToAliasMapping) {
 		this.nameToAliasMapping = nameToAliasMapping;
 	}
 
-	public Map<String, ArrayList<String>> csvToMap(String fileName) throws Exception {
+	public Map<String, ArrayList<String>> csvToMap(String fileName) throws IOException {
 
 		CSVReader reader = new CSVReader(new FileReader(fileName));
 		Map<String, ArrayList<String>> csvMap = new LinkedHashMap<String, ArrayList<String>>();
@@ -34,7 +35,9 @@ public class CSVUtil {
 			String actualLocalName = null;
 			
 			actualLocalName = nameToAliasMapping.get(aliasLocalName);
-				if (actualLocalName == null) actualLocalName = aliasLocalName;
+				if (actualLocalName == null) {
+					actualLocalName = aliasLocalName;
+				}
 			csvMap.put(headerCol.trim().replace(aliasLocalName, actualLocalName), new ArrayList<String>());
 			
 		}
