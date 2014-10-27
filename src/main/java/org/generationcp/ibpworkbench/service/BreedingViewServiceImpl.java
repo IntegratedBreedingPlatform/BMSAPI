@@ -72,9 +72,15 @@ public class BreedingViewServiceImpl implements BreedingViewService {
     private WorkbenchDataManager workbenchDataManager;
 	@Autowired
 	private Cloner cloner;
+	
+	private CSVUtil csvUtil;
+	private OutlierCSV outlierCSV;
+	private SummaryStatsCSV summaryStatsCSV;
 
 	private Map<String, String> nameToAliasMapping;
 	private boolean meansDataSetExists = false;
+	private VariableTypeList meansVariableTypeList = new VariableTypeList();
+	private List<ExperimentValues> experimentValuesList;
 
 	private static final Logger LOG = LoggerFactory.getLogger(BreedingViewServiceImpl.class);
 
@@ -84,7 +90,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			
 			nameToAliasMapping = getNameToAliasMapping();
 			
-			CSVUtil csvUtil = new CSVUtil(nameToAliasMapping);
+			initializeCsvUtil();
 
 			String mainOutputFilePath = params.get(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue());
 			String summaryOutputFilePath = params.get(WebAPIConstants.SUMMARY_OUTPUT_FILE_PATH.getParamValue());
@@ -130,8 +136,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 				Stocks stocks = studyDataManager.getStocksInDataset(inputDatasetId);
 
 				DataSet dataSet = studyDataManager.getDataSet(inputDatasetId);
-				VariableTypeList variableTypeList = new VariableTypeList();
-
+				
 				//Get only the trial environment and germplasm factors
 
 				for (VariableType factorFromDataSet : dataSet.getVariableTypes().getFactors().getVariableTypes()){
@@ -139,9 +144,9 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 							== PhenotypicType.TRIAL_ENVIRONMENT
 							|| factorFromDataSet.getStandardVariable().getPhenotypicType() 
 							== PhenotypicType.GERMPLASM) {
-						variableTypeList.makeRoom(1);
+						meansVariableTypeList.makeRoom(1);
 						factorFromDataSet.setRank(1);
-						variableTypeList.add(factorFromDataSet);
+						meansVariableTypeList.add(factorFromDataSet);
 					}
 				}
 				//get variates only
@@ -149,8 +154,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 				
 
 				Integer numOfFactorsAndVariates = 
-						variableTypeList.getFactors().getVariableTypes().size()
-						+ variableTypeList.getVariates().getVariableTypes().size() + 1;
+						meansVariableTypeList.getFactors().getVariableTypes().size()
+						+ meansVariableTypeList.getVariates().getVariableTypes().size() + 1;
 				for(int i = 3; i < csvHeader.length; i += 2) {   
 					//means and errors are in pair, so just get the word before _
 					String root = csvHeader[i] != null 
@@ -181,7 +186,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 												);
 								
 								//check if the stdVariableId already exists in the variableTypeList
-								for (VariableType vt : variableTypeList.getVariableTypes()){
+								for (VariableType vt : meansVariableTypeList.getVariableTypes()){
 									if (stdVariableId != null && vt.getStandardVariable().getId() == stdVariableId.intValue()){
 										
 										termLSMean = ontologyDataManager.findMethodByName("LS MEAN (" + root + ")");
@@ -235,9 +240,9 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 									meansVariableType.setStandardVariable(stdVar);
 								}
 
-								variableTypeList.makeRoom(numOfFactorsAndVariates);
+								meansVariableTypeList.makeRoom(numOfFactorsAndVariates);
 								meansVariableType.setRank(numOfFactorsAndVariates);
-								variableTypeList.add(meansVariableType);
+								meansVariableTypeList.add(meansVariableType);
 
 								stdVariableId = null;
 								//Unit Errors
@@ -260,7 +265,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 								
 								
 								//check if the stdVariableId already exists in the variableTypeList
-								for (VariableType vt : variableTypeList.getVariableTypes()){
+								for (VariableType vt : meansVariableTypeList.getVariableTypes()){
 									if (stdVariableId != null && vt.getStandardVariable().getId() == stdVariableId.intValue()){
 										
 										termErrorEstimate = ontologyDataManager.findMethodByName("ERROR ESTIMATE (" + root + ")");
@@ -314,9 +319,9 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 									unitErrorsVariableType.setStandardVariable(stdVar);
 								}
 
-								variableTypeList.makeRoom(numOfFactorsAndVariates);
+								meansVariableTypeList.makeRoom(numOfFactorsAndVariates);
 								unitErrorsVariableType.setRank(numOfFactorsAndVariates);
-								variableTypeList.add(unitErrorsVariableType);
+								meansVariableTypeList.add(unitErrorsVariableType);
 							}
 				}
 
@@ -327,25 +332,25 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 				Study study = studyDataManager.getStudy(studyId);
 				Variable variable = createVariable(TermId.DATASET_NAME.getId()
 						, study.getName() + "-MEANS"  , 1);
-				variableTypeList.makeRoom(1);
+				meansVariableTypeList.makeRoom(1);
 				variable.getVariableType().setRank(1);
-				variableTypeList.add(variable.getVariableType());
+				meansVariableTypeList.add(variable.getVariableType());
 
 				//name of dataset [STUDY NAME]-MEANS
 				updateVariableType(variable.getVariableType(), study.getName() + "-MEANS", "Dataset name (local)");
 				variableList.add(variable);
 
 				variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", 2);
-				variableTypeList.makeRoom(1);
+				meansVariableTypeList.makeRoom(1);
 				variable.getVariableType().setRank(1);
-				variableTypeList.add(variable.getVariableType());
+				meansVariableTypeList.add(variable.getVariableType());
 				updateVariableType(variable.getVariableType(), "DATASET_TITLE", "Dataset title (local)");
 				variableList.add(variable);
 
 				variable = createVariable(TermId.DATASET_TYPE.getId(), "10070", 3);
-				variableTypeList.makeRoom(1);
+				meansVariableTypeList.makeRoom(1);
 				variable.getVariableType().setRank(1);
-				variableTypeList.add(variable.getVariableType());
+				meansVariableTypeList.add(variable.getVariableType());
 				updateVariableType(variable.getVariableType(), "DATASET_TYPE", "Dataset type (local)");
 				variableList.add(variable);
 				DatasetValues datasetValues = new DatasetValues();
@@ -355,11 +360,11 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 				if (meansDataSet == null){
 					//save data
 					//get dataset using new datasetid
-					datasetReference = studyDataManager.addDataSet(studyId, variableTypeList, datasetValues);
+					datasetReference = studyDataManager.addDataSet(studyId, meansVariableTypeList, datasetValues);
 					meansDataSet = studyDataManager.getDataSet(datasetReference.getId());
 				}
 
-				List<ExperimentValues> experimentValuesList = new ArrayList<ExperimentValues>();
+				experimentValuesList = new ArrayList<ExperimentValues>();
 				List<String> environments = traitsAndMeans.get(csvHeader[0]);
 				for(int i = 0; i < environments.size(); i++) {
 
@@ -672,12 +677,13 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 		studyDataManager.deleteDataSet(dataSetId);
 	}
 
-	private void uploadAndSaveOutlierDataToDB(
+	public void uploadAndSaveOutlierDataToDB(
 			String outlierOutputFilePath, int studyId, 
 			Map<String, Integer> ndGeolocationIds, DataSet measurementDataSet) 
 					throws MiddlewareQueryException, IOException {
 
-		OutlierCSV outlierCSV = new OutlierCSV(outlierOutputFilePath, nameToAliasMapping);
+		
+		initializeOutlierCSV(outlierOutputFilePath);
 
 		Map<String, Map<String, ArrayList<String>>> outlierData = 
 				outlierCSV.getData();
@@ -728,12 +734,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 	}
 
-	private void uploadAndSaveSummaryStatsToDB(
+	public void uploadAndSaveSummaryStatsToDB(
 			String summaryStatsOutputFilePath, int studyId, 
 			TrialEnvironments trialEnvironments, DataSet measurementDataSet) 
 					throws MiddlewareQueryException, IOException {
 
-			SummaryStatsCSV summaryStatsCSV = new SummaryStatsCSV(summaryStatsOutputFilePath, nameToAliasMapping);
+			initializeSummaryStatsCSV(summaryStatsOutputFilePath);
 
 			Map<String, Map<String, ArrayList<String>>> summaryStatsData = 
 					summaryStatsCSV.getData();
@@ -929,17 +935,102 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	
 	private Map<String, String> getNameToAliasMapping() throws MiddlewareQueryException {
 		
-		Map<String, String> map = new HashMap<String, String>();
+		if (nameToAliasMapping ==null){
+			Map<String, String> map = new HashMap<String, String>();
+			
+			String fileName = String.format("%s\\Temp\\%s", 
+					workbenchDataManager.getWorkbenchSetting().getInstallationDirectory()
+					, "mapping.ser" );
+			
+			map = new ObjectUtil<HashMap<String, String>>().deserializeFromFile(fileName);
+			
+			return map;
+		}else{
+			return nameToAliasMapping;
+		}
 		
-		String fileName = String.format("%s\\Temp\\%s", 
-				workbenchDataManager.getWorkbenchSetting().getInstallationDirectory()
-				, "mapping.ser" );
-		
-		map = new ObjectUtil<HashMap<String, String>>().deserializeFromFile(fileName);
-		
-		return map;
 	}
 
+
+	public void setStudyDataManager(StudyDataManager studyDataManager) {
+		this.studyDataManager = studyDataManager;
+	}
+
+
+	public void setOntologyDataManager(OntologyDataManager ontologyDataManager) {
+		this.ontologyDataManager = ontologyDataManager;
+	}
+
+
+	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
+		this.workbenchDataManager = workbenchDataManager;
+	}
+
+
+	public void setNameToAliasMapping(Map<String, String> nameToAliasMapping) {
+		this.nameToAliasMapping = nameToAliasMapping;
+	}
+
+
+	private void initializeCsvUtil() {
+		
+		if (csvUtil == null){
+			csvUtil = new CSVUtil(nameToAliasMapping);
+		}
+	}
+
+	public void setCsvUtil(CSVUtil csvUtil) {
+		this.csvUtil = csvUtil;
+	}
+
+	private void initializeOutlierCSV(String outlierOutputFilePath) {
+		
+		if (outlierCSV == null){
+			outlierCSV = new OutlierCSV(outlierOutputFilePath, nameToAliasMapping); 
+		}
+		 
+	}
+
+	public void setOutlierCSV(OutlierCSV outlierCSV) {
+		this.outlierCSV = outlierCSV;
+	}
+
+
+	private void initializeSummaryStatsCSV(String summaryStatsOutputFilePath) {
+		if (summaryStatsCSV == null){
+			summaryStatsCSV = new SummaryStatsCSV(summaryStatsOutputFilePath, nameToAliasMapping);
+		}
+		 
+	}
+
+	public void setSummaryStatsCSV(SummaryStatsCSV summaryStatsCSV) {
+		this.summaryStatsCSV = summaryStatsCSV;
+	}
+
+
+	public Cloner getCloner() {
+		return cloner;
+	}
+
+
+	public void setCloner(Cloner cloner) {
+		this.cloner = cloner;
+	}
+
+
+	public VariableTypeList getMeansVariableTypeList() {
+		return meansVariableTypeList;
+	}
+
+
+	public void setMeansVariableTypeList(VariableTypeList meansVariableTypeList) {
+		this.meansVariableTypeList = meansVariableTypeList;
+	}
+
+
+	public List<ExperimentValues> getExperimentValuesList() {
+		return experimentValuesList;
+	}
 
 
 }
