@@ -45,6 +45,10 @@ import static org.mockito.Mockito.*;
 
 public class BreedingViewServiceTest {
 	
+	private static final String AD_NUM_VALUES = "AD_NumValues";
+	private static final String AD_HERITABILITY = "AD_Heritability";
+	private static final int NUM_VALUES_TERMID = 6354;
+	private static final int HERITABILITY_TERMID = 7652;
 	private static final int DATASET_TITLE_STANDARD_VAR_ID = 8155;
 	private static final int DATASET_STANDARD_VAR_ID = 8160;
 	private static final int STUDY_STANDARD_VAR_ID = 8150;
@@ -83,6 +87,7 @@ public class BreedingViewServiceTest {
 	 
 	@Mock DataSet inputDataSet;
 	@Mock DataSet meansDataSet;
+	@Mock DataSet trialDataSet;
 	@Mock TrialEnvironments trialEnvironments;
 	@Mock TrialEnvironment trialEnvironment;
 	
@@ -92,6 +97,17 @@ public class BreedingViewServiceTest {
 	Map<String,ArrayList<String>> meansInput;
 	Map<String,Map<String,ArrayList<String>>> summaryStatisticsInput;
 	BreedingViewServiceImpl service;
+	
+	List<VariableType> factorVariableTypes = new ArrayList<VariableType>();
+	List<VariableType> variateVariableTypes = new ArrayList<VariableType>();
+	
+	VariableType variate_AD;
+	VariableType heritability_AD;
+	VariableType numValues_AD;
+	
+	Term lsMean = new Term();
+	Term heritability = new Term();
+	Term numValues = new Term();
 	
 	@Before
 	public void setUp() throws Exception {
@@ -145,14 +161,13 @@ public class BreedingViewServiceTest {
 		
 		
 
-		ArrayList<String> summaryVal1 = new ArrayList<String>();
-		summaryVal1.add(SUMMARY_VALUE_1);
-		ArrayList<String> summaryVal2 = new ArrayList<String>();
-		summaryVal2.add(SUMMARY_VALUE_2);
+		ArrayList<String> summaryValues = new ArrayList<String>();
+		summaryValues.add(SUMMARY_VALUE_1);
+		summaryValues.add(SUMMARY_VALUE_2);
 		
+		data.put(AD,summaryValues);
 		summaryStatisticsInput.put(SITE_VALUE, data);
-		data.put(AD,summaryVal1);
-		data.put(AD,summaryVal2);
+		
 		
 		List<String> header = new ArrayList<String>();
 		header.add(SITE);
@@ -168,17 +183,6 @@ public class BreedingViewServiceTest {
 		when(summaryStatsCSV.getTrialHeader()).thenReturn(SITE);
 		when(summaryStatsCSV.getHeader()).thenReturn(header);
 		when(summaryStatsCSV.getHeaderStats()).thenReturn(headerStats);
-	
-	}
-	
-	
-	@Test
-	public void testExecute_SaveTheMeansDataWithCommaInEnvironments() throws Exception {
-		
-		List<DataSet> dataSets = new ArrayList<DataSet>();
-		Set<TrialEnvironment> trialEnvironmentList = new HashSet<TrialEnvironment>();
-		List<VariableType> factorVariableTypes = new ArrayList<VariableType>();
-		List<VariableType> variateVariableTypes = new ArrayList<VariableType>();
 		
 		VariableType factor = new VariableType();
 		StandardVariable factorStandardVar = new StandardVariable();
@@ -189,15 +193,32 @@ public class BreedingViewServiceTest {
 		factor.setLocalName(SITE);
 		factor.setStandardVariable(factorStandardVar);
 		
-		VariableType variate = createVariateVariableType(AD);
+		variate_AD = createVariateVariableType(AD);
+		heritability_AD = createVariateVariableType(AD_HERITABILITY);
+		numValues_AD = createVariateVariableType(AD_NUM_VALUES);
 		
-		Term lsMean = new Term();
 		lsMean.setId(LS_MEAN_TERMID);
 		lsMean.setName(LS_MEAN);
 		
-		trialEnvironmentList.add(trialEnvironment);
+		heritability.setId(HERITABILITY_TERMID);
+		heritability.setName(HERITABILITY);
+		
+		numValues.setId(NUM_VALUES_TERMID);
+		numValues.setName(NUM_VALUES);
+		
+		
 		factorVariableTypes.add(factor);
-		variateVariableTypes.add(variate);
+		variateVariableTypes.add(variate_AD);
+	
+	}
+	
+	
+	@Test
+	public void testExecute_SaveTheMeansDataWithCommaInEnvironments() throws Exception {
+		
+		List<DataSet> dataSets = new ArrayList<DataSet>();
+		Set<TrialEnvironment> trialEnvironmentList = new HashSet<TrialEnvironment>();
+		trialEnvironmentList.add(trialEnvironment);
 		
 		StandardVariable studyStdVar = new StandardVariable();
 		studyStdVar.setId(STUDY_STANDARD_VAR_ID);
@@ -231,8 +252,8 @@ public class BreedingViewServiceTest {
 		when(inputDataSet.getVariableTypes().getFactors()).thenReturn(mock(VariableTypeList.class));
 		when(inputDataSet.getVariableTypes().getFactors().getVariableTypes()).thenReturn(factorVariableTypes);
 		when(inputDataSet.getVariableTypes().getVariates()).thenReturn(mock(VariableTypeList.class));
-		when(inputDataSet.getVariableTypes().getVariates().findByLocalName(AD)).thenReturn(variate);
-		when(inputDataSet.getVariableTypes().getVariates().getVariableTypes()).thenReturn(factorVariableTypes);
+		when(inputDataSet.getVariableTypes().getVariates().findByLocalName(AD)).thenReturn(variate_AD);
+		when(inputDataSet.getVariableTypes().getVariates().getVariableTypes()).thenReturn(variateVariableTypes);
 		
 		when(meansDataSet.getVariableTypes()).thenReturn(meansVariableTypeList);
 		
@@ -267,6 +288,102 @@ public class BreedingViewServiceTest {
 		} catch (IBPWebServiceException e) {
 			
 			fail("Failed to execute the Web Service");
+		}
+		
+	}
+	
+	@Test
+	public void testExecute_SaveTheSummaryStatisticsData_TraitsAreSelected() throws Exception {
+		
+		when(trialEnvironments.findOnlyOneByLocalName(SITE, ENV_NAME_CIMMYT_HARARE)).thenReturn(trialEnvironment);
+		when(trialEnvironment.getId()).thenReturn(1);
+		when(trialEnvironment.getVariables()).thenReturn(mock(VariableList.class));
+		when(trialEnvironment.getVariables().findByLocalName(anyString())).thenReturn(mock(Variable.class));
+		when(trialEnvironment.getVariables().findByLocalName(anyString()).getValue()).thenReturn(ENV_NAME_CIMMYT_HARARE);
+		
+		when(ontologyDataManager.getStandardVariableIdByPropertyScaleMethodRole(anyInt(),anyInt(),anyInt(),(PhenotypicType) anyObject())).thenReturn(null);
+		when(ontologyDataManager.findMethodByName(HERITABILITY)).thenReturn(heritability);
+		when(ontologyDataManager.findMethodByName(NUM_VALUES)).thenReturn(numValues);
+		
+		when(studyDataManager.getDataSet(3)).thenReturn(inputDataSet);
+		when(studyDataManager.getDataSet(1)).thenReturn(trialDataSet);
+		
+		when(inputDataSet.getVariableTypes()).thenReturn(mock(VariableTypeList.class));
+		when(inputDataSet.getVariableTypes().getFactors()).thenReturn(mock(VariableTypeList.class));
+		when(inputDataSet.getVariableTypes().getFactors().getVariableTypes()).thenReturn(factorVariableTypes);
+		when(inputDataSet.getVariableTypes().getVariates()).thenReturn(mock(VariableTypeList.class));
+		when(inputDataSet.getVariableTypes().getVariates().findByLocalName(AD)).thenReturn(variate_AD);
+		when(inputDataSet.getVariableTypes().getVariates().getVariableTypes()).thenReturn(variateVariableTypes);
+		
+		when(nameToAliasMapping.containsValue(AD)).thenReturn(true);
+		
+		VariableTypeList list = new VariableTypeList();
+		list.getVariableTypes().addAll(factorVariableTypes);
+		when(trialDataSet.getVariableTypes()).thenReturn(list);
+		when(trialDataSet.findVariableTypeByLocalName(AD_HERITABILITY)).thenReturn(null).thenReturn(heritability_AD);
+		when(trialDataSet.findVariableTypeByLocalName(AD_NUM_VALUES)).thenReturn(null).thenReturn(numValues_AD);
+		
+		try {
+			
+			service.uploadAndSaveSummaryStatsToDB("", 2, trialEnvironments, inputDataSet);
+			
+			List<ExperimentValues> experimentValues = service.getSummaryStatsExperimentValuesList();
+			VariableTypeList statsList = service.getVariableTypeListSummaryStats();
+			
+			assertFalse("The summary stats list must not be empty", statsList.getVariableTypes().isEmpty());
+			assertFalse("ExperimentValues list should not be empty", experimentValues.isEmpty());
+			assertEquals("The number of summary stats to save should match the input", 2 , experimentValues.size());			
+
+			
+		} catch (Exception e) {
+			
+			fail("Failed to execute uploadAndSaveSummaryStatsToDB");
+		}
+		
+	}
+	
+	@Test
+	public void testExecute_SaveTheSummaryStatisticsData_TraitsAreNotSelected() throws Exception {
+		
+		when(trialEnvironments.findOnlyOneByLocalName(SITE, ENV_NAME_CIMMYT_HARARE)).thenReturn(trialEnvironment);
+		when(trialEnvironment.getId()).thenReturn(1);
+		when(trialEnvironment.getVariables()).thenReturn(mock(VariableList.class));
+		when(trialEnvironment.getVariables().findByLocalName(anyString())).thenReturn(mock(Variable.class));
+		when(trialEnvironment.getVariables().findByLocalName(anyString()).getValue()).thenReturn(ENV_NAME_CIMMYT_HARARE);
+		
+		when(ontologyDataManager.getStandardVariableIdByPropertyScaleMethodRole(anyInt(),anyInt(),anyInt(),(PhenotypicType) anyObject())).thenReturn(null);
+		when(ontologyDataManager.findMethodByName(HERITABILITY)).thenReturn(heritability);
+		when(ontologyDataManager.findMethodByName(NUM_VALUES)).thenReturn(numValues);
+		
+		when(studyDataManager.getDataSet(3)).thenReturn(inputDataSet);
+		when(studyDataManager.getDataSet(1)).thenReturn(trialDataSet);
+		
+		when(inputDataSet.getVariableTypes()).thenReturn(mock(VariableTypeList.class));
+		when(inputDataSet.getVariableTypes().getFactors()).thenReturn(mock(VariableTypeList.class));
+		when(inputDataSet.getVariableTypes().getFactors().getVariableTypes()).thenReturn(factorVariableTypes);
+		when(inputDataSet.getVariableTypes().getVariates()).thenReturn(mock(VariableTypeList.class));
+		when(inputDataSet.getVariableTypes().getVariates().findByLocalName(AD)).thenReturn(variate_AD);
+		when(inputDataSet.getVariableTypes().getVariates().getVariableTypes()).thenReturn(variateVariableTypes);
+		
+		when(nameToAliasMapping.containsValue(AD)).thenReturn(false);
+		
+		VariableTypeList list = new VariableTypeList();
+		list.getVariableTypes().addAll(factorVariableTypes);
+		when(trialDataSet.getVariableTypes()).thenReturn(list);
+		when(trialDataSet.findVariableTypeByLocalName(AD_HERITABILITY)).thenReturn(heritability_AD);
+		when(trialDataSet.findVariableTypeByLocalName(AD_NUM_VALUES)).thenReturn(numValues_AD);
+		
+		try {
+			
+			service.uploadAndSaveSummaryStatsToDB("", 2, trialEnvironments, inputDataSet);
+			
+			VariableTypeList statsList = service.getVariableTypeListSummaryStats();
+			assertTrue("The summary stats list must be empty", statsList.getVariableTypes().isEmpty());
+			
+			
+		} catch (Exception e) {
+			
+			fail("Failed to execute uploadAndSaveSummaryStatsToDB");
 		}
 		
 	}

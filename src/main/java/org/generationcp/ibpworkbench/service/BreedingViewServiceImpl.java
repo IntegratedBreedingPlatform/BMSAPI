@@ -80,7 +80,10 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	private Map<String, String> nameToAliasMapping;
 	private boolean meansDataSetExists = false;
 	private VariableTypeList meansVariableTypeList = new VariableTypeList();
+	private VariableTypeList variableTypeListSummaryStats;
+
 	private List<ExperimentValues> experimentValuesList;
+	private List<ExperimentValues> summaryStatsExperimentValuesList;
 
 	private static final Logger LOG = LoggerFactory.getLogger(BreedingViewServiceImpl.class);
 
@@ -779,7 +782,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			VariableTypeList variableTypeListVariates = measurementDataSet.getVariableTypes().getVariates();
 
 			//list that will contain all summary stats project properties
-			VariableTypeList variableTypeList = new VariableTypeList();
+			variableTypeListSummaryStats = new VariableTypeList();
 
 			List<String> summaryStatsList = summaryStatsCSV.getHeaderStats();
 			String trialLocalName =  summaryStatsCSV.getTrialHeader();
@@ -862,7 +865,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 							}
 
 							summaryStatVariableType.setRank(++lastRank);
-							variableTypeList.add(summaryStatVariableType);
+							variableTypeListSummaryStats.add(summaryStatVariableType);
 							trialDataSet.getVariableTypes()
 							.add(summaryStatVariableType);
 						}
@@ -873,7 +876,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			ontologyDataManager.addStandardVariable(list);
 
 			Set<String> environments = summaryStatsData.keySet();
-			List<ExperimentValues> experimentValues = new ArrayList<ExperimentValues>();
+			summaryStatsExperimentValuesList = new ArrayList<ExperimentValues>();
 			List<Integer> locationIds = new ArrayList<Integer>();
 
 			for (String summaryStatName : summaryStatsList){
@@ -897,7 +900,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 					ExperimentValues e = new ExperimentValues();
 					e.setVariableList(variableList);
 					e.setLocationId(ndLocationId);
-					experimentValues.add(e);
+					summaryStatsExperimentValuesList.add(e);
 
 					Map<String, ArrayList<String>> traitSummaryStats = summaryStatsData.get(env);
 					for(Entry<String, ArrayList<String>> traitSummaryStat : traitSummaryStats.entrySet()) {
@@ -927,7 +930,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			//------------ save project properties and experiments ----------------------------------//
 			DmsProject project = new DmsProject();
 			project.setProjectId(trialDatasetId);
-			studyDataManager.saveTrialDatasetSummary(project,variableTypeList, experimentValues, locationIds);
+			studyDataManager.saveTrialDatasetSummary(project,variableTypeListSummaryStats, summaryStatsExperimentValuesList, locationIds);
 
 
 	}
@@ -1031,6 +1034,13 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	public List<ExperimentValues> getExperimentValuesList() {
 		return experimentValuesList;
 	}
-
+	
+	public List<ExperimentValues> getSummaryStatsExperimentValuesList() {
+		return summaryStatsExperimentValuesList;
+	}
+	
+	public VariableTypeList getVariableTypeListSummaryStats() {
+		return variableTypeListSummaryStats;
+	}
 
 }
