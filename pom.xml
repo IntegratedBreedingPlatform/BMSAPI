@@ -12,6 +12,19 @@
 		<spring-boot-version>1.0.1.RELEASE</spring-boot-version>
 		<middleware-version>3.0.0.RELEASE</middleware-version>		
 	</properties>
+	
+	<distributionManagement>
+        <repository>
+            <id>efficio-nexus</id>
+            <name>Releases</name>
+            <url>http://gcp.efficio.us.com:8081/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>efficio-nexus</id>
+            <name>Snapshots</name>
+            <url>http://gcp.efficio.us.com:8081/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 	<profiles>
 		<profile>
