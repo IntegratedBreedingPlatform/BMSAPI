@@ -32,7 +32,7 @@
                 <configuration>
                     <forkMode>once</forkMode>
                     <argLine>
-                        -javaagent:"${user.home}/.m2/repository/org/springframework/spring-instrument/3.1.1.RELEASE/spring-instrument-3.1.1.RELEASE.jar"
+                        ${argLine} -javaagent:"${user.home}/.m2/repository/org/springframework/spring-instrument/3.1.1.RELEASE/spring-instrument-3.1.1.RELEASE.jar"
                     </argLine>
                     <useSystemClassloader>true</useSystemClassloader>
                 </configuration>
