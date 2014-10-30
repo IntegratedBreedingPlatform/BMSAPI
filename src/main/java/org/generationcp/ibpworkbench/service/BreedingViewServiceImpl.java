@@ -72,14 +72,9 @@ public class BreedingViewServiceImpl implements BreedingViewService {
     private WorkbenchDataManager workbenchDataManager;
 	@Autowired
 	private Cloner cloner;
-	
-	private CSVUtil csvUtil;
-	private OutlierCSV outlierCSV;
-	private SummaryStatsCSV summaryStatsCSV;
 
 	private Map<String, String> nameToAliasMapping;
-	private boolean meansDataSetExists = false;
-	private VariableTypeList meansVariableTypeList = new VariableTypeList();
+	private boolean meansDataSetExists;
 	private VariableTypeList variableTypeListSummaryStats;
 
 	private List<ExperimentValues> experimentValuesList;
@@ -90,16 +85,17 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	public void execute(Map<String, String> params, List<String> errors) throws IBPWebServiceException {
 
 		try{
-			
+			meansDataSetExists = false;
 			nameToAliasMapping = getNameToAliasMapping();
 			
-			initializeCsvUtil();
+			CSVUtil csvUtil = getCsvUtil();
 
 			String mainOutputFilePath = params.get(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue());
 			String summaryOutputFilePath = params.get(WebAPIConstants.SUMMARY_OUTPUT_FILE_PATH.getParamValue());
 			String outlierOutputFilePath = params.get(WebAPIConstants.OUTLIER_OUTPUT_FILE_PATH.getParamValue());
 
 			Map<String, ArrayList<String>> traitsAndMeans = csvUtil.csvToMap(mainOutputFilePath);
+			
 			Map<String, Integer> ndGeolocationIds = new HashMap<String, Integer>();
 			LOG.info("Traits and Means: " + traitsAndMeans);
 
@@ -137,8 +133,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 				}
 
 				Stocks stocks = studyDataManager.getStocksInDataset(inputDatasetId);
-
 				DataSet dataSet = studyDataManager.getDataSet(inputDatasetId);
+				VariableTypeList meansVariableTypeList = getMeansVariableTypeList();
 				
 				//Get only the trial environment and germplasm factors
 
@@ -686,7 +682,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 					throws MiddlewareQueryException, IOException {
 
 		
-		initializeOutlierCSV(outlierOutputFilePath);
+		OutlierCSV outlierCSV = getOutlierCSV(outlierOutputFilePath);
 
 		Map<String, Map<String, ArrayList<String>>> outlierData = 
 				outlierCSV.getData();
@@ -699,7 +695,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			stdVariableIds.put(i, traitId);
 			i++;
 		}
-
 
 		Set<String> environments = outlierData.keySet();
 		for(String env : environments) {
@@ -742,7 +737,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			TrialEnvironments trialEnvironments, DataSet measurementDataSet) 
 					throws MiddlewareQueryException, IOException {
 
-			initializeSummaryStatsCSV(summaryStatsOutputFilePath);
+		    SummaryStatsCSV summaryStatsCSV = getSummaryStatsCSV(summaryStatsOutputFilePath);
 
 			Map<String, Map<String, ArrayList<String>>> summaryStatsData = 
 					summaryStatsCSV.getData();
@@ -936,9 +931,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	}
 	
 	
-	private Map<String, String> getNameToAliasMapping() throws MiddlewareQueryException {
+	protected Map<String, String> getNameToAliasMapping() throws MiddlewareQueryException {
 		
-		if (nameToAliasMapping ==null){
 			Map<String, String> map = new HashMap<String, String>();
 			
 			String fileName = String.format("%s\\Temp\\%s", 
@@ -948,98 +942,67 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			map = new ObjectUtil<HashMap<String, String>>().deserializeFromFile(fileName);
 			
 			return map;
-		}else{
-			return nameToAliasMapping;
-		}
-		
 	}
 
 
-	public void setStudyDataManager(StudyDataManager studyDataManager) {
+	protected void setStudyDataManager(StudyDataManager studyDataManager) {
 		this.studyDataManager = studyDataManager;
 	}
 
 
-	public void setOntologyDataManager(OntologyDataManager ontologyDataManager) {
+	protected void setOntologyDataManager(OntologyDataManager ontologyDataManager) {
 		this.ontologyDataManager = ontologyDataManager;
 	}
 
 
-	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
+	protected void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}
 
+	protected CSVUtil getCsvUtil() {
+			return new CSVUtil(nameToAliasMapping);
+	}
 
-	public void setNameToAliasMapping(Map<String, String> nameToAliasMapping) {
-		this.nameToAliasMapping = nameToAliasMapping;
+	protected OutlierCSV getOutlierCSV(String outlierOutputFilePath) {
+	
+		return new OutlierCSV(outlierOutputFilePath, nameToAliasMapping); 
 	}
 
 
-	private void initializeCsvUtil() {
+	protected SummaryStatsCSV getSummaryStatsCSV(String summaryStatsOutputFilePath) {
 		
-		if (csvUtil == null){
-			csvUtil = new CSVUtil(nameToAliasMapping);
-		}
-	}
-
-	public void setCsvUtil(CSVUtil csvUtil) {
-		this.csvUtil = csvUtil;
-	}
-
-	private void initializeOutlierCSV(String outlierOutputFilePath) {
-		
-		if (outlierCSV == null){
-			outlierCSV = new OutlierCSV(outlierOutputFilePath, nameToAliasMapping); 
-		}
+		return new SummaryStatsCSV(summaryStatsOutputFilePath, nameToAliasMapping);
 		 
 	}
-
-	public void setOutlierCSV(OutlierCSV outlierCSV) {
-		this.outlierCSV = outlierCSV;
+	
+	protected void setNameToAliasMapping(Map<String, String> mapping){
+		this.nameToAliasMapping = mapping;
 	}
 
-
-	private void initializeSummaryStatsCSV(String summaryStatsOutputFilePath) {
-		if (summaryStatsCSV == null){
-			summaryStatsCSV = new SummaryStatsCSV(summaryStatsOutputFilePath, nameToAliasMapping);
-		}
-		 
-	}
-
-	public void setSummaryStatsCSV(SummaryStatsCSV summaryStatsCSV) {
-		this.summaryStatsCSV = summaryStatsCSV;
-	}
-
-
-	public Cloner getCloner() {
+	protected Cloner getCloner() {
 		return cloner;
 	}
 
 
-	public void setCloner(Cloner cloner) {
+	protected void setCloner(Cloner cloner) {
 		this.cloner = cloner;
 	}
 
 
-	public VariableTypeList getMeansVariableTypeList() {
-		return meansVariableTypeList;
+	protected VariableTypeList getMeansVariableTypeList() {
+		return new VariableTypeList();
 	}
 
 
-	public void setMeansVariableTypeList(VariableTypeList meansVariableTypeList) {
-		this.meansVariableTypeList = meansVariableTypeList;
-	}
-
-
-	public List<ExperimentValues> getExperimentValuesList() {
+	protected List<ExperimentValues> getExperimentValuesList() {
 		return experimentValuesList;
 	}
 	
-	public List<ExperimentValues> getSummaryStatsExperimentValuesList() {
+	protected List<ExperimentValues> getSummaryStatsExperimentValuesList() {
 		return summaryStatsExperimentValuesList;
 	}
 	
-	public VariableTypeList getVariableTypeListSummaryStats() {
+	protected VariableTypeList getVariableTypeListSummaryStats() {
 		return variableTypeListSummaryStats;
 	}
 
