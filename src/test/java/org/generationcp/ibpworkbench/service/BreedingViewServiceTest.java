@@ -113,14 +113,17 @@ public class BreedingViewServiceTest {
 	public void setUp() throws Exception {
 		
 		MockitoAnnotations.initMocks(this);
-		service = new BreedingViewServiceImpl();
+		service = spy(new BreedingViewServiceImpl());
+		
+		doReturn(csvUtil).when(service).getCsvUtil();
+		doReturn(summaryStatsCSV).when(service).getSummaryStatsCSV(anyString());
+		doReturn(outlierCSV).when(service).getOutlierCSV(anyString());
+		doReturn(nameToAliasMapping).when(service).getNameToAliasMapping();
+		
 		service.setWorkbenchDataManager(workbenchDataManager);
 		service.setStudyDataManager(studyDataManager);
 		service.setOntologyDataManager(ontologyDataManager);
 		service.setNameToAliasMapping(nameToAliasMapping);
-		service.setCsvUtil(csvUtil);
-		service.setSummaryStatsCSV(summaryStatsCSV);
-		service.setOutlierCSV(outlierCSV);
 		service.setCloner(new Cloner());
 		
 		when(params.get(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue())).thenReturn(EMPTY_VALUE);
@@ -233,6 +236,7 @@ public class BreedingViewServiceTest {
 		
 		VariableTypeList meansVariableTypeList = new VariableTypeList();
 
+		doReturn(meansVariableTypeList).when(service).getMeansVariableTypeList();
 		
 		when(studyDataManager.getDataSetsByType(anyInt(), (DataSetType)anyObject())).thenReturn(dataSets);
 		when(studyDataManager.getTrialEnvironmentsInDataset(anyInt())).thenReturn(trialEnvironments);
@@ -272,7 +276,6 @@ public class BreedingViewServiceTest {
 		
 		try {
 			
-			service.setMeansVariableTypeList(meansVariableTypeList);
 			service.execute(params, errors);
 			
 			List<ExperimentValues> experimentValues = service.getExperimentValuesList();
