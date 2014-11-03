@@ -34,4 +34,8 @@ public class UrlComposer {
 		return String.format("%s/germplasm/list/%s", getBaseUrl(), germplasmListId);
 	}
 	
+	public String getVariableDetailsUrl(Integer variableId) {
+		return String.format("%s/ontology/var/%s", getBaseUrl(), variableId);
+	}
+	
 }

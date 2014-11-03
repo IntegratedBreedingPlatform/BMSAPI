@@ -1,12 +1,12 @@
 package org.generationcp.bms.resource;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
-import org.generationcp.bms.dao.MongoDao;
+import org.generationcp.bms.domain.StandardVariableBasicInfo;
 import org.generationcp.bms.exception.NotFoundException;
+import org.generationcp.bms.web.UrlComposer;
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,24 +24,43 @@ public class OntologyResource {
 	private OntologyDataManager ontologyDataManager;
 	
 	@Autowired
-	private MongoDao mongoDao;
+	private UrlComposer urlComposer;
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String home() {
 		return "redirect:/api-docs/default/ontology-resource";
 	}
 	
-	@RequestMapping(value = "/var/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/var/list", method = RequestMethod.GET)
 	@ResponseBody
-	public StandardVariableSummary getSummaryById(@PathVariable Integer id) throws MiddlewareQueryException {
-		StandardVariableSummary svSummary = ontologyDataManager.getStandardVariableSummary(id);
-		if(svSummary == null) {
-			throw new NotFoundException();
+	public Set<StandardVariableBasicInfo> getAllDetailed() throws MiddlewareQueryException {
+		Set<StandardVariableBasicInfo> basicInfo = new HashSet<StandardVariableBasicInfo>();
+		// FIXME : Need a Middleware method to load all summaries - does not exist yet.
+		// Just using existing method which loads deatils in loop - bad but okay for prototyping!
+
+		Set<StandardVariable> allVariables = ontologyDataManager.getAllStandardVariables();
+		for (StandardVariable var : allVariables) {
+			StandardVariableBasicInfo varBasicInfo = new StandardVariableBasicInfo(var.getId(), var.getProperty().getName(), var.getMethod().getName(), var.getScale().getName());
+
+			if (var.getDataType() != null) {
+				varBasicInfo.setDataType(var.getDataType().getName());
+			}
+
+			if (var.getStoredIn() != null) {
+				varBasicInfo.setRole(var.getStoredIn().getName());
+			}
+
+			if (var.getIsA() != null) {
+				varBasicInfo.setTraitClass(var.getIsA().getName());
+			}
+
+			varBasicInfo.setDetailsUrl(urlComposer.getVariableDetailsUrl(var.getId()));
+			basicInfo.add(varBasicInfo);
 		}
-		return svSummary;		
+		return basicInfo;
 	}
 	
-	@RequestMapping(value = "/var/{id}/details", method = RequestMethod.GET)
+	@RequestMapping(value = "/var/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public StandardVariable getDetailsById(@PathVariable Integer id) throws MiddlewareQueryException {
 		StandardVariable svDetails = ontologyDataManager.getStandardVariable(id);
@@ -49,17 +68,5 @@ public class OntologyResource {
 			throw new NotFoundException();
 		}
 		return svDetails;		
-	}
-	
-	@RequestMapping(value = "/var/all/details", method = RequestMethod.GET)
-	@ResponseBody
-	public Set<StandardVariable> getAllDetailed() throws MiddlewareQueryException {
-		return ontologyDataManager.getAllStandardVariables();
-	}
-	
-	@RequestMapping(value = "/var/all/mongo", method = RequestMethod.GET)
-	@ResponseBody
-	public List<StandardVariable> getAllMongo() throws MiddlewareQueryException {
-		return mongoDao.getAllStandardVariables();
 	}
 }
