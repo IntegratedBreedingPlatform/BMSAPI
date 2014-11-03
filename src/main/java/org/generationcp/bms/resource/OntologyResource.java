@@ -33,31 +33,31 @@ public class OntologyResource {
 	
 	@RequestMapping(value = "/var/list", method = RequestMethod.GET)
 	@ResponseBody
-	public Set<StandardVariableBasicInfo> getAllDetailed() throws MiddlewareQueryException {
-		Set<StandardVariableBasicInfo> basicInfo = new HashSet<StandardVariableBasicInfo>();
+	public Set<StandardVariableBasicInfo> listAllSummaries() throws MiddlewareQueryException {
+		Set<StandardVariableBasicInfo> variableSummaries = new HashSet<StandardVariableBasicInfo>();
 		// FIXME : Need a Middleware method to load all summaries - does not exist yet.
 		// Just using existing method which loads deatils in loop - bad but okay for prototyping!
 
 		Set<StandardVariable> allVariables = ontologyDataManager.getAllStandardVariables();
 		for (StandardVariable var : allVariables) {
-			StandardVariableBasicInfo varBasicInfo = new StandardVariableBasicInfo(var.getId(), var.getProperty().getName(), var.getMethod().getName(), var.getScale().getName());
+			StandardVariableBasicInfo varSummary = new StandardVariableBasicInfo(var.getId(), var.getProperty().getName(), var.getMethod().getName(), var.getScale().getName());
 
 			if (var.getDataType() != null) {
-				varBasicInfo.setDataType(var.getDataType().getName());
+				varSummary.setDataType(var.getDataType().getName());
 			}
 
 			if (var.getStoredIn() != null) {
-				varBasicInfo.setRole(var.getStoredIn().getName());
+				varSummary.setRole(var.getStoredIn().getName());
 			}
 
 			if (var.getIsA() != null) {
-				varBasicInfo.setTraitClass(var.getIsA().getName());
+				varSummary.setTraitClass(var.getIsA().getName());
 			}
 
-			varBasicInfo.setDetailsUrl(urlComposer.getVariableDetailsUrl(var.getId()));
-			basicInfo.add(varBasicInfo);
+			varSummary.setDetailsUrl(urlComposer.getVariableDetailsUrl(var.getId()));
+			variableSummaries.add(varSummary);
 		}
-		return basicInfo;
+		return variableSummaries;
 	}
 	
 	@RequestMapping(value = "/var/{id}", method = RequestMethod.GET)
