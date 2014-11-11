@@ -1,4 +1,4 @@
-/target
+target/
 .DS_Store
-workbench.properties
-.settings
+src/main/resources/workbench.properties
+.settings/
