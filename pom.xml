@@ -4,13 +4,26 @@
     <groupId>IBPWebService</groupId>
     <artifactId>IBPWebService</artifactId>
     <packaging>war</packaging>
-    <version>3.0.0.RELEASE</version>
+    <version>3.1.0-SNAPSHOT</version>
     <name>IBPWebService Jersey Webapp</name>
     <properties>
         <jersey-version>1.8</jersey-version>
         <spring.version>3.1.1.RELEASE</spring.version>
-        <ibpcommons.version>3.0.0.RELEASE</ibpcommons.version>
+        <ibpcommons.version>3.1.0-SNAPSHOT</ibpcommons.version>
     </properties>
+
+    <distributionManagement>
+            <repository>
+                <id>efficio-nexus</id>
+                <name>Releases</name>
+                <url>http://gcp.efficio.us.com:8081/nexus/content/repositories/releases/</url>
+            </repository>
+            <snapshotRepository>
+                <id>efficio-nexus</id>
+                <name>Snapshots</name>
+                <url>http://gcp.efficio.us.com:8081/nexus/content/repositories/snapshots/</url>
+            </snapshotRepository>
+        </distributionManagement>
 
     <build>
         <finalName>${project.artifactId}</finalName>
