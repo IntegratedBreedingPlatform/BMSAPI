@@ -3,3 +3,4 @@ target/
 src/main/resources/workbench.properties
 .settings/
 .classpath
+*.iml
