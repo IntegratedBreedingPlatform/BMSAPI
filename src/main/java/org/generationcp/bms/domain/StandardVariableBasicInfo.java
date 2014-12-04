@@ -4,6 +4,7 @@ package org.generationcp.bms.domain;
 public class StandardVariableBasicInfo {
 
 	private int id;
+	private String name;
 	private String property;
 	private String method;
 	private String scale;
@@ -13,8 +14,9 @@ public class StandardVariableBasicInfo {
 	
 	private String detailsUrl;
 
-	public StandardVariableBasicInfo(int id, String property, String method, String scale) {
+	public StandardVariableBasicInfo(int id, String name, String property, String method, String scale) {
 		this.id = id;
+		this.name = name;
 		this.property = property;
 		this.method = method;
 		this.scale = scale;
@@ -26,6 +28,14 @@ public class StandardVariableBasicInfo {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getProperty() {
