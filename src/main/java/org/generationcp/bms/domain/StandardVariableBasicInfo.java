@@ -5,6 +5,8 @@ public class StandardVariableBasicInfo {
 
 	private int id;
 	private String name;
+	private String description;
+	
 	private String property;
 	private String method;
 	private String scale;
@@ -14,9 +16,11 @@ public class StandardVariableBasicInfo {
 	
 	private String detailsUrl;
 
-	public StandardVariableBasicInfo(int id, String name, String property, String method, String scale) {
+	public StandardVariableBasicInfo(int id, String name, String description, String property, String method, String scale) {
 		this.id = id;
 		this.name = name;
+		this.description = description;
+		
 		this.property = property;
 		this.method = method;
 		this.scale = scale;
@@ -36,6 +40,14 @@ public class StandardVariableBasicInfo {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public String getProperty() {

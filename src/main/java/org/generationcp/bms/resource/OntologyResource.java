@@ -40,7 +40,9 @@ public class OntologyResource {
 
 		Set<StandardVariable> allVariables = ontologyDataManager.getAllStandardVariables();
 		for (StandardVariable var : allVariables) {
-			StandardVariableBasicInfo varSummary = new StandardVariableBasicInfo(var.getId(), var.getName(), var.getProperty().getName(), var.getMethod().getName(), var.getScale().getName());
+			StandardVariableBasicInfo varSummary =
+					new StandardVariableBasicInfo(var.getId(), var.getName(), var.getDescription(), 
+							var.getProperty().getName(), var.getMethod().getName(), var.getScale().getName());
 
 			if (var.getDataType() != null) {
 				varSummary.setDataType(var.getDataType().getName());
