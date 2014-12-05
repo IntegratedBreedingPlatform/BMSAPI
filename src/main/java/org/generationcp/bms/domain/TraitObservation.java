@@ -1,26 +1,38 @@
+
 package org.generationcp.bms.domain;
 
 public class TraitObservation {
 
-	private final int experimentId;	
-	private final int germplasmId;
-    private final int environmentId;
-	
+	private String traitId;
+	private String traitName;
+
+	private String entryNumber;
 	private String designation;
+	private String gid;
 	private String value;
 
-	public TraitObservation(int experimentId, int germplasmId, int environmentId) {
-		this.experimentId = experimentId;
-		this.germplasmId = germplasmId;
-		this.environmentId = environmentId;	
+	public String getTraitId() {
+		return traitId;
 	}
 
-	public int getGermplasmId() {
-		return germplasmId;
+	public void setTraitId(String traitId) {
+		this.traitId = traitId;
 	}
 
-	public int getEnvironmentId() {
-		return environmentId;
+	public String getTraitName() {
+		return traitName;
+	}
+
+	public void setTraitName(String traitName) {
+		this.traitName = traitName;
+	}
+
+	public String getEntryNumber() {
+		return entryNumber;
+	}
+
+	public void setEntryNumber(String entryNumber) {
+		this.entryNumber = entryNumber;
 	}
 
 	public String getDesignation() {
@@ -31,6 +43,14 @@ public class TraitObservation {
 		this.designation = designation;
 	}
 
+	public String getGid() {
+		return gid;
+	}
+
+	public void setGid(String gid) {
+		this.gid = gid;
+	}
+
 	public String getValue() {
 		return value;
 	}
@@ -38,9 +58,4 @@ public class TraitObservation {
 	public void setValue(String value) {
 		this.value = value;
 	}
-
-	public int getExperimentId() {
-		return experimentId;
-	}
-
 }

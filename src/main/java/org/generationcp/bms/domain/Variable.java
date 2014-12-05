@@ -1,7 +1,6 @@
 package org.generationcp.bms.domain;
 
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.oms.TermSummary;
 
 public class Variable {
 	
@@ -24,30 +23,6 @@ public class Variable {
 		return standardVariable.getId();
 	}
 	
-	public TermSummary getProperty() {
-		return new TermSummary(standardVariable.getProperty().getId(), 
-				standardVariable.getProperty().getName(), 
-				standardVariable.getProperty().getDefinition());
-	}
-	
-	public TermSummary getMethod() {
-		return new TermSummary(standardVariable.getMethod().getId(), 
-				standardVariable.getMethod().getName(), 
-				standardVariable.getMethod().getDefinition());
-	}
-	
-	public TermSummary getScale() {
-		return new TermSummary(standardVariable.getScale().getId(), 
-				standardVariable.getScale().getName(), 
-				standardVariable.getScale().getDefinition());
-	}
-	
-	public TermSummary getDataType() {
-		return new TermSummary(standardVariable.getDataType().getId(), 
-				standardVariable.getDataType().getName(), 
-				standardVariable.getDataType().getDefinition());
-	}
-
 	public String getLocalName() {
 		return localName;
 	}

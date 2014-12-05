@@ -26,8 +26,8 @@ public class UrlComposer {
 		return String.format("%s/study/dataset/%s", getBaseUrl(), dataSetId);
 	}
 	
-	public String getObservationDetailsUrl(Integer studyId, Integer traitId) {
-		return String.format("%s/study/%s/trait/%s", getBaseUrl(), studyId, traitId);
+	public String getObservationDetailsUrl(Integer studyId) {
+		return String.format("%s/study/observations", getBaseUrl());
 	}
 	
 	public String getListDetailsUrl(Integer germplasmListId) {

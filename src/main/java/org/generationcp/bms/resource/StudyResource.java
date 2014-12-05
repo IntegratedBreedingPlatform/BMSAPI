@@ -10,7 +10,6 @@ import org.generationcp.bms.domain.StudyDetails;
 import org.generationcp.bms.domain.StudySummary;
 import org.generationcp.bms.domain.Trait;
 import org.generationcp.bms.domain.TraitObservation;
-import org.generationcp.bms.domain.TraitObservationDetails;
 import org.generationcp.bms.exception.NotFoundException;
 import org.generationcp.bms.web.UrlComposer;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -19,6 +18,8 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.MeasurementData;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -123,7 +124,8 @@ public class StudyResource {
 		studySummary.setType(study.getType());
 		studySummary.setStartDate(String.valueOf(study.getStartDate()));
 		studySummary.setEndDate(String.valueOf(study.getEndDate()));
-		studySummary.setStudyDetailsUrl(this.urlComposer.getStudyDetailsUrl(study.getId()));	
+		studySummary.setStudyDetailsUrl(this.urlComposer.getStudyDetailsUrl(study.getId()));
+		studySummary.setObservationDetailsUrl(this.urlComposer.getObservationDetailsUrl(study.getId()));
 	}
 
 	private void populateDatasetSummary(StudySummary studySummary, int studyId) throws MiddlewareQueryException {
@@ -175,15 +177,36 @@ public class StudyResource {
 			factor.setLocalDescription(factorDetail.getLocalDescription());
 			studyDetails.addFactor(factor);
 		}
-		studyDetails.addMeasuredTraits(simpleDao.getMeasuredTraitsForStudy(studyId));
-		setTraitObservationDetailsUrl(studyDetails.getId(), studyDetails.getMeasuredTraits());
+		
+        //Variates - What was measured?
+        VariableTypeList variates = studyDataManager.getAllStudyVariates(Integer.valueOf(studyId));
+        List<VariableType> variateDetails = variates.getVariableTypes(); 
+        
+        List<Trait> measuredTraits = new ArrayList<Trait>();
+        for(VariableType variateDetail : variateDetails){
+            String name = variateDetail.getLocalName();
+            String description = variateDetail.getStandardVariable().getDescription();
+            if(variateDetail.getLocalDescription() != null && variateDetail.getLocalDescription().length() != 0){
+                description = variateDetail.getLocalDescription().trim();
+            }
+            String propertyName = variateDetail.getStandardVariable().getProperty().getName();
+            String scaleName = variateDetail.getStandardVariable().getScale().getName();
+            String methodName = variateDetail.getStandardVariable().getMethod().getName();
+            String dataType = variateDetail.getStandardVariable().getDataType().getName();
+            
+            //studyDetails.addVariate(propertyName + " (" + name + ")", value + " (" + scaleName + ")");
+            Trait trait = new Trait(variateDetail.getId());
+            trait.setName(name);
+            trait.setDescription(description);
+            trait.setProperty(propertyName);
+            trait.setMethod(methodName);
+            trait.setScale(scaleName);
+            trait.setType(dataType);
+            measuredTraits.add(trait);           
+        }
+		studyDetails.addMeasuredTraits(measuredTraits);
+		
 		return studyDetails;
-	}
-
-	private void setTraitObservationDetailsUrl(Integer studyId, List<Trait> traits) {
-		for (Trait trait : traits) {
-			trait.setObservationDetailsUrl(this.urlComposer.getObservationDetailsUrl(studyId, trait.getId()));
-		}
 	}
 
 	@RequestMapping(value = "/dataset/{dataSetId}", method = RequestMethod.GET)
@@ -202,21 +225,44 @@ public class StudyResource {
 		details.setStudyDetailsUrl(this.urlComposer.getStudyDetailsUrl(dataSet.getStudyId()));
 		details.addMeasuredTraits(this.simpleDao.getMeasuredTraitsForDataset(dataSetId));
 		details.setDatasetDetailUrl(this.urlComposer.getDataSetDetailsUrl(dataSet.getId()));
-		setTraitObservationDetailsUrl(dataSet.getStudyId(), details.getMeasuredTraits());
 		return details;
 	}
 
-	@RequestMapping(value = "/{studyId}/trait/{traitId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{studyId}/observations", method = RequestMethod.GET)
 	@ResponseBody
-	public TraitObservationDetails getTraitObservationDetails(@PathVariable Integer studyId,
-			@PathVariable Integer traitId) {
-
-		List<TraitObservation> traitObservations = simpleDao.getTraitObservations(studyId, traitId);
-		if (!traitObservations.isEmpty()) {
-			TraitObservationDetails details = new TraitObservationDetails(traitId, studyId);
-			details.addObservations(traitObservations);
-			return details;
+	public List<TraitObservation> getTraitObservationDetails(@PathVariable Integer studyId) throws MiddlewareQueryException {
+		
+		StudyType studyType = studyDataManager.getStudyType(studyId);
+		Workbook workbook = null;
+		if(studyType == StudyType.N) {
+			workbook = fieldbookService.getNurseryDataSet(studyId);
+		} else {
+			workbook = fieldbookService.getTrialDataSet(studyId);
 		}
-		throw new NotFoundException();
+		
+		List<TraitObservation> observations = new ArrayList<TraitObservation>();
+		List<MeasurementRow> measurementRows = workbook.getObservations();		
+
+		for(MeasurementRow row : measurementRows) {
+			TraitObservation obs = new TraitObservation();
+			for(MeasurementData data : row.getDataList()) {
+				obs.setTraitId(String.valueOf(data.getMeasurementVariable().getTermId()));
+				if(data.getLabel().equals("ENTRY_NO")) {
+					obs.setEntryNumber(data.getValue());
+				}
+				if(data.getLabel().equals("DESIGNATION")) {
+					obs.setDesignation(data.getValue());
+				}
+				if(data.getLabel().equals("GID")) {
+					obs.setGid(data.getValue());
+				}
+				if(data.getPhenotypeId() != null) {
+					obs.setTraitName(data.getLabel());
+					obs.setValue(data.getValue());
+				}
+			}
+			observations.add(obs);
+		}		
+		return observations;		
 	}
 }

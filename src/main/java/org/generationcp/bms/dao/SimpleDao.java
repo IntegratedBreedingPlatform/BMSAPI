@@ -192,31 +192,7 @@ public class SimpleDao {
 		return new ArrayList<GermplasmScoreCard>(scoreMap.values());
 	}
 	
-	public List<TraitObservation> getTraitObservations(int studyId, int traitId) {
-		
-		List<TraitObservation> traitObservations = new ArrayList<TraitObservation>();
-		List<Map<String, Object>> queryResults = this.jdbcTemplate
-				.queryForList("select gtd.experiment_id, gtd.observed_value, gtd.envt_id, gtd.entry_designation, gtd.gid from germplasm_trial_details gtd "
-						+ " where gtd.study_id =" + studyId
-						+ " and "
-						+ " gtd.stdvar_id = " + traitId + ";");
 
-		for (Map<String, Object> row : queryResults) {
-			int experimentId = (Integer) row.get("experiment_id");
-			int germplasmId = (Integer) row.get("gid");
-			int environmentId = (Integer) row.get("envt_id");
-			String observedValue = (String) row.get("observed_value");	
-			String designation = (String) row.get("entry_designation");
-
-			TraitObservation obs = new TraitObservation(experimentId, germplasmId, environmentId);
-			obs.setDesignation(designation);
-			obs.setValue(observedValue);
-			traitObservations.add(obs);
-		}
-		
-		return traitObservations;
-	}
-	
 	public List<GermplasmSearchResult> searchGermplasm(String queryString) {
 		
 		BeanPropertyRowMapper<GermplasmSearchResult> rowMapper = new BeanPropertyRowMapper<GermplasmSearchResult>();
