@@ -243,7 +243,7 @@ public class BreedingViewServiceTest {
 		when(studyDataManager.getDataSet(3)).thenReturn(inputDataSet);
 		when(studyDataManager.getDataSet(4)).thenReturn(null).thenReturn(meansDataSet);
 		when(studyDataManager.getStudy(anyInt())).thenReturn(study);
-		when(studyDataManager.addDataSet(anyInt(), (VariableTypeList) anyObject(), (DatasetValues) anyObject())).thenReturn(new DatasetReference(4, EMPTY_VALUE));
+		when(studyDataManager.addDataSet(anyInt(), (VariableTypeList) anyObject(), (DatasetValues) anyObject(), anyString())).thenReturn(new DatasetReference(4, EMPTY_VALUE));
 		when(studyDataManager.getStocksInDataset(anyInt())).thenReturn(stocks);
 		
 		when(ontologyDataManager.addMethod(anyString(), anyString())).thenReturn(lsMean);
