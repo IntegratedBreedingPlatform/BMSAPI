@@ -84,7 +84,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 	public void execute(Map<String, String> params, List<String> errors) throws IBPWebServiceException {
 
-		try{
+		try {
+		
 			meansDataSetExists = false;
 			nameToAliasMapping = getNameToAliasMapping();
 			
@@ -134,7 +135,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 				Stocks stocks = studyDataManager.getStocksInDataset(inputDatasetId);
 				DataSet dataSet = studyDataManager.getDataSet(inputDatasetId);
-				VariableTypeList meansVariableTypeList = getMeansVariableTypeList();
+				VariableTypeList meansVariatesList = getMeansVariableTypeList();
 				
 				//Get only the trial environment and germplasm factors
 
@@ -143,187 +144,22 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 							== PhenotypicType.TRIAL_ENVIRONMENT
 							|| factorFromDataSet.getStandardVariable().getPhenotypicType() 
 							== PhenotypicType.GERMPLASM) {
-						meansVariableTypeList.makeRoom(1);
+						meansVariatesList.makeRoom(1);
 						factorFromDataSet.setRank(1);
-						meansVariableTypeList.add(factorFromDataSet);
+						meansVariatesList.add(factorFromDataSet);
 					}
 				}
 				//get variates only
-				VariableTypeList variableTypeListVariates = dataSet.getVariableTypes().getVariates();
+				VariableTypeList allVariatesList = dataSet.getVariableTypes().getVariates();
 				
 
 				Integer numOfFactorsAndVariates = 
-						meansVariableTypeList.getFactors().getVariableTypes().size()
-						+ meansVariableTypeList.getVariates().getVariableTypes().size() + 1;
-				for(int i = 3; i < csvHeader.length; i += 2) {   
-					//means and errors are in pair, so just get the word before _
-					String root = csvHeader[i] != null 
-							? csvHeader[i].substring(0, csvHeader[i].lastIndexOf("_")) : "";
-							if(!"".equals(root)) {
-								
-								VariableType originalVariableType = null;
-								VariableType meansVariableType = null;
-								VariableType unitErrorsVariableType = null;
-								
-								//Means
-								originalVariableType = variableTypeListVariates.findByLocalName(root);
-								meansVariableType = cloner.deepClone(originalVariableType);
-								meansVariableType.setLocalName(root + "_Means");
-								Term termLSMean = ontologyDataManager.findMethodByName("LS MEAN");
-								if(termLSMean == null) {
-									String definitionMeans = 
-											meansVariableType.getStandardVariable().getMethod().getDefinition();
-									termLSMean = ontologyDataManager.addMethod("LS MEAN", definitionMeans);
-								}
-
-								Integer stdVariableId = 
-										ontologyDataManager.getStandardVariableIdByPropertyScaleMethodRole(
-												meansVariableType.getStandardVariable().getProperty().getId()
-												,meansVariableType.getStandardVariable().getScale().getId()
-												,termLSMean.getId()
-												,PhenotypicType.VARIATE
-												);
-								
-								//check if the stdVariableId already exists in the variableTypeList
-								for (VariableType vt : meansVariableTypeList.getVariableTypes()){
-									if (stdVariableId != null && vt.getStandardVariable().getId() == stdVariableId.intValue()){
-										
-										termLSMean = ontologyDataManager.findMethodByName("LS MEAN (" + root + ")");
-										
-										if(termLSMean == null) {
-											String definitionMeans = 
-													meansVariableType.getStandardVariable().getMethod().getDefinition();
-											termLSMean = ontologyDataManager.addMethod("LS MEAN (" + root + ")" , definitionMeans);
-										}
-
-										stdVariableId = 
-												ontologyDataManager.getStandardVariableIdByPropertyScaleMethodRole(
-														meansVariableType.getStandardVariable().getProperty().getId()
-														,meansVariableType.getStandardVariable().getScale().getId()
-														,termLSMean.getId()
-														,PhenotypicType.VARIATE
-														);
-										break;
-									}
-								}
-								
-
-								if (stdVariableId == null){
-									StandardVariable stdVariable = new StandardVariable();
-									stdVariable = cloner.deepClone(meansVariableType.getStandardVariable());
-									stdVariable.setEnumerations(null);
-									stdVariable.setConstraints(null);
-									stdVariable.setId(0);
-									stdVariable.setName(meansVariableType.getLocalName());
-									stdVariable.setMethod(termLSMean);
-									//check if name is already used
-									Term existingStdVar = ontologyDataManager
-											.findTermByName(stdVariable.getName(), CvId.VARIABLES);
-									if (existingStdVar != null){
-										//rename 
-										stdVariable.setName(stdVariable.getName()+"_1");
-									}
-									ontologyDataManager.addStandardVariable(stdVariable);
-									meansVariableType.setStandardVariable(stdVariable);
-
-								}else{
-									StandardVariable stdVar = ontologyDataManager
-											.getStandardVariable(stdVariableId);
-												if (stdVar.getEnumerations() != null){
-													for (Enumeration enumeration : stdVar.getEnumerations()){
-														ontologyDataManager.deleteStandardVariableEnumeration(stdVariableId, enumeration.getId());
-													}
-												}
-											stdVar.setEnumerations(null);
-											ontologyDataManager.deleteStandardVariableLocalConstraints(stdVariableId);
-									meansVariableType.setStandardVariable(stdVar);
-								}
-
-								meansVariableTypeList.makeRoom(numOfFactorsAndVariates);
-								meansVariableType.setRank(numOfFactorsAndVariates);
-								meansVariableTypeList.add(meansVariableType);
-
-								stdVariableId = null;
-								//Unit Errors
-								unitErrorsVariableType = cloner.deepClone(originalVariableType);
-								unitErrorsVariableType.setLocalName(root + "_UnitErrors");
-								Term termErrorEstimate = ontologyDataManager.findMethodByName("ERROR ESTIMATE");
-								if(termErrorEstimate == null) {
-									String definitionUErrors = 
-											unitErrorsVariableType.getStandardVariable().getMethod().getDefinition();
-									termErrorEstimate = ontologyDataManager
-											.addMethod("ERROR ESTIMATE", definitionUErrors);
-								}
-
-								stdVariableId = ontologyDataManager.getStandardVariableIdByPropertyScaleMethodRole(
-										unitErrorsVariableType.getStandardVariable().getProperty().getId()
-										,unitErrorsVariableType.getStandardVariable().getScale().getId()
-										,termErrorEstimate.getId()
-										,PhenotypicType.VARIATE
-										);
-								
-								
-								//check if the stdVariableId already exists in the variableTypeList
-								for (VariableType vt : meansVariableTypeList.getVariableTypes()){
-									if (stdVariableId != null && vt.getStandardVariable().getId() == stdVariableId.intValue()){
-										
-										termErrorEstimate = ontologyDataManager.findMethodByName("ERROR ESTIMATE (" + root + ")");
-										if(termErrorEstimate == null) {
-											String definitionUErrors = 
-													unitErrorsVariableType.getStandardVariable().getMethod().getDefinition();
-											termErrorEstimate = ontologyDataManager
-													.addMethod("ERROR ESTIMATE (" + root + ")", definitionUErrors);
-										}
-
-										stdVariableId = ontologyDataManager.getStandardVariableIdByPropertyScaleMethodRole(
-												unitErrorsVariableType.getStandardVariable().getProperty().getId()
-												,unitErrorsVariableType.getStandardVariable().getScale().getId()
-												,termErrorEstimate.getId()
-												,PhenotypicType.VARIATE
-												);
-										break;
-									}
-								}
-										
-									
-
-								if (stdVariableId == null){
-									StandardVariable stdVariable = new StandardVariable();
-									stdVariable = cloner.deepClone(unitErrorsVariableType.getStandardVariable());
-									stdVariable.setEnumerations(null);
-									stdVariable.setConstraints(null);
-									stdVariable.setId(0);
-									stdVariable.setName(unitErrorsVariableType.getLocalName());
-									stdVariable.setMethod(termErrorEstimate);
-									//check if name is already used
-									Term existingStdVar = 
-											ontologyDataManager.findTermByName(stdVariable.getName(), CvId.VARIABLES);
-									if (existingStdVar != null){
-										//rename 
-										stdVariable.setName(stdVariable.getName()+"_1");
-									}
-									ontologyDataManager.addStandardVariable(stdVariable);
-									unitErrorsVariableType.setStandardVariable(stdVariable);
-
-								}else{
-									StandardVariable stdVar = ontologyDataManager
-											.getStandardVariable(stdVariableId);
-												if (stdVar.getEnumerations() != null) {
-													for (Enumeration enumeration : stdVar.getEnumerations()){
-														ontologyDataManager.deleteStandardVariableEnumeration(stdVariableId, enumeration.getId());
-													}
-												}
-											stdVar.setEnumerations(null);
-											ontologyDataManager.deleteStandardVariableLocalConstraints(stdVariableId);
-									unitErrorsVariableType.setStandardVariable(stdVar);
-								}
-
-								meansVariableTypeList.makeRoom(numOfFactorsAndVariates);
-								unitErrorsVariableType.setRank(numOfFactorsAndVariates);
-								meansVariableTypeList.add(unitErrorsVariableType);
-							}
+						meansVariatesList.getFactors().getVariableTypes().size()
+						+ meansVariatesList.getVariates().getVariableTypes().size() + 1;
+				
+				for(int i = 2; i < csvHeader.length; i++) {
+					createMeansVariableType(numOfFactorsAndVariates, csvHeader[i], allVariatesList, meansVariatesList);		
 				}
-
 
 
 				//please make sure that the study name is unique and does not exist in the db.
@@ -331,25 +167,25 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 				Study study = studyDataManager.getStudy(studyId);
 				Variable variable = createVariable(TermId.DATASET_NAME.getId()
 						, study.getName() + "-MEANS"  , 1);
-				meansVariableTypeList.makeRoom(1);
+				meansVariatesList.makeRoom(1);
 				variable.getVariableType().setRank(1);
-				meansVariableTypeList.add(variable.getVariableType());
+				meansVariatesList.add(variable.getVariableType());
 
 				//name of dataset [STUDY NAME]-MEANS
 				updateVariableType(variable.getVariableType(), study.getName() + "-MEANS", "Dataset name (local)");
 				variableList.add(variable);
 
 				variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", 2);
-				meansVariableTypeList.makeRoom(1);
+				meansVariatesList.makeRoom(1);
 				variable.getVariableType().setRank(1);
-				meansVariableTypeList.add(variable.getVariableType());
+				meansVariatesList.add(variable.getVariableType());
 				updateVariableType(variable.getVariableType(), "DATASET_TITLE", "Dataset title (local)");
 				variableList.add(variable);
 
 				variable = createVariable(TermId.DATASET_TYPE.getId(), "10070", 3);
-				meansVariableTypeList.makeRoom(1);
+				meansVariatesList.makeRoom(1);
 				variable.getVariableType().setRank(1);
-				meansVariableTypeList.add(variable.getVariableType());
+				meansVariatesList.add(variable.getVariableType());
 				updateVariableType(variable.getVariableType(), "DATASET_TYPE", "Dataset type (local)");
 				variableList.add(variable);
 				DatasetValues datasetValues = new DatasetValues();
@@ -359,7 +195,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 				if (meansDataSet == null){
 					//save data
 					//get dataset using new datasetid
-					datasetReference = studyDataManager.addDataSet(studyId, meansVariableTypeList, datasetValues);
+					datasetReference = studyDataManager.addDataSet(studyId, meansVariatesList, datasetValues);
 					meansDataSet = studyDataManager.getDataSet(datasetReference.getId());
 				}
 
@@ -379,7 +215,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 						List<Variable> list = new ArrayList<Variable>();
 
-						for(int j = 3; j < csvHeader.length; j++) {
+						for(int j = 2; j < csvHeader.length; j++) {
 							if (meansDataSetExists){
 								if (meansDataSet.getVariableTypes().getVariates()
 										.findByLocalName(csvHeader[j]) == null){
@@ -428,6 +264,106 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 		}
 		
 		
+		
+	}
+	
+	protected void createMeansVariableType(Integer numOfFactorsAndVariates, String headerName, VariableTypeList allVariatesList,VariableTypeList meansVariateList) throws MiddlewareQueryException {
+		
+		String traitName = "", localName = "", methodName = "";
+		
+		traitName = (headerName != null && headerName.lastIndexOf("_") != -1)
+				? headerName.substring(0, headerName.lastIndexOf("_")) : "";
+		if (headerName.endsWith("_Means")){
+			localName = "_Means";
+			methodName = "LS MEAN";
+		} else if (headerName.endsWith("_UnitErrors")) {
+			localName = "_UnitErrors";
+			methodName = "ERROR ESTIMATE";
+		} else {
+			return;
+		}
+		
+		VariableType originalVariableType = null;
+		VariableType newVariableType = null;
+		
+		originalVariableType = allVariatesList.findByLocalName(traitName);
+		newVariableType = cloner.deepClone(originalVariableType);
+		
+		newVariableType.setLocalName(traitName + localName);
+		
+		Term termMethod = ontologyDataManager.findMethodByName(methodName);
+		if(termMethod == null) {
+			String definitionMeans = 
+					newVariableType.getStandardVariable().getMethod().getDefinition();
+			termMethod = ontologyDataManager.addMethod(methodName, definitionMeans);
+		}
+
+		Integer stdVariableId = 
+				ontologyDataManager.getStandardVariableIdByPropertyScaleMethodRole(
+						newVariableType.getStandardVariable().getProperty().getId()
+						,newVariableType.getStandardVariable().getScale().getId()
+						,termMethod.getId()
+						,PhenotypicType.VARIATE
+						);
+		
+		//check if the stdVariableId already exists in the variableTypeList
+		for (VariableType vt : meansVariateList.getVariableTypes()){
+			if (stdVariableId != null && vt.getStandardVariable().getId() == stdVariableId.intValue()){
+				
+				termMethod = ontologyDataManager.findMethodByName(methodName+ " (" + traitName + ")");
+				
+				if(termMethod == null) {
+					String definitionMeans = 
+							newVariableType.getStandardVariable().getMethod().getDefinition();
+					termMethod = ontologyDataManager.addMethod(methodName + " (" + traitName + ")" , definitionMeans);
+				}
+
+				stdVariableId = 
+						ontologyDataManager.getStandardVariableIdByPropertyScaleMethodRole(
+								newVariableType.getStandardVariable().getProperty().getId()
+								,newVariableType.getStandardVariable().getScale().getId()
+								,termMethod.getId()
+								,PhenotypicType.VARIATE
+								);
+				break;
+			}
+		}
+		
+
+		if (stdVariableId == null){
+			StandardVariable stdVariable = new StandardVariable();
+			stdVariable = cloner.deepClone(newVariableType.getStandardVariable());
+			stdVariable.setEnumerations(null);
+			stdVariable.setConstraints(null);
+			stdVariable.setId(0);
+			stdVariable.setName(newVariableType.getLocalName());
+			stdVariable.setMethod(termMethod);
+			//check if name is already used
+			Term existingStdVar = ontologyDataManager
+					.findTermByName(stdVariable.getName(), CvId.VARIABLES);
+			if (existingStdVar != null){
+				//rename 
+				stdVariable.setName(stdVariable.getName()+"_1");
+			}
+			ontologyDataManager.addStandardVariable(stdVariable);
+			newVariableType.setStandardVariable(stdVariable);
+
+		}else{
+			StandardVariable stdVar = ontologyDataManager
+					.getStandardVariable(stdVariableId);
+						if (stdVar.getEnumerations() != null){
+							for (Enumeration enumeration : stdVar.getEnumerations()){
+								ontologyDataManager.deleteStandardVariableEnumeration(stdVariableId, enumeration.getId());
+							}
+						}
+					stdVar.setEnumerations(null);
+					ontologyDataManager.deleteStandardVariableLocalConstraints(stdVariableId);
+			newVariableType.setStandardVariable(stdVar);
+		}
+
+		meansVariateList.makeRoom(numOfFactorsAndVariates);
+		newVariableType.setRank(numOfFactorsAndVariates);
+		meansVariateList.add(newVariableType);
 		
 	}
 
