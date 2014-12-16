@@ -34,7 +34,7 @@
     
     <bean id="workbenchSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
         <property name="dataSource" ref="workbenchDataSource"/>
-        <property name="configLocation" value="classpath:ibpworkbench_hib.cfg.xml"/>
+        <property name="configLocation" value="classpath:ibpmidware_hib.cfg.xml"/>
     </bean>
     
     <bean id="workbenchHibernateSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider" scope="request"  destroy-method="close">
