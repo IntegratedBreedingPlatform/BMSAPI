@@ -29,20 +29,15 @@ import org.generationcp.middleware.service.api.FieldbookService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
-
 @Controller
 @RequestMapping("/study")
+@SuppressWarnings("unused")
 public class StudyResource {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(StudyResource.class);
@@ -50,6 +45,7 @@ public class StudyResource {
 	private StudyDataManager studyDataManager;
 	private SimpleDao simpleDao;
 	private FieldbookService fieldbookService;
+	
 	private DataImportService dataImportService;
 	private UrlComposer urlComposer;
 
@@ -92,28 +88,6 @@ public class StudyResource {
 			studySummaries.add(summary);
 		}
 		return studySummaries;
-	}
-
-	@RequestMapping(value = "/", method = RequestMethod.PUT)
-	@ApiResponses(value = { @ApiResponse(code = 201, message = "Created")})
-	public ResponseEntity<StudySummary> createStudy(@RequestBody StudySummary studySummary) throws MiddlewareQueryException {
-		LOGGER.info(studySummary.toString());
-		
-		Workbook workbook = new Workbook();
-    	// Basic Details
-    	org.generationcp.middleware.domain.etl.StudyDetails studyDetails = new org.generationcp.middleware.domain.etl.StudyDetails();
-    	studyDetails.setStudyType(StudyType.N);
-    	studyDetails.setStudyName(studySummary.getName());
-    	studyDetails.setObjective(studySummary.getObjective());
-    	studyDetails.setTitle(studySummary.getTitle());
-    	studyDetails.setStartDate(studySummary.getStartDate());
-    	studyDetails.setEndDate(studySummary.getEndDate());
-    	studyDetails.setParentFolderId(1);    	
-    	workbook.setStudyDetails(studyDetails);
-    	
-    	int studyId = dataImportService.saveDataset(workbook);    	
-    	studySummary.setId(studyId);    	
-		return new ResponseEntity<StudySummary>(studySummary, HttpStatus.CREATED);
 	}
 
 	private void populateStudySummary(StudySummary studySummary, Study study) throws MiddlewareQueryException {

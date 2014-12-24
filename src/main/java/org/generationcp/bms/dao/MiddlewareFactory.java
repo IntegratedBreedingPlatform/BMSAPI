@@ -65,126 +65,96 @@ public class MiddlewareFactory {
 		}
 	}
 	
-	private SessionFactory getCentralSessionFactory() throws FileNotFoundException {
-		String selectedCentralDB = getCurrentlySelectedCentralDBName();
+	private SessionFactory getSessionFactory() throws FileNotFoundException {
+		String selectedCropDB = getCurrentlySelectedCropDBName();
 		SessionFactory sessionFactory;
 
-		if (this.sessionFactoryCache.get(selectedCentralDB) == null) {
-			DatabaseConnectionParameters centralConnectionParams = new DatabaseConnectionParameters(
-					config.getDbHost(), config.getDbPort(), selectedCentralDB, config.getDbUsername(), config.getDbPassword());
-			sessionFactory = SessionFactoryUtil.openSessionFactory(centralConnectionParams);
-			sessionFactoryCache.put(selectedCentralDB, sessionFactory);
+		if (this.sessionFactoryCache.get(selectedCropDB) == null) {
+			DatabaseConnectionParameters connectionParams = new DatabaseConnectionParameters(
+					config.getDbHost(), config.getDbPort(), selectedCropDB, config.getDbUsername(), config.getDbPassword());
+			sessionFactory = SessionFactoryUtil.openSessionFactory(connectionParams);
+			sessionFactoryCache.put(selectedCropDB, sessionFactory);
 		} else {
-			sessionFactory = this.sessionFactoryCache.get(selectedCentralDB);
+			sessionFactory = this.sessionFactoryCache.get(selectedCropDB);
 		}
 		return sessionFactory;
 	}
 	
-	private SessionFactory getLocalSessionFactory() throws FileNotFoundException {
-		String selectedLocalDB = getCurrentlySelectedLocalDBName();
-		SessionFactory sessionFactory;
-
-		if (this.sessionFactoryCache.get(selectedLocalDB) == null) {
-			DatabaseConnectionParameters localConnectionParams = new DatabaseConnectionParameters(
-					config.getDbHost(), config.getDbPort(), selectedLocalDB, config.getDbUsername(), config.getDbPassword());
-			sessionFactory = SessionFactoryUtil.openSessionFactory(localConnectionParams);
-			sessionFactoryCache.put(selectedLocalDB, sessionFactory);
-		} else {
-			sessionFactory = this.sessionFactoryCache.get(selectedLocalDB);
-		}
-		return sessionFactory;
-	}
-	
-	private String getCurrentlySelectedCentralDBName() {
-		return this.contextResolver.resolveProgram().getCentralDbName();
-	}
-	
-	private String getCurrentlySelectedLocalDBName() {
-		return this.contextResolver.resolveProgram().getLocalDbName();
+	private String getCurrentlySelectedCropDBName() {
+		return this.contextResolver.resolveProgram().getDatabaseName();
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StudyDataManager getStudyDataManager() throws FileNotFoundException {		
-		return new StudyDataManagerImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
-				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
+		return new StudyDataManagerImpl(new HibernateSessionPerRequestProvider(getSessionFactory()));
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public FieldbookService getFieldbookService() throws FileNotFoundException {
-		return new FieldbookServiceImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
-				new HibernateSessionPerRequestProvider(getCentralSessionFactory()), getCurrentlySelectedLocalDBName(), getCurrentlySelectedCentralDBName());
+		return new FieldbookServiceImpl(new HibernateSessionPerRequestProvider(getSessionFactory()), getCurrentlySelectedCropDBName());
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GenotypicDataManager getGenotypicDataManager() throws FileNotFoundException {
-		return new GenotypicDataManagerImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
-				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
+		return new GenotypicDataManagerImpl(new HibernateSessionPerRequestProvider(getSessionFactory()));
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public OntologyDataManager getOntologyDataManager() throws FileNotFoundException {
-		return new OntologyDataManagerImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
-				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
+		return new OntologyDataManagerImpl(new HibernateSessionPerRequestProvider(getSessionFactory()));
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public OntologyService getOntologyService() throws FileNotFoundException {
-		return new OntologyServiceImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
-				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
+		return new OntologyServiceImpl(new HibernateSessionPerRequestProvider(getSessionFactory()));
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public InventoryDataManager getInventoryDataManager() throws FileNotFoundException {
-		return new InventoryDataManagerImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
-				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
+		return new InventoryDataManagerImpl(new HibernateSessionPerRequestProvider(getSessionFactory()));
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public LocationDataManager getLocationDataManager() throws FileNotFoundException {
-		return new LocationDataManagerImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
-				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
+		return new LocationDataManagerImpl(new HibernateSessionPerRequestProvider(getSessionFactory()));
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public UserDataManager getUserDataManager() throws FileNotFoundException {
-		return new UserDataManagerImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
-				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
+		return new UserDataManagerImpl(new HibernateSessionPerRequestProvider(getSessionFactory()));
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GermplasmListManager getGermplasmListManager() throws FileNotFoundException {
-		return new GermplasmListManagerImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
-				new HibernateSessionPerRequestProvider(getCentralSessionFactory()), getCurrentlySelectedLocalDBName(), getCurrentlySelectedCentralDBName());
+		return new GermplasmListManagerImpl(new HibernateSessionPerRequestProvider(getSessionFactory()), getCurrentlySelectedCropDBName());
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GermplasmDataManager getGermplasmDataManager() throws FileNotFoundException {
-		return new GermplasmDataManagerImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
-				new HibernateSessionPerRequestProvider(getCentralSessionFactory()), getCurrentlySelectedLocalDBName(), getCurrentlySelectedCentralDBName());
+		return new GermplasmDataManagerImpl(new HibernateSessionPerRequestProvider(getSessionFactory()), getCurrentlySelectedCropDBName());
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public DataImportService getDataImportService() throws FileNotFoundException {
-		return new DataImportServiceImpl(new HibernateSessionPerRequestProvider(getLocalSessionFactory()), 
-				new HibernateSessionPerRequestProvider(getCentralSessionFactory()));
+		return new DataImportServiceImpl(new HibernateSessionPerRequestProvider(getSessionFactory()));
 	}
 
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public JdbcTemplate getJDBCTemplate() {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource(
-				String.format("jdbc:mysql://%s:%s/%s", config.getDbHost(), config.getDbPort(), getCurrentlySelectedCentralDBName()), 
+				String.format("jdbc:mysql://%s:%s/%s", config.getDbHost(), config.getDbPort(), getCurrentlySelectedCropDBName()), 
 				config.getDbUsername(), config.getDbPassword());
 		
 		return new JdbcTemplate(dataSource);

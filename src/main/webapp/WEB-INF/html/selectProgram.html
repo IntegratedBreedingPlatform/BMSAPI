@@ -37,7 +37,7 @@
 					<div class="form-group">
 						<select id="selectedProgramId" name="selectedProgramId" class="form-control">
 							<option value="0">- Select -</option>
-							<option th:each="program : ${availablePrograms}" th:value="${program.projectId}" th:text="${program.projectName + '  [' + program.centralDbName + ']  [' + program.localDbName + ']'}" 
+							<option th:each="program : ${availablePrograms}" th:value="${program.projectId}" th:text="${program.projectName + '  [' + program.databaseName + ']'}" 
 								th:selected="${program.getProjectId().toString().equals(#httpSession.getAttribute('selectedProgramId'))}" />
 						</select>
 					</div>

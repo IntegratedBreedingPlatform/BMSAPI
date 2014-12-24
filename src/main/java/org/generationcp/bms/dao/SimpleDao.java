@@ -10,7 +10,6 @@ import java.util.Map;
 import org.generationcp.bms.domain.GermplasmScoreCard;
 import org.generationcp.bms.domain.GermplasmSearchResult;
 import org.generationcp.bms.domain.Trait;
-import org.generationcp.bms.domain.TraitObservation;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.h2h.Observation;

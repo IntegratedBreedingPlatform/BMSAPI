@@ -84,8 +84,7 @@
 				<div class="navbar-form navbar-right">
 					<div class="form-group">
 						<div th:if="${session.selectedProgram}" th:text="${session.selectedProgram.cropType.cropName}"></div>
-						<div th:if="${session.selectedProgram}" th:text="${session.selectedProgram.centralDbName}"></div>
-						<div th:if="${session.selectedProgram}" th:text="${session.selectedProgram.localDbName}"></div>
+						<div th:if="${session.selectedProgram}" th:text="${session.selectedProgram.databaseName}"></div>
 					</div>				
 				</div>
 				<form class="navbar-form navbar-right" role="form" id="programSelectionForm" action="/selectProgram" method="POST">
