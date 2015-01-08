@@ -9,7 +9,7 @@
     <properties>
         <jersey-version>1.8</jersey-version>
         <spring.version>3.2.11.RELEASE</spring.version>
-        <ibpcommons.version>3.1.0.SNAPSHOT</ibpcommons.version>
+        <ibpcommons.version>3.1.1.SNAPSHOT</ibpcommons.version>
     </properties>
 
     <distributionManagement>
