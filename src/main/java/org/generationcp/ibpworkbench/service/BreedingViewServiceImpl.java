@@ -195,8 +195,8 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 				if (meansDataSet == null){
 					//save data
 					//get dataset using new datasetid
-					//FIXME -Need to get the programUUID (via URL may be) and set on the dataset being added.
-					datasetReference = studyDataManager.addDataSet(studyId, meansVariatesList, datasetValues, null);
+					datasetReference = studyDataManager.addDataSet(studyId, meansVariatesList, datasetValues, 
+							getProgramUUID(studyDataManager,studyId));
 					meansDataSet = studyDataManager.getDataSet(datasetReference.getId());
 				}
 
@@ -268,6 +268,11 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 		
 	}
 	
+	protected String getProgramUUID(StudyDataManager studyDataManager, int studyId) 
+			throws MiddlewareQueryException {
+		return studyDataManager.getProject(studyId).getProgramUUID();
+	}
+
 	protected void createMeansVariableType(Integer numOfFactorsAndVariates, String headerName, VariableTypeList allVariatesList,VariableTypeList meansVariateList) throws MiddlewareQueryException {
 		
 		String traitName = "", localName = "", methodName = "";
