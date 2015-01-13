@@ -81,6 +81,11 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	private List<ExperimentValues> summaryStatsExperimentValuesList;
 
 	private static final Logger LOG = LoggerFactory.getLogger(BreedingViewServiceImpl.class);
+	private static final String ERROR_ESTIMATE = "ERROR ESTIMATE";
+	private static final String LS_MEAN = "LS MEAN";
+	private static final String MEANS_SUFFIX = "_Means";
+	private static final String UNIT_ERRORS_SUFFIX = "_UnitErrors";
+	private static final CharSequence UNIT_ERR_SUFFIX = "_UnitErr";
 
 	public void execute(Map<String, String> params, List<String> errors) throws IBPWebServiceException {
 
@@ -246,13 +251,13 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 				studyDataManager.addOrUpdateExperiment(
 						meansDataSet.getId(), ExperimentType.AVERAGE, experimentValuesList);
 
-				if(outlierOutputFilePath!=null && !outlierOutputFilePath.equals("")) {
+				if(outlierOutputFilePath!=null && !"".equals(outlierOutputFilePath)) {
 					uploadAndSaveOutlierDataToDB(
 							outlierOutputFilePath, studyId, ndGeolocationIds, dataSet);
 				}
 
 				//GCP-6209
-				if(summaryOutputFilePath!=null && !summaryOutputFilePath.equals("")) {
+				if(summaryOutputFilePath!=null && !"".equals(summaryOutputFilePath)) {
 					uploadAndSaveSummaryStatsToDB(
 							summaryOutputFilePath, studyId, trialEnvironments, dataSet);
 				}
@@ -279,12 +284,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 		
 		traitName = (headerName != null && headerName.lastIndexOf("_") != -1)
 				? headerName.substring(0, headerName.lastIndexOf("_")) : "";
-		if (headerName.endsWith("_Means")){
-			localName = "_Means";
-			methodName = "LS MEAN";
-		} else if (headerName.endsWith("_UnitErrors")) {
-			localName = "_UnitErrors";
-			methodName = "ERROR ESTIMATE";
+		if (headerName.endsWith(MEANS_SUFFIX)){
+			localName = MEANS_SUFFIX;
+			methodName = LS_MEAN;
+		} else if (headerName.endsWith(UNIT_ERRORS_SUFFIX)) {
+			localName = UNIT_ERRORS_SUFFIX;
+			methodName = ERROR_ESTIMATE;
 		} else {
 			return;
 		}
@@ -413,14 +418,14 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 		Iterator<String> iterator = inputDataSetVariateNames.iterator();
 		while (iterator.hasNext()){
-			if (iterator.next().contains("_UnitErrors") || iterator.next().contains("_UnitErr")) {
+			if (iterator.next().contains(UNIT_ERRORS_SUFFIX) || iterator.next().contains(UNIT_ERR_SUFFIX)) {
 				iterator.remove();
 			}
 		}
 
 		for (VariableType var : meansDataSet.getVariableTypes().getVariates().getVariableTypes()){
 			standardVariableIdTracker.add(var.getStandardVariable().getId());
-			if (!var.getStandardVariable().getMethod().getName().equalsIgnoreCase("error estimate")){
+			if (!ERROR_ESTIMATE.equalsIgnoreCase(var.getStandardVariable().getMethod().getName())){
 				meansDataSetVariateNames.add(var.getLocalName().trim());
 			}
 				
@@ -436,12 +441,12 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 					VariableType meansVariableType = cloner.deepClone(
 							inputDataSet.getVariableTypes().findByLocalName(root));
-					meansVariableType.setLocalName(root + "_Means");
-					Term termLSMean = ontologyDataManager.findMethodByName("LS MEAN");
+					meansVariableType.setLocalName(root + MEANS_SUFFIX);
+					Term termLSMean = ontologyDataManager.findMethodByName(LS_MEAN);
 					if(termLSMean == null) {
 						String definitionMeans = meansVariableType.getStandardVariable()
 								.getMethod().getDefinition();
-						termLSMean = ontologyDataManager.addMethod("LS MEAN", definitionMeans);
+						termLSMean = ontologyDataManager.addMethod(LS_MEAN, definitionMeans);
 					}
 
 					Integer stdVariableId = ontologyDataManager
@@ -520,14 +525,14 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 					//Unit Errors
 					VariableType unitErrorsVariableType = cloner.deepClone(
 							inputDataSet.getVariableTypes().findByLocalName(root));
-					unitErrorsVariableType.setLocalName(root + "_UnitErrors");
+					unitErrorsVariableType.setLocalName(root + UNIT_ERRORS_SUFFIX);
 					Term termErrorEstimate = ontologyDataManager
-							.findMethodByName("ERROR ESTIMATE");
+							.findMethodByName(ERROR_ESTIMATE);
 					if(termErrorEstimate == null) {
 						String definitionUErrors = unitErrorsVariableType
 								.getStandardVariable().getMethod().getDefinition();
 						termErrorEstimate = ontologyDataManager
-								.addMethod("ERROR ESTIMATE", definitionUErrors);
+								.addMethod(ERROR_ESTIMATE, definitionUErrors);
 					}
 
 					stdVariableId = ontologyDataManager.getStandardVariableIdByPropertyScaleMethodRole(
