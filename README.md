@@ -7,7 +7,7 @@ BMS API is a RESTful services prototyping project built on top of the [Middlewar
 * Maven
 * MySQL
 * JDK
-* An existing BMS installation with at least one program in it. [IBPDevUtils](https://github.com/naymesh/IBPDevUtil) is one option for setting them up.
+* An existing BMS installation with at least one program in it. Or a BMS development environment can be setup using instructions [here](https://github.com/digitalabs/IBDBScripts/tree/master/setuputils).
 
 ### Setup ###
 * Checkout the project: `git clone https://github.com/naymesh/BMSAPI`.
