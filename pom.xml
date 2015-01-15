@@ -10,7 +10,7 @@
 	
 	<properties>
 		<spring-boot-version>1.0.1.RELEASE</spring-boot-version>
-		<middleware-version>3.1.1.SNAPSHOT</middleware-version>		
+		<middleware-version>4.0.0.SNAPSHOT</middleware-version>		
 	</properties>
 	
 	<distributionManagement>
