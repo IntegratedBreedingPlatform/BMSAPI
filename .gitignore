@@ -7,3 +7,10 @@ logs
 .metadata
 
 .DS_Store
+
+
+# INTELLIJ IDEA IGNORES
+*.iml
+*.ipr
+*.iws
+.idea/

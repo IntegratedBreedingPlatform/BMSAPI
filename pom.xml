@@ -48,7 +48,7 @@
 		<repository>
 			<id>efficio-nexus</id>
 			<name>Efficio Nexus Repositoty</name>
-			<url>http://gcp.efficio.us.com:8081/nexus/content/repositories/snapshots/</url>
+			<url>http://apps.leafnode.io:8081/nexus/content/repositories/snapshots/</url>
 		</repository>
 	</repositories>
 
@@ -140,6 +140,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
