@@ -117,7 +117,7 @@
 	</dependencies>
 
 	<scm>
-		<developerConnection>scm:git:https://github.com/naymesh/BMSAPI</developerConnection>
+		<developerConnection>scm:git:https://github.com/digitalabs/BMSAPI</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 
