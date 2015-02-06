@@ -1,5 +1,6 @@
 package org.generationcp.bms.program;
 
+import org.generationcp.bms.program.dto.ProjectBasicInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -18,7 +20,15 @@ public class ProgramResource {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public List<Project> listPrograms() throws MiddlewareQueryException {
-		return this.workbenchDataManager.getProjects();
+	public List<ProjectBasicInfo> listPrograms() throws MiddlewareQueryException {
+        List<Project> projectList = this.workbenchDataManager.getProjects();
+        List<ProjectBasicInfo> projectBasicInfoList = new ArrayList<>();
+
+        if(projectList.size() > 0){
+            for(Project project : projectList){
+                projectBasicInfoList.add(new ProjectBasicInfo(project));
+            }
+        }
+		return projectBasicInfoList;
 	}
 }
