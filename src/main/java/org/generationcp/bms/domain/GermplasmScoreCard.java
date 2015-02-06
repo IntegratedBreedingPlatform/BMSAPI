@@ -1,10 +1,10 @@
 package org.generationcp.bms.domain;
 
+import org.generationcp.middleware.domain.h2h.Observation;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.generationcp.middleware.domain.h2h.Observation;
 
 
 

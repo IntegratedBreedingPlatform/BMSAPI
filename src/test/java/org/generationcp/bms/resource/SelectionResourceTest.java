@@ -1,10 +1,5 @@
 package org.generationcp.bms.resource;
 
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.bms.dao.SimpleDao;
 import org.generationcp.bms.domain.GermplasmScoreCard;
 import org.generationcp.middleware.domain.h2h.Observation;
@@ -14,6 +9,11 @@ import org.generationcp.middleware.util.Debug;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 
 public class SelectionResourceTest {
 	

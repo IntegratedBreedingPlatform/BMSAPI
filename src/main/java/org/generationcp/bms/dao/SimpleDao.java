@@ -1,12 +1,5 @@
 package org.generationcp.bms.dao;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.bms.domain.GermplasmScoreCard;
 import org.generationcp.bms.domain.GermplasmSearchResult;
 import org.generationcp.bms.domain.Trait;
@@ -23,6 +16,13 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class SimpleDao {

@@ -1,7 +1,5 @@
 package org.generationcp.bms.resource;
 
-import java.util.Arrays;
-
 import org.generationcp.bms.dao.SimpleDao;
 import org.generationcp.bms.domain.StudyDetails;
 import org.generationcp.bms.domain.Trait;
@@ -18,6 +16,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import java.util.Arrays;
 
 public class StudyResourceTest {
 	

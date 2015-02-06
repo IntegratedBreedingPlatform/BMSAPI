@@ -1,8 +1,7 @@
 package org.generationcp.bms.domain;
 
-import org.generationcp.middleware.pojos.ims.LotStatus;
-
 import com.wordnik.swagger.annotations.ApiModel;
+import org.generationcp.middleware.pojos.ims.LotStatus;
 
 @ApiModel("Germplasm Inventory Information")
 public class GermplasmInventoryInfo {

@@ -1,32 +1,11 @@
 
 package org.generationcp.bms.dao;
 
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.PreDestroy;
-
 import org.generationcp.bms.context.ContextResolver;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.SessionFactoryUtil;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
-import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
-import org.generationcp.middleware.manager.GermplasmListManagerImpl;
-import org.generationcp.middleware.manager.InventoryDataManagerImpl;
-import org.generationcp.middleware.manager.LocationDataManagerImpl;
-import org.generationcp.middleware.manager.OntologyDataManagerImpl;
-import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.UserDataManagerImpl;
-import org.generationcp.middleware.manager.api.GenotypicDataManager;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.manager.*;
+import org.generationcp.middleware.manager.api.*;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.OntologyServiceImpl;
@@ -43,6 +22,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+
+import javax.annotation.PreDestroy;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class MiddlewareFactory {

@@ -1,23 +1,11 @@
 package org.generationcp.bms.resource;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.bms.dao.SimpleDao;
-import org.generationcp.bms.domain.DatasetDetails;
-import org.generationcp.bms.domain.DatasetSummary;
-import org.generationcp.bms.domain.StudyDetails;
-import org.generationcp.bms.domain.StudySummary;
-import org.generationcp.bms.domain.Trait;
-import org.generationcp.bms.domain.TraitObservation;
+import org.generationcp.bms.domain.*;
 import org.generationcp.bms.exception.NotFoundException;
 import org.generationcp.bms.web.UrlComposer;
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.Workbook;
@@ -34,6 +22,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/study")

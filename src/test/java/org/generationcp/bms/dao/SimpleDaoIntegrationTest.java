@@ -1,11 +1,5 @@
 package org.generationcp.bms.dao;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
 import org.generationcp.bms.domain.GermplasmScoreCard;
 import org.generationcp.bms.domain.Trait;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -17,6 +11,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * This test relies on the data from central crop database for rice.

@@ -1,7 +1,5 @@
 package org.generationcp.bms.dao;
 
-import java.io.FileNotFoundException;
-
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.SessionFactoryUtil;
@@ -13,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+
+import java.io.FileNotFoundException;
 
 @Configuration
 public class WorkbenchFactory {

@@ -1,19 +1,15 @@
 package org.generationcp.bms.resource;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.generationcp.bms.dao.SimpleDao;
 import org.generationcp.bms.domain.GermplasmScoreCard;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 @Controller

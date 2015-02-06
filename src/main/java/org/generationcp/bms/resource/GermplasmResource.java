@@ -1,8 +1,5 @@
 package org.generationcp.bms.resource;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.bms.dao.SimpleDao;
 import org.generationcp.bms.domain.GermplasmListDetails;
 import org.generationcp.bms.domain.GermplasmListSummary;
@@ -16,11 +13,10 @@ import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/germplasm")
