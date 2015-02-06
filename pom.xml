@@ -10,7 +10,8 @@
 	
 	<properties>
 		<spring-boot-version>1.0.1.RELEASE</spring-boot-version>
-		<middleware-version>4.0.0.SNAPSHOT</middleware-version>		
+		<middleware-version>4.0.0.SNAPSHOT</middleware-version>
+        <jsonpath.version>0.8.1</jsonpath.version>
 	</properties>
 	
 	<distributionManagement>
@@ -121,6 +122,13 @@
 			<version>1.9.5</version>
 			<scope>test</scope>
 		</dependency>
+
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path-assert</artifactId>
+            <version>${jsonpath.version}</version>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 
 	<scm>
