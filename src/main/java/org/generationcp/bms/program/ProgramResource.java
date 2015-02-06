@@ -1,4 +1,4 @@
-package org.generationcp.bms.resource;
+package org.generationcp.bms.program;
 
 import java.util.List;
 
