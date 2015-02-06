@@ -35,7 +35,7 @@ public class OntologyScaleResource {
 		return scaleList;
 	}
 
-	@ApiOperation(value = "All Scale", notes = "Get Scale using Scale Id")
+	@ApiOperation(value = "Get Scale by Id", notes = "Get Scale using Scale Id")
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public Scale listAllStandardVariablesByScaleId(@PathVariable Integer id) throws MiddlewareQueryException {
