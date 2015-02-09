@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.generationcp</groupId>
-	<artifactId>bms-api</artifactId>
+	<artifactId>bmsapi</artifactId>
 	<packaging>${packaging.type}</packaging>
 	<version>1.0.0-SNAPSHOT</version>
 	<name>Breeding Management System API</name>
@@ -137,6 +137,7 @@
 	</scm>
 
 	<build>
+		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
