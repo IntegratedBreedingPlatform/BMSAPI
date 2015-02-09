@@ -1,0 +1,3 @@
+db.url=jdbc:mysql://localhost:3306/ibdbv2_rice_central
+db.username=root
+db.password=

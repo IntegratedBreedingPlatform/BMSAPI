@@ -1,0 +1,14 @@
+#Spring embedded tomcat config
+server.port=19080
+
+spring.thymeleaf.cache=false
+
+db.host=localhost
+db.port=13306
+db.username=root
+db.password=
+
+spring.data.mongodb.host=localhost
+spring.data.mongodb.port=27017
+
+db.workbench.name=workbench
