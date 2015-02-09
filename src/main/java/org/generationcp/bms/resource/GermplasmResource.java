@@ -45,7 +45,7 @@ public class GermplasmResource {
 	public List<GermplasmListSummary> searchGermplasmLists(@RequestParam String q) throws MiddlewareQueryException {
 		
 		List<GermplasmListSummary> results = new ArrayList<GermplasmListSummary>();
-		List<GermplasmList> matchingLists = this.germplasmListManager.searchForGermplasmList(q, Operation.LIKE, true);			
+		List<GermplasmList> matchingLists = this.germplasmListManager.searchForGermplasmList(q, Operation.LIKE);			
 		
 		if(matchingLists != null && !matchingLists.isEmpty()) {
 			for(GermplasmList gpList : matchingLists) {
