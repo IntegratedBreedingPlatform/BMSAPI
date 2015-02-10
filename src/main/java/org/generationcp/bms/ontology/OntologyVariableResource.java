@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 import java.util.Set;
@@ -36,11 +36,19 @@ public class OntologyVariableResource {
 		return allVariables;
 	}
 
-	@ApiOperation(value = "All variables by property", notes = "Get all standard variables using given property id")
+	@ApiOperation(value = "All variables by property id", notes = "Get all standard variables using given property id")
 	@RequestMapping(value = "/property/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<StandardVariable> listAllStandardVariablesByPropertyId(@PathVariable Integer id) throws MiddlewareQueryException {
 		List<StandardVariable> variables = ontologyService.getStandardVariablesByProperty(id);
 		return variables;
 	}
+
+    @ApiOperation(value = "All variables by search term", notes = "Get all standard variables using search term")
+    @RequestMapping(value = "/filter/{text}", method = RequestMethod.GET)
+    @ResponseBody
+    public List<StandardVariable> listAllStandardVariablesByFilter(@PathVariable String text) throws MiddlewareQueryException {
+        List<StandardVariable> variables = ontologyService.getStandardVariables(text);
+        return variables;
+    }
 }
