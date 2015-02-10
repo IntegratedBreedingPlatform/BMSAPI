@@ -95,4 +95,26 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 
         verify(ontologyService, times(1)).getProperty(1);
     }
+
+    @Test
+    public void getPropertyByFilter() throws Exception{
+
+        Term term = new Term();
+        term.setId(1);
+
+        Property property = new Property(term);
+        property.setId(1);
+        property.setName("propertyName");
+        property.setDefinition("propertyDefinition");
+
+        Mockito.doReturn(property).when(ontologyService).getProperty("propertyName");
+
+        mockMvc.perform(get("/ontology/properties/filter/{text}", "propertyName").contentType(contentType)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is(property.getName())))
+                .andExpect(jsonPath("$.definition", is(property.getDefinition())))
+                .andDo(print());
+
+        verify(ontologyService, times(1)).getProperty("propertyName");
+    }
 }

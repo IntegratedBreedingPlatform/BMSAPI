@@ -1,16 +1,16 @@
 package org.generationcp.bms.ontology;
 
+import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.service.api.OntologyService;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.service.api.OntologyService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -40,6 +40,14 @@ public class OntologyPropertyResource {
     @ResponseBody
     public Property getPropertyById(@PathVariable Integer id) throws MiddlewareQueryException {
         Property property = ontologyService.getProperty(id);
+        return property;
+    }
+
+    @ApiOperation(value = "Property By Filter", notes = "Get Property By Filter Text")
+    @RequestMapping(value = "/filter/{text}", method = RequestMethod.GET)
+    @ResponseBody
+    public Property getPropertyByFilter(@PathVariable String text) throws MiddlewareQueryException {
+        Property property = ontologyService.getProperty(text);
         return property;
     }
 }
