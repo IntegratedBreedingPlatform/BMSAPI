@@ -42,4 +42,12 @@ public class OntologyScaleResource {
 		Scale scale = ontologyService.getScale(id);
 		return scale;
 	}
+
+    @ApiOperation(value = "Get Scale by Filter", notes = "Get Scale using Filter term")
+    @RequestMapping(value = "/filter/{text}", method = RequestMethod.GET)
+    @ResponseBody
+    public Scale listAllStandardVariablesByFilter(@PathVariable String text) throws MiddlewareQueryException {
+        Scale scale = ontologyService.getScale(text);
+        return scale;
+    }
 }

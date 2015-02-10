@@ -96,4 +96,26 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 
         verify(ontologyService, times(1)).getScale(1);
     }
+
+    @Test
+    public void getScaleByFilter() throws Exception{
+
+        Term term = new Term();
+        term.setId(1);
+
+        Scale scale = new Scale(term);
+        scale.setId(1);
+        scale.setName("scaleName");
+        scale.setDefinition("scaleDefinition");
+
+        Mockito.doReturn(scale).when(ontologyService).getScale("scaleName");
+
+        mockMvc.perform(get("/ontology/scales/filter/{text}", "scaleName").contentType(contentType)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(scale.getId())))
+                .andExpect(jsonPath("$.name", is(scale.getName())))
+                .andExpect(jsonPath("$.definition", is(scale.getDefinition())))
+                .andDo(print());
+
+        verify(ontologyService, times(1)).getScale("scaleName");
+    }
 }
