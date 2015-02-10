@@ -50,4 +50,12 @@ public class OntologyPropertyResource {
         Property property = ontologyService.getProperty(text);
         return property;
     }
+
+    @ApiOperation(value = "Properties With Trait Class", notes = "Get All Properties with Trait Class")
+    @RequestMapping(value = "/class/list", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Property> listPropertiesByClass() throws MiddlewareQueryException {
+        List<Property> propertyList = ontologyService.getAllPropertiesWithTraitClass();
+        return propertyList;
+    }
 }

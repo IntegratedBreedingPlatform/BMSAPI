@@ -117,4 +117,31 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 
         verify(ontologyService, times(1)).getProperty("propertyName");
     }
+
+    @Test
+    public void listPropertyByTrailClass() throws Exception{
+
+        Term term = new Term();
+        term.setId(1);
+
+        List<Property> propertyList = new ArrayList<>();
+
+        Property property = new Property(term);
+        property.setId(1);
+        property.setName("propertyName");
+        property.setDefinition("propertyDefinition");
+        property.setCropOntologyId("33");
+
+        propertyList.add(property);
+
+        Mockito.doReturn(propertyList).when(ontologyService).getAllPropertiesWithTraitClass();
+
+        mockMvc.perform(get("/ontology/properties/class/list").contentType(contentType)).andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id", is(1)))
+                .andExpect(jsonPath("$[0].name", is(property.getName())))
+                .andExpect(jsonPath("$[0].definition", is(property.getDefinition())))
+                .andDo(print());
+
+        verify(ontologyService, times(1)).getAllPropertiesWithTraitClass();
+    }
 }
