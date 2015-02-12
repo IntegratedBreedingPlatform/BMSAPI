@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.generationcp.ibpworkbench.constants.WebAPIConstants;
 import org.generationcp.ibpworkbench.exceptions.IBPWebServiceException;
@@ -33,9 +34,12 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import com.rits.cloning.Cloner;
@@ -244,6 +248,10 @@ public class BreedingViewServiceTest {
 		when(studyDataManager.addDataSet(anyInt(), (VariableTypeList) anyObject(), (DatasetValues) anyObject(), anyString())).thenReturn(new DatasetReference(4, EMPTY_VALUE));
 		when(studyDataManager.getStocksInDataset(anyInt())).thenReturn(stocks);
 		
+		DmsProject testProject = new DmsProject();
+		testProject.setProgramUUID(UUID.randomUUID().toString());
+		when(studyDataManager.getProject(Mockito.anyInt())).thenReturn(testProject);
+		
 		when(ontologyDataManager.addMethod(anyString(), anyString())).thenReturn(lsMean);
 		when(ontologyDataManager.getStandardVariableIdByPropertyScaleMethodRole(anyInt(),anyInt(),anyInt(),(PhenotypicType) anyObject())).thenReturn(null);
 		when(ontologyDataManager.getStandardVariable(8150)).thenReturn(studyStdVar);
@@ -327,6 +335,10 @@ public class BreedingViewServiceTest {
 		when(studyDataManager.getStudy(anyInt())).thenReturn(study);
 		when(studyDataManager.addDataSet(anyInt(), (VariableTypeList) anyObject(), (DatasetValues) anyObject(), anyString())).thenReturn(new DatasetReference(4, EMPTY_VALUE));
 		when(studyDataManager.getStocksInDataset(anyInt())).thenReturn(stocks);
+		
+		DmsProject testProject = new DmsProject();
+		testProject.setProgramUUID(UUID.randomUUID().toString());
+		when(studyDataManager.getProject(Mockito.anyInt())).thenReturn(testProject);
 		
 		when(ontologyDataManager.addMethod(anyString(), anyString())).thenReturn(lsMean);
 		when(ontologyDataManager.getStandardVariableIdByPropertyScaleMethodRole(anyInt(),anyInt(),anyInt(),(PhenotypicType) anyObject())).thenReturn(null);
