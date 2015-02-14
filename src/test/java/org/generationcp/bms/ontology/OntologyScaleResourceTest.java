@@ -55,11 +55,11 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 
         List<Scale> scaleList = new ArrayList<>();
 
-        Scale scale = new ScaleBuilder()
+        Scale scale = new Builder()
                 .id(1)
                 .name("scaleName")
                 .definition("scaleDefinition")
-                .build();
+                .buildScale();
 
         scaleList.add(scale);
 
@@ -78,11 +78,11 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
     public void getScaleById() throws Exception{
 
         String cropName = "rice";
-        Scale scale = new ScaleBuilder()
+        Scale scale = new Builder()
                 .id(1)
                 .name("scaleName")
                 .definition("scaleDefinition")
-                .build();
+                .buildScale();
 
         Mockito.doReturn(scale).when(ontologyService).getScale(1);
 
@@ -99,11 +99,11 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
     public void getScaleByFilter() throws Exception{
 
         String cropName = "rice";
-        Scale scale = new ScaleBuilder()
+        Scale scale = new Builder()
                 .id(1)
                 .name("scaleName")
                 .definition("scaleDefinition")
-                .build();
+                .buildScale();
 
         Mockito.doReturn(scale).when(ontologyService).getScale("scaleName");
 

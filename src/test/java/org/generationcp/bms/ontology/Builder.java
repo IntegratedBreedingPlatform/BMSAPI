@@ -3,30 +3,30 @@ package org.generationcp.bms.ontology;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.Scale;
 
-public class ScaleBuilder {
+public class Builder {
 
     private Term term;
 
-    public ScaleBuilder(){
+    public Builder(){
         term = new Term();
     }
 
-    public ScaleBuilder id(int id) {
+    public Builder id(int id) {
         term.setId(id);
         return this;
     }
 
-    public ScaleBuilder name(String name) {
+    public Builder name(String name) {
         term.setName(name);
         return this;
     }
 
-    public ScaleBuilder definition(String definition) {
+    public Builder definition(String definition) {
         term.setDefinition(definition);
         return this;
     }
 
-    public Scale build(){
+    public Scale buildScale(){
         return new Scale(term);
     }
 }
