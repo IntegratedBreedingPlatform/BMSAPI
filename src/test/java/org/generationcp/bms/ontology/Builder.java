@@ -2,6 +2,7 @@ package org.generationcp.bms.ontology;
 
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.oms.Method;
 
 public class Builder {
 
@@ -28,5 +29,9 @@ public class Builder {
 
     public Scale buildScale(){
         return new Scale(term);
+    }
+
+    public Method buildMethod(){
+        return new Method(term);
     }
 }
