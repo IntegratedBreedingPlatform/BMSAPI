@@ -27,6 +27,16 @@ public class Builder {
         return this;
     }
 
+    public Builder vocabularyId(int vocabularyId) {
+        term.setVocabularyId(vocabularyId);
+        return this;
+    }
+
+    public Builder obsolete(boolean obsolete) {
+        term.setObsolete(obsolete);
+        return this;
+    }
+
     public Scale buildScale(){
         return new Scale(term);
     }
