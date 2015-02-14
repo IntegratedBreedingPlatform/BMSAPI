@@ -45,4 +45,14 @@ public class ContextResolverImpl implements ContextResolver {
 		}
 		throw new ContextResolutionException("Unable to resolve program in context.");
 	}
+
+    @Override
+    public String resolveDatabaseFromUrl() throws ContextResolutionException {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String requestURL = request.getRequestURI();
+        int a = requestURL.indexOf("/");
+        int b = requestURL.indexOf("/", a + 1);
+        String dbName = requestURL.substring(b + 1, requestURL.indexOf("/", b + 1));
+        return String.format("ibdbv2_%s_merged", dbName.trim().toLowerCase().replaceAll("\\s+", "_"));
+    }
 }

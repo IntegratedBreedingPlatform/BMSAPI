@@ -5,4 +5,5 @@ import org.generationcp.middleware.pojos.workbench.Project;
 public interface ContextResolver {
 	
 	Project resolveProgram() throws ContextResolutionException;
+    String resolveDatabaseFromUrl() throws ContextResolutionException;
 }

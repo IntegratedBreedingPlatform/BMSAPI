@@ -51,7 +51,7 @@ public class MiddlewareFactory {
 	
 	private SessionFactory getSessionFactory() throws FileNotFoundException {
 		String selectedCropDB = getCurrentlySelectedCropDBName();
-		SessionFactory sessionFactory;
+        SessionFactory sessionFactory;
 
 		if (this.sessionFactoryCache.get(selectedCropDB) == null) {
 			DatabaseConnectionParameters connectionParams = new DatabaseConnectionParameters(
@@ -65,7 +65,8 @@ public class MiddlewareFactory {
 	}
 	
 	private String getCurrentlySelectedCropDBName() {
-		return this.contextResolver.resolveProgram().getDatabaseName();
+        //return this.contextResolver.resolveProgram().getDatabaseName();
+        return this.contextResolver.resolveDatabaseFromUrl();
 	}
 	
 	@Bean
