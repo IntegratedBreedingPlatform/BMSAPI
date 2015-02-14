@@ -1,16 +1,12 @@
 package org.generationcp.bms.ontology;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.*;
+import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.service.api.OntologyService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Set;
@@ -22,33 +18,35 @@ import java.util.Set;
 
 @Api(value = "Ontology Variable Service")
 @Controller
-@RequestMapping("/ontology/variables")
+@RequestMapping("/ontology")
 public class OntologyVariableResource {
 	
 	@Autowired
 	private OntologyService ontologyService;
-	
+
 	@ApiOperation(value = "All variables", notes = "Gets all standard variables.")
-	@RequestMapping(value = "/", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropname}/variables/list", method = RequestMethod.GET)
 	@ResponseBody
-	public Set<StandardVariable> listAllStandardVariables() throws MiddlewareQueryException {
-		Set<StandardVariable> allVariables = ontologyService.getAllStandardVariables();
+	public Set<StandardVariable> listAllStandardVariables(@PathVariable String  cropname) throws MiddlewareQueryException {
+        Set<StandardVariable> allVariables = ontologyService.getAllStandardVariables();
 		return allVariables;
 	}
 
 	@ApiOperation(value = "All variables by property id", notes = "Get all standard variables using given property id")
-	@RequestMapping(value = "/property/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropname}/variables/property/{id}", method = RequestMethod.GET)
 	@ResponseBody
-	public List<StandardVariable> listAllStandardVariablesByPropertyId(@PathVariable Integer id) throws MiddlewareQueryException {
-		List<StandardVariable> variables = ontologyService.getStandardVariablesByProperty(id);
-		return variables;
+	public List<StandardVariable> listAllStandardVariablesByPropertyId(@PathVariable Integer id, @PathVariable String  cropname) throws MiddlewareQueryException {
+
+        List<StandardVariable> variables = ontologyService.getStandardVariablesByProperty(id);
+        return variables;
 	}
 
     @ApiOperation(value = "All variables by search term", notes = "Get all standard variables using search term")
-    @RequestMapping(value = "/filter/{text}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{cropname}/variables/filter/{text}", method = RequestMethod.GET)
     @ResponseBody
-    public List<StandardVariable> listAllStandardVariablesByFilter(@PathVariable String text) throws MiddlewareQueryException {
+    public List<StandardVariable> listAllStandardVariablesByFilter(@PathVariable String text, @PathVariable String  cropname) throws MiddlewareQueryException {
         List<StandardVariable> variables = ontologyService.getStandardVariables(text);
         return variables;
     }
+
 }
