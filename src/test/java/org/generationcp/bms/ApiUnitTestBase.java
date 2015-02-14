@@ -33,14 +33,12 @@ public class ApiUnitTestBase {
 
     @Before
     public void setUp() throws Exception {
-        System.out.println("called setup");
         MockitoAnnotations.initMocks(this);
         mockMvc = webAppContextSetup(webApplicationContext).build();
     }
 
     @After
     public void tearDown() throws Exception{
-        System.out.println("called tearDown");
         mockMvc = null;
     }
 
