@@ -15,11 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.ibpworkbench.exceptions.IBPWebServiceException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 public interface BreedingViewService {
 
     void execute(Map<String, String> params, List<String> errors) throws IBPWebServiceException;
-
-    void deleteDataSet(Integer dataSetId) throws MiddlewareQueryException;
+    
 }

@@ -200,33 +200,5 @@ public class BreedingView {
         }
         return response;
     }
-
-    @GET
-    @Path("/ssa/delete_dataset")
-    @ApiOperation(value = "Delete the dataset", notes = "", response = DataResponse.class)
-    @Produces(MediaType.TEXT_XML)
-    public DataResponse deleteDataSet(@QueryParam("dataSetId") Integer dataSetId) {
-    	try {
-    		
-			breedingViewService.deleteDataSet(dataSetId);
-			managerFactoryProvider.close();
-	       
-			 return new DataResponse(true, "Successfully deleted the dataset");
-		} catch (Exception e) {
-		    LOG.debug(e.getMessage(), e);
-			return new DataResponse(false, "Dataset not deleted: " + e.toString());
-		}
-    	
-    	
-       
-    }
     
-    @GET
-    @Path("/test")
-    @Produces("text/plain")
-    public String test() {
-        return "WebService for BreedingView has been setup properly.";
-    }
-    
-   
 }
