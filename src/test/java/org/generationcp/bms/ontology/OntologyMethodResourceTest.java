@@ -107,7 +107,6 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 
         String cropName = "maize";
 
-        //TODO: check editable and deletable fields.
         mockMvc.perform(get("/ontology/{cropname}/methods/{id}",cropName, 1).contentType(contentType))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
