@@ -2,19 +2,17 @@ package org.generationcp.bms.ontology;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import org.generationcp.bms.ontology.dto.incoming.AddMethodRequest;
+import org.generationcp.bms.ontology.dto.outgoing.GenericAddResponse;
 import org.generationcp.bms.ontology.dto.outgoing.MethodSummary;
 import org.generationcp.bms.ontology.dto.outgoing.MethodResponse;
 import org.generationcp.bms.ontology.services.IOntologyModelService;
-import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 
@@ -45,4 +43,14 @@ public class OntologyMethodResource {
         }
 		return new ResponseEntity<>(method, HttpStatus.OK);
 	}
+
+    //TODO: 403 response for user without permission
+    @ApiOperation(value = "Add Method", notes = "Add a Method using Given Data")
+    @RequestMapping(value = "/{cropname}/methods", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<GenericAddResponse> addMethod(@PathVariable String  cropname, @RequestBody AddMethodRequest request) throws MiddlewareQueryException {
+        if(!request.validate()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        GenericAddResponse response = ontologyModelService.addMethod(request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 }

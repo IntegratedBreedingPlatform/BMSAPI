@@ -1,5 +1,7 @@
 package org.generationcp.bms.ontology.services.impl;
 
+import org.generationcp.bms.ontology.dto.incoming.AddMethodRequest;
+import org.generationcp.bms.ontology.dto.outgoing.GenericAddResponse;
 import org.generationcp.bms.ontology.dto.outgoing.MethodSummary;
 import org.generationcp.bms.ontology.dto.outgoing.MethodResponse;
 import org.generationcp.bms.ontology.services.IOntologyModelService;
@@ -44,4 +46,9 @@ public class OntologyModelService implements IOntologyModelService {
         return mapper.map(method, MethodResponse.class);
     }
 
+    @Override
+    public GenericAddResponse addMethod(AddMethodRequest request) throws MiddlewareQueryException {
+        Method method = ontologyService.addMethod(request.getName(), request.getDescription());
+        return new GenericAddResponse(method.getId());
+    }
 }

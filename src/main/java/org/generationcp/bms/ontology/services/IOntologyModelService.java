@@ -1,6 +1,8 @@
 package org.generationcp.bms.ontology.services;
 
 
+import org.generationcp.bms.ontology.dto.incoming.AddMethodRequest;
+import org.generationcp.bms.ontology.dto.outgoing.GenericAddResponse;
 import org.generationcp.bms.ontology.dto.outgoing.MethodResponse;
 import org.generationcp.bms.ontology.dto.outgoing.MethodSummary;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -11,4 +13,5 @@ public interface IOntologyModelService {
 
     public List<MethodSummary> getAllMethods() throws MiddlewareQueryException;
     public MethodResponse getMethod(Integer id) throws MiddlewareQueryException;
+    public GenericAddResponse addMethod(AddMethodRequest method) throws MiddlewareQueryException;
 }

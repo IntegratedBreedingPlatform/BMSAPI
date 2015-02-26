@@ -20,8 +20,15 @@ public class AddMethodRequest {
     public void setDescription(String description) {
         this.description = description;
     }
-
+  
     public String toString() {
         return "Method [name=" + this.getName() + ", description=" + this.getDescription() + "]";
+    }
+
+    public boolean validate(){
+        if(this.getName().isEmpty() || this.getDescription().isEmpty()){
+            return false;
+        }
+        return true;
     }
 }
