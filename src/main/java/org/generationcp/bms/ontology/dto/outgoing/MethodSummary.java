@@ -1,6 +1,6 @@
 package org.generationcp.bms.ontology.dto.outgoing;
 
-public class MethodDTO {
+public class MethodSummary {
     
     private Integer id;
     private String name;

@@ -1,6 +1,6 @@
 package org.generationcp.bms.ontology;
 
-import org.generationcp.bms.ontology.dto.outgoing.MethodDTO;
+import org.generationcp.bms.ontology.dto.outgoing.MethodSummary;
 import org.generationcp.bms.ontology.services.OntologyMapper;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Term;
@@ -23,11 +23,11 @@ public class OntologyMapperTest {
 
         ModelMapper mapper = OntologyMapper.methodMapper();
 
-        MethodDTO methodDTO = mapper.map(method, MethodDTO.class);
+        MethodSummary methodSummary = mapper.map(method, MethodSummary.class);
         
-        Assert.assertEquals((long) method.getId(), (long) methodDTO.getId());
-        Assert.assertEquals(method.getName(), methodDTO.getName());
-        Assert.assertEquals(method.getDefinition(), methodDTO.getDescription());
+        Assert.assertEquals((long) method.getId(), (long) methodSummary.getId());
+        Assert.assertEquals(method.getName(), methodSummary.getName());
+        Assert.assertEquals(method.getDefinition(), methodSummary.getDescription());
         
     }
 

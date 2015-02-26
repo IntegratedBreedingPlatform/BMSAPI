@@ -1,6 +1,7 @@
 package org.generationcp.bms.ontology.services.impl;
 
-import org.generationcp.bms.ontology.dto.outgoing.MethodDTO;
+import org.generationcp.bms.ontology.dto.outgoing.MethodSummary;
+import org.generationcp.bms.ontology.dto.outgoing.MethodResponse;
 import org.generationcp.bms.ontology.services.IOntologyModelService;
 import org.generationcp.bms.ontology.services.OntologyMapper;
 import org.generationcp.middleware.domain.oms.Method;
@@ -21,17 +22,26 @@ public class OntologyModelService implements IOntologyModelService {
     private OntologyService ontologyService;
 
     @Override
-    public List<MethodDTO> getAllMethods() throws MiddlewareQueryException {
+    public List<MethodSummary> getAllMethods() throws MiddlewareQueryException {
 
         List<Method> methodList = ontologyService.getAllMethods();
-        List<MethodDTO> methods = new ArrayList<>();
+        List<MethodSummary> methods = new ArrayList<>();
 
         ModelMapper mapper = OntologyMapper.methodMapper();
 
         for (Method method : methodList){
-            MethodDTO methodDTO = mapper.map(method, MethodDTO.class);
-            methods.add(methodDTO);
+            MethodSummary methodSummary = mapper.map(method, MethodSummary.class);
+            methods.add(methodSummary);
         }
         return methods;
     }
+
+    @Override
+    public MethodResponse getMethod(Integer id) throws MiddlewareQueryException {
+        Method method = ontologyService.getMethod(id);
+        if(method == null) return null;
+        ModelMapper mapper = OntologyMapper.methodMapper();
+        return mapper.map(method, MethodResponse.class);
+    }
+
 }

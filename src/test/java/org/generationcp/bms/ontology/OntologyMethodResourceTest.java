@@ -73,4 +73,28 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 
         verify(ontologyService, times(1)).getAllMethods();
     }
+
+    /**
+     * Get a method with id. It should respond with 200 and method data.
+     * * *
+     * @throws Exception
+     */
+    @Test
+    public void getMethodById() throws Exception{
+
+        String cropName = "maize";
+        Method method = new MethodBuilder().build(1, "m1", "d1");
+
+        Mockito.doReturn(method).when(ontologyService).getMethod(1);
+
+        //TODO: check editable and deletable fields.
+        mockMvc.perform(get("/ontology/{cropname}/methods/{id}",cropName, 1).contentType(contentType)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is(method.getName())))
+                .andExpect(jsonPath("$.description", is(method.getDefinition())))
+                .andDo(print());
+
+        verify(ontologyService, times(1)).getMethod(1);
+    }
+
 }
