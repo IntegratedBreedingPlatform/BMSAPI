@@ -97,4 +97,22 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
         verify(ontologyService, times(1)).getMethod(1);
     }
 
+    /**
+     * This test should expect 400
+     * * *
+     * @throws Exception
+     */
+    @Test
+    public void getMethodById_Should_Respond_With_400_For_Invalid_Id() throws Exception{
+
+        String cropName = "maize";
+
+        //TODO: check editable and deletable fields.
+        mockMvc.perform(get("/ontology/{cropname}/methods/{id}",cropName, 1).contentType(contentType))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+        verify(ontologyService, times(1)).getMethod(1);
+    }
+
 }
