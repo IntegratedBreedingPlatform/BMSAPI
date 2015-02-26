@@ -2,6 +2,8 @@ package org.generationcp.bms.ontology;
 
 import org.generationcp.bms.ApiUnitTestBase;
 import org.generationcp.bms.ontology.builders.MethodBuilder;
+import org.generationcp.bms.ontology.dto.incoming.AddMethodRequest;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.service.api.OntologyService;
 
@@ -13,8 +15,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 import org.mockito.Mockito;
 
@@ -22,6 +24,7 @@ import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.*;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -112,6 +115,32 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
                 .andDo(print());
 
         verify(ontologyService, times(1)).getMethod(1);
+    }
+
+    /**
+     * This test should expect 201 : Created*
+     * @throws Exception
+     */
+    @Test
+    public void addMethod() throws Exception {
+
+        String cropName = "maize";
+
+        AddMethodRequest methodDTO = new AddMethodRequest();
+        methodDTO.setName("methodName");
+        methodDTO.setDescription("methodDescription");
+
+        Method method = new Method(new Term(10, methodDTO.getName(), methodDTO.getDescription()));
+
+        Mockito.doReturn(method).when(ontologyService).addMethod(methodDTO.getName(), methodDTO.getDescription());
+
+        mockMvc.perform(post("/ontology/{cropname}/methods",cropName)
+                .contentType(contentType).content(convertObjectToByte(methodDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", is(10)))
+                .andDo(print());
+
+        verify(ontologyService, times(1)).addMethod(methodDTO.getName(), methodDTO.getDescription());
     }
 
 }

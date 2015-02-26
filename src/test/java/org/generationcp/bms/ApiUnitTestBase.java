@@ -1,5 +1,8 @@
 package org.generationcp.bms;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -40,6 +43,11 @@ public class ApiUnitTestBase {
     @After
     public void tearDown() throws Exception{
         mockMvc = null;
+    }
+
+    public byte[] convertObjectToByte(Object object) throws JsonProcessingException {
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        return ow.writeValueAsBytes(object);
     }
 
 }
