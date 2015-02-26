@@ -1,8 +1,10 @@
 package org.generationcp.bms.ontology;
 
 import org.generationcp.bms.ApiUnitTestBase;
+import org.generationcp.bms.ontology.builders.MethodBuilder;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.service.api.OntologyService;
+
 import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;
@@ -15,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mockito.Mockito;
+
+import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.*;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -51,67 +55,22 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
     @Test
     public void listAllMethods() throws Exception {
 
-        String cropName = "rice";
+        String cropName = "maize";
 
         List<Method> methodList = new ArrayList<>();
-        Method method = new Builder()
-                .id(1)
-                .name("methodName")
-                .definition("methodName")
-                .buildMethod();
-
-        methodList.add(method);
+        methodList.add(new MethodBuilder().build(1, "m1", "d1"));
+        methodList.add(new MethodBuilder().build(2, "m2", "d2"));
+        methodList.add(new MethodBuilder().build(3, "m3", "d3"));
 
         Mockito.doReturn(methodList).when(ontologyService).getAllMethods();
 
         mockMvc.perform(get("/ontology/{cropname}/methods/list", cropName).contentType(contentType)).andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(methodList.size())))
                 .andExpect(jsonPath("$[0].id", is(1)))
                 .andExpect(jsonPath("$[0].name", is(methodList.get(0).getName())))
-                .andExpect(jsonPath("$[0].definition", is(methodList.get(0).getDefinition())))
+                .andExpect(jsonPath("$[0].description", is(methodList.get(0).getDefinition())))
                 .andDo(print());
 
         verify(ontologyService, times(1)).getAllMethods();
-    }
-
-    @Test
-    public void getMethodById() throws Exception{
-
-        String cropName = "rice";
-        Method method = new Builder()
-                .id(1)
-                .name("methodName")
-                .definition("methodName")
-                .buildMethod();
-
-        Mockito.doReturn(method).when(ontologyService).getMethod(1);
-
-        mockMvc.perform(get("/ontology/{cropname}/methods/{id}",cropName, 1).contentType(contentType)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is(method.getName())))
-                .andExpect(jsonPath("$.definition", is(method.getDefinition())))
-                .andDo(print());
-
-        verify(ontologyService, times(1)).getMethod(1);
-    }
-
-    @Test
-    public void getMethodByName() throws Exception{
-
-        String cropName = "rice";
-        Method method = new Builder()
-                .id(1)
-                .name("methodName")
-                .definition("methodName")
-                .buildMethod();
-
-        Mockito.doReturn(method).when(ontologyService).getMethod("methodName");
-
-        mockMvc.perform(get("/ontology/{cropname}/methods/filter/{name}",cropName, "methodName").contentType(contentType)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is(method.getName())))
-                .andExpect(jsonPath("$.definition", is(method.getDefinition())))
-                .andDo(print());
-
-        verify(ontologyService, times(1)).getMethod("methodName");
     }
 }

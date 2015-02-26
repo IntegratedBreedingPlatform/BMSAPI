@@ -1,6 +1,7 @@
 package org.generationcp.bms.ontology;
 
 import org.generationcp.bms.ApiUnitTestBase;
+import org.generationcp.bms.ontology.builders.ScaleBuilder;
 import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.junit.Test;
@@ -55,11 +56,7 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 
         List<Scale> scaleList = new ArrayList<>();
 
-        Scale scale = new Builder()
-                .id(1)
-                .name("scaleName")
-                .definition("scaleDefinition")
-                .buildScale();
+        Scale scale = new ScaleBuilder().build(1, "scaleName", "scaleDefinition");
 
         scaleList.add(scale);
 
@@ -78,11 +75,7 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
     public void getScaleById() throws Exception{
 
         String cropName = "rice";
-        Scale scale = new Builder()
-                .id(1)
-                .name("scaleName")
-                .definition("scaleDefinition")
-                .buildScale();
+        Scale scale = new ScaleBuilder().build(1, "scaleName", "scaleDefinition");
 
         Mockito.doReturn(scale).when(ontologyService).getScale(1);
 
@@ -99,12 +92,7 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
     public void getScaleByFilter() throws Exception{
 
         String cropName = "rice";
-        Scale scale = new Builder()
-                .id(1)
-                .name("scaleName")
-                .definition("scaleDefinition")
-                .buildScale();
-
+        Scale scale = new ScaleBuilder().build(1, "scaleName", "scaleDefinition");
         Mockito.doReturn(scale).when(ontologyService).getScale("scaleName");
 
         mockMvc.perform(get("/ontology/{cropname}/scales/filter/{text}",cropName, "scaleName").contentType(contentType)).andExpect(status().isOk())
