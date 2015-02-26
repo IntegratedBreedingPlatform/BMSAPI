@@ -31,6 +31,10 @@ public class MethodResponse extends MethodSummary {
     }
     
     public String toString() {
-        return "Method [id=" + this.getId() + ", name=" + this.getName() + ", description=" + this.getDescription() + "]";
+        return "Method [id=" + this.getId() 
+                + ", name=" + this.getName() 
+                + ", description=" + this.getDescription() 
+                + ", editableFields=" + this.editableFields.toString() 
+                + ", deletable=" + this.getDeletable() + "]";
     }
 }
