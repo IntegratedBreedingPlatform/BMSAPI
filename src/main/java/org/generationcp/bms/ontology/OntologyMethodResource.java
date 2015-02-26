@@ -41,12 +41,4 @@ public class OntologyMethodResource {
 		Method method = ontologyService.getMethod(id);
 		return method;
 	}
-
-    @ApiOperation(value = "Get method by name", notes = "Get method given method name")
-    @RequestMapping(value = "/{cropname}/methods/filter/{name}", method = RequestMethod.GET)
-    @ResponseBody
-    public Method getMethodByName(@PathVariable String  cropname, @PathVariable String name) throws MiddlewareQueryException {
-        Method method = ontologyService.getMethod(name);
-        return method;
-    }
 }
