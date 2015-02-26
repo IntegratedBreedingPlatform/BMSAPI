@@ -1,15 +1,16 @@
 package org.generationcp.bms.ontology.services;
 
 
-import org.generationcp.bms.ontology.dto.outgoing.MethodResponse;
 import org.generationcp.bms.ontology.dto.outgoing.MethodSummary;
+import org.generationcp.bms.ontology.dto.outgoing.MethodResponse;
+import org.generationcp.bms.ontology.dto.outgoing.PropertySummary;
 import org.generationcp.middleware.domain.oms.Method;
+import org.generationcp.middleware.domain.oms.Property;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.ArrayList;
 
 public class OntologyMapper {
 
@@ -58,6 +59,33 @@ public class OntologyMapper {
         ModelMapper mapper = new ModelMapper();
         mapper.addMappings(methodMap);
         mapper.addMappings(methodResponseMap);
+        return mapper;
+    }
+
+
+    /**
+     * Custom Mapping for Middleware Property Class to PropertySummary
+     * Definition to Description Mapping
+     */
+    public static PropertyMap<Property, PropertySummary> propertyMap = new PropertyMap<Property, PropertySummary>() {
+
+        @Override
+        protected void configure() {
+            map().setId(source.getId());
+            map().setName(source.getName());
+            map().setDescription(source.getDefinition());
+            map().setCropOntologyId(source.getCropOntologyId());
+            map().setClasses(new ArrayList<>(Arrays.asList("Abiotic Stress","Trait")));
+        }
+    };
+
+    /**
+     * Customise Mapped property 'propertyMap' is Initialize in Mapper and Returned
+     * @return ModelMapper Instance
+     */
+    public static ModelMapper propertyMapper(){
+        ModelMapper mapper = new ModelMapper();
+        mapper.addMappings(propertyMap);
         return mapper;
     }
 }

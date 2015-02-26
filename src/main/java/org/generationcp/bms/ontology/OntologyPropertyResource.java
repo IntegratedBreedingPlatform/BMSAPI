@@ -1,7 +1,7 @@
 package org.generationcp.bms.ontology;
 
-import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.service.api.OntologyService;
+import org.generationcp.bms.ontology.dto.outgoing.PropertySummary;
+import org.generationcp.bms.ontology.services.IOntologyModelService;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -14,48 +14,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 
-/**
- * Author: Sunny
- * Created Date: 2 Feb 2015
- */
 
 @Api(value = "Ontology Property Service")
 @Controller
-@RequestMapping("/ontology/properties")
+@RequestMapping("/ontology")
 public class OntologyPropertyResource {
-	
-	@Autowired
-	private OntologyService ontologyService;
+
+    @Autowired
+    private IOntologyModelService ontologyModelService;
 	
 	@ApiOperation(value = "All properties", notes = "Get all properties")
-	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropname}/properties/list", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Property> listAllProperty() throws MiddlewareQueryException {
-		List<Property> propertyList = ontologyService.getAllProperties();
-		return propertyList;
+	public List<PropertySummary> listAllProperty(@PathVariable String  cropname) throws MiddlewareQueryException {
+        return ontologyModelService.getAllProperties();
 	}
 
-    @ApiOperation(value = "Property By Id", notes = "Get Property By Id")
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    @ResponseBody
-    public Property getPropertyById(@PathVariable Integer id) throws MiddlewareQueryException {
-        Property property = ontologyService.getProperty(id);
-        return property;
-    }
-
-    @ApiOperation(value = "Property By Filter", notes = "Get Property By Filter Text")
-    @RequestMapping(value = "/filter/{text}", method = RequestMethod.GET)
-    @ResponseBody
-    public Property getPropertyByFilter(@PathVariable String text) throws MiddlewareQueryException {
-        Property property = ontologyService.getProperty(text);
-        return property;
-    }
-
-    @ApiOperation(value = "Properties With Trait Class", notes = "Get All Properties with Trait Class")
-    @RequestMapping(value = "/class/list", method = RequestMethod.GET)
-    @ResponseBody
-    public List<Property> listPropertiesByClass() throws MiddlewareQueryException {
-        List<Property> propertyList = ontologyService.getAllPropertiesWithTraitClass();
-        return propertyList;
-    }
 }

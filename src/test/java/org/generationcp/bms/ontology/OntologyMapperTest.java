@@ -1,8 +1,10 @@
 package org.generationcp.bms.ontology;
 
 import org.generationcp.bms.ontology.dto.outgoing.MethodSummary;
+import org.generationcp.bms.ontology.dto.outgoing.PropertySummary;
 import org.generationcp.bms.ontology.services.OntologyMapper;
 import org.generationcp.middleware.domain.oms.Method;
+import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.junit.Assert;
 import org.modelmapper.ModelMapper;
@@ -12,8 +14,7 @@ import org.junit.Test;
 public class OntologyMapperTest {
 
     @Test
-    public void shouldMapHashMapToFoo()
-    {
+    public void methodMapperTest(){
         Term term = new Term();
         term.setId(1);
         term.setName("name");
@@ -31,4 +32,23 @@ public class OntologyMapperTest {
         
     }
 
+    @Test
+    public void propertyMapperTest(){
+        Term term = new Term();
+
+        term.setId(1);
+        term.setName("name");
+        term.setDefinition("definition");
+
+        Property property = new Property(term);
+
+        ModelMapper mapper = OntologyMapper.propertyMapper();
+
+        PropertySummary propertySummary = mapper.map(property, PropertySummary.class);
+
+        Assert.assertEquals((long) property.getId(), (long) propertySummary.getId());
+        Assert.assertEquals(property.getName(), propertySummary.getName());
+        Assert.assertEquals(property.getDefinition(), propertySummary.getDescription());
+        
+    }
 }

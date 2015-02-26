@@ -3,10 +3,12 @@ package org.generationcp.bms.ontology.services.impl;
 import org.generationcp.bms.ontology.services.OntologyMapper;
 import org.generationcp.bms.ontology.dto.outgoing.MethodSummary;
 import org.generationcp.bms.ontology.dto.outgoing.MethodResponse;
+import org.generationcp.bms.ontology.dto.outgoing.PropertySummary;
 import org.generationcp.bms.ontology.dto.incoming.AddMethodRequest;
 import org.generationcp.bms.ontology.services.IOntologyModelService;
 import org.generationcp.bms.ontology.dto.outgoing.GenericAddResponse;
 import org.generationcp.middleware.domain.oms.Method;
+import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.modelmapper.ModelMapper;
@@ -50,5 +52,19 @@ public class OntologyModelService implements IOntologyModelService {
     public GenericAddResponse addMethod(AddMethodRequest request) throws MiddlewareQueryException {
         Method method = ontologyService.addMethod(request.getName(), request.getDescription());
         return new GenericAddResponse(method.getId());
+    }
+
+    @Override
+    public List<PropertySummary> getAllProperties() throws MiddlewareQueryException {
+        List<Property> propertyList = ontologyService.getAllProperties();
+        List<PropertySummary> properties = new ArrayList<>();
+
+        ModelMapper mapper = OntologyMapper.propertyMapper();
+
+        for (Property property : propertyList){
+            PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
+            properties.add(propertyDTO);
+        }
+        return properties;
     }
 }
