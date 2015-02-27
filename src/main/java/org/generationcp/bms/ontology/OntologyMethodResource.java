@@ -7,6 +7,7 @@ import org.generationcp.bms.ontology.dto.outgoing.MethodResponse;
 import org.generationcp.bms.ontology.dto.incoming.AddMethodRequest;
 import org.generationcp.bms.ontology.services.IOntologyModelService;
 import org.generationcp.bms.ontology.dto.outgoing.GenericAddResponse;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,5 +53,15 @@ public class OntologyMethodResource {
         if(!request.validate()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         GenericAddResponse response = ontologyModelService.addMethod(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    //TODO: 403 response for user without permission, Check if fields are editable or not
+    @ApiOperation(value = "Update Method", notes = "Update Method using Given Data")
+    @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
+    @ResponseBody
+    public ResponseEntity updateMethod(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody AddMethodRequest request) throws MiddlewareQueryException, MiddlewareException {
+        if(!request.validate()) return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        ontologyModelService.updateMethod(id, request);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

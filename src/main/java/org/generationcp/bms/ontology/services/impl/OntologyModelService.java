@@ -7,6 +7,7 @@ import org.generationcp.bms.ontology.services.IOntologyModelService;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.modelmapper.ModelMapper;
@@ -50,6 +51,12 @@ public class OntologyModelService implements IOntologyModelService {
     public GenericAddResponse addMethod(AddMethodRequest request) throws MiddlewareQueryException {
         Method method = ontologyService.addMethod(request.getName(), request.getDescription());
         return new GenericAddResponse(method.getId());
+    }
+
+    @Override
+    public void updateMethod(Integer id, AddMethodRequest request) throws MiddlewareQueryException, MiddlewareException {
+        Method method = new Method(new Term(id, request.getName(), request.getDescription()));
+        ontologyService.updateMethod(method);
     }
 
     @Override

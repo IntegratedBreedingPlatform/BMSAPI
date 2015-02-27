@@ -5,11 +5,13 @@ import org.generationcp.bms.ontology.builders.MethodBuilder;
 import org.generationcp.bms.ontology.dto.incoming.AddMethodRequest;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.Method;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyService;
 
 import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;
+import org.mockito.ArgumentCaptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Configuration;
@@ -21,10 +23,10 @@ import java.util.ArrayList;
 import org.mockito.Mockito;
 
 import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -143,4 +145,39 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
         verify(ontologyService, times(1)).addMethod(methodDTO.getName(), methodDTO.getDescription());
     }
 
+    /**
+     * This test should expect 204 : No Content
+     * @throws Exception
+     */
+    @Test
+    public void updateMethod() throws Exception {
+
+        String cropName = "maize";
+
+        AddMethodRequest methodDTO = new AddMethodRequest();
+        methodDTO.setName("methodName");
+        methodDTO.setDescription("methodDescription");
+
+        Method method = new Method(new Term(10, methodDTO.getName(), methodDTO.getDescription()));
+
+        /**
+         * We Need equals method inside Method (Middleware) because it throws hashcode matching error.
+         * So Added ArgumentCaptor that will implement equals()
+         */
+        ArgumentCaptor<Method> captor = ArgumentCaptor.forClass(Method.class);
+
+        Mockito.doNothing().when(ontologyService).updateMethod(any(Method.class));
+
+        mockMvc.perform(put("/ontology/{cropname}/methods/{id}", cropName, method.getId())
+                .contentType(contentType).content(convertObjectToByte(methodDTO)))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+
+        verify(ontologyService).updateMethod(captor.capture());
+
+        Method captured = captor.getValue();
+
+        assertEquals(method.getName(), captured.getName());
+        assertEquals(method.getDefinition(), captured.getDefinition());
+    }
 }
