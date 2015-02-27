@@ -1,14 +1,12 @@
 package org.generationcp.bms.ontology.services.impl;
 
+import org.generationcp.bms.ontology.dto.outgoing.*;
 import org.generationcp.bms.ontology.services.OntologyMapper;
-import org.generationcp.bms.ontology.dto.outgoing.MethodSummary;
-import org.generationcp.bms.ontology.dto.outgoing.MethodResponse;
-import org.generationcp.bms.ontology.dto.outgoing.PropertySummary;
 import org.generationcp.bms.ontology.dto.incoming.AddMethodRequest;
 import org.generationcp.bms.ontology.services.IOntologyModelService;
-import org.generationcp.bms.ontology.dto.outgoing.GenericAddResponse;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.modelmapper.ModelMapper;
@@ -66,5 +64,19 @@ public class OntologyModelService implements IOntologyModelService {
             properties.add(propertyDTO);
         }
         return properties;
+    }
+
+    @Override
+    public List<DataTypeSummary> getAllDataTypes() throws MiddlewareQueryException {
+        List<Term> termList = ontologyService.getAllDataTypes();
+        List<DataTypeSummary> dataTypeSummaries = new ArrayList<>();
+
+        ModelMapper mapper = OntologyMapper.getInstance();
+
+        for(Term term : termList){
+            DataTypeSummary summary = mapper.map(term, DataTypeSummary.class);
+            dataTypeSummaries.add(summary);
+        }
+        return dataTypeSummaries;
     }
 }
