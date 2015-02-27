@@ -73,5 +73,28 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
         verify(ontologyService, times(1)).getAllProperties();
     }
 
+    /**
+     * Get a property with id. It should respond with 200 and property data.
+     * * *
+     * @throws Exception
+     */
+    @Test
+    public void getPropertyById() throws Exception{
+
+        String cropName = "maize";
+        Property property = new PropertyBuilder().build(1, "property", "description");
+
+        Mockito.doReturn(property).when(ontologyService).getProperty(1);
+
+        mockMvc.perform(get("/ontology/{cropname}/properties/{id}",cropName, property.getId()).contentType(contentType))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(property.getId())))
+                .andExpect(jsonPath("$.name", is(property.getName())))
+                .andExpect(jsonPath("$.description", is(property.getDefinition())))
+                .andDo(print());
+
+        verify(ontologyService, times(1)).getProperty(property.getId());
+    }
+
 
 }

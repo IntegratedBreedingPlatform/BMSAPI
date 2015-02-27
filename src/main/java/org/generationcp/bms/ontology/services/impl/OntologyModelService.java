@@ -79,6 +79,14 @@ public class OntologyModelService implements IOntologyModelService {
     }
 
     @Override
+    public PropertyResponse getProperty(Integer id) throws MiddlewareQueryException {
+        Property property = ontologyService.getProperty(id);
+        if (property == null) return null;
+        ModelMapper mapper = OntologyMapper.propertyMapper();
+        return mapper.map(property, PropertyResponse.class);
+    }
+
+    @Override
     public List<DataTypeSummary> getAllDataTypes() throws MiddlewareQueryException {
         List<Term> termList = ontologyService.getAllDataTypes();
         List<DataTypeSummary> dataTypeSummaries = new ArrayList<>();

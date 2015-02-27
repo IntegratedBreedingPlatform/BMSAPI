@@ -17,6 +17,7 @@ public interface IOntologyModelService {
     public void deleteMethod(Integer id) throws MiddlewareQueryException;
 
     public List<PropertySummary> getAllProperties() throws MiddlewareQueryException;
+    public PropertyResponse getProperty(Integer id) throws MiddlewareQueryException;
 
     public List<DataTypeSummary> getAllDataTypes() throws MiddlewareQueryException;
 }

@@ -3,6 +3,7 @@ package org.generationcp.bms.ontology.services;
 
 import org.generationcp.bms.ontology.dto.outgoing.MethodSummary;
 import org.generationcp.bms.ontology.dto.outgoing.MethodResponse;
+import org.generationcp.bms.ontology.dto.outgoing.PropertyResponse;
 import org.generationcp.bms.ontology.dto.outgoing.PropertySummary;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
@@ -28,7 +29,7 @@ public class OntologyMapper {
     }
 
     /**
-     * Custom Mapping for Middleware Method Class to MethodDTO
+     * Custom Mapping for Middleware Method Class to MethodSummary
      * Definition to Description Mapping
      */
     public static PropertyMap<Method, MethodSummary> methodMap = new PropertyMap<Method, MethodSummary>() {
@@ -79,6 +80,19 @@ public class OntologyMapper {
         }
     };
 
+    public static PropertyMap<Property, PropertyResponse> propertyResponseMap = new PropertyMap<Property, PropertyResponse>() {
+        @Override
+        protected void configure() {
+            map().setId(source.getId());
+            map().setName(source.getName());
+            map().setDescription(source.getDefinition());
+            map().setCropOntologyId(source.getCropOntologyId());
+            map().setClasses(new ArrayList<>(Arrays.asList("Abiotic Stress","Trait")));
+            map().setEditableFields(new ArrayList<>(Arrays.asList("description")));
+            map().setDeletable(false);
+        }
+    };
+
     /**
      * Customise Mapped property 'propertyMap' is Initialize in Mapper and Returned
      * @return ModelMapper Instance
@@ -86,6 +100,7 @@ public class OntologyMapper {
     public static ModelMapper propertyMapper(){
         ModelMapper mapper = new ModelMapper();
         mapper.addMappings(propertyMap);
+        mapper.addMappings(propertyResponseMap);
         return mapper;
     }
 }
