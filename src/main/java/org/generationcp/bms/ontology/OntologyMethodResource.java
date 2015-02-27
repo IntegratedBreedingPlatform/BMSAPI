@@ -64,4 +64,13 @@ public class OntologyMethodResource {
         ontologyModelService.updateMethod(id, request);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
+
+    //TODO: 403 response for user without permission, Check if method is deletable or not
+    @ApiOperation(value = "Delete Method", notes = "Delete Method using Given Id")
+    @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.DELETE)
+    @ResponseBody
+    public ResponseEntity deleteMethod(@PathVariable String  cropname, @PathVariable Integer id) throws MiddlewareQueryException, MiddlewareException {
+        ontologyModelService.deleteMethod(id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
 }
