@@ -10,7 +10,7 @@
 
     <properties>
         <spring-boot-version>1.0.1.RELEASE</spring-boot-version>
-        <middleware-version>4.0.0.SNAPSHOT</middleware-version>
+        <middleware-version>4.0.1.SNAPSHOT</middleware-version>
         <jsonpath.version>0.8.1</jsonpath.version>
         <modelmapper.version>0.7.3</modelmapper.version>
     </properties>

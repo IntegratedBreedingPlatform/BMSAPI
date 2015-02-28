@@ -7,6 +7,7 @@ import org.generationcp.bms.ontology.services.IOntologyModelService;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -98,5 +99,16 @@ public class OntologyModelService implements IOntologyModelService {
             dataTypeSummaries.add(summary);
         }
         return dataTypeSummaries;
+    }
+
+    @Override
+    public List<String> getAllClasses() throws MiddlewareQueryException {
+        List<TraitClassReference> traitClassReferences = ontologyService.getAllTraitClass();
+        List<String> classList = new ArrayList<>();
+
+        for (TraitClassReference traitClassReference : traitClassReferences){
+            classList.add(traitClassReference.getName());
+        }
+        return classList;
     }
 }
