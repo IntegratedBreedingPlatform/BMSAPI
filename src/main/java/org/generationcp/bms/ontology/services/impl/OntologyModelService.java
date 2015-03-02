@@ -81,7 +81,7 @@ public class OntologyModelService implements IOntologyModelService {
 
     @Override
     public PropertyResponse getProperty(Integer id) throws MiddlewareQueryException {
-        Property property = ontologyService.getProperty(id);
+        Property property = ontologyService.getPropertyById(id);
         if (property == null) return null;
         ModelMapper mapper = OntologyMapper.propertyMapper();
         return mapper.map(property, PropertyResponse.class);

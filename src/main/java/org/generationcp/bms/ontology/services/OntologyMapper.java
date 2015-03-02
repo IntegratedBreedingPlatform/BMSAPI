@@ -76,7 +76,7 @@ public class OntologyMapper {
             map().setName(source.getName());
             map().setDescription(source.getDefinition());
             map().setCropOntologyId(source.getCropOntologyId());
-            map().setClasses(new ArrayList<>(Arrays.asList("Abiotic Stress","Trait")));
+            map().setClasses(source.getClassNames());
         }
     };
 
@@ -87,7 +87,7 @@ public class OntologyMapper {
             map().setName(source.getName());
             map().setDescription(source.getDefinition());
             map().setCropOntologyId(source.getCropOntologyId());
-            map().setClasses(new ArrayList<>(Arrays.asList("Abiotic Stress","Trait")));
+            map().setClasses(source.getClassNames());
             map().setEditableFields(new ArrayList<>(Arrays.asList("description")));
             map().setDeletable(false);
         }
