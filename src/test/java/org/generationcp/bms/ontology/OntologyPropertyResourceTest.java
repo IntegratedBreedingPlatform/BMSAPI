@@ -2,6 +2,7 @@ package org.generationcp.bms.ontology;
 
 import org.generationcp.bms.ApiUnitTestBase;
 import org.generationcp.bms.ontology.builders.PropertyBuilder;
+import org.generationcp.bms.ontology.dto.incoming.AddPropertyRequest;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.service.api.OntologyService;
@@ -13,12 +14,14 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 
 import org.mockito.Mockito;
 import static org.mockito.Mockito.*;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -121,5 +124,39 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
                 .andDo(print());
 
         verify(ontologyService, times(1)).getPropertyById(1);
+    }
+
+    /**
+     * This test should expect 201 : Created*
+     * @throws Exception
+     */
+    @Test
+    public void addProperty() throws Exception {
+
+        String cropName = "maize";
+
+        List<String> classes = new ArrayList<>(Arrays.asList("Abiotic Stress"));
+
+        AddPropertyRequest propertyDTO = new AddPropertyRequest();
+        propertyDTO.setName("propertyName");
+        propertyDTO.setDescription("propertyDescription");
+        propertyDTO.setCropOntologyId("CO:000001");
+        propertyDTO.setClasses(classes);
+
+        List<Term> classList = new ArrayList<>();
+        Term term = new Term(1, "Abiotic Stress", "Description");
+        classList.add(term);
+
+        Property property = new PropertyBuilder().build(11, propertyDTO.getName(), propertyDTO.getDescription(), propertyDTO.getCropOntologyId() , classList);
+
+        Mockito.doReturn(property).when(ontologyService).addProperty(propertyDTO.getName(), propertyDTO.getDescription(), property.getCropOntologyId(), classes);
+
+        mockMvc.perform(post("/ontology/{cropname}/properties",cropName)
+                .contentType(contentType).content(convertObjectToByte(propertyDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", is(property.getId())))
+                .andDo(print());
+
+        verify(ontologyService, times(1)).addProperty(propertyDTO.getName(), propertyDTO.getDescription(), property.getCropOntologyId(), classes);
     }
 }
