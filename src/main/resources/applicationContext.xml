@@ -50,7 +50,7 @@
     </bean>
     
      <bean id="workbenchDataManager"
-        class="org.generationcp.middleware.manager.WorkbenchDataManagerImpl">
+        class="org.generationcp.middleware.manager.WorkbenchDataManagerImpl" destroy-method="close">
         <constructor-arg ref="workbenchHibernateSessionProvider" />
     </bean>
     
