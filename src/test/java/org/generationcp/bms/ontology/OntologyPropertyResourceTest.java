@@ -87,9 +87,14 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
     public void getPropertyById() throws Exception{
 
         String cropName = "maize";
-        Property property = new PropertyBuilder().build(1, "property", "description", "", null);
 
-        Mockito.doReturn(property).when(ontologyService).getProperty(1);
+        List<Term> classList = new ArrayList<>();
+        Term term = new Term(10, "Abiotic Stress", "Description");
+        classList.add(term);
+
+        Property property = new PropertyBuilder().build(1, "property", "description", "CO:000001" , classList);
+
+        Mockito.doReturn(property).when(ontologyService).getPropertyById(1);
 
         mockMvc.perform(get("/ontology/{cropname}/properties/{id}",cropName, property.getId()).contentType(contentType))
                 .andExpect(status().isOk())
@@ -98,8 +103,6 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
                 .andExpect(jsonPath("$.description", is(property.getDefinition())))
                 .andDo(print());
 
-        verify(ontologyService, times(1)).getProperty(property.getId());
+        verify(ontologyService, times(1)).getPropertyById(1);
     }
-
-
 }
