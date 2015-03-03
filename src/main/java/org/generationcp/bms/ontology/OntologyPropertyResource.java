@@ -1,5 +1,7 @@
 package org.generationcp.bms.ontology;
 
+import org.generationcp.bms.ontology.dto.incoming.AddPropertyRequest;
+import org.generationcp.bms.ontology.dto.outgoing.GenericAddResponse;
 import org.generationcp.bms.ontology.dto.outgoing.PropertySummary;
 import org.generationcp.bms.ontology.dto.outgoing.PropertyResponse;
 import org.generationcp.bms.ontology.services.IOntologyModelService;
@@ -9,11 +11,8 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 
@@ -43,5 +42,15 @@ public class OntologyPropertyResource {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(propertyResponse, HttpStatus.OK);
+    }
+
+    //TODO: 403 response for user without permission
+    @ApiOperation(value = "Add Property", notes = "Add a Property using Given Data")
+    @RequestMapping(value = "/{cropname}/properties", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<GenericAddResponse> addProperty(@PathVariable String  cropname, @RequestBody AddPropertyRequest request) throws MiddlewareQueryException {
+        if(!request.validate()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        GenericAddResponse response = ontologyModelService.addProperty(request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

@@ -3,6 +3,7 @@ package org.generationcp.bms.ontology.services;
 
 import org.generationcp.bms.ontology.dto.outgoing.*;
 import org.generationcp.bms.ontology.dto.incoming.AddMethodRequest;
+import org.generationcp.bms.ontology.dto.incoming.AddPropertyRequest;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
@@ -18,6 +19,7 @@ public interface IOntologyModelService {
 
     public List<PropertySummary> getAllProperties() throws MiddlewareQueryException;
     public PropertyResponse getProperty(Integer id) throws MiddlewareQueryException;
+    public GenericAddResponse addProperty(AddPropertyRequest request) throws MiddlewareQueryException;
 
     public List<DataTypeSummary> getAllDataTypes() throws MiddlewareQueryException;
 

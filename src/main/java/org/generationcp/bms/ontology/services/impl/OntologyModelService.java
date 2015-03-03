@@ -4,6 +4,7 @@ import org.generationcp.bms.ontology.dto.outgoing.*;
 import org.generationcp.bms.ontology.services.OntologyMapper;
 import org.generationcp.bms.ontology.dto.incoming.AddMethodRequest;
 import org.generationcp.bms.ontology.services.IOntologyModelService;
+import org.generationcp.bms.ontology.dto.incoming.AddPropertyRequest;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
@@ -84,6 +85,11 @@ public class OntologyModelService implements IOntologyModelService {
         if (property == null) return null;
         ModelMapper mapper = OntologyMapper.propertyMapper();
         return mapper.map(property, PropertyResponse.class);
+    }
+
+    @Override
+    public GenericAddResponse addProperty(AddPropertyRequest request) throws MiddlewareQueryException {
+        return new GenericAddResponse(ontologyService.addProperty(request.getName(), request.getDescription(), request.getCropOntologyId(), request.getClasses()).getId());
     }
 
     @Override
