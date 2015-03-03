@@ -1,5 +1,6 @@
 package org.generationcp.bms.ontology.dto.incoming;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AddPropertyRequest {
@@ -34,6 +35,7 @@ public class AddPropertyRequest {
     }
 
     public List<String> getClasses() {
+        if(classes == null) classes = new ArrayList<>();
         return classes;
     }
 
@@ -52,7 +54,7 @@ public class AddPropertyRequest {
     }
 
     public boolean validate(){
-        if(this.getName().isEmpty() || this.getDescription().isEmpty()){
+        if(this.getName().isEmpty() || this.getDescription().isEmpty() || this.getClasses().size() == 0){
             return false;
         }
         return true;
