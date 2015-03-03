@@ -1,8 +1,8 @@
 package org.generationcp.bms.ontology;
 
 import org.generationcp.bms.ApiUnitTestBase;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.service.api.OntologyService;
-import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;
@@ -54,20 +54,20 @@ public class OntologyClassResourceTest extends ApiUnitTestBase {
 
         String cropName = "maize";
 
-        List<TraitClassReference> referenceClassList = new ArrayList<>();
-        TraitClassReference referenceClass = new TraitClassReference(1, "Abiotic Stress");
-        referenceClassList.add(referenceClass);
-        referenceClass = new TraitClassReference(2, "Agronomic");
-        referenceClassList.add(referenceClass);
-        referenceClass = new TraitClassReference(3, "Biotic Stress");
-        referenceClassList.add(referenceClass);
+        List<Term> termList = new ArrayList<>();
+        Term term = new Term(1, "Abiotic Stress","");
+        termList.add(term);
+        term = new Term(2, "Agronomic","");
+        termList.add(term);
+        term = new Term(3, "Biotic Stress","");
+        termList.add(term);
 
-        Mockito.doReturn(referenceClassList).when(ontologyService).getAllTraitClass();
+        Mockito.doReturn(termList).when(ontologyService).getAllTraitClass();
 
         mockMvc.perform(get("/ontology/{cropname}/classes/list", cropName).contentType(contentType))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(referenceClassList.size())))
-                .andExpect(jsonPath("$[0]", is(referenceClassList.get(0).getName())))
+                .andExpect(jsonPath("$", hasSize(termList.size())))
+                .andExpect(jsonPath("$[0]", is(termList.get(0).getName())))
                 .andDo(print());
 
         verify(ontologyService, times(1)).getAllTraitClass();
