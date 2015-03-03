@@ -9,6 +9,8 @@ import org.generationcp.bms.ontology.services.IOntologyModelService;
 import org.generationcp.bms.ontology.dto.outgoing.GenericAddResponse;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,8 @@ import java.util.List;
 @Controller
 @RequestMapping("/ontology")
 public class OntologyMethodResource {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OntologyMethodResource.class);
 	
     @Autowired
     private IOntologyModelService ontologyModelService;
@@ -38,8 +42,8 @@ public class OntologyMethodResource {
 	@ResponseBody
 	public ResponseEntity<MethodResponse> getMethodById(@PathVariable String  cropname, @PathVariable Integer id) throws MiddlewareQueryException {
 		MethodResponse method = ontologyModelService.getMethod(id);
-        if(method == null)
-        {
+        if(method == null) {
+            LOGGER.error("No Valid Method Found using Id " + id);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 		return new ResponseEntity<>(method, HttpStatus.OK);
@@ -50,7 +54,10 @@ public class OntologyMethodResource {
     @RequestMapping(value = "/{cropname}/methods", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<GenericAddResponse> addMethod(@PathVariable String  cropname, @RequestBody AddMethodRequest request) throws MiddlewareQueryException {
-        if(!request.validate()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(!request.validate()){
+            LOGGER.error("Not Enough Data to Add New Method");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         GenericAddResponse response = ontologyModelService.addMethod(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -60,7 +67,10 @@ public class OntologyMethodResource {
     @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity updateMethod(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody AddMethodRequest request) throws MiddlewareQueryException, MiddlewareException {
-        if(!request.validate()) return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        if(!request.validate()) {
+            LOGGER.error("Not Enough Data to Update Existing Method");
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
         ontologyModelService.updateMethod(id, request);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

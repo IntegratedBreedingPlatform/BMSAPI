@@ -8,6 +8,8 @@ import org.generationcp.bms.ontology.services.IOntologyModelService;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,9 +24,11 @@ import java.util.List;
 @RequestMapping("/ontology")
 public class OntologyPropertyResource {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(OntologyPropertyResource.class);
+
     @Autowired
     private IOntologyModelService ontologyModelService;
-	
+
 	@ApiOperation(value = "All properties", notes = "Get all properties")
 	@RequestMapping(value = "/{cropname}/properties/list", method = RequestMethod.GET)
 	@ResponseBody
@@ -39,6 +43,7 @@ public class OntologyPropertyResource {
     public ResponseEntity<PropertyResponse> getPropertyById(@PathVariable String  cropname, @PathVariable Integer id) throws MiddlewareQueryException {
         PropertyResponse propertyResponse = ontologyModelService.getProperty(id);
         if(propertyResponse == null){
+            LOGGER.error("No Valid Property Found using Id " + id);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(propertyResponse, HttpStatus.OK);
@@ -49,7 +54,10 @@ public class OntologyPropertyResource {
     @RequestMapping(value = "/{cropname}/properties", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<GenericAddResponse> addProperty(@PathVariable String  cropname, @RequestBody AddPropertyRequest request) throws MiddlewareQueryException {
-        if(!request.validate()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(!request.validate()){
+            LOGGER.error("Not Enough Data to Add New Property");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         GenericAddResponse response = ontologyModelService.addProperty(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
