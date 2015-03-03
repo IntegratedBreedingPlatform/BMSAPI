@@ -3,6 +3,7 @@ package org.generationcp.bms.ontology;
 import org.generationcp.bms.ApiUnitTestBase;
 import org.generationcp.bms.ontology.builders.PropertyBuilder;
 import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.junit.Test;
 import org.junit.After;
@@ -55,12 +56,16 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 
         String cropName = "maize";
 
-        List<Property> propertyList = new ArrayList<>();
-        propertyList.add(new PropertyBuilder().build(1, "p1", "d1"));
-        propertyList.add(new PropertyBuilder().build(2, "p2", "d2"));
-        propertyList.add(new PropertyBuilder().build(3, "p3", "d3"));
+        List<Term> classList = new ArrayList<>();
+        Term term = new Term(10, "Abiotic Stress", "Description");
+        classList.add(term);
 
-        Mockito.doReturn(propertyList).when(ontologyService).getAllProperties();
+        List<Property> propertyList = new ArrayList<>();
+        propertyList.add(new PropertyBuilder().build(1, "p1", "d1", "CO:000001", classList));
+        propertyList.add(new PropertyBuilder().build(2, "p2", "d2", "CO:000002", classList));
+        propertyList.add(new PropertyBuilder().build(3, "p3", "d3", "CO:000003", classList));
+
+        Mockito.doReturn(propertyList).when(ontologyService).getAllPropertiesWithClassAndCropOntology();
 
         mockMvc.perform(get("/ontology/{cropname}/properties/list", cropName).contentType(contentType))
                 .andExpect(status().isOk())
@@ -70,7 +75,7 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
                 .andExpect(jsonPath("$[0].description", is(propertyList.get(0).getDefinition())))
                 .andDo(print());
 
-        verify(ontologyService, times(1)).getAllProperties();
+        verify(ontologyService, times(1)).getAllPropertiesWithClassAndCropOntology();
     }
 
     /**
@@ -82,7 +87,7 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
     public void getPropertyById() throws Exception{
 
         String cropName = "maize";
-        Property property = new PropertyBuilder().build(1, "property", "description");
+        Property property = new PropertyBuilder().build(1, "property", "description", "", null);
 
         Mockito.doReturn(property).when(ontologyService).getProperty(1);
 

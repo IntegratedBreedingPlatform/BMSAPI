@@ -66,7 +66,7 @@ public class OntologyModelService implements IOntologyModelService {
 
     @Override
     public List<PropertySummary> getAllProperties() throws MiddlewareQueryException {
-        List<Property> propertyList = ontologyService.getAllProperties();
+        List<Property> propertyList = ontologyService.getAllPropertiesWithClassAndCropOntology();
         List<PropertySummary> properties = new ArrayList<>();
 
         ModelMapper mapper = OntologyMapper.propertyMapper();

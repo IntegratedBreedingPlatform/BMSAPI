@@ -29,8 +29,8 @@ public class OntologyPropertyResource {
 	@ApiOperation(value = "All properties", notes = "Get all properties")
 	@RequestMapping(value = "/{cropname}/properties/list", method = RequestMethod.GET)
 	@ResponseBody
-	public List<PropertySummary> listAllProperty(@PathVariable String  cropname) throws MiddlewareQueryException {
-        return ontologyModelService.getAllProperties();
+	public ResponseEntity<List<PropertySummary>> listAllProperty(@PathVariable String  cropname) throws MiddlewareQueryException {
+        return new ResponseEntity<>(ontologyModelService.getAllProperties(), HttpStatus.OK);
 	}
 
     // TODO : editableFields and deletable need to be determined
