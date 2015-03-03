@@ -105,4 +105,21 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 
         verify(ontologyService, times(1)).getPropertyById(1);
     }
+
+    /**
+     * This test should expect 400 if no Property Found
+     * * *
+     * @throws Exception
+     */
+    @Test
+    public void getPropertyById_Should_Respond_With_400_For_Invalid_Id() throws Exception{
+
+        String cropName = "maize";
+
+        mockMvc.perform(get("/ontology/{cropname}/properties/{id}",cropName, 1).contentType(contentType))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+        verify(ontologyService, times(1)).getPropertyById(1);
+    }
 }
