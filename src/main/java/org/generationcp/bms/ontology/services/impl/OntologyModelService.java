@@ -5,6 +5,7 @@ import org.generationcp.bms.ontology.services.OntologyMapper;
 import org.generationcp.bms.ontology.dto.incoming.AddMethodRequest;
 import org.generationcp.bms.ontology.services.IOntologyModelService;
 import org.generationcp.bms.ontology.dto.incoming.AddPropertyRequest;
+import org.generationcp.bms.ontology.util.Validator;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
@@ -90,6 +91,51 @@ public class OntologyModelService implements IOntologyModelService {
     @Override
     public GenericAddResponse addProperty(AddPropertyRequest request) throws MiddlewareQueryException {
         return new GenericAddResponse(ontologyService.addProperty(request.getName(), request.getDescription(), request.getCropOntologyId(), request.getClasses()).getId());
+    }
+
+    @Override
+    public List<PropertySummary> getAllPropertiesByClass(String propertyClass) throws MiddlewareQueryException {
+        List<Property> propertyList = ontologyService.getAllPropertiesWithClass(propertyClass);
+        if(Validator.validateList(propertyList)) return null;
+        List<PropertySummary> properties = new ArrayList<>();
+
+        ModelMapper mapper = OntologyMapper.propertyMapper();
+
+        for (Property property : propertyList){
+            PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
+            properties.add(propertyDTO);
+        }
+        return properties;
+    }
+
+    @Override
+    public List<PropertySummary> getAllPropertiesByFilter(String filter) throws MiddlewareQueryException {
+        List<Property> propertyList = ontologyService.searchProperties(filter);
+        if(Validator.validateList(propertyList)) return null;
+        List<PropertySummary> properties = new ArrayList<>();
+
+        ModelMapper mapper = OntologyMapper.propertyMapper();
+
+        for (Property property : propertyList){
+            PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
+            properties.add(propertyDTO);
+        }
+        return properties;
+    }
+
+    @Override
+    public List<PropertySummary> getAllPropertiesByClasses(List<String> classes) throws MiddlewareQueryException {
+        List<Property> propertyList = ontologyService.getAllPropertiesWithClasses(classes);
+        if(Validator.validateList(propertyList)) return null;
+        List<PropertySummary> properties = new ArrayList<>();
+
+        ModelMapper mapper = OntologyMapper.propertyMapper();
+
+        for (Property property : propertyList){
+            PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
+            properties.add(propertyDTO);
+        }
+        return properties;
     }
 
     @Override

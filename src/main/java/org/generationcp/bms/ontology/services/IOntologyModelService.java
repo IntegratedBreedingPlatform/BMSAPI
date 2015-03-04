@@ -20,6 +20,9 @@ public interface IOntologyModelService {
     public List<PropertySummary> getAllProperties() throws MiddlewareQueryException;
     public PropertyResponse getProperty(Integer id) throws MiddlewareQueryException;
     public GenericAddResponse addProperty(AddPropertyRequest request) throws MiddlewareQueryException;
+    public List<PropertySummary> getAllPropertiesByClass(String propertyClass) throws MiddlewareQueryException;
+    public List<PropertySummary> getAllPropertiesByFilter(String filter) throws MiddlewareQueryException;
+    public List<PropertySummary> getAllPropertiesByClasses(List<String> classes) throws MiddlewareQueryException;
 
     public List<DataTypeSummary> getAllDataTypes() throws MiddlewareQueryException;
 
