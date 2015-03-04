@@ -90,7 +90,7 @@ public class OntologyPropertyResource {
     @RequestMapping(value = "/{cropname}/properties", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<GenericResponse> addProperty(@PathVariable String  cropname, @RequestBody PropertyRequest request) throws MiddlewareQueryException {
-        if(!request.validate()){
+        if(!request.isValid()){
             LOGGER.error("Not Enough Data to Add New Property");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

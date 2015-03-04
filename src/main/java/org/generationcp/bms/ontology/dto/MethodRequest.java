@@ -25,7 +25,7 @@ public class MethodRequest {
         return "Method [name=" + this.getName() + ", description=" + this.getDescription() + "]";
     }
 
-    public boolean validate(){
+    public boolean isValid(){
         return !(this.getName().isEmpty() || this.getDescription().isEmpty());
     }
 }

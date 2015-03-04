@@ -53,7 +53,7 @@ public class PropertyRequest {
                 ']';
     }
 
-    public boolean validate(){
+    public boolean isValid(){
         if(this.getName().isEmpty() || this.getDescription().isEmpty() || this.getClasses().size() == 0){
             return false;
         }

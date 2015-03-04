@@ -14,11 +14,6 @@ public class MethodResponse extends MethodSummary {
     public void setEditableFields(List<String> editableFields) {
         this.editableFields = editableFields;
     }
-    
-    private void addEditableFiled(String fieldName){
-        if(this.editableFields == null) this.editableFields = new ArrayList<>();
-        this.editableFields.add(fieldName);
-    }
 
     private Boolean deletable;
 
