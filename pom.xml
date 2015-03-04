@@ -9,7 +9,7 @@
     <properties>
         <jersey-version>1.8</jersey-version>
         <spring.version>3.2.11.RELEASE</spring.version>
-        <ibpcommons.version>4.0.1.SNAPSHOT</ibpcommons.version>
+        <ibpcommons.version>4.0.1.SNAPSHOT-BV_DISCONNECT</ibpcommons.version>
     </properties>
 
     <distributionManagement>
