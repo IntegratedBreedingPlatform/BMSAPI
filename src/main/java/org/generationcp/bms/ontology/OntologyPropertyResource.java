@@ -1,10 +1,10 @@
 package org.generationcp.bms.ontology;
 
 import org.generationcp.bms.ontology.util.Validator;
-import org.generationcp.bms.ontology.dto.outgoing.PropertySummary;
-import org.generationcp.bms.ontology.dto.outgoing.PropertyResponse;
-import org.generationcp.bms.ontology.dto.incoming.AddPropertyRequest;
-import org.generationcp.bms.ontology.dto.outgoing.GenericAddResponse;
+import org.generationcp.bms.ontology.dto.PropertySummary;
+import org.generationcp.bms.ontology.dto.PropertyResponse;
+import org.generationcp.bms.ontology.dto.PropertyRequest;
+import org.generationcp.bms.ontology.dto.GenericResponse;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import com.wordnik.swagger.annotations.Api;
@@ -89,12 +89,12 @@ public class OntologyPropertyResource {
     @ApiOperation(value = "Add Property", notes = "Add a Property using Given Data")
     @RequestMapping(value = "/{cropname}/properties", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<GenericAddResponse> addProperty(@PathVariable String  cropname, @RequestBody AddPropertyRequest request) throws MiddlewareQueryException {
+    public ResponseEntity<GenericResponse> addProperty(@PathVariable String  cropname, @RequestBody PropertyRequest request) throws MiddlewareQueryException {
         if(!request.validate()){
             LOGGER.error("Not Enough Data to Add New Property");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        GenericAddResponse response = ontologyModelService.addProperty(request);
+        GenericResponse response = ontologyModelService.addProperty(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

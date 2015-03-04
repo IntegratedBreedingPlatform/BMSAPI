@@ -1,18 +1,9 @@
-package org.generationcp.bms.ontology.dto.outgoing;
+package org.generationcp.bms.ontology.dto;
 
-public class MethodSummary {
-    
-    private Integer id;
+public class MethodRequest {
+
     private String name;
     private String description;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -29,8 +20,12 @@ public class MethodSummary {
     public void setDescription(String description) {
         this.description = description;
     }
-
+  
     public String toString() {
-        return "Method [id=" + this.getId() + ", name=" + this.getName() + ", description=" + this.getDescription() + "]";
+        return "Method [name=" + this.getName() + ", description=" + this.getDescription() + "]";
+    }
+
+    public boolean validate(){
+        return !(this.getName().isEmpty() || this.getDescription().isEmpty());
     }
 }

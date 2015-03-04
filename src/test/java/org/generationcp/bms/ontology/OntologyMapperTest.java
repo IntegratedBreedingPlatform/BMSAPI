@@ -1,7 +1,7 @@
 package org.generationcp.bms.ontology;
 
-import org.generationcp.bms.ontology.dto.outgoing.MethodSummary;
-import org.generationcp.bms.ontology.dto.outgoing.PropertySummary;
+import org.generationcp.bms.ontology.dto.MethodSummary;
+import org.generationcp.bms.ontology.dto.PropertySummary;
 import org.generationcp.bms.ontology.services.OntologyMapper;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;

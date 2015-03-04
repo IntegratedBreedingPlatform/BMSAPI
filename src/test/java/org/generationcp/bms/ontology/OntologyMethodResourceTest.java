@@ -2,7 +2,7 @@ package org.generationcp.bms.ontology;
 
 import org.generationcp.bms.ApiUnitTestBase;
 import org.generationcp.bms.ontology.builders.MethodBuilder;
-import org.generationcp.bms.ontology.dto.incoming.AddMethodRequest;
+import org.generationcp.bms.ontology.dto.MethodRequest;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.service.api.OntologyService;
@@ -127,7 +127,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 
         String cropName = "maize";
 
-        AddMethodRequest methodDTO = new AddMethodRequest();
+        MethodRequest methodDTO = new MethodRequest();
         methodDTO.setName("methodName");
         methodDTO.setDescription("methodDescription");
 
@@ -153,7 +153,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 
         String cropName = "maize";
 
-        AddMethodRequest methodDTO = new AddMethodRequest();
+        MethodRequest methodDTO = new MethodRequest();
         methodDTO.setName("methodName");
         methodDTO.setDescription("methodDescription");
 
@@ -189,7 +189,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 
         String cropName = "maize";
 
-        AddMethodRequest methodDTO = new AddMethodRequest();
+        MethodRequest methodDTO = new MethodRequest();
         methodDTO.setName("methodName");
         methodDTO.setDescription("methodDescription");
 

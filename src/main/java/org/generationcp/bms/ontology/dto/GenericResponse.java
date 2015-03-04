@@ -1,8 +1,8 @@
-package org.generationcp.bms.ontology.dto.outgoing;
+package org.generationcp.bms.ontology.dto;
 
-public class GenericAddResponse {
+public class GenericResponse {
 
-    public GenericAddResponse(int id){
+    public GenericResponse(int id){
         this.setId(id);
     }
     

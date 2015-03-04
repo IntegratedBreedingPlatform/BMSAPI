@@ -1,10 +1,10 @@
 package org.generationcp.bms.ontology.services.impl;
 
-import org.generationcp.bms.ontology.dto.outgoing.*;
+import org.generationcp.bms.ontology.dto.*;
 import org.generationcp.bms.ontology.services.OntologyMapper;
-import org.generationcp.bms.ontology.dto.incoming.AddMethodRequest;
+import org.generationcp.bms.ontology.dto.MethodRequest;
 import org.generationcp.bms.ontology.services.OntologyModelService;
-import org.generationcp.bms.ontology.dto.incoming.AddPropertyRequest;
+import org.generationcp.bms.ontology.dto.PropertyRequest;
 import org.generationcp.bms.ontology.util.Validator;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.Method;
@@ -50,13 +50,13 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     }
 
     @Override
-    public GenericAddResponse addMethod(AddMethodRequest request) throws MiddlewareQueryException {
+    public GenericResponse addMethod(MethodRequest request) throws MiddlewareQueryException {
         Method method = ontologyService.addMethod(request.getName(), request.getDescription());
-        return new GenericAddResponse(method.getId());
+        return new GenericResponse(method.getId());
     }
 
     @Override
-    public void updateMethod(Integer id, AddMethodRequest request) throws MiddlewareQueryException, MiddlewareException {
+    public void updateMethod(Integer id, MethodRequest request) throws MiddlewareQueryException, MiddlewareException {
         Method method = new Method(new Term(id, request.getName(), request.getDescription()));
         ontologyService.updateMethod(method);
     }
@@ -89,8 +89,8 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     }
 
     @Override
-    public GenericAddResponse addProperty(AddPropertyRequest request) throws MiddlewareQueryException {
-        return new GenericAddResponse(ontologyService.addProperty(request.getName(), request.getDescription(), request.getCropOntologyId(), request.getClasses()).getId());
+    public GenericResponse addProperty(PropertyRequest request) throws MiddlewareQueryException {
+        return new GenericResponse(ontologyService.addProperty(request.getName(), request.getDescription(), request.getCropOntologyId(), request.getClasses()).getId());
     }
 
     @Override

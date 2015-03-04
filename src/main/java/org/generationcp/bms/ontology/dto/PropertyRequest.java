@@ -1,9 +1,9 @@
-package org.generationcp.bms.ontology.dto.incoming;
+package org.generationcp.bms.ontology.dto;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
-public class AddPropertyRequest {
+public class PropertyRequest {
 
     private String name;
     private String description;

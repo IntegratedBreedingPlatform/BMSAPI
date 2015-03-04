@@ -2,7 +2,7 @@ package org.generationcp.bms.ontology;
 
 import org.generationcp.bms.ApiUnitTestBase;
 import org.generationcp.bms.ontology.builders.PropertyBuilder;
-import org.generationcp.bms.ontology.dto.incoming.AddPropertyRequest;
+import org.generationcp.bms.ontology.dto.PropertyRequest;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.service.api.OntologyService;
@@ -137,7 +137,7 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 
         List<String> classes = new ArrayList<>(Arrays.asList("Abiotic Stress"));
 
-        AddPropertyRequest propertyDTO = new AddPropertyRequest();
+        PropertyRequest propertyDTO = new PropertyRequest();
         propertyDTO.setName("propertyName");
         propertyDTO.setDescription("propertyDescription");
         propertyDTO.setCropOntologyId("CO:000001");

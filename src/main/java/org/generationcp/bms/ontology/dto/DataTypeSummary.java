@@ -1,4 +1,4 @@
-package org.generationcp.bms.ontology.dto.outgoing;
+package org.generationcp.bms.ontology.dto;
 
 
 public class DataTypeSummary {
