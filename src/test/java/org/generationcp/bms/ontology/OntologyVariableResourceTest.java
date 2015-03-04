@@ -37,6 +37,11 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
         }
     }
 
+    private final String scaleName = "scaleName";
+    private final String scaleDefinition = "scaleDefinition";
+    private final String propertyName = "Abiotic Stress";
+    private final String propertyDescription = "Description";
+
     @Autowired
     private OntologyService ontologyService;
 
@@ -61,8 +66,8 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
                 .name("standardVariable")
                 .description("standardDescription")
                 .cropOntologyId("C21")
-                .setScale(10,"scaleName", "scaleDefinition")
-                .setProperty(11, "propertyName", "propertyDefinition")
+                .setScale(10,scaleName, scaleDefinition)
+                .setProperty(11, propertyName, propertyDescription)
                 .build();
 
         standardVariables.add(standardVariable);
@@ -88,8 +93,8 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
                 .name("standardVariable")
                 .description("standardDescription")
                 .cropOntologyId("C21")
-                .setScale(10,"scaleName", "scaleDefinition")
-                .setProperty(11, "propertyName", "propertyDefinition")
+                .setScale(10,scaleName, scaleDefinition)
+                .setProperty(11, propertyName, propertyDescription)
                 .build();
 
         standardVariables.add(standardVariable);
@@ -115,8 +120,8 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
                 .name("standardVariable")
                 .description("standardDescription")
                 .cropOntologyId("C21")
-                .setScale(10,"scaleName", "scaleDefinition")
-                .setProperty(11, "propertyName", "propertyDefinition")
+                .setScale(10,scaleName, scaleDefinition)
+                .setProperty(11, propertyName, propertyDescription)
                 .build();
 
         standardVariables.add(standardVariable);

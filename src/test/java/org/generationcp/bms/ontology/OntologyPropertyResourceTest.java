@@ -41,6 +41,9 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
         }
     }
 
+    private final String propertyName = "Abiotic Stress";
+    private final String propertyDescription = "Description";
+
     @Autowired
     private OntologyService ontologyService;
 
@@ -60,7 +63,7 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
         String cropName = "maize";
 
         List<Term> classList = new ArrayList<>();
-        Term term = new Term(10, "Abiotic Stress", "Description");
+        Term term = new Term(10, propertyName, propertyDescription);
         classList.add(term);
 
         List<Property> propertyList = new ArrayList<>();
@@ -92,7 +95,7 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
         String cropName = "maize";
 
         List<Term> classList = new ArrayList<>();
-        Term term = new Term(10, "Abiotic Stress", "Description");
+        Term term = new Term(10, propertyName, propertyDescription);
         classList.add(term);
 
         Property property = new PropertyBuilder().build(1, "property", "description", "CO:000001" , classList);
@@ -135,7 +138,7 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 
         String cropName = "maize";
 
-        List<String> classes = new ArrayList<>(Arrays.asList("Abiotic Stress"));
+        List<String> classes = new ArrayList<>(Arrays.asList(propertyName));
 
         PropertyRequest propertyDTO = new PropertyRequest();
         propertyDTO.setName("propertyName");
@@ -144,7 +147,7 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
         propertyDTO.setClasses(classes);
 
         List<Term> classList = new ArrayList<>();
-        Term term = new Term(1, "Abiotic Stress", "Description");
+        Term term = new Term(1, propertyName, propertyDescription);
         classList.add(term);
 
         Property property = new PropertyBuilder().build(11, propertyDTO.getName(), propertyDTO.getDescription(), propertyDTO.getCropOntologyId() , classList);

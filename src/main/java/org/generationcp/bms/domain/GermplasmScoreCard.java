@@ -13,7 +13,6 @@ public class GermplasmScoreCard implements Comparable<GermplasmScoreCard> {
 	private final Integer gid;
 	private final String name;
 	private List<Observation> observations = new ArrayList<Observation>();
-	//private Map<Observation, Integer> weightings;
 	private List<String> inventoryLocations = Arrays.asList(new String[] {"Shed 5, Bin 2", "Lab 32, Shelf 5, Bag 36", "Storage Room 34, Drawer 25", "Lab 23, Shelf 2, Canister 5"});
 	
 	public GermplasmScoreCard(Integer gid, String name) {

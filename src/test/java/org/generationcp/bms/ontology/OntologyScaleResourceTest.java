@@ -36,6 +36,9 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
         }
     }
 
+    private final String scaleName = "scaleName";
+    private final String scaleDefinition = "scaleDefinition";
+
     @Autowired
     private OntologyService ontologyService;
 
@@ -56,7 +59,7 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 
         List<Scale> scaleList = new ArrayList<>();
 
-        Scale scale = new ScaleBuilder().build(1, "scaleName", "scaleDefinition");
+        Scale scale = new ScaleBuilder().build(1, scaleName, scaleDefinition);
 
         scaleList.add(scale);
 
@@ -75,7 +78,7 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
     public void getScaleById() throws Exception{
 
         String cropName = "rice";
-        Scale scale = new ScaleBuilder().build(1, "scaleName", "scaleDefinition");
+        Scale scale = new ScaleBuilder().build(1, scaleName, scaleDefinition);
 
         Mockito.doReturn(scale).when(ontologyService).getScale(1);
 
@@ -92,15 +95,15 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
     public void getScaleByFilter() throws Exception{
 
         String cropName = "rice";
-        Scale scale = new ScaleBuilder().build(1, "scaleName", "scaleDefinition");
-        Mockito.doReturn(scale).when(ontologyService).getScale("scaleName");
+        Scale scale = new ScaleBuilder().build(1, scaleName, scaleDefinition);
+        Mockito.doReturn(scale).when(ontologyService).getScale(scaleName);
 
-        mockMvc.perform(get("/ontology/{cropname}/scales/filter/{text}",cropName, "scaleName").contentType(contentType)).andExpect(status().isOk())
+        mockMvc.perform(get("/ontology/{cropname}/scales/filter/{text}",cropName, scaleName).contentType(contentType)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(scale.getId())))
                 .andExpect(jsonPath("$.name", is(scale.getName())))
                 .andExpect(jsonPath("$.definition", is(scale.getDefinition())))
                 .andDo(print());
 
-        verify(ontologyService, times(1)).getScale("scaleName");
+        verify(ontologyService, times(1)).getScale(scaleName);
     }
 }

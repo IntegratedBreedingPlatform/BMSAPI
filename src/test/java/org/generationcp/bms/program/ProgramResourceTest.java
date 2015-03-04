@@ -4,7 +4,6 @@ import org.generationcp.bms.ApiUnitTestBase;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.service.api.OntologyService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
