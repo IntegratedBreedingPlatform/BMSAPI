@@ -65,7 +65,6 @@ public class MiddlewareFactory {
 	}
 	
 	private String getCurrentlySelectedCropDBName() {
-        //return this.contextResolver.resolveProgram().getDatabaseName();
         return this.contextResolver.resolveDatabaseFromUrl();
 	}
 	

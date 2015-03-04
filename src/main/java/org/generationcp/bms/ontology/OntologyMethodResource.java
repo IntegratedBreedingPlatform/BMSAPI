@@ -5,7 +5,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.bms.ontology.dto.outgoing.MethodSummary;
 import org.generationcp.bms.ontology.dto.outgoing.MethodResponse;
 import org.generationcp.bms.ontology.dto.incoming.AddMethodRequest;
-import org.generationcp.bms.ontology.services.IOntologyModelService;
+import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.dto.outgoing.GenericAddResponse;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -27,7 +27,7 @@ public class OntologyMethodResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(OntologyMethodResource.class);
 	
     @Autowired
-    private IOntologyModelService ontologyModelService;
+    private OntologyModelService ontologyModelService;
 
     @ApiOperation(value = "All Methods", notes = "Get all methods")
     @RequestMapping(value = "/{cropname}/methods/list", method = RequestMethod.GET)

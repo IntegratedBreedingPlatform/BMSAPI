@@ -9,7 +9,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 import java.util.List;
 
-public interface IOntologyModelService {
+public interface OntologyModelService {
 
     public List<MethodSummary> getAllMethods() throws MiddlewareQueryException;
     public MethodResponse getMethod(Integer id) throws MiddlewareQueryException;

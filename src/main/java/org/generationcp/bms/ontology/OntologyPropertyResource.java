@@ -5,7 +5,7 @@ import org.generationcp.bms.ontology.dto.outgoing.PropertySummary;
 import org.generationcp.bms.ontology.dto.outgoing.PropertyResponse;
 import org.generationcp.bms.ontology.dto.incoming.AddPropertyRequest;
 import org.generationcp.bms.ontology.dto.outgoing.GenericAddResponse;
-import org.generationcp.bms.ontology.services.IOntologyModelService;
+import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -29,7 +29,7 @@ public class OntologyPropertyResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(OntologyPropertyResource.class);
 
     @Autowired
-    private IOntologyModelService ontologyModelService;
+    private OntologyModelService ontologyModelService;
 
 	@ApiOperation(value = "All properties", notes = "Get all properties")
 	@RequestMapping(value = "/{cropname}/properties/list", method = RequestMethod.GET)

@@ -3,7 +3,7 @@ package org.generationcp.bms.ontology.services.impl;
 import org.generationcp.bms.ontology.dto.outgoing.*;
 import org.generationcp.bms.ontology.services.OntologyMapper;
 import org.generationcp.bms.ontology.dto.incoming.AddMethodRequest;
-import org.generationcp.bms.ontology.services.IOntologyModelService;
+import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.dto.incoming.AddPropertyRequest;
 import org.generationcp.bms.ontology.util.Validator;
 import org.generationcp.middleware.domain.oms.Term;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 @Service
-public class OntologyModelService implements IOntologyModelService {
+public class OntologyModelServiceImpl implements OntologyModelService {
 
     @Autowired
     private OntologyService ontologyService;

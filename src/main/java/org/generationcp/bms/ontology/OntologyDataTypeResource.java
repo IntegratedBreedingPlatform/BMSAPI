@@ -3,7 +3,7 @@ package org.generationcp.bms.ontology;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.bms.ontology.dto.outgoing.DataTypeSummary;
-import org.generationcp.bms.ontology.services.IOntologyModelService;
+import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +22,7 @@ import java.util.List;
 public class OntologyDataTypeResource {
 	
 	@Autowired
-	private IOntologyModelService ontologyModelService;
+	private OntologyModelService ontologyModelService;
 
     @ApiOperation(value = "All Data Types", notes = "Get all Data Types")
     @RequestMapping(value = "/{cropname}/datatype/list", method = RequestMethod.GET)
