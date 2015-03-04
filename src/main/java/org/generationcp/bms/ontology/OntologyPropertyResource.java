@@ -1,6 +1,6 @@
 package org.generationcp.bms.ontology;
 
-import org.generationcp.bms.ontology.util.Validator;
+import com.google.common.base.Strings;
 import org.generationcp.bms.ontology.dto.PropertySummary;
 import org.generationcp.bms.ontology.dto.PropertyResponse;
 import org.generationcp.bms.ontology.dto.PropertyRequest;
@@ -42,7 +42,7 @@ public class OntologyPropertyResource {
     @RequestMapping(value = "/{cropname}/properties/class/{propertyClass}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<PropertySummary>> listAllPropertyByClass(@PathVariable String  cropname, @PathVariable String propertyClass) throws MiddlewareQueryException {
-        if(Validator.validateIsEmpty(propertyClass)){
+        if(Strings.isNullOrEmpty(propertyClass)){
             LOGGER.error("Empty Request");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -53,7 +53,7 @@ public class OntologyPropertyResource {
     @RequestMapping(value = "/{cropname}/properties/filter/{filter}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<PropertySummary>> listAllPropertyByFilter(@PathVariable String  cropname, @PathVariable String filter) throws MiddlewareQueryException {
-        if(Validator.validateIsEmpty(filter)){
+        if(Strings.isNullOrEmpty(filter)){
             LOGGER.error("Empty Request");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -65,7 +65,7 @@ public class OntologyPropertyResource {
     @ResponseBody
     public ResponseEntity<List<PropertySummary>> listAllPropertyByClasses(@PathVariable String  cropname, @PathVariable String classes) throws MiddlewareQueryException {
         List<String> classList = Arrays.asList(classes.split(","));
-        if(Validator.validateList(classList)){
+        if(classList.isEmpty()){
             LOGGER.error("No Classes Specified to Get Properties");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

@@ -5,7 +5,6 @@ import org.generationcp.bms.ontology.services.OntologyMapper;
 import org.generationcp.bms.ontology.dto.MethodRequest;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.dto.PropertyRequest;
-import org.generationcp.bms.ontology.util.Validator;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
@@ -96,7 +95,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     @Override
     public List<PropertySummary> getAllPropertiesByClass(String propertyClass) throws MiddlewareQueryException {
         List<Property> propertyList = ontologyService.getAllPropertiesWithClass(propertyClass);
-        if(Validator.validateList(propertyList)) return null;
+        if(propertyList.isEmpty()) return null;
         List<PropertySummary> properties = new ArrayList<>();
 
         ModelMapper mapper = OntologyMapper.propertyMapper();
@@ -111,7 +110,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     @Override
     public List<PropertySummary> getAllPropertiesByFilter(String filter) throws MiddlewareQueryException {
         List<Property> propertyList = ontologyService.searchProperties(filter);
-        if(Validator.validateList(propertyList)) return null;
+        if(propertyList.isEmpty()) return null;
         List<PropertySummary> properties = new ArrayList<>();
 
         ModelMapper mapper = OntologyMapper.propertyMapper();
@@ -126,7 +125,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     @Override
     public List<PropertySummary> getAllPropertiesByClasses(List<String> classes) throws MiddlewareQueryException {
         List<Property> propertyList = ontologyService.getAllPropertiesWithClasses(classes);
-        if(Validator.validateList(propertyList)) return null;
+        if(propertyList.isEmpty()) return null;
         List<PropertySummary> properties = new ArrayList<>();
 
         ModelMapper mapper = OntologyMapper.propertyMapper();
