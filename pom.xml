@@ -123,52 +123,7 @@
 			<version>1.9.5</version>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
 
-	<scm>
-		<developerConnection>scm:git:https://github.com/digitalabs/BMSAPI</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
-            <scope>test</scope>
-        </dependency>
-
-	<build>
-		<finalName>${project.artifactId}</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>${spring-boot-version}</version>
-				<configuration>
-					<mainClass>org.generationcp.bms.Main</mainClass>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5</version>
-			</plugin>
-		</plugins>
-	</build>
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path-assert</artifactId>
@@ -176,7 +131,6 @@
             <scope>test</scope>
         </dependency>
 
-</project>
         <dependency>
             <groupId>org.modelmapper</groupId>
             <artifactId>modelmapper</artifactId>
@@ -185,7 +139,7 @@
     </dependencies>
 
     <scm>
-        <developerConnection>scm:git:https://github.com/digitalabs/BMSAPI</developerConnection>
+        <developerConnection>scm:git:https://github.com/IntegratedBreedingPlatform/BMSAPI</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
