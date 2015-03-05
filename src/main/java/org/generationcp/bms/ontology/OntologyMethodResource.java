@@ -30,7 +30,7 @@ public class OntologyMethodResource {
     private OntologyModelService ontologyModelService;
 
     @ApiOperation(value = "All Methods", notes = "Get all methods")
-    @RequestMapping(value = "/{cropname}/methods/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/{cropname}/methods", method = RequestMethod.GET)
     @ResponseBody
     public List<MethodSummary> listAllMethods(@PathVariable String  cropname) throws MiddlewareQueryException {
         return ontologyModelService.getAllMethods();
