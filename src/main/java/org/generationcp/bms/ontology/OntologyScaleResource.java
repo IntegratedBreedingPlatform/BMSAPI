@@ -14,11 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 
-/**
- * Author: Sunny
- * Created Date: 2 Feb 2015
- */
-
 @Api(value = "Ontology Scale Service")
 @Controller
 @RequestMapping("/ontology")
@@ -28,7 +23,7 @@ public class OntologyScaleResource {
 	private OntologyService ontologyService;
 
 	@ApiOperation(value = "All Scales", notes = "Get all scales")
-	@RequestMapping(value = "/{cropname}/scales/list", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropname}/scales", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Scale> listAllScale(@PathVariable String  cropname) throws MiddlewareQueryException {
 		List<Scale> scaleList = ontologyService.getAllScales();
@@ -38,16 +33,8 @@ public class OntologyScaleResource {
 	@ApiOperation(value = "Get Scale by Id", notes = "Get Scale using Scale Id")
 	@RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.GET)
 	@ResponseBody
-	public Scale listAllStandardVariablesByScaleId(@PathVariable String  cropname, @PathVariable Integer id) throws MiddlewareQueryException {
+	public Scale getScaleById(@PathVariable String  cropname, @PathVariable Integer id) throws MiddlewareQueryException {
 		Scale scale = ontologyService.getScale(id);
 		return scale;
 	}
-
-    @ApiOperation(value = "Get Scale by Filter", notes = "Get Scale using Filter term")
-    @RequestMapping(value = "/{cropname}/scales/filter/{text}", method = RequestMethod.GET)
-    @ResponseBody
-    public Scale listAllStandardVariablesByFilter(@PathVariable String  cropname, @PathVariable String text) throws MiddlewareQueryException {
-        Scale scale = ontologyService.getScale(text);
-        return scale;
-    }
 }

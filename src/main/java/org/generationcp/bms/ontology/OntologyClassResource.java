@@ -24,7 +24,7 @@ public class OntologyClassResource {
 	private OntologyModelService ontologyModelService;
 
     @ApiOperation(value = "All Classes", notes = "Get all Classes")
-    @RequestMapping(value = "/{cropname}/classes/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/{cropname}/classes", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<String>> listAllClasses(@PathVariable String cropname) throws MiddlewareQueryException {
         List<String> classes = ontologyModelService.getAllClasses();

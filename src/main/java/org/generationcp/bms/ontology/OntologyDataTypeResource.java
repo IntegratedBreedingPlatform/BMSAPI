@@ -25,7 +25,7 @@ public class OntologyDataTypeResource {
 	private OntologyModelService ontologyModelService;
 
     @ApiOperation(value = "All Data Types", notes = "Get all Data Types")
-    @RequestMapping(value = "/{cropname}/datatype/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/{cropname}/datatypes", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<DataTypeSummary>> listAllDataTypes(@PathVariable String cropname) throws MiddlewareQueryException {
         List<DataTypeSummary> dataTypes = ontologyModelService.getAllDataTypes();
