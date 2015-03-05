@@ -18,8 +18,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.Arrays;
-
 
 @Api(value = "Ontology Property Service")
 @Controller
@@ -32,14 +30,14 @@ public class OntologyPropertyResource {
     private OntologyModelService ontologyModelService;
 
 	@ApiOperation(value = "All properties", notes = "Get all properties")
-	@RequestMapping(value = "/{cropname}/properties/list", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropname}/properties", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<PropertySummary>> listAllProperty(@PathVariable String  cropname) throws MiddlewareQueryException {
         return new ResponseEntity<>(ontologyModelService.getAllProperties(), HttpStatus.OK);
 	}
 
     @ApiOperation(value = "All properties by class name", notes = "Get all properties by class name")
-    @RequestMapping(value = "/{cropname}/properties/class/{propertyClass}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{cropname}/properties?class={propertyClass}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<PropertySummary>> listAllPropertyByClass(@PathVariable String  cropname, @PathVariable String propertyClass) throws MiddlewareQueryException {
         if(Strings.isNullOrEmpty(propertyClass)){
@@ -47,29 +45,6 @@ public class OntologyPropertyResource {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(ontologyModelService.getAllPropertiesByClass(propertyClass), HttpStatus.OK);
-    }
-
-    @ApiOperation(value = "All properties by search filter", notes = "Get all properties by search filter")
-    @RequestMapping(value = "/{cropname}/properties/filter/{filter}", method = RequestMethod.GET)
-    @ResponseBody
-    public ResponseEntity<List<PropertySummary>> listAllPropertyByFilter(@PathVariable String  cropname, @PathVariable String filter) throws MiddlewareQueryException {
-        if(Strings.isNullOrEmpty(filter)){
-            LOGGER.error("Empty Request");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(ontologyModelService.getAllPropertiesByFilter(filter), HttpStatus.OK);
-    }
-
-    @ApiOperation(value = "All properties by class names", notes = "Get all properties by class names")
-    @RequestMapping(value = "/{cropname}/properties/classes/{classes}", method = RequestMethod.GET)
-    @ResponseBody
-    public ResponseEntity<List<PropertySummary>> listAllPropertyByClasses(@PathVariable String  cropname, @PathVariable String classes) throws MiddlewareQueryException {
-        List<String> classList = Arrays.asList(classes.split(","));
-        if(classList.isEmpty()){
-            LOGGER.error("No Classes Specified to Get Properties");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(ontologyModelService.getAllPropertiesByClasses(classList), HttpStatus.OK);
     }
 
     // TODO : editableFields and deletable need to be determined
