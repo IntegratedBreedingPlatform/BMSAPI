@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 
+/**
+ * NOTE: Work in Progress, Do Not Use API Exposed
+ */
+
 @Api(value = "Ontology Scale Service")
 @Controller
 @RequestMapping("/ontology")

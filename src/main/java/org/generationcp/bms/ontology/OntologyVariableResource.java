@@ -11,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * NOTE: Work in Progress, Do Not Use API Exposed
+ */
+
 @Api(value = "Ontology Variable Service")
 @Controller
 @RequestMapping("/ontology")
