@@ -2,8 +2,6 @@ package org.generationcp.bms.ontology.services;
 
 
 import org.generationcp.bms.ontology.dto.*;
-import org.generationcp.bms.ontology.dto.MethodRequest;
-import org.generationcp.bms.ontology.dto.PropertyRequest;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
@@ -59,7 +57,7 @@ public interface OntologyModelService {
 
     /**
      * get property by given property id
-     * @param id
+     * @param id property id
      * @return property that have given id
      * @throws MiddlewareQueryException
      */
@@ -80,22 +78,6 @@ public interface OntologyModelService {
      * @throws MiddlewareQueryException
      */
     public List<PropertySummary> getAllPropertiesByClass(String propertyClass) throws MiddlewareQueryException;
-
-    /**
-     * get all properties that contain search data inside name or description
-     * @param filter data to be searched inside name & description
-     * @return list of properties
-     * @throws MiddlewareQueryException
-     */
-    public List<PropertySummary> getAllPropertiesByFilter(String filter) throws MiddlewareQueryException;
-
-    /**
-     * get all properties containing class names
-     * @param classes class names to be search in property
-     * @return list of properties
-     * @throws MiddlewareQueryException
-     */
-    public List<PropertySummary> getAllPropertiesByClasses(List<String> classes) throws MiddlewareQueryException;
 
     /**
      * get all data types

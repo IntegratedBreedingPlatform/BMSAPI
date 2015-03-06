@@ -109,36 +109,6 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     }
 
     @Override
-    public List<PropertySummary> getAllPropertiesByFilter(String filter) throws MiddlewareQueryException {
-        List<Property> propertyList = ontologyService.searchProperties(filter);
-        if(propertyList.isEmpty()) return null;
-        List<PropertySummary> properties = new ArrayList<>();
-
-        ModelMapper mapper = OntologyMapper.propertyMapper();
-
-        for (Property property : propertyList){
-            PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
-            properties.add(propertyDTO);
-        }
-        return properties;
-    }
-
-    @Override
-    public List<PropertySummary> getAllPropertiesByClasses(List<String> classes) throws MiddlewareQueryException {
-        List<Property> propertyList = ontologyService.getAllPropertiesWithClasses(classes);
-        if(propertyList.isEmpty()) return null;
-        List<PropertySummary> properties = new ArrayList<>();
-
-        ModelMapper mapper = OntologyMapper.propertyMapper();
-
-        for (Property property : propertyList){
-            PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
-            properties.add(propertyDTO);
-        }
-        return properties;
-    }
-
-    @Override
     public List<DataTypeSummary> getAllDataTypes() throws MiddlewareQueryException {
         List<Term> termList = ontologyService.getAllDataTypes();
         List<DataTypeSummary> dataTypeSummaries = new ArrayList<>();

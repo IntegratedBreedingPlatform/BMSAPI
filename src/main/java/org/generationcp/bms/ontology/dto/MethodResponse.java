@@ -1,7 +1,6 @@
 package org.generationcp.bms.ontology.dto;
 
 import java.util.List;
-import java.util.ArrayList;
 
 public class MethodResponse extends MethodSummary {
 
@@ -22,7 +21,7 @@ public class MethodResponse extends MethodSummary {
     }
 
     public void setDeletable(Boolean deletable) {
-        this.deletable = deletable;
+        this.deletable = false;
     }
     
     public String toString() {

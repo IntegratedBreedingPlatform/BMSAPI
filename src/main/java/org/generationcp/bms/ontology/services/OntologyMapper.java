@@ -24,7 +24,7 @@ public class OntologyMapper {
      * Used when Simple Class to Class Mapping is Required without Custom Mapping
      * @return ModelMapper Instance
      */
-    public static final ModelMapper getInstance(){
+    public static ModelMapper getInstance(){
         return SINGLETON;
     }
 
@@ -32,7 +32,7 @@ public class OntologyMapper {
      * Custom Mapping for Middleware Method Class to MethodSummary
      * Definition to Description Mapping
      */
-    public static PropertyMap<Method, MethodSummary> methodMap = new PropertyMap<Method, MethodSummary>() {
+    private static PropertyMap<Method, MethodSummary> methodMap = new PropertyMap<Method, MethodSummary>() {
         @Override
         protected void configure() {
             map().setId(source.getId());
@@ -41,7 +41,7 @@ public class OntologyMapper {
         }
     };
 
-    public static PropertyMap<Method, MethodResponse> methodResponseMap = new PropertyMap<Method, MethodResponse>() {
+    private static PropertyMap<Method, MethodResponse> methodResponseMap = new PropertyMap<Method, MethodResponse>() {
         @Override
         protected void configure() {
             map().setId(source.getId());
@@ -68,7 +68,7 @@ public class OntologyMapper {
      * Custom Mapping for Middleware Property Class to PropertySummary
      * Definition to Description Mapping
      */
-    public static PropertyMap<Property, PropertySummary> propertyMap = new PropertyMap<Property, PropertySummary>() {
+    private static PropertyMap<Property, PropertySummary> propertyMap = new PropertyMap<Property, PropertySummary>() {
 
         @Override
         protected void configure() {
@@ -80,7 +80,7 @@ public class OntologyMapper {
         }
     };
 
-    public static PropertyMap<Property, PropertyResponse> propertyResponseMap = new PropertyMap<Property, PropertyResponse>() {
+    private static PropertyMap<Property, PropertyResponse> propertyResponseMap = new PropertyMap<Property, PropertyResponse>() {
         @Override
         protected void configure() {
             map().setId(source.getId());
