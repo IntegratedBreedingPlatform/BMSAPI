@@ -32,8 +32,13 @@ public class OntologyMethodResource {
     @ApiOperation(value = "All Methods", notes = "Get all methods")
     @RequestMapping(value = "/{cropname}/methods", method = RequestMethod.GET)
     @ResponseBody
-    public List<MethodSummary> listAllMethods(@PathVariable String  cropname) throws MiddlewareQueryException {
-        return ontologyModelService.getAllMethods();
+    public ResponseEntity<List<MethodSummary>> listAllMethods(@PathVariable String  cropname) throws MiddlewareQueryException {
+        List<MethodSummary> methodList = ontologyModelService.getAllMethods();
+        if(methodList == null){
+            LOGGER.error("No Valid Method Found");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(methodList, HttpStatus.OK);
     }
 
     // TODO : editableFields and deletable need to be determined

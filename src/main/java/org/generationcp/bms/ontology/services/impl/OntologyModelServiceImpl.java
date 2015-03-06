@@ -29,6 +29,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     public List<MethodSummary> getAllMethods() throws MiddlewareQueryException {
 
         List<Method> methodList = ontologyService.getAllMethods();
+        if(methodList == null) return null;
         List<MethodSummary> methods = new ArrayList<>();
 
         ModelMapper mapper = OntologyMapper.methodMapper();
