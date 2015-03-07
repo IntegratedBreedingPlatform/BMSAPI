@@ -6,6 +6,7 @@ import org.generationcp.bms.ontology.dto.PropertyResponse;
 import org.generationcp.bms.ontology.dto.PropertyRequest;
 import org.generationcp.bms.ontology.dto.GenericResponse;
 import org.generationcp.bms.ontology.services.OntologyModelService;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -56,12 +57,36 @@ public class OntologyPropertyResource {
     @ApiOperation(value = "Add Property", notes = "Add a Property using Given Data")
     @RequestMapping(value = "/{cropname}/properties", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<GenericResponse> addProperty(@PathVariable String  cropname, @RequestBody PropertyRequest request) throws MiddlewareQueryException {
+    public ResponseEntity<GenericResponse> addProperty(@PathVariable String  cropname, @RequestBody PropertyRequest request) throws MiddlewareQueryException, MiddlewareException {
         if(!request.isValid()){
             LOGGER.error("Not Enough Data to Add New Property");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         GenericResponse response = ontologyModelService.addProperty(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    //TODO: 403 response for user without permission, Check if method is deletable or not
+    @ApiOperation(value = "Delete Property", notes = "Delete Property using Given Id")
+    @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.DELETE)
+    @ResponseBody
+    public ResponseEntity deleteProperty(@PathVariable String  cropname, @PathVariable Integer id) throws MiddlewareQueryException, MiddlewareException {
+        if (!ontologyModelService.deleteProperty(id)) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    //TODO: 403 response for user without permission, Check if fields are editable or not
+    @ApiOperation(value = "Update Property", notes = "Update Property using Given Data")
+    @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.PUT)
+    @ResponseBody
+    public ResponseEntity updateProperty(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody PropertyRequest request) throws MiddlewareQueryException, MiddlewareException {
+        if(!request.isValid()) {
+            LOGGER.error("Not Enough Data to Update Existing Property");
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        if(!ontologyModelService.updateProperty(id, request)) return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

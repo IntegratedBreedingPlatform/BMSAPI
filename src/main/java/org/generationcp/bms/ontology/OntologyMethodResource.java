@@ -76,7 +76,7 @@ public class OntologyMethodResource {
             LOGGER.error("Not Enough Data to Update Existing Method");
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
-        ontologyModelService.updateMethod(id, request);
+        if(!ontologyModelService.updateMethod(id, request)) return new ResponseEntity(HttpStatus.BAD_REQUEST);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -85,7 +85,9 @@ public class OntologyMethodResource {
     @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.DELETE)
     @ResponseBody
     public ResponseEntity deleteMethod(@PathVariable String  cropname, @PathVariable Integer id) throws MiddlewareQueryException, MiddlewareException {
-        ontologyModelService.deleteMethod(id);
+        if (!ontologyModelService.deleteMethod(id)) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

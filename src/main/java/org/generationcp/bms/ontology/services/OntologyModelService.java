@@ -38,14 +38,15 @@ public interface OntologyModelService {
      * @param request method data to be updated
      * @throws MiddlewareQueryException, MiddlewareException
      */
-    public void updateMethod(Integer id, MethodRequest request) throws MiddlewareQueryException, MiddlewareException;
+    public boolean updateMethod(Integer id, MethodRequest request) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * delete method using given id
      * @param id method to be deleted
+     * @return if method deleted or not
      * @throws MiddlewareQueryException
      */
-    public void deleteMethod(Integer id) throws MiddlewareQueryException;
+    public boolean deleteMethod(Integer id) throws MiddlewareQueryException;
 
 
     /**
@@ -69,7 +70,7 @@ public interface OntologyModelService {
      * @return newly created property id
      * @throws MiddlewareQueryException
      */
-    public GenericResponse addProperty(PropertyRequest request) throws MiddlewareQueryException;
+    public GenericResponse addProperty(PropertyRequest request) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * get all properties containing class name
@@ -78,6 +79,24 @@ public interface OntologyModelService {
      * @throws MiddlewareQueryException
      */
     public List<PropertySummary> getAllPropertiesByClass(String propertyClass) throws MiddlewareQueryException;
+
+    /**
+     * delete property if not used
+     * @param id property to be deleted
+     * @return if property deleted or not
+     * @throws MiddlewareQueryException
+     */
+    public boolean deleteProperty(Integer id) throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     *
+     * @param id property to update
+     * @param request property data to update
+     * @return if property updated or not
+     * @throws MiddlewareQueryException
+     * @throws MiddlewareException
+     */
+    public boolean updateProperty(Integer id, PropertyRequest request) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * get all data types
