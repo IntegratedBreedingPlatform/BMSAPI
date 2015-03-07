@@ -54,6 +54,10 @@ public class PropertyRequest {
     }
 
     public boolean isValid(){
-        return !(this.getName().isEmpty() || this.getDescription().isEmpty() || this.getClasses().size() == 0);
+        if(this.classes.size() > 0){
+            return !(this.getName().isEmpty() || this.getDescription().isEmpty() || this.getClasses().get(0).trim().isEmpty());
+        }else {
+            return !(this.getName().isEmpty() || this.getDescription().isEmpty());
+        }
     }
 }
