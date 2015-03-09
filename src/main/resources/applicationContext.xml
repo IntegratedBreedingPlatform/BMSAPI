@@ -62,7 +62,7 @@
      <bean id="managerFactoryProvider" 
     	class="org.generationcp.commons.hibernate.DynamicManagerFactoryProvider"  destroy-method="closeAllSessionFactories">
     	<constructor-arg ref="workbenchDataManager" />
-    	<property name="maxCachedSessionFactories" value="1" />
+    	<property name="maxCachedSessionFactories" value="10" />
     	<property name="dbPort" value="${workbench.port}" />
     	<property name="dbHost" value="${workbench.host}" />
     	<property name="dbUsername" value="${workbench.username}"/>
