@@ -8,7 +8,4 @@ db.port=13306
 db.username=root
 db.password=
 
-spring.data.mongodb.host=localhost
-spring.data.mongodb.port=27017
-
 db.workbench.name=workbench
