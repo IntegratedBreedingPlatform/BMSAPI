@@ -21,7 +21,7 @@ public class MethodResponse extends MethodSummary {
     }
 
     public void setDeletable(Boolean deletable) {
-        this.deletable = false;
+        this.deletable = deletable;
     }
     
     public String toString() {

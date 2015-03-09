@@ -68,7 +68,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 
         Mockito.doReturn(methodList).when(ontologyService).getAllMethods();
 
-        mockMvc.perform(get("/ontology/{cropname}/methods/list", cropName).contentType(contentType)).andExpect(status().isOk())
+        mockMvc.perform(get("/ontology/{cropname}/methods", cropName).contentType(contentType)).andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(methodList.size())))
                 .andExpect(jsonPath("$[0].id", is(1)))
                 .andExpect(jsonPath("$[0].name", is(methodList.get(0).getName())))
