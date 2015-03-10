@@ -47,6 +47,7 @@ public class OntologyMapper {
             map().setId(source.getId());
             map().setName(source.getName());
             map().setDescription(source.getDefinition());
+            map().setEditableFields(new ArrayList<String>());
             map().setDeletable(false);
         }
     };
@@ -87,6 +88,7 @@ public class OntologyMapper {
             map().setDescription(source.getDefinition());
             map().setCropOntologyId(source.getCropOntologyId());
             map().setClasses(source.getClassNames());
+            map().setEditableFields(new ArrayList<String>());
             map().setDeletable(false);
         }
     };
