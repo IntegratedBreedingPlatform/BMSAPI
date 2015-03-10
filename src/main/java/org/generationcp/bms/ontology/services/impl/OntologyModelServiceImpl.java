@@ -30,7 +30,9 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     public List<MethodSummary> getAllMethods() throws MiddlewareQueryException {
 
         List<Method> methodList = ontologyService.getAllMethods();
-        if(methodList == null) return null;
+        if(methodList == null){
+            return null;
+        }
         List<MethodSummary> methods = new ArrayList<>();
 
         ModelMapper mapper = OntologyMapper.methodMapper();
@@ -45,12 +47,18 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     @Override
     public MethodResponse getMethod(Integer id) throws MiddlewareQueryException {
         Method method = ontologyService.getMethod(id);
-        if(method == null) return null;
+        if(method == null){
+            return null;
+        }
         boolean deletable = true;
-        if(ontologyService.isTermReferred(id)) deletable = false;
+        if(ontologyService.isTermReferred(id)){
+            deletable = false;
+        }
         ModelMapper mapper = OntologyMapper.methodMapper();
         MethodResponse response = mapper.map(method, MethodResponse.class);
-        if(deletable) response.setEditableFields(new ArrayList<>(Arrays.asList("description")));
+        if(deletable){
+            response.setEditableFields(new ArrayList<>(Arrays.asList("description")));
+        }
         response.setDeletable(deletable);
         return response;
     }
@@ -63,7 +71,9 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 
     @Override
     public boolean updateMethod(Integer id, MethodRequest request) throws MiddlewareQueryException, MiddlewareException {
-        if(ontologyService.isTermReferred(id)) return false;
+        if(ontologyService.isTermReferred(id)){
+            return false;
+        }
         Method method = new Method(new Term(id, request.getName(), request.getDescription()));
         ontologyService.updateMethod(method);
         return true;
@@ -72,7 +82,9 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     @Override
     public boolean deleteMethod(Integer id) throws MiddlewareQueryException {
         boolean isReferred = ontologyService.isTermReferred(id);
-        if(isReferred) return false;
+        if(isReferred){
+            return false;
+        }
         ontologyService.deleteMethod(id);
         return true;
     }
