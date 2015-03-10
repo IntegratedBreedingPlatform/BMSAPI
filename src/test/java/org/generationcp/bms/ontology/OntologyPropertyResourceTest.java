@@ -73,7 +73,7 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 
         Mockito.doReturn(propertyList).when(ontologyService).getAllPropertiesWithClassAndCropOntology();
 
-        mockMvc.perform(get("/ontology/{cropname}/properties/list", cropName).contentType(contentType))
+        mockMvc.perform(get("/ontology/{cropname}/properties", cropName).contentType(contentType))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(propertyList.size())))
                 .andExpect(jsonPath("$[0].id", is(1)))

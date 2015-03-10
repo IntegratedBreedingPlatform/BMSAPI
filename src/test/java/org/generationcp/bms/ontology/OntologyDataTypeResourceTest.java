@@ -66,7 +66,7 @@ public class OntologyDataTypeResourceTest extends ApiUnitTestBase {
 
         Mockito.doReturn(termList).when(ontologyService).getAllDataTypes();
 
-        mockMvc.perform(get("/ontology/{cropname}/datatype/list", cropName).contentType(contentType))
+        mockMvc.perform(get("/ontology/{cropname}/datatypes", cropName).contentType(contentType))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(termList.size())))
                 .andExpect(jsonPath("$[0].id", is(termList.get(0).getId())))

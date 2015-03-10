@@ -64,7 +64,7 @@ public class OntologyClassResourceTest extends ApiUnitTestBase {
 
         Mockito.doReturn(termList).when(ontologyService).getAllTraitClass();
 
-        mockMvc.perform(get("/ontology/{cropname}/classes/list", cropName).contentType(contentType))
+        mockMvc.perform(get("/ontology/{cropname}/classes", cropName).contentType(contentType))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(termList.size())))
                 .andExpect(jsonPath("$[0]", is(termList.get(0).getName())))
