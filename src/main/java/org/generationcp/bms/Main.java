@@ -1,9 +1,10 @@
 package org.generationcp.bms;
 
-import com.wordnik.swagger.model.ApiInfo;
+import com.mangofactory.swagger.models.dto.ApiInfo;
 import com.mangofactory.swagger.plugin.EnableSwagger;
 import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
 import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;

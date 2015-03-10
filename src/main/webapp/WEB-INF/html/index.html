@@ -32,7 +32,9 @@
 		 	  if (window.location.pathname.indexOf('/api') > 0) {
 		 	    apiUrl += window.location.pathname.substring(0, window.location.pathname.indexOf('/api'))
 		 	  }
-		 	  apiUrl += "/api-docs";
+		 	  
+		 	  var contextPath = $("#contextPath").attr("href");
+		 	  apiUrl += contextPath + "/api-docs";
 		  	  
 		    window.swaggerUi = new SwaggerUi({
 		    url: apiUrl,
@@ -67,6 +69,7 @@
 </head>
 
 <body>
+	<a id="contextPath" style="display: none;" th:href="@{/}">Context Path</a>
 	<nav class="navbar navbar-default" role="navigation">
 		<div class="container-fluid">
 			<div class="navbar-header">
