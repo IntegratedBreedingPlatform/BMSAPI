@@ -140,7 +140,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
         mockMvc.perform(post("/ontology/{cropname}/methods",cropName)
                 .contentType(contentType).content(convertObjectToByte(methodDTO)))
                 .andExpect(status().isCreated())
-                //.andExpect(jsonPath("$.id", is(10)))
+                .andExpect(jsonPath("$.id", is(0)))
                 .andDo(print());
 
 
