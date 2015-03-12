@@ -38,15 +38,14 @@ public interface OntologyModelService {
      * @param request method data to be updated
      * @throws MiddlewareQueryException, MiddlewareException
      */
-    public boolean updateMethod(Integer id, MethodRequest request) throws MiddlewareQueryException, MiddlewareException;
+    public void updateMethod(Integer id, MethodRequest request) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * delete method using given id
      * @param id method to be deleted
-     * @return if method deleted or not
      * @throws MiddlewareQueryException
      */
-    public boolean deleteMethod(Integer id) throws MiddlewareQueryException;
+    public void deleteMethod(Integer id) throws MiddlewareQueryException;
 
 
     /**

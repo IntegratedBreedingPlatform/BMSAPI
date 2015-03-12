@@ -8,7 +8,7 @@ import org.generationcp.bms.ontology.dto.PropertyRequest;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.service.api.OntologyService;
+import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.modelmapper.ModelMapper;
@@ -24,12 +24,12 @@ import java.util.ArrayList;
 public class OntologyModelServiceImpl implements OntologyModelService {
 
     @Autowired
-    private OntologyService ontologyService;
+    private OntologyManagerService ontologyManagerService;
 
     @Override
     public List<MethodSummary> getAllMethods() throws MiddlewareQueryException {
 
-        List<Method> methodList = ontologyService.getAllMethods();
+        List<Method> methodList = ontologyManagerService.getAllMethods();
         if(methodList == null){
             return Collections.emptyList();
         }
@@ -46,18 +46,20 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 
     @Override
     public MethodResponse getMethod(Integer id) throws MiddlewareQueryException {
-        Method method = ontologyService.getMethod(id);
+        Method method = ontologyManagerService.getMethod(id);
         if(method == null){
             return null;
         }
         boolean deletable = true;
-        if(ontologyService.isTermReferred(id)){
+        if(ontologyManagerService.isTermReferred(id)){
             deletable = false;
         }
         ModelMapper mapper = OntologyMapper.methodMapper();
         MethodResponse response = mapper.map(method, MethodResponse.class);
-        if(deletable){
+        if(!deletable){
             response.setEditableFields(new ArrayList<>(Arrays.asList("description")));
+        }else {
+            response.setEditableFields(new ArrayList<>(Arrays.asList("name", "description")));
         }
         response.setDeletable(deletable);
         return response;
@@ -65,33 +67,31 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 
     @Override
     public GenericResponse addMethod(MethodRequest request) throws MiddlewareQueryException {
-        Method method = ontologyService.addMethod(request.getName(), request.getDescription());
+        Method method = new Method();
+        method.setName(request.getName());
+        method.setDefinition(request.getDescription());
+        ontologyManagerService.addMethod(method);
         return new GenericResponse(method.getId());
     }
 
     @Override
-    public boolean updateMethod(Integer id, MethodRequest request) throws MiddlewareQueryException, MiddlewareException {
-        if(ontologyService.isTermReferred(id)){
-            return false;
-        }
-        Method method = new Method(new Term(id, request.getName(), request.getDescription()));
-        ontologyService.updateMethod(method);
-        return true;
+    public void updateMethod(Integer id, MethodRequest request) throws MiddlewareQueryException, MiddlewareException {
+        Method method = new Method();
+        method.setId(request.getId());
+        method.setName(request.getName());
+        method.setDefinition(request.getDescription());
+        method.print(2);
+        ontologyManagerService.updateMethod(method);
     }
 
     @Override
-    public boolean deleteMethod(Integer id) throws MiddlewareQueryException {
-        boolean isReferred = ontologyService.isTermReferred(id);
-        if(isReferred){
-            return false;
-        }
-        ontologyService.deleteMethod(id);
-        return true;
+    public void deleteMethod(Integer id) throws MiddlewareQueryException {
+        ontologyManagerService.deleteMethod(id);
     }
 
     @Override
     public List<PropertySummary> getAllProperties() throws MiddlewareQueryException {
-        List<Property> propertyList = ontologyService.getAllPropertiesWithClassAndCropOntology();
+        List<Property> propertyList = ontologyManagerService.getAllProperties();
         List<PropertySummary> properties = new ArrayList<>();
 
         ModelMapper mapper = OntologyMapper.propertyMapper();
@@ -105,12 +105,12 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 
     @Override
     public PropertyResponse getProperty(Integer id) throws MiddlewareQueryException {
-        Property property = ontologyService.getPropertyById(id);
+        Property property = ontologyManagerService.getProperty(id);
         if (property == null) {
         	return null;
         }
         boolean deletable = true;
-        if(ontologyService.isTermReferred(id)) {
+        if(ontologyManagerService.isTermReferred(id)) {
         	deletable = false;
         }
         ModelMapper mapper = OntologyMapper.propertyMapper();
@@ -124,12 +124,14 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 
     @Override
     public GenericResponse addProperty(PropertyRequest request) throws MiddlewareQueryException, MiddlewareException {
-        return new GenericResponse(ontologyService.addProperty(request.getName(), request.getDescription(), request.getCropOntologyId(), request.getClasses()).getId());
+        //TODO : Create Property Object and pass directly to method
+        //return new GenericResponse(ontologyService.addProperty(request.getName(), request.getDescription(), request.getCropOntologyId(), request.getClasses()).getId());
+        return null;
     }
 
     @Override
     public List<PropertySummary> getAllPropertiesByClass(String propertyClass) throws MiddlewareQueryException {
-        List<Property> propertyList = ontologyService.getAllPropertiesWithClass(propertyClass);
+        List<Property> propertyList = ontologyManagerService.getAllPropertiesWithClass(propertyClass);
         if(propertyList.isEmpty()) {
         	return Collections.emptyList();
         }
@@ -146,26 +148,27 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 
     @Override
     public boolean deleteProperty(Integer id) throws MiddlewareQueryException, MiddlewareException {
-        boolean isReferred = ontologyService.isTermReferred(id);
+        boolean isReferred = ontologyManagerService.isTermReferred(id);
         if(isReferred) {
         	return false;
         }
-        ontologyService.deleteProperty(id);
+        ontologyManagerService.deleteProperty(id);
         return true;
     }
 
     @Override
     public boolean updateProperty(Integer id, PropertyRequest request) throws MiddlewareQueryException, MiddlewareException {
-        if(ontologyService.isTermReferred(id)) {
+        if(ontologyManagerService.isTermReferred(id)) {
         	return false;
         }
-        ontologyService.updateProperty(id, request.getName(), request.getDescription(), request.getCropOntologyId(), request.getClasses());
+        //TODO : Create Property Object and pass directly to method
+        //ontologyService.updateProperty(id, request.getName(), request.getDescription(), request.getCropOntologyId(), request.getClasses());
         return true;
     }
 
     @Override
     public List<DataTypeSummary> getAllDataTypes() throws MiddlewareQueryException {
-        List<Term> termList = ontologyService.getAllDataTypes();
+        List<Term> termList = ontologyManagerService.getDataTypes();
         List<DataTypeSummary> dataTypeSummaries = new ArrayList<>();
 
         ModelMapper mapper = OntologyMapper.getInstance();
@@ -179,7 +182,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 
     @Override
     public List<String> getAllClasses() throws MiddlewareQueryException {
-        List<Term> classes = ontologyService.getAllTraitClass();
+        List<Term> classes = ontologyManagerService.getAllTraitClass();
         List<String> classList = new ArrayList<>();
 
         for (Term term : classes){
