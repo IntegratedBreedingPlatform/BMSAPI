@@ -29,7 +29,6 @@ public class OntologyDataTypeResource {
     @RequestMapping(value = "/{cropname}/datatypes", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<DataTypeSummary>> listAllDataTypes(@PathVariable String cropname) throws MiddlewareQueryException {
-        List<DataTypeSummary> dataTypes = ontologyModelService.getAllDataTypes();
-        return new ResponseEntity<>(dataTypes, HttpStatus.OK);
+        return new ResponseEntity<>(ontologyModelService.getAllDataTypes(), HttpStatus.OK);
     }
 }

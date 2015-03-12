@@ -2,6 +2,7 @@ package org.generationcp.bms.ontology;
 
 import org.generationcp.bms.ApiUnitTestBase;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.junit.Test;
 import org.junit.After;
@@ -31,17 +32,17 @@ public class OntologyDataTypeResourceTest extends ApiUnitTestBase {
 
         @Bean
         @Primary
-        public OntologyService ontologyService() {
-            return Mockito.mock(OntologyService.class);
+        public OntologyManagerService ontologyManagerService() {
+            return Mockito.mock(OntologyManagerService.class);
         }
     }
 
     @Autowired
-    private OntologyService ontologyService;
+    private OntologyManagerService ontologyManagerService;
 
     @Before
     public void reset(){
-        Mockito.reset(ontologyService);
+        Mockito.reset(ontologyManagerService);
     }
 
     @After
@@ -64,7 +65,7 @@ public class OntologyDataTypeResourceTest extends ApiUnitTestBase {
         term = new Term(4, "Date", "");
         termList.add(term);
 
-        Mockito.doReturn(termList).when(ontologyService).getAllDataTypes();
+        Mockito.doReturn(termList).when(ontologyManagerService).getDataTypes();
 
         mockMvc.perform(get("/ontology/{cropname}/datatypes", cropName).contentType(contentType))
                 .andExpect(status().isOk())
@@ -73,6 +74,6 @@ public class OntologyDataTypeResourceTest extends ApiUnitTestBase {
                 .andExpect(jsonPath("$[0].name", is(termList.get(0).getName())))
                 .andDo(print());
 
-        verify(ontologyService, times(1)).getAllDataTypes();
+        verify(ontologyManagerService, times(1)).getDataTypes();
     }
 }
