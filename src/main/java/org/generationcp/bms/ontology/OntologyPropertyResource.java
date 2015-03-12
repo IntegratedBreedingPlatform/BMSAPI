@@ -1,22 +1,22 @@
 package org.generationcp.bms.ontology;
 
 import com.google.common.base.Strings;
-import org.generationcp.bms.ontology.dto.PropertySummary;
-import org.generationcp.bms.ontology.dto.PropertyResponse;
-import org.generationcp.bms.ontology.dto.PropertyRequest;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.bms.ontology.dto.GenericResponse;
+import org.generationcp.bms.ontology.dto.PropertyRequest;
+import org.generationcp.bms.ontology.dto.PropertyResponse;
+import org.generationcp.bms.ontology.dto.PropertySummary;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
