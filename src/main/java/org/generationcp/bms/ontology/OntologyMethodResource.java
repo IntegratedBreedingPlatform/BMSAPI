@@ -34,7 +34,7 @@ public class OntologyMethodResource {
     @ResponseBody
     public ResponseEntity<List<MethodSummary>> listAllMethods(@PathVariable String  cropname) throws MiddlewareQueryException {
         List<MethodSummary> methodList = ontologyModelService.getAllMethods();
-        if(methodList == null){
+        if(methodList.isEmpty()){
             LOGGER.error("No Valid Method Found");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

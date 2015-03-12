@@ -12,11 +12,11 @@ import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.modelmapper.ModelMapper;
-
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -31,7 +31,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 
         List<Method> methodList = ontologyService.getAllMethods();
         if(methodList == null){
-            return null;
+            return Collections.emptyList();
         }
         List<MethodSummary> methods = new ArrayList<>();
 
@@ -131,7 +131,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     public List<PropertySummary> getAllPropertiesByClass(String propertyClass) throws MiddlewareQueryException {
         List<Property> propertyList = ontologyService.getAllPropertiesWithClass(propertyClass);
         if(propertyList.isEmpty()) {
-        	return null;
+        	return Collections.emptyList();
         }
         List<PropertySummary> properties = new ArrayList<>();
 
