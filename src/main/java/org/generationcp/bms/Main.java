@@ -26,7 +26,7 @@ public class Main extends WebMvcConfigurerAdapter {
 	@Autowired
 	private SpringSwaggerConfig springSwaggerConfig;
 	
-	public static void main(String[] args) throws Exception {	
+	public static void main(String[] args) {	
 		SpringApplication.run(Main.class, args);	    
 		LOGGER.info("Startup Complete!");
 	}
