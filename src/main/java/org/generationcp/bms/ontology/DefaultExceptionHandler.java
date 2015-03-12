@@ -37,7 +37,7 @@ public class DefaultExceptionHandler {
     public @ResponseBody
     ErrorResponse handleRequestException(Exception ex) {
         ErrorResponse response = new ErrorResponse();
-        response.addError(ex.getMessage(), "SERVER1");
+        response.addError(ex.getMessage(), "SERVER");
         return response;
     }
 
@@ -53,7 +53,7 @@ public class DefaultExceptionHandler {
     public @ResponseBody
     ErrorResponse handleDataIntegrityViolationException(DataIntegrityViolationException ex) throws IOException {
         ErrorResponse response = new ErrorResponse();
-        response.addError(ex.getMessage(), "SERVER2");
+        response.addError(ex.getMessage(), "SERVER");
         return response;
     }
 
@@ -69,7 +69,7 @@ public class DefaultExceptionHandler {
     public @ResponseBody
     ErrorResponse handleDataAccessException(DataAccessException ex) throws IOException {
         ErrorResponse response = new ErrorResponse();
-        response.addError(ex.getMessage(), "SERVER3");
+        response.addError(ex.getMessage(), "SERVER");
         return response;
     }
 
@@ -86,7 +86,7 @@ public class DefaultExceptionHandler {
     public @ResponseBody
     ErrorResponse handleUnsupportedMediaTypeException(HttpMediaTypeNotSupportedException ex) throws IOException {
         ErrorResponse response = new ErrorResponse();
-        response.addError(ex.getMessage(), "SERVER4");
+        response.addError(ex.getMessage(), "SERVER");
         return response;
     }
 
@@ -106,9 +106,6 @@ public class DefaultExceptionHandler {
     public @ResponseBody
     ErrorResponse handleUncaughtException(Exception ex) throws IOException {
         ErrorResponse response = new ErrorResponse();
-
-        System.out.println(ex.getMessage());
-        ex.printStackTrace();
 
         if (ex.getCause() != null) {
             response.addError(ex.getCause().getMessage(), "SERVER");
