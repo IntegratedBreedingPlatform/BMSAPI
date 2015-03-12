@@ -24,9 +24,7 @@ import java.util.List;
 import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -201,5 +199,35 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 
         verify(ontologyManagerService, times(1)).updateProperty(captor.capture());
         Property captured = captor.getValue();
+    }
+
+    /**
+     * This test should expect 204 : No Content
+     * @throws Exception
+     */
+    @Test
+    public void deleteProperty() throws Exception{
+        String cropName = "maize";
+
+        PropertyRequest propertyDTO = new PropertyRequest();
+        propertyDTO.setName(propertyName);
+        propertyDTO.setDescription(propertyDescription);
+        propertyDTO.setCropOntologyId("CO:000001");
+        propertyDTO.setClasses(new ArrayList<>(Arrays.asList(className)));
+
+        List<Term> classList = new ArrayList<>();
+        Term term = new Term(1, className, propertyDescription);
+        classList.add(term);
+
+        Property property = new PropertyBuilder().build(11, propertyDTO.getName(), propertyDTO.getDescription(), propertyDTO.getCropOntologyId() , classList);
+
+        Mockito.doNothing().when(ontologyManagerService).deleteProperty(property.getId());
+
+        mockMvc.perform(delete("/ontology/{cropname}/properties/{id}", cropName, property.getId())
+                .contentType(contentType))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+
+        verify(ontologyManagerService, times(1)).deleteProperty(property.getId());
     }
 }
