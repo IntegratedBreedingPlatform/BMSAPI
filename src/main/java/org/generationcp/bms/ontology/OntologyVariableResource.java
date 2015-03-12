@@ -27,16 +27,14 @@ public class OntologyVariableResource {
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.GET)
 	@ResponseBody
 	public Set<StandardVariable> listAllStandardVariables(@PathVariable String  cropname) throws MiddlewareQueryException {
-        Set<StandardVariable> allVariables = ontologyService.getAllStandardVariables();
-		return allVariables;
+        return ontologyService.getAllStandardVariables();
 	}
 
 	@ApiOperation(value = "All variables by property id", notes = "Get all standard variables using given property id")
 	@RequestMapping(value = "/{cropname}/variables?property={id}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<StandardVariable> listAllStandardVariablesByPropertyId(@PathVariable String  cropname, @PathVariable Integer id) throws MiddlewareQueryException {
-        List<StandardVariable> variables = ontologyService.getStandardVariablesByProperty(id);
-        return variables;
+        return ontologyService.getStandardVariablesByProperty(id);
 	}
 
 }

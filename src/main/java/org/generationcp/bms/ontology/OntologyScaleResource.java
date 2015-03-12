@@ -30,15 +30,13 @@ public class OntologyScaleResource {
 	@RequestMapping(value = "/{cropname}/scales", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Scale> listAllScale(@PathVariable String  cropname) throws MiddlewareQueryException {
-		List<Scale> scaleList = ontologyService.getAllScales();
-		return scaleList;
+		return ontologyService.getAllScales();
 	}
 
 	@ApiOperation(value = "Get Scale by Id", notes = "Get Scale using Scale Id")
 	@RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public Scale getScaleById(@PathVariable String  cropname, @PathVariable Integer id) throws MiddlewareQueryException {
-		Scale scale = ontologyService.getScale(id);
-		return scale;
+		return ontologyService.getScale(id);
 	}
 }

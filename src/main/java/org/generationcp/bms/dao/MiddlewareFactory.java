@@ -169,7 +169,6 @@ public class MiddlewareFactory {
 				config.getDbHost(), config.getDbPort(), config.getWorkbenchDBName(), config.getDbUsername(), config.getDbPassword());		
 		SessionFactory sessionFactory = SessionFactoryUtil.openSessionFactory(workbenchConnectionParameters);
 		HibernateSessionPerRequestProvider sessionProvider = new HibernateSessionPerRequestProvider(sessionFactory);
-		WorkbenchDataManagerImpl workbenchDataManager = new WorkbenchDataManagerImpl(sessionProvider);
-		return workbenchDataManager;
+		return new WorkbenchDataManagerImpl(sessionProvider);
 	}
 }
