@@ -59,6 +59,6 @@ public class PropertyRequest {
 
     @JsonIgnore
     public boolean isValid(){
-        return !(this.getName().isEmpty() || this.getDescription().isEmpty()) && this.classes.size() > 0;
+        return !(this.getName().isEmpty() || this.getDescription().isEmpty()) && !this.classes.isEmpty();
     }
 }

@@ -24,7 +24,7 @@ public class ProgramResource {
         List<Project> projectList = this.workbenchDataManager.getProjects();
         List<ProjectBasicInfo> projectBasicInfoList = new ArrayList<>();
 
-        if(projectList.size() > 0){
+        if(!projectList.isEmpty()){
             for(Project project : projectList){
                 projectBasicInfoList.add(new ProjectBasicInfo(project));
             }
