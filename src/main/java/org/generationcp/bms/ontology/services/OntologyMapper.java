@@ -10,7 +10,6 @@ import org.generationcp.middleware.domain.oms.Property;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 
-import java.util.Arrays;
 import java.util.ArrayList;
 
 public class OntologyMapper {
