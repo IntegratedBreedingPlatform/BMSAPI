@@ -1,9 +1,27 @@
 package org.generationcp.bms.ontology.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.generationcp.bms.ontology.validator.NotNull;
+import org.generationcp.bms.ontology.validator.UniqueField;
+
 public class MethodRequest {
 
+    @UniqueField(fields = "@Fields:name")
+    @NotNull(fields = "@Fields:name")
     private String name;
+
     private String description;
+
+    @JsonIgnore
+    private Integer id;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -22,6 +40,6 @@ public class MethodRequest {
     }
   
     public String toString() {
-        return "Method [name=" + this.getName() + ", description=" + this.getDescription() + "]";
+        return "Method [id=" + this.id + ", name=" + this.getName() + ", description=" + this.getDescription() + "]";
     }
 }
