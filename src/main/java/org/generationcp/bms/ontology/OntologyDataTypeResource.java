@@ -19,6 +19,7 @@ import java.util.List;
 @Api(value = "Ontology Data Type Service")
 @Controller
 @RequestMapping("/ontology")
+@SuppressWarnings("unused") // Added because it shows the cropname not used warning that is used in URL
 public class OntologyDataTypeResource {
 	
 	@Autowired

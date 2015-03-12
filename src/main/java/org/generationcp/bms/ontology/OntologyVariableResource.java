@@ -18,6 +18,7 @@ import java.util.Set;
 @Api(value = "Ontology Variable Service")
 @Controller
 @RequestMapping("/ontology")
+@SuppressWarnings("unused") // Added because it shows the cropname not used warning that is used in URL
 public class OntologyVariableResource {
 	
 	@Autowired
