@@ -1,7 +1,5 @@
 package org.generationcp.bms.ontology.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class MethodRequest {
 
     private String name;
@@ -25,10 +23,5 @@ public class MethodRequest {
   
     public String toString() {
         return "Method [name=" + this.getName() + ", description=" + this.getDescription() + "]";
-    }
-
-    @JsonIgnore
-    public boolean isValid(){
-        return !(this.getName().isEmpty() || this.getDescription().isEmpty());
     }
 }

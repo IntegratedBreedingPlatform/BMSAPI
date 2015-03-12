@@ -60,10 +60,6 @@ public class OntologyMethodResource {
     @RequestMapping(value = "/{cropname}/methods", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<GenericResponse> addMethod(@PathVariable String  cropname, @RequestBody MethodRequest request) throws MiddlewareQueryException {
-        if(!request.isValid()){
-            LOGGER.error("Not Enough Data to Add New Method");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         GenericResponse response = ontologyModelService.addMethod(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -73,10 +69,6 @@ public class OntologyMethodResource {
     @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity updateMethod(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody MethodRequest request) throws MiddlewareQueryException, MiddlewareException {
-        if(!request.isValid()) {
-            LOGGER.error("Not Enough Data to Update Existing Method");
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
         if(!ontologyModelService.updateMethod(id, request)) {
         	return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
