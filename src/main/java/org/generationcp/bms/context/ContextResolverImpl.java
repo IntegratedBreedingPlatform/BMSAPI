@@ -3,12 +3,11 @@ package org.generationcp.bms.context;
 import org.generationcp.bms.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.stereotype.Component;
 
 @Component
 public class ContextResolverImpl implements ContextResolver {

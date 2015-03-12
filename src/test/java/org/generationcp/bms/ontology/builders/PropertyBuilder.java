@@ -1,7 +1,7 @@
 package org.generationcp.bms.ontology.builders;
 
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.Term;
 
 import java.util.List;
 

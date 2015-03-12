@@ -2,7 +2,6 @@ package org.generationcp.bms.ontology.validator;
 
 import org.generationcp.bms.ontology.dto.MethodRequest;
 import org.generationcp.bms.util.Init;
-import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;

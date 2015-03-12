@@ -7,9 +7,8 @@ import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.junit.Assert;
-import org.modelmapper.ModelMapper;
-
 import org.junit.Test;
+import org.modelmapper.ModelMapper;
 
 public class OntologyMapperTest {
 

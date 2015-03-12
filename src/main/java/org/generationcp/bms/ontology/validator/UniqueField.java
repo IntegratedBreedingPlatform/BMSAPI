@@ -1,20 +1,20 @@
 package org.generationcp.bms.ontology.validator;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.service.api.OntologyManagerService;
-import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.validation.*;
-import java.lang.annotation.Target;
-import java.lang.annotation.Retention;
+import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.Payload;
 import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

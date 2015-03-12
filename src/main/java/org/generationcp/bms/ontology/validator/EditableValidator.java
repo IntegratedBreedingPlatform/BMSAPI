@@ -4,11 +4,10 @@ import org.generationcp.bms.ontology.dto.MethodRequest;
 import org.generationcp.bms.util.Init;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.service.api.OntologyManagerService;
-import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.validation.Errors;
-
-import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.stereotype.Component;
+import org.springframework.validation.Errors;
 
 
 @Component

@@ -3,26 +3,25 @@ package org.generationcp.bms.ontology;
 import org.generationcp.bms.ApiUnitTestBase;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.service.api.OntologyManagerService;
-import org.generationcp.middleware.service.api.OntologyService;
-import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-import java.util.ArrayList;
-
+import org.junit.Test;
 import org.mockito.Mockito;
-import static org.mockito.Mockito.*;
-import static org.hamcrest.Matchers.is;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 public class OntologyClassResourceTest extends ApiUnitTestBase {

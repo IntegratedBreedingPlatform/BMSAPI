@@ -1,9 +1,9 @@
 package org.generationcp.bms.util;
 
-import java.util.Locale;
-
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
+
+import java.util.Locale;
 
 public class Init {
 

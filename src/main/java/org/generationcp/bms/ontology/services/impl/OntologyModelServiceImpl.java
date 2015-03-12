@@ -2,23 +2,21 @@ package org.generationcp.bms.ontology.services.impl;
 
 import org.generationcp.bms.ontology.dto.*;
 import org.generationcp.bms.ontology.services.OntologyMapper;
-import org.generationcp.bms.ontology.dto.MethodRequest;
 import org.generationcp.bms.ontology.services.OntologyModelService;
-import org.generationcp.bms.ontology.dto.PropertyRequest;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.ArrayList;
 
 @Service
 public class OntologyModelServiceImpl implements OntologyModelService {

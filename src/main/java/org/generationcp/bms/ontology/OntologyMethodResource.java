@@ -2,13 +2,14 @@ package org.generationcp.bms.ontology;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-import org.generationcp.bms.ontology.dto.*;
+import org.generationcp.bms.ontology.dto.GenericResponse;
+import org.generationcp.bms.ontology.dto.MethodRequest;
+import org.generationcp.bms.ontology.dto.MethodResponse;
+import org.generationcp.bms.ontology.dto.MethodSummary;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.validator.DeletableValidator;
 import org.generationcp.bms.ontology.validator.EditableValidator;
 import org.generationcp.bms.ontology.validator.IntegerValidator;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

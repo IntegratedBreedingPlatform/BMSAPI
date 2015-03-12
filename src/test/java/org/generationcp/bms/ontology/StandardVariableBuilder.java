@@ -1,9 +1,9 @@
 package org.generationcp.bms.ontology;
 
 
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
+import org.generationcp.middleware.domain.oms.Term;
 
 public class StandardVariableBuilder {
 

@@ -1,12 +1,16 @@
 package org.generationcp.bms.ontology;
 
-import com.wordnik.swagger.annotations.*;
-import org.generationcp.middleware.service.api.OntologyService;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.stereotype.Controller;
+import org.generationcp.middleware.service.api.OntologyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.Set;

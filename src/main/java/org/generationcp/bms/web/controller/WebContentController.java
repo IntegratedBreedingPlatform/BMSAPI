@@ -1,13 +1,12 @@
 package org.generationcp.bms.web.controller;
 
-import javax.servlet.http.HttpSession;
-
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.mangofactory.swagger.annotations.ApiIgnore;
+import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/")
