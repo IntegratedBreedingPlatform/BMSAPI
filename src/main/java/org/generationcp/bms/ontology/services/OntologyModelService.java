@@ -91,11 +91,10 @@ public interface OntologyModelService {
      *
      * @param id property to update
      * @param request property data to update
-     * @return if property updated or not
      * @throws MiddlewareQueryException
      * @throws MiddlewareException
      */
-    public boolean updateProperty(Integer id, PropertyRequest request) throws MiddlewareQueryException, MiddlewareException;
+    public void updateProperty(Integer id, PropertyRequest request) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * get all data types

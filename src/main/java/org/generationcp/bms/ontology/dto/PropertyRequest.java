@@ -7,6 +7,8 @@ import java.util.List;
 
 public class PropertyRequest {
 
+    //TODO : Need to apply validation here
+
     private String name;
     private String description;
     private String cropOntologyId;

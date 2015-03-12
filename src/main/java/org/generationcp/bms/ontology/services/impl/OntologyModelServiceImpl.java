@@ -105,16 +105,16 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     public PropertyResponse getProperty(Integer id) throws MiddlewareQueryException {
         Property property = ontologyManagerService.getProperty(id);
         if (property == null) {
-        	return null;
+            return null;
         }
         boolean deletable = true;
         if(ontologyManagerService.isTermReferred(id)) {
-        	deletable = false;
+            deletable = false;
         }
         ModelMapper mapper = OntologyMapper.propertyMapper();
         PropertyResponse response = mapper.map(property, PropertyResponse.class);
         if(deletable) {
-        	response.setEditableFields(new ArrayList<>(Arrays.asList("description")));
+            response.setEditableFields(new ArrayList<>(Arrays.asList("description")));
         }
         response.setDeletable(deletable);
         return response;
@@ -122,16 +122,31 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 
     @Override
     public GenericResponse addProperty(PropertyRequest request) throws MiddlewareQueryException, MiddlewareException {
-        //TODO : Create Property Object and pass directly to method
-        //return new GenericResponse(ontologyService.addProperty(request.getName(), request.getDescription(), request.getCropOntologyId(), request.getClasses()).getId());
-        return null;
+        Property property = new Property();
+        property.setName(request.getName());
+        property.setDefinition(request.getDescription());
+        property.setCropOntologyId(request.getCropOntologyId());
+
+        List<Term> traitClasses = ontologyManagerService.getAllTraitClass();
+
+        for(String c : request.getClasses()){
+            for(Term tc : traitClasses ) {
+                if(tc.getName().equals(c)) {
+                    property.addClass(tc);
+                }
+            }
+        }
+
+        ontologyManagerService.addProperty(property);
+
+        return new GenericResponse(property.getId());
     }
 
     @Override
     public List<PropertySummary> getAllPropertiesByClass(String propertyClass) throws MiddlewareQueryException {
         List<Property> propertyList = ontologyManagerService.getAllPropertiesWithClass(propertyClass);
         if(propertyList.isEmpty()) {
-        	return Collections.emptyList();
+            return Collections.emptyList();
         }
         List<PropertySummary> properties = new ArrayList<>();
 
@@ -148,20 +163,31 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     public boolean deleteProperty(Integer id) throws MiddlewareQueryException, MiddlewareException {
         boolean isReferred = ontologyManagerService.isTermReferred(id);
         if(isReferred) {
-        	return false;
+            return false;
         }
         ontologyManagerService.deleteProperty(id);
         return true;
     }
 
     @Override
-    public boolean updateProperty(Integer id, PropertyRequest request) throws MiddlewareQueryException, MiddlewareException {
-        if(ontologyManagerService.isTermReferred(id)) {
-        	return false;
+    public void updateProperty(Integer id, PropertyRequest request) throws MiddlewareQueryException, MiddlewareException {
+        Property property = new Property();
+        property.setId(id);
+        property.setName(request.getName());
+        property.setDefinition(request.getDescription());
+        property.setCropOntologyId(request.getCropOntologyId());
+
+        List<Term> traitClasses = ontologyManagerService.getAllTraitClass();
+
+        for(String c : request.getClasses()){
+            for(Term tc : traitClasses ) {
+                if(tc.getName().equals(c)) {
+                    property.addClass(tc);
+                }
+            }
         }
-        //TODO : Create Property Object and pass directly to method
-        //ontologyService.updateProperty(id, request.getName(), request.getDescription(), request.getCropOntologyId(), request.getClasses());
-        return true;
+
+        ontologyManagerService.updateProperty(property);
     }
 
     @Override

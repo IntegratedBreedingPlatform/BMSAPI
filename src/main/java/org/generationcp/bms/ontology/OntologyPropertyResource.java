@@ -87,9 +87,7 @@ public class OntologyPropertyResource {
             LOGGER.error("Not Enough Data to Update Existing Property");
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
-        if(!ontologyModelService.updateProperty(id, request)) {
-        	return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
+        ontologyModelService.updateProperty(id, request);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
