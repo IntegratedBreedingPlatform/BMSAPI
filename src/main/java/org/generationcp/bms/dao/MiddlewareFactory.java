@@ -26,9 +26,11 @@ import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
+import org.generationcp.middleware.service.OntologyManagerServiceImpl;
 import org.generationcp.middleware.service.OntologyServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
@@ -115,6 +117,12 @@ public class MiddlewareFactory {
 	public OntologyService getOntologyService() throws FileNotFoundException {
 		return new OntologyServiceImpl(new HibernateSessionPerRequestProvider(getSessionFactory()));
 	}
+
+    @Bean
+    @Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+    public OntologyManagerService getOntologyManagerService() throws FileNotFoundException {
+        return new OntologyManagerServiceImpl(new HibernateSessionPerRequestProvider(getSessionFactory()));
+    }
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
