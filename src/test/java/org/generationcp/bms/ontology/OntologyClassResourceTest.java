@@ -2,6 +2,7 @@ package org.generationcp.bms.ontology;
 
 import org.generationcp.bms.ApiUnitTestBase;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.junit.Test;
 import org.junit.After;
@@ -31,17 +32,17 @@ public class OntologyClassResourceTest extends ApiUnitTestBase {
 
         @Bean
         @Primary
-        public OntologyService ontologyService() {
-            return Mockito.mock(OntologyService.class);
+        public OntologyManagerService ontologyManagerService() {
+            return Mockito.mock(OntologyManagerService.class);
         }
     }
 
     @Autowired
-    private OntologyService ontologyService;
+    private OntologyManagerService ontologyManagerService;
 
     @Before
     public void reset(){
-        Mockito.reset(ontologyService);
+        Mockito.reset(ontologyManagerService);
     }
 
     @After
@@ -62,7 +63,7 @@ public class OntologyClassResourceTest extends ApiUnitTestBase {
         term = new Term(3, "Biotic Stress","");
         termList.add(term);
 
-        Mockito.doReturn(termList).when(ontologyService).getAllTraitClass();
+        Mockito.doReturn(termList).when(ontologyManagerService).getAllTraitClass();
 
         mockMvc.perform(get("/ontology/{cropname}/classes", cropName).contentType(contentType))
                 .andExpect(status().isOk())
@@ -70,6 +71,6 @@ public class OntologyClassResourceTest extends ApiUnitTestBase {
                 .andExpect(jsonPath("$[0]", is(termList.get(0).getName())))
                 .andDo(print());
 
-        verify(ontologyService, times(1)).getAllTraitClass();
+        verify(ontologyManagerService, times(1)).getAllTraitClass();
     }
 }

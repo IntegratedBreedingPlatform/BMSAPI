@@ -28,7 +28,6 @@ public class OntologyClassResource {
     @RequestMapping(value = "/{cropname}/classes", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<String>> listAllClasses(@PathVariable String cropname) throws MiddlewareQueryException {
-        List<String> classes = ontologyModelService.getAllClasses();
-        return new ResponseEntity<>(classes, HttpStatus.OK);
+        return new ResponseEntity<>(ontologyModelService.getAllClasses(), HttpStatus.OK);
     }
 }
