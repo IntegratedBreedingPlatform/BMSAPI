@@ -22,6 +22,7 @@ import java.util.List;
 @Api(value = "Ontology Method Service")
 @Controller
 @RequestMapping("/ontology")
+@SuppressWarnings("unused") // Added because it shows the cropname not used warning that is used in URL
 public class OntologyMethodResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OntologyMethodResource.class);
@@ -67,7 +68,7 @@ public class OntologyMethodResource {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    //TODO: 403 response for user without permission, Check if fields are editable or not
+    //TODO: 403 response for user without permission
     @ApiOperation(value = "Update Method", notes = "Update Method using Given Data")
     @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
     @ResponseBody
@@ -82,7 +83,7 @@ public class OntologyMethodResource {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    //TODO: 403 response for user without permission, Check if method is deletable or not
+    //TODO: 403 response for user without permission
     @ApiOperation(value = "Delete Method", notes = "Delete Method using Given Id")
     @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.DELETE)
     @ResponseBody
