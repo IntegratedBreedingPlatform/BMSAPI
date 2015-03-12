@@ -4,6 +4,8 @@ import org.generationcp.bms.ontology.dto.MethodRequest;
 import org.generationcp.bms.util.Init;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
@@ -11,6 +13,8 @@ import org.springframework.validation.Errors;
 
 @Component
 public class DeletableValidator implements org.springframework.validation.Validator{
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeletableValidator.class);
 
     @Autowired
     OntologyManagerService ontologyManagerService;
@@ -28,14 +32,17 @@ public class DeletableValidator implements org.springframework.validation.Valida
         Integer id = (Integer) target;
 
         if(id == null){
+            LOGGER.error("id should not be null");
             errors.rejectValue("id", Init.formatErrorMessage(messageSource, "should.not.be.null", null));
         }
         try {
             Method method = ontologyManagerService.getMethod(id);
             if(method == null){
+                LOGGER.error("term does not exist");
                 errors.rejectValue("id", Init.formatErrorMessage(messageSource, "does.not.exist", null));
             }else {
                 if(ontologyManagerService.isTermReferred(id)){
+                    LOGGER.error("can not delete term, it is referred");
                     errors.rejectValue("id", Init.formatErrorMessage(messageSource, "delete.term.referred", null));
                 }
             }
