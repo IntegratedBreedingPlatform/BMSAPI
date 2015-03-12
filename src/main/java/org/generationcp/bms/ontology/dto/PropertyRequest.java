@@ -37,7 +37,9 @@ public class PropertyRequest {
     }
 
     public List<String> getClasses() {
-        if(classes == null) classes = new ArrayList<>();
+        if(classes == null) {
+        	classes = new ArrayList<>();
+        }
         return classes;
     }
 

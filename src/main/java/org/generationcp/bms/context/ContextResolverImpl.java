@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings("unused")
 @Component
 public class ContextResolverImpl implements ContextResolver {
 	
@@ -20,7 +19,9 @@ public class ContextResolverImpl implements ContextResolver {
     public String resolveDatabaseFromUrl() throws ContextResolutionException {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
-        if(request == null) throw new ContextResolutionException("Request is null");
+        if(request == null) {
+        	throw new ContextResolutionException("Request is null");
+        }
 
         String path = request.getRequestURI().substring(request.getContextPath().length());
         LOG.debug("Request path: " + path);

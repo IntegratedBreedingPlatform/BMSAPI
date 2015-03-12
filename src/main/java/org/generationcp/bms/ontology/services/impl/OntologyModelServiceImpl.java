@@ -106,12 +106,18 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     @Override
     public PropertyResponse getProperty(Integer id) throws MiddlewareQueryException {
         Property property = ontologyService.getPropertyById(id);
-        if (property == null) return null;
+        if (property == null) {
+        	return null;
+        }
         boolean deletable = true;
-        if(ontologyService.isTermReferred(id)) deletable = false;
+        if(ontologyService.isTermReferred(id)) {
+        	deletable = false;
+        }
         ModelMapper mapper = OntologyMapper.propertyMapper();
         PropertyResponse response = mapper.map(property, PropertyResponse.class);
-        if(deletable) response.setEditableFields(new ArrayList<>(Arrays.asList("description")));
+        if(deletable) {
+        	response.setEditableFields(new ArrayList<>(Arrays.asList("description")));
+        }
         response.setDeletable(deletable);
         return response;
     }
@@ -124,7 +130,9 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     @Override
     public List<PropertySummary> getAllPropertiesByClass(String propertyClass) throws MiddlewareQueryException {
         List<Property> propertyList = ontologyService.getAllPropertiesWithClass(propertyClass);
-        if(propertyList.isEmpty()) return null;
+        if(propertyList.isEmpty()) {
+        	return null;
+        }
         List<PropertySummary> properties = new ArrayList<>();
 
         ModelMapper mapper = OntologyMapper.propertyMapper();
@@ -139,14 +147,18 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     @Override
     public boolean deleteProperty(Integer id) throws MiddlewareQueryException, MiddlewareException {
         boolean isReferred = ontologyService.isTermReferred(id);
-        if(isReferred) return false;
+        if(isReferred) {
+        	return false;
+        }
         ontologyService.deleteProperty(id);
         return true;
     }
 
     @Override
     public boolean updateProperty(Integer id, PropertyRequest request) throws MiddlewareQueryException, MiddlewareException {
-        if(ontologyService.isTermReferred(id)) return false;
+        if(ontologyService.isTermReferred(id)) {
+        	return false;
+        }
         ontologyService.updateProperty(id, request.getName(), request.getDescription(), request.getCropOntologyId(), request.getClasses());
         return true;
     }
