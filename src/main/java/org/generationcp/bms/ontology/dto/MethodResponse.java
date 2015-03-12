@@ -5,6 +5,8 @@ import java.util.List;
 public class MethodResponse extends MethodSummary {
 
     private List<String> editableFields;
+    
+    private Boolean deletable;
 
     public List<String> getEditableFields() {
         return editableFields;
@@ -13,8 +15,6 @@ public class MethodResponse extends MethodSummary {
     public void setEditableFields(List<String> editableFields) {
         this.editableFields = editableFields;
     }
-
-    private Boolean deletable;
 
     public Boolean getDeletable() {
         return deletable;

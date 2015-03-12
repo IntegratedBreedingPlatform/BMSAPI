@@ -6,6 +6,8 @@ public class PropertyResponse extends PropertySummary {
 
     private List<String> editableFields;
 
+    private Boolean deletable;
+    
     public List<String> getEditableFields() {
         return editableFields;
     }
@@ -13,8 +15,6 @@ public class PropertyResponse extends PropertySummary {
     public void setEditableFields(List<String> editableFields) {
         this.editableFields = editableFields;
     }
-
-    private Boolean deletable;
 
     public Boolean getDeletable() {
         return deletable;
