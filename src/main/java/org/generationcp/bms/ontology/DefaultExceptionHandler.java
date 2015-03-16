@@ -119,7 +119,9 @@ public class DefaultExceptionHandler {
                 continue;
             }
 
-            if(error.getArguments() == null) continue;
+            if(error.getArguments() == null){
+                continue;
+            }
 
             for(Object o : error.getArguments()){
                 if(!(o instanceof String)) {
