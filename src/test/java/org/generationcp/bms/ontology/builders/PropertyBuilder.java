@@ -14,6 +14,7 @@ public class PropertyBuilder {
     public Property build(int id, String name, String description, String cropOntologyId, List<Term> classes) {
 
         Property property = new Property();
+        property.setId(id);
         property.setName(name);
         property.setDefinition(description);
         property.setCropOntologyId(cropOntologyId);
