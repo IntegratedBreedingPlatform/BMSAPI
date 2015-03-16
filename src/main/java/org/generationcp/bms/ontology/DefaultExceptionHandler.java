@@ -41,12 +41,6 @@ public class DefaultExceptionHandler {
         return response;
     }
 
-    /*
-        Map<String, Object>  map = Maps.newHashMap();
-        map.put("error", "Data Integrity Error");
-        map.put("cause", ex.getCause().getCause().getLocalizedMessage());
-        return map;
-     */
     @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(value = HttpStatus.CONFLICT)
@@ -57,12 +51,6 @@ public class DefaultExceptionHandler {
         return response;
     }
 
-    /*
-        Map<String, Object>  map = Maps.newHashMap();
-        map.put("error", "Data Error");
-        map.put("cause", ex.getCause().getMessage());
-        return map;
-    */
     @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
     @ExceptionHandler(DataAccessException.class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
@@ -73,13 +61,6 @@ public class DefaultExceptionHandler {
         return response;
     }
 
-    /*
-        Map<String, Object>  map = Maps.newHashMap();
-        map.put("error", "Unsupported Media Type");
-        map.put("cause", ex.getLocalizedMessage());
-        map.put("supported", ex.getSupportedMediaTypes());
-        return map;
-     */
     @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     @ResponseStatus(value = HttpStatus.UNSUPPORTED_MEDIA_TYPE)
@@ -90,16 +71,6 @@ public class DefaultExceptionHandler {
         return response;
     }
 
-    /*
-        Map<String, Object>  map = Maps.newHashMap();
-        map.put("error", "Unknown Error");
-        if (ex.getCause() != null) {
-            map.put("cause", ex.getCause().getMessage());
-        } else {
-            map.put("cause", ex.getMessage());
-        }
-        return map;
-     */
     @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
@@ -115,13 +86,6 @@ public class DefaultExceptionHandler {
         return response;
     }
 
-    /*
-        Map<String, Object>  violationMap = Maps.newHashMap();
-        violationMap.put("value", constraintViolation.getInvalidValue());
-        violationMap.put("type", constraintViolation.getRootBeanClass());
-        violationMap.put("message", constraintViolation.getMessage());
-        result.put(constraintViolation.getPropertyPath().toString(), violationMap);
-    */
     @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
@@ -134,12 +98,6 @@ public class DefaultExceptionHandler {
         return response;
     }
 
-    /*
-        Map<String, Object>  violationMap = Maps.newHashMap();
-        violationMap.put("target", ex.getBindingResult().getTarget());
-        violationMap.put("type", ex.getBindingResult().getTarget().getClass());
-        violationMap.put("message", error.getDefaultMessage());
-     */
     @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
     @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
