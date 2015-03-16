@@ -61,7 +61,6 @@ public class OntologyMethodResource {
         return new ResponseEntity<>(methodList, HttpStatus.OK);
     }
 
-    // TODO : editableFields and deletable need to be determined
     @ApiOperation(value = "Get method by id", notes = "Get method using given method id")
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.GET)
 	@ResponseBody
