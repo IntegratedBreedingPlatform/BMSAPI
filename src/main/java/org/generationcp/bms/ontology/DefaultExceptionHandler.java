@@ -25,6 +25,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @ControllerAdvice
 public class DefaultExceptionHandler {
 
+    private final String SERVER = "SERVER";
+
     @RequestMapping(produces = {APPLICATION_JSON_VALUE})
     @ExceptionHandler({MissingServletRequestParameterException.class,
             UnsatisfiedServletRequestParameterException.class,
@@ -35,51 +37,51 @@ public class DefaultExceptionHandler {
     public @ResponseBody
     ErrorResponse handleRequestException(Exception ex) {
         ErrorResponse response = new ErrorResponse();
-        response.addError(ex.getMessage(), "SERVER");
+        response.addError(ex.getMessage(), SERVER);
         return response;
     }
 
     @RequestMapping(produces = {APPLICATION_JSON_VALUE})
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(value = CONFLICT)
-    public @ResponseBody
-    ErrorResponse handleDataIntegrityViolationException(DataIntegrityViolationException ex) throws IOException {
+    @ResponseBody
+    public ErrorResponse handleDataIntegrityViolationException(DataIntegrityViolationException ex) throws IOException {
         ErrorResponse response = new ErrorResponse();
-        response.addError(ex.getMessage(), "SERVER");
+        response.addError(ex.getMessage(), SERVER);
         return response;
     }
 
     @RequestMapping(produces = {APPLICATION_JSON_VALUE})
     @ExceptionHandler(DataAccessException.class)
     @ResponseStatus(value = INTERNAL_SERVER_ERROR)
-    public @ResponseBody
-    ErrorResponse handleDataAccessException(DataAccessException ex) throws IOException {
+    @ResponseBody
+    public ErrorResponse handleDataAccessException(DataAccessException ex) throws IOException {
         ErrorResponse response = new ErrorResponse();
-        response.addError(ex.getMessage(), "SERVER");
+        response.addError(ex.getMessage(), SERVER);
         return response;
     }
 
     @RequestMapping(produces = {APPLICATION_JSON_VALUE})
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     @ResponseStatus(value = UNSUPPORTED_MEDIA_TYPE)
-    public @ResponseBody
-    ErrorResponse handleUnsupportedMediaTypeException(HttpMediaTypeNotSupportedException ex) throws IOException {
+    @ResponseBody
+    public ErrorResponse handleUnsupportedMediaTypeException(HttpMediaTypeNotSupportedException ex) throws IOException {
         ErrorResponse response = new ErrorResponse();
-        response.addError(ex.getMessage(), "SERVER");
+        response.addError(ex.getMessage(), SERVER);
         return response;
     }
 
     @RequestMapping(produces = {APPLICATION_JSON_VALUE})
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = INTERNAL_SERVER_ERROR)
-    public @ResponseBody
-    ErrorResponse handleUncaughtException(Exception ex) throws IOException {
+    @ResponseBody
+    public ErrorResponse handleUncaughtException(Exception ex) throws IOException {
         ErrorResponse response = new ErrorResponse();
 
         if (ex.getCause() != null) {
-            response.addError(ex.getCause().getMessage(), "SERVER");
+            response.addError(ex.getCause().getMessage(), SERVER);
         } else {
-            response.addError(ex.getMessage(), "SERVER");
+            response.addError(ex.getMessage(), SERVER);
         }
         return response;
     }
@@ -87,8 +89,8 @@ public class DefaultExceptionHandler {
     @RequestMapping(produces = {APPLICATION_JSON_VALUE})
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(value = BAD_REQUEST)
-    public @ResponseBody
-    ErrorResponse handleValidationException(ConstraintViolationException ex) throws IOException {
+    @ResponseBody
+    public ErrorResponse handleValidationException(ConstraintViolationException ex) throws IOException {
         ErrorResponse response = new ErrorResponse();
         for (ConstraintViolation constraintViolation : ex.getConstraintViolations()) {
             response.addError(constraintViolation.getMessage(), constraintViolation.getRootBeanClass().getSimpleName());
@@ -99,8 +101,8 @@ public class DefaultExceptionHandler {
     @RequestMapping(produces = {APPLICATION_JSON_VALUE})
     @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
     @ResponseStatus(value = BAD_REQUEST)
-    public @ResponseBody
-    ErrorResponse handleValidationException(MethodArgumentNotValidException ex) throws IOException {
+    @ResponseBody
+    public ErrorResponse handleValidationException(MethodArgumentNotValidException ex) throws IOException {
         return parseErrors(ex.getBindingResult());
     }
 
