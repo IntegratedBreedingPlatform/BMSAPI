@@ -2,14 +2,14 @@ package org.generationcp.bms.ontology;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-import org.generationcp.bms.ontology.dto.GenericResponse;
 import org.generationcp.bms.ontology.dto.MethodRequest;
 import org.generationcp.bms.ontology.dto.MethodResponse;
 import org.generationcp.bms.ontology.dto.MethodSummary;
 import org.generationcp.bms.ontology.services.OntologyModelService;
+import org.generationcp.bms.ontology.validator.IntegerValidator;
 import org.generationcp.bms.ontology.validator.MethodDeletableValidator;
 import org.generationcp.bms.ontology.validator.MethodEditableValidator;
-import org.generationcp.bms.ontology.validator.IntegerValidator;
+import org.generationcp.bms.ontology.validator.MethodNullAndUniqueValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,6 +38,8 @@ public class OntologyMethodResource {
     private MethodEditableValidator methodEditableValidator;
     @Autowired
     private MethodDeletableValidator methodDeletableValidator;
+    @Autowired
+    private MethodNullAndUniqueValidator nullAndUniqueValidator;
     @Autowired
     private OntologyModelService ontologyModelService;
 
@@ -76,9 +77,12 @@ public class OntologyMethodResource {
     @ApiOperation(value = "Add Method", notes = "Add a Method using Given Data")
     @RequestMapping(value = "/{cropname}/methods", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<GenericResponse> addMethod(@PathVariable String  cropname,@RequestBody @Valid MethodRequest request) throws Exception {
-        GenericResponse response = ontologyModelService.addMethod(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    public ResponseEntity<?> addMethod(@PathVariable String  cropname,@RequestBody MethodRequest request, BindingResult result) throws Exception {
+        nullAndUniqueValidator.validate(request, result);
+        if(result.hasErrors()){
+            return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(result), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(ontologyModelService.addMethod(request), HttpStatus.CREATED);
     }
 
     //TODO: 403 response for user without permission

@@ -1,13 +1,9 @@
 package org.generationcp.bms.ontology.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.generationcp.bms.ontology.validator.NotNull;
-import org.generationcp.bms.ontology.validator.UniqueField;
 
 public class MethodRequest {
 
-    @UniqueField(fields = "@Fields:name")
-    @NotNull(fields = "@Fields:name")
     private String name;
 
     private String description;
