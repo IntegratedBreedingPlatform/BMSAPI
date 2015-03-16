@@ -11,11 +11,10 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
-
 @Component
-public class EditableValidator implements org.springframework.validation.Validator{
+public class MethodDeletableValidator implements org.springframework.validation.Validator{
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EditableValidator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodDeletableValidator.class);
 
     @Autowired
     OntologyManagerService ontologyManagerService;
@@ -30,33 +29,25 @@ public class EditableValidator implements org.springframework.validation.Validat
     @Override
     public void validate(Object target, Errors errors) {
 
-        MethodRequest request = (MethodRequest) target;
+        Integer id = (Integer) target;
 
-        if(request == null){
-            errors.rejectValue("request", I18nUtil.formatErrorMessage(messageSource, "should.not.be.null", null));
-        }
-
-        assert request != null;
-
-        if(request.getName().isEmpty()){
-            LOGGER.error("field should not be null");
-            errors.rejectValue("name", I18nUtil.formatErrorMessage(messageSource, "should.not.be.null", null));
+        if(id == null){
+            LOGGER.error("id should not be null");
+            errors.rejectValue("id", I18nUtil.formatErrorMessage(messageSource, "should.not.be.null", null));
         }
         try {
-            Method method = ontologyManagerService.getMethod(request.getId());
-            if(method == null) {
+            Method method = ontologyManagerService.getMethod(id);
+            if(method == null){
                 LOGGER.error("term does not exist");
                 errors.rejectValue("id", I18nUtil.formatErrorMessage(messageSource, "does.not.exist", null));
             }else {
-                if (ontologyManagerService.isTermReferred(request.getId())) {
-                    if (!method.getName().trim().equals(request.getName().trim())) {
-                        LOGGER.error("name not editable");
-                        errors.rejectValue("name", I18nUtil.formatErrorMessage(messageSource, "name.not.editable", null));
-                    }
+                if(ontologyManagerService.isTermReferred(id)){
+                    LOGGER.error("can not delete term, it is referred");
+                    errors.rejectValue("id", I18nUtil.formatErrorMessage(messageSource, "delete.term.referred", null));
                 }
             }
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error("Error while validating object", e);
         }
     }
 }

@@ -7,8 +7,8 @@ import org.generationcp.bms.ontology.dto.MethodRequest;
 import org.generationcp.bms.ontology.dto.MethodResponse;
 import org.generationcp.bms.ontology.dto.MethodSummary;
 import org.generationcp.bms.ontology.services.OntologyModelService;
-import org.generationcp.bms.ontology.validator.DeletableValidator;
-import org.generationcp.bms.ontology.validator.EditableValidator;
+import org.generationcp.bms.ontology.validator.MethodDeletableValidator;
+import org.generationcp.bms.ontology.validator.MethodEditableValidator;
 import org.generationcp.bms.ontology.validator.IntegerValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +36,9 @@ public class OntologyMethodResource {
     @Autowired
     private IntegerValidator integerValidator;
     @Autowired
-    private EditableValidator editableValidator;
+    private MethodEditableValidator methodEditableValidator;
     @Autowired
-    private DeletableValidator deletableValidator;
+    private MethodDeletableValidator methodDeletableValidator;
     @Autowired
     private OntologyModelService ontologyModelService;
 
@@ -59,8 +59,6 @@ public class OntologyMethodResource {
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<?> getMethodById(@PathVariable String cropname, @PathVariable String id) throws Exception {
-        //FIXME : BindingResult does not work with @PathVariable in method argument so here initialize BindingResult with MapBindingResult
-
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
         integerValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
@@ -89,7 +87,7 @@ public class OntologyMethodResource {
     @ResponseBody
     public ResponseEntity<?> updateMethod(@PathVariable String  cropname,@PathVariable Integer id, @RequestBody MethodRequest request, BindingResult result) throws Exception {
         request.setId(id);
-        editableValidator.validate(request, result);
+        methodEditableValidator.validate(request, result);
         if(result.hasErrors()){
             return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(result), HttpStatus.BAD_REQUEST);
         }
@@ -102,9 +100,8 @@ public class OntologyMethodResource {
     @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.DELETE)
     @ResponseBody
     public ResponseEntity deleteMethod(@PathVariable String  cropname,@PathVariable Integer id) throws Exception {
-        //FIXME : BindingResult does not work with @PathVariable in method argument so here initialize BindingResult with MapBindingResult
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-        deletableValidator.validate(id, bindingResult);
+        methodDeletableValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
             return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(bindingResult), HttpStatus.BAD_REQUEST);
         }
