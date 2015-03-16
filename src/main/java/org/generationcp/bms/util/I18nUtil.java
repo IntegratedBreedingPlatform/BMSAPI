@@ -5,13 +5,13 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 
 import java.util.Locale;
 
-public class Init {
+public class I18nUtil {
 
     private static final Locale getLocale(){
         return LocaleContextHolder.getLocale();
     }
 
     public static String formatErrorMessage(ResourceBundleMessageSource messageSource, String errorCode, Object[] parameters){
-        return messageSource.getMessage(errorCode, parameters, Init.getLocale());
+        return messageSource.getMessage(errorCode, parameters, I18nUtil.getLocale());
     }
 }

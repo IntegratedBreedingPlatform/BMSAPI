@@ -1,7 +1,7 @@
 package org.generationcp.bms.ontology.validator;
 
 import org.generationcp.bms.ontology.dto.MethodRequest;
-import org.generationcp.bms.util.Init;
+import org.generationcp.bms.util.I18nUtil;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,7 @@ public class IntegerValidator implements org.springframework.validation.Validato
 
         if(! id.matches("^[0-9]+$")){
             LOGGER.error("field should be numeric");
-            errors.rejectValue("id", Init.formatErrorMessage(messageSource, "should.be.numeric", null));
+            errors.rejectValue("id", I18nUtil.formatErrorMessage(messageSource, "should.be.numeric", null));
         }
     }
 }
