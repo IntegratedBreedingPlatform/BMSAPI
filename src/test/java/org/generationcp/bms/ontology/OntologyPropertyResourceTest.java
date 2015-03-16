@@ -3,7 +3,6 @@ package org.generationcp.bms.ontology;
 import org.generationcp.bms.ApiUnitTestBase;
 import org.generationcp.bms.ontology.builders.PropertyBuilder;
 import org.generationcp.bms.ontology.dto.PropertyRequest;
-import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.service.api.OntologyManagerService;
@@ -153,8 +152,6 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
         Term term = new Term(1, className, propertyDescription);
         classList.add(term);
 
-        Property property = new PropertyBuilder().build(11, propertyDTO.getName(), propertyDTO.getDescription(), propertyDTO.getCropOntologyId() , classList);
-
         ArgumentCaptor<Property> captor = ArgumentCaptor.forClass(Property.class);
 
         Mockito.doNothing().when(ontologyManagerService).addProperty(any(Property.class));
@@ -162,7 +159,7 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
         mockMvc.perform(post("/ontology/{cropname}/properties",cropName)
                 .contentType(contentType).content(convertObjectToByte(propertyDTO)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", is(property.getId())))
+                .andExpect(jsonPath("$.id", is(0)))
                 .andDo(print());
 
         verify(ontologyManagerService, times(1)).addProperty(captor.capture());
@@ -198,7 +195,6 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
                 .andDo(print());
 
         verify(ontologyManagerService, times(1)).updateProperty(captor.capture());
-        Property captured = captor.getValue();
     }
 
     /**
