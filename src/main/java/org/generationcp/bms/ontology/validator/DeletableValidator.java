@@ -47,6 +47,7 @@ public class DeletableValidator implements org.springframework.validation.Valida
                 }
             }
         } catch (Exception e) {
+            LOGGER.error("Error while validating object", e);
         }
     }
 }
