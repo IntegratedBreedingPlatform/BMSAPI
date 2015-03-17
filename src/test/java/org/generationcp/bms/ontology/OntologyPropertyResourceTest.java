@@ -54,7 +54,7 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 
     private final String propertyDescription = "Description";
 
-    private final String className = "Abiotic Stress";
+    private final String className = "Study condition";
 
     @After
     public void validate() {
@@ -152,11 +152,15 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
         Term term = new Term(1, className, propertyDescription);
         classList.add(term);
 
+        List<Property> propertyList = new ArrayList<>();
+        propertyList.add(new PropertyBuilder().build(0, propertyDTO.getName(), propertyDTO.getDescription(), propertyDTO.getCropOntologyId() , classList));
+
         ArgumentCaptor<Property> captor = ArgumentCaptor.forClass(Property.class);
 
         Mockito.doNothing().when(ontologyManagerService).addProperty(any(Property.class));
+        Mockito.doReturn(propertyList).when(ontologyManagerService).getAllPropertiesWithClass(propertyDTO.getClasses().get(0));
 
-        mockMvc.perform(post("/ontology/{cropname}/properties",cropName)
+        mockMvc.perform(post("/ontology/{cropname}/properties", cropName)
                 .contentType(contentType).content(convertObjectToByte(propertyDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", is(0)))
