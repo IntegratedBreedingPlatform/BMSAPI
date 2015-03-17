@@ -9,6 +9,7 @@ import org.generationcp.bms.ontology.dto.PropertyResponse;
 import org.generationcp.bms.ontology.dto.PropertySummary;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.validator.IntegerValidator;
+import org.generationcp.bms.ontology.validator.PropertyEditableValidator;
 import org.generationcp.bms.ontology.validator.PropertyNullAndUniqueValidator;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -39,6 +40,8 @@ public class OntologyPropertyResource {
     private IntegerValidator integerValidator;
     @Autowired
     private PropertyNullAndUniqueValidator nullAndUniqueValidator;
+    @Autowired
+    private PropertyEditableValidator editableValidator;
     @Autowired
     private OntologyModelService ontologyModelService;
 
@@ -100,11 +103,12 @@ public class OntologyPropertyResource {
     @ApiOperation(value = "Update Property", notes = "Update Property using Given Data")
     @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity updateProperty(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody PropertyRequest request) throws MiddlewareQueryException, MiddlewareException {
-        /*if(!request.isValid()) {
-            LOGGER.error("Not Enough Data to Update Existing Property");
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }*/
+    public ResponseEntity updateProperty(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody PropertyRequest request, BindingResult result) throws MiddlewareQueryException, MiddlewareException {
+        request.setId(id);
+        editableValidator.validate(request, result);
+        if(result.hasErrors()){
+            return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(result), BAD_REQUEST);
+        }
         ontologyModelService.updateProperty(id, request);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

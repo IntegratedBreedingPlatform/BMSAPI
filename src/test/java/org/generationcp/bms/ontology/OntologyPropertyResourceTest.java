@@ -1,32 +1,32 @@
 package org.generationcp.bms.ontology;
 
 import org.generationcp.bms.ApiUnitTestBase;
-import org.generationcp.bms.ontology.builders.PropertyBuilder;
 import org.generationcp.bms.ontology.dto.PropertyRequest;
-import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.bms.ontology.builders.PropertyBuilder;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.ArgumentCaptor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Arrays;
+import java.util.ArrayList;
 
-import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
+import static org.hamcrest.Matchers.is;
+import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 
 public class OntologyPropertyResourceTest extends ApiUnitTestBase {
@@ -188,10 +188,14 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
         classList.add(term);
 
         Property property = new PropertyBuilder().build(11, propertyDTO.getName(), propertyDTO.getDescription(), propertyDTO.getCropOntologyId() , classList);
+        List<Property> propertyList = new ArrayList<>();
+        propertyList.add(property);
 
         ArgumentCaptor<Property> captor = ArgumentCaptor.forClass(Property.class);
 
         Mockito.doNothing().when(ontologyManagerService).updateProperty(any(Property.class));
+        Mockito.doReturn(property).when(ontologyManagerService).getProperty(property.getId());
+        Mockito.doReturn(propertyList).when(ontologyManagerService).getAllPropertiesWithClass(propertyDTO.getClasses().get(0));
 
         mockMvc.perform(put("/ontology/{cropname}/properties/{id}", cropName, property.getId())
                 .contentType(contentType).content(convertObjectToByte(propertyDTO)))

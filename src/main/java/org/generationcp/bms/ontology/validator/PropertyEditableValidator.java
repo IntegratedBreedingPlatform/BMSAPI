@@ -2,7 +2,6 @@ package org.generationcp.bms.ontology.validator;
 
 import org.generationcp.bms.ontology.dto.PropertyRequest;
 import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.slf4j.Logger;
@@ -17,12 +16,12 @@ import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.generationcp.bms.util.I18nUtil.formatErrorMessage;
-import static org.generationcp.middleware.domain.oms.CvId.PROPERTIES;
+
 
 @Component
-public class PropertyNullAndUniqueValidator implements org.springframework.validation.Validator{
+public class PropertyEditableValidator implements org.springframework.validation.Validator{
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PropertyNullAndUniqueValidator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PropertyEditableValidator.class);
 
     @Autowired
     OntologyManagerService ontologyManagerService;
@@ -43,7 +42,7 @@ public class PropertyNullAndUniqueValidator implements org.springframework.valid
             errors.rejectValue("request", formatErrorMessage(messageSource, "request.null", null));
         }
 
-        if (request != null) {
+        if(request != null){
             if(isNullOrEmpty(request.getName()) || request.getClasses().isEmpty()){
                 if(isNullOrEmpty(request.getName())){
                     LOGGER.error("name should not be empty");
@@ -54,21 +53,25 @@ public class PropertyNullAndUniqueValidator implements org.springframework.valid
                     ValidationUtils.rejectIfEmptyOrWhitespace(errors, "classes", formatErrorMessage(messageSource, "property.class.required", null));
                 }
 
-            } else {
+            }else {
                 try {
-                    Term property = ontologyManagerService.getTermByNameAndCvId(request.getName(), PROPERTIES.getId());
-
-                    if (property != null) {
-                        if (property.getName().trim().equals(request.getName().trim())) {
-                            LOGGER.debug("Property already exist with same name : " + request.getName());
-                            errors.rejectValue("name", formatErrorMessage(messageSource, "field.should.be.unique", null));
-                        }
-                    }
-                    for(String className : request.getClasses()){
-                        List<Property> propertyList = ontologyManagerService.getAllPropertiesWithClass(className);
-                        if(propertyList.isEmpty()){
-                            LOGGER.error("Class does not exist: " + className);
-                            errors.rejectValue("classes", formatErrorMessage(messageSource, "property.class.invalid", new Object[]{className}));
+                    Property property = ontologyManagerService.getProperty(request.getId());
+                    if(property == null){
+                        LOGGER.error("term does not exist");
+                        errors.rejectValue("id", formatErrorMessage(messageSource, "does.not.exist", new Object[]{request.getId()}));
+                    }else {
+                        if(ontologyManagerService.isTermReferred(request.getId())){
+                            if(!property.getName().trim().equals(request.getName().trim())){
+                                LOGGER.error("name not editable");
+                                errors.rejectValue("name", formatErrorMessage(messageSource, "name.not.editable", null));
+                            }
+                            for(String className : request.getClasses()){
+                                List<Property> propertyList = ontologyManagerService.getAllPropertiesWithClass(className);
+                                if(propertyList.isEmpty()){
+                                    LOGGER.error("Class does not exist: " + className);
+                                    errors.rejectValue("classes", formatErrorMessage(messageSource, "property.class.invalid", new Object[]{className}));
+                                }
+                            }
                         }
                     }
                 } catch (MiddlewareQueryException e) {
