@@ -39,7 +39,7 @@ public class MethodDeletableValidator implements org.springframework.validation.
             Method method = ontologyManagerService.getMethod(id);
             if(method == null){
                 LOGGER.error("term does not exist");
-                errors.rejectValue("id", I18nUtil.formatErrorMessage(messageSource, "does.not.exist", null));
+                errors.rejectValue("id", I18nUtil.formatErrorMessage(messageSource, "does.not.exist", new Object[]{id}));
             }else {
                 if(ontologyManagerService.isTermReferred(id)){
                     LOGGER.error("can not delete term, it is referred");

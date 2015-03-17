@@ -47,7 +47,7 @@ public class MethodEditableValidator implements org.springframework.validation.V
                 Method method = ontologyManagerService.getMethod(request.getId());
                 if(method == null) {
                     LOGGER.error("term does not exist");
-                    errors.rejectValue("id", formatErrorMessage(messageSource, "does.not.exist", null));
+                    errors.rejectValue("id", formatErrorMessage(messageSource, "does.not.exist", new Object[]{request.getId()}));
                 }else {
                     if (ontologyManagerService.isTermReferred(request.getId())) {
                         if (!method.getName().trim().equals(request.getName().trim())) {
