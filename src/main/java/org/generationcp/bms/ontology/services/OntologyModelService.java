@@ -101,7 +101,7 @@ public interface OntologyModelService {
      * @return list of data types
      * @throws MiddlewareQueryException
      */
-    public List<DataTypeSummary> getAllDataTypes() throws MiddlewareQueryException;
+    public List<IdName> getAllDataTypes() throws MiddlewareQueryException;
 
     /**
      * get all classes

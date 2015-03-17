@@ -1,7 +1,7 @@
 package org.generationcp.bms.ontology.dto;
 
 
-public class DataTypeSummary {
+public class IdName {
 
     private Integer id;
     private String name;

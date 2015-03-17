@@ -2,7 +2,7 @@ package org.generationcp.bms.ontology;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-import org.generationcp.bms.ontology.dto.DataTypeSummary;
+import org.generationcp.bms.ontology.dto.IdName;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class OntologyDataTypeResource {
     @ApiOperation(value = "All Data Types", notes = "Get all Data Types")
     @RequestMapping(value = "/{cropname}/datatypes", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<List<DataTypeSummary>> listAllDataTypes(@PathVariable String cropname) throws MiddlewareQueryException {
+    public ResponseEntity<List<IdName>> listAllDataTypes(@PathVariable String cropname) throws MiddlewareQueryException {
         return new ResponseEntity<>(ontologyModelService.getAllDataTypes(), HttpStatus.OK);
     }
 }

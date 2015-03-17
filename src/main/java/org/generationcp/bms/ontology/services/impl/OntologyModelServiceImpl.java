@@ -185,14 +185,14 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     }
 
     @Override
-    public List<DataTypeSummary> getAllDataTypes() throws MiddlewareQueryException {
+    public List<IdName> getAllDataTypes() throws MiddlewareQueryException {
         List<Term> termList = ontologyManagerService.getDataTypes();
-        List<DataTypeSummary> dataTypeSummaries = new ArrayList<>();
+        List<IdName> dataTypeSummaries = new ArrayList<>();
 
         ModelMapper mapper = OntologyMapper.getInstance();
 
         for(Term term : termList){
-            DataTypeSummary summary = mapper.map(term, DataTypeSummary.class);
+            IdName summary = mapper.map(term, IdName.class);
             dataTypeSummaries.add(summary);
         }
         return dataTypeSummaries;
