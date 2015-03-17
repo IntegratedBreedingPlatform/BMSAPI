@@ -9,6 +9,7 @@ import org.generationcp.bms.ontology.dto.PropertyResponse;
 import org.generationcp.bms.ontology.dto.PropertySummary;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.validator.IntegerValidator;
+import org.generationcp.bms.ontology.validator.PropertyNullAndUniqueValidator;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.slf4j.Logger;
@@ -36,6 +37,8 @@ public class OntologyPropertyResource {
 
     @Autowired
     private IntegerValidator integerValidator;
+    @Autowired
+    private PropertyNullAndUniqueValidator nullAndUniqueValidator;
     @Autowired
     private OntologyModelService ontologyModelService;
 
@@ -73,10 +76,10 @@ public class OntologyPropertyResource {
     @ApiOperation(value = "Add Property", notes = "Add a Property using Given Data")
     @RequestMapping(value = "/{cropname}/properties", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<GenericResponse> addProperty(@PathVariable String  cropname, @RequestBody PropertyRequest request) throws MiddlewareQueryException, MiddlewareException {
-        if(!request.isValid()){
-            LOGGER.error("Not Enough Data to Add New Property");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> addProperty(@PathVariable String  cropname, @RequestBody PropertyRequest request, BindingResult result) throws MiddlewareQueryException, MiddlewareException {
+        nullAndUniqueValidator.validate(request, result);
+        if(result.hasErrors()){
+            return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(result), BAD_REQUEST);
         }
         GenericResponse response = ontologyModelService.addProperty(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -98,10 +101,10 @@ public class OntologyPropertyResource {
     @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity updateProperty(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody PropertyRequest request) throws MiddlewareQueryException, MiddlewareException {
-        if(!request.isValid()) {
+        /*if(!request.isValid()) {
             LOGGER.error("Not Enough Data to Update Existing Property");
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
+        }*/
         ontologyModelService.updateProperty(id, request);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

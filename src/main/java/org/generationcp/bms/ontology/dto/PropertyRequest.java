@@ -7,12 +7,21 @@ import java.util.List;
 
 public class PropertyRequest {
 
-    //TODO : Need to apply validation here
-
     private String name;
     private String description;
     private String cropOntologyId;
     private List<String> classes;
+
+    @JsonIgnore
+    private Integer id;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -51,16 +60,11 @@ public class PropertyRequest {
 
     @Override
     public String toString() {
-        return "Property [" +
-                "name='" + name + '\'' +
+        return "Property [id=" + id +
+                ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", cropOntologyId='" + cropOntologyId + '\'' +
                 ", classes=" + classes +
                 ']';
-    }
-
-    @JsonIgnore
-    public boolean isValid(){
-        return !(this.getName().isEmpty() || this.getDescription().isEmpty()) && !this.classes.isEmpty();
     }
 }
