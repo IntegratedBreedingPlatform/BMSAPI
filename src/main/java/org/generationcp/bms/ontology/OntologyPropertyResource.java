@@ -9,6 +9,7 @@ import org.generationcp.bms.ontology.dto.PropertyResponse;
 import org.generationcp.bms.ontology.dto.PropertySummary;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.validator.IntegerValidator;
+import org.generationcp.bms.ontology.validator.PropertyDeletableValidator;
 import org.generationcp.bms.ontology.validator.PropertyEditableValidator;
 import org.generationcp.bms.ontology.validator.PropertyNullAndUniqueValidator;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -42,6 +43,8 @@ public class OntologyPropertyResource {
     private PropertyNullAndUniqueValidator nullAndUniqueValidator;
     @Autowired
     private PropertyEditableValidator editableValidator;
+    @Autowired
+    private PropertyDeletableValidator deletableValidator;
     @Autowired
     private OntologyModelService ontologyModelService;
 
@@ -93,9 +96,12 @@ public class OntologyPropertyResource {
     @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.DELETE)
     @ResponseBody
     public ResponseEntity deleteProperty(@PathVariable String  cropname, @PathVariable Integer id) throws MiddlewareQueryException, MiddlewareException {
-        if (!ontologyModelService.deleteProperty(id)) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
+        deletableValidator.validate(id, bindingResult);
+        if(bindingResult.hasErrors()){
+            return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(bindingResult), BAD_REQUEST);
         }
+        ontologyModelService.deleteProperty(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

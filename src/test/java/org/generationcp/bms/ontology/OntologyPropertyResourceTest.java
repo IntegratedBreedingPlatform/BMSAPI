@@ -225,6 +225,8 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 
         Property property = new PropertyBuilder().build(11, propertyDTO.getName(), propertyDTO.getDescription(), propertyDTO.getCropOntologyId() , classList);
 
+        Mockito.doReturn(property).when(ontologyManagerService).getProperty(property.getId());
+        Mockito.doReturn(false).when(ontologyManagerService).isTermReferred(property.getId());
         Mockito.doNothing().when(ontologyManagerService).deleteProperty(property.getId());
 
         mockMvc.perform(delete("/ontology/{cropname}/properties/{id}", cropName, property.getId())
