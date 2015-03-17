@@ -109,7 +109,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
         ModelMapper mapper = OntologyMapper.propertyMapper();
         PropertyResponse response = mapper.map(property, PropertyResponse.class);
         if(!deletable) {
-            response.setEditableFields(new ArrayList<>(Arrays.asList("description")));
+            response.setEditableFields(new ArrayList<>(Arrays.asList("description", "classes", "cropOntologyId")));
         }else {
             response.setEditableFields(new ArrayList<>(Arrays.asList("name", "description", "classes", "cropOntologyId")));
         }
