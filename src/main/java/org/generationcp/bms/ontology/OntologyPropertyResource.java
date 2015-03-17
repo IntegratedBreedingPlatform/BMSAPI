@@ -8,6 +8,7 @@ import org.generationcp.bms.ontology.dto.PropertyRequest;
 import org.generationcp.bms.ontology.dto.PropertyResponse;
 import org.generationcp.bms.ontology.dto.PropertySummary;
 import org.generationcp.bms.ontology.services.OntologyModelService;
+import org.generationcp.bms.ontology.validator.IntegerValidator;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.slf4j.Logger;
@@ -16,9 +17,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Api(value = "Ontology Property Service")
 @Controller
@@ -28,6 +34,8 @@ public class OntologyPropertyResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OntologyPropertyResource.class);
 
+    @Autowired
+    private IntegerValidator integerValidator;
     @Autowired
     private OntologyModelService ontologyModelService;
 
@@ -44,12 +52,16 @@ public class OntologyPropertyResource {
         }
     }
 
-    // TODO : editableFields and deletable need to be determined
     @ApiOperation(value = "Get Property by id", notes = "Get Property using given Property id")
     @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<PropertyResponse> getPropertyById(@PathVariable String  cropname, @PathVariable Integer id) throws MiddlewareQueryException {
-        PropertyResponse propertyResponse = ontologyModelService.getProperty(id);
+    public ResponseEntity<?> getPropertyById(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
+        integerValidator.validate(id, bindingResult);
+        if(bindingResult.hasErrors()){
+            return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(bindingResult), BAD_REQUEST);
+        }
+        PropertyResponse propertyResponse = ontologyModelService.getProperty(Integer.valueOf(id));
         if(propertyResponse == null){
             LOGGER.error("No Valid Property Found using Id " + id);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
