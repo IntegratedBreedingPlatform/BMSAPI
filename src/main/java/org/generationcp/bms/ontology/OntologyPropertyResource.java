@@ -36,9 +36,12 @@ public class OntologyPropertyResource {
     @ResponseBody
     public ResponseEntity<List<PropertySummary>> listAllPropertyByClass(@PathVariable String  cropname, @RequestParam(value = "class", defaultValue = "", required = false) String className) throws MiddlewareQueryException {
         if(Strings.isNullOrEmpty(className)){
-            return new ResponseEntity<>(ontologyModelService.getAllProperties(), HttpStatus.OK);
+            List<PropertySummary> propertyList = ontologyModelService.getAllProperties();
+            return new ResponseEntity<>(propertyList, HttpStatus.OK);
+        }else {
+            List<PropertySummary> propertyList = ontologyModelService.getAllPropertiesByClass(className);
+            return new ResponseEntity<>(propertyList, HttpStatus.OK);
         }
-        return new ResponseEntity<>(ontologyModelService.getAllPropertiesByClass(className), HttpStatus.OK);
     }
 
     // TODO : editableFields and deletable need to be determined

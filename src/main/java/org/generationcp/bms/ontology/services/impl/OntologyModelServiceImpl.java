@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -26,11 +25,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 
     @Override
     public List<MethodSummary> getAllMethods() throws MiddlewareQueryException {
-
         List<Method> methodList = ontologyManagerService.getAllMethods();
-        if(methodList == null){
-            return Collections.emptyList();
-        }
         List<MethodSummary> methods = new ArrayList<>();
 
         ModelMapper mapper = OntologyMapper.methodMapper();
@@ -145,9 +140,6 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     @Override
     public List<PropertySummary> getAllPropertiesByClass(String propertyClass) throws MiddlewareQueryException {
         List<Property> propertyList = ontologyManagerService.getAllPropertiesWithClass(propertyClass);
-        if(propertyList.isEmpty()) {
-            return Collections.emptyList();
-        }
         List<PropertySummary> properties = new ArrayList<>();
 
         ModelMapper mapper = OntologyMapper.propertyMapper();
