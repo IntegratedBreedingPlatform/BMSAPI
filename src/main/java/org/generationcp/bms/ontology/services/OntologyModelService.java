@@ -109,4 +109,12 @@ public interface OntologyModelService {
      * @throws MiddlewareQueryException
      */
     public List<String> getAllClasses() throws MiddlewareQueryException;
+
+    /**
+     * get all scales with details
+     * @return list of scales
+     * @throws MiddlewareQueryException
+     */
+    public List<ScaleSummary> getAllScales() throws MiddlewareQueryException;
+
 }

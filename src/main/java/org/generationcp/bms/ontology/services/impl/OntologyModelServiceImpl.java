@@ -5,6 +5,7 @@ import org.generationcp.bms.ontology.services.OntologyMapper;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -208,4 +209,19 @@ public class OntologyModelServiceImpl implements OntologyModelService {
         }
         return classList;
     }
+
+    @Override
+    public List<ScaleSummary> getAllScales() throws MiddlewareQueryException {
+        List<Scale> scales = ontologyManagerService.getAllScales();
+        List<ScaleSummary> scaleSummaries = new ArrayList<>();
+
+        ModelMapper mapper = OntologyMapper.scaleMapper();
+
+        for (Scale scale: scales){
+            ScaleSummary scaleSummary = mapper.map(scale, ScaleSummary.class);
+            scaleSummaries.add(scaleSummary);
+        }
+        return scaleSummaries;
+    }
+
 }

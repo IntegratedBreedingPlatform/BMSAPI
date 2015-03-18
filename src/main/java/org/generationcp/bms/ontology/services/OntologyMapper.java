@@ -1,14 +1,13 @@
 package org.generationcp.bms.ontology.services;
 
 
-import org.generationcp.bms.ontology.dto.MethodResponse;
-import org.generationcp.bms.ontology.dto.MethodSummary;
-import org.generationcp.bms.ontology.dto.PropertyResponse;
-import org.generationcp.bms.ontology.dto.PropertySummary;
+import org.generationcp.bms.ontology.dto.*;
+import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
+import org.generationcp.middleware.domain.oms.Scale;
+import org.modelmapper.*;
+import org.modelmapper.spi.MappingContext;
 
 import java.util.ArrayList;
 
@@ -102,4 +101,37 @@ public class OntologyMapper {
         mapper.addMappings(propertyResponseMap);
         return mapper;
     }
+
+    /**
+     * Custom Mapping for Middleware Scale Class to ScaleSummary
+     * Definition to Description Mapping
+     */
+    private static PropertyMap<Scale, ScaleSummary> scaleMap = new PropertyMap<Scale, ScaleSummary>() {
+        @Override
+        protected void configure() {
+            map().setId(source.getId());
+            map().setName(source.getName());
+            map().setDescription(source.getDefinition());
+            map().setMinValue(source.getMinValue());
+            map().setMaxValue(source.getMaxValue());
+            map().setCategories(source.getCategories());
+        }
+    };
+
+    /**
+     * Customise Mapped property 'scaleMap' is Initialize in Mapper and Returned
+     * @return ModelMapper Instance
+     */
+    public static ModelMapper scaleMapper(){
+        ModelMapper scaleMapper = new ModelMapper();
+        scaleMapper.addMappings(scaleMap);
+        scaleMapper.createTypeMap(DataType.class, IdName.class).setConverter(new Converter<DataType, IdName>() {
+            @Override
+            public IdName convert(MappingContext<DataType, IdName> mappingContext) {
+                return new IdName();
+            }
+        });
+        return scaleMapper;
+    }
+
 }
