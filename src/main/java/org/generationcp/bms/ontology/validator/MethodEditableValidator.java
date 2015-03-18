@@ -2,6 +2,7 @@ package org.generationcp.bms.ontology.validator;
 
 import org.generationcp.bms.ontology.dto.MethodRequest;
 import org.generationcp.middleware.domain.oms.Method;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import org.springframework.validation.Errors;
 
 import static com.google.common.base.Strings.*;
 import static org.generationcp.bms.util.I18nUtil.formatErrorMessage;
+import static org.generationcp.middleware.domain.oms.CvId.METHODS;
 
 
 @Component
@@ -53,6 +55,13 @@ public class MethodEditableValidator implements org.springframework.validation.V
                         if (!method.getName().trim().equals(request.getName().trim())) {
                             LOGGER.error("name not editable");
                             errors.rejectValue("name", formatErrorMessage(messageSource, "name.not.editable", null));
+                        }
+                    }
+                    Term methodByName = ontologyManagerService.getTermByNameAndCvId(request.getName(), METHODS.getId());
+                    if(methodByName != null){
+                        if((methodByName.getName().trim().equals(request.getName().trim())) && (methodByName.getId() != request.getId())){
+                            LOGGER.debug("Method already exist with same name : " + request.getName());
+                            errors.rejectValue("name", formatErrorMessage(messageSource, "field.should.be.unique", null));
                         }
                     }
                 }
