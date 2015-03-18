@@ -117,4 +117,12 @@ public interface OntologyModelService {
      */
     public List<ScaleSummary> getAllScales() throws MiddlewareQueryException;
 
+    /**
+     * get scale using given id
+     * @param id scale id
+     * @return scale that matches id
+     * @throws MiddlewareQueryException
+     */
+    public ScaleResponse getScaleById(Integer id) throws MiddlewareQueryException;
+
 }

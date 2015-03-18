@@ -118,6 +118,20 @@ public class OntologyMapper {
         }
     };
 
+    private static PropertyMap<Scale, ScaleResponse> scaleResponseMap = new PropertyMap<Scale, ScaleResponse>() {
+        @Override
+        protected void configure() {
+            map().setId(source.getId());
+            map().setName(source.getName());
+            map().setDescription(source.getDefinition());
+            map().setMinValue(source.getMinValue());
+            map().setMaxValue(source.getMaxValue());
+            map().setCategories(source.getCategories());
+            map().setEditableFields(new ArrayList<String>());
+            map().setDeletable(false);
+        }
+    };
+
     /**
      * Customise Mapped property 'scaleMap' is Initialize in Mapper and Returned
      * @return ModelMapper Instance
@@ -125,6 +139,7 @@ public class OntologyMapper {
     public static ModelMapper scaleMapper(){
         ModelMapper scaleMapper = new ModelMapper();
         scaleMapper.addMappings(scaleMap);
+        scaleMapper.addMappings(scaleResponseMap);
         scaleMapper.createTypeMap(DataType.class, IdName.class).setConverter(new Converter<DataType, IdName>() {
             @Override
             public IdName convert(MappingContext<DataType, IdName> mappingContext) {

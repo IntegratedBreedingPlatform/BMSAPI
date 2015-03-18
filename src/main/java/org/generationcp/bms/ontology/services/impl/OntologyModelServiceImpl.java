@@ -224,4 +224,24 @@ public class OntologyModelServiceImpl implements OntologyModelService {
         return scaleSummaries;
     }
 
+    @Override
+    public ScaleResponse getScaleById(Integer id) throws MiddlewareQueryException {
+        Scale scale = ontologyManagerService.getScaleById(id);
+        if(scale == null){
+            return null;
+        }
+        boolean deletable = true;
+        if(ontologyManagerService.isTermReferred(id)){
+            deletable = false;
+        }
+        ModelMapper mapper = OntologyMapper.scaleMapper();
+        ScaleResponse response = mapper.map(scale, ScaleResponse.class);
+        if(!deletable){
+            response.setEditableFields(new ArrayList<>(Arrays.asList("description")));
+        }else {
+            response.setEditableFields(new ArrayList<>(Arrays.asList("name", "description", "validValues")));
+        }
+        response.setDeletable(deletable);
+        return response;
+    }
 }
