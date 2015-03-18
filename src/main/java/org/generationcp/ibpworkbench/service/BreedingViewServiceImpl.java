@@ -49,11 +49,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	private List<ExperimentValues> summaryStatsExperimentValuesList;
 
 	private static final Logger LOG = LoggerFactory.getLogger(BreedingViewServiceImpl.class);
-	private static final String ERROR_ESTIMATE = "ERROR ESTIMATE";
-	private static final String LS_MEAN = "LS MEAN";
-	private static final String MEANS_SUFFIX = "_Means";
-	private static final String UNIT_ERRORS_SUFFIX = "_UnitErrors";
-	private static final CharSequence UNIT_ERR_SUFFIX = "_UnitErr";
 
 	public void execute(Map<String, String> params, List<String> errors) throws IBPWebServiceException {
 
