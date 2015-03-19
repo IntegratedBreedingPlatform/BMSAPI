@@ -1,12 +1,15 @@
 package org.generationcp.bms.ontology.validator;
 
+import org.generationcp.bms.ontology.dto.NameDescription;
 import org.generationcp.bms.ontology.dto.ScaleRequest;
+import org.generationcp.bms.ontology.dto.ValidValues;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.springframework.validation.Errors;
 
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Objects;
 
 /** Add Scale
@@ -49,14 +52,22 @@ public class ScaleRequestValidator extends BaseValidator implements org.springfr
         //4. The data type ID must correspond to the ID of one of the supported data types (Numeric, Categorical, Character, DateTime, Person, Location or any other special data type that we add)
         shouldHaveValidDataType("dataTypeId", request.getDataTypeId(), errors);
 
-        //5. If the data type is categorical, at least one category must be submitted
-        if(Objects.equals(request.getDataTypeId(), DataType.CATEGORICAL_VARIABLE.getId())){
-            shouldNotNullOrEmpty("validValues.categories", Objects.isNull(request.getValidValues()) ? null : request.getValidValues().getCategories(), errors);
-        }
-
         //Need to return from here because other code is dependent on above validation
         if(errors.hasErrors()){
             return;
+        }
+
+        DataType dataType = DataType.getById(request.getDataTypeId());
+
+        ValidValues validValues = Objects.isNull(request.getValidValues()) ? new ValidValues() : request.getValidValues();
+
+        String minValue = validValues.getMinValue();
+        String maxValue = validValues.getMaxValue();
+        List<NameDescription> categories = validValues.getCategories();
+
+        //5. If the data type is categorical, at least one category must be submitted
+        if(Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)){
+            shouldNotNullOrEmpty("validValues.categories", categories, errors);
         }
 
         //TODO: Add more validation
