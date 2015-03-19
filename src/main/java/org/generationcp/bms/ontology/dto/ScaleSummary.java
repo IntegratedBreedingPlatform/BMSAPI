@@ -59,7 +59,7 @@ public class ScaleSummary {
 
     public void setCategories(Map<String, String> categories) {
         ensureValidValuesInitialized();
-        this.validValues.setCategories(categories);
+        this.validValues.setCategoriesFromMap(categories);
     }
 
     private void ensureValidValuesInitialized(){
