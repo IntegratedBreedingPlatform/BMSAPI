@@ -2,11 +2,14 @@ package org.generationcp.bms.ontology;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import org.generationcp.bms.ontology.dto.ScaleRequest;
 import org.generationcp.bms.ontology.dto.ScaleSummary;
 import org.generationcp.bms.ontology.dto.TermRequest;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.validator.IntegerValidator;
+import org.generationcp.bms.ontology.validator.ScaleRequestValidator;
 import org.generationcp.bms.ontology.validator.TermValidator;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,10 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +44,9 @@ public class OntologyScaleResource {
     @Autowired
     private IntegerValidator integerValidator;
 
+    @Autowired
+    private ScaleRequestValidator scaleRequestValidator;
+
 	@ApiOperation(value = "All Scales", notes = "Get all scales")
 	@RequestMapping(value = "/{cropname}/scales", method = RequestMethod.GET)
 	@ResponseBody
@@ -66,5 +69,16 @@ public class OntologyScaleResource {
             return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(bindingResult), BAD_REQUEST);
         }
         return new ResponseEntity<>(ontologyModelService.getScaleById(Integer.valueOf(id)), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Add Scale", notes = "Add new scale using detail")
+    @RequestMapping(value = "/{cropname}/scales", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<?> addScale(@PathVariable String  cropname, @RequestBody ScaleRequest request, BindingResult result) throws MiddlewareQueryException, MiddlewareException {
+        scaleRequestValidator.validate(request, result);
+        if(result.hasErrors()){
+            return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(result), BAD_REQUEST);
+        }
+        return new ResponseEntity<>(ontologyModelService.addScale(request), HttpStatus.OK);
     }
 }
