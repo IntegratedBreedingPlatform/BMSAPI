@@ -20,6 +20,12 @@ public abstract class BaseValidator {
         return value != null && (value instanceof Integer || value instanceof String && ((String) value).matches("^[0-9]+$"));
     }
 
+    protected Integer getIntegerValueSafe(Object value, Integer defaultValue){
+        if(value instanceof Integer) return (Integer) value;
+        if(value instanceof String) return Integer.valueOf((String) value);
+        return defaultValue;
+    }
+
     /**
      * This function is useful to checking object value as null or empty with any plain object or from collection
      * @param value value of object

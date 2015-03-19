@@ -47,6 +47,8 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
         final String CATEGORIES_SHOULD_BE_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE = "scale.categories.should.not.pass.with.non.categorical.data.type";
         final String CATEGORIES_NAME_DUPLICATE = "scale.categories.name.duplicate";
         final String CATEGORIES_DESCRIPTION_DUPLICATE = "scale.categories.description.duplicate";
+        final String MIN_MAX_NOT_EXPECTED = "scale.min.max.should.not.supply.when.data.type.non.numeric";
+        final String MIN_MAX_NOT_VALID = "scale.min.max.not.valid";
         final String VALUE_SHOULD_BE_NUMERIC = "value.should.be.numeric";
 
         ScaleRequest request = (ScaleRequest) target;
@@ -110,6 +112,11 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
         }
 
         //8. The min and max valid values are only stored if the data type is numeric
+        if((!Objects.equals(dataType, DataType.NUMERIC_VARIABLE)) && (Objects.nonNull(minValue) || Objects.nonNull(maxValue))){
+            errors.rejectValue("validValues", I18nUtil.formatErrorMessage(messageSource, MIN_MAX_NOT_EXPECTED, null));
+        }
+
+        //9. If the data type is numeric and minimum and maximum valid values are provided (they are not mandatory), they must be numeric values
         if(Objects.equals(dataType, DataType.NUMERIC_VARIABLE)){
             if(Objects.nonNull(minValue) && !isNonNullValidNumericString(minValue)){
                 errors.rejectValue("validValues.minValue", I18nUtil.formatErrorMessage(messageSource, VALUE_SHOULD_BE_NUMERIC, null));
@@ -120,9 +127,14 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
             }
         }
 
-        //TODO: Add more validation
-        //9. If the data type is numeric and minimum and maximum valid values are provided (they are not mandatory), they must be numeric values
         //10. If present, the minimum valid value must be less than or equal to the maximum valid value, and the maximum valid value must be greater than or equal to the minimum valid value
+        if(isNonNullValidNumericString(minValue) && isNonNullValidNumericString(maxValue)){
+            if(getIntegerValueSafe(minValue, 0) > getIntegerValueSafe(maxValue, 0)){
+                errors.rejectValue("validValues", I18nUtil.formatErrorMessage(messageSource, MIN_MAX_NOT_VALID, null));
+            }
+        }
+
+        //TODO: Add more validation
         //11. The name, data type and valid values cannot be changed if the scale is already in use
     }
 }
