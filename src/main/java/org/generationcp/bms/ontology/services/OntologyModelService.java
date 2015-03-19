@@ -61,7 +61,7 @@ public interface OntologyModelService {
      * @return property that have given id
      * @throws MiddlewareQueryException
      */
-    public PropertyResponse getProperty(Integer id) throws MiddlewareQueryException;
+    public PropertyResponse getProperty(Integer id) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * add property using given input data

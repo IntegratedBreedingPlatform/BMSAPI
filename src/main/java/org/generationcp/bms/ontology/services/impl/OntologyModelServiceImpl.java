@@ -98,7 +98,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     }
 
     @Override
-    public PropertyResponse getProperty(Integer id) throws MiddlewareQueryException {
+    public PropertyResponse getProperty(Integer id) throws MiddlewareQueryException, MiddlewareException {
         Property property = ontologyManagerService.getProperty(id);
         if (property == null) {
             return null;
