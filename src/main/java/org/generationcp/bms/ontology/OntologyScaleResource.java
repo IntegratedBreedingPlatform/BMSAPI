@@ -9,6 +9,7 @@ import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.validator.IntegerValidator;
 import org.generationcp.bms.ontology.validator.ScaleRequestValidator;
 import org.generationcp.bms.ontology.validator.TermValidator;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +64,7 @@ public class OntologyScaleResource {
         if(bindingResult.hasErrors()){
             return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(bindingResult), BAD_REQUEST);
         }
-        TermRequest request = new TermRequest(Integer.valueOf(id), 1030);
+        TermRequest request = new TermRequest(Integer.valueOf(id), CvId.SCALES.getId());
         termValidator.validate(request, bindingResult);
         if(bindingResult.hasErrors()){
             return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(bindingResult), BAD_REQUEST);

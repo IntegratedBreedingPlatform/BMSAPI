@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Objects;
 
+import static org.generationcp.bms.util.I18nUtil.formatErrorMessage;
+
 public abstract class BaseValidator {
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
@@ -27,6 +29,17 @@ public abstract class BaseValidator {
         if(id.matches("^[0-9]+$")) return;
         log.error("field should be numeric");
         errors.rejectValue("id", I18nUtil.formatErrorMessage(messageSource, "should.be.numeric", null));
+    }
+
+    protected void checkTermExist(Integer id, Integer cvId, Errors errors){
+        try {
+            Term term = ontologyManagerService.getTermById(id);
+            if(Objects.equals(term, null) || !Objects.equals(term.getVocabularyId(), cvId) ){
+                errors.rejectValue("id", formatErrorMessage(messageSource, "does.not.exist", new Object[]{id.toString()}));
+            }
+        } catch (Exception e) {
+            log.error("Error while validating object", e);
+        }
     }
 
     protected void checkUniqueness(Integer id, String name, Integer cvId, Errors errors) {
