@@ -2,6 +2,7 @@ package org.generationcp.bms.ontology.validator;
 
 import com.google.common.base.Strings;
 import org.generationcp.bms.util.I18nUtil;
+import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
@@ -24,6 +25,7 @@ public abstract class BaseValidator {
     protected static final String SHOULD_BE_NUMERIC = "should.be.numeric";
     protected static final String SHOULD_NOT_NULL_OR_EMPTY = "should.not.be.null";
     protected static final String SHOULD_BE_UNIQUE = "should.be.unique";
+    protected static final String ENUM_TYPE_NOT_VALID = "enum.type.not.valid";
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -71,6 +73,12 @@ public abstract class BaseValidator {
         }
         catch (MiddlewareQueryException e) {
             log.error("Error checking uniqueness of term name", e);
+        }
+    }
+
+    protected void shouldHaveValidDataType(String fieldName, Integer dataTypeId, Errors errors){
+        if(Objects.isNull(DataType.getById(dataTypeId))){
+            errors.rejectValue(fieldName, I18nUtil.formatErrorMessage(messageSource, ENUM_TYPE_NOT_VALID, null));
         }
     }
 }
