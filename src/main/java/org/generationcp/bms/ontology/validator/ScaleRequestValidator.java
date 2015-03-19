@@ -28,7 +28,7 @@ public class ScaleRequestValidator extends BaseValidator implements org.springfr
             shouldNotNullOrEmpty("validValues.categories", request.getValidValues().getCategories(), errors);
         }
 
-        checkUniqueness(request.getId(), request.getName(), CvId.SCALES.getId(), errors);
+        checkTermUniqueness(request.getId(), request.getName(), CvId.SCALES.getId(), errors);
 
         //TODO: Add more validation
     }

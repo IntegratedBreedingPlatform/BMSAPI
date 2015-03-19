@@ -59,7 +59,7 @@ public abstract class BaseValidator {
         }
     }
 
-    protected void checkUniqueness(Integer id, String name, Integer cvId, Errors errors) {
+    protected void checkTermUniqueness(Integer id, String name, Integer cvId, Errors errors) {
 
         try {
             Term term = ontologyManagerService.getTermByNameAndCvId(name, cvId);
