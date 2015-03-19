@@ -6,7 +6,7 @@ import org.springframework.validation.Errors;
 import org.springframework.stereotype.Component;
 
 @Component
-public class IntegerValidator extends BaseValidator implements org.springframework.validation.Validator{
+public class RequestIdValidator extends BaseValidator implements org.springframework.validation.Validator{
 
     @Override
     public boolean supports(Class<?> aClass) {
@@ -16,6 +16,6 @@ public class IntegerValidator extends BaseValidator implements org.springframewo
     @Override
     public void validate(Object target, Errors errors) {
         String id = (String) target;
-        checkNumber(id, errors);
+        checkNumberField("Id", id, errors);
     }
 }

@@ -6,7 +6,7 @@ import org.generationcp.bms.ontology.dto.ScaleRequest;
 import org.generationcp.bms.ontology.dto.ScaleSummary;
 import org.generationcp.bms.ontology.dto.TermRequest;
 import org.generationcp.bms.ontology.services.OntologyModelService;
-import org.generationcp.bms.ontology.validator.IntegerValidator;
+import org.generationcp.bms.ontology.validator.RequestIdValidator;
 import org.generationcp.bms.ontology.validator.ScaleRequestValidator;
 import org.generationcp.bms.ontology.validator.TermValidator;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -43,7 +43,7 @@ public class OntologyScaleResource {
     private TermValidator termValidator;
 
     @Autowired
-    private IntegerValidator integerValidator;
+    private RequestIdValidator requestIdValidator;
 
     @Autowired
     private ScaleRequestValidator scaleRequestValidator;
@@ -60,7 +60,7 @@ public class OntologyScaleResource {
     @ResponseBody
     public ResponseEntity<?> getScaleById(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-        integerValidator.validate(id, bindingResult);
+        requestIdValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
             return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(bindingResult), BAD_REQUEST);
         }

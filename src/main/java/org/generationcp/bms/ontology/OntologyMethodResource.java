@@ -6,7 +6,7 @@ import org.generationcp.bms.ontology.dto.MethodRequest;
 import org.generationcp.bms.ontology.dto.MethodResponse;
 import org.generationcp.bms.ontology.dto.MethodSummary;
 import org.generationcp.bms.ontology.services.OntologyModelService;
-import org.generationcp.bms.ontology.validator.IntegerValidator;
+import org.generationcp.bms.ontology.validator.RequestIdValidator;
 import org.generationcp.bms.ontology.validator.MethodDeletableValidator;
 import org.generationcp.bms.ontology.validator.MethodEditableValidator;
 import org.generationcp.bms.ontology.validator.MethodNullAndUniqueValidator;
@@ -39,7 +39,7 @@ public class OntologyMethodResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(OntologyMethodResource.class);
 
     @Autowired
-    private IntegerValidator integerValidator;
+    private RequestIdValidator requestIdValidator;
     @Autowired
     private MethodEditableValidator methodEditableValidator;
     @Autowired
@@ -62,7 +62,7 @@ public class OntologyMethodResource {
 	@ResponseBody
 	public ResponseEntity<?> getMethodById(@PathVariable String cropname, @PathVariable String id) throws MiddlewareQueryException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-        integerValidator.validate(id, bindingResult);
+        requestIdValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
             return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(bindingResult), BAD_REQUEST);
         }

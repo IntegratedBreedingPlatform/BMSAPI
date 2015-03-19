@@ -25,10 +25,10 @@ public abstract class BaseValidator {
     @Autowired
     ResourceBundleMessageSource messageSource;
 
-    protected void checkNumber(String id, Errors errors){
-        if(id.matches("^[0-9]+$")) return;
+    protected void checkNumberField(String fieldName, String value, Errors errors){
+        if(value.matches("^[0-9]+$")) return;
         log.error("field should be numeric");
-        errors.rejectValue("id", I18nUtil.formatErrorMessage(messageSource, "should.be.numeric", null));
+        errors.rejectValue(fieldName, I18nUtil.formatErrorMessage(messageSource, "should.be.numeric", null));
     }
 
     protected void checkTermExist(Integer id, Integer cvId, Errors errors){

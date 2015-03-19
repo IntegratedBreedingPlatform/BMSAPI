@@ -8,7 +8,7 @@ import org.generationcp.bms.ontology.dto.PropertyRequest;
 import org.generationcp.bms.ontology.dto.PropertyResponse;
 import org.generationcp.bms.ontology.dto.PropertySummary;
 import org.generationcp.bms.ontology.services.OntologyModelService;
-import org.generationcp.bms.ontology.validator.IntegerValidator;
+import org.generationcp.bms.ontology.validator.RequestIdValidator;
 import org.generationcp.bms.ontology.validator.PropertyDeletableValidator;
 import org.generationcp.bms.ontology.validator.PropertyEditableValidator;
 import org.generationcp.bms.ontology.validator.PropertyNullAndUniqueValidator;
@@ -38,7 +38,7 @@ public class OntologyPropertyResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(OntologyPropertyResource.class);
 
     @Autowired
-    private IntegerValidator integerValidator;
+    private RequestIdValidator requestIdValidator;
     @Autowired
     private PropertyNullAndUniqueValidator nullAndUniqueValidator;
     @Autowired
@@ -66,7 +66,7 @@ public class OntologyPropertyResource {
     @ResponseBody
     public ResponseEntity<?> getPropertyById(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
-        integerValidator.validate(id, bindingResult);
+        requestIdValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
             return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(bindingResult), BAD_REQUEST);
         }
