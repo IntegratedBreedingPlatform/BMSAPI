@@ -2,16 +2,11 @@ package org.generationcp.bms.ontology.validator;
 
 import org.generationcp.bms.ontology.dto.ScaleRequest;
 import org.generationcp.middleware.domain.oms.CvId;
-
 import org.springframework.validation.Errors;
-import org.springframework.validation.ValidationUtils;
-
-import java.util.Objects;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.generationcp.bms.util.I18nUtil.formatErrorMessage;
 
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 @Component
 public class ScaleRequestValidator extends BaseValidator implements org.springframework.validation.Validator{
@@ -26,11 +21,11 @@ public class ScaleRequestValidator extends BaseValidator implements org.springfr
 
         ScaleRequest request = (ScaleRequest) target;
 
-        if(isNullOrEmpty(request.getName())){
-            ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", formatErrorMessage(messageSource, "should.not.be.null", null));
-        }
-        if(Objects.isNull(request.getDataTypeId())){
-            ValidationUtils.rejectIfEmptyOrWhitespace(errors, "dataTypeId", formatErrorMessage(messageSource, "data.type.should.not.be.null", null));
+        shouldNotNullOrEmpty("name", request.getName(), errors);
+        shouldNotNullOrEmpty("dataTypeId", request.getDataTypeId(), errors);
+
+        if(Objects.nonNull(request.getValidValues())){
+            shouldNotNullOrEmpty("validValues.categories", request.getValidValues().getCategories(), errors);
         }
 
         checkUniqueness(request.getId(), request.getName(), CvId.SCALES.getId(), errors);

@@ -1,5 +1,6 @@
 package org.generationcp.bms.ontology.validator;
 
+import com.google.common.base.Strings;
 import org.generationcp.bms.util.I18nUtil;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -11,11 +12,18 @@ import org.springframework.validation.Errors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.generationcp.bms.util.I18nUtil.formatErrorMessage;
 
 public abstract class BaseValidator {
+
+    protected static final String DOES_NOT_EXIST = "does.not.exist";
+    protected static final String SHOULD_BE_NUMERIC = "should.be.numeric";
+    protected static final String SHOULD_NOT_NULL_OR_EMPTY = "should.not.be.null";
+    protected static final String SHOULD_BE_UNIQUE = "should.be.unique";
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -28,14 +36,23 @@ public abstract class BaseValidator {
     protected void checkNumberField(String fieldName, String value, Errors errors){
         if(value.matches("^[0-9]+$")) return;
         log.error("field should be numeric");
-        errors.rejectValue(fieldName, I18nUtil.formatErrorMessage(messageSource, "should.be.numeric", null));
+        errors.rejectValue(fieldName, I18nUtil.formatErrorMessage(messageSource, SHOULD_BE_NUMERIC, null));
+    }
+
+    protected void shouldNotNullOrEmpty(String fieldName, Object value, Errors errors){
+        if((value instanceof String && Strings.isNullOrEmpty((String) value)) ||
+                Objects.isNull(value) ||
+                (value instanceof Collection && ((Collection) value).isEmpty()) ||
+                (value instanceof Map && ((Map) value).isEmpty())){
+            errors.rejectValue(fieldName, I18nUtil.formatErrorMessage(messageSource, SHOULD_NOT_NULL_OR_EMPTY, null));
+        }
     }
 
     protected void checkTermExist(Integer id, Integer cvId, Errors errors){
         try {
             Term term = ontologyManagerService.getTermById(id);
             if(Objects.equals(term, null) || !Objects.equals(term.getVocabularyId(), cvId) ){
-                errors.rejectValue("id", formatErrorMessage(messageSource, "does.not.exist", new Object[]{id.toString()}));
+                errors.rejectValue("id", formatErrorMessage(messageSource, DOES_NOT_EXIST, new Object[]{id.toString()}));
             }
         } catch (Exception e) {
             log.error("Error while validating object", e);
@@ -49,7 +66,7 @@ public abstract class BaseValidator {
             if (term == null) return;
 
             if (Objects.isNull(id) || !Objects.equals(id, term.getId())) {
-                errors.rejectValue("name", I18nUtil.formatErrorMessage(messageSource, "field.should.be.unique", null));
+                errors.rejectValue("name", I18nUtil.formatErrorMessage(messageSource, SHOULD_BE_UNIQUE, null));
             }
         }
         catch (MiddlewareQueryException e) {
