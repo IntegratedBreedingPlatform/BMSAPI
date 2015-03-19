@@ -9,12 +9,14 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.springframework.validation.Errors;
 
-import org.springframework.stereotype.Component;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
+
+import org.springframework.stereotype.Component;
+
 
 /** Add Scale
  * Validation rules for Scale request
@@ -45,6 +47,7 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
         final String CATEGORIES_SHOULD_BE_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE = "scale.categories.should.not.pass.with.non.categorical.data.type";
         final String CATEGORIES_NAME_DUPLICATE = "scale.categories.name.duplicate";
         final String CATEGORIES_DESCRIPTION_DUPLICATE = "scale.categories.description.duplicate";
+        final String VALUE_SHOULD_BE_NUMERIC = "value.should.be.numeric";
 
         ScaleRequest request = (ScaleRequest) target;
 
@@ -106,8 +109,18 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
             }
         }
 
-        //TODO: Add more validation
         //8. The min and max valid values are only stored if the data type is numeric
+        if(Objects.equals(dataType, DataType.NUMERIC_VARIABLE)){
+            if(Objects.nonNull(minValue) && !isNonNullValidNumericString(minValue)){
+                errors.rejectValue("validValues.minValue", I18nUtil.formatErrorMessage(messageSource, VALUE_SHOULD_BE_NUMERIC, null));
+            }
+
+            if(Objects.nonNull(maxValue) && !isNonNullValidNumericString(maxValue)){
+                errors.rejectValue("validValues.maxValue", I18nUtil.formatErrorMessage(messageSource, VALUE_SHOULD_BE_NUMERIC, null));
+            }
+        }
+
+        //TODO: Add more validation
         //9. If the data type is numeric and minimum and maximum valid values are provided (they are not mandatory), they must be numeric values
         //10. If present, the minimum valid value must be less than or equal to the maximum valid value, and the maximum valid value must be greater than or equal to the minimum valid value
         //11. The name, data type and valid values cannot be changed if the scale is already in use

@@ -16,6 +16,10 @@ public abstract class BaseValidator {
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
 
+    protected boolean isNonNullValidNumericString(Object value) {
+        return value != null && (value instanceof Integer || value instanceof String && ((String) value).matches("^[0-9]+$"));
+    }
+
     /**
      * This function is useful to checking object value as null or empty with any plain object or from collection
      * @param value value of object
