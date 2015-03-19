@@ -1,5 +1,6 @@
 package org.generationcp.bms.ontology.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.ArrayList;
@@ -14,12 +15,6 @@ public class ValidValues{
     private List<NameDescription> categories;
 
     public ValidValues() {
-    }
-
-    public ValidValues(String minValue, String maxValue, Map<String, String> categories) {
-        this.minValue = minValue;
-        this.maxValue = maxValue;
-        mapCategories(categories);
     }
 
     public String getMinValue() {
@@ -42,6 +37,7 @@ public class ValidValues{
         return categories;
     }
 
+    @JsonIgnore
     public void setCategoriesFromMap(Map<String, String> categories) {
         mapCategories(categories);
     }
