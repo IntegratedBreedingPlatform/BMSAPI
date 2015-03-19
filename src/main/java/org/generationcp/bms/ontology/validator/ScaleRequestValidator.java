@@ -3,6 +3,7 @@ package org.generationcp.bms.ontology.validator;
 import org.generationcp.bms.ontology.dto.NameDescription;
 import org.generationcp.bms.ontology.dto.ScaleRequest;
 import org.generationcp.bms.ontology.dto.ValidValues;
+import org.generationcp.bms.util.I18nUtil;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.springframework.validation.Errors;
@@ -29,6 +30,8 @@ import java.util.Objects;
  */
 @Component
 public class ScaleRequestValidator extends BaseValidator implements org.springframework.validation.Validator{
+
+    private final String CATEGORIES_SHOULD_BE_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE = "scale.categories.should.not.pass.with.non.categorical.data.type";
 
     @Override
     public boolean supports(Class<?> aClass) {
@@ -70,8 +73,12 @@ public class ScaleRequestValidator extends BaseValidator implements org.springfr
             shouldNotNullOrEmpty("validValues.categories", categories, errors);
         }
 
-        //TODO: Add more validation
         //6. Categories are only stored if the data type is categorical
+        if(!Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE) && !isNullOrEmpty(categories)){
+            errors.rejectValue("validValues.categories", I18nUtil.formatErrorMessage(messageSource, CATEGORIES_SHOULD_BE_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE, null));
+        }
+
+        //TODO: Add more validation
         //7. If there are categories, all labels and values within the set of categories must be unique
         //8. The min and max valid values are only stored if the data type is numeric
         //9. If the data type is numeric and minimum and maximum valid values are provided (they are not mandatory), they must be numeric values
