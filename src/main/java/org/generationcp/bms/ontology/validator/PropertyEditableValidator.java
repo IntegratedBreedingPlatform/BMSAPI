@@ -2,7 +2,6 @@ package org.generationcp.bms.ontology.validator;
 
 import org.generationcp.bms.ontology.dto.PropertyRequest;
 import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +73,7 @@ public class PropertyEditableValidator implements org.springframework.validation
                             }
                         }
                     }
-                } catch (MiddlewareQueryException e) {
+                } catch (Exception e) {
                     LOGGER.error("Error while validating object", e);
                 }
             }
