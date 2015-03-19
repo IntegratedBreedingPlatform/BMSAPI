@@ -42,12 +42,8 @@ public abstract class BaseValidator {
     }
 
     protected void shouldNotNullOrEmpty(String fieldName, Object value, Errors errors){
-        if((value instanceof String && Strings.isNullOrEmpty((String) value)) ||
-                Objects.isNull(value) ||
-                (value instanceof Collection && ((Collection) value).isEmpty()) ||
-                (value instanceof Map && ((Map) value).isEmpty())){
-            errors.rejectValue(fieldName, I18nUtil.formatErrorMessage(messageSource, SHOULD_NOT_NULL_OR_EMPTY, null));
-        }
+        if(!isNullOrEmpty(value)) return;
+        errors.rejectValue(fieldName, I18nUtil.formatErrorMessage(messageSource, SHOULD_NOT_NULL_OR_EMPTY, null));
     }
 
     protected void checkTermExist(Integer id, Integer cvId, Errors errors){
@@ -80,5 +76,17 @@ public abstract class BaseValidator {
         if(Objects.isNull(DataType.getById(dataTypeId))){
             errors.rejectValue(fieldName, I18nUtil.formatErrorMessage(messageSource, ENUM_TYPE_NOT_VALID, null));
         }
+    }
+
+    /**
+     * This function is useful to checking object value as null or empty with any plain object or from collection
+     * @param value value of object
+     * @return boolean
+     */
+    protected boolean isNullOrEmpty(Object value){
+        return (value instanceof String && Strings.isNullOrEmpty((String) value)) ||
+                Objects.isNull(value) ||
+                (value instanceof Collection && ((Collection) value).isEmpty()) ||
+                (value instanceof Map && ((Map) value).isEmpty());
     }
 }

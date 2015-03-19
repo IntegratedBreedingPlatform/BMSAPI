@@ -54,6 +54,11 @@ public class ScaleRequestValidator extends BaseValidator implements org.springfr
             shouldNotNullOrEmpty("validValues.categories", Objects.isNull(request.getValidValues()) ? null : request.getValidValues().getCategories(), errors);
         }
 
+        //Need to return from here because other code is dependent on above validation
+        if(errors.hasErrors()){
+            return;
+        }
+
         //TODO: Add more validation
         //6. Categories are only stored if the data type is categorical
         //7. If there are categories, all labels and values within the set of categories must be unique
