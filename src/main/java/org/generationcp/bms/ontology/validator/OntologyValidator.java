@@ -55,7 +55,7 @@ public abstract class OntologyValidator extends BaseValidator {
             Term term = ontologyManagerService.getTermByNameAndCvId(name, cvId);
             if (term == null) return;
 
-            if (Objects.isNull(id) || !Objects.equals(id, term.getId())) {
+            if (id == null || !Objects.equals(id, term.getId())) {
                 errors.rejectValue("name", I18nUtil.formatErrorMessage(messageSource, SHOULD_BE_UNIQUE, null));
             }
         }
@@ -65,7 +65,7 @@ public abstract class OntologyValidator extends BaseValidator {
     }
 
     protected void shouldHaveValidDataType(String fieldName, Integer dataTypeId, Errors errors){
-        if(Objects.isNull(DataType.getById(dataTypeId))){
+        if(DataType.getById(dataTypeId) == null) {
             errors.rejectValue(fieldName, I18nUtil.formatErrorMessage(messageSource, ENUM_TYPE_NOT_VALID, null));
         }
     }

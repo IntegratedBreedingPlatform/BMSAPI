@@ -72,7 +72,7 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
 
         DataType dataType = DataType.getById(request.getDataTypeId());
 
-        ValidValues validValues = Objects.isNull(request.getValidValues()) ? new ValidValues() : request.getValidValues();
+        ValidValues validValues = request.getValidValues() == null ? new ValidValues() : request.getValidValues();
 
         String minValue = validValues.getMinValue();
         String maxValue = validValues.getMaxValue();
@@ -89,7 +89,7 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
         }
 
         //7. If there are categories, all labels and values within the set of categories must be unique
-        if(Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE) && Objects.nonNull(categories)){
+        if(Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE) && categories != null){
             Set<String> labels = new HashSet<>();
             Set<String> values = new HashSet<>();
             for(int i = 0; i < categories.size(); i++){
@@ -112,17 +112,17 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
         }
 
         //8. The min and max valid values are only stored if the data type is numeric
-        if((!Objects.equals(dataType, DataType.NUMERIC_VARIABLE)) && (Objects.nonNull(minValue) || Objects.nonNull(maxValue))){
+        if((!Objects.equals(dataType, DataType.NUMERIC_VARIABLE)) && (minValue != null || maxValue != null)){
             errors.rejectValue("validValues", I18nUtil.formatErrorMessage(messageSource, MIN_MAX_NOT_EXPECTED, null));
         }
 
         //9. If the data type is numeric and minimum and maximum valid values are provided (they are not mandatory), they must be numeric values
         if(Objects.equals(dataType, DataType.NUMERIC_VARIABLE)){
-            if(Objects.nonNull(minValue) && !isNonNullValidNumericString(minValue)){
+            if(minValue != null && !isNonNullValidNumericString(minValue)){
                 errors.rejectValue("validValues.minValue", I18nUtil.formatErrorMessage(messageSource, VALUE_SHOULD_BE_NUMERIC, null));
             }
 
-            if(Objects.nonNull(maxValue) && !isNonNullValidNumericString(maxValue)){
+            if(maxValue != null && !isNonNullValidNumericString(maxValue)){
                 errors.rejectValue("validValues.maxValue", I18nUtil.formatErrorMessage(messageSource, VALUE_SHOULD_BE_NUMERIC, null));
             }
         }

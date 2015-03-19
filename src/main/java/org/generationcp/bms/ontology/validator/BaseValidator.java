@@ -33,7 +33,7 @@ public abstract class BaseValidator {
      */
     protected boolean isNullOrEmpty(Object value){
         return (value instanceof String && Strings.isNullOrEmpty((String) value)) ||
-                Objects.isNull(value) ||
+                value == null ||
                 (value instanceof Collection && ((Collection) value).isEmpty()) ||
                 (value instanceof Map && ((Map) value).isEmpty());
     }
