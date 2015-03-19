@@ -125,4 +125,12 @@ public interface OntologyModelService {
      */
     public ScaleResponse getScaleById(Integer id) throws MiddlewareQueryException;
 
+    /**
+     * Adding new scale
+     * @param request ScaleRequest
+     * @throws MiddlewareQueryException
+     * @throws MiddlewareException
+     */
+    public GenericResponse addScale(ScaleRequest request) throws MiddlewareQueryException, MiddlewareException;
+
 }

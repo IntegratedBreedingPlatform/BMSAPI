@@ -3,10 +3,7 @@ package org.generationcp.bms.ontology.services.impl;
 import org.generationcp.bms.ontology.dto.*;
 import org.generationcp.bms.ontology.services.OntologyMapper;
 import org.generationcp.bms.ontology.services.OntologyModelService;
-import org.generationcp.middleware.domain.oms.Method;
-import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.domain.oms.Scale;
-import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
@@ -17,6 +14,10 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+
+import static org.generationcp.middleware.domain.oms.DataType.CATEGORICAL_VARIABLE;
+import static org.generationcp.middleware.domain.oms.DataType.NUMERIC_VARIABLE;
 
 @Service
 public class OntologyModelServiceImpl implements OntologyModelService {
@@ -243,5 +244,27 @@ public class OntologyModelServiceImpl implements OntologyModelService {
         }
         response.setDeletable(deletable);
         return response;
+    }
+
+    @Override
+    public GenericResponse addScale(ScaleRequest request) throws MiddlewareQueryException, MiddlewareException {
+        Scale scale = new Scale();
+        scale.setName(request.getName());
+        scale.setDefinition(request.getDescription());
+
+        scale.setDataType(DataType.getById(request.getDataTypeId()));
+
+        if(Objects.equals(request.getDataTypeId(), CATEGORICAL_VARIABLE.getId())){
+            for(NameDescription description : request.getValidValues().getCategories()){
+                scale.addCategory(description.getName(), description.getDescription());
+            }
+        }
+        if(Objects.equals(request.getDataTypeId(), NUMERIC_VARIABLE.getId())){
+            scale.setMinValue(request.getValidValues().getMinValue());
+            scale.setMaxValue(request.getValidValues().getMaxValue());
+        }
+
+        ontologyManagerService.addScale(scale);
+        return new GenericResponse(scale.getId());
     }
 }
