@@ -6,7 +6,7 @@ import org.springframework.validation.Errors;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RequestIdValidator extends BaseValidator implements org.springframework.validation.Validator{
+public class RequestIdValidator extends OntologyValidator implements org.springframework.validation.Validator{
 
     @Override
     public boolean supports(Class<?> aClass) {

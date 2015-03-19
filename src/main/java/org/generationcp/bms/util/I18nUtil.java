@@ -5,9 +5,10 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 
 import java.util.Locale;
 
+//TODO: Should remove this utility and resolve messages automatically via spring boot auto configuration.
 public class I18nUtil {
 
-    private static final Locale getLocale(){
+    private static Locale getLocale(){
         return LocaleContextHolder.getLocale();
     }
 

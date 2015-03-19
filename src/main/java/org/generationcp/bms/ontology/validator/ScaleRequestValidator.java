@@ -1,5 +1,6 @@
 package org.generationcp.bms.ontology.validator;
 
+import com.google.common.base.Strings;
 import org.generationcp.bms.ontology.dto.NameDescription;
 import org.generationcp.bms.ontology.dto.ScaleRequest;
 import org.generationcp.bms.ontology.dto.ValidValues;
@@ -31,7 +32,7 @@ import java.util.Set;
  11. The name, data type and valid values cannot be changed if the scale is already in use
  */
 @Component
-public class ScaleRequestValidator extends BaseValidator implements org.springframework.validation.Validator{
+public class ScaleRequestValidator extends OntologyValidator implements org.springframework.validation.Validator{
 
     @Override
     public boolean supports(Class<?> aClass) {
@@ -88,20 +89,22 @@ public class ScaleRequestValidator extends BaseValidator implements org.springfr
             Set<String> values = new HashSet<>();
             for(int i = 0; i < categories.size(); i++){
                 NameDescription nameDescription = categories.get(i);
-                if(labels.contains(nameDescription.getName())){
+                String name = nameDescription.getName();
+                String value = nameDescription.getDescription();
+
+                if(Strings.isNullOrEmpty(name) || labels.contains(nameDescription.getName())){
                     errors.rejectValue("validValues.categories[" + i + "].name", I18nUtil.formatErrorMessage(messageSource, CATEGORIES_NAME_DUPLICATE, null));
                 } else{
                     labels.add(nameDescription.getName());
                 }
 
-                if(values.contains(nameDescription.getDescription())){
+                if(Strings.isNullOrEmpty(value) || values.contains(value)){
                     errors.rejectValue("validValues.categories[" + i + "].description", I18nUtil.formatErrorMessage(messageSource, CATEGORIES_DESCRIPTION_DUPLICATE, null));
                 } else{
                     values.add(nameDescription.getDescription());
                 }
             }
         }
-
 
         //TODO: Add more validation
         //8. The min and max valid values are only stored if the data type is numeric
