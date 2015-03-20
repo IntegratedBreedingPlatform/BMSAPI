@@ -13,12 +13,10 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.generationcp.middleware.domain.oms.CvId.METHODS;
-import static org.generationcp.bms.util.I18nUtil.formatErrorMessage;
 
 @Component
-public class MethodNullAndUniqueValidator implements org.springframework.validation.Validator{
+public class MethodNullAndUniqueValidator extends BaseValidator implements org.springframework.validation.Validator{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodNullAndUniqueValidator.class);
 
@@ -38,13 +36,13 @@ public class MethodNullAndUniqueValidator implements org.springframework.validat
         MethodRequest request = (MethodRequest) target;
 
         if(request == null){
-            errors.rejectValue("request", formatErrorMessage(messageSource, "should.not.be.null", null));
+            addCustomError(errors,"request","should.not.be.null", null);
         }
 
         if (request != null) {
             if(isNullOrEmpty(request.getName())){
                 LOGGER.error("field should not be null");
-                errors.rejectValue("name", formatErrorMessage(messageSource, "should.not.be.null", null));
+                addCustomError(errors,"name", "should.not.be.null", null);
             }else {
                 try {
                     Term method = ontologyManagerService.getTermByNameAndCvId(request.getName(), METHODS.getId());
@@ -52,7 +50,7 @@ public class MethodNullAndUniqueValidator implements org.springframework.validat
                     if (method != null) {
                         if (method.getName().trim().equals(request.getName().trim())) {
                             LOGGER.debug("Method already exist with same name : " + request.getName());
-                            errors.rejectValue("name", formatErrorMessage(messageSource, "field.should.be.unique", null));
+                            addCustomError(errors,"name", "field.should.be.unique", null);
                         }
                     }
                 } catch (MiddlewareQueryException e) {

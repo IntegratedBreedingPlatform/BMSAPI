@@ -4,15 +4,13 @@ import com.google.common.base.Strings;
 import org.generationcp.bms.ontology.dto.NameDescription;
 import org.generationcp.bms.ontology.dto.ScaleRequest;
 import org.generationcp.bms.ontology.dto.ValidValues;
-import org.generationcp.bms.util.I18nUtil;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
+import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.springframework.validation.Errors;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 
 import org.springframework.stereotype.Component;
@@ -42,6 +40,7 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
     final String MIN_MAX_NOT_EXPECTED = "scale.min.max.should.not.supply.when.data.type.non.numeric";
     final String MIN_MAX_NOT_VALID = "scale.min.max.not.valid";
     final String VALUE_SHOULD_BE_NUMERIC = "value.should.be.numeric";
+    final String SCALE_NOT_EDITABLE = "scale.not.editable";
 
     @Override
     public boolean supports(Class<?> aClass) {
@@ -52,6 +51,14 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
     public void validate(Object target, Errors errors) {
 
         ScaleRequest request = (ScaleRequest) target;
+
+        //11. The name, data type and valid values cannot be changed if the scale is already in use
+        scaleShouldBeEditable(request, errors);
+
+        //Need to return from here because we should not check other constraints if request is not required to process
+        if(errors.hasErrors()){
+            return;
+        }
 
         //1. Name is required
         shouldNotNullOrEmpty("name", request.getName(), errors);
@@ -85,11 +92,36 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
 
         //6. Categories are only stored if the data type is categorical
         if(!Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE) && !isNullOrEmpty(categories)){
-            errors.rejectValue("validValues.categories", I18nUtil.formatErrorMessage(messageSource, CATEGORIES_SHOULD_BE_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE, null));
+            addCustomError(errors, "validValues.categories", CATEGORIES_SHOULD_BE_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE, null);
         }
 
         //7. If there are categories, all labels and values within the set of categories must be unique
-        if(Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE) && categories != null){
+        validateCategoriesForUniqueness(categories, dataType, errors);
+
+        //8. The min and max valid values are only stored if the data type is numeric
+        if((!Objects.equals(dataType, DataType.NUMERIC_VARIABLE)) && (minValue != null || maxValue != null)){
+            addCustomError(errors, "validValues", MIN_MAX_NOT_EXPECTED, null);
+        }
+
+        //9. If the data type is numeric and minimum and maximum valid values are provided (they are not mandatory), they must be numeric values
+        if(Objects.equals(dataType, DataType.NUMERIC_VARIABLE)){
+            if(minValue != null && !isNonNullValidNumericString(minValue)){
+                addCustomError(errors, "validValues.minValue", VALUE_SHOULD_BE_NUMERIC, null);
+            }
+
+            if(maxValue != null && !isNonNullValidNumericString(maxValue)){
+                addCustomError(errors, "validValues.maxValue", VALUE_SHOULD_BE_NUMERIC, null);
+            }
+        }
+
+        //10. If present, the minimum valid value must be less than or equal to the maximum valid value, and the maximum valid value must be greater than or equal to the minimum valid value
+        if(isNonNullValidNumericString(minValue) && isNonNullValidNumericString(maxValue) && getIntegerValueSafe(minValue, 0) > getIntegerValueSafe(maxValue, 0)){
+            addCustomError(errors,"validValues", MIN_MAX_NOT_VALID,null);
+        }
+    }
+
+    private void validateCategoriesForUniqueness(List<NameDescription> categories, DataType dataType, Errors errors) {
+        if(categories != null && Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)){
             Set<String> labels = new HashSet<>();
             Set<String> values = new HashSet<>();
             for(int i = 0; i < categories.size(); i++){
@@ -98,41 +130,64 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
                 String value = nameDescription.getDescription();
 
                 if(Strings.isNullOrEmpty(name) || labels.contains(nameDescription.getName())){
-                    errors.rejectValue("validValues.categories[" + i + "].name", I18nUtil.formatErrorMessage(messageSource, CATEGORIES_NAME_DUPLICATE, null));
+                    addCustomError(errors,"validValues.categories[" + i + "].name",CATEGORIES_NAME_DUPLICATE, null);
                 } else{
                     labels.add(nameDescription.getName());
                 }
 
                 if(Strings.isNullOrEmpty(value) || values.contains(value)){
-                    errors.rejectValue("validValues.categories[" + i + "].description", I18nUtil.formatErrorMessage(messageSource, CATEGORIES_DESCRIPTION_DUPLICATE, null));
+                    addCustomError(errors,"validValues.categories[" + i + "].description", CATEGORIES_DESCRIPTION_DUPLICATE, null);
                 } else{
                     values.add(nameDescription.getDescription());
                 }
             }
         }
+    }
 
-        //8. The min and max valid values are only stored if the data type is numeric
-        if((!Objects.equals(dataType, DataType.NUMERIC_VARIABLE)) && (minValue != null || maxValue != null)){
-            errors.rejectValue("validValues", I18nUtil.formatErrorMessage(messageSource, MIN_MAX_NOT_EXPECTED, null));
+    private void scaleShouldBeEditable(ScaleRequest request, Errors errors){
+        if(request.getId() == null){
+            return;
         }
 
-        //9. If the data type is numeric and minimum and maximum valid values are provided (they are not mandatory), they must be numeric values
-        if(Objects.equals(dataType, DataType.NUMERIC_VARIABLE)){
-            if(minValue != null && !isNonNullValidNumericString(minValue)){
-                errors.rejectValue("validValues.minValue", I18nUtil.formatErrorMessage(messageSource, VALUE_SHOULD_BE_NUMERIC, null));
+        try {
+            boolean isEditable = !ontologyManagerService.isTermReferred(request.getId());
+            if(isEditable){
+                return;
             }
 
-            if(maxValue != null && !isNonNullValidNumericString(maxValue)){
-                errors.rejectValue("validValues.maxValue", I18nUtil.formatErrorMessage(messageSource, VALUE_SHOULD_BE_NUMERIC, null));
+            Scale oldScale = ontologyManagerService.getScaleById(request.getId());
+            boolean isNameSame = Objects.equals(request.getName(), oldScale.getName());
+            boolean isDataTypeSame = Objects.equals(request.getDataTypeId(), getDataTypeIdSafe(oldScale.getDataType()));
+            if(isNameSame && isDataTypeSame) {
+                ValidValues validValues = request.getValidValues() == null ? new ValidValues() : request.getValidValues();
+                boolean minValuesAreEqual = Objects.equals(validValues.getMinValue(), oldScale.getMinValue());
+                boolean maxValuesAreEqual = Objects.equals(validValues.getMaxValue(), oldScale.getMaxValue());
+                List<NameDescription> categories = validValues.getCategories() == null ? new ArrayList<NameDescription>() : validValues.getCategories();
+                boolean categoriesEqualSize = Objects.equals(categories.size(), oldScale.getCategories().size());
+                boolean categoriesValuesAreSame = true;
+                if(categoriesEqualSize){
+                    for(NameDescription l : categories){
+                        if(oldScale.getCategories().containsKey(l.getName()) && Objects.equals(oldScale.getCategories().get(l.getName()), l.getDescription())){
+                            continue;
+                        }
+                        categoriesValuesAreSame = false;
+                        break;
+                    }
+                }
+                if(minValuesAreEqual && maxValuesAreEqual && categoriesEqualSize && categoriesValuesAreSame){
+                    return;
+                }
             }
+
+        } catch (MiddlewareQueryException e) {
+            log.error("Error while executing scaleShouldBeEditable", e);
+            addDefaultError(errors);
         }
 
-        //10. If present, the minimum valid value must be less than or equal to the maximum valid value, and the maximum valid value must be greater than or equal to the minimum valid value
-        if(isNonNullValidNumericString(minValue) && isNonNullValidNumericString(maxValue) && getIntegerValueSafe(minValue, 0) > getIntegerValueSafe(maxValue, 0)){
-            errors.rejectValue("validValues", I18nUtil.formatErrorMessage(messageSource, MIN_MAX_NOT_VALID, null));
-        }
+        errors.reject(SCALE_NOT_EDITABLE);
+    }
 
-        //TODO: Add more validation
-        //11. The name, data type and valid values cannot be changed if the scale is already in use
+    private Integer getDataTypeIdSafe(DataType dataType){
+        return dataType == null ? null : dataType.getId();
     }
 }

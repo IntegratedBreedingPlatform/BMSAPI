@@ -10,14 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
-
-import static com.google.common.base.Strings.*;
-import static org.generationcp.bms.util.I18nUtil.formatErrorMessage;
 import static org.generationcp.middleware.domain.oms.CvId.METHODS;
 
 
 @Component
-public class MethodEditableValidator implements org.springframework.validation.Validator{
+public class MethodEditableValidator extends BaseValidator implements org.springframework.validation.Validator{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodEditableValidator.class);
 
@@ -37,31 +34,31 @@ public class MethodEditableValidator implements org.springframework.validation.V
         MethodRequest request = (MethodRequest) target;
 
         if(request == null){
-            errors.rejectValue("request", formatErrorMessage(messageSource, "should.not.be.null", null));
+            addCustomError(errors,"request", "should.not.be.null", null);
         }
 
         if(request != null){
             if(isNullOrEmpty(request.getName())){
                 LOGGER.error("field should not be null");
-                errors.rejectValue("name", formatErrorMessage(messageSource, "should.not.be.null", null));
+                addCustomError(errors,"name", "should.not.be.null", null);
             }
             try {
                 Method method = ontologyManagerService.getMethod(request.getId());
                 if(method == null) {
                     LOGGER.error("term does not exist");
-                    errors.rejectValue("id", formatErrorMessage(messageSource, "does.not.exist", new Object[]{request.getId()}));
+                    addCustomError(errors,"id","does.not.exist", new Object[]{request.getId()});
                 }else {
                     if (ontologyManagerService.isTermReferred(request.getId())) {
                         if (!method.getName().trim().equals(request.getName().trim())) {
                             LOGGER.error("name not editable");
-                            errors.rejectValue("name", formatErrorMessage(messageSource, "name.not.editable", null));
+                            addCustomError(errors,"name", "name.not.editable", null);
                         }
                     }
                     Term methodByName = ontologyManagerService.getTermByNameAndCvId(request.getName(), METHODS.getId());
                     if(methodByName != null){
                         if((methodByName.getName().trim().equals(request.getName().trim())) && (methodByName.getId() != request.getId())){
                             LOGGER.debug("Method already exist with same name : " + request.getName());
-                            errors.rejectValue("name", formatErrorMessage(messageSource, "field.should.be.unique", null));
+                            addCustomError(errors,"name", "field.should.be.unique", null);
                         }
                     }
                 }

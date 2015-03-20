@@ -3,6 +3,7 @@ package org.generationcp.bms.ontology;
 import com.google.common.base.Strings;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import org.generationcp.bms.exception.ApiRequestValidationException;
 import org.generationcp.bms.ontology.dto.GenericResponse;
 import org.generationcp.bms.ontology.dto.PropertyRequest;
 import org.generationcp.bms.ontology.dto.PropertyResponse;
@@ -16,10 +17,8 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +26,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 @Api(value = "Ontology Property Service")
 @Controller
@@ -68,7 +68,7 @@ public class OntologyPropertyResource {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
         requestIdValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
-            return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(bindingResult), BAD_REQUEST);
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         PropertyResponse propertyResponse = ontologyModelService.getProperty(Integer.valueOf(id));
         if(propertyResponse == null){
@@ -82,10 +82,10 @@ public class OntologyPropertyResource {
     @ApiOperation(value = "Add Property", notes = "Add a Property using Given Data")
     @RequestMapping(value = "/{cropname}/properties", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<?> addProperty(@PathVariable String  cropname, @RequestBody PropertyRequest request, BindingResult result) throws MiddlewareQueryException, MiddlewareException {
-        nullAndUniqueValidator.validate(request, result);
-        if(result.hasErrors()){
-            return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(result), BAD_REQUEST);
+    public ResponseEntity<?> addProperty(@PathVariable String  cropname, @RequestBody PropertyRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
+        nullAndUniqueValidator.validate(request, bindingResult);
+        if(bindingResult.hasErrors()){
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         GenericResponse response = ontologyModelService.addProperty(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -99,7 +99,7 @@ public class OntologyPropertyResource {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
         deletableValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
-            return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(bindingResult), BAD_REQUEST);
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         ontologyModelService.deleteProperty(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -109,11 +109,11 @@ public class OntologyPropertyResource {
     @ApiOperation(value = "Update Property", notes = "Update Property using Given Data")
     @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity updateProperty(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody PropertyRequest request, BindingResult result) throws MiddlewareQueryException, MiddlewareException {
+    public ResponseEntity updateProperty(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody PropertyRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
         request.setId(id);
-        editableValidator.validate(request, result);
-        if(result.hasErrors()){
-            return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(result), BAD_REQUEST);
+        editableValidator.validate(request, bindingResult);
+        if(bindingResult.hasErrors()){
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         ontologyModelService.updateProperty(id, request);
         return new ResponseEntity(HttpStatus.NO_CONTENT);

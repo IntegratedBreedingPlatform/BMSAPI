@@ -2,6 +2,7 @@ package org.generationcp.bms.ontology;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import org.generationcp.bms.exception.ApiRequestValidationException;
 import org.generationcp.bms.ontology.dto.ScaleRequest;
 import org.generationcp.bms.ontology.dto.ScaleSummary;
 import org.generationcp.bms.ontology.dto.TermRequest;
@@ -12,10 +13,8 @@ import org.generationcp.bms.ontology.validator.TermValidator;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-
+import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * NOTE: Work in Progress, Do Not Use API Exposed
@@ -62,12 +61,12 @@ public class OntologyScaleResource {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
         requestIdValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
-            return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(bindingResult), BAD_REQUEST);
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         TermRequest request = new TermRequest(Integer.valueOf(id), CvId.SCALES.getId());
         termValidator.validate(request, bindingResult);
         if(bindingResult.hasErrors()){
-            return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(bindingResult), BAD_REQUEST);
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         return new ResponseEntity<>(ontologyModelService.getScaleById(Integer.valueOf(id)), HttpStatus.OK);
     }
@@ -75,11 +74,23 @@ public class OntologyScaleResource {
     @ApiOperation(value = "Add Scale", notes = "Add new scale using detail")
     @RequestMapping(value = "/{cropname}/scales", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<?> addScale(@PathVariable String  cropname, @RequestBody ScaleRequest request, BindingResult result) throws MiddlewareQueryException, MiddlewareException {
+    public ResponseEntity<?> addScale(@PathVariable String  cropname, @RequestBody ScaleRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
+        scaleRequestValidator.validate(request, bindingResult);
+        if(bindingResult.hasErrors()){
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
+        }
+        return new ResponseEntity<>(request, HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value = "Update Scale", notes = "Update existing scale using detail")
+    @RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.PUT)
+    @ResponseBody
+    public ResponseEntity<?> updateScale(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody ScaleRequest request, BindingResult result) throws MiddlewareQueryException, MiddlewareException, ApiRequestValidationException {
+        request.setId(id);
         scaleRequestValidator.validate(request, result);
         if(result.hasErrors()){
-            return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(result), BAD_REQUEST);
+            throw new ApiRequestValidationException(result.getAllErrors());
         }
-        return new ResponseEntity<>(ontologyModelService.addScale(request), HttpStatus.OK);
+        return new ResponseEntity<>(request, HttpStatus.CREATED);
     }
 }

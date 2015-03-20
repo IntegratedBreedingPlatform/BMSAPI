@@ -10,10 +10,8 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
-import static org.generationcp.bms.util.I18nUtil.formatErrorMessage;
-
 @Component
-public class PropertyDeletableValidator implements org.springframework.validation.Validator{
+public class PropertyDeletableValidator extends BaseValidator implements org.springframework.validation.Validator{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertyDeletableValidator.class);
 
@@ -34,17 +32,17 @@ public class PropertyDeletableValidator implements org.springframework.validatio
 
         if(id == null){
             LOGGER.error("id should not be null");
-            errors.rejectValue("id", formatErrorMessage(messageSource, "should.not.be.null", null));
+            addCustomError(errors,"id","should.not.be.null", null);
         }
         try {
             Property property = ontologyManagerService.getProperty(id);
             if(property == null){
                 LOGGER.error("term does not exist");
-                errors.rejectValue("id", formatErrorMessage(messageSource, "does.not.exist", new Object[]{id}));
+                addCustomError(errors,"id","does.not.exist", new Object[]{id});
             }else {
                 if(ontologyManagerService.isTermReferred(id)){
                     LOGGER.error("can not delete term, it is referred");
-                    errors.rejectValue("id", formatErrorMessage(messageSource, "delete.term.referred", null));
+                    addCustomError(errors,"id", "delete.term.referred", null);
                 }
             }
         } catch (Exception e) {

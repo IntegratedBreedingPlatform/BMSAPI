@@ -2,6 +2,7 @@ package org.generationcp.bms.ontology;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import org.generationcp.bms.exception.ApiRequestValidationException;
 import org.generationcp.bms.ontology.dto.MethodRequest;
 import org.generationcp.bms.ontology.dto.MethodResponse;
 import org.generationcp.bms.ontology.dto.MethodSummary;
@@ -64,7 +65,7 @@ public class OntologyMethodResource {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
         requestIdValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
-            return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(bindingResult), BAD_REQUEST);
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         MethodResponse method = ontologyModelService.getMethod(Integer.valueOf(id));
         if(method == null) {
@@ -78,10 +79,10 @@ public class OntologyMethodResource {
     @ApiOperation(value = "Add Method", notes = "Add a Method using Given Data")
     @RequestMapping(value = "/{cropname}/methods", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<?> addMethod(@PathVariable String  cropname,@RequestBody MethodRequest request, BindingResult result) throws MiddlewareQueryException {
-        nullAndUniqueValidator.validate(request, result);
-        if(result.hasErrors()){
-            return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(result), BAD_REQUEST);
+    public ResponseEntity<?> addMethod(@PathVariable String  cropname,@RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareQueryException {
+        nullAndUniqueValidator.validate(request, bindingResult);
+        if(bindingResult.hasErrors()){
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         return new ResponseEntity<>(ontologyModelService.addMethod(request), CREATED);
     }
@@ -90,11 +91,11 @@ public class OntologyMethodResource {
     @ApiOperation(value = "Update Method", notes = "Update Method using Given Data")
     @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<?> updateMethod(@PathVariable String  cropname,@PathVariable Integer id, @RequestBody MethodRequest request, BindingResult result) throws MiddlewareQueryException, MiddlewareException {
+    public ResponseEntity<?> updateMethod(@PathVariable String  cropname,@PathVariable Integer id, @RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
         request.setId(id);
-        methodEditableValidator.validate(request, result);
-        if(result.hasErrors()){
-            return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(result), BAD_REQUEST);
+        methodEditableValidator.validate(request, bindingResult);
+        if(bindingResult.hasErrors()){
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         ontologyModelService.updateMethod(request.getId(), request);
         return new ResponseEntity(NO_CONTENT);
@@ -108,7 +109,7 @@ public class OntologyMethodResource {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
         methodDeletableValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
-            return new ResponseEntity<>(DefaultExceptionHandler.parseErrors(bindingResult), BAD_REQUEST);
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         ontologyModelService.deleteMethod(id);
         return new ResponseEntity(NO_CONTENT);

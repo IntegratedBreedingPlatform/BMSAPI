@@ -1,6 +1,7 @@
 package org.generationcp.bms.ontology.validator;
 
 import org.generationcp.bms.ontology.dto.PropertyRequest;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -15,12 +16,10 @@ import org.springframework.validation.ValidationUtils;
 
 import java.util.List;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.generationcp.bms.util.I18nUtil.formatErrorMessage;
 import static org.generationcp.middleware.domain.oms.CvId.PROPERTIES;
 
 @Component
-public class PropertyNullAndUniqueValidator implements org.springframework.validation.Validator{
+public class PropertyNullAndUniqueValidator extends OntologyValidator implements org.springframework.validation.Validator{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertyNullAndUniqueValidator.class);
 
@@ -40,35 +39,33 @@ public class PropertyNullAndUniqueValidator implements org.springframework.valid
         PropertyRequest request = (PropertyRequest) target;
 
         if(request == null){
-            errors.rejectValue("request", formatErrorMessage(messageSource, "request.null", null));
+            addCustomError(errors, "request", "request.null", null);
         }
 
         if (request != null) {
             if(isNullOrEmpty(request.getName()) || request.getClasses().isEmpty()){
                 if(isNullOrEmpty(request.getName())){
                     LOGGER.error("name should not be empty");
-                    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", formatErrorMessage(messageSource, "should.not.be.null", null));
+                    addCustomError(errors, "name", "should.not.be.null", null);
+
+                    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name","should.not.be.null");
                 }
                 if(request.getClasses().isEmpty()){
                     LOGGER.error("one class required");
-                    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "classes", formatErrorMessage(messageSource, "property.class.required", null));
+                    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "classes",  "property.class.required");
                 }
 
             } else {
                 try {
                     Term property = ontologyManagerService.getTermByNameAndCvId(request.getName(), PROPERTIES.getId());
 
-                    if (property != null) {
-                        if (property.getName().trim().equals(request.getName().trim())) {
-                            LOGGER.debug("Property already exist with same name : " + request.getName());
-                            errors.rejectValue("name", formatErrorMessage(messageSource, "field.should.be.unique", null));
-                        }
-                    }
+                    checkTermUniqueness(property.getId(), property.getName(), CvId.PROPERTIES.getId(), errors);
+
                     for(String className : request.getClasses()){
                         List<Property> propertyList = ontologyManagerService.getAllPropertiesWithClass(className);
                         if(propertyList.isEmpty()){
                             LOGGER.error("Class does not exist: " + className);
-                            errors.rejectValue("classes", formatErrorMessage(messageSource, "property.class.invalid", new Object[]{className}));
+                            addCustomError(errors, "classes", "property.class.invalid", new Object[]{className});
                         }
                     }
                 } catch (MiddlewareQueryException e) {

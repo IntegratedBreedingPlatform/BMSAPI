@@ -13,12 +13,8 @@ import org.springframework.validation.ValidationUtils;
 
 import java.util.List;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.generationcp.bms.util.I18nUtil.formatErrorMessage;
-
-
 @Component
-public class PropertyEditableValidator implements org.springframework.validation.Validator{
+public class PropertyEditableValidator extends BaseValidator implements org.springframework.validation.Validator{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertyEditableValidator.class);
 
@@ -38,18 +34,18 @@ public class PropertyEditableValidator implements org.springframework.validation
         PropertyRequest request = (PropertyRequest) target;
 
         if(request == null){
-            errors.rejectValue("request", formatErrorMessage(messageSource, "request.null", null));
+            addCustomError(errors, "request", "request.null", null);
         }
-
+         //todo : i have removed null as last parameter from  ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name","should.not.be.null");
         if(request != null){
             if(isNullOrEmpty(request.getName()) || request.getClasses().isEmpty()){
                 if(isNullOrEmpty(request.getName())){
                     LOGGER.error("name should not be empty");
-                    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", formatErrorMessage(messageSource, "should.not.be.null", null));
+                    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "should.not.be.null");
                 }
                 if(request.getClasses().isEmpty()){
                     LOGGER.error("one class required");
-                    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "classes", formatErrorMessage(messageSource, "property.class.required", null));
+                    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "classes","property.class.required");
                 }
 
             }else {
@@ -57,18 +53,18 @@ public class PropertyEditableValidator implements org.springframework.validation
                     Property property = ontologyManagerService.getProperty(request.getId());
                     if(property == null){
                         LOGGER.error("term does not exist");
-                        errors.rejectValue("id", formatErrorMessage(messageSource, "does.not.exist", new Object[]{request.getId()}));
+                        addCustomError(errors,"id","does.not.exist", new Object[]{request.getId()});
                     }else {
                         if(ontologyManagerService.isTermReferred(request.getId())){
                             if(!property.getName().trim().equals(request.getName().trim())){
                                 LOGGER.error("name not editable");
-                                errors.rejectValue("name", formatErrorMessage(messageSource, "name.not.editable", null));
+                                addCustomError(errors,"name","name.not.editable", null);
                             }
                             for(String className : request.getClasses()){
                                 List<Property> propertyList = ontologyManagerService.getAllPropertiesWithClass(className);
                                 if(propertyList.isEmpty()){
                                     LOGGER.error("Class does not exist: " + className);
-                                    errors.rejectValue("classes", formatErrorMessage(messageSource, "property.class.invalid", new Object[]{className}));
+                                    addCustomError(errors,"classes","property.class.invalid", new Object[]{className});
                                 }
                             }
                         }
