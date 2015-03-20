@@ -1,16 +1,14 @@
 package org.generationcp.bms.ontology.validator;
 
-import org.generationcp.bms.ontology.dto.MethodRequest;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
-import org.springframework.stereotype.Component;
-
 @Component
-public class RequestIdValidator extends OntologyValidator implements org.springframework.validation.Validator{
+public class RequestIdValidator extends OntologyValidator implements org.springframework.validation.Validator {
 
     @Override
     public boolean supports(Class<?> aClass) {
-        return MethodRequest.class.equals(aClass);
+        return String.class.isAssignableFrom(aClass);
     }
 
     @Override
