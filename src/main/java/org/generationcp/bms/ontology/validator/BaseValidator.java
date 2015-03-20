@@ -21,8 +21,14 @@ public abstract class BaseValidator {
     }
 
     protected Integer getIntegerValueSafe(Object value, Integer defaultValue){
-        if(value instanceof Integer) return (Integer) value;
-        if(value instanceof String) return Integer.valueOf((String) value);
+        if(value instanceof Integer){
+            return (Integer) value;
+        }
+
+        if(value instanceof String){
+            return Integer.valueOf((String) value);
+        }
+
         return defaultValue;
     }
 
@@ -43,8 +49,7 @@ public abstract class BaseValidator {
      *
      * @param errors The current errors collection
      */
-    protected void addDefaultError(Errors errors)
-    {
+    protected void addDefaultError(Errors errors) {
         errors.reject("error.standard.defaultMessage");
     }
 
@@ -55,8 +60,7 @@ public abstract class BaseValidator {
      * @param fieldName The given field name
      * @param fieldCode The given field code
      */
-    protected void addRequiredError(Errors errors, String fieldName, String fieldCode)
-    {
+    protected void addRequiredError(Errors errors, String fieldName, String fieldCode){
         errors.rejectValue(fieldName, "error.standard.required", getCodeAsArgument(fieldCode), null);
     }
 
@@ -68,8 +72,7 @@ public abstract class BaseValidator {
      * @param fieldCode1 The first field code
      * @param fieldCode2 The second field code
      */
-    protected void addRequiredIfError(Errors errors, String fieldName, String fieldCode1, String fieldCode2)
-    {
+    protected void addRequiredIfError(Errors errors, String fieldName, String fieldCode1, String fieldCode2){
         Object[] arguments = getCodesAsArguments(new String[] {fieldCode1, fieldCode2});
 
         errors.rejectValue(fieldName, "error.standard.requiredIf", arguments, null);
@@ -83,8 +86,7 @@ public abstract class BaseValidator {
      * @param fieldCode1 The first field code
      * @param fieldCode2 The second field code
      */
-    protected void addValidWhenError(Errors errors, String fieldName, String fieldCode1, String fieldCode2)
-    {
+    protected void addValidWhenError(Errors errors, String fieldName, String fieldCode1, String fieldCode2){
         Object[] arguments = getCodesAsArguments(new String[] {fieldCode1, fieldCode2});
 
         errors.rejectValue(fieldName, "error.standard.validWhen", arguments, null);
@@ -98,8 +100,7 @@ public abstract class BaseValidator {
      * @param fieldCode The given field code
      * @param minLength The minimum length of the field
      */
-    protected void addMinLengthError(Errors errors, String fieldName, String fieldCode, int minLength)
-    {
+    protected void addMinLengthError(Errors errors, String fieldName, String fieldCode, int minLength){
         Object[] arguments = getCodeAsArgument(fieldCode);
         arguments = addArgument(arguments, minLength);
 
@@ -114,8 +115,7 @@ public abstract class BaseValidator {
      * @param fieldCode The given field code
      * @param maxLength The maximum length of the field
      */
-    protected void addMaxLengthError(Errors errors, String fieldName, String fieldCode, int maxLength)
-    {
+    protected void addMaxLengthError(Errors errors, String fieldName, String fieldCode, int maxLength){
         Object[] arguments = getCodeAsArgument(fieldCode);
         arguments = addArgument(arguments, maxLength);
 
@@ -130,8 +130,7 @@ public abstract class BaseValidator {
      * @param fieldCode The given field code
      * @param minValue The minimum value of the field
      */
-    protected void addMinValueError(Errors errors, String fieldName, String fieldCode, int minValue)
-    {
+    protected void addMinValueError(Errors errors, String fieldName, String fieldCode, int minValue){
         Object[] arguments = getCodeAsArgument(fieldCode);
         arguments = addArgument(arguments, minValue);
 
@@ -146,8 +145,7 @@ public abstract class BaseValidator {
      * @param fieldCode The given field code
      * @param maxValue The maximum value of the field
      */
-    protected void addMaxValueError(Errors errors, String fieldName, String fieldCode, int maxValue)
-    {
+    protected void addMaxValueError(Errors errors, String fieldName, String fieldCode, int maxValue){
         Object[] arguments = getCodeAsArgument(fieldCode);
         arguments = addArgument(arguments, maxValue);
 
@@ -161,8 +159,7 @@ public abstract class BaseValidator {
      * @param fieldName The given field name
      * @param fieldCode The given field code
      */
-    protected void addByteError(Errors errors, String fieldName, String fieldCode)
-    {
+    protected void addByteError(Errors errors, String fieldName, String fieldCode){
         errors.rejectValue(fieldName, "error.standard.byte", getCodeAsArgument(fieldCode), null);
     }
 
@@ -173,8 +170,7 @@ public abstract class BaseValidator {
      * @param fieldName The given field name
      * @param fieldCode The given field code
      */
-    protected void addShortError(Errors errors, String fieldName, String fieldCode)
-    {
+    protected void addShortError(Errors errors, String fieldName, String fieldCode){
         errors.rejectValue(fieldName, "error.standard.short", getCodeAsArgument(fieldCode), null);
     }
 
@@ -185,8 +181,7 @@ public abstract class BaseValidator {
      * @param fieldName The given field name
      * @param fieldCode The given field code
      */
-    protected void addIntegerError(Errors errors, String fieldName, String fieldCode)
-    {
+    protected void addIntegerError(Errors errors, String fieldName, String fieldCode){
         errors.rejectValue(fieldName, "error.standard.integer", getCodeAsArgument(fieldCode), null);
     }
 
@@ -197,8 +192,7 @@ public abstract class BaseValidator {
      * @param fieldName The given field name
      * @param fieldCode The given field code
      */
-    protected void addLongError(Errors errors, String fieldName, String fieldCode)
-    {
+    protected void addLongError(Errors errors, String fieldName, String fieldCode){
         errors.rejectValue(fieldName, "error.standard.long", getCodeAsArgument(fieldCode), null);
     }
 
@@ -209,8 +203,7 @@ public abstract class BaseValidator {
      * @param fieldName The given field name
      * @param fieldCode The given field code
      */
-    protected void addFloatError(Errors errors, String fieldName, String fieldCode)
-    {
+    protected void addFloatError(Errors errors, String fieldName, String fieldCode){
         errors.rejectValue(fieldName, "error.standard.float", getCodeAsArgument(fieldCode), null);
     }
 
@@ -221,8 +214,7 @@ public abstract class BaseValidator {
      * @param fieldName The given field name
      * @param fieldCode The given field code
      */
-    protected void addDoubleError(Errors errors, String fieldName, String fieldCode)
-    {
+    protected void addDoubleError(Errors errors, String fieldName, String fieldCode){
         errors.rejectValue(fieldName, "error.standard.double", getCodeAsArgument(fieldCode), null);
     }
 
@@ -233,8 +225,7 @@ public abstract class BaseValidator {
      * @param fieldName The given field name
      * @param fieldCode The given field code
      */
-    protected void addDateError(Errors errors, String fieldName, String fieldCode)
-    {
+    protected void addDateError(Errors errors, String fieldName, String fieldCode){
         errors.rejectValue(fieldName, "error.standard.date", getCodeAsArgument(fieldCode), null);
     }
 
@@ -247,8 +238,7 @@ public abstract class BaseValidator {
      * @param min The minimum value in the range
      * @param max The maximum value in the range
      */
-    protected void addIntegerRangeError(Errors errors, String fieldName, String fieldCode, int min, int max)
-    {
+    protected void addIntegerRangeError(Errors errors, String fieldName, String fieldCode, int min, int max){
         Object[] arguments = getCodeAsArgument(fieldCode);
         arguments = addArgument(arguments, min);
         arguments = addArgument(arguments, max);
@@ -265,8 +255,7 @@ public abstract class BaseValidator {
      * @param min The minimum value in the range
      * @param max The maximum value in the range
      */
-    protected void addFloatRangeError(Errors errors, String fieldName, String fieldCode, float min, float max)
-    {
+    protected void addFloatRangeError(Errors errors, String fieldName, String fieldCode, float min, float max){
         Object[] arguments = getCodeAsArgument(fieldCode);
         arguments = addArgument(arguments, min);
         arguments = addArgument(arguments, max);
@@ -283,8 +272,7 @@ public abstract class BaseValidator {
      * @param min The minimum value in the range
      * @param max The maximum value in the range
      */
-    protected void addDoubleRangeError(Errors errors, String fieldName, String fieldCode, double min, double max)
-    {
+    protected void addDoubleRangeError(Errors errors, String fieldName, String fieldCode, double min, double max){
         Object[] arguments = getCodeAsArgument(fieldCode);
         arguments = addArgument(arguments, min);
         arguments = addArgument(arguments, max);
@@ -299,8 +287,7 @@ public abstract class BaseValidator {
      * @param fieldName The given field name
      * @param fieldCode The given field code
      */
-    protected void addCreditCardError(Errors errors, String fieldName, String fieldCode)
-    {
+    protected void addCreditCardError(Errors errors, String fieldName, String fieldCode){
         errors.rejectValue(fieldName, "error.standard.creditCard", getCodeAsArgument(fieldCode), null);
     }
 
@@ -311,8 +298,7 @@ public abstract class BaseValidator {
      * @param fieldName The given field name
      * @param fieldCode The given field code
      */
-    protected void addEmailError(Errors errors, String fieldName, String fieldCode)
-    {
+    protected void addEmailError(Errors errors, String fieldName, String fieldCode){
         errors.rejectValue(fieldName, "error.standard.email", getCodeAsArgument(fieldCode), null);
     }
 
@@ -324,8 +310,7 @@ public abstract class BaseValidator {
      * @param errorCode The given error code
      * @param arguments The given arguments
      */
-    protected void addCustomError(Errors errors, String fieldName, String errorCode, Object[] arguments)
-    {
+    protected void addCustomError(Errors errors, String fieldName, String errorCode, Object[] arguments){
         errors.rejectValue(fieldName, errorCode, arguments, null);
     }
 
@@ -337,8 +322,7 @@ public abstract class BaseValidator {
      * @param errorCode The given error code
      * @param resolvableArguments The given resolvable arguments
      */
-    protected void addCustomErrorWithResolvableArguments(Errors errors, String fieldName, String errorCode, String[] resolvableArguments)
-    {
+    protected void addCustomErrorWithResolvableArguments(Errors errors, String fieldName, String errorCode, String[] resolvableArguments){
         errors.rejectValue(fieldName, errorCode, getCodesAsArguments(resolvableArguments), null);
     }
 
@@ -349,8 +333,7 @@ public abstract class BaseValidator {
      * @param errorCode The given error code
      * @param arguments The given arguments
      */
-    protected void addCustomError(Errors errors, String errorCode, Object[] arguments)
-    {
+    protected void addCustomError(Errors errors, String errorCode, Object[] arguments){
         errors.reject(errorCode, arguments, null);
     }
 
@@ -361,8 +344,7 @@ public abstract class BaseValidator {
      * @param errorCode The given error code
      * @param resolvableArguments The given resolvable arguments
      */
-    protected void addCustomErrorWithResolvableArguments(Errors errors, String errorCode, String[] resolvableArguments)
-    {
+    protected void addCustomErrorWithResolvableArguments(Errors errors, String errorCode, String[] resolvableArguments){
         errors.reject(errorCode, getCodesAsArguments(resolvableArguments), null);
     }
 
@@ -373,12 +355,11 @@ public abstract class BaseValidator {
      * @param argument The new argument to add to the array
      * @return The updated array
      */
-    private static Object[] addArgument(Object[] arguments, Object argument)
-    {
+    private static Object[] addArgument(Object[] arguments, Object argument){
         List<Object> argumentList = new ArrayList<>();
         Collections.addAll(argumentList, arguments);
         argumentList.add(argument);
-        return (argumentList.toArray());
+        return argumentList.toArray();
     }
 
     /**
@@ -387,9 +368,8 @@ public abstract class BaseValidator {
      * @param messageCode The message code
      * @return The resolvable argument array
      */
-    private static Object[] getCodeAsArgument(String messageCode)
-    {
-        return (new Object[] {new DefaultMessageSourceResolvable(new String[] {messageCode})});
+    private static Object[] getCodeAsArgument(String messageCode){
+        return new Object[] {new DefaultMessageSourceResolvable(new String[] {messageCode})};
     }
 
     /**
@@ -398,16 +378,13 @@ public abstract class BaseValidator {
      * @param messageCodes The array of message codes
      * @return The resolvable argument array
      */
-    private static Object[] getCodesAsArguments(String[] messageCodes)
-    {
+    private static Object[] getCodesAsArguments(String[] messageCodes){
         Object[] arguments = new Object[messageCodes.length];
 
-        for (int i = 0; i < messageCodes.length; i++)
-        {
+        for (int i = 0; i < messageCodes.length; i++){
             arguments[i] = new DefaultMessageSourceResolvable(new String[] {messageCodes[i]});
         }
-
-        return (arguments);
+        return arguments;
     }
 
 }

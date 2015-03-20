@@ -128,10 +128,8 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
         }
 
         //10. If present, the minimum valid value must be less than or equal to the maximum valid value, and the maximum valid value must be greater than or equal to the minimum valid value
-        if(isNonNullValidNumericString(minValue) && isNonNullValidNumericString(maxValue)){
-            if(getIntegerValueSafe(minValue, 0) > getIntegerValueSafe(maxValue, 0)){
-                errors.rejectValue("validValues", I18nUtil.formatErrorMessage(messageSource, MIN_MAX_NOT_VALID, null));
-            }
+        if(isNonNullValidNumericString(minValue) && isNonNullValidNumericString(maxValue) && getIntegerValueSafe(minValue, 0) > getIntegerValueSafe(maxValue, 0)){
+            errors.rejectValue("validValues", I18nUtil.formatErrorMessage(messageSource, MIN_MAX_NOT_VALID, null));
         }
 
         //TODO: Add more validation
