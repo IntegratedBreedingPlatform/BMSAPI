@@ -36,6 +36,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class ScaleRequestValidator extends OntologyValidator implements org.springframework.validation.Validator{
 
+    final String CATEGORIES_SHOULD_BE_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE = "scale.categories.should.not.pass.with.non.categorical.data.type";
+    final String CATEGORIES_NAME_DUPLICATE = "scale.categories.name.duplicate";
+    final String CATEGORIES_DESCRIPTION_DUPLICATE = "scale.categories.description.duplicate";
+    final String MIN_MAX_NOT_EXPECTED = "scale.min.max.should.not.supply.when.data.type.non.numeric";
+    final String MIN_MAX_NOT_VALID = "scale.min.max.not.valid";
+    final String VALUE_SHOULD_BE_NUMERIC = "value.should.be.numeric";
+
     @Override
     public boolean supports(Class<?> aClass) {
         return ScaleRequest.class.equals(aClass);
@@ -43,13 +50,6 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
 
     @Override
     public void validate(Object target, Errors errors) {
-
-        final String CATEGORIES_SHOULD_BE_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE = "scale.categories.should.not.pass.with.non.categorical.data.type";
-        final String CATEGORIES_NAME_DUPLICATE = "scale.categories.name.duplicate";
-        final String CATEGORIES_DESCRIPTION_DUPLICATE = "scale.categories.description.duplicate";
-        final String MIN_MAX_NOT_EXPECTED = "scale.min.max.should.not.supply.when.data.type.non.numeric";
-        final String MIN_MAX_NOT_VALID = "scale.min.max.not.valid";
-        final String VALUE_SHOULD_BE_NUMERIC = "value.should.be.numeric";
 
         ScaleRequest request = (ScaleRequest) target;
 
