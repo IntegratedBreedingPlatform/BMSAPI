@@ -14,10 +14,11 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TermDeletableValidator.class);
 
-    @Autowired
-    OntologyManagerService ontologyManagerService;
-    @Autowired
-    ResourceBundleMessageSource messageSource;
+    @Autowired OntologyManagerService ontologyManagerService;
+
+    @Autowired ResourceBundleMessageSource messageSource;
+
+    @Autowired TermValidator termValidator;
 
     @Override
     public boolean supports(Class<?> aClass) {
@@ -33,6 +34,12 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
             return;
         }
         try {
+            termValidator.validate(target, errors);
+
+            if(errors.hasErrors()){
+                return;
+            }
+
             boolean isReferred = ontologyManagerService.isTermReferred(request.getId());
             if(!isReferred) return;
 
