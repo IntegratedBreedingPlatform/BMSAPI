@@ -15,7 +15,14 @@ public class RequestIdValidator extends OntologyValidator implements org.springf
 
     @Override
     public void validate(Object target, Errors errors) {
+        shouldNotNullOrEmpty("id", target, errors);
+        if(errors.hasErrors()) {
+            return;
+        }
+
+        if(target instanceof Integer) return;
+
         String id = (String) target;
-        checkNumberField("Id", id, errors);
+        checkNumberField("id", id, errors);
     }
 }

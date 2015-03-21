@@ -5,7 +5,6 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.validation.Errors;
 
 import java.util.Objects;
@@ -22,16 +21,17 @@ public abstract class OntologyValidator extends BaseValidator {
     @Autowired
     protected OntologyManagerService ontologyManagerService;
 
-    @Autowired
-    ResourceBundleMessageSource messageSource;
-
     protected void checkNumberField(String fieldName, String value, Errors errors){
-        if(value.matches("^[0-9]+$")) return;
+        if(value.matches("^[0-9]+$")){
+            return;
+        }
         addCustomError(errors, fieldName, SHOULD_BE_NUMERIC, null);
     }
 
     protected void shouldNotNullOrEmpty(String fieldName, Object value, Errors errors){
-        if(!isNullOrEmpty(value)) return;
+        if(!isNullOrEmpty(value)){
+            return;
+        }
         addCustomError(errors, fieldName, SHOULD_NOT_NULL_OR_EMPTY, null);
     }
 
@@ -51,7 +51,9 @@ public abstract class OntologyValidator extends BaseValidator {
 
         try {
             Term term = ontologyManagerService.getTermByNameAndCvId(name, cvId);
-            if (term == null) return;
+            if (term == null){
+                return;
+            }
 
             if (id == null || !Objects.equals(id, term.getId())) {
                 addCustomError(errors, "name", SHOULD_BE_UNIQUE, null);
