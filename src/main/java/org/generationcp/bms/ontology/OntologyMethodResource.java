@@ -6,10 +6,12 @@ import org.generationcp.bms.exception.ApiRequestValidationException;
 import org.generationcp.bms.ontology.dto.MethodRequest;
 import org.generationcp.bms.ontology.dto.MethodResponse;
 import org.generationcp.bms.ontology.dto.MethodSummary;
+import org.generationcp.bms.ontology.dto.TermRequest;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.validator.MethodRequestValidator;
 import org.generationcp.bms.ontology.validator.RequestIdValidator;
-import org.generationcp.bms.ontology.validator.MethodDeletableValidator;
+import org.generationcp.bms.ontology.validator.TermDeletableValidator;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.slf4j.Logger;
@@ -42,7 +44,7 @@ public class OntologyMethodResource {
 
     @Autowired private MethodRequestValidator methodRequestValidator;
 
-    @Autowired private MethodDeletableValidator methodDeletableValidator;
+    @Autowired private TermDeletableValidator termDeletableValidator;
 
     @Autowired private OntologyModelService ontologyModelService;
 
@@ -103,7 +105,7 @@ public class OntologyMethodResource {
     @ResponseBody
     public ResponseEntity deleteMethod(@PathVariable String  cropname,@PathVariable Integer id) throws MiddlewareQueryException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-        methodDeletableValidator.validate(id, bindingResult);
+        termDeletableValidator.validate(new TermRequest(id, CvId.METHODS.getId()), bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }

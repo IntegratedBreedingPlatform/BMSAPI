@@ -10,9 +10,9 @@ import org.generationcp.bms.ontology.dto.PropertyResponse;
 import org.generationcp.bms.ontology.dto.PropertySummary;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.validator.RequestIdValidator;
-import org.generationcp.bms.ontology.validator.PropertyDeletableValidator;
 import org.generationcp.bms.ontology.validator.PropertyEditableValidator;
 import org.generationcp.bms.ontology.validator.PropertyNullAndUniqueValidator;
+import org.generationcp.bms.ontology.validator.TermDeletableValidator;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ public class OntologyPropertyResource {
     @Autowired
     private PropertyEditableValidator editableValidator;
     @Autowired
-    private PropertyDeletableValidator deletableValidator;
+    private TermDeletableValidator deletableValidator;
     @Autowired
     private OntologyModelService ontologyModelService;
 

@@ -4,10 +4,10 @@ import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
-
 import java.util.Objects;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 public abstract class OntologyValidator extends BaseValidator {
@@ -17,6 +17,7 @@ public abstract class OntologyValidator extends BaseValidator {
     protected static final String SHOULD_NOT_NULL_OR_EMPTY = "should.not.be.null";
     protected static final String SHOULD_BE_UNIQUE = "should.be.unique";
     protected static final String ENUM_TYPE_NOT_VALID = "enum.type.not.valid";
+    protected static final String CAN_NOT_DELETE_REFERRED_TERM = "can.not.delete.referred.term";
 
     @Autowired
     protected OntologyManagerService ontologyManagerService;
