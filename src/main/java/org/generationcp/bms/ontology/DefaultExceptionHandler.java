@@ -43,8 +43,6 @@ public class DefaultExceptionHandler {
     @ResponseBody
     public ErrorResponse handleValidationException(ApiRequestValidationException ex) throws IOException {
 
-        System.out.println(LocaleContextHolder.getLocale());
-
         ErrorResponse response = new ErrorResponse();
 
         for (ObjectError error : ex.getErrors()) {
