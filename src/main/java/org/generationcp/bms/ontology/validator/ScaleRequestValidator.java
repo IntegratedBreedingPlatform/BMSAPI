@@ -16,7 +16,7 @@ import java.util.*;
 import org.springframework.stereotype.Component;
 
 
-/** Add Scale
+/** Add Scale/Update Scale
  * Validation rules for Scale request
  * Refer: http://confluence.leafnode.io/display/CD/Services+Validation
  1. Name is required
