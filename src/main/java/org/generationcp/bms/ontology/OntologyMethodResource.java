@@ -7,10 +7,10 @@ import org.generationcp.bms.ontology.dto.MethodRequest;
 import org.generationcp.bms.ontology.dto.MethodResponse;
 import org.generationcp.bms.ontology.dto.MethodSummary;
 import org.generationcp.bms.ontology.services.OntologyModelService;
+import org.generationcp.bms.ontology.validator.MethodRequestValidator;
 import org.generationcp.bms.ontology.validator.RequestIdValidator;
 import org.generationcp.bms.ontology.validator.MethodDeletableValidator;
 import org.generationcp.bms.ontology.validator.MethodEditableValidator;
-import org.generationcp.bms.ontology.validator.MethodNullAndUniqueValidator;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ public class OntologyMethodResource {
     @Autowired
     private MethodDeletableValidator methodDeletableValidator;
     @Autowired
-    private MethodNullAndUniqueValidator nullAndUniqueValidator;
+    private MethodRequestValidator methodRequestValidator;
     @Autowired
     private OntologyModelService ontologyModelService;
 
@@ -80,7 +80,7 @@ public class OntologyMethodResource {
     @RequestMapping(value = "/{cropname}/methods", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<?> addMethod(@PathVariable String  cropname,@RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareQueryException {
-        nullAndUniqueValidator.validate(request, bindingResult);
+        methodRequestValidator.validate(request, bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }

@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 import static org.generationcp.middleware.domain.oms.CvId.METHODS;
 
 @Component
-public class MethodNullAndUniqueValidator extends BaseValidator implements org.springframework.validation.Validator{
+public class MethodRequestValidator extends BaseValidator implements org.springframework.validation.Validator{
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodNullAndUniqueValidator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodRequestValidator.class);
 
     @Autowired
     OntologyManagerService ontologyManagerService;
