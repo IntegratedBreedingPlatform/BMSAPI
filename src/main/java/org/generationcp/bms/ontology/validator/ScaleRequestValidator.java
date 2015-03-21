@@ -150,12 +150,19 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
         }
 
         try {
+            Scale oldScale = ontologyManagerService.getScaleById(request.getId());
+
+            //that method should exist with requestId
+            if(Objects.equals(oldScale, null)){
+                addCustomError(errors, DOES_NOT_EXIST, new Object[]{request.getId()});
+                return;
+            }
+
             boolean isEditable = !ontologyManagerService.isTermReferred(request.getId());
             if(isEditable){
                 return;
             }
 
-            Scale oldScale = ontologyManagerService.getScaleById(request.getId());
             boolean isNameSame = Objects.equals(request.getName(), oldScale.getName());
             boolean isDataTypeSame = Objects.equals(request.getDataTypeId(), getDataTypeIdSafe(oldScale.getDataType()));
             if(isNameSame && isDataTypeSame) {

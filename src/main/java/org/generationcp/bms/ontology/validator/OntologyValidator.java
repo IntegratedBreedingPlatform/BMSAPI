@@ -55,9 +55,15 @@ public abstract class OntologyValidator extends BaseValidator {
                 return;
             }
 
-            if (id == null || !Objects.equals(id, term.getId())) {
-                addCustomError(errors, "name", SHOULD_BE_UNIQUE, null);
+            if(Objects.equals(id, null) && Objects.equals(term, null)){
+                return;
             }
+
+            if (id != null && Objects.equals(id, term.getId())) {
+                return;
+            }
+
+            addCustomError(errors, "name", SHOULD_BE_UNIQUE, null);
         } catch (MiddlewareQueryException e) {
             log.error("Error checking uniqueness of term name", e);
         }

@@ -10,7 +10,6 @@ import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.validator.MethodRequestValidator;
 import org.generationcp.bms.ontology.validator.RequestIdValidator;
 import org.generationcp.bms.ontology.validator.MethodDeletableValidator;
-import org.generationcp.bms.ontology.validator.MethodEditableValidator;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.slf4j.Logger;
@@ -39,16 +38,13 @@ public class OntologyMethodResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OntologyMethodResource.class);
 
-    @Autowired
-    private RequestIdValidator requestIdValidator;
-    @Autowired
-    private MethodEditableValidator methodEditableValidator;
-    @Autowired
-    private MethodDeletableValidator methodDeletableValidator;
-    @Autowired
-    private MethodRequestValidator methodRequestValidator;
-    @Autowired
-    private OntologyModelService ontologyModelService;
+    @Autowired private RequestIdValidator requestIdValidator;
+
+    @Autowired private MethodRequestValidator methodRequestValidator;
+
+    @Autowired private MethodDeletableValidator methodDeletableValidator;
+
+    @Autowired private OntologyModelService ontologyModelService;
 
     @ApiOperation(value = "All Methods", notes = "Get all methods")
     @RequestMapping(value = "/{cropname}/methods", method = RequestMethod.GET)
@@ -93,7 +89,7 @@ public class OntologyMethodResource {
     @ResponseBody
     public ResponseEntity<?> updateMethod(@PathVariable String  cropname,@PathVariable Integer id, @RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
         request.setId(id);
-        methodEditableValidator.validate(request, bindingResult);
+        methodRequestValidator.validate(request, bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
