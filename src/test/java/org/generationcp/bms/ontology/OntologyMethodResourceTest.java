@@ -3,6 +3,7 @@ package org.generationcp.bms.ontology;
 import org.generationcp.bms.ApiUnitTestBase;
 import org.generationcp.bms.ontology.builders.MethodBuilder;
 import org.generationcp.bms.ontology.dto.MethodRequest;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.service.api.OntologyManagerService;
@@ -194,11 +195,9 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 
         String cropName = "maize";
 
-        MethodRequest methodDTO = new MethodRequest();
-        methodDTO.setName("methodName");
-        methodDTO.setDescription("methodDescription");
-
-        Method method = new Method(new Term(10, methodDTO.getName(), methodDTO.getDescription()));
+        Term term = new Term(10, "name", "", CvId.METHODS.getId(), false);
+        Method method = new Method(term);
+        Mockito.doReturn(term).when(ontologyManagerService).getTermById(method.getId());
         Mockito.doReturn(method).when(ontologyManagerService).getMethod(method.getId());
         Mockito.doReturn(false).when(ontologyManagerService).isTermReferred(method.getId());
 
