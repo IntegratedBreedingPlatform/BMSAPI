@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class MethodRequest {
 
+    @JsonIgnore
+    private Integer id;
+
     private String name;
 
     private String description;
-
-    @JsonIgnore
-    private Integer id;
 
     public Integer getId() {
         return id;

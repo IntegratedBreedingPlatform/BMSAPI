@@ -79,8 +79,9 @@ public class MethodRequestValidator extends OntologyValidator implements org.spr
             }
 
         }catch (MiddlewareQueryException e){
-            log.error("Error while executing methodShouldBeEditable", e);
+            logError(e);
             addDefaultError(errors);
+            return;
         }
 
         errors.reject(METHOD_NOT_EDITABLE);
