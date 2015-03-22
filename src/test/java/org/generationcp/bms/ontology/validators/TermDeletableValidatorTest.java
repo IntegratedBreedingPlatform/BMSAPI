@@ -4,6 +4,7 @@ import org.generationcp.bms.ApiUnitTestBase;
 import org.generationcp.bms.ontology.dto.TermRequest;
 import org.generationcp.bms.ontology.validator.TermDeletableValidator;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.junit.After;
@@ -88,6 +89,7 @@ public class TermDeletableValidatorTest extends ApiUnitTestBase {
     @Test
     public void testWithTermNotReferred() throws MiddlewareQueryException {
 
+        Mockito.doReturn(new Term(10, "name", "", CvId.METHODS.getId(), false)).when(ontologyManagerService).getTermById(10);
         Mockito.doReturn(false).when(ontologyManagerService).isTermReferred(10);
 
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
