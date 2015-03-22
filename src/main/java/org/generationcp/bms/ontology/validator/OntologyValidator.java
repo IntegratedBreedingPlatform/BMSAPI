@@ -75,4 +75,14 @@ public abstract class OntologyValidator extends BaseValidator {
             addCustomError(errors,fieldName, ENUM_TYPE_NOT_VALID, null);
         }
     }
+
+    protected void logError(final Throwable cause)
+    {
+        Throwable rootCause = cause;
+        while(rootCause.getCause() != null &&  rootCause.getCause() != rootCause){
+            rootCause = rootCause.getCause();
+        }
+
+        log.error(String.format("Error in %s.%s", rootCause.getStackTrace()[0].getClassName(), rootCause.getStackTrace()[0].getMethodName()), cause);
+    }
 }

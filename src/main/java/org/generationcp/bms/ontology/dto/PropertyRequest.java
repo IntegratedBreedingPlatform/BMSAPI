@@ -7,13 +7,13 @@ import java.util.List;
 
 public class PropertyRequest {
 
+    @JsonIgnore
+    private Integer id;
+
     private String name;
     private String description;
     private String cropOntologyId;
     private List<String> classes;
-
-    @JsonIgnore
-    private Integer id;
 
     public Integer getId() {
         return id;

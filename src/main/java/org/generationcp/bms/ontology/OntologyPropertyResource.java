@@ -4,15 +4,12 @@ import com.google.common.base.Strings;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.bms.exception.ApiRequestValidationException;
-import org.generationcp.bms.ontology.dto.GenericResponse;
-import org.generationcp.bms.ontology.dto.PropertyRequest;
-import org.generationcp.bms.ontology.dto.PropertyResponse;
-import org.generationcp.bms.ontology.dto.PropertySummary;
+import org.generationcp.bms.ontology.dto.*;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.validator.RequestIdValidator;
-import org.generationcp.bms.ontology.validator.PropertyEditableValidator;
-import org.generationcp.bms.ontology.validator.PropertyNullAndUniqueValidator;
+import org.generationcp.bms.ontology.validator.PropertyRequestValidator;
 import org.generationcp.bms.ontology.validator.TermDeletableValidator;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.slf4j.Logger;
@@ -37,16 +34,13 @@ public class OntologyPropertyResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OntologyPropertyResource.class);
 
-    @Autowired
-    private RequestIdValidator requestIdValidator;
-    @Autowired
-    private PropertyNullAndUniqueValidator nullAndUniqueValidator;
-    @Autowired
-    private PropertyEditableValidator editableValidator;
-    @Autowired
-    private TermDeletableValidator deletableValidator;
-    @Autowired
-    private OntologyModelService ontologyModelService;
+    @Autowired private RequestIdValidator requestIdValidator;
+
+    @Autowired private PropertyRequestValidator propertyRequestValidator;
+
+    @Autowired private TermDeletableValidator deletableValidator;
+
+    @Autowired private OntologyModelService ontologyModelService;
 
 	@ApiOperation(value = "All properties or filter by class name", notes = "Get all properties or filter by class name")
     @RequestMapping(value = "/{cropname}/properties", method = RequestMethod.GET)
@@ -83,7 +77,7 @@ public class OntologyPropertyResource {
     @RequestMapping(value = "/{cropname}/properties", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<?> addProperty(@PathVariable String  cropname, @RequestBody PropertyRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
-        nullAndUniqueValidator.validate(request, bindingResult);
+        propertyRequestValidator.validate(request, bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
@@ -95,13 +89,19 @@ public class OntologyPropertyResource {
     @ApiOperation(value = "Delete Property", notes = "Delete Property using Given Id")
     @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.DELETE)
     @ResponseBody
-    public ResponseEntity deleteProperty(@PathVariable String  cropname, @PathVariable Integer id) throws MiddlewareQueryException, MiddlewareException {
+    public ResponseEntity deleteProperty(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
-        deletableValidator.validate(id, bindingResult);
+
+        requestIdValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
-        ontologyModelService.deleteProperty(id);
+
+        deletableValidator.validate(new TermRequest(Integer.valueOf(id), CvId.PROPERTIES.getId()), bindingResult);
+        if(bindingResult.hasErrors()){
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
+        }
+        ontologyModelService.deleteProperty(Integer.valueOf(id));
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -111,7 +111,7 @@ public class OntologyPropertyResource {
     @ResponseBody
     public ResponseEntity updateProperty(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody PropertyRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
         request.setId(id);
-        editableValidator.validate(request, bindingResult);
+        propertyRequestValidator.validate(request, bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
