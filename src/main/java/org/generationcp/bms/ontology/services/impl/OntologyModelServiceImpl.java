@@ -1,5 +1,6 @@
 package org.generationcp.bms.ontology.services.impl;
 
+import com.google.common.base.Function;
 import org.generationcp.bms.ontology.dto.*;
 import org.generationcp.bms.ontology.services.OntologyMapper;
 import org.generationcp.bms.ontology.services.OntologyModelService;
@@ -7,6 +8,7 @@ import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.generationcp.middleware.util.Util;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -290,5 +292,16 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     @Override
     public void deleteScale(Integer id) throws MiddlewareQueryException, MiddlewareException {
         ontologyManagerService.deleteScale(id);
+    }
+
+    @Override
+    public List<IdName> getAllVariableTypes() {
+
+        return Util.convertAll(Arrays.asList(VariableType.values()), new Function<VariableType, IdName>(){
+            @Override
+            public IdName apply(VariableType variableType) {
+                return new IdName(variableType.getId(), variableType.getName());
+            }
+        });
     }
 }

@@ -148,4 +148,10 @@ public interface OntologyModelService {
      * @throws MiddlewareException
      */
     public void deleteScale(Integer id) throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     * Get List of all variable types
+     * @return List of Variable Types
+     */
+    public List<IdName> getAllVariableTypes();
 }
