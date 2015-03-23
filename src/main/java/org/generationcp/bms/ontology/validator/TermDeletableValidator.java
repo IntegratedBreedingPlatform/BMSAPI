@@ -31,7 +31,9 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
             }
 
             boolean isReferred = ontologyManagerService.isTermReferred(request.getId());
-            if(!isReferred) return;
+            if(!isReferred){
+                return;
+            }
 
             addCustomError(errors, "id", CAN_NOT_DELETE_REFERRED_TERM, null);
 

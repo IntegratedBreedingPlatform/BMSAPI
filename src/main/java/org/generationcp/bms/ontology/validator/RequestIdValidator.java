@@ -18,7 +18,9 @@ public class RequestIdValidator extends OntologyValidator implements org.springf
             return;
         }
 
-        if(target instanceof Integer) return;
+        if(target instanceof Integer){
+            return;
+        }
 
         String id = (String) target;
         checkNumberField("id", id, errors);
