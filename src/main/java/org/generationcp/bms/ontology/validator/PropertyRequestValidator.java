@@ -1,11 +1,11 @@
 package org.generationcp.bms.ontology.validator;
 
-import org.generationcp.bms.OntologyProjections;
-import org.generationcp.bms.Utility;
 import org.generationcp.bms.ontology.dto.PropertyRequest;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.OntologyProjections;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.util.Util;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
@@ -86,7 +86,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
         //Trying to see for valid class names
         try {
 
-            List<String> validClassNames = Utility.convertAll(ontologyManagerService.getAllTraitClass(), OntologyProjections.termNameProjection);
+            List<String> validClassNames = Util.convertAll(ontologyManagerService.getAllTraitClass(), OntologyProjections.termNameProjection);
 
             for(int i = 0; i < classes.size(); i++) {
                 if(!validClassNames.contains(classes.get(i))){
