@@ -19,15 +19,15 @@ BMS API is a RESTful services prototyping project built on top of the [Middlewar
 
 In standalone mode, application uses the embeded Tomcat from Spring-Boot and automatically deploys to it.
 
-* At the root of the checkout directory run `mvn package`. This will build an executable jar `bms-api-1.0-SNAPSHOT.jar` under the Maven `target` folder. Building a standalone jar is the default packaging mode.
-* To run do `java -jar bms-api-1.0-SNAPSHOT.jar`
+* At the root of the checkout directory run `mvn package`. This will build an executable jar `bmsapi.jar` under the Maven `target` folder. Building a standalone jar is the default packaging mode.
+* To run do `java -jar bmsapi.jar`
 * BMS API will load and run inside the Spring Boot embedded Tomcat. Then browse to `http://localhost:19080/` (if using default settings, see below for property overrides). 
 
 Another alternative is to build a war that can be deployed on external Tomcat. For this:
 * At the root of the checkout directory run `mvn package -Pwebapp`
-* This will create `bms-api-1.0-SNAPSHOT.war` under Maven `target` folder.
-* Note that this is also an executable war file and can be run using `java -jar bms-api-1.0-SNAPSHOT.war` command to launch BMS API standlone with embedded tomcat.
-* Copy this war (perhaps after renaming to somethig simpler e.g. bms-api.war) to the `webapps` directory of your Tomcat installation, in this case the embedded tomcat will automatically be disabled and BMS API will be deployed as a web application within external Tomcat under context path equal to the name of the war file (without the .war extension) as usual.
+* This will create `bmsapi.war` under Maven `target` folder.
+* Note that this is also an executable war file and can be run using `java -jar bmsapi.war` command to launch BMS API standlone with embedded tomcat.
+* Copy bmsapi.war file to the `webapps` directory of your Tomcat installation, in this case the embedded tomcat will automatically be disabled and BMS API will be deployed as a web application within external Tomcat under context path equal to the name of the war file (without the .war extension) as usual.
 
 #### Within Eclipse ####
 * Import the BMSAPI Maven project from the checkout.
@@ -36,8 +36,8 @@ Another alternative is to build a war that can be deployed on external Tomcat. F
 
 #### Get pre-built war file and run ####
 
-* Get the latest snapshot of built .war file [from our Nexus repository](http://gcp.efficio.us.com:8081/nexus/content/repositories/snapshots/org/generationcp/bms-api/)
-* Run this with `java -jar  bms-api-<version-stamp>.war`
+* Get the latest snapshot of built .war file [from our Nexus repository](http://gcp.efficio.us.com:8081/nexus/content/repositories/snapshots/org/generationcp/bmsapi/)
+* Run this with `java -jar  bmsapi.war`
 
 #### General Notes ###
 The default database connection parameters BMS API uses are the same as the default BMS MySQL database parameters (localhost, port 13306 with user name root and no password). If you are running BMS API alongside your BMS installation, make sure that BMS is started first (mainly so that the BMS MySQL database is up). 
@@ -60,7 +60,7 @@ spring.data.mongodb.port=27017
 db.workbench.name=workbench
 ```
 
-then run with the usual `java -jar bms-api-<version_stamp>.war` and BMS API will pick up the application.properties file from local directory and override the defaults.
+then run with the usual `java -jar bmsapi.war` and BMS API will pick up the application.properties file from local directory and override the defaults.
 
 ### Explore the API ###
 Explore and try out the live API documentation (built with [Swagger](https://helloreverb.com/developers/swagger)) at the home page `http://<host>:<port>/`.
