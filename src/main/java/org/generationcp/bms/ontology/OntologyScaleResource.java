@@ -79,7 +79,7 @@ public class OntologyScaleResource {
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
-        return new ResponseEntity<>(request, HttpStatus.CREATED);
+        return new ResponseEntity<>(ontologyModelService.addScale(request), HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "Update Scale", notes = "Update existing scale using detail")
