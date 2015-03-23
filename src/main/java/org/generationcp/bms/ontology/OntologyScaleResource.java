@@ -9,6 +9,7 @@ import org.generationcp.bms.ontology.dto.TermRequest;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.validator.RequestIdValidator;
 import org.generationcp.bms.ontology.validator.ScaleRequestValidator;
+import org.generationcp.bms.ontology.validator.TermDeletableValidator;
 import org.generationcp.bms.ontology.validator.TermValidator;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -24,6 +25,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
+
 
 /**
  * NOTE: Work in Progress, Do Not Use API Exposed
@@ -46,6 +48,9 @@ public class OntologyScaleResource {
 
     @Autowired
     private ScaleRequestValidator scaleRequestValidator;
+
+    @Autowired
+    private TermDeletableValidator termDeletableValidator;
 
 	@ApiOperation(value = "All Scales", notes = "Get all scales")
 	@RequestMapping(value = "/{cropname}/scales", method = RequestMethod.GET)
@@ -93,5 +98,18 @@ public class OntologyScaleResource {
         }
         ontologyModelService.updateScale(request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @ApiOperation(value = "Delete Scale", notes = "Delete Scale using Given Id")
+    @RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.DELETE)
+    @ResponseBody
+    public ResponseEntity deleteScale(@PathVariable String  cropname,@PathVariable Integer id) throws MiddlewareQueryException, MiddlewareException {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+        termDeletableValidator.validate(new TermRequest(id, CvId.SCALES.getId()), bindingResult);
+        if(bindingResult.hasErrors()){
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
+        }
+        ontologyModelService.deleteScale(id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

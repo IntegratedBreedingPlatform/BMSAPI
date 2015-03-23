@@ -140,4 +140,12 @@ public interface OntologyModelService {
      * @throws MiddlewareException
      */
     public void updateScale(ScaleRequest request) throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     * Delete a scale using given id
+     * @param id scale to be deleted
+     * @throws MiddlewareQueryException
+     * @throws MiddlewareException
+     */
+    public void deleteScale(Integer id) throws MiddlewareQueryException, MiddlewareException;
 }

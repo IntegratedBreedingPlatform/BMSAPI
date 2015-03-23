@@ -286,4 +286,9 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 
         ontologyManagerService.updateScale(scale);
     }
+
+    @Override
+    public void deleteScale(Integer id) throws MiddlewareQueryException, MiddlewareException {
+        ontologyManagerService.deleteScale(id);
+    }
 }
