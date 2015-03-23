@@ -133,4 +133,11 @@ public interface OntologyModelService {
      */
     public GenericResponse addScale(ScaleRequest request) throws MiddlewareQueryException, MiddlewareException;
 
+    /**
+     * update scale with new request data
+     * @param request ScaleRequest instance that have new data
+     * @throws MiddlewareQueryException
+     * @throws MiddlewareException
+     */
+    public void updateScale(ScaleRequest request) throws MiddlewareQueryException, MiddlewareException;
 }

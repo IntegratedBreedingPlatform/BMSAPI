@@ -267,4 +267,23 @@ public class OntologyModelServiceImpl implements OntologyModelService {
         ontologyManagerService.addScale(scale);
         return new GenericResponse(scale.getId());
     }
+
+    @Override
+    public void updateScale(ScaleRequest request) throws MiddlewareQueryException, MiddlewareException {
+        Scale scale = new Scale(new Term(request.getId(), request.getName(), request.getDescription()));
+
+        scale.setDataType(DataType.getById(request.getDataTypeId()));
+
+        if(Objects.equals(request.getDataTypeId(), CATEGORICAL_VARIABLE.getId())){
+            for(NameDescription description : request.getValidValues().getCategories()){
+                scale.addCategory(description.getName(), description.getDescription());
+            }
+        }
+        if(Objects.equals(request.getDataTypeId(), NUMERIC_VARIABLE.getId())){
+            scale.setMinValue(request.getValidValues().getMinValue());
+            scale.setMaxValue(request.getValidValues().getMaxValue());
+        }
+
+        ontologyManagerService.updateScale(scale);
+    }
 }

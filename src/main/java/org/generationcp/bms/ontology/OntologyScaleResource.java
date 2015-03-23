@@ -91,6 +91,7 @@ public class OntologyScaleResource {
         if(result.hasErrors()){
             throw new ApiRequestValidationException(result.getAllErrors());
         }
-        return new ResponseEntity<>(request, HttpStatus.CREATED);
+        ontologyModelService.updateScale(request);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
