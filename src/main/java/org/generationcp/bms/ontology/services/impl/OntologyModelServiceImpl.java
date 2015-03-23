@@ -276,14 +276,16 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 
         scale.setDataType(DataType.getById(request.getDataTypeId()));
 
+        ValidValues validValues = Objects.equals(request.getValidValues(), null) ? new ValidValues() : request.getValidValues();
+
         if(Objects.equals(request.getDataTypeId(), CATEGORICAL_VARIABLE.getId())){
-            for(NameDescription description : request.getValidValues().getCategories()){
+            for(NameDescription description : validValues.getCategories()){
                 scale.addCategory(description.getName(), description.getDescription());
             }
         }
         if(Objects.equals(request.getDataTypeId(), NUMERIC_VARIABLE.getId())){
-            scale.setMinValue(request.getValidValues().getMinValue());
-            scale.setMaxValue(request.getValidValues().getMaxValue());
+            scale.setMinValue(validValues.getMinValue());
+            scale.setMaxValue(validValues.getMaxValue());
         }
 
         ontologyManagerService.updateScale(scale);
