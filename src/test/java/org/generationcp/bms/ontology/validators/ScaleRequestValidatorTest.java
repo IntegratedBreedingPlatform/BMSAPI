@@ -74,7 +74,7 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
         ScaleRequest request = new ScaleRequest();
-        request.setName(null);
+        request.setName("");
         request.setDescription(description);
 
         scaleRequestValidator.validate(request, bindingResult);
@@ -271,6 +271,46 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
         scaleRequestValidator.validate(request, bindingResult);
         Assert.assertTrue(bindingResult.hasErrors());
         Assert.assertNotNull(bindingResult.getFieldError("validValues"));
+    }
+
+    /**
+     * Test for to check name length not exceed 200 characters
+     * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
+     */
+    @Test
+    public void testWithNameLengthExceedMaxLimit() throws MiddlewareQueryException {
+
+        Mockito.doReturn(null).when(ontologyManagerService).getTermByNameAndCvId(scaleName, cvId);
+
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+
+        ScaleRequest request = new ScaleRequest();
+        request.setName(randomString(205));
+        request.setDescription(description);
+
+        scaleRequestValidator.validate(request, bindingResult);
+        Assert.assertTrue(bindingResult.hasErrors());
+        Assert.assertNotNull(bindingResult.getFieldError("name"));
+    }
+
+    /**
+     * Test for to check description length not exceed 255 characters
+     * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
+     */
+    @Test
+    public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareQueryException {
+
+        Mockito.doReturn(null).when(ontologyManagerService).getTermByNameAndCvId(scaleName, cvId);
+
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+
+        ScaleRequest request = new ScaleRequest();
+        request.setName(scaleName);
+        request.setDescription(randomString(260));
+
+        scaleRequestValidator.validate(request, bindingResult);
+        Assert.assertTrue(bindingResult.hasErrors());
+        Assert.assertNotNull(bindingResult.getFieldError("description"));
     }
 
     /**
