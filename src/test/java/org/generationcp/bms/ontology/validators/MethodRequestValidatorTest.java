@@ -69,7 +69,7 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
         MethodRequest request = new MethodRequest();
-        request.setName(null);
+        request.setName("");
         request.setDescription(description);
 
         methodRequestValidator.validate(request, bindingResult);
@@ -120,6 +120,42 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
     }
 
     /**
+     * Test for to check name length not exceed 200 characters
+     */
+    @Test
+    public void testWithNameLengthExceedMaxLimit() throws MiddlewareQueryException {
+        Mockito.doReturn(null).when(ontologyManagerService).getTermByNameAndCvId(methodName, cvId);
+
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
+
+        MethodRequest request = new MethodRequest();
+        request.setName(randomString(201));
+        request.setDescription(description);
+
+        methodRequestValidator.validate(request, bindingResult);
+        Assert.assertTrue(bindingResult.hasErrors());
+        Assert.assertNotNull(bindingResult.getFieldError("name"));
+    }
+
+    /**
+     * Test for to check description length not exceed 255 characters
+     */
+    @Test
+    public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareQueryException {
+        Mockito.doReturn(null).when(ontologyManagerService).getTermByNameAndCvId(methodName, cvId);
+
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
+
+        MethodRequest request = new MethodRequest();
+        request.setName(methodName);
+        request.setDescription(randomString(260));
+
+        methodRequestValidator.validate(request, bindingResult);
+        Assert.assertTrue(bindingResult.hasErrors());
+        Assert.assertNotNull(bindingResult.getFieldError("description"));
+    }
+
+    /**
      * Test for valid request
      */
     @Test
@@ -136,4 +172,5 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
         methodRequestValidator.validate(request, bindingResult);
         Assert.assertFalse(bindingResult.hasErrors());
     }
+
 }

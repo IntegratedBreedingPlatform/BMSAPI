@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.Charset;
+import java.util.Random;
 
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -52,4 +53,17 @@ public class ApiUnitTestBase {
         return ow.writeValueAsBytes(object);
     }
 
+    /**
+     * Utility Method to generate random string of given length
+     * @param len
+     * @return
+     */
+    public String randomString (int len) {
+        final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        Random rnd = new Random();
+        StringBuilder sb = new StringBuilder(len);
+        for( int i = 0; i < len; i++ )
+            sb.append(chars.charAt(rnd.nextInt(chars.length())));
+        return sb.toString();
+    }
 }
