@@ -76,7 +76,7 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
         PropertyRequest request = new PropertyRequest();
-        request.setName(null);
+        request.setName("");
         request.setDescription(description);
 
         propertyRequestValidator.validate(request, bindingResult);
@@ -177,5 +177,45 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 
         propertyRequestValidator.validate(request, bindingResult);
         Assert.assertFalse(bindingResult.hasErrors());
+    }
+
+    /**
+     * Test for to check name length not exceed 200 characters
+     * @throws MiddlewareQueryException
+     */
+    @Test
+    public void testWithNameLengthExceedMaxLimit() throws MiddlewareQueryException {
+
+        Mockito.doReturn(null).when(ontologyManagerService).getTermByNameAndCvId(propertyName, cvId);
+
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
+
+        PropertyRequest request = new PropertyRequest();
+        request.setName(randomString(205));
+        request.setDescription(description);
+
+        propertyRequestValidator.validate(request, bindingResult);
+        Assert.assertTrue(bindingResult.hasErrors());
+        Assert.assertNotNull(bindingResult.getFieldError("name"));
+    }
+
+    /**
+     * Test for to check name length not exceed 200 characters
+     * @throws MiddlewareQueryException
+     */
+    @Test
+    public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareQueryException {
+
+        Mockito.doReturn(null).when(ontologyManagerService).getTermByNameAndCvId(propertyName, cvId);
+
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
+
+        PropertyRequest request = new PropertyRequest();
+        request.setName(propertyName);
+        request.setDescription(randomString(260));
+
+        propertyRequestValidator.validate(request, bindingResult);
+        Assert.assertTrue(bindingResult.hasErrors());
+        Assert.assertNotNull(bindingResult.getFieldError("description"));
     }
 }
