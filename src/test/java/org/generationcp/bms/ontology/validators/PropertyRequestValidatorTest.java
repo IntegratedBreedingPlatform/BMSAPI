@@ -159,27 +159,6 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
     }
 
     /**
-     * Test for valid request
-     * @throws MiddlewareQueryException
-     */
-    @Test
-    public void testWithValidRequest() throws MiddlewareQueryException {
-
-        Mockito.doReturn(null).when(ontologyManagerService).getTermByNameAndCvId(propertyName, cvId);
-        Mockito.doReturn(traitClasses).when(ontologyManagerService).getAllTraitClass();
-
-        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
-
-        PropertyRequest request = new PropertyRequest();
-        request.setName(propertyName);
-        request.setDescription(description);
-        request.setClasses(classes);
-
-        propertyRequestValidator.validate(request, bindingResult);
-        Assert.assertFalse(bindingResult.hasErrors());
-    }
-
-    /**
      * Test for to check name length not exceed 200 characters
      * @throws MiddlewareQueryException
      */
@@ -200,7 +179,7 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
     }
 
     /**
-     * Test for to check name length not exceed 200 characters
+     * Test for to check description length not exceed 255 characters
      * @throws MiddlewareQueryException
      */
     @Test
@@ -217,5 +196,26 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
         propertyRequestValidator.validate(request, bindingResult);
         Assert.assertTrue(bindingResult.hasErrors());
         Assert.assertNotNull(bindingResult.getFieldError("description"));
+    }
+
+    /**
+     * Test for valid request
+     * @throws MiddlewareQueryException
+     */
+    @Test
+    public void testWithValidRequest() throws MiddlewareQueryException {
+
+        Mockito.doReturn(null).when(ontologyManagerService).getTermByNameAndCvId(propertyName, cvId);
+        Mockito.doReturn(traitClasses).when(ontologyManagerService).getAllTraitClass();
+
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
+
+        PropertyRequest request = new PropertyRequest();
+        request.setName(propertyName);
+        request.setDescription(description);
+        request.setClasses(classes);
+
+        propertyRequestValidator.validate(request, bindingResult);
+        Assert.assertFalse(bindingResult.hasErrors());
     }
 }
