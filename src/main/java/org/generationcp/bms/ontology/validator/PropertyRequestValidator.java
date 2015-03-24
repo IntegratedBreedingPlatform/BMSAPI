@@ -21,6 +21,8 @@ import java.util.Set;
  3 Classes must be an array containing at least one string
  4 Each class should contain unique valid value
  5 Name cannot change if the property is already in use
+ 6 Name is no more than 200 characters
+ 7 Description is no more than 255 characters
  */
 @Component
 public class PropertyRequestValidator extends OntologyValidator implements org.springframework.validation.Validator{
@@ -56,8 +58,14 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
         //1. Name is required
         shouldNotNullOrEmpty("name", request.getName(), errors);
 
-        //2.Name is unique
+        //6. Name is no more than 200 characters
+        nameShouldHaveMax200Chars("name", request.getName(), errors);
+
+        //2. Name is unique
         checkTermUniqueness(request.getId(), request.getName(), CvId.PROPERTIES.getId(), errors);
+
+        //7. Description is no more than 255 characters
+        descriptionShouldHaveMax255Chars("description", request.getDescription(), errors);
 
         //3. Classes must be an array containing at least one string
         shouldNotNullOrEmpty("classes", request.getClasses(), errors);
@@ -69,7 +77,6 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 
         //4 Each class should contain unique valid value
         shouldClassesContainValidValue(request.getClasses(), errors);
-
     }
 
     private void shouldClassesContainValidValue(List<String> classes, Errors errors){
