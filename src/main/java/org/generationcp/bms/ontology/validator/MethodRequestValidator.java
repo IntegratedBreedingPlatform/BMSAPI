@@ -13,6 +13,7 @@ import java.util.Objects;
  1 Name is required
  2 Name is unique
  3 Name cannot change if the method is already in use
+ 4 Name is no more than 200 characters
  */
 @Component
 public class MethodRequestValidator extends OntologyValidator implements org.springframework.validation.Validator{
@@ -47,10 +48,11 @@ public class MethodRequestValidator extends OntologyValidator implements org.spr
         //1. Name is required
         shouldNotNullOrEmpty("name", request.getName(), errors);
 
+        //4. Name is no more than 200 characters
+        nameShouldHaveMax200Chars("name", request.getName(), errors);
+
         //2.Name is unique
         checkTermUniqueness(request.getId(), request.getName(), CvId.METHODS.getId(), errors);
-
-
     }
 
     private void methodShouldBeEditable(MethodRequest request, Errors errors){
