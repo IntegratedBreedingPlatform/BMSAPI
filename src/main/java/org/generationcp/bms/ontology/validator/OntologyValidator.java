@@ -19,6 +19,7 @@ public abstract class OntologyValidator extends BaseValidator {
     protected static final String ENUM_TYPE_NOT_VALID = "enum.type.not.valid";
     protected static final String CAN_NOT_DELETE_REFERRED_TERM = "can.not.delete.referred.term";
     protected static final String NAME_LENGTH_SHOULD_NOT_EXCEED_200_CHARS = "name.should.not.exceed.max.chars";
+    protected static final String DESCRIPTION_LENGTH_SHOULD_NOT_EXCEED_255_CHARS = "description.should.not.exceed.max.chars";
 
     @Autowired
     protected OntologyManagerService ontologyManagerService;
@@ -81,6 +82,14 @@ public abstract class OntologyValidator extends BaseValidator {
        if(value.trim().length() > 200){
            addCustomError(errors, fieldName, NAME_LENGTH_SHOULD_NOT_EXCEED_200_CHARS, null);
        }
+    }
+
+    protected void descriptionShouldHaveMax255Chars(String fieldName, String value, Errors errors){
+        if(!value.isEmpty()){
+            if(value.trim().length() > 255){
+                addCustomError(errors, fieldName, DESCRIPTION_LENGTH_SHOULD_NOT_EXCEED_255_CHARS, null);
+            }
+        }
     }
 
     protected void logError(final Throwable cause)
