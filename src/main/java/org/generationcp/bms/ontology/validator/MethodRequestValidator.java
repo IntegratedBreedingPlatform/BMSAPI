@@ -19,7 +19,7 @@ import java.util.Objects;
 @Component
 public class MethodRequestValidator extends OntologyValidator implements org.springframework.validation.Validator{
 
-    final static String METHOD_NOT_EDITABLE = "method.not.editable";
+    static final String METHOD_NOT_EDITABLE = "method.not.editable";
 
 
     @Override

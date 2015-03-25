@@ -27,9 +27,9 @@ import java.util.Set;
 @Component
 public class PropertyRequestValidator extends OntologyValidator implements org.springframework.validation.Validator{
 
-    final static String DUPLICATE_ENTRIES_IN_CLASSES = "property.class.duplicate.entries";
-    final static String INVALID_CLASS_NAME = "property.class.name.not.found";
-    final static String PROPERTY_NOT_EDITABLE = "property.not.editable";
+    static final String DUPLICATE_ENTRIES_IN_CLASSES = "property.class.duplicate.entries";
+    static final String INVALID_CLASS_NAME = "property.class.name.not.found";
+    static final String PROPERTY_NOT_EDITABLE = "property.not.editable";
 
     @Override
     public boolean supports(Class<?> aClass) {
