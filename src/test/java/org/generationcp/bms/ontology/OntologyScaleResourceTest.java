@@ -66,6 +66,10 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
         validateMockitoUsage();
     }
 
+    /**
+     * List all scales with details
+     * @throws Exception
+     */
     @Test
     public void listAllScales() throws Exception {
 
@@ -91,6 +95,10 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
         verify(ontologyManagerService, times(1)).getAllScales();
     }
 
+    /**
+     * Get a scale if exist using given scale id
+     * @throws Exception
+     */
     @Test
     public void getScaleById() throws Exception{
 
@@ -110,6 +118,10 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
         verify(ontologyManagerService, times(1)).getScaleById(1);
     }
 
+    /**
+     * Add new scale with provided data and return id of newly generated scale
+     * @throws Exception
+     */
     @Test
     public void addScale() throws Exception{
 
@@ -142,6 +154,10 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
         verify(ontologyManagerService).addScale(captor.capture());
     }
 
+    /**
+     * Update a scale if exist
+     * @throws Exception
+     */
     @Test
     public void updateScale() throws Exception{
 
@@ -177,6 +193,10 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
         assertEquals(scale.getDefinition(), captured.getDefinition());
     }
 
+    /**
+     * Delete a scale if exist and not referred
+     * @throws Exception
+     */
     @Test
     public void deleteScale() throws Exception{
 
