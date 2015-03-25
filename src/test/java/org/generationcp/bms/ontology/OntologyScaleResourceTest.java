@@ -26,12 +26,14 @@ import org.mockito.Mockito;
 
 import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.validateMockitoUsage;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -140,5 +142,40 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
                 .andDo(print());
 
         verify(ontologyManagerService).addScale(captor.capture());
+    }
+
+    @Test
+    public void updateScale() throws Exception{
+
+        String cropName = "maize";
+
+        ValidValues validValues = new ValidValues();
+        validValues.setMinValue("10");
+        validValues.setMaxValue("20");
+
+        ScaleRequest scaleRequest = new ScaleRequest();
+        scaleRequest.setName(scaleName);
+        scaleRequest.setDescription(scaleDescription);
+        scaleRequest.setDataTypeId(1110);
+        scaleRequest.setValidValues(validValues);
+
+        Scale scale = new Scale(new Term(1, scaleName, scaleDescription));
+
+        ArgumentCaptor<Scale> captor = ArgumentCaptor.forClass(Scale.class);
+
+        Mockito.doNothing().when(ontologyManagerService).updateScale(any(Scale.class));
+        Mockito.doReturn(scale).when(ontologyManagerService).getScaleById(scale.getId());
+
+        mockMvc.perform(put("/ontology/{cropname}/scales/{id}", cropName, scale.getId())
+                .contentType(contentType).content(convertObjectToByte(scaleRequest)))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+
+        verify(ontologyManagerService).updateScale(captor.capture());
+
+        Scale captured = captor.getValue();
+
+        assertEquals(scale.getName(), captured.getName());
+        assertEquals(scale.getDefinition(), captured.getDefinition());
     }
 }
