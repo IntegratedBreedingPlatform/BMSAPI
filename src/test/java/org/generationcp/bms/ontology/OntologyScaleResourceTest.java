@@ -2,8 +2,10 @@ package org.generationcp.bms.ontology;
 
 import org.generationcp.bms.ApiUnitTestBase;
 import org.generationcp.bms.ontology.builders.ScaleBuilder;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.junit.Test;
 import org.junit.After;
@@ -82,5 +84,25 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
                 .andDo(print());
 
         verify(ontologyManagerService, times(1)).getAllScales();
+    }
+
+    @Test
+    public void getScaleById() throws Exception{
+
+        String cropName = "maize";
+
+        Scale scale = new ScaleBuilder().build(1, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
+
+        Mockito.doReturn(scale).when(ontologyManagerService).getScaleById(1);
+        Mockito.doReturn(new Term(1, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(ontologyManagerService).getTermById(1);
+
+        mockMvc.perform(get("/ontology/{cropname}/scales/{id}",cropName, String.valueOf(1)).contentType(contentType)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is(scale.getName())))
+                .andExpect(jsonPath("$.description", is(scale.getDefinition())))
+                .andDo(print());
+
+        verify(ontologyManagerService, times(1)).getScaleById(1);
+
     }
 }
