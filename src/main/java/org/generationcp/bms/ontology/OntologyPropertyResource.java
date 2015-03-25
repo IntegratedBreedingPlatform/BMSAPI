@@ -85,7 +85,7 @@ public class OntologyPropertyResource {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    //TODO: 403 response for user without permission, Check if method is deletable or not
+    //TODO: 403 response for user without permission
     @ApiOperation(value = "Delete Property", notes = "Delete Property using Given Id")
     @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.DELETE)
     @ResponseBody
@@ -105,7 +105,7 @@ public class OntologyPropertyResource {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    //TODO: 403 response for user without permission, Check if fields are editable or not
+    //TODO: 403 response for user without permission
     @ApiOperation(value = "Update Property", notes = "Update Property using Given Data")
     @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.PUT)
     @ResponseBody
