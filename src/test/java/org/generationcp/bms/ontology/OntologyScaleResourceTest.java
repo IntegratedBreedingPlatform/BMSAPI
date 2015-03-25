@@ -2,17 +2,16 @@ package org.generationcp.bms.ontology;
 
 import org.generationcp.bms.ApiUnitTestBase;
 import org.generationcp.bms.ontology.builders.ScaleBuilder;
-import org.generationcp.bms.ontology.dto.ScaleRequest;
 import org.generationcp.bms.ontology.dto.ValidValues;
-import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.DataType;
-import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.bms.ontology.dto.ScaleRequest;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;
-import org.mockito.ArgumentCaptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Configuration;
@@ -23,20 +22,19 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.ArrayList;
 import org.mockito.Mockito;
+import org.mockito.ArgumentCaptor;
 
 import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.validateMockitoUsage;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.mockito.Mockito.validateMockitoUsage;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 
 public class OntologyScaleResourceTest extends ApiUnitTestBase {
@@ -177,5 +175,26 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 
         assertEquals(scale.getName(), captured.getName());
         assertEquals(scale.getDefinition(), captured.getDefinition());
+    }
+
+    @Test
+    public void deleteScale() throws Exception{
+
+        String cropName = "maize";
+
+        Term term = new Term(10, "name", "", CvId.SCALES.getId(), false);
+        Scale scale = new Scale(term);
+
+        Mockito.doReturn(term).when(ontologyManagerService).getTermById(scale.getId());
+        Mockito.doReturn(scale).when(ontologyManagerService).getScaleById(scale.getId());
+        Mockito.doReturn(false).when(ontologyManagerService).isTermReferred(scale.getId());
+        Mockito.doNothing().when(ontologyManagerService).deleteScale(scale.getId());
+
+        mockMvc.perform(delete("/ontology/{cropname}/scales/{id}", cropName, scale.getId())
+                .contentType(contentType))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+
+        verify(ontologyManagerService, times(1)).deleteScale(scale.getId());
     }
 }
