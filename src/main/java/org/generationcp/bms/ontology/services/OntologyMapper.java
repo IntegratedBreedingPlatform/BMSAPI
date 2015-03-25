@@ -182,4 +182,31 @@ public class OntologyMapper {
         });
         return variableMapper;
     }
+
+    private static PropertyMap<OntologyVariable, VariableResponse> variableResponseMap = new PropertyMap<OntologyVariable, VariableResponse>() {
+        @Override
+        protected void configure() {
+            map().setName(source.getName());
+            map().setDescription(source.getDefinition());
+            map().setFavourite(source.getIsFavorite());
+            map().setAlias("");
+            map().setVariableTypeIds(source.getVariableTypes());
+            map().setCreatedDate(source.getDateCreated());
+            map().setModifiedData(source.getDateLastModified());
+            map().setObservations(source.getObservations());
+            map().setExpectedMin(source.getMinValue());
+            map().setExpectedMax(source.getMaxValue());
+            map().setEditableFields(new ArrayList<String>());
+            map().setDeletable(false);
+        }
+    };
+
+    public static ModelMapper variableResponseMapper(){
+        ModelMapper variableMapper = new ModelMapper();
+        variableMapper.addMappings(methodMap);
+        variableMapper.addMappings(propertyMap);
+        variableMapper.addMappings(scaleMap);
+        variableMapper.addMappings(variableResponseMap);
+        return variableMapper;
+    }
 }

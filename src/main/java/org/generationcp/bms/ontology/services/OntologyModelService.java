@@ -162,4 +162,12 @@ public interface OntologyModelService {
      */
     public List<VariableSummary> getAllVariables() throws MiddlewareQueryException;
 
+    /**
+     * Get variable using given id
+     * @param variableId id of the variable
+     * @return variable that matches id
+     * @throws MiddlewareQueryException
+     * @throws MiddlewareException
+     */
+    public VariableResponse getVariableById(Integer variableId) throws MiddlewareQueryException, MiddlewareException;
 }

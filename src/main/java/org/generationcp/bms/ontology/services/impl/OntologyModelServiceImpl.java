@@ -320,4 +320,25 @@ public class OntologyModelServiceImpl implements OntologyModelService {
         }
         return variableSummaryList;
     }
+
+    @Override
+    public VariableResponse getVariableById(Integer variableId) throws MiddlewareQueryException, MiddlewareException {
+        OntologyVariable ontologyVariable = ontologyManagerService.getVariable(variableId);
+        if(ontologyVariable == null){
+            return null;
+        }
+        boolean deletable = true;
+        if(ontologyManagerService.isTermReferred(variableId)){
+            deletable = false;
+        }
+        ModelMapper mapper = OntologyMapper.variableResponseMapper();
+        VariableResponse response = mapper.map(ontologyVariable, VariableResponse.class);
+        if(!deletable){
+            response.setEditableFields(new ArrayList<>(Arrays.asList("description")));
+        }else {
+            response.setEditableFields(new ArrayList<>(Arrays.asList("name", "description", "alias", "cropOntologyId", "variableTypeIds", "propertySummary", "methodSummary", "scale", "expectedRange")));
+        }
+        response.setDeletable(deletable);
+        return response;
+    }
 }
