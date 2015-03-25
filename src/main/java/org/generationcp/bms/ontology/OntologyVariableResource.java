@@ -2,10 +2,14 @@ package org.generationcp.bms.ontology;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.bms.ontology.dto.VariableSummary;
+import org.generationcp.bms.ontology.services.OntologyModelService;
+import org.generationcp.bms.ontology.validator.RequestIdValidator;
+import org.generationcp.bms.ontology.validator.TermValidator;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.service.api.OntologyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * NOTE: Work in Progress, Do Not Use API Exposed
@@ -26,20 +29,18 @@ import java.util.Set;
 public class OntologyVariableResource {
 	
 	@Autowired
-	private OntologyService ontologyService;
+	private OntologyModelService ontologyModelService;
 
-	@ApiOperation(value = "All variables", notes = "Gets all standard variables.")
+    @Autowired
+    private RequestIdValidator requestIdValidator;
+
+    @Autowired
+    private TermValidator termValidator;
+
+	@ApiOperation(value = "All variables", notes = "Gets all variables.")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.GET)
 	@ResponseBody
-	public Set<StandardVariable> listAllStandardVariables(@PathVariable String  cropname) throws MiddlewareQueryException {
-        return ontologyService.getAllStandardVariables();
+	public ResponseEntity<List<VariableSummary>> listAllVariables(@PathVariable String  cropname) throws MiddlewareQueryException {
+        return new ResponseEntity<>(ontologyModelService.getAllVariables(), HttpStatus.OK);
 	}
-
-	@ApiOperation(value = "All variables by property id", notes = "Get all standard variables using given property id")
-	@RequestMapping(value = "/{cropname}/variables?property={id}", method = RequestMethod.GET)
-	@ResponseBody
-	public List<StandardVariable> listAllStandardVariablesByPropertyId(@PathVariable String  cropname, @PathVariable Integer id) throws MiddlewareQueryException {
-        return ontologyService.getStandardVariablesByProperty(id);
-	}
-
 }

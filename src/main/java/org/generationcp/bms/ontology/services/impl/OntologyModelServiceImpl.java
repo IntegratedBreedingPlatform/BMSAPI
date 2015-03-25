@@ -306,4 +306,18 @@ public class OntologyModelServiceImpl implements OntologyModelService {
             }
         });
     }
+
+    @Override
+    public List<VariableSummary> getAllVariables() throws MiddlewareQueryException {
+        List<OntologyVariableSummary> variableSummaries = ontologyManagerService.getAllVariables();
+        List<VariableSummary> variableSummaryList = new ArrayList<>();
+
+        ModelMapper mapper = OntologyMapper.variableMapper();
+
+        for (OntologyVariableSummary variable : variableSummaries){
+            VariableSummary variableSummary = mapper.map(variable, VariableSummary.class);
+            variableSummaryList.add(variableSummary);
+        }
+        return variableSummaryList;
+    }
 }

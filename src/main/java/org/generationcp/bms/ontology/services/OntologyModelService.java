@@ -154,4 +154,12 @@ public interface OntologyModelService {
      * @return List of Variable Types
      */
     public List<IdName> getAllVariableTypes();
+
+    /**
+     * Get List of all variables
+     * @return List of Variables
+     * @throws MiddlewareQueryException
+     */
+    public List<VariableSummary> getAllVariables() throws MiddlewareQueryException;
+
 }

@@ -2,10 +2,7 @@ package org.generationcp.bms.ontology.services;
 
 
 import org.generationcp.bms.ontology.dto.*;
-import org.generationcp.middleware.domain.oms.DataType;
-import org.generationcp.middleware.domain.oms.Method;
-import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.oms.*;
 import org.modelmapper.*;
 import org.modelmapper.spi.MappingContext;
 
@@ -149,4 +146,40 @@ public class OntologyMapper {
         return scaleMapper;
     }
 
+    /**
+     * Custom Mapping for Middleware OntologyVariableSummary Class to VariableSummary
+     * Definition to Description Mapping
+     */
+    private static PropertyMap<OntologyVariableSummary, VariableSummary> variableMap = new PropertyMap<OntologyVariableSummary, VariableSummary>() {
+        @Override
+        protected void configure() {
+            map().setId(source.getId());
+            map().setName(source.getName());
+            map().setDescription(source.getDescription());
+            map().setFavourite(source.getIsFavorite());
+            map().setAlias("");
+            map().setVariableTypeIds(source.getVariableTypes());
+            map().setCreatedDate(source.getDateCreated());
+            map().setModifiedData(source.getDateLastModified());
+            map().setObservations(source.getObservations());
+            map().setExpectedMin(source.getMinValue());
+            map().setExpectedMax(source.getMaxValue());
+        }
+    };
+
+    /**
+     * Customise Mapped property 'variableMap' is Initialize in Mapper and Returned
+     * @return ModelMapper Instance
+     */
+    public static ModelMapper variableMapper(){
+        ModelMapper variableMapper = new ModelMapper();
+        variableMapper.addMappings(variableMap);
+        variableMapper.createTypeMap(TermSummary.class, IdName.class).setConverter(new Converter<TermSummary, IdName>() {
+            @Override
+            public IdName convert(MappingContext<TermSummary, IdName> mappingContext) {
+                return new IdName();
+            }
+        });
+        return variableMapper;
+    }
 }
