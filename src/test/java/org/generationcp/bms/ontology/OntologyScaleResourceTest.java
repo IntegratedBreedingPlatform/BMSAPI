@@ -2,6 +2,8 @@ package org.generationcp.bms.ontology;
 
 import org.generationcp.bms.ApiUnitTestBase;
 import org.generationcp.bms.ontology.builders.ScaleBuilder;
+import org.generationcp.bms.ontology.dto.ScaleRequest;
+import org.generationcp.bms.ontology.dto.ValidValues;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Scale;
@@ -10,6 +12,7 @@ import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;
+import org.mockito.ArgumentCaptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Configuration;
@@ -23,10 +26,12 @@ import org.mockito.Mockito;
 
 import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.validateMockitoUsage;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -103,6 +108,37 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
                 .andDo(print());
 
         verify(ontologyManagerService, times(1)).getScaleById(1);
+    }
 
+    @Test
+    public void addScale() throws Exception{
+
+        String cropName = "maize";
+
+        ValidValues validValues = new ValidValues();
+        validValues.setMinValue("10");
+        validValues.setMaxValue("20");
+
+        ScaleRequest scaleRequest = new ScaleRequest();
+        scaleRequest.setName(scaleName);
+        scaleRequest.setDescription(scaleDescription);
+        scaleRequest.setDataTypeId(1110);
+        scaleRequest.setValidValues(validValues);
+
+        Scale scale = new Scale();
+        scale.setName(scaleName);
+        scale.setDefinition(scaleDescription);
+
+        ArgumentCaptor<Scale> captor = ArgumentCaptor.forClass(Scale.class);
+
+        Mockito.doNothing().when(ontologyManagerService).addScale(any(Scale.class));
+
+        mockMvc.perform(post("/ontology/{cropname}/scales", cropName)
+                .contentType(contentType).content(convertObjectToByte(scaleRequest)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", is(0)))
+                .andDo(print());
+
+        verify(ontologyManagerService).addScale(captor.capture());
     }
 }
