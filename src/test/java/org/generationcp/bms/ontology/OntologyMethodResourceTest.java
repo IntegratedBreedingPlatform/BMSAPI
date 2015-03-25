@@ -90,7 +90,6 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 
         Mockito.doReturn(method).when(ontologyManagerService).getMethod(1);
 
-        //TODO: check editable and deletable fields.
         mockMvc.perform(get("/ontology/{cropname}/methods/{id}",cropName, 1).contentType(contentType)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.name", is(method.getName())))
