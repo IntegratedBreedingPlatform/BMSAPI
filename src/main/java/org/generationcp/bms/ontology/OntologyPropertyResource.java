@@ -34,13 +34,17 @@ public class OntologyPropertyResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OntologyPropertyResource.class);
 
-    @Autowired private RequestIdValidator requestIdValidator;
+    @Autowired 
+    private RequestIdValidator requestIdValidator;
 
-    @Autowired private PropertyRequestValidator propertyRequestValidator;
+    @Autowired 
+    private PropertyRequestValidator propertyRequestValidator;
 
-    @Autowired private TermDeletableValidator deletableValidator;
+    @Autowired 
+    private TermDeletableValidator deletableValidator;
 
-    @Autowired private OntologyModelService ontologyModelService;
+    @Autowired 
+    private OntologyModelService ontologyModelService;
 
 	@ApiOperation(value = "All properties or filter by class name", notes = "Get all properties or filter by class name")
     @RequestMapping(value = "/{cropname}/properties", method = RequestMethod.GET)
