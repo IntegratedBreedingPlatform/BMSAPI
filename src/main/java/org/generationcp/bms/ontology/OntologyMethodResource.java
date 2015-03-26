@@ -40,13 +40,17 @@ public class OntologyMethodResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OntologyMethodResource.class);
 
-    @Autowired private RequestIdValidator requestIdValidator;
+    @Autowired 
+    private RequestIdValidator requestIdValidator;
 
-    @Autowired private MethodRequestValidator methodRequestValidator;
+    @Autowired 
+    private MethodRequestValidator methodRequestValidator;
 
-    @Autowired private TermDeletableValidator termDeletableValidator;
+    @Autowired 
+    private TermDeletableValidator termDeletableValidator;
 
-    @Autowired private OntologyModelService ontologyModelService;
+    @Autowired 
+    private OntologyModelService ontologyModelService;
 
     @ApiOperation(value = "All Methods", notes = "Get all methods")
     @RequestMapping(value = "/{cropname}/methods", method = RequestMethod.GET)
