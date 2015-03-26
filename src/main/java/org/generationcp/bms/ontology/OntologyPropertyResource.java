@@ -3,6 +3,7 @@ package org.generationcp.bms.ontology;
 import com.google.common.base.Strings;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+
 import org.generationcp.bms.exception.ApiRequestValidationException;
 import org.generationcp.bms.ontology.dto.*;
 import org.generationcp.bms.ontology.services.OntologyModelService;
@@ -29,7 +30,6 @@ import org.springframework.stereotype.Controller;
 @Api(value = "Ontology Property Service")
 @Controller
 @RequestMapping("/ontology")
-@SuppressWarnings("unused") // Added because it shows the cropname not used warning that is used in URL
 public class OntologyPropertyResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OntologyPropertyResource.class);
@@ -86,10 +86,10 @@ public class OntologyPropertyResource {
     }
 
     //TODO: 403 response for user without permission
-    @ApiOperation(value = "Delete Property", notes = "Delete Property using Given Id")
+	@ApiOperation(value = "Delete Property", notes = "Delete Property using Given Id")
     @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.DELETE)
     @ResponseBody
-    public ResponseEntity deleteProperty(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
+    public ResponseEntity<?> deleteProperty(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
         requestIdValidator.validate(id, bindingResult);
@@ -102,20 +102,20 @@ public class OntologyPropertyResource {
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         ontologyModelService.deleteProperty(Integer.valueOf(id));
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     //TODO: 403 response for user without permission
-    @ApiOperation(value = "Update Property", notes = "Update Property using Given Data")
+	@ApiOperation(value = "Update Property", notes = "Update Property using Given Data")
     @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity updateProperty(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody PropertyRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
+    public ResponseEntity<?> updateProperty(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody PropertyRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
         request.setId(id);
         propertyRequestValidator.validate(request, bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         ontologyModelService.updateProperty(id, request);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

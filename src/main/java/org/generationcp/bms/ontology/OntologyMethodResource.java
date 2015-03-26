@@ -2,6 +2,7 @@ package org.generationcp.bms.ontology;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+
 import org.generationcp.bms.exception.ApiRequestValidationException;
 import org.generationcp.bms.ontology.dto.MethodRequest;
 import org.generationcp.bms.ontology.dto.MethodResponse;
@@ -35,7 +36,6 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @Api(value = "Ontology Method Service")
 @Controller
 @RequestMapping("/ontology")
-@SuppressWarnings("unused") // Added because it shows the cropname not used warning that is used in URL
 public class OntologyMethodResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OntologyMethodResource.class);
@@ -86,7 +86,7 @@ public class OntologyMethodResource {
     }
 
     //TODO: 403 response for user without permission
-    @ApiOperation(value = "Update Method", notes = "Update Method using Given Data")
+	@ApiOperation(value = "Update Method", notes = "Update Method using Given Data")
     @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<?> updateMethod(@PathVariable String  cropname,@PathVariable Integer id, @RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
@@ -96,20 +96,20 @@ public class OntologyMethodResource {
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         ontologyModelService.updateMethod(request.getId(), request);
-        return new ResponseEntity(NO_CONTENT);
+        return new ResponseEntity<>(NO_CONTENT);
     }
 
     //TODO: 403 response for user without permission
-    @ApiOperation(value = "Delete Method", notes = "Delete Method using Given Id")
+	@ApiOperation(value = "Delete Method", notes = "Delete Method using Given Id")
     @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.DELETE)
     @ResponseBody
-    public ResponseEntity deleteMethod(@PathVariable String  cropname,@PathVariable Integer id) throws MiddlewareQueryException {
+    public ResponseEntity<?> deleteMethod(@PathVariable String  cropname,@PathVariable Integer id) throws MiddlewareQueryException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
         termDeletableValidator.validate(new TermRequest(id, CvId.METHODS.getId()), bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         ontologyModelService.deleteMethod(id);
-        return new ResponseEntity(NO_CONTENT);
+        return new ResponseEntity<>(NO_CONTENT);
     }
 }

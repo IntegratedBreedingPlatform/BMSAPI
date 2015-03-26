@@ -1,6 +1,7 @@
 package org.generationcp.bms.ontology.validator;
 
 import com.google.common.base.Strings;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -11,7 +12,6 @@ import java.util.*;
 /**
  * Helper methods to manage message codes.
  */
-@SuppressWarnings("unused")
 public abstract class BaseValidator {
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
@@ -37,7 +37,8 @@ public abstract class BaseValidator {
      * @param value value of object
      * @return boolean
      */
-    protected boolean isNullOrEmpty(Object value){
+    @SuppressWarnings("rawtypes")
+	protected boolean isNullOrEmpty(Object value){
         return (value instanceof String && Strings.isNullOrEmpty((String) value)) ||
                 value == null ||
                 (value instanceof Collection && ((Collection) value).isEmpty()) ||

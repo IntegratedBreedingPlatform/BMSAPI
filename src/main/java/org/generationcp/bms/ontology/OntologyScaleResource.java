@@ -2,6 +2,7 @@ package org.generationcp.bms.ontology;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+
 import org.generationcp.bms.exception.ApiRequestValidationException;
 import org.generationcp.bms.ontology.dto.ScaleRequest;
 import org.generationcp.bms.ontology.dto.ScaleSummary;
@@ -34,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Api(value = "Ontology Scale Service")
 @Controller
 @RequestMapping("/ontology")
-@SuppressWarnings("unused") // Added because it shows the cropname not used warning that is used in URL
 public class OntologyScaleResource {
 	
 	@Autowired
@@ -100,16 +100,16 @@ public class OntologyScaleResource {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @ApiOperation(value = "Delete Scale", notes = "Delete Scale using Given Id")
+	@ApiOperation(value = "Delete Scale", notes = "Delete Scale using Given Id")
     @RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.DELETE)
     @ResponseBody
-    public ResponseEntity deleteScale(@PathVariable String  cropname,@PathVariable Integer id) throws MiddlewareQueryException, MiddlewareException {
+    public ResponseEntity<?> deleteScale(@PathVariable String  cropname,@PathVariable Integer id) throws MiddlewareQueryException, MiddlewareException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
         termDeletableValidator.validate(new TermRequest(id, CvId.SCALES.getId()), bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         ontologyModelService.deleteScale(id);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
