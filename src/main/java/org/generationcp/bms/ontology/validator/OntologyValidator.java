@@ -2,6 +2,8 @@ package org.generationcp.bms.ontology.validator;
 
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.springframework.validation.Errors;
 
@@ -31,9 +33,13 @@ public abstract class OntologyValidator extends BaseValidator {
     protected static final String MIN_MAX_NOT_VALID = "scale.min.max.not.valid";
     protected static final String SCALE_DOES_NOT_HAVE_DATA_TYPE = "scale.does.not.have.data.type";
     protected static final String METHOD_PROPERTY_SCALE_COMBINATION_EXIST = "method.property.scale.combination.already.exist";
+    protected static final String PROGRAM_DOES_NOT_EXIST = "program.does.not.exist";
 
     @Autowired
     protected OntologyManagerService ontologyManagerService;
+
+    @Autowired
+    private WorkbenchDataManager workbenchDataManager;
 
     protected void checkNumberField(String fieldName, String value, Errors errors){
         if(value.matches("^[0-9]+$")){
@@ -151,6 +157,17 @@ public abstract class OntologyValidator extends BaseValidator {
             }
         } catch (MiddlewareQueryException e) {
             log.error("Error occur while fetching variable in checkIfMethodPropertyScaleCombination");
+        }
+    }
+
+    protected void checkIfProgramExist(String fieldName, String programId, Errors errors){
+        try {
+            Project project = workbenchDataManager.getProjectById(Long.valueOf(programId));
+            if(Objects.equals(project, null)){
+                addCustomError(errors,fieldName, PROGRAM_DOES_NOT_EXIST, null);
+            }
+        } catch (MiddlewareQueryException e) {
+            log.error("Error occur while fetching program data");
         }
     }
 
