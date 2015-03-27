@@ -39,9 +39,6 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
     static final String CATEGORIES_SHOULD_BE_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE = "scale.categories.should.not.pass.with.non.categorical.data.type";
     static final String CATEGORIES_NAME_DUPLICATE = "scale.categories.name.duplicate";
     static final String CATEGORIES_DESCRIPTION_DUPLICATE = "scale.categories.description.duplicate";
-    static final String MIN_MAX_NOT_EXPECTED = "scale.min.max.should.not.supply.when.data.type.non.numeric";
-    static final String MIN_MAX_NOT_VALID = "scale.min.max.not.valid";
-    static final String VALUE_SHOULD_BE_NUMERIC = "value.should.be.numeric";
     static final String SCALE_NOT_EDITABLE = "scale.not.editable";
 
     @Override
