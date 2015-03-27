@@ -4,9 +4,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 import org.generationcp.bms.exception.ApiRequestValidationException;
-import org.generationcp.bms.ontology.dto.ScaleRequest;
-import org.generationcp.bms.ontology.dto.ScaleSummary;
-import org.generationcp.bms.ontology.dto.TermRequest;
+import org.generationcp.bms.ontology.dto.*;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.validator.RequestIdValidator;
 import org.generationcp.bms.ontology.validator.ScaleRequestValidator;
@@ -62,7 +60,7 @@ public class OntologyScaleResource {
     @ApiOperation(value = "Get Scale", notes = "Get Scale By Id")
     @RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<?> getScaleById(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException {
+    public ResponseEntity<ScaleResponse> getScaleById(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
         requestIdValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
@@ -79,7 +77,7 @@ public class OntologyScaleResource {
     @ApiOperation(value = "Add Scale", notes = "Add new scale using detail")
     @RequestMapping(value = "/{cropname}/scales", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<?> addScale(@PathVariable String  cropname, @RequestBody ScaleRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
+    public ResponseEntity<GenericResponse> addScale(@PathVariable String  cropname, @RequestBody ScaleRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
         scaleRequestValidator.validate(request, bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -90,7 +88,7 @@ public class OntologyScaleResource {
     @ApiOperation(value = "Update Scale", notes = "Update existing scale using detail")
     @RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<?> updateScale(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody ScaleRequest request, BindingResult result) throws MiddlewareQueryException, MiddlewareException, ApiRequestValidationException {
+    public ResponseEntity updateScale(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody ScaleRequest request, BindingResult result) throws MiddlewareQueryException, MiddlewareException, ApiRequestValidationException {
         request.setId(id);
         scaleRequestValidator.validate(request, result);
         if(result.hasErrors()){
@@ -103,7 +101,7 @@ public class OntologyScaleResource {
 	@ApiOperation(value = "Delete Scale", notes = "Delete Scale using Given Id")
     @RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.DELETE)
     @ResponseBody
-    public ResponseEntity<?> deleteScale(@PathVariable String  cropname,@PathVariable Integer id) throws MiddlewareQueryException, MiddlewareException {
+    public ResponseEntity deleteScale(@PathVariable String  cropname,@PathVariable Integer id) throws MiddlewareQueryException, MiddlewareException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
         termDeletableValidator.validate(new TermRequest(id, CvId.SCALES.getId()), bindingResult);
         if(bindingResult.hasErrors()){
