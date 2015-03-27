@@ -62,7 +62,7 @@ public class OntologyPropertyResource {
     @ApiOperation(value = "Get Property by id", notes = "Get Property using given Property id")
     @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<?> getPropertyById(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
+    public ResponseEntity<PropertyResponse> getPropertyById(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
         requestIdValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
@@ -80,20 +80,19 @@ public class OntologyPropertyResource {
     @ApiOperation(value = "Add Property", notes = "Add a Property using Given Data")
     @RequestMapping(value = "/{cropname}/properties", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<?> addProperty(@PathVariable String  cropname, @RequestBody PropertyRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
+    public ResponseEntity<GenericResponse> addProperty(@PathVariable String  cropname, @RequestBody PropertyRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
         propertyRequestValidator.validate(request, bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
-        GenericResponse response = ontologyModelService.addProperty(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(ontologyModelService.addProperty(request), HttpStatus.CREATED);
     }
 
     //TODO: 403 response for user without permission
 	@ApiOperation(value = "Delete Property", notes = "Delete Property using Given Id")
     @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.DELETE)
     @ResponseBody
-    public ResponseEntity<?> deleteProperty(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
+    public ResponseEntity deleteProperty(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
         requestIdValidator.validate(id, bindingResult);
@@ -113,7 +112,7 @@ public class OntologyPropertyResource {
 	@ApiOperation(value = "Update Property", notes = "Update Property using Given Data")
     @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<?> updateProperty(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody PropertyRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
+    public ResponseEntity updateProperty(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody PropertyRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
         request.setId(id);
         propertyRequestValidator.validate(request, bindingResult);
         if(bindingResult.hasErrors()){
