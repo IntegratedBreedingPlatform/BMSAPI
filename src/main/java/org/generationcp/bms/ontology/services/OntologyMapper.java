@@ -148,7 +148,6 @@ public class OntologyMapper {
 
     /**
      * Custom Mapping for Middleware OntologyVariableSummary Class to VariableSummary
-     * Definition to Description Mapping
      */
     private static PropertyMap<OntologyVariableSummary, VariableSummary> variableMap = new PropertyMap<OntologyVariableSummary, VariableSummary>() {
         @Override
@@ -183,6 +182,9 @@ public class OntologyMapper {
         return variableMapper;
     }
 
+    /**
+     * Custom Mapping for Middleware OntologyVariable Class to VariableResponse
+     */
     private static PropertyMap<OntologyVariable, VariableResponse> variableResponseMap = new PropertyMap<OntologyVariable, VariableResponse>() {
         @Override
         protected void configure() {
@@ -201,6 +203,10 @@ public class OntologyMapper {
         }
     };
 
+    /**
+     * Customise Mapped property 'variableResponseMap' is Initialize in Mapper and Returned
+     * @return ModelMapper Instance
+     */
     public static ModelMapper variableResponseMapper(){
         ModelMapper variableMapper = new ModelMapper();
         variableMapper.addMappings(methodMap);
