@@ -304,8 +304,8 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     }
 
     @Override
-    public List<VariableSummary> getAllVariables() throws MiddlewareQueryException {
-        List<OntologyVariableSummary> variableSummaries = ontologyManagerService.getAllVariables();
+    public List<VariableSummary> getAllVariablesByFilter(Integer programId, Integer propertyId, Boolean favourite) throws MiddlewareQueryException {
+        List<OntologyVariableSummary> variableSummaries = ontologyManagerService.getWithFilter(programId, favourite, null, propertyId, null);
         List<VariableSummary> variableSummaryList = new ArrayList<>();
 
         ModelMapper mapper = OntologyMapper.variableMapper();
@@ -318,8 +318,8 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     }
 
     @Override
-    public VariableResponse getVariableById(Integer variableId) throws MiddlewareQueryException, MiddlewareException {
-        OntologyVariable ontologyVariable = ontologyManagerService.getVariable(variableId);
+    public VariableResponse getVariableById(Integer programId, Integer variableId) throws MiddlewareQueryException, MiddlewareException {
+        OntologyVariable ontologyVariable = ontologyManagerService.getVariable(programId, variableId);
         if(ontologyVariable == null){
             return null;
         }

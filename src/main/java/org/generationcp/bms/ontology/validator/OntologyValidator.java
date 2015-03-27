@@ -151,7 +151,7 @@ public abstract class OntologyValidator extends BaseValidator {
 
     protected void checkIfMethodPropertyScaleCombination(String fieldName, Integer methodId, Integer propertyId, Integer scaleId, Errors errors){
         try {
-            List<OntologyVariableSummary> variableSummary =  ontologyManagerService.getVariableMethodPropertyScale(methodId, propertyId, scaleId);
+            List<OntologyVariableSummary> variableSummary =  ontologyManagerService.getWithFilter(null, null, methodId, propertyId, scaleId);
             if(!variableSummary.isEmpty()){
                 addCustomError(errors,fieldName, METHOD_PROPERTY_SCALE_COMBINATION_EXIST, null);
             }

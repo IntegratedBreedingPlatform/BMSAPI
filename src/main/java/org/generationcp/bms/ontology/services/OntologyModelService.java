@@ -156,18 +156,23 @@ public interface OntologyModelService {
     public List<IdName> getAllVariableTypes();
 
     /**
-     * Get List of all variables
-     * @return List of Variables
+     * Get List of variables
+     * @param programId id of program
+     * @param propertyId id of property
+     * @param favourite favourite variable
+     * @return list of variables
      * @throws MiddlewareQueryException
      */
-    public List<VariableSummary> getAllVariables() throws MiddlewareQueryException;
+    public List<VariableSummary> getAllVariablesByFilter(Integer programId, Integer propertyId, Boolean favourite) throws MiddlewareQueryException;
 
     /**
      * Get variable using given id
+     * @param programId id of program
      * @param variableId id of the variable
      * @return variable that matches id
      * @throws MiddlewareQueryException
      * @throws MiddlewareException
      */
-    public VariableResponse getVariableById(Integer variableId) throws MiddlewareQueryException, MiddlewareException;
+    public VariableResponse getVariableById(Integer programId, Integer variableId) throws MiddlewareQueryException, MiddlewareException;
+
 }

@@ -1,12 +1,12 @@
 package org.generationcp.bms.ontology;
 
+import com.google.common.base.Strings;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.bms.exception.ApiRequestValidationException;
-import org.generationcp.bms.ontology.dto.TermRequest;
-import org.generationcp.bms.ontology.dto.VariableResponse;
-import org.generationcp.bms.ontology.dto.VariableSummary;
+import org.generationcp.bms.ontology.dto.*;
 import org.generationcp.bms.ontology.services.OntologyModelService;
+import org.generationcp.bms.ontology.validator.ProgramValidator;
 import org.generationcp.bms.ontology.validator.RequestIdValidator;
 import org.generationcp.bms.ontology.validator.TermValidator;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -41,18 +41,38 @@ public class OntologyVariableResource {
     @Autowired
     private TermValidator termValidator;
 
+    @Autowired
+    private ProgramValidator programValidator;
+
 	@ApiOperation(value = "All variables", notes = "Gets all variables.")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<VariableSummary>> listAllVariables(@PathVariable String  cropname) throws MiddlewareQueryException {
-        return new ResponseEntity<>(ontologyModelService.getAllVariables(), HttpStatus.OK);
+	public ResponseEntity<List<VariableSummary>> listAllVariables(@PathVariable String  cropname, @RequestParam(value = "property", required = false) String propertyId, @RequestParam(value = "favourite", required = false) Boolean favourite, @RequestParam(value = "programId") String programId) throws MiddlewareQueryException {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+        programValidator.validate(programId, bindingResult);
+
+        if(bindingResult.hasErrors()){
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
+        }
+
+        Integer pId = null;
+
+        if(!Strings.isNullOrEmpty(propertyId)){
+            requestIdValidator.validate(propertyId, bindingResult);
+            if(bindingResult.hasErrors()){
+                throw new ApiRequestValidationException(bindingResult.getAllErrors());
+            }
+            pId = Integer.valueOf(propertyId);
+        }
+        return new ResponseEntity<>(ontologyModelService.getAllVariablesByFilter(Integer.valueOf(programId), pId, favourite), HttpStatus.OK);
 	}
 
     @ApiOperation(value = "Get Variable", notes = "Get Variable By Id")
     @RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<VariableResponse> getVariableById(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
+    public ResponseEntity<VariableResponse> getVariableById(@PathVariable String  cropname,@RequestParam(value = "programId") String programId, @PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+        programValidator.validate(programId, bindingResult);
         requestIdValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -62,6 +82,7 @@ public class OntologyVariableResource {
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
-        return new ResponseEntity<>(ontologyModelService.getVariableById(Integer.valueOf(id)), HttpStatus.OK);
+        return new ResponseEntity<>(ontologyModelService.getVariableById(Integer.valueOf(programId), Integer.valueOf(id)), HttpStatus.OK);
     }
+
 }
