@@ -13,10 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static org.generationcp.middleware.domain.oms.DataType.CATEGORICAL_VARIABLE;
 import static org.generationcp.middleware.domain.oms.DataType.NUMERIC_VARIABLE;
@@ -54,7 +51,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
         ModelMapper mapper = OntologyMapper.methodMapper();
         MethodResponse response = mapper.map(method, MethodResponse.class);
         if(!deletable){
-            response.setEditableFields(new ArrayList<>(Arrays.asList("description")));
+            response.setEditableFields(new ArrayList<>(Collections.singletonList("description")));
         }else {
             response.setEditableFields(new ArrayList<>(Arrays.asList("name", "description")));
         }
@@ -77,7 +74,6 @@ public class OntologyModelServiceImpl implements OntologyModelService {
         method.setId(request.getId());
         method.setName(request.getName());
         method.setDefinition(request.getDescription());
-        method.print(2);
         ontologyManagerService.updateMethod(method);
     }
 

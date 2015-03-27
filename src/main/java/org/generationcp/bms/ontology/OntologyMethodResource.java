@@ -4,10 +4,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 import org.generationcp.bms.exception.ApiRequestValidationException;
-import org.generationcp.bms.ontology.dto.MethodRequest;
-import org.generationcp.bms.ontology.dto.MethodResponse;
-import org.generationcp.bms.ontology.dto.MethodSummary;
-import org.generationcp.bms.ontology.dto.TermRequest;
+import org.generationcp.bms.ontology.dto.*;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.validator.MethodRequestValidator;
 import org.generationcp.bms.ontology.validator.RequestIdValidator;
@@ -63,7 +60,7 @@ public class OntologyMethodResource {
     @ApiOperation(value = "Get method by id", notes = "Get method using given method id")
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<?> getMethodById(@PathVariable String cropname, @PathVariable String id) throws MiddlewareQueryException {
+	public ResponseEntity<MethodResponse> getMethodById(@PathVariable String cropname, @PathVariable String id) throws MiddlewareQueryException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
         requestIdValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
@@ -81,7 +78,7 @@ public class OntologyMethodResource {
     @ApiOperation(value = "Add Method", notes = "Add a Method using Given Data")
     @RequestMapping(value = "/{cropname}/methods", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<?> addMethod(@PathVariable String  cropname,@RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareQueryException {
+    public ResponseEntity<GenericResponse> addMethod(@PathVariable String  cropname,@RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareQueryException {
         methodRequestValidator.validate(request, bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -93,7 +90,7 @@ public class OntologyMethodResource {
 	@ApiOperation(value = "Update Method", notes = "Update Method using Given Data")
     @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<?> updateMethod(@PathVariable String  cropname,@PathVariable Integer id, @RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
+    public ResponseEntity updateMethod(@PathVariable String  cropname,@PathVariable Integer id, @RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
         request.setId(id);
         methodRequestValidator.validate(request, bindingResult);
         if(bindingResult.hasErrors()){
@@ -107,7 +104,7 @@ public class OntologyMethodResource {
 	@ApiOperation(value = "Delete Method", notes = "Delete Method using Given Id")
     @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.DELETE)
     @ResponseBody
-    public ResponseEntity<?> deleteMethod(@PathVariable String  cropname,@PathVariable Integer id) throws MiddlewareQueryException {
+    public ResponseEntity deleteMethod(@PathVariable String  cropname,@PathVariable Integer id) throws MiddlewareQueryException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
         termDeletableValidator.validate(new TermRequest(id, CvId.METHODS.getId()), bindingResult);
         if(bindingResult.hasErrors()){
