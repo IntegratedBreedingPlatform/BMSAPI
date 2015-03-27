@@ -4,6 +4,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.bms.exception.ApiRequestValidationException;
 import org.generationcp.bms.ontology.dto.TermRequest;
+import org.generationcp.bms.ontology.dto.VariableResponse;
 import org.generationcp.bms.ontology.dto.VariableSummary;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.validator.RequestIdValidator;
@@ -17,10 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.HashMap;
@@ -53,7 +51,7 @@ public class OntologyVariableResource {
     @ApiOperation(value = "Get Variable", notes = "Get Variable By Id")
     @RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<?> getVariableById(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
+    public ResponseEntity<VariableResponse> getVariableById(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
         requestIdValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
