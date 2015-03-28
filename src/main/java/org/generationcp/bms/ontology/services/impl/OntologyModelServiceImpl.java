@@ -237,7 +237,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
         ModelMapper mapper = OntologyMapper.scaleMapper();
         ScaleResponse response = mapper.map(scale, ScaleResponse.class);
         if(!deletable){
-            response.setEditableFields(new ArrayList<>(Arrays.asList("description")));
+            response.setEditableFields(new ArrayList<>(Collections.singletonList("description")));
         }else {
             response.setEditableFields(new ArrayList<>(Arrays.asList("name", "description", "validValues")));
         }
@@ -331,7 +331,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
         ModelMapper mapper = OntologyMapper.variableResponseMapper();
         VariableResponse response = mapper.map(ontologyVariable, VariableResponse.class);
         if(!deletable){
-            response.setEditableFields(new ArrayList<>(Arrays.asList("description")));
+            response.setEditableFields(new ArrayList<>(Collections.singletonList("description")));
         }else {
             response.setEditableFields(new ArrayList<>(Arrays.asList("name", "description", "alias", "cropOntologyId", "variableTypeIds", "propertySummary", "methodSummary", "scale", "expectedRange")));
         }
