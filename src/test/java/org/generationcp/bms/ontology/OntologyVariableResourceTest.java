@@ -89,7 +89,7 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 
 
         List<OntologyVariableSummary> variableSummaries = new ArrayList<>();
-        OntologyVariableSummary variableSummary = new VariableBuilder().build(1, "Name", "Description", new TermSummary(11, methodName, methodDescription),new TermSummary(10, propertyName, propertyDescription),new TermSummary(12, scaleName, scaleDescription));
+        OntologyVariableSummary variableSummary = new VariableBuilder().build(1, variableName, variableDescription, new TermSummary(11, methodName, methodDescription),new TermSummary(10, propertyName, propertyDescription),new TermSummary(12, scaleName, scaleDescription));
         variableSummaries.add(variableSummary);
 
         Mockito.doReturn(variableSummaries).when(ontologyManagerService).getWithFilter(programId, null, null, null, null);
