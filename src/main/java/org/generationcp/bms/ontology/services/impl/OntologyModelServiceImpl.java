@@ -1,6 +1,7 @@
 package org.generationcp.bms.ontology.services.impl;
 
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import org.generationcp.bms.ontology.dto.*;
 import org.generationcp.bms.ontology.services.OntologyMapper;
 import org.generationcp.bms.ontology.services.OntologyModelService;
@@ -336,5 +337,26 @@ public class OntologyModelServiceImpl implements OntologyModelService {
         }
         response.setDeletable(deletable);
         return response;
+    }
+
+    @Override
+    public GenericResponse addVariable(VariableRequest request) throws MiddlewareQueryException, MiddlewareException {
+        OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+        variableInfo.setName(request.getName());
+        variableInfo.setDescription(request.getDescription());
+        variableInfo.setMethodId(request.getMethodId());
+        variableInfo.setPropertyId(request.getPropertyId());
+        variableInfo.setScaleId(request.getScaleId());
+
+        if(!Strings.isNullOrEmpty(request.getExpectedRange().getMin()) && !Strings.isNullOrEmpty(request.getExpectedRange().getMax())){
+            variableInfo.setMinValue(request.getExpectedRange().getMin());
+            variableInfo.setMaxValue(request.getExpectedRange().getMax());
+        }
+
+        for(Integer i : request.getVariableTypeIds()){
+            variableInfo.addVariableType(VariableType.getById(i));
+        }
+        ontologyManagerService.addVariable(variableInfo);
+        return new GenericResponse(variableInfo.getId());
     }
 }

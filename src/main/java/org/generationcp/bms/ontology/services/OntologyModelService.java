@@ -175,4 +175,12 @@ public interface OntologyModelService {
      */
     public VariableResponse getVariableById(Integer programId, Integer variableId) throws MiddlewareQueryException, MiddlewareException;
 
+    /**
+     * Add variable using given data
+     * @param request data to be added
+     * @return newly created variable id
+     * @throws MiddlewareQueryException
+     * @throws MiddlewareException
+     */
+    public GenericResponse addVariable(VariableRequest request) throws MiddlewareQueryException, MiddlewareException;
 }

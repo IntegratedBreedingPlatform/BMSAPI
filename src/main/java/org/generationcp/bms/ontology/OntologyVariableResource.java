@@ -9,6 +9,7 @@ import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.validator.ProgramValidator;
 import org.generationcp.bms.ontology.validator.RequestIdValidator;
 import org.generationcp.bms.ontology.validator.TermValidator;
+import org.generationcp.bms.ontology.validator.VariableRequestValidator;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -43,6 +44,9 @@ public class OntologyVariableResource {
 
     @Autowired
     private ProgramValidator programValidator;
+
+    @Autowired
+    private VariableRequestValidator variableRequestValidator;
 
 	@ApiOperation(value = "All variables", notes = "Gets all variables.")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.GET)
@@ -83,6 +87,17 @@ public class OntologyVariableResource {
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         return new ResponseEntity<>(ontologyModelService.getVariableById(Integer.valueOf(programId), Integer.valueOf(id)), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Add Variable", notes = "Add new variable using given data")
+    @RequestMapping(value = "/{cropname}/variables", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<GenericResponse> addVariable(@PathVariable String  cropname, @RequestBody VariableRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
+        variableRequestValidator.validate(request, bindingResult);
+        if(bindingResult.hasErrors()){
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
+        }
+        return new ResponseEntity<>(ontologyModelService.addVariable(request), HttpStatus.CREATED);
     }
 
 }
