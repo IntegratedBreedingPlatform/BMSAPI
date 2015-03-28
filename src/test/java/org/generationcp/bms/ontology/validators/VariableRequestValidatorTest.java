@@ -470,11 +470,11 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
         String scaleDescription = "Scale Description";
 
         List<OntologyVariableSummary> variableSummaries = new ArrayList<>();
-        variableSummaries.add(new OntologyVariableSummary(1, "Name", "Description"));
         OntologyVariableSummary variableSummary = new OntologyVariableSummary(1, "Name", "Description");
         variableSummary.setMethodSummary(new TermSummary(11, methodName, methodDescription));
         variableSummary.setPropertySummary(new TermSummary(10, propertyName, propertyDescription));
         variableSummary.setScaleSummary(new TermSummary(12, scaleName, scaleDescription));
+        variableSummaries.add(variableSummary);
 
         ExpectedRange expectedRange = new ExpectedRange();
         expectedRange.setMin("12");
