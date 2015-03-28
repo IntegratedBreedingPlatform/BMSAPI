@@ -164,6 +164,11 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 
         //17. If present, Variable type IDs must be an array of integer values (or an empty array)
         shouldNotNullOrEmpty("variableTypeIds", request.getVariableTypeIds(), errors);
+
+        if(errors.hasErrors()){
+            return;
+        }
+
         for(Integer i : request.getVariableTypeIds()){
             shouldHaveValidVariableType("variableTypeIds", i, errors);
         }
