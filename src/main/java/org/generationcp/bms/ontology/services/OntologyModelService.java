@@ -14,7 +14,7 @@ public interface OntologyModelService {
      * @return list of methods
      * @throws MiddlewareQueryException
      */
-    public List<MethodSummary> getAllMethods() throws MiddlewareQueryException;
+    List<MethodSummary> getAllMethods() throws MiddlewareQueryException;
 
     /**
      * get method by method id
@@ -22,7 +22,7 @@ public interface OntologyModelService {
      * @return method
      * @throws MiddlewareQueryException
      */
-    public MethodResponse getMethod(Integer id) throws MiddlewareQueryException;
+    MethodResponse getMethod(Integer id) throws MiddlewareQueryException;
 
     /**
      * add method using given input data
@@ -30,7 +30,7 @@ public interface OntologyModelService {
      * @return newly created method id
      * @throws MiddlewareQueryException
      */
-    public GenericResponse addMethod(MethodRequest method) throws MiddlewareQueryException;
+    GenericResponse addMethod(MethodRequest method) throws MiddlewareQueryException;
 
     /**
      * update method data using given method id
@@ -38,14 +38,14 @@ public interface OntologyModelService {
      * @param request method data to be updated
      * @throws MiddlewareQueryException, MiddlewareException
      */
-    public void updateMethod(Integer id, MethodRequest request) throws MiddlewareQueryException, MiddlewareException;
+    void updateMethod(Integer id, MethodRequest request) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * delete method using given id
      * @param id method to be deleted
      * @throws MiddlewareQueryException
      */
-    public void deleteMethod(Integer id) throws MiddlewareQueryException;
+    void deleteMethod(Integer id) throws MiddlewareQueryException;
 
 
     /**
@@ -53,7 +53,7 @@ public interface OntologyModelService {
      * @return list of properties
      * @throws MiddlewareQueryException
      */
-    public List<PropertySummary> getAllProperties() throws MiddlewareQueryException;
+    List<PropertySummary> getAllProperties() throws MiddlewareQueryException;
 
     /**
      * get property by given property id
@@ -61,7 +61,7 @@ public interface OntologyModelService {
      * @return property that have given id
      * @throws MiddlewareQueryException
      */
-    public PropertyResponse getProperty(Integer id) throws MiddlewareQueryException, MiddlewareException;
+    PropertyResponse getProperty(Integer id) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * add property using given input data
@@ -69,7 +69,7 @@ public interface OntologyModelService {
      * @return newly created property id
      * @throws MiddlewareQueryException
      */
-    public GenericResponse addProperty(PropertyRequest request) throws MiddlewareQueryException, MiddlewareException;
+    GenericResponse addProperty(PropertyRequest request) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * get all properties containing class name
@@ -77,7 +77,7 @@ public interface OntologyModelService {
      * @return list of properties
      * @throws MiddlewareQueryException
      */
-    public List<PropertySummary> getAllPropertiesByClass(String propertyClass) throws MiddlewareQueryException;
+    List<PropertySummary> getAllPropertiesByClass(String propertyClass) throws MiddlewareQueryException;
 
     /**
      * delete property if not used
@@ -85,7 +85,7 @@ public interface OntologyModelService {
      * @return if property deleted or not
      * @throws MiddlewareQueryException
      */
-    public boolean deleteProperty(Integer id) throws MiddlewareQueryException, MiddlewareException;
+    boolean deleteProperty(Integer id) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      *
@@ -94,28 +94,28 @@ public interface OntologyModelService {
      * @throws MiddlewareQueryException
      * @throws MiddlewareException
      */
-    public void updateProperty(Integer id, PropertyRequest request) throws MiddlewareQueryException, MiddlewareException;
+    void updateProperty(Integer id, PropertyRequest request) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * get all data types
      * @return list of data types
      * @throws MiddlewareQueryException
      */
-    public List<IdName> getAllDataTypes() throws MiddlewareQueryException;
+    List<IdName> getAllDataTypes() throws MiddlewareQueryException;
 
     /**
      * get all classes
      * @return list of classes
      * @throws MiddlewareQueryException
      */
-    public List<String> getAllClasses() throws MiddlewareQueryException;
+    List<String> getAllClasses() throws MiddlewareQueryException;
 
     /**
      * get all scales with details
      * @return list of scales
      * @throws MiddlewareQueryException
      */
-    public List<ScaleSummary> getAllScales() throws MiddlewareQueryException;
+    List<ScaleSummary> getAllScales() throws MiddlewareQueryException;
 
     /**
      * get scale using given id
@@ -123,7 +123,7 @@ public interface OntologyModelService {
      * @return scale that matches id
      * @throws MiddlewareQueryException
      */
-    public ScaleResponse getScaleById(Integer id) throws MiddlewareQueryException;
+    ScaleResponse getScaleById(Integer id) throws MiddlewareQueryException;
 
     /**
      * Adding new scale
@@ -131,7 +131,7 @@ public interface OntologyModelService {
      * @throws MiddlewareQueryException
      * @throws MiddlewareException
      */
-    public GenericResponse addScale(ScaleRequest request) throws MiddlewareQueryException, MiddlewareException;
+    GenericResponse addScale(ScaleRequest request) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * update scale with new request data
@@ -139,7 +139,7 @@ public interface OntologyModelService {
      * @throws MiddlewareQueryException
      * @throws MiddlewareException
      */
-    public void updateScale(ScaleRequest request) throws MiddlewareQueryException, MiddlewareException;
+    void updateScale(ScaleRequest request) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * Delete a scale using given id
@@ -147,13 +147,13 @@ public interface OntologyModelService {
      * @throws MiddlewareQueryException
      * @throws MiddlewareException
      */
-    public void deleteScale(Integer id) throws MiddlewareQueryException, MiddlewareException;
+    void deleteScale(Integer id) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * Get List of all variable types
      * @return List of Variable Types
      */
-    public List<IdName> getAllVariableTypes();
+    List<IdName> getAllVariableTypes();
 
     /**
      * Get List of variables
@@ -163,7 +163,7 @@ public interface OntologyModelService {
      * @return list of variables
      * @throws MiddlewareQueryException
      */
-    public List<VariableSummary> getAllVariablesByFilter(Integer programId, Integer propertyId, Boolean favourite) throws MiddlewareQueryException;
+    List<VariableSummary> getAllVariablesByFilter(Integer programId, Integer propertyId, Boolean favourite) throws MiddlewareQueryException;
 
     /**
      * Get variable using given id
@@ -173,7 +173,7 @@ public interface OntologyModelService {
      * @throws MiddlewareQueryException
      * @throws MiddlewareException
      */
-    public VariableResponse getVariableById(Integer programId, Integer variableId) throws MiddlewareQueryException, MiddlewareException;
+    VariableResponse getVariableById(Integer programId, Integer variableId) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * Add variable using given data
@@ -182,5 +182,5 @@ public interface OntologyModelService {
      * @throws MiddlewareQueryException
      * @throws MiddlewareException
      */
-    public GenericResponse addVariable(VariableRequest request) throws MiddlewareQueryException, MiddlewareException;
+    GenericResponse addVariable(VariableRequest request) throws MiddlewareQueryException, MiddlewareException;
 }
