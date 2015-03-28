@@ -172,7 +172,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
         }
 
         try {
-            OntologyVariable oldVariable = ontologyManagerService.getVariable(request.getId());
+            OntologyVariable oldVariable = ontologyManagerService.getVariable(request.getProgramId(), request.getId());
 
             if(Objects.equals(oldVariable, null)){
                 addCustomError(errors, DOES_NOT_EXIST, new Object[]{request.getId()});
