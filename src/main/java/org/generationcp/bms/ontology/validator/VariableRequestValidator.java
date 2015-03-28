@@ -109,6 +109,10 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
         //11. Scale ID must correspond to the ID of an existing scale
         checkTermExist(request.getScaleId(), CvId.SCALES.getId(), errors);
 
+        if(errors.hasErrors()){
+            return;
+        }
+
         //12. The min and max expected range values are only stored if the scales data type is numeric
         Scale scale = getScaleData(request.getScaleId());
 
