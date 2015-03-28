@@ -8,6 +8,8 @@ public class VariableRequest {
 
     @JsonIgnore
     private Integer id;
+    @JsonIgnore
+    private Integer programId;
 
     private String name;
     private String description;
@@ -16,6 +18,14 @@ public class VariableRequest {
     private Integer scaleId;
     private List<Integer> variableTypeIds;
     private ExpectedRange expectedRange;
+
+    public Integer getProgramId() {
+        return programId;
+    }
+
+    public void setProgramId(Integer programId) {
+        this.programId = programId;
+    }
 
     public Integer getId() {
         return id;
