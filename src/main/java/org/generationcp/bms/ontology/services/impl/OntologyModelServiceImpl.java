@@ -25,6 +25,8 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     @Autowired
     private OntologyManagerService ontologyManagerService;
 
+    private String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
+
     @Override
     public List<MethodSummary> getAllMethods() throws MiddlewareQueryException {
         List<Method> methodList = ontologyManagerService.getAllMethods();
@@ -52,7 +54,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
         ModelMapper mapper = OntologyMapper.methodMapper();
         MethodResponse response = mapper.map(method, MethodResponse.class);
         if(!deletable){
-            response.setEditableFields(new ArrayList<>(Collections.singletonList("description")));
+            response.setEditableFields(new ArrayList<>(Collections.singletonList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
         }else {
             response.setEditableFields(new ArrayList<>(Arrays.asList("name", "description")));
         }
@@ -237,7 +239,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
         ModelMapper mapper = OntologyMapper.scaleMapper();
         ScaleResponse response = mapper.map(scale, ScaleResponse.class);
         if(!deletable){
-            response.setEditableFields(new ArrayList<>(Collections.singletonList("description")));
+            response.setEditableFields(new ArrayList<>(Collections.singletonList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
         }else {
             response.setEditableFields(new ArrayList<>(Arrays.asList("name", "description", "validValues")));
         }
@@ -331,7 +333,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
         ModelMapper mapper = OntologyMapper.variableResponseMapper();
         VariableResponse response = mapper.map(ontologyVariable, VariableResponse.class);
         if(!deletable){
-            response.setEditableFields(new ArrayList<>(Collections.singletonList("description")));
+            response.setEditableFields(new ArrayList<>(Collections.singletonList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
         }else {
             response.setEditableFields(new ArrayList<>(Arrays.asList("name", "description", "alias", "cropOntologyId", "variableTypeIds", "propertySummary", "methodSummary", "scale", "expectedRange")));
         }

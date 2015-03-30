@@ -114,10 +114,8 @@ public abstract class OntologyValidator extends BaseValidator {
     }
 
     protected void descriptionShouldHaveMax255Chars(String fieldName, String value, Errors errors){
-        if(!value.isEmpty()){
-            if(value.trim().length() > 255){
-                addCustomError(errors, fieldName, DESCRIPTION_LENGTH_SHOULD_NOT_EXCEED_255_CHARS, null);
-            }
+        if (!value.isEmpty() && value.trim().length() > 255) {
+            addCustomError(errors, fieldName, DESCRIPTION_LENGTH_SHOULD_NOT_EXCEED_255_CHARS, null);
         }
     }
 
