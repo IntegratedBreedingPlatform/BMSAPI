@@ -14,7 +14,8 @@ public class ProjectBasicInfo {
     private Date startDate;
     private Date lastOpenDate;
 
-    public ProjectBasicInfo(){}
+    public ProjectBasicInfo(){
+    }
 
     public ProjectBasicInfo(Project project){
         this.id = project.getProjectId();

@@ -42,7 +42,9 @@ public class ValidValues{
         mapCategories(categories);
     }
 
-    public void setCategories(List<NameDescription> categories) { this.categories = categories; }
+    public void setCategories(List<NameDescription> categories) {
+        this.categories = categories;
+    }
 
     private void mapCategories(Map<String, String> categories){
         if(categories != null){
