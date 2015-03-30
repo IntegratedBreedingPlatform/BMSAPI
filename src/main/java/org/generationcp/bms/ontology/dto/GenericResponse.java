@@ -2,11 +2,11 @@ package org.generationcp.bms.ontology.dto;
 
 public class GenericResponse {
 
+    private int id;
+
     public GenericResponse(int id){
         this.setId(id);
     }
-    
-    private int id;
 
     public int getId() {
         return id;
