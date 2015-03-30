@@ -180,8 +180,7 @@ public abstract class OntologyValidator extends BaseValidator {
         return null;
     }
 
-    protected void logError(final Throwable cause)
-    {
+    protected void logError(final Throwable cause){
         Throwable rootCause = cause;
         while(rootCause.getCause() != null &&  rootCause.getCause() != rootCause){
             rootCause = rootCause.getCause();
