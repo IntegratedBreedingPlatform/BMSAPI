@@ -156,7 +156,7 @@ public abstract class OntologyValidator extends BaseValidator {
                 addCustomError(errors,fieldName, METHOD_PROPERTY_SCALE_COMBINATION_EXIST, null);
             }
         } catch (MiddlewareQueryException e) {
-            log.error("Error occur while fetching variable in checkIfMethodPropertyScaleCombination");
+            log.error("Error occur while fetching variable in checkIfMethodPropertyScaleCombination", e);
         }
     }
 
@@ -167,7 +167,7 @@ public abstract class OntologyValidator extends BaseValidator {
                 addCustomError(errors,fieldName, PROGRAM_DOES_NOT_EXIST, null);
             }
         } catch (MiddlewareQueryException e) {
-            log.error("Error occur while fetching program data");
+            log.error("Error occur while fetching program data", e);
         }
     }
 
@@ -175,7 +175,7 @@ public abstract class OntologyValidator extends BaseValidator {
         try {
             return ontologyManagerService.getScaleById(scaleId);
         } catch (MiddlewareQueryException e) {
-            log.error("Error occur while fetching scale");
+            log.error("Error occur while fetching scale", e);
         }
         return null;
     }
