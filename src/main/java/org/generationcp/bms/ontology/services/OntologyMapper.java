@@ -116,7 +116,7 @@ public class OntologyMapper {
             map().setDescription(source.getDescription());
             map().setFavourite(source.getIsFavorite());
             map().setAlias("");
-            map().setVariableTypeIds(source.getVariableTypes());
+            map().setVariableTypes(source.getVariableTypes());
             map().setCreatedDate(source.getDateCreated());
             map().setModifiedData(source.getDateLastModified());
             map().setObservations(source.getObservations());
@@ -135,7 +135,7 @@ public class OntologyMapper {
             map().setDescription(source.getDefinition());
             map().setFavourite(source.getIsFavorite());
             map().setAlias("");
-            map().setVariableTypeIds(source.getVariableTypes());
+            map().setVariableTypes(source.getVariableTypes());
             map().setCreatedDate(source.getDateCreated());
             map().setModifiedData(source.getDateLastModified());
             map().setObservations(source.getObservations());

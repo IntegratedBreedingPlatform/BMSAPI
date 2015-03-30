@@ -15,7 +15,7 @@ public class VariableResponse implements EditableDeletableFields{
     private MethodSummary method;
     private PropertySummary property;
     private ScaleSummary scale;
-    private List<Integer> variableTypeIds;
+    private List<IdName> variableTypes;
     private boolean favourite;
     private MetaData metadata;
     private ExpectedRange expectedRange;
@@ -78,18 +78,18 @@ public class VariableResponse implements EditableDeletableFields{
         this.description = description;
     }
 
-    public List<Integer> getVariableTypeIds() {
-        return variableTypeIds;
+    public List<IdName> getVariableTypes() {
+        return variableTypes;
     }
 
-    public void setVariableTypeIds(Set<VariableType> variables) {
-        if(this.variableTypeIds == null){
-            this.variableTypeIds = new ArrayList<>();
+    public void setVariableTypes(Set<VariableType> variables) {
+        if(this.variableTypes == null){
+            this.variableTypes = new ArrayList<>();
         }
 
-        this.variableTypeIds.clear();
+        this.variableTypes.clear();
         for(VariableType v : variables){
-            this.variableTypeIds.add(v.getId());
+            this.variableTypes.add(new IdName(v.getId(), v.getName()));
         }
     }
 
