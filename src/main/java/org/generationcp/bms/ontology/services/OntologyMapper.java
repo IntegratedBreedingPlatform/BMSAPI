@@ -12,15 +12,7 @@ public class OntologyMapper {
 
     private static volatile ModelMapper SINGLETON = new ModelMapper();
 
-    private OntologyMapper(){  }
-
-    /**
-     * Eager Initialization of ModelMapper Instance
-     * Used when Simple Class to Class Mapping is Required without Custom Mapping
-     * @return ModelMapper Instance
-     */
-    public static ModelMapper getInstance(){
-        return SINGLETON;
+    private OntologyMapper(){
     }
 
     /**
@@ -36,6 +28,9 @@ public class OntologyMapper {
         }
     };
 
+    /**
+     * Custom Mapping for Middleware Method Class to MethodResponse
+     */
     private static PropertyMap<Method, MethodResponse> methodResponseMap = new PropertyMap<Method, MethodResponse>() {
         @Override
         protected void configure() {
@@ -48,20 +43,7 @@ public class OntologyMapper {
     };
 
     /**
-     * Customise Mapped method 'methodMap' is Initialize in Mapper and Returned
-     * @return ModelMapper Instance
-     */
-    public static ModelMapper methodMapper(){
-        ModelMapper mapper = new ModelMapper();
-        mapper.addMappings(methodMap);
-        mapper.addMappings(methodResponseMap);
-        return mapper;
-    }
-
-
-    /**
      * Custom Mapping for Middleware Property Class to PropertySummary
-     * Definition to Description Mapping
      */
     private static PropertyMap<Property, PropertySummary> propertyMap = new PropertyMap<Property, PropertySummary>() {
 
@@ -75,6 +57,9 @@ public class OntologyMapper {
         }
     };
 
+    /**
+     * Custom Mapping for Middleware Property Class to PropertyResponse
+     */
     private static PropertyMap<Property, PropertyResponse> propertyResponseMap = new PropertyMap<Property, PropertyResponse>() {
         @Override
         protected void configure() {
@@ -89,19 +74,7 @@ public class OntologyMapper {
     };
 
     /**
-     * Customise Mapped property 'propertyMap' is Initialize in Mapper and Returned
-     * @return ModelMapper Instance
-     */
-    public static ModelMapper propertyMapper(){
-        ModelMapper mapper = new ModelMapper();
-        mapper.addMappings(propertyMap);
-        mapper.addMappings(propertyResponseMap);
-        return mapper;
-    }
-
-    /**
      * Custom Mapping for Middleware Scale Class to ScaleSummary
-     * Definition to Description Mapping
      */
     private static PropertyMap<Scale, ScaleSummary> scaleMap = new PropertyMap<Scale, ScaleSummary>() {
         @Override
@@ -115,6 +88,9 @@ public class OntologyMapper {
         }
     };
 
+    /**
+     * Custom Mapping for Middleware Scale Class to ScaleResponse
+     */
     private static PropertyMap<Scale, ScaleResponse> scaleResponseMap = new PropertyMap<Scale, ScaleResponse>() {
         @Override
         protected void configure() {
@@ -128,23 +104,6 @@ public class OntologyMapper {
             map().setDeletable(false);
         }
     };
-
-    /**
-     * Customise Mapped property 'scaleMap' is Initialize in Mapper and Returned
-     * @return ModelMapper Instance
-     */
-    public static ModelMapper scaleMapper(){
-        ModelMapper scaleMapper = new ModelMapper();
-        scaleMapper.addMappings(scaleMap);
-        scaleMapper.addMappings(scaleResponseMap);
-        scaleMapper.createTypeMap(DataType.class, IdName.class).setConverter(new Converter<DataType, IdName>() {
-            @Override
-            public IdName convert(MappingContext<DataType, IdName> mappingContext) {
-                return new IdName();
-            }
-        });
-        return scaleMapper;
-    }
 
     /**
      * Custom Mapping for Middleware OntologyVariableSummary Class to VariableSummary
@@ -167,22 +126,6 @@ public class OntologyMapper {
     };
 
     /**
-     * Customise Mapped property 'variableMap' is Initialize in Mapper and Returned
-     * @return ModelMapper Instance
-     */
-    public static ModelMapper variableMapper(){
-        ModelMapper variableMapper = new ModelMapper();
-        variableMapper.addMappings(variableMap);
-        variableMapper.createTypeMap(TermSummary.class, IdName.class).setConverter(new Converter<TermSummary, IdName>() {
-            @Override
-            public IdName convert(MappingContext<TermSummary, IdName> mappingContext) {
-                return new IdName();
-            }
-        });
-        return variableMapper;
-    }
-
-    /**
      * Custom Mapping for Middleware OntologyVariable Class to VariableResponse
      */
     private static PropertyMap<OntologyVariable, VariableResponse> variableResponseMap = new PropertyMap<OntologyVariable, VariableResponse>() {
@@ -202,6 +145,70 @@ public class OntologyMapper {
             map().setDeletable(false);
         }
     };
+
+    /**
+     * Eager Initialization of ModelMapper Instance
+     * Used when Simple Class to Class Mapping is Required without Custom Mapping
+     * @return ModelMapper Instance
+     */
+    public static ModelMapper getInstance(){
+        return SINGLETON;
+    }
+
+    /**
+     * Customise Mapped method 'methodMap' is Initialize in Mapper and Returned
+     * @return ModelMapper Instance
+     */
+    public static ModelMapper methodMapper(){
+        ModelMapper mapper = new ModelMapper();
+        mapper.addMappings(methodMap);
+        mapper.addMappings(methodResponseMap);
+        return mapper;
+    }
+
+    /**
+     * Customise Mapped property 'propertyMap' is Initialize in Mapper and Returned
+     * @return ModelMapper Instance
+     */
+    public static ModelMapper propertyMapper(){
+        ModelMapper mapper = new ModelMapper();
+        mapper.addMappings(propertyMap);
+        mapper.addMappings(propertyResponseMap);
+        return mapper;
+    }
+
+    /**
+     * Customise Mapped property 'scaleMap' is Initialize in Mapper and Returned
+     * @return ModelMapper Instance
+     */
+    public static ModelMapper scaleMapper(){
+        ModelMapper scaleMapper = new ModelMapper();
+        scaleMapper.addMappings(scaleMap);
+        scaleMapper.addMappings(scaleResponseMap);
+        scaleMapper.createTypeMap(DataType.class, IdName.class).setConverter(new Converter<DataType, IdName>() {
+            @Override
+            public IdName convert(MappingContext<DataType, IdName> mappingContext) {
+                return new IdName();
+            }
+        });
+        return scaleMapper;
+    }
+
+    /**
+     * Customise Mapped property 'variableMap' is Initialize in Mapper and Returned
+     * @return ModelMapper Instance
+     */
+    public static ModelMapper variableMapper(){
+        ModelMapper variableMapper = new ModelMapper();
+        variableMapper.addMappings(variableMap);
+        variableMapper.createTypeMap(TermSummary.class, IdName.class).setConverter(new Converter<TermSummary, IdName>() {
+            @Override
+            public IdName convert(MappingContext<TermSummary, IdName> mappingContext) {
+                return new IdName();
+            }
+        });
+        return variableMapper;
+    }
 
     /**
      * Customise Mapped property 'variableResponseMap' is Initialize in Mapper and Returned
