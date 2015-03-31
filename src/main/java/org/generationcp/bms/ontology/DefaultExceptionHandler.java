@@ -47,7 +47,7 @@ public class DefaultExceptionHandler {
         ErrorResponse response = new ErrorResponse();
         if(ex.getCause() instanceof UnrecognizedPropertyException){
             UnrecognizedPropertyException unrecognizedPropertyException = (UnrecognizedPropertyException) ex.getCause();
-            response.addError(unrecognizedPropertyException.getPropertyName() + " is not a recognised field", "");
+            response.addError(String.format("%s is not a recognised field", unrecognizedPropertyException.getPropertyName()), "");
         } else {
             response.addError(ex.getMessage(), "");
         }
