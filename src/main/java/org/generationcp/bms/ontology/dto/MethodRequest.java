@@ -34,7 +34,8 @@ public class MethodRequest {
     public void setDescription(String description) {
         this.description = description;
     }
-  
+
+    @Override
     public String toString() {
         return "Method [id=" + this.id + ", name=" + this.getName() + ", description=" + this.getDescription() + "]";
     }

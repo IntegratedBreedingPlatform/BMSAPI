@@ -26,4 +26,15 @@ public class ScaleResponse extends ScaleSummary implements EditableDeletableFiel
     public void setDeletable(Boolean deletable) {
         this.deletable = deletable;
     }
+
+    @Override
+    public String toString() {
+        return "Scale  [id=" + this.getId()
+                + ", name=" + this.getName()
+                + ", description=" + this.getDescription()
+                + ", dataType=" + this.getDataType()
+                + ", editableFields=" + this.editableFields
+                + ", deletable=" + this.deletable
+                + ']';
+    }
 }

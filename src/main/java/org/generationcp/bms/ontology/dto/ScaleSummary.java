@@ -68,4 +68,12 @@ public class ScaleSummary {
         }
     }
 
+    @Override
+    public String toString() {
+        return "Scale  [id=" + this.getId()
+                + ", name=" + this.getName()
+                + ", description=" + this.getDescription()
+                + ", dataType=" + this.getDataType()
+                + ']';
+    }
 }

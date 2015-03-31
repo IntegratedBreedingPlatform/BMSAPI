@@ -28,6 +28,7 @@ public class PropertyResponse extends PropertySummary implements EditableDeletab
         this.deletable = deletable;
     }
 
+    @Override
     public String toString() {
         return "Property [id=" + this.getId()
                 + ", name=" + this.getName()

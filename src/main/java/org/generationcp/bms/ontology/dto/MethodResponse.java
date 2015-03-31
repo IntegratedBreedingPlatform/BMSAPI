@@ -27,7 +27,8 @@ public class MethodResponse extends MethodSummary implements EditableDeletableFi
     public void setDeletable(Boolean deletable) {
         this.deletable = deletable;
     }
-    
+
+    @Override
     public String toString() {
         return "Method [id=" + this.getId() 
                 + ", name=" + this.getName() 

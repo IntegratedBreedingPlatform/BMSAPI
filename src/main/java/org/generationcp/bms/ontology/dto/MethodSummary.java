@@ -12,6 +12,7 @@ public class MethodSummary extends MethodRequest {
         this.id = id;
     }
 
+    @Override
     public String toString() {
         return "Method [id=" + this.getId() + ", name=" + this.getName() + ", description=" + this.getDescription() + "]";
     }

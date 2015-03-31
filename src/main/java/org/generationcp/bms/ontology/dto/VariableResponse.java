@@ -157,4 +157,22 @@ public class VariableResponse implements EditableDeletableFields{
             this.expectedRange = new ExpectedRange();
         }
     }
+
+    @Override
+    public String toString() {
+        return "Variable [" +
+                "name='" + name + '\'' +
+                ", alias='" + alias + '\'' +
+                ", description='" + description + '\'' +
+                ", method=" + method +
+                ", property=" + property +
+                ", scale=" + scale +
+                ", variableTypes=" + variableTypes +
+                ", favourite=" + favourite +
+                ", metadata=" + metadata +
+                ", expectedRange=" + expectedRange +
+                ", editableFields=" + editableFields +
+                ", deletable=" + deletable +
+                ']';
+    }
 }

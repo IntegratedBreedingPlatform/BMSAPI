@@ -146,4 +146,21 @@ public class VariableSummary {
             this.expectedRange = new ExpectedRange();
         }
     }
+
+    @Override
+    public String toString() {
+        return "Variable [" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", alias='" + alias + '\'' +
+                ", description='" + description + '\'' +
+                ", propertySummary=" + propertySummary +
+                ", methodSummary=" + methodSummary +
+                ", scaleSummary=" + scaleSummary +
+                ", variableTypes=" + variableTypes +
+                ", favourite=" + favourite +
+                ", metadata=" + metadata +
+                ", expectedRange=" + expectedRange +
+                ']';
+    }
 }

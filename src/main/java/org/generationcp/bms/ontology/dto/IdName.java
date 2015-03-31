@@ -30,6 +30,7 @@ public class IdName {
         this.name = name;
     }
 
+    @Override
     public String toString() {
         return "DataTypeSummary[" + "id=" + id + ", name='" + name + '\'' + ']';
     }

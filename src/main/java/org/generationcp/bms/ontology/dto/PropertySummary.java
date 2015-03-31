@@ -12,6 +12,7 @@ public class PropertySummary extends PropertyRequest {
         this.id = id;
     }
 
+    @Override
     public String toString() {
         return "Property [" +
                 "id=" + this.getId() +
