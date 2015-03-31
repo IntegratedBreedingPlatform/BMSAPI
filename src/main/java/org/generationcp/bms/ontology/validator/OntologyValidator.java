@@ -136,7 +136,7 @@ public abstract class OntologyValidator extends BaseValidator {
     }
 
     protected void shouldHaveValidString(String fieldName, String value, Errors errors){
-        Pattern regex = Pattern.compile("[$&+,./')\\[}\\]{(*^!`~:;=?@#|1234567890]");
+        Pattern regex = Pattern.compile("[$&+,./%')\\[}\\]{(*^!`~:;=?@#|1234567890]");
         Matcher matcher = regex.matcher(value);
 
         if(value.isEmpty()){

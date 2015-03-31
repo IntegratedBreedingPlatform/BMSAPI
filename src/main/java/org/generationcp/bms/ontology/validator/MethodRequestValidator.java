@@ -50,8 +50,16 @@ public class MethodRequestValidator extends OntologyValidator implements org.spr
         //1. Name is required
         shouldNotNullOrEmpty("name", request.getName(), errors);
 
+        if(errors.hasErrors()){
+            return;
+        }
+
         //6. Name and description are textual
         shouldHaveValidString("name", request.getName(), errors);
+
+        if(errors.hasErrors()){
+            return;
+        }
 
         //4. Name is no more than 200 characters
         nameShouldHaveMax200Chars("name", request.getName(), errors);
