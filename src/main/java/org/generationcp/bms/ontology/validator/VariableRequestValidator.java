@@ -2,17 +2,12 @@ package org.generationcp.bms.ontology.validator;
 
 import org.generationcp.bms.ontology.dto.VariableRequest;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.OntologyVariable;
 import org.generationcp.middleware.domain.oms.Scale;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import java.util.Objects;
-
-/** Add Variable/Update Variable
+/** Add Variable
  * Validation rules for Variable request
  * Refer: http://confluence.leafnode.io/display/CD/Services+Validation
  1. Name is required
@@ -32,15 +27,10 @@ import java.util.Objects;
  15. If provided, the expected range minimum must be less than or equal to the expected range maximum, and the expected range maximum must be greater than or equal to the expected range minimum
  16. The combination of property, method and scale must not already exist
  17. If present, Variable type IDs must be an array of integer values (or an empty array)
- 18. Name, property, method, scale, alias and expected range cannot be changed if the property is already in use
  */
 
 @Component
 public class VariableRequestValidator extends OntologyValidator implements Validator{
-
-    static final String EXPECTED_MIN_SHOULD_NOT_LESSER_THAN_SCALE_MIN = "expected.min.should.not.be.smaller";
-    static final String EXPECTED_MAX_SHOULD_NOT_GREATER_THAN_SCALE_MAX = "expected.max.should.not.be.greater";
-    static final String VARIABLE_NOT_EDITABLE = "variable.not.editable";
 
     @Override
     public boolean supports(Class<?> aClass) {
@@ -51,14 +41,6 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
     public void validate(Object target, Errors errors) {
 
         VariableRequest request = (VariableRequest) target;
-
-        //18. Name, property, method, scale, alias and expected range cannot be changed if the property is already in use
-        variableShouldBeEditable(request, errors);
-
-        //Need to return from here because other code is dependent on above validation
-        if(errors.hasErrors()){
-            return;
-        }
 
         //1. Name is required
         shouldNotNullOrEmpty("name", request.getName(), errors);
@@ -171,41 +153,6 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 
         for(Integer i : request.getVariableTypeIds()){
             shouldHaveValidVariableType("variableTypeIds", i, errors);
-        }
-    }
-
-    //TODO : Need to get alias data and also compare
-    private void variableShouldBeEditable(VariableRequest request, Errors errors){
-        if(request.getId() == null){
-            return;
-        }
-
-        try {
-            OntologyVariable oldVariable = ontologyManagerService.getVariable(request.getProgramId(), request.getId());
-
-            if(Objects.equals(oldVariable, null)){
-                addCustomError(errors, DOES_NOT_EXIST, new Object[]{request.getId()});
-                return;
-            }
-
-            boolean isEditable = !ontologyManagerService.isTermReferred(request.getId());
-            if(isEditable){
-                return;
-            }
-
-            boolean isNameNotSame = !Objects.equals(request.getName(), oldVariable.getName());
-            boolean isMethodNotSame = !Objects.equals(request.getMethodId(), oldVariable.getMethod().getId());
-            boolean isPropertyNotSame = !Objects.equals(request.getPropertyId(), oldVariable.getProperty().getId());
-            boolean isScaleNotSame = !Objects.equals(request.getScaleId(), oldVariable.getScale().getId());
-            boolean isExpectedRangeNotSame = !Objects.equals(request.getExpectedRange().getMin(), oldVariable.getMinValue()) && !Objects.equals(request.getExpectedRange().getMax(), oldVariable.getMaxValue());
-
-            if(isNameNotSame || isMethodNotSame || isPropertyNotSame || isScaleNotSame || isExpectedRangeNotSame){
-                errors.reject(VARIABLE_NOT_EDITABLE);
-            }
-
-        } catch (MiddlewareQueryException | MiddlewareException e) {
-            log.error("Error while executing variableShouldBeEditable", e);
-            addDefaultError(errors);
         }
     }
 }

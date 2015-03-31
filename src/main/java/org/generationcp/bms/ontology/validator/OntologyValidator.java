@@ -34,6 +34,10 @@ public abstract class OntologyValidator extends BaseValidator {
     protected static final String SCALE_DOES_NOT_HAVE_DATA_TYPE = "scale.does.not.have.data.type";
     protected static final String METHOD_PROPERTY_SCALE_COMBINATION_EXIST = "method.property.scale.combination.already.exist";
     protected static final String PROGRAM_DOES_NOT_EXIST = "program.does.not.exist";
+    protected static final String EXPECTED_MIN_SHOULD_NOT_LESSER_THAN_SCALE_MIN = "expected.min.should.not.be.smaller";
+    protected static final String EXPECTED_MAX_SHOULD_NOT_GREATER_THAN_SCALE_MAX = "expected.max.should.not.be.greater";
+    protected static final String VARIABLE_NOT_EDITABLE = "variable.not.editable";
+    protected static final String SHOULD_BE_STRING = "should.be.string";
 
     @Autowired
     protected OntologyManagerService ontologyManagerService;
@@ -128,6 +132,18 @@ public abstract class OntologyValidator extends BaseValidator {
         }
         if(Character.isDigit(value.charAt(0))){
             addCustomError(errors, fieldName, FIRST_CHARACTER_SHOULD_NOT_BE_NUMERIC, null);
+        }
+    }
+
+    protected void shouldHaveValidString(String fieldName, String value, Errors errors){
+        Pattern regex = Pattern.compile("[$&+,./')\\[}\\]{(*^!`~:;=?@#|1234567890]");
+        Matcher matcher = regex.matcher(value);
+
+        if(value.isEmpty()){
+            return;
+        }
+        if(matcher.find()){
+            addCustomError(errors, fieldName, SHOULD_BE_STRING, null);
         }
     }
 
