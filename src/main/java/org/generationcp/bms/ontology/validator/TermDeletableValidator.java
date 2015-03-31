@@ -1,14 +1,11 @@
 package org.generationcp.bms.ontology.validator;
 
 import org.generationcp.bms.ontology.dto.TermRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
 @Component
 public class TermDeletableValidator extends OntologyValidator implements org.springframework.validation.Validator{
-
-    @Autowired TermValidator termValidator;
 
     @Override
     public boolean supports(Class<?> aClass) {
@@ -24,7 +21,7 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
             return;
         }
         try {
-            termValidator.validate(target, errors);
+            checkTermExist(request.getTermName(), request.getId(), request.getCvId(), errors);
 
             if(errors.hasErrors()){
                 return;

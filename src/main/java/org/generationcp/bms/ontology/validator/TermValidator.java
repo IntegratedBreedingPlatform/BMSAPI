@@ -16,6 +16,6 @@ public class TermValidator extends OntologyValidator implements org.springframew
     @Override
     public void validate(Object target, Errors errors) {
         TermRequest request = (TermRequest) target;
-        checkTermExist(request.getId(), request.getCvId(), errors);
+        checkTermExist(request.getTermName(), request.getId(), request.getCvId(), errors);
     }
 }

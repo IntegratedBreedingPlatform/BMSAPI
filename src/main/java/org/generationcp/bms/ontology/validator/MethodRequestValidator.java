@@ -86,7 +86,7 @@ public class MethodRequestValidator extends OntologyValidator implements org.spr
 
             //that method should exist with requestId
             if(Objects.equals(oldMethod, null)){
-                addCustomError(errors, DOES_NOT_EXIST, new Object[]{request.getId()});
+                addCustomError(errors, TERM_DOES_NOT_EXIST, new Object[]{"method", request.getId()});
                 return;
             }
 

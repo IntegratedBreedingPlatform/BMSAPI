@@ -9,6 +9,7 @@ import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.validator.MethodRequestValidator;
 import org.generationcp.bms.ontology.validator.RequestIdValidator;
 import org.generationcp.bms.ontology.validator.TermDeletableValidator;
+import org.generationcp.bms.ontology.validator.TermValidator;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -25,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
@@ -39,6 +39,9 @@ public class OntologyMethodResource {
 
     @Autowired 
     private RequestIdValidator requestIdValidator;
+
+    @Autowired
+    private TermValidator termValidator;
 
     @Autowired 
     private MethodRequestValidator methodRequestValidator;
@@ -66,12 +69,12 @@ public class OntologyMethodResource {
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
-        MethodResponse method = ontologyModelService.getMethod(Integer.valueOf(id));
-        if(method == null) {
-            LOGGER.error("No Valid Method Found using Id " + id);
-            return new ResponseEntity<>(BAD_REQUEST);
+        TermRequest request = new TermRequest(Integer.valueOf(id), "method", CvId.METHODS.getId());
+        termValidator.validate(request, bindingResult);
+        if(bindingResult.hasErrors()){
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
-		return new ResponseEntity<>(method, HttpStatus.OK);
+		return new ResponseEntity<>(ontologyModelService.getMethod(Integer.valueOf(id)), HttpStatus.OK);
 	}
 
     //TODO: 403 response for user without permission
@@ -114,7 +117,7 @@ public class OntologyMethodResource {
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
-        termDeletableValidator.validate(new TermRequest(Integer.valueOf(id), CvId.METHODS.getId()), bindingResult);
+        termDeletableValidator.validate(new TermRequest(Integer.valueOf(id), "method", CvId.METHODS.getId()), bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }

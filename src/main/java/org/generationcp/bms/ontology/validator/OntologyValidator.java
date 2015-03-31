@@ -1,5 +1,6 @@
 package org.generationcp.bms.ontology.validator;
 
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -17,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class OntologyValidator extends BaseValidator {
 
-    protected static final String DOES_NOT_EXIST = "does.not.exist";
+    protected static final String TERM_DOES_NOT_EXIST = "term.does.not.exist";
     protected static final String SHOULD_BE_NUMERIC = "should.be.numeric";
     protected static final String SHOULD_NOT_NULL_OR_EMPTY = "should.not.be.null";
     protected static final String SHOULD_BE_UNIQUE = "should.be.unique";
@@ -59,11 +60,19 @@ public abstract class OntologyValidator extends BaseValidator {
         addCustomError(errors, fieldName, SHOULD_NOT_NULL_OR_EMPTY, null);
     }
 
-    protected void checkTermExist(Integer id, Integer cvId, Errors errors){
+    protected void checkTermExist(String termName, Integer id, Integer cvId, Errors errors){
+        checkTermExist(termName, null, id, cvId, errors);
+    }
+
+    protected void checkTermExist(String termName, String fieldName, Integer id, Integer cvId, Errors errors){
         try {
             Term term = ontologyManagerService.getTermById(id);
             if(Objects.equals(term, null) || !Objects.equals(term.getVocabularyId(), cvId) ){
-                addCustomError(errors, "id", DOES_NOT_EXIST, new Object[]{id.toString()});
+                if(Strings.isNullOrEmpty(fieldName)) {
+                    addCustomError(errors, TERM_DOES_NOT_EXIST, new Object[] {termName, id.toString()});
+                } else {
+                    addCustomError(errors, fieldName, TERM_DOES_NOT_EXIST, new Object[] {termName, id.toString()});
+                }
             }
         } catch (Exception e) {
             log.error("Error while validating object", e);

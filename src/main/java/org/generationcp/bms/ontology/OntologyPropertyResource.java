@@ -10,6 +10,7 @@ import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.bms.ontology.validator.RequestIdValidator;
 import org.generationcp.bms.ontology.validator.PropertyRequestValidator;
 import org.generationcp.bms.ontology.validator.TermDeletableValidator;
+import org.generationcp.bms.ontology.validator.TermValidator;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -36,6 +37,9 @@ public class OntologyPropertyResource {
 
     @Autowired 
     private RequestIdValidator requestIdValidator;
+
+    @Autowired
+    private TermValidator termValidator;
 
     @Autowired 
     private PropertyRequestValidator propertyRequestValidator;
@@ -68,12 +72,12 @@ public class OntologyPropertyResource {
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
-        PropertyResponse propertyResponse = ontologyModelService.getProperty(Integer.valueOf(id));
-        if(propertyResponse == null){
-            LOGGER.error("No Valid Property Found using Id " + id);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        TermRequest request = new TermRequest(Integer.valueOf(id), "property", CvId.PROPERTIES.getId());
+        termValidator.validate(request, bindingResult);
+        if(bindingResult.hasErrors()){
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
-        return new ResponseEntity<>(propertyResponse, HttpStatus.OK);
+        return new ResponseEntity<>(ontologyModelService.getProperty(Integer.valueOf(id)), HttpStatus.OK);
     }
 
     //TODO: 403 response for user without permission
@@ -100,7 +104,7 @@ public class OntologyPropertyResource {
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
 
-        deletableValidator.validate(new TermRequest(Integer.valueOf(id), CvId.PROPERTIES.getId()), bindingResult);
+        deletableValidator.validate(new TermRequest(Integer.valueOf(id), "property", CvId.PROPERTIES.getId()), bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }

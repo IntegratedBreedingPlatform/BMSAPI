@@ -86,8 +86,8 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
 
         ValidValues validValues = request.getValidValues() == null ? new ValidValues() : request.getValidValues();
 
-        String minValue = validValues.getMinValue();
-        String maxValue = validValues.getMaxValue();
+        String minValue = validValues.getMin();
+        String maxValue = validValues.getMax();
         List<NameDescription> categories = validValues.getCategories();
 
         //5. If the data type is categorical, at least one category must be submitted
@@ -159,7 +159,7 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
 
             //that method should exist with requestId
             if(Objects.equals(oldScale, null)){
-                addCustomError(errors, DOES_NOT_EXIST, new Object[]{request.getId()});
+                addCustomError(errors, TERM_DOES_NOT_EXIST, new Object[]{"scale", request.getId()});
                 return;
             }
 
@@ -172,8 +172,8 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
             boolean isDataTypeSame = Objects.equals(request.getDataTypeId(), getDataTypeIdSafe(oldScale.getDataType()));
             if(isNameSame && isDataTypeSame) {
                 ValidValues validValues = request.getValidValues() == null ? new ValidValues() : request.getValidValues();
-                boolean minValuesAreEqual = Objects.equals(validValues.getMinValue(), oldScale.getMinValue());
-                boolean maxValuesAreEqual = Objects.equals(validValues.getMaxValue(), oldScale.getMaxValue());
+                boolean minValuesAreEqual = Objects.equals(validValues.getMin(), oldScale.getMinValue());
+                boolean maxValuesAreEqual = Objects.equals(validValues.getMax(), oldScale.getMaxValue());
                 List<NameDescription> categories = validValues.getCategories() == null ? new ArrayList<NameDescription>() : validValues.getCategories();
                 boolean categoriesEqualSize = Objects.equals(categories.size(), oldScale.getCategories().size());
                 boolean categoriesValuesAreSame = true;

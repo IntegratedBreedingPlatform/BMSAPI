@@ -117,7 +117,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 
             //that property should exist with requestId
             if(Objects.equals(oldProperty, null)){
-                addCustomError(errors, DOES_NOT_EXIST, new Object[]{request.getId()});
+                addCustomError(errors, TERM_DOES_NOT_EXIST, new Object[]{"property", request.getId()});
                 return;
             }
 

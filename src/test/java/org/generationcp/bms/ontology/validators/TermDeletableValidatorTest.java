@@ -78,7 +78,7 @@ public class TermDeletableValidatorTest extends ApiUnitTestBase {
         Mockito.doReturn(true).when(ontologyManagerService).isTermReferred(10);
 
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-        termDeletableValidator.validate(new TermRequest(10, cvId), bindingResult);
+        termDeletableValidator.validate(new TermRequest(10, "method", cvId), bindingResult);
         Assert.assertTrue(bindingResult.hasErrors());
     }
 
@@ -93,7 +93,7 @@ public class TermDeletableValidatorTest extends ApiUnitTestBase {
         Mockito.doReturn(false).when(ontologyManagerService).isTermReferred(10);
 
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-        termDeletableValidator.validate(new TermRequest(10, cvId), bindingResult);
+        termDeletableValidator.validate(new TermRequest(10, "method", cvId), bindingResult);
         Assert.assertFalse(bindingResult.hasErrors());
     }
 }

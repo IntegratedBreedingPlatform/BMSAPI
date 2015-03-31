@@ -69,7 +69,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
         }
 
         //7. Property ID must correspond to the ID of an existing property
-        checkTermExist(request.getPropertyId(), CvId.PROPERTIES.getId(), errors);
+        checkTermExist("property", request.getPropertyId(), CvId.PROPERTIES.getId(), errors);
 
         //8. Method ID is required
         checkIntegerNull("methodId", request.getMethodId(), errors);
@@ -79,7 +79,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
         }
 
         //9. Method ID must correspond to the ID of an existing method
-        checkTermExist(request.getMethodId(), CvId.METHODS.getId(), errors);
+        checkTermExist("method", request.getMethodId(), CvId.METHODS.getId(), errors);
 
         //10. Scale ID is required
         checkIntegerNull("scaleId", request.getScaleId(), errors);
@@ -89,7 +89,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
         }
 
         //11. Scale ID must correspond to the ID of an existing scale
-        checkTermExist(request.getScaleId(), CvId.SCALES.getId(), errors);
+        checkTermExist("scale", request.getScaleId(), CvId.SCALES.getId(), errors);
 
         if(errors.hasErrors()){
             return;
