@@ -40,9 +40,11 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
         }
     }
 
-    @Autowired OntologyManagerService ontologyManagerService;
+    @Autowired
+    OntologyManagerService ontologyManagerService;
 
-    @Autowired VariableRequestValidator variableRequestValidator;
+    @Autowired
+    VariableRequestValidator variableRequestValidator;
 
     Integer cvId = CvId.VARIABLES.getId();
     String variableName = "My Variable";
@@ -180,14 +182,18 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
         VariableRequest request = new VariableRequest();
         request.setName(variableName);
         request.setDescription(description);
-        request.setPropertyId(0);
+        request.setPropertyId(10);
+        request.setScaleId(20);
+        request.setMethodId(30);
 
-        Mockito.doReturn(null).when(ontologyManagerService).getTermById(request.getPropertyId());
+        Mockito.doReturn(null).when(ontologyManagerService).getTermById(10);
+        Mockito.doReturn(new Term(20, "scale", "", CvId.SCALES.getId(), false)).when(ontologyManagerService).getTermById(20);
+        Mockito.doReturn(new Term(30, "method", "", CvId.METHODS.getId(), false)).when(ontologyManagerService).getTermById(30);
+
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
         variableRequestValidator.validate(request, bindingResult);
         Assert.assertTrue(bindingResult.hasErrors());
-        Assert.assertNotNull(bindingResult.getFieldError("id"));
     }
 
     /**
@@ -221,15 +227,16 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
         request.setName(variableName);
         request.setDescription(description);
         request.setPropertyId(10);
-        request.setMethodId(0);
+        request.setScaleId(20);
+        request.setMethodId(30);
 
-        Mockito.doReturn(null).when(ontologyManagerService).getTermById(request.getMethodId());
-        Mockito.doReturn(new Term(10, "name", "", CvId.PROPERTIES.getId(), false)).when(ontologyManagerService).getTermById(10);
+        Mockito.doReturn(new Term(10, "property", "", CvId.PROPERTIES.getId(), false)).when(ontologyManagerService).getTermById(10);
+        Mockito.doReturn(new Term(20, "scale", "", CvId.SCALES.getId(), false)).when(ontologyManagerService).getTermById(20);
+        Mockito.doReturn(null).when(ontologyManagerService).getTermById(30);
+
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-
         variableRequestValidator.validate(request, bindingResult);
         Assert.assertTrue(bindingResult.hasErrors());
-        Assert.assertNotNull(bindingResult.getFieldError("id"));
     }
 
     /**
@@ -264,18 +271,20 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
         VariableRequest request = new VariableRequest();
         request.setName(variableName);
         request.setDescription(description);
+        request.setName(variableName);
+        request.setDescription(description);
         request.setPropertyId(10);
-        request.setMethodId(11);
-        request.setScaleId(0);
+        request.setScaleId(20);
+        request.setMethodId(30);
 
-        Mockito.doReturn(null).when(ontologyManagerService).getTermById(request.getScaleId());
-        Mockito.doReturn(new Term(10, "name", "", CvId.PROPERTIES.getId(), false)).when(ontologyManagerService).getTermById(10);
-        Mockito.doReturn(new Term(11, "mName", "", CvId.METHODS.getId(), false)).when(ontologyManagerService).getTermById(11);
+        Mockito.doReturn(new Term(10, "property", "", CvId.PROPERTIES.getId(), false)).when(ontologyManagerService).getTermById(10);
+        Mockito.doReturn(null).when(ontologyManagerService).getTermById(20);
+        Mockito.doReturn(new Term(30, "scale", "", CvId.METHODS.getId(), false)).when(ontologyManagerService).getTermById(30);
+
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
         variableRequestValidator.validate(request, bindingResult);
         Assert.assertTrue(bindingResult.hasErrors());
-        Assert.assertNotNull(bindingResult.getFieldError("id"));
     }
 
     /**

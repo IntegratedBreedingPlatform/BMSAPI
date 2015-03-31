@@ -88,6 +88,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
         String cropName = "maize";
         Method method = new MethodBuilder().build(1, "m1", "d1");
 
+        Mockito.doReturn(new Term(1, method.getName(), method.getDefinition(), CvId.METHODS.getId(), false)).when(ontologyManagerService).getTermById(1);
         Mockito.doReturn(method).when(ontologyManagerService).getMethod(1);
 
         mockMvc.perform(get("/ontology/{cropname}/methods/{id}",cropName, 1).contentType(contentType)).andExpect(status().isOk())
@@ -109,11 +110,13 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 
         String cropName = "maize";
 
+        Mockito.doReturn(null).when(ontologyManagerService).getTermById(1);
+
         mockMvc.perform(get("/ontology/{cropname}/methods/{id}",cropName, 1).contentType(contentType))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
 
-        verify(ontologyManagerService, times(1)).getMethod(1);
+        verify(ontologyManagerService, times(1)).getTermById(1);
     }
 
     /**
