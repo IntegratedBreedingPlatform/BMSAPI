@@ -17,12 +17,12 @@ import java.util.Set;
 /**
  * Request validator for add/edit property
  1 Name is required
- 2 Name is unique
- 3 Classes must be an array containing at least one string
- 4 Each class should contain unique valid value
- 5 Name cannot change if the property is already in use
- 6 Name is no more than 200 characters
- 7 Description is no more than 255 characters
+ 2 Name is no more than 200 characters
+ 3 Name is unique
+ 4 Description is no more than 255 characters
+ 5 Classes must be an array containing at least one string
+ 6 Each class should contain unique valid value
+ 7 Name cannot change if the property is already in use
  */
 @Component
 public class PropertyRequestValidator extends OntologyValidator implements org.springframework.validation.Validator{
@@ -47,7 +47,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 
         PropertyRequest request = (PropertyRequest) target;
 
-        //3 Name cannot change if the method is already in use
+        //7 Name cannot change if the method is already in use
         propertyShouldBeEditable(request, errors);
 
         //Need to return from here because we should not check other constraints if request is not required to process
@@ -62,16 +62,16 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
             return;
         }
 
-        //6. Name is no more than 200 characters
+        //2. Name is no more than 200 characters
         nameShouldHaveMax200Chars("name", request.getName(), errors);
 
-        //2. Name is unique
+        //3. Name is unique
         checkTermUniqueness(request.getId(), request.getName(), CvId.PROPERTIES.getId(), errors);
 
-        //7. Description is no more than 255 characters
+        //4. Description is no more than 255 characters
         descriptionShouldHaveMax255Chars("description", request.getDescription(), errors);
 
-        //3. Classes must be an array containing at least one string
+        //5. Classes must be an array containing at least one string
         shouldNotNullOrEmpty("classes", request.getClasses(), errors);
 
         //Need to return from here because we should not check other constraints if request is not required to process
@@ -79,7 +79,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
             return;
         }
 
-        //4 Each class should contain unique valid value
+        //6 Each class should contain unique valid value
         shouldClassesContainValidValue(request.getClasses(), errors);
     }
 
@@ -130,9 +130,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
                 return;
             }
 
-            if(Objects.equals(request.getName(), oldProperty.getName())
-                    && Objects.equals(request.getClasses().size(), oldProperty.getClassNames().size())
-                    && request.getClasses().containsAll(oldProperty.getClassNames())) {
+            if(Objects.equals(request.getName(), oldProperty.getName())) {
                 return;
             }
 
