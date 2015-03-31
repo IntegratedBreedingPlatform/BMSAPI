@@ -62,6 +62,10 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
         //1. Name is required
         shouldNotNullOrEmpty("name", request.getName(), errors);
 
+        if(errors.hasErrors()){
+            return;
+        }
+
         //12. Name is no more than 200 characters
         nameShouldHaveMax200Chars("name", request.getName(), errors);
 
