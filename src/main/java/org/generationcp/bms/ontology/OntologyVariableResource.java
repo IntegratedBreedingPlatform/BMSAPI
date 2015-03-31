@@ -6,10 +6,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.bms.exception.ApiRequestValidationException;
 import org.generationcp.bms.ontology.dto.*;
 import org.generationcp.bms.ontology.services.OntologyModelService;
-import org.generationcp.bms.ontology.validator.ProgramValidator;
-import org.generationcp.bms.ontology.validator.RequestIdValidator;
-import org.generationcp.bms.ontology.validator.TermValidator;
-import org.generationcp.bms.ontology.validator.VariableRequestValidator;
+import org.generationcp.bms.ontology.validator.*;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -81,7 +78,7 @@ public class OntologyVariableResource {
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
-        TermRequest request = new TermRequest(Integer.valueOf(id), CvId.VARIABLES.getId());
+        TermRequest request = new TermRequest(Integer.valueOf(id), "variable", CvId.VARIABLES.getId());
         termValidator.validate(request, bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
