@@ -1,5 +1,7 @@
 package org.generationcp.bms.ontology;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import org.generationcp.bms.exception.ApiRequestValidationException;
 import org.generationcp.bms.ontology.dto.ErrorResponse;
@@ -30,11 +32,10 @@ public class DefaultExceptionHandler {
     @ResponseBody
     public ErrorResponse handleUncaughtException(Exception ex) throws IOException {
         ErrorResponse response = new ErrorResponse();
-
         if (ex.getCause() != null) {
-            response.addError(ex.getCause().getMessage(), "SERVER");
+            response.addError(ex.getCause().getMessage(), "");
         } else {
-            response.addError(ex.getMessage(), "SERVER");
+            response.addError(ex.getMessage(), "");
         }
         return response;
     }
@@ -45,11 +46,14 @@ public class DefaultExceptionHandler {
     @ResponseBody
     public ErrorResponse httpMessageNotReadableException(HttpMessageNotReadableException ex) throws IOException {
         ErrorResponse response = new ErrorResponse();
-        if(ex.getCause() instanceof UnrecognizedPropertyException){
+        Throwable rootCause = ex.getRootCause();
+        if(rootCause instanceof UnrecognizedPropertyException){
             UnrecognizedPropertyException unrecognizedPropertyException = (UnrecognizedPropertyException) ex.getCause();
-            response.addError(String.format("%s is not a recognised field", unrecognizedPropertyException.getPropertyName()), "");
-        } else {
-            response.addError(ex.getMessage(), "");
+            response.addError(messageSource.getMessage("not.recognised.field", new Object[]{unrecognizedPropertyException.getPropertyName()}, LocaleContextHolder.getLocale()));
+        } else if(rootCause instanceof JsonParseException){
+            response.addError(messageSource.getMessage("invalid.body", null, LocaleContextHolder.getLocale()));
+        } else if(rootCause instanceof JsonMappingException){
+            response.addError(messageSource.getMessage("invalid.body", null, LocaleContextHolder.getLocale()));
         }
         return response;
     }
