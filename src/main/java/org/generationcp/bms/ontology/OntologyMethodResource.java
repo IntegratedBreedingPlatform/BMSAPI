@@ -90,13 +90,17 @@ public class OntologyMethodResource {
 	@ApiOperation(value = "Update Method", notes = "Update Method using Given Data")
     @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity updateMethod(@PathVariable String  cropname,@PathVariable Integer id, @RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
-        request.setId(id);
+    public ResponseEntity updateMethod(@PathVariable String  cropname,@PathVariable String id, @RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
+        requestIdValidator.validate(id, bindingResult);
+        if(bindingResult.hasErrors()){
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
+        }
+        request.setId(Integer.valueOf(id));
         methodRequestValidator.validate(request, bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
-        ontologyModelService.updateMethod(request.getId(), request);
+        ontologyModelService.updateMethod(Integer.valueOf(request.getId()), request);
         return new ResponseEntity<>(NO_CONTENT);
     }
 
@@ -104,13 +108,17 @@ public class OntologyMethodResource {
 	@ApiOperation(value = "Delete Method", notes = "Delete Method using Given Id")
     @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.DELETE)
     @ResponseBody
-    public ResponseEntity deleteMethod(@PathVariable String  cropname,@PathVariable Integer id) throws MiddlewareQueryException {
+    public ResponseEntity deleteMethod(@PathVariable String  cropname,@PathVariable String id) throws MiddlewareQueryException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-        termDeletableValidator.validate(new TermRequest(id, CvId.METHODS.getId()), bindingResult);
+        requestIdValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
-        ontologyModelService.deleteMethod(id);
+        termDeletableValidator.validate(new TermRequest(Integer.valueOf(id), CvId.METHODS.getId()), bindingResult);
+        if(bindingResult.hasErrors()){
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
+        }
+        ontologyModelService.deleteMethod(Integer.valueOf(id));
         return new ResponseEntity<>(NO_CONTENT);
     }
 }
