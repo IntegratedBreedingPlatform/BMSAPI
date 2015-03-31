@@ -1,9 +1,11 @@
 package org.generationcp.bms.ontology;
 
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import org.generationcp.bms.exception.ApiRequestValidationException;
 import org.generationcp.bms.ontology.dto.ErrorResponse;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +35,21 @@ public class DefaultExceptionHandler {
             response.addError(ex.getCause().getMessage(), "SERVER");
         } else {
             response.addError(ex.getMessage(), "SERVER");
+        }
+        return response;
+    }
+
+    @RequestMapping(produces = {APPLICATION_JSON_VALUE})
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(value = BAD_REQUEST)
+    @ResponseBody
+    public ErrorResponse httpMessageNotReadableException(HttpMessageNotReadableException ex) throws IOException {
+        ErrorResponse response = new ErrorResponse();
+        if(ex.getCause() instanceof UnrecognizedPropertyException){
+            UnrecognizedPropertyException unrecognizedPropertyException = (UnrecognizedPropertyException) ex.getCause();
+            response.addError(unrecognizedPropertyException.getPropertyName() + " is not a recognised field", "");
+        } else {
+            response.addError(ex.getMessage(), "");
         }
         return response;
     }
