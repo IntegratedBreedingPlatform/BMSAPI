@@ -1,6 +1,7 @@
 package org.generationcp.bms.ontology.validator;
 
 import org.generationcp.bms.ontology.dto.TermRequest;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
@@ -20,6 +21,7 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
             addCustomError(errors, SHOULD_NOT_NULL_OR_EMPTY, null);
             return;
         }
+
         try {
             checkTermExist(request.getTermName(), request.getId(), request.getCvId(), errors);
 
@@ -34,7 +36,7 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
 
             addCustomError(errors, "id", CAN_NOT_DELETE_REFERRED_TERM, null);
 
-        } catch (Exception e) {
+        } catch (MiddlewareQueryException e) {
             log.error("Error while validating object", e);
         }
     }

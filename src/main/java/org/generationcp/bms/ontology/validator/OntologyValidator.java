@@ -74,7 +74,7 @@ public abstract class OntologyValidator extends BaseValidator {
                     addCustomError(errors, fieldName, TERM_DOES_NOT_EXIST, new Object[] {termName, id.toString()});
                 }
             }
-        } catch (Exception e) {
+        } catch (MiddlewareQueryException e) {
             log.error("Error while validating object", e);
             addDefaultError(errors);
         }

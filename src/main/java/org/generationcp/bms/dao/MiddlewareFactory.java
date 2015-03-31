@@ -28,6 +28,9 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.annotation.PreDestroy;
 import java.io.FileNotFoundException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +39,7 @@ public class MiddlewareFactory {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(MiddlewareFactory.class); 
 	
-	private final Map<String, SessionFactory> sessionFactoryCache = new HashMap<String, SessionFactory>();
+	private final Map<String, SessionFactory> sessionFactoryCache = new HashMap<>();
 	
 	@Autowired
 	private ApiEnvironmentConfiguration config;
@@ -57,8 +60,18 @@ public class MiddlewareFactory {
         SessionFactory sessionFactory;
 
 		if (this.sessionFactoryCache.get(selectedCropDB) == null) {
-			DatabaseConnectionParameters connectionParams = new DatabaseConnectionParameters(
-					config.getDbHost(), config.getDbPort(), selectedCropDB, config.getDbUsername(), config.getDbPassword());
+
+			//NOTE: This will check weather selected crop db exist or not.
+			//TODO: Add proper exception that handle this scenario.
+			try {
+				Connection conn = DriverManager.getConnection(String.format("jdbc:mysql://%s:%s/%s", config.getDbHost(), config.getDbPort(), selectedCropDB), config.getDbUsername(), config.getDbPassword());
+				conn.isValid(5);// 5 sec
+			} catch (SQLException e) {
+				throw new FileNotFoundException("selected.crop.not.valid");
+			}
+
+			DatabaseConnectionParameters connectionParams = new DatabaseConnectionParameters(config.getDbHost(), config.getDbPort(), selectedCropDB, config.getDbUsername(), config.getDbPassword());
+
 			sessionFactory = SessionFactoryUtil.openSessionFactory(connectionParams);
 			sessionFactoryCache.put(selectedCropDB, sessionFactory);
 		} else {
@@ -66,7 +79,7 @@ public class MiddlewareFactory {
 		}
 		return sessionFactory;
 	}
-	
+
 	private String getCurrentlySelectedCropDBName() {
         return this.contextResolver.resolveDatabaseFromUrl();
 	}

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import org.generationcp.bms.exception.ApiRequestValidationException;
 import org.generationcp.bms.ontology.dto.ErrorResponse;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -16,7 +17,9 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -36,6 +39,21 @@ public class DefaultExceptionHandler {
             response.addError(ex.getCause().getMessage(), "");
         } else {
             response.addError(ex.getMessage(), "");
+        }
+        return response;
+    }
+
+    @RequestMapping(produces = {APPLICATION_JSON_VALUE})
+    @ExceptionHandler(BeanCreationException.class)
+    @ResponseStatus(value = BAD_REQUEST)
+    @ResponseBody
+    public ErrorResponse httpMessageNotReadableException(BeanCreationException ex) throws IOException {
+        ErrorResponse response = new ErrorResponse();
+        Throwable rootCause = ex.getRootCause();
+        if(rootCause instanceof FileNotFoundException && Objects.equals(rootCause.getMessage(), "selected.crop.not.valid")){
+            response.addError(messageSource.getMessage("selected.crop.not.valid", null, LocaleContextHolder.getLocale()), "cropname");
+        } else {
+            response.addError(messageSource.getMessage("unknown.error", null, LocaleContextHolder.getLocale()));
         }
         return response;
     }
