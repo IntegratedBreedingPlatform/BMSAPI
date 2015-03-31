@@ -49,12 +49,12 @@ public class ScaleSummary {
 
     public void setMinValue(String minValue) {
         ensureValidValuesInitialized();
-        this.validValues.setMinValue(minValue);
+        this.validValues.setMin(minValue);
     }
 
     public void setMaxValue(String maxValue) {
         ensureValidValuesInitialized();
-        this.validValues.setMaxValue(maxValue);
+        this.validValues.setMax(maxValue);
     }
 
     public void setCategories(Map<String, String> categories) {

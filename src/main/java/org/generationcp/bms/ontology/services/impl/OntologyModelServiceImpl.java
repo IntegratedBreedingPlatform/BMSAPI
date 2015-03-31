@@ -261,8 +261,8 @@ public class OntologyModelServiceImpl implements OntologyModelService {
             }
         }
         if(Objects.equals(request.getDataTypeId(), NUMERIC_VARIABLE.getId())){
-            scale.setMinValue(request.getValidValues().getMinValue());
-            scale.setMaxValue(request.getValidValues().getMaxValue());
+            scale.setMinValue(request.getValidValues().getMin());
+            scale.setMaxValue(request.getValidValues().getMax());
         }
 
         ontologyManagerService.addScale(scale);
@@ -283,8 +283,8 @@ public class OntologyModelServiceImpl implements OntologyModelService {
             }
         }
         if(Objects.equals(request.getDataTypeId(), NUMERIC_VARIABLE.getId())){
-            scale.setMinValue(validValues.getMinValue());
-            scale.setMaxValue(validValues.getMaxValue());
+            scale.setMinValue(validValues.getMin());
+            scale.setMaxValue(validValues.getMax());
         }
 
         ontologyManagerService.updateScale(scale);

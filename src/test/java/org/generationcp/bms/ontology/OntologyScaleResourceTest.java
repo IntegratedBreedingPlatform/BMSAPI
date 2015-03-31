@@ -128,8 +128,8 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
         String cropName = "maize";
 
         ValidValues validValues = new ValidValues();
-        validValues.setMinValue("10");
-        validValues.setMaxValue("20");
+        validValues.setMin("10");
+        validValues.setMax("20");
 
         ScaleRequest scaleRequest = new ScaleRequest();
         scaleRequest.setName(scaleName);
@@ -164,8 +164,8 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
         String cropName = "maize";
 
         ValidValues validValues = new ValidValues();
-        validValues.setMinValue("10");
-        validValues.setMaxValue("20");
+        validValues.setMin("10");
+        validValues.setMax("20");
 
         ScaleRequest scaleRequest = new ScaleRequest();
         scaleRequest.setName(scaleName);

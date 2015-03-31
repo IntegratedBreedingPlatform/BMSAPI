@@ -214,8 +214,8 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
         categories.add(new NameDescription("11","description1"));
 
         ValidValues validValues = new ValidValues();
-        validValues.setMinValue("5");
-        validValues.setMaxValue("10");
+        validValues.setMin("5");
+        validValues.setMax("10");
         validValues.setCategories(categories);
 
         ScaleRequest request = new ScaleRequest();
@@ -237,8 +237,8 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
         ValidValues validValues = new ValidValues();
-        validValues.setMinValue("a");
-        validValues.setMaxValue("10");
+        validValues.setMin("a");
+        validValues.setMax("10");
 
         ScaleRequest request = new ScaleRequest();
         request.setName(scaleName);
@@ -259,8 +259,8 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
         ValidValues validValues = new ValidValues();
-        validValues.setMinValue("10");
-        validValues.setMaxValue("1");
+        validValues.setMin("10");
+        validValues.setMax("1");
 
         ScaleRequest request = new ScaleRequest();
         request.setName(scaleName);

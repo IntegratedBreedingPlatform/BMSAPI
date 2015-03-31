@@ -10,27 +10,27 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ValidValues{
 
-    private String minValue;
-    private String maxValue;
+    private String min;
+    private String max;
     private List<NameDescription> categories;
 
     public ValidValues() {
     }
 
-    public String getMinValue() {
-        return minValue;
+    public String getMin() {
+        return min;
     }
 
-    public void setMinValue(String minValue) {
-        this.minValue = minValue;
+    public void setMin(String min) {
+        this.min = min;
     }
 
-    public String getMaxValue() {
-        return maxValue;
+    public String getMax() {
+        return max;
     }
 
-    public void setMaxValue(String maxValue) {
-        this.maxValue = maxValue;
+    public void setMax(String max) {
+        this.max = max;
     }
 
     public List<NameDescription> getCategories() {
