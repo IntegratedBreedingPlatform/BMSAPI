@@ -2,52 +2,19 @@ package org.generationcp.bms.ontology;
 
 import org.generationcp.bms.ApiUnitTestBase;
 import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.service.api.OntologyManagerService;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 public class OntologyDataTypeResourceTest extends ApiUnitTestBase {
-
-    @Configuration
-    public static class TestConfiguration {
-
-        @Bean
-        @Primary
-        public OntologyManagerService ontologyManagerService() {
-            return Mockito.mock(OntologyManagerService.class);
-        }
-    }
-
-    @Autowired
-    private OntologyManagerService ontologyManagerService;
-
-    @Before
-    public void reset(){
-        Mockito.reset(ontologyManagerService);
-    }
-
-    @After
-    public void validate() {
-        validateMockitoUsage();
-    }
 
     @Test
     public void listAllDataTypes() throws Exception {
@@ -55,16 +22,14 @@ public class OntologyDataTypeResourceTest extends ApiUnitTestBase {
         String cropName = "maize";
 
         List<Term> termList = new ArrayList<>();
-        Term term = new Term(1, "Categorical", "");
+        Term term = new Term(1048, "Categorical", "");
         termList.add(term);
-        term = new Term(2, "Numeric", "");
+        term = new Term(1110, "Numeric", "");
         termList.add(term);
-        term = new Term(3, "Character", "");
+        term = new Term(1117, "Character", "");
         termList.add(term);
-        term = new Term(4, "Date", "");
+        term = new Term(1120, "Date", "");
         termList.add(term);
-
-        Mockito.doReturn(termList).when(ontologyManagerService).getDataTypes();
 
         mockMvc.perform(get("/ontology/{cropname}/datatypes", cropName).contentType(contentType))
                 .andExpect(status().isOk())
@@ -72,7 +37,5 @@ public class OntologyDataTypeResourceTest extends ApiUnitTestBase {
                 .andExpect(jsonPath("$[0].id", is(termList.get(0).getId())))
                 .andExpect(jsonPath("$[0].name", is(termList.get(0).getName())))
                 .andDo(print());
-
-        verify(ontologyManagerService, times(1)).getDataTypes();
     }
 }
