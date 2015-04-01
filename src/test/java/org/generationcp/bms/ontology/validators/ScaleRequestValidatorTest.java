@@ -248,7 +248,7 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 
         scaleRequestValidator.validate(request, bindingResult);
         Assert.assertTrue(bindingResult.hasErrors());
-        Assert.assertNotNull(bindingResult.getFieldError("validValues.minValue"));
+        Assert.assertNotNull(bindingResult.getFieldError("validValues.min"));
     }
 
     /**
