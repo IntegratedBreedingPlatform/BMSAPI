@@ -115,11 +115,11 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
         //9. If the data type is numeric and minimum and maximum valid values are provided (they are not mandatory), they must be numeric values
         if(Objects.equals(dataType, DataType.NUMERIC_VARIABLE)){
             if(minValue != null && !isNonNullValidNumericString(minValue)){
-                addCustomError(errors, "validValues.minValue", VALUE_SHOULD_BE_NUMERIC, null);
+                addCustomError(errors, "validValues.min", VALUE_SHOULD_BE_NUMERIC, null);
             }
 
             if(maxValue != null && !isNonNullValidNumericString(maxValue)){
-                addCustomError(errors, "validValues.maxValue", VALUE_SHOULD_BE_NUMERIC, null);
+                addCustomError(errors, "validValues.max", VALUE_SHOULD_BE_NUMERIC, null);
             }
         }
 
