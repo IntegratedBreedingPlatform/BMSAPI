@@ -12,9 +12,6 @@ public class OntologyMapper {
 
     private static volatile ModelMapper SINGLETON = new ModelMapper();
 
-    private OntologyMapper(){
-    }
-
     /**
      * Custom Mapping for Middleware Method Class to MethodSummary
      * Definition to Description Mapping
@@ -145,6 +142,9 @@ public class OntologyMapper {
             map().setDeletable(false);
         }
     };
+
+    private OntologyMapper(){
+    }
 
     /**
      * Eager Initialization of ModelMapper Instance
