@@ -153,7 +153,7 @@ public interface OntologyModelService {
      * Get List of all variable types
      * @return List of Variable Types
      */
-    List<IdName> getAllVariableTypes();
+    List<VariableTypeResponse> getAllVariableTypes();
 
     /**
      * Get List of variables

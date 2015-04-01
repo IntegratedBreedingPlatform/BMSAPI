@@ -2,7 +2,7 @@ package org.generationcp.bms.ontology;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-import org.generationcp.bms.ontology.dto.IdName;
+import org.generationcp.bms.ontology.dto.VariableTypeResponse;
 import org.generationcp.bms.ontology.services.OntologyModelService;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class OntologyVariableTypeResource {
     @ApiOperation(value = "All Classes", notes = "Get all Classes")
     @RequestMapping(value = "/{cropname}/variableTypes", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<List<IdName>> listAllVariableTypes(@PathVariable String cropname) throws MiddlewareQueryException {
+    public ResponseEntity<List<VariableTypeResponse>> listAllVariableTypes(@PathVariable String cropname) throws MiddlewareQueryException {
         return new ResponseEntity<>(ontologyModelService.getAllVariableTypes(), HttpStatus.OK);
     }
 }

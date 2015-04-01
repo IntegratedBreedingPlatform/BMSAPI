@@ -292,12 +292,12 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     }
 
     @Override
-    public List<IdName> getAllVariableTypes() {
+    public List<VariableTypeResponse> getAllVariableTypes() {
 
-        return Util.convertAll(Arrays.asList(VariableType.values()), new Function<VariableType, IdName>(){
+        return Util.convertAll(Arrays.asList(VariableType.values()), new Function<VariableType, VariableTypeResponse>(){
             @Override
-            public IdName apply(VariableType variableType) {
-                return new IdName(variableType.getId(), variableType.getName());
+            public VariableTypeResponse apply(VariableType variableType) {
+                return new VariableTypeResponse(variableType.getId(), variableType.getName(), variableType.getDescription());
             }
         });
     }
