@@ -2,7 +2,6 @@ package org.generationcp.bms.ontology;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-
 import org.generationcp.bms.exception.ApiRequestValidationException;
 import org.generationcp.bms.ontology.dto.*;
 import org.generationcp.bms.ontology.services.OntologyModelService;
@@ -13,8 +12,6 @@ import org.generationcp.bms.ontology.validator.TermValidator;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,9 +32,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @RequestMapping("/ontology")
 public class OntologyMethodResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OntologyMethodResource.class);
-
-    @Autowired 
+    @Autowired
     private RequestIdValidator requestIdValidator;
 
     @Autowired

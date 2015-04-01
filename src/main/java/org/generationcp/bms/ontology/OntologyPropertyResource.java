@@ -3,21 +3,20 @@ package org.generationcp.bms.ontology;
 import com.google.common.base.Strings;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-
 import org.generationcp.bms.exception.ApiRequestValidationException;
 import org.generationcp.bms.ontology.dto.*;
 import org.generationcp.bms.ontology.services.OntologyModelService;
-import org.generationcp.bms.ontology.validator.RequestIdValidator;
 import org.generationcp.bms.ontology.validator.PropertyRequestValidator;
+import org.generationcp.bms.ontology.validator.RequestIdValidator;
 import org.generationcp.bms.ontology.validator.TermDeletableValidator;
 import org.generationcp.bms.ontology.validator.TermValidator;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -25,17 +24,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-
 @Api(value = "Ontology Property Service")
 @Controller
 @RequestMapping("/ontology")
 public class OntologyPropertyResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OntologyPropertyResource.class);
-
-    @Autowired 
+    @Autowired
     private RequestIdValidator requestIdValidator;
 
     @Autowired
