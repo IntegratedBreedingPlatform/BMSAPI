@@ -25,11 +25,6 @@ import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 
-
-/**
- * NOTE: Work in Progress, Do Not Use API Exposed
- */
-
 @Api(value = "Ontology Scale Service")
 @Controller
 @RequestMapping("/ontology")
