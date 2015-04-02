@@ -47,7 +47,7 @@ public class DefaultExceptionHandler {
     @ExceptionHandler(BeanCreationException.class)
     @ResponseStatus(value = BAD_REQUEST)
     @ResponseBody
-    public ErrorResponse httpMessageNotReadableException(BeanCreationException ex) throws IOException {
+    public ErrorResponse handleBeanCreationException(BeanCreationException ex) throws IOException {
         ErrorResponse response = new ErrorResponse();
         Throwable rootCause = ex.getRootCause();
         if(rootCause instanceof FileNotFoundException && Objects.equals(rootCause.getMessage(), "selected.crop.not.valid")){
