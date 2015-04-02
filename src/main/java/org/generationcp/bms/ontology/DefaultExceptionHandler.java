@@ -90,7 +90,7 @@ public class DefaultExceptionHandler {
                 FieldError fieldError = (FieldError) error;
                 response.addError(message, fieldError.getField());
             } else {
-                response.addError(message, "");
+                response.addError(message);
             }
         }
         return response;
