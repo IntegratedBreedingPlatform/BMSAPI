@@ -84,6 +84,14 @@ public class RequestIdValidationTest extends ApiUnitTestBase {
     }
 
     @Test
+    public void testWithIdMoreThanMaximumLimit() throws MiddlewareQueryException {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
+        requestIdValidator.validate("12345678901", bindingResult);
+        Assert.assertTrue(bindingResult.hasErrors());
+        Assert.assertNotNull(bindingResult.getFieldError("id"));
+    }
+
+    @Test
     public void testWithValidIntegerId() throws MiddlewareQueryException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
         requestIdValidator.validate(1, bindingResult);
