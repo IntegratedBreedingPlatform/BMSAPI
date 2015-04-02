@@ -2,18 +2,20 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.generationcp</groupId>
-	<artifactId>bmsapi</artifactId>
-	<packaging>${packaging.type}</packaging>
-	<version>1.0.0-SNAPSHOT</version>
-	<name>Breeding Management System API</name>
-	
-	<properties>
-		<spring-boot-version>1.0.1.RELEASE</spring-boot-version>
-		<middleware-version>4.0.1.SNAPSHOT</middleware-version>		
-	</properties>
-	
-	<distributionManagement>
+    <groupId>org.generationcp</groupId>
+    <artifactId>bmsapi</artifactId>
+    <packaging>${packaging.type}</packaging>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>Breeding Management System API</name>
+
+    <properties>
+        <spring-boot-version>1.0.1.RELEASE</spring-boot-version>
+        <middleware-version>4.1.0.SNAPSHOT</middleware-version>
+        <jsonpath.version>0.8.1</jsonpath.version>
+        <modelmapper.version>0.7.3</modelmapper.version>
+    </properties>
+
+    <distributionManagement>
         <repository>
             <id>efficio-nexus</id>
             <name>Releases</name>
@@ -29,15 +31,15 @@
 	<profiles>
 		<profile>
 			<id>standalone</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
 			<properties>
 				<packaging.type>jar</packaging.type>
 			</properties>
 		</profile>
 		<profile>
 			<id>webapp</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 			<properties>
 				<packaging.type>war</packaging.type>
 			</properties>
@@ -97,7 +99,7 @@
 		<dependency>
 		    <groupId>com.mangofactory</groupId>
 		    <artifactId>swagger-springmvc</artifactId>
-		    <version>0.8.5</version>
+		    <version>0.9.5</version>
 		</dependency>
 
 		<dependency>
@@ -113,45 +115,117 @@
 			<version>1.9.5</version>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
 
-	<scm>
-		<developerConnection>scm:git:https://github.com/digitalabs/BMSAPI</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path-assert</artifactId>
+            <version>${jsonpath.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-	<build>
-		<finalName>${project.artifactId}</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>${spring-boot-version}</version>
-				<configuration>
-					<mainClass>org.generationcp.bms.Main</mainClass>
-				</configuration>
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>${modelmapper.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>1.1.0.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>5.1.0.Final</version>
+        </dependency>
+
+    </dependencies>
+
+    <scm>
+        <developerConnection>scm:git:https://github.com/IntegratedBreedingPlatform/BMSAPI</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-version}</version>
+                <configuration>
+                    <mainClass>org.generationcp.bms.Main</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5</version>
+            </plugin>
+            <plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
 				<executions>
 					<execution>
+						<phase>generate-resources</phase>
+						<configuration>
+							<tasks>
+								<copy todir="src/main/resources" overwrite="true">
+									<fileset dir="pipeline/config/${envConfig}" id="fromDir">
+										<include name="application.properties" />
+									</fileset>
+								</copy>
+								<copy todir="src/test/resources" overwrite="true">
+									<fileset dir="pipeline/config/${envConfig}" id="fromDir">
+										<include name="test.properties" />
+									</fileset>
+								</copy>
+							</tasks>
+						</configuration>
 						<goals>
-							<goal>repackage</goal>
+							<goal>run</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
 			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.4.201502262128</version>
+				<executions>
+					<execution>
+						<id>default-prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>default-report</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5</version>
-			</plugin>
-		</plugins>
-	</build>
+        </plugins>
+    </build>
 
 </project>

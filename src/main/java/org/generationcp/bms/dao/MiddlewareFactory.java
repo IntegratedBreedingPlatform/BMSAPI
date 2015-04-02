@@ -1,40 +1,19 @@
 
 package org.generationcp.bms.dao;
 
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.PreDestroy;
-
 import org.generationcp.bms.context.ContextResolver;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.SessionFactoryUtil;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
-import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
-import org.generationcp.middleware.manager.GermplasmListManagerImpl;
-import org.generationcp.middleware.manager.InventoryDataManagerImpl;
-import org.generationcp.middleware.manager.LocationDataManagerImpl;
-import org.generationcp.middleware.manager.OntologyDataManagerImpl;
-import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.UserDataManagerImpl;
-import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
-import org.generationcp.middleware.manager.api.GenotypicDataManager;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.manager.*;
+import org.generationcp.middleware.manager.api.*;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
+import org.generationcp.middleware.service.OntologyManagerServiceImpl;
 import org.generationcp.middleware.service.OntologyServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
@@ -47,12 +26,20 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+import javax.annotation.PreDestroy;
+import java.io.FileNotFoundException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
 @Configuration
 public class MiddlewareFactory {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(MiddlewareFactory.class); 
 	
-	private final Map<String, SessionFactory> sessionFactoryCache = new HashMap<String, SessionFactory>();
+	private final Map<String, SessionFactory> sessionFactoryCache = new HashMap<>();
 	
 	@Autowired
 	private ApiEnvironmentConfiguration config;
@@ -70,11 +57,21 @@ public class MiddlewareFactory {
 	
 	private SessionFactory getSessionFactory() throws FileNotFoundException {
 		String selectedCropDB = getCurrentlySelectedCropDBName();
-		SessionFactory sessionFactory;
+        SessionFactory sessionFactory;
 
 		if (this.sessionFactoryCache.get(selectedCropDB) == null) {
-			DatabaseConnectionParameters connectionParams = new DatabaseConnectionParameters(
-					config.getDbHost(), config.getDbPort(), selectedCropDB, config.getDbUsername(), config.getDbPassword());
+
+			//NOTE: This will check weather selected crop db exist or not.
+			//TODO: Add proper exception that handle this scenario.
+			try {
+				Connection conn = DriverManager.getConnection(String.format("jdbc:mysql://%s:%s/%s", config.getDbHost(), config.getDbPort(), selectedCropDB), config.getDbUsername(), config.getDbPassword());
+				conn.isValid(5);// 5 sec
+			} catch (SQLException e) {
+				throw new FileNotFoundException("selected.crop.not.valid");
+			}
+
+			DatabaseConnectionParameters connectionParams = new DatabaseConnectionParameters(config.getDbHost(), config.getDbPort(), selectedCropDB, config.getDbUsername(), config.getDbPassword());
+
 			sessionFactory = SessionFactoryUtil.openSessionFactory(connectionParams);
 			sessionFactoryCache.put(selectedCropDB, sessionFactory);
 		} else {
@@ -82,9 +79,9 @@ public class MiddlewareFactory {
 		}
 		return sessionFactory;
 	}
-	
+
 	private String getCurrentlySelectedCropDBName() {
-		return this.contextResolver.resolveProgram().getDatabaseName();
+        return this.contextResolver.resolveDatabaseFromUrl();
 	}
 	
 	@Bean
@@ -116,6 +113,12 @@ public class MiddlewareFactory {
 	public OntologyService getOntologyService() throws FileNotFoundException {
 		return new OntologyServiceImpl(new HibernateSessionPerRequestProvider(getSessionFactory()));
 	}
+
+    @Bean
+    @Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+    public OntologyManagerService getOntologyManagerService() throws FileNotFoundException {
+        return new OntologyManagerServiceImpl(new HibernateSessionPerRequestProvider(getSessionFactory()));
+    }
 	
 	@Bean
 	@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -170,7 +173,6 @@ public class MiddlewareFactory {
 				config.getDbHost(), config.getDbPort(), config.getWorkbenchDBName(), config.getDbUsername(), config.getDbPassword());		
 		SessionFactory sessionFactory = SessionFactoryUtil.openSessionFactory(workbenchConnectionParameters);
 		HibernateSessionPerRequestProvider sessionProvider = new HibernateSessionPerRequestProvider(sessionFactory);
-		WorkbenchDataManagerImpl workbenchDataManager = new WorkbenchDataManagerImpl(sessionProvider);
-		return workbenchDataManager;
+		return new WorkbenchDataManagerImpl(sessionProvider);
 	}
 }
