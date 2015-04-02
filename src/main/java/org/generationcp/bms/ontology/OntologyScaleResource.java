@@ -80,6 +80,7 @@ public class OntologyScaleResource {
         return new ResponseEntity<>(ontologyModelService.addScale(request), HttpStatus.CREATED);
     }
 
+    @SuppressWarnings("rawtypes")
     @ApiOperation(value = "Update Scale", notes = "Update existing scale using detail")
     @RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.PUT)
     @ResponseBody
@@ -93,6 +94,7 @@ public class OntologyScaleResource {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Delete Scale", notes = "Delete Scale using Given Id")
     @RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.DELETE)
     @ResponseBody

@@ -87,6 +87,7 @@ public class OntologyPropertyResource {
     }
 
     //TODO: 403 response for user without permission
+    @SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Delete Property", notes = "Delete Property using Given Id")
     @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.DELETE)
     @ResponseBody
@@ -107,6 +108,7 @@ public class OntologyPropertyResource {
     }
 
     //TODO: 403 response for user without permission
+    @SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Update Property", notes = "Update Property using Given Data")
     @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.PUT)
     @ResponseBody

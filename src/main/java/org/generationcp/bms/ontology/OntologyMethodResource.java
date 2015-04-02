@@ -85,6 +85,7 @@ public class OntologyMethodResource {
     }
 
     //TODO: 403 response for user without permission
+    @SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Update Method", notes = "Update Method using Given Data")
     @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
     @ResponseBody
@@ -103,6 +104,7 @@ public class OntologyMethodResource {
     }
 
     //TODO: 403 response for user without permission
+    @SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Delete Method", notes = "Delete Method using Given Id")
     @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.DELETE)
     @ResponseBody
