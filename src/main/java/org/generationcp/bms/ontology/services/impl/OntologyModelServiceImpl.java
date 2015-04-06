@@ -18,6 +18,7 @@ import java.util.*;
 
 import static org.generationcp.middleware.domain.oms.DataType.CATEGORICAL_VARIABLE;
 import static org.generationcp.middleware.domain.oms.DataType.NUMERIC_VARIABLE;
+import static org.generationcp.middleware.util.Util.convertAll;
 
 @Service
 public class OntologyModelServiceImpl implements OntologyModelService {
@@ -189,9 +190,9 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 
     @Override
     public List<IdName> getAllDataTypes() throws MiddlewareQueryException {
-        return Util.convertAll(Arrays.asList(DataType.values()), new Function<DataType, IdName>(){
-            @Override
-            public IdName apply(DataType dataType) {
+        return convertAll(Arrays.asList(DataType.values()), new Function<DataType, IdName>() {
+
+            @Override public IdName apply(DataType dataType) {
                 return new IdName(dataType.getId(), dataType.getName());
             }
         });
@@ -294,9 +295,9 @@ public class OntologyModelServiceImpl implements OntologyModelService {
     @Override
     public List<VariableTypeResponse> getAllVariableTypes() {
 
-        return Util.convertAll(Arrays.asList(VariableType.values()), new Function<VariableType, VariableTypeResponse>(){
-            @Override
-            public VariableTypeResponse apply(VariableType variableType) {
+        return convertAll(Arrays.asList(VariableType.values()), new Function<VariableType, VariableTypeResponse>() {
+
+            @Override public VariableTypeResponse apply(VariableType variableType) {
                 return new VariableTypeResponse(variableType.getId(), variableType.getName(), variableType.getDescription());
             }
         });
