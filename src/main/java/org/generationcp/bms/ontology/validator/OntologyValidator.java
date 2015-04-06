@@ -20,7 +20,7 @@ public abstract class OntologyValidator extends BaseValidator {
 
     protected static final String TERM_DOES_NOT_EXIST = "term.does.not.exist";
     protected static final String SHOULD_BE_NUMERIC = "should.be.numeric";
-    protected static final String ID_LENGTH_EXCEED_MAXIMUM = "id.length.exceed.maximum";
+    protected static final String INVALID_ID = "invalid.id";
     protected static final String SHOULD_NOT_NULL_OR_EMPTY = "should.not.be.null";
     protected static final String SHOULD_BE_UNIQUE = "should.be.unique";
     protected static final String ENUM_TYPE_NOT_VALID = "enum.type.not.valid";
@@ -58,7 +58,7 @@ public abstract class OntologyValidator extends BaseValidator {
         try{
             Integer.valueOf(value);
         }catch (Exception ignored) {
-            addCustomError(errors, fieldName, ID_LENGTH_EXCEED_MAXIMUM, null);
+            addCustomError(errors, fieldName, INVALID_ID, null);
         }
     }
 
