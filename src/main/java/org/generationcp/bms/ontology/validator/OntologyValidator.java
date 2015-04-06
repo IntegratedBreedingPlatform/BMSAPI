@@ -55,10 +55,11 @@ public abstract class OntologyValidator extends BaseValidator {
     }
 
     protected void checkMaximumLengthOfId(String fieldName, String value, Errors errors){
-        if(value.length() <= 10){
-            return;
+        try{
+            Integer.valueOf(value);
+        }catch (Exception ignored) {
+            addCustomError(errors, fieldName, ID_LENGTH_EXCEED_MAXIMUM, null);
         }
-        addCustomError(errors, fieldName, ID_LENGTH_EXCEED_MAXIMUM, null);
     }
 
     protected void shouldNotNullOrEmpty(String fieldName, Object value, Errors errors){

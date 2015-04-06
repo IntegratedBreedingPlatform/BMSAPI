@@ -36,9 +36,9 @@ public class DefaultExceptionHandler {
     public ErrorResponse handleUncaughtException(Exception ex) throws IOException {
         ErrorResponse response = new ErrorResponse();
         if (ex.getCause() != null) {
-            response.addError(ex.getCause().getMessage(), "");
+            response.addError(ex.getCause().getMessage());
         } else {
-            response.addError(ex.getMessage(), "");
+            response.addError(ex.getMessage());
         }
         return response;
     }
