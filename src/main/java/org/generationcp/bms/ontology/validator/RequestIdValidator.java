@@ -23,10 +23,6 @@ public class RequestIdValidator extends OntologyValidator implements org.springf
         }
 
         String id = (String) target;
-        checkNumberField("id", id, errors);
-        if(errors.hasErrors()) {
-            return;
-        }
-        checkMaximumLengthOfId("id", id, errors);
+        checkNumberFieldAndLength(id, errors);
     }
 }

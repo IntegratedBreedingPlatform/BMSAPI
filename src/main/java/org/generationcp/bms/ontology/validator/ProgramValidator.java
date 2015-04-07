@@ -22,7 +22,7 @@ public class ProgramValidator extends OntologyValidator implements Validator{
 
         // check if program id is non numeric
         String id = (String) target;
-        checkNumberField("id", id, errors);
+        checkNumberFieldAndLength(id, errors);
 
         if(errors.hasErrors()) {
             return;

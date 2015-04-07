@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class OntologyValidator extends BaseValidator {
 
     protected static final String TERM_DOES_NOT_EXIST = "term.does.not.exist";
-    protected static final String SHOULD_BE_NUMERIC = "should.be.numeric";
     protected static final String INVALID_ID = "invalid.id";
     protected static final String SHOULD_NOT_NULL_OR_EMPTY = "should.not.be.null";
     protected static final String SHOULD_BE_UNIQUE = "should.be.unique";
@@ -38,7 +37,6 @@ public abstract class OntologyValidator extends BaseValidator {
     protected static final String PROGRAM_DOES_NOT_EXIST = "program.does.not.exist";
     protected static final String EXPECTED_MIN_SHOULD_NOT_LESSER_THAN_SCALE_MIN = "expected.min.should.not.be.smaller";
     protected static final String EXPECTED_MAX_SHOULD_NOT_GREATER_THAN_SCALE_MAX = "expected.max.should.not.be.greater";
-    protected static final String VARIABLE_NOT_EDITABLE = "variable.not.editable";
     protected static final String SHOULD_BE_STRING = "should.be.string";
 
     @Autowired
@@ -47,19 +45,17 @@ public abstract class OntologyValidator extends BaseValidator {
     @Autowired
     private WorkbenchDataManager workbenchDataManager;
 
-    protected void checkNumberField(String fieldName, String value, Errors errors){
+    protected void checkNumberFieldAndLength(String value, Errors errors){
         if(value.matches("^[0-9]+$")){
-            return;
+            try{
+                Integer.valueOf(value);
+                return;
+            }catch (Exception ignored) {
+                addCustomError(errors, INVALID_ID, null);
+                return;
+            }
         }
-        addCustomError(errors, fieldName, SHOULD_BE_NUMERIC, null);
-    }
-
-    protected void checkMaximumLengthOfId(String fieldName, String value, Errors errors){
-        try{
-            Integer.valueOf(value);
-        }catch (Exception ignored) {
-            addCustomError(errors, fieldName, INVALID_ID, null);
-        }
+        addCustomError(errors, INVALID_ID, null);
     }
 
     protected void shouldNotNullOrEmpty(String fieldName, Object value, Errors errors){
