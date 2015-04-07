@@ -62,7 +62,7 @@ public abstract class OntologyValidator extends BaseValidator {
         if(!isNullOrEmpty(value)){
             return;
         }
-        addCustomError(errors, fieldName, SHOULD_NOT_NULL_OR_EMPTY, null);
+        addCustomError(errors, fieldName, SHOULD_NOT_NULL_OR_EMPTY, new Object[] {fieldName});
     }
 
     protected void checkTermExist(String termName, Integer id, Integer cvId, Errors errors){
