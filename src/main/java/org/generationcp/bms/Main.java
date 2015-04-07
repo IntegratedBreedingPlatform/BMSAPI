@@ -17,7 +17,7 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 
 @EnableAutoConfiguration
-@ComponentScan
+@ComponentScan(basePackages = {"org.generationcp.bms", "org.ibp.api"})
 @EnableSwagger
 public class Main extends WebMvcConfigurerAdapter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
