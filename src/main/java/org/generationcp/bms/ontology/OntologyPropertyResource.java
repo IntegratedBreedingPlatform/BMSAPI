@@ -58,7 +58,7 @@ public class OntologyPropertyResource {
     }
 
     @ApiOperation(value = "Get Property by id", notes = "Get Property using given Property id")
-    @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{cropname}/properties/{id:.+}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<PropertyResponse> getPropertyById(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
@@ -89,7 +89,7 @@ public class OntologyPropertyResource {
     //TODO: 403 response for user without permission
     @SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Delete Property", notes = "Delete Property using Given Id")
-    @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{cropname}/properties/{id:.+}", method = RequestMethod.DELETE)
     @ResponseBody
     public ResponseEntity deleteProperty(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
@@ -110,15 +110,19 @@ public class OntologyPropertyResource {
     //TODO: 403 response for user without permission
     @SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Update Property", notes = "Update Property using Given Data")
-    @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{cropname}/properties/{id:.+}", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity updateProperty(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody PropertyRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
-        request.setId(id);
+    public ResponseEntity updateProperty(@PathVariable String  cropname, @PathVariable String id, @RequestBody PropertyRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
+        requestIdValidator.validate(id, bindingResult);
+        if(bindingResult.hasErrors()){
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
+        }
+        request.setId(Integer.valueOf(id));
         propertyRequestValidator.validate(request, bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
-        ontologyModelService.updateProperty(id, request);
+        ontologyModelService.updateProperty(Integer.valueOf(id), request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -73,6 +74,16 @@ public class DefaultExceptionHandler {
         } else if(rootCause instanceof JsonMappingException){
             response.addError(messageSource.getMessage("invalid.body", null, LocaleContextHolder.getLocale()));
         }
+        return response;
+    }
+
+    @RequestMapping(produces = {APPLICATION_JSON_VALUE})
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseStatus(value = BAD_REQUEST)
+    @ResponseBody
+    public ErrorResponse httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) throws IOException {
+        ErrorResponse response = new ErrorResponse();
+        response.addError(messageSource.getMessage("request.method.not.supported", null, LocaleContextHolder.getLocale()));
         return response;
     }
 
