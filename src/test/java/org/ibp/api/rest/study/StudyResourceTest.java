@@ -1,4 +1,4 @@
-package org.ibp.api.rest;
+package org.ibp.api.rest.study;
 
 import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.bms.ApiUnitTestBase;
-import org.ibp.api.domain.StudySummary;
-import org.ibp.api.java.StudyService;
+import org.ibp.api.domain.study.StudySummary;
+import org.ibp.api.java.study.StudyService;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;

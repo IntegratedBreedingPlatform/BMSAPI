@@ -1,5 +1,5 @@
 
-package org.ibp.api.impl.middleware;
+package org.ibp.api.impl.middleware.study;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +8,8 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.ibp.api.domain.StudySummary;
-import org.ibp.api.java.StudyService;
+import org.ibp.api.domain.study.StudySummary;
+import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

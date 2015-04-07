@@ -1,5 +1,5 @@
 
-package org.ibp.api.domain;
+package org.ibp.api.domain.study;
 
 /**
  * Summary information about a study (Trials and Nurseries).
