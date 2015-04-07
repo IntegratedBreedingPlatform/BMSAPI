@@ -12,7 +12,6 @@ import org.springframework.validation.Errors;
 
 import java.util.*;
 
-
 import org.springframework.stereotype.Component;
 
 
@@ -172,34 +171,38 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
             }
 
             boolean isNameSame = Objects.equals(request.getName(), oldScale.getName());
+            if(!isNameSame){
+                addCustomError(errors, "name", TERM_NOT_EDITABLE, new Object[] {"scale", "name"});
+            }
+
             boolean isDataTypeSame = Objects.equals(request.getDataTypeId(), getDataTypeIdSafe(oldScale.getDataType()));
-            if(isNameSame && isDataTypeSame) {
-                ValidValues validValues = request.getValidValues() == null ? new ValidValues() : request.getValidValues();
-                boolean minValuesAreEqual = Objects.equals(validValues.getMin(), oldScale.getMinValue());
-                boolean maxValuesAreEqual = Objects.equals(validValues.getMax(), oldScale.getMaxValue());
-                List<NameDescription> categories = validValues.getCategories() == null ? new ArrayList<NameDescription>() : validValues.getCategories();
-                boolean categoriesEqualSize = Objects.equals(categories.size(), oldScale.getCategories().size());
-                boolean categoriesValuesAreSame = true;
-                if(categoriesEqualSize){
-                    for(NameDescription l : categories){
-                        if(oldScale.getCategories().containsKey(l.getName()) && Objects.equals(oldScale.getCategories().get(l.getName()), l.getDescription())){
-                            continue;
-                        }
-                        categoriesValuesAreSame = false;
-                        break;
+            if(!isDataTypeSame){
+                addCustomError(errors, "dataTypeId", TERM_NOT_EDITABLE, new Object[] {"scale", "dataTypeId"});
+            }
+
+            ValidValues validValues = request.getValidValues() == null ? new ValidValues() : request.getValidValues();
+            boolean minValuesAreEqual = Objects.equals(validValues.getMin(), oldScale.getMinValue());
+            boolean maxValuesAreEqual = Objects.equals(validValues.getMax(), oldScale.getMaxValue());
+            List<NameDescription> categories = validValues.getCategories() == null ? new ArrayList<NameDescription>() : validValues.getCategories();
+            boolean categoriesEqualSize = Objects.equals(categories.size(), oldScale.getCategories().size());
+            boolean categoriesValuesAreSame = true;
+            if(categoriesEqualSize){
+                for(NameDescription l : categories){
+                    if(oldScale.getCategories().containsKey(l.getName()) && Objects.equals(oldScale.getCategories().get(l.getName()), l.getDescription())){
+                        continue;
                     }
+                    categoriesValuesAreSame = false;
+                    break;
                 }
-                if(minValuesAreEqual && maxValuesAreEqual && categoriesEqualSize && categoriesValuesAreSame){
-                    return;
-                }
+            }
+            if(!minValuesAreEqual || !maxValuesAreEqual || !categoriesEqualSize || !categoriesValuesAreSame){
+                addCustomError(errors, "validValues", TERM_NOT_EDITABLE, new Object[] {"scale", "validValues"});
             }
 
         } catch (MiddlewareQueryException e) {
             log.error("Error while executing scaleShouldBeEditable", e);
             addDefaultError(errors);
         }
-
-        addCustomError(errors, TERM_NOT_EDITABLE, new Object[] {"scale", "name, dataTypeId, validValues"});
     }
 
     private Integer getDataTypeIdSafe(DataType dataType){
