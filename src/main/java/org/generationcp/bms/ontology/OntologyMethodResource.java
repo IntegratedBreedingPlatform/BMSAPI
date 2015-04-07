@@ -23,9 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-
 
 @Api(value = "Ontology Method Service")
 @Controller
@@ -81,7 +78,7 @@ public class OntologyMethodResource {
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
-        return new ResponseEntity<>(ontologyModelService.addMethod(request), CREATED);
+        return new ResponseEntity<>(ontologyModelService.addMethod(request), HttpStatus.CREATED);
     }
 
     //TODO: 403 response for user without permission
@@ -100,7 +97,7 @@ public class OntologyMethodResource {
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         ontologyModelService.updateMethod(Integer.valueOf(request.getId()), request);
-        return new ResponseEntity<>(NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     //TODO: 403 response for user without permission
@@ -119,6 +116,6 @@ public class OntologyMethodResource {
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
         ontologyModelService.deleteMethod(Integer.valueOf(id));
-        return new ResponseEntity<>(NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
