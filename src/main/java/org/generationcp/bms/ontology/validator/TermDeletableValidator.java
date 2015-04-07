@@ -34,7 +34,7 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
                 return;
             }
 
-            addCustomError(errors, "id", CAN_NOT_DELETE_REFERRED_TERM, null);
+            addCustomError(errors, CAN_NOT_DELETE_REFERRED_TERM, new Object[] {request.getId(), request.getTermName()});
 
         } catch (MiddlewareQueryException e) {
             log.error("Error while validating object", e);
