@@ -58,7 +58,7 @@ public class OntologyPropertyResource {
     }
 
     @ApiOperation(value = "Get Property by id", notes = "Get Property using given Property id")
-    @RequestMapping(value = "/{cropname}/properties/{id:.+}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<PropertyResponse> getPropertyById(@PathVariable String  cropname, @PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");

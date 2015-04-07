@@ -84,7 +84,7 @@ public class OntologyMethodResource {
     //TODO: 403 response for user without permission
     @SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Update Method", notes = "Update Method using Given Data")
-    @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{cropname}/methods/{id:.+}", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity updateMethod(@PathVariable String  cropname,@PathVariable String id, @RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
         requestIdValidator.validate(id, bindingResult);
@@ -103,7 +103,7 @@ public class OntologyMethodResource {
     //TODO: 403 response for user without permission
     @SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Delete Method", notes = "Delete Method using Given Id")
-    @RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{cropname}/methods/{id:.+}", method = RequestMethod.DELETE)
     @ResponseBody
     public ResponseEntity deleteMethod(@PathVariable String  cropname,@PathVariable String id) throws MiddlewareQueryException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");

@@ -82,10 +82,14 @@ public class OntologyScaleResource {
 
     @SuppressWarnings("rawtypes")
     @ApiOperation(value = "Update Scale", notes = "Update existing scale using detail")
-    @RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{cropname}/scales/{id:.+}", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity updateScale(@PathVariable String  cropname, @PathVariable Integer id, @RequestBody ScaleRequest request, BindingResult result) throws MiddlewareQueryException, MiddlewareException, ApiRequestValidationException {
-        request.setId(id);
+    public ResponseEntity updateScale(@PathVariable String  cropname, @PathVariable String id, @RequestBody ScaleRequest request, BindingResult result) throws MiddlewareQueryException, MiddlewareException, ApiRequestValidationException {
+        requestIdValidator.validate(id, result);
+        if(result.hasErrors()){
+            throw new ApiRequestValidationException(result.getAllErrors());
+        }
+        request.setId(Integer.valueOf(id));
         scaleRequestValidator.validate(request, result);
         if(result.hasErrors()){
             throw new ApiRequestValidationException(result.getAllErrors());
@@ -96,15 +100,19 @@ public class OntologyScaleResource {
 
     @SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Delete Scale", notes = "Delete Scale using Given Id")
-    @RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{cropname}/scales/{id:.+}", method = RequestMethod.DELETE)
     @ResponseBody
-    public ResponseEntity deleteScale(@PathVariable String  cropname,@PathVariable Integer id) throws MiddlewareQueryException, MiddlewareException {
+    public ResponseEntity deleteScale(@PathVariable String  cropname,@PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-        termDeletableValidator.validate(new TermRequest(id, "scale", CvId.SCALES.getId()), bindingResult);
+        requestIdValidator.validate(id, bindingResult);
         if(bindingResult.hasErrors()){
             throw new ApiRequestValidationException(bindingResult.getAllErrors());
         }
-        ontologyModelService.deleteScale(id);
+        termDeletableValidator.validate(new TermRequest(Integer.valueOf(id), "scale", CvId.SCALES.getId()), bindingResult);
+        if(bindingResult.hasErrors()){
+            throw new ApiRequestValidationException(bindingResult.getAllErrors());
+        }
+        ontologyModelService.deleteScale(Integer.valueOf(id));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
