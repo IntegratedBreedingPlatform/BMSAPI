@@ -39,6 +39,8 @@ public abstract class OntologyValidator extends BaseValidator {
     protected static final String EXPECTED_MAX_SHOULD_NOT_GREATER_THAN_SCALE_MAX = "expected.max.should.not.be.greater";
     protected static final String SHOULD_BE_STRING = "should.be.string";
     protected static final String TERM_NOT_EDITABLE = "term.not.editable";
+    protected static final String SHOULD_HAVE_VALID_DATA_TYPE = "should.have.valid.data.type";
+    protected static final String CATEGORY_SHOULD_HAVE_AT_LEAST_ONE_ITEM = "category.should.have.at.least.one.item";
 
     @Autowired
     protected OntologyManagerService ontologyManagerService;
@@ -116,7 +118,7 @@ public abstract class OntologyValidator extends BaseValidator {
 
     protected void shouldHaveValidDataType(String fieldName, Integer dataTypeId, Errors errors){
         if(DataType.getById(dataTypeId) == null) {
-            addCustomError(errors,fieldName, ENUM_TYPE_NOT_VALID, null);
+            addCustomError(errors,fieldName, SHOULD_HAVE_VALID_DATA_TYPE, null);
         }
     }
 

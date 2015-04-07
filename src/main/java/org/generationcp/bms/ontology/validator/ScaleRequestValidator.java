@@ -94,7 +94,13 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
 
         //5. If the data type is categorical, at least one category must be submitted
         if(Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)){
-            shouldNotNullOrEmpty("validValues.categories", categories, errors);
+            if(categories == null){
+                addCustomError(errors, "validValues.categories", CATEGORY_SHOULD_HAVE_AT_LEAST_ONE_ITEM, null);
+            }
+        }
+
+        if(errors.hasErrors()){
+            return;
         }
 
         //6. Categories are only stored if the data type is categorical
