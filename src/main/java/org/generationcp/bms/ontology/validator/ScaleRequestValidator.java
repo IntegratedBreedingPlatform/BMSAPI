@@ -39,7 +39,6 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
     static final String CATEGORIES_SHOULD_BE_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE = "scale.categories.should.not.pass.with.non.categorical.data.type";
     static final String CATEGORIES_NAME_DUPLICATE = "scale.categories.name.duplicate";
     static final String CATEGORIES_DESCRIPTION_DUPLICATE = "scale.categories.description.duplicate";
-    static final String SCALE_NOT_EDITABLE = "scale.not.editable";
 
     @Override
     public boolean supports(Class<?> aClass) {
@@ -200,7 +199,7 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
             addDefaultError(errors);
         }
 
-        errors.reject(SCALE_NOT_EDITABLE);
+        addCustomError(errors, TERM_NOT_EDITABLE, new Object[] {"scale", "name, dataTypeId, validValues"});
     }
 
     private Integer getDataTypeIdSafe(DataType dataType){

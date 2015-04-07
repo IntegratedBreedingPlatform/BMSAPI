@@ -29,7 +29,6 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 
     static final String DUPLICATE_ENTRIES_IN_CLASSES = "property.class.duplicate.entries";
     static final String INVALID_CLASS_NAME = "property.class.name.not.found";
-    static final String PROPERTY_NOT_EDITABLE = "property.not.editable";
 
     @Override
     public boolean supports(Class<?> aClass) {
@@ -140,6 +139,6 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
             return;
         }
 
-        errors.reject(PROPERTY_NOT_EDITABLE);
+        addCustomError(errors, "name", TERM_NOT_EDITABLE, new Object[] {"property", "name"});
     }
 }

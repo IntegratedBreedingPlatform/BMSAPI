@@ -38,6 +38,7 @@ public abstract class OntologyValidator extends BaseValidator {
     protected static final String EXPECTED_MIN_SHOULD_NOT_LESSER_THAN_SCALE_MIN = "expected.min.should.not.be.smaller";
     protected static final String EXPECTED_MAX_SHOULD_NOT_GREATER_THAN_SCALE_MAX = "expected.max.should.not.be.greater";
     protected static final String SHOULD_BE_STRING = "should.be.string";
+    protected static final String TERM_NOT_EDITABLE = "term.not.editable";
 
     @Autowired
     protected OntologyManagerService ontologyManagerService;

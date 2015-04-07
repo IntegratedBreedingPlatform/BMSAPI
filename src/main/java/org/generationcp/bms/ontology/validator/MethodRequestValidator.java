@@ -20,9 +20,6 @@ import java.util.Objects;
 @Component
 public class MethodRequestValidator extends OntologyValidator implements org.springframework.validation.Validator{
 
-    static final String METHOD_NOT_EDITABLE = "method.not.editable";
-
-
     @Override
     public boolean supports(Class<?> aClass) {
         return MethodRequest.class.equals(aClass);
@@ -105,6 +102,6 @@ public class MethodRequestValidator extends OntologyValidator implements org.spr
             return;
         }
 
-        errors.reject(METHOD_NOT_EDITABLE);
+        addCustomError(errors, "name" , TERM_NOT_EDITABLE, new Object[]{"method", "name"});
     }
 }
