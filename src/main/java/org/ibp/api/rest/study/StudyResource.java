@@ -1,9 +1,7 @@
-
 package org.ibp.api.rest.study;
 
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +24,15 @@ public class StudyResource {
 	@Autowired
 	private StudyService studyService;
 
+	/**
+	 * @param cropname The crop for which this rest call is being made 
+	 */
 	@ApiOperation(value = "List all studies", notes = "Returns summary information for all studies (Nurseries and Trials).")
 	@RequestMapping(value = "/{cropname}/list", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<StudySummary>> listAllStudies(@PathVariable String cropname) throws MiddlewareQueryException {
-		return new ResponseEntity<List<StudySummary>>(studyService.listAllStudies(), HttpStatus.OK);
+	public ResponseEntity<List<StudySummary>> listAllStudies(@PathVariable String cropname) {
+		return new ResponseEntity<List<StudySummary>>(this.studyService.listAllStudies(),
+				HttpStatus.OK);
 	}
 
 }

@@ -1,221 +1,252 @@
 package org.ibp.api.rest.ontology;
 
-import org.generationcp.middleware.domain.oms.Term;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.hamcrest.Matchers;
+
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.DataType;
+import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.ScaleRequest;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.ibp.builders.ScaleBuilder;
-import org.junit.Test;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
-import java.util.ArrayList;
-
-import org.mockito.Mockito;
+import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.validateMockitoUsage;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 
 public class OntologyScaleResourceTest extends ApiUnitTestBase {
 
-    @Configuration
-    public static class TestConfiguration {
+	@Configuration
+	public static class TestConfiguration {
 
-        @Bean
-        @Primary
-        public OntologyManagerService ontologyManagerService() {
-            return Mockito.mock(OntologyManagerService.class);
-        }
-    }
+		@Bean
+		@Primary
+		public OntologyManagerService ontologyManagerService() {
+			return Mockito.mock(OntologyManagerService.class);
+		}
+	}
 
-    @Autowired
-    private OntologyManagerService ontologyManagerService;
+	@Autowired
+	private OntologyManagerService ontologyManagerService;
 
-    private final String scaleName = "scaleName";
-    private final String scaleDescription = "scaleDescription";
-    private Map<String, String> categories = new HashMap<>();
+	private final String scaleName = "scaleName";
+	private final String scaleDescription = "scaleDescription";
+	private final Map<String, String> categories = new HashMap<>();
 
-    @Before
-    public void reset(){
-        Mockito.reset(ontologyManagerService);
-    }
+	@Before
+	public void reset() {
+		Mockito.reset(this.ontologyManagerService);
+	}
 
-    @After
-    public void validate() {
-        validateMockitoUsage();
-    }
+	@After
+	public void validate() {
+		Mockito.validateMockitoUsage();
+	}
 
-    /**
-     * List all scales with details
-     * @throws Exception
-     */
-    @Test
-    public void listAllScales() throws Exception {
+	/**
+	 * List all scales with details
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void listAllScales() throws Exception {
 
-        String cropName = "maize";
+		String cropName = "maize";
 
-        categories.put("label", "value");
-        categories.put("label2", "value2");
+		this.categories.put("label", "value");
+		this.categories.put("label2", "value2");
 
-        List<Scale> scaleList = new ArrayList<>();
-        scaleList.add(new ScaleBuilder().build(1, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null));
-        scaleList.add(new ScaleBuilder().build(1, scaleName + "2", scaleDescription + "2", DataType.NUMERIC_VARIABLE, "30", "40", null));
-        scaleList.add(new ScaleBuilder().build(1, scaleName + "3", scaleDescription + "3", DataType.CATEGORICAL_VARIABLE, "", "", categories));
+		List<Scale> scaleList = new ArrayList<>();
+		scaleList.add(new ScaleBuilder().build(1, this.scaleName, this.scaleDescription,
+				DataType.NUMERIC_VARIABLE, "10", "20", null));
+		scaleList.add(new ScaleBuilder().build(1, this.scaleName + "2",
+				this.scaleDescription + "2", DataType.NUMERIC_VARIABLE, "30", "40", null));
+		scaleList.add(new ScaleBuilder()
+				.build(1, this.scaleName + "3", this.scaleDescription + "3",
+						DataType.CATEGORICAL_VARIABLE, "", "", this.categories));
 
-        Mockito.doReturn(scaleList).when(ontologyManagerService).getAllScales();
+		Mockito.doReturn(scaleList).when(this.ontologyManagerService).getAllScales();
 
-        mockMvc.perform(get("/ontology/{cropname}/scales", cropName).contentType(contentType)).andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(scaleList.size())))
-                .andExpect(jsonPath("$[0].id", is(1)))
-                .andExpect(jsonPath("$[0].name", is(scaleList.get(0).getName())))
-                .andExpect(jsonPath("$[0].description", is(scaleList.get(0).getDefinition())))
-                .andDo(print());
+		this.mockMvc
+				.perform(
+						MockMvcRequestBuilders.get("/ontology/{cropname}/scales", cropName)
+								.contentType(this.contentType))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$",
+								IsCollectionWithSize.hasSize(scaleList.size())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(1)))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$[0].name",
+								Matchers.is(scaleList.get(0).getName())))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$[0].description",
+								Matchers.is(scaleList.get(0).getDefinition())))
+				.andDo(MockMvcResultHandlers.print());
 
-        verify(ontologyManagerService, times(1)).getAllScales();
-    }
+		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).getAllScales();
+	}
 
-    /**
-     * Get a scale if exist using given scale id
-     * @throws Exception
-     */
-    @Test
-    public void getScaleById() throws Exception{
+	/**
+	 * Get a scale if exist using given scale id
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void getScaleById() throws Exception {
 
-        String cropName = "maize";
+		String cropName = "maize";
 
-        Scale scale = new ScaleBuilder().build(1, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Scale scale = new ScaleBuilder().build(1, this.scaleName, this.scaleDescription,
+				DataType.NUMERIC_VARIABLE, "10", "20", null);
 
-        Mockito.doReturn(scale).when(ontologyManagerService).getScaleById(1);
-        Mockito.doReturn(new Term(1, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(ontologyManagerService).getTermById(1);
+		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(1);
+		Mockito.doReturn(
+				new Term(1, this.scaleName, this.scaleDescription, CvId.SCALES.getId(), false))
+				.when(this.ontologyManagerService).getTermById(1);
 
-        mockMvc.perform(get("/ontology/{cropname}/scales/{id}",cropName, String.valueOf(1)).contentType(contentType)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is(scale.getName())))
-                .andExpect(jsonPath("$.description", is(scale.getDefinition())))
-                .andDo(print());
+		this.mockMvc
+				.perform(
+						MockMvcRequestBuilders.get("/ontology/{cropname}/scales/{id}", cropName,
+								String.valueOf(1)).contentType(this.contentType))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(1)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(scale.getName())))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$.description",
+								Matchers.is(scale.getDefinition())))
+				.andDo(MockMvcResultHandlers.print());
 
-        verify(ontologyManagerService, times(1)).getScaleById(1);
-    }
+		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).getScaleById(1);
+	}
 
-    /**
-     * Add new scale with provided data and return id of newly generated scale
-     * @throws Exception
-     */
-    @Test
-    public void addScale() throws Exception{
+	/**
+	 * Add new scale with provided data and return id of newly generated scale
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void addScale() throws Exception {
 
-        String cropName = "maize";
+		String cropName = "maize";
 
-        ValidValues validValues = new ValidValues();
-        validValues.setMin("10");
-        validValues.setMax("20");
+		ValidValues validValues = new ValidValues();
+		validValues.setMin("10");
+		validValues.setMax("20");
 
-        ScaleRequest scaleRequest = new ScaleRequest();
-        scaleRequest.setName(scaleName);
-        scaleRequest.setDescription(scaleDescription);
-        scaleRequest.setDataTypeId(1110);
-        scaleRequest.setValidValues(validValues);
+		ScaleRequest scaleRequest = new ScaleRequest();
+		scaleRequest.setName(this.scaleName);
+		scaleRequest.setDescription(this.scaleDescription);
+		scaleRequest.setDataTypeId(1110);
+		scaleRequest.setValidValues(validValues);
 
-        Scale scale = new Scale();
-        scale.setName(scaleName);
-        scale.setDefinition(scaleDescription);
+		Scale scale = new Scale();
+		scale.setName(this.scaleName);
+		scale.setDefinition(this.scaleDescription);
 
-        ArgumentCaptor<Scale> captor = ArgumentCaptor.forClass(Scale.class);
+		ArgumentCaptor<Scale> captor = ArgumentCaptor.forClass(Scale.class);
 
-        Mockito.doNothing().when(ontologyManagerService).addScale(any(Scale.class));
+		Mockito.doNothing().when(this.ontologyManagerService).addScale(org.mockito.Matchers.any(Scale.class));
 
-        mockMvc.perform(post("/ontology/{cropname}/scales", cropName)
-                .contentType(contentType).content(convertObjectToByte(scaleRequest)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", is(0)))
-                .andDo(print());
+		this.mockMvc
+				.perform(
+						MockMvcRequestBuilders.post("/ontology/{cropname}/scales", cropName)
+								.contentType(this.contentType)
+								.content(this.convertObjectToByte(scaleRequest)))
+				.andExpect(MockMvcResultMatchers.status().isCreated())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(0)))
+				.andDo(MockMvcResultHandlers.print());
 
-        verify(ontologyManagerService).addScale(captor.capture());
-    }
+		Mockito.verify(this.ontologyManagerService).addScale(captor.capture());
+	}
 
-    /**
-     * Update a scale if exist
-     * @throws Exception
-     */
-    @Test
-    public void updateScale() throws Exception{
+	/**
+	 * Update a scale if exist
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void updateScale() throws Exception {
 
-        String cropName = "maize";
+		String cropName = "maize";
 
-        ValidValues validValues = new ValidValues();
-        validValues.setMin("10");
-        validValues.setMax("20");
+		ValidValues validValues = new ValidValues();
+		validValues.setMin("10");
+		validValues.setMax("20");
 
-        ScaleRequest scaleRequest = new ScaleRequest();
-        scaleRequest.setName(scaleName);
-        scaleRequest.setDescription(scaleDescription);
-        scaleRequest.setDataTypeId(1110);
-        scaleRequest.setValidValues(validValues);
+		ScaleRequest scaleRequest = new ScaleRequest();
+		scaleRequest.setName(this.scaleName);
+		scaleRequest.setDescription(this.scaleDescription);
+		scaleRequest.setDataTypeId(1110);
+		scaleRequest.setValidValues(validValues);
 
-        Scale scale = new Scale(new Term(1, scaleName, scaleDescription));
+		Scale scale = new Scale(new Term(1, this.scaleName, this.scaleDescription));
 
-        ArgumentCaptor<Scale> captor = ArgumentCaptor.forClass(Scale.class);
+		ArgumentCaptor<Scale> captor = ArgumentCaptor.forClass(Scale.class);
 
-        Mockito.doNothing().when(ontologyManagerService).updateScale(any(Scale.class));
-        Mockito.doReturn(scale).when(ontologyManagerService).getScaleById(scale.getId());
+		Mockito.doNothing().when(this.ontologyManagerService)
+				.updateScale(org.mockito.Matchers.any(Scale.class));
+		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scale.getId());
 
-        mockMvc.perform(put("/ontology/{cropname}/scales/{id}", cropName, scale.getId())
-                .contentType(contentType).content(convertObjectToByte(scaleRequest)))
-                .andExpect(status().isNoContent())
-                .andDo(print());
+		this.mockMvc
+				.perform(
+						MockMvcRequestBuilders
+								.put("/ontology/{cropname}/scales/{id}", cropName, scale.getId())
+								.contentType(this.contentType)
+								.content(this.convertObjectToByte(scaleRequest)))
+				.andExpect(MockMvcResultMatchers.status().isNoContent())
+				.andDo(MockMvcResultHandlers.print());
 
-        verify(ontologyManagerService).updateScale(captor.capture());
+		Mockito.verify(this.ontologyManagerService).updateScale(captor.capture());
 
-        Scale captured = captor.getValue();
+		Scale captured = captor.getValue();
 
-        assertEquals(scale.getName(), captured.getName());
-        assertEquals(scale.getDefinition(), captured.getDefinition());
-    }
+		Assert.assertEquals(scale.getName(), captured.getName());
+		Assert.assertEquals(scale.getDefinition(), captured.getDefinition());
+	}
 
-    /**
-     * Delete a scale if exist and not referred
-     * @throws Exception
-     */
-    @Test
-    public void deleteScale() throws Exception{
+	/**
+	 * Delete a scale if exist and not referred
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void deleteScale() throws Exception {
 
-        String cropName = "maize";
+		String cropName = "maize";
 
-        Term term = new Term(10, "name", "", CvId.SCALES.getId(), false);
-        Scale scale = new Scale(term);
+		Term term = new Term(10, "name", "", CvId.SCALES.getId(), false);
+		Scale scale = new Scale(term);
 
-        Mockito.doReturn(term).when(ontologyManagerService).getTermById(scale.getId());
-        Mockito.doReturn(scale).when(ontologyManagerService).getScaleById(scale.getId());
-        Mockito.doReturn(false).when(ontologyManagerService).isTermReferred(scale.getId());
-        Mockito.doNothing().when(ontologyManagerService).deleteScale(scale.getId());
+		Mockito.doReturn(term).when(this.ontologyManagerService).getTermById(scale.getId());
+		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scale.getId());
+		Mockito.doReturn(false).when(this.ontologyManagerService).isTermReferred(scale.getId());
+		Mockito.doNothing().when(this.ontologyManagerService).deleteScale(scale.getId());
 
-        mockMvc.perform(delete("/ontology/{cropname}/scales/{id}", cropName, scale.getId())
-                .contentType(contentType))
-                .andExpect(status().isNoContent())
-                .andDo(print());
+		this.mockMvc
+				.perform(
+						MockMvcRequestBuilders.delete("/ontology/{cropname}/scales/{id}", cropName,
+								scale.getId()).contentType(this.contentType))
+				.andExpect(MockMvcResultMatchers.status().isNoContent())
+				.andDo(MockMvcResultHandlers.print());
 
-        verify(ontologyManagerService, times(1)).deleteScale(scale.getId());
-    }
+		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).deleteScale(scale.getId());
+	}
 }

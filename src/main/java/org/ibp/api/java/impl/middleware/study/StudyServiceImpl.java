@@ -1,4 +1,3 @@
-
 package org.ibp.api.java.impl.middleware.study;
 
 import java.util.ArrayList;

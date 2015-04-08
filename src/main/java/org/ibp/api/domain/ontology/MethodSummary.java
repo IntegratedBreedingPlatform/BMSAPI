@@ -1,19 +1,22 @@
 package org.ibp.api.domain.ontology;
 
 public class MethodSummary extends MethodRequest {
-    
-    private Integer id;
 
-    public Integer getId() {
-        return id;
-    }
+	private Integer id;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	@Override
+	public Integer getId() {
+		return this.id;
+	}
 
-    @Override
-    public String toString() {
-        return "Method [id=" + this.getId() + ", name=" + this.getName() + ", description=" + this.getDescription() + "]";
-    }
+	@Override
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	@Override
+	public String toString() {
+		return "Method [id=" + this.getId() + ", name=" + this.getName() + ", description="
+				+ this.getDescription() + "]";
+	}
 }

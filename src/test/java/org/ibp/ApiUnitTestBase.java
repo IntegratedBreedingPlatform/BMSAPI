@@ -1,10 +1,8 @@
 package org.ibp;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import java.nio.charset.Charset;
+import java.util.Random;
 
-import org.ibp.Main;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -16,13 +14,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.Charset;
-import java.util.Random;
-
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
@@ -30,42 +27,43 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @Ignore
 public class ApiUnitTestBase {
 
-    protected final MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
-            MediaType.APPLICATION_JSON.getSubtype(),
-            Charset.forName("utf8"));
+	protected final MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
+			MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
 
-    protected MockMvc mockMvc;
+	protected MockMvc mockMvc;
 
-    @Autowired
-    private WebApplicationContext webApplicationContext;
+	@Autowired
+	private WebApplicationContext webApplicationContext;
 
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        mockMvc = webAppContextSetup(webApplicationContext).build();
-    }
+	@Before
+	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
+		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+	}
 
-    @After
-    public void tearDown() throws Exception{
-        mockMvc = null;
-    }
+	@After
+	public void tearDown() throws Exception {
+		this.mockMvc = null;
+	}
 
-    public byte[] convertObjectToByte(Object object) throws JsonProcessingException {
-        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        return ow.writeValueAsBytes(object);
-    }
+	public byte[] convertObjectToByte(Object object) throws JsonProcessingException {
+		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+		return ow.writeValueAsBytes(object);
+	}
 
-    /**
-     * Utility Method to generate random string of given length
-     * @param len
-     * @return
-     */
-    public String randomString (int len) {
-        final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        Random rnd = new Random();
-        StringBuilder sb = new StringBuilder(len);
-        for( int i = 0; i < len; i++ )
-            sb.append(chars.charAt(rnd.nextInt(chars.length())));
-        return sb.toString();
-    }
+	/**
+	 * Utility Method to generate random string of given length
+	 * 
+	 * @param len
+	 * @return
+	 */
+	public String randomString(int len) {
+		final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		Random rnd = new Random();
+		StringBuilder sb = new StringBuilder(len);
+		for (int i = 0; i < len; i++) {
+			sb.append(chars.charAt(rnd.nextInt(chars.length())));
+		}
+		return sb.toString();
+	}
 }

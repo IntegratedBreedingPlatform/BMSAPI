@@ -11,23 +11,23 @@ public class ApiEnvironmentConfiguration {
 	private Environment environment;
 
 	public String getDbHost() {
-		return environment.getProperty("db.host");
+		return this.environment.getProperty("db.host");
 	}
 
 	public String getDbPort() {
-		return environment.getProperty("db.port");
+		return this.environment.getProperty("db.port");
 	}
 
 	public String getDbUsername() {
-		return environment.getProperty("db.username");
+		return this.environment.getProperty("db.username");
 	}
 
 	public String getDbPassword() {
-		return environment.getProperty("db.password");
+		return this.environment.getProperty("db.password");
 	}
-	
+
 	public String getWorkbenchDBName() {
-		return environment.getProperty("db.workbench.name");
+		return this.environment.getProperty("db.workbench.name");
 	}
 
 }

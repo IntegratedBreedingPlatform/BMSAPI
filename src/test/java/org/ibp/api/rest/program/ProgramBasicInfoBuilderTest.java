@@ -1,34 +1,30 @@
 package org.ibp.api.rest.program;
 
-import org.ibp.api.domain.program.ProjectBasicInfo;
-import org.junit.Test;
-
 import java.sql.Timestamp;
 import java.util.Date;
 
-import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertEquals;
+import junit.framework.TestCase;
+
+import org.ibp.api.domain.program.ProjectBasicInfo;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class ProgramBasicInfoBuilderTest {
 
-    private final String PROJECT_NAME = "projectName";
-    private final String UNIQUE_ID = "98765";
-    private final Integer USER_ID = 1;
-    private final Date START_DATE = new Timestamp(new Date().getTime());
+	private final String PROJECT_NAME = "projectName";
+	private final String UNIQUE_ID = "98765";
+	private final Integer USER_ID = 1;
+	private final Date START_DATE = new Timestamp(new Date().getTime());
 
-    @Test
-    public void buildWithMandatoryInformation() {
-        ProjectBasicInfo built = new ProgramBasicInfoBuilder()
-                .projectName(PROJECT_NAME)
-                .uniqueID(UNIQUE_ID)
-                .userId(USER_ID)
-                .startDate(START_DATE)
-                .build();
+	@Test
+	public void buildWithMandatoryInformation() {
+		ProjectBasicInfo built = new ProgramBasicInfoBuilder().projectName(this.PROJECT_NAME)
+				.uniqueID(this.UNIQUE_ID).userId(this.USER_ID).startDate(this.START_DATE).build();
 
-        assertNull(built.getId());
-        assertEquals(PROJECT_NAME, built.getProjectName());
-        assertEquals(UNIQUE_ID, built.getUniqueID());
-        assertEquals(START_DATE, built.getStartDate());
-    }
+		TestCase.assertNull(built.getId());
+		Assert.assertEquals(this.PROJECT_NAME, built.getProjectName());
+		Assert.assertEquals(this.UNIQUE_ID, built.getUniqueID());
+		Assert.assertEquals(this.START_DATE, built.getStartDate());
+	}
 
 }

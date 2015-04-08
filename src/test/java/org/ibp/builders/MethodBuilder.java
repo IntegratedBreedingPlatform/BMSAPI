@@ -5,17 +5,16 @@ import org.generationcp.middleware.domain.oms.Term;
 
 public class MethodBuilder {
 
-    private Term term;
+	private final Term term;
 
-    public MethodBuilder(){
-        term = new Term();
-    }
+	public MethodBuilder() {
+		this.term = new Term();
+	}
 
-    public Method build(int id, String name, String description)
-    {
-        term.setId(id);
-        term.setName(name);
-        term.setDefinition(description);
-        return new Method(term);
-    }
+	public Method build(int id, String name, String description) {
+		this.term.setId(id);
+		this.term.setName(name);
+		this.term.setDefinition(description);
+		return new Method(this.term);
+	}
 }

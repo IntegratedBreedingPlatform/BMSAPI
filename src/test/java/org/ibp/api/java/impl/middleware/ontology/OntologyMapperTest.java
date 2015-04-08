@@ -5,49 +5,48 @@ import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.domain.ontology.PropertySummary;
-import org.ibp.api.java.impl.middleware.ontology.OntologyMapper;
 import org.junit.Assert;
 import org.junit.Test;
 import org.modelmapper.ModelMapper;
 
 public class OntologyMapperTest {
 
-    @Test
-    public void methodMapperTest(){
-        Term term = new Term();
-        term.setId(1);
-        term.setName("name");
-        term.setDefinition("def");
+	@Test
+	public void methodMapperTest() {
+		Term term = new Term();
+		term.setId(1);
+		term.setName("name");
+		term.setDefinition("def");
 
-        Method method = new Method(term);
+		Method method = new Method(term);
 
-        ModelMapper mapper = OntologyMapper.methodMapper();
+		ModelMapper mapper = OntologyMapper.methodMapper();
 
-        MethodSummary methodSummary = mapper.map(method, MethodSummary.class);
-        
-        Assert.assertEquals((long) method.getId(), (long) methodSummary.getId());
-        Assert.assertEquals(method.getName(), methodSummary.getName());
-        Assert.assertEquals(method.getDefinition(), methodSummary.getDescription());
-        
-    }
+		MethodSummary methodSummary = mapper.map(method, MethodSummary.class);
 
-    @Test
-    public void propertyMapperTest(){
-        Term term = new Term();
+		Assert.assertEquals((long) method.getId(), (long) methodSummary.getId());
+		Assert.assertEquals(method.getName(), methodSummary.getName());
+		Assert.assertEquals(method.getDefinition(), methodSummary.getDescription());
 
-        term.setId(1);
-        term.setName("name");
-        term.setDefinition("definition");
+	}
 
-        Property property = new Property(term);
+	@Test
+	public void propertyMapperTest() {
+		Term term = new Term();
 
-        ModelMapper mapper = OntologyMapper.propertyMapper();
+		term.setId(1);
+		term.setName("name");
+		term.setDefinition("definition");
 
-        PropertySummary propertySummary = mapper.map(property, PropertySummary.class);
+		Property property = new Property(term);
 
-        Assert.assertEquals((long) property.getId(), (long) propertySummary.getId());
-        Assert.assertEquals(property.getName(), propertySummary.getName());
-        Assert.assertEquals(property.getDefinition(), propertySummary.getDescription());
-        
-    }
+		ModelMapper mapper = OntologyMapper.propertyMapper();
+
+		PropertySummary propertySummary = mapper.map(property, PropertySummary.class);
+
+		Assert.assertEquals((long) property.getId(), (long) propertySummary.getId());
+		Assert.assertEquals(property.getName(), propertySummary.getName());
+		Assert.assertEquals(property.getDefinition(), propertySummary.getDescription());
+
+	}
 }

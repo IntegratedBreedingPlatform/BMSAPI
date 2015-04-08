@@ -1,9 +1,8 @@
-
 package org.ibp.api.domain.study;
 
 /**
  * Summary information about a study (Trials and Nurseries).
- * 
+ *
  */
 public class StudySummary {
 
@@ -19,12 +18,12 @@ public class StudySummary {
 
 	}
 
-	public StudySummary(int id) {
-		this.id = id;
+	public StudySummary(Integer studyId) {
+		this.id = studyId;
 	}
 
 	public Integer getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(Integer id) {
@@ -32,7 +31,7 @@ public class StudySummary {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
@@ -40,7 +39,7 @@ public class StudySummary {
 	}
 
 	public String getTitle() {
-		return title;
+		return this.title;
 	}
 
 	public void setTitle(String title) {
@@ -48,7 +47,7 @@ public class StudySummary {
 	}
 
 	public String getObjective() {
-		return objective;
+		return this.objective;
 	}
 
 	public void setObjective(String objective) {
@@ -56,7 +55,7 @@ public class StudySummary {
 	}
 
 	public String getType() {
-		return type;
+		return this.type;
 	}
 
 	public void setType(String type) {
@@ -64,7 +63,7 @@ public class StudySummary {
 	}
 
 	public String getStartDate() {
-		return startDate;
+		return this.startDate;
 	}
 
 	public void setStartDate(String startDate) {
@@ -72,7 +71,7 @@ public class StudySummary {
 	}
 
 	public String getEndDate() {
-		return endDate;
+		return this.endDate;
 	}
 
 	public void setEndDate(String endDate) {
@@ -81,6 +80,7 @@ public class StudySummary {
 
 	@Override
 	public String toString() {
-		return "StudySummary [id=" + id + ", name=" + name + ", title=" + title + ", type=" + type + "]";
+		return "StudySummary [id=" + this.id + ", name=" + this.name + ", title=" + this.title
+				+ ", type=" + this.type + "]";
 	}
 }

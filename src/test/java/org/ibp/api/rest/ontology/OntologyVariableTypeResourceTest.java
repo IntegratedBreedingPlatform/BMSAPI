@@ -1,41 +1,36 @@
 package org.ibp.api.rest.ontology;
 
+import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
-import org.junit.Test;
 import org.junit.After;
-import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.validateMockitoUsage;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 
 public class OntologyVariableTypeResourceTest extends ApiUnitTestBase {
 
-    @Before
-    public void reset(){
+	@After
+	public void validate() {
+		Mockito.validateMockitoUsage();
+	}
 
-    }
+	@Test
+	public void listAllVariableTypes() throws Exception {
 
-    @After
-    public void validate() {
-        validateMockitoUsage();
-    }
+		String cropName = "maize";
 
-    @Test
-    public void listAllVariableTypes() throws Exception {
+		this.mockMvc
+				.perform(
+						MockMvcRequestBuilders.get("/ontology/{cropname}/variableTypes", cropName)
+								.contentType(this.contentType))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(9)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is("Analysis")))
+				.andDo(MockMvcResultHandlers.print());
 
-        String cropName = "maize";
-
-        mockMvc.perform(get("/ontology/{cropname}/variableTypes", cropName).contentType(contentType))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(9)))
-                .andExpect(jsonPath("$[0].name", is("Analysis")))
-                .andDo(print());
-
-    }
+	}
 }

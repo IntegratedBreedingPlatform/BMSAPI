@@ -1,7 +1,6 @@
 package org.ibp.api.rest.ontology;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.ibp.api.domain.ontology.IdName;
@@ -15,20 +14,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.List;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 @Api(value = "Ontology Data Type Service")
 @Controller
 @RequestMapping("/ontology")
 public class OntologyDataTypeResource {
-	
+
 	@Autowired
 	private OntologyModelService ontologyModelService;
 
-    @ApiOperation(value = "All Data Types", notes = "Get all Data Types")
-    @RequestMapping(value = "/{cropname}/datatypes", method = RequestMethod.GET)
-    @ResponseBody
-    public ResponseEntity<List<IdName>> listAllDataTypes(@PathVariable String cropname) throws MiddlewareQueryException {
-        return new ResponseEntity<>(ontologyModelService.getAllDataTypes(), HttpStatus.OK);
-    }
+	/**
+	 * @param cropname The crop for which this rest call is being made 
+	 */
+	@ApiOperation(value = "All Data Types", notes = "Get all Data Types")
+	@RequestMapping(value = "/{cropname}/datatypes", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<IdName>> listAllDataTypes(@PathVariable String cropname)
+			throws MiddlewareQueryException {
+		return new ResponseEntity<>(this.ontologyModelService.getAllDataTypes(), HttpStatus.OK);
+	}
 }

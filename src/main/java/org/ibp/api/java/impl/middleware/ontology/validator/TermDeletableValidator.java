@@ -6,38 +6,40 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
 @Component
-public class TermDeletableValidator extends OntologyValidator implements org.springframework.validation.Validator{
+public class TermDeletableValidator extends OntologyValidator implements
+		org.springframework.validation.Validator {
 
-    @Override
-    public boolean supports(Class<?> aClass) {
-        return TermRequest.class.equals(aClass);
-    }
+	@Override
+	public boolean supports(Class<?> aClass) {
+		return TermRequest.class.equals(aClass);
+	}
 
-    @Override
-    public void validate(Object target, Errors errors) {
-        TermRequest request = (TermRequest) target;
+	@Override
+	public void validate(Object target, Errors errors) {
+		TermRequest request = (TermRequest) target;
 
-        if(request == null){
-            addCustomError(errors, SHOULD_NOT_NULL_OR_EMPTY, null);
-            return;
-        }
+		if (request == null) {
+			this.addCustomError(errors, OntologyValidator.SHOULD_NOT_NULL_OR_EMPTY, null);
+			return;
+		}
 
-        try {
-            checkTermExist(request.getTermName(), request.getId(), request.getCvId(), errors);
+		try {
+			this.checkTermExist(request.getTermName(), request.getId(), request.getCvId(), errors);
 
-            if(errors.hasErrors()){
-                return;
-            }
+			if (errors.hasErrors()) {
+				return;
+			}
 
-            boolean isReferred = ontologyManagerService.isTermReferred(request.getId());
-            if(!isReferred){
-                return;
-            }
+			boolean isReferred = this.ontologyManagerService.isTermReferred(request.getId());
+			if (!isReferred) {
+				return;
+			}
 
-            addCustomError(errors, CAN_NOT_DELETE_REFERRED_TERM, new Object[] {request.getId(), request.getTermName()});
+			this.addCustomError(errors, OntologyValidator.CAN_NOT_DELETE_REFERRED_TERM,
+					new Object[] { request.getId(), request.getTermName() });
 
-        } catch (MiddlewareQueryException e) {
-            log.error("Error while validating object", e);
-        }
-    }
+		} catch (MiddlewareQueryException e) {
+			this.log.error("Error while validating object", e);
+		}
+	}
 }
