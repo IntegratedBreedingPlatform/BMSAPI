@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -28,7 +29,7 @@ public class StudyResource {
 	@ApiOperation(value = "List all studies", notes = "Returns summary information for all studies (Nurseries and Trials).")
 	@RequestMapping(value = "/{cropname}/list", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<StudySummary>> listAllStudies() throws MiddlewareQueryException {
+	public ResponseEntity<List<StudySummary>> listAllStudies(@PathVariable String cropname) throws MiddlewareQueryException {
 		return new ResponseEntity<List<StudySummary>>(studyService.listAllStudies(), HttpStatus.OK);
 	}
 
