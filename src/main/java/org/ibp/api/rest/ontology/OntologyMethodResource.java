@@ -1,36 +1,27 @@
 package org.ibp.api.rest.ontology;
 
-import java.util.HashMap;
-import java.util.List;
-
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.ibp.api.domain.ontology.GenericResponse;
-import org.ibp.api.domain.ontology.MethodRequest;
-import org.ibp.api.domain.ontology.MethodResponse;
-import org.ibp.api.domain.ontology.MethodSummary;
-import org.ibp.api.domain.ontology.TermRequest;
+import org.ibp.api.domain.ontology.*;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.ontology.validator.MethodRequestValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.RequestIdValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
-import org.ibp.api.java.ontology.OntologyModelService;
+import org.ibp.api.java.ontology.OntologyMethodService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.HashMap;
+import java.util.List;
 
 @Api(value = "Ontology Method Service")
 @Controller
@@ -50,7 +41,7 @@ public class OntologyMethodResource {
 	private TermDeletableValidator termDeletableValidator;
 
 	@Autowired
-	private OntologyModelService ontologyModelService;
+	private OntologyMethodService ontologyMethodService;
 
 	/**
 	 * @param cropname
@@ -61,7 +52,7 @@ public class OntologyMethodResource {
 	@ResponseBody
 	public ResponseEntity<List<MethodSummary>> listAllMethods(@PathVariable String cropname)
 			throws MiddlewareQueryException {
-		List<MethodSummary> methodList = this.ontologyModelService.getAllMethods();
+		List<MethodSummary> methodList = this.ontologyMethodService.getAllMethods();
 		return new ResponseEntity<>(methodList, HttpStatus.OK);
 	}
 
@@ -84,7 +75,7 @@ public class OntologyMethodResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		return new ResponseEntity<>(this.ontologyModelService.getMethod(Integer.valueOf(id)),
+		return new ResponseEntity<>(this.ontologyMethodService.getMethod(Integer.valueOf(id)),
 				HttpStatus.OK);
 	}
 
@@ -103,7 +94,7 @@ public class OntologyMethodResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		return new ResponseEntity<>(this.ontologyModelService.addMethod(request),
+		return new ResponseEntity<>(this.ontologyMethodService.addMethod(request),
 				HttpStatus.CREATED);
 	}
 
@@ -128,7 +119,7 @@ public class OntologyMethodResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		this.ontologyModelService.updateMethod(Integer.valueOf(request.getId()), request);
+		this.ontologyMethodService.updateMethod(Integer.valueOf(request.getId()), request);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
@@ -153,7 +144,7 @@ public class OntologyMethodResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		this.ontologyModelService.deleteMethod(Integer.valueOf(id));
+		this.ontologyMethodService.deleteMethod(Integer.valueOf(id));
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }
