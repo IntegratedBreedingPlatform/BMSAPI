@@ -41,6 +41,7 @@ public abstract class OntologyValidator extends BaseValidator {
     protected static final String TERM_NOT_EDITABLE = "term.not.editable";
     protected static final String SHOULD_HAVE_VALID_DATA_TYPE = "should.have.valid.data.type";
     protected static final String CATEGORY_SHOULD_HAVE_AT_LEAST_ONE_ITEM = "category.should.have.at.least.one.item";
+    protected static final String INVALID_DATA_TYPE = "invalid.data.type";
 
     @Autowired
     protected OntologyManagerService ontologyManagerService;
@@ -118,7 +119,7 @@ public abstract class OntologyValidator extends BaseValidator {
 
     protected void shouldHaveValidDataType(String fieldName, Integer dataTypeId, Errors errors){
         if(DataType.getById(dataTypeId) == null) {
-            addCustomError(errors,fieldName, SHOULD_HAVE_VALID_DATA_TYPE, null);
+            addCustomError(errors,fieldName, SHOULD_HAVE_VALID_DATA_TYPE, new Object[] {dataTypeId});
         }
     }
 

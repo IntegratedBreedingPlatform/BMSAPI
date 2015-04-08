@@ -77,6 +77,18 @@ public class ScaleRequestValidator extends OntologyValidator implements org.spri
         //3. Data type is required
         shouldNotNullOrEmpty("dataTypeId", request.getDataTypeId(), errors);
 
+        if(errors.hasErrors()){
+            return;
+        }
+
+        if(!isNonNullValidNumericString(request.getDataTypeId())){
+            addCustomError(errors, "dataTypeId", INVALID_DATA_TYPE, null);
+        }
+
+        if(errors.hasErrors()){
+            return;
+        }
+
         //4. The data type ID must correspond to the ID of one of the supported data types (Numeric, Categorical, Character, DateTime, Person, Location or any other special data type that we add)
         shouldHaveValidDataType("dataTypeId", request.getDataTypeId(), errors);
 
