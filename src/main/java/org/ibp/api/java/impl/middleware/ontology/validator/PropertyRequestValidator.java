@@ -26,6 +26,7 @@ public class PropertyRequestValidator extends OntologyValidator implements
 
 	static final String DUPLICATE_ENTRIES_IN_CLASSES = "property.class.duplicate.entries";
 	static final String CLASS_SHOULD_NOT_NULL_OR_EMPTY = "property.class.should.not.null.or.empty";
+	static final String CLASS_IS_NECESSARY = "property.class.is.necessary";
 
 	@Override
 	public boolean supports(Class<?> aClass) {
@@ -70,7 +71,11 @@ public class PropertyRequestValidator extends OntologyValidator implements
 		this.descriptionShouldHaveMax255Chars("description", request.getDescription(), errors);
 
 		// 5. Classes must be an array containing at least one string
-		this.shouldNotNullOrEmpty("classes", request.getClasses(), errors);
+		//this.shouldNotNullOrEmpty("classes", request.getClasses(), errors);
+	    if(request.getClasses().isEmpty()){
+		    this.addCustomError(errors, "classes",
+				  PropertyRequestValidator.CLASS_IS_NECESSARY, null);
+		}
 
 		// Need to return from here because we should not check other
 		// constraints if request is not required to process
@@ -88,7 +93,13 @@ public class PropertyRequestValidator extends OntologyValidator implements
 			if (Strings.isNullOrEmpty(classes.get(i))) {
 				this.addCustomError(errors, "classes[" + i + "]",
 						PropertyRequestValidator.CLASS_SHOULD_NOT_NULL_OR_EMPTY, null);
+			}else {
+			  this.classShouldHaveMax200Chars("classes", classes.get(i), errors);
 			}
+		}
+
+		if (errors.hasErrors()) {
+		  	return;
 		}
 
 		// Convert to set to check duplication

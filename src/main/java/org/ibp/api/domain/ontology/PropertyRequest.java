@@ -59,6 +59,7 @@ public class PropertyRequest {
 		this.classes = classes;
 	}
 
+    @JsonIgnore
 	public void setClassesFromSet(Set<String> classes) {
 		if (classes == null) {
 			return;

@@ -38,6 +38,7 @@ public abstract class OntologyValidator extends BaseValidator {
 	protected static final String CATEGORY_SHOULD_HAVE_AT_LEAST_ONE_ITEM = "category.should.have.at.least.one.item";
     protected static final String CATEGORY_DESCRIPTION_IS_NECESSARY = "category.description.is.necessary";
     protected static final String CATEGORY_NAME_IS_NECESSARY = "category.name.is.necessary";
+  	protected static final String CLASS_LENGTH_SHOULD_NOT_EXCEED_200_CHARS = "class.should.not.exceed.max.chars";
 
 	@Autowired
 	protected OntologyManagerService ontologyManagerService;
@@ -114,6 +115,13 @@ public abstract class OntologyValidator extends BaseValidator {
 		}
 	}
 
+	protected void classShouldHaveMax200Chars(String fieldName, String value, Errors errors) {
+		if (value.trim().length() > 200) {
+		  	this.addCustomError(errors, fieldName,
+				  OntologyValidator.CLASS_LENGTH_SHOULD_NOT_EXCEED_200_CHARS, null);
+		}
+	}
+
 	protected void nameShouldNotHaveSpecialCharacterAndNoDigitInStart(String fieldName, String value, Errors errors) {
 		Pattern regex = Pattern.compile("[$&+,:;=?@#|]");
 		Matcher matcher = regex.matcher(value);
@@ -155,8 +163,8 @@ public abstract class OntologyValidator extends BaseValidator {
 	}
 
 	protected void checkIfMethodPropertyScaleCombination(String fieldName, Integer methodId, Integer propertyId, Integer scaleId, Errors errors) {
-		try {
-			List<OntologyVariableSummary> variableSummary = this.ontologyManagerService
+	  try {
+		List<OntologyVariableSummary> variableSummary = this.ontologyManagerService
 					.getWithFilter(null, null, methodId, propertyId, scaleId);
 			if (!variableSummary.isEmpty()) {
 				this.addCustomError(errors, fieldName,
