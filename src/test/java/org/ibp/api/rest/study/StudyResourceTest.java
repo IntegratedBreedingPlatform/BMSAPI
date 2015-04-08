@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.bms.ApiUnitTestBase;
+import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.java.study.StudyService;
 import org.junit.Test;

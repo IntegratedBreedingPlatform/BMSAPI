@@ -156,7 +156,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot-version}</version>
                 <configuration>
-                    <mainClass>org.generationcp.bms.Main</mainClass>
+                    <mainClass>org.ibp.Main</mainClass>
                 </configuration>
                 <executions>
                     <execution>
