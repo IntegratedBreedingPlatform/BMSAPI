@@ -58,7 +58,7 @@ public class TermDeletableValidatorTest extends ApiUnitTestBase {
 
 	/**
 	 * Test for Term with Null request
-	 * 
+	 *
 	 * @throws MiddlewareQueryException
 	 */
 	@Test
@@ -72,7 +72,7 @@ public class TermDeletableValidatorTest extends ApiUnitTestBase {
 
 	/**
 	 * Test for Term Referred
-	 * 
+	 *
 	 * @throws MiddlewareQueryException
 	 */
 	@Test
@@ -88,14 +88,14 @@ public class TermDeletableValidatorTest extends ApiUnitTestBase {
 
 	/**
 	 * Test for Term Not Referred
-	 * 
+	 *
 	 * @throws MiddlewareQueryException
 	 */
 	@Test
 	public void testWithTermNotReferred() throws MiddlewareQueryException {
 
 		Mockito.doReturn(new Term(10, "name", "", CvId.METHODS.getId(), false))
-				.when(this.ontologyManagerService).getTermById(10);
+		.when(this.ontologyManagerService).getTermById(10);
 		Mockito.doReturn(false).when(this.ontologyManagerService).isTermReferred(10);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");

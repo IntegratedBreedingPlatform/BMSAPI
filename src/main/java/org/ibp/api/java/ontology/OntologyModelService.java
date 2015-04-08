@@ -24,7 +24,7 @@ public interface OntologyModelService {
 
 	/**
 	 * get all methods using middleware ontology service
-	 * 
+	 *
 	 * @return list of methods
 	 * @throws MiddlewareQueryException
 	 */
@@ -32,7 +32,7 @@ public interface OntologyModelService {
 
 	/**
 	 * get method by method id
-	 * 
+	 *
 	 * @param id
 	 *            the method id
 	 * @return method
@@ -42,7 +42,7 @@ public interface OntologyModelService {
 
 	/**
 	 * add method using given input data
-	 * 
+	 *
 	 * @param method
 	 *            method to add
 	 * @return newly created method id
@@ -52,7 +52,7 @@ public interface OntologyModelService {
 
 	/**
 	 * update method data using given method id
-	 * 
+	 *
 	 * @param id
 	 *            method to be updated
 	 * @param request
@@ -61,11 +61,11 @@ public interface OntologyModelService {
 	 *             , MiddlewareException
 	 */
 	void updateMethod(Integer id, MethodRequest request) throws MiddlewareQueryException,
-			MiddlewareException;
+	MiddlewareException;
 
 	/**
 	 * delete method using given id
-	 * 
+	 *
 	 * @param id
 	 *            method to be deleted
 	 * @throws MiddlewareQueryException
@@ -74,7 +74,7 @@ public interface OntologyModelService {
 
 	/**
 	 * get all properties
-	 * 
+	 *
 	 * @return list of properties
 	 * @throws MiddlewareQueryException
 	 */
@@ -82,7 +82,7 @@ public interface OntologyModelService {
 
 	/**
 	 * get property by given property id
-	 * 
+	 *
 	 * @param id
 	 *            property id
 	 * @return property that have given id
@@ -92,18 +92,18 @@ public interface OntologyModelService {
 
 	/**
 	 * add property using given input data
-	 * 
+	 *
 	 * @param request
 	 *            property data to be added
 	 * @return newly created property id
 	 * @throws MiddlewareQueryException
 	 */
 	GenericResponse addProperty(PropertyRequest request) throws MiddlewareQueryException,
-			MiddlewareException;
+	MiddlewareException;
 
 	/**
 	 * get all properties containing class name
-	 * 
+	 *
 	 * @param propertyClass
 	 *            class name to be search in property
 	 * @return list of properties
@@ -114,7 +114,7 @@ public interface OntologyModelService {
 
 	/**
 	 * delete property if not used
-	 * 
+	 *
 	 * @param id
 	 *            property to be deleted
 	 * @return if property deleted or not
@@ -132,11 +132,11 @@ public interface OntologyModelService {
 	 * @throws MiddlewareException
 	 */
 	void updateProperty(Integer id, PropertyRequest request) throws MiddlewareQueryException,
-			MiddlewareException;
+	MiddlewareException;
 
 	/**
 	 * get all data types
-	 * 
+	 *
 	 * @return list of data types
 	 * @throws MiddlewareQueryException
 	 */
@@ -144,7 +144,7 @@ public interface OntologyModelService {
 
 	/**
 	 * get all classes
-	 * 
+	 *
 	 * @return list of classes
 	 * @throws MiddlewareQueryException
 	 */
@@ -152,7 +152,7 @@ public interface OntologyModelService {
 
 	/**
 	 * get all scales with details
-	 * 
+	 *
 	 * @return list of scales
 	 * @throws MiddlewareQueryException
 	 */
@@ -160,7 +160,7 @@ public interface OntologyModelService {
 
 	/**
 	 * get scale using given id
-	 * 
+	 *
 	 * @param id
 	 *            scale id
 	 * @return scale that matches id
@@ -170,18 +170,18 @@ public interface OntologyModelService {
 
 	/**
 	 * Adding new scale
-	 * 
+	 *
 	 * @param request
 	 *            ScaleRequest
 	 * @throws MiddlewareQueryException
 	 * @throws MiddlewareException
 	 */
 	GenericResponse addScale(ScaleRequest request) throws MiddlewareQueryException,
-			MiddlewareException;
+	MiddlewareException;
 
 	/**
 	 * update scale with new request data
-	 * 
+	 *
 	 * @param request
 	 *            ScaleRequest instance that have new data
 	 * @throws MiddlewareQueryException
@@ -191,7 +191,7 @@ public interface OntologyModelService {
 
 	/**
 	 * Delete a scale using given id
-	 * 
+	 *
 	 * @param id
 	 *            scale to be deleted
 	 * @throws MiddlewareQueryException
@@ -201,14 +201,14 @@ public interface OntologyModelService {
 
 	/**
 	 * Get List of all variable types
-	 * 
+	 *
 	 * @return List of Variable Types
 	 */
 	List<VariableTypeResponse> getAllVariableTypes();
 
 	/**
 	 * Get List of variables
-	 * 
+	 *
 	 * @param programId
 	 *            id of program
 	 * @param propertyId
@@ -223,7 +223,7 @@ public interface OntologyModelService {
 
 	/**
 	 * Get variable using given id
-	 * 
+	 *
 	 * @param programId
 	 *            id of program
 	 * @param variableId
@@ -237,7 +237,7 @@ public interface OntologyModelService {
 
 	/**
 	 * Add variable using given data
-	 * 
+	 *
 	 * @param request
 	 *            data to be added
 	 * @return newly created variable id
@@ -245,5 +245,5 @@ public interface OntologyModelService {
 	 * @throws MiddlewareException
 	 */
 	GenericResponse addVariable(VariableRequest request) throws MiddlewareQueryException,
-			MiddlewareException;
+	MiddlewareException;
 }

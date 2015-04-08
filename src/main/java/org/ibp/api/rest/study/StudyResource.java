@@ -25,7 +25,8 @@ public class StudyResource {
 	private StudyService studyService;
 
 	/**
-	 * @param cropname The crop for which this rest call is being made 
+	 * @param cropname
+	 *            The crop for which this rest call is being made
 	 */
 	@ApiOperation(value = "List all studies", notes = "Returns summary information for all studies (Nurseries and Trials).")
 	@RequestMapping(value = "/{cropname}/list", method = RequestMethod.GET)

@@ -25,7 +25,9 @@ public class OntologyVariableTypeResource {
 	private OntologyModelService ontologyModelService;
 
 	/**
-	 * @param cropname The name of the crop which is we wish to retrieve variable types. 
+	 * @param cropname
+	 *            The name of the crop which is we wish to retrieve variable
+	 *            types.
 	 */
 	@ApiOperation(value = "All Classes", notes = "Get all Classes")
 	@RequestMapping(value = "/{cropname}/variableTypes", method = RequestMethod.GET)

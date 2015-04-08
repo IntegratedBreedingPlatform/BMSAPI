@@ -13,8 +13,8 @@ import com.mangofactory.swagger.annotations.ApiIgnore;
 public class WebContentController {
 
 	/**
-	 * @param model  
-	 * @param session 
+	 * @param model
+	 * @param session
 	 */
 	@ApiIgnore
 	@RequestMapping("/")

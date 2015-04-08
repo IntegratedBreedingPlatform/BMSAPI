@@ -55,7 +55,8 @@ public class OntologyPropertyResource {
 	private OntologyModelService ontologyModelService;
 
 	/**
-	 * @param cropname The crop for which this rest call is being made 
+	 * @param cropname
+	 *            The crop for which this rest call is being made
 	 */
 	@ApiOperation(value = "All properties or filter by class name", notes = "Get all properties or filter by class name")
 	@RequestMapping(value = "/{cropname}/properties", method = RequestMethod.GET)
@@ -63,11 +64,11 @@ public class OntologyPropertyResource {
 	public ResponseEntity<List<PropertySummary>> listAllPropertyByClass(
 			@PathVariable String cropname,
 			@RequestParam(value = "class", defaultValue = "", required = false) String className)
-			throws MiddlewareQueryException {
+					throws MiddlewareQueryException {
 		if (Strings.isNullOrEmpty(className)) {
 			List<PropertySummary> propertyList = this.ontologyModelService.getAllProperties();
 			return new ResponseEntity<>(propertyList, HttpStatus.OK);
-		} 
+		}
 		List<PropertySummary> propertyList = this.ontologyModelService
 				.getAllPropertiesByClass(className);
 		return new ResponseEntity<>(propertyList, HttpStatus.OK);
@@ -75,7 +76,8 @@ public class OntologyPropertyResource {
 	}
 
 	/**
-	 * @param cropname The crop for which this rest call is being made 
+	 * @param cropname
+	 *            The crop for which this rest call is being made
 	 */
 	@ApiOperation(value = "Get Property by id", notes = "Get Property using given Property id")
 	@RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.GET)
@@ -99,7 +101,8 @@ public class OntologyPropertyResource {
 	}
 
 	/**
-	 * @param cropname The crop for which this rest call is being made 
+	 * @param cropname
+	 *            The crop for which this rest call is being made
 	 */
 	// TODO: 403 response for user without permission
 	@ApiOperation(value = "Add Property", notes = "Add a Property using Given Data")
@@ -107,7 +110,7 @@ public class OntologyPropertyResource {
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addProperty(@PathVariable String cropname,
 			@RequestBody PropertyRequest request, BindingResult bindingResult)
-			throws MiddlewareQueryException, MiddlewareException {
+					throws MiddlewareQueryException, MiddlewareException {
 		this.propertyRequestValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -117,7 +120,8 @@ public class OntologyPropertyResource {
 	}
 
 	/**
-	 * @param cropname The crop for which this rest call is being made 
+	 * @param cropname
+	 *            The crop for which this rest call is being made
 	 */
 	// TODO: 403 response for user without permission
 	@SuppressWarnings("rawtypes")
@@ -144,7 +148,8 @@ public class OntologyPropertyResource {
 	}
 
 	/**
-	 * @param cropname The name of the crop which this rest call is being made 
+	 * @param cropname
+	 *            The name of the crop which this rest call is being made
 	 */
 	// TODO: 403 response for user without permission
 	@SuppressWarnings("rawtypes")
@@ -153,7 +158,7 @@ public class OntologyPropertyResource {
 	@ResponseBody
 	public ResponseEntity updateProperty(@PathVariable String cropname, @PathVariable String id,
 			@RequestBody PropertyRequest request, BindingResult bindingResult)
-			throws MiddlewareQueryException, MiddlewareException {
+					throws MiddlewareQueryException, MiddlewareException {
 		this.requestIdValidator.validate(id, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());

@@ -65,28 +65,28 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(methodList).when(this.ontologyManagerService).getAllMethods();
 
 		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders.get("/ontology/{cropname}/methods", cropName)
-								.contentType(this.contentType))
+		.perform(
+				MockMvcRequestBuilders.get("/ontology/{cropname}/methods", cropName)
+				.contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$",
 								IsCollectionWithSize.hasSize(methodList.size())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(1)))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].name",
-								Matchers.is(methodList.get(0).getName())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].description",
-								Matchers.is(methodList.get(0).getDefinition())))
-				.andDo(MockMvcResultHandlers.print());
+								.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(1)))
+								.andExpect(
+										MockMvcResultMatchers.jsonPath("$[0].name",
+												Matchers.is(methodList.get(0).getName())))
+												.andExpect(
+														MockMvcResultMatchers.jsonPath("$[0].description",
+																Matchers.is(methodList.get(0).getDefinition())))
+																.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).getAllMethods();
 	}
 
 	/**
 	 * Get a method with id. It should respond with 200 and method data. * *
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -101,24 +101,24 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(method).when(this.ontologyManagerService).getMethod(1);
 
 		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders
-								.get("/ontology/{cropname}/methods/{id}", cropName, 1).contentType(
-										this.contentType))
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(1)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(method.getName())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$.description",
-								Matchers.is(method.getDefinition())))
-				.andDo(MockMvcResultHandlers.print());
+		.perform(
+				MockMvcRequestBuilders
+				.get("/ontology/{cropname}/methods/{id}", cropName, 1).contentType(
+						this.contentType))
+						.andExpect(MockMvcResultMatchers.status().isOk())
+						.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(1)))
+						.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(method.getName())))
+						.andExpect(
+								MockMvcResultMatchers.jsonPath("$.description",
+										Matchers.is(method.getDefinition())))
+										.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).getMethod(1);
 	}
 
 	/**
 	 * This test should expect 400 * *
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -129,19 +129,19 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(null).when(this.ontologyManagerService).getTermById(1);
 
 		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders
-								.get("/ontology/{cropname}/methods/{id}", cropName, 1).contentType(
-										this.contentType))
-				.andExpect(MockMvcResultMatchers.status().isBadRequest())
-				.andDo(MockMvcResultHandlers.print());
+		.perform(
+				MockMvcRequestBuilders
+				.get("/ontology/{cropname}/methods/{id}", cropName, 1).contentType(
+						this.contentType))
+						.andExpect(MockMvcResultMatchers.status().isBadRequest())
+						.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).getTermById(1);
 	}
 
 	/**
 	 * This test should expect 201 : Created*
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -159,13 +159,14 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 
 		ArgumentCaptor<Method> captor = ArgumentCaptor.forClass(Method.class);
 
-		Mockito.doNothing().when(this.ontologyManagerService).addMethod(org.mockito.Matchers.any(Method.class));
+		Mockito.doNothing().when(this.ontologyManagerService)
+				.addMethod(org.mockito.Matchers.any(Method.class));
 
 		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders.post("/ontology/{cropname}/methods", cropName)
-								.contentType(this.contentType)
-								.content(this.convertObjectToByte(methodDTO)))
+		.perform(
+				MockMvcRequestBuilders.post("/ontology/{cropname}/methods", cropName)
+				.contentType(this.contentType)
+				.content(this.convertObjectToByte(methodDTO)))
 				.andExpect(MockMvcResultMatchers.status().isCreated())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(0)))
 				.andDo(MockMvcResultHandlers.print());
@@ -176,7 +177,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * This test should expect 204 : No Content
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -198,15 +199,15 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 		ArgumentCaptor<Method> captor = ArgumentCaptor.forClass(Method.class);
 
 		Mockito.doNothing().when(this.ontologyManagerService)
-				.updateMethod(org.mockito.Matchers.any(Method.class));
+		.updateMethod(org.mockito.Matchers.any(Method.class));
 		Mockito.doReturn(method).when(this.ontologyManagerService).getMethod(method.getId());
 
 		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders
-								.put("/ontology/{cropname}/methods/{id}", cropName, method.getId())
-								.contentType(this.contentType)
-								.content(this.convertObjectToByte(methodDTO)))
+		.perform(
+				MockMvcRequestBuilders
+				.put("/ontology/{cropname}/methods/{id}", cropName, method.getId())
+				.contentType(this.contentType)
+				.content(this.convertObjectToByte(methodDTO)))
 				.andExpect(MockMvcResultMatchers.status().isNoContent())
 				.andDo(MockMvcResultHandlers.print());
 
@@ -220,7 +221,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * This test should expect 204 : No Content
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -237,11 +238,11 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 		Mockito.doNothing().when(this.ontologyManagerService).deleteMethod(method.getId());
 
 		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders.delete("/ontology/{cropname}/methods/{id}",
-								cropName, method.getId()).contentType(this.contentType))
-				.andExpect(MockMvcResultMatchers.status().isNoContent())
-				.andDo(MockMvcResultHandlers.print());
+		.perform(
+				MockMvcRequestBuilders.delete("/ontology/{cropname}/methods/{id}",
+						cropName, method.getId()).contentType(this.contentType))
+						.andExpect(MockMvcResultMatchers.status().isNoContent())
+						.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).deleteMethod(method.getId());
 	}

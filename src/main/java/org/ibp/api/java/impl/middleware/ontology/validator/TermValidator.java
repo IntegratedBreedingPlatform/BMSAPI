@@ -6,7 +6,7 @@ import org.springframework.validation.Errors;
 
 @Component
 public class TermValidator extends OntologyValidator implements
-		org.springframework.validation.Validator {
+org.springframework.validation.Validator {
 
 	@Override
 	public boolean supports(Class<?> aClass) {

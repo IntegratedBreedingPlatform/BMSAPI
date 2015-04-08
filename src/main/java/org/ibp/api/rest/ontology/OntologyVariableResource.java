@@ -59,7 +59,9 @@ public class OntologyVariableResource {
 	private VariableRequestValidator variableRequestValidator;
 
 	/**
-	 * @param cropname The name of the crop which is we wish to retrieve variable types. 
+	 * @param cropname
+	 *            The name of the crop which is we wish to retrieve variable
+	 *            types.
 	 */
 	@ApiOperation(value = "All variables", notes = "Gets all variables.")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.GET)
@@ -90,14 +92,16 @@ public class OntologyVariableResource {
 	}
 
 	/**
-	 * @param cropname The name of the crop which is we wish to retrieve variable types. 
+	 * @param cropname
+	 *            The name of the crop which is we wish to retrieve variable
+	 *            types.
 	 */
 	@ApiOperation(value = "Get Variable", notes = "Get Variable By Id")
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<VariableResponse> getVariableById(@PathVariable String cropname,
 			@RequestParam(value = "programId") String programId, @PathVariable String id)
-			throws MiddlewareQueryException, MiddlewareException {
+					throws MiddlewareQueryException, MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
 				"Variable");
 		this.programValidator.validate(programId, bindingResult);
@@ -116,14 +120,16 @@ public class OntologyVariableResource {
 	}
 
 	/**
-	 * @param cropname The name of the crop which is we wish to retrieve variable types. 
+	 * @param cropname
+	 *            The name of the crop which is we wish to retrieve variable
+	 *            types.
 	 */
 	@ApiOperation(value = "Add Variable", notes = "Add new variable using given data")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addVariable(@PathVariable String cropname,
 			@RequestBody VariableRequest request, BindingResult bindingResult)
-			throws MiddlewareQueryException, MiddlewareException {
+					throws MiddlewareQueryException, MiddlewareException {
 		this.variableRequestValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());

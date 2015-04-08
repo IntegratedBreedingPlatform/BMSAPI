@@ -60,14 +60,14 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
 
 	/**
 	 * Test for Name is required
-	 * 
+	 *
 	 * @throws MiddlewareQueryException
 	 */
 	@Test
 	public void testWithNullNameRequest() throws MiddlewareQueryException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService)
-				.getTermByNameAndCvId(this.methodName, this.cvId);
+		.getTermByNameAndCvId(this.methodName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
@@ -82,14 +82,14 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
 
 	/**
 	 * Test for Name is unique
-	 * 
+	 *
 	 * @throws MiddlewareQueryException
 	 */
 	@Test
 	public void testWithUniqueNonNullMethodName() throws MiddlewareQueryException {
 
 		Mockito.doReturn(new Term(10, this.methodName, this.description))
-				.when(this.ontologyManagerService).getTermByNameAndCvId(this.methodName, this.cvId);
+		.when(this.ontologyManagerService).getTermByNameAndCvId(this.methodName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
@@ -104,7 +104,7 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
 
 	/**
 	 * Test for Name cannot change if the method is already in use
-	 * 
+	 *
 	 * @throws MiddlewareQueryException
 	 */
 	@Test
@@ -116,7 +116,7 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
 		request.setDescription(this.description);
 
 		Mockito.doReturn(new Term(10, this.methodName, this.description))
-				.when(this.ontologyManagerService).getTermByNameAndCvId(this.methodName, this.cvId);
+		.when(this.ontologyManagerService).getTermByNameAndCvId(this.methodName, this.cvId);
 		Mockito.doReturn(true).when(this.ontologyManagerService).isTermReferred(request.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
@@ -132,7 +132,7 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
 	@Test
 	public void testWithNameLengthExceedMaxLimit() throws MiddlewareQueryException {
 		Mockito.doReturn(null).when(this.ontologyManagerService)
-				.getTermByNameAndCvId(this.methodName, this.cvId);
+		.getTermByNameAndCvId(this.methodName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
@@ -151,7 +151,7 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
 	@Test
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareQueryException {
 		Mockito.doReturn(null).when(this.ontologyManagerService)
-				.getTermByNameAndCvId(this.methodName, this.cvId);
+		.getTermByNameAndCvId(this.methodName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
@@ -171,7 +171,7 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
 	public void testWithValidRequest() throws MiddlewareQueryException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService)
-				.getTermByNameAndCvId(this.methodName, this.cvId);
+		.getTermByNameAndCvId(this.methodName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 

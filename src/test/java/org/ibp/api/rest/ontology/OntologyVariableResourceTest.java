@@ -73,7 +73,7 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * List all variables with details
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -90,34 +90,34 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 		OntologyVariableSummary variableSummary = new VariableBuilder().build(1, this.variableName,
 				this.variableDescription, new TermSummary(11, this.methodName,
 						this.methodDescription), new TermSummary(10, this.propertyName,
-						this.propertyDescription), new TermSummary(12, this.scaleName,
-						this.scaleDescription));
+								this.propertyDescription), new TermSummary(12, this.scaleName,
+										this.scaleDescription));
 		variableSummaries.add(variableSummary);
 
 		Mockito.doReturn(variableSummaries).when(this.ontologyManagerService)
-				.getWithFilter(programId, null, null, null, null);
+		.getWithFilter(programId, null, null, null, null);
 		Mockito.doReturn(project).when(this.workbenchDataManager)
-				.getProjectById(Long.valueOf(programId));
+		.getProjectById(Long.valueOf(programId));
 
 		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders.get(
-								"/ontology/{cropname}/variables?programId=" + programId.toString(),
-								cropName).contentType(this.contentType))
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$",
-								IsCollectionWithSize.hasSize(variableSummaries.size())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].id",
-								Matchers.is(variableSummaries.get(0).getId())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].name",
-								Matchers.is(variableSummaries.get(0).getName())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].description",
-								Matchers.is(variableSummaries.get(0).getDescription())))
-				.andDo(MockMvcResultHandlers.print());
+		.perform(
+				MockMvcRequestBuilders.get(
+						"/ontology/{cropname}/variables?programId=" + programId.toString(),
+						cropName).contentType(this.contentType))
+						.andExpect(MockMvcResultMatchers.status().isOk())
+						.andExpect(
+								MockMvcResultMatchers.jsonPath("$",
+										IsCollectionWithSize.hasSize(variableSummaries.size())))
+										.andExpect(
+												MockMvcResultMatchers.jsonPath("$[0].id",
+														Matchers.is(variableSummaries.get(0).getId())))
+														.andExpect(
+																MockMvcResultMatchers.jsonPath("$[0].name",
+																		Matchers.is(variableSummaries.get(0).getName())))
+																		.andExpect(
+																				MockMvcResultMatchers.jsonPath("$[0].description",
+																						Matchers.is(variableSummaries.get(0).getDescription())))
+																						.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).getWithFilter(programId,
 				null, null, null, null);

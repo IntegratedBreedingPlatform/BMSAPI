@@ -53,7 +53,8 @@ public class OntologyMethodResource {
 	private OntologyModelService ontologyModelService;
 
 	/**
-	 * @param cropname The crop for which this rest call is being made 
+	 * @param cropname
+	 *            The crop for which this rest call is being made
 	 */
 	@ApiOperation(value = "All Methods", notes = "Get all methods")
 	@RequestMapping(value = "/{cropname}/methods", method = RequestMethod.GET)
@@ -65,7 +66,8 @@ public class OntologyMethodResource {
 	}
 
 	/**
-	 * @param cropname The crop for which this rest call is being made 
+	 * @param cropname
+	 *            The crop for which this rest call is being made
 	 */
 	@ApiOperation(value = "Get method by id", notes = "Get method using given method id")
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.GET)
@@ -87,7 +89,8 @@ public class OntologyMethodResource {
 	}
 
 	/**
-	 * @param cropname The crop for which this rest call is being made 
+	 * @param cropname
+	 *            The crop for which this rest call is being made
 	 */
 	// TODO: 403 response for user without permission
 	@ApiOperation(value = "Add Method", notes = "Add a Method using Given Data")
@@ -95,7 +98,7 @@ public class OntologyMethodResource {
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addMethod(@PathVariable String cropname,
 			@RequestBody MethodRequest request, BindingResult bindingResult)
-			throws MiddlewareQueryException {
+					throws MiddlewareQueryException {
 		this.methodRequestValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -105,7 +108,8 @@ public class OntologyMethodResource {
 	}
 
 	/**
-	 * @param cropname The crop for which this rest call is being made 
+	 * @param cropname
+	 *            The crop for which this rest call is being made
 	 */
 	// TODO: 403 response for user without permission
 	@SuppressWarnings("rawtypes")
@@ -114,7 +118,7 @@ public class OntologyMethodResource {
 	@ResponseBody
 	public ResponseEntity updateMethod(@PathVariable String cropname, @PathVariable String id,
 			@RequestBody MethodRequest request, BindingResult bindingResult)
-			throws MiddlewareQueryException, MiddlewareException {
+					throws MiddlewareQueryException, MiddlewareException {
 		this.requestIdValidator.validate(id, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -129,7 +133,8 @@ public class OntologyMethodResource {
 	}
 
 	/**
-	 * @param cropname The crop for which this rest call is being made 
+	 * @param cropname
+	 *            The crop for which this rest call is being made
 	 */
 	// TODO: 403 response for user without permission
 	@SuppressWarnings("rawtypes")

@@ -65,14 +65,14 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 
 	/**
 	 * Test for Name is required
-	 * 
+	 *
 	 * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
 	 */
 	@Test
 	public void testWithNullNameRequest() throws MiddlewareQueryException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService)
-				.getTermByNameAndCvId(this.scaleName, this.cvId);
+		.getTermByNameAndCvId(this.scaleName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
@@ -87,14 +87,14 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 
 	/**
 	 * Test for Name is unique
-	 * 
+	 *
 	 * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
 	 */
 	@Test
 	public void testWithUniqueNonNullScaleName() throws MiddlewareQueryException {
 
 		Mockito.doReturn(new Term(10, this.scaleName, this.description))
-				.when(this.ontologyManagerService).getTermByNameAndCvId(this.scaleName, this.cvId);
+		.when(this.ontologyManagerService).getTermByNameAndCvId(this.scaleName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
@@ -281,14 +281,14 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 
 	/**
 	 * Test for to check name length not exceed 200 characters
-	 * 
+	 *
 	 * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
 	 */
 	@Test
 	public void testWithNameLengthExceedMaxLimit() throws MiddlewareQueryException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService)
-				.getTermByNameAndCvId(this.scaleName, this.cvId);
+		.getTermByNameAndCvId(this.scaleName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
@@ -303,14 +303,14 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 
 	/**
 	 * Test for to check description length not exceed 255 characters
-	 * 
+	 *
 	 * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
 	 */
 	@Test
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareQueryException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService)
-				.getTermByNameAndCvId(this.scaleName, this.cvId);
+		.getTermByNameAndCvId(this.scaleName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 

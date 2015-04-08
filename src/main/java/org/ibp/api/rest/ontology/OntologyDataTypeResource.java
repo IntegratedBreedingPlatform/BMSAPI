@@ -26,7 +26,8 @@ public class OntologyDataTypeResource {
 	private OntologyModelService ontologyModelService;
 
 	/**
-	 * @param cropname The crop for which this rest call is being made 
+	 * @param cropname
+	 *            The crop for which this rest call is being made
 	 */
 	@ApiOperation(value = "All Data Types", notes = "Get all Data Types")
 	@RequestMapping(value = "/{cropname}/datatypes", method = RequestMethod.GET)

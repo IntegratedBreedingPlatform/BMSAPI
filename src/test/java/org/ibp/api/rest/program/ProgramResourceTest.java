@@ -64,18 +64,18 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(projectList).when(this.workbenchDataManager).getProjects();
 
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.get("/program/list").contentType(this.contentType))
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].projectName",
-								Matchers.is(projectList.get(0).getProjectName())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].uniqueID",
-								Matchers.is(projectList.get(0).getUniqueID())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].userId",
-								Matchers.is(projectList.get(0).getUserId())))
-				.andDo(MockMvcResultHandlers.print());
+		.perform(MockMvcRequestBuilders.get("/program/list").contentType(this.contentType))
+		.andExpect(MockMvcResultMatchers.status().isOk())
+		.andExpect(
+				MockMvcResultMatchers.jsonPath("$[0].projectName",
+						Matchers.is(projectList.get(0).getProjectName())))
+						.andExpect(
+								MockMvcResultMatchers.jsonPath("$[0].uniqueID",
+										Matchers.is(projectList.get(0).getUniqueID())))
+										.andExpect(
+												MockMvcResultMatchers.jsonPath("$[0].userId",
+														Matchers.is(projectList.get(0).getUserId())))
+														.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.workbenchDataManager, Mockito.times(1)).getProjects();
 	}

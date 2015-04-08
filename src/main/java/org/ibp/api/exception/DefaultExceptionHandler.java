@@ -88,7 +88,7 @@ public class DefaultExceptionHandler {
 	}
 
 	/**
-	 * @param ex  
+	 * @param ex
 	 */
 	@RequestMapping(produces = { MediaType.APPLICATION_JSON_VALUE })
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)

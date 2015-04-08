@@ -50,34 +50,34 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		Mockito.when(this.studyService.listAllStudies()).thenReturn(summaries);
 
 		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders.get("/study/{cropname}/list", "maize").contentType(
-								this.contentType))
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$",
-								IsCollectionWithSize.hasSize(summaries.size())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0]['id']", Matchers.is(summary.getId())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0]['name']",
-								Matchers.is(summary.getName())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0]['title']",
-								Matchers.is(summary.getTitle())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0]['objective']",
-								Matchers.is(summary.getObjective())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0]['type']",
-								Matchers.is(summary.getType())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0]['startDate']",
-								Matchers.is(summary.getStartDate())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0]['endDate']",
-								Matchers.is(summary.getEndDate())))
-				.andDo(MockMvcResultHandlers.print());
+		.perform(
+				MockMvcRequestBuilders.get("/study/{cropname}/list", "maize").contentType(
+						this.contentType))
+						.andExpect(MockMvcResultMatchers.status().isOk())
+						.andExpect(
+								MockMvcResultMatchers.jsonPath("$",
+										IsCollectionWithSize.hasSize(summaries.size())))
+										.andExpect(
+												MockMvcResultMatchers.jsonPath("$[0]['id']", Matchers.is(summary.getId())))
+												.andExpect(
+														MockMvcResultMatchers.jsonPath("$[0]['name']",
+																Matchers.is(summary.getName())))
+																.andExpect(
+																		MockMvcResultMatchers.jsonPath("$[0]['title']",
+																				Matchers.is(summary.getTitle())))
+																				.andExpect(
+																						MockMvcResultMatchers.jsonPath("$[0]['objective']",
+																								Matchers.is(summary.getObjective())))
+																								.andExpect(
+																										MockMvcResultMatchers.jsonPath("$[0]['type']",
+																												Matchers.is(summary.getType())))
+																												.andExpect(
+																														MockMvcResultMatchers.jsonPath("$[0]['startDate']",
+																																Matchers.is(summary.getStartDate())))
+																																.andExpect(
+																																		MockMvcResultMatchers.jsonPath("$[0]['endDate']",
+																																				Matchers.is(summary.getEndDate())))
+																																				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.studyService).listAllStudies();
 	}

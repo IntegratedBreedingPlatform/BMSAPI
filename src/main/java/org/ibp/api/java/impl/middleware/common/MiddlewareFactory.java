@@ -78,7 +78,7 @@ public class MiddlewareFactory {
 
 			// NOTE: This will check weather selected crop db exist or not.
 			// TODO: Add proper exception that handle this scenario.
-			checkIfTheDatabaseExists(selectedCropDB);
+			this.checkIfTheDatabaseExists(selectedCropDB);
 
 			DatabaseConnectionParameters connectionParams = new DatabaseConnectionParameters(
 					this.config.getDbHost(), this.config.getDbPort(), selectedCropDB,
@@ -94,20 +94,22 @@ public class MiddlewareFactory {
 
 	/**
 	 * A raw JDBC connection whose purpose is to check that a database exists.
+	 * 
 	 * @param selectedCropDB
 	 * @throws FileNotFoundException
 	 */
 	private void checkIfTheDatabaseExists(String selectedCropDB) throws FileNotFoundException {
-		
-		// TODO: This method needs to be looked at and refactored. Must be done before we release.
-		try(Connection conn = DriverManager.getConnection(
+
+		// TODO: This method needs to be looked at and refactored. Must be done
+		// before we release.
+		try (Connection conn = DriverManager.getConnection(
 				String.format("jdbc:mysql://%s:%s/%s", this.config.getDbHost(),
-						this.config.getDbPort(), selectedCropDB),
-				this.config.getDbUsername(), this.config.getDbPassword())) {
+						this.config.getDbPort(), selectedCropDB), this.config.getDbUsername(),
+				this.config.getDbPassword())) {
 			// Do nothing
 		} catch (SQLException e) {
 			throw new FileNotFoundException("selected.crop.not.valid");
-		} 
+		}
 	}
 
 	private String getCurrentlySelectedCropDBName() {

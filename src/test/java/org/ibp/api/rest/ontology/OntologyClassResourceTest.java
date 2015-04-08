@@ -62,17 +62,17 @@ public class OntologyClassResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(termList).when(this.ontologyManagerService).getAllTraitClass();
 
 		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders.get("/ontology/{cropname}/classes", cropName)
-								.contentType(this.contentType))
+		.perform(
+				MockMvcRequestBuilders.get("/ontology/{cropname}/classes", cropName)
+				.contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$",
 								IsCollectionWithSize.hasSize(termList.size())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0]",
-								Matchers.is(termList.get(0).getName())))
-				.andDo(MockMvcResultHandlers.print());
+								.andExpect(
+										MockMvcResultMatchers.jsonPath("$[0]",
+												Matchers.is(termList.get(0).getName())))
+												.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).getAllTraitClass();
 	}

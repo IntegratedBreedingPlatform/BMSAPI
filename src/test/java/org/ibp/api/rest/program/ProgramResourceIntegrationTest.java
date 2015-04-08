@@ -12,9 +12,9 @@ public class ProgramResourceIntegrationTest extends ApiUnitTestBase {
 	public void listAllSummariesTest() throws Exception {
 
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.get("/program/list").contentType(this.contentType))
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andDo(MockMvcResultHandlers.print());
+		.perform(MockMvcRequestBuilders.get("/program/list").contentType(this.contentType))
+		.andExpect(MockMvcResultMatchers.status().isOk())
+		.andDo(MockMvcResultHandlers.print());
 	}
 
 }

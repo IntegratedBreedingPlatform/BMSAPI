@@ -41,7 +41,7 @@ public abstract class BaseValidator {
 	/**
 	 * This function is useful to checking object value as null or empty with
 	 * any plain object or from collection
-	 * 
+	 *
 	 * @param value
 	 *            value of object
 	 * @return boolean
@@ -170,7 +170,8 @@ public abstract class BaseValidator {
 	 * @param minValue
 	 *            The minimum value of the field
 	 */
-	protected void addMinValueError(Errors errors, String fieldName, String fieldCode, Integer minValue) {
+	protected void addMinValueError(Errors errors, String fieldName, String fieldCode,
+			Integer minValue) {
 		Object[] arguments = BaseValidator.getCodeAsArgument(fieldCode);
 		arguments = BaseValidator.addArgument(arguments, minValue);
 
@@ -189,7 +190,8 @@ public abstract class BaseValidator {
 	 * @param maxValue
 	 *            The maximum value of the field
 	 */
-	protected void addMaxValueError(Errors errors, String fieldName, String fieldCode, Integer maxValue) {
+	protected void addMaxValueError(Errors errors, String fieldName, String fieldCode,
+			Integer maxValue) {
 		Object[] arguments = BaseValidator.getCodeAsArgument(fieldCode);
 		arguments = BaseValidator.addArgument(arguments, maxValue);
 
@@ -315,8 +317,8 @@ public abstract class BaseValidator {
 	 * @param max
 	 *            The maximum value in the range
 	 */
-	protected void addIntegerRangeError(Errors errors, String fieldName, String fieldCode, Integer min,
-			Integer max) {
+	protected void addIntegerRangeError(Errors errors, String fieldName, String fieldCode,
+			Integer min, Integer max) {
 		Object[] arguments = BaseValidator.getCodeAsArgument(fieldCode);
 		arguments = BaseValidator.addArgument(arguments, min);
 		arguments = BaseValidator.addArgument(arguments, max);

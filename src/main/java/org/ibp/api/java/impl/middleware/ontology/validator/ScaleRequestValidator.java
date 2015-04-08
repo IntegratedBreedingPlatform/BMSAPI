@@ -38,7 +38,7 @@ import com.google.common.base.Strings;
  */
 @Component
 public class ScaleRequestValidator extends OntologyValidator implements
-		org.springframework.validation.Validator {
+org.springframework.validation.Validator {
 
 	static final String CATEGORIES_SHOULD_BE_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE = "scale.categories.should.not.pass.with.non.categorical.data.type";
 	static final String CATEGORIES_NAME_DUPLICATE = "scale.categories.name.duplicate";
@@ -220,7 +220,7 @@ public class ScaleRequestValidator extends OntologyValidator implements
 			}
 
 			ValidValues validValues = request.getValidValues() == null ? new ValidValues()
-					: request.getValidValues();
+			: request.getValidValues();
 			boolean minValuesAreEqual = Objects
 					.equals(validValues.getMin(), oldScale.getMinValue());
 			boolean maxValuesAreEqual = Objects

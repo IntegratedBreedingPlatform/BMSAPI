@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.hamcrest.Matchers;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.ScaleRequest;
 import org.ibp.api.domain.ontology.ValidValues;
@@ -62,7 +62,7 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * List all scales with details
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -79,34 +79,34 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 		scaleList.add(new ScaleBuilder().build(1, this.scaleName + "2",
 				this.scaleDescription + "2", DataType.NUMERIC_VARIABLE, "30", "40", null));
 		scaleList.add(new ScaleBuilder()
-				.build(1, this.scaleName + "3", this.scaleDescription + "3",
-						DataType.CATEGORICAL_VARIABLE, "", "", this.categories));
+		.build(1, this.scaleName + "3", this.scaleDescription + "3",
+				DataType.CATEGORICAL_VARIABLE, "", "", this.categories));
 
 		Mockito.doReturn(scaleList).when(this.ontologyManagerService).getAllScales();
 
 		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders.get("/ontology/{cropname}/scales", cropName)
-								.contentType(this.contentType))
+		.perform(
+				MockMvcRequestBuilders.get("/ontology/{cropname}/scales", cropName)
+				.contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$",
 								IsCollectionWithSize.hasSize(scaleList.size())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(1)))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].name",
-								Matchers.is(scaleList.get(0).getName())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].description",
-								Matchers.is(scaleList.get(0).getDefinition())))
-				.andDo(MockMvcResultHandlers.print());
+								.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(1)))
+								.andExpect(
+										MockMvcResultMatchers.jsonPath("$[0].name",
+												Matchers.is(scaleList.get(0).getName())))
+												.andExpect(
+														MockMvcResultMatchers.jsonPath("$[0].description",
+																Matchers.is(scaleList.get(0).getDefinition())))
+																.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).getAllScales();
 	}
 
 	/**
 	 * Get a scale if exist using given scale id
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -123,23 +123,23 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 				.when(this.ontologyManagerService).getTermById(1);
 
 		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders.get("/ontology/{cropname}/scales/{id}", cropName,
-								String.valueOf(1)).contentType(this.contentType))
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(1)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(scale.getName())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$.description",
-								Matchers.is(scale.getDefinition())))
-				.andDo(MockMvcResultHandlers.print());
+		.perform(
+				MockMvcRequestBuilders.get("/ontology/{cropname}/scales/{id}", cropName,
+						String.valueOf(1)).contentType(this.contentType))
+						.andExpect(MockMvcResultMatchers.status().isOk())
+						.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(1)))
+						.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(scale.getName())))
+						.andExpect(
+								MockMvcResultMatchers.jsonPath("$.description",
+										Matchers.is(scale.getDefinition())))
+										.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).getScaleById(1);
 	}
 
 	/**
 	 * Add new scale with provided data and return id of newly generated scale
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -163,13 +163,14 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 
 		ArgumentCaptor<Scale> captor = ArgumentCaptor.forClass(Scale.class);
 
-		Mockito.doNothing().when(this.ontologyManagerService).addScale(org.mockito.Matchers.any(Scale.class));
+		Mockito.doNothing().when(this.ontologyManagerService)
+				.addScale(org.mockito.Matchers.any(Scale.class));
 
 		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders.post("/ontology/{cropname}/scales", cropName)
-								.contentType(this.contentType)
-								.content(this.convertObjectToByte(scaleRequest)))
+		.perform(
+				MockMvcRequestBuilders.post("/ontology/{cropname}/scales", cropName)
+				.contentType(this.contentType)
+				.content(this.convertObjectToByte(scaleRequest)))
 				.andExpect(MockMvcResultMatchers.status().isCreated())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(0)))
 				.andDo(MockMvcResultHandlers.print());
@@ -179,7 +180,7 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * Update a scale if exist
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -202,15 +203,15 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 		ArgumentCaptor<Scale> captor = ArgumentCaptor.forClass(Scale.class);
 
 		Mockito.doNothing().when(this.ontologyManagerService)
-				.updateScale(org.mockito.Matchers.any(Scale.class));
+		.updateScale(org.mockito.Matchers.any(Scale.class));
 		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scale.getId());
 
 		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders
-								.put("/ontology/{cropname}/scales/{id}", cropName, scale.getId())
-								.contentType(this.contentType)
-								.content(this.convertObjectToByte(scaleRequest)))
+		.perform(
+				MockMvcRequestBuilders
+				.put("/ontology/{cropname}/scales/{id}", cropName, scale.getId())
+				.contentType(this.contentType)
+				.content(this.convertObjectToByte(scaleRequest)))
 				.andExpect(MockMvcResultMatchers.status().isNoContent())
 				.andDo(MockMvcResultHandlers.print());
 
@@ -224,7 +225,7 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 
 	/**
 	 * Delete a scale if exist and not referred
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -241,11 +242,11 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 		Mockito.doNothing().when(this.ontologyManagerService).deleteScale(scale.getId());
 
 		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders.delete("/ontology/{cropname}/scales/{id}", cropName,
-								scale.getId()).contentType(this.contentType))
-				.andExpect(MockMvcResultMatchers.status().isNoContent())
-				.andDo(MockMvcResultHandlers.print());
+		.perform(
+				MockMvcRequestBuilders.delete("/ontology/{cropname}/scales/{id}", cropName,
+						scale.getId()).contentType(this.contentType))
+						.andExpect(MockMvcResultMatchers.status().isNoContent())
+						.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).deleteScale(scale.getId());
 	}
