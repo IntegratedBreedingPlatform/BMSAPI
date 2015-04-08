@@ -8,23 +8,19 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.PropertyRequest;
-import org.ibp.api.java.impl.middleware.ontology.validator.PropertyRequestValidator;
-import org.junit.After;
 import org.junit.Assert;
+import org.mockito.Mockito;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
+import java.util.*;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.MapBindingResult;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 
 public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 
@@ -44,15 +40,15 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
         }
     }
 
-    @Autowired OntologyManagerService ontologyManagerService;
+    @Autowired
+    OntologyManagerService ontologyManagerService;
 
-    @Autowired PropertyRequestValidator propertyRequestValidator;
+    @Autowired
+    PropertyRequestValidator propertyRequestValidator;
 
     Integer cvId = CvId.PROPERTIES.getId();
     String propertyName = "MyProperty";
     String description = "Property Description";
-    List<Term> traitClasses = new ArrayList<>(Arrays.asList(new Term(1, "My Class", "")));
-    List<String> classes = new ArrayList<>(Arrays.asList("My Class"));
 
     @Before
     public void reset(){
@@ -109,28 +105,36 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
      * @throws MiddlewareQueryException
      */
     @Test
-    public void testWithClassNameValidAndNonEmpty() throws MiddlewareQueryException {
+    public void testWithClassNameNonEmptyUniqueValues() throws MiddlewareQueryException {
 
         Mockito.doReturn(null).when(ontologyManagerService).getTermByNameAndCvId(propertyName, cvId);
-        Mockito.doReturn(traitClasses).when(ontologyManagerService).getAllTraitClass();
-
-        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
         PropertyRequest request = new PropertyRequest();
         request.setName(propertyName);
         request.setDescription(description);
 
+        //Assert for no class defined
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
+
         propertyRequestValidator.validate(request, bindingResult);
         Assert.assertTrue(bindingResult.hasErrors());
         Assert.assertNotNull(bindingResult.getFieldError("classes"));
 
+        //Assert for empty class is defined
         bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-        request.setClasses(Arrays.asList("not a valid class"));
-
+        request.setClasses(Collections.singletonList(""));
         propertyRequestValidator.validate(request, bindingResult);
         Assert.assertTrue(bindingResult.hasErrors());
         Assert.assertNotNull(bindingResult.getFieldError("classes[0]"));
+
+        //Assert for duplicate class names
+        bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
+
+        request.setClasses(Arrays.asList("class", "class"));
+        propertyRequestValidator.validate(request, bindingResult);
+        Assert.assertTrue(bindingResult.hasErrors());
+        Assert.assertNotNull(bindingResult.getFieldError("classes"));
     }
 
     /**
@@ -206,14 +210,12 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
     public void testWithValidRequest() throws MiddlewareQueryException {
 
         Mockito.doReturn(null).when(ontologyManagerService).getTermByNameAndCvId(propertyName, cvId);
-        Mockito.doReturn(traitClasses).when(ontologyManagerService).getAllTraitClass();
-
         BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
         PropertyRequest request = new PropertyRequest();
         request.setName(propertyName);
         request.setDescription(description);
-        request.setClasses(classes);
+        request.setClasses(Arrays.asList("Class1", "Class2"));
 
         propertyRequestValidator.validate(request, bindingResult);
         Assert.assertFalse(bindingResult.hasErrors());

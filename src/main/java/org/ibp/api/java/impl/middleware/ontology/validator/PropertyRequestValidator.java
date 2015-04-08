@@ -1,18 +1,17 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.OntologyProjections;
 import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.ontology.PropertyRequest;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
+import org.springframework.stereotype.Component;
 
 /**
  * Request validator for add/edit property
@@ -21,14 +20,14 @@ import java.util.Set;
  3 Name is unique
  4 Description is no more than 255 characters
  5 Classes must be an array containing at least one string
- 6 Each class should contain unique valid value
+ 6 Each class should contain unique value
  7 Name cannot change if the property is already in use
  */
 @Component
 public class PropertyRequestValidator extends OntologyValidator implements org.springframework.validation.Validator{
 
     static final String DUPLICATE_ENTRIES_IN_CLASSES = "property.class.duplicate.entries";
-    static final String INVALID_CLASS_NAME = "property.class.name.not.found";
+    static final String CLASS_SHOULD_NOT_NULL_OR_EMPTY = "property.class.should.not.null.or.empty";
 
     @Override
     public boolean supports(Class<?> aClass) {
@@ -78,11 +77,17 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
             return;
         }
 
-        //6 Each class should contain unique valid value
-        shouldClassesContainValidValue(request.getClasses(), errors);
+        //6 Each class should contain unique values
+        shouldClassesContainUniqueValue(request.getClasses(), errors);
     }
 
-    private void shouldClassesContainValidValue(List<String> classes, Errors errors){
+    private void shouldClassesContainUniqueValue(List<String> classes, Errors errors){
+
+        for(int i=0; i<classes.size(); i++){
+            if(Strings.isNullOrEmpty(classes.get(i))) {
+                addCustomError(errors, "classes[" + i + "]", CLASS_SHOULD_NOT_NULL_OR_EMPTY, null);
+            }
+        }
 
         //Convert to set to check duplication
         Set<String> classesSet = new HashSet<>(classes);
@@ -90,22 +95,6 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
         //If both size are same then there is no duplication of classes
         if(classesSet.size() != classes.size()){
             addCustomError(errors, "classes", DUPLICATE_ENTRIES_IN_CLASSES, null);
-            return;
-        }
-
-        //Trying to see for valid class names
-        try {
-
-            List<String> validClassNames = Util.convertAll(ontologyManagerService.getAllTraitClass(), OntologyProjections.termNameProjection);
-
-            for(int i = 0; i < classes.size(); i++) {
-                if(!validClassNames.contains(classes.get(i))){
-                    addCustomError(errors, "classes[" + i + "]", INVALID_CLASS_NAME, new Object[]{classes.get(i)});
-                }
-            }
-
-        } catch (MiddlewareQueryException e) {
-            logError(e);
         }
     }
 

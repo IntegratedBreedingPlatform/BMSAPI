@@ -50,7 +50,7 @@ public class OntologyMapper {
             map().setName(source.getName());
             map().setDescription(source.getDefinition());
             map().setCropOntologyId(source.getCropOntologyId());
-            map().setClasses(source.getClassNames());
+            map().setClassesFromSet(source.getClasses());
         }
     };
 
@@ -64,7 +64,7 @@ public class OntologyMapper {
             map().setName(source.getName());
             map().setDescription(source.getDefinition());
             map().setCropOntologyId(source.getCropOntologyId());
-            map().setClasses(source.getClassNames());
+            map().setClassesFromSet(source.getClasses());
             map().setEditableFields(new ArrayList<String>());
             map().setDeletable(false);
         }

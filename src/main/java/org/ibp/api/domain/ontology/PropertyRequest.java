@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class PropertyRequest {
 
@@ -56,6 +57,14 @@ public class PropertyRequest {
 
     public void setClasses(List<String> classes) {
         this.classes = classes;
+    }
+
+    public void setClassesFromSet(Set<String> classes){
+        if(classes == null) {
+            return;
+        }
+
+        this.classes = new ArrayList<>(classes);
     }
 
     @Override

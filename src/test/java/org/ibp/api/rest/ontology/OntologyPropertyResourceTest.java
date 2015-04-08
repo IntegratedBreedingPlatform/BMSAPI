@@ -17,9 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -31,7 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 public class OntologyPropertyResourceTest extends ApiUnitTestBase {
-
 
     @Configuration
     public static class TestConfiguration {
@@ -51,11 +48,16 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
         Mockito.reset(ontologyManagerService);
     }
 
-    private final String propertyName = "My Property";
+    private static final String cropName = "maize";
 
-    private final String propertyDescription = "Description";
+    private static final String propertyName = "My Property";
 
-    private final String className = "Study condition";
+    private static final String propertyDescription = "Description";
+
+    private static final String className1 = "Study condition";
+    private static final String className2 = "Biotic stress";
+
+    private static final List<String> classes = new ArrayList<>(Arrays.asList(className1, className2));
 
     @After
     public void validate() {
@@ -65,26 +67,21 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
     @Test
     public void listAllProperties() throws Exception {
 
-        String cropName = "maize";
-
-        List<Term> classList = new ArrayList<>();
-        Term term = new Term(10, propertyName, propertyDescription);
-        classList.add(term);
-
         List<Property> propertyList = new ArrayList<>();
-        propertyList.add(new PropertyBuilder().build(1, "p1", "d1", "CO:000001", classList));
-        propertyList.add(new PropertyBuilder().build(2, "p2", "d2", "CO:000002", classList));
-        propertyList.add(new PropertyBuilder().build(3, "p3", "d3", "CO:000003", classList));
+        propertyList.add(new PropertyBuilder().build(1, "p1", "d1", "CO:000001", classes));
+        propertyList.add(new PropertyBuilder().build(2, "p2", "d2", "CO:000002", classes));
+        propertyList.add(new PropertyBuilder().build(3, "p3", "d3", "CO:000003", classes));
 
         Mockito.doReturn(propertyList).when(ontologyManagerService).getAllProperties();
 
         mockMvc.perform(get("/ontology/{cropname}/properties", cropName).contentType(contentType))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(propertyList.size())))
                 .andExpect(jsonPath("$[0].id", is(1)))
                 .andExpect(jsonPath("$[0].name", is(propertyList.get(0).getName())))
-                .andExpect(jsonPath("$[0].description", is(propertyList.get(0).getDefinition())))
-                .andDo(print());
+                .andExpect(jsonPath("$[0].description", is(propertyList.get(0).getDefinition())));
+
 
         verify(ontologyManagerService, times(1)).getAllProperties();
     }
@@ -97,23 +94,18 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
     @Test
     public void getPropertyById() throws Exception{
 
-        String cropName = "maize";
-
-        List<Term> classList = new ArrayList<>();
-        Term term = new Term(10, propertyName, propertyDescription);
-        classList.add(term);
-
-        Property property = new PropertyBuilder().build(1, "property", "description", "CO:000001" , classList);
+        Property property = new PropertyBuilder().build(1, "property", "description", "CO:000001" , classes);
 
         Mockito.doReturn(new Term(1, property.getName(), property.getDefinition(), CvId.PROPERTIES.getId(), false)).when(ontologyManagerService).getTermById(1);
         Mockito.doReturn(property).when(ontologyManagerService).getProperty(1);
 
         mockMvc.perform(get("/ontology/{cropname}/properties/{id}",cropName, property.getId()).contentType(contentType))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(property.getId())))
                 .andExpect(jsonPath("$.name", is(property.getName())))
-                .andExpect(jsonPath("$.description", is(property.getDefinition())))
-                .andDo(print());
+                .andExpect(jsonPath("$.description", is(property.getDefinition())));
+
 
         verify(ontologyManagerService, times(1)).getProperty(1);
     }
@@ -125,8 +117,6 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
      */
     @Test
     public void getPropertyById_Should_Respond_With_400_For_Invalid_Id() throws Exception{
-
-        String cropName = "maize";
 
         Mockito.doReturn(null).when(ontologyManagerService).getTermById(1);
 
@@ -144,18 +134,15 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
     @Test
     public void addProperty() throws Exception {
 
-        String cropName = "maize";
-
         PropertyRequest propertyDTO = new PropertyRequest();
         propertyDTO.setName(propertyName);
         propertyDTO.setDescription(propertyDescription);
         propertyDTO.setCropOntologyId("CO:000001");
-        propertyDTO.setClasses(new ArrayList<>(Collections.singletonList(className)));
+        propertyDTO.setClasses(new ArrayList<>(Collections.singletonList(className1)));
 
         ArgumentCaptor<Property> captor = ArgumentCaptor.forClass(Property.class);
 
         Mockito.doReturn(null).when(ontologyManagerService).getTermByNameAndCvId(propertyName, CvId.PROPERTIES.getId());
-        Mockito.doReturn(Collections.singletonList(new Term(1, className, ""))).when(ontologyManagerService).getAllTraitClass();
         Mockito.doNothing().when(ontologyManagerService).addProperty(any(Property.class));
 
         mockMvc.perform(post("/ontology/{cropname}/properties", cropName)
@@ -173,24 +160,20 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
     */
     @Test
     public void updateProperty() throws Exception{
-        String cropName = "maize";
 
         PropertyRequest propertyDTO = new PropertyRequest();
         propertyDTO.setName(propertyName);
         propertyDTO.setDescription(propertyDescription);
         propertyDTO.setCropOntologyId("CO:000001");
-        propertyDTO.setClasses(new ArrayList<>(Collections.singletonList(className)));
+        propertyDTO.setClasses(classes);
 
-        List<Term> classList = new ArrayList<>(Collections.singletonList(new Term(1, className, propertyDescription)));
-
-        Property property = new PropertyBuilder().build(11, propertyDTO.getName(), propertyDTO.getDescription(), propertyDTO.getCropOntologyId() , classList);
+        Property property = new PropertyBuilder().build(11, propertyDTO.getName(), propertyDTO.getDescription(), propertyDTO.getCropOntologyId() , classes);
 
         ArgumentCaptor<Property> captor = ArgumentCaptor.forClass(Property.class);
 
         Mockito.doReturn(new Term(11, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false))
                 .when(ontologyManagerService).getTermByNameAndCvId(propertyName, CvId.PROPERTIES.getId());
         Mockito.doReturn(property).when(ontologyManagerService).getProperty(property.getId());
-        Mockito.doReturn(Collections.singletonList(new Term(1, className, ""))).when(ontologyManagerService).getAllTraitClass();
         Mockito.doNothing().when(ontologyManagerService).updateProperty(any(Property.class));
 
         mockMvc.perform(put("/ontology/{cropname}/properties/{id}", cropName, property.getId())
@@ -207,19 +190,16 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
      */
     @Test
     public void deleteProperty() throws Exception{
-        String cropName = "maize";
 
         PropertyRequest propertyDTO = new PropertyRequest();
         propertyDTO.setName(propertyName);
         propertyDTO.setDescription(propertyDescription);
         propertyDTO.setCropOntologyId("CO:000001");
-        propertyDTO.setClasses(new ArrayList<>(Collections.singletonList(className)));
+        propertyDTO.setClasses(classes);
 
         Term term = new Term(10, propertyDTO.getName(), propertyDTO.getDescription(), CvId.PROPERTIES.getId(), false);
-        List<Term> classList = new ArrayList<>();
-        classList.add(new Term(1, className, propertyDescription));
 
-        Property property = new PropertyBuilder().build(10, propertyDTO.getName(), propertyDTO.getDescription(), propertyDTO.getCropOntologyId() , classList);
+        Property property = new PropertyBuilder().build(10, propertyDTO.getName(), propertyDTO.getDescription(), propertyDTO.getCropOntologyId() , classes);
 
         Mockito.doReturn(term).when(ontologyManagerService).getTermById(term.getId());
         Mockito.doReturn(property).when(ontologyManagerService).getProperty(property.getId());

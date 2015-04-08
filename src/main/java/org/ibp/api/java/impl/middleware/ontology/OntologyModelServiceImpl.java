@@ -127,14 +127,8 @@ public class OntologyModelServiceImpl implements OntologyModelService {
         property.setDefinition(request.getDescription());
         property.setCropOntologyId(request.getCropOntologyId());
 
-        List<Term> traitClasses = ontologyManagerService.getAllTraitClass();
-
         for(String c : request.getClasses()){
-            for(Term tc : traitClasses ) {
-                if(tc.getName().equals(c)) {
-                    property.addClass(tc);
-                }
-            }
+            property.addClass(c);
         }
 
         ontologyManagerService.addProperty(property);
@@ -174,14 +168,8 @@ public class OntologyModelServiceImpl implements OntologyModelService {
         property.setDefinition(request.getDescription());
         property.setCropOntologyId(request.getCropOntologyId());
 
-        List<Term> traitClasses = ontologyManagerService.getAllTraitClass();
-
         for(String c : request.getClasses()){
-            for(Term tc : traitClasses ) {
-                if(tc.getName().equals(c)) {
-                    property.addClass(tc);
-                }
-            }
+            property.addClass(c);
         }
 
         ontologyManagerService.updateProperty(property);
