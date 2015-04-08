@@ -1,38 +1,28 @@
 package org.ibp.api.rest.ontology;
 
-import java.util.HashMap;
-import java.util.List;
-
+import com.google.common.base.Strings;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.ibp.api.domain.ontology.GenericResponse;
-import org.ibp.api.domain.ontology.TermRequest;
-import org.ibp.api.domain.ontology.VariableRequest;
-import org.ibp.api.domain.ontology.VariableResponse;
-import org.ibp.api.domain.ontology.VariableSummary;
+import org.ibp.api.domain.ontology.*;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.RequestIdValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableRequestValidator;
-import org.ibp.api.java.ontology.OntologyModelService;
+import org.ibp.api.java.ontology.OntologyVariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import com.google.common.base.Strings;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * NOTE: Work in Progress, Do Not Use API Exposed
@@ -43,8 +33,8 @@ import com.wordnik.swagger.annotations.ApiOperation;
 @RequestMapping("/ontology")
 public class OntologyVariableResource {
 
-	@Autowired
-	private OntologyModelService ontologyModelService;
+  	@Autowired
+	private OntologyVariableService ontologyVariableService;
 
 	@Autowired
 	private RequestIdValidator requestIdValidator;
@@ -87,7 +77,7 @@ public class OntologyVariableResource {
 			}
 			pId = Integer.valueOf(propertyId);
 		}
-		return new ResponseEntity<>(this.ontologyModelService.getAllVariablesByFilter(Integer.valueOf(programId), pId, favourite), HttpStatus.OK);
+		return new ResponseEntity<>(this.ontologyVariableService.getAllVariablesByFilter(Integer.valueOf(programId), pId, favourite), HttpStatus.OK);
 	}
 
 	/**
@@ -114,7 +104,7 @@ public class OntologyVariableResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		return new ResponseEntity<>(this.ontologyModelService.getVariableById(
+		return new ResponseEntity<>(this.ontologyVariableService.getVariableById(
 				Integer.valueOf(programId), Integer.valueOf(id)), HttpStatus.OK);
 	}
 
@@ -133,7 +123,6 @@ public class OntologyVariableResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		return new ResponseEntity<>(this.ontologyModelService.addVariable(request), HttpStatus.CREATED);
+		return new ResponseEntity<>(this.ontologyVariableService.addVariable(request), HttpStatus.CREATED);
 	}
-
 }
