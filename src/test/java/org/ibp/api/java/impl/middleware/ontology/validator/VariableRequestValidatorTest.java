@@ -1,4 +1,4 @@
-package org.ibp.api.impl.middleware.ontology.validator;
+package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;

@@ -1,4 +1,4 @@
-package org.ibp.api.impl.middleware.ontology;
+package org.ibp.api.java.impl.middleware.ontology;
 
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
