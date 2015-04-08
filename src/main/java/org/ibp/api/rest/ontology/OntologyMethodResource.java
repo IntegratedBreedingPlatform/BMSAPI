@@ -67,7 +67,7 @@ public class OntologyMethodResource {
 	/**
 	 * @param cropname The crop for which this rest call is being made
 	 */
-	@ApiOperation(value = "Get method by id", notes = "Get method using given method id")
+	@ApiOperation(value = "Get method by id", notes = "Get method using method id")
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<MethodResponse> getMethodById(@PathVariable String cropname, @PathVariable String id) throws MiddlewareQueryException {
@@ -93,7 +93,7 @@ public class OntologyMethodResource {
 	 * @param cropname The crop for which this rest call is being made
 	 */
 	// TODO: 403 response for user without permission
-	@ApiOperation(value = "Add Method", notes = "Add a Method using Given Data")
+	@ApiOperation(value = "Add Method", notes = "Add a new Method")
 	@RequestMapping(value = "/{cropname}/methods", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addMethod(@PathVariable String cropname, @RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareQueryException {
@@ -115,7 +115,7 @@ public class OntologyMethodResource {
 	 */
 	// TODO: 403 response for user without permission
 	@SuppressWarnings("rawtypes")
-	@ApiOperation(value = "Update Method", notes = "Update Method using Given Data")
+	@ApiOperation(value = "Update Method", notes = "Update a Method by Id")
 	@RequestMapping(value = "/{cropname}/methods/{id:.+}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateMethod(@PathVariable String cropname, @PathVariable String id, @RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
@@ -143,7 +143,7 @@ public class OntologyMethodResource {
 	 */
 	// TODO: 403 response for user without permission
 	@SuppressWarnings("rawtypes")
-	@ApiOperation(value = "Delete Method", notes = "Delete Method using Given Id")
+	@ApiOperation(value = "Delete Method", notes = "Delete Method by Id")
 	@RequestMapping(value = "/{cropname}/methods/{id:.+}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteMethod(@PathVariable String cropname, @PathVariable String id) throws MiddlewareQueryException {
