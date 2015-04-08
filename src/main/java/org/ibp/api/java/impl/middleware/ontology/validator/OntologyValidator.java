@@ -44,6 +44,8 @@ public abstract class OntologyValidator extends BaseValidator {
 	protected static final String TERM_NOT_EDITABLE = "term.not.editable";
 	protected static final String SHOULD_HAVE_VALID_DATA_TYPE = "should.have.valid.data.type";
 	protected static final String CATEGORY_SHOULD_HAVE_AT_LEAST_ONE_ITEM = "category.should.have.at.least.one.item";
+    protected static final String CATEGORY_DESCRIPTION_IS_NECESSARY = "category.description.is.necessary";
+    protected static final String CATEGORY_NAME_IS_NECESSARY = "category.name.is.necessary";
 
 	@Autowired
 	protected OntologyManagerService ontologyManagerService;

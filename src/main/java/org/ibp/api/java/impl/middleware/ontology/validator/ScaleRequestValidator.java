@@ -155,7 +155,7 @@ org.springframework.validation.Validator {
 		if (this.isNonNullValidNumericString(minValue)
 				&& this.isNonNullValidNumericString(maxValue)
 				&& this.getIntegerValueSafe(minValue, 0) > this.getIntegerValueSafe(maxValue, 0)) {
-			this.addCustomError(errors, "validValues", OntologyValidator.MIN_MAX_NOT_VALID, null);
+			this.addCustomError(errors, "validValues.min", OntologyValidator.MIN_MAX_NOT_VALID, null);
 		}
 	}
 
@@ -169,14 +169,28 @@ org.springframework.validation.Validator {
 				String name = nameDescription.getName();
 				String value = nameDescription.getDescription();
 
-				if (Strings.isNullOrEmpty(name) || labels.contains(nameDescription.getName())) {
+				if(Strings.isNullOrEmpty(value)){
+					this.addCustomError(errors, "validValues.categories[" + i + "].description",
+						  OntologyValidator.CATEGORY_DESCRIPTION_IS_NECESSARY, null);
+				}
+
+				if(Strings.isNullOrEmpty(name)){
+					this.addCustomError(errors, "validValues.categories[" + i + "].name",
+						  OntologyValidator.CATEGORY_NAME_IS_NECESSARY, null);
+				}
+
+				if (errors.hasErrors()) {
+					return;
+				}
+
+				if (labels.contains(name)) {
 					this.addCustomError(errors, "validValues.categories[" + i + "].name",
 							ScaleRequestValidator.CATEGORIES_NAME_DUPLICATE, null);
 				} else {
 					labels.add(nameDescription.getName());
 				}
 
-				if (Strings.isNullOrEmpty(value) || values.contains(value)) {
+				if (values.contains(value)) {
 					this.addCustomError(errors, "validValues.categories[" + i + "].description",
 							ScaleRequestValidator.CATEGORIES_DESCRIPTION_DUPLICATE, null);
 				} else {
@@ -221,10 +235,8 @@ org.springframework.validation.Validator {
 
 			ValidValues validValues = request.getValidValues() == null ? new ValidValues()
 			: request.getValidValues();
-			boolean minValuesAreEqual = Objects
-					.equals(validValues.getMin(), oldScale.getMinValue());
-			boolean maxValuesAreEqual = Objects
-					.equals(validValues.getMax(), oldScale.getMaxValue());
+			boolean minValuesAreEqual = Objects.equals(validValues.getMin(), oldScale.getMinValue());
+			boolean maxValuesAreEqual = Objects.equals(validValues.getMax(), oldScale.getMaxValue());
 			List<NameDescription> categories = validValues.getCategories() == null ? new ArrayList<NameDescription>()
 					: validValues.getCategories();
 			boolean categoriesEqualSize = Objects.equals(categories.size(), oldScale
