@@ -12,7 +12,7 @@ import org.ibp.api.domain.ontology.VariableRequest;
 import org.ibp.api.domain.ontology.VariableResponse;
 import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.ontology.validator.ProgramValidator;
+import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.RequestIdValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableRequestValidator;
@@ -87,8 +87,7 @@ public class OntologyVariableResource {
 			}
 			pId = Integer.valueOf(propertyId);
 		}
-		return new ResponseEntity<>(this.ontologyModelService.getAllVariablesByFilter(
-				Integer.valueOf(programId), pId, favourite), HttpStatus.OK);
+		return new ResponseEntity<>(this.ontologyModelService.getAllVariablesByFilter(Integer.valueOf(programId), pId, favourite), HttpStatus.OK);
 	}
 
 	/**
@@ -100,8 +99,8 @@ public class OntologyVariableResource {
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<VariableResponse> getVariableById(@PathVariable String cropname,
-			@RequestParam(value = "programId") String programId, @PathVariable String id)
-					throws MiddlewareQueryException, MiddlewareException {
+															@RequestParam(value = "programId") String programId, @PathVariable String id)
+			throws MiddlewareQueryException, MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
 				"Variable");
 		this.programValidator.validate(programId, bindingResult);
@@ -128,14 +127,13 @@ public class OntologyVariableResource {
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addVariable(@PathVariable String cropname,
-			@RequestBody VariableRequest request, BindingResult bindingResult)
+													   @RequestBody VariableRequest request, BindingResult bindingResult)
 					throws MiddlewareQueryException, MiddlewareException {
 		this.variableRequestValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		return new ResponseEntity<>(this.ontologyModelService.addVariable(request),
-				HttpStatus.CREATED);
+		return new ResponseEntity<>(this.ontologyModelService.addVariable(request), HttpStatus.CREATED);
 	}
 
 }
