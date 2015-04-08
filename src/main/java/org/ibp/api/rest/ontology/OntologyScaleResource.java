@@ -7,6 +7,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.ibp.api.domain.ontology.*;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.CropNameValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.RequestIdValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.ScaleRequestValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
@@ -43,6 +44,10 @@ public class OntologyScaleResource {
 	@Autowired
 	private TermDeletableValidator termDeletableValidator;
 
+	@Autowired
+	private CropNameValidator cropNameValidator;
+
+
 	/**
 	 * @param cropname
 	 *            The name of the crop which is we wish to retrieve variable
@@ -51,8 +56,12 @@ public class OntologyScaleResource {
 	@ApiOperation(value = "All Scales", notes = "Get all scales")
 	@RequestMapping(value = "/{cropname}/scales", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<ScaleSummary>> listAllScale(@PathVariable String cropname)
-			throws MiddlewareQueryException {
+	public ResponseEntity<List<ScaleSummary>> listAllScale(@PathVariable String cropname)throws MiddlewareQueryException {
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+		this.cropNameValidator.validate(cropname, bindingResult);
+		if(bindingResult.hasErrors()){
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
 		return new ResponseEntity<>(this.ontologyScaleService.getAllScales(), HttpStatus.OK);
 	}
 
@@ -67,6 +76,10 @@ public class OntologyScaleResource {
 	public ResponseEntity<ScaleResponse> getScaleById(@PathVariable String cropname,
 			@PathVariable String id) throws MiddlewareQueryException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+		this.cropNameValidator.validate(cropname, bindingResult);
+		if(bindingResult.hasErrors()){
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
 		this.requestIdValidator.validate(id, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -91,6 +104,10 @@ public class OntologyScaleResource {
 	public ResponseEntity<GenericResponse> addScale(@PathVariable String cropname,
 			@RequestBody ScaleRequest request, BindingResult bindingResult)
 					throws MiddlewareQueryException, MiddlewareException {
+		this.cropNameValidator.validate(cropname, bindingResult);
+		if(bindingResult.hasErrors()){
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
 		this.scaleRequestValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -108,16 +125,20 @@ public class OntologyScaleResource {
 	@RequestMapping(value = "/{cropname}/scales/{id:.+}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateScale(@PathVariable String cropname, @PathVariable String id,
-			@RequestBody ScaleRequest request, BindingResult result)
+			@RequestBody ScaleRequest request, BindingResult bindingResult)
 					throws MiddlewareQueryException, MiddlewareException, ApiRequestValidationException {
-		this.requestIdValidator.validate(id, result);
-		if (result.hasErrors()) {
-			throw new ApiRequestValidationException(result.getAllErrors());
+		this.cropNameValidator.validate(cropname, bindingResult);
+		if(bindingResult.hasErrors()){
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+		this.requestIdValidator.validate(id, bindingResult);
+		if (bindingResult.hasErrors()) {
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 		request.setId(Integer.valueOf(id));
-		this.scaleRequestValidator.validate(request, result);
-		if (result.hasErrors()) {
-			throw new ApiRequestValidationException(result.getAllErrors());
+		this.scaleRequestValidator.validate(request, bindingResult);
+		if (bindingResult.hasErrors()) {
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 		this.ontologyScaleService.updateScale(request);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -135,6 +156,10 @@ public class OntologyScaleResource {
 	public ResponseEntity deleteScale(@PathVariable String cropname, @PathVariable String id)
 			throws MiddlewareQueryException, MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+		this.cropNameValidator.validate(cropname, bindingResult);
+		if(bindingResult.hasErrors()){
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
 		this.requestIdValidator.validate(id, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());

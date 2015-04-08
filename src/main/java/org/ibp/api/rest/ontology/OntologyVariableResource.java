@@ -1,13 +1,18 @@
 package org.ibp.api.rest.ontology;
 
-import com.google.common.base.Strings;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.HashMap;
+import java.util.List;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.ibp.api.domain.ontology.*;
+import org.ibp.api.domain.ontology.GenericResponse;
+import org.ibp.api.domain.ontology.TermRequest;
+import org.ibp.api.domain.ontology.VariableRequest;
+import org.ibp.api.domain.ontology.VariableResponse;
+import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.common.validator.CropNameValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.RequestIdValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
@@ -19,10 +24,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
-import java.util.List;
+import com.google.common.base.Strings;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 /**
  * NOTE: Work in Progress, Do Not Use API Exposed
@@ -33,7 +44,10 @@ import java.util.List;
 @RequestMapping("/ontology")
 public class OntologyVariableResource {
 
-  	@Autowired
+	@Autowired
+	private CropNameValidator cropNameValidator;
+
+	@Autowired
 	private OntologyVariableService ontologyVariableService;
 
 	@Autowired
@@ -50,18 +64,21 @@ public class OntologyVariableResource {
 
 	/**
 	 * @param cropname
-	 *            The name of the crop which is we wish to retrieve variable
-	 *            types.
+	 *            The name of the crop which is we wish to retrieve variables.
 	 */
 	@ApiOperation(value = "All variables", notes = "Gets all variables.")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<VariableSummary>> listAllVariables(@PathVariable String cropname,
-			@RequestParam(value = "property", required = false) String propertyId,
-			@RequestParam(value = "favourite", required = false) Boolean favourite,
-			@RequestParam(value = "programId") String programId) throws MiddlewareQueryException {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Variable");
+																  @RequestParam(value = "property", required = false) String propertyId,
+																  @RequestParam(value = "favourite", required = false) Boolean favourite,
+																  @RequestParam(value = "programId") String programId) throws MiddlewareQueryException {
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		this.cropNameValidator.validate(cropname, bindingResult);
+		if(bindingResult.hasErrors()){
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
 		this.programValidator.validate(programId, bindingResult);
 
 		if (bindingResult.hasErrors()) {
@@ -82,47 +99,53 @@ public class OntologyVariableResource {
 
 	/**
 	 * @param cropname
-	 *            The name of the crop which is we wish to retrieve variable
-	 *            types.
+	 *            The name of the crop which is we wish to retrieve variable.
 	 */
 	@ApiOperation(value = "Get Variable", notes = "Get Variable By Id")
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<VariableResponse> getVariableById(@PathVariable String cropname,
-															@RequestParam(value = "programId") String programId, @PathVariable String id)
-			throws MiddlewareQueryException, MiddlewareException {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Variable");
+															@RequestParam(value = "programId") String programId,
+															@PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		this.cropNameValidator.validate(cropname, bindingResult);
+		if(bindingResult.hasErrors()){
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
 		this.programValidator.validate(programId, bindingResult);
 		this.requestIdValidator.validate(id, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		TermRequest request = new TermRequest(Integer.valueOf(id), "variable",
-				CvId.VARIABLES.getId());
+		TermRequest request = new TermRequest(Integer.valueOf(id), "variable", CvId.VARIABLES.getId());
 		this.termValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		return new ResponseEntity<>(this.ontologyVariableService.getVariableById(
-				Integer.valueOf(programId), Integer.valueOf(id)), HttpStatus.OK);
+		return new ResponseEntity<>(this.ontologyVariableService.getVariableById(Integer.valueOf(programId), Integer.valueOf(id)), HttpStatus.OK);
 	}
 
 	/**
 	 * @param cropname
-	 *            The name of the crop which is we wish to retrieve variable
-	 *            types.
+	 *            The name of the crop which is we wish to add variable.
 	 */
 	@ApiOperation(value = "Add Variable", notes = "Add new variable using given data")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> addVariable(@PathVariable String cropname,
-													   @RequestBody VariableRequest request, BindingResult bindingResult)
-					throws MiddlewareQueryException, MiddlewareException {
+	public ResponseEntity<GenericResponse> addVariable(@PathVariable String cropname, @RequestBody VariableRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
+
+		this.cropNameValidator.validate(cropname, bindingResult);
+		if(bindingResult.hasErrors()){
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
 		this.variableRequestValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 		return new ResponseEntity<>(this.ontologyVariableService.addVariable(request), HttpStatus.CREATED);
 	}
+
 }

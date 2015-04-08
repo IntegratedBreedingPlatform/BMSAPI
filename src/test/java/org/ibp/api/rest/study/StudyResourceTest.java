@@ -3,6 +3,8 @@ package org.ibp.api.rest.study;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.study.StudySummary;
@@ -23,12 +25,22 @@ public class StudyResourceTest extends ApiUnitTestBase {
 
 	@Configuration
 	public static class TestConfiguration {
+
+		@Bean
+		@Primary
+		public WorkbenchDataManager workbenchDataManager() {
+			return Mockito.mock(WorkbenchDataManager.class);
+		}
+
 		@Bean
 		@Primary
 		public StudyService getStudyService() {
 			return Mockito.mock(StudyService.class);
 		}
 	}
+
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
 	private StudyService studyService;
@@ -47,37 +59,21 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		summary.setEndDate("01012015");
 		summaries.add(summary);
 
+		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.when(this.studyService.listAllStudies()).thenReturn(summaries);
 
-		this.mockMvc
-		.perform(
-				MockMvcRequestBuilders.get("/study/{cropname}/list", "maize").contentType(
-						this.contentType))
-						.andExpect(MockMvcResultMatchers.status().isOk())
-						.andExpect(
-								MockMvcResultMatchers.jsonPath("$",
-										IsCollectionWithSize.hasSize(summaries.size())))
-										.andExpect(
-												MockMvcResultMatchers.jsonPath("$[0]['id']", Matchers.is(summary.getId())))
-												.andExpect(
-														MockMvcResultMatchers.jsonPath("$[0]['name']",
-																Matchers.is(summary.getName())))
-																.andExpect(
-																		MockMvcResultMatchers.jsonPath("$[0]['title']",
-																				Matchers.is(summary.getTitle())))
-																				.andExpect(
-																						MockMvcResultMatchers.jsonPath("$[0]['objective']",
-																								Matchers.is(summary.getObjective())))
-																								.andExpect(
-																										MockMvcResultMatchers.jsonPath("$[0]['type']",
-																												Matchers.is(summary.getType())))
-																												.andExpect(
-																														MockMvcResultMatchers.jsonPath("$[0]['startDate']",
-																																Matchers.is(summary.getStartDate())))
-																																.andExpect(
-																																		MockMvcResultMatchers.jsonPath("$[0]['endDate']",
-																																				Matchers.is(summary.getEndDate())))
-																																				.andDo(MockMvcResultHandlers.print());
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/study/{cropname}/list", "maize")
+				.contentType(this.contentType))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(summaries.size())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['id']", Matchers.is(summary.getId())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['name']", Matchers.is(summary.getName())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['title']", Matchers.is(summary.getTitle())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['objective']", Matchers.is(summary.getObjective())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['type']", Matchers.is(summary.getType())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['startDate']", Matchers.is(summary.getStartDate())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['endDate']", Matchers.is(summary.getEndDate())))
+				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.studyService).listAllStudies();
 	}

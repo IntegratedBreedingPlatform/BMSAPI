@@ -18,8 +18,6 @@ public class OntologyDataTypeResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllDataTypes() throws Exception {
 
-		String cropName = "maize";
-
 		List<Term> termList = new ArrayList<>();
 		Term term = new Term(1048, "Categorical", "");
 		termList.add(term);
@@ -30,20 +28,12 @@ public class OntologyDataTypeResourceTest extends ApiUnitTestBase {
 		term = new Term(1120, "Date", "");
 		termList.add(term);
 
-		this.mockMvc
-		.perform(
-				MockMvcRequestBuilders.get("/ontology/{cropname}/datatypes", cropName)
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/datatypes")
 				.contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$",
-								IsCollectionWithSize.hasSize(termList.size())))
-								.andExpect(
-										MockMvcResultMatchers.jsonPath("$[0].id",
-												Matchers.is(termList.get(0).getId())))
-												.andExpect(
-														MockMvcResultMatchers.jsonPath("$[0].name",
-																Matchers.is(termList.get(0).getName())))
-																.andDo(MockMvcResultHandlers.print());
+				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(termList.size())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(termList.get(0).getId())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is(termList.get(0).getName())))
+				.andDo(MockMvcResultHandlers.print());
 	}
 }

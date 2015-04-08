@@ -27,8 +27,9 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 @Ignore
 public class ApiUnitTestBase {
 
-	protected final MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
-			MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
+	protected final MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
+
+	protected final String cropName = "maize";
 
 	protected MockMvc mockMvc;
 
@@ -54,8 +55,8 @@ public class ApiUnitTestBase {
 	/**
 	 * Utility Method to generate random string of given length
 	 *
-	 * @param len
-	 * @return
+	 * @param len length of random string
+	 * @return String generated string
 	 */
 	public String randomString(int len) {
 		final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

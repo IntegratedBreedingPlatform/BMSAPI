@@ -20,12 +20,7 @@ public class OntologyVariableTypeResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void listAllVariableTypes() throws Exception {
-
-		String cropName = "maize";
-
-		this.mockMvc
-		.perform(
-				MockMvcRequestBuilders.get("/ontology/{cropname}/variableTypes", cropName)
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/variableTypes")
 				.contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(9)))

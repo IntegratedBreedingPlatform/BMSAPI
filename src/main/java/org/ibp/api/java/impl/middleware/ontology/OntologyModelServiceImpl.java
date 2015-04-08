@@ -24,17 +24,6 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 	private OntologyManagerService ontologyManagerService;
 
 	@Override
-	public List<VariableTypeResponse> getAllVariableTypes() {
-
-		return Util.convertAll(Arrays.asList(VariableType.values()), new Function<VariableType, VariableTypeResponse>() {
-
-			@Override public VariableTypeResponse apply(VariableType variableType) {
-			  	return new VariableTypeResponse(variableType.getId(), variableType.getName(), variableType.getDescription());
-			}
-		});
-	}
-
-  	@Override
 	public List<IdName> getAllDataTypes() throws MiddlewareQueryException {
 		return Util.convertAll(Arrays.asList(DataType.values()), new Function<DataType, IdName>() {
 
@@ -56,5 +45,17 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 		return classList;
 	}
 
+	@Override
+	public List<VariableTypeResponse> getAllVariableTypes() {
 
+		return Util.convertAll(Arrays.asList(VariableType.values()),
+				new Function<VariableType, VariableTypeResponse>() {
+
+					@Override
+					public VariableTypeResponse apply(VariableType variableType) {
+						return new VariableTypeResponse(variableType.getId(), variableType
+								.getName(), variableType.getDescription());
+					}
+				});
+	}
 }
