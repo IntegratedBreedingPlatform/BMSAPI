@@ -1,44 +1,35 @@
 package org.ibp.api.rest.ontology;
 
-import java.util.HashMap;
-import java.util.List;
-
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.ibp.api.domain.ontology.GenericResponse;
-import org.ibp.api.domain.ontology.ScaleRequest;
-import org.ibp.api.domain.ontology.ScaleResponse;
-import org.ibp.api.domain.ontology.ScaleSummary;
-import org.ibp.api.domain.ontology.TermRequest;
+import org.ibp.api.domain.ontology.*;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.ontology.validator.RequestIdValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.ScaleRequestValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
-import org.ibp.api.java.ontology.OntologyModelService;
+import org.ibp.api.java.ontology.OntologyScaleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.HashMap;
+import java.util.List;
 
 @Api(value = "Ontology Scale Service")
 @Controller
 @RequestMapping("/ontology")
 public class OntologyScaleResource {
 
-	@Autowired
-	private OntologyModelService ontologyModelService;
+  	@Autowired
+	private OntologyScaleService ontologyScaleService;
 
 	@Autowired
 	private TermValidator termValidator;
@@ -62,7 +53,7 @@ public class OntologyScaleResource {
 	@ResponseBody
 	public ResponseEntity<List<ScaleSummary>> listAllScale(@PathVariable String cropname)
 			throws MiddlewareQueryException {
-		return new ResponseEntity<>(this.ontologyModelService.getAllScales(), HttpStatus.OK);
+		return new ResponseEntity<>(this.ontologyScaleService.getAllScales(), HttpStatus.OK);
 	}
 
 	/**
@@ -85,7 +76,7 @@ public class OntologyScaleResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		return new ResponseEntity<>(this.ontologyModelService.getScaleById(Integer.valueOf(id)),
+		return new ResponseEntity<>(this.ontologyScaleService.getScaleById(Integer.valueOf(id)),
 				HttpStatus.OK);
 	}
 
@@ -104,7 +95,7 @@ public class OntologyScaleResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		return new ResponseEntity<>(this.ontologyModelService.addScale(request), HttpStatus.CREATED);
+		return new ResponseEntity<>(this.ontologyScaleService.addScale(request), HttpStatus.CREATED);
 	}
 
 	/**
@@ -128,7 +119,7 @@ public class OntologyScaleResource {
 		if (result.hasErrors()) {
 			throw new ApiRequestValidationException(result.getAllErrors());
 		}
-		this.ontologyModelService.updateScale(request);
+		this.ontologyScaleService.updateScale(request);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
@@ -153,7 +144,7 @@ public class OntologyScaleResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		this.ontologyModelService.deleteScale(Integer.valueOf(id));
+		this.ontologyScaleService.deleteScale(Integer.valueOf(id));
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }

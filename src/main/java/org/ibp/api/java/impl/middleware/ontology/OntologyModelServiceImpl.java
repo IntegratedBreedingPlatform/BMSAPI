@@ -13,10 +13,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-
-import static org.generationcp.middleware.domain.oms.DataType.CATEGORICAL_VARIABLE;
-import static org.generationcp.middleware.domain.oms.DataType.NUMERIC_VARIABLE;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class OntologyModelServiceImpl implements OntologyModelService {
@@ -24,9 +24,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 	@Autowired
 	private OntologyManagerService ontologyManagerService;
 
-	private final String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
-
-	@Override
+  @Override
 	public List<IdName> getAllDataTypes() throws MiddlewareQueryException {
 		return Util.convertAll(Arrays.asList(DataType.values()), new Function<DataType, IdName>() {
 
@@ -46,95 +44,6 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 			classList.add(term.getName());
 		}
 		return classList;
-	}
-
-	@Override
-	public List<ScaleSummary> getAllScales() throws MiddlewareQueryException {
-		List<Scale> scales = this.ontologyManagerService.getAllScales();
-		List<ScaleSummary> scaleSummaries = new ArrayList<>();
-
-		ModelMapper mapper = OntologyMapper.scaleMapper();
-
-		for (Scale scale : scales) {
-			ScaleSummary scaleSummary = mapper.map(scale, ScaleSummary.class);
-			scaleSummaries.add(scaleSummary);
-		}
-		return scaleSummaries;
-	}
-
-	@Override
-	public ScaleResponse getScaleById(Integer id) throws MiddlewareQueryException {
-		Scale scale = this.ontologyManagerService.getScaleById(id);
-		if (scale == null) {
-			return null;
-		}
-		boolean deletable = true;
-		if (this.ontologyManagerService.isTermReferred(id)) {
-			deletable = false;
-		}
-		ModelMapper mapper = OntologyMapper.scaleMapper();
-		ScaleResponse response = mapper.map(scale, ScaleResponse.class);
-		if (!deletable) {
-			response.setEditableFields(new ArrayList<>(Collections
-					.singletonList(this.FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
-		} else {
-			response.setEditableFields(new ArrayList<>(Arrays.asList("name", "description",
-					"validValues")));
-		}
-		response.setDeletable(deletable);
-		return response;
-	}
-
-	@Override
-	public GenericResponse addScale(ScaleRequest request) throws MiddlewareQueryException,
-			MiddlewareException {
-		Scale scale = new Scale();
-		scale.setName(request.getName());
-		scale.setDefinition(request.getDescription());
-
-		scale.setDataType(DataType.getById(request.getDataTypeId()));
-
-		if (Objects.equals(request.getDataTypeId(), CATEGORICAL_VARIABLE.getId())) {
-			for (NameDescription description : request.getValidValues().getCategories()) {
-				scale.addCategory(description.getName(), description.getDescription());
-			}
-		}
-		if (Objects.equals(request.getDataTypeId(), NUMERIC_VARIABLE.getId())) {
-			scale.setMinValue(request.getValidValues().getMin());
-			scale.setMaxValue(request.getValidValues().getMax());
-		}
-
-		this.ontologyManagerService.addScale(scale);
-		return new GenericResponse(scale.getId());
-	}
-
-	@Override
-	public void updateScale(ScaleRequest request) throws MiddlewareQueryException,
-			MiddlewareException {
-		Scale scale = new Scale(new Term(request.getId(), request.getName(),
-				request.getDescription()));
-
-		scale.setDataType(DataType.getById(request.getDataTypeId()));
-
-		ValidValues validValues = Objects.equals(request.getValidValues(), null) ? new ValidValues()
-				: request.getValidValues();
-
-		if (Objects.equals(request.getDataTypeId(), CATEGORICAL_VARIABLE.getId())) {
-			for (NameDescription description : validValues.getCategories()) {
-				scale.addCategory(description.getName(), description.getDescription());
-			}
-		}
-		if (Objects.equals(request.getDataTypeId(), NUMERIC_VARIABLE.getId())) {
-			scale.setMinValue(validValues.getMin());
-			scale.setMaxValue(validValues.getMax());
-		}
-
-		this.ontologyManagerService.updateScale(scale);
-	}
-
-	@Override
-	public void deleteScale(Integer id) throws MiddlewareQueryException, MiddlewareException {
-		this.ontologyManagerService.deleteScale(id);
 	}
 
 	@Override
@@ -181,11 +90,12 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 		}
 		ModelMapper mapper = OntologyMapper.variableResponseMapper();
 		VariableResponse response = mapper.map(ontologyVariable, VariableResponse.class);
-		if (!deletable) {
-			response.setEditableFields(new ArrayList<>(Collections
-					.singletonList(this.FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
+	  String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
+	  if (!deletable) {
+		  response.setEditableFields(new ArrayList<>(Collections
+					.singletonList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
 		} else {
-			response.setEditableFields(new ArrayList<>(Arrays.asList("name", "description",
+			response.setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED,
 					"alias", "cropOntologyId", "variableTypeIds", "propertySummary",
 					"methodSummary", "scale", "expectedRange")));
 		}
