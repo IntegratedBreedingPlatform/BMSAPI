@@ -1,38 +1,28 @@
 package org.ibp.api.rest.ontology;
 
-import java.util.HashMap;
-import java.util.List;
-
+import com.google.common.base.Strings;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.ibp.api.domain.ontology.GenericResponse;
-import org.ibp.api.domain.ontology.PropertyRequest;
-import org.ibp.api.domain.ontology.PropertyResponse;
-import org.ibp.api.domain.ontology.PropertySummary;
-import org.ibp.api.domain.ontology.TermRequest;
+import org.ibp.api.domain.ontology.*;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.ontology.validator.PropertyRequestValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.RequestIdValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
-import org.ibp.api.java.ontology.OntologyModelService;
+import org.ibp.api.java.ontology.OntologyPropertyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import com.google.common.base.Strings;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.HashMap;
+import java.util.List;
 
 @Api(value = "Ontology Property Service")
 @Controller
@@ -52,7 +42,7 @@ public class OntologyPropertyResource {
 	private TermDeletableValidator deletableValidator;
 
 	@Autowired
-	private OntologyModelService ontologyModelService;
+	private OntologyPropertyService ontologyPropertyService;
 
 	/**
 	 * @param cropname
@@ -66,10 +56,10 @@ public class OntologyPropertyResource {
 			@RequestParam(value = "class", defaultValue = "", required = false) String className)
 					throws MiddlewareQueryException {
 		if (Strings.isNullOrEmpty(className)) {
-			List<PropertySummary> propertyList = this.ontologyModelService.getAllProperties();
+			List<PropertySummary> propertyList = this.ontologyPropertyService.getAllProperties();
 			return new ResponseEntity<>(propertyList, HttpStatus.OK);
 		}
-		List<PropertySummary> propertyList = this.ontologyModelService
+		List<PropertySummary> propertyList = this.ontologyPropertyService
 				.getAllPropertiesByClass(className);
 		return new ResponseEntity<>(propertyList, HttpStatus.OK);
 
@@ -96,7 +86,7 @@ public class OntologyPropertyResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		return new ResponseEntity<>(this.ontologyModelService.getProperty(Integer.valueOf(id)),
+		return new ResponseEntity<>(this.ontologyPropertyService.getProperty(Integer.valueOf(id)),
 				HttpStatus.OK);
 	}
 
@@ -115,7 +105,7 @@ public class OntologyPropertyResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		return new ResponseEntity<>(this.ontologyModelService.addProperty(request),
+		return new ResponseEntity<>(this.ontologyPropertyService.addProperty(request),
 				HttpStatus.CREATED);
 	}
 
@@ -143,7 +133,7 @@ public class OntologyPropertyResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		this.ontologyModelService.deleteProperty(Integer.valueOf(id));
+		this.ontologyPropertyService.deleteProperty(Integer.valueOf(id));
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
@@ -168,7 +158,7 @@ public class OntologyPropertyResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		this.ontologyModelService.updateProperty(Integer.valueOf(id), request);
+		this.ontologyPropertyService.updateProperty(Integer.valueOf(id), request);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }
