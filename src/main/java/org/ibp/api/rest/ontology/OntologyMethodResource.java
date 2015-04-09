@@ -68,7 +68,7 @@ public class OntologyMethodResource {
 	 * @param cropname The crop for which this rest call is being made
 	 */
 	@ApiOperation(value = "Get method by id", notes = "Get method using method id")
-	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropname}/methods/{id:.+}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<MethodResponse> getMethodById(@PathVariable String cropname, @PathVariable String id) throws MiddlewareQueryException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
