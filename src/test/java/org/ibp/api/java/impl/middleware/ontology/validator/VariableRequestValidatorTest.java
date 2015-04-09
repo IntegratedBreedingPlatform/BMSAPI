@@ -328,42 +328,6 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	}
 
 	/**
-	 * Test for scale data type does not exist or null
-	 *
-	 * @throws MiddlewareQueryException
-	 */
-	@Test
-	public void testWithScaleDataTypeNull() throws MiddlewareQueryException {
-
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Variable");
-
-		String scaleName = "Scale Name";
-		String scaleDescription = "Scale Description";
-		VariableRequest request = new VariableRequest();
-		request.setName(this.variableName);
-		request.setDescription(this.description);
-		request.setPropertyId(10);
-		request.setMethodId(11);
-		request.setScaleId(12);
-
-		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, null, "", "", null);
-
-		Mockito.doReturn(new Term(10, "pName", "", CvId.PROPERTIES.getId(), false))
-		.when(this.ontologyManagerService).getTermById(request.getPropertyId());
-		Mockito.doReturn(new Term(11, "mName", "", CvId.METHODS.getId(), false))
-		.when(this.ontologyManagerService).getTermById(request.getMethodId());
-		Mockito.doReturn(new Term(12, scaleName, scaleDescription, CvId.SCALES.getId(), false))
-		.when(this.ontologyManagerService).getTermById(request.getScaleId());
-		Mockito.doReturn(scale).when(this.ontologyManagerService)
-		.getScaleById(request.getScaleId());
-
-		this.variableRequestValidator.validate(request, bindingResult);
-		Assert.assertTrue(bindingResult.hasErrors());
-		Assert.assertNotNull(bindingResult.getFieldError("scaleId"));
-	}
-
-	/**
 	 * Test for scale data type non numeric and expected range given in request
 	 *
 	 * @throws MiddlewareQueryException

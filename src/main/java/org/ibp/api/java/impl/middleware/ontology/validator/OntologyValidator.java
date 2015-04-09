@@ -27,7 +27,6 @@ public abstract class OntologyValidator extends BaseValidator {
 	protected static final String MIN_MAX_NOT_EXPECTED = "scale.min.max.should.not.supply.when.data.type.non.numeric";
 	protected static final String VALUE_SHOULD_BE_NUMERIC = "value.should.be.numeric";
 	protected static final String MIN_MAX_NOT_VALID = "scale.min.max.not.valid";
-	protected static final String SCALE_DOES_NOT_HAVE_DATA_TYPE = "scale.does.not.have.data.type";
 	protected static final String METHOD_PROPERTY_SCALE_COMBINATION_EXIST = "method.property.scale.combination.already.exist";
 	protected static final String EXPECTED_MIN_SHOULD_NOT_LESSER_THAN_SCALE_MIN = "expected.min.should.not.be.smaller";
 	protected static final String EXPECTED_MAX_SHOULD_NOT_GREATER_THAN_SCALE_MAX = "expected.max.should.not.be.greater";
@@ -83,12 +82,6 @@ public abstract class OntologyValidator extends BaseValidator {
 			this.addCustomError(errors, "name", OntologyValidator.SHOULD_BE_UNIQUE, null);
 		} catch (MiddlewareQueryException e) {
 			this.log.error("Error checking uniqueness of term name", e);
-		}
-	}
-
-	protected void checkDataTypeNull(String fieldName, Scale scale, Errors errors) {
-		if (scale.getDataType() == null) {
-			this.addCustomError(errors, fieldName, OntologyValidator.SCALE_DOES_NOT_HAVE_DATA_TYPE, null);
 		}
 	}
 

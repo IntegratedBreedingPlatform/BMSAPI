@@ -103,12 +103,6 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 		// scales data type is numeric
 		Scale scale = this.getScaleData(request.getScaleId());
 
-		this.checkDataTypeNull("scaleId", scale, errors);
-
-		if (errors.hasErrors()) {
-			return;
-		}
-
 		boolean isNumericType = this.checkNumericDataType(scale.getDataType());
 		if (!isNumericType && !request.getExpectedRange().getMin().isEmpty()
 				&& !request.getExpectedRange().getMax().isEmpty()) {
@@ -161,7 +155,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 		// 15. If provided, the expected range minimum must be less than or
 		// equal to the expected range maximum, and the expected range maximum
 		// must be greater than or equal to the expected range minimum
-		if (this.getIntegerValueSafe(request.getExpectedRange().getMin(), 0) > this
+		if (isNumericType && this.getIntegerValueSafe(request.getExpectedRange().getMin(), 0) > this
 				.getIntegerValueSafe(request.getExpectedRange().getMax(), 0)) {
 			this.addCustomError(errors, "expectedRange", OntologyValidator.EXPECTED_MIN_SHOULD_NOT_BE_GREATER_THAN_MAX, null);
 		}
