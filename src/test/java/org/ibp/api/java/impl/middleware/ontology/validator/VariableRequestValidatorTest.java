@@ -493,7 +493,7 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 
 		this.variableRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
-		Assert.assertNotNull(bindingResult.getFieldError("expectedRange"));
+		Assert.assertNotNull(bindingResult.getFieldError("expectedRange.min"));
 	}
 
 	/**
@@ -636,6 +636,7 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 		request.setMethodId(11);
 		request.setScaleId(12);
 		request.setExpectedRange(expectedRange);
+	  	request.setVariableTypeIds(new ArrayList<Integer>());
 
 		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,
 				DataType.NUMERIC_VARIABLE, "10", "20", null);
