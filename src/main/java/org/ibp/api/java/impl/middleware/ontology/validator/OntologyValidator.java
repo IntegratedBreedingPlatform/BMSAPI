@@ -23,8 +23,7 @@ public abstract class OntologyValidator extends BaseValidator {
 	protected static final String NAME_LENGTH_SHOULD_NOT_EXCEED_200_CHARS = "name.should.not.exceed.max.chars";
 	protected static final String NAME_LENGTH_SHOULD_NOT_EXCEED_32_CHARS = "variable.name.should.not.exceed.max.chars";
 	protected static final String DESCRIPTION_LENGTH_SHOULD_NOT_EXCEED_255_CHARS = "description.should.not.exceed.max.chars";
-	protected static final String NAME_SHOULD_NOT_HAVE_SPECIAL_CHARACTERS = "name.should.not.have.special.character";
-	protected static final String FIRST_CHARACTER_SHOULD_NOT_BE_NUMERIC = "first.character.should.not.be.numeric";
+	protected static final String NAME_SHOULD_NOT_HAVE_SPECIAL_CHARACTERS_AND_NOT_START_WITH_DIGIT = "name.should.not.have.special.character.and.first.digit";
 	protected static final String MIN_MAX_NOT_EXPECTED = "scale.min.max.should.not.supply.when.data.type.non.numeric";
 	protected static final String VALUE_SHOULD_BE_NUMERIC = "value.should.be.numeric";
 	protected static final String MIN_MAX_NOT_VALID = "scale.min.max.not.valid";
@@ -32,6 +31,7 @@ public abstract class OntologyValidator extends BaseValidator {
 	protected static final String METHOD_PROPERTY_SCALE_COMBINATION_EXIST = "method.property.scale.combination.already.exist";
 	protected static final String EXPECTED_MIN_SHOULD_NOT_LESSER_THAN_SCALE_MIN = "expected.min.should.not.be.smaller";
 	protected static final String EXPECTED_MAX_SHOULD_NOT_GREATER_THAN_SCALE_MAX = "expected.max.should.not.be.greater";
+  	protected static final String EXPECTED_MIN_SHOULD_NOT_BE_GREATER_THAN_MAX = "expected.range.min.should.not.be.greater.than.max";
 	protected static final String SHOULD_BE_STRING = "should.be.string";
 	protected static final String TERM_NOT_EDITABLE = "term.not.editable";
 	protected static final String SHOULD_HAVE_VALID_DATA_TYPE = "should.have.valid.data.type";
@@ -39,6 +39,7 @@ public abstract class OntologyValidator extends BaseValidator {
     protected static final String CATEGORY_DESCRIPTION_IS_NECESSARY = "category.description.is.necessary";
     protected static final String CATEGORY_NAME_IS_NECESSARY = "category.name.is.necessary";
   	protected static final String CLASS_LENGTH_SHOULD_NOT_EXCEED_200_CHARS = "class.should.not.exceed.max.chars";
+  	protected static final String VARIABLE_TYPE_ID_IS_REQUIRED = "variable.type.id.is.required";
 
 	@Autowired
 	protected OntologyManagerService ontologyManagerService;
@@ -123,14 +124,11 @@ public abstract class OntologyValidator extends BaseValidator {
 	}
 
 	protected void nameShouldNotHaveSpecialCharacterAndNoDigitInStart(String fieldName, String value, Errors errors) {
-		Pattern regex = Pattern.compile("[$&+,:;=?@#|]");
+		Pattern regex = Pattern.compile("[$&+,./%')\\[}\\]{(*^!`~:;=?@#|]");
 		Matcher matcher = regex.matcher(value);
 
-		if (matcher.find()) {
-			this.addCustomError(errors, fieldName, OntologyValidator.NAME_SHOULD_NOT_HAVE_SPECIAL_CHARACTERS, null);
-		}
-		if (Character.isDigit(value.charAt(0))) {
-			this.addCustomError(errors, fieldName, OntologyValidator.FIRST_CHARACTER_SHOULD_NOT_BE_NUMERIC, null);
+		if (matcher.find() || Character.isDigit(value.charAt(0))) {
+			this.addCustomError(errors, fieldName, OntologyValidator.NAME_SHOULD_NOT_HAVE_SPECIAL_CHARACTERS_AND_NOT_START_WITH_DIGIT, null);
 		}
 	}
 

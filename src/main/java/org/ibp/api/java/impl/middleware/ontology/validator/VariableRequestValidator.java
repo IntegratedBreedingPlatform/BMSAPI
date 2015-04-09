@@ -28,7 +28,8 @@ import org.springframework.validation.Validator;
  * maximum must be greater than or equal to the expected range minimum 16. The
  * combination of property, method and scale must not already exist 17. If
  * present, Variable type IDs must be an array of integer values (or an empty
- * array)
+ * array) 18. Variable type IDs must be an array of integer values that correspond
+ * to the IDs of variable types and contain at least one item
  */
 
 @Component
@@ -145,14 +146,14 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 		if (isNumericType) {
 			if (this.getIntegerValueSafe(request.getExpectedRange().getMin(), 0) < this
 					.getIntegerValueSafe(scale.getMinValue(), 0)) {
-				this.addCustomError(errors, "expectedRange",
-						OntologyValidator.EXPECTED_MIN_SHOULD_NOT_LESSER_THAN_SCALE_MIN, null);
+				this.addCustomError(errors, "expectedRange.min",
+						OntologyValidator.EXPECTED_MIN_SHOULD_NOT_LESSER_THAN_SCALE_MIN, new Object[] { scale.getMinValue(), scale.getMaxValue() });
 				return;
 			}
 			if (this.getIntegerValueSafe(request.getExpectedRange().getMax(), 0) > this
 					.getIntegerValueSafe(scale.getMaxValue(), 0)) {
-				this.addCustomError(errors, "expectedRange",
-						OntologyValidator.EXPECTED_MAX_SHOULD_NOT_GREATER_THAN_SCALE_MAX, null);
+				this.addCustomError(errors, "expectedRange.max",
+						OntologyValidator.EXPECTED_MAX_SHOULD_NOT_GREATER_THAN_SCALE_MAX, new Object[] { scale.getMinValue(), scale.getMaxValue() });
 				return;
 			}
 		}
@@ -162,22 +163,23 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 		// must be greater than or equal to the expected range minimum
 		if (this.getIntegerValueSafe(request.getExpectedRange().getMin(), 0) > this
 				.getIntegerValueSafe(request.getExpectedRange().getMax(), 0)) {
-			this.addCustomError(errors, "expectedRange", OntologyValidator.MIN_MAX_NOT_VALID, null);
+			this.addCustomError(errors, "expectedRange", OntologyValidator.EXPECTED_MIN_SHOULD_NOT_BE_GREATER_THAN_MAX, null);
 		}
 
 		// 16. The combination of property, method and scale must not already
 		// exist
-		this.checkIfMethodPropertyScaleCombination("methodId", request.getMethodId(),
-				request.getPropertyId(), request.getScaleId(), errors);
+		this.checkIfMethodPropertyScaleCombination("methodId", request.getMethodId(), request.getPropertyId(), request.getScaleId(), errors);
 
-		// 17. If present, Variable type IDs must be an array of integer values
-		// (or an empty array)
-		this.shouldNotNullOrEmpty("variableTypeIds", request.getVariableTypeIds(), errors);
+		// 17. Variable type IDs is required
+	  	if(request.getVariableTypeIds().isEmpty()){
+		  	this.addCustomError(errors, "variableTypeIds", OntologyValidator.VARIABLE_TYPE_ID_IS_REQUIRED, null);
+		}
 
 		if (errors.hasErrors()) {
 			return;
 		}
 
+	  	// 18. Variable type IDs must be an array of integer values that correspond to the IDs of variable types and contain at least one item
 		for (Integer i : request.getVariableTypeIds()) {
 			this.shouldHaveValidVariableType("variableTypeIds", i, errors);
 		}
