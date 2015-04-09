@@ -3,10 +3,10 @@ package org.ibp.api.rest.study;
 import java.util.HashMap;
 import java.util.List;
 
+import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.CropNameValidator;
-import org.ibp.api.java.ontology.OntologyVariableService;
 import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,6 +49,13 @@ public class StudyResource {
 		}
 
 		return new ResponseEntity<>(this.studyService.listAllStudies(), HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "Get all observations", notes = "Returns observations available in the study.")
+	@RequestMapping(value = "/{cropname}/{studyId}/observations", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<Observation>> getObservations(@PathVariable String cropname, @PathVariable Integer studyId) {
+		return new ResponseEntity<>(studyService.getObservations(studyId), HttpStatus.OK);
 	}
 
 }
