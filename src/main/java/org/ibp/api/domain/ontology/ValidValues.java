@@ -12,7 +12,7 @@ public class ValidValues {
 
 	private String min;
 	private String max;
-	private List<NameDescription> categories;
+	private List<VariableCategory> categories;
 
 	public ValidValues() {
 	}
@@ -33,7 +33,7 @@ public class ValidValues {
 		this.max = max;
 	}
 
-	public List<NameDescription> getCategories() {
+	public List<VariableCategory> getCategories() {
 		return this.categories;
 	}
 
@@ -42,7 +42,7 @@ public class ValidValues {
 		this.mapCategories(categories);
 	}
 
-	public void setCategories(List<NameDescription> categories) {
+	public void setCategories(List<VariableCategory> categories) {
 		this.categories = categories;
 	}
 
@@ -50,7 +50,7 @@ public class ValidValues {
 		if (suppliedCategories != null) {
 			this.categories = new ArrayList<>();
 			for (String k : suppliedCategories.keySet()) {
-				this.categories.add(new NameDescription(k, suppliedCategories.get(k)));
+				this.categories.add(new VariableCategory(k, suppliedCategories.get(k)));
 			}
 		}
 	}

@@ -1,16 +1,15 @@
+
 package org.ibp.api.domain.ontology;
 
-public class NameDescription {
+public class VariableCategory {
 
 	private String name;
-
 	private String description;
 
-	public NameDescription() {
-
+	public VariableCategory() {
 	}
 
-	public NameDescription(String name, String description) {
+	public VariableCategory(String name, String description) {
 		this.name = name;
 		this.description = description;
 	}

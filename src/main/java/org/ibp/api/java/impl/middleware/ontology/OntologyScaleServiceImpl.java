@@ -69,8 +69,8 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 		scale.setDataType(DataType.getById(request.getDataTypeId()));
 
 		if (Objects.equals(request.getDataTypeId(), CATEGORICAL_VARIABLE.getId())) {
-			for (NameDescription description : request.getValidValues().getCategories()) {
-				scale.addCategory(description.getName(), description.getDescription());
+			for (VariableCategory categoty : request.getValidValues().getCategories()) {
+				scale.addCategory(categoty.getName(), categoty.getDescription());
 			}
 		}
 		if (Objects.equals(request.getDataTypeId(), NUMERIC_VARIABLE.getId())) {
@@ -94,7 +94,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 				: request.getValidValues();
 
 		if (Objects.equals(request.getDataTypeId(), CATEGORICAL_VARIABLE.getId())) {
-			for (NameDescription description : validValues.getCategories()) {
+			for (VariableCategory description : validValues.getCategories()) {
 				scale.addCategory(description.getName(), description.getDescription());
 			}
 		}

@@ -10,7 +10,7 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.ibp.api.domain.ontology.NameDescription;
+import org.ibp.api.domain.ontology.VariableCategory;
 import org.ibp.api.domain.ontology.ScaleRequest;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.springframework.stereotype.Component;
@@ -101,7 +101,7 @@ org.springframework.validation.Validator {
 
 		String minValue = validValues.getMin();
 		String maxValue = validValues.getMax();
-		List<NameDescription> categories = validValues.getCategories();
+		List<VariableCategory> categories = validValues.getCategories();
 
 		// 5. If the data type is categorical, at least one category must be
 		// submitted
@@ -159,15 +159,15 @@ org.springframework.validation.Validator {
 		}
 	}
 
-	private void validateCategoriesForUniqueness(List<NameDescription> categories,
+	private void validateCategoriesForUniqueness(List<VariableCategory> categories,
 			DataType dataType, Errors errors) {
 		if (categories != null && Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)) {
 			Set<String> labels = new HashSet<>();
 			Set<String> values = new HashSet<>();
 			for (int i = 0; i < categories.size(); i++) {
-				NameDescription nameDescription = categories.get(i);
-				String name = nameDescription.getName();
-				String value = nameDescription.getDescription();
+				VariableCategory category = categories.get(i);
+				String name = category.getName();
+				String value = category.getDescription();
 
 				if(Strings.isNullOrEmpty(value)){
 					this.addCustomError(errors, "validValues.categories[" + i + "].description",
@@ -187,14 +187,14 @@ org.springframework.validation.Validator {
 					this.addCustomError(errors, "validValues.categories[" + i + "].name",
 							ScaleRequestValidator.CATEGORIES_NAME_DUPLICATE, null);
 				} else {
-					labels.add(nameDescription.getName());
+					labels.add(category.getName());
 				}
 
 				if (values.contains(value)) {
 					this.addCustomError(errors, "validValues.categories[" + i + "].description",
 							ScaleRequestValidator.CATEGORIES_DESCRIPTION_DUPLICATE, null);
 				} else {
-					values.add(nameDescription.getDescription());
+					values.add(category.getDescription());
 				}
 			}
 		}
@@ -237,13 +237,13 @@ org.springframework.validation.Validator {
 			: request.getValidValues();
 			boolean minValuesAreEqual = Objects.equals(validValues.getMin(), oldScale.getMinValue());
 			boolean maxValuesAreEqual = Objects.equals(validValues.getMax(), oldScale.getMaxValue());
-			List<NameDescription> categories = validValues.getCategories() == null ? new ArrayList<NameDescription>()
+			List<VariableCategory> categories = validValues.getCategories() == null ? new ArrayList<VariableCategory>()
 					: validValues.getCategories();
 			boolean categoriesEqualSize = Objects.equals(categories.size(), oldScale
 					.getCategories().size());
 			boolean categoriesValuesAreSame = true;
 			if (categoriesEqualSize) {
-				for (NameDescription l : categories) {
+				for (VariableCategory l : categories) {
 					if (oldScale.getCategories().containsKey(l.getName())
 							&& Objects.equals(oldScale.getCategories().get(l.getName()),
 									l.getDescription())) {

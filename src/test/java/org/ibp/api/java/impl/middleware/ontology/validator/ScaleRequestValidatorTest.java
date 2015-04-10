@@ -10,7 +10,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.domain.ontology.NameDescription;
+import org.ibp.api.domain.ontology.VariableCategory;
 import org.ibp.api.domain.ontology.ScaleRequest;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.junit.After;
@@ -165,8 +165,8 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 	public void testWithNoCategoryDataTypeWithCategoricalData() {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
-		List<NameDescription> categories = new ArrayList<>();
-		categories.add(new NameDescription("1", "description"));
+		List<VariableCategory> categories = new ArrayList<>();
+		categories.add(new VariableCategory("1", "description"));
 
 		ValidValues validValues = new ValidValues();
 		validValues.setCategories(categories);
@@ -190,9 +190,9 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 	public void testWithUniqueLabelNameInCategoricalDataType() {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
-		List<NameDescription> categories = new ArrayList<>();
-		categories.add(new NameDescription("1", "description"));
-		categories.add(new NameDescription("1", "description1"));
+		List<VariableCategory> categories = new ArrayList<>();
+		categories.add(new VariableCategory("1", "description"));
+		categories.add(new VariableCategory("1", "description1"));
 
 		ValidValues validValues = new ValidValues();
 		validValues.setCategories(categories);
@@ -215,9 +215,9 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 	public void testWithMinMaxValueNonNumericDataType() {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
-		List<NameDescription> categories = new ArrayList<>();
-		categories.add(new NameDescription("1", "description"));
-		categories.add(new NameDescription("11", "description1"));
+		List<VariableCategory> categories = new ArrayList<>();
+		categories.add(new VariableCategory("1", "description"));
+		categories.add(new VariableCategory("11", "description1"));
 
 		ValidValues validValues = new ValidValues();
 		validValues.setMin("5");
@@ -330,9 +330,9 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 	public void testWithValidRequest() {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
-		List<NameDescription> categories = new ArrayList<>();
-		categories.add(new NameDescription("1", "description"));
-		categories.add(new NameDescription("11", "description1"));
+		List<VariableCategory> categories = new ArrayList<>();
+		categories.add(new VariableCategory("1", "description"));
+		categories.add(new VariableCategory("11", "description1"));
 
 		ValidValues validValues = new ValidValues();
 		validValues.setCategories(categories);
