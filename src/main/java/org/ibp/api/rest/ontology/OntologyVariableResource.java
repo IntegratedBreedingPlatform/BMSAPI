@@ -6,7 +6,7 @@ import java.util.List;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.ibp.api.domain.ontology.GenericResponse;
+import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.TermRequest;
 import org.ibp.api.domain.ontology.VariableRequest;
 import org.ibp.api.domain.ontology.VariableResponse;

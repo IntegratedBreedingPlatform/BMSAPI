@@ -4,7 +4,7 @@ import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
-import org.ibp.api.domain.ontology.GenericResponse;
+import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.PropertyRequest;
 import org.ibp.api.domain.ontology.PropertyResponse;
 import org.ibp.api.domain.ontology.PropertySummary;

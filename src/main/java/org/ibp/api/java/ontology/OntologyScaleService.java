@@ -2,7 +2,7 @@ package org.ibp.api.java.ontology;
 
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.ibp.api.domain.ontology.GenericResponse;
+import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.ScaleRequest;
 import org.ibp.api.domain.ontology.ScaleResponse;
 import org.ibp.api.domain.ontology.ScaleSummary;

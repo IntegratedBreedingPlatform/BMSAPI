@@ -1,4 +1,4 @@
-package org.ibp.api.domain.ontology;
+package org.ibp.api.domain.common;
 
 public class GenericResponse {
 
