@@ -18,7 +18,7 @@ import com.google.common.base.Strings;
  * than 200 characters 3 Name is unique 4 Description is no more than 255
  * characters 5 Classes must be an array containing at least one string 6 Each
  * class should contain unique value 7 Name cannot change if the property is
- * already in use
+ * already in use 8 Individual classes may not be longer than 200 characters each
  */
 @Component
 public class PropertyRequestValidator extends OntologyValidator implements
@@ -44,7 +44,7 @@ public class PropertyRequestValidator extends OntologyValidator implements
 
 		PropertyRequest request = (PropertyRequest) target;
 
-		// 7 Name cannot change if the method is already in use
+		// 7 Name cannot change if the property is already in use
 		this.propertyShouldBeEditable(request, errors);
 
 		// Need to return from here because we should not check other
@@ -94,6 +94,7 @@ public class PropertyRequestValidator extends OntologyValidator implements
 				this.addCustomError(errors, "classes[" + i + "]",
 						PropertyRequestValidator.CLASS_SHOULD_NOT_NULL_OR_EMPTY, null);
 			}else {
+			  //8 Individual classes may not be longer than 200 characters each
 			  this.classShouldHaveMax200Chars("classes", classes.get(i), errors);
 			}
 		}
