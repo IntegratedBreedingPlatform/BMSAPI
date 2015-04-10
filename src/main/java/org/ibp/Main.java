@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
@@ -40,6 +41,11 @@ public class Main extends WebMvcConfigurerAdapter {
 		templateResolver.setCacheable(false);
 
 		return templateResolver;
+	}
+
+	@Override
+	public void configurePathMatch(PathMatchConfigurer configurer) {
+		configurer.setUseSuffixPatternMatch(false);
 	}
 
 	@Override

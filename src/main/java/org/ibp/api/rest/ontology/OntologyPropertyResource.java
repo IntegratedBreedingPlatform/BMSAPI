@@ -131,7 +131,7 @@ public class OntologyPropertyResource {
 	// TODO: 403 response for user without permission
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Delete Property", notes = "Delete Property using Given Id")
-	@RequestMapping(value = "/{cropname}/properties/{id:.+}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteProperty(@PathVariable String cropname, @PathVariable String id)
 			throws MiddlewareQueryException, MiddlewareException {
@@ -162,7 +162,7 @@ public class OntologyPropertyResource {
 	// TODO: 403 response for user without permission
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Update Property", notes = "Update Property using Given Data")
-	@RequestMapping(value = "/{cropname}/properties/{id:.+}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateProperty(@PathVariable String cropname, @PathVariable String id,
 			@RequestBody PropertyRequest request, BindingResult bindingResult)

@@ -124,7 +124,7 @@ public class OntologyScaleResource {
 	 */
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Update Scale", notes = "Update existing scale using detail")
-	@RequestMapping(value = "/{cropname}/scales/{id:.+}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateScale(@PathVariable String cropname, @PathVariable String id,
 			@RequestBody ScaleRequest request, BindingResult bindingResult)
@@ -153,7 +153,7 @@ public class OntologyScaleResource {
 	 */
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Delete Scale", notes = "Delete Scale using Given Id")
-	@RequestMapping(value = "/{cropname}/scales/{id:.+}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteScale(@PathVariable String cropname, @PathVariable String id)
 			throws MiddlewareQueryException, MiddlewareException {

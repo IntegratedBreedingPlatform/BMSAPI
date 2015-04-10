@@ -1,11 +1,10 @@
 package org.ibp.api.rest.ontology;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.hamcrest.Matchers;
@@ -23,7 +22,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OntologyVariableResourceTest extends ApiUnitTestBase {
 
@@ -93,6 +93,7 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 
 		variableSummaries.add(variableSummary);
 
+	  	Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(variableSummaries).when(this.ontologyManagerService).getWithFilter(programId, null, null, null, null);
 		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectById(Long.valueOf(programId));
 

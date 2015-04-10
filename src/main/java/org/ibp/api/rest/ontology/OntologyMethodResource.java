@@ -69,7 +69,7 @@ public class OntologyMethodResource {
 	 * @param cropname The crop for which this rest call is being made
 	 */
 	@ApiOperation(value = "Get method by id", notes = "Get method using method id")
-	@RequestMapping(value = "/{cropname}/methods/{id:.+}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<MethodResponse> getMethodById(@PathVariable String cropname, @PathVariable String id) throws MiddlewareQueryException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
@@ -117,7 +117,7 @@ public class OntologyMethodResource {
 	// TODO: 403 response for user without permission
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Update Method", notes = "Update a Method by Id")
-	@RequestMapping(value = "/{cropname}/methods/{id:.+}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateMethod(@PathVariable String cropname, @PathVariable String id, @RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
 
@@ -145,7 +145,7 @@ public class OntologyMethodResource {
 	// TODO: 403 response for user without permission
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Delete Method", notes = "Delete Method by Id")
-	@RequestMapping(value = "/{cropname}/methods/{id:.+}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteMethod(@PathVariable String cropname, @PathVariable String id) throws MiddlewareQueryException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
