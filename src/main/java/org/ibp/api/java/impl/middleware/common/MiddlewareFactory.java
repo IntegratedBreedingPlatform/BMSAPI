@@ -12,12 +12,15 @@ import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.generationcp.middleware.service.api.OntologyService;
+import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+
 import javax.annotation.PreDestroy;
 
 @Configuration
@@ -83,6 +87,12 @@ public class MiddlewareFactory {
 	public FieldbookService getFieldbookService() throws FileNotFoundException {
 		return new FieldbookServiceImpl(new HibernateSessionPerRequestProvider(
 				this.getSessionFactory()), this.getCurrentlySelectedCropDBName());
+	}
+	
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public StudyService getStudyService() throws FileNotFoundException {
+		return new StudyServiceImpl(new HibernateSessionPerRequestProvider(this.getSessionFactory()));
 	}
 
 	@Bean
