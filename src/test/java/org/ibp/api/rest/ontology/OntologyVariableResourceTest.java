@@ -5,7 +5,6 @@ import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
@@ -24,6 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class OntologyVariableResourceTest extends ApiUnitTestBase {
 
@@ -48,6 +48,8 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
+
+	private final String programUuid = UUID.randomUUID().toString();
 
 	private final String variableName = "Variable Name";
 	private final String variableDescription = "Variable Description";
@@ -79,12 +81,6 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllVariables() throws Exception {
 
-		Integer programId = 1;
-
-		Project project = new Project();
-		project.setProjectId(Long.valueOf(programId));
-		project.setProjectName("Maize Test");
-
 		List<OntologyVariableSummary> variableSummaries = new ArrayList<>();
 		OntologyVariableSummary variableSummary = new VariableBuilder().build(1, this.variableName, this.variableDescription,
 				new TermSummary(11, this.methodName, this.methodDescription),
@@ -94,10 +90,10 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 		variableSummaries.add(variableSummary);
 
 	  	Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
-		Mockito.doReturn(variableSummaries).when(this.ontologyManagerService).getWithFilter(programId, null, null, null, null);
-		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectById(Long.valueOf(programId));
+		Mockito.doReturn(variableSummaries).when(this.ontologyManagerService).getWithFilter(programUuid, null, null, null, null);
+		//Mockito.doReturn(project).when(this.workbenchDataManager).getProjectById(Long.valueOf(programId));
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/variables?programId=" + programId.toString(),cropName)
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/variables?programId=" + programUuid,cropName)
 				.contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(variableSummaries.size())))
@@ -106,6 +102,6 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(variableSummaries.get(0).getDescription())))
 				.andDo(MockMvcResultHandlers.print());
 
-		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).getWithFilter(programId, null, null, null, null);
+		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).getWithFilter(programUuid, null, null, null, null);
 	}
 }

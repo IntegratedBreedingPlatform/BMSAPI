@@ -21,7 +21,7 @@ public interface OntologyVariableService {
 	 * @return list of variables
 	 * @throws MiddlewareQueryException
 	 */
-	List<VariableSummary> getAllVariablesByFilter(Integer programId, Integer propertyId, Boolean favourite) throws MiddlewareQueryException;
+	List<VariableSummary> getAllVariablesByFilter(String programId, Integer propertyId, Boolean favourite) throws MiddlewareQueryException;
 
 	/**
 	 * Get variable using given id
@@ -34,7 +34,7 @@ public interface OntologyVariableService {
 	 * @throws MiddlewareQueryException
 	 * @throws MiddlewareException
 	 */
-	VariableResponse getVariableById(Integer programId, Integer variableId) throws MiddlewareQueryException, MiddlewareException;
+	VariableResponse getVariableById(String programId, Integer variableId) throws MiddlewareException;
 
 	/**
 	 * Add variable using given data
@@ -45,5 +45,5 @@ public interface OntologyVariableService {
 	 * @throws MiddlewareQueryException
 	 * @throws MiddlewareException
 	 */
-	GenericResponse addVariable(VariableRequest request) throws MiddlewareQueryException, MiddlewareException;
+	GenericResponse addVariable(VariableRequest request) throws MiddlewareException;
 }

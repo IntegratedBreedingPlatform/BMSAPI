@@ -94,7 +94,7 @@ public class OntologyVariableResource {
 			}
 			pId = Integer.valueOf(propertyId);
 		}
-		return new ResponseEntity<>(this.ontologyVariableService.getAllVariablesByFilter(Integer.valueOf(programId), pId, favourite), HttpStatus.OK);
+		return new ResponseEntity<>(this.ontologyVariableService.getAllVariablesByFilter(programId, pId, favourite), HttpStatus.OK);
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class OntologyVariableResource {
 	@ResponseBody
 	public ResponseEntity<VariableResponse> getVariableById(@PathVariable String cropname,
 															@RequestParam(value = "programId") String programId,
-															@PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
+															@PathVariable String id) throws MiddlewareException {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 		this.cropNameValidator.validate(cropname, bindingResult);
@@ -124,7 +124,7 @@ public class OntologyVariableResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		return new ResponseEntity<>(this.ontologyVariableService.getVariableById(Integer.valueOf(programId), Integer.valueOf(id)), HttpStatus.OK);
+		return new ResponseEntity<>(this.ontologyVariableService.getVariableById(programId, Integer.valueOf(id)), HttpStatus.OK);
 	}
 
 	/**
@@ -134,7 +134,7 @@ public class OntologyVariableResource {
 	@ApiOperation(value = "Add Variable", notes = "Add new variable using given data")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> addVariable(@PathVariable String cropname, @RequestBody VariableRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
+	public ResponseEntity<GenericResponse> addVariable(@PathVariable String cropname, @RequestBody VariableRequest request, BindingResult bindingResult) throws MiddlewareException {
 
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){

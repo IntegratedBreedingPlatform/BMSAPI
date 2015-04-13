@@ -2,15 +2,10 @@ package org.ibp.api.domain.ontology;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class VariableRequest {
 
-	@JsonIgnore
 	private Integer id;
-	@JsonIgnore
-	private Integer programId;
-
+	private String programId;
 	private String name;
 	private String description;
 	private Integer propertyId;
@@ -19,11 +14,11 @@ public class VariableRequest {
 	private List<Integer> variableTypeIds;
 	private ExpectedRange expectedRange;
 
-	public Integer getProgramId() {
+	public String getProgramId() {
 		return this.programId;
 	}
 
-	public void setProgramId(Integer programId) {
+	public void setProgramId(String programId) {
 		this.programId = programId;
 	}
 

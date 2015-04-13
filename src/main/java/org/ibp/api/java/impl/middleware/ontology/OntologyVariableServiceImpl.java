@@ -30,7 +30,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
     private OntologyManagerService ontologyManagerService;
 
     @Override
-    public List<VariableSummary> getAllVariablesByFilter(Integer programId, Integer propertyId, Boolean favourite) throws MiddlewareQueryException {
+    public List<VariableSummary> getAllVariablesByFilter(String programId, Integer propertyId, Boolean favourite) throws MiddlewareQueryException {
         List<OntologyVariableSummary> variableSummaries = this.ontologyManagerService.getWithFilter(programId, favourite, null, propertyId, null);
         List<VariableSummary> variableSummaryList = new ArrayList<>();
 
@@ -44,7 +44,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
     }
 
     @Override
-    public VariableResponse getVariableById(Integer programId, Integer variableId) throws MiddlewareQueryException, MiddlewareException {
+    public VariableResponse getVariableById(String programId, Integer variableId) throws MiddlewareException {
         OntologyVariable ontologyVariable = this.ontologyManagerService.getVariable(programId, variableId);
 
         if (ontologyVariable == null) {
@@ -70,7 +70,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
     }
 
     @Override
-    public GenericResponse addVariable(VariableRequest request) throws MiddlewareQueryException, MiddlewareException {
+    public GenericResponse addVariable(VariableRequest request) throws MiddlewareException {
         OntologyVariableInfo variableInfo = new OntologyVariableInfo();
         variableInfo.setName(request.getName());
         variableInfo.setDescription(request.getDescription());
