@@ -111,8 +111,9 @@ public class OntologyPropertyResource {
 	@RequestMapping(value = "/{cropname}/properties", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addProperty(@PathVariable String cropname,
-			@RequestBody PropertyRequest request, BindingResult bindingResult)
+			@RequestBody PropertyRequest request)
 					throws MiddlewareQueryException, MiddlewareException {
+	  	BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -165,8 +166,9 @@ public class OntologyPropertyResource {
 	@RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateProperty(@PathVariable String cropname, @PathVariable String id,
-			@RequestBody PropertyRequest request, BindingResult bindingResult)
+			@RequestBody PropertyRequest request)
 					throws MiddlewareQueryException, MiddlewareException {
+	  	BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
