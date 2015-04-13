@@ -104,8 +104,9 @@ public class OntologyScaleResource {
 	@RequestMapping(value = "/{cropname}/scales", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addScale(@PathVariable String cropname,
-			@RequestBody ScaleRequest request, BindingResult bindingResult)
-					throws MiddlewareQueryException, MiddlewareException {
+			@RequestBody ScaleRequest request)
+					throws MiddlewareException {
+	  	BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -127,8 +128,9 @@ public class OntologyScaleResource {
 	@RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateScale(@PathVariable String cropname, @PathVariable String id,
-			@RequestBody ScaleRequest request, BindingResult bindingResult)
-					throws MiddlewareQueryException, MiddlewareException, ApiRequestValidationException {
+			@RequestBody ScaleRequest request)
+					throws MiddlewareException, ApiRequestValidationException {
+	  	BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -156,7 +158,7 @@ public class OntologyScaleResource {
 	@RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteScale(@PathVariable String cropname, @PathVariable String id)
-			throws MiddlewareQueryException, MiddlewareException {
+			throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){

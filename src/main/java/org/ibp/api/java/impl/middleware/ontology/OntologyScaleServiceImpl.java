@@ -61,7 +61,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 	}
 
 	@Override
-	public GenericResponse addScale(ScaleRequest request) throws MiddlewareQueryException, MiddlewareException {
+	public GenericResponse addScale(ScaleRequest request) throws MiddlewareException {
 		Scale scale = new Scale();
 		scale.setName(request.getName());
 		scale.setDefinition(request.getDescription());
@@ -83,8 +83,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 	}
 
 	@Override
-	public void updateScale(ScaleRequest request) throws MiddlewareQueryException,
-			MiddlewareException {
+	public void updateScale(ScaleRequest request) throws MiddlewareException {
 		Scale scale = new Scale(new Term(request.getId(), request.getName(),
 				request.getDescription()));
 
@@ -107,7 +106,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 	}
 
 	@Override
-	public void deleteScale(Integer id) throws MiddlewareQueryException, MiddlewareException {
+	public void deleteScale(Integer id) throws MiddlewareException {
 		this.ontologyManagerService.deleteScale(id);
 	}
 }

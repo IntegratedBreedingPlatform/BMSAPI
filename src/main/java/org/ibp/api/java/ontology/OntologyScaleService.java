@@ -37,8 +37,7 @@ public interface OntologyScaleService {
 	 * @throws MiddlewareQueryException
 	 * @throws MiddlewareException
 	 */
-	GenericResponse addScale(ScaleRequest request) throws MiddlewareQueryException,
-			MiddlewareException;
+	GenericResponse addScale(ScaleRequest request) throws MiddlewareException;
 
 	/**
 	 * update scale with new request data
@@ -48,7 +47,7 @@ public interface OntologyScaleService {
 	 * @throws MiddlewareQueryException
 	 * @throws MiddlewareException
 	 */
-	void updateScale(ScaleRequest request) throws MiddlewareQueryException, MiddlewareException;
+	void updateScale(ScaleRequest request) throws MiddlewareException;
 
 	/**
 	 * Delete a scale using given id
@@ -58,5 +57,5 @@ public interface OntologyScaleService {
 	 * @throws MiddlewareQueryException
 	 * @throws MiddlewareException
 	 */
-	void deleteScale(Integer id) throws MiddlewareQueryException, MiddlewareException;
+	void deleteScale(Integer id) throws MiddlewareException;
 }
