@@ -97,8 +97,8 @@ public class OntologyMethodResource {
 	@ApiOperation(value = "Add Method", notes = "Add a new Method")
 	@RequestMapping(value = "/{cropname}/methods", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> addMethod(@PathVariable String cropname, @RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareQueryException {
-
+	public ResponseEntity<GenericResponse> addMethod(@PathVariable String cropname, @RequestBody MethodRequest request) throws MiddlewareQueryException {
+	  	BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -119,8 +119,8 @@ public class OntologyMethodResource {
 	@ApiOperation(value = "Update Method", notes = "Update a Method by Id")
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity updateMethod(@PathVariable String cropname, @PathVariable String id, @RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareException {
-
+	public ResponseEntity updateMethod(@PathVariable String cropname, @PathVariable String id, @RequestBody MethodRequest request) throws MiddlewareException {
+	  	BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
