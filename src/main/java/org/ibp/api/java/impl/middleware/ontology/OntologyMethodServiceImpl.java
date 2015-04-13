@@ -24,9 +24,7 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	@Autowired
 	private OntologyManagerService ontologyManagerService;
 
-	private final String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
-
-	@Override
+  @Override
 	public List<MethodSummary> getAllMethods() throws MiddlewareQueryException {
 		List<Method> methodList = this.ontologyManagerService.getAllMethods();
 		List<MethodSummary> methods = new ArrayList<>();
@@ -52,11 +50,12 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 		}
 		ModelMapper mapper = OntologyMapper.methodMapper();
 		MethodResponse response = mapper.map(method, MethodResponse.class);
-		if (!deletable) {
-		  	response.setEditableFields(new ArrayList<>(Collections
-				  .singletonList(this.FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
+	  	String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
+	  	if (!deletable) {
+		  response.setEditableFields(new ArrayList<>(Collections
+				  .singletonList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
 		} else {
-		  	response.setEditableFields(new ArrayList<>(Arrays.asList("name", "description")));
+		  	response.setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
 		}
 		response.setDeletable(deletable);
 		return response;
@@ -72,8 +71,7 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	}
 
 	@Override
-	public void updateMethod(Integer id, MethodRequest request) throws MiddlewareQueryException,
-			MiddlewareException {
+	public void updateMethod(Integer id, MethodRequest request) throws MiddlewareException {
 		Method method = new Method();
 		method.setId(request.getId());
 		method.setName(request.getName());

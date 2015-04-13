@@ -49,7 +49,7 @@ public interface OntologyMethodService {
 	 * @throws MiddlewareQueryException
 	 *             , MiddlewareException
 	 */
-	void updateMethod(Integer id, MethodRequest request) throws MiddlewareQueryException, MiddlewareException;
+	void updateMethod(Integer id, MethodRequest request) throws MiddlewareException;
 
 	/**
 	 * delete method using given id

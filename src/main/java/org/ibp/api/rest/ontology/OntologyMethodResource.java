@@ -119,7 +119,7 @@ public class OntologyMethodResource {
 	@ApiOperation(value = "Update Method", notes = "Update a Method by Id")
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity updateMethod(@PathVariable String cropname, @PathVariable String id, @RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareQueryException, MiddlewareException {
+	public ResponseEntity updateMethod(@PathVariable String cropname, @PathVariable String id, @RequestBody MethodRequest request, BindingResult bindingResult) throws MiddlewareException {
 
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
