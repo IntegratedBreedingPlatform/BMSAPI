@@ -84,7 +84,7 @@ public class OntologyPropertyResource {
 	@RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<PropertyResponse> getPropertyById(@PathVariable String cropname,
-			@PathVariable String id) throws MiddlewareQueryException, MiddlewareException {
+			@PathVariable String id) throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
@@ -112,7 +112,7 @@ public class OntologyPropertyResource {
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addProperty(@PathVariable String cropname,
 			@RequestBody PropertyRequest request)
-					throws MiddlewareQueryException, MiddlewareException {
+					throws MiddlewareException {
 	  	BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
@@ -135,7 +135,7 @@ public class OntologyPropertyResource {
 	@RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteProperty(@PathVariable String cropname, @PathVariable String id)
-			throws MiddlewareQueryException, MiddlewareException {
+			throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
@@ -167,7 +167,7 @@ public class OntologyPropertyResource {
 	@ResponseBody
 	public ResponseEntity updateProperty(@PathVariable String cropname, @PathVariable String id,
 			@RequestBody PropertyRequest request)
-					throws MiddlewareQueryException, MiddlewareException {
+					throws MiddlewareException {
 	  	BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){

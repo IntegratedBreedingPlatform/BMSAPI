@@ -27,7 +27,7 @@ public interface OntologyPropertyService {
 	 * @return property that have given id
 	 * @throws MiddlewareQueryException
 	 */
-	PropertyResponse getProperty(Integer id) throws MiddlewareQueryException, MiddlewareException;
+	PropertyResponse getProperty(Integer id) throws MiddlewareException;
 
 	/**
 	 * add property using given input data
@@ -37,8 +37,7 @@ public interface OntologyPropertyService {
 	 * @return newly created property id
 	 * @throws MiddlewareQueryException
 	 */
-	GenericResponse addProperty(PropertyRequest request) throws MiddlewareQueryException,
-			MiddlewareException;
+	GenericResponse addProperty(PropertyRequest request) throws MiddlewareException;
 
 	/**
 	 * get all properties containing class name
@@ -59,7 +58,7 @@ public interface OntologyPropertyService {
 	 * @return if property deleted or not
 	 * @throws MiddlewareQueryException
 	 */
-	boolean deleteProperty(Integer id) throws MiddlewareQueryException, MiddlewareException;
+	boolean deleteProperty(Integer id) throws MiddlewareException;
 
 	/**
 	 *
@@ -70,6 +69,5 @@ public interface OntologyPropertyService {
 	 * @throws MiddlewareQueryException
 	 * @throws MiddlewareException
 	 */
-	void updateProperty(Integer id, PropertyRequest request) throws MiddlewareQueryException,
-			MiddlewareException;
+	void updateProperty(Integer id, PropertyRequest request) throws MiddlewareException;
 }

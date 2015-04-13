@@ -23,9 +23,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	@Autowired
 	private OntologyManagerService ontologyManagerService;
 
-	private final String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
-
-	@Override
+  	@Override
 	public List<PropertySummary> getAllProperties() throws MiddlewareQueryException {
 		List<Property> propertyList = this.ontologyManagerService.getAllProperties();
 		List<PropertySummary> properties = new ArrayList<>();
@@ -40,8 +38,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	}
 
 	@Override
-	public PropertyResponse getProperty(Integer id) throws MiddlewareQueryException,
-			MiddlewareException {
+	public PropertyResponse getProperty(Integer id) throws MiddlewareException {
 		Property property = this.ontologyManagerService.getProperty(id);
 		if (property == null) {
 		  	return null;
@@ -52,7 +49,10 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 		}
 		ModelMapper mapper = OntologyMapper.propertyMapper();
 		PropertyResponse response = mapper.map(property, PropertyResponse.class);
-		if (!deletable) {
+
+	  	String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
+
+	  	if (!deletable) {
 		  	response.setEditableFields(new ArrayList<>(Arrays.asList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED, "classes", "cropOntologyId")));
 		} else {
 		  	response.setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED,
@@ -63,8 +63,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	}
 
 	@Override
-	public GenericResponse addProperty(PropertyRequest request) throws MiddlewareQueryException,
-			MiddlewareException {
+	public GenericResponse addProperty(PropertyRequest request) throws MiddlewareException {
 		Property property = new Property();
 		property.setName(request.getName());
 		property.setDefinition(request.getDescription());
@@ -96,7 +95,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	}
 
 	@Override
-	public boolean deleteProperty(Integer id) throws MiddlewareQueryException, MiddlewareException {
+	public boolean deleteProperty(Integer id) throws MiddlewareException {
 		boolean isReferred = this.ontologyManagerService.isTermReferred(id);
 		if (isReferred) {
 		  	return false;
@@ -107,7 +106,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 
 	@Override
 	public void updateProperty(Integer id, PropertyRequest request)
-			throws MiddlewareQueryException, MiddlewareException {
+			throws MiddlewareException {
 		Property property = new Property();
 		property.setId(id);
 		property.setName(request.getName());
