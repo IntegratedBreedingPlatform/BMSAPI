@@ -5,10 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.DataType;
-import org.generationcp.middleware.domain.oms.Scale;
-import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.OntologyManagerService;
@@ -23,6 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +31,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+
+import static org.mockito.Mockito.doAnswer;
 
 public class OntologyScaleResourceTest extends ApiUnitTestBase {
 
@@ -148,18 +149,27 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 		scale.setName(this.scaleName);
 		scale.setDefinition(this.scaleDescription);
 
-		ArgumentCaptor<Scale> captor = ArgumentCaptor.forClass(Scale.class);
-
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
-		Mockito.doNothing().when(this.ontologyManagerService).addScale(org.mockito.Matchers.any(Scale.class));
+
+		//Mock Scale Class and when addScale method called it will set id to 1 and return (self member alter if void is return type of method)
+		doAnswer(new Answer<Void>() {
+			@Override public Void answer(InvocationOnMock invocation) throws Throwable {
+				Object[] arguments = invocation.getArguments();
+				if (arguments != null && arguments.length > 0 && arguments[0] != null) {
+					Scale entity = (Scale) arguments[0];
+					entity.setId(1);
+				}
+				return null;
+			}
+		}).when(this.ontologyManagerService).addScale(org.mockito.Matchers.any(Scale.class));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/scales", cropName)
 				.contentType(this.contentType).content(this.convertObjectToByte(scaleRequest)))
 				.andExpect(MockMvcResultMatchers.status().isCreated())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(0)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(1)))
 				.andDo(MockMvcResultHandlers.print());
 
-		Mockito.verify(this.ontologyManagerService).addScale(captor.capture());
+		Mockito.verify(this.ontologyManagerService).addScale(org.mockito.Matchers.any(Scale.class));
 	}
 
 	/**

@@ -20,6 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +31,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+
+import static org.mockito.Mockito.doAnswer;
 
 public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 
@@ -154,20 +158,30 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 		propertyDTO.setCropOntologyId("CO:000001");
 		propertyDTO.setClasses(new ArrayList<>(Collections.singletonList(OntologyPropertyResourceTest.className1)));
 
-		ArgumentCaptor<Property> captor = ArgumentCaptor.forClass(Property.class);
-
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
-		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(OntologyPropertyResourceTest.propertyName, CvId.PROPERTIES.getId());
-		Mockito.doNothing().when(this.ontologyManagerService).addProperty(org.mockito.Matchers.any(Property.class));
+		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(OntologyPropertyResourceTest.propertyName,
+				CvId.PROPERTIES.getId());
+
+		//Mock Property Class and when addProperty method called it will set id to 1 and return (self member alter if void is return type of method)
+		doAnswer(new Answer<Void>() {
+			@Override public Void answer(InvocationOnMock invocation) throws Throwable {
+				Object[] arguments = invocation.getArguments();
+				if (arguments != null && arguments.length > 0 && arguments[0] != null) {
+				  Property entity = (Property) arguments[0];
+					entity.setId(1);
+				}
+				return null;
+			}
+		}).when(this.ontologyManagerService).addProperty(org.mockito.Matchers.any(Property.class));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/properties", cropName)
 				.contentType(this.contentType)
 				.content(this.convertObjectToByte(propertyDTO)))
 				.andExpect(MockMvcResultMatchers.status().isCreated())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(0)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(1)))
 				.andDo(MockMvcResultHandlers.print());
 
-		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).addProperty(captor.capture());
+		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).addProperty(org.mockito.Matchers.any(Property.class));
 	}
 
 	/*

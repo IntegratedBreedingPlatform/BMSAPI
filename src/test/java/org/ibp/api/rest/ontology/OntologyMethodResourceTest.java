@@ -19,6 +19,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +30,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+
+import static org.mockito.Mockito.doAnswer;
 
 public class OntologyMethodResourceTest extends ApiUnitTestBase {
 
@@ -146,20 +150,28 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 		method.setName(methodDTO.getName());
 		method.setDefinition(methodDTO.getDescription());
 
-		ArgumentCaptor<Method> captor = ArgumentCaptor.forClass(Method.class);
-
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
-		Mockito.doNothing().when(this.ontologyManagerService).addMethod(org.mockito.Matchers.any(Method.class));
+
+		//Mock Method Class and when addMethod method called it will set id to 1 and return (self member alter if void is return type of method)
+		doAnswer(new Answer<Void>() {
+			@Override public Void answer(InvocationOnMock invocation) throws Throwable {
+				Object[] arguments = invocation.getArguments();
+				if (arguments != null && arguments.length > 0 && arguments[0] != null) {
+					Method entity = (Method) arguments[0];
+					entity.setId(1);
+				}
+				return null;
+			}
+		}).when(this.ontologyManagerService).addMethod(org.mockito.Matchers.any(Method.class));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/methods", cropName)
 				.contentType(this.contentType)
 				.content(this.convertObjectToByte(methodDTO)))
 				.andExpect(MockMvcResultMatchers.status().isCreated())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(0)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(1)))
 				.andDo(MockMvcResultHandlers.print());
 
-		Mockito.verify(this.ontologyManagerService).addMethod(captor.capture());
-
+		Mockito.verify(this.ontologyManagerService).addMethod(org.mockito.Matchers.any(Method.class));
 	}
 
 	/**
