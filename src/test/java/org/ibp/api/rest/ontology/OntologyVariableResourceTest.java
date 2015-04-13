@@ -1,13 +1,15 @@
 package org.ibp.api.rest.ontology;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
-import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
-import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.builders.MethodBuilder;
+import org.ibp.builders.PropertyBuilder;
+import org.ibp.builders.ScaleBuilder;
 import org.ibp.builders.VariableBuilder;
 import org.junit.After;
 import org.junit.Before;
@@ -22,6 +24,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -63,6 +66,11 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 	private final String scaleName = "Scale Name";
 	private final String scaleDescription = "Scale Description";
 
+	private static final String className1 = "Study condition";
+	private static final String className2 = "Biotic stress";
+
+	private static final List<String> classes = new ArrayList<>(Arrays.asList(className1, className2));
+
 	@Before
 	public void reset() {
 		Mockito.reset(this.ontologyManagerService);
@@ -91,7 +99,6 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 
 	  	Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(variableSummaries).when(this.ontologyManagerService).getWithFilter(programUuid, null, null, null, null);
-		//Mockito.doReturn(project).when(this.workbenchDataManager).getProjectById(Long.valueOf(programId));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/variables?programId=" + programUuid,cropName)
 				.contentType(this.contentType))
@@ -103,5 +110,35 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).getWithFilter(programUuid, null, null, null, null);
+	}
+
+  	@Test
+  	public void getVariableById() throws Exception{
+		Term term = new Term(1, this.variableName, this.variableDescription);
+		OntologyVariable ontologyVariable = new OntologyVariable(term);
+
+	  	ontologyVariable.setProperty(new PropertyBuilder().build(10, this.propertyName, this.propertyDescription, "CO:000001", classes));
+	  	ontologyVariable.setMethod(new MethodBuilder().build(11, this.methodName, this.methodDescription));
+	  	ontologyVariable.setScale(
+				new ScaleBuilder().build(12, this.scaleName, this.scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null));
+	  	ontologyVariable.setMinValue("14");
+	  	ontologyVariable.setMaxValue("16");
+	  	ontologyVariable.setAlias("Variable Alias Name");
+	  	ontologyVariable.addVariableType(VariableType.getById(1));
+
+		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
+		Mockito.doReturn(ontologyVariable).when(this.ontologyManagerService).getVariable(programUuid, ontologyVariable.getId());
+	  	Mockito.doReturn(new Term(1, this.variableName, this.variableDescription, CvId.VARIABLES.getId(), false)).when(
+				this.ontologyManagerService).getTermById(ontologyVariable.getId());
+
+		this.mockMvc.perform(MockMvcRequestBuilders
+				.get("/ontology/{cropname}/variables/{id}?programId=" + programUuid, cropName, ontologyVariable.getId())
+				.contentType(this.contentType))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(ontologyVariable.getName())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.is(ontologyVariable.getDefinition())))
+				.andDo(MockMvcResultHandlers.print());
+
+	  Mockito.verify(this.ontologyManagerService, Mockito.times(1)).getVariable(programUuid, ontologyVariable.getId());
 	}
 }
