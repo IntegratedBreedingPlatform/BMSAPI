@@ -128,7 +128,7 @@ public class OntologyMapper {
 			this.map().setName(this.source.getName());
 			this.map().setDescription(this.source.getDescription());
 			this.map().setFavourite(this.source.getIsFavorite());
-			this.map().setAlias("");
+			this.map().setAlias(this.source.getAlias());
 			this.map().setVariableTypes(this.source.getVariableTypes());
 			this.map().setCreatedDate(this.source.getDateCreated());
 			this.map().setModifiedData(this.source.getDateLastModified());
@@ -147,7 +147,7 @@ public class OntologyMapper {
 			this.map().setName(this.source.getName());
 			this.map().setDescription(this.source.getDefinition());
 			this.map().setFavourite(this.source.getIsFavorite());
-			this.map().setAlias("");
+			this.map().setAlias(this.source.getAlias());
 			this.map().setVariableTypes(this.source.getVariableTypes());
 			this.map().setCreatedDate(this.source.getDateCreated());
 			this.map().setModifiedData(this.source.getDateLastModified());
