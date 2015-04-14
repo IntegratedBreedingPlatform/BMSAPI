@@ -51,21 +51,19 @@ org.springframework.validation.Validator {
 			return;
 		}
 
-		// 6. Name and description are textual
-		this.shouldHaveValidString("name", request.getName(), errors);
-
-		if (errors.hasErrors()) {
-			return;
-		}
-
 		// 4. Name is no more than 200 characters
 		this.nameShouldHaveMax200Chars("name", request.getName(), errors);
 
-		// 2. Name is unique
-		this.checkTermUniqueness(request.getId(), request.getName(), CvId.METHODS.getId(), errors);
+		if (errors.hasErrors()) {
+		  return;
+		}
 
-		// 6. Name and description are textual
-		this.shouldHaveValidString("description", request.getDescription(), errors);
+		// 2. Name is unique
+	  	this.checkTermUniqueness(request.getId(), request.getName(), CvId.METHODS.getId(), errors);
+
+		if (errors.hasErrors()) {
+		  return;
+		}
 
 		// 5. Description is no more than 255 characters
 		this.descriptionShouldHaveMax255Chars("description", request.getDescription(), errors);
