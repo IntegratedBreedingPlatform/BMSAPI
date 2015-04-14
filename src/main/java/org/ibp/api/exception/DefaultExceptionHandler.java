@@ -88,9 +88,9 @@ public class DefaultExceptionHandler {
 					LocaleContextHolder.getLocale());
 			if (error instanceof FieldError) {
 				FieldError fieldError = (FieldError) error;
-				response.addError(message, fieldError.getField());
+				response.addError(message.substring(0, 1).toUpperCase() + message.substring(1), fieldError.getField());
 			} else {
-				response.addError(message);
+				response.addError(message.substring(0, 1).toUpperCase() + message.substring(1));
 			}
 		}
 		return response;
