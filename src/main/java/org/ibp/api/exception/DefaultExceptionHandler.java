@@ -49,8 +49,7 @@ public class DefaultExceptionHandler {
 			UnrecognizedPropertyException unrecognizedPropertyException = (UnrecognizedPropertyException) ex
 					.getCause();
 			response.addError(this.messageSource.getMessage("not.recognised.field",
-					new Object[] { unrecognizedPropertyException.getPropertyName() },
-					LocaleContextHolder.getLocale()));
+					new Object[] {unrecognizedPropertyException.getPropertyName()}, LocaleContextHolder.getLocale()));
 		} else if (rootCause instanceof JsonParseException) {
 			response.addError(this.messageSource.getMessage("invalid.body", null,
 					LocaleContextHolder.getLocale()));
@@ -88,11 +87,16 @@ public class DefaultExceptionHandler {
 					LocaleContextHolder.getLocale());
 			if (error instanceof FieldError) {
 				FieldError fieldError = (FieldError) error;
-				response.addError(message.substring(0, 1).toUpperCase() + message.substring(1), fieldError.getField());
+				response.addError(capitalizeFirstLetterOfErrorMessage(message), fieldError.getField());
 			} else {
-				response.addError(message.substring(0, 1).toUpperCase() + message.substring(1));
+				response.addError(capitalizeFirstLetterOfErrorMessage(message));
 			}
 		}
 		return response;
+	}
+
+  	// Will Capitalize first character of error message
+  	private String capitalizeFirstLetterOfErrorMessage(String errorMessage){
+	  	return errorMessage.substring(0, 1).toUpperCase() + errorMessage.substring(1);
 	}
 }
