@@ -159,30 +159,6 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 	}
 
 	/**
-	 * Test for No Categorical DataType with Categories
-	 */
-	@Test
-	public void testWithNoCategoryDataTypeWithCategoricalData() {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-
-		List<VariableCategory> categories = new ArrayList<>();
-		categories.add(new VariableCategory("1", "description"));
-
-		ValidValues validValues = new ValidValues();
-		validValues.setCategories(categories);
-
-		ScaleRequest request = new ScaleRequest();
-		request.setName(this.scaleName);
-		request.setDescription(this.description);
-		request.setDataTypeId(DataType.NUMERIC_VARIABLE.getId());
-		request.setValidValues(validValues);
-
-		this.scaleRequestValidator.validate(request, bindingResult);
-		Assert.assertTrue(bindingResult.hasErrors());
-		Assert.assertNotNull(bindingResult.getFieldError("validValues.categories"));
-	}
-
-	/**
 	 * Test for to Check Label and Value Uniqueness in Categories if DataType is
 	 * Categorical
 	 */
@@ -206,33 +182,6 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 		this.scaleRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("validValues.categories[1].name"));
-	}
-
-	/**
-	 * Test for If DataType is Not Numeric and Mix and Max Value Provided
-	 */
-	@Test
-	public void testWithMinMaxValueNonNumericDataType() {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-
-		List<VariableCategory> categories = new ArrayList<>();
-		categories.add(new VariableCategory("1", "description"));
-		categories.add(new VariableCategory("11", "description1"));
-
-		ValidValues validValues = new ValidValues();
-		validValues.setMin("5");
-		validValues.setMax("10");
-		validValues.setCategories(categories);
-
-		ScaleRequest request = new ScaleRequest();
-		request.setName(this.scaleName);
-		request.setDescription(this.description);
-		request.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId());
-		request.setValidValues(validValues);
-
-		this.scaleRequestValidator.validate(request, bindingResult);
-		Assert.assertTrue(bindingResult.hasErrors());
-		Assert.assertNotNull(bindingResult.getFieldError("validValues"));
 	}
 
 	/**
