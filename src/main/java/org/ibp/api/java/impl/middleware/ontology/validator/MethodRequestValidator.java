@@ -82,7 +82,7 @@ org.springframework.validation.Validator {
 			// that method should exist with requestId
 			if (Objects.equals(oldMethod, null)) {
 				this.addCustomError(errors, OntologyValidator.TERM_DOES_NOT_EXIST, new Object[] {
-						"method", request.getId() });
+						"method", request.getId().toString() });
 				return;
 			}
 
