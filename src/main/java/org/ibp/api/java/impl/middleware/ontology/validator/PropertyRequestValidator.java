@@ -125,7 +125,7 @@ public class PropertyRequestValidator extends OntologyValidator implements
 			// that property should exist with requestId
 			if (Objects.equals(oldProperty, null)) {
 				this.addCustomError(errors, OntologyValidator.TERM_DOES_NOT_EXIST, new Object[] {
-						"property", request.getId() });
+						"property", request.getId().toString() });
 				return;
 			}
 
