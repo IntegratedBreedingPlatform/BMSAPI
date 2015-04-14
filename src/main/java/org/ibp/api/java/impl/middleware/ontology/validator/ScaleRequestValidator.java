@@ -116,24 +116,9 @@ org.springframework.validation.Validator {
 			return;
 		}
 
-		// 6. Categories are only stored if the data type is categorical
-		if (!Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)
-				&& !this.isNullOrEmpty(categories)) {
-			this.addCustomError(errors, "validValues.categories",
-					ScaleRequestValidator.CATEGORIES_SHOULD_BE_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE,
-					null);
-		}
-
 		// 7. If there are categories, all labels and values within the set of
 		// categories must be unique
 		this.validateCategoriesForUniqueness(categories, dataType, errors);
-
-		// 8. The min and max valid values are only stored if the data type is
-		// numeric
-		if (!Objects.equals(dataType, DataType.NUMERIC_VARIABLE)
-				&& (minValue != null || maxValue != null)) {
-			this.addCustomError(errors, "validValues", OntologyValidator.MIN_MAX_NOT_EXPECTED, null);
-		}
 
 		// 9. If the data type is numeric and minimum and maximum valid values
 		// are provided (they are not mandatory), they must be numeric values
