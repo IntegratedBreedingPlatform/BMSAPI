@@ -40,7 +40,6 @@ import com.google.common.base.Strings;
 public class ScaleRequestValidator extends OntologyValidator implements
 org.springframework.validation.Validator {
 
-	static final String CATEGORIES_SHOULD_BE_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE = "scale.categories.should.not.pass.with.non.categorical.data.type";
 	static final String CATEGORIES_NAME_DUPLICATE = "scale.categories.name.duplicate";
 	static final String CATEGORIES_DESCRIPTION_DUPLICATE = "scale.categories.description.duplicate";
 
@@ -196,7 +195,7 @@ org.springframework.validation.Validator {
 			// that method should exist with requestId
 			if (Objects.equals(oldScale, null)) {
 				this.addCustomError(errors, OntologyValidator.TERM_DOES_NOT_EXIST, new Object[] {
-						"scale", request.getId() });
+						"scale", request.getId().toString() });
 				return;
 			}
 
