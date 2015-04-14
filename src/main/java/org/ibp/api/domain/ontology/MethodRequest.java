@@ -1,42 +1,23 @@
 package org.ibp.api.domain.ontology;
 
-public class MethodRequest {
+public class MethodRequest extends MethodRequestBase {
 
-	private String id;
+  private String id;
 
-	private String name;
+  public String getId() {
+	return id;
+  }
 
-	private String description;
+  public void setId(String id) {
+	this.id = id;
+  }
 
-	public String getId() {
-		return this.id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return this.name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	@Override public String toString() {
+  @Override public String toString() {
 	  return "MethodRequest{" +
-			  "id=" + id +
-			  ", name='" + name + '\'' +
-			  ", description='" + description + '\'' +
+			  "id=" + this.getId() +
+			  ", name='" + this.getName() + '\'' +
+			  ", description='" + this.getDescription() + '\'' +
 			  '}';
 	}
 }
+

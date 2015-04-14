@@ -12,6 +12,7 @@ import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.MethodRequest;
+import org.ibp.api.domain.ontology.MethodRequestBase;
 import org.ibp.builders.MethodBuilder;
 import org.junit.After;
 import org.junit.Assert;
@@ -142,7 +143,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 	@Test
 	public void addMethod() throws Exception {
 
-		MethodRequest methodDTO = new MethodRequest();
+		MethodRequestBase methodDTO = new MethodRequestBase();
 		methodDTO.setName("methodName");
 		methodDTO.setDescription("methodDescription");
 
@@ -182,7 +183,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 	@Test
 	public void updateMethod() throws Exception {
 
-		MethodRequest methodDTO = new MethodRequest();
+		MethodRequestBase methodDTO = new MethodRequestBase();
 		methodDTO.setName("methodName");
 		methodDTO.setDescription("methodDescription");
 

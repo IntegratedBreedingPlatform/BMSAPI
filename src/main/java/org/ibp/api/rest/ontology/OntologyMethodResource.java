@@ -10,11 +10,13 @@ import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.*;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.CropNameValidator;
+import org.ibp.api.java.impl.middleware.ontology.OntologyMapper;
 import org.ibp.api.java.impl.middleware.ontology.validator.MethodRequestValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.RequestIdValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.ontology.OntologyMethodService;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -97,8 +99,10 @@ public class OntologyMethodResource {
 	@ApiOperation(value = "Add Method", notes = "Add a new Method")
 	@RequestMapping(value = "/{cropname}/methods", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> addMethod(@PathVariable String cropname, @RequestBody MethodRequest request) throws MiddlewareQueryException {
-	  	BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
+	public ResponseEntity<GenericResponse> addMethod(@PathVariable String cropname, @RequestBody MethodRequestBase requestBase) throws MiddlewareQueryException {
+	  ModelMapper mapper = OntologyMapper.getInstance();
+	  MethodRequest request = mapper.map(requestBase, MethodRequest.class);
+	  BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -119,8 +123,10 @@ public class OntologyMethodResource {
 	@ApiOperation(value = "Update Method", notes = "Update a Method by Id")
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity updateMethod(@PathVariable String cropname, @PathVariable String id, @RequestBody MethodRequest request) throws MiddlewareException {
-	  	BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
+	public ResponseEntity updateMethod(@PathVariable String cropname, @PathVariable String id, @RequestBody MethodRequestBase requestBase) throws MiddlewareException {
+	  ModelMapper mapper = OntologyMapper.getInstance();
+	  MethodRequest request = mapper.map(requestBase, MethodRequest.class);
+	  BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
