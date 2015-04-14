@@ -1,21 +1,18 @@
 package org.ibp.api.domain.ontology;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class MethodRequest {
 
-	@JsonIgnore
-	private Integer id;
+	private String id;
 
 	private String name;
 
 	private String description;
 
-	public Integer getId() {
+	public String getId() {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -35,9 +32,11 @@ public class MethodRequest {
 		this.description = description;
 	}
 
-	@Override
-	public String toString() {
-		return "Method [id=" + this.id + ", name=" + this.getName() + ", description="
-				+ this.getDescription() + "]";
+	@Override public String toString() {
+	  return "MethodRequest{" +
+			  "id=" + id +
+			  ", name='" + name + '\'' +
+			  ", description='" + description + '\'' +
+			  '}';
 	}
 }

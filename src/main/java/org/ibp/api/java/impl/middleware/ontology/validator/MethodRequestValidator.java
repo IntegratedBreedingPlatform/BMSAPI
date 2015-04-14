@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.ibp.api.CommonUtil;
 import org.ibp.api.domain.ontology.MethodRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -59,7 +60,7 @@ org.springframework.validation.Validator {
 		}
 
 		// 2. Name is unique
-	  	this.checkTermUniqueness(request.getId(), request.getName(), CvId.METHODS.getId(), errors);
+		this.checkTermUniqueness(CommonUtil.tryParseSafe(request.getId()), request.getName(), CvId.METHODS.getId(), errors);
 
 		if (errors.hasErrors()) {
 		  return;
@@ -77,16 +78,15 @@ org.springframework.validation.Validator {
 
 		try {
 
-			Method oldMethod = this.ontologyManagerService.getMethod(request.getId());
+			Method oldMethod = this.ontologyManagerService.getMethod(CommonUtil.tryParseSafe(request.getId()));
 
 			// that method should exist with requestId
 			if (Objects.equals(oldMethod, null)) {
-				this.addCustomError(errors, OntologyValidator.TERM_DOES_NOT_EXIST, new Object[] {
-						"method", request.getId().toString() });
+				this.addCustomError(errors, OntologyValidator.TERM_DOES_NOT_EXIST, new Object[] { "method", request.getId()});
 				return;
 			}
 
-			boolean isEditable = !this.ontologyManagerService.isTermReferred(request.getId());
+			boolean isEditable = !this.ontologyManagerService.isTermReferred(CommonUtil.tryParseSafe(request.getId()));
 			if (isEditable) {
 				return;
 			}

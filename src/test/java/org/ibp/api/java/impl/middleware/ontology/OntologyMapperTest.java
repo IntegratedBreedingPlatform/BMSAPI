@@ -24,7 +24,7 @@ public class OntologyMapperTest {
 
 		MethodSummary methodSummary = mapper.map(method, MethodSummary.class);
 
-		Assert.assertEquals((long) method.getId(), (long) methodSummary.getId());
+		Assert.assertEquals(String.valueOf(method.getId()), methodSummary.getId());
 		Assert.assertEquals(method.getName(), methodSummary.getName());
 		Assert.assertEquals(method.getDefinition(), methodSummary.getDescription());
 

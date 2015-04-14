@@ -82,7 +82,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 				.contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$",IsCollectionWithSize.hasSize(methodList.size())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(1)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is("1")))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is(methodList.get(0).getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(methodList.get(0).getDefinition())))
 				.andDo(MockMvcResultHandlers.print());
@@ -107,7 +107,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/methods/{id}", cropName, 1)
 				.contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(1)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is("1")))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(method.getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.is(method.getDefinition())))
 				.andDo(MockMvcResultHandlers.print());

@@ -4,6 +4,7 @@ import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.ibp.api.CommonUtil;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.MethodRequest;
 import org.ibp.api.domain.ontology.MethodResponse;
@@ -73,7 +74,7 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	@Override
 	public void updateMethod(Integer id, MethodRequest request) throws MiddlewareException {
 		Method method = new Method();
-		method.setId(request.getId());
+		method.setId(CommonUtil.tryParseSafe(request.getId()));
 		method.setName(request.getName());
 		method.setDefinition(request.getDescription());
 		this.ontologyManagerService.updateMethod(method);

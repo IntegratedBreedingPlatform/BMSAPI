@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.CommonUtil;
 import org.ibp.api.domain.ontology.MethodRequest;
 import org.junit.After;
 import org.junit.Assert;
@@ -111,13 +112,13 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
 	public void testWithNonEditableRequest() throws MiddlewareQueryException {
 
 		MethodRequest request = new MethodRequest();
-		request.setId(10);
+		request.setId("10");
 		request.setName(this.methodName);
 		request.setDescription(this.description);
 
 		Mockito.doReturn(new Term(10, this.methodName, this.description))
 		.when(this.ontologyManagerService).getTermByNameAndCvId(this.methodName, this.cvId);
-		Mockito.doReturn(true).when(this.ontologyManagerService).isTermReferred(request.getId());
+		Mockito.doReturn(true).when(this.ontologyManagerService).isTermReferred(CommonUtil.tryParseSafe(request.getId()));
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 

@@ -9,15 +9,8 @@ import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.TermSummary;
-import org.ibp.api.domain.ontology.IdName;
-import org.ibp.api.domain.ontology.MethodResponse;
+import org.ibp.api.domain.ontology.*;
 import org.ibp.api.domain.ontology.MethodSummary;
-import org.ibp.api.domain.ontology.PropertyResponse;
-import org.ibp.api.domain.ontology.PropertySummary;
-import org.ibp.api.domain.ontology.ScaleResponse;
-import org.ibp.api.domain.ontology.ScaleSummary;
-import org.ibp.api.domain.ontology.VariableResponse;
-import org.ibp.api.domain.ontology.VariableSummary;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
@@ -34,7 +27,7 @@ public class OntologyMapper {
 	private static PropertyMap<Method, MethodSummary> methodMap = new PropertyMap<Method, MethodSummary>() {
 		@Override
 		protected void configure() {
-			this.map().setId(this.source.getId());
+			this.map().setId(String.valueOf(this.source.getId()));
 			this.map().setName(this.source.getName());
 			this.map().setDescription(this.source.getDefinition());
 		}
@@ -46,7 +39,7 @@ public class OntologyMapper {
 	private static PropertyMap<Method, MethodResponse> methodResponseMap = new PropertyMap<Method, MethodResponse>() {
 		@Override
 		protected void configure() {
-			this.map().setId(this.source.getId());
+			this.map().setId(String.valueOf(this.source.getId()));
 			this.map().setName(this.source.getName());
 			this.map().setDescription(this.source.getDefinition());
 			this.map().setEditableFields(new ArrayList<String>());

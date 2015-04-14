@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
+import org.ibp.api.CommonUtil;
 import org.ibp.api.domain.common.ErrorResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -20,6 +23,8 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @ControllerAdvice
 public class DefaultExceptionHandler {
+
+  	protected final Logger log = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	ResourceBundleMessageSource messageSource;
@@ -60,17 +65,14 @@ public class DefaultExceptionHandler {
 		return response;
 	}
 
-	/**
-	 * @param ignored Ignored exception message
-	 */
 	@RequestMapping(produces = { MediaType.APPLICATION_JSON_VALUE })
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
 	@ResponseStatus(value = BAD_REQUEST)
 	@ResponseBody
-	public ErrorResponse httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ignored) {
+	public ErrorResponse httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
 		ErrorResponse response = new ErrorResponse();
-		response.addError(this.messageSource.getMessage("request.method.not.supported", null,
-				LocaleContextHolder.getLocale()));
+	  	log.error("Request not supported with given input", ex);
+		response.addError(this.messageSource.getMessage("request.method.not.supported", null, LocaleContextHolder.getLocale()));
 		return response;
 	}
 
@@ -87,16 +89,11 @@ public class DefaultExceptionHandler {
 					LocaleContextHolder.getLocale());
 			if (error instanceof FieldError) {
 				FieldError fieldError = (FieldError) error;
-				response.addError(capitalizeFirstLetterOfErrorMessage(message), fieldError.getField());
+				response.addError(CommonUtil.capitalizeFirstLetterOfErrorMessage(message), fieldError.getField());
 			} else {
-				response.addError(capitalizeFirstLetterOfErrorMessage(message));
+				response.addError(CommonUtil.capitalizeFirstLetterOfErrorMessage(message));
 			}
 		}
 		return response;
-	}
-
-  	// Will Capitalize first character of error message
-  	private String capitalizeFirstLetterOfErrorMessage(String errorMessage){
-	  	return errorMessage.substring(0, 1).toUpperCase() + errorMessage.substring(1);
 	}
 }

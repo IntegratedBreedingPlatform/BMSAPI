@@ -130,12 +130,12 @@ public class OntologyMethodResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		request.setId(Integer.valueOf(id));
+		request.setId(id);
 		this.methodRequestValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		this.ontologyMethodService.updateMethod(request.getId(), request);
+		this.ontologyMethodService.updateMethod(Integer.valueOf(request.getId()), request);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 

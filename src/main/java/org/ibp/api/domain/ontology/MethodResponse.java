@@ -30,8 +30,10 @@ public class MethodResponse extends MethodSummary implements EditableDeletableFi
 
 	@Override
 	public String toString() {
-		return "Method [id=" + this.getId() + ", name=" + this.getName() + ", description="
-				+ this.getDescription() + ", editableFields=" + this.editableFields.toString()
+		return "Method [id=" + this.getId()
+				+ ", name=" + this.getName()
+				+ ", description=" + this.getDescription()
+				+ ", editableFields=" + this.editableFields.toString()
 				+ ", deletable=" + this.getDeletable() + "]";
 	}
 }
