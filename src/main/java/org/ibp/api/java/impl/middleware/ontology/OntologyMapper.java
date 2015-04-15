@@ -48,6 +48,20 @@ public class OntologyMapper {
 	};
 
 	/**
+	 * Custom mapping for RequestBody PropertyRequestBase to PropertyRequest
+	 */
+	private static PropertyMap<PropertyRequestBase, PropertyRequest> propertyBaseToRequest = new PropertyMap<PropertyRequestBase, PropertyRequest>() {
+		@Override
+		protected void configure() {
+			this.map().setId(null);
+			this.map().setName(this.source.getName());
+			this.map().setDescription(this.source.getDescription());
+			this.map().setCropOntologyId(this.source.getCropOntologyId());
+			this.map().setClasses(this.source.getClasses());
+		}
+	};
+
+	/**
 	 * Custom Mapping for Middleware Property Class to PropertySummary
 	 */
 	private static PropertyMap<Property, PropertySummary> propertyMap = new PropertyMap<Property, PropertySummary>() {
@@ -174,6 +188,16 @@ public class OntologyMapper {
 		ModelMapper mapper = new ModelMapper();
 		mapper.addMappings(OntologyMapper.methodMap);
 		mapper.addMappings(OntologyMapper.methodResponseMap);
+		return mapper;
+	}
+
+	/**
+	 * Customise Mapped property 'propertyBaseToRequest' is Initialize in Mapper and Returned
+	 * @return ModelMapper Instance
+	 */
+	public static ModelMapper propertyBaseToRequestMapper(){
+		ModelMapper mapper = new ModelMapper();
+		mapper.addMappings(OntologyMapper.propertyBaseToRequest);
 		return mapper;
 	}
 

@@ -114,7 +114,7 @@ public class OntologyPropertyResource {
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addProperty(@PathVariable String cropname,
 													   @RequestBody PropertyRequestBase requestBase) throws MiddlewareException {
-		ModelMapper modelMapper = OntologyMapper.getInstance();
+		ModelMapper modelMapper = OntologyMapper.propertyBaseToRequestMapper();
 		PropertyRequest request = modelMapper.map(requestBase, PropertyRequest.class);
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 		this.cropNameValidator.validate(cropname, bindingResult);
