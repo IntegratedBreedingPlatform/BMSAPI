@@ -57,7 +57,7 @@ public abstract class BaseValidator {
      */
     @SuppressWarnings("rawtypes")
 	protected boolean isNullOrEmpty(Object value){
-        return (value instanceof String && Strings.isNullOrEmpty((String) value)) ||
+        return (value instanceof String && Strings.isNullOrEmpty((String) ((String) value).trim())) ||
                 value == null ||
                 (value instanceof Collection && ((Collection) value).isEmpty()) ||
                 (value instanceof Map && ((Map) value).isEmpty());

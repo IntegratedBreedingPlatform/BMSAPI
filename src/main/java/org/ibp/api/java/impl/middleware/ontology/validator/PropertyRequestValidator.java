@@ -70,7 +70,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 		this.nameShouldHaveMax200Chars("name", request.getName(), errors);
 
 		// 3. Name is unique
-		this.checkTermUniqueness(CommonUtil.tryParseSafe(request.getId()), request.getName(), CvId.PROPERTIES.getId(), errors);
+		this.checkTermUniqueness(CommonUtil.tryParseSafe(request.getId()), request.getName(), CvId.PROPERTIES.getId(), "property", errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
@@ -103,12 +103,12 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 
 		List<String> classes = request.getClasses();
 
-		for (int i = 0; i < classes.size(); i++) {
-			if (Strings.isNullOrEmpty(classes.get(i))) {
+		for (int i = 1; i <= classes.size(); i++) {
+			if(isNullOrEmpty(classes.get(i-1))){
 				this.addCustomError(errors, "classes[" + i + "]", PropertyRequestValidator.CLASS_SHOULD_NOT_NULL_OR_EMPTY, null);
 			}else {
 				//8 Individual classes may not be longer than 200 characters each
-				this.classShouldHaveMax200Chars("classes[" + i + "]", classes.get(i), errors);
+				this.classShouldHaveMax200Chars("classes[" + i + "]", classes.get(i-1), errors);
 			}
 		}
 

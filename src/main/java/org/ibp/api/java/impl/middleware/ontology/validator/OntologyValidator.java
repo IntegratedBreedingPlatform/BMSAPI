@@ -63,7 +63,7 @@ public abstract class OntologyValidator extends BaseValidator {
 		}
 	}
 
-	protected void checkTermUniqueness(Integer id, String name, Integer cvId, Errors errors) {
+	protected void checkTermUniqueness(Integer id, String name, Integer cvId, String termName, Errors errors) {
 
 		try {
 			Term term = this.ontologyManagerService.getTermByNameAndCvId(name, cvId);
@@ -79,7 +79,7 @@ public abstract class OntologyValidator extends BaseValidator {
 				return;
 			}
 
-			this.addCustomError(errors, "name", OntologyValidator.SHOULD_BE_UNIQUE, null);
+			this.addCustomError(errors, "name", OntologyValidator.SHOULD_BE_UNIQUE, new Object[]{termName});
 		} catch (MiddlewareQueryException e) {
 			this.log.error("Error checking uniqueness of term name", e);
 		}

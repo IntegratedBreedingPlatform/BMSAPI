@@ -74,7 +74,7 @@ org.springframework.validation.Validator {
 		this.nameShouldHaveMax200Chars("name", request.getName(), errors);
 
 		// 2. The name must be unique
-		this.checkTermUniqueness(request.getId(), request.getName(), CvId.SCALES.getId(), errors);
+		this.checkTermUniqueness(request.getId(), request.getName(), CvId.SCALES.getId(), "scale", errors);
 
 		// 13. Description is no more than 255 characters
 		this.descriptionShouldHaveMax255Chars("description", request.getDescription(), errors);

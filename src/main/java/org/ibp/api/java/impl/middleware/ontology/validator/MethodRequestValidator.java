@@ -60,7 +60,7 @@ org.springframework.validation.Validator {
 		}
 
 		// 2. Name is unique
-		this.checkTermUniqueness(CommonUtil.tryParseSafe(request.getId()), request.getName(), CvId.METHODS.getId(), errors);
+		this.checkTermUniqueness(CommonUtil.tryParseSafe(request.getId()), request.getName(), CvId.METHODS.getId(), "method", errors);
 
 		if (errors.hasErrors()) {
 		  return;

@@ -55,7 +55,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 		this.descriptionShouldHaveMax255Chars("description", request.getDescription(), errors);
 
 		// 4. The name must be unique
-		this.checkTermUniqueness(null, request.getName(), CvId.VARIABLES.getId(), errors);
+		this.checkTermUniqueness(null, request.getName(), CvId.VARIABLES.getId(), "variable", errors);
 
 		if (errors.hasErrors()) {
 			return;
