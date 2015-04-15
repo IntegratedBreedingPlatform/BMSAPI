@@ -2,21 +2,21 @@ package org.ibp.api.domain.ontology;
 
 public class TermRequest {
 
-	private Integer id;
+	private String id;
 	private String termName;
 	private Integer cvId;
 
-	public TermRequest(Integer id, String name, Integer cvId) {
+	public TermRequest(String id, String name, Integer cvId) {
 		this.id = id;
 		this.termName = name;
 		this.cvId = cvId;
 	}
 
-	public Integer getId() {
+	public String getId() {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

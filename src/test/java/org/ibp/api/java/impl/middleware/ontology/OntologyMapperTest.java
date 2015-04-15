@@ -44,7 +44,7 @@ public class OntologyMapperTest {
 
 		PropertySummary propertySummary = mapper.map(property, PropertySummary.class);
 
-		Assert.assertEquals((long) property.getId(), (long) propertySummary.getId());
+		Assert.assertEquals(String.valueOf(property.getId()), propertySummary.getId());
 		Assert.assertEquals(property.getName(), propertySummary.getName());
 		Assert.assertEquals(property.getDefinition(), propertySummary.getDescription());
 

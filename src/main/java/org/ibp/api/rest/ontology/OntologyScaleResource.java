@@ -86,7 +86,7 @@ public class OntologyScaleResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		TermRequest request = new TermRequest(Integer.valueOf(id), "scale", CvId.SCALES.getId());
+		TermRequest request = new TermRequest(id, "scale", CvId.SCALES.getId());
 		this.termValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -168,8 +168,7 @@ public class OntologyScaleResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		this.termDeletableValidator.validate(new TermRequest(Integer.valueOf(id), "scale",
-				CvId.SCALES.getId()), bindingResult);
+		this.termDeletableValidator.validate(new TermRequest(id, "scale", CvId.SCALES.getId()), bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}

@@ -70,11 +70,9 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 	@Test
 	public void testWithNullNameRequest() throws MiddlewareQueryException {
 
-		Mockito.doReturn(null).when(this.ontologyManagerService)
-				.getTermByNameAndCvId(this.propertyName, this.cvId);
+		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.propertyName, this.cvId);
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Property");
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
 		PropertyRequest request = new PropertyRequest();
 		request.setName("");
@@ -97,8 +95,7 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 				.when(this.ontologyManagerService)
 				.getTermByNameAndCvId(this.propertyName, this.cvId);
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Property");
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
 		PropertyRequest request = new PropertyRequest();
 		request.setName(this.propertyName);
@@ -117,16 +114,14 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 	@Test
 	public void testWithClassNameNonEmptyUniqueValues() throws MiddlewareQueryException {
 
-		Mockito.doReturn(null).when(this.ontologyManagerService)
-				.getTermByNameAndCvId(this.propertyName, this.cvId);
+		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.propertyName, this.cvId);
 
 		PropertyRequest request = new PropertyRequest();
 		request.setName(this.propertyName);
 		request.setDescription(this.description);
 
 		// Assert for no class defined
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Property");
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
 		this.propertyRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -152,26 +147,26 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for Name cannot change if the property is already in use
 	 * 
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithNonEditableRequest() throws MiddlewareQueryException, MiddlewareException {
+	public void testWithNonEditableRequest() throws MiddlewareException {
 
-		Term dbTerm = new Term(10, this.propertyName, this.description);
+		Integer requestId = 10;
+
+		Term dbTerm = new Term(requestId, this.propertyName, this.description);
 		Property toReturn = new Property(dbTerm);
 
 		PropertyRequest request = new PropertyRequest();
-		request.setId(10);
+		request.setId(String.valueOf(requestId));
 		request.setName(this.propertyName + "0");
 		request.setDescription(this.description);
 
-		Mockito.doReturn(dbTerm).when(this.ontologyManagerService)
-				.getTermByNameAndCvId(this.propertyName, this.cvId);
-		Mockito.doReturn(true).when(this.ontologyManagerService).isTermReferred(request.getId());
-		Mockito.doReturn(toReturn).when(this.ontologyManagerService).getProperty(request.getId());
+		Mockito.doReturn(dbTerm).when(this.ontologyManagerService).getTermByNameAndCvId(this.propertyName, this.cvId);
+		Mockito.doReturn(true).when(this.ontologyManagerService).isTermReferred(requestId);
+		Mockito.doReturn(toReturn).when(this.ontologyManagerService).getProperty(requestId);
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Property");
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
 		this.propertyRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -185,11 +180,9 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 	@Test
 	public void testWithNameLengthExceedMaxLimit() throws MiddlewareQueryException {
 
-		Mockito.doReturn(null).when(this.ontologyManagerService)
-				.getTermByNameAndCvId(this.propertyName, this.cvId);
+		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.propertyName, this.cvId);
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Property");
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
 		PropertyRequest request = new PropertyRequest();
 		request.setName(this.randomString(205));
@@ -208,11 +201,9 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 	@Test
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareQueryException {
 
-		Mockito.doReturn(null).when(this.ontologyManagerService)
-				.getTermByNameAndCvId(this.propertyName, this.cvId);
+		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.propertyName, this.cvId);
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Property");
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
 		PropertyRequest request = new PropertyRequest();
 		request.setName(this.propertyName);
@@ -231,10 +222,9 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 	@Test
 	public void testWithValidRequest() throws MiddlewareQueryException {
 
-		Mockito.doReturn(null).when(this.ontologyManagerService)
-				.getTermByNameAndCvId(this.propertyName, this.cvId);
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Property");
+		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.propertyName, this.cvId);
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
 		PropertyRequest request = new PropertyRequest();
 		request.setName(this.propertyName);

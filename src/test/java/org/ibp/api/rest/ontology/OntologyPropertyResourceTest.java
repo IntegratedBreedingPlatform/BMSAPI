@@ -14,6 +14,7 @@ import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.PropertyRequest;
+import org.ibp.api.domain.ontology.PropertyRequestBase;
 import org.ibp.builders.PropertyBuilder;
 import org.junit.After;
 import org.junit.Before;
@@ -93,8 +94,8 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$",IsCollectionWithSize.hasSize(propertyList.size())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(1)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name",Matchers.is(propertyList.get(0).getName())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is("1")))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is(propertyList.get(0).getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description",Matchers.is(propertyList.get(0).getDefinition())));
 
 		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).getAllProperties();
@@ -118,7 +119,7 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 				.contentType(this.contentType))
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(property.getId())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(property.getId()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(property.getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.description",Matchers.is(property.getDefinition())));
 
@@ -152,7 +153,7 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void addProperty() throws Exception {
 
-		PropertyRequest propertyDTO = new PropertyRequest();
+		PropertyRequestBase propertyDTO = new PropertyRequestBase();
 		propertyDTO.setName(OntologyPropertyResourceTest.propertyName);
 		propertyDTO.setDescription(OntologyPropertyResourceTest.propertyDescription);
 		propertyDTO.setCropOntologyId("CO:000001");
@@ -192,7 +193,7 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void updateProperty() throws Exception {
 
-		PropertyRequest propertyDTO = new PropertyRequest();
+		PropertyRequestBase propertyDTO = new PropertyRequestBase();
 		propertyDTO.setName(OntologyPropertyResourceTest.propertyName);
 		propertyDTO.setDescription(OntologyPropertyResourceTest.propertyDescription);
 		propertyDTO.setCropOntologyId("CO:000001");

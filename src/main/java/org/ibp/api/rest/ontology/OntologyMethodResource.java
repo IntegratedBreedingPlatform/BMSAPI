@@ -83,7 +83,7 @@ public class OntologyMethodResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		TermRequest request = new TermRequest(Integer.valueOf(id), "method", CvId.METHODS.getId());
+		TermRequest request = new TermRequest(id, "method", CvId.METHODS.getId());
 		this.termValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -165,7 +165,7 @@ public class OntologyMethodResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		this.termDeletableValidator.validate(new TermRequest(Integer.valueOf(id), "method", CvId.METHODS.getId()), bindingResult);
+		this.termDeletableValidator.validate(new TermRequest(id, "method", CvId.METHODS.getId()), bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}

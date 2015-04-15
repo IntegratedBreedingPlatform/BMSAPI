@@ -54,11 +54,11 @@ public class OntologyMapper {
 
 		@Override
 		protected void configure() {
-			this.map().setId(this.source.getId());
+			this.map().setId(String.valueOf(this.source.getId()));
 			this.map().setName(this.source.getName());
 			this.map().setDescription(this.source.getDefinition());
 			this.map().setCropOntologyId(this.source.getCropOntologyId());
-			this.map().setClassesFromSet(this.source.getClasses());
+			this.map().setClasses(this.source.getClasses());
 		}
 	};
 
@@ -68,11 +68,11 @@ public class OntologyMapper {
 	private static PropertyMap<Property, PropertyResponse> propertyResponseMap = new PropertyMap<Property, PropertyResponse>() {
 		@Override
 		protected void configure() {
-			this.map().setId(this.source.getId());
+			this.map().setId(String.valueOf(this.source.getId()));
 			this.map().setName(this.source.getName());
 			this.map().setDescription(this.source.getDefinition());
 			this.map().setCropOntologyId(this.source.getCropOntologyId());
-			this.map().setClassesFromSet(this.source.getClasses());
+			this.map().setClasses(this.source.getClasses());
 			this.map().setEditableFields(new ArrayList<String>());
 			this.map().setDeletable(false);
 		}

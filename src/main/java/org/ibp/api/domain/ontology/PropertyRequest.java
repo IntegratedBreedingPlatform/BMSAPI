@@ -1,77 +1,21 @@
 package org.ibp.api.domain.ontology;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+public class PropertyRequest extends PropertyRequestBase {
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+	private String id;
 
-public class PropertyRequest {
-
-	@JsonIgnore
-	private Integer id;
-
-	private String name;
-	private String description;
-	private String cropOntologyId;
-	private List<String> classes;
-
-	public Integer getId() {
+	public String getId() {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
-	public String getName() {
-		return this.name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getCropOntologyId() {
-		return this.cropOntologyId;
-	}
-
-	public void setCropOntologyId(String cropOntologyId) {
-		this.cropOntologyId = cropOntologyId;
-	}
-
-	public List<String> getClasses() {
-		if (this.classes == null) {
-			this.classes = new ArrayList<>();
-		}
-		return this.classes;
-	}
-
-	public void setClasses(List<String> classes) {
-		this.classes = classes;
-	}
-
-    @JsonIgnore
-	public void setClassesFromSet(Set<String> classes) {
-		if (classes == null) {
-			return;
-		}
-
-		this.classes = new ArrayList<>(classes);
-	}
-
-	@Override
-	public String toString() {
-		return "Property [id=" + this.id + ", name='" + this.name + '\'' + ", description='"
-				+ this.description + '\'' + ", cropOntologyId='" + this.cropOntologyId + '\''
-				+ ", classes=" + this.classes + ']';
+	@Override public String toString() {
+		return "PropertyRequest{" +
+				"id='" + id + '\'' +
+				"} " + super.toString();
 	}
 }
+

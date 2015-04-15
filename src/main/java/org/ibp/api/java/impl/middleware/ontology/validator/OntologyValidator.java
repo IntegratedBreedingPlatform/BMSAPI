@@ -43,18 +43,18 @@ public abstract class OntologyValidator extends BaseValidator {
 	@Autowired
 	protected OntologyManagerService ontologyManagerService;
 
-	protected void checkTermExist(String termName, Integer id, Integer cvId, Errors errors) {
+	protected void checkTermExist(String termName, String id, Integer cvId, Errors errors) {
 		this.checkTermExist(termName, null, id, cvId, errors);
 	}
 
-	protected void checkTermExist(String termName, String fieldName, Integer id, Integer cvId, Errors errors) {
+	protected void checkTermExist(String termName, String fieldName, String id, Integer cvId, Errors errors) {
 		try {
-			Term term = this.ontologyManagerService.getTermById(id);
+			Term term = this.ontologyManagerService.getTermById(Integer.valueOf(id));
 			if (Objects.equals(term, null) || !Objects.equals(term.getVocabularyId(), cvId)) {
 				if (Strings.isNullOrEmpty(fieldName)) {
-					this.addCustomError(errors, OntologyValidator.TERM_DOES_NOT_EXIST, new Object[] { termName, id.toString() });
+					this.addCustomError(errors, OntologyValidator.TERM_DOES_NOT_EXIST, new Object[] { termName, id });
 				} else {
-					this.addCustomError(errors, fieldName, OntologyValidator.TERM_DOES_NOT_EXIST, new Object[] { termName, id.toString() });
+					this.addCustomError(errors, fieldName, OntologyValidator.TERM_DOES_NOT_EXIST, new Object[] { termName, id });
 				}
 			}
 		} catch (MiddlewareQueryException e) {

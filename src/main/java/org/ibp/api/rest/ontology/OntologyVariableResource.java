@@ -119,7 +119,7 @@ public class OntologyVariableResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		TermRequest request = new TermRequest(Integer.valueOf(id), "variable", CvId.VARIABLES.getId());
+		TermRequest request = new TermRequest(id, "variable", CvId.VARIABLES.getId());
 		this.termValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());

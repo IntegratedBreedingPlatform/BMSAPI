@@ -72,8 +72,12 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 			return;
 		}
 
+		String propertyId = String.valueOf(request.getPropertyId());
+		String methodId = String.valueOf(request.getMethodId());
+		String scaleId = String.valueOf(request.getScaleId());
+
 		// 7. Property ID must correspond to the ID of an existing property
-		this.checkTermExist("property", request.getPropertyId(), CvId.PROPERTIES.getId(), errors);
+		this.checkTermExist("property", propertyId, CvId.PROPERTIES.getId(), errors);
 
 		// 8. Method ID is required
 		this.checkIntegerNull("methodId", request.getMethodId(), errors);
@@ -83,7 +87,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 		}
 
 		// 9. Method ID must correspond to the ID of an existing method
-		this.checkTermExist("method", request.getMethodId(), CvId.METHODS.getId(), errors);
+		this.checkTermExist("method", methodId, CvId.METHODS.getId(), errors);
 
 		// 10. Scale ID is required
 		this.checkIntegerNull("scaleId", request.getScaleId(), errors);
@@ -93,7 +97,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 		}
 
 		// 11. Scale ID must correspond to the ID of an existing scale
-		this.checkTermExist("scale", request.getScaleId(), CvId.SCALES.getId(), errors);
+		this.checkTermExist("scale", scaleId, CvId.SCALES.getId(), errors);
 
 		if (errors.hasErrors()) {
 			return;
