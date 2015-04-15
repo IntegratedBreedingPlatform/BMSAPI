@@ -63,20 +63,6 @@ public abstract class BaseValidator {
                 (value instanceof Map && ((Map) value).isEmpty());
     }
 
-
-
-    protected void shouldHaveValidString(String fieldName, String value, Errors errors) {
-        Pattern regex = Pattern.compile("[$&+,./%')\\[}\\]{(*^!`~:;=?@#|1234567890]");
-        Matcher matcher = regex.matcher(value);
-
-        if (value.isEmpty()) {
-            return;
-        }
-        if (matcher.find()) {
-            this.addCustomError(errors, fieldName, SHOULD_BE_STRING, null);
-        }
-    }
-
     /**
      * Adds an custom error for the given field name, error code and arguments
      *
