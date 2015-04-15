@@ -40,6 +40,8 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 		for (Term term : classes) {
 			classList.add(term.getName());
 		}
+		Collections.sort(classList);
+
 		return classList;
 	}
 
