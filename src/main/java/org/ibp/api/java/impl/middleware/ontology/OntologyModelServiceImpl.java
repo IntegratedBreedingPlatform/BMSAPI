@@ -13,9 +13,7 @@ import org.ibp.api.java.ontology.OntologyModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class OntologyModelServiceImpl implements OntologyModelService {
@@ -48,7 +46,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 	@Override
 	public List<VariableTypeResponse> getAllVariableTypes() {
 
-		return Util.convertAll(Arrays.asList(VariableType.values()),
+		List<VariableTypeResponse> variableTypes =  Util.convertAll(Arrays.asList(VariableType.values()),
 				new Function<VariableType, VariableTypeResponse>() {
 
 					@Override
@@ -57,5 +55,13 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 								.getName(), variableType.getDescription());
 					}
 				});
+
+	  	Collections.sort(variableTypes, new Comparator<VariableTypeResponse>() {
+			@Override
+			public int compare(VariableTypeResponse o1, VariableTypeResponse o2) {
+			  	return o1.getName().compareTo(o2.getName());
+			}
+		});
+	  	return variableTypes;
 	}
 }
