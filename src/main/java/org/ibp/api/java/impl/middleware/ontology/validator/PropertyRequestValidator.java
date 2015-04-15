@@ -72,7 +72,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 		// 3. Name is unique
 		this.checkTermUniqueness(CommonUtil.tryParseSafe(request.getId()), request.getName(), CvId.PROPERTIES.getId(), errors);
 
-		return errors.getErrorCount() > initialCount;
+		return errors.getErrorCount() == initialCount;
 	}
 
 	private boolean descriptionValidationProcessor(PropertyRequest request, Errors errors){
