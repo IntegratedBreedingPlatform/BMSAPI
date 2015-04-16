@@ -1,14 +1,12 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import com.google.common.base.Strings;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.Errors;
 
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Helper methods to manage message codes.
@@ -19,7 +17,6 @@ public abstract class BaseValidator {
 
     protected static final String INVALID_ID = "invalid.id";
     protected static final String SHOULD_NOT_NULL_OR_EMPTY = "should.not.be.null";
-    protected static final String SHOULD_BE_STRING = "should.be.string";
 
     protected boolean isNonNullValidNumericString(Object value) {
         return value != null && (value instanceof Integer || value instanceof String && ((String) value).matches("^[0-9]+$"));
@@ -57,7 +54,7 @@ public abstract class BaseValidator {
      */
     @SuppressWarnings("rawtypes")
 	protected boolean isNullOrEmpty(Object value){
-        return (value instanceof String && Strings.isNullOrEmpty((String) ((String) value).trim())) ||
+        return (value instanceof String && Strings.isNullOrEmpty(((String) value).trim())) ||
                 value == null ||
                 (value instanceof Collection && ((Collection) value).isEmpty()) ||
                 (value instanceof Map && ((Map) value).isEmpty());
@@ -98,7 +95,6 @@ public abstract class BaseValidator {
             addCustomError(errors,fieldName, SHOULD_NOT_NULL_OR_EMPTY, null);
         }
     }
-
 
     /**
      * Adds the default error message into the current errors collection

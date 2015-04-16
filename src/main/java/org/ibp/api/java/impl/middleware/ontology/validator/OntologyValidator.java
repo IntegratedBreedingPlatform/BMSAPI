@@ -31,7 +31,6 @@ public abstract class OntologyValidator extends BaseValidator {
 	protected static final String EXPECTED_MIN_SHOULD_NOT_LESSER_THAN_SCALE_MIN = "expected.min.should.not.be.smaller";
 	protected static final String EXPECTED_MAX_SHOULD_NOT_GREATER_THAN_SCALE_MAX = "expected.max.should.not.be.greater";
   	protected static final String EXPECTED_MIN_SHOULD_NOT_BE_GREATER_THAN_MAX = "expected.range.min.should.not.be.greater.than.max";
-	protected static final String SHOULD_BE_STRING = "should.be.string";
 	protected static final String TERM_NOT_EDITABLE = "term.not.editable";
 	protected static final String SHOULD_HAVE_VALID_DATA_TYPE = "should.have.valid.data.type";
 	protected static final String CATEGORY_SHOULD_HAVE_AT_LEAST_ONE_ITEM = "category.should.have.at.least.one.item";
@@ -122,18 +121,6 @@ public abstract class OntologyValidator extends BaseValidator {
 
 		if (matcher.find() || Character.isDigit(value.charAt(0))) {
 			this.addCustomError(errors, fieldName, OntologyValidator.NAME_SHOULD_NOT_HAVE_SPECIAL_CHARACTERS_AND_NOT_START_WITH_DIGIT, null);
-		}
-	}
-
-	protected void shouldHaveValidString(String fieldName, String value, Errors errors) {
-		Pattern regex = Pattern.compile("[$&+,./%')\\[}\\]{(*^!`~:;=?@#|1234567890]");
-		Matcher matcher = regex.matcher(value);
-
-		if (value.isEmpty()) {
-			return;
-		}
-		if (matcher.find()) {
-			this.addCustomError(errors, fieldName, OntologyValidator.SHOULD_BE_STRING, null);
 		}
 	}
 
