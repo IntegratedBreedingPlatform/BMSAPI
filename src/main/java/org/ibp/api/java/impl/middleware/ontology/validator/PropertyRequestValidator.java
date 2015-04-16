@@ -1,9 +1,6 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
@@ -11,8 +8,6 @@ import org.ibp.api.CommonUtil;
 import org.ibp.api.domain.ontology.PropertyRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
-
-import com.google.common.base.Strings;
 
 /**
  * Request validator for add/edit property 1 Name is required 2 Name is no more
@@ -25,7 +20,6 @@ import com.google.common.base.Strings;
 public class PropertyRequestValidator extends OntologyValidator implements org.springframework.validation.Validator {
 
 	static final String DUPLICATE_ENTRIES_IN_CLASSES = "property.class.duplicate.entries";
-	static final String CLASS_SHOULD_NOT_NULL_OR_EMPTY = "property.class.should.not.null.or.empty";
 	static final String CLASS_IS_NECESSARY = "property.class.is.necessary";
 
 	@Override
@@ -87,6 +81,17 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 	private boolean classValidationProcessor(PropertyRequest request, Errors errors){
 		Integer initialCount = errors.getErrorCount();
 
+		List<String> nonEmptyClasses = new ArrayList<>();
+
+		for(String c : request.getClasses()) {
+			if(isNullOrEmpty(c)){
+				continue;
+			}
+			nonEmptyClasses.add(c);
+		}
+
+		request.setClasses(nonEmptyClasses);
+
 		// 5. Classes must be an array containing at least one string
 		//this.shouldNotNullOrEmpty("classes", request.getClasses(), errors);
 		if(request.getClasses().isEmpty()){
@@ -104,12 +109,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 		List<String> classes = request.getClasses();
 
 		for (int i = 1; i <= classes.size(); i++) {
-			if(isNullOrEmpty(classes.get(i-1))){
-				this.addCustomError(errors, "classes[" + i + "]", PropertyRequestValidator.CLASS_SHOULD_NOT_NULL_OR_EMPTY, null);
-			}else {
-				//8 Individual classes may not be longer than 200 characters each
-				this.classShouldHaveMax200Chars("classes[" + i + "]", classes.get(i-1), errors);
-			}
+			this.classShouldHaveMax200Chars("classes[" + i + "]", classes.get(i-1), errors);
 		}
 
 		if (errors.getErrorCount() > initialCount) {
