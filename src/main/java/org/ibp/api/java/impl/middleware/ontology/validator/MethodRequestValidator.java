@@ -1,14 +1,14 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import java.util.Objects;
-
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Method;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.CommonUtil;
 import org.ibp.api.domain.ontology.MethodRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
+
+import java.util.Objects;
 
 /**
  * Method add/update validator 1 Name is required 2 Name is unique 3 Name cannot
@@ -95,7 +95,7 @@ org.springframework.validation.Validator {
 				return;
 			}
 
-		} catch (MiddlewareQueryException e) {
+		} catch (MiddlewareException e) {
 			this.logError(e);
 			this.addDefaultError(errors);
 			return;

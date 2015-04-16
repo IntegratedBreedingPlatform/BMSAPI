@@ -2,7 +2,6 @@ package org.ibp.api.java.impl.middleware.ontology;
 
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.PropertyRequest;
@@ -24,7 +23,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	private OntologyManagerService ontologyManagerService;
 
   	@Override
-	public List<PropertySummary> getAllProperties() throws MiddlewareQueryException {
+	public List<PropertySummary> getAllProperties() throws MiddlewareException {
 		List<Property> propertyList = this.ontologyManagerService.getAllProperties();
 		List<PropertySummary> properties = new ArrayList<>();
 
@@ -79,10 +78,8 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	}
 
 	@Override
-	public List<PropertySummary> getAllPropertiesByClass(String propertyClass)
-			throws MiddlewareQueryException {
-		List<Property> propertyList = this.ontologyManagerService
-				.getAllPropertiesWithClass(propertyClass);
+	public List<PropertySummary> getAllPropertiesByClass(String propertyClass)throws MiddlewareException {
+		List<Property> propertyList = this.ontologyManagerService.getAllPropertiesWithClass(propertyClass);
 		List<PropertySummary> properties = new ArrayList<>();
 
 		ModelMapper mapper = OntologyMapper.propertyMapper();

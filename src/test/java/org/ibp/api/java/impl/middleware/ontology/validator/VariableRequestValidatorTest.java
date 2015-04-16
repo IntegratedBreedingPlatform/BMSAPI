@@ -12,7 +12,7 @@ import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.oms.VariableType;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.ExpectedRange;
@@ -71,10 +71,10 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for Name is required
 	 *
-	 * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
+	 * @throws org.generationcp.middleware.exceptions.MiddlewareException
 	 */
 	@Test
-	public void testWithNullNameRequest() throws MiddlewareQueryException {
+	public void testWithNullNameRequest() throws MiddlewareException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService)
 		.getTermByNameAndCvId(this.variableName, this.cvId);
@@ -94,10 +94,10 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for to check name length not exceed 32 characters
 	 *
-	 * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
+	 * @throws org.generationcp.middleware.exceptions.MiddlewareException
 	 */
 	@Test
-	public void testWithNameLengthExceedMaxLimit() throws MiddlewareQueryException {
+	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService)
 		.getTermByNameAndCvId(this.variableName, this.cvId);
@@ -117,10 +117,10 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for to check description length not exceed 255 characters
 	 *
-	 * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
+	 * @throws org.generationcp.middleware.exceptions.MiddlewareException
 	 */
 	@Test
-	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareQueryException {
+	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService)
 		.getTermByNameAndCvId(this.variableName, this.cvId);
@@ -140,10 +140,10 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for Name is unique
 	 *
-	 * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
+	 * @throws org.generationcp.middleware.exceptions.MiddlewareException
 	 */
 	@Test
-	public void testWithUniqueNonNullVariableName() throws MiddlewareQueryException {
+	public void testWithUniqueNonNullVariableName() throws MiddlewareException {
 
 		Mockito.doReturn(new Term(10, this.variableName, this.description))
 		.when(this.ontologyManagerService)
@@ -198,10 +198,10 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for property id exist or not
 	 *
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithPropertyIdExistOrNotRequest() throws MiddlewareQueryException {
+	public void testWithPropertyIdExistOrNotRequest() throws MiddlewareException {
 
 		VariableRequest request = new VariableRequest();
 		request.setName(this.variableName);
@@ -227,7 +227,7 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	 * Test for methodId is required
 	 */
 	@Test
-	public void testWithMethodIdRequiredRequest() throws MiddlewareQueryException {
+	public void testWithMethodIdRequiredRequest() throws MiddlewareException {
 
 		Mockito.doReturn(new Term(10, "name", "", CvId.PROPERTIES.getId(), false))
 		.when(this.ontologyManagerService).getTermById(10);
@@ -248,10 +248,10 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for method id exist or not
 	 *
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithMethodIdExistOrNotRequest() throws MiddlewareQueryException {
+	public void testWithMethodIdExistOrNotRequest() throws MiddlewareException {
 
 		VariableRequest request = new VariableRequest();
 		request.setName(this.variableName);
@@ -276,7 +276,7 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	 * Test for scaleId is required
 	 */
 	@Test
-	public void testWithScaleIdRequiredRequest() throws MiddlewareQueryException {
+	public void testWithScaleIdRequiredRequest() throws MiddlewareException {
 
 		Mockito.doReturn(new Term(10, "pName", "", CvId.PROPERTIES.getId(), false))
 		.when(this.ontologyManagerService).getTermById(10);
@@ -300,10 +300,10 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for scale id exist or not
 	 *
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithScaleIdExistOrNotRequest() throws MiddlewareQueryException {
+	public void testWithScaleIdExistOrNotRequest() throws MiddlewareException {
 
 		VariableRequest request = new VariableRequest();
 		request.setName(this.variableName);
@@ -330,11 +330,11 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for scale data type non numeric and expected range given in request
 	 *
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
 	public void testWithScaleDataTypeNotNumericAndExpectedRangeGiven()
-			throws MiddlewareQueryException {
+			throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
 				"Variable");
 
@@ -374,11 +374,11 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for scale data type is Numeric and Expected range is not given
 	 *
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
 	public void testWithScaleDataTypeNumericAndExpectedRangeNotGiven()
-			throws MiddlewareQueryException {
+			throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
 				"Variable");
 
@@ -419,11 +419,11 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	 * Test for scale data type is Numeric and expected range min is less than
 	 * scale valid values min
 	 *
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
 	public void testWithScaleDataTypeNumericAndExpectedRangeLessThanScaleValidValues()
-			throws MiddlewareQueryException {
+			throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
 				"Variable");
 
@@ -464,11 +464,11 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	 * Test for Scale data type is Numeric and expected range min is greater
 	 * than max
 	 *
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
 	public void testWithScaleDataTypeNumericAndExpectedRangeMinGreaterThanMax()
-			throws MiddlewareQueryException {
+			throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
 				"Variable");
 
@@ -509,10 +509,10 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	 * Test for method, property and scale combination already exist for other
 	 * variable
 	 *
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithMethodPropertyScaleCombinationExist() throws MiddlewareQueryException {
+	public void testWithMethodPropertyScaleCombinationExist() throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
 				"Variable");
 
@@ -571,10 +571,10 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for variable type id should not be null
 	 *
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithVariableTypeShouldNotBeNull() throws MiddlewareQueryException {
+	public void testWithVariableTypeShouldNotBeNull() throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
 				"Variable");
 
@@ -627,10 +627,10 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for invalid variable type
 	 *
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithVariableTypeIsNotValid() throws MiddlewareQueryException {
+	public void testWithVariableTypeIsNotValid() throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
 				"Variable");
 
@@ -683,10 +683,10 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for valid variable request
 	 *
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithValidRequest() throws MiddlewareQueryException {
+	public void testWithValidRequest() throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
 				"Variable");
 

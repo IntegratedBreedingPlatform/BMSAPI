@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.CommonUtil;
@@ -62,10 +62,10 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for Name is required
 	 *
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithNullNameRequest() throws MiddlewareQueryException {
+	public void testWithNullNameRequest() throws MiddlewareException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService)
 		.getTermByNameAndCvId(this.methodName, this.cvId);
@@ -84,10 +84,10 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for Name is unique
 	 *
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithUniqueNonNullMethodName() throws MiddlewareQueryException {
+	public void testWithUniqueNonNullMethodName() throws MiddlewareException {
 
 		Mockito.doReturn(new Term(10, this.methodName, this.description))
 		.when(this.ontologyManagerService).getTermByNameAndCvId(this.methodName, this.cvId);
@@ -106,10 +106,10 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for Name cannot change if the method is already in use
 	 *
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithNonEditableRequest() throws MiddlewareQueryException {
+	public void testWithNonEditableRequest() throws MiddlewareException {
 
 		MethodRequest request = new MethodRequest();
 		request.setId("10");
@@ -131,7 +131,7 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
 	 * Test for to check name length not exceed 200 characters
 	 */
 	@Test
-	public void testWithNameLengthExceedMaxLimit() throws MiddlewareQueryException {
+	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
 		Mockito.doReturn(null).when(this.ontologyManagerService)
 		.getTermByNameAndCvId(this.methodName, this.cvId);
 
@@ -150,7 +150,7 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
 	 * Test for to check description length not exceed 255 characters
 	 */
 	@Test
-	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareQueryException {
+	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 		Mockito.doReturn(null).when(this.ontologyManagerService)
 		.getTermByNameAndCvId(this.methodName, this.cvId);
 
@@ -169,7 +169,7 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
 	 * Test for valid request
 	 */
 	@Test
-	public void testWithValidRequest() throws MiddlewareQueryException {
+	public void testWithValidRequest() throws MiddlewareException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService)
 		.getTermByNameAndCvId(this.methodName, this.cvId);

@@ -2,7 +2,7 @@ package org.ibp.api.rest.ontology;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.ontology.IdName;
 import org.ibp.api.java.ontology.OntologyModelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class OntologyDataTypeResource {
 	@ApiOperation(value = "All Data Types", notes = "Get all Data Types")
 	@RequestMapping(value = "/datatypes", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<IdName>> listAllDataTypes() throws MiddlewareQueryException {
+	public ResponseEntity<List<IdName>> listAllDataTypes() throws MiddlewareException {
 		return new ResponseEntity<>(this.ontologyModelService.getAllDataTypes(), HttpStatus.OK);
 	}
 }

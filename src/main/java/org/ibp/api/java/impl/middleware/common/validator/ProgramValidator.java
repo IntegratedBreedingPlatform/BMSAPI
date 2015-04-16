@@ -34,7 +34,7 @@ public class ProgramValidator extends BaseValidator implements Validator {
             if(Objects.equals(project, null)){
                 addCustomError(errors, fieldName, PROGRAM_DOES_NOT_EXIST, null);
             }
-        } catch (MiddlewareQueryException e) {
+        } catch (MiddlewareException e) {
             log.error("Error occur while fetching program data", e);
         }*/
     }

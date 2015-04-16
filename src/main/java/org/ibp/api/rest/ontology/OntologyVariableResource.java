@@ -1,11 +1,10 @@
 package org.ibp.api.rest.ontology;
 
-import java.util.HashMap;
-import java.util.List;
-
+import com.google.common.base.Strings;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.TermRequest;
 import org.ibp.api.domain.ontology.VariableRequest;
@@ -24,16 +23,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import com.google.common.base.Strings;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * NOTE: Work in Progress, Do Not Use API Exposed
@@ -72,7 +65,7 @@ public class OntologyVariableResource {
 	public ResponseEntity<List<VariableSummary>> listAllVariables(@PathVariable String cropname,
 																  @RequestParam(value = "property", required = false) String propertyId,
 																  @RequestParam(value = "favourite", required = false) Boolean favourite,
-																  @RequestParam(value = "programId") String programId) throws MiddlewareQueryException {
+																  @RequestParam(value = "programId") String programId) throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){

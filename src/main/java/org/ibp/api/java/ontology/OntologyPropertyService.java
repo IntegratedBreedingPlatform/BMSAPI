@@ -1,7 +1,6 @@
 package org.ibp.api.java.ontology;
 
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.PropertyRequest;
 import org.ibp.api.domain.ontology.PropertyResponse;
@@ -15,9 +14,9 @@ public interface OntologyPropertyService {
 	 * get all properties
 	 *
 	 * @return list of properties
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
-	List<PropertySummary> getAllProperties() throws MiddlewareQueryException;
+	List<PropertySummary> getAllProperties() throws MiddlewareException;
 
 	/**
 	 * get property by given property id
@@ -25,7 +24,7 @@ public interface OntologyPropertyService {
 	 * @param id
 	 *            property id
 	 * @return property that have given id
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	PropertyResponse getProperty(Integer id) throws MiddlewareException;
 
@@ -35,7 +34,7 @@ public interface OntologyPropertyService {
 	 * @param request
 	 *            property data to be added
 	 * @return newly created property id
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	GenericResponse addProperty(PropertyRequest request) throws MiddlewareException;
 
@@ -45,10 +44,9 @@ public interface OntologyPropertyService {
 	 * @param propertyClass
 	 *            class name to be search in property
 	 * @return list of properties
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
-	List<PropertySummary> getAllPropertiesByClass(String propertyClass)
-			throws MiddlewareQueryException;
+	List<PropertySummary> getAllPropertiesByClass(String propertyClass)throws MiddlewareException;
 
 	/**
 	 * delete property if not used
@@ -56,7 +54,7 @@ public interface OntologyPropertyService {
 	 * @param id
 	 *            property to be deleted
 	 * @return if property deleted or not
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	boolean deleteProperty(Integer id) throws MiddlewareException;
 
@@ -66,7 +64,6 @@ public interface OntologyPropertyService {
 	 *            property to update
 	 * @param request
 	 *            property data to update
-	 * @throws MiddlewareQueryException
 	 * @throws MiddlewareException
 	 */
 	void updateProperty(Integer id, PropertyRequest request) throws MiddlewareException;

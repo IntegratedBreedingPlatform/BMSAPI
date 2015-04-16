@@ -1,6 +1,6 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.springframework.validation.Errors;
@@ -40,7 +40,7 @@ public class CropNameValidator extends BaseValidator implements Validator {
                 addCustomError(errors, "cropname", INVALID_CROP_NAME, null);
             }
 
-        } catch (MiddlewareQueryException e) {
+        } catch (MiddlewareException e) {
             log.error("Error occur while fetching program data", e);
         }
     }

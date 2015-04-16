@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.TermRequest;
@@ -59,10 +59,10 @@ public class TermDeletableValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for Term with Null request
 	 *
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithNullRequest() throws MiddlewareQueryException {
+	public void testWithNullRequest() throws MiddlewareException {
 		Mockito.doReturn(true).when(this.ontologyManagerService).isTermReferred(10);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
@@ -73,10 +73,10 @@ public class TermDeletableValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for Term Referred
 	 *
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithTermReferred() throws MiddlewareQueryException {
+	public void testWithTermReferred() throws MiddlewareException {
 
 		Mockito.doReturn(true).when(this.ontologyManagerService).isTermReferred(10);
 
@@ -89,10 +89,10 @@ public class TermDeletableValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for Term Not Referred
 	 *
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithTermNotReferred() throws MiddlewareQueryException {
+	public void testWithTermNotReferred() throws MiddlewareException {
 
 		Mockito.doReturn(new Term(10, "name", "", CvId.METHODS.getId(), false))
 		.when(this.ontologyManagerService).getTermById(10);

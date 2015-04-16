@@ -2,7 +2,6 @@ package org.ibp.api.java.impl.middleware.ontology;
 
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.api.CommonUtil;
 import org.ibp.api.domain.common.GenericResponse;
@@ -26,7 +25,7 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	private OntologyManagerService ontologyManagerService;
 
   @Override
-	public List<MethodSummary> getAllMethods() throws MiddlewareQueryException {
+	public List<MethodSummary> getAllMethods() throws MiddlewareException {
 		List<Method> methodList = this.ontologyManagerService.getAllMethods();
 		List<MethodSummary> methods = new ArrayList<>();
 
@@ -40,7 +39,7 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	}
 
 	@Override
-	public MethodResponse getMethod(Integer id) throws MiddlewareQueryException {
+	public MethodResponse getMethod(Integer id) throws MiddlewareException {
 		Method method = this.ontologyManagerService.getMethod(id);
 		if (method == null) {
 		  	return null;
@@ -63,7 +62,7 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	}
 
 	@Override
-	public GenericResponse addMethod(MethodRequest request) throws MiddlewareQueryException {
+	public GenericResponse addMethod(MethodRequest request) throws MiddlewareException {
 		Method method = new Method();
 		method.setName(request.getName());
 		method.setDefinition(request.getDescription());
@@ -81,7 +80,7 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	}
 
 	@Override
-	public void deleteMethod(Integer id) throws MiddlewareQueryException {
+	public void deleteMethod(Integer id) throws MiddlewareException {
 	  	this.ontologyManagerService.deleteMethod(id);
 	}
 }

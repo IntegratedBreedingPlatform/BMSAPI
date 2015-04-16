@@ -3,7 +3,7 @@ package org.ibp.api.rest.program;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.ibp.api.domain.program.ProjectBasicInfo;
@@ -20,7 +20,7 @@ public class ProgramResource {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public List<ProjectBasicInfo> listPrograms() throws MiddlewareQueryException {
+	public List<ProjectBasicInfo> listPrograms() throws MiddlewareException {
 		List<Project> projectList = this.workbenchDataManager.getProjects();
 		List<ProjectBasicInfo> projectBasicInfoList = new ArrayList<>();
 

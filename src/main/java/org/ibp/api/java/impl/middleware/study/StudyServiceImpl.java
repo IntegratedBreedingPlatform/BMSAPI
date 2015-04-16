@@ -3,7 +3,7 @@ package org.ibp.api.java.impl.middleware.study;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudySummary;
@@ -35,7 +35,7 @@ public class StudyServiceImpl implements StudyService {
 				summary.setType(mwStudySummary.getType().getName());
 				studySummaries.add(summary);
 			}
-		} catch (MiddlewareQueryException e) {
+		} catch (MiddlewareException e) {
 			// can I do much about this? what can I do?
 		}
 		return studySummaries;

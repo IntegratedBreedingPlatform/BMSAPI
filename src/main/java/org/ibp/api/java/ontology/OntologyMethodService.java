@@ -1,7 +1,6 @@
 package org.ibp.api.java.ontology;
 
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.MethodRequest;
 import org.ibp.api.domain.ontology.MethodResponse;
@@ -15,9 +14,9 @@ public interface OntologyMethodService {
 	 * get all methods using middleware ontology service
 	 *
 	 * @return list of methods
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
-	List<MethodSummary> getAllMethods() throws MiddlewareQueryException;
+	List<MethodSummary> getAllMethods() throws MiddlewareException;
 
 	/**
 	 * get method by method id
@@ -25,9 +24,9 @@ public interface OntologyMethodService {
 	 * @param id
 	 *            the method id
 	 * @return method
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
-	MethodResponse getMethod(Integer id) throws MiddlewareQueryException;
+	MethodResponse getMethod(Integer id) throws MiddlewareException;
 
 	/**
 	 * add method using given input data
@@ -35,9 +34,9 @@ public interface OntologyMethodService {
 	 * @param method
 	 *            method to add
 	 * @return newly created method id
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
-	GenericResponse addMethod(MethodRequest method) throws MiddlewareQueryException;
+	GenericResponse addMethod(MethodRequest method) throws MiddlewareException;
 
 	/**
 	 * update method data using given method id
@@ -46,8 +45,7 @@ public interface OntologyMethodService {
 	 *            method to be updated
 	 * @param request
 	 *            method data to be updated
-	 * @throws MiddlewareQueryException
-	 *             , MiddlewareException
+	 * @throws MiddlewareException
 	 */
 	void updateMethod(Integer id, MethodRequest request) throws MiddlewareException;
 
@@ -56,8 +54,8 @@ public interface OntologyMethodService {
 	 *
 	 * @param id
 	 *            method to be deleted
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
-	void deleteMethod(Integer id) throws MiddlewareQueryException;
+	void deleteMethod(Integer id) throws MiddlewareException;
 
 }

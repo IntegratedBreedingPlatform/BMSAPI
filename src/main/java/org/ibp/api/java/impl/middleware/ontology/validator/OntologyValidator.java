@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.*;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +56,7 @@ public abstract class OntologyValidator extends BaseValidator {
 					this.addCustomError(errors, fieldName, OntologyValidator.TERM_DOES_NOT_EXIST, new Object[] { termName, id });
 				}
 			}
-		} catch (MiddlewareQueryException e) {
+		} catch (MiddlewareException e) {
 			this.log.error("Error while validating object", e);
 			this.addDefaultError(errors);
 		}
@@ -79,14 +79,14 @@ public abstract class OntologyValidator extends BaseValidator {
 			}
 
 			this.addCustomError(errors, "name", OntologyValidator.SHOULD_BE_UNIQUE, new Object[]{termName});
-		} catch (MiddlewareQueryException e) {
+		} catch (MiddlewareException e) {
 			this.log.error("Error checking uniqueness of term name", e);
 		}
 	}
 
 	protected void shouldHaveValidDataType(String fieldName, Integer dataTypeId, Errors errors) {
 		if (DataType.getById(dataTypeId) == null) {
-			this.addCustomError(errors, fieldName, OntologyValidator.SHOULD_HAVE_VALID_DATA_TYPE, null);
+			this.addCustomError(errors, fieldName, OntologyValidator.SHOULD_HAVE_VALID_DATA_TYPE, new Object[] {dataTypeId});
 		}
 	}
 
@@ -148,7 +148,7 @@ public abstract class OntologyValidator extends BaseValidator {
 				this.addCustomError(errors, fieldName,
 						OntologyValidator.METHOD_PROPERTY_SCALE_COMBINATION_EXIST, null);
 			}
-		} catch (MiddlewareQueryException e) {
+		} catch (MiddlewareException e) {
 			this.log.error("Error occur while fetching variable in checkIfMethodPropertyScaleCombination", e);
 		}
 	}
@@ -156,7 +156,7 @@ public abstract class OntologyValidator extends BaseValidator {
 	protected Scale getScaleData(Integer scaleId) {
 		try {
 			return this.ontologyManagerService.getScaleById(scaleId);
-		} catch (MiddlewareQueryException e) {
+		} catch (MiddlewareException e) {
 			this.log.error("Error occur while fetching scale", e);
 		}
 		return null;

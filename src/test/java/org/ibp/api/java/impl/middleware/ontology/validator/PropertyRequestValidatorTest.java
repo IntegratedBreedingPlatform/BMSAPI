@@ -8,7 +8,6 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.PropertyRequest;
@@ -65,10 +64,10 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for Name is required
 	 * 
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithNullNameRequest() throws MiddlewareQueryException {
+	public void testWithNullNameRequest() throws MiddlewareException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.propertyName, this.cvId);
 
@@ -86,10 +85,10 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for Name is unique
 	 * 
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithUniqueNonNullPropertyName() throws MiddlewareQueryException {
+	public void testWithUniqueNonNullPropertyName() throws MiddlewareException {
 
 		Mockito.doReturn(new Term(10, this.propertyName, this.description))
 				.when(this.ontologyManagerService)
@@ -109,10 +108,10 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for should have at least one class and that is valid
 	 * 
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithClassNameNonEmptyUniqueValues() throws MiddlewareQueryException {
+	public void testWithClassNameNonEmptyUniqueValues() throws MiddlewareException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.propertyName, this.cvId);
 
@@ -175,10 +174,10 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for to check name length not exceed 200 characters
 	 * 
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithNameLengthExceedMaxLimit() throws MiddlewareQueryException {
+	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.propertyName, this.cvId);
 
@@ -196,10 +195,10 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for to check description length not exceed 255 characters
 	 * 
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareQueryException {
+	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.propertyName, this.cvId);
 
@@ -217,10 +216,10 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for valid request
 	 * 
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
 	@Test
-	public void testWithValidRequest() throws MiddlewareQueryException {
+	public void testWithValidRequest() throws MiddlewareException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.propertyName, this.cvId);
 

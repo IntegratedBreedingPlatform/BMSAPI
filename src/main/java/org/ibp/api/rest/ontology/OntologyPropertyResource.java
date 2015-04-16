@@ -3,10 +3,8 @@ package org.ibp.api.rest.ontology;
 import com.google.common.base.Strings;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.*;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -62,7 +60,7 @@ public class OntologyPropertyResource {
 	public ResponseEntity<List<PropertySummary>> listAllPropertyByClass(
 			@PathVariable String cropname,
 			@RequestParam(value = "class", defaultValue = "", required = false) String className)
-			throws MiddlewareQueryException {
+			throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
@@ -72,8 +70,7 @@ public class OntologyPropertyResource {
 			List<PropertySummary> propertyList = this.ontologyPropertyService.getAllProperties();
 			return new ResponseEntity<>(propertyList, HttpStatus.OK);
 		}
-		List<PropertySummary> propertyList = this.ontologyPropertyService
-				.getAllPropertiesByClass(className);
+		List<PropertySummary> propertyList = this.ontologyPropertyService.getAllPropertiesByClass(className);
 		return new ResponseEntity<>(propertyList, HttpStatus.OK);
 
 	}

@@ -1,9 +1,8 @@
 package org.ibp.api.rest.ontology;
 
-import java.util.HashMap;
-import java.util.List;
-
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.CropNameValidator;
 import org.ibp.api.java.ontology.OntologyModelService;
@@ -18,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.HashMap;
+import java.util.List;
 
 @Api(value = "Ontology Class Service")
 @Controller
@@ -39,7 +38,7 @@ public class OntologyClassResource {
 	@ApiOperation(value = "All Classes", notes = "Get all Classes")
 	@RequestMapping(value = "/{cropname}/classes", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<String>> listAllClasses(@PathVariable String cropname) throws MiddlewareQueryException {
+	public ResponseEntity<List<String>> listAllClasses(@PathVariable String cropname) throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Class");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){

@@ -1,6 +1,6 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.CommonUtil;
 import org.ibp.api.domain.ontology.TermRequest;
 import org.springframework.stereotype.Component;
@@ -39,7 +39,7 @@ org.springframework.validation.Validator {
 			this.addCustomError(errors, OntologyValidator.CAN_NOT_DELETE_REFERRED_TERM,
 					new Object[] { request.getId(), request.getTermName() });
 
-		} catch (MiddlewareQueryException e) {
+		} catch (MiddlewareException e) {
 			this.log.error("Error while validating object", e);
 		}
 	}

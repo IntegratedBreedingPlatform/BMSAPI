@@ -1,11 +1,9 @@
 package org.ibp.api.rest.ontology;
 
-import java.util.HashMap;
-import java.util.List;
-
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.*;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -17,16 +15,16 @@ import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidato
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.ontology.OntologyMethodService;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.HashMap;
+import java.util.List;
 
 @Api(value = "Ontology Method Service")
 @Controller
@@ -57,7 +55,7 @@ public class OntologyMethodResource {
 	@ApiOperation(value = "All Methods", notes = "Get all methods")
 	@RequestMapping(value = "/{cropname}/methods", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<MethodSummary>> listAllMethods(@PathVariable String cropname) throws MiddlewareQueryException {
+	public ResponseEntity<List<MethodSummary>> listAllMethods(@PathVariable String cropname) throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
@@ -73,7 +71,7 @@ public class OntologyMethodResource {
 	@ApiOperation(value = "Get method by id", notes = "Get method using method id")
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<MethodResponse> getMethodById(@PathVariable String cropname, @PathVariable String id) throws MiddlewareQueryException {
+	public ResponseEntity<MethodResponse> getMethodById(@PathVariable String cropname, @PathVariable String id) throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
@@ -99,7 +97,7 @@ public class OntologyMethodResource {
 	@ApiOperation(value = "Add Method", notes = "Add a new Method")
 	@RequestMapping(value = "/{cropname}/methods", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> addMethod(@PathVariable String cropname, @RequestBody MethodRequestBase requestBase) throws MiddlewareQueryException {
+	public ResponseEntity<GenericResponse> addMethod(@PathVariable String cropname, @RequestBody MethodRequestBase requestBase) throws MiddlewareException {
 	  ModelMapper mapper = OntologyMapper.getInstance();
 	  MethodRequest request = mapper.map(requestBase, MethodRequest.class);
 	  BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
@@ -153,7 +151,7 @@ public class OntologyMethodResource {
 	@ApiOperation(value = "Delete Method", notes = "Delete Method by Id")
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public ResponseEntity deleteMethod(@PathVariable String cropname, @PathVariable String id) throws MiddlewareQueryException {
+	public ResponseEntity deleteMethod(@PathVariable String cropname, @PathVariable String id) throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
 		this.cropNameValidator.validate(cropname, bindingResult);

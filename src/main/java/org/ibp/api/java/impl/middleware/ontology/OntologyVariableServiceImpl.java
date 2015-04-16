@@ -1,13 +1,11 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import com.google.common.base.Strings;
-
 import org.generationcp.middleware.domain.oms.OntologyVariable;
 import org.generationcp.middleware.domain.oms.OntologyVariableInfo;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableRequest;
@@ -30,7 +28,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
     private OntologyManagerService ontologyManagerService;
 
     @Override
-    public List<VariableSummary> getAllVariablesByFilter(String programId, Integer propertyId, Boolean favourite) throws MiddlewareQueryException {
+    public List<VariableSummary> getAllVariablesByFilter(String programId, Integer propertyId, Boolean favourite) throws MiddlewareException {
         List<OntologyVariableSummary> variableSummaries = this.ontologyManagerService.getWithFilter(programId, favourite, null, propertyId, null);
         List<VariableSummary> variableSummaryList = new ArrayList<>();
 

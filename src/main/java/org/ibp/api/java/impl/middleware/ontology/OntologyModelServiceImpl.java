@@ -4,7 +4,7 @@ import com.google.common.base.Function;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.VariableType;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.ontology.IdName;
@@ -22,7 +22,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 	private OntologyManagerService ontologyManagerService;
 
 	@Override
-	public List<IdName> getAllDataTypes() throws MiddlewareQueryException {
+	public List<IdName> getAllDataTypes() throws MiddlewareException {
 		return Util.convertAll(Arrays.asList(DataType.values()), new Function<DataType, IdName>() {
 
 			@Override
@@ -33,7 +33,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 	}
 
 	@Override
-	public List<String> getAllClasses() throws MiddlewareQueryException {
+	public List<String> getAllClasses() throws MiddlewareException {
 		List<Term> classes = this.ontologyManagerService.getAllTraitClass();
 		List<String> classList = new ArrayList<>();
 
