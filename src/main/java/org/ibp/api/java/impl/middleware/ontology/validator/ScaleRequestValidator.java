@@ -17,8 +17,6 @@ import org.ibp.api.domain.ontology.ValidValues;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
-import com.google.common.base.Strings;
-
 /**
  * Add Scale/Update Scale Validation rules for Scale request Refer:
  * http://confluence.leafnode.io/display/CD/Services+Validation 1. Name is
@@ -80,24 +78,21 @@ org.springframework.validation.Validator {
 		}
 	}
 
-	private void validateCategoriesForUniqueness(List<VariableCategory> categories,
-			DataType dataType, Errors errors) {
+	private void validateCategoriesForUniqueness(List<VariableCategory> categories, DataType dataType, Errors errors) {
 		if (categories != null && Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)) {
 			Set<String> labels = new HashSet<>();
 			Set<String> values = new HashSet<>();
 			for (int i = 1; i <= categories.size(); i++) {
 				VariableCategory category = categories.get(i-1);
-				String name = category.getName();
-				String value = category.getDescription();
+				String name = category.getName().trim();
+				String value = category.getDescription().trim();
 
-				if(Strings.isNullOrEmpty(value)){
-					this.addCustomError(errors, "validValues.categories[" + i + "].description",
-						  OntologyValidator.CATEGORY_DESCRIPTION_IS_NECESSARY, null);
+				if(isNullOrEmpty(value)){
+					this.addCustomError(errors, "validValues.categories[" + i + "].description", OntologyValidator.CATEGORY_DESCRIPTION_IS_NECESSARY, null);
 				}
 
-				if(Strings.isNullOrEmpty(name)){
-					this.addCustomError(errors, "validValues.categories[" + i + "].name",
-						  OntologyValidator.CATEGORY_NAME_IS_NECESSARY, null);
+				if(isNullOrEmpty(name)){
+					this.addCustomError(errors, "validValues.categories[" + i + "].name", OntologyValidator.CATEGORY_NAME_IS_NECESSARY, null);
 				}
 
 				if (errors.hasErrors()) {
@@ -105,17 +100,15 @@ org.springframework.validation.Validator {
 				}
 
 				if (labels.contains(name)) {
-					this.addCustomError(errors, "validValues.categories[" + i + "].name",
-							ScaleRequestValidator.CATEGORIES_NAME_DUPLICATE, null);
+					this.addCustomError(errors, "validValues.categories[" + i + "].name", ScaleRequestValidator.CATEGORIES_NAME_DUPLICATE, null);
 				} else {
-					labels.add(category.getName());
+					labels.add(category.getName().trim());
 				}
 
 				if (values.contains(value)) {
-					this.addCustomError(errors, "validValues.categories[" + i + "].description",
-							ScaleRequestValidator.CATEGORIES_DESCRIPTION_DUPLICATE, null);
+					this.addCustomError(errors, "validValues.categories[" + i + "].description", ScaleRequestValidator.CATEGORIES_DESCRIPTION_DUPLICATE, null);
 				} else {
-					values.add(category.getDescription());
+					values.add(category.getDescription().trim());
 				}
 			}
 		}
@@ -131,8 +124,7 @@ org.springframework.validation.Validator {
 
 			// that method should exist with requestId
 			if (Objects.equals(oldScale, null)) {
-				this.addCustomError(errors, OntologyValidator.TERM_DOES_NOT_EXIST, new Object[] {
-						"scale", request.getId().toString() });
+				this.addCustomError(errors, OntologyValidator.TERM_DOES_NOT_EXIST, new Object[] {"scale", request.getId()});
 				return;
 			}
 
@@ -143,41 +135,31 @@ org.springframework.validation.Validator {
 
 			boolean isNameSame = Objects.equals(request.getName(), oldScale.getName());
 			if (!isNameSame) {
-				this.addCustomError(errors, "name", OntologyValidator.TERM_NOT_EDITABLE,
-						new Object[] { "scale", "name" });
+				this.addCustomError(errors, "name", OntologyValidator.TERM_NOT_EDITABLE,new Object[] { "scale", "name" });
 			}
 
-			boolean isDataTypeSame = Objects.equals(request.getDataTypeId(),
-					this.getDataTypeIdSafe(oldScale.getDataType()));
+			boolean isDataTypeSame = Objects.equals(request.getDataTypeId(), this.getDataTypeIdSafe(oldScale.getDataType()));
 			if (!isDataTypeSame) {
-				this.addCustomError(errors, "dataTypeId", OntologyValidator.TERM_NOT_EDITABLE,
-						new Object[] { "scale", "dataTypeId" });
+				this.addCustomError(errors, "dataTypeId", OntologyValidator.TERM_NOT_EDITABLE, new Object[] { "scale", "dataTypeId" });
 			}
 
-			ValidValues validValues = request.getValidValues() == null ? new ValidValues()
-			: request.getValidValues();
+			ValidValues validValues = request.getValidValues() == null ? new ValidValues() : request.getValidValues();
 			boolean minValuesAreEqual = Objects.equals(validValues.getMin(), oldScale.getMinValue());
 			boolean maxValuesAreEqual = Objects.equals(validValues.getMax(), oldScale.getMaxValue());
-			List<VariableCategory> categories = validValues.getCategories() == null ? new ArrayList<VariableCategory>()
-					: validValues.getCategories();
-			boolean categoriesEqualSize = Objects.equals(categories.size(), oldScale
-					.getCategories().size());
+			List<VariableCategory> categories = validValues.getCategories() == null ? new ArrayList<VariableCategory>() : validValues.getCategories();
+			boolean categoriesEqualSize = Objects.equals(categories.size(), oldScale .getCategories().size());
 			boolean categoriesValuesAreSame = true;
 			if (categoriesEqualSize) {
 				for (VariableCategory l : categories) {
-					if (oldScale.getCategories().containsKey(l.getName())
-							&& Objects.equals(oldScale.getCategories().get(l.getName()),
-									l.getDescription())) {
+					if (oldScale.getCategories().containsKey(l.getName()) && Objects.equals(oldScale.getCategories().get(l.getName()), l.getDescription())) {
 						continue;
 					}
 					categoriesValuesAreSame = false;
 					break;
 				}
 			}
-			if (!minValuesAreEqual || !maxValuesAreEqual || !categoriesEqualSize
-					|| !categoriesValuesAreSame) {
-				this.addCustomError(errors, "validValues", OntologyValidator.TERM_NOT_EDITABLE,
-						new Object[] { "scale", "validValues" });
+			if (!minValuesAreEqual || !maxValuesAreEqual || !categoriesEqualSize || !categoriesValuesAreSame) {
+				this.addCustomError(errors, "validValues", OntologyValidator.TERM_NOT_EDITABLE, new Object[] { "scale", "validValues" });
 			}
 
 		} catch (MiddlewareException e) {

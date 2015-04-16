@@ -63,14 +63,14 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 	@Override
 	public GenericResponse addScale(ScaleRequest request) throws MiddlewareException {
 		Scale scale = new Scale();
-		scale.setName(request.getName());
-		scale.setDefinition(request.getDescription());
+		scale.setName(request.getName().trim());
+		scale.setDefinition(request.getDescription().trim());
 
 		scale.setDataType(DataType.getById(request.getDataTypeId()));
 
 		if (Objects.equals(request.getDataTypeId(), CATEGORICAL_VARIABLE.getId())) {
 			for (VariableCategory category : request.getValidValues().getCategories()) {
-				scale.addCategory(category.getName(), category.getDescription());
+				scale.addCategory(category.getName().trim(), category.getDescription().trim());
 			}
 		}
 		if (Objects.equals(request.getDataTypeId(), NUMERIC_VARIABLE.getId())) {
