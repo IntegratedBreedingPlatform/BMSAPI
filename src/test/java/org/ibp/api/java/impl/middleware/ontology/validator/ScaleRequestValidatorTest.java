@@ -152,6 +152,9 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 		request.setName(this.scaleName);
 		request.setDescription(this.description);
 		request.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId());
+		ValidValues validValues = new ValidValues();
+		validValues.setCategories(new ArrayList<VariableCategory>());
+		request.setValidValues(validValues);
 
 		this.scaleRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -181,7 +184,7 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 
 		this.scaleRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
-		Assert.assertNotNull(bindingResult.getFieldError("validValues.categories[1].name"));
+		Assert.assertNotNull(bindingResult.getFieldError("validValues.categories[2].name"));
 	}
 
 	/**
