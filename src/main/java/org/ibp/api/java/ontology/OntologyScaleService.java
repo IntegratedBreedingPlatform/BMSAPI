@@ -1,7 +1,6 @@
 package org.ibp.api.java.ontology;
 
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.ScaleRequest;
 import org.ibp.api.domain.ontology.ScaleResponse;
@@ -15,9 +14,9 @@ public interface OntologyScaleService {
 	 * get all scales with details
 	 *
 	 * @return list of scales
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
-	List<ScaleSummary> getAllScales() throws MiddlewareQueryException;
+	List<ScaleSummary> getAllScales() throws MiddlewareException;
 
 	/**
 	 * get scale using given id
@@ -25,16 +24,15 @@ public interface OntologyScaleService {
 	 * @param id
 	 *            scale id
 	 * @return scale that matches id
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareException
 	 */
-	ScaleResponse getScaleById(Integer id) throws MiddlewareQueryException;
+	ScaleResponse getScaleById(Integer id) throws MiddlewareException;
 
 	/**
 	 * Adding new scale
 	 *
 	 * @param request
 	 *            ScaleRequest
-	 * @throws MiddlewareQueryException
 	 * @throws MiddlewareException
 	 */
 	GenericResponse addScale(ScaleRequest request) throws MiddlewareException;
@@ -44,7 +42,6 @@ public interface OntologyScaleService {
 	 *
 	 * @param request
 	 *            ScaleRequest instance that have new data
-	 * @throws MiddlewareQueryException
 	 * @throws MiddlewareException
 	 */
 	void updateScale(ScaleRequest request) throws MiddlewareException;
@@ -54,7 +51,6 @@ public interface OntologyScaleService {
 	 *
 	 * @param id
 	 *            scale to be deleted
-	 * @throws MiddlewareQueryException
 	 * @throws MiddlewareException
 	 */
 	void deleteScale(Integer id) throws MiddlewareException;

@@ -4,7 +4,6 @@ import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.api.CommonUtil;
 import org.ibp.api.domain.common.GenericResponse;
@@ -26,7 +25,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 	private OntologyManagerService ontologyManagerService;
 
 	@Override
-	public List<ScaleSummary> getAllScales() throws MiddlewareQueryException {
+	public List<ScaleSummary> getAllScales() throws MiddlewareException {
 		List<Scale> scales = this.ontologyManagerService.getAllScales();
 		List<ScaleSummary> scaleSummaries = new ArrayList<>();
 
@@ -40,7 +39,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 	}
 
 	@Override
-	public ScaleResponse getScaleById(Integer id) throws MiddlewareQueryException {
+	public ScaleResponse getScaleById(Integer id) throws MiddlewareException {
 		Scale scale = this.ontologyManagerService.getScaleById(id);
 		if (scale == null) {
 			return null;

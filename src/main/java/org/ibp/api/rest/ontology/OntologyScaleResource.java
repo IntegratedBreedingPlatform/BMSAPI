@@ -2,10 +2,8 @@ package org.ibp.api.rest.ontology;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.*;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -59,7 +57,7 @@ public class OntologyScaleResource {
 	@ApiOperation(value = "All Scales", notes = "Get all scales")
 	@RequestMapping(value = "/{cropname}/scales", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<ScaleSummary>> listAllScale(@PathVariable String cropname)throws MiddlewareQueryException {
+	public ResponseEntity<List<ScaleSummary>> listAllScale(@PathVariable String cropname)throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
@@ -77,7 +75,7 @@ public class OntologyScaleResource {
 	@RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<ScaleResponse> getScaleById(@PathVariable String cropname,
-			@PathVariable String id) throws MiddlewareQueryException {
+			@PathVariable String id) throws MiddlewareException {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 		this.cropNameValidator.validate(cropname, bindingResult);

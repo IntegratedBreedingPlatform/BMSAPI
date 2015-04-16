@@ -7,7 +7,7 @@ import java.util.List;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.VariableCategory;
@@ -66,10 +66,10 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for Name is required
 	 *
-	 * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
+	 * @throws org.generationcp.middleware.exceptions.MiddlewareException
 	 */
 	@Test
-	public void testWithNullNameRequest() throws MiddlewareQueryException {
+	public void testWithNullNameRequest() throws MiddlewareException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService)
 		.getTermByNameAndCvId(this.scaleName, this.cvId);
@@ -88,10 +88,10 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for Name is unique
 	 *
-	 * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
+	 * @throws org.generationcp.middleware.exceptions.MiddlewareException
 	 */
 	@Test
-	public void testWithUniqueNonNullScaleName() throws MiddlewareQueryException {
+	public void testWithUniqueNonNullScaleName() throws MiddlewareException {
 
 		Mockito.doReturn(new Term(10, this.scaleName, this.description))
 		.when(this.ontologyManagerService).getTermByNameAndCvId(this.scaleName, this.cvId);
@@ -231,10 +231,10 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for to check name length not exceed 200 characters
 	 *
-	 * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
+	 * @throws org.generationcp.middleware.exceptions.MiddlewareException
 	 */
 	@Test
-	public void testWithNameLengthExceedMaxLimit() throws MiddlewareQueryException {
+	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService)
 		.getTermByNameAndCvId(this.scaleName, this.cvId);
@@ -253,10 +253,10 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 	/**
 	 * Test for to check description length not exceed 255 characters
 	 *
-	 * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
+	 * @throws org.generationcp.middleware.exceptions.MiddlewareException
 	 */
 	@Test
-	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareQueryException {
+	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 
 		Mockito.doReturn(null).when(this.ontologyManagerService)
 		.getTermByNameAndCvId(this.scaleName, this.cvId);
