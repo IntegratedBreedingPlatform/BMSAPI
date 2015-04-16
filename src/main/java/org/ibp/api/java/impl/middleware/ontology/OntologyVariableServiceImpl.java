@@ -88,4 +88,27 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
         this.ontologyManagerService.addVariable(variableInfo);
         return new GenericResponse(variableInfo.getId());
     }
+
+    @Override
+    public void updateVariable(VariableRequest request) throws MiddlewareException {
+        OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+        variableInfo.setId(request.getId());
+        variableInfo.setName(request.getName());
+        variableInfo.setAlias(request.getAlias());
+        variableInfo.setDescription(request.getDescription());
+        variableInfo.setMethodId(request.getMethodId());
+        variableInfo.setPropertyId(request.getPropertyId());
+        variableInfo.setScaleId(request.getScaleId());
+
+        if (!Strings.isNullOrEmpty(request.getExpectedRange().getMin()) && !Strings.isNullOrEmpty(request.getExpectedRange().getMax())) {
+            variableInfo.setMinValue(request.getExpectedRange().getMin());
+            variableInfo.setMaxValue(request.getExpectedRange().getMax());
+        }
+
+        for (Integer i : request.getVariableTypeIds()) {
+            variableInfo.addVariableType(VariableType.getById(i));
+        }
+
+        this.ontologyManagerService.updateVariable(variableInfo);
+    }
 }

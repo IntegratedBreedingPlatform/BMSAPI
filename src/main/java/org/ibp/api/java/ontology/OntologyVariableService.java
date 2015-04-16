@@ -43,4 +43,13 @@ public interface OntologyVariableService {
 	 * @throws MiddlewareException
 	 */
 	GenericResponse addVariable(VariableRequest request) throws MiddlewareException;
+
+	/**
+	 * Add variable using given data
+	 *
+	 * @param request
+	 *            data to be added
+	 * @throws MiddlewareException
+	 */
+	void updateVariable(VariableRequest request) throws MiddlewareException;
 }

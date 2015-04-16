@@ -6,17 +6,16 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.TermRequest;
-import org.ibp.api.domain.ontology.VariableRequest;
-import org.ibp.api.domain.ontology.VariableResponse;
-import org.ibp.api.domain.ontology.VariableSummary;
+import org.ibp.api.domain.ontology.*;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.CropNameValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
+import org.ibp.api.java.impl.middleware.ontology.OntologyMapper;
 import org.ibp.api.java.impl.middleware.ontology.validator.RequestIdValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableRequestValidator;
 import org.ibp.api.java.ontology.OntologyVariableService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -127,18 +126,76 @@ public class OntologyVariableResource {
 	@ApiOperation(value = "Add Variable", notes = "Add new variable using given data")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> addVariable(@PathVariable String cropname, @RequestBody VariableRequest request, BindingResult bindingResult) throws MiddlewareException {
+	public ResponseEntity<GenericResponse> addVariable(@PathVariable String cropname, @RequestParam(value = "programId") String programId,
+													   @RequestBody AddVariableRequest addVariableRequest) throws MiddlewareException {
+
+		ModelMapper mapper = OntologyMapper.getInstance();
+		VariableRequest request = mapper.map(addVariableRequest, VariableRequest.class);
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 
+		this.programValidator.validate(programId, bindingResult);
+		if (bindingResult.hasErrors()) {
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
+		request.setProgramUuid(programId);
+
 		this.variableRequestValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
+
 		return new ResponseEntity<>(this.ontologyVariableService.addVariable(request), HttpStatus.CREATED);
+	}
+
+	/**
+	 *
+	 * @param cropname The name of the crop which is we wish to add variable.
+	 * @param programId programId to which variable is related
+	 * @param id variable id
+	 * @throws MiddlewareException
+	 */
+	@ApiOperation(value = "Update Variable", notes = "Update variable using given data")
+	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity updateVariable(@PathVariable String cropname,
+										 @RequestParam(value = "programId") String programId,
+										 @PathVariable String id,
+										 @RequestBody UpdateVariableRequest updateVariableDetail) throws MiddlewareException {
+
+		ModelMapper mapper = OntologyMapper.getInstance();
+		VariableRequest request = mapper.map(updateVariableDetail, VariableRequest.class);
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+		this.cropNameValidator.validate(cropname, bindingResult);
+		if(bindingResult.hasErrors()){
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
+		this.programValidator.validate(programId, bindingResult);
+		this.requestIdValidator.validate(id, bindingResult);
+
+		if (bindingResult.hasErrors()) {
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
+		request.setId(Integer.valueOf(id));
+		request.setProgramUuid(programId);
+
+		this.variableRequestValidator.validate(request, bindingResult);
+		if (bindingResult.hasErrors()) {
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
+		this.ontologyVariableService.updateVariable(request);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 }
