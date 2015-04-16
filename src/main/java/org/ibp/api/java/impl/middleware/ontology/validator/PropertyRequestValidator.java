@@ -117,11 +117,15 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 		}
 
 		// Convert to set to check duplication
-		Set<String> classesSet = new HashSet<>(classes);
+		Set<String> classesSet = new HashSet<>();
 
-		// If both size are same then there is no duplication of classes
-		if (classesSet.size() != classes.size()) {
-			this.addCustomError(errors, "classes", PropertyRequestValidator.DUPLICATE_ENTRIES_IN_CLASSES, null);
+		for(String c : request.getClasses()) {
+			String loweredName = c.toLowerCase();
+			if(classesSet.contains(loweredName)) {
+				this.addCustomError(errors, "classes", PropertyRequestValidator.DUPLICATE_ENTRIES_IN_CLASSES, null);
+				break;
+			}
+			classesSet.add(c.toLowerCase());
 		}
 
 		return errors.getErrorCount() == initialCount;
