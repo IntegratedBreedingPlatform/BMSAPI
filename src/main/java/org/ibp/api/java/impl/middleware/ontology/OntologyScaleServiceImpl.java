@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.ibp.api.CommonUtil;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.*;
 import org.ibp.api.java.ontology.OntologyScaleService;
@@ -69,8 +70,8 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 		scale.setDataType(DataType.getById(request.getDataTypeId()));
 
 		if (Objects.equals(request.getDataTypeId(), CATEGORICAL_VARIABLE.getId())) {
-			for (VariableCategory categoty : request.getValidValues().getCategories()) {
-				scale.addCategory(categoty.getName(), categoty.getDescription());
+			for (VariableCategory category : request.getValidValues().getCategories()) {
+				scale.addCategory(category.getName(), category.getDescription());
 			}
 		}
 		if (Objects.equals(request.getDataTypeId(), NUMERIC_VARIABLE.getId())) {
@@ -84,8 +85,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 
 	@Override
 	public void updateScale(ScaleRequest request) throws MiddlewareException {
-		Scale scale = new Scale(new Term(request.getId(), request.getName(),
-				request.getDescription()));
+		Scale scale = new Scale(new Term(CommonUtil.tryParseSafe(request.getId()), request.getName(), request.getDescription()));
 
 		scale.setDataType(DataType.getById(request.getDataTypeId()));
 

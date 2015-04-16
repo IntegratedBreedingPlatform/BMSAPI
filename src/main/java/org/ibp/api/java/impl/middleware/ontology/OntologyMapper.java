@@ -93,6 +93,20 @@ public class OntologyMapper {
 	};
 
 	/**
+	 * Custom mapping for RequestBody ScaleRequestBase to ScaleRequest
+	 */
+	private static PropertyMap<ScaleRequestBase, ScaleRequest> scaleBaseToRequest = new PropertyMap<ScaleRequestBase, ScaleRequest>() {
+		@Override
+		protected void configure() {
+			this.map().setId(null);
+			this.map().setName(this.source.getName());
+			this.map().setDescription(this.source.getDescription());
+			this.map().setDataTypeId(this.source.getDataTypeId());
+			this.map().setValidValues(this.source.getValidValues());
+		}
+	};
+
+	/**
 	 * Custom Mapping for Middleware Scale Class to ScaleSummary
 	 */
 	private static PropertyMap<Scale, ScaleSummary> scaleMap = new PropertyMap<Scale, ScaleSummary>() {
@@ -198,6 +212,16 @@ public class OntologyMapper {
 	public static ModelMapper propertyBaseToRequestMapper(){
 		ModelMapper mapper = new ModelMapper();
 		mapper.addMappings(OntologyMapper.propertyBaseToRequest);
+		return mapper;
+	}
+
+	/**
+	 * Customise Mapped Scale 'propertyBaseToRequest' is Initialize in Mapper and Returned
+	 * @return ModelMapper Instance
+	 */
+	public static ModelMapper scaleBaseToRequestMapper(){
+		ModelMapper mapper = new ModelMapper();
+		mapper.addMappings(OntologyMapper.scaleBaseToRequest);
 		return mapper;
 	}
 

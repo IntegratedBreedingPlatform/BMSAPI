@@ -1,17 +1,16 @@
 package org.ibp.api.rest.ontology;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.generationcp.middleware.domain.oms.*;
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.DataType;
+import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.domain.ontology.ScaleRequest;
+import org.ibp.api.domain.ontology.ScaleRequestBase;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.ibp.builders.ScaleBuilder;
 import org.junit.After;
@@ -30,7 +29,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.doAnswer;
 
@@ -139,7 +141,7 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 		validValues.setMin("10");
 		validValues.setMax("20");
 
-		ScaleRequest scaleRequest = new ScaleRequest();
+		ScaleRequestBase scaleRequest = new ScaleRequestBase();
 		scaleRequest.setName(this.scaleName);
 		scaleRequest.setDescription(this.scaleDescription);
 		scaleRequest.setDataTypeId(1110);
@@ -184,7 +186,7 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 		validValues.setMin("10");
 		validValues.setMax("20");
 
-		ScaleRequest scaleRequest = new ScaleRequest();
+		ScaleRequestBase scaleRequest = new ScaleRequestBase();
 		scaleRequest.setName(this.scaleName);
 		scaleRequest.setDescription(this.scaleDescription);
 		scaleRequest.setDataTypeId(1110);
