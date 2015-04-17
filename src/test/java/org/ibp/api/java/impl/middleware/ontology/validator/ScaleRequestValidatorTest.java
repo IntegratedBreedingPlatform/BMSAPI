@@ -134,7 +134,7 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 		ScaleRequest request = new ScaleRequest();
 		request.setName(this.scaleName);
 		request.setDescription(this.description);
-		request.setDataTypeId(0);
+		request.setDataTypeId("0");
 
 		this.scaleRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -151,7 +151,7 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 		ScaleRequest request = new ScaleRequest();
 		request.setName(this.scaleName);
 		request.setDescription(this.description);
-		request.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId());
+		request.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId().toString());
 		ValidValues validValues = new ValidValues();
 		validValues.setCategories(new ArrayList<VariableCategory>());
 		request.setValidValues(validValues);
@@ -179,7 +179,7 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 		ScaleRequest request = new ScaleRequest();
 		request.setName(this.scaleName);
 		request.setDescription(this.description);
-		request.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId());
+		request.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId().toString());
 		request.setValidValues(validValues);
 
 		this.scaleRequestValidator.validate(request, bindingResult);
@@ -201,7 +201,7 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 		ScaleRequest request = new ScaleRequest();
 		request.setName(this.scaleName);
 		request.setDescription(this.description);
-		request.setDataTypeId(DataType.NUMERIC_VARIABLE.getId());
+		request.setDataTypeId(DataType.NUMERIC_VARIABLE.getId().toString());
 		request.setValidValues(validValues);
 
 		this.scaleRequestValidator.validate(request, bindingResult);
@@ -223,7 +223,7 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 		ScaleRequest request = new ScaleRequest();
 		request.setName(this.scaleName);
 		request.setDescription(this.description);
-		request.setDataTypeId(DataType.NUMERIC_VARIABLE.getId());
+		request.setDataTypeId(DataType.NUMERIC_VARIABLE.getId().toString());
 		request.setValidValues(validValues);
 
 		this.scaleRequestValidator.validate(request, bindingResult);
@@ -292,7 +292,7 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 		ScaleRequest request = new ScaleRequest();
 		request.setName(this.scaleName);
 		request.setDescription(this.description);
-		request.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId());
+		request.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId().toString());
 		request.setValidValues(validValues);
 
 		this.scaleRequestValidator.validate(request, bindingResult);

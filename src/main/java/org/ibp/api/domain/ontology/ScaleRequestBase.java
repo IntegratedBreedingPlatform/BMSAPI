@@ -4,7 +4,7 @@ public class ScaleRequestBase {
 
 	private String name;
 	private String description;
-	private Integer dataTypeId;
+	private String dataTypeId;
 	private ValidValues validValues;
 
 	public String getName() {
@@ -23,11 +23,11 @@ public class ScaleRequestBase {
 		this.description = description;
 	}
 
-	public Integer getDataTypeId() {
+	public String getDataTypeId() {
 		return this.dataTypeId;
 	}
 
-	public void setDataTypeId(Integer dataTypeId) {
+	public void setDataTypeId(String dataTypeId) {
 		this.dataTypeId = dataTypeId;
 	}
 

@@ -65,10 +65,13 @@ org.springframework.validation.Validator {
 		boolean dataTypeValidationResult = dataTypeValidationProcessor(request, errors);
 
 		if(dataTypeValidationResult){
-			if (Objects.equals(request.getDataTypeId(), DataType.CATEGORICAL_VARIABLE.getId())) {
+
+			Integer dataTypeId = CommonUtil.tryParseSafe(request.getDataTypeId());
+
+			if (Objects.equals(dataTypeId, DataType.CATEGORICAL_VARIABLE.getId())) {
 				categoricalDataTypeValidationProcessor(request, errors);
 			}
-			if (Objects.equals(request.getDataTypeId(), DataType.NUMERIC_VARIABLE.getId())) {
+			if (Objects.equals(dataTypeId, DataType.NUMERIC_VARIABLE.getId())) {
 				numericDataTypeValidationProcessor(request, errors);
 			}
 		}
@@ -138,7 +141,7 @@ org.springframework.validation.Validator {
 				this.addCustomError(errors, "name", OntologyValidator.TERM_NOT_EDITABLE,new Object[] { "scale", "name" });
 			}
 
-			boolean isDataTypeSame = Objects.equals(request.getDataTypeId(), this.getDataTypeIdSafe(oldScale.getDataType()));
+			boolean isDataTypeSame = Objects.equals(CommonUtil.tryParseSafe(request.getDataTypeId()), this.getDataTypeIdSafe(oldScale.getDataType()));
 			if (!isDataTypeSame) {
 				this.addCustomError(errors, "dataTypeId", OntologyValidator.TERM_NOT_EDITABLE, new Object[] { "scale", "dataTypeId" });
 			}
@@ -213,6 +216,14 @@ org.springframework.validation.Validator {
 			return false;
 		}
 
+		if(!this.isNonNullValidNumericString(request.getDataTypeId())){
+			addCustomError(errors, "dataTypeId", VALUE_SHOULD_BE_NUMERIC, null);
+		}
+
+		if (errors.getErrorCount() > initialCount) {
+			return false;
+		}
+
 		// 4. The data type ID must correspond to the ID of one of the supported
 		// data types (Numeric, Categorical, Character, DateTime, Person,
 		// Location or any other special data type that we add)
@@ -225,7 +236,7 @@ org.springframework.validation.Validator {
 
 		Integer initialCount = errors.getErrorCount();
 
-		DataType dataType = DataType.getById(request.getDataTypeId());
+		DataType dataType = DataType.getById(CommonUtil.tryParseSafe(request.getDataTypeId()));
 
 		ValidValues validValues = request.getValidValues() == null ? new ValidValues() : request.getValidValues();
 
@@ -254,7 +265,7 @@ org.springframework.validation.Validator {
 
 		Integer initialCount = errors.getErrorCount();
 
-		DataType dataType = DataType.getById(request.getDataTypeId());
+		DataType dataType = DataType.getById(CommonUtil.tryParseSafe(request.getDataTypeId()));
 
 		ValidValues validValues = request.getValidValues() == null ? new ValidValues() : request.getValidValues();
 

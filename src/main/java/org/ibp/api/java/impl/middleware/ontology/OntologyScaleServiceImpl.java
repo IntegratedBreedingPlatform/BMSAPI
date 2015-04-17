@@ -66,14 +66,15 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 		scale.setName(request.getName().trim());
 		scale.setDefinition(request.getDescription().trim());
 
-		scale.setDataType(DataType.getById(request.getDataTypeId()));
+		Integer dataTypeId = CommonUtil.tryParseSafe(request.getDataTypeId());
+		scale.setDataType(DataType.getById(dataTypeId));
 
-		if (Objects.equals(request.getDataTypeId(), CATEGORICAL_VARIABLE.getId())) {
+		if (Objects.equals(dataTypeId, CATEGORICAL_VARIABLE.getId())) {
 			for (VariableCategory category : request.getValidValues().getCategories()) {
 				scale.addCategory(category.getName().trim(), category.getDescription().trim());
 			}
 		}
-		if (Objects.equals(request.getDataTypeId(), NUMERIC_VARIABLE.getId())) {
+		if (Objects.equals(dataTypeId, NUMERIC_VARIABLE.getId())) {
 			scale.setMinValue(request.getValidValues().getMin());
 			scale.setMaxValue(request.getValidValues().getMax());
 		}
@@ -84,19 +85,20 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 
 	@Override
 	public void updateScale(ScaleRequest request) throws MiddlewareException {
-		Scale scale = new Scale(new Term(CommonUtil.tryParseSafe(request.getId()), request.getName(), request.getDescription()));
+		Scale scale = new Scale(new Term(CommonUtil.tryParseSafe(request.getId()), request.getName().trim(), request.getDescription().trim()));
 
-		scale.setDataType(DataType.getById(request.getDataTypeId()));
+		Integer dataTypeId = CommonUtil.tryParseSafe(request.getDataTypeId());
 
-		ValidValues validValues = Objects.equals(request.getValidValues(), null) ? new ValidValues()
-				: request.getValidValues();
+		scale.setDataType(DataType.getById(dataTypeId));
 
-		if (Objects.equals(request.getDataTypeId(), CATEGORICAL_VARIABLE.getId())) {
+		ValidValues validValues = Objects.equals(request.getValidValues(), null) ? new ValidValues() : request.getValidValues();
+
+		if (Objects.equals(dataTypeId, CATEGORICAL_VARIABLE.getId())) {
 			for (VariableCategory description : validValues.getCategories()) {
-				scale.addCategory(description.getName(), description.getDescription());
+				scale.addCategory(description.getName().trim(), description.getDescription().trim());
 			}
 		}
-		if (Objects.equals(request.getDataTypeId(), NUMERIC_VARIABLE.getId())) {
+		if (Objects.equals(dataTypeId, NUMERIC_VARIABLE.getId())) {
 			scale.setMinValue(validValues.getMin());
 			scale.setMaxValue(validValues.getMax());
 		}

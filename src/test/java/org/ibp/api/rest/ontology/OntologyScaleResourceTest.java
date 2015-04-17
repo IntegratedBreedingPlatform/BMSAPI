@@ -144,7 +144,7 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 		ScaleRequestBase scaleRequest = new ScaleRequestBase();
 		scaleRequest.setName(this.scaleName);
 		scaleRequest.setDescription(this.scaleDescription);
-		scaleRequest.setDataTypeId(1110);
+		scaleRequest.setDataTypeId("1110");
 		scaleRequest.setValidValues(validValues);
 
 		Scale scale = new Scale();
@@ -189,7 +189,7 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 		ScaleRequestBase scaleRequest = new ScaleRequestBase();
 		scaleRequest.setName(this.scaleName);
 		scaleRequest.setDescription(this.scaleDescription);
-		scaleRequest.setDataTypeId(1110);
+		scaleRequest.setDataTypeId("1110");
 		scaleRequest.setValidValues(validValues);
 
 		Scale scale = new Scale(new Term(1, this.scaleName, this.scaleDescription));

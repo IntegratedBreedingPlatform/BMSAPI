@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.ibp.api.CommonUtil;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
@@ -84,8 +85,8 @@ public abstract class OntologyValidator extends BaseValidator {
 		}
 	}
 
-	protected void shouldHaveValidDataType(String fieldName, Integer dataTypeId, Errors errors) {
-		if (DataType.getById(dataTypeId) == null) {
+	protected void shouldHaveValidDataType(String fieldName, String dataTypeId, Errors errors) {
+		if (DataType.getById(CommonUtil.tryParseSafe(dataTypeId)) == null) {
 			this.addCustomError(errors, fieldName, OntologyValidator.SHOULD_HAVE_VALID_DATA_TYPE, new Object[] {dataTypeId});
 		}
 	}
