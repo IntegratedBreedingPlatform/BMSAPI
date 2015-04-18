@@ -14,7 +14,7 @@ org.springframework.validation.Validator {
 
 	@Override
 	public void validate(Object target, Errors errors) {
-		this.shouldNotNullOrEmpty("id", target, errors);
+		this.shouldNotNullOrEmpty("ID", "id", target, errors);
 		if (errors.hasErrors()) {
 			return;
 		}
@@ -24,6 +24,6 @@ org.springframework.validation.Validator {
 		}
 
 		String id = (String) target;
-		this.checkNumberFieldAndLength(id, errors);
+		this.checkNumberField(id, errors);
 	}
 }

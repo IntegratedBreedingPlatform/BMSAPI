@@ -7,6 +7,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.CommonUtil;
 import org.ibp.api.domain.ontology.ExpectedRange;
 import org.ibp.api.domain.ontology.VariableRequest;
 import org.ibp.builders.MethodBuilder;
@@ -165,25 +166,25 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 		VariableRequest request = new VariableRequest();
 		request.setName(this.variableName);
 		request.setDescription(this.variableDescription);
-		request.setPropertyId(10);
-		request.setMethodId(11);
-		request.setScaleId(12);
-	  	request.setVariableTypeIds(new ArrayList<>(Collections.singletonList(1)));
+		request.setPropertyId("10");
+		request.setMethodId("11");
+		request.setScaleId("12");
+	  	request.setVariableTypeIds(new ArrayList<>(Collections.singletonList("1")));
 	  	request.setExpectedRange(expectedRange);
+
+		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
+		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(request.getName(), CvId.VARIABLES.getId());
 		Mockito.doReturn(
-				new ScaleBuilder().build(12, this.scaleName, this.scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null)).when(this.ontologyManagerService).getScaleById(
-				request.getScaleId());
-		Mockito.doReturn(new Term(10, this.propertyName, this.propertyDescription, CvId.PROPERTIES.getId(), null)).when(this.ontologyManagerService).getTermById(
-				request.getPropertyId());
-		Mockito.doReturn(new Term(11, this.methodName, this.methodDescription, CvId.METHODS.getId(), null)).when(
-				this.ontologyManagerService).getTermById(request.getMethodId());
+				new ScaleBuilder().build(12, this.scaleName, this.scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null)).when(this.ontologyManagerService).getScaleById(scaleId);
+		Mockito.doReturn(new Term(10, this.propertyName, this.propertyDescription, CvId.PROPERTIES.getId(), null)).when(this.ontologyManagerService).getTermById(propertyId);
+		Mockito.doReturn(new Term(11, this.methodName, this.methodDescription, CvId.METHODS.getId(), null)).when(this.ontologyManagerService).getTermById(methodId);
 		Mockito.doReturn(new Term(12, this.scaleName, this.scaleDescription, CvId.SCALES.getId(),
-				null)).when(this.ontologyManagerService).getTermById(request.getScaleId());
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyManagerService).getWithFilter(null, null,
-				request.getMethodId(), request.getPropertyId(), request.getScaleId());
+				null)).when(this.ontologyManagerService).getTermById(scaleId);
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyManagerService).getWithFilter(null, null,methodId, propertyId, scaleId);
 
 	  	//Mock OntologyVariableInfo Class and when addVariable method called it will set id to 1 and return (self member alter if void is return type of method)
 		doAnswer(new Answer<Void>() {

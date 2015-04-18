@@ -15,8 +15,20 @@ public abstract class BaseValidator {
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
 
-    protected static final String INVALID_ID = "invalid.id";
-    protected static final String SHOULD_NOT_NULL_OR_EMPTY = "should.not.be.null";
+    protected static final String INVALID_ID = "id.is.invalid.format";
+    protected static final String INVALID_TYPE_ID = "type.id.is.invalid.format";
+    protected static final String ID_DOES_NOT_EXIST = "id.does.not.exist";
+    protected static final String FIELD_IS_REQUIRED = "field.is.required";
+    protected static final String FIELD_SHOULD_BE_NUMERIC = "field.should.be.numeric";
+    protected static final String FIELD_SHOULD_BE_STRING = "field.should.be.string";
+    protected static final String TEXTUAL_FIELD_IS_TOO_LONG = "textual.field.is.too.long";
+    protected static final String LIST_TEXTUAL_FIELD_IS_TOO_LONG = "list.textual.field.is.too.long";
+    protected static final String NAME_ALREADY_EXIST = "name.already.exist";
+    protected static final String RECORD_IS_NOT_EDITABLE = "record.is.not.editable";
+    protected static final String RECORD_IS_NOT_DELETABLE = "record.is.not.deletable";
+    protected static final String LIST_SHOULD_NOT_BE_EMPTY = "list.should.not.be.empty";
+    protected static final String MIN_MAX_NOT_VALID = "min.max.not.valid";
+    protected static final String MIN_SHOULD_NOT_GREATER_THEN_MAX = "min.should.not.be.greater.than.max";
 
     protected boolean isNonNullValidNumericString(Object value) {
         return value != null && (value instanceof Integer || value instanceof String && ((String) value).matches("^[0-9]+$"));
@@ -34,7 +46,7 @@ public abstract class BaseValidator {
         return defaultValue;
     }
 
-    protected void checkNumberFieldAndLength(String value, Errors errors){
+    protected void checkNumberField(String value, Errors errors){
         if(value.matches("^[0-9]+$")){
             try{
                 Integer.valueOf(value);
@@ -83,17 +95,11 @@ public abstract class BaseValidator {
         errors.reject(errorCode, arguments, null);
     }
 
-    protected void shouldNotNullOrEmpty(String fieldName, Object value, Errors errors){
+    protected void shouldNotNullOrEmpty(String termName, String fieldName, Object value, Errors errors){
         if(!isNullOrEmpty(value)){
             return;
         }
-        addCustomError(errors, fieldName, SHOULD_NOT_NULL_OR_EMPTY, new Object[]{fieldName});
-    }
-
-    protected void checkIntegerNull(String fieldName, Integer value, Errors errors){
-        if(value == null){
-            addCustomError(errors,fieldName, SHOULD_NOT_NULL_OR_EMPTY, null);
-        }
+        addCustomError(errors, fieldName, FIELD_IS_REQUIRED, new Object[]{termName});
     }
 
     /**
@@ -102,7 +108,15 @@ public abstract class BaseValidator {
      * @param errors The current errors collection
      */
     protected void addDefaultError(Errors errors) {
-        errors.reject("error.standard.defaultMessage");
+        errors.reject("unknown.error");
+    }
+
+    protected void addRequestShouldNotBeNull(Errors errors) {
+        errors.reject("request.null");
+    }
+
+    protected void addInvalidRequestBody(Errors errors){
+        errors.reject("request.body.invalid");
     }
 
     protected void logError(final Throwable cause){

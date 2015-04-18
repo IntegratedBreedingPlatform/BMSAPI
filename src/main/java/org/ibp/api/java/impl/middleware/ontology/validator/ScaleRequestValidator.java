@@ -19,28 +19,32 @@ import org.springframework.validation.Errors;
 
 /**
  * Add Scale/Update Scale Validation rules for Scale request Refer:
- * http://confluence.leafnode.io/display/CD/Services+Validation 1. Name is
- * required 2. The name must be unique 3. Data type is required 4. The data type
- * ID must correspond to the ID of one of the supported data types (Numeric,
- * Categorical, Character, DateTime, Person, Location or any other special data
- * type that we add) 5. If the data type is categorical, at least one category
- * must be submitted 6. Categories are only stored if the data type is
- * categorical 7. If there are categories, all labels and values within the set
- * of categories must be unique 8. The min and max valid values are only stored
- * if the data type is numeric 9. If the data type is numeric and minimum and
- * maximum valid values are provided (they are not mandatory), they must be
- * numeric values 10. If present, the minimum valid value must be less than or
- * equal to the maximum valid value, and the maximum valid value must be greater
- * than or equal to the minimum valid value 11. The name, data type and valid
- * values cannot be changed if the scale is already in use 12. Name is no more
- * than 200 characters 13. Description is no more than 255 characters
+ * http://confluence.leafnode.io/display/CD/Services+Validation
+ * 1. Name is required
+ * 2. The name must be unique
+ * 3. Data type is required
+ * 4. The data type ID must correspond to the ID of one of the supported data types (Numeric, Categorical, Character, DateTime, Person, Location or any other special data type that we add)
+ * 5. If the data type is categorical, at least one category must be submitted
+ * 6. Categories are only stored if the data type is categorical
+ * 7. If there are categories, all labels and values within the set of categories must be unique
+ * 8. The min and max valid values are only stored if the data type is numeric
+ * 9. If the data type is numeric and minimum and maximum valid values are provided (they are not mandatory), they must be numeric values
+ * 10. If present, the minimum valid value must be less than or equal to the maximum valid value, and the maximum valid value must be greater than or equal to the minimum valid value
+ * 11. The name, data type and valid values cannot be changed if the scale is already in use
+ * 12. Name is no more than 200 characters
+ * 13. Description is no more than 255 characters
  */
 @Component
 public class ScaleRequestValidator extends OntologyValidator implements
 org.springframework.validation.Validator {
 
-	static final String CATEGORIES_NAME_DUPLICATE = "scale.categories.name.duplicate";
-	static final String CATEGORIES_DESCRIPTION_DUPLICATE = "scale.categories.description.duplicate";
+	private static final Integer NAME_TEXT_LIMIT = 200;
+	private static final Integer DESCRIPTION_TEXT_LIMIT = 255;
+
+	private static final String SCALE_CATEGORIES_NAME_DUPLICATE = "scale.category.name.duplicate";
+	private static final String SCALE_CATEGORIES_DESCRIPTION_DUPLICATE = "scale.category.description.duplicate";
+	private static final String SCALE_CATEGORY_DESCRIPTION_REQUIRED = "scale.category.description.required";
+	private static final String SCALE_NAME_DESCRIPTION_REQUIRED = "scale.category.name.required";
 
 	@Override
 	public boolean supports(Class<?> aClass) {
@@ -50,13 +54,7 @@ org.springframework.validation.Validator {
 	@Override
 	public void validate(Object target, Errors errors) {
 
-		this.shouldNotNullOrEmpty("request", target, errors);
-
 		ScaleRequest request = (ScaleRequest) target;
-
-		if (errors.hasErrors()) {
-			return;
-		}
 
 		boolean nameValidationResult = nameValidationProcessor(request, errors);
 
@@ -91,11 +89,11 @@ org.springframework.validation.Validator {
 				String value = category.getDescription().trim();
 
 				if(isNullOrEmpty(value)){
-					this.addCustomError(errors, "validValues.categories[" + i + "].description", OntologyValidator.CATEGORY_DESCRIPTION_IS_NECESSARY, null);
+					this.addCustomError(errors, "validValues.categories[" + i + "].description", SCALE_CATEGORY_DESCRIPTION_REQUIRED, null);
 				}
 
 				if(isNullOrEmpty(name)){
-					this.addCustomError(errors, "validValues.categories[" + i + "].name", OntologyValidator.CATEGORY_NAME_IS_NECESSARY, null);
+					this.addCustomError(errors, "validValues.categories[" + i + "].name", SCALE_NAME_DESCRIPTION_REQUIRED, null);
 				}
 
 				if (errors.hasErrors()) {
@@ -103,13 +101,13 @@ org.springframework.validation.Validator {
 				}
 
 				if (labels.contains(name)) {
-					this.addCustomError(errors, "validValues.categories[" + i + "].name", ScaleRequestValidator.CATEGORIES_NAME_DUPLICATE, null);
+					this.addCustomError(errors, "validValues.categories[" + i + "].name", SCALE_CATEGORIES_NAME_DUPLICATE, null);
 				} else {
 					labels.add(category.getName().trim());
 				}
 
 				if (values.contains(value)) {
-					this.addCustomError(errors, "validValues.categories[" + i + "].description", ScaleRequestValidator.CATEGORIES_DESCRIPTION_DUPLICATE, null);
+					this.addCustomError(errors, "validValues.categories[" + i + "].description", SCALE_CATEGORIES_DESCRIPTION_DUPLICATE, null);
 				} else {
 					values.add(category.getDescription().trim());
 				}
@@ -127,7 +125,7 @@ org.springframework.validation.Validator {
 
 			// that method should exist with requestId
 			if (Objects.equals(oldScale, null)) {
-				this.addCustomError(errors, OntologyValidator.TERM_DOES_NOT_EXIST, new Object[] {"scale", request.getId()});
+				this.addCustomError(errors, ID_DOES_NOT_EXIST, new Object[] {"Scale", request.getId()});
 				return;
 			}
 
@@ -138,12 +136,12 @@ org.springframework.validation.Validator {
 
 			boolean isNameSame = Objects.equals(request.getName(), oldScale.getName());
 			if (!isNameSame) {
-				this.addCustomError(errors, "name", OntologyValidator.TERM_NOT_EDITABLE,new Object[] { "scale", "name" });
+				this.addCustomError(errors, "name", RECORD_IS_NOT_EDITABLE,new Object[] { "scale", "Name" });
 			}
 
 			boolean isDataTypeSame = Objects.equals(CommonUtil.tryParseSafe(request.getDataTypeId()), this.getDataTypeIdSafe(oldScale.getDataType()));
 			if (!isDataTypeSame) {
-				this.addCustomError(errors, "dataTypeId", OntologyValidator.TERM_NOT_EDITABLE, new Object[] { "scale", "dataTypeId" });
+				this.addCustomError(errors, "dataTypeId", RECORD_IS_NOT_EDITABLE, new Object[] { "scale", "DataTypeId" });
 			}
 
 			ValidValues validValues = request.getValidValues() == null ? new ValidValues() : request.getValidValues();
@@ -162,7 +160,7 @@ org.springframework.validation.Validator {
 				}
 			}
 			if (!minValuesAreEqual || !maxValuesAreEqual || !categoriesEqualSize || !categoriesValuesAreSame) {
-				this.addCustomError(errors, "validValues", OntologyValidator.TERM_NOT_EDITABLE, new Object[] { "scale", "validValues" });
+				this.addCustomError(errors, "validValues", RECORD_IS_NOT_EDITABLE, new Object[] { "scale", "ValidValues" });
 			}
 
 		} catch (MiddlewareException e) {
@@ -180,17 +178,17 @@ org.springframework.validation.Validator {
 		Integer initialCount = errors.getErrorCount();
 
 		// 1. Name is required
-		this.shouldNotNullOrEmpty("name", request.getName(), errors);
+		this.shouldNotNullOrEmpty("Name", "name", request.getName(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
 
 		// 12. Name is no more than 200 characters
-		this.nameShouldHaveMax200Chars("name", request.getName(), errors);
+		this.fieldShouldNotOverflow("name", request.getName(), NAME_TEXT_LIMIT, errors);
 
 		// 2. The name must be unique
-		this.checkTermUniqueness(CommonUtil.tryParseSafe(request.getId()), request.getName(), CvId.SCALES.getId(), "scale", errors);
+		this.checkTermUniqueness("Scale", CommonUtil.tryParseSafe(request.getId()), request.getName(), CvId.SCALES.getId(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
@@ -200,7 +198,7 @@ org.springframework.validation.Validator {
 		Integer initialCount = errors.getErrorCount();
 
 		// 13. Description is no more than 255 characters
-		this.descriptionShouldHaveMax255Chars("description", request.getDescription(), errors);
+		this.fieldShouldNotOverflow("description", request.getDescription(), DESCRIPTION_TEXT_LIMIT, errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
@@ -210,14 +208,14 @@ org.springframework.validation.Validator {
 		Integer initialCount = errors.getErrorCount();
 
 		// 3. Data type is required
-		this.shouldNotNullOrEmpty("dataTypeId", request.getDataTypeId(), errors);
+		this.shouldNotNullOrEmpty("Data Type", "dataTypeId", request.getDataTypeId(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
 
 		if(!this.isNonNullValidNumericString(request.getDataTypeId())){
-			addCustomError(errors, "dataTypeId", VALUE_SHOULD_BE_NUMERIC, null);
+			addCustomError(errors, "dataTypeId", INVALID_TYPE_ID, new Object[]{"Data Type"});
 		}
 
 		if (errors.getErrorCount() > initialCount) {
@@ -227,7 +225,9 @@ org.springframework.validation.Validator {
 		// 4. The data type ID must correspond to the ID of one of the supported
 		// data types (Numeric, Categorical, Character, DateTime, Person,
 		// Location or any other special data type that we add)
-		this.shouldHaveValidDataType("dataTypeId", request.getDataTypeId(), errors);
+		if (DataType.getById(CommonUtil.tryParseSafe(request.getDataTypeId())) == null) {
+			this.addCustomError(errors, "dataTypeId", INVALID_TYPE_ID, new Object[] {"Data Type"});
+		}
 
 		return errors.getErrorCount() == initialCount;
 	}
@@ -246,7 +246,7 @@ org.springframework.validation.Validator {
 		// submitted
 		if (Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)) {
 			if (categories.isEmpty()) {
-				this.addCustomError(errors, "validValues.categories", OntologyValidator.CATEGORY_SHOULD_HAVE_AT_LEAST_ONE_ITEM, null);
+				this.addCustomError(errors, "validValues.categories", LIST_SHOULD_NOT_BE_EMPTY, new Object[]{"category"});
 			}
 		}
 
@@ -276,11 +276,11 @@ org.springframework.validation.Validator {
 		// are provided (they are not mandatory), they must be numeric values
 		if (Objects.equals(dataType, DataType.NUMERIC_VARIABLE)) {
 			if (minValue != null && !this.isNonNullValidNumericString(minValue)) {
-				this.addCustomError(errors, "validValues.min", OntologyValidator.VALUE_SHOULD_BE_NUMERIC, null);
+				this.addCustomError(errors, "validValues.min", FIELD_SHOULD_BE_NUMERIC, null);
 			}
 
 			if (maxValue != null && !this.isNonNullValidNumericString(maxValue)) {
-				this.addCustomError(errors, "validValues.max", OntologyValidator.VALUE_SHOULD_BE_NUMERIC, null);
+				this.addCustomError(errors, "validValues.max", FIELD_SHOULD_BE_NUMERIC, null);
 			}
 		}
 

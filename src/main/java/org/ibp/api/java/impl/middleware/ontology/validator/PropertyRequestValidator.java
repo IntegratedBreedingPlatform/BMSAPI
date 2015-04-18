@@ -10,17 +10,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
 /**
- * Request validator for add/edit property 1 Name is required 2 Name is no more
- * than 200 characters 3 Name is unique 4 Description is no more than 255
- * characters 5 Classes must be an array containing at least one string 6 Each
- * class should contain unique value 7 Name cannot change if the property is
- * already in use 8 Individual classes may not be longer than 200 characters each
+ * Request validator for add/edit property
+ * 1 Name is required
+ * 2 Name is no more than 200 characters
+ * 3 Name is unique
+ * 4 Description is no more than 255 characters
+ * 5 Classes must be an array containing at least one string
+ * 6 Each class should contain unique value
+ * 7 Name cannot change if the property is already in use
+ * 8 Individual classes may not be longer than 200 characters each
  */
 @Component
 public class PropertyRequestValidator extends OntologyValidator implements org.springframework.validation.Validator {
 
-	static final String DUPLICATE_ENTRIES_IN_CLASSES = "property.class.duplicate.entries";
-	static final String CLASS_IS_NECESSARY = "property.class.is.necessary";
+	private static final Integer NAME_TEXT_LIMIT = 200;
+	private static final Integer DESCRIPTION_TEXT_LIMIT = 255;
 
 	@Override
 	public boolean supports(Class<?> aClass) {
@@ -30,13 +34,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 	@Override
 	public void validate(Object target, Errors errors) {
 
-		this.shouldNotNullOrEmpty("request", target, errors);
-
 		PropertyRequest request = (PropertyRequest) target;
-
-		if (errors.hasErrors()) {
-			return;
-		}
 
 		boolean nameValidationResult = nameValidationProcessor(request, errors);
 
@@ -54,17 +52,17 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 		Integer initialCount = errors.getErrorCount();
 
 		// 1. Name is required
-		this.shouldNotNullOrEmpty("name", request.getName(), errors);
+		this.shouldNotNullOrEmpty("Name", "name", request.getName(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
 
 		// 2. Name is no more than 200 characters
-		this.nameShouldHaveMax200Chars("name", request.getName(), errors);
+		this.fieldShouldNotOverflow("name", request.getName(), NAME_TEXT_LIMIT, errors);
 
 		// 3. Name is unique
-		this.checkTermUniqueness(CommonUtil.tryParseSafe(request.getId()), request.getName(), CvId.PROPERTIES.getId(), "property", errors);
+		this.checkTermUniqueness("Property", CommonUtil.tryParseSafe(request.getId()), request.getName(), CvId.PROPERTIES.getId(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
@@ -73,7 +71,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 		Integer initialCount = errors.getErrorCount();
 
 		// 4. Description is no more than 255 characters
-		this.descriptionShouldHaveMax255Chars("description", request.getDescription(), errors);
+		this.fieldShouldNotOverflow("description", request.getDescription(), DESCRIPTION_TEXT_LIMIT, errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
@@ -82,11 +80,13 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 		Integer initialCount = errors.getErrorCount();
 
 		List<String> nonEmptyClasses = new ArrayList<>();
+		Set<String> classesSet = new HashSet<>();
 
 		for(String c : request.getClasses()) {
-			if(isNullOrEmpty(c)){
+			if(isNullOrEmpty(c) || classesSet.contains(c.toLowerCase())){
 				continue;
 			}
+			classesSet.add(c.toLowerCase());
 			nonEmptyClasses.add(c);
 		}
 
@@ -95,7 +95,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 		// 5. Classes must be an array containing at least one string
 		//this.shouldNotNullOrEmpty("classes", request.getClasses(), errors);
 		if(request.getClasses().isEmpty()){
-			this.addCustomError(errors, "classes", PropertyRequestValidator.CLASS_IS_NECESSARY, null);
+			this.addCustomError(errors, "classes", LIST_SHOULD_NOT_BE_EMPTY, new Object[]{"class"});
 		}
 
 		// Need to return from here because we should not check other
@@ -105,27 +105,13 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 		}
 
 		// 6 Each class should contain unique values
-
 		List<String> classes = request.getClasses();
 
 		for (int i = 1; i <= classes.size(); i++) {
-			this.classShouldHaveMax200Chars("classes[" + i + "]", classes.get(i-1), errors);
-		}
-
-		if (errors.getErrorCount() > initialCount) {
-			return false;
-		}
-
-		// Convert to set to check duplication
-		Set<String> classesSet = new HashSet<>();
-
-		for(String c : request.getClasses()) {
-			String loweredName = c.toLowerCase();
-			if(classesSet.contains(loweredName)) {
-				this.addCustomError(errors, "classes", PropertyRequestValidator.DUPLICATE_ENTRIES_IN_CLASSES, null);
+			this.listShouldNotOverflow("class names", "classes", classes.get(i-1), NAME_TEXT_LIMIT, errors);
+			if (errors.getErrorCount() > initialCount) {
 				break;
 			}
-			classesSet.add(c.toLowerCase());
 		}
 
 		return errors.getErrorCount() == initialCount;
@@ -147,7 +133,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 
 			// that property should exist with requestId
 			if (Objects.equals(oldProperty, null)) {
-				this.addCustomError(errors, OntologyValidator.TERM_DOES_NOT_EXIST, new Object[] { "property", request.getId() });
+				this.addCustomError(errors, ID_DOES_NOT_EXIST, new Object[] { "Property", request.getId() });
 				return false;
 			}
 
@@ -168,7 +154,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 			return false;
 		}
 
-		this.addCustomError(errors, "name", OntologyValidator.TERM_NOT_EDITABLE, new Object[]{"property", "name"});
+		this.addCustomError(errors, "name", RECORD_IS_NOT_EDITABLE, new Object[]{"property", "Name"});
 
 		return errors.getErrorCount() == initialCount;
 	}

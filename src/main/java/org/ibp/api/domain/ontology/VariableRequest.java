@@ -2,20 +2,30 @@ package org.ibp.api.domain.ontology;
 
 public class VariableRequest extends UpdateVariableRequest {
 
-	private Integer id;
+	private String id;
+	private String programUuid;
 
-	public Integer getId() {
+	public String getId() {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getProgramUuid() {
+		return programUuid;
+	}
+
+	public void setProgramUuid(String programUuid) {
+		this.programUuid = programUuid;
 	}
 
 	@Override
 	public String toString() {
 		return "VariableRequest{" +
-				"id=" + id +
+				"id='" + id + '\'' +
+				", programUuid='" + programUuid + '\'' +
 				"} " + super.toString();
 	}
 }

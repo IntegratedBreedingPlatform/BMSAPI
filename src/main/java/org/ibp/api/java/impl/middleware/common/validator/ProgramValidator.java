@@ -16,7 +16,7 @@ public class ProgramValidator extends BaseValidator implements Validator {
     public void validate(Object target, Errors errors) {
 
         // check for program id should not be null
-        shouldNotNullOrEmpty("programId", target, errors);
+        shouldNotNullOrEmpty("Program", "programId", target, errors);
         if(errors.hasErrors()) {
             return;
         }

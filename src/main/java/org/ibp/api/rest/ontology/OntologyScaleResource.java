@@ -174,7 +174,7 @@ public class OntologyScaleResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		this.termDeletableValidator.validate(new TermRequest(id, "scale", CvId.SCALES.getId()), bindingResult);
+		this.termDeletableValidator.validate(new TermRequest(id, "Scale", CvId.SCALES.getId()), bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}

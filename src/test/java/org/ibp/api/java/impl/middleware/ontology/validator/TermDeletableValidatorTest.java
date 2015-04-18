@@ -57,20 +57,6 @@ public class TermDeletableValidatorTest extends ApiUnitTestBase {
 	}
 
 	/**
-	 * Test for Term with Null request
-	 *
-	 * @throws MiddlewareException
-	 */
-	@Test
-	public void testWithNullRequest() throws MiddlewareException {
-		Mockito.doReturn(true).when(this.ontologyManagerService).isTermReferred(10);
-
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-		this.termDeletableValidator.validate(null, bindingResult);
-		Assert.assertTrue(bindingResult.hasErrors());
-	}
-
-	/**
 	 * Test for Term Referred
 	 *
 	 * @throws MiddlewareException

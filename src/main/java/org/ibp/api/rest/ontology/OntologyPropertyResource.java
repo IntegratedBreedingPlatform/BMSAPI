@@ -179,7 +179,7 @@ public class OntologyPropertyResource {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 
-		this.deletableValidator.validate(new TermRequest(id, "property", CvId.PROPERTIES.getId()), bindingResult);
+		this.deletableValidator.validate(new TermRequest(id, "Property", CvId.PROPERTIES.getId()), bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}

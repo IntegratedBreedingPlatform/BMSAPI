@@ -26,7 +26,7 @@ public class CropNameValidator extends BaseValidator implements Validator {
     public void validate(Object target, Errors errors) {
 
         // check for cropname should not be null
-        shouldNotNullOrEmpty("cropname", target, errors);
+        shouldNotNullOrEmpty("Crop Name", "cropname", target, errors);
         if(errors.hasErrors()) {
             return;
         }

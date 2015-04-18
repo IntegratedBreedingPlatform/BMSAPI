@@ -19,11 +19,6 @@ org.springframework.validation.Validator {
 	public void validate(Object target, Errors errors) {
 		TermRequest request = (TermRequest) target;
 
-		if (request == null) {
-			this.addCustomError(errors, OntologyValidator.SHOULD_NOT_NULL_OR_EMPTY, null);
-			return;
-		}
-
 		try {
 			this.checkTermExist(request.getTermName(), request.getId(), request.getCvId(), errors);
 
@@ -36,8 +31,7 @@ org.springframework.validation.Validator {
 				return;
 			}
 
-			this.addCustomError(errors, OntologyValidator.CAN_NOT_DELETE_REFERRED_TERM,
-					new Object[] { request.getId(), request.getTermName() });
+			this.addCustomError(errors, RECORD_IS_NOT_DELETABLE, new Object[] { request.getTermName(), request.getId() });
 
 		} catch (MiddlewareException e) {
 			this.log.error("Error while validating object", e);

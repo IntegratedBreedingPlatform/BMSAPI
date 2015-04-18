@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.ibp.api.CommonUtil;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableRequest;
 import org.ibp.api.domain.ontology.VariableResponse;
@@ -69,20 +70,25 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 
     @Override
     public GenericResponse addVariable(VariableRequest request) throws MiddlewareException {
+
+        Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
+        Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
+        Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+
         OntologyVariableInfo variableInfo = new OntologyVariableInfo();
         variableInfo.setName(request.getName());
         variableInfo.setDescription(request.getDescription());
-        variableInfo.setMethodId(request.getMethodId());
-        variableInfo.setPropertyId(request.getPropertyId());
-        variableInfo.setScaleId(request.getScaleId());
+        variableInfo.setMethodId(methodId);
+        variableInfo.setPropertyId(propertyId);
+        variableInfo.setScaleId(scaleId);
 
         if (!Strings.isNullOrEmpty(request.getExpectedRange().getMin()) && !Strings.isNullOrEmpty(request.getExpectedRange().getMax())) {
             variableInfo.setMinValue(request.getExpectedRange().getMin());
             variableInfo.setMaxValue(request.getExpectedRange().getMax());
         }
 
-        for (Integer i : request.getVariableTypeIds()) {
-            variableInfo.addVariableType(VariableType.getById(i));
+        for (String i : request.getVariableTypeIds()) {
+            variableInfo.addVariableType(VariableType.getById(CommonUtil.tryParseSafe(i)));
         }
 
         this.ontologyManagerService.addVariable(variableInfo);
@@ -91,22 +97,28 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 
     @Override
     public void updateVariable(VariableRequest request) throws MiddlewareException {
+
+        Integer id = CommonUtil.tryParseSafe(request.getId());
+        Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
+        Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
+        Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+
         OntologyVariableInfo variableInfo = new OntologyVariableInfo();
-        variableInfo.setId(request.getId());
+        variableInfo.setId(id);
         variableInfo.setName(request.getName());
         variableInfo.setAlias(request.getAlias());
         variableInfo.setDescription(request.getDescription());
-        variableInfo.setMethodId(request.getMethodId());
-        variableInfo.setPropertyId(request.getPropertyId());
-        variableInfo.setScaleId(request.getScaleId());
+        variableInfo.setMethodId(methodId);
+        variableInfo.setPropertyId(propertyId);
+        variableInfo.setScaleId(scaleId);
 
         if (!Strings.isNullOrEmpty(request.getExpectedRange().getMin()) && !Strings.isNullOrEmpty(request.getExpectedRange().getMax())) {
             variableInfo.setMinValue(request.getExpectedRange().getMin());
             variableInfo.setMaxValue(request.getExpectedRange().getMax());
         }
 
-        for (Integer i : request.getVariableTypeIds()) {
-            variableInfo.addVariableType(VariableType.getById(i));
+        for (String i : request.getVariableTypeIds()) {
+            variableInfo.addVariableType(VariableType.getById(CommonUtil.tryParseSafe(i)));
         }
 
         this.ontologyManagerService.updateVariable(variableInfo);

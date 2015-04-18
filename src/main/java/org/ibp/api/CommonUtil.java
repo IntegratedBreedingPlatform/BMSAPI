@@ -14,9 +14,4 @@ public class CommonUtil {
 		}
 		return null;
 	}
-
-	// Will Capitalize first character of error message
-	public static String capitalizeFirstLetterOfErrorMessage(String errorMessage){
-	  	return errorMessage.substring(0, 1).toUpperCase() + errorMessage.substring(1);
-	}
 }

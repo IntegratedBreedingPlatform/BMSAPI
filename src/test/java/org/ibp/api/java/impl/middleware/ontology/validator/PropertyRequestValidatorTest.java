@@ -125,14 +125,6 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 		this.propertyRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("classes"));
-
-		// Assert for duplicate class names
-		bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
-
-		request.setClasses(Arrays.asList("class", "class"));
-		this.propertyRequestValidator.validate(request, bindingResult);
-		Assert.assertTrue(bindingResult.hasErrors());
-		Assert.assertNotNull(bindingResult.getFieldError("classes"));
 	}
 
 	/**

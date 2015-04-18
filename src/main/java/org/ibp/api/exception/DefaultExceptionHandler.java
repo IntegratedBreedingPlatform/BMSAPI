@@ -3,8 +3,6 @@ package org.ibp.api.exception;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
-
-import org.ibp.api.CommonUtil;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,9 +87,9 @@ public class DefaultExceptionHandler {
 					LocaleContextHolder.getLocale());
 			if (error instanceof FieldError) {
 				FieldError fieldError = (FieldError) error;
-				response.addError(CommonUtil.capitalizeFirstLetterOfErrorMessage(message), fieldError.getField());
+				response.addError(message, fieldError.getField());
 			} else {
-				response.addError(CommonUtil.capitalizeFirstLetterOfErrorMessage(message));
+				response.addError(message);
 			}
 		}
 		return response;

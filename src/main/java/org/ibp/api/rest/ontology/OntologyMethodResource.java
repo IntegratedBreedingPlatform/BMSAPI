@@ -163,7 +163,7 @@ public class OntologyMethodResource {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		this.termDeletableValidator.validate(new TermRequest(id, "method", CvId.METHODS.getId()), bindingResult);
+		this.termDeletableValidator.validate(new TermRequest(id, "Method", CvId.METHODS.getId()), bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}

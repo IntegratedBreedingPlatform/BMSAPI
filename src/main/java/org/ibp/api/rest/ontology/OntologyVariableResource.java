@@ -186,7 +186,7 @@ public class OntologyVariableResource {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 
-		request.setId(Integer.valueOf(id));
+		request.setId(id);
 		request.setProgramUuid(programId);
 
 		this.variableRequestValidator.validate(request, bindingResult);

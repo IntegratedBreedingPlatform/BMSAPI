@@ -3,22 +3,13 @@ package org.ibp.api.domain.ontology;
 import java.util.List;
 
 public class AddVariableRequest {
-	private String programUuid;
 	private String name;
 	private String description;
-	private Integer propertyId;
-	private Integer methodId;
-	private Integer scaleId;
-	private List<Integer> variableTypeIds;
+	private String propertyId;
+	private String methodId;
+	private String scaleId;
+	private List<String> variableTypeIds;
 	private ExpectedRange expectedRange;
-
-	public String getProgramUuid() {
-		return programUuid;
-	}
-
-	public void setProgramUuid(String programUuid) {
-		this.programUuid = programUuid;
-	}
 
 	public String getName() {
 		return name;
@@ -36,35 +27,35 @@ public class AddVariableRequest {
 		this.description = description;
 	}
 
-	public Integer getPropertyId() {
+	public String getPropertyId() {
 		return propertyId;
 	}
 
-	public void setPropertyId(Integer propertyId) {
+	public void setPropertyId(String propertyId) {
 		this.propertyId = propertyId;
 	}
 
-	public Integer getMethodId() {
+	public String getMethodId() {
 		return methodId;
 	}
 
-	public void setMethodId(Integer methodId) {
+	public void setMethodId(String methodId) {
 		this.methodId = methodId;
 	}
 
-	public Integer getScaleId() {
+	public String getScaleId() {
 		return scaleId;
 	}
 
-	public void setScaleId(Integer scaleId) {
+	public void setScaleId(String scaleId) {
 		this.scaleId = scaleId;
 	}
 
-	public List<Integer> getVariableTypeIds() {
+	public List<String> getVariableTypeIds() {
 		return variableTypeIds;
 	}
 
-	public void setVariableTypeIds(List<Integer> variableTypeIds) {
+	public void setVariableTypeIds(List<String> variableTypeIds) {
 		this.variableTypeIds = variableTypeIds;
 	}
 
@@ -79,8 +70,7 @@ public class AddVariableRequest {
 	@Override
 	public String toString() {
 		return "AddVariableRequest{" +
-				"programUuid='" + programUuid + '\'' +
-				", name='" + name + '\'' +
+				"name='" + name + '\'' +
 				", description='" + description + '\'' +
 				", propertyId=" + propertyId +
 				", methodId=" + methodId +
