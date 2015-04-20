@@ -105,12 +105,14 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 
         OntologyVariableInfo variableInfo = new OntologyVariableInfo();
         variableInfo.setId(id);
+        variableInfo.setProgramUuid(request.getProgramUuid());
         variableInfo.setName(request.getName());
         variableInfo.setAlias(request.getAlias());
         variableInfo.setDescription(request.getDescription());
         variableInfo.setMethodId(methodId);
         variableInfo.setPropertyId(propertyId);
         variableInfo.setScaleId(scaleId);
+        variableInfo.setIsFavorite(request.isFavourite());
 
         if (!Strings.isNullOrEmpty(request.getExpectedRange().getMin()) && !Strings.isNullOrEmpty(request.getExpectedRange().getMax())) {
             variableInfo.setMinValue(request.getExpectedRange().getMin());

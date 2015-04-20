@@ -10,6 +10,7 @@ public class AddVariableRequest {
 	private String scaleId;
 	private List<String> variableTypeIds;
 	private ExpectedRange expectedRange;
+	private boolean favourite;
 
 	public String getName() {
 		return name;
@@ -67,16 +68,25 @@ public class AddVariableRequest {
 		this.expectedRange = expectedRange;
 	}
 
+	public boolean isFavourite() {
+		return favourite;
+	}
+
+	public void setFavourite(boolean favourite) {
+		this.favourite = favourite;
+	}
+
 	@Override
 	public String toString() {
 		return "AddVariableRequest{" +
 				"name='" + name + '\'' +
 				", description='" + description + '\'' +
-				", propertyId=" + propertyId +
-				", methodId=" + methodId +
-				", scaleId=" + scaleId +
+				", propertyId='" + propertyId + '\'' +
+				", methodId='" + methodId + '\'' +
+				", scaleId='" + scaleId + '\'' +
 				", variableTypeIds=" + variableTypeIds +
 				", expectedRange=" + expectedRange +
+				", favourite=" + favourite +
 				'}';
 	}
 }
