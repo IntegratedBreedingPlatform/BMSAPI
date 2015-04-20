@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.CommonUtil;
@@ -102,6 +103,9 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 			return false;
 		}
 
+		//Trim name
+		request.setName(request.getName().trim());
+
 		// 2. Name is no more than 32 characters
 		this.fieldShouldNotOverflow("name", request.getName(), NAME_TEXT_LIMIT,errors);
 
@@ -122,11 +126,17 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 		return errors.getErrorCount() == initialCount;
 	}
 
+	// 5. Description is optional and no more than 255 characters
 	private boolean descriptionValidationProcessor(VariableRequest request, Errors errors){
 
 		Integer initialCount = errors.getErrorCount();
 
-		// 5. Description is no more than 255 characters
+		if(Strings.isNullOrEmpty(request.getDescription())) {
+			request.setDescription("");
+		} else {
+			request.setDescription(request.getDescription().trim());
+		}
+
 		this.fieldShouldNotOverflow("description", request.getDescription(), DESCRIPTION_TEXT_LIMIT, errors);
 
 		return errors.getErrorCount() == initialCount;
