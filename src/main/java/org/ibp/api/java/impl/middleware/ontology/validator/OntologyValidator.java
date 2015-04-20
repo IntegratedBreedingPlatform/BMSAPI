@@ -62,16 +62,21 @@ public abstract class OntologyValidator extends BaseValidator {
 	protected void fieldShouldNotOverflow(String fieldName, String value, Integer limit, Errors errors) {
 
 		if(Strings.isNullOrEmpty(value)) {
-			value = "";
+			return;
 		}
 
-		if (value.trim().length() > limit) {
+		if (value.length() > limit) {
 			this.addCustomError(errors, fieldName, TEXTUAL_FIELD_IS_TOO_LONG, new Object[] {limit});
 		}
 	}
 
 	protected void listShouldNotOverflow(String termName, String fieldName, String value, Integer limit, Errors errors) {
-		if (value.trim().length() > limit) {
+
+		if(Strings.isNullOrEmpty(value)) {
+			return;
+		}
+
+		if (value.length() > limit) {
 			this.addCustomError(errors, fieldName, OntologyValidator.LIST_TEXTUAL_FIELD_IS_TOO_LONG, new Object[] {termName, limit});
 		}
 	}
