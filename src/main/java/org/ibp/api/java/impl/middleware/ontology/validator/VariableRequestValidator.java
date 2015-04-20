@@ -79,11 +79,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 
 		if(combinationValidationResult){
 
-			Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
-			Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
-			Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
-
-			combinationValidationResult = checkIfMethodPropertyScaleCombination(methodId, propertyId, scaleId, errors);
+			combinationValidationResult = checkIfMethodPropertyScaleCombination(request, errors);
 		}
 
 		boolean variableTypeValidationResult = variableTypeValidationProcessor(request, errors);
@@ -294,7 +290,11 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 				return;
 			}
 
-			boolean isEditable = !this.ontologyManagerService.isTermReferred(requestId);
+			if(oldVariable.getObservations() == null) {
+				oldVariable.setObservations(0);
+			}
+
+			boolean isEditable = oldVariable.getObservations() == 0;
 			if (isEditable) {
 				return;
 			}
@@ -350,13 +350,20 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 	}
 
 	//FIXME : Spring Does not allow multiple fields in rejectValue so here fieldNames have been not added
-	protected boolean checkIfMethodPropertyScaleCombination(Integer methodId, Integer propertyId, Integer scaleId, Errors errors) {
+	protected boolean checkIfMethodPropertyScaleCombination(VariableRequest request, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 
 		try {
+
+			Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
+			Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
+			Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+
 			List<OntologyVariableSummary> variableSummary = this.ontologyManagerService.getWithFilter(null, null, methodId, propertyId, scaleId);
-			if (!variableSummary.isEmpty()) {
+
+			if(variableSummary.size() > 1 ||
+					(variableSummary.size() == 1 && !Objects.equals(String.valueOf(variableSummary.get(0).getId()), request.getId()))) {
 				this.addCustomError(errors, VARIABLE_WITH_SAME_COMBINATION_EXISTS, null);
 			}
 		} catch (MiddlewareException e) {

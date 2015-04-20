@@ -11,6 +11,7 @@ import org.ibp.ApiUnitTestBase;
 import org.ibp.api.CommonUtil;
 import org.ibp.api.domain.ontology.AddVariableRequest;
 import org.ibp.api.domain.ontology.ExpectedRange;
+import org.ibp.api.domain.ontology.UpdateVariableRequest;
 import org.ibp.builders.MethodBuilder;
 import org.ibp.builders.PropertyBuilder;
 import org.ibp.builders.ScaleBuilder;
@@ -207,5 +208,62 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 
 
 	  Mockito.verify(this.ontologyManagerService, Mockito.times(1)).addVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
+	}
+
+	/**
+	 * add new variable and return new generated variable Id with status code 201 : Created
+	 * @throws Exception
+	 */
+	@Test
+	public void updateVariable() throws Exception{
+
+		ExpectedRange expectedRange = new ExpectedRange();
+		expectedRange.setMin("12");
+		expectedRange.setMax("16");
+
+		UpdateVariableRequest request = new UpdateVariableRequest();
+		request.setAlias("Test");
+		request.setName(this.variableName);
+		request.setDescription(this.variableDescription);
+		request.setPropertyId("10");
+		request.setMethodId("11");
+		request.setScaleId("12");
+		request.setVariableTypeIds(new ArrayList<>(Collections.singletonList("1")));
+		request.setExpectedRange(expectedRange);
+
+		Term propertyTerm = new Term(10, this.propertyName, this.propertyDescription, CvId.PROPERTIES.getId(), null);
+		Term methodTerm = new Term(11, this.methodName, this.methodDescription, CvId.METHODS.getId(), null);
+		Term scaleTerm = new Term(12, this.scaleName, this.scaleDescription, CvId.SCALES.getId(), null);
+		Term variableTerm = new Term(1, this.variableName, this.variableDescription, CvId.VARIABLES.getId(), null);
+
+		Scale scale = new ScaleBuilder().build(scaleTerm.getId(), scaleTerm.getName(), scaleTerm.getDefinition(), DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyVariable variable = new OntologyVariable(variableTerm);
+		variable.setMethod(new Method(methodTerm));
+		variable.setProperty(new Property(propertyTerm));
+		variable.setScale(scale);
+
+		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
+		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
+
+		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
+		Mockito.doReturn(new Project()).when(this.workbenchDataManager).getProjectByUuid(programUuid);
+		Mockito.doReturn(variableTerm).when(this.ontologyManagerService).getTermById(variableTerm.getId());
+		Mockito.doReturn(variableTerm).when(this.ontologyManagerService).getTermByNameAndCvId(request.getName(), CvId.VARIABLES.getId());
+		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
+		Mockito.doReturn(propertyTerm).when(this.ontologyManagerService).getTermById(propertyId);
+		Mockito.doReturn(methodTerm).when(this.ontologyManagerService).getTermById(methodId);
+		Mockito.doReturn(scaleTerm).when(this.ontologyManagerService).getTermById(scaleId);
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyManagerService).getWithFilter(null, null, methodId, propertyId, scaleId);
+		Mockito.doReturn(variable).when(this.ontologyManagerService).getVariable(programUuid, variable.getId());
+		Mockito.doNothing().when(this.ontologyManagerService).updateVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
+
+		this.mockMvc.perform(MockMvcRequestBuilders.put("/ontology/{cropname}/variables/{id}?programId=" + programUuid, cropName, variableTerm.getId())
+				.contentType(this.contentType)
+				.content(this.convertObjectToByte(request)))
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.status().isNoContent());
+
+		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).updateVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
 	}
 }
