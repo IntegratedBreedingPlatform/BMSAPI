@@ -42,7 +42,7 @@ public class ProgramServiceImpl implements ProgramService {
 				}
 			}
 		} catch (MiddlewareQueryException e) {
-			// TODO re-throw as API runtime exception
+			throw new RuntimeException("Error! Caused by: " + e.getMessage(), e);
 		}
 		return programSummaries;
 	}

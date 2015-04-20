@@ -36,7 +36,7 @@ public class StudyServiceImpl implements StudyService {
 				studySummaries.add(summary);
 			}
 		} catch (MiddlewareException e) {
-			// can I do much about this? what can I do?
+			throw new RuntimeException("Error! Caused by: " + e.getMessage(), e);
 		}
 		return studySummaries;
 	}
