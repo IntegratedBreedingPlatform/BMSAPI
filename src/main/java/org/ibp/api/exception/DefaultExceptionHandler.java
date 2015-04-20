@@ -49,16 +49,12 @@ public class DefaultExceptionHandler {
 		ErrorResponse response = new ErrorResponse();
 		Throwable rootCause = ex.getRootCause();
 		if (rootCause instanceof UnrecognizedPropertyException) {
-			UnrecognizedPropertyException unrecognizedPropertyException = (UnrecognizedPropertyException) ex
-					.getCause();
-			response.addError(this.messageSource.getMessage("not.recognised.field",
-					new Object[] {unrecognizedPropertyException.getPropertyName()}, LocaleContextHolder.getLocale()));
+			UnrecognizedPropertyException unrecognizedPropertyException = (UnrecognizedPropertyException) ex.getCause();
+			response.addError(this.messageSource.getMessage("not.recognised.field", new Object[] {unrecognizedPropertyException.getPropertyName()}, LocaleContextHolder.getLocale()));
 		} else if (rootCause instanceof JsonParseException) {
-			response.addError(this.messageSource.getMessage("invalid.body", null,
-					LocaleContextHolder.getLocale()));
+			response.addError(this.messageSource.getMessage("invalid.body", null, LocaleContextHolder.getLocale()));
 		} else if (rootCause instanceof JsonMappingException) {
-			response.addError(this.messageSource.getMessage("invalid.body", null,
-					LocaleContextHolder.getLocale()));
+			response.addError(this.messageSource.getMessage("invalid.body", null, LocaleContextHolder.getLocale()));
 		}
 		return response;
 	}

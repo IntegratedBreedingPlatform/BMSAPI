@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import java.util.*;
 
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.ibp.api.CommonUtil;
@@ -40,6 +41,8 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 
 		descriptionValidationProcessor(request, errors);
 
+		cropOntologyIDValidationProcessor(request, errors);
+
 		classValidationProcessor(request, errors);
 
 		if(nameValidationResult) {
@@ -58,6 +61,9 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 			return false;
 		}
 
+		//Trim name
+		request.setName(request.getName().trim());
+
 		// 2. Name is no more than 200 characters
 		this.fieldShouldNotOverflow("name", request.getName(), NAME_TEXT_LIMIT, errors);
 
@@ -70,8 +76,29 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 	private boolean descriptionValidationProcessor(PropertyRequest request, Errors errors){
 		Integer initialCount = errors.getErrorCount();
 
+		if(Strings.isNullOrEmpty(request.getDescription())) {
+			request.setDescription("");
+		} else {
+			request.setDescription(request.getDescription().trim());
+		}
+
 		// 4. Description is no more than 255 characters
 		this.fieldShouldNotOverflow("description", request.getDescription(), DESCRIPTION_TEXT_LIMIT, errors);
+
+		return errors.getErrorCount() == initialCount;
+	}
+
+	private boolean cropOntologyIDValidationProcessor(PropertyRequest request, Errors errors){
+		Integer initialCount = errors.getErrorCount();
+
+		if(Strings.isNullOrEmpty(request.getCropOntologyId())) {
+			request.setCropOntologyId("");
+		} else {
+			request.setCropOntologyId(request.getCropOntologyId().trim());
+		}
+
+		// 4. Description is no more than 255 characters
+		this.fieldShouldNotOverflow("cropOntologyId", request.getCropOntologyId(), NAME_TEXT_LIMIT, errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
@@ -87,7 +114,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 				continue;
 			}
 			classesSet.add(c.toLowerCase());
-			nonEmptyClasses.add(c);
+			nonEmptyClasses.add(c.trim());
 		}
 
 		request.setClasses(nonEmptyClasses);
