@@ -69,18 +69,22 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 
 		boolean scaleValidationResult = scaleIdValidationProcessor(request, errors);
 
-		boolean combinationValidationResult = false;
+		boolean scaleDataTypeValidationResult = false;
 
-		if(propertyValidationResult && methodValidationResult && scaleValidationResult){
+		if(scaleValidationResult) {
+			scaleDataTypeValidationResult = scaleDataTypeValidationProcessor(request, errors);
+		}
+
+		boolean combinationValidationResult = propertyValidationResult && methodValidationResult && scaleValidationResult;
+
+		if(combinationValidationResult){
 
 			Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 			Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 			Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-			combinationValidationResult = checkIfMethodPropertyScaleCombination(methodId, propertyId, scaleId, errors );
+			combinationValidationResult = checkIfMethodPropertyScaleCombination(methodId, propertyId, scaleId, errors);
 		}
-
-		boolean scaleDataTypeValidationResult = scaleDataTypeValidationProcessor(request, errors);
 
 		boolean variableTypeValidationResult = variableTypeValidationProcessor(request, errors);
 

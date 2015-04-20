@@ -2,6 +2,7 @@ package org.ibp;
 
 import java.nio.charset.Charset;
 import java.util.Random;
+import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
@@ -30,6 +31,7 @@ public class ApiUnitTestBase {
 	protected final MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
 
 	protected final String cropName = "maize";
+	protected final String programUuid = UUID.randomUUID().toString();
 
 	protected MockMvc mockMvc;
 

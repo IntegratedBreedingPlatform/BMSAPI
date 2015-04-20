@@ -14,11 +14,50 @@ import org.ibp.api.domain.ontology.MethodSummary;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
+import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.spi.MappingContext;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class OntologyMapper {
 
-	private static volatile ModelMapper SINGLETON = new ModelMapper();
+	private static ModelMapper SINGLETON = null;
+
+	private final Lock lock = new ReentrantLock();
+
+	/**
+	 * We do not want public constructor of this class as all methods are static
+	 */
+	private OntologyMapper() {
+
+	}
+
+	/**
+	 * Eager Initialization of ModelMapper Instance Used when Simple Class to
+	 * Class Mapping is Required without Custom Mapping
+	 *
+	 * @return ModelMapper Instance
+	 */
+	public static ModelMapper getInstance() {
+
+		if (SINGLETON == null) {
+			// Thread Safe. Might be costly operation in some case
+			synchronized (OntologyMapper.class) {
+				if (SINGLETON == null) {
+					SINGLETON = new ModelMapper();
+					applyMapperConfiguration(SINGLETON);
+				}
+			}
+		}
+
+		return SINGLETON;
+	}
+
+	private static void applyMapperConfiguration(ModelMapper mapper) {
+		mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+	}
+
 
 	/**
 	 * Custom Mapping for Middleware Method Class to MethodSummary Definition to
@@ -180,19 +219,6 @@ public class OntologyMapper {
 		}
 	};
 
-	private OntologyMapper() {
-	}
-
-	/**
-	 * Eager Initialization of ModelMapper Instance Used when Simple Class to
-	 * Class Mapping is Required without Custom Mapping
-	 * 
-	 * @return ModelMapper Instance
-	 */
-	public static ModelMapper getInstance() {
-		return OntologyMapper.SINGLETON;
-	}
-
 	/**
 	 * Customise Mapped method 'methodMap' is Initialize in Mapper and Returned
 	 * 
@@ -220,7 +246,7 @@ public class OntologyMapper {
 	 * @return ModelMapper Instance
 	 */
 	public static ModelMapper scaleBaseToRequestMapper(){
-		ModelMapper mapper = new ModelMapper();
+		ModelMapper mapper = getInstance();
 		mapper.addMappings(OntologyMapper.scaleBaseToRequest);
 		return mapper;
 	}
