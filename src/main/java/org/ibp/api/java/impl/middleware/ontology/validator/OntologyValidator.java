@@ -1,16 +1,14 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import com.google.common.base.Strings;
-import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
-import org.ibp.api.CommonUtil;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
-import org.springframework.validation.Errors;
-import java.util.Objects;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.Errors;
+
+import java.util.Objects;
 
 public abstract class OntologyValidator extends BaseValidator {
 
@@ -62,6 +60,11 @@ public abstract class OntologyValidator extends BaseValidator {
 
 
 	protected void fieldShouldNotOverflow(String fieldName, String value, Integer limit, Errors errors) {
+
+		if(Strings.isNullOrEmpty(value)) {
+			value = "";
+		}
+
 		if (value.trim().length() > limit) {
 			this.addCustomError(errors, fieldName, TEXTUAL_FIELD_IS_TOO_LONG, new Object[] {limit});
 		}

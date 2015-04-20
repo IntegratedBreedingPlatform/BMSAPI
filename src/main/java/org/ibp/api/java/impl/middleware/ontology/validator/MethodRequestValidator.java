@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -89,6 +90,9 @@ public class MethodRequestValidator extends OntologyValidator implements org.spr
 			return false;
 		}
 
+		//Trim name
+		request.setName(request.getName().trim());
+
 		// 4. Name is no more than 200 characters
 		this.fieldShouldNotOverflow("name", request.getName(), NAME_TEXT_LIMIT, errors);
 
@@ -102,12 +106,20 @@ public class MethodRequestValidator extends OntologyValidator implements org.spr
 		return errors.getErrorCount() == initialCount;
 	}
 
+	// 5. Description is optional no more than 255 characters
 	private boolean descriptionValidationProcessor(MethodRequest request, Errors errors){
 
 		Integer initialCount = errors.getErrorCount();
 
-		// 5. Description is no more than 255 characters
-		this.fieldShouldNotOverflow("description", request.getDescription(), DESCRIPTION_TEXT_LIMIT, errors);
+		if(Strings.isNullOrEmpty(request.getDescription())) {
+			request.setDescription("");
+		} else {
+			request.setDescription(request.getDescription().trim());
+		}
+
+		if(!isNullOrEmpty(request.getDescription())){
+			this.fieldShouldNotOverflow("description", request.getDescription(), DESCRIPTION_TEXT_LIMIT, errors);
+		}
 
 		return errors.getErrorCount() == initialCount;
 	}
