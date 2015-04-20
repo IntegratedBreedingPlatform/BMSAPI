@@ -1,13 +1,12 @@
 package org.ibp.api.rest.program;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.workbench.Project;
-import org.ibp.api.domain.program.ProjectBasicInfo;
+import org.ibp.api.domain.program.ProgramSummary;
+import org.ibp.api.java.program.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,18 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProgramResource {
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private ProgramService programService;
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public List<ProjectBasicInfo> listPrograms() throws MiddlewareException {
-		List<Project> projectList = this.workbenchDataManager.getProjects();
-		List<ProjectBasicInfo> projectBasicInfoList = new ArrayList<>();
-
-		if (!projectList.isEmpty()) {
-			for (Project project : projectList) {
-				projectBasicInfoList.add(new ProjectBasicInfo(project));
-			}
-		}
-		return projectBasicInfoList;
+	public ResponseEntity<List<ProgramSummary>> listPrograms()  {
+		return new ResponseEntity<>(programService.listAllPrograms(), HttpStatus.OK);
 	}
 }
