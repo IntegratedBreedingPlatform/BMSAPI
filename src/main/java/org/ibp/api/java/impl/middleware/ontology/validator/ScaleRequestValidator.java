@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Scale;
@@ -193,11 +194,17 @@ org.springframework.validation.Validator {
 		return errors.getErrorCount() == initialCount;
 	}
 
+	// 13. Description is no more than 255 characters
 	private boolean descriptionValidationProcessor(ScaleRequest request, Errors errors){
 
 		Integer initialCount = errors.getErrorCount();
 
-		// 13. Description is no more than 255 characters
+		if(Strings.isNullOrEmpty(request.getDescription())) {
+			request.setDescription("");
+		} else {
+			request.setDescription(request.getDescription().trim());
+		}
+
 		this.fieldShouldNotOverflow("description", request.getDescription(), DESCRIPTION_TEXT_LIMIT, errors);
 
 		return errors.getErrorCount() == initialCount;
