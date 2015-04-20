@@ -117,9 +117,7 @@ public class MethodRequestValidator extends OntologyValidator implements org.spr
 			request.setDescription(request.getDescription().trim());
 		}
 
-		if(!isNullOrEmpty(request.getDescription())){
-			this.fieldShouldNotOverflow("description", request.getDescription(), DESCRIPTION_TEXT_LIMIT, errors);
-		}
+		this.fieldShouldNotOverflow("description", request.getDescription(), DESCRIPTION_TEXT_LIMIT, errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
