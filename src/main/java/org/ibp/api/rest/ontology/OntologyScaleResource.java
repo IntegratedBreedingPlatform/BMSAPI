@@ -3,7 +3,6 @@ package org.ibp.api.rest.ontology;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.*;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -57,7 +56,7 @@ public class OntologyScaleResource {
 	@ApiOperation(value = "All Scales", notes = "Get all scales")
 	@RequestMapping(value = "/{cropname}/scales", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<ScaleSummary>> listAllScale(@PathVariable String cropname)throws MiddlewareException {
+	public ResponseEntity<List<ScaleSummary>> listAllScale(@PathVariable String cropname) {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
@@ -75,7 +74,7 @@ public class OntologyScaleResource {
 	@RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<ScaleResponse> getScaleById(@PathVariable String cropname,
-			@PathVariable String id) throws MiddlewareException {
+			@PathVariable String id)  {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 		this.cropNameValidator.validate(cropname, bindingResult);
@@ -104,7 +103,7 @@ public class OntologyScaleResource {
 	@RequestMapping(value = "/{cropname}/scales", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addScale(@PathVariable String cropname,
-			@RequestBody ScaleRequestBase requestBase) throws MiddlewareException {
+			@RequestBody ScaleRequestBase requestBase)  {
 
 		ModelMapper modelMapper = OntologyMapper.scaleBaseToRequestMapper();
 		ScaleRequest request = modelMapper.map(requestBase, ScaleRequest.class);
@@ -131,7 +130,7 @@ public class OntologyScaleResource {
 	@RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateScale(@PathVariable String cropname, @PathVariable String id,
-			@RequestBody ScaleRequestBase requestBase) throws MiddlewareException, ApiRequestValidationException {
+			@RequestBody ScaleRequestBase requestBase) throws ApiRequestValidationException {
 
 		ModelMapper modelMapper = OntologyMapper.getInstance();
 		ScaleRequest request = modelMapper.map(requestBase, ScaleRequest.class);
@@ -163,7 +162,7 @@ public class OntologyScaleResource {
 	@ApiOperation(value = "Delete Scale", notes = "Delete Scale using Given Id")
 	@RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public ResponseEntity deleteScale(@PathVariable String cropname, @PathVariable String id) throws MiddlewareException {
+	public ResponseEntity deleteScale(@PathVariable String cropname, @PathVariable String id)  {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 		this.cropNameValidator.validate(cropname, bindingResult);

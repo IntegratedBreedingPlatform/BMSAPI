@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.*;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -60,7 +59,7 @@ public class OntologyPropertyResource {
 	public ResponseEntity<List<PropertySummary>> listAllPropertyByClass(
 			@PathVariable String cropname,
 			@RequestParam(value = "class", defaultValue = "", required = false) String className)
-			throws MiddlewareException {
+			 {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
@@ -83,7 +82,7 @@ public class OntologyPropertyResource {
 	@RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<PropertyResponse> getPropertyById(@PathVariable String cropname,
-															@PathVariable String id) throws MiddlewareException {
+															@PathVariable String id)  {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
@@ -110,7 +109,7 @@ public class OntologyPropertyResource {
 	@RequestMapping(value = "/{cropname}/properties", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addProperty(@PathVariable String cropname,
-													   @RequestBody PropertyRequestBase requestBase) throws MiddlewareException {
+													   @RequestBody PropertyRequestBase requestBase)  {
 		ModelMapper modelMapper = OntologyMapper.propertyBaseToRequestMapper();
 		PropertyRequest request = modelMapper.map(requestBase, PropertyRequest.class);
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
@@ -135,7 +134,7 @@ public class OntologyPropertyResource {
 	@RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateProperty(@PathVariable String cropname, @PathVariable String id,
-										 @RequestBody PropertyRequestBase requestBase) throws MiddlewareException {
+										 @RequestBody PropertyRequestBase requestBase)  {
 
 		ModelMapper modelMapper = OntologyMapper.getInstance();
 		PropertyRequest request = modelMapper.map(requestBase, PropertyRequest.class);
@@ -166,8 +165,7 @@ public class OntologyPropertyResource {
 	@ApiOperation(value = "Delete Property", notes = "Delete Property using Given Id")
 	@RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public ResponseEntity deleteProperty(@PathVariable String cropname, @PathVariable String id)
-			throws MiddlewareException {
+	public ResponseEntity deleteProperty(@PathVariable String cropname, @PathVariable String id) {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){

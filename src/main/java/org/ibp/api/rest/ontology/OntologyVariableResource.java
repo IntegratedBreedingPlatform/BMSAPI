@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.*;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -64,7 +63,7 @@ public class OntologyVariableResource {
 	public ResponseEntity<List<VariableSummary>> listAllVariables(@PathVariable String cropname,
 																  @RequestParam(value = "property", required = false) String propertyId,
 																  @RequestParam(value = "favourite", required = false) Boolean favourite,
-																  @RequestParam(value = "programId") String programId) throws MiddlewareException {
+																  @RequestParam(value = "programId") String programId)  {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
@@ -98,7 +97,7 @@ public class OntologyVariableResource {
 	@ResponseBody
 	public ResponseEntity<VariableResponse> getVariableById(@PathVariable String cropname,
 															@RequestParam(value = "programId") String programId,
-															@PathVariable String id) throws MiddlewareException {
+															@PathVariable String id) {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 		this.cropNameValidator.validate(cropname, bindingResult);
@@ -127,7 +126,7 @@ public class OntologyVariableResource {
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addVariable(@PathVariable String cropname, @RequestParam(value = "programId") String programId,
-													   @RequestBody AddVariableRequest addVariableRequest) throws MiddlewareException {
+													   @RequestBody AddVariableRequest addVariableRequest)  {
 
 		ModelMapper mapper = OntologyMapper.getInstance();
 		VariableRequest request = mapper.map(addVariableRequest, VariableRequest.class);
@@ -159,7 +158,7 @@ public class OntologyVariableResource {
 	 * @param cropname The name of the crop which is we wish to add variable.
 	 * @param programId programId to which variable is related
 	 * @param id variable id
-	 * @throws MiddlewareException
+	 * @
 	 */
 	@ApiOperation(value = "Update Variable", notes = "Update variable using given data")
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.PUT)
@@ -167,7 +166,7 @@ public class OntologyVariableResource {
 	public ResponseEntity<?> updateVariable(@PathVariable String cropname,
 										 @RequestParam(value = "programId") String programId,
 										 @PathVariable String id,
-										 @RequestBody UpdateVariableRequest updateVariableDetail) throws MiddlewareException {
+										 @RequestBody UpdateVariableRequest updateVariableDetail)  {
 
 		ModelMapper mapper = OntologyMapper.getInstance();
 		VariableRequest request = mapper.map(updateVariableDetail, VariableRequest.class);
