@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 
 import org.generationcp.middleware.domain.oms.CvId;

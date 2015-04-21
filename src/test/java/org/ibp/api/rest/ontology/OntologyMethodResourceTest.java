@@ -11,7 +11,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.domain.ontology.MethodRequest;
 import org.ibp.api.domain.ontology.MethodRequestBase;
 import org.ibp.builders.MethodBuilder;
 import org.junit.After;
