@@ -9,6 +9,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.ibp.api.domain.program.ProgramSummary;
+import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.program.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ public class ProgramServiceImpl implements ProgramService {
 				}
 			}
 		} catch (MiddlewareQueryException e) {
-			throw new RuntimeException("Error! Caused by: " + e.getMessage(), e);
+			throw new ApiRuntimeException("Error!", e);
 		}
 		return programSummaries;
 	}

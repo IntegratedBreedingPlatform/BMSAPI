@@ -10,6 +10,7 @@ import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.ontology.IdName;
 import org.ibp.api.domain.ontology.VariableTypeResponse;
+import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.ontology.OntologyModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,7 +58,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 
 			return classList;
 		} catch (MiddlewareException e) {
-			throw new RuntimeException("Error!", e);
+			throw new ApiRuntimeException("Error!", e);
 		}
 	}
 
