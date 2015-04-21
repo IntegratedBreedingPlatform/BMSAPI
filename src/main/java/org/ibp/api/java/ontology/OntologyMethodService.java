@@ -1,6 +1,5 @@
 package org.ibp.api.java.ontology;
 
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.MethodRequest;
 import org.ibp.api.domain.ontology.MethodResponse;
@@ -16,7 +15,7 @@ public interface OntologyMethodService {
 	 * @return list of methods
 	 * @throws MiddlewareException
 	 */
-	List<MethodSummary> getAllMethods() throws MiddlewareException;
+	List<MethodSummary> getAllMethods();
 
 	/**
 	 * get method by method id
@@ -26,7 +25,7 @@ public interface OntologyMethodService {
 	 * @return method
 	 * @throws MiddlewareException
 	 */
-	MethodResponse getMethod(Integer id) throws MiddlewareException;
+	MethodResponse getMethod(Integer id);
 
 	/**
 	 * add method using given input data
@@ -36,7 +35,7 @@ public interface OntologyMethodService {
 	 * @return newly created method id
 	 * @throws MiddlewareException
 	 */
-	GenericResponse addMethod(MethodRequest method) throws MiddlewareException;
+	GenericResponse addMethod(MethodRequest method);
 
 	/**
 	 * update method data using given method id
@@ -47,7 +46,7 @@ public interface OntologyMethodService {
 	 *            method data to be updated
 	 * @throws MiddlewareException
 	 */
-	void updateMethod(Integer id, MethodRequest request) throws MiddlewareException;
+	void updateMethod(Integer id, MethodRequest request);
 
 	/**
 	 * delete method using given id
@@ -56,6 +55,6 @@ public interface OntologyMethodService {
 	 *            method to be deleted
 	 * @throws MiddlewareException
 	 */
-	void deleteMethod(Integer id) throws MiddlewareException;
+	void deleteMethod(Integer id);
 
 }

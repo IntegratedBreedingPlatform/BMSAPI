@@ -1,6 +1,5 @@
 package org.ibp.api.java.ontology;
 
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.*;
 
@@ -20,7 +19,7 @@ public interface OntologyVariableService {
 	 * @return list of variables
 	 * @throws MiddlewareException
 	 */
-	List<VariableSummary> getAllVariablesByFilter(String programId, Integer propertyId, Boolean favourite) throws MiddlewareException;
+	List<VariableSummary> getAllVariablesByFilter(String programId, Integer propertyId, Boolean favourite);
 
 	/**
 	 * Get variable using given id
@@ -32,7 +31,7 @@ public interface OntologyVariableService {
 	 * @return variable that matches id
 	 * @throws MiddlewareException
 	 */
-	VariableResponse getVariableById(String programId, Integer variableId) throws MiddlewareException;
+	VariableResponse getVariableById(String programId, Integer variableId);
 
 	/**
 	 * Add variable using given data
@@ -42,7 +41,7 @@ public interface OntologyVariableService {
 	 * @return newly created variable id
 	 * @throws MiddlewareException
 	 */
-	GenericResponse addVariable(VariableRequest request) throws MiddlewareException;
+	GenericResponse addVariable(VariableRequest request);
 
 	/**
 	 * Add variable using given data
@@ -51,5 +50,5 @@ public interface OntologyVariableService {
 	 *            data to be added
 	 * @throws MiddlewareException
 	 */
-	void updateVariable(VariableRequest request) throws MiddlewareException;
+	void updateVariable(VariableRequest request);
 }

@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import com.google.common.base.Function;
+
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.VariableType;
@@ -22,7 +23,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 	private OntologyManagerService ontologyManagerService;
 
 	@Override
-	public List<IdName> getAllDataTypes() throws MiddlewareException {
+	public List<IdName> getAllDataTypes() {
 		return Util.convertAll(Arrays.asList(DataType.values()), new Function<DataType, IdName>() {
 
 			@Override
@@ -33,27 +34,31 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 	}
 
 	@Override
-	public List<String> getAllClasses() throws MiddlewareException {
-		List<Term> classes = this.ontologyManagerService.getAllTraitClass();
-		List<String> classList = new ArrayList<>();
+	public List<String> getAllClasses() {
+		try {
+			List<Term> classes = this.ontologyManagerService.getAllTraitClass();
+			List<String> classList = new ArrayList<>();
 
-		for (Term term : classes) {
-			classList.add(term.getName());
-		}
-
-		Comparator<String> ALPHABETICAL_ORDER = new Comparator<String>() {
-			public int compare(String str1, String str2) {
-				int res = String.CASE_INSENSITIVE_ORDER.compare(str1, str2);
-				if (res == 0) {
-					res = str1.compareTo(str2);
-				}
-				return res;
+			for (Term term : classes) {
+				classList.add(term.getName());
 			}
-		};
 
-		Collections.sort(classList, ALPHABETICAL_ORDER);
+			Comparator<String> ALPHABETICAL_ORDER = new Comparator<String>() {
+				public int compare(String str1, String str2) {
+					int res = String.CASE_INSENSITIVE_ORDER.compare(str1, str2);
+					if (res == 0) {
+						res = str1.compareTo(str2);
+					}
+					return res;
+				}
+			};
 
-		return classList;
+			Collections.sort(classList, ALPHABETICAL_ORDER);
+
+			return classList;
+		} catch (MiddlewareException e) {
+			throw new RuntimeException("Error!", e);
+		}
 	}
 
 	@Override

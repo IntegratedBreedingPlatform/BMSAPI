@@ -1,6 +1,5 @@
 package org.ibp.api.java.ontology;
 
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.PropertyRequest;
 import org.ibp.api.domain.ontology.PropertyResponse;
@@ -16,7 +15,7 @@ public interface OntologyPropertyService {
 	 * @return list of properties
 	 * @throws MiddlewareException
 	 */
-	List<PropertySummary> getAllProperties() throws MiddlewareException;
+	List<PropertySummary> getAllProperties();
 
 	/**
 	 * get property by given property id
@@ -26,7 +25,7 @@ public interface OntologyPropertyService {
 	 * @return property that have given id
 	 * @throws MiddlewareException
 	 */
-	PropertyResponse getProperty(Integer id) throws MiddlewareException;
+	PropertyResponse getProperty(Integer id);
 
 	/**
 	 * add property using given input data
@@ -36,7 +35,7 @@ public interface OntologyPropertyService {
 	 * @return newly created property id
 	 * @throws MiddlewareException
 	 */
-	GenericResponse addProperty(PropertyRequest request) throws MiddlewareException;
+	GenericResponse addProperty(PropertyRequest request);
 
 	/**
 	 * get all properties containing class name
@@ -46,7 +45,7 @@ public interface OntologyPropertyService {
 	 * @return list of properties
 	 * @throws MiddlewareException
 	 */
-	List<PropertySummary> getAllPropertiesByClass(String propertyClass)throws MiddlewareException;
+	List<PropertySummary> getAllPropertiesByClass(String propertyClass);
 
 	/**
 	 * delete property if not used
@@ -56,7 +55,7 @@ public interface OntologyPropertyService {
 	 * @return if property deleted or not
 	 * @throws MiddlewareException
 	 */
-	boolean deleteProperty(Integer id) throws MiddlewareException;
+	boolean deleteProperty(Integer id);
 
 	/**
 	 *
@@ -66,5 +65,5 @@ public interface OntologyPropertyService {
 	 *            property data to update
 	 * @throws MiddlewareException
 	 */
-	void updateProperty(Integer id, PropertyRequest request) throws MiddlewareException;
+	void updateProperty(Integer id, PropertyRequest request);
 }

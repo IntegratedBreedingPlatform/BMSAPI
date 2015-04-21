@@ -7,6 +7,7 @@ import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.PropertyRequest;
 import org.ibp.api.domain.ontology.PropertyResponse;
 import org.ibp.api.domain.ontology.PropertySummary;
+import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.ontology.OntologyPropertyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,97 +24,120 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	private OntologyManagerService ontologyManagerService;
 
   	@Override
-	public List<PropertySummary> getAllProperties() throws MiddlewareException {
-		List<Property> propertyList = this.ontologyManagerService.getAllProperties();
-		List<PropertySummary> properties = new ArrayList<>();
+	public List<PropertySummary> getAllProperties() {
+		try {
+			List<Property> propertyList = this.ontologyManagerService.getAllProperties();
+			List<PropertySummary> properties = new ArrayList<>();
 
-		ModelMapper mapper = OntologyMapper.propertyMapper();
+			ModelMapper mapper = OntologyMapper.propertyMapper();
 
-		for (Property property : propertyList) {
-		  	PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
-		  	properties.add(propertyDTO);
+			for (Property property : propertyList) {
+			  	PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
+			  	properties.add(propertyDTO);
+			}
+			return properties;
+		} catch (MiddlewareException e) {
+			throw new ApiRuntimeException("Error!", e);
 		}
-		return properties;
 	}
 
 	@Override
-	public PropertyResponse getProperty(Integer id) throws MiddlewareException {
-		Property property = this.ontologyManagerService.getProperty(id);
-		if (property == null) {
-		  	return null;
-		}
-		boolean deletable = true;
-		if (this.ontologyManagerService.isTermReferred(id)) {
-		  	deletable = false;
-		}
-		ModelMapper mapper = OntologyMapper.propertyMapper();
-		PropertyResponse response = mapper.map(property, PropertyResponse.class);
+	public PropertyResponse getProperty(Integer id) {
+		try {
+			Property property = this.ontologyManagerService.getProperty(id);
+			if (property == null) {
+			  	return null;
+			}
+			boolean deletable = true;
+			if (this.ontologyManagerService.isTermReferred(id)) {
+			  	deletable = false;
+			}
+			ModelMapper mapper = OntologyMapper.propertyMapper();
+			PropertyResponse response = mapper.map(property, PropertyResponse.class);
 
-	  	String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
+			String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
 
-	  	if (!deletable) {
-		  	response.setEditableFields(new ArrayList<>(Arrays.asList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED, "classes", "cropOntologyId")));
-		} else {
-		  	response.setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED,
-				  "classes", "cropOntologyId")));
+			if (!deletable) {
+			  	response.setEditableFields(new ArrayList<>(Arrays.asList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED, "classes", "cropOntologyId")));
+			} else {
+			  	response.setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED,
+					  "classes", "cropOntologyId")));
+			}
+			response.setDeletable(deletable);
+			return response;
+		} catch (MiddlewareException e) {
+			throw new ApiRuntimeException("Error!", e);
 		}
-		response.setDeletable(deletable);
-		return response;
 	}
 
 	@Override
-	public GenericResponse addProperty(PropertyRequest request) throws MiddlewareException {
-		Property property = new Property();
-		property.setName(request.getName());
-		property.setDefinition(request.getDescription());
-		property.setCropOntologyId(request.getCropOntologyId());
+	public GenericResponse addProperty(PropertyRequest request) {
+		try {
+			Property property = new Property();
+			property.setName(request.getName());
+			property.setDefinition(request.getDescription());
+			property.setCropOntologyId(request.getCropOntologyId());
 
-		for (String c : request.getClasses()) {
-		  	property.addClass(c);
+			for (String c : request.getClasses()) {
+			  	property.addClass(c);
+			}
+
+			this.ontologyManagerService.addProperty(property);
+
+			return new GenericResponse(property.getId());
+		} catch (MiddlewareException e) {
+			throw new ApiRuntimeException("Error!", e);
 		}
-
-		this.ontologyManagerService.addProperty(property);
-
-		return new GenericResponse(property.getId());
 	}
 
 	@Override
-	public List<PropertySummary> getAllPropertiesByClass(String propertyClass)throws MiddlewareException {
-		List<Property> propertyList = this.ontologyManagerService.getAllPropertiesWithClass(propertyClass);
-		List<PropertySummary> properties = new ArrayList<>();
+	public List<PropertySummary> getAllPropertiesByClass(String propertyClass) {
+		try {
+			List<Property> propertyList = this.ontologyManagerService.getAllPropertiesWithClass(propertyClass);
+			List<PropertySummary> properties = new ArrayList<>();
 
-		ModelMapper mapper = OntologyMapper.propertyMapper();
+			ModelMapper mapper = OntologyMapper.propertyMapper();
 
-		for (Property property : propertyList) {
-		  	PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
-		  	properties.add(propertyDTO);
+			for (Property property : propertyList) {
+			  	PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
+			  	properties.add(propertyDTO);
+			}
+			return properties;
+		} catch (MiddlewareException e) {
+			throw new ApiRuntimeException("Error!", e);
 		}
-		return properties;
 	}
 
 	@Override
-	public boolean deleteProperty(Integer id) throws MiddlewareException {
-		boolean isReferred = this.ontologyManagerService.isTermReferred(id);
-		if (isReferred) {
-		  	return false;
+	public boolean deleteProperty(Integer id) {
+		try {
+			boolean isReferred = this.ontologyManagerService.isTermReferred(id);
+			if (isReferred) {
+			  	return false;
+			}
+			this.ontologyManagerService.deleteProperty(id);
+			return true;
+		} catch (MiddlewareException e) {
+			throw new ApiRuntimeException("Error!", e);
 		}
-		this.ontologyManagerService.deleteProperty(id);
-		return true;
 	}
 
 	@Override
-	public void updateProperty(Integer id, PropertyRequest request)
-			throws MiddlewareException {
-		Property property = new Property();
-		property.setId(id);
-		property.setName(request.getName());
-		property.setDefinition(request.getDescription());
-		property.setCropOntologyId(request.getCropOntologyId());
+	public void updateProperty(Integer id, PropertyRequest request) {
+		try {
+			Property property = new Property();
+			property.setId(id);
+			property.setName(request.getName());
+			property.setDefinition(request.getDescription());
+			property.setCropOntologyId(request.getCropOntologyId());
 
-		for (String c : request.getClasses()) {
-		  	property.addClass(c);
+			for (String c : request.getClasses()) {
+			  	property.addClass(c);
+			}
+
+			this.ontologyManagerService.updateProperty(property);
+		} catch (MiddlewareException e) {
+			throw new ApiRuntimeException("Error!", e);
 		}
-
-		this.ontologyManagerService.updateProperty(property);
 	}
 }

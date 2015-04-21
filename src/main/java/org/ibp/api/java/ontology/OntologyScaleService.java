@@ -1,6 +1,5 @@
 package org.ibp.api.java.ontology;
 
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.ScaleRequest;
 import org.ibp.api.domain.ontology.ScaleResponse;
@@ -16,7 +15,7 @@ public interface OntologyScaleService {
 	 * @return list of scales
 	 * @throws MiddlewareException
 	 */
-	List<ScaleSummary> getAllScales() throws MiddlewareException;
+	List<ScaleSummary> getAllScales();
 
 	/**
 	 * get scale using given id
@@ -26,7 +25,7 @@ public interface OntologyScaleService {
 	 * @return scale that matches id
 	 * @throws MiddlewareException
 	 */
-	ScaleResponse getScaleById(Integer id) throws MiddlewareException;
+	ScaleResponse getScaleById(Integer id);
 
 	/**
 	 * Adding new scale
@@ -35,7 +34,7 @@ public interface OntologyScaleService {
 	 *            ScaleRequest
 	 * @throws MiddlewareException
 	 */
-	GenericResponse addScale(ScaleRequest request) throws MiddlewareException;
+	GenericResponse addScale(ScaleRequest request);
 
 	/**
 	 * update scale with new request data
@@ -44,7 +43,7 @@ public interface OntologyScaleService {
 	 *            ScaleRequest instance that have new data
 	 * @throws MiddlewareException
 	 */
-	void updateScale(ScaleRequest request) throws MiddlewareException;
+	void updateScale(ScaleRequest request);
 
 	/**
 	 * Delete a scale using given id
@@ -53,5 +52,5 @@ public interface OntologyScaleService {
 	 *            scale to be deleted
 	 * @throws MiddlewareException
 	 */
-	void deleteScale(Integer id) throws MiddlewareException;
+	void deleteScale(Integer id);
 }

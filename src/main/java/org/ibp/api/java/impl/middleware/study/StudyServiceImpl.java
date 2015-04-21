@@ -7,6 +7,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudySummary;
+import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class StudyServiceImpl implements StudyService {
 				studySummaries.add(summary);
 			}
 		} catch (MiddlewareException e) {
-			throw new RuntimeException("Error! Caused by: " + e.getMessage(), e);
+			throw new ApiRuntimeException("Error! Caused by: " + e.getMessage(), e);
 		}
 		return studySummaries;
 	}

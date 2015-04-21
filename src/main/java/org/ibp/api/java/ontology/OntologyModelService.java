@@ -1,6 +1,5 @@
 package org.ibp.api.java.ontology;
 
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.ontology.IdName;
 import org.ibp.api.domain.ontology.VariableTypeResponse;
 
@@ -14,7 +13,7 @@ public interface OntologyModelService {
 	 * @return list of data types
 	 * @throws MiddlewareException
 	 */
-	List<IdName> getAllDataTypes() throws MiddlewareException;
+	List<IdName> getAllDataTypes();
 
 	/**
 	 * get all classes
@@ -22,7 +21,7 @@ public interface OntologyModelService {
 	 * @return list of classes
 	 * @throws MiddlewareException
 	 */
-	List<String> getAllClasses() throws MiddlewareException;
+	List<String> getAllClasses();
 
 	/**
 	 * Get List of all variable types
