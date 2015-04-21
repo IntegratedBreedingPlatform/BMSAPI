@@ -20,7 +20,7 @@ public class OntologyMapperTest {
 
 		Method method = new Method(term);
 
-		ModelMapper mapper = OntologyMapper.methodMapper();
+		ModelMapper mapper = OntologyMapper.getInstance();
 
 		MethodSummary methodSummary = mapper.map(method, MethodSummary.class);
 
@@ -40,7 +40,7 @@ public class OntologyMapperTest {
 
 		Property property = new Property(term);
 
-		ModelMapper mapper = OntologyMapper.propertyMapper();
+		ModelMapper mapper = OntologyMapper.getInstance();
 
 		PropertySummary propertySummary = mapper.map(property, PropertySummary.class);
 

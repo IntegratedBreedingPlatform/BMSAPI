@@ -31,7 +31,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 			List<Scale> scales = this.ontologyManagerService.getAllScales();
 			List<ScaleSummary> scaleSummaries = new ArrayList<>();
 
-			ModelMapper mapper = OntologyMapper.scaleMapper();
+			ModelMapper mapper = OntologyMapper.getInstance();
 
 			for (Scale scale : scales) {
 				ScaleSummary scaleSummary = mapper.map(scale, ScaleSummary.class);
@@ -54,7 +54,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 			if (this.ontologyManagerService.isTermReferred(id)) {
 				deletable = false;
 			}
-			ModelMapper mapper = OntologyMapper.scaleMapper();
+			ModelMapper mapper = OntologyMapper.getInstance();
 			ScaleResponse response = mapper.map(scale, ScaleResponse.class);
 			String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
 			if (!deletable) {

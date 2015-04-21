@@ -105,7 +105,7 @@ public class OntologyScaleResource {
 	public ResponseEntity<GenericResponse> addScale(@PathVariable String cropname,
 			@RequestBody ScaleRequestBase requestBase)  {
 
-		ModelMapper modelMapper = OntologyMapper.scaleBaseToRequestMapper();
+		ModelMapper modelMapper = OntologyMapper.getInstance();
 		ScaleRequest request = modelMapper.map(requestBase, ScaleRequest.class);
 
 	  	BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");

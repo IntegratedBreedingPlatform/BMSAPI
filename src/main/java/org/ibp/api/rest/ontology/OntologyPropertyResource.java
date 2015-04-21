@@ -109,8 +109,8 @@ public class OntologyPropertyResource {
 	@RequestMapping(value = "/{cropname}/properties", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addProperty(@PathVariable String cropname,
-													   @RequestBody PropertyRequestBase requestBase)  {
-		ModelMapper modelMapper = OntologyMapper.propertyBaseToRequestMapper();
+													   @RequestBody PropertyRequestBase requestBase) {
+		ModelMapper modelMapper = OntologyMapper.getInstance();
 		PropertyRequest request = modelMapper.map(requestBase, PropertyRequest.class);
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 		this.cropNameValidator.validate(cropname, bindingResult);

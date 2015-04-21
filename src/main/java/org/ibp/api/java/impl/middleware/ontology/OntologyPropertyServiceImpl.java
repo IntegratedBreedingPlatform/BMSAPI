@@ -29,7 +29,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 			List<Property> propertyList = this.ontologyManagerService.getAllProperties();
 			List<PropertySummary> properties = new ArrayList<>();
 
-			ModelMapper mapper = OntologyMapper.propertyMapper();
+			ModelMapper mapper = OntologyMapper.getInstance();
 
 			for (Property property : propertyList) {
 			  	PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
@@ -52,7 +52,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 			if (this.ontologyManagerService.isTermReferred(id)) {
 			  	deletable = false;
 			}
-			ModelMapper mapper = OntologyMapper.propertyMapper();
+			ModelMapper mapper = OntologyMapper.getInstance();
 			PropertyResponse response = mapper.map(property, PropertyResponse.class);
 
 			String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
@@ -96,7 +96,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 			List<Property> propertyList = this.ontologyManagerService.getAllPropertiesWithClass(propertyClass);
 			List<PropertySummary> properties = new ArrayList<>();
 
-			ModelMapper mapper = OntologyMapper.propertyMapper();
+			ModelMapper mapper = OntologyMapper.getInstance();
 
 			for (Property property : propertyList) {
 			  	PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);

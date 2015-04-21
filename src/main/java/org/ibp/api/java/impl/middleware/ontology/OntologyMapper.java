@@ -1,21 +1,12 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
-import java.util.ArrayList;
-
-import org.generationcp.middleware.domain.oms.DataType;
-import org.generationcp.middleware.domain.oms.Method;
-import org.generationcp.middleware.domain.oms.OntologyVariable;
-import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
-import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.domain.oms.Scale;
-import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.oms.*;
 import org.ibp.api.domain.ontology.*;
-import org.ibp.api.domain.ontology.MethodSummary;
-import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.convention.MatchingStrategies;
-import org.modelmapper.spi.MappingContext;
+
+import java.util.ArrayList;
 
 public class OntologyMapper {
 
@@ -42,6 +33,10 @@ public class OntologyMapper {
 				if (SINGLETON == null) {
 					SINGLETON = new ModelMapper();
 					applyMapperConfiguration(SINGLETON);
+					addMethodMappers(SINGLETON);
+					addPropertyMappers(SINGLETON);
+					addScaleMappers(SINGLETON);
+					addVariableMappers(SINGLETON);
 				}
 			}
 		}
@@ -53,262 +48,133 @@ public class OntologyMapper {
 		mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 	}
 
-
 	/**
-	 * Custom Mapping for Middleware Method Class to MethodSummary Definition to
-	 * Description Mapping
+	 * Get ModelMapper instance and add Method related mapping to it
 	 */
-	private static PropertyMap<Method, MethodSummary> methodMap = new PropertyMap<Method, MethodSummary>() {
-		@Override
-		protected void configure() {
-			this.map().setId(String.valueOf(this.source.getId()));
-			this.map().setName(this.source.getName());
-			this.map().setDescription(this.source.getDefinition());
-		}
-	};
+	private static void addMethodMappers(ModelMapper mapper) {
 
-	/**
-	 * Custom Mapping for Middleware Method Class to MethodResponse
-	 */
-	private static PropertyMap<Method, MethodResponse> methodResponseMap = new PropertyMap<Method, MethodResponse>() {
-		@Override
-		protected void configure() {
-			this.map().setId(String.valueOf(this.source.getId()));
-			this.map().setName(this.source.getName());
-			this.map().setDescription(this.source.getDefinition());
-			this.map().setEditableFields(new ArrayList<String>());
-			this.map().setDeletable(false);
-		}
-	};
+		mapper.addMappings(new PropertyMap<Method, MethodSummary>() {
+			@Override
+			protected void configure() {
+				this.map().setId(String.valueOf(this.source.getId()));
+				this.map().setName(this.source.getName());
+				this.map().setDescription(this.source.getDefinition());
+			}
+		});
 
-	/**
-	 * Custom mapping for RequestBody PropertyRequestBase to PropertyRequest
-	 */
-	private static PropertyMap<PropertyRequestBase, PropertyRequest> propertyBaseToRequest = new PropertyMap<PropertyRequestBase, PropertyRequest>() {
-		@Override
-		protected void configure() {
-			this.map().setId(null);
-			this.map().setName(this.source.getName());
-			this.map().setDescription(this.source.getDescription());
-			this.map().setCropOntologyId(this.source.getCropOntologyId());
-			this.map().setClasses(this.source.getClasses());
-		}
-	};
-
-	/**
-	 * Custom Mapping for Middleware Property Class to PropertySummary
-	 */
-	private static PropertyMap<Property, PropertySummary> propertyMap = new PropertyMap<Property, PropertySummary>() {
-
-		@Override
-		protected void configure() {
-			this.map().setId(String.valueOf(this.source.getId()));
-			this.map().setName(this.source.getName());
-			this.map().setDescription(this.source.getDefinition());
-			this.map().setCropOntologyId(this.source.getCropOntologyId());
-			this.map().setClasses(this.source.getClasses());
-		}
-	};
-
-	/**
-	 * Custom Mapping for Middleware Property Class to PropertyResponse
-	 */
-	private static PropertyMap<Property, PropertyResponse> propertyResponseMap = new PropertyMap<Property, PropertyResponse>() {
-		@Override
-		protected void configure() {
-			this.map().setId(String.valueOf(this.source.getId()));
-			this.map().setName(this.source.getName());
-			this.map().setDescription(this.source.getDefinition());
-			this.map().setCropOntologyId(this.source.getCropOntologyId());
-			this.map().setClasses(this.source.getClasses());
-			this.map().setEditableFields(new ArrayList<String>());
-			this.map().setDeletable(false);
-		}
-	};
-
-	/**
-	 * Custom mapping for RequestBody ScaleRequestBase to ScaleRequest
-	 */
-	private static PropertyMap<ScaleRequestBase, ScaleRequest> scaleBaseToRequest = new PropertyMap<ScaleRequestBase, ScaleRequest>() {
-		@Override
-		protected void configure() {
-			this.map().setId(null);
-			this.map().setName(this.source.getName());
-			this.map().setDescription(this.source.getDescription());
-			this.map().setDataTypeId(this.source.getDataTypeId());
-			this.map().setValidValues(this.source.getValidValues());
-		}
-	};
-
-	/**
-	 * Custom Mapping for Middleware Scale Class to ScaleSummary
-	 */
-	private static PropertyMap<Scale, ScaleSummary> scaleMap = new PropertyMap<Scale, ScaleSummary>() {
-		@Override
-		protected void configure() {
-			this.map().setId(this.source.getId());
-			this.map().setName(this.source.getName());
-			this.map().setDescription(this.source.getDefinition());
-			this.map().setMinValue(this.source.getMinValue());
-			this.map().setMaxValue(this.source.getMaxValue());
-			this.map().setCategories(this.source.getCategories());
-		}
-	};
-
-	/**
-	 * Custom Mapping for Middleware Scale Class to ScaleResponse
-	 */
-	private static PropertyMap<Scale, ScaleResponse> scaleResponseMap = new PropertyMap<Scale, ScaleResponse>() {
-		@Override
-		protected void configure() {
-			this.map().setId(this.source.getId());
-			this.map().setName(this.source.getName());
-			this.map().setDescription(this.source.getDefinition());
-			this.map().setMinValue(this.source.getMinValue());
-			this.map().setMaxValue(this.source.getMaxValue());
-			this.map().setCategories(this.source.getCategories());
-			this.map().setEditableFields(new ArrayList<String>());
-			this.map().setDeletable(false);
-		}
-	};
-
-	/**
-	 * Custom Mapping for Middleware OntologyVariableSummary Class to
-	 * VariableSummary
-	 */
-	private static PropertyMap<OntologyVariableSummary, VariableSummary> variableMap = new PropertyMap<OntologyVariableSummary, VariableSummary>() {
-		@Override
-		protected void configure() {
-			this.map().setId(this.source.getId());
-			this.map().setName(this.source.getName());
-			this.map().setDescription(this.source.getDescription());
-			this.map().setFavourite(this.source.getIsFavorite());
-			this.map().setAlias(this.source.getAlias());
-			this.map().setVariableTypes(this.source.getVariableTypes());
-			this.map().setCreatedDate(this.source.getDateCreated());
-			this.map().setModifiedData(this.source.getDateLastModified());
-			this.map().setObservations(this.source.getObservations());
-			this.map().setExpectedMin(this.source.getMinValue());
-			this.map().setExpectedMax(this.source.getMaxValue());
-		}
-	};
-
-	/**
-	 * Custom Mapping for Middleware OntologyVariable Class to VariableResponse
-	 */
-	private static PropertyMap<OntologyVariable, VariableResponse> variableResponseMap = new PropertyMap<OntologyVariable, VariableResponse>() {
-		@Override
-		protected void configure() {
-			this.map().setName(this.source.getName());
-			this.map().setDescription(this.source.getDefinition());
-			this.map().setFavourite(this.source.getIsFavorite());
-			this.map().setAlias(this.source.getAlias());
-			this.map().setVariableTypes(this.source.getVariableTypes());
-			this.map().setCreatedDate(this.source.getDateCreated());
-			this.map().setModifiedData(this.source.getDateLastModified());
-			this.map().setObservations(this.source.getObservations());
-			this.map().setExpectedMin(this.source.getMinValue());
-			this.map().setExpectedMax(this.source.getMaxValue());
-			this.map().setEditableFields(new ArrayList<String>());
-			this.map().setDeletable(false);
-		}
-	};
-
-	/**
-	 * Customise Mapped method 'methodMap' is Initialize in Mapper and Returned
-	 * 
-	 * @return ModelMapper Instance
-	 */
-	public static ModelMapper methodMapper() {
-		ModelMapper mapper = new ModelMapper();
-		mapper.addMappings(OntologyMapper.methodMap);
-		mapper.addMappings(OntologyMapper.methodResponseMap);
-		return mapper;
+		mapper.addMappings(new PropertyMap<Method, MethodResponse>() {
+			@Override
+			protected void configure() {
+				this.map().setId(String.valueOf(this.source.getId()));
+				this.map().setName(this.source.getName());
+				this.map().setDescription(this.source.getDefinition());
+				this.map().setEditableFields(new ArrayList<String>());
+				this.map().setDeletable(false);
+			}
+		});
 	}
 
 	/**
-	 * Customise Mapped property 'propertyBaseToRequest' is Initialize in Mapper and Returned
-	 * @return ModelMapper Instance
+	 * Get ModelMapper instance and add Property related mapping to it
 	 */
-	public static ModelMapper propertyBaseToRequestMapper(){
-		ModelMapper mapper = new ModelMapper();
-		mapper.addMappings(OntologyMapper.propertyBaseToRequest);
-		return mapper;
+	public static void addPropertyMappers(ModelMapper mapper) {
+
+		mapper.addMappings(new PropertyMap<Property, PropertySummary>() {
+			@Override
+			protected void configure() {
+				this.map().setId(String.valueOf(this.source.getId()));
+				this.map().setName(this.source.getName());
+				this.map().setDescription(this.source.getDefinition());
+				this.map().setCropOntologyId(this.source.getCropOntologyId());
+				this.map().setClasses(this.source.getClasses());
+			}
+		});
+
+		mapper.addMappings(new PropertyMap<Property, PropertyResponse>() {
+			@Override
+			protected void configure() {
+				this.map().setId(String.valueOf(this.source.getId()));
+				this.map().setName(this.source.getName());
+				this.map().setDescription(this.source.getDefinition());
+				this.map().setCropOntologyId(this.source.getCropOntologyId());
+				this.map().setClasses(this.source.getClasses());
+				this.map().setEditableFields(new ArrayList<String>());
+				this.map().setDeletable(false);
+			}
+		});
 	}
 
 	/**
-	 * Customise Mapped Scale 'propertyBaseToRequest' is Initialize in Mapper and Returned
-	 * @return ModelMapper Instance
+	 *  Get ModelMapper instance and add Scale related mapping to it
 	 */
-	public static ModelMapper scaleBaseToRequestMapper(){
-		ModelMapper mapper = getInstance();
-		mapper.addMappings(OntologyMapper.scaleBaseToRequest);
-		return mapper;
+	public static void addScaleMappers(ModelMapper mapper) {
+
+		mapper.addMappings(new PropertyMap<Scale, ScaleSummary>() {
+			@Override
+			protected void configure() {
+				this.map().setId(this.source.getId());
+				this.map().setName(this.source.getName());
+				this.map().setDescription(this.source.getDefinition());
+				this.map().setMinValue(this.source.getMinValue());
+				this.map().setMaxValue(this.source.getMaxValue());
+				this.map().setCategories(this.source.getCategories());
+			}
+		});
+
+		mapper.addMappings(new PropertyMap<Scale, ScaleResponse>() {
+			@Override
+			protected void configure() {
+				this.map().setId(this.source.getId());
+				this.map().setName(this.source.getName());
+				this.map().setDescription(this.source.getDefinition());
+				this.map().setMinValue(this.source.getMinValue());
+				this.map().setMaxValue(this.source.getMaxValue());
+				this.map().setCategories(this.source.getCategories());
+				this.map().setEditableFields(new ArrayList<String>());
+				this.map().setDeletable(false);
+			}
+		});
 	}
 
 	/**
-	 * Customise Mapped property 'propertyMap' is Initialize in Mapper and
-	 * Returned
-	 * 
-	 * @return ModelMapper Instance
+	 * Get ModelMapper instance and add Property related mapping to it
 	 */
-	public static ModelMapper propertyMapper() {
-		ModelMapper mapper = new ModelMapper();
-		mapper.addMappings(OntologyMapper.propertyMap);
-		mapper.addMappings(OntologyMapper.propertyResponseMap);
-		return mapper;
+	public static void addVariableMappers(ModelMapper mapper) {
+
+		mapper.addMappings(new PropertyMap<OntologyVariableSummary, VariableSummary>() {
+			@Override
+			protected void configure() {
+				this.map().setId(this.source.getId());
+				this.map().setName(this.source.getName());
+				this.map().setDescription(this.source.getDescription());
+				this.map().setFavourite(this.source.getIsFavorite());
+				this.map().setAlias(this.source.getAlias());
+				this.map().setVariableTypes(this.source.getVariableTypes());
+				this.map().setCreatedDate(this.source.getDateCreated());
+				this.map().setModifiedData(this.source.getDateLastModified());
+				this.map().setObservations(this.source.getObservations());
+				this.map().setExpectedMin(this.source.getMinValue());
+				this.map().setExpectedMax(this.source.getMaxValue());
+			}
+		});
+
+		mapper.addMappings(new PropertyMap<OntologyVariable, VariableResponse>() {
+			@Override
+			protected void configure() {
+				this.map().setName(this.source.getName());
+				this.map().setDescription(this.source.getDefinition());
+				this.map().setFavourite(this.source.getIsFavorite());
+				this.map().setAlias(this.source.getAlias());
+				this.map().setVariableTypes(this.source.getVariableTypes());
+				this.map().setCreatedDate(this.source.getDateCreated());
+				this.map().setModifiedData(this.source.getDateLastModified());
+				this.map().setObservations(this.source.getObservations());
+				this.map().setExpectedMin(this.source.getMinValue());
+				this.map().setExpectedMax(this.source.getMaxValue());
+				this.map().setEditableFields(new ArrayList<String>());
+				this.map().setDeletable(false);
+			}
+		});
 	}
 
-	/**
-	 * Customise Mapped property 'scaleMap' is Initialize in Mapper and Returned
-	 * 
-	 * @return ModelMapper Instance
-	 */
-	public static ModelMapper scaleMapper() {
-		ModelMapper scaleMapper = new ModelMapper();
-		scaleMapper.addMappings(OntologyMapper.scaleMap);
-		scaleMapper.addMappings(OntologyMapper.scaleResponseMap);
-		scaleMapper.createTypeMap(DataType.class, IdName.class).setConverter(
-				new Converter<DataType, IdName>() {
-					@Override
-					public IdName convert(MappingContext<DataType, IdName> mappingContext) {
-						return new IdName();
-					}
-				});
-		return scaleMapper;
-	}
-
-	/**
-	 * Customise Mapped property 'variableMap' is Initialize in Mapper and
-	 * Returned
-	 * 
-	 * @return ModelMapper Instance
-	 */
-	public static ModelMapper variableMapper() {
-		ModelMapper variableMapper = new ModelMapper();
-		variableMapper.addMappings(OntologyMapper.variableMap);
-		variableMapper.createTypeMap(TermSummary.class, IdName.class).setConverter(
-				new Converter<TermSummary, IdName>() {
-					@Override
-					public IdName convert(MappingContext<TermSummary, IdName> mappingContext) {
-						return new IdName();
-					}
-				});
-		return variableMapper;
-	}
-
-	/**
-	 * Customise Mapped property 'variableResponseMap' is Initialize in Mapper
-	 * and Returned
-	 * 
-	 * @return ModelMapper Instance
-	 */
-	public static ModelMapper variableResponseMapper() {
-		ModelMapper variableMapper = new ModelMapper();
-		variableMapper.addMappings(OntologyMapper.methodMap);
-		variableMapper.addMappings(OntologyMapper.propertyMap);
-		variableMapper.addMappings(OntologyMapper.scaleMap);
-		variableMapper.addMappings(OntologyMapper.variableResponseMap);
-		return variableMapper;
-	}
 }

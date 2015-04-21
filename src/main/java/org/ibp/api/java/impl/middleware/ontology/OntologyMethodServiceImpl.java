@@ -25,13 +25,13 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	@Autowired
 	private OntologyManagerService ontologyManagerService;
 
-  @Override
+  	@Override
 	public List<MethodSummary> getAllMethods() {
 		try {
 			List<Method> methodList = this.ontologyManagerService.getAllMethods();
 			List<MethodSummary> methods = new ArrayList<>();
 
-			ModelMapper mapper = OntologyMapper.methodMapper();
+			ModelMapper mapper = OntologyMapper.getInstance();
 
 			for (Method method : methodList) {
 			  	MethodSummary methodSummary = mapper.map(method, MethodSummary.class);
@@ -54,7 +54,7 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 			if (this.ontologyManagerService.isTermReferred(id)) {
 			  	deletable = false;
 			}
-			ModelMapper mapper = OntologyMapper.methodMapper();
+			ModelMapper mapper = OntologyMapper.getInstance();
 			MethodResponse response = mapper.map(method, MethodResponse.class);
 			String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
 			if (!deletable) {

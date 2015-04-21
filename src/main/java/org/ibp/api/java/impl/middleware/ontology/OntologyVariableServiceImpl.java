@@ -36,7 +36,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 			List<OntologyVariableSummary> variableSummaries = this.ontologyManagerService.getWithFilter(programId, favourite, null, propertyId, null);
 			List<VariableSummary> variableSummaryList = new ArrayList<>();
 
-			ModelMapper mapper = OntologyMapper.variableMapper();
+			ModelMapper mapper = OntologyMapper.getInstance();
 
 			for (OntologyVariableSummary variable : variableSummaries) {
 			    VariableSummary variableSummary = mapper.map(variable, VariableSummary.class);
@@ -62,7 +62,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 			    deletable = false;
 			}
 
-			ModelMapper mapper = OntologyMapper.variableResponseMapper();
+			ModelMapper mapper = OntologyMapper.getInstance();
 			VariableResponse response = mapper.map(ontologyVariable, VariableResponse.class);
 
 			if (!deletable) {
