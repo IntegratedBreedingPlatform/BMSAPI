@@ -74,7 +74,7 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 										Matchers.is(projectList.get(0).getUniqueID())))
 										.andExpect(
 												MockMvcResultMatchers.jsonPath("$[0].userId",
-														Matchers.is(projectList.get(0).getUserId())))
+														Matchers.is(String.valueOf(projectList.get(0).getUserId()))))
 														.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.workbenchDataManager, Mockito.times(1)).getProjects();
