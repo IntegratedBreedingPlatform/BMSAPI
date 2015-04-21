@@ -164,7 +164,7 @@ public class OntologyVariableResource {
 	@ApiOperation(value = "Update Variable", notes = "Update variable using given data")
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity updateVariable(@PathVariable String cropname,
+	public ResponseEntity<?> updateVariable(@PathVariable String cropname,
 										 @RequestParam(value = "programId") String programId,
 										 @PathVariable String id,
 										 @RequestBody UpdateVariableRequest updateVariableDetail) throws MiddlewareException {

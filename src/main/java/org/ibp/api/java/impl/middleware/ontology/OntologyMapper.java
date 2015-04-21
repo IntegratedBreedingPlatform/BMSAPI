@@ -17,14 +17,9 @@ import org.modelmapper.PropertyMap;
 import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.spi.MappingContext;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 public class OntologyMapper {
 
 	private static ModelMapper SINGLETON = null;
-
-	private final Lock lock = new ReentrantLock();
 
 	/**
 	 * We do not want public constructor of this class as all methods are static
