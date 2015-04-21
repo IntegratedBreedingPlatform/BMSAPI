@@ -1,11 +1,12 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import com.google.common.base.Strings;
+
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.ibp.api.CommonUtil;
 import org.ibp.api.domain.ontology.ExpectedRange;
 import org.ibp.api.domain.ontology.VariableRequest;
+import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;

@@ -1,6 +1,7 @@
 package org.ibp.api.rest.ontology;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -8,10 +9,10 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.CommonUtil;
 import org.ibp.api.domain.ontology.AddVariableRequest;
 import org.ibp.api.domain.ontology.ExpectedRange;
 import org.ibp.api.domain.ontology.UpdateVariableRequest;
+import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.ibp.builders.MethodBuilder;
 import org.ibp.builders.PropertyBuilder;
 import org.ibp.builders.ScaleBuilder;

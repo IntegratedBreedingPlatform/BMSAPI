@@ -7,14 +7,15 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.google.common.base.Strings;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.ibp.api.CommonUtil;
 import org.ibp.api.domain.ontology.VariableCategory;
 import org.ibp.api.domain.ontology.ScaleRequest;
 import org.ibp.api.domain.ontology.ValidValues;
+import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
