@@ -18,7 +18,7 @@ public class VariableResponse implements EditableDeletableFields {
 	private List<IdName> variableTypes;
 	private boolean favourite;
 	private final MetaData metadata = new MetaData();
-	private ExpectedRange expectedRange;
+	private final ExpectedRange expectedRange = new ExpectedRange();
 	private List<String> editableFields;
 	private Boolean deletable;
 
@@ -122,12 +122,10 @@ public class VariableResponse implements EditableDeletableFields {
 	}
 
 	public void setExpectedMin(String min) {
-		this.ensureExpectedRangeInitialized();
 		this.expectedRange.setMin(min);
 	}
 
 	public void setExpectedMax(String max) {
-		this.ensureExpectedRangeInitialized();
 		this.expectedRange.setMax(max);
 	}
 
@@ -141,12 +139,6 @@ public class VariableResponse implements EditableDeletableFields {
 
 	public void setObservations(Integer observations) {
 		this.metadata.setObservations(observations);
-	}
-
-	private void ensureExpectedRangeInitialized() {
-		if (this.expectedRange == null) {
-			this.expectedRange = new ExpectedRange();
-		}
 	}
 
 	@Override
