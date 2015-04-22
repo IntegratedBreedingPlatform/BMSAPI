@@ -17,7 +17,7 @@ public class VariableResponse implements EditableDeletableFields {
 	private ScaleSummary scale;
 	private List<IdName> variableTypes;
 	private boolean favourite;
-	private MetaData metadata;
+	private final MetaData metadata = new MetaData();
 	private ExpectedRange expectedRange;
 	private List<String> editableFields;
 	private Boolean deletable;
@@ -131,25 +131,16 @@ public class VariableResponse implements EditableDeletableFields {
 		this.expectedRange.setMax(max);
 	}
 
-	public void setModifiedData(Date modifiedDate) {
-		this.ensureMetaDataInitialized();
+	public void setModifiedDate(Date modifiedDate) {
 		this.metadata.setDateLastModified(modifiedDate);
 	}
 
 	public void setCreatedDate(Date createdDate) {
-		this.ensureMetaDataInitialized();
 		this.metadata.setDateCreated(createdDate);
 	}
 
 	public void setObservations(Integer observations) {
-		this.ensureMetaDataInitialized();
 		this.metadata.setObservations(observations);
-	}
-
-	private void ensureMetaDataInitialized() {
-		if (this.metadata == null) {
-			this.metadata = new MetaData();
-		}
 	}
 
 	private void ensureExpectedRangeInitialized() {
