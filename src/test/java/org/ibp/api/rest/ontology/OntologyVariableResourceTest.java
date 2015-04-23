@@ -141,8 +141,7 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(new Project()).when(this.workbenchDataManager).getProjectByUuid(programUuid);
 		Mockito.doReturn(ontologyVariable).when(this.ontologyManagerService).getVariable(programUuid, ontologyVariable.getId());
-	  	Mockito.doReturn(new Term(1, this.variableName, this.variableDescription, CvId.VARIABLES.getId(), false)).when(
-				this.ontologyManagerService).getTermById(ontologyVariable.getId());
+	  	Mockito.doReturn(new Term(1, this.variableName, this.variableDescription, CvId.VARIABLES.getId(), false)).when(this.ontologyManagerService).getTermById(ontologyVariable.getId());
 
 		this.mockMvc.perform(MockMvcRequestBuilders
 				.get("/ontology/{cropname}/variables/{id}?programId=" + programUuid, cropName, ontologyVariable.getId())
@@ -212,7 +211,7 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 	}
 
 	/**
-	 * add new variable and return new generated variable Id with status code 201 : Created
+	 * update variable using given Id and data if exist and return status code 204 : No Content
 	 * @throws Exception
 	 */
 	@Test
@@ -266,5 +265,39 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.status().isNoContent());
 
 		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).updateVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
+	}
+
+
+	/**
+	 * delete variable using given Id if exist and return status code 204 : No Content
+	 * @throws Exception
+	 */
+	@Test
+	public void deleteVariable() throws Exception{
+
+		Term term = new Term(10, variableName, variableDescription, CvId.VARIABLES.getId(), false);
+		OntologyVariable ontologyVariable = new OntologyVariable(term);
+
+		ontologyVariable.setProperty(new PropertyBuilder().build(10, this.propertyName, this.propertyDescription, "CO:000001", classes));
+		ontologyVariable.setMethod(new MethodBuilder().build(11, this.methodName, this.methodDescription));
+		ontologyVariable.setScale(new ScaleBuilder().build(12, this.scaleName, this.scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null));
+		ontologyVariable.setMinValue("14");
+		ontologyVariable.setMaxValue("16");
+		ontologyVariable.setAlias("Variable Alias Name");
+		ontologyVariable.addVariableType(VariableType.getById(1));
+
+		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
+		Mockito.doReturn(new Project()).when(this.workbenchDataManager).getProjectByUuid(programUuid);
+		Mockito.doReturn(term).when(this.ontologyManagerService).getTermById(ontologyVariable.getId());
+		Mockito.doReturn(ontologyVariable).when(this.ontologyManagerService).getVariable(programUuid, ontologyVariable.getId());
+		Mockito.doReturn(false).when(this.ontologyManagerService).isTermReferred(ontologyVariable.getId());
+		Mockito.doNothing().when(this.ontologyManagerService).deleteVariable(ontologyVariable.getId());
+
+		this.mockMvc.perform(MockMvcRequestBuilders.delete("/ontology/{cropname}/variables/{id}", cropName, ontologyVariable.getId())
+				.contentType(this.contentType))
+				.andExpect(MockMvcResultMatchers.status().isNoContent())
+				.andDo(MockMvcResultHandlers.print());
+
+		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).deleteVariable(ontologyVariable.getId());
 	}
 }

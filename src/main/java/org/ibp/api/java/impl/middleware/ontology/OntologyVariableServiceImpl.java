@@ -142,4 +142,13 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 			throw new ApiRuntimeException("Error!", e);
 		}
     }
+
+	@Override
+	public void deleteVariable(Integer id) {
+		try{
+			ontologyManagerService.deleteVariable(id);
+		}catch (MiddlewareException e){
+			throw new ApiRuntimeException("Error!", e);
+		}
+	}
 }

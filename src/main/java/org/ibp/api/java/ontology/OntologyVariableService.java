@@ -40,4 +40,10 @@ public interface OntologyVariableService {
 	 * @param request data to be added
 	 */
 	void updateVariable(VariableRequest request);
+
+	/**
+	 * Delete variable of given Id
+	 * @param id Variable Id to be deleted
+	 */
+	void deleteVariable(Integer id);
 }

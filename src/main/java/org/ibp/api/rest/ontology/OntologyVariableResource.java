@@ -11,6 +11,7 @@ import org.ibp.api.java.impl.middleware.common.validator.CropNameValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.ontology.OntologyMapper;
 import org.ibp.api.java.impl.middleware.ontology.validator.RequestIdValidator;
+import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableRequestValidator;
 import org.ibp.api.java.ontology.OntologyVariableService;
@@ -52,6 +53,9 @@ public class OntologyVariableResource {
 
 	@Autowired
 	private VariableRequestValidator variableRequestValidator;
+
+	@Autowired
+	private TermDeletableValidator termDeletableValidator;
 
 	/**
 	 * @param cropname
@@ -194,6 +198,34 @@ public class OntologyVariableResource {
 		}
 
 		this.ontologyVariableService.updateVariable(request);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	/**
+	 * @param cropname The crop for which this rest call is being made
+	 */
+	// TODO: 403 response for user without permission
+	@SuppressWarnings("rawtypes")
+	@ApiOperation(value = "Delete Variable", notes = "Delete Variable by Id")
+	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity deleteVariable(@PathVariable String cropname, @PathVariable String id)  {
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+		this.cropNameValidator.validate(cropname, bindingResult);
+		if(bindingResult.hasErrors()){
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
+		this.requestIdValidator.validate(id, bindingResult);
+		if (bindingResult.hasErrors()) {
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+		this.termDeletableValidator.validate(new TermRequest(id, "Variable", CvId.VARIABLES.getId()), bindingResult);
+		if (bindingResult.hasErrors()) {
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+		this.ontologyVariableService.deleteVariable(Integer.valueOf(id));
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
