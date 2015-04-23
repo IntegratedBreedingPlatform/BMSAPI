@@ -1,26 +1,31 @@
 package org.ibp.api.domain.ontology;
 
+import org.generationcp.middleware.util.ISO8601DateParser;
 import java.util.Date;
 
 public class MetaData {
-	private Date dateCreated;
-	private Date dateLastModified;
+	private String dateCreated;
+	private String dateLastModified;
 	private Integer observations;
 
-	public Date getDateCreated() {
+	public String getDateCreated() {
 		return this.dateCreated;
 	}
 
 	public void setDateCreated(Date dateCreated) {
-		this.dateCreated = dateCreated;
+		if(dateCreated != null){
+			this.dateCreated = ISO8601DateParser.toString(dateCreated);
+		}
 	}
 
-	public Date getDateLastModified() {
+	public String getDateLastModified() {
 		return this.dateLastModified;
 	}
 
 	public void setDateLastModified(Date dateLastModified) {
-		this.dateLastModified = dateLastModified;
+		if(dateLastModified != null){
+			this.dateLastModified = ISO8601DateParser.toString(dateLastModified);
+		}
 	}
 
 	public Integer getObservations() {
