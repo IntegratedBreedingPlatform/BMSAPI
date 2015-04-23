@@ -17,6 +17,7 @@ import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wordnik.swagger.annotations.Api;
@@ -41,14 +42,14 @@ public class StudyResource {
 	@ApiOperation(value = "List all studies", notes = "Returns summary information for all studies (Nurseries and Trials).")
 	@RequestMapping(value = "/{cropname}/list", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<StudySummary>> listAllStudies(@PathVariable String cropname) {
+	public ResponseEntity<List<StudySummary>> listAllStudies(@PathVariable String cropname, @RequestParam(value = "programUniqueId", required = false) String programUniqueId) {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 		this.cropNameValidator.validate(cropname, bindingResult);
 		if(bindingResult.hasErrors()){
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 
-		return new ResponseEntity<>(this.studyService.listAllStudies(), HttpStatus.OK);
+		return new ResponseEntity<>(this.studyService.listAllStudies(programUniqueId), HttpStatus.OK);
 	}
 	
 	@ApiOperation(value = "Get all observations", notes = "Returns observations available in the study.")

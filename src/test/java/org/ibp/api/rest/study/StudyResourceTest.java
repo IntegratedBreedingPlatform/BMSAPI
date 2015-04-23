@@ -69,7 +69,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		summariesMW.add(summaryMW);
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
-		Mockito.when(this.studyServiceMW.listAllStudies()).thenReturn(summariesMW);
+		Mockito.when(this.studyServiceMW.listAllStudies(Mockito.anyString())).thenReturn(summariesMW);
 		
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/study/{cropname}/list", "maize")
 				.contentType(this.contentType))
@@ -84,7 +84,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['endDate']", Matchers.is(summaryMW.getEndDate())))
 				.andDo(MockMvcResultHandlers.print());
 
-		Mockito.verify(this.studyServiceMW).listAllStudies();
+		Mockito.verify(this.studyServiceMW).listAllStudies(Mockito.anyString());
 	}
 
 }

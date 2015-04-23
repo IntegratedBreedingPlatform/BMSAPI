@@ -7,7 +7,12 @@ import org.ibp.api.domain.study.StudySummary;
 
 public interface StudyService {
 
-	List<StudySummary> listAllStudies();
+	/**
+	 * @param programUniqueId Optional parameter, if provided the results are filtered to only return studies that belong to the program
+	 *        identified by this unique id.
+	 * @return List of {@link StudySummary}ies. Omits deleted studies.
+	 */
+	List<StudySummary> listAllStudies(final String programUniqueId);
 	
 	List<Observation> getObservations(Integer studyId);
 

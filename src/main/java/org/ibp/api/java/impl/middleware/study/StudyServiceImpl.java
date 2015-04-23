@@ -13,8 +13,6 @@ import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.common.collect.Lists;
-
 @Service
 public class StudyServiceImpl implements StudyService {
 
@@ -22,11 +20,10 @@ public class StudyServiceImpl implements StudyService {
 	private org.generationcp.middleware.service.api.study.StudyService middlewareStudyService;
 
 	@Override
-	public List<StudySummary> listAllStudies() {
+	public List<StudySummary> listAllStudies(final String programUniqueId) {
 		List<StudySummary> studySummaries = new ArrayList<StudySummary>();
 		try {
-			List<org.generationcp.middleware.service.api.study.StudySummary> mwStudySummaries = middlewareStudyService.listAllStudies();
-			middlewareStudyService.getMeasurements(2007);
+			List<org.generationcp.middleware.service.api.study.StudySummary> mwStudySummaries = middlewareStudyService.listAllStudies(programUniqueId);
 			
 			for (org.generationcp.middleware.service.api.study.StudySummary mwStudySummary : mwStudySummaries) {
 				StudySummary summary = new StudySummary(mwStudySummary.getId());
