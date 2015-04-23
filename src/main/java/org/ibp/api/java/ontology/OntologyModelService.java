@@ -11,7 +11,6 @@ public interface OntologyModelService {
 	 * get all data types
 	 *
 	 * @return list of data types
-	 * @throws MiddlewareException
 	 */
 	List<IdName> getAllDataTypes();
 
@@ -19,7 +18,6 @@ public interface OntologyModelService {
 	 * get all classes
 	 *
 	 * @return list of classes
-	 * @throws MiddlewareException
 	 */
 	List<String> getAllClasses();
 

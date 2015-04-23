@@ -13,44 +13,35 @@ public interface OntologyScaleService {
 	 * get all scales with details
 	 *
 	 * @return list of scales
-	 * @throws MiddlewareException
 	 */
 	List<ScaleSummary> getAllScales();
 
 	/**
 	 * get scale using given id
 	 *
-	 * @param id
-	 *            scale id
+	 * @param id scale id
 	 * @return scale that matches id
-	 * @throws MiddlewareException
 	 */
 	ScaleResponse getScaleById(Integer id);
 
 	/**
 	 * Adding new scale
 	 *
-	 * @param request
-	 *            ScaleRequest
-	 * @throws MiddlewareException
+	 * @param request ScaleRequest
 	 */
 	GenericResponse addScale(ScaleRequest request);
 
 	/**
 	 * update scale with new request data
 	 *
-	 * @param request
-	 *            ScaleRequest instance that have new data
-	 * @throws MiddlewareException
+	 * @param request ScaleRequest instance that have new data
 	 */
 	void updateScale(ScaleRequest request);
 
 	/**
 	 * Delete a scale using given id
 	 *
-	 * @param id
-	 *            scale to be deleted
-	 * @throws MiddlewareException
+	 * @param id scale to be deleted
 	 */
 	void deleteScale(Integer id);
 }
