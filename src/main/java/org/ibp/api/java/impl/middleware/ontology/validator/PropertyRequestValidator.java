@@ -24,13 +24,14 @@ import org.springframework.validation.Errors;
  * 5 Classes must be an array containing at least one string
  * 6 Each class should contain unique value
  * 7 Name cannot change if the property is already in use
- * 8 Individual classes may not be longer than 200 characters each
+ * 8 Individual classes may not be longer than 100 characters each
  */
 @Component
 public class PropertyRequestValidator extends OntologyValidator implements org.springframework.validation.Validator {
 
 	private static final Integer NAME_TEXT_LIMIT = 200;
 	private static final Integer DESCRIPTION_TEXT_LIMIT = 255;
+	private static final Integer CLASS_TEXT_LIMIT = 100;
 	private static final String PROPERTY_CLASS_NOT_VALID = "class.not.valid";
 
 	@Override
@@ -175,7 +176,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 		List<String> classes = request.getClasses();
 
 		for (int i = 1; i <= classes.size(); i++) {
-			this.listShouldNotOverflow("class names", "classes", classes.get(i-1), NAME_TEXT_LIMIT, errors);
+			this.listShouldNotOverflow("class names", "classes", classes.get(i-1), CLASS_TEXT_LIMIT, errors);
 			if (errors.getErrorCount() > initialCount) {
 				break;
 			}
