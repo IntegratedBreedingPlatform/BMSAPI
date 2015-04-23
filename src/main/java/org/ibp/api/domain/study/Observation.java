@@ -5,16 +5,30 @@ import java.util.List;
 
 public class Observation {
 
+	private String uniqueIdentifier;
 	private Integer germplasmId;
 	private String germplasmDesignation;
-	private Integer enrtyNumber;
+	private String enrtyNumber;
 	private String entryType;
-	private Integer plotNumber;
-	private String parentage;
-	private Integer replicationNumber;
-	private Integer environmentNumber;
+	private String plotNumber;
+	private String replicationNumber;
+	private String environmentNumber;
 
 	private List<Measurement> measurements;
+	
+	/**
+	 * @return the uniqueIdentifier
+	 */
+	public String getUniqueIdentifier() {
+		return uniqueIdentifier;
+	}
+
+	/**
+	 * @param uniqueIdentifier the uniqueIdentifier to set
+	 */
+	public void setUniqueIdentifier(String uniqueIdentifier) {
+		this.uniqueIdentifier = uniqueIdentifier;
+	}
 
 	public Integer getGermplasmId() {
 		return germplasmId;
@@ -32,11 +46,11 @@ public class Observation {
 		this.germplasmDesignation = germplasmDesignation;
 	}
 
-	public Integer getEnrtyNumber() {
+	public String getEnrtyNumber() {
 		return enrtyNumber;
 	}
 
-	public void setEnrtyNumber(Integer enrtyNumber) {
+	public void setEnrtyNumber(String enrtyNumber) {
 		this.enrtyNumber = enrtyNumber;
 	}
 
@@ -50,35 +64,27 @@ public class Observation {
 		this.entryType = entryType;
 	}
 
-	public Integer getPlotNumber() {
+	public String getPlotNumber() {
 		return plotNumber;
 	}
 
-	public void setPlotNumber(Integer plotNumber) {
+	public void setPlotNumber(String plotNumber) {
 		this.plotNumber = plotNumber;
 	}
 
-	public String getParentage() {
-		return parentage;
-	}
-
-	public void setParentage(String parentage) {
-		this.parentage = parentage;
-	}
-
-	public Integer getReplicationNumber() {
+	public String getReplicationNumber() {
 		return replicationNumber;
 	}
 
-	public void setReplicationNumber(Integer replicationNumber) {
+	public void setReplicationNumber(String replicationNumber) {
 		this.replicationNumber = replicationNumber;
 	}
 
-	public Integer getEnvironmentNumber() {
+	public String getEnvironmentNumber() {
 		return environmentNumber;
 	}
 
-	public void setEnvironmentNumber(Integer environmentNumber) {
+	public void setEnvironmentNumber(String environmentNumber) {
 		this.environmentNumber = environmentNumber;
 	}
 
