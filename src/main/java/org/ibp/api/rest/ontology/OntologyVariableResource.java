@@ -1,13 +1,17 @@
 package org.ibp.api.rest.ontology;
 
-import com.google.common.base.Strings;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.HashMap;
+import java.util.List;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.*;
+import org.ibp.api.domain.ontology.AddVariableRequest;
+import org.ibp.api.domain.ontology.TermRequest;
+import org.ibp.api.domain.ontology.UpdateVariableRequest;
+import org.ibp.api.domain.ontology.VariableRequest;
+import org.ibp.api.domain.ontology.VariableResponse;
+import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.common.validator.CropNameValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.ontology.OntologyMapper;
 import org.ibp.api.java.impl.middleware.ontology.validator.RequestIdValidator;
@@ -15,6 +19,7 @@ import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidato
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableRequestValidator;
 import org.ibp.api.java.ontology.OntologyVariableService;
+import org.ibp.api.rest.AbstractResource;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,10 +27,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
-import java.util.List;
+import com.google.common.base.Strings;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 /**
  * NOTE: Work in Progress, Do Not Use API Exposed
@@ -34,10 +45,7 @@ import java.util.List;
 @Api(value = "Ontology Variable Service")
 @Controller
 @RequestMapping("/ontology")
-public class OntologyVariableResource {
-
-	@Autowired
-	private CropNameValidator cropNameValidator;
+public class OntologyVariableResource extends AbstractResource {
 
 	@Autowired
 	private OntologyVariableService ontologyVariableService;
@@ -69,10 +77,7 @@ public class OntologyVariableResource {
 																  @RequestParam(value = "favourite", required = false) Boolean favourite,
 																  @RequestParam(value = "programId") String programId)  {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
+		super.validateCropName(cropname, bindingResult);
 
 		this.programValidator.validate(programId, bindingResult);
 

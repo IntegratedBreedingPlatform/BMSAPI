@@ -1,19 +1,23 @@
 package org.ibp.api.rest.ontology;
 
-import com.google.common.base.Strings;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.HashMap;
+import java.util.List;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.*;
+import org.ibp.api.domain.ontology.PropertyRequest;
+import org.ibp.api.domain.ontology.PropertyRequestBase;
+import org.ibp.api.domain.ontology.PropertyResponse;
+import org.ibp.api.domain.ontology.PropertySummary;
+import org.ibp.api.domain.ontology.TermRequest;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.common.validator.CropNameValidator;
 import org.ibp.api.java.impl.middleware.ontology.OntologyMapper;
 import org.ibp.api.java.impl.middleware.ontology.validator.PropertyRequestValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.RequestIdValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.ontology.OntologyPropertyService;
+import org.ibp.api.rest.AbstractResource;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,15 +25,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
-import java.util.List;
+import com.google.common.base.Strings;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 @Api(value = "Ontology Property Service")
 @Controller
 @RequestMapping("/ontology")
-public class OntologyPropertyResource {
+public class OntologyPropertyResource extends AbstractResource {
 
 	@Autowired
 	private RequestIdValidator requestIdValidator;
@@ -46,9 +56,6 @@ public class OntologyPropertyResource {
 	@Autowired
 	private OntologyPropertyService ontologyPropertyService;
 
-	@Autowired
-	private CropNameValidator cropNameValidator;
-
 	/**
 	 * @param cropname
 	 *            The crop for which this rest call is being made
@@ -61,10 +68,7 @@ public class OntologyPropertyResource {
 			@RequestParam(value = "class", defaultValue = "", required = false) String className)
 			 {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
+		super.validateCropName(cropname, bindingResult);
 		if (Strings.isNullOrEmpty(className)) {
 			List<PropertySummary> propertyList = this.ontologyPropertyService.getAllProperties();
 			return new ResponseEntity<>(propertyList, HttpStatus.OK);

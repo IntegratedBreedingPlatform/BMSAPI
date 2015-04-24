@@ -5,9 +5,8 @@ import java.util.List;
 
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudySummary;
-import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.common.validator.CropNameValidator;
 import org.ibp.api.java.study.StudyService;
+import org.ibp.api.rest.AbstractResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,11 +25,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 @Api(value = "Study Services")
 @Controller
 @RequestMapping("/study")
-public class StudyResource {
-
-	@Autowired
-	private CropNameValidator cropNameValidator;
-
+public class StudyResource extends AbstractResource {
 
 	@Autowired
 	private StudyService studyService;
@@ -43,12 +38,8 @@ public class StudyResource {
 	@RequestMapping(value = "/{cropname}/list", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<StudySummary>> listAllStudies(@PathVariable String cropname, @RequestParam(value = "programUniqueId", required = false) String programUniqueId) {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Study");
+		super.validateCropName(cropname, bindingResult);
 		return new ResponseEntity<>(this.studyService.listAllStudies(programUniqueId), HttpStatus.OK);
 	}
 	
@@ -56,6 +47,8 @@ public class StudyResource {
 	@RequestMapping(value = "/{cropname}/{studyId}/observations", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<Observation>> getObservations(@PathVariable String cropname, @PathVariable Integer studyId) {
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Study");
+		super.validateCropName(cropname, bindingResult);
 		return new ResponseEntity<>(studyService.getObservations(studyId), HttpStatus.OK);
 	}
 

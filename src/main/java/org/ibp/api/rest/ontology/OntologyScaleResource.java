@@ -1,18 +1,23 @@
 package org.ibp.api.rest.ontology;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.HashMap;
+import java.util.List;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.*;
+import org.ibp.api.domain.ontology.ScaleRequest;
+import org.ibp.api.domain.ontology.ScaleRequestBase;
+import org.ibp.api.domain.ontology.ScaleResponse;
+import org.ibp.api.domain.ontology.ScaleSummary;
+import org.ibp.api.domain.ontology.TermRequest;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.common.validator.CropNameValidator;
 import org.ibp.api.java.impl.middleware.ontology.OntologyMapper;
 import org.ibp.api.java.impl.middleware.ontology.validator.RequestIdValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.ScaleRequestValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.ontology.OntologyScaleService;
+import org.ibp.api.rest.AbstractResource;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,15 +25,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
-import java.util.List;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 @Api(value = "Ontology Scale Service")
 @Controller
 @RequestMapping("/ontology")
-public class OntologyScaleResource {
+public class OntologyScaleResource extends AbstractResource {
 
   	@Autowired
 	private OntologyScaleService ontologyScaleService;
@@ -45,10 +54,6 @@ public class OntologyScaleResource {
 	@Autowired
 	private TermDeletableValidator termDeletableValidator;
 
-	@Autowired
-	private CropNameValidator cropNameValidator;
-
-
 	/**
 	 * @param cropname
 	 *            The name of the crop which is we wish to retrieve variable types.
@@ -58,10 +63,7 @@ public class OntologyScaleResource {
 	@ResponseBody
 	public ResponseEntity<List<ScaleSummary>> listAllScale(@PathVariable String cropname) {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
+		super.validateCropName(cropname, bindingResult);
 		return new ResponseEntity<>(this.ontologyScaleService.getAllScales(), HttpStatus.OK);
 	}
 
