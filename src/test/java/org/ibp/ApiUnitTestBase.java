@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +23,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @SpringApplicationConfiguration(classes = Main.class)
-@Ignore
-public class ApiUnitTestBase {
+public abstract class ApiUnitTestBase {
 
 	protected final MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
 
