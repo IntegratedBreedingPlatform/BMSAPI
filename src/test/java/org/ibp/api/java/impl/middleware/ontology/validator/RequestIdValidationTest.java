@@ -3,46 +3,28 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 import java.util.HashMap;
 
 import org.generationcp.middleware.service.api.OntologyManagerService;
-import org.ibp.ApiUnitTestBase;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-public class RequestIdValidationTest extends ApiUnitTestBase {
+public class RequestIdValidationTest {
 
-	@Configuration
-	public static class TestConfiguration {
-
-		@Bean
-		@Primary
-		public OntologyManagerService ontologyManagerService() {
-			return Mockito.mock(OntologyManagerService.class);
-		}
-
-		@Bean
-		@Primary
-		public RequestIdValidator requestIdValidator() {
-			return Mockito.mock(RequestIdValidator.class);
-		}
-	}
-
-	@Autowired
+	@Mock
 	private OntologyManagerService ontologyManagerService;
 
-	@Autowired
-	RequestIdValidator requestIdValidator;
+	private RequestIdValidator requestIdValidator;
 
 	@Before
 	public void reset() {
-		Mockito.reset(this.ontologyManagerService);
+		MockitoAnnotations.initMocks(this);
+		requestIdValidator = new RequestIdValidator();
+		requestIdValidator.setOntologyManagerService(ontologyManagerService);
 	}
 
 	@After

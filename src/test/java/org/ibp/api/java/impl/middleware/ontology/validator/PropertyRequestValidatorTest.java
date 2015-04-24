@@ -9,51 +9,33 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.ApiTestUtilities;
-import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.PropertyRequest;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-public class PropertyRequestValidatorTest extends ApiUnitTestBase {
+public class PropertyRequestValidatorTest {
 
-	@Configuration
-	public static class TestConfiguration {
+	private PropertyRequestValidator propertyRequestValidator;
 
-		@Bean
-		@Primary
-		public OntologyManagerService ontologyManagerService() {
-			return Mockito.mock(OntologyManagerService.class);
-		}
-
-		@Bean
-		@Primary
-		public PropertyRequestValidator propertyRequestValidator() {
-			return Mockito.mock(PropertyRequestValidator.class);
-		}
-	}
-
-	@Autowired
-	OntologyManagerService ontologyManagerService;
-
-	@Autowired
-	PropertyRequestValidator propertyRequestValidator;
+	@Mock
+	private OntologyManagerService ontologyManagerService;
 
 	Integer cvId = CvId.PROPERTIES.getId();
 	String propertyName = "MyProperty";
 	String description = "Property Description";
 
 	@Before
-	public void reset() {
-		Mockito.reset(this.ontologyManagerService);
+	public void beforeEachTest() {
+		MockitoAnnotations .initMocks(this);
+		propertyRequestValidator = new PropertyRequestValidator();
+		propertyRequestValidator.setOntologyManagerService(ontologyManagerService);		
 	}
 
 	@After

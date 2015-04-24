@@ -7,54 +7,36 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.ApiTestUtilities;
-import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.MethodRequest;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-public class MethodRequestValidatorTest extends ApiUnitTestBase {
+public class MethodRequestValidatorTest {
 
-	@Configuration
-	public static class TestConfiguration {
+	private MethodRequestValidator methodRequestValidator;
 
-		@Bean
-		@Primary
-		public OntologyManagerService ontologyManagerService() {
-			return Mockito.mock(OntologyManagerService.class);
-		}
-
-		@Bean
-		@Primary
-		public MethodRequestValidator methodRequestValidator() {
-			return Mockito.mock(MethodRequestValidator.class);
-		}
-	}
-
-	@Autowired
-	OntologyManagerService ontologyManagerService;
-
-	@Autowired
-	MethodRequestValidator methodRequestValidator;
-
+	@Mock
+	private OntologyManagerService ontologyManagerService;
+	
 	Integer cvId = CvId.METHODS.getId();
 	String methodName = "MyMethod";
 	String description = "Method Description";
 
 	@Before
-	public void reset() {
-		Mockito.reset(this.ontologyManagerService);
+	public void beforeEachTest() {
+		MockitoAnnotations .initMocks(this);
+		methodRequestValidator = new MethodRequestValidator();
+		methodRequestValidator.setOntologyManagerService(ontologyManagerService);
 	}
-
+	
 	@After
 	public void validate() {
 		Mockito.validateMockitoUsage();

@@ -6,49 +6,31 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
-import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.TermRequest;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-public class TermDeletableValidatorTest extends ApiUnitTestBase {
+public class TermDeletableValidatorTest {
 
-	@Configuration
-	public static class TestConfiguration {
+	@Mock
+	private OntologyManagerService ontologyManagerService;
 
-		@Bean
-		@Primary
-		public OntologyManagerService ontologyManagerService() {
-			return Mockito.mock(OntologyManagerService.class);
-		}
-
-		@Bean
-		@Primary
-		public TermDeletableValidator termDeletableValidator() {
-			return Mockito.mock(TermDeletableValidator.class);
-		}
-	}
-
-	@Autowired
-	OntologyManagerService ontologyManagerService;
-
-	@Autowired
-	TermDeletableValidator termDeletableValidator;
+	private TermDeletableValidator termDeletableValidator;
 
 	Integer cvId = CvId.METHODS.getId();
 
 	@Before
 	public void reset() {
-		Mockito.reset(this.ontologyManagerService);
+		MockitoAnnotations.initMocks(this);
+		termDeletableValidator = new TermDeletableValidator();
+		termDeletableValidator.setOntologyManagerService(this.ontologyManagerService);
 	}
 
 	@After

@@ -37,7 +37,6 @@ public class ScaleRequestValidatorTest {
 	@Before
 	public void reset() {
 		MockitoAnnotations .initMocks(this);
-		Mockito.reset(this.ontologyManagerService);
 		scaleRequestValidator = new ScaleRequestValidator();
 		scaleRequestValidator.setOntologyManagerService(ontologyManagerService);
 	}

@@ -15,7 +15,6 @@ import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.ApiTestUtilities;
-import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.ExpectedRange;
 import org.ibp.api.domain.ontology.VariableRequest;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
@@ -24,37 +23,18 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-public class VariableRequestValidatorTest extends ApiUnitTestBase {
+public class VariableRequestValidatorTest {
 
-	@Configuration
-	public static class TestConfiguration {
+	@Mock
+	private OntologyManagerService ontologyManagerService;
 
-		@Bean
-		@Primary
-		public OntologyManagerService ontologyManagerService() {
-			return Mockito.mock(OntologyManagerService.class);
-		}
-
-		@Bean
-		@Primary
-		public VariableRequestValidator variableRequestValidator() {
-			return Mockito.mock(VariableRequestValidator.class);
-		}
-	}
-
-	@Autowired
-	OntologyManagerService ontologyManagerService;
-
-	@Autowired
-	VariableRequestValidator variableRequestValidator;
+	private VariableRequestValidator variableRequestValidator;
 
 	Integer cvId = CvId.VARIABLES.getId();
 	String variableName = "My Variable";
@@ -70,8 +50,10 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	String scaleDescription = "Scale Description";
 
 	@Before
-	public void reset() {
-		Mockito.reset(this.ontologyManagerService);
+	public void beforeEachTest() {
+		MockitoAnnotations.initMocks(this);
+		variableRequestValidator = new VariableRequestValidator();
+		variableRequestValidator.setOntologyManagerService(this.ontologyManagerService);
 	}
 
 	@After
