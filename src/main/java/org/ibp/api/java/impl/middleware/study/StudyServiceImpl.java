@@ -69,6 +69,7 @@ public class StudyServiceImpl implements StudyService {
 		return observations;
 	}
 
-
-
+	protected void setMiddlewareStudyService(org.generationcp.middleware.service.api.study.StudyService middlewareStudyService) {
+		this.middlewareStudyService = middlewareStudyService;
+	}
 }
