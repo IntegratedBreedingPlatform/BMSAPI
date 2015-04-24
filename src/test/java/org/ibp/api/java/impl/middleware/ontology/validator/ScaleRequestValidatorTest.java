@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.ibp.ApiTestUtilities;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.VariableCategory;
 import org.ibp.api.domain.ontology.ScaleRequest;
@@ -245,7 +246,7 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
 		ScaleRequest request = new ScaleRequest();
-		request.setName(this.randomString(205));
+		request.setName(ApiTestUtilities.randomString(205));
 		request.setDescription(this.description);
 
 		this.scaleRequestValidator.validate(request, bindingResult);
@@ -268,7 +269,7 @@ public class ScaleRequestValidatorTest extends ApiUnitTestBase {
 
 		ScaleRequest request = new ScaleRequest();
 		request.setName(this.scaleName);
-		request.setDescription(this.randomString(260));
+		request.setDescription(ApiTestUtilities.randomString(260));
 
 		this.scaleRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());

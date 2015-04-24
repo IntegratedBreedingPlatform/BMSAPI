@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.ibp.ApiTestUtilities;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.PropertyRequest;
 import org.junit.After;
@@ -167,7 +168,7 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
 		PropertyRequest request = new PropertyRequest();
-		request.setName(this.randomString(205));
+		request.setName(ApiTestUtilities.randomString(205));
 		request.setDescription(this.description);
 
 		this.propertyRequestValidator.validate(request, bindingResult);
@@ -189,7 +190,7 @@ public class PropertyRequestValidatorTest extends ApiUnitTestBase {
 
 		PropertyRequest request = new PropertyRequest();
 		request.setName(this.propertyName);
-		request.setDescription(this.randomString(260));
+		request.setDescription(ApiTestUtilities.randomString(260));
 
 		this.propertyRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());

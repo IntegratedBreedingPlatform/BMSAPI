@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.ibp.ApiTestUtilities;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.MethodRequest;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
@@ -138,7 +139,7 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
 		MethodRequest request = new MethodRequest();
-		request.setName(this.randomString(201));
+		request.setName(ApiTestUtilities.randomString(201));
 		request.setDescription(this.description);
 
 		this.methodRequestValidator.validate(request, bindingResult);
@@ -158,7 +159,7 @@ public class MethodRequestValidatorTest extends ApiUnitTestBase {
 
 		MethodRequest request = new MethodRequest();
 		request.setName(this.methodName);
-		request.setDescription(this.randomString(260));
+		request.setDescription(ApiTestUtilities.randomString(260));
 
 		this.methodRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());

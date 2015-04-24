@@ -14,6 +14,7 @@ import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.ibp.ApiTestUtilities;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.ExpectedRange;
 import org.ibp.api.domain.ontology.VariableRequest;
@@ -124,7 +125,7 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
 
 		VariableRequest request = new VariableRequest();
-		request.setName(this.randomString(210));
+		request.setName(ApiTestUtilities.randomString(210));
 		request.setDescription(this.description);
 		request.setPropertyId("10");
 		request.setMethodId("20");
@@ -160,7 +161,7 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 
 		VariableRequest request = new VariableRequest();
 		request.setName(this.variableName);
-		request.setDescription(this.randomString(260));
+		request.setDescription(ApiTestUtilities.randomString(260));
 		request.setPropertyId("10");
 		request.setMethodId("20");
 		request.setScaleId("30");
@@ -297,7 +298,7 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 
 		VariableRequest request = new VariableRequest();
 		request.setName(this.variableName);
-		request.setDescription(this.randomString(260));
+		request.setDescription(ApiTestUtilities.randomString(260));
 		request.setPropertyId("10");
 		request.setMethodId("20");
 		request.setScaleId("30");
@@ -363,7 +364,7 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 
 		VariableRequest request = new VariableRequest();
 		request.setName(this.variableName);
-		request.setDescription(this.randomString(260));
+		request.setDescription(ApiTestUtilities.randomString(260));
 		request.setPropertyId("10");
 		request.setMethodId("20");
 		request.setScaleId("30");
@@ -396,7 +397,7 @@ public class VariableRequestValidatorTest extends ApiUnitTestBase {
 
 		VariableRequest request = new VariableRequest();
 		request.setName(this.variableName);
-		request.setDescription(this.randomString(260));
+		request.setDescription(ApiTestUtilities.randomString(260));
 		request.setPropertyId("10");
 		request.setMethodId("20");
 		request.setScaleId("30");
