@@ -80,4 +80,8 @@ public abstract class OntologyValidator extends BaseValidator {
 			this.addCustomError(errors, fieldName, OntologyValidator.LIST_TEXTUAL_FIELD_IS_TOO_LONG, new Object[] {termName, limit});
 		}
 	}
+
+	protected void setOntologyManagerService(OntologyManagerService ontologyManagerService) {
+		this.ontologyManagerService = ontologyManagerService;
+	}
 }

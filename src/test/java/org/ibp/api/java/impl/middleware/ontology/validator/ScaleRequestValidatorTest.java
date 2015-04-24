@@ -10,53 +10,36 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.ibp.ApiTestUtilities;
-import org.ibp.ApiUnitTestBase;
-import org.ibp.api.domain.ontology.VariableCategory;
 import org.ibp.api.domain.ontology.ScaleRequest;
 import org.ibp.api.domain.ontology.ValidValues;
+import org.ibp.api.domain.ontology.VariableCategory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-public class ScaleRequestValidatorTest extends ApiUnitTestBase {
+public class ScaleRequestValidatorTest {
 
-	@Configuration
-	public static class TestConfiguration {
+	@Mock
+	private OntologyManagerService ontologyManagerService;
 
-		@Bean
-		@Primary
-		public OntologyManagerService ontologyManagerService() {
-			return Mockito.mock(OntologyManagerService.class);
-		}
-
-		@Bean
-		@Primary
-		public ScaleRequestValidator scaleRequestValidator() {
-			return Mockito.mock(ScaleRequestValidator.class);
-		}
-	}
-
-	@Autowired
-	OntologyManagerService ontologyManagerService;
-
-	@Autowired
-	ScaleRequestValidator scaleRequestValidator;
-
+	private ScaleRequestValidator scaleRequestValidator;
+	
 	Integer cvId = CvId.SCALES.getId();
 	String scaleName = "MyScale";
 	String description = "Scale Description";
 
 	@Before
 	public void reset() {
+		MockitoAnnotations .initMocks(this);
 		Mockito.reset(this.ontologyManagerService);
+		scaleRequestValidator = new ScaleRequestValidator();
+		scaleRequestValidator.setOntologyManagerService(ontologyManagerService);
 	}
 
 	@After
