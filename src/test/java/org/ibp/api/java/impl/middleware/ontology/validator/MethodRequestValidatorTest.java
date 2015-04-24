@@ -2,11 +2,11 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import java.util.HashMap;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
-import org.ibp.ApiTestUtilities;
 import org.ibp.api.domain.ontology.MethodRequest;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.junit.After;
@@ -121,7 +121,7 @@ public class MethodRequestValidatorTest {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
 		MethodRequest request = new MethodRequest();
-		request.setName(ApiTestUtilities.randomString(201));
+		request.setName(RandomStringUtils.random(201));
 		request.setDescription(this.description);
 
 		this.methodRequestValidator.validate(request, bindingResult);
@@ -141,7 +141,7 @@ public class MethodRequestValidatorTest {
 
 		MethodRequest request = new MethodRequest();
 		request.setName(this.methodName);
-		request.setDescription(ApiTestUtilities.randomString(260));
+		request.setDescription(RandomStringUtils.random(260));
 
 		this.methodRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());

@@ -3,12 +3,12 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
-import org.ibp.ApiTestUtilities;
 import org.ibp.api.domain.ontology.PropertyRequest;
 import org.junit.After;
 import org.junit.Assert;
@@ -150,7 +150,7 @@ public class PropertyRequestValidatorTest {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
 		PropertyRequest request = new PropertyRequest();
-		request.setName(ApiTestUtilities.randomString(205));
+		request.setName(RandomStringUtils.random(205));
 		request.setDescription(this.description);
 
 		this.propertyRequestValidator.validate(request, bindingResult);
@@ -172,7 +172,7 @@ public class PropertyRequestValidatorTest {
 
 		PropertyRequest request = new PropertyRequest();
 		request.setName(this.propertyName);
-		request.setDescription(ApiTestUtilities.randomString(260));
+		request.setDescription(RandomStringUtils.random(260));
 
 		this.propertyRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());

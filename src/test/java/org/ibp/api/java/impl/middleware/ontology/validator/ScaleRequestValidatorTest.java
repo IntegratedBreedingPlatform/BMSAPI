@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
-import org.ibp.ApiTestUtilities;
 import org.ibp.api.domain.ontology.ScaleRequest;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.ibp.api.domain.ontology.VariableCategory;
@@ -228,7 +228,7 @@ public class ScaleRequestValidatorTest {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
 		ScaleRequest request = new ScaleRequest();
-		request.setName(ApiTestUtilities.randomString(205));
+		request.setName(RandomStringUtils.random(205));
 		request.setDescription(this.description);
 
 		this.scaleRequestValidator.validate(request, bindingResult);
@@ -251,7 +251,7 @@ public class ScaleRequestValidatorTest {
 
 		ScaleRequest request = new ScaleRequest();
 		request.setName(this.scaleName);
-		request.setDescription(ApiTestUtilities.randomString(260));
+		request.setDescription(RandomStringUtils.random(260));
 
 		this.scaleRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());

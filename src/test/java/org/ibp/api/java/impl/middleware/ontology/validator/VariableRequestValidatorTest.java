@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
@@ -14,7 +15,6 @@ import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.service.api.OntologyManagerService;
-import org.ibp.ApiTestUtilities;
 import org.ibp.api.domain.ontology.ExpectedRange;
 import org.ibp.api.domain.ontology.VariableRequest;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
@@ -107,7 +107,7 @@ public class VariableRequestValidatorTest {
 	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
 
 		VariableRequest request = new VariableRequest();
-		request.setName(ApiTestUtilities.randomString(210));
+		request.setName(RandomStringUtils.random(210));
 		request.setDescription(this.description);
 		request.setPropertyId("10");
 		request.setMethodId("20");
@@ -143,7 +143,7 @@ public class VariableRequestValidatorTest {
 
 		VariableRequest request = new VariableRequest();
 		request.setName(this.variableName);
-		request.setDescription(ApiTestUtilities.randomString(260));
+		request.setDescription(RandomStringUtils.random(260));
 		request.setPropertyId("10");
 		request.setMethodId("20");
 		request.setScaleId("30");
@@ -280,7 +280,7 @@ public class VariableRequestValidatorTest {
 
 		VariableRequest request = new VariableRequest();
 		request.setName(this.variableName);
-		request.setDescription(ApiTestUtilities.randomString(260));
+		request.setDescription(RandomStringUtils.random(260));
 		request.setPropertyId("10");
 		request.setMethodId("20");
 		request.setScaleId("30");
@@ -346,7 +346,7 @@ public class VariableRequestValidatorTest {
 
 		VariableRequest request = new VariableRequest();
 		request.setName(this.variableName);
-		request.setDescription(ApiTestUtilities.randomString(260));
+		request.setDescription(RandomStringUtils.random(260));
 		request.setPropertyId("10");
 		request.setMethodId("20");
 		request.setScaleId("30");
@@ -379,7 +379,7 @@ public class VariableRequestValidatorTest {
 
 		VariableRequest request = new VariableRequest();
 		request.setName(this.variableName);
-		request.setDescription(ApiTestUtilities.randomString(260));
+		request.setDescription(RandomStringUtils.random(260));
 		request.setPropertyId("10");
 		request.setMethodId("20");
 		request.setScaleId("30");
