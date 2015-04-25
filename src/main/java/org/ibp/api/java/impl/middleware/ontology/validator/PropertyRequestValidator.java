@@ -137,7 +137,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 			});
 
 		} catch (MiddlewareException e) {
-			e.printStackTrace();
+			log.error("Error in getting all trait classes.");
 		}
 
 		for(String c : request.getClasses()) {

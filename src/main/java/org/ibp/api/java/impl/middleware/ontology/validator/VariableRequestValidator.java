@@ -245,7 +245,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 			}
 
 		} catch (MiddlewareException e) {
-			e.printStackTrace();
+			log.error("Error in validating VariableRequest", e);
 		}
 
 		return errors.getErrorCount() == initialCount;
