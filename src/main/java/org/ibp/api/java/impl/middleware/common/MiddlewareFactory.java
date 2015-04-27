@@ -1,9 +1,32 @@
 package org.ibp.api.java.impl.middleware.common;
 
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.PreDestroy;
+
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.SessionFactoryUtil;
-import org.generationcp.middleware.manager.*;
-import org.generationcp.middleware.manager.api.*;
+import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
+import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
+import org.generationcp.middleware.manager.GermplasmListManagerImpl;
+import org.generationcp.middleware.manager.InventoryDataManagerImpl;
+import org.generationcp.middleware.manager.LocationDataManagerImpl;
+import org.generationcp.middleware.manager.OntologyDataManagerImpl;
+import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.UserDataManagerImpl;
+import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
+import org.generationcp.middleware.manager.api.GenotypicDataManager;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.manager.api.InventoryDataManager;
+import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.OntologyManagerServiceImpl;
@@ -17,20 +40,13 @@ import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-
-import javax.annotation.PreDestroy;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 @Configuration
 public class MiddlewareFactory {
@@ -44,12 +60,20 @@ public class MiddlewareFactory {
 
 	@Autowired
 	private ContextResolver contextResolver;
-
+	
+	private SessionFactory workbenchSessionFactory;
+	
 	@PreDestroy
 	public void preDestroy() {
-		MiddlewareFactory.LOGGER.info("Closing cached session factories.");
+		
 		for (String key : this.sessionFactoryCache.keySet()) {
+			LOGGER.info("Closing cached session factory for crop database: " + key);
 			this.sessionFactoryCache.get(key).close();
+		}
+		
+		if(this.workbenchSessionFactory != null) {
+			LOGGER.info("Closing session factory for workbench database.");
+			this.workbenchSessionFactory.close();
 		}
 	}
 
@@ -177,15 +201,19 @@ public class MiddlewareFactory {
 	}
 
 	@Bean
-	@Scope(value = "singleton")
 	public WorkbenchDataManager getWorkbenchDataManager() throws FileNotFoundException {
-		DatabaseConnectionParameters workbenchConnectionParameters = new DatabaseConnectionParameters(
-				this.config.getDbHost(), this.config.getDbPort(), this.config.getWorkbenchDBName(),
-				this.config.getDbUsername(), this.config.getDbPassword());
-		SessionFactory sessionFactory = SessionFactoryUtil
-				.openSessionFactory(workbenchConnectionParameters);
-		HibernateSessionPerRequestProvider sessionProvider = new HibernateSessionPerRequestProvider(
-				sessionFactory);
-		return new WorkbenchDataManagerImpl(sessionProvider);
+		return new WorkbenchDataManagerImpl(getWorkbenchSessionProvider());
+	}
+
+	@Bean(destroyMethod = "close")
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public HibernateSessionPerRequestProvider getWorkbenchSessionProvider() throws FileNotFoundException {
+		if (workbenchSessionFactory == null) {
+			DatabaseConnectionParameters workbenchConnectionParameters =
+					new DatabaseConnectionParameters(this.config.getDbHost(), this.config.getDbPort(), 
+							this.config.getWorkbenchDBName(), this.config.getDbUsername(), this.config.getDbPassword());
+			this.workbenchSessionFactory = SessionFactoryUtil.openSessionFactory(workbenchConnectionParameters);
+		}
+		return new HibernateSessionPerRequestProvider(this.workbenchSessionFactory);
 	}
 }
