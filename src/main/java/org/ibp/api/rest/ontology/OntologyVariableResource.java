@@ -109,10 +109,7 @@ public class OntologyVariableResource extends AbstractResource {
 															@PathVariable String id) {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
+		super.validateCropName(cropname, bindingResult);
 
 		this.programValidator.validate(programId, bindingResult);
 		this.requestIdValidator.validate(id, bindingResult);
@@ -141,11 +138,7 @@ public class OntologyVariableResource extends AbstractResource {
 		VariableRequest request = mapper.map(addVariableRequest, VariableRequest.class);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
+		super.validateCropName(cropname, bindingResult);
 
 		this.programValidator.validate(programId, bindingResult);
 		if (bindingResult.hasErrors()) {
@@ -181,11 +174,7 @@ public class OntologyVariableResource extends AbstractResource {
 		VariableRequest request = mapper.map(updateVariableDetail, VariableRequest.class);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
+		super.validateCropName(cropname, bindingResult);
 
 		this.programValidator.validate(programId, bindingResult);
 		this.requestIdValidator.validate(id, bindingResult);
@@ -216,11 +205,7 @@ public class OntologyVariableResource extends AbstractResource {
 	@ResponseBody
 	public ResponseEntity deleteVariable(@PathVariable String cropname, @PathVariable String id)  {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
+		super.validateCropName(cropname, bindingResult);
 
 		this.requestIdValidator.validate(id, bindingResult);
 		if (bindingResult.hasErrors()) {
