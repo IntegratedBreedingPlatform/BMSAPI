@@ -10,7 +10,7 @@ import java.util.List;
 public interface OntologyMethodService {
 
 	/**
-	 * get all methods using middleware ontology service
+	 * Get all methods.
 	 *
 	 * @return list of methods
 	 */
