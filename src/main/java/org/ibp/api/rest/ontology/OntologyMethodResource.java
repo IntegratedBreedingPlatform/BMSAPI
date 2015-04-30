@@ -13,9 +13,6 @@ import org.ibp.api.domain.ontology.TermRequest;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.ontology.OntologyMapper;
 import org.ibp.api.java.impl.middleware.ontology.validator.MethodRequestValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.RequestIdValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.ontology.OntologyMethodService;
 import org.ibp.api.rest.AbstractResource;
 import org.modelmapper.ModelMapper;
@@ -40,16 +37,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 public class OntologyMethodResource extends AbstractResource {
 
 	@Autowired
-	private RequestIdValidator requestIdValidator;
-
-	@Autowired
-	private TermValidator termValidator;
-
-	@Autowired
 	private MethodRequestValidator methodRequestValidator;
-
-	@Autowired
-	private TermDeletableValidator termDeletableValidator;
 
 	@Autowired
 	private OntologyMethodService ontologyMethodService;

@@ -14,9 +14,6 @@ import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.ontology.OntologyMapper;
-import org.ibp.api.java.impl.middleware.ontology.validator.RequestIdValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableRequestValidator;
 import org.ibp.api.java.ontology.OntologyVariableService;
 import org.ibp.api.rest.AbstractResource;
@@ -51,19 +48,11 @@ public class OntologyVariableResource extends AbstractResource {
 	private OntologyVariableService ontologyVariableService;
 
 	@Autowired
-	private RequestIdValidator requestIdValidator;
-
-	@Autowired
-	private TermValidator termValidator;
-
-	@Autowired
 	private ProgramValidator programValidator;
 
 	@Autowired
 	private VariableRequestValidator variableRequestValidator;
 
-	@Autowired
-	private TermDeletableValidator termDeletableValidator;
 
 	/**
 	 * @param cropname

@@ -13,9 +13,6 @@ import org.ibp.api.domain.ontology.TermRequest;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.ontology.OntologyMapper;
 import org.ibp.api.java.impl.middleware.ontology.validator.PropertyRequestValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.RequestIdValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.ontology.OntologyPropertyService;
 import org.ibp.api.rest.AbstractResource;
 import org.modelmapper.ModelMapper;
@@ -42,16 +39,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 public class OntologyPropertyResource extends AbstractResource {
 
 	@Autowired
-	private RequestIdValidator requestIdValidator;
-
-	@Autowired
-	private TermValidator termValidator;
-
-	@Autowired
 	private PropertyRequestValidator propertyRequestValidator;
-
-	@Autowired
-	private TermDeletableValidator deletableValidator;
 
 	@Autowired
 	private OntologyPropertyService ontologyPropertyService;
@@ -163,7 +151,7 @@ public class OntologyPropertyResource extends AbstractResource {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 
-		this.deletableValidator.validate(new TermRequest(id, "Property", CvId.PROPERTIES.getId()), bindingResult);
+		this.termDeletableValidator.validate(new TermRequest(id, "Property", CvId.PROPERTIES.getId()), bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}

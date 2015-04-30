@@ -12,10 +12,7 @@ import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.domain.ontology.TermRequest;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.ontology.OntologyMapper;
-import org.ibp.api.java.impl.middleware.ontology.validator.RequestIdValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.ScaleRequestValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.ontology.OntologyScaleService;
 import org.ibp.api.rest.AbstractResource;
 import org.modelmapper.ModelMapper;
@@ -43,16 +40,7 @@ public class OntologyScaleResource extends AbstractResource {
 	private OntologyScaleService ontologyScaleService;
 
 	@Autowired
-	private TermValidator termValidator;
-
-	@Autowired
-	private RequestIdValidator requestIdValidator;
-
-	@Autowired
 	private ScaleRequestValidator scaleRequestValidator;
-
-	@Autowired
-	private TermDeletableValidator termDeletableValidator;
 
 	/**
 	 * @param cropname
