@@ -1,5 +1,6 @@
 package org.ibp;
 
+import org.ibp.api.java.impl.middleware.common.validator.CropNameValidationInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -21,12 +24,13 @@ import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
 @EnableAutoConfiguration
 @ComponentScan
 @EnableSwagger
+@Configuration
 public class Main extends WebMvcConfigurerAdapter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
 	@Autowired
 	private SpringSwaggerConfig springSwaggerConfig;
-
+	
 	public static void main(String[] args) {
 		SpringApplication.run(Main.class, args);
 		Main.LOGGER.info("Startup Complete!");
@@ -42,6 +46,11 @@ public class Main extends WebMvcConfigurerAdapter {
 
 		return templateResolver;
 	}
+	
+	@Bean
+	public CropNameValidationInterceptor getCropNameValidationInterceptor() {
+		return new CropNameValidationInterceptor();
+	}
 
 	@Override
 	public void configurePathMatch(PathMatchConfigurer configurer) {
@@ -51,6 +60,11 @@ public class Main extends WebMvcConfigurerAdapter {
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/static/**").addResourceLocations("/WEB-INF/static/");
+	}
+	
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(getCropNameValidationInterceptor()).addPathPatterns("/**");
 	}
 
 	@Bean

@@ -62,8 +62,6 @@ public class OntologyScaleResource extends AbstractResource {
 	@RequestMapping(value = "/{cropname}/scales", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<ScaleSummary>> listAllScale(@PathVariable String cropname) {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-		super.validateCropName(cropname, bindingResult);
 		return new ResponseEntity<>(this.ontologyScaleService.getAllScales(), HttpStatus.OK);
 	}
 
@@ -79,10 +77,6 @@ public class OntologyScaleResource extends AbstractResource {
 			@PathVariable String id)  {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
 		this.requestIdValidator.validate(id, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -111,10 +105,6 @@ public class OntologyScaleResource extends AbstractResource {
 		ScaleRequest request = modelMapper.map(requestBase, ScaleRequest.class);
 
 	  	BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
 		this.scaleRequestValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -138,10 +128,6 @@ public class OntologyScaleResource extends AbstractResource {
 		ScaleRequest request = modelMapper.map(requestBase, ScaleRequest.class);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
 		this.requestIdValidator.validate(id, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -167,10 +153,6 @@ public class OntologyScaleResource extends AbstractResource {
 	public ResponseEntity deleteScale(@PathVariable String cropname, @PathVariable String id)  {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
 		this.requestIdValidator.validate(id, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());

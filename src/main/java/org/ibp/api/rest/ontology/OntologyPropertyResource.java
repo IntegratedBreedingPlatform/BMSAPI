@@ -67,8 +67,6 @@ public class OntologyPropertyResource extends AbstractResource {
 			@PathVariable String cropname,
 			@RequestParam(value = "class", defaultValue = "", required = false) String className)
 			 {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
-		super.validateCropName(cropname, bindingResult);
 		if (Strings.isNullOrEmpty(className)) {
 			List<PropertySummary> propertyList = this.ontologyPropertyService.getAllProperties();
 			return new ResponseEntity<>(propertyList, HttpStatus.OK);
@@ -88,10 +86,6 @@ public class OntologyPropertyResource extends AbstractResource {
 	public ResponseEntity<PropertyResponse> getPropertyById(@PathVariable String cropname,
 															@PathVariable String id)  {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
 		this.requestIdValidator.validate(id, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -117,10 +111,6 @@ public class OntologyPropertyResource extends AbstractResource {
 		ModelMapper modelMapper = OntologyMapper.getInstance();
 		PropertyRequest request = modelMapper.map(requestBase, PropertyRequest.class);
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
 		this.propertyRequestValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -143,10 +133,6 @@ public class OntologyPropertyResource extends AbstractResource {
 		ModelMapper modelMapper = OntologyMapper.getInstance();
 		PropertyRequest request = modelMapper.map(requestBase, PropertyRequest.class);
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
 		this.requestIdValidator.validate(id, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -171,10 +157,6 @@ public class OntologyPropertyResource extends AbstractResource {
 	@ResponseBody
 	public ResponseEntity deleteProperty(@PathVariable String cropname, @PathVariable String id) {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
 
 		this.requestIdValidator.validate(id, bindingResult);
 		if (bindingResult.hasErrors()) {

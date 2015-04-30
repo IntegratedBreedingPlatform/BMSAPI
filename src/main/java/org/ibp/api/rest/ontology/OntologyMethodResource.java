@@ -61,11 +61,6 @@ public class OntologyMethodResource extends AbstractResource {
 	@RequestMapping(value = "/{cropname}/methods", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<MethodSummary>> listAllMethods(@PathVariable String cropname)  {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
 		List<MethodSummary> methodList = this.ontologyMethodService.getAllMethods();
 		return new ResponseEntity<>(methodList, HttpStatus.OK);
 	}
@@ -78,10 +73,6 @@ public class OntologyMethodResource extends AbstractResource {
 	@ResponseBody
 	public ResponseEntity<MethodResponse> getMethodById(@PathVariable String cropname, @PathVariable String id)  {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
 		this.requestIdValidator.validate(id, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -106,11 +97,6 @@ public class OntologyMethodResource extends AbstractResource {
 	  ModelMapper mapper = OntologyMapper.getInstance();
 	  MethodRequest request = mapper.map(requestBase, MethodRequest.class);
 	  BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-
 		this.methodRequestValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -130,10 +116,6 @@ public class OntologyMethodResource extends AbstractResource {
 	  ModelMapper mapper = OntologyMapper.getInstance();
 	  MethodRequest request = mapper.map(requestBase, MethodRequest.class);
 	  BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
 
 		this.requestIdValidator.validate(id, bindingResult);
 		if (bindingResult.hasErrors()) {
@@ -158,11 +140,6 @@ public class OntologyMethodResource extends AbstractResource {
 	@ResponseBody
 	public ResponseEntity deleteMethod(@PathVariable String cropname, @PathVariable String id)  {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-
-		this.cropNameValidator.validate(cropname, bindingResult);
-		if(bindingResult.hasErrors()){
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
 
 		this.requestIdValidator.validate(id, bindingResult);
 		if (bindingResult.hasErrors()) {
