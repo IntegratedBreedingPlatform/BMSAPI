@@ -11,7 +11,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.ibp.api.domain.germplasm.GermplasmListDetails;
 import org.ibp.api.domain.germplasm.GermplasmListSummary;
-import org.ibp.api.domain.germplasm.GermplasmSummary;
+import org.ibp.api.domain.germplasm.GermplasmListEnrtySummary;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.germplasm.GermplasmListService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,13 +69,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				listDetails.setListSize(gpList.getListData().size());
 
 				for (GermplasmListData gpListData : gpList.getListData()) {
-					GermplasmSummary gp = new GermplasmSummary();
-					gp.setGid(gpListData.getGid());
-					gp.setDesignation(gpListData.getDesignation());
-					gp.setEntryCode(gpListData.getEntryCode());
-					gp.setSource(gpListData.getSeedSource());
-					gp.setGroupName(gpListData.getGroupName());
-					listDetails.addGermplasmEntry(gp);
+					GermplasmListEnrtySummary gpEntry = new GermplasmListEnrtySummary();
+					gpEntry.setGid(gpListData.getGid());
+					gpEntry.setDesignation(gpListData.getDesignation());
+					gpEntry.setEntryCode(gpListData.getEntryCode());
+					gpEntry.setSource(gpListData.getSeedSource());
+					gpEntry.setGroupName(gpListData.getGroupName());
+					listDetails.addGermplasmEntry(gpEntry);
 				}
 			}
 			return listDetails;

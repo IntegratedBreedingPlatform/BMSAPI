@@ -1,7 +1,7 @@
 
 package org.ibp.api.domain.germplasm;
 
-public class GermplasmSummary {
+public class GermplasmListEnrtySummary {
 
 	private Integer gid;
 	private String designation;
