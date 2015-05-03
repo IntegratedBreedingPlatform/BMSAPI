@@ -13,12 +13,12 @@ import org.ibp.api.domain.germplasm.GermplasmListDetails;
 import org.ibp.api.domain.germplasm.GermplasmListSummary;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.exception.ApiRuntimeException;
-import org.ibp.api.java.germplasm.GermplasmService;
+import org.ibp.api.java.germplasm.GermplasmListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class GermplasmServiceImpl implements GermplasmService {
+public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Autowired
 	private GermplasmListManager germplasmListManager;

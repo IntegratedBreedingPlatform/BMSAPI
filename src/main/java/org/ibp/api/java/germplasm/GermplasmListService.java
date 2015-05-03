@@ -6,7 +6,7 @@ import java.util.List;
 import org.ibp.api.domain.germplasm.GermplasmListDetails;
 import org.ibp.api.domain.germplasm.GermplasmListSummary;
 
-public interface GermplasmService {
+public interface GermplasmListService {
 
 	List<GermplasmListSummary> searchGermplasmLists(String searchText);
 	
