@@ -6,26 +6,29 @@ import java.util.List;
 
 public class GermplasmSummary {
 
-	private Integer gid;
-	private String cross;
+	private String germplasmId;
+	private String pedigreeString;
 	private final List<String> names = new ArrayList<String>();
 	private String breedingMethod;
 	private String location;
 
-	public Integer getGid() {
-		return gid;
+	private String parent1Id;
+	private String parent2Id;
+
+	public String getGermplasmId() {
+		return germplasmId;
 	}
 
-	public void setGid(Integer gid) {
-		this.gid = gid;
+	public void setGermplasmId(String germplasmId) {
+		this.germplasmId = germplasmId;
 	}
 
-	public String getCross() {
-		return cross;
+	public String getPedigreeString() {
+		return pedigreeString;
 	}
 
-	public void setCross(String cross) {
-		this.cross = cross;
+	public void setPedigreeString(String pedigreeString) {
+		this.pedigreeString = pedigreeString;
 	}
 
 	public String getBreedingMethod() {
@@ -52,6 +55,22 @@ public class GermplasmSummary {
 
 	public void setLocation(String location) {
 		this.location = location;
+	}
+
+	public String getParent1Id() {
+		return parent1Id;
+	}
+
+	public void setParent1Id(String parent1Id) {
+		this.parent1Id = parent1Id;
+	}
+
+	public String getParent2Id() {
+		return parent2Id;
+	}
+
+	public void setParent2Id(String parent2Id) {
+		this.parent2Id = parent2Id;
 	}
 
 }

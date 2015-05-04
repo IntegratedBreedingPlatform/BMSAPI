@@ -40,15 +40,17 @@ public class GermplasmServiceImpl implements GermplasmService {
 			for (Germplasm germplasm : searchResults) {
 
 				GermplasmSummary summary = new GermplasmSummary();
-				summary.setGid(germplasm.getGid());
+				summary.setGermplasmId(germplasm.getGid().toString());
+				summary.setParent1Id(germplasm.getGpid1() != null ? germplasm.getGpid1().toString() : null);
+				summary.setParent2Id(germplasm.getGpid2() != null ? germplasm.getGpid2().toString() : null);
 
 				CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties();
 				crossExpansionProperties.setDefaultLevel(1);
 				crossExpansionProperties.setWheatLevel(1);
-				summary.setCross(pedigreeService.getCrossExpansion(germplasm.getGid(), crossExpansionProperties));
+				summary.setPedigreeString(pedigreeService.getCrossExpansion(germplasm.getGid(), crossExpansionProperties));
 
 				// FIXME - select in a loop ... Middleware service should handle all this in main query.
-				List<Name> namesByGID = germplasmDataManager.getNamesByGID(new Integer(summary.getGid()), null, null);
+				List<Name> namesByGID = germplasmDataManager.getNamesByGID(new Integer(germplasm.getGid()), null, null);
 				List<String> names = new ArrayList<String>();
 				for (Name gpName : namesByGID) {
 					names.add(gpName.getNval());
