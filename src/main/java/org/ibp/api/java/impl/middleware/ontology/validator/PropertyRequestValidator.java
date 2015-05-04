@@ -161,7 +161,6 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 		request.setClasses(nonEmptyClasses);
 
 		// 5. Classes must be an array containing at least one string
-		//this.shouldNotNullOrEmpty("classes", request.getClasses(), errors);
 		if(request.getClasses().isEmpty()){
 			this.addCustomError(errors, "classes", LIST_SHOULD_NOT_BE_EMPTY, new Object[]{"class"});
 		}
