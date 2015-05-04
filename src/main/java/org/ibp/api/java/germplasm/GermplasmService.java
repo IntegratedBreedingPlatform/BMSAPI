@@ -8,5 +8,7 @@ import org.ibp.api.domain.germplasm.GermplasmSummary;
 public interface GermplasmService {
 	
 	List<GermplasmSummary> searchGermplasm(String searchText);
+	
+	GermplasmSummary getGermplasm(String germplasmId);
 
 }

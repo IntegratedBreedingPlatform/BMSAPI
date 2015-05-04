@@ -28,7 +28,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private PedigreeService pedigreeService;
-	
+
 	@Autowired
 	private LocationDataManager locationDataManger;
 
@@ -38,41 +38,57 @@ public class GermplasmServiceImpl implements GermplasmService {
 		try {
 			List<Germplasm> searchResults = germplasmDataManager.searchForGermplasm(searchText, Operation.LIKE, false);
 			for (Germplasm germplasm : searchResults) {
-
-				GermplasmSummary summary = new GermplasmSummary();
-				summary.setGermplasmId(germplasm.getGid().toString());
-				summary.setParent1Id(germplasm.getGpid1() != null ? germplasm.getGpid1().toString() : null);
-				summary.setParent2Id(germplasm.getGpid2() != null ? germplasm.getGpid2().toString() : null);
-
-				CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties();
-				crossExpansionProperties.setDefaultLevel(1);
-				crossExpansionProperties.setWheatLevel(1);
-				summary.setPedigreeString(pedigreeService.getCrossExpansion(germplasm.getGid(), crossExpansionProperties));
-
-				// FIXME - select in a loop ... Middleware service should handle all this in main query.
-				List<Name> namesByGID = germplasmDataManager.getNamesByGID(new Integer(germplasm.getGid()), null, null);
-				List<String> names = new ArrayList<String>();
-				for (Name gpName : namesByGID) {
-					names.add(gpName.getNval());
-				}
-				summary.addNames(names);
-
-				Method germplasmMethod = germplasmDataManager.getMethodByID(germplasm.getMethodId());
-				if (germplasmMethod != null && germplasmMethod.getMname() != null) {
-					summary.setBreedingMethod(germplasmMethod.getMname());
-				}
-
-				Location germplasmLocation = locationDataManger.getLocationByID(germplasm.getLocationId());
-				if (germplasmLocation != null && germplasmLocation.getLname() != null) {
-					summary.setLocation(germplasmLocation.getLname());
-				}
-
-				results.add(summary);
+				results.add(populateGermplasmSummary(germplasm));
 			}
 		} catch (MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
 		return results;
+	}
+
+	private GermplasmSummary populateGermplasmSummary(Germplasm germplasm) throws MiddlewareQueryException {
+		if (germplasm == null) {
+			return null;
+		}
+		GermplasmSummary summary = new GermplasmSummary();
+		summary.setGermplasmId(germplasm.getGid().toString());
+		summary.setParent1Id(germplasm.getGpid1() != null ? germplasm.getGpid1().toString() : null);
+		summary.setParent2Id(germplasm.getGpid2() != null ? germplasm.getGpid2().toString() : null);
+
+		CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties();
+		crossExpansionProperties.setDefaultLevel(1);
+		crossExpansionProperties.setWheatLevel(1);
+		summary.setPedigreeString(pedigreeService.getCrossExpansion(germplasm.getGid(), crossExpansionProperties));
+
+		// FIXME - select in a loop ... Middleware service should handle all this in main query.
+		List<Name> namesByGID = germplasmDataManager.getNamesByGID(new Integer(germplasm.getGid()), null, null);
+		List<String> names = new ArrayList<String>();
+		for (Name gpName : namesByGID) {
+			names.add(gpName.getNval());
+		}
+		summary.addNames(names);
+
+		Method germplasmMethod = germplasmDataManager.getMethodByID(germplasm.getMethodId());
+		if (germplasmMethod != null && germplasmMethod.getMname() != null) {
+			summary.setBreedingMethod(germplasmMethod.getMname());
+		}
+
+		Location germplasmLocation = locationDataManger.getLocationByID(germplasm.getLocationId());
+		if (germplasmLocation != null && germplasmLocation.getLname() != null) {
+			summary.setLocation(germplasmLocation.getLname());
+		}
+		return summary;
+	}
+
+	@Override
+	public GermplasmSummary getGermplasm(String germplasmId) {
+		Germplasm germplasm;
+		try {
+			germplasm = this.germplasmDataManager.getGermplasmByGID(Integer.valueOf(germplasmId));
+			return populateGermplasmSummary(germplasm);
+		} catch (NumberFormatException | MiddlewareQueryException e) {
+			throw new ApiRuntimeException("Error!", e);
+		}
 	}
 
 }
