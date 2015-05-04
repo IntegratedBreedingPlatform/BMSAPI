@@ -6,15 +6,15 @@ import java.util.List;
 
 public class GermplasmListDetails extends GermplasmListSummary {
 
-	private final List<GermplasmListEnrtySummary> germplasmEntries = new ArrayList<GermplasmListEnrtySummary>();
+	private final List<GermplasmListEntrySummary> germplasmEntries = new ArrayList<GermplasmListEntrySummary>();
 
-	public void addGermplasmEntry(GermplasmListEnrtySummary germplasmEntry) {
+	public void addGermplasmEntry(GermplasmListEntrySummary germplasmEntry) {
 		if (germplasmEntry != null) {
 			this.germplasmEntries.add(germplasmEntry);
 		}
 	}
 
-	public List<GermplasmListEnrtySummary> getGermplasmEntries() {
+	public List<GermplasmListEntrySummary> getGermplasmEntries() {
 		return germplasmEntries;
 	}
 
