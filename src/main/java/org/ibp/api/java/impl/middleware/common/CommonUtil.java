@@ -10,8 +10,8 @@ public class CommonUtil {
 
 		try {
 			return Integer.valueOf(value);
-		} catch (Exception ignored) {
-
+		} catch (NumberFormatException ignored) {
+			// Ignore.
 		}
 		return null;
 	}
