@@ -73,8 +73,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 					gpEntry.setGid(gpListData.getGid());
 					gpEntry.setDesignation(gpListData.getDesignation());
 					gpEntry.setEntryCode(gpListData.getEntryCode());
-					gpEntry.setSource(gpListData.getSeedSource());
-					gpEntry.setGroupName(gpListData.getGroupName());
+					gpEntry.setSeedSource(gpListData.getSeedSource());
+					gpEntry.setCross(gpListData.getGroupName());
 					listDetails.addGermplasmEntry(gpEntry);
 				}
 			}

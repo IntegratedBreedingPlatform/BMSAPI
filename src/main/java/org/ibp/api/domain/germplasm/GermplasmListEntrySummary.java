@@ -5,9 +5,9 @@ public class GermplasmListEntrySummary {
 
 	private Integer gid;
 	private String designation;
-	private String source;
+	private String seedSource;
 	private String entryCode;
-	private String groupName;
+	private String cross;
 
 	public Integer getGid() {
 		return gid;
@@ -25,12 +25,12 @@ public class GermplasmListEntrySummary {
 		this.designation = designation;
 	}
 
-	public String getSource() {
-		return source;
+	public String getSeedSource() {
+		return seedSource;
 	}
 
-	public void setSource(String source) {
-		this.source = source;
+	public void setSeedSource(String seedSource) {
+		this.seedSource = seedSource;
 	}
 
 	public String getEntryCode() {
@@ -41,12 +41,12 @@ public class GermplasmListEntrySummary {
 		this.entryCode = entryCode;
 	}
 
-	public String getGroupName() {
-		return groupName;
+	public String getCross() {
+		return cross;
 	}
 
-	public void setGroupName(String groupName) {
-		this.groupName = groupName;
+	public void setCross(String cross) {
+		this.cross = cross;
 	}
 
 }
