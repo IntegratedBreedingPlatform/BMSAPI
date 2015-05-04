@@ -35,8 +35,10 @@ import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.generationcp.middleware.service.api.OntologyService;
+import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
+import org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -198,6 +200,13 @@ public class MiddlewareFactory {
 				this.config.getDbPassword());
 
 		return new JdbcTemplate(dataSource);
+	}
+	
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public PedigreeService getPedigreeService() throws FileNotFoundException {
+		//FIXME - producing the default pedigree service impl. Make it configurable for CIMMYT wheat pedigree generation.
+		return new PedigreeDefaultServiceImpl(new HibernateSessionPerRequestProvider(getSessionFactory()));
 	}
 
 	@Bean
