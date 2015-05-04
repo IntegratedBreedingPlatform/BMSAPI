@@ -22,7 +22,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 @ControllerAdvice
 public class DefaultExceptionHandler {
 
-  	protected final Logger log = LoggerFactory.getLogger(getClass());
+  	private static final Logger LOG = LoggerFactory.getLogger(DefaultExceptionHandler.class);
 
 	@Autowired
 	ResourceBundleMessageSource messageSource;
@@ -65,7 +65,7 @@ public class DefaultExceptionHandler {
 	@ResponseBody
 	public ErrorResponse httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
 		ErrorResponse response = new ErrorResponse();
-	  	log.error("Request not supported with given input", ex);
+	  	LOG.error("Request not supported with given input", ex);
 		response.addError(this.messageSource.getMessage("request.method.not.supported", null, LocaleContextHolder.getLocale()));
 		return response;
 	}
