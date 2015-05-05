@@ -152,7 +152,6 @@ public class OntologyMapper {
 				this.map().setVariableTypes(this.source.getVariableTypes());
 				this.map().setCreatedDate(this.source.getDateCreated());
 				this.map().setModifiedData(this.source.getDateLastModified());
-				this.map().setObservations(this.source.getObservations());
 				this.map().setExpectedMin(this.source.getMinValue());
 				this.map().setExpectedMax(this.source.getMaxValue());
 			}
