@@ -52,8 +52,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 		GermplasmSummary summary = new GermplasmSummary();
 		summary.setGermplasmId(germplasm.getGid().toString());
-		summary.setParent1Id(germplasm.getGpid1() != null ? germplasm.getGpid1().toString() : null);
-		summary.setParent2Id(germplasm.getGpid2() != null ? germplasm.getGpid2().toString() : null);
+		summary.setParent1Id(germplasm.getGpid1() != null && germplasm.getGpid1() != 0 ? germplasm.getGpid1().toString() : "Unknown");
+		summary.setParent2Id(germplasm.getGpid2() != null && germplasm.getGpid2() != 0 ? germplasm.getGpid2().toString() : "Unknown");
 
 		CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties();
 		crossExpansionProperties.setDefaultLevel(1);

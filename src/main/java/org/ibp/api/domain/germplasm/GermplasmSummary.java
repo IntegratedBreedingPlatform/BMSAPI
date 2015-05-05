@@ -13,7 +13,10 @@ public class GermplasmSummary {
 	private String location;
 
 	private String parent1Id;
+	private String parent1Url;
+
 	private String parent2Id;
+	private String parent2Url;
 
 	public String getGermplasmId() {
 		return germplasmId;
@@ -71,6 +74,22 @@ public class GermplasmSummary {
 
 	public void setParent2Id(String parent2Id) {
 		this.parent2Id = parent2Id;
+	}
+
+	public String getParent1Url() {
+		return parent1Url;
+	}
+
+	public void setParent1Url(String parent1Url) {
+		this.parent1Url = parent1Url;
+	}
+
+	public String getParent2Url() {
+		return parent2Url;
+	}
+
+	public void setParent2Url(String parent2Url) {
+		this.parent2Url = parent2Url;
 	}
 
 }
