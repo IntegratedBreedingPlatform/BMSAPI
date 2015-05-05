@@ -1,5 +1,7 @@
 package org.ibp.api.domain.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,11 @@ public class ErrorResponse {
 		}
 
 		this.errors.add(new Error(fields, message));
+	}
+
+	@JsonIgnore
+	public boolean isValid() {
+		return this.errors.isEmpty();
 	}
 
 	public static class Error {
@@ -51,3 +58,4 @@ public class ErrorResponse {
 		}
 	}
 }
+

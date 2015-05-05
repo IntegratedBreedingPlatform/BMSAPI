@@ -5,14 +5,12 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.AddVariableRequest;
-import org.ibp.api.domain.ontology.TermRequest;
-import org.ibp.api.domain.ontology.UpdateVariableRequest;
-import org.ibp.api.domain.ontology.VariableRequest;
-import org.ibp.api.domain.ontology.VariableResponse;
-import org.ibp.api.domain.ontology.VariableSummary;
+import org.ibp.api.domain.common.ValidationErrors;
+import org.ibp.api.domain.ontology.*;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ApiRequestValidationException2;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
+import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator2;
 import org.ibp.api.java.impl.middleware.ontology.OntologyMapper;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableRequestValidator;
 import org.ibp.api.java.ontology.OntologyVariableService;
@@ -51,6 +49,9 @@ public class OntologyVariableResource extends AbstractResource {
 	private ProgramValidator programValidator;
 
 	@Autowired
+	private ProgramValidator2 programValidator2;
+
+	@Autowired
 	private VariableRequestValidator variableRequestValidator;
 
 
@@ -65,6 +66,15 @@ public class OntologyVariableResource extends AbstractResource {
 																  @RequestParam(value = "property", required = false) String propertyId,
 																  @RequestParam(value = "favourite", required = false) Boolean favourite,
 																  @RequestParam(value = "programId") String programId)  {
+		ValidationErrors validationErrors = new ValidationErrors();
+
+		this.programValidator2.validate(new ProgramId(programId), validationErrors);
+
+		//validate and throw
+		if(!validationErrors.isValid()){
+			throw new ApiRequestValidationException2(validationErrors);
+		}
+
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 		this.programValidator.validate(programId, bindingResult);
 
