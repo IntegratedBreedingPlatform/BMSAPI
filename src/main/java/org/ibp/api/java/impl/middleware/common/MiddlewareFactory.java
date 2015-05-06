@@ -1,40 +1,15 @@
 package org.ibp.api.java.impl.middleware.common;
 
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.PreDestroy;
-
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.SessionFactoryUtil;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
-import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
-import org.generationcp.middleware.manager.GermplasmListManagerImpl;
-import org.generationcp.middleware.manager.InventoryDataManagerImpl;
-import org.generationcp.middleware.manager.LocationDataManagerImpl;
-import org.generationcp.middleware.manager.OntologyDataManagerImpl;
-import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.UserDataManagerImpl;
-import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
-import org.generationcp.middleware.manager.api.GenotypicDataManager;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.manager.*;
+import org.generationcp.middleware.manager.api.*;
+import org.generationcp.middleware.manager.ontology.*;
+import org.generationcp.middleware.manager.ontology.api.*;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
-import org.generationcp.middleware.service.OntologyManagerServiceImpl;
-import org.generationcp.middleware.service.OntologyServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
-import org.generationcp.middleware.service.api.OntologyManagerService;
-import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
@@ -49,6 +24,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+
+import javax.annotation.PreDestroy;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class MiddlewareFactory {
@@ -127,20 +107,33 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public OntologyDataManager getOntologyDataManager() throws FileNotFoundException {
-		return new OntologyDataManagerImpl(getCropDatabaseSessionProvider());
+	public OntologyBasicDataManager getOntologyBasicDataManager() throws FileNotFoundException {
+		return new OntologyBasicDataManagerImpl(getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public OntologyService getOntologyService() throws FileNotFoundException {
-		return new OntologyServiceImpl(getCropDatabaseSessionProvider());
+	public OntologyMethodDataManager getOntologyMethodDataManager() throws FileNotFoundException {
+		return new OntologyMethodDataManagerImpl(getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public OntologyManagerService getOntologyManagerService() throws FileNotFoundException {
-		return new OntologyManagerServiceImpl(getCropDatabaseSessionProvider());
+	public OntologyPropertyDataManager getOntologyPropertyDataManager() throws FileNotFoundException {
+		return new OntologyPropertyDataManagerImpl(getOntologyBasicDataManager(), getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyScaleDataManager getOntologyScaleDataManager() throws FileNotFoundException {
+		return new OntologyScaleDataManagerImpl(getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyVariableDataManager getOntologyVariableDataManager() throws FileNotFoundException {
+		return new OntologyVariableDataManagerImpl(getOntologyBasicDataManager(), getOntologyMethodDataManager(),
+				getOntologyPropertyDataManager(), getOntologyScaleDataManager(), getCropDatabaseSessionProvider());
 	}
 
 	@Bean

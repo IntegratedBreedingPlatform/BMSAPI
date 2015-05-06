@@ -1,12 +1,11 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import com.google.common.base.Function;
-
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.ontology.IdName;
 import org.ibp.api.domain.ontology.VariableTypeResponse;
@@ -21,7 +20,7 @@ import java.util.*;
 public class OntologyModelServiceImpl implements OntologyModelService {
 
 	@Autowired
-	private OntologyManagerService ontologyManagerService;
+	private OntologyBasicDataManager ontologyBasicDataManager;
 
 	@Override
 	public List<IdName> getAllDataTypes() {
@@ -37,7 +36,7 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 	@Override
 	public List<String> getAllClasses() {
 		try {
-			List<Term> classes = this.ontologyManagerService.getAllTraitClass();
+			List<Term> classes = this.ontologyBasicDataManager.getAllTraitClass();
 			List<String> classList = new ArrayList<>();
 
 			for (Term term : classes) {

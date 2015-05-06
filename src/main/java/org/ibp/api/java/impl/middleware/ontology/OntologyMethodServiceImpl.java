@@ -1,8 +1,9 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
-import org.generationcp.middleware.domain.oms.Method;
+import org.generationcp.middleware.domain.oms.OntologyMethod;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.MethodRequest;
 import org.ibp.api.domain.ontology.MethodResponse;
@@ -23,17 +24,19 @@ import java.util.List;
 public class OntologyMethodServiceImpl implements OntologyMethodService{
 
 	@Autowired
-	private OntologyManagerService ontologyManagerService;
+	private OntologyMethodDataManager ontologyMethodDataManager;
+	@Autowired
+	private OntologyBasicDataManager ontologyBasicDataManager;
 
   	@Override
 	public List<MethodSummary> getAllMethods() {
 		try {
-			List<Method> methodList = this.ontologyManagerService.getAllMethods();
+			List<OntologyMethod> methodList = this.ontologyMethodDataManager.getAllMethods();
 			List<MethodSummary> methods = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
 
-			for (Method method : methodList) {
+			for (OntologyMethod method : methodList) {
 			  	MethodSummary methodSummary = mapper.map(method, MethodSummary.class);
 			  	methods.add(methodSummary);
 			}
@@ -46,20 +49,19 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	@Override
 	public MethodResponse getMethod(Integer id) {
 		try {
-			Method method = this.ontologyManagerService.getMethod(id);
+			OntologyMethod method = this.ontologyMethodDataManager.getMethod(id);
 			if (method == null) {
 			  	return null;
 			}
 			boolean deletable = true;
-			if (this.ontologyManagerService.isTermReferred(id)) {
+			if (this.ontologyBasicDataManager.isTermReferred(id)) {
 			  	deletable = false;
 			}
 			ModelMapper mapper = OntologyMapper.getInstance();
 			MethodResponse response = mapper.map(method, MethodResponse.class);
 			String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
 			if (!deletable) {
-			  response.setEditableFields(new ArrayList<>(Collections
-					  .singletonList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
+			  response.setEditableFields(new ArrayList<>(Collections.singletonList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
 			} else {
 			  	response.setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
 			}
@@ -73,10 +75,10 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	@Override
 	public GenericResponse addMethod(MethodRequest request) {
 		try {
-			Method method = new Method();
+			OntologyMethod method = new OntologyMethod();
 			method.setName(request.getName());
 			method.setDefinition(request.getDescription());
-			this.ontologyManagerService.addMethod(method);
+			this.ontologyMethodDataManager.addMethod(method);
 			return new GenericResponse(method.getId());
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
@@ -86,11 +88,11 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	@Override
 	public void updateMethod(Integer id, MethodRequest request) {
 		try {
-			Method method = new Method();
+			OntologyMethod method = new OntologyMethod();
 			method.setId(CommonUtil.tryParseSafe(request.getId()));
 			method.setName(request.getName());
 			method.setDefinition(request.getDescription());
-			this.ontologyManagerService.updateMethod(method);
+			this.ontologyMethodDataManager.updateMethod(method);
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
@@ -99,7 +101,7 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	@Override
 	public void deleteMethod(Integer id) {
 	  	try {
-			this.ontologyManagerService.deleteMethod(id);
+			this.ontologyMethodDataManager.deleteMethod(id);
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}

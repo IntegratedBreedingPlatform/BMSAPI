@@ -1,10 +1,10 @@
 package org.ibp.builders;
 
-import java.util.Map;
-
 import org.generationcp.middleware.domain.oms.DataType;
-import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.oms.OntologyScale;
 import org.generationcp.middleware.domain.oms.Term;
+
+import java.util.Map;
 
 public class ScaleBuilder {
 
@@ -14,12 +14,12 @@ public class ScaleBuilder {
 		this.term = new Term();
 	}
 
-	public Scale build(int id, String name, String description, DataType dataType, String minValue,
+	public OntologyScale build(int id, String name, String description, DataType dataType, String minValue,
 			String maxValue, Map<String, String> categories) {
 		this.term.setId(id);
 		this.term.setName(name);
 		this.term.setDefinition(description);
-		Scale scale = new Scale(this.term);
+		OntologyScale scale = new OntologyScale(this.term);
 		scale.setDataType(dataType);
 		scale.setMinValue(minValue);
 		scale.setMaxValue(maxValue);

@@ -1,23 +1,18 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
 import com.google.common.base.Strings;
-
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
-import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.oms.OntologyScale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.ibp.api.domain.ontology.VariableCategory;
 import org.ibp.api.domain.ontology.ScaleRequest;
 import org.ibp.api.domain.ontology.ValidValues;
+import org.ibp.api.domain.ontology.VariableCategory;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
+
+import java.util.*;
 
 /**
  * Add Scale/Update Scale Validation rules for Scale request Refer:
@@ -123,7 +118,7 @@ org.springframework.validation.Validator {
 		}
 
 		try {
-			Scale oldScale = this.ontologyManagerService.getScaleById(CommonUtil.tryParseSafe(request.getId()));
+			OntologyScale oldScale = this.ontologyScaleDataManager.getScaleById(CommonUtil.tryParseSafe(request.getId()));
 
 			// that method should exist with requestId
 			if (Objects.equals(oldScale, null)) {
@@ -131,7 +126,7 @@ org.springframework.validation.Validator {
 				return;
 			}
 
-			boolean isEditable = !this.ontologyManagerService.isTermReferred(CommonUtil.tryParseSafe(request.getId()));
+			boolean isEditable = !this.ontologyBasicDataManager.isTermReferred(CommonUtil.tryParseSafe(request.getId()));
 			if (isEditable) {
 				return;
 			}
@@ -147,8 +142,8 @@ org.springframework.validation.Validator {
 			}
 
 			ValidValues validValues = request.getValidValues() == null ? new ValidValues() : request.getValidValues();
-			boolean minValuesAreEqual = Objects.equals(validValues.getMin(), oldScale.getMinValue());
-			boolean maxValuesAreEqual = Objects.equals(validValues.getMax(), oldScale.getMaxValue());
+			boolean minValuesAreEqual = Objects.equals(validValues.getMin(), CommonUtil.tryParseSafe(oldScale.getMinValue()));
+			boolean maxValuesAreEqual = Objects.equals(validValues.getMax(), CommonUtil.tryParseSafe(oldScale.getMaxValue()));
 			List<VariableCategory> categories = validValues.getCategories() == null ? new ArrayList<VariableCategory>() : validValues.getCategories();
 			boolean categoriesEqualSize = Objects.equals(categories.size(), oldScale .getCategories().size());
 			boolean categoriesValuesAreSame = true;
@@ -277,17 +272,17 @@ org.springframework.validation.Validator {
 
 		ValidValues validValues = request.getValidValues() == null ? new ValidValues() : request.getValidValues();
 
-		String minValue = validValues.getMin();
-		String maxValue = validValues.getMax();
+		String minValue = validValues.getMin() == null ? null : validValues.getMin().toString();
+		String maxValue = validValues.getMax() == null ? null : validValues.getMax().toString();
 
 		// 9. If the data type is numeric and minimum and maximum valid values
 		// are provided (they are not mandatory), they must be numeric values
 		if (Objects.equals(dataType, DataType.NUMERIC_VARIABLE)) {
-			if (minValue != null && !this.isNonNullValidNumericString(minValue)) {
+			if (!this.isNonNullValidNumericString(minValue)) {
 				this.addCustomError(errors, "validValues.min", FIELD_SHOULD_BE_NUMERIC, null);
 			}
 
-			if (maxValue != null && !this.isNonNullValidNumericString(maxValue)) {
+			if (!this.isNonNullValidNumericString(maxValue)) {
 				this.addCustomError(errors, "validValues.max", FIELD_SHOULD_BE_NUMERIC, null);
 			}
 		}

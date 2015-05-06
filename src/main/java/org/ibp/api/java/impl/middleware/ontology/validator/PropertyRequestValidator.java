@@ -1,12 +1,9 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import java.util.*;
-
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
-
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.OntologyProperty;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.util.Util;
@@ -14,6 +11,8 @@ import org.ibp.api.domain.ontology.PropertyRequest;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
+
+import java.util.*;
 
 /**
  * Request validator for add/edit property
@@ -121,7 +120,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 		try {
 
 			//Add all classes to String list
-			traitClasses = Util.convertAll(this.ontologyManagerService.getAllTraitClass(), new Function<Term, String>() {
+			traitClasses = Util.convertAll(this.ontologyBasicDataManager.getAllTraitClass(), new Function<Term, String>() {
 				@Override
 				public String apply(Term term) {
 					return term.getName();
@@ -129,7 +128,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 			});
 
 			//Add all terms to String list
-			allTerms = Util.convertAll(this.ontologyManagerService.getTermByCvId(CvId.IBDB_TERMS.getId()), new Function<Term, String>() {
+			allTerms = Util.convertAll(this.ontologyBasicDataManager.getTermByCvId(CvId.IBDB_TERMS.getId()), new Function<Term, String>() {
 				@Override
 				public String apply(Term term) {
 					return term.getName();
@@ -196,7 +195,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 
 		try {
 
-			Property oldProperty = this.ontologyManagerService.getProperty(propertyId);
+			OntologyProperty oldProperty = this.ontologyPropertyDataManager.getProperty(propertyId);
 
 			// that property should exist with requestId
 			if (Objects.equals(oldProperty, null)) {
@@ -204,7 +203,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 				return false;
 			}
 
-			boolean isEditable = !this.ontologyManagerService.isTermReferred(propertyId);
+			boolean isEditable = !this.ontologyBasicDataManager.isTermReferred(propertyId);
 
 			if (isEditable) {
 				return true;

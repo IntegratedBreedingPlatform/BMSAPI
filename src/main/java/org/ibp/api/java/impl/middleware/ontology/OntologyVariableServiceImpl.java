@@ -1,13 +1,13 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import com.google.common.base.Strings;
-
 import org.generationcp.middleware.domain.oms.OntologyVariable;
 import org.generationcp.middleware.domain.oms.OntologyVariableInfo;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableRequest;
 import org.ibp.api.domain.ontology.VariableResponse;
@@ -27,13 +27,16 @@ import java.util.List;
 @Service
 public class OntologyVariableServiceImpl implements OntologyVariableService {
 
+	@Autowired
+	private OntologyVariableDataManager ontologyVariableDataManager;
+
     @Autowired
-    private OntologyManagerService ontologyManagerService;
+    private OntologyBasicDataManager ontologyBasicDataManager;
 
     @Override
     public List<VariableSummary> getAllVariablesByFilter(String programId, Integer propertyId, Boolean favourite) {
         try {
-			List<OntologyVariableSummary> variableSummaries = this.ontologyManagerService.getWithFilter(programId, favourite, null, propertyId, null);
+			List<OntologyVariableSummary> variableSummaries = this.ontologyVariableDataManager.getWithFilter(programId, favourite, null, propertyId, null);
 			List<VariableSummary> variableSummaryList = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
@@ -51,14 +54,14 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
     @Override
     public VariableResponse getVariableById(String programId, Integer variableId) {
         try {
-			OntologyVariable ontologyVariable = this.ontologyManagerService.getVariable(programId, variableId);
+			OntologyVariable ontologyVariable = this.ontologyVariableDataManager.getVariable(programId, variableId);
 
 			if (ontologyVariable == null) {
 			    return null;
 			}
 
 			boolean deletable = true;
-			if (this.ontologyManagerService.isTermReferred(variableId)) {
+			if (this.ontologyBasicDataManager.isTermReferred(variableId)) {
 			    deletable = false;
 			}
 
@@ -102,7 +105,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 			    variableInfo.addVariableType(VariableType.getById(CommonUtil.tryParseSafe(i)));
 			}
 
-			this.ontologyManagerService.addVariable(variableInfo);
+			this.ontologyVariableDataManager.addVariable(variableInfo);
 			return new GenericResponse(variableInfo.getId());
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
@@ -137,7 +140,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 			    variableInfo.addVariableType(VariableType.getById(CommonUtil.tryParseSafe(i)));
 			}
 
-			this.ontologyManagerService.updateVariable(variableInfo);
+			this.ontologyVariableDataManager.updateVariable(variableInfo);
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
@@ -146,7 +149,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 	@Override
 	public void deleteVariable(Integer id) {
 		try{
-			ontologyManagerService.deleteVariable(id);
+			ontologyVariableDataManager.deleteVariable(id);
 		}catch (MiddlewareException e){
 			throw new ApiRuntimeException("Error!", e);
 		}

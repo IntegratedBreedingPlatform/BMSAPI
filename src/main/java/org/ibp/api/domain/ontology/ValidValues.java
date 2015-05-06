@@ -1,36 +1,41 @@
 package org.ibp.api.domain.ontology;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.ibp.api.java.impl.middleware.common.CommonUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ValidValues {
 
-	private String min;
-	private String max;
+	private Integer min;
+	private Integer max;
 	private List<VariableCategory> categories;
 
 	public ValidValues() {
 	}
 
-	public String getMin() {
+	public Integer getMin() {
 		return this.min;
 	}
 
 	public void setMin(String min) {
-		this.min = min;
+		if(min != null){
+			this.min = CommonUtil.tryParseSafe(min);
+		}
 	}
 
-	public String getMax() {
+	public Integer getMax() {
 		return this.max;
 	}
 
 	public void setMax(String max) {
-		this.max = max;
+		if(max != null){
+			this.max = CommonUtil.tryParseSafe(max);
+		}
 	}
 
 	public List<VariableCategory> getCategories() {

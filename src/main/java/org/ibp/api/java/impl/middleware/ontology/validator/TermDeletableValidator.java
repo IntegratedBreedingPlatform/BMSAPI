@@ -30,12 +30,12 @@ org.springframework.validation.Validator {
 			}
 
 			if(Objects.equals(request.getCvId(), CvId.VARIABLES.getId())){
-				int observations = this.ontologyManagerService.getObservationsByVariableId(Integer.valueOf(request.getId()));
+				int observations = this.ontologyBasicDataManager.getVariableObservations(Integer.valueOf(request.getId()));
 				if(observations == 0){
 					return;
 				}
 			} else {
-				boolean isReferred = this.ontologyManagerService.isTermReferred(CommonUtil.tryParseSafe(request.getId()));
+				boolean isReferred = this.ontologyBasicDataManager.isTermReferred(CommonUtil.tryParseSafe(request.getId()));
 				if (!isReferred) {
 					return;
 				}

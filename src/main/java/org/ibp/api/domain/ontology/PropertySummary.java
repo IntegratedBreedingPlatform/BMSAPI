@@ -2,37 +2,10 @@ package org.ibp.api.domain.ontology;
 
 import java.util.Set;
 
-public class PropertySummary  {
+public class PropertySummary extends AuditTermSummary {
 
-	private String id;
-	private String name;
-	private String description;
 	private String cropOntologyId;
 	private Set<String> classes;
-
-	public String getId() {
-		return this.id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return this.name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
 
 	public String getCropOntologyId() {
 		return this.cropOntologyId;
@@ -53,11 +26,8 @@ public class PropertySummary  {
 	@Override
 	public String toString() {
 		return "PropertySummary{" +
-				"id='" + id + '\'' +
-				", name='" + name + '\'' +
-				", description='" + description + '\'' +
-				", cropOntologyId='" + cropOntologyId + '\'' +
+				"cropOntologyId='" + cropOntologyId + '\'' +
 				", classes=" + classes +
-				'}';
+				"} " + super.toString();
 	}
 }

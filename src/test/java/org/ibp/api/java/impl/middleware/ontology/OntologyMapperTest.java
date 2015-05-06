@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
-import org.generationcp.middleware.domain.oms.Method;
-import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.OntologyMethod;
+import org.generationcp.middleware.domain.oms.OntologyProperty;
 import org.generationcp.middleware.domain.oms.Term;
 import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.domain.ontology.PropertySummary;
@@ -18,7 +18,7 @@ public class OntologyMapperTest {
 		term.setName("name");
 		term.setDefinition("def");
 
-		Method method = new Method(term);
+		OntologyMethod method = new OntologyMethod(term);
 
 		ModelMapper mapper = OntologyMapper.getInstance();
 
@@ -38,7 +38,7 @@ public class OntologyMapperTest {
 		term.setName("name");
 		term.setDefinition("definition");
 
-		Property property = new Property(term);
+		OntologyProperty property = new OntologyProperty(term);
 
 		ModelMapper mapper = OntologyMapper.getInstance();
 

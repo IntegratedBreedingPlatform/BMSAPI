@@ -1,12 +1,13 @@
 package org.ibp.api.rest.ontology;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
-
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.service.api.OntologyManagerService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.AddVariableRequest;
@@ -45,8 +46,8 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public OntologyManagerService ontologyManagerService() {
-			return Mockito.mock(OntologyManagerService.class);
+		public OntologyBasicDataManager ontologyBasicDataManager() {
+			return Mockito.mock(OntologyBasicDataManager.class);
 		}
 
 		@Bean
@@ -54,10 +55,29 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 		public WorkbenchDataManager workbenchDataManager() {
 			return Mockito.mock(WorkbenchDataManager.class);
 		}
+
+		@Bean
+		@Primary
+		public OntologyVariableDataManager ontologyVariableDataManager(){
+			return Mockito.mock(OntologyVariableDataManager.class);
+		}
+
+		@Bean
+		@Primary
+		public OntologyScaleDataManager ontologyScaleDataManager(){
+			return Mockito.mock(OntologyScaleDataManager.class);
+		}
+
 	}
 
 	@Autowired
-	private OntologyManagerService ontologyManagerService;
+	private OntologyBasicDataManager ontologyBasicDataManager;
+
+	@Autowired
+	private OntologyVariableDataManager ontologyVariableDataManager;
+
+	@Autowired
+	private OntologyScaleDataManager ontologyScaleDataManager;
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -81,7 +101,8 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 
 	@Before
 	public void reset() {
-		Mockito.reset(this.ontologyManagerService);
+		Mockito.reset(this.ontologyBasicDataManager);
+		Mockito.reset(this.ontologyVariableDataManager);
 	}
 
 	@After
@@ -107,18 +128,18 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 
 	  	Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(new Project()).when(this.workbenchDataManager).getProjectByUuid(programUuid);
-		Mockito.doReturn(variableSummaries).when(this.ontologyManagerService).getWithFilter(programUuid, null, null, null, null);
+		Mockito.doReturn(variableSummaries).when(this.ontologyVariableDataManager).getWithFilter(programUuid, null, null, null, null);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/variables?programId=" + programUuid, cropName)
 				.contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(variableSummaries.size())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(variableSummaries.get(0).getId())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(variableSummaries.get(0).getId().toString())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is(variableSummaries.get(0).getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(variableSummaries.get(0).getDescription())))
 				.andDo(MockMvcResultHandlers.print());
 
-		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).getWithFilter(programUuid, null, null, null, null);
+		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).getWithFilter(programUuid, null, null, null, null);
 	}
 
 	/**
@@ -140,8 +161,8 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(new Project()).when(this.workbenchDataManager).getProjectByUuid(programUuid);
-		Mockito.doReturn(ontologyVariable).when(this.ontologyManagerService).getVariable(programUuid, ontologyVariable.getId());
-	  	Mockito.doReturn(new Term(1, this.variableName, this.variableDescription, CvId.VARIABLES.getId(), false)).when(this.ontologyManagerService).getTermById(ontologyVariable.getId());
+		Mockito.doReturn(ontologyVariable).when(this.ontologyVariableDataManager).getVariable(programUuid, ontologyVariable.getId());
+	  	Mockito.doReturn(new Term(1, this.variableName, this.variableDescription, CvId.VARIABLES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(ontologyVariable.getId());
 
 		this.mockMvc.perform(MockMvcRequestBuilders
 				.get("/ontology/{cropname}/variables/{id}?programId=" + programUuid, cropName, ontologyVariable.getId())
@@ -151,7 +172,7 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.is(ontologyVariable.getDefinition())))
 				.andDo(MockMvcResultHandlers.print());
 
-	  Mockito.verify(this.ontologyManagerService, Mockito.times(1)).getVariable(programUuid, ontologyVariable.getId());
+	  Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).getVariable(programUuid, ontologyVariable.getId());
 	}
 
 	/**
@@ -180,12 +201,12 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(new Project()).when(this.workbenchDataManager).getProjectByUuid(programUuid);
-		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(request.getName(), CvId.VARIABLES.getId());
-		Mockito.doReturn(new ScaleBuilder().build(12, this.scaleName, this.scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null)).when(this.ontologyManagerService).getScaleById(scaleId);
-		Mockito.doReturn(new Term(10, this.propertyName, this.propertyDescription, CvId.PROPERTIES.getId(), null)).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(new Term(11, this.methodName, this.methodDescription, CvId.METHODS.getId(), null)).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(new Term(12, this.scaleName, this.scaleDescription, CvId.SCALES.getId(), null)).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyManagerService).getWithFilter(null, null,methodId, propertyId, scaleId);
+		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(request.getName(), CvId.VARIABLES.getId());
+		Mockito.doReturn(new ScaleBuilder().build(12, this.scaleName, this.scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null)).when(this.ontologyScaleDataManager).getScaleById(scaleId);
+		Mockito.doReturn(new Term(10, this.propertyName, this.propertyDescription, CvId.PROPERTIES.getId(), null)).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(new Term(11, this.methodName, this.methodDescription, CvId.METHODS.getId(), null)).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(new Term(12, this.scaleName, this.scaleDescription, CvId.SCALES.getId(), null)).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null,methodId, propertyId, scaleId);
 
 	  	//Mock OntologyVariableInfo Class and when addVariable method called it will set id to 1 and return (self member alter if void is return type of method)
 		doAnswer(new Answer<Void>() {
@@ -197,7 +218,7 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 				}
 				return null;
 			}
-		}).when(this.ontologyManagerService).addVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
+		}).when(this.ontologyVariableDataManager).addVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/variables?programId=" + programUuid, cropName)
 				.contentType(this.contentType)
@@ -207,7 +228,7 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(1)));
 
 
-	  Mockito.verify(this.ontologyManagerService, Mockito.times(1)).addVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
+	  Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).addVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
 	}
 
 	/**
@@ -236,10 +257,10 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 		Term scaleTerm = new Term(12, this.scaleName, this.scaleDescription, CvId.SCALES.getId(), null);
 		Term variableTerm = new Term(1, this.variableName, this.variableDescription, CvId.VARIABLES.getId(), null);
 
-		Scale scale = new ScaleBuilder().build(scaleTerm.getId(), scaleTerm.getName(), scaleTerm.getDefinition(), DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyScale scale = new ScaleBuilder().build(scaleTerm.getId(), scaleTerm.getName(), scaleTerm.getDefinition(), DataType.NUMERIC_VARIABLE, "10", "20", null);
 		OntologyVariable variable = new OntologyVariable(variableTerm);
-		variable.setMethod(new Method(methodTerm));
-		variable.setProperty(new Property(propertyTerm));
+		variable.setMethod(new OntologyMethod(methodTerm));
+		variable.setProperty(new OntologyProperty(propertyTerm));
 		variable.setScale(scale);
 
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
@@ -248,15 +269,15 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(new Project()).when(this.workbenchDataManager).getProjectByUuid(programUuid);
-		Mockito.doReturn(variableTerm).when(this.ontologyManagerService).getTermById(variableTerm.getId());
-		Mockito.doReturn(variableTerm).when(this.ontologyManagerService).getTermByNameAndCvId(request.getName(), CvId.VARIABLES.getId());
-		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
-		Mockito.doReturn(propertyTerm).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(methodTerm).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(scaleTerm).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyManagerService).getWithFilter(null, null, methodId, propertyId, scaleId);
-		Mockito.doReturn(variable).when(this.ontologyManagerService).getVariable(programUuid, variable.getId());
-		Mockito.doNothing().when(this.ontologyManagerService).updateVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
+		Mockito.doReturn(variableTerm).when(this.ontologyBasicDataManager).getTermById(variableTerm.getId());
+		Mockito.doReturn(variableTerm).when(this.ontologyBasicDataManager).getTermByNameAndCvId(request.getName(), CvId.VARIABLES.getId());
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
+		Mockito.doReturn(propertyTerm).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(methodTerm).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(scaleTerm).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
+		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(programUuid, variable.getId());
+		Mockito.doNothing().when(this.ontologyVariableDataManager).updateVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.put("/ontology/{cropname}/variables/{id}?programId=" + programUuid, cropName, variableTerm.getId())
 				.contentType(this.contentType)
@@ -264,7 +285,7 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isNoContent());
 
-		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).updateVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
+		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).updateVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
 	}
 
 
@@ -288,16 +309,16 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(new Project()).when(this.workbenchDataManager).getProjectByUuid(programUuid);
-		Mockito.doReturn(term).when(this.ontologyManagerService).getTermById(ontologyVariable.getId());
-		Mockito.doReturn(ontologyVariable).when(this.ontologyManagerService).getVariable(programUuid, ontologyVariable.getId());
-		Mockito.doReturn(false).when(this.ontologyManagerService).isTermReferred(ontologyVariable.getId());
-		Mockito.doNothing().when(this.ontologyManagerService).deleteVariable(ontologyVariable.getId());
+		Mockito.doReturn(term).when(this.ontologyBasicDataManager).getTermById(ontologyVariable.getId());
+		Mockito.doReturn(ontologyVariable).when(this.ontologyVariableDataManager).getVariable(programUuid, ontologyVariable.getId());
+		Mockito.doReturn(false).when(this.ontologyBasicDataManager).isTermReferred(ontologyVariable.getId());
+		Mockito.doNothing().when(this.ontologyVariableDataManager).deleteVariable(ontologyVariable.getId());
 
 		this.mockMvc.perform(MockMvcRequestBuilders.delete("/ontology/{cropname}/variables/{id}", cropName, ontologyVariable.getId())
 				.contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isNoContent())
 				.andDo(MockMvcResultHandlers.print());
 
-		Mockito.verify(this.ontologyManagerService, Mockito.times(1)).deleteVariable(ontologyVariable.getId());
+		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).deleteVariable(ontologyVariable.getId());
 	}
 }

@@ -1,7 +1,6 @@
 package org.ibp.api.domain.ontology;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -17,7 +16,7 @@ public class VariableResponse implements EditableDeletableFields {
 	private ScaleSummary scale;
 	private List<IdName> variableTypes;
 	private boolean favourite;
-	private final MetaData metadata = new MetaData();
+	private final VariableUsages metadata = new VariableUsages();
 	private final ExpectedRange expectedRange = new ExpectedRange();
 	private List<String> editableFields;
 	private Boolean deletable;
@@ -113,7 +112,7 @@ public class VariableResponse implements EditableDeletableFields {
 		this.deletable = deletable;
 	}
 
-	public MetaData getMetadata() {
+	public VariableUsages getMetadata() {
 		return this.metadata;
 	}
 
@@ -129,12 +128,8 @@ public class VariableResponse implements EditableDeletableFields {
 		this.expectedRange.setMax(max);
 	}
 
-	public void setModifiedDate(Date modifiedDate) {
-		this.metadata.setDateLastModified(modifiedDate);
-	}
-
-	public void setCreatedDate(Date createdDate) {
-		this.metadata.setDateCreated(createdDate);
+	public void setStudies(Integer studies){
+		this.metadata.setStudies(studies);
 	}
 
 	public void setObservations(Integer observations) {

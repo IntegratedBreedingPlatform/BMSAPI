@@ -1,5 +1,6 @@
 package org.ibp.api.rest.ontology;
 
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.junit.After;
@@ -8,8 +9,6 @@ import org.mockito.Mockito;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 
 public class OntologyVariableTypeResourceTest extends ApiUnitTestBase {
 

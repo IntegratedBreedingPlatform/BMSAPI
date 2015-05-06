@@ -1,8 +1,9 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
-import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.OntologyProperty;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.PropertyRequest;
 import org.ibp.api.domain.ontology.PropertyResponse;
@@ -21,17 +22,19 @@ import java.util.List;
 public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 
 	@Autowired
-	private OntologyManagerService ontologyManagerService;
+	private OntologyPropertyDataManager ontologyPropertyDataManager;
+	@Autowired
+	private OntologyBasicDataManager ontologyBasicDataManager;
 
   	@Override
 	public List<PropertySummary> getAllProperties() {
 		try {
-			List<Property> propertyList = this.ontologyManagerService.getAllProperties();
+			List<OntologyProperty> propertyList = this.ontologyPropertyDataManager.getAllProperties();
 			List<PropertySummary> properties = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
 
-			for (Property property : propertyList) {
+			for (OntologyProperty property : propertyList) {
 			  	PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
 			  	properties.add(propertyDTO);
 			}
@@ -44,12 +47,12 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	@Override
 	public PropertyResponse getProperty(Integer id) {
 		try {
-			Property property = this.ontologyManagerService.getProperty(id);
+			OntologyProperty property = this.ontologyPropertyDataManager.getProperty(id);
 			if (property == null) {
 			  	return null;
 			}
 			boolean deletable = true;
-			if (this.ontologyManagerService.isTermReferred(id)) {
+			if (this.ontologyBasicDataManager.isTermReferred(id)) {
 			  	deletable = false;
 			}
 			ModelMapper mapper = OntologyMapper.getInstance();
@@ -73,7 +76,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	@Override
 	public GenericResponse addProperty(PropertyRequest request) {
 		try {
-			Property property = new Property();
+			OntologyProperty property = new OntologyProperty();
 			property.setName(request.getName());
 			property.setDefinition(request.getDescription());
 			property.setCropOntologyId(request.getCropOntologyId());
@@ -82,7 +85,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 			  	property.addClass(c);
 			}
 
-			this.ontologyManagerService.addProperty(property);
+			this.ontologyPropertyDataManager.addProperty(property);
 
 			return new GenericResponse(property.getId());
 		} catch (MiddlewareException e) {
@@ -93,12 +96,12 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	@Override
 	public List<PropertySummary> getAllPropertiesByClass(String propertyClass) {
 		try {
-			List<Property> propertyList = this.ontologyManagerService.getAllPropertiesWithClass(propertyClass);
+			List<OntologyProperty> propertyList = this.ontologyPropertyDataManager.getAllPropertiesWithClass(propertyClass);
 			List<PropertySummary> properties = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
 
-			for (Property property : propertyList) {
+			for (OntologyProperty property : propertyList) {
 			  	PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
 			  	properties.add(propertyDTO);
 			}
@@ -111,11 +114,11 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	@Override
 	public boolean deleteProperty(Integer id) {
 		try {
-			boolean isReferred = this.ontologyManagerService.isTermReferred(id);
+			boolean isReferred = this.ontologyBasicDataManager.isTermReferred(id);
 			if (isReferred) {
 			  	return false;
 			}
-			this.ontologyManagerService.deleteProperty(id);
+			this.ontologyPropertyDataManager.deleteProperty(id);
 			return true;
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
@@ -125,7 +128,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	@Override
 	public void updateProperty(Integer id, PropertyRequest request) {
 		try {
-			Property property = new Property();
+			OntologyProperty property = new OntologyProperty();
 			property.setId(id);
 			property.setName(request.getName());
 			property.setDefinition(request.getDescription());
@@ -135,7 +138,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 			  	property.addClass(c);
 			}
 
-			this.ontologyManagerService.updateProperty(property);
+			this.ontologyPropertyDataManager.updateProperty(property);
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}

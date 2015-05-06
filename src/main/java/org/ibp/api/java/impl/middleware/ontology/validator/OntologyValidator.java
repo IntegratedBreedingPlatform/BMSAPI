@@ -3,7 +3,7 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.generationcp.middleware.manager.ontology.api.*;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
@@ -13,7 +13,19 @@ import java.util.Objects;
 public abstract class OntologyValidator extends BaseValidator {
 
 	@Autowired
-	protected OntologyManagerService ontologyManagerService;
+	protected OntologyBasicDataManager ontologyBasicDataManager;
+
+	@Autowired
+	protected OntologyScaleDataManager ontologyScaleDataManager;
+
+	@Autowired
+	protected OntologyVariableDataManager ontologyVariableDataManager;
+
+	@Autowired
+	protected OntologyPropertyDataManager ontologyPropertyDataManager;
+
+	@Autowired
+	protected OntologyMethodDataManager ontologyMethodDataManager;
 
 	protected void checkTermExist(String termName, String id, Integer cvId, Errors errors) {
 		this.checkTermExist(termName, null, id, cvId, errors);
@@ -21,7 +33,7 @@ public abstract class OntologyValidator extends BaseValidator {
 
 	protected void checkTermExist(String termName, String fieldName, String id, Integer cvId, Errors errors) {
 		try {
-			Term term = this.ontologyManagerService.getTermById(Integer.valueOf(id));
+			Term term = this.ontologyBasicDataManager.getTermById(Integer.valueOf(id));
 			if (Objects.equals(term, null) || !Objects.equals(term.getVocabularyId(), cvId)) {
 				if (Strings.isNullOrEmpty(fieldName)) {
 					this.addCustomError(errors, ID_DOES_NOT_EXIST, new Object[] { termName, id });
@@ -38,7 +50,7 @@ public abstract class OntologyValidator extends BaseValidator {
 	protected void checkTermUniqueness(String termName, Integer id, String name, Integer cvId, Errors errors) {
 
 		try {
-			Term term = this.ontologyManagerService.getTermByNameAndCvId(name, cvId);
+			Term term = this.ontologyBasicDataManager.getTermByNameAndCvId(name, cvId);
 			if (term == null) {
 				return;
 			}
@@ -81,7 +93,23 @@ public abstract class OntologyValidator extends BaseValidator {
 		}
 	}
 
-	protected void setOntologyManagerService(OntologyManagerService ontologyManagerService) {
-		this.ontologyManagerService = ontologyManagerService;
+	public void setOntologyBasicDataManager(OntologyBasicDataManager ontologyBasicDataManager) {
+		this.ontologyBasicDataManager = ontologyBasicDataManager;
+	}
+
+	public void setOntologyMethodDataManager(OntologyMethodDataManager ontologyMethodDataManager) {
+		this.ontologyMethodDataManager = ontologyMethodDataManager;
+	}
+
+	public void setOntologyScaleDataManager(OntologyScaleDataManager ontologyScaleDataManager){
+		this.ontologyScaleDataManager = ontologyScaleDataManager;
+	}
+
+	public void setOntologyPropertyDataManager(OntologyPropertyDataManager ontologyPropertyDataManager){
+		this.ontologyPropertyDataManager = ontologyPropertyDataManager;
+	}
+
+	public void setOntologyVariableDataManager(OntologyVariableDataManager ontologyVariableDataManager){
+		this.ontologyVariableDataManager = ontologyVariableDataManager;
 	}
 }

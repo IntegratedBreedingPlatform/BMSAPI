@@ -1,8 +1,6 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import java.util.HashMap;
-
-import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,10 +11,12 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.HashMap;
+
 public class RequestIdValidationTest {
 
 	@Mock
-	private OntologyManagerService ontologyManagerService;
+	private OntologyBasicDataManager ontologyBasicDataManager;
 
 	private RequestIdValidator requestIdValidator;
 
@@ -24,7 +24,7 @@ public class RequestIdValidationTest {
 	public void reset() {
 		MockitoAnnotations.initMocks(this);
 		requestIdValidator = new RequestIdValidator();
-		requestIdValidator.setOntologyManagerService(ontologyManagerService);
+		requestIdValidator.setOntologyBasicDataManager(ontologyBasicDataManager);
 	}
 
 	@After

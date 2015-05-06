@@ -1,11 +1,9 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import java.util.HashMap;
-
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.ibp.api.domain.ontology.TermRequest;
 import org.junit.After;
 import org.junit.Assert;
@@ -17,10 +15,12 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.HashMap;
+
 public class TermDeletableValidatorTest {
 
 	@Mock
-	private OntologyManagerService ontologyManagerService;
+	private OntologyBasicDataManager ontologyBasicDataManager;
 
 	private TermDeletableValidator termDeletableValidator;
 
@@ -30,7 +30,7 @@ public class TermDeletableValidatorTest {
 	public void reset() {
 		MockitoAnnotations.initMocks(this);
 		termDeletableValidator = new TermDeletableValidator();
-		termDeletableValidator.setOntologyManagerService(this.ontologyManagerService);
+		termDeletableValidator.setOntologyBasicDataManager(this.ontologyBasicDataManager);
 	}
 
 	@After
@@ -46,7 +46,7 @@ public class TermDeletableValidatorTest {
 	@Test
 	public void testWithTermReferred() throws MiddlewareException {
 
-		Mockito.doReturn(true).when(this.ontologyManagerService).isTermReferred(10);
+		Mockito.doReturn(true).when(this.ontologyBasicDataManager).isTermReferred(10);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 		this.termDeletableValidator.validate(new TermRequest("10", "method", this.cvId),
@@ -63,8 +63,8 @@ public class TermDeletableValidatorTest {
 	public void testWithTermNotReferred() throws MiddlewareException {
 
 		Mockito.doReturn(new Term(10, "name", "", CvId.METHODS.getId(), false))
-		.when(this.ontologyManagerService).getTermById(10);
-		Mockito.doReturn(false).when(this.ontologyManagerService).isTermReferred(10);
+		.when(this.ontologyBasicDataManager).getTermById(10);
+		Mockito.doReturn(false).when(this.ontologyBasicDataManager).isTermReferred(10);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 		this.termDeletableValidator.validate(new TermRequest("10", "method", this.cvId),

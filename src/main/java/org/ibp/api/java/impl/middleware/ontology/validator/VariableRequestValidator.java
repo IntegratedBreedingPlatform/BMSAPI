@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import com.google.common.base.Strings;
-
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.ontology.ExpectedRange;
@@ -200,7 +199,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 
 		// 13. The min and max expected range values are only stored if the scales data type is numeric
 		try {
-			Scale scale = this.ontologyManagerService.getScaleById(CommonUtil.tryParseSafe(request.getScaleId()));
+			OntologyScale scale = this.ontologyScaleDataManager.getScaleById(CommonUtil.tryParseSafe(request.getScaleId()));
 
 			boolean isNumericType = Objects.equals(scale.getDataType(), DataType.NUMERIC_VARIABLE);
 
@@ -283,7 +282,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 		try {
 
 			Integer requestId = CommonUtil.tryParseSafe(request.getId());
-			OntologyVariable oldVariable = this.ontologyManagerService.getVariable(request.getProgramUuid(), requestId);
+			OntologyVariable oldVariable = this.ontologyVariableDataManager.getVariable(request.getProgramUuid(), requestId);
 
 			// that variable should exist with requestId
 			if (Objects.equals(oldVariable, null)) {
@@ -361,7 +360,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 			Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 			Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-			List<OntologyVariableSummary> variableSummary = this.ontologyManagerService.getWithFilter(null, null, methodId, propertyId, scaleId);
+			List<OntologyVariableSummary> variableSummary = this.ontologyVariableDataManager.getWithFilter(null, null, methodId, propertyId, scaleId);
 
 			if(variableSummary.size() > 1 ||
 					(variableSummary.size() == 1 && !Objects.equals(String.valueOf(variableSummary.get(0).getId()), request.getId()))) {

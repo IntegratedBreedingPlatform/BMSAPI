@@ -1,10 +1,11 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import org.generationcp.middleware.domain.oms.DataType;
-import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.oms.OntologyScale;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.*;
 import org.ibp.api.exception.ApiRuntimeException;
@@ -23,17 +24,20 @@ import static org.generationcp.middleware.domain.oms.DataType.NUMERIC_VARIABLE;
 public class OntologyScaleServiceImpl implements OntologyScaleService {
 
 	@Autowired
-	private OntologyManagerService ontologyManagerService;
+	private OntologyScaleDataManager ontologyScaleDataManager;
+
+	@Autowired
+	private OntologyBasicDataManager ontologyBasicDataManager;
 
 	@Override
 	public List<ScaleSummary> getAllScales()  {
 		try {
-			List<Scale> scales = this.ontologyManagerService.getAllScales();
+			List<OntologyScale> scales = this.ontologyScaleDataManager.getAllScales();
 			List<ScaleSummary> scaleSummaries = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
 
-			for (Scale scale : scales) {
+			for (OntologyScale scale : scales) {
 				ScaleSummary scaleSummary = mapper.map(scale, ScaleSummary.class);
 				scaleSummaries.add(scaleSummary);
 			}
@@ -46,12 +50,12 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 	@Override
 	public ScaleResponse getScaleById(Integer id) {
 		try {
-			Scale scale = this.ontologyManagerService.getScaleById(id);
+			OntologyScale scale = this.ontologyScaleDataManager.getScaleById(id);
 			if (scale == null) {
 				return null;
 			}
 			boolean deletable = true;
-			if (this.ontologyManagerService.isTermReferred(id)) {
+			if (this.ontologyBasicDataManager.isTermReferred(id)) {
 				deletable = false;
 			}
 			ModelMapper mapper = OntologyMapper.getInstance();
@@ -72,7 +76,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 	@Override
 	public GenericResponse addScale(ScaleRequest request) {
 		try {
-			Scale scale = new Scale();
+			OntologyScale scale = new OntologyScale();
 			scale.setName(request.getName().trim());
 			scale.setDefinition(request.getDescription().trim());
 
@@ -85,11 +89,11 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 				}
 			}
 			if (Objects.equals(dataTypeId, NUMERIC_VARIABLE.getId())) {
-				scale.setMinValue(request.getValidValues().getMin());
-				scale.setMaxValue(request.getValidValues().getMax());
+				scale.setMinValue(request.getValidValues().getMin().toString());
+				scale.setMaxValue(request.getValidValues().getMax().toString());
 			}
 
-			this.ontologyManagerService.addScale(scale);
+			this.ontologyScaleDataManager.addScale(scale);
 			return new GenericResponse(scale.getId());
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
@@ -99,7 +103,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 	@Override
 	public void updateScale(ScaleRequest request) {
 		try {
-			Scale scale = new Scale(new Term(CommonUtil.tryParseSafe(request.getId()), request.getName().trim(), request.getDescription().trim()));
+			OntologyScale scale = new OntologyScale(new Term(CommonUtil.tryParseSafe(request.getId()), request.getName().trim(), request.getDescription().trim()));
 
 			Integer dataTypeId = CommonUtil.tryParseSafe(request.getDataTypeId());
 
@@ -113,11 +117,11 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 				}
 			}
 			if (Objects.equals(dataTypeId, NUMERIC_VARIABLE.getId())) {
-				scale.setMinValue(validValues.getMin());
-				scale.setMaxValue(validValues.getMax());
+				scale.setMinValue(validValues.getMin().toString());
+				scale.setMaxValue(validValues.getMax().toString());
 			}
 
-			this.ontologyManagerService.updateScale(scale);
+			this.ontologyScaleDataManager.updateScale(scale);
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
@@ -126,7 +130,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 	@Override
 	public void deleteScale(Integer id) {
 		try {
-			this.ontologyManagerService.deleteScale(id);
+			this.ontologyScaleDataManager.deleteScale(id);
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}

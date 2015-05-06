@@ -1,20 +1,11 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.DataType;
-import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
-import org.generationcp.middleware.domain.oms.Scale;
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.oms.TermSummary;
-import org.generationcp.middleware.domain.oms.VariableType;
+import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.service.api.OntologyManagerService;
+import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.ibp.api.domain.ontology.ExpectedRange;
 import org.ibp.api.domain.ontology.VariableRequest;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
@@ -29,10 +20,21 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 public class VariableRequestValidatorTest {
 
 	@Mock
-	private OntologyManagerService ontologyManagerService;
+	private OntologyBasicDataManager ontologyBasicDataManager;
+
+	@Mock
+	private OntologyScaleDataManager ontologyScaleDataManager;
+
+	@Mock
+	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	private VariableRequestValidator variableRequestValidator;
 
@@ -53,7 +55,9 @@ public class VariableRequestValidatorTest {
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
 		variableRequestValidator = new VariableRequestValidator();
-		variableRequestValidator.setOntologyManagerService(this.ontologyManagerService);
+		variableRequestValidator.setOntologyBasicDataManager(this.ontologyBasicDataManager);
+		variableRequestValidator.setOntologyVariableDataManager(this.ontologyVariableDataManager);
+		variableRequestValidator.setOntologyScaleDataManager(this.ontologyScaleDataManager);
 	}
 
 	@After
@@ -80,19 +84,19 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.variableName, this.cvId);
-		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.variableName, this.cvId);
-		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyManagerService).getWithFilter(null, null, methodId, propertyId, scaleId);
-		Mockito.doReturn(new Term(10, this.variableName, this.description)).when(this.ontologyManagerService).getTermByNameAndCvId(this.variableName, this.cvId);
+		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
+		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
+		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
+		Mockito.doReturn(new Term(10, this.variableName, this.description)).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 
 		this.variableRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -114,17 +118,17 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.variableName, this.cvId);
-		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyManagerService).getWithFilter(null, null, methodId, propertyId, scaleId);
+		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
+		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
@@ -149,17 +153,17 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.variableName, this.cvId);
-		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyManagerService).getWithFilter(null, null, methodId, propertyId, scaleId);
+		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
+		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
@@ -184,18 +188,18 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.variableName, this.cvId);
-		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyManagerService).getWithFilter(null, null, methodId, propertyId, scaleId);
-		Mockito.doReturn(new Term(10, this.variableName, this.description)).when(this.ontologyManagerService).getTermByNameAndCvId(this.variableName, this.cvId);
+		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
+		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
+		Mockito.doReturn(new Term(10, this.variableName, this.description)).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
@@ -219,18 +223,18 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.variableName, this.cvId);
-		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyManagerService).getWithFilter(null, null, methodId, propertyId, scaleId);
-		Mockito.doReturn(new Term(10, this.variableName, this.description)).when(this.ontologyManagerService).getTermByNameAndCvId(this.variableName, this.cvId);
+		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
+		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
+		Mockito.doReturn(new Term(10, this.variableName, this.description)).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 
 		this.variableRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -253,18 +257,18 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.variableName, this.cvId);
-		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyManagerService).getWithFilter(null, null, methodId, propertyId, scaleId);
-		Mockito.doReturn(new Term(10, this.variableName, this.description)).when(this.ontologyManagerService).getTermByNameAndCvId(this.variableName, this.cvId);
+		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
+		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
+		Mockito.doReturn(new Term(10, this.variableName, this.description)).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 
 		this.variableRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -286,17 +290,17 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.variableName, this.cvId);
-		Mockito.doReturn(null).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyManagerService).getWithFilter(null, null, methodId, propertyId, scaleId);
+		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
+		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 		this.variableRequestValidator.validate(request, bindingResult);
@@ -319,18 +323,18 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.variableName, this.cvId);
-		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyManagerService).getWithFilter(null, null, methodId, propertyId, scaleId);
-		Mockito.doReturn(new Term(10, this.variableName, this.description)).when(this.ontologyManagerService).getTermByNameAndCvId(this.variableName, this.cvId);
+		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
+		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
+		Mockito.doReturn(new Term(10, this.variableName, this.description)).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 
 		this.variableRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -352,17 +356,17 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.variableName, this.cvId);
-		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(null).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyManagerService).getWithFilter(null, null, methodId, propertyId, scaleId);
+		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
+		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 		this.variableRequestValidator.validate(request, bindingResult);
@@ -385,17 +389,17 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-		Mockito.doReturn(null).when(this.ontologyManagerService).getTermByNameAndCvId(this.variableName, this.cvId);
-		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.SCALES.getId(), false)).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(null).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyManagerService).getWithFilter(null, null, methodId, propertyId, scaleId);
+		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
+		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.SCALES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 		this.variableRequestValidator.validate(request, bindingResult);
@@ -427,16 +431,16 @@ public class VariableRequestValidatorTest {
 		request.setExpectedRange(expectedRange);
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
 
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
+		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
 
 		this.variableRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -463,21 +467,21 @@ public class VariableRequestValidatorTest {
 		request.setName(this.variableName);
 		request.setDescription(this.description);
 		request.setPropertyId("10");
-		request.setScaleId("20");
+		request.setScaleId("12");
 		request.setMethodId("30");
 		request.setExpectedRange(expectedRange);
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
+		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(new Term(12, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
 
 		this.variableRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -516,17 +520,17 @@ public class VariableRequestValidatorTest {
 		request.setExpectedRange(expectedRange);
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
 
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
-		Mockito.doReturn(variableSummaries).when(this.ontologyManagerService).getWithFilter(null, null, methodId, propertyId, scaleId);
+		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
+		Mockito.doReturn(variableSummaries).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 
 		this.variableRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -557,17 +561,17 @@ public class VariableRequestValidatorTest {
 		request.setExpectedRange(expectedRange);
 	  	request.setVariableTypeIds(new ArrayList<String>());
 
-		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
-		Mockito.doReturn(variableSummaries).when(this.ontologyManagerService).getWithFilter(null, null, methodId, propertyId, scaleId);
+		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
+		Mockito.doReturn(variableSummaries).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 
 		this.variableRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -599,17 +603,17 @@ public class VariableRequestValidatorTest {
 		request.setExpectedRange(expectedRange);
 		request.setVariableTypeIds(Collections.singletonList("12"));
 
-		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
 
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
-		Mockito.doReturn(variableSummaries).when(this.ontologyManagerService).getWithFilter(null, null, methodId, propertyId, scaleId);
+		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
+		Mockito.doReturn(variableSummaries).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 
 		this.variableRequestValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -641,17 +645,17 @@ public class VariableRequestValidatorTest {
 		request.setExpectedRange(expectedRange);
 		request.setVariableTypeIds(Collections.singletonList("1"));
 
-		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
+		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
 
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
 
-		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyManagerService).getTermById(propertyId);
-		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyManagerService).getTermById(methodId);
-		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyManagerService).getTermById(scaleId);
-		Mockito.doReturn(scale).when(this.ontologyManagerService).getScaleById(scaleId);
-		Mockito.doReturn(variableSummaries).when(this.ontologyManagerService).getWithFilter(null, null, methodId, propertyId, scaleId);
+		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(propertyId);
+		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.ontologyBasicDataManager).getTermById(methodId);
+		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(scaleId);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
+		Mockito.doReturn(variableSummaries).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 
 		this.variableRequestValidator.validate(request, bindingResult);
 		Assert.assertFalse(bindingResult.hasErrors());
