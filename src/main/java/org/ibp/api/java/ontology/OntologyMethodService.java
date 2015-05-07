@@ -1,12 +1,12 @@
 package org.ibp.api.java.ontology;
 
+import java.util.List;
+
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.MethodRequest;
 import org.ibp.api.domain.ontology.MethodResponse;
 import org.ibp.api.domain.ontology.MethodSummary;
 
-import java.util.List;
-
+//TODO change all ID parameters to Strings.
 public interface OntologyMethodService {
 
 	/**
@@ -30,7 +30,7 @@ public interface OntologyMethodService {
 	 * @param method method to add
 	 * @return newly created method id
 	 */
-	GenericResponse addMethod(MethodRequest method);
+	GenericResponse addMethod(MethodSummary method);
 
 	/**
 	 * update method data using given method id
@@ -38,7 +38,7 @@ public interface OntologyMethodService {
 	 * @param id method to be updated
 	 * @param request method data to be updated
 	 */
-	void updateMethod(Integer id, MethodRequest request);
+	void updateMethod(Integer id, MethodSummary method);
 
 	/**
 	 * delete method using given id

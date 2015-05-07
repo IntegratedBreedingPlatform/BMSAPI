@@ -1,5 +1,7 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
+import java.util.HashMap;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.OntologyMethod;
@@ -7,7 +9,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
-import org.ibp.api.domain.ontology.MethodRequest;
+import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.ibp.builders.MethodBuilder;
 import org.junit.After;
@@ -20,11 +22,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.HashMap;
+public class MethodValidatorTest {
 
-public class MethodRequestValidatorTest {
-
-	private MethodRequestValidator methodRequestValidator;
+	private MethodValidator methodRequestValidator;
 
 	@Mock
 	private OntologyBasicDataManager ontologyBasicDataManager;
@@ -39,7 +39,7 @@ public class MethodRequestValidatorTest {
 	@Before
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
-		methodRequestValidator = new MethodRequestValidator();
+		methodRequestValidator = new MethodValidator();
 		methodRequestValidator.setOntologyBasicDataManager(ontologyBasicDataManager);
 		methodRequestValidator.setOntologyMethodDataManager(ontologyMethodDataManager);
 	}
@@ -62,7 +62,7 @@ public class MethodRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
-		MethodRequest request = new MethodRequest();
+		MethodSummary request = new MethodSummary();
 		request.setName("");
 		request.setDescription(this.description);
 
@@ -83,7 +83,7 @@ public class MethodRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
-		MethodRequest request = new MethodRequest();
+		MethodSummary request = new MethodSummary();
 		request.setName(this.methodName);
 		request.setDescription(this.description);
 
@@ -100,7 +100,7 @@ public class MethodRequestValidatorTest {
 	@Test
 	public void testWithNonEditableRequest() throws MiddlewareException {
 
-		MethodRequest request = new MethodRequest();
+		MethodSummary request = new MethodSummary();
 		request.setId("10");
 		request.setName(this.methodName);
 		request.setDescription(this.description);
@@ -129,7 +129,7 @@ public class MethodRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
-		MethodRequest request = new MethodRequest();
+		MethodSummary request = new MethodSummary();
 		request.setName(RandomStringUtils.random(201));
 		request.setDescription(this.description);
 
@@ -147,7 +147,7 @@ public class MethodRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
-		MethodRequest request = new MethodRequest();
+		MethodSummary request = new MethodSummary();
 		request.setName(this.methodName);
 		request.setDescription(RandomStringUtils.random(260));
 
@@ -166,7 +166,7 @@ public class MethodRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
-		MethodRequest request = new MethodRequest();
+		MethodSummary request = new MethodSummary();
 		request.setName(this.methodName);
 		request.setDescription(this.description);
 

@@ -5,17 +5,12 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.MethodRequest;
-import org.ibp.api.domain.ontology.MethodRequestBase;
 import org.ibp.api.domain.ontology.MethodResponse;
 import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.domain.ontology.TermRequest;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.ontology.OntologyMapper;
-import org.ibp.api.java.impl.middleware.ontology.validator.MethodRequestValidator;
 import org.ibp.api.java.ontology.OntologyMethodService;
 import org.ibp.api.rest.AbstractResource;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,9 +30,6 @@ import com.wordnik.swagger.annotations.ApiOperation;
 @Controller
 @RequestMapping("/ontology")
 public class OntologyMethodResource extends AbstractResource {
-
-	@Autowired
-	private MethodRequestValidator methodRequestValidator;
 
 	@Autowired
 	private OntologyMethodService ontologyMethodService;
@@ -81,15 +73,8 @@ public class OntologyMethodResource extends AbstractResource {
 	@ApiOperation(value = "Add Method", notes = "Add a new Method")
 	@RequestMapping(value = "/{cropname}/methods", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> addMethod(@PathVariable String cropname, @RequestBody MethodRequestBase requestBase)  {
-	  ModelMapper mapper = OntologyMapper.getInstance();
-	  MethodRequest request = mapper.map(requestBase, MethodRequest.class);
-	  BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-		this.methodRequestValidator.validate(request, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		return new ResponseEntity<>(this.ontologyMethodService.addMethod(request), HttpStatus.CREATED);
+	public ResponseEntity<GenericResponse> addMethod(@PathVariable String cropname, @RequestBody MethodSummary method)  {
+		return new ResponseEntity<>(this.ontologyMethodService.addMethod(method), HttpStatus.CREATED);
 	}
 
 	/**
@@ -100,21 +85,14 @@ public class OntologyMethodResource extends AbstractResource {
 	@ApiOperation(value = "Update Method", notes = "Update a Method by Id")
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity updateMethod(@PathVariable String cropname, @PathVariable String id, @RequestBody MethodRequestBase requestBase)  {
-	  ModelMapper mapper = OntologyMapper.getInstance();
-	  MethodRequest request = mapper.map(requestBase, MethodRequest.class);
-	  BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-
+	public ResponseEntity updateMethod(@PathVariable String cropname, @PathVariable String id, @RequestBody MethodSummary method) {
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 		this.requestIdValidator.validate(id, bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		request.setId(id);
-		this.methodRequestValidator.validate(request, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		this.ontologyMethodService.updateMethod(Integer.valueOf(request.getId()), request);
+		method.setId(id);
+		this.ontologyMethodService.updateMethod(Integer.valueOf(method.getId()), method);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
@@ -126,14 +104,9 @@ public class OntologyMethodResource extends AbstractResource {
 	@ApiOperation(value = "Delete Method", notes = "Delete Method by Id")
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public ResponseEntity deleteMethod(@PathVariable String cropname, @PathVariable String id)  {
+	public ResponseEntity deleteMethod(@PathVariable String cropname, @PathVariable String id) {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-
 		this.requestIdValidator.validate(id, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		this.termDeletableValidator.validate(new TermRequest(id, "Method", CvId.METHODS.getId()), bindingResult);
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}

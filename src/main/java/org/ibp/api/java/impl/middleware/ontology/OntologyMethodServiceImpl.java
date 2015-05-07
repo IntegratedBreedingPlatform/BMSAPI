@@ -1,32 +1,46 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.OntologyMethod;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.MethodRequest;
 import org.ibp.api.domain.ontology.MethodResponse;
 import org.ibp.api.domain.ontology.MethodSummary;
+import org.ibp.api.domain.ontology.TermRequest;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
+import org.ibp.api.java.impl.middleware.ontology.validator.MethodValidator;
+import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
 import org.ibp.api.java.ontology.OntologyMethodService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 @Service
 public class OntologyMethodServiceImpl implements OntologyMethodService{
 
 	@Autowired
 	private OntologyMethodDataManager ontologyMethodDataManager;
+	
 	@Autowired
 	private OntologyBasicDataManager ontologyBasicDataManager;
+	
+	@Autowired
+	private MethodValidator methodValidator;
+	
+	@Autowired
+	protected TermDeletableValidator termDeletableValidator;
 
   	@Override
 	public List<MethodSummary> getAllMethods() {
@@ -73,26 +87,38 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	}
 
 	@Override
-	public GenericResponse addMethod(MethodRequest request) {
+	public GenericResponse addMethod(MethodSummary method) {
+		method.setId(null);
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
+		this.methodValidator.validate(method, errors);
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		
 		try {
-			OntologyMethod method = new OntologyMethod();
-			method.setName(request.getName());
-			method.setDefinition(request.getDescription());
-			this.ontologyMethodDataManager.addMethod(method);
-			return new GenericResponse(method.getId());
+			OntologyMethod middlewareMethod = new OntologyMethod();
+			middlewareMethod.setName(method.getName());
+			middlewareMethod.setDefinition(method.getDescription());
+			this.ontologyMethodDataManager.addMethod(middlewareMethod);
+			return new GenericResponse(middlewareMethod.getId());
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
 	}
 
 	@Override
-	public void updateMethod(Integer id, MethodRequest request) {
+	public void updateMethod(Integer id, MethodSummary method) {
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
+		this.methodValidator.validate(method, errors);
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
 		try {
-			OntologyMethod method = new OntologyMethod();
-			method.setId(CommonUtil.tryParseSafe(request.getId()));
-			method.setName(request.getName());
-			method.setDefinition(request.getDescription());
-			this.ontologyMethodDataManager.updateMethod(method);
+			OntologyMethod middlewareMethod = new OntologyMethod();
+			middlewareMethod.setId(CommonUtil.tryParseSafe(method.getId()));
+			middlewareMethod.setName(method.getName());
+			middlewareMethod.setDefinition(method.getDescription());
+			this.ontologyMethodDataManager.updateMethod(middlewareMethod);
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
@@ -100,7 +126,13 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 
 	@Override
 	public void deleteMethod(Integer id) {
-	  	try {
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
+		this.termDeletableValidator.validate(new TermRequest(String.valueOf(id), "Method", CvId.METHODS.getId()), errors);
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		try {
 			this.ontologyMethodDataManager.deleteMethod(id);
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
