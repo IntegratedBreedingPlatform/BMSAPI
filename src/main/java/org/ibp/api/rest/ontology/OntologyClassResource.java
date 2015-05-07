@@ -3,7 +3,6 @@ package org.ibp.api.rest.ontology;
 import java.util.List;
 
 import org.ibp.api.java.ontology.OntologyModelService;
-import org.ibp.api.rest.AbstractResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +18,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 @Api(value = "Ontology Class Service")
 @Controller
 @RequestMapping("/ontology")
-public class OntologyClassResource extends AbstractResource {
+public class OntologyClassResource {
 
 	@Autowired
 	private OntologyModelService ontologyModelService;

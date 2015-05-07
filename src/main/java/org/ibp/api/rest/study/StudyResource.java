@@ -5,7 +5,6 @@ import java.util.List;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.java.study.StudyService;
-import org.ibp.api.rest.AbstractResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +21,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 @Api(value = "Study Services")
 @Controller
 @RequestMapping("/study")
-public class StudyResource extends AbstractResource {
+public class StudyResource {
 
 	@Autowired
 	private StudyService studyService;

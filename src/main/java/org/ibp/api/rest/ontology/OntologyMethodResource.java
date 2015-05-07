@@ -6,7 +6,6 @@ import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.MethodResponse;
 import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.java.ontology.OntologyMethodService;
-import org.ibp.api.rest.AbstractResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +22,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 @Api(value = "Ontology Method Service")
 @Controller
 @RequestMapping("/ontology")
-public class OntologyMethodResource extends AbstractResource {
+public class OntologyMethodResource {
 
 	@Autowired
 	private OntologyMethodService ontologyMethodService;
