@@ -126,6 +126,12 @@ public class OntologyMethodServiceImpl implements OntologyMethodService {
 	public void updateMethod(String id, MethodSummary method) {
 		validateId(id);
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
+		TermRequest term = new TermRequest(id, "method", CvId.METHODS.getId());
+		this.termValidator.validate(term, errors);
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		method.setId(id);
 		this.methodValidator.validate(method, errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());

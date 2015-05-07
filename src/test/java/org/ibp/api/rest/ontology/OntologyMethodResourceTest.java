@@ -11,6 +11,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.MethodSummary;
+import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.builders.MethodBuilder;
 import org.junit.After;
 import org.junit.Assert;
@@ -205,7 +206,12 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 		 */
 		ArgumentCaptor<Method> captor = ArgumentCaptor.forClass(Method.class);
 
+		Term term = new Term(10, "method name", "methodDescription");
+		term.setVocabularyId(1020);
+
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
+		Mockito.doReturn(term).when(this.ontologyBasicDataManager).getTermById(method.getId());
+		Mockito.doReturn(new Term(11, "method name", "methodDescription", CvId.METHODS.getId(),false)).when(this.ontologyBasicDataManager).getTermByNameAndCvId("method name", CvId.METHODS.getId());
 		Mockito.doNothing().when(this.ontologyMethodDataManager).updateMethod(org.mockito.Matchers.any(Method.class));
 		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId());
 
