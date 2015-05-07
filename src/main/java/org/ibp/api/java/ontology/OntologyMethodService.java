@@ -6,45 +6,44 @@ import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.MethodResponse;
 import org.ibp.api.domain.ontology.MethodSummary;
 
-//TODO change all ID parameters to Strings.
 public interface OntologyMethodService {
 
 	/**
-	 * Get all methods.
+	 * Get all Methods
 	 *
-	 * @return list of methods
+	 * @return List of all Methods
 	 */
 	List<MethodSummary> getAllMethods();
 
 	/**
-	 * get method by method id
+	 * Get Method by id
 	 *
-	 * @param id the method id
-	 * @return method
+	 * @param id of the Method to retrieve
+	 * @return Method details
 	 */
-	MethodResponse getMethod(Integer id);
+	MethodResponse getMethod(String id);
 
 	/**
-	 * add method using given input data
+	 * Add new Method
 	 *
-	 * @param method method to add
-	 * @return newly created method id
+	 * @param method Method to add
+	 * @return Newly created method id
 	 */
 	GenericResponse addMethod(MethodSummary method);
 
 	/**
-	 * update method data using given method id
+	 * Update Method
 	 *
-	 * @param id method to be updated
-	 * @param request method data to be updated
+	 * @param id of the Method to be updated
+	 * @param Method data to be updated
 	 */
-	void updateMethod(Integer id, MethodSummary method);
+	void updateMethod(String id, MethodSummary method);
 
 	/**
-	 * delete method using given id
+	 * Delete Method
 	 *
-	 * @param id method to be deleted
+	 * @param id of the Method to be deleted
 	 */
-	void deleteMethod(Integer id);
+	void deleteMethod(String id);
 
 }

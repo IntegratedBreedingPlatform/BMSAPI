@@ -1,22 +1,16 @@
 package org.ibp.api.rest.ontology;
 
-import java.util.HashMap;
 import java.util.List;
 
-import org.generationcp.middleware.domain.oms.CvId;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.MethodResponse;
 import org.ibp.api.domain.ontology.MethodSummary;
-import org.ibp.api.domain.ontology.TermRequest;
-import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.ontology.OntologyMethodService;
 import org.ibp.api.rest.AbstractResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,18 +46,7 @@ public class OntologyMethodResource extends AbstractResource {
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<MethodResponse> getMethodById(@PathVariable String cropname, @PathVariable String id)  {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-		this.requestIdValidator.validate(id, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		TermRequest request = new TermRequest(id, "method", CvId.METHODS.getId());
-		this.termValidator.validate(request, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-
-		return new ResponseEntity<>(this.ontologyMethodService.getMethod(Integer.valueOf(id)), HttpStatus.OK);
+		return new ResponseEntity<>(this.ontologyMethodService.getMethod(id), HttpStatus.OK);
 	}
 
 	/**
@@ -86,13 +69,7 @@ public class OntologyMethodResource extends AbstractResource {
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateMethod(@PathVariable String cropname, @PathVariable String id, @RequestBody MethodSummary method) {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-		this.requestIdValidator.validate(id, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		method.setId(id);
-		this.ontologyMethodService.updateMethod(Integer.valueOf(method.getId()), method);
+		this.ontologyMethodService.updateMethod(id, method);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
@@ -105,12 +82,7 @@ public class OntologyMethodResource extends AbstractResource {
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteMethod(@PathVariable String cropname, @PathVariable String id) {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-		this.requestIdValidator.validate(id, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		this.ontologyMethodService.deleteMethod(Integer.valueOf(id));
+		this.ontologyMethodService.deleteMethod(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }

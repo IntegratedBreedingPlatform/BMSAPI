@@ -19,7 +19,9 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.ibp.api.java.impl.middleware.ontology.validator.MethodValidator;
+import org.ibp.api.java.impl.middleware.ontology.validator.MiddlewareIdFormatValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
+import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.ontology.OntologyMethodService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 @Service
-public class OntologyMethodServiceImpl implements OntologyMethodService{
+public class OntologyMethodServiceImpl implements OntologyMethodService {
 
 	@Autowired
 	private OntologyMethodDataManager ontologyMethodDataManager;
@@ -41,6 +43,12 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	
 	@Autowired
 	protected TermDeletableValidator termDeletableValidator;
+	
+	@Autowired
+	protected MiddlewareIdFormatValidator idFormatValidator;
+	
+	@Autowired
+	protected TermValidator termValidator;
 
   	@Override
 	public List<MethodSummary> getAllMethods() {
@@ -61,14 +69,22 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	}
 
 	@Override
-	public MethodResponse getMethod(Integer id) {
+	public MethodResponse getMethod(String id) {
+		validateId(id);
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
+		TermRequest term = new TermRequest(id, "method", CvId.METHODS.getId());
+		this.termValidator.validate(term, errors);
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		
 		try {
-			Method method = this.ontologyMethodDataManager.getMethod(id);
+			Method method = this.ontologyMethodDataManager.getMethod(Integer.valueOf(id));
 			if (method == null) {
 			  	return null;
 			}
 			boolean deletable = true;
-			if (this.ontologyBasicDataManager.isTermReferred(id)) {
+			if (this.ontologyBasicDataManager.isTermReferred(Integer.valueOf(id))) {
 			  	deletable = false;
 			}
 			ModelMapper mapper = OntologyMapper.getInstance();
@@ -107,12 +123,14 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	}
 
 	@Override
-	public void updateMethod(Integer id, MethodSummary method) {
+	public void updateMethod(String id, MethodSummary method) {
+		validateId(id);
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
 		this.methodValidator.validate(method, errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
+		method.setId(id);
 		try {
 			Method middlewareMethod = new Method();
 			middlewareMethod.setId(CommonUtil.tryParseSafe(method.getId()));
@@ -125,7 +143,8 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	}
 
 	@Override
-	public void deleteMethod(Integer id) {
+	public void deleteMethod(String id) {
+		validateId(id);
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
 		this.termDeletableValidator.validate(new TermRequest(String.valueOf(id), "Method", CvId.METHODS.getId()), errors);
 		if (errors.hasErrors()) {
@@ -133,9 +152,17 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 		}
 
 		try {
-			this.ontologyMethodDataManager.deleteMethod(id);
+			this.ontologyMethodDataManager.deleteMethod(Integer.valueOf(id));
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
+		}
+	}
+	
+	private void validateId(String id) {
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
+		this.idFormatValidator.validate(id, errors);
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 }
