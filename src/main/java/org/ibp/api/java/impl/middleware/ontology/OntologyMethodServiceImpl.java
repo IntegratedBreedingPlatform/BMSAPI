@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.OntologyMethod;
+import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
@@ -45,12 +45,12 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
   	@Override
 	public List<MethodSummary> getAllMethods() {
 		try {
-			List<OntologyMethod> methodList = this.ontologyMethodDataManager.getAllMethods();
+			List<Method> methodList = this.ontologyMethodDataManager.getAllMethods();
 			List<MethodSummary> methods = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
 
-			for (OntologyMethod method : methodList) {
+			for (Method method : methodList) {
 			  	MethodSummary methodSummary = mapper.map(method, MethodSummary.class);
 			  	methods.add(methodSummary);
 			}
@@ -63,7 +63,7 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 	@Override
 	public MethodResponse getMethod(Integer id) {
 		try {
-			OntologyMethod method = this.ontologyMethodDataManager.getMethod(id);
+			Method method = this.ontologyMethodDataManager.getMethod(id);
 			if (method == null) {
 			  	return null;
 			}
@@ -96,7 +96,7 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 		}
 		
 		try {
-			OntologyMethod middlewareMethod = new OntologyMethod();
+			Method middlewareMethod = new Method();
 			middlewareMethod.setName(method.getName());
 			middlewareMethod.setDefinition(method.getDescription());
 			this.ontologyMethodDataManager.addMethod(middlewareMethod);
@@ -114,7 +114,7 @@ public class OntologyMethodServiceImpl implements OntologyMethodService{
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		try {
-			OntologyMethod middlewareMethod = new OntologyMethod();
+			Method middlewareMethod = new Method();
 			middlewareMethod.setId(CommonUtil.tryParseSafe(method.getId()));
 			middlewareMethod.setName(method.getName());
 			middlewareMethod.setDefinition(method.getDescription());

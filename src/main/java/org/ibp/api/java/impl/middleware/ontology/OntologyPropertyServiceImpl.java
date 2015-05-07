@@ -1,6 +1,6 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
-import org.generationcp.middleware.domain.oms.OntologyProperty;
+import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
@@ -29,12 +29,12 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
   	@Override
 	public List<PropertySummary> getAllProperties() {
 		try {
-			List<OntologyProperty> propertyList = this.ontologyPropertyDataManager.getAllProperties();
+			List<Property> propertyList = this.ontologyPropertyDataManager.getAllProperties();
 			List<PropertySummary> properties = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
 
-			for (OntologyProperty property : propertyList) {
+			for (Property property : propertyList) {
 			  	PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
 			  	properties.add(propertyDTO);
 			}
@@ -47,7 +47,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	@Override
 	public PropertyResponse getProperty(Integer id) {
 		try {
-			OntologyProperty property = this.ontologyPropertyDataManager.getProperty(id);
+			Property property = this.ontologyPropertyDataManager.getProperty(id);
 			if (property == null) {
 			  	return null;
 			}
@@ -76,7 +76,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	@Override
 	public GenericResponse addProperty(PropertyRequest request) {
 		try {
-			OntologyProperty property = new OntologyProperty();
+			Property property = new Property();
 			property.setName(request.getName());
 			property.setDefinition(request.getDescription());
 			property.setCropOntologyId(request.getCropOntologyId());
@@ -96,12 +96,12 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	@Override
 	public List<PropertySummary> getAllPropertiesByClass(String propertyClass) {
 		try {
-			List<OntologyProperty> propertyList = this.ontologyPropertyDataManager.getAllPropertiesWithClass(propertyClass);
+			List<Property> propertyList = this.ontologyPropertyDataManager.getAllPropertiesWithClass(propertyClass);
 			List<PropertySummary> properties = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
 
-			for (OntologyProperty property : propertyList) {
+			for (Property property : propertyList) {
 			  	PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
 			  	properties.add(propertyDTO);
 			}
@@ -128,7 +128,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	@Override
 	public void updateProperty(Integer id, PropertyRequest request) {
 		try {
-			OntologyProperty property = new OntologyProperty();
+			Property property = new Property();
 			property.setId(id);
 			property.setName(request.getName());
 			property.setDefinition(request.getDescription());

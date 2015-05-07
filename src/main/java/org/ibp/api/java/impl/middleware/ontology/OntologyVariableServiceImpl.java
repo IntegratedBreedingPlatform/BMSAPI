@@ -1,10 +1,10 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import com.google.common.base.Strings;
-import org.generationcp.middleware.domain.oms.OntologyVariable;
 import org.generationcp.middleware.domain.oms.OntologyVariableInfo;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.VariableType;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
@@ -54,7 +54,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
     @Override
     public VariableResponse getVariableById(String programId, Integer variableId) {
         try {
-			OntologyVariable ontologyVariable = this.ontologyVariableDataManager.getVariable(programId, variableId);
+			Variable ontologyVariable = this.ontologyVariableDataManager.getVariable(programId, variableId);
 
 			if (ontologyVariable == null) {
 			    return null;

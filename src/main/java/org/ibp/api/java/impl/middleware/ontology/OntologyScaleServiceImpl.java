@@ -1,8 +1,8 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import org.generationcp.middleware.domain.oms.DataType;
-import org.generationcp.middleware.domain.oms.OntologyScale;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
@@ -32,12 +32,12 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 	@Override
 	public List<ScaleSummary> getAllScales()  {
 		try {
-			List<OntologyScale> scales = this.ontologyScaleDataManager.getAllScales();
+			List<Scale> scales = this.ontologyScaleDataManager.getAllScales();
 			List<ScaleSummary> scaleSummaries = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
 
-			for (OntologyScale scale : scales) {
+			for (Scale scale : scales) {
 				ScaleSummary scaleSummary = mapper.map(scale, ScaleSummary.class);
 				scaleSummaries.add(scaleSummary);
 			}
@@ -50,7 +50,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 	@Override
 	public ScaleResponse getScaleById(Integer id) {
 		try {
-			OntologyScale scale = this.ontologyScaleDataManager.getScaleById(id);
+			Scale scale = this.ontologyScaleDataManager.getScaleById(id);
 			if (scale == null) {
 				return null;
 			}
@@ -76,7 +76,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 	@Override
 	public GenericResponse addScale(ScaleRequest request) {
 		try {
-			OntologyScale scale = new OntologyScale();
+			Scale scale = new Scale();
 			scale.setName(request.getName().trim());
 			scale.setDefinition(request.getDescription().trim());
 
@@ -103,7 +103,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 	@Override
 	public void updateScale(ScaleRequest request) {
 		try {
-			OntologyScale scale = new OntologyScale(new Term(CommonUtil.tryParseSafe(request.getId()), request.getName().trim(), request.getDescription().trim()));
+			Scale scale = new Scale(new Term(CommonUtil.tryParseSafe(request.getId()), request.getName().trim(), request.getDescription().trim()));
 
 			Integer dataTypeId = CommonUtil.tryParseSafe(request.getDataTypeId());
 

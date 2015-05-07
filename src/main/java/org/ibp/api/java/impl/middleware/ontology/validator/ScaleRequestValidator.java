@@ -3,7 +3,7 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
-import org.generationcp.middleware.domain.oms.OntologyScale;
+import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.ontology.ScaleRequest;
 import org.ibp.api.domain.ontology.ValidValues;
@@ -118,7 +118,7 @@ org.springframework.validation.Validator {
 		}
 
 		try {
-			OntologyScale oldScale = this.ontologyScaleDataManager.getScaleById(CommonUtil.tryParseSafe(request.getId()));
+			Scale oldScale = this.ontologyScaleDataManager.getScaleById(CommonUtil.tryParseSafe(request.getId()));
 
 			// that method should exist with requestId
 			if (Objects.equals(oldScale, null)) {

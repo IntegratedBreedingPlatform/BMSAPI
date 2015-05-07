@@ -2,8 +2,8 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.OntologyProperty;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
@@ -125,7 +125,7 @@ public class PropertyRequestValidatorTest {
 		Integer requestId = 10;
 
 		Term dbTerm = new Term(requestId, this.propertyName, this.description);
-		OntologyProperty toReturn = new OntologyProperty(dbTerm);
+		Property toReturn = new Property(dbTerm);
 
 		PropertyRequest request = new PropertyRequest();
 		request.setId(String.valueOf(requestId));

@@ -1,7 +1,7 @@
 package org.ibp.builders;
 
-import org.generationcp.middleware.domain.oms.OntologyMethod;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.ontology.Method;
 
 public class MethodBuilder {
 
@@ -11,10 +11,10 @@ public class MethodBuilder {
 		this.term = new Term();
 	}
 
-	public OntologyMethod build(int id, String name, String description) {
+	public Method build(int id, String name, String description) {
 		this.term.setId(id);
 		this.term.setName(name);
 		this.term.setDefinition(description);
-		return new OntologyMethod(this.term);
+		return new Method(this.term);
 	}
 }

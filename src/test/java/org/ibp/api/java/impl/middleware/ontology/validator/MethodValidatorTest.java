@@ -4,8 +4,8 @@ import java.util.HashMap;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.OntologyMethod;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
@@ -105,7 +105,7 @@ public class MethodValidatorTest {
 		request.setName(this.methodName);
 		request.setDescription(this.description);
 
-		OntologyMethod method = new MethodBuilder().build(1, "m1", "d1");
+		Method method = new MethodBuilder().build(1, "m1", "d1");
 
 		Mockito.doReturn(new Term(10, this.methodName, this.description))
 		.when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.methodName, this.cvId);

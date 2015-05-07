@@ -1,6 +1,6 @@
 package org.ibp.builders;
 
-import org.generationcp.middleware.domain.oms.OntologyProperty;
+import org.generationcp.middleware.domain.ontology.Property;
 
 import java.util.List;
 
@@ -10,10 +10,10 @@ public class PropertyBuilder {
 
 	}
 
-	public OntologyProperty build(int id, String name, String description, String cropOntologyId,
+	public Property build(int id, String name, String description, String cropOntologyId,
 			List<String> classes) {
 
-		OntologyProperty property = new OntologyProperty();
+		Property property = new Property();
 		property.setId(id);
 		property.setName(name);
 		property.setDefinition(description);

@@ -2,8 +2,8 @@ package org.ibp.api.rest.ontology;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.OntologyMethod;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
@@ -80,7 +80,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllMethods() throws Exception {
 
-		List<OntologyMethod> methodList = new ArrayList<>();
+		List<Method> methodList = new ArrayList<>();
 		methodList.add(new MethodBuilder().build(1, "m1", "d1"));
 		methodList.add(new MethodBuilder().build(2, "m2", "d2"));
 		methodList.add(new MethodBuilder().build(3, "m3", "d3"));
@@ -108,7 +108,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 	@Test
 	public void getMethodById() throws Exception {
 
-		OntologyMethod method = new MethodBuilder().build(1, "m1", "d1");
+		Method method = new MethodBuilder().build(1, "m1", "d1");
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(new Term(1, method.getName(), method.getDefinition(), CvId.METHODS.getId(), false)).when(this.ontologyBasicDataManager).getTermById(1);
@@ -156,7 +156,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 		methodDTO.setName("methodName");
 		methodDTO.setDescription("methodDescription");
 
-		OntologyMethod method = new OntologyMethod();
+		Method method = new Method();
 		method.setName(methodDTO.getName());
 		method.setDefinition(methodDTO.getDescription());
 
@@ -167,12 +167,12 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 			@Override public Void answer(InvocationOnMock invocation) throws Throwable {
 				Object[] arguments = invocation.getArguments();
 				if (arguments != null && arguments.length > 0 && arguments[0] != null) {
-					OntologyMethod entity = (OntologyMethod) arguments[0];
+					Method entity = (Method) arguments[0];
 					entity.setId(1);
 				}
 				return null;
 			}
-		}).when(this.ontologyMethodDataManager).addMethod(org.mockito.Matchers.any(OntologyMethod.class));
+		}).when(this.ontologyMethodDataManager).addMethod(org.mockito.Matchers.any(Method.class));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/methods", cropName)
 				.contentType(this.contentType)
@@ -181,7 +181,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(1)))
 				.andDo(MockMvcResultHandlers.print());
 
-		Mockito.verify(this.ontologyMethodDataManager).addMethod(org.mockito.Matchers.any(OntologyMethod.class));
+		Mockito.verify(this.ontologyMethodDataManager).addMethod(org.mockito.Matchers.any(Method.class));
 	}
 
 	/**
@@ -196,17 +196,17 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 		methodDTO.setName("methodName");
 		methodDTO.setDescription("methodDescription");
 
-		OntologyMethod method = new OntologyMethod(new Term(10, methodDTO.getName(), methodDTO.getDescription()));
+		Method method = new Method(new Term(10, methodDTO.getName(), methodDTO.getDescription()));
 
 		/**
 		 * We Need equals method inside Method (Middleware) because it throws
 		 * hashcode matching error. So Added ArgumentCaptor that will implement
 		 * equals()
 		 */
-		ArgumentCaptor<OntologyMethod> captor = ArgumentCaptor.forClass(OntologyMethod.class);
+		ArgumentCaptor<Method> captor = ArgumentCaptor.forClass(Method.class);
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
-		Mockito.doNothing().when(this.ontologyMethodDataManager).updateMethod(org.mockito.Matchers.any(OntologyMethod.class));
+		Mockito.doNothing().when(this.ontologyMethodDataManager).updateMethod(org.mockito.Matchers.any(Method.class));
 		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId());
 
 		this.mockMvc.perform(MockMvcRequestBuilders
@@ -218,7 +218,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 
 		Mockito.verify(this.ontologyMethodDataManager).updateMethod(captor.capture());
 
-		OntologyMethod captured = captor.getValue();
+		Method captured = captor.getValue();
 
 		Assert.assertEquals(method.getName(), captured.getName());
 		Assert.assertEquals(method.getDefinition(), captured.getDefinition());
@@ -233,7 +233,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 	public void deleteMethod() throws Exception {
 
 		Term term = new Term(10, "name", "", CvId.METHODS.getId(), false);
-		OntologyMethod method = new OntologyMethod(term);
+		Method method = new Method(term);
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(term).when(this.ontologyBasicDataManager).getTermById(method.getId());

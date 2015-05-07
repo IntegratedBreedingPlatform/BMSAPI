@@ -1,7 +1,17 @@
 package org.ibp.api.rest.ontology;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
-import org.generationcp.middleware.domain.oms.*;
+import org.generationcp.middleware.domain.oms.DataType;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.VariableType;
+import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
+import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.OntologyVariableInfo;
+import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.domain.ontology.Method;
+import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
@@ -149,7 +159,7 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
   	@Test
   	public void getVariableById() throws Exception{
 		Term term = new Term(1, this.variableName, this.variableDescription);
-		OntologyVariable ontologyVariable = new OntologyVariable(term);
+		Variable ontologyVariable = new Variable(term);
 
 	  	ontologyVariable.setProperty(new PropertyBuilder().build(10, this.propertyName, this.propertyDescription, "CO:000001", classes));
 	  	ontologyVariable.setMethod(new MethodBuilder().build(11, this.methodName, this.methodDescription));
@@ -257,10 +267,10 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 		Term scaleTerm = new Term(12, this.scaleName, this.scaleDescription, CvId.SCALES.getId(), null);
 		Term variableTerm = new Term(1, this.variableName, this.variableDescription, CvId.VARIABLES.getId(), null);
 
-		OntologyScale scale = new ScaleBuilder().build(scaleTerm.getId(), scaleTerm.getName(), scaleTerm.getDefinition(), DataType.NUMERIC_VARIABLE, "10", "20", null);
-		OntologyVariable variable = new OntologyVariable(variableTerm);
-		variable.setMethod(new OntologyMethod(methodTerm));
-		variable.setProperty(new OntologyProperty(propertyTerm));
+		Scale scale = new ScaleBuilder().build(scaleTerm.getId(), scaleTerm.getName(), scaleTerm.getDefinition(), DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Variable variable = new Variable(variableTerm);
+		variable.setMethod(new Method(methodTerm));
+		variable.setProperty(new Property(propertyTerm));
 		variable.setScale(scale);
 
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
@@ -297,7 +307,7 @@ public class OntologyVariableResourceTest extends ApiUnitTestBase {
 	public void deleteVariable() throws Exception{
 
 		Term term = new Term(10, variableName, variableDescription, CvId.VARIABLES.getId(), false);
-		OntologyVariable ontologyVariable = new OntologyVariable(term);
+		Variable ontologyVariable = new Variable(term);
 
 		ontologyVariable.setProperty(new PropertyBuilder().build(10, this.propertyName, this.propertyDescription, "CO:000001", classes));
 		ontologyVariable.setMethod(new MethodBuilder().build(11, this.methodName, this.methodDescription));

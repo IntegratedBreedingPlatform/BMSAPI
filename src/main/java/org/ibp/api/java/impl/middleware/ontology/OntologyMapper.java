@@ -1,6 +1,10 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
-import org.generationcp.middleware.domain.oms.*;
+import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
+import org.generationcp.middleware.domain.ontology.Method;
+import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.ibp.api.domain.ontology.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
@@ -53,7 +57,7 @@ public class OntologyMapper {
 	 */
 	private static void addMethodMappers(ModelMapper mapper) {
 
-		mapper.addMappings(new PropertyMap<OntologyMethod, MethodSummary>() {
+		mapper.addMappings(new PropertyMap<Method, MethodSummary>() {
 			@Override
 			protected void configure() {
 				this.map().setId(String.valueOf(this.source.getId()));
@@ -64,7 +68,7 @@ public class OntologyMapper {
 			}
 		});
 
-		mapper.addMappings(new PropertyMap<OntologyMethod, MethodResponse>() {
+		mapper.addMappings(new PropertyMap<Method, MethodResponse>() {
 			@Override
 			protected void configure() {
 				this.map().setId(String.valueOf(this.source.getId()));
@@ -81,7 +85,7 @@ public class OntologyMapper {
 	 */
 	public static void addPropertyMappers(ModelMapper mapper) {
 
-		mapper.addMappings(new PropertyMap<OntologyProperty, PropertySummary>() {
+		mapper.addMappings(new PropertyMap<Property, PropertySummary>() {
 			@Override
 			protected void configure() {
 				this.map().setId(String.valueOf(this.source.getId()));
@@ -94,7 +98,7 @@ public class OntologyMapper {
 			}
 		});
 
-		mapper.addMappings(new PropertyMap<OntologyProperty, PropertyResponse>() {
+		mapper.addMappings(new PropertyMap<Property, PropertyResponse>() {
 			@Override
 			protected void configure() {
 				this.map().setId(String.valueOf(this.source.getId()));
@@ -113,7 +117,7 @@ public class OntologyMapper {
 	 */
 	public static void addScaleMappers(ModelMapper mapper) {
 
-		mapper.addMappings(new PropertyMap<OntologyScale, ScaleSummary>() {
+		mapper.addMappings(new PropertyMap<Scale, ScaleSummary>() {
 			@Override
 			protected void configure() {
 				this.map().setId(String.valueOf(this.source.getId()));
@@ -127,7 +131,7 @@ public class OntologyMapper {
 			}
 		});
 
-		mapper.addMappings(new PropertyMap<OntologyScale, ScaleResponse>() {
+		mapper.addMappings(new PropertyMap<Scale, ScaleResponse>() {
 			@Override
 			protected void configure() {
 				this.map().setId(String.valueOf(this.source.getId()));
@@ -163,7 +167,7 @@ public class OntologyMapper {
 			}
 		});
 
-		mapper.addMappings(new PropertyMap<OntologyVariable, VariableResponse>() {
+		mapper.addMappings(new PropertyMap<Variable, VariableResponse>() {
 			@Override
 			protected void configure() {
 				this.map().setName(this.source.getName());

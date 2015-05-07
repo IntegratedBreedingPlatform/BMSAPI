@@ -1,7 +1,13 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.domain.oms.*;
+import org.generationcp.middleware.domain.oms.DataType;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.VariableType;
+import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
+import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
@@ -84,7 +90,7 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
@@ -118,7 +124,7 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
@@ -153,7 +159,7 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
@@ -188,7 +194,7 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
@@ -223,7 +229,7 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
@@ -257,7 +263,7 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
@@ -290,7 +296,7 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
@@ -323,7 +329,7 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
@@ -356,7 +362,7 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
@@ -389,7 +395,7 @@ public class VariableRequestValidatorTest {
 		request.setScaleId("30");
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
 		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
@@ -431,7 +437,7 @@ public class VariableRequestValidatorTest {
 		request.setExpectedRange(expectedRange);
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
 
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
@@ -472,7 +478,7 @@ public class VariableRequestValidatorTest {
 		request.setExpectedRange(expectedRange);
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
@@ -520,7 +526,7 @@ public class VariableRequestValidatorTest {
 		request.setExpectedRange(expectedRange);
 		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
 
-		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
 
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
@@ -561,7 +567,7 @@ public class VariableRequestValidatorTest {
 		request.setExpectedRange(expectedRange);
 	  	request.setVariableTypeIds(new ArrayList<String>());
 
-		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
@@ -603,7 +609,7 @@ public class VariableRequestValidatorTest {
 		request.setExpectedRange(expectedRange);
 		request.setVariableTypeIds(Collections.singletonList("12"));
 
-		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
 
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
@@ -645,7 +651,7 @@ public class VariableRequestValidatorTest {
 		request.setExpectedRange(expectedRange);
 		request.setVariableTypeIds(Collections.singletonList("1"));
 
-		OntologyScale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
+		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
 
 		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
 		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());

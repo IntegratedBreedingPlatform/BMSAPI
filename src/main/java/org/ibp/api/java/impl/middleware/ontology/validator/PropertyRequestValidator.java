@@ -3,8 +3,8 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.OntologyProperty;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.ontology.PropertyRequest;
@@ -195,7 +195,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 
 		try {
 
-			OntologyProperty oldProperty = this.ontologyPropertyDataManager.getProperty(propertyId);
+			Property oldProperty = this.ontologyPropertyDataManager.getProperty(propertyId);
 
 			// that property should exist with requestId
 			if (Objects.equals(oldProperty, null)) {

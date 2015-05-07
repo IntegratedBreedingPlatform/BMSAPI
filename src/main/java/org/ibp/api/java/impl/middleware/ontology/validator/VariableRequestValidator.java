@@ -1,7 +1,12 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import com.google.common.base.Strings;
-import org.generationcp.middleware.domain.oms.*;
+import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.domain.oms.DataType;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.VariableType;
+import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.ontology.ExpectedRange;
 import org.ibp.api.domain.ontology.VariableRequest;
@@ -199,7 +204,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 
 		// 13. The min and max expected range values are only stored if the scales data type is numeric
 		try {
-			OntologyScale scale = this.ontologyScaleDataManager.getScaleById(CommonUtil.tryParseSafe(request.getScaleId()));
+			Scale scale = this.ontologyScaleDataManager.getScaleById(CommonUtil.tryParseSafe(request.getScaleId()));
 
 			boolean isNumericType = Objects.equals(scale.getDataType(), DataType.NUMERIC_VARIABLE);
 
@@ -282,7 +287,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 		try {
 
 			Integer requestId = CommonUtil.tryParseSafe(request.getId());
-			OntologyVariable oldVariable = this.ontologyVariableDataManager.getVariable(request.getProgramUuid(), requestId);
+			Variable oldVariable = this.ontologyVariableDataManager.getVariable(request.getProgramUuid(), requestId);
 
 			// that variable should exist with requestId
 			if (Objects.equals(oldVariable, null)) {
