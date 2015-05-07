@@ -13,17 +13,17 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
 
-public class RequestIdValidationTest {
+public class MiddlewareIdFormatValidatorTest {
 
 	@Mock
 	private OntologyBasicDataManager ontologyBasicDataManager;
 
-	private RequestIdValidator requestIdValidator;
+	private MiddlewareIdFormatValidator requestIdValidator;
 
 	@Before
 	public void reset() {
 		MockitoAnnotations.initMocks(this);
-		requestIdValidator = new RequestIdValidator();
+		requestIdValidator = new MiddlewareIdFormatValidator();
 		requestIdValidator.setOntologyBasicDataManager(ontologyBasicDataManager);
 	}
 
