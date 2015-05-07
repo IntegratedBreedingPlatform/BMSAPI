@@ -3,7 +3,7 @@ package org.ibp.api.rest.ontology;
 import java.util.List;
 
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.MethodResponse;
+import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.java.ontology.OntologyMethodService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +44,7 @@ public class OntologyMethodResource {
 	@ApiOperation(value = "Get method by id", notes = "Get method using method id")
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<MethodResponse> getMethodById(@PathVariable String cropname, @PathVariable String id)  {
+	public ResponseEntity<MethodDetails> getMethodById(@PathVariable String cropname, @PathVariable String id)  {
 		return new ResponseEntity<>(this.ontologyMethodService.getMethod(id), HttpStatus.OK);
 	}
 

@@ -68,7 +68,7 @@ public class OntologyMapper {
 			}
 		});
 
-		mapper.addMappings(new PropertyMap<Method, MethodResponse>() {
+		mapper.addMappings(new PropertyMap<Method, MethodDetails>() {
 			@Override
 			protected void configure() {
 				this.map().setId(String.valueOf(this.source.getId()));

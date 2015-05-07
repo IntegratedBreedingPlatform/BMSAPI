@@ -2,7 +2,7 @@ package org.ibp.api.domain.ontology;
 
 import java.util.List;
 
-public class MethodResponse extends MethodSummary implements EditableDeletableFields {
+public class MethodDetails extends MethodSummary implements EditableDeletableFields {
 
 	private List<String> editableFields;
 

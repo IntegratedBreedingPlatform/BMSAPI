@@ -12,7 +12,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.MethodResponse;
+import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.domain.ontology.TermRequest;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -69,7 +69,7 @@ public class OntologyMethodServiceImpl implements OntologyMethodService {
 	}
 
 	@Override
-	public MethodResponse getMethod(String id) {
+	public MethodDetails getMethod(String id) {
 		validateId(id);
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
 		TermRequest term = new TermRequest(id, "method", CvId.METHODS.getId());
@@ -88,15 +88,15 @@ public class OntologyMethodServiceImpl implements OntologyMethodService {
 			  	deletable = false;
 			}
 			ModelMapper mapper = OntologyMapper.getInstance();
-			MethodResponse response = mapper.map(method, MethodResponse.class);
+			MethodDetails methodDetails = mapper.map(method, MethodDetails.class);
 			String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
 			if (!deletable) {
-			  response.setEditableFields(new ArrayList<>(Collections.singletonList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
+			  methodDetails.setEditableFields(new ArrayList<>(Collections.singletonList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
 			} else {
-			  	response.setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
+			  	methodDetails.setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
 			}
-			response.setDeletable(deletable);
-			return response;
+			methodDetails.setDeletable(deletable);
+			return methodDetails;
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}

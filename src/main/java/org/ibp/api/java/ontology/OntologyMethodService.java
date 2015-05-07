@@ -3,7 +3,7 @@ package org.ibp.api.java.ontology;
 import java.util.List;
 
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.MethodResponse;
+import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.MethodSummary;
 
 public interface OntologyMethodService {
@@ -21,7 +21,7 @@ public interface OntologyMethodService {
 	 * @param id of the Method to retrieve
 	 * @return Method details
 	 */
-	MethodResponse getMethod(String id);
+	MethodDetails getMethod(String id);
 
 	/**
 	 * Add new Method
