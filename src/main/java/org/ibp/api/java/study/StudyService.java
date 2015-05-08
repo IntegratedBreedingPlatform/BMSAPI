@@ -16,4 +16,8 @@ public interface StudyService {
 	
 	List<Observation> getObservations(Integer studyId);
 
+	Observation getSingleObservation(Integer studyId, Integer obeservationId);
+
+	Observation updateObsevation(final Integer studyIdentifier, Observation observation);
+
 }

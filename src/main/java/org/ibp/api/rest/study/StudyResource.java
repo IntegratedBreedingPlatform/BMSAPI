@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,5 +44,26 @@ public class StudyResource {
 	public ResponseEntity<List<Observation>> getObservations(@PathVariable String cropname, @PathVariable Integer studyId) {
 		return new ResponseEntity<>(studyService.getObservations(studyId), HttpStatus.OK);
 	}
+	
+	
+	@ApiOperation(value = "Get a observations", notes = "Returns the requested observation in the study.")
+	@RequestMapping(value = "/{cropname}/{studyId}/observations/{observationId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Observation> getSingleObservation(@PathVariable String cropname, @PathVariable Integer studyId, @PathVariable Integer observationId) {
+		return new ResponseEntity<>(studyService.getSingleObservation(studyId, observationId), HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "Update an observation", notes = "Returns observations available in the study.")
+	@RequestMapping(value = "/{cropname}/{studyId}/observations/{observationId}", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity<Observation> updateObservation(@PathVariable String cropname, @PathVariable Integer studyId, @PathVariable Integer observationId,
+			@RequestBody Observation observation) {
+		if(observation.getUniqueIdentifier() != observationId) {
+			throw new IllegalArgumentException("The observation identifier must be the same in the object an the url");
+			//TODO: Give back some better error messages.
+		}
+		return new ResponseEntity<>(studyService.updateObsevation(studyId, observation), HttpStatus.OK);
+	}
+
 
 }

@@ -1,3 +1,4 @@
+
 package org.ibp.api.domain.study;
 
 /**
@@ -80,7 +81,6 @@ public class StudySummary {
 
 	@Override
 	public String toString() {
-		return "StudySummary [id=" + this.id + ", name=" + this.name + ", title=" + this.title
-				+ ", type=" + this.type + "]";
+		return "StudySummary [id=" + this.id + ", name=" + this.name + ", title=" + this.title + ", type=" + this.type + "]";
 	}
 }
