@@ -11,7 +11,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.MethodSummary;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.builders.MethodBuilder;
 import org.junit.After;
 import org.junit.Assert;

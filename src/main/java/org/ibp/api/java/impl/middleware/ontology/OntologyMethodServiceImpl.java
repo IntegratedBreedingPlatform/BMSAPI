@@ -136,7 +136,6 @@ public class OntologyMethodServiceImpl implements OntologyMethodService {
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
-		method.setId(id);
 		try {
 			Method middlewareMethod = new Method();
 			middlewareMethod.setId(CommonUtil.tryParseSafe(method.getId()));
