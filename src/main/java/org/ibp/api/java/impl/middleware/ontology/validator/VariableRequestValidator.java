@@ -41,12 +41,15 @@ import java.util.regex.Pattern;
  * 16. If provided, the expected range minimum must be less than or equal to the expected range maximum, and the expected range maximum must be greater than or equal to the expected range minimum
  * 17. If present, Variable type IDs must be an array of integer values (or an empty array)
  * 18. Variable type IDs must be an array of integer values that correspond to the IDs of variable types and contain at least one item
+ * 19. Name, property, method, scale, alias and expected range cannot be changed if the variable is already in use
+ * 20. Alias is no more than 32 characters
+ * 21. Alias must only contain alphanumeric characters, underscores and cannot start with a number
  */
 
 @Component
 public class VariableRequestValidator extends OntologyValidator implements Validator {
 
-	private static final String VARIABLE_NAME_SHOULD_HAVE_VALID_PATTERN = "variable.name.does.not.match.pattern";
+	private static final String VARIABLE_FIELD_SHOULD_HAVE_VALID_PATTERN = "variable.field.does.not.match.pattern";
 	private static final String VARIABLE_WITH_SAME_COMBINATION_EXISTS = "variable.method.property.scale.combination.already.exist";
 	private static final String VARIABLE_MIN_SHOULD_BE_IN_SCALE_RANGE = "variable.expected.min.should.not.be.smaller";
 	private static final String VARIABLE_MAX_SHOULD_BE_IN_SCALE_RANGE = "variable.expected.max.should.not.be.greater";
@@ -126,7 +129,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 		}
 
 		//4. Name must only contain alphanumeric characters, underscores and cannot start with a number
-		this.nameShouldHaveValidPattern("name", request.getName(), errors);
+		this.fieldShouldHaveValidPattern("name", request.getName(), "Name", errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
@@ -278,6 +281,21 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 		return errors.getErrorCount() == initialCount;
 	}
 
+	private void aliasValidationProcessor(VariableRequest request, Errors errors){
+
+		if(!isNullOrEmpty(request.getAlias().trim())){
+
+			// Trim alias
+			request.setAlias(request.getAlias().trim());
+
+			// 20. Alias is no more than 32 characters
+			this.fieldShouldNotOverflow("alias", request.getAlias(), NAME_TEXT_LIMIT, errors);
+
+			//21. Alias must only contain alphanumeric characters, underscores and cannot start with a number
+			this.fieldShouldHaveValidPattern("alias", request.getAlias(), "Alias", errors);
+		}
+	}
+
 	private void variableShouldBeEditable(VariableRequest request, Errors errors) {
 
 		if (request.getId() == null) {
@@ -298,6 +316,9 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 			if(oldVariable.getObservations() == null) {
 				oldVariable.setObservations(0);
 			}
+
+			// Alias validation
+			this.aliasValidationProcessor(request, errors);
 
 			boolean isEditable = oldVariable.getObservations() == 0;
 			if (isEditable) {
@@ -345,12 +366,12 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 		}
 	}
 
-	protected void nameShouldHaveValidPattern(String fieldName, String value, Errors errors) {
+	protected void fieldShouldHaveValidPattern(String fieldName, String value, String termName, Errors errors) {
 		Pattern regex = Pattern.compile("[$&+,./%')\\[}\\]{(*^!`~:;=?@#|]");
 		Matcher matcher = regex.matcher(value);
 
 		if (matcher.find() || Character.isDigit(value.charAt(0))) {
-			this.addCustomError(errors, fieldName, VARIABLE_NAME_SHOULD_HAVE_VALID_PATTERN, null);
+			this.addCustomError(errors, fieldName, VARIABLE_FIELD_SHOULD_HAVE_VALID_PATTERN, new Object[]{ termName });
 		}
 	}
 
