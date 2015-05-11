@@ -63,8 +63,6 @@ public class OntologyMapper {
 				this.map().setId(String.valueOf(this.source.getId()));
 				this.map().setName(this.source.getName());
 				this.map().setDescription(this.source.getDefinition());
-				this.map().setDateCreated(this.source.getDateCreated());
-				this.map().setDateLastModified(this.source.getDateLastModified());
 			}
 		});
 
@@ -93,8 +91,6 @@ public class OntologyMapper {
 				this.map().setDescription(this.source.getDefinition());
 				this.map().setCropOntologyId(this.source.getCropOntologyId());
 				this.map().setClasses(this.source.getClasses());
-				this.map().setDateCreated(this.source.getDateCreated());
-				this.map().setDateLastModified(this.source.getDateLastModified());
 			}
 		});
 
@@ -126,8 +122,6 @@ public class OntologyMapper {
 				this.map().setMinValue(this.source.getMinValue());
 				this.map().setMaxValue(this.source.getMaxValue());
 				this.map().setCategories(this.source.getCategories());
-				this.map().setDateCreated(this.source.getDateCreated());
-				this.map().setDateLastModified(this.source.getDateLastModified());
 			}
 		});
 
@@ -160,8 +154,6 @@ public class OntologyMapper {
 				this.map().setFavourite(this.source.getIsFavorite());
 				this.map().setAlias(this.source.getAlias());
 				this.map().setVariableTypes(this.source.getVariableTypes());
-				this.map().setDateCreated(this.source.getDateCreated());
-				this.map().setDateLastModified(this.source.getDateLastModified());
 				this.map().setExpectedMin(this.source.getMinValue());
 				this.map().setExpectedMax(this.source.getMaxValue());
 			}
