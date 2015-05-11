@@ -61,8 +61,8 @@ public class OntologyMapperTest {
 		Assert.assertEquals(String.valueOf(property.getId()), propertySummary.getId());
 		Assert.assertEquals(property.getName(), propertySummary.getName());
 		Assert.assertEquals(property.getDefinition(), propertySummary.getDescription());
-		Assert.assertEquals(property.getDateCreated(), ISO8601DateParser.parse(propertySummary.getMetadata().getDateCreated()));
-		Assert.assertEquals(property.getDateLastModified(), ISO8601DateParser.parse(propertySummary.getMetadata().getDateLastModified()));
+		Assert.assertEquals(property.getDateCreated(), ISO8601DateParser.parse(propertySummary.getDateCreated()));
+		Assert.assertEquals(property.getDateLastModified(), ISO8601DateParser.parse(propertySummary.getDateLastModified()));
 	}
 	
 	@Test
@@ -84,8 +84,8 @@ public class OntologyMapperTest {
 		Assert.assertEquals(String.valueOf(scale.getId()), scaleSummary.getId());
 		Assert.assertEquals(scale.getName(), scaleSummary.getName());
 		Assert.assertEquals(scale.getDefinition(), scaleSummary.getDescription());
-		Assert.assertEquals(scale.getDateCreated(), ISO8601DateParser.parse(scaleSummary.getMetadata().getDateCreated()));
-		Assert.assertEquals(scale.getDateLastModified(), ISO8601DateParser.parse(scaleSummary.getMetadata().getDateLastModified()));
+		Assert.assertEquals(scale.getDateCreated(), ISO8601DateParser.parse(scaleSummary.getDateCreated()));
+		Assert.assertEquals(scale.getDateLastModified(), ISO8601DateParser.parse(scaleSummary.getDateLastModified()));
 	}
 	
 	@Test
@@ -101,7 +101,7 @@ public class OntologyMapperTest {
 		Assert.assertEquals(String.valueOf(variable.getId()), variableSummary.getId());
 		Assert.assertEquals(variable.getName(), variableSummary.getName());
 		Assert.assertEquals(variable.getDescription(), variableSummary.getDescription());
-		Assert.assertEquals(variable.getDateCreated(), ISO8601DateParser.parse(variableSummary.getMetadata().getDateCreated()));
-		Assert.assertEquals(variable.getDateLastModified(), ISO8601DateParser.parse(variableSummary.getMetadata().getDateLastModified()));
+		Assert.assertEquals(variable.getDateCreated(), ISO8601DateParser.parse(variableSummary.getDateCreated()));
+		Assert.assertEquals(variable.getDateLastModified(), ISO8601DateParser.parse(variableSummary.getDateLastModified()));
 	}
 }

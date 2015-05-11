@@ -1,12 +1,27 @@
 package org.ibp.api.domain.ontology;
 
+import java.util.Date;
 import java.util.List;
 
-public class MethodDetails extends MethodSummary implements EditableDeletableFields {
+public class MethodDetails extends TermSummary implements EditableDeletableFields {
 
 	private List<String> editableFields;
 
 	private Boolean deletable;
+	
+	private final MetadataDetails metadata = new MetadataDetails();
+	
+	public MetadataDetails getMetadata() {
+		return metadata;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.metadata.setDateCreated(dateCreated);
+	}
+
+	public void setDateLastModified(Date dateLastModified) {
+		this.metadata.setDateLastModified(dateLastModified);
+	}
 
 	@Override
 	public List<String> getEditableFields() {
@@ -27,7 +42,7 @@ public class MethodDetails extends MethodSummary implements EditableDeletableFie
 	public void setDeletable(Boolean deletable) {
 		this.deletable = deletable;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "Method [id=" + this.getId()

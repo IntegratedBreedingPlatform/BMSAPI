@@ -1,9 +1,26 @@
+
 package org.ibp.api.domain.ontology;
 
-public class MethodSummary extends AuditTermSummary {
+import java.util.Date;
 
-    @Override
-    public String toString() {
-        return "MethodSummary{} " + super.toString();
-    }
+public class MethodSummary extends TermSummary {
+
+	private final MetadataSummary metadata = new MetadataSummary();
+
+	public MetadataSummary getMetadata() {
+		return metadata;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.metadata.setDateCreated(dateCreated);
+	}
+
+	public void setDateLastModified(Date dateLastModified) {
+		this.metadata.setDateLastModified(dateLastModified);
+	}
+
+	@Override
+	public String toString() {
+		return "MethodSummary{} " + super.toString();
+	}
 }

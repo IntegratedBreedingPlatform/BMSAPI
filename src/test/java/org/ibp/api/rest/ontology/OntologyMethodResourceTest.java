@@ -1,6 +1,7 @@
 package org.ibp.api.rest.ontology;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Method;
@@ -8,6 +9,7 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.util.ISO8601DateParser;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.MethodSummary;
@@ -29,9 +31,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import static org.mockito.Mockito.doAnswer;
+import static org.hamcrest.Matchers.*;
 
 public class OntologyMethodResourceTest extends ApiUnitTestBase {
 
@@ -80,10 +84,16 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllMethods() throws Exception {
 
+		Calendar dateCreated = Calendar.getInstance();
+		dateCreated.set(2015, 1, 1);
+		
+		Calendar dateLastModified = Calendar.getInstance();
+		dateLastModified.set(2015, 1, 2);
+			
 		List<Method> methodList = new ArrayList<>();
-		methodList.add(new MethodBuilder().build(1, "m1", "d1"));
-		methodList.add(new MethodBuilder().build(2, "m2", "d2"));
-		methodList.add(new MethodBuilder().build(3, "m3", "d3"));
+		methodList.add(new MethodBuilder().build(1, "m1", "d1", dateCreated.getTime(), dateLastModified.getTime()));
+		methodList.add(new MethodBuilder().build(2, "m2", "d2", dateCreated.getTime(), dateLastModified.getTime()));
+		methodList.add(new MethodBuilder().build(3, "m3", "d3", dateCreated.getTime(), dateLastModified.getTime()));
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(methodList).when(this.ontologyMethodDataManager).getAllMethods();
@@ -92,9 +102,11 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 				.contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$",IsCollectionWithSize.hasSize(methodList.size())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is("1")))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is(methodList.get(0).getName())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(methodList.get(0).getDefinition())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", is("1")))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", is(methodList.get(0).getName())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", is(methodList.get(0).getDefinition())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].metadata.dateCreated", is(ISO8601DateParser.toString(methodList.get(0).getDateCreated()))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].metadata.dateLastModified", is(ISO8601DateParser.toString(methodList.get(0).getDateLastModified()))))
 				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyMethodDataManager, Mockito.times(1)).getAllMethods();
@@ -107,8 +119,14 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 	 */
 	@Test
 	public void getMethodById() throws Exception {
+		
+		Calendar dateCreated = Calendar.getInstance();
+		dateCreated.set(2015, 1, 1);
+		
+		Calendar dateLastModified = Calendar.getInstance();
+		dateLastModified.set(2015, 1, 2);
 
-		Method method = new MethodBuilder().build(1, "m1", "d1");
+		Method method = new MethodBuilder().build(1, "m1", "d1", dateCreated.getTime(), dateLastModified.getTime());
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(new Term(1, method.getName(), method.getDefinition(), CvId.METHODS.getId(), false)).when(this.ontologyBasicDataManager).getTermById(1);
@@ -117,9 +135,14 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/methods/{id}", cropName, 1)
 				.contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is("1")))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(method.getName())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.is(method.getDefinition())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is("1")))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.name", is(method.getName())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.description", is(method.getDefinition())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.dateCreated", is(ISO8601DateParser.toString(method.getDateCreated()))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.dateLastModified", is(ISO8601DateParser.toString(method.getDateLastModified()))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.deletable", is(true)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.editableFields", contains("name", "description")))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.usage", nullValue()))
 				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyMethodDataManager, Mockito.times(1)).getMethod(1);
@@ -178,7 +201,7 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 				.contentType(this.contentType)
 				.content(this.convertObjectToByte(methodDTO)))
 				.andExpect(MockMvcResultMatchers.status().isCreated())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(1)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(1)))
 				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyMethodDataManager).addMethod(org.mockito.Matchers.any(Method.class));
