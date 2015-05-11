@@ -317,11 +317,10 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 				oldVariable.setObservations(0);
 			}
 
-			// Alias validation
-			this.aliasValidationProcessor(request, errors);
-
 			boolean isEditable = oldVariable.getObservations() == 0;
 			if (isEditable) {
+				// Alias validation
+				this.aliasValidationProcessor(request, errors);
 				return;
 			}
 
