@@ -9,10 +9,12 @@ import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.util.ISO8601DateParser;
+import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.domain.ontology.PropertySummary;
 import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.domain.ontology.VariableSummary;
+import org.ibp.builders.MethodBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.modelmapper.ModelMapper;
@@ -40,6 +42,23 @@ public class OntologyMapperTest {
 		Assert.assertEquals(method.getDefinition(), methodSummary.getDescription());
 		Assert.assertEquals(method.getDateCreated(), ISO8601DateParser.parse(methodSummary.getMetadata().getDateCreated()));
 		Assert.assertEquals(method.getDateLastModified(), ISO8601DateParser.parse(methodSummary.getMetadata().getDateLastModified()));
+	}
+	
+	@Test
+	public void methodDetailsMapperTest() throws ParseException {
+		Method method = new MethodBuilder().build(1, "Method name", "Method description.", new Date(), new Date());
+		ModelMapper mapper = OntologyMapper.getInstance();
+
+		MethodDetails methodDetails = mapper.map(method, MethodDetails.class);
+
+		Assert.assertEquals(String.valueOf(method.getId()), methodDetails.getId());
+		Assert.assertEquals(method.getName(), methodDetails.getName());
+		Assert.assertEquals(method.getDefinition(), methodDetails.getDescription());
+		Assert.assertEquals(method.getDateCreated(), ISO8601DateParser.parse(methodDetails.getMetadata().getDateCreated()));
+		Assert.assertEquals(method.getDateLastModified(), ISO8601DateParser.parse(methodDetails.getMetadata().getDateLastModified()));
+		Assert.assertTrue(methodDetails.getMetadata().getEditableFields().isEmpty());
+		Assert.assertFalse(methodDetails.getMetadata().isDeletable());
+		Assert.assertTrue(methodDetails.getMetadata().getUsage().getVariables().isEmpty());
 	}
 
 	@Test

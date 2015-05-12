@@ -76,8 +76,8 @@ public class OntologyMapper {
 				this.map().setDescription(this.source.getDefinition());
 				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
 				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
-				this.map().setEditableFields(new ArrayList<String>());
-				this.map().setDeletable(false);
+				this.map().getMetadata().setEditableFields(new ArrayList<String>());
+				this.map().getMetadata().setDeletable(false);
 			}
 		});
 	}

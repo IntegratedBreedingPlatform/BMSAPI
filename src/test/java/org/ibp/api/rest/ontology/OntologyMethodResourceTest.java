@@ -139,9 +139,9 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.description", is(method.getDefinition())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.dateCreated", is(ISO8601DateParser.toString(method.getDateCreated()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.dateLastModified", is(ISO8601DateParser.toString(method.getDateLastModified()))))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.deletable", is(true)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.editableFields", contains("name", "description")))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.usage", nullValue()))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.deletable", is(true)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.editableFields", contains("name", "description")))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.usage.variables", empty()))
 				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyMethodDataManager, Mockito.times(1)).getMethod(1);

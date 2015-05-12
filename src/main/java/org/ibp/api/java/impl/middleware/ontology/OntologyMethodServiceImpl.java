@@ -91,11 +91,11 @@ public class OntologyMethodServiceImpl implements OntologyMethodService {
 			MethodDetails methodDetails = mapper.map(method, MethodDetails.class);
 			String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
 			if (!deletable) {
-			  methodDetails.setEditableFields(new ArrayList<>(Collections.singletonList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
+			  methodDetails.getMetadata().setEditableFields(new ArrayList<>(Collections.singletonList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
 			} else {
-			  	methodDetails.setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
+			  	methodDetails.getMetadata().setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
 			}
-			methodDetails.setDeletable(deletable);
+			methodDetails.getMetadata().setDeletable(deletable);
 			return methodDetails;
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
