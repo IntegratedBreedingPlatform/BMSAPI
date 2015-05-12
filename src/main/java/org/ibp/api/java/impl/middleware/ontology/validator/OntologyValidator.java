@@ -13,7 +13,7 @@ import java.util.Objects;
 public abstract class OntologyValidator extends BaseValidator {
 
 	@Autowired
-	protected OntologyBasicDataManager ontologyBasicDataManager;
+	protected TermDataManager termDataManager;
 
 	@Autowired
 	protected OntologyScaleDataManager ontologyScaleDataManager;
@@ -33,7 +33,7 @@ public abstract class OntologyValidator extends BaseValidator {
 
 	protected void checkTermExist(String termName, String fieldName, String id, Integer cvId, Errors errors) {
 		try {
-			Term term = this.ontologyBasicDataManager.getTermById(Integer.valueOf(id));
+			Term term = this.termDataManager.getTermById(Integer.valueOf(id));
 			if (Objects.equals(term, null) || !Objects.equals(term.getVocabularyId(), cvId)) {
 				if (Strings.isNullOrEmpty(fieldName)) {
 					this.addCustomError(errors, ID_DOES_NOT_EXIST, new Object[] { termName, id });
@@ -50,7 +50,7 @@ public abstract class OntologyValidator extends BaseValidator {
 	protected void checkTermUniqueness(String termName, Integer id, String name, Integer cvId, Errors errors) {
 
 		try {
-			Term term = this.ontologyBasicDataManager.getTermByNameAndCvId(name, cvId);
+			Term term = this.termDataManager.getTermByNameAndCvId(name, cvId);
 			if (term == null) {
 				return;
 			}
@@ -93,8 +93,8 @@ public abstract class OntologyValidator extends BaseValidator {
 		}
 	}
 
-	public void setOntologyBasicDataManager(OntologyBasicDataManager ontologyBasicDataManager) {
-		this.ontologyBasicDataManager = ontologyBasicDataManager;
+	public void setTermDataManager(TermDataManager termDataManager) {
+		this.termDataManager = termDataManager;
 	}
 
 	public void setOntologyMethodDataManager(OntologyMethodDataManager ontologyMethodDataManager) {

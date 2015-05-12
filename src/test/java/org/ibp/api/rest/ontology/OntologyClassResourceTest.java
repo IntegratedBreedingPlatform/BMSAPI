@@ -1,9 +1,10 @@
 package org.ibp.api.rest.ontology;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
@@ -35,13 +36,13 @@ public class OntologyClassResourceTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public OntologyBasicDataManager ontologyBasicDataManager() {
-			return Mockito.mock(OntologyBasicDataManager.class);
+		public TermDataManager termDataManager() {
+			return Mockito.mock(TermDataManager.class);
 		}
 	}
 
 	@Autowired
-	private OntologyBasicDataManager ontologyBasicDataManager;
+	private TermDataManager termDataManager;
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -49,7 +50,7 @@ public class OntologyClassResourceTest extends ApiUnitTestBase {
 
 	@Before
 	public void reset() {
-		Mockito.reset(this.ontologyBasicDataManager);
+		Mockito.reset(this.termDataManager);
 	}
 
 	@After
@@ -69,7 +70,7 @@ public class OntologyClassResourceTest extends ApiUnitTestBase {
 		termList.add(term);
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
-		Mockito.doReturn(termList).when(this.ontologyBasicDataManager).getAllTraitClass();
+		Mockito.doReturn(termList).when(this.termDataManager).getTermByCvId(CvId.TRAIT_CLASS.getId());
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/classes", cropName)
 				.contentType(this.contentType))
@@ -78,6 +79,6 @@ public class OntologyClassResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]", Matchers.is(termList.get(0).getName())))
 				.andDo(MockMvcResultHandlers.print());
 
-		Mockito.verify(this.ontologyBasicDataManager, Mockito.times(1)).getAllTraitClass();
+		Mockito.verify(this.termDataManager, Mockito.times(1)).getTermByCvId(CvId.TRAIT_CLASS.getId());
 	}
 }

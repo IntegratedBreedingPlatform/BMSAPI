@@ -5,7 +5,7 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.domain.ontology.ScaleRequest;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.ibp.api.domain.ontology.VariableCategory;
@@ -26,7 +26,7 @@ import java.util.List;
 public class ScaleRequestValidatorTest {
 
 	@Mock
-	private OntologyBasicDataManager ontologyBasicDataManager;
+	private TermDataManager termDataManager;
 
 	private ScaleRequestValidator scaleRequestValidator;
 	
@@ -38,7 +38,7 @@ public class ScaleRequestValidatorTest {
 	public void reset() {
 		MockitoAnnotations .initMocks(this);
 		scaleRequestValidator = new ScaleRequestValidator();
-		scaleRequestValidator.setOntologyBasicDataManager(ontologyBasicDataManager);
+		scaleRequestValidator.setTermDataManager(termDataManager);
 	}
 
 	@After
@@ -54,7 +54,7 @@ public class ScaleRequestValidatorTest {
 	@Test
 	public void testWithNullNameRequest() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.ontologyBasicDataManager)
+		Mockito.doReturn(null).when(this.termDataManager)
 		.getTermByNameAndCvId(this.scaleName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
@@ -77,7 +77,7 @@ public class ScaleRequestValidatorTest {
 	public void testWithUniqueNonNullScaleName() throws MiddlewareException {
 
 		Mockito.doReturn(new Term(10, this.scaleName, this.description))
-		.when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.scaleName, this.cvId);
+		.when(this.termDataManager).getTermByNameAndCvId(this.scaleName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
@@ -200,7 +200,7 @@ public class ScaleRequestValidatorTest {
 	@Test
 	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.scaleName, this.cvId);
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.scaleName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
@@ -221,7 +221,7 @@ public class ScaleRequestValidatorTest {
 	@Test
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.scaleName, this.cvId);
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.scaleName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 

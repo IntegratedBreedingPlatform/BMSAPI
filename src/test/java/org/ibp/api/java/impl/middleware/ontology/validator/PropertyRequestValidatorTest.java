@@ -5,8 +5,8 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.domain.ontology.PropertyRequest;
 import org.junit.After;
 import org.junit.Assert;
@@ -29,7 +29,7 @@ public class PropertyRequestValidatorTest {
 	private OntologyPropertyDataManager ontologyPropertyDataManager;
 
 	@Mock
-	private OntologyBasicDataManager ontologyBasicDataManager;
+	private TermDataManager termDataManager;
 
 	Integer cvId = CvId.PROPERTIES.getId();
 	String propertyName = "MyProperty";
@@ -39,7 +39,7 @@ public class PropertyRequestValidatorTest {
 	public void beforeEachTest() {
 		MockitoAnnotations .initMocks(this);
 		propertyRequestValidator = new PropertyRequestValidator();
-		propertyRequestValidator.setOntologyBasicDataManager(ontologyBasicDataManager);
+		propertyRequestValidator.setTermDataManager(termDataManager);
 		propertyRequestValidator.setOntologyPropertyDataManager(ontologyPropertyDataManager);
 	}
 
@@ -56,7 +56,7 @@ public class PropertyRequestValidatorTest {
 	@Test
 	public void testWithNullNameRequest() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
@@ -78,7 +78,7 @@ public class PropertyRequestValidatorTest {
 	public void testWithUniqueNonNullPropertyName() throws MiddlewareException {
 
 		Mockito.doReturn(new Term(10, this.propertyName, this.description))
-				.when(this.ontologyBasicDataManager)
+				.when(this.termDataManager)
 				.getTermByNameAndCvId(this.propertyName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
@@ -100,7 +100,7 @@ public class PropertyRequestValidatorTest {
 	@Test
 	public void testWithClassNameNonEmptyUniqueValues() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
 
 		PropertyRequest request = new PropertyRequest();
 		request.setName(this.propertyName);
@@ -132,8 +132,8 @@ public class PropertyRequestValidatorTest {
 		request.setName(this.propertyName + "0");
 		request.setDescription(this.description);
 
-		Mockito.doReturn(dbTerm).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
-		Mockito.doReturn(true).when(this.ontologyBasicDataManager).isTermReferred(requestId);
+		Mockito.doReturn(dbTerm).when(this.termDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
+		Mockito.doReturn(true).when(this.termDataManager).isTermReferred(requestId);
 		Mockito.doReturn(toReturn).when(this.ontologyPropertyDataManager).getProperty(requestId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
@@ -150,7 +150,7 @@ public class PropertyRequestValidatorTest {
 	@Test
 	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
@@ -171,7 +171,7 @@ public class PropertyRequestValidatorTest {
 	@Test
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
@@ -192,7 +192,7 @@ public class PropertyRequestValidatorTest {
 	@Test
 	public void testWithValidRequest() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 

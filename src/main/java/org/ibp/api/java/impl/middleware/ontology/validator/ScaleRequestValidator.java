@@ -126,7 +126,7 @@ org.springframework.validation.Validator {
 				return;
 			}
 
-			boolean isEditable = !this.ontologyBasicDataManager.isTermReferred(CommonUtil.tryParseSafe(request.getId()));
+			boolean isEditable = !this.termDataManager.isTermReferred(CommonUtil.tryParseSafe(request.getId()));
 			if (isEditable) {
 				return;
 			}

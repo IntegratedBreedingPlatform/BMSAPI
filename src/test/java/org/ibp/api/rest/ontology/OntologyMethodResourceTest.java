@@ -6,7 +6,7 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.ISO8601DateParser;
@@ -49,8 +49,8 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public OntologyBasicDataManager ontologyBasicDataManager() {
-			return Mockito.mock(OntologyBasicDataManager.class);
+		public TermDataManager termDataManager() {
+			return Mockito.mock(TermDataManager.class);
 		}
 
 		@Bean
@@ -64,14 +64,14 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
-	private OntologyBasicDataManager ontologyBasicDataManager;
+	private TermDataManager termDataManager;
 
 	@Autowired
 	private OntologyMethodDataManager ontologyMethodDataManager;
 
 	@Before
 	public void reset() {
-		Mockito.reset(this.ontologyBasicDataManager);
+		Mockito.reset(this.termDataManager);
 		Mockito.reset(this.ontologyMethodDataManager);
 	}
 
@@ -84,10 +84,10 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 	public void listAllMethods() throws Exception {
 
 		Calendar dateCreated = Calendar.getInstance();
-		dateCreated.set(2015, 1, 1);
+		dateCreated.set(2015, Calendar.JANUARY, 1);
 		
 		Calendar dateLastModified = Calendar.getInstance();
-		dateLastModified.set(2015, 1, 2);
+		dateLastModified.set(2015, Calendar.JANUARY, 2);
 			
 		List<Method> methodList = new ArrayList<>();
 		methodList.add(new MethodBuilder().build(1, "m1", "d1", dateCreated.getTime(), dateLastModified.getTime()));
@@ -120,15 +120,15 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 	public void getMethodById() throws Exception {
 		
 		Calendar dateCreated = Calendar.getInstance();
-		dateCreated.set(2015, 1, 1);
+		dateCreated.set(2015, Calendar.JANUARY, 1);
 		
 		Calendar dateLastModified = Calendar.getInstance();
-		dateLastModified.set(2015, 1, 2);
+		dateLastModified.set(2015, Calendar.JANUARY, 2);
 
 		Method method = new MethodBuilder().build(1, "m1", "d1", dateCreated.getTime(), dateLastModified.getTime());
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
-		Mockito.doReturn(new Term(1, method.getName(), method.getDefinition(), CvId.METHODS.getId(), false)).when(this.ontologyBasicDataManager).getTermById(1);
+		Mockito.doReturn(new Term(1, method.getName(), method.getDefinition(), CvId.METHODS.getId(), false)).when(this.termDataManager).getTermById(1);
 		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(1);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/methods/{id}", cropName, 1)
@@ -156,14 +156,14 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 	public void getMethodById_Should_Respond_With_400_For_Invalid_Id() throws Exception {
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
-		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermById(1);
+		Mockito.doReturn(null).when(this.termDataManager).getTermById(1);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/methods/{id}", cropName, 1)
 				.contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest())
 				.andDo(MockMvcResultHandlers.print());
 
-		Mockito.verify(this.ontologyBasicDataManager, Mockito.times(1)).getTermById(1);
+		Mockito.verify(this.termDataManager, Mockito.times(1)).getTermById(1);
 	}
 
 	/**
@@ -231,8 +231,8 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 		term.setVocabularyId(1020);
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
-		Mockito.doReturn(term).when(this.ontologyBasicDataManager).getTermById(method.getId());
-		Mockito.doReturn(new Term(11, "method name", "methodDescription", CvId.METHODS.getId(),false)).when(this.ontologyBasicDataManager).getTermByNameAndCvId("method name", CvId.METHODS.getId());
+		Mockito.doReturn(term).when(this.termDataManager).getTermById(method.getId());
+		Mockito.doReturn(new Term(11, "method name", "methodDescription", CvId.METHODS.getId(),false)).when(this.termDataManager).getTermByNameAndCvId("method name", CvId.METHODS.getId());
 		Mockito.doNothing().when(this.ontologyMethodDataManager).updateMethod(org.mockito.Matchers.any(Method.class));
 		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId());
 
@@ -263,9 +263,9 @@ public class OntologyMethodResourceTest extends ApiUnitTestBase {
 		Method method = new Method(term);
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
-		Mockito.doReturn(term).when(this.ontologyBasicDataManager).getTermById(method.getId());
+		Mockito.doReturn(term).when(this.termDataManager).getTermById(method.getId());
 		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId());
-		Mockito.doReturn(false).when(this.ontologyBasicDataManager).isTermReferred(method.getId());
+		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(method.getId());
 		Mockito.doNothing().when(this.ontologyMethodDataManager).deleteMethod(method.getId());
 
 		this.mockMvc.perform(MockMvcRequestBuilders.delete("/ontology/{cropname}/methods/{id}",cropName, method.getId())

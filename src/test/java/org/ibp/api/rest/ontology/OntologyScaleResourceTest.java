@@ -6,8 +6,8 @@ import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
@@ -50,8 +50,8 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public OntologyBasicDataManager ontologyBasicDataManager() {
-			return Mockito.mock(OntologyBasicDataManager.class);
+		public TermDataManager termDataManager() {
+			return Mockito.mock(TermDataManager.class);
 		}
 
 		@Bean
@@ -65,7 +65,7 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
-	private OntologyBasicDataManager ontologyBasicDataManager;
+	private  TermDataManager termDataManager;
 
 	@Autowired
 	private OntologyScaleDataManager ontologyScaleDataManager;
@@ -76,7 +76,7 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 
 	@Before
 	public void reset() {
-		Mockito.reset(this.ontologyBasicDataManager);
+		Mockito.reset(this.termDataManager);
 		Mockito.reset(this.ontologyScaleDataManager);
 	}
 
@@ -128,7 +128,7 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(1);
-		Mockito.doReturn(new Term(1, this.scaleName, this.scaleDescription, CvId.SCALES.getId(), false)).when(this.ontologyBasicDataManager).getTermById(1);
+		Mockito.doReturn(new Term(1, this.scaleName, this.scaleDescription, CvId.SCALES.getId(), false)).when(this.termDataManager).getTermById(1);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/scales/{id}", cropName, String.valueOf(1)).contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
@@ -236,9 +236,9 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 		Scale scale = new Scale(term);
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
-		Mockito.doReturn(term).when(this.ontologyBasicDataManager).getTermById(scale.getId());
+		Mockito.doReturn(term).when(this.termDataManager).getTermById(scale.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(false).when(this.ontologyBasicDataManager).isTermReferred(scale.getId());
+		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(scale.getId());
 		Mockito.doNothing().when(this.ontologyScaleDataManager).deleteScale(scale.getId());
 
 		this.mockMvc.perform(MockMvcRequestBuilders.delete("/ontology/{cropname}/scales/{id}", cropName,scale.getId()).contentType(this.contentType))

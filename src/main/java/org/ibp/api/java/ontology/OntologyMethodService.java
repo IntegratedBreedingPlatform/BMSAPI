@@ -35,7 +35,7 @@ public interface OntologyMethodService {
 	 * Update Method
 	 *
 	 * @param id of the Method to be updated
-	 * @param Method data to be updated
+	 * @param method data to be updated
 	 */
 	void updateMethod(String id, MethodSummary method);
 

@@ -4,8 +4,8 @@ import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.*;
 import org.ibp.api.exception.ApiRuntimeException;
@@ -27,7 +27,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 	private OntologyScaleDataManager ontologyScaleDataManager;
 
 	@Autowired
-	private OntologyBasicDataManager ontologyBasicDataManager;
+	private TermDataManager termDataManager;
 
 	@Override
 	public List<ScaleSummary> getAllScales()  {
@@ -55,7 +55,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 				return null;
 			}
 			boolean deletable = true;
-			if (this.ontologyBasicDataManager.isTermReferred(id)) {
+			if (this.termDataManager.isTermReferred(id)) {
 				deletable = false;
 			}
 			ModelMapper mapper = OntologyMapper.getInstance();

@@ -7,8 +7,8 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.ibp.builders.MethodBuilder;
@@ -27,7 +27,7 @@ public class MethodValidatorTest {
 	private MethodValidator methodRequestValidator;
 
 	@Mock
-	private OntologyBasicDataManager ontologyBasicDataManager;
+	private TermDataManager termDataManager;
 
 	@Mock
 	private OntologyMethodDataManager ontologyMethodDataManager;
@@ -40,7 +40,7 @@ public class MethodValidatorTest {
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
 		methodRequestValidator = new MethodValidator();
-		methodRequestValidator.setOntologyBasicDataManager(ontologyBasicDataManager);
+		methodRequestValidator.setTermDataManager(termDataManager);
 		methodRequestValidator.setOntologyMethodDataManager(ontologyMethodDataManager);
 	}
 	
@@ -57,7 +57,7 @@ public class MethodValidatorTest {
 	@Test
 	public void testWithNullNameRequest() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.ontologyBasicDataManager)
+		Mockito.doReturn(null).when(this.termDataManager)
 		.getTermByNameAndCvId(this.methodName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
@@ -79,7 +79,7 @@ public class MethodValidatorTest {
 	@Test
 	public void testWithUniqueNonNullMethodName() throws MiddlewareException {
 
-		Mockito.doReturn(new Term(10, this.methodName, this.description)).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.methodName, this.cvId);
+		Mockito.doReturn(new Term(10, this.methodName, this.description)).when(this.termDataManager).getTermByNameAndCvId(this.methodName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
@@ -108,8 +108,8 @@ public class MethodValidatorTest {
 		Method method = new MethodBuilder().build(1, "m1", "d1");
 
 		Mockito.doReturn(new Term(10, this.methodName, this.description))
-		.when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.methodName, this.cvId);
-		Mockito.doReturn(true).when(this.ontologyBasicDataManager).isTermReferred(CommonUtil.tryParseSafe(request.getId()));
+		.when(this.termDataManager).getTermByNameAndCvId(this.methodName, this.cvId);
+		Mockito.doReturn(true).when(this.termDataManager).isTermReferred(CommonUtil.tryParseSafe(request.getId()));
 		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(CommonUtil.tryParseSafe(request.getId()));
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
@@ -124,7 +124,7 @@ public class MethodValidatorTest {
 	 */
 	@Test
 	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
-		Mockito.doReturn(null).when(this.ontologyBasicDataManager)
+		Mockito.doReturn(null).when(this.termDataManager)
 		.getTermByNameAndCvId(this.methodName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
@@ -143,7 +143,7 @@ public class MethodValidatorTest {
 	 */
 	@Test
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
-		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.methodName, this.cvId);
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.methodName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
@@ -162,7 +162,7 @@ public class MethodValidatorTest {
 	@Test
 	public void testWithValidRequest() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.ontologyBasicDataManager).getTermByNameAndCvId(this.methodName, this.cvId);
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.methodName, this.cvId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 

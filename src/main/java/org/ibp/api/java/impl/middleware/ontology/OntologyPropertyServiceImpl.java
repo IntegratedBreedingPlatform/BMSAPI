@@ -2,8 +2,8 @@ package org.ibp.api.java.impl.middleware.ontology;
 
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.PropertyRequest;
 import org.ibp.api.domain.ontology.PropertyResponse;
@@ -24,7 +24,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	@Autowired
 	private OntologyPropertyDataManager ontologyPropertyDataManager;
 	@Autowired
-	private OntologyBasicDataManager ontologyBasicDataManager;
+	private TermDataManager termDataManager;
 
   	@Override
 	public List<PropertySummary> getAllProperties() {
@@ -52,7 +52,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 			  	return null;
 			}
 			boolean deletable = true;
-			if (this.ontologyBasicDataManager.isTermReferred(id)) {
+			if (this.termDataManager.isTermReferred(id)) {
 			  	deletable = false;
 			}
 			ModelMapper mapper = OntologyMapper.getInstance();
@@ -114,7 +114,7 @@ public class OntologyPropertyServiceImpl implements OntologyPropertyService {
 	@Override
 	public boolean deleteProperty(Integer id) {
 		try {
-			boolean isReferred = this.ontologyBasicDataManager.isTermReferred(id);
+			boolean isReferred = this.termDataManager.isTermReferred(id);
 			if (isReferred) {
 			  	return false;
 			}

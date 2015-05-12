@@ -6,8 +6,8 @@ import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableRequest;
 import org.ibp.api.domain.ontology.VariableResponse;
@@ -31,7 +31,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
     @Autowired
-    private OntologyBasicDataManager ontologyBasicDataManager;
+    private TermDataManager termDataManager;
 
     @Override
     public List<VariableSummary> getAllVariablesByFilter(String programId, Integer propertyId, Boolean favourite) {
@@ -61,7 +61,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 			}
 
 			boolean deletable = true;
-			if (this.ontologyBasicDataManager.isTermReferred(variableId)) {
+			if (this.termDataManager.isTermReferred(variableId)) {
 			    deletable = false;
 			}
 

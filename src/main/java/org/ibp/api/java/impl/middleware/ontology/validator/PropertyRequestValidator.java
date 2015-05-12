@@ -1,12 +1,8 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Property;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.ontology.PropertyRequest;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.springframework.stereotype.Component;
@@ -31,7 +27,6 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 	private static final Integer NAME_TEXT_LIMIT = 200;
 	private static final Integer DESCRIPTION_TEXT_LIMIT = 255;
 	private static final Integer CLASS_TEXT_LIMIT = 100;
-	private static final String PROPERTY_CLASS_NOT_VALID = "class.not.valid";
 
 	@Override
 	public boolean supports(Class<?> aClass) {
@@ -115,38 +110,9 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 		List<String> nonEmptyClasses = new ArrayList<>();
 		Set<String> classesSet = new HashSet<>();
 
-		List<String> traitClasses = new ArrayList<>();
-		List<String> allTerms = new ArrayList<>();
-		try {
-
-			//Add all classes to String list
-			traitClasses = Util.convertAll(this.ontologyBasicDataManager.getAllTraitClass(), new Function<Term, String>() {
-				@Override
-				public String apply(Term term) {
-					return term.getName();
-				}
-			});
-
-			//Add all terms to String list
-			allTerms = Util.convertAll(this.ontologyBasicDataManager.getTermByCvId(CvId.IBDB_TERMS.getId()), new Function<Term, String>() {
-				@Override
-				public String apply(Term term) {
-					return term.getName();
-				}
-			});
-
-		} catch (MiddlewareException e) {
-			log.error("Error in getting all trait classes.");
-		}
-
 		for(String c : request.getClasses()) {
 			if(isNullOrEmpty(c) || classesSet.contains(c.toLowerCase())){
 				continue;
-			}
-
-			// Check if class element already in terms
-			if(!traitClasses.contains(c) && allTerms.contains(c)) {
-				this.addCustomError(errors, "classes", PROPERTY_CLASS_NOT_VALID, new Object[]{c});
 			}
 
 			classesSet.add(c.toLowerCase());
@@ -203,7 +169,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 				return false;
 			}
 
-			boolean isEditable = !this.ontologyBasicDataManager.isTermReferred(propertyId);
+			boolean isEditable = !this.termDataManager.isTermReferred(propertyId);
 
 			if (isEditable) {
 				return true;

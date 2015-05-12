@@ -1,6 +1,6 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,7 +16,7 @@ import java.util.HashMap;
 public class MiddlewareIdFormatValidatorTest {
 
 	@Mock
-	private OntologyBasicDataManager ontologyBasicDataManager;
+	private TermDataManager termDataManager;
 
 	private MiddlewareIdFormatValidator requestIdValidator;
 
@@ -24,7 +24,7 @@ public class MiddlewareIdFormatValidatorTest {
 	public void reset() {
 		MockitoAnnotations.initMocks(this);
 		requestIdValidator = new MiddlewareIdFormatValidator();
-		requestIdValidator.setOntologyBasicDataManager(ontologyBasicDataManager);
+		requestIdValidator.setTermDataManager(termDataManager);
 	}
 
 	@After

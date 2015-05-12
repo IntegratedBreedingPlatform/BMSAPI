@@ -9,8 +9,8 @@ import java.util.List;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.MethodSummary;
@@ -33,10 +33,10 @@ import org.springframework.validation.MapBindingResult;
 public class OntologyMethodServiceImpl implements OntologyMethodService {
 
 	@Autowired
-	private OntologyMethodDataManager ontologyMethodDataManager;
-	
+	private TermDataManager termDataManager;
+
 	@Autowired
-	private OntologyBasicDataManager ontologyBasicDataManager;
+	private OntologyMethodDataManager ontologyMethodDataManager;
 	
 	@Autowired
 	private MethodValidator methodValidator;
@@ -84,7 +84,7 @@ public class OntologyMethodServiceImpl implements OntologyMethodService {
 			  	return null;
 			}
 			boolean deletable = true;
-			if (this.ontologyBasicDataManager.isTermReferred(Integer.valueOf(id))) {
+			if (this.termDataManager.isTermReferred(Integer.valueOf(id))) {
 			  	deletable = false;
 			}
 			ModelMapper mapper = OntologyMapper.getInstance();

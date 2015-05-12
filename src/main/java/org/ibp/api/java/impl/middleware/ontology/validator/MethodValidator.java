@@ -60,7 +60,7 @@ public class MethodValidator extends OntologyValidator implements org.springfram
 				return;
 			}
 
-			boolean isEditable = !this.ontologyBasicDataManager.isTermReferred(CommonUtil.tryParseSafe(method.getId()));
+			boolean isEditable = !this.termDataManager.isTermReferred(CommonUtil.tryParseSafe(method.getId()));
 			if (isEditable) {
 				return;
 			}
