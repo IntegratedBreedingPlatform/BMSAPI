@@ -5,7 +5,14 @@ import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.ibp.api.domain.ontology.*;
+import org.ibp.api.domain.ontology.MethodDetails;
+import org.ibp.api.domain.ontology.MethodSummary;
+import org.ibp.api.domain.ontology.PropertyDetails;
+import org.ibp.api.domain.ontology.PropertySummary;
+import org.ibp.api.domain.ontology.ScaleResponse;
+import org.ibp.api.domain.ontology.ScaleSummary;
+import org.ibp.api.domain.ontology.VariableResponse;
+import org.ibp.api.domain.ontology.VariableSummary;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.convention.MatchingStrategies;
@@ -95,10 +102,12 @@ public class OntologyMapper {
 				this.map().setDescription(this.source.getDefinition());
 				this.map().setCropOntologyId(this.source.getCropOntologyId());
 				this.map().setClasses(this.source.getClasses());
+				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
+				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
 			}
 		});
 
-		mapper.addMappings(new PropertyMap<Property, PropertyResponse>() {
+		mapper.addMappings(new PropertyMap<Property, PropertyDetails>() {
 			@Override
 			protected void configure() {
 				this.map().setId(String.valueOf(this.source.getId()));
@@ -106,8 +115,10 @@ public class OntologyMapper {
 				this.map().setDescription(this.source.getDefinition());
 				this.map().setCropOntologyId(this.source.getCropOntologyId());
 				this.map().setClasses(this.source.getClasses());
-				this.map().setEditableFields(new ArrayList<String>());
-				this.map().setDeletable(false);
+				this.map().getMetadata().setEditableFields(new ArrayList<String>());
+				this.map().getMetadata().setDeletable(false);
+				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
+				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
 			}
 		});
 	}

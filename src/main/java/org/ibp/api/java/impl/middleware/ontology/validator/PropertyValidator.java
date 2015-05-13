@@ -3,12 +3,16 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.Property;
-import org.ibp.api.domain.ontology.PropertyRequest;
+import org.ibp.api.domain.ontology.PropertySummary;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Request validator for add/edit property
@@ -21,8 +25,12 @@ import java.util.*;
  * 7 Name cannot change if the property is already in use
  * 8 Individual classes may not be longer than 100 characters each
  */
+
+/**
+ * Extended from {@link OntologyValidator} for basic validation functions and error messages
+ */
 @Component
-public class PropertyRequestValidator extends OntologyValidator implements org.springframework.validation.Validator {
+public class PropertyValidator extends OntologyValidator implements org.springframework.validation.Validator {
 
 	private static final Integer NAME_TEXT_LIMIT = 200;
 	private static final Integer DESCRIPTION_TEXT_LIMIT = 255;
@@ -30,87 +38,90 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 
 	@Override
 	public boolean supports(Class<?> aClass) {
-		return PropertyRequest.class.equals(aClass);
+		return PropertySummary.class.equals(aClass);
 	}
 
 	@Override
 	public void validate(Object target, Errors errors) {
 
-		PropertyRequest request = (PropertyRequest) target;
+		PropertySummary propertySummary = (PropertySummary) target;
 
-		boolean nameValidationResult = nameValidationProcessor(request, errors);
+		boolean nameValidationResult = nameValidationProcessor(propertySummary, errors);
 
-		descriptionValidationProcessor(request, errors);
+		descriptionValidationProcessor(propertySummary, errors);
 
-		cropOntologyIDValidationProcessor(request, errors);
+		cropOntologyIDValidationProcessor(propertySummary, errors);
 
-		classValidationProcessor(request, errors);
+		classValidationProcessor(propertySummary, errors);
 
 		if(nameValidationResult) {
-			propertyShouldBeEditableProcessor(request, errors);
+			propertyShouldBeEditableProcessor(propertySummary, errors);
 		}
 	}
 
-	private boolean nameValidationProcessor(PropertyRequest request, Errors errors){
+	private boolean nameValidationProcessor(PropertySummary propertySummary, Errors errors){
 
 		Integer initialCount = errors.getErrorCount();
 
 		// 1. Name is required
-		this.shouldNotNullOrEmpty("Name", "name", request.getName(), errors);
+		this.shouldNotNullOrEmpty("Name", "name", propertySummary.getName(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
 
 		//Trim name
-		request.setName(request.getName().trim());
+		propertySummary.setName(propertySummary.getName().trim());
 
 		// 2. Name is no more than 200 characters
-		this.fieldShouldNotOverflow("name", request.getName(), NAME_TEXT_LIMIT, errors);
+		this.fieldShouldNotOverflow("name", propertySummary.getName(), NAME_TEXT_LIMIT, errors);
 
 		// 3. Name is unique
-		this.checkTermUniqueness("Property", CommonUtil.tryParseSafe(request.getId()), request.getName(), CvId.PROPERTIES.getId(), errors);
+		this.checkTermUniqueness("Property", CommonUtil.tryParseSafe(propertySummary.getId()), propertySummary.getName(), CvId.PROPERTIES.getId(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean descriptionValidationProcessor(PropertyRequest request, Errors errors){
+	private boolean descriptionValidationProcessor(PropertySummary propertySummary, Errors errors){
 		Integer initialCount = errors.getErrorCount();
 
-		if(Strings.isNullOrEmpty(request.getDescription())) {
-			request.setDescription("");
+		// Note: If Description is null then initialize it with empty value and if not null then trim.
+		if(Strings.isNullOrEmpty(propertySummary.getDescription())) {
+			propertySummary.setDescription("");
 		} else {
-			request.setDescription(request.getDescription().trim());
+			propertySummary.setDescription(propertySummary.getDescription().trim());
 		}
 
 		// 4. Description is no more than 255 characters
-		this.fieldShouldNotOverflow("description", request.getDescription(), DESCRIPTION_TEXT_LIMIT, errors);
+		this.fieldShouldNotOverflow("description", propertySummary.getDescription(), DESCRIPTION_TEXT_LIMIT, errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean cropOntologyIDValidationProcessor(PropertyRequest request, Errors errors){
+	private boolean cropOntologyIDValidationProcessor(PropertySummary propertySummary, Errors errors){
 		Integer initialCount = errors.getErrorCount();
 
-		if(Strings.isNullOrEmpty(request.getCropOntologyId())) {
-			request.setCropOntologyId("");
+		// Note: If cropOntologyId is null then initialize it with empty value if not then trim.
+		if(Strings.isNullOrEmpty(propertySummary.getCropOntologyId())) {
+			propertySummary.setCropOntologyId("");
 		} else {
-			request.setCropOntologyId(request.getCropOntologyId().trim());
+			propertySummary.setCropOntologyId(propertySummary.getCropOntologyId().trim());
 		}
 
 		// 4. Description is no more than 255 characters
-		this.fieldShouldNotOverflow("cropOntologyId", request.getCropOntologyId(), NAME_TEXT_LIMIT, errors);
+		this.fieldShouldNotOverflow("cropOntologyId", propertySummary.getCropOntologyId(), NAME_TEXT_LIMIT, errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean classValidationProcessor(PropertyRequest request, Errors errors){
+	private boolean classValidationProcessor(PropertySummary propertySummary, Errors errors){
 		Integer initialCount = errors.getErrorCount();
 
-		List<String> nonEmptyClasses = new ArrayList<>();
+		Set<String> nonEmptyClasses = new HashSet<>();
 		Set<String> classesSet = new HashSet<>();
 
-		for(String c : request.getClasses()) {
+		// Note: Iterate through each class
+		for(String c : propertySummary.getClasses()) {
 			if(isNullOrEmpty(c) || classesSet.contains(c.toLowerCase())){
 				continue;
 			}
@@ -123,10 +134,10 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 			return false;
 		}
 
-		request.setClasses(nonEmptyClasses);
+		propertySummary.setClasses(nonEmptyClasses);
 
 		// 5. Classes must be an array containing at least one string
-		if(request.getClasses().isEmpty()){
+		if(propertySummary.getClasses().isEmpty()){
 			this.addCustomError(errors, "classes", LIST_SHOULD_NOT_BE_EMPTY, new Object[]{"class"});
 		}
 
@@ -137,7 +148,8 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 		}
 
 		// 6 Each class should contain unique values
-		List<String> classes = request.getClasses();
+		List<String> classes = new ArrayList<>();
+		classes.addAll(propertySummary.getClasses());
 
 		for (int i = 1; i <= classes.size(); i++) {
 			this.listShouldNotOverflow("class names", "classes", classes.get(i-1), CLASS_TEXT_LIMIT, errors);
@@ -149,15 +161,15 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean propertyShouldBeEditableProcessor(PropertyRequest request, Errors errors) {
+	private boolean propertyShouldBeEditableProcessor(PropertySummary propertySummary, Errors errors) {
 		Integer initialCount = errors.getErrorCount();
 
 		//Check method for edit request
-		if (request.getId() == null) {
+		if (propertySummary.getId() == null) {
 			return true;
 		}
 
-		Integer propertyId = CommonUtil.tryParseSafe(request.getId());
+		Integer propertyId = CommonUtil.tryParseSafe(propertySummary.getId());
 
 		try {
 
@@ -165,7 +177,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 
 			// that property should exist with requestId
 			if (Objects.equals(oldProperty, null)) {
-				this.addCustomError(errors, ID_DOES_NOT_EXIST, new Object[] { "Property", request.getId() });
+				this.addCustomError(errors, ID_DOES_NOT_EXIST, new Object[] { "Property", propertySummary.getId() });
 				return false;
 			}
 
@@ -176,7 +188,7 @@ public class PropertyRequestValidator extends OntologyValidator implements org.s
 			}
 
 			//Term is referred and check for name changes
-			if (Objects.equals(request.getName(), oldProperty.getName())) {
+			if (Objects.equals(propertySummary.getName(), oldProperty.getName())) {
 				return true;
 			}
 

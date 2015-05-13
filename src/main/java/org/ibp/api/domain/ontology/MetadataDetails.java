@@ -4,10 +4,15 @@ package org.ibp.api.domain.ontology;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Derived from {@link MetadataSummary} to provide extra information like fields which are editable, record is deletable
+ * and variable usage. {@link Usage} only have observations and studies carried out for variable
+ */
 public class MetadataDetails extends MetadataSummary {
 
 	private List<String> editableFields = new ArrayList<>();
 	private boolean deletable;
+
 	private Usage usage = new Usage();
 
 	public Usage getUsage() {

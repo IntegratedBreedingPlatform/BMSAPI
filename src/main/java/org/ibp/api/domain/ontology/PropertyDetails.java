@@ -3,16 +3,13 @@ package org.ibp.api.domain.ontology;
 import java.util.Set;
 
 /**
- * Contains basic data used for list, insert and update of property
- * Extended from {@link TermSummary} for getting basic fields like id, name and description
+ * Holds all property details. Extended from {@link TermSummary} for basic term details.
  */
-
-public class PropertySummary extends TermSummary {
+public class PropertyDetails extends TermSummary {
 
 	private String cropOntologyId;
 	private Set<String> classes;
-	private MetadataSummary metadata = new MetadataSummary();
-
+	private MetadataDetails metadata = new MetadataDetails();
 
 	public String getCropOntologyId() {
 		return this.cropOntologyId;
@@ -30,20 +27,21 @@ public class PropertySummary extends TermSummary {
 		this.classes = classes;
 	}
 
-	public MetadataSummary getMetadata() {
+	public MetadataDetails getMetadata() {
 		return metadata;
 	}
 
-	public void setMetadata(MetadataSummary metadata) {
+	public void setMetadata(MetadataDetails metadata) {
 		this.metadata = metadata;
 	}
 
 	@Override
 	public String toString() {
-		return "PropertySummary{" +
+		return "PropertyDetails{" +
 				"cropOntologyId='" + cropOntologyId + '\'' +
 				", classes=" + classes +
 				", metadata=" + metadata +
 				"} " + super.toString();
 	}
 }
+

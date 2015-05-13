@@ -1,27 +1,17 @@
 package org.ibp.api.rest.ontology;
 
-import java.util.HashMap;
-import java.util.List;
-
-import org.generationcp.middleware.domain.oms.CvId;
+import com.google.common.base.Strings;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.PropertyRequest;
-import org.ibp.api.domain.ontology.PropertyRequestBase;
-import org.ibp.api.domain.ontology.PropertyResponse;
+import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.domain.ontology.PropertySummary;
-import org.ibp.api.domain.ontology.TermRequest;
-import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.ontology.OntologyMapper;
-import org.ibp.api.java.impl.middleware.ontology.validator.PropertyRequestValidator;
 import org.ibp.api.java.ontology.OntologyPropertyService;
 import org.ibp.api.rest.AbstractResource;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,17 +19,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.common.base.Strings;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.List;
 
 @Api(value = "Ontology Property Service")
 @Controller
 @RequestMapping("/ontology")
-public class OntologyPropertyResource extends AbstractResource {
 
-	@Autowired
-	private PropertyRequestValidator propertyRequestValidator;
+/**
+ * Extended from {@link AbstractResource} for providing basic validations to resource
+ */
+public class OntologyPropertyResource extends AbstractResource {
 
 	@Autowired
 	private OntologyPropertyService ontologyPropertyService;
@@ -71,19 +60,9 @@ public class OntologyPropertyResource extends AbstractResource {
 	@ApiOperation(value = "Get Property by id", notes = "Get Property using given Property id")
 	@RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<PropertyResponse> getPropertyById(@PathVariable String cropname,
+	public ResponseEntity<PropertyDetails> getPropertyById(@PathVariable String cropname,
 															@PathVariable String id)  {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
-		this.requestIdValidator.validate(id, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		TermRequest request = new TermRequest(id, "property", CvId.PROPERTIES.getId());
-		this.termValidator.validate(request, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		return new ResponseEntity<>(this.ontologyPropertyService.getProperty(Integer.valueOf(id)), HttpStatus.OK);
+		return new ResponseEntity<>(this.ontologyPropertyService.getProperty(id), HttpStatus.OK);
 	}
 
 	/**
@@ -95,15 +74,8 @@ public class OntologyPropertyResource extends AbstractResource {
 	@RequestMapping(value = "/{cropname}/properties", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addProperty(@PathVariable String cropname,
-													   @RequestBody PropertyRequestBase requestBase) {
-		ModelMapper modelMapper = OntologyMapper.getInstance();
-		PropertyRequest request = modelMapper.map(requestBase, PropertyRequest.class);
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
-		this.propertyRequestValidator.validate(request, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		return new ResponseEntity<>(this.ontologyPropertyService.addProperty(request), HttpStatus.CREATED);
+													   @RequestBody PropertySummary property) {
+		return new ResponseEntity<>(this.ontologyPropertyService.addProperty(property), HttpStatus.CREATED);
 	}
 
 	/**
@@ -116,21 +88,9 @@ public class OntologyPropertyResource extends AbstractResource {
 	@RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateProperty(@PathVariable String cropname, @PathVariable String id,
-										 @RequestBody PropertyRequestBase requestBase)  {
+										 @RequestBody PropertySummary property)  {
 
-		ModelMapper modelMapper = OntologyMapper.getInstance();
-		PropertyRequest request = modelMapper.map(requestBase, PropertyRequest.class);
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
-		this.requestIdValidator.validate(id, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		request.setId(id);
-		this.propertyRequestValidator.validate(request, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		this.ontologyPropertyService.updateProperty(Integer.valueOf(id), request);
+		this.ontologyPropertyService.updateProperty(id, property);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
@@ -144,18 +104,7 @@ public class OntologyPropertyResource extends AbstractResource {
 	@RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteProperty(@PathVariable String cropname, @PathVariable String id) {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
-
-		this.requestIdValidator.validate(id, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-
-		this.termDeletableValidator.validate(new TermRequest(id, "Property", CvId.PROPERTIES.getId()), bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		this.ontologyPropertyService.deleteProperty(Integer.valueOf(id));
+		this.ontologyPropertyService.deleteProperty(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 

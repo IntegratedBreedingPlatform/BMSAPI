@@ -1,8 +1,7 @@
 package org.ibp.api.java.ontology;
 
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.PropertyRequest;
-import org.ibp.api.domain.ontology.PropertyResponse;
+import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.domain.ontology.PropertySummary;
 
 import java.util.List;
@@ -22,7 +21,7 @@ public interface OntologyPropertyService {
 	 * @param id property id
 	 * @return property that have given id
 	 */
-	PropertyResponse getProperty(Integer id);
+	PropertyDetails getProperty(String id);
 
 	/**
 	 * add property using given input data
@@ -30,7 +29,7 @@ public interface OntologyPropertyService {
 	 * @param request property data to be added
 	 * @return newly created property id
 	 */
-	GenericResponse addProperty(PropertyRequest request);
+	GenericResponse addProperty(PropertySummary request);
 
 	/**
 	 * get all properties containing class name
@@ -44,14 +43,13 @@ public interface OntologyPropertyService {
 	 * delete property if not used
 	 *
 	 * @param id property to be deleted
-	 * @return if property deleted or not
 	 */
-	boolean deleteProperty(Integer id);
+	void deleteProperty(String id);
 
 	/**
 	 *
 	 * @param id property to update
 	 * @param request property data to update
 	 */
-	void updateProperty(Integer id, PropertyRequest request);
+	void updateProperty(String id, PropertySummary request);
 }

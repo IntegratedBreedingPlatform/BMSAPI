@@ -7,7 +7,7 @@ import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
-import org.ibp.api.domain.ontology.PropertyRequest;
+import org.ibp.api.domain.ontology.PropertySummary;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -18,18 +18,24 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
-public class PropertyRequestValidatorTest {
+/**
+ * Test each property validation
+ */
+public class PropertyValidatorTest {
 
-	private PropertyRequestValidator propertyRequestValidator;
+	private PropertyValidator propertyValidator;
 
 	@Mock
 	private OntologyPropertyDataManager ontologyPropertyDataManager;
 
 	@Mock
 	private TermDataManager termDataManager;
+
+	private Set<String> classes = new HashSet<>();
 
 	Integer cvId = CvId.PROPERTIES.getId();
 	String propertyName = "MyProperty";
@@ -38,9 +44,9 @@ public class PropertyRequestValidatorTest {
 	@Before
 	public void beforeEachTest() {
 		MockitoAnnotations .initMocks(this);
-		propertyRequestValidator = new PropertyRequestValidator();
-		propertyRequestValidator.setTermDataManager(termDataManager);
-		propertyRequestValidator.setOntologyPropertyDataManager(ontologyPropertyDataManager);
+		propertyValidator = new PropertyValidator();
+		propertyValidator.setTermDataManager(termDataManager);
+		propertyValidator.setOntologyPropertyDataManager(ontologyPropertyDataManager);
 	}
 
 	@After
@@ -60,11 +66,12 @@ public class PropertyRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		PropertyRequest request = new PropertyRequest();
-		request.setName("");
-		request.setDescription(this.description);
+		PropertySummary propertySummary = new PropertySummary();
+		propertySummary.setName("");
+		propertySummary.setDescription(this.description);
+		propertySummary.setClasses(new HashSet<String>());
 
-		this.propertyRequestValidator.validate(request, bindingResult);
+		this.propertyValidator.validate(propertySummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
@@ -83,11 +90,12 @@ public class PropertyRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		PropertyRequest request = new PropertyRequest();
+		PropertySummary request = new PropertySummary();
 		request.setName(this.propertyName);
 		request.setDescription(this.description);
+		request.setClasses(new HashSet<String>());
 
-		this.propertyRequestValidator.validate(request, bindingResult);
+		this.propertyValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
@@ -102,14 +110,15 @@ public class PropertyRequestValidatorTest {
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
 
-		PropertyRequest request = new PropertyRequest();
+		PropertySummary request = new PropertySummary();
 		request.setName(this.propertyName);
 		request.setDescription(this.description);
+		request.setClasses(new HashSet<String>());
 
 		// Assert for no class defined
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		this.propertyRequestValidator.validate(request, bindingResult);
+		this.propertyValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("classes"));
 	}
@@ -127,10 +136,11 @@ public class PropertyRequestValidatorTest {
 		Term dbTerm = new Term(requestId, this.propertyName, this.description);
 		Property toReturn = new Property(dbTerm);
 
-		PropertyRequest request = new PropertyRequest();
+		PropertySummary request = new PropertySummary();
 		request.setId(String.valueOf(requestId));
 		request.setName(this.propertyName + "0");
 		request.setDescription(this.description);
+		request.setClasses(new HashSet<String>());
 
 		Mockito.doReturn(dbTerm).when(this.termDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
 		Mockito.doReturn(true).when(this.termDataManager).isTermReferred(requestId);
@@ -138,7 +148,7 @@ public class PropertyRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		this.propertyRequestValidator.validate(request, bindingResult);
+		this.propertyValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 	}
 
@@ -154,11 +164,12 @@ public class PropertyRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		PropertyRequest request = new PropertyRequest();
+		PropertySummary request = new PropertySummary();
 		request.setName(RandomStringUtils.random(205));
 		request.setDescription(this.description);
+		request.setClasses(new HashSet<String>());
 
-		this.propertyRequestValidator.validate(request, bindingResult);
+		this.propertyValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
@@ -175,11 +186,12 @@ public class PropertyRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		PropertyRequest request = new PropertyRequest();
+		PropertySummary request = new PropertySummary();
 		request.setName(this.propertyName);
 		request.setDescription(RandomStringUtils.random(260));
+		request.setClasses(new HashSet<String>());
 
-		this.propertyRequestValidator.validate(request, bindingResult);
+		this.propertyValidator.validate(request, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("description"));
 	}
@@ -196,12 +208,14 @@ public class PropertyRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		PropertyRequest request = new PropertyRequest();
-		request.setName(this.propertyName);
-		request.setDescription(this.description);
-		request.setClasses(Arrays.asList("Class1", "Class2"));
+		PropertySummary propertySummary = new PropertySummary();
+		propertySummary.setName(this.propertyName);
+		propertySummary.setDescription(this.description);
+		classes.add("Class1");
+		classes.add("Class2");
+		propertySummary.setClasses(classes);
 
-		this.propertyRequestValidator.validate(request, bindingResult);
+		this.propertyValidator.validate(propertySummary, bindingResult);
 		Assert.assertFalse(bindingResult.hasErrors());
 	}
 }

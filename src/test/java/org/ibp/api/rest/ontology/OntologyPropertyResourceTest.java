@@ -10,8 +10,7 @@ import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.domain.ontology.PropertyRequest;
-import org.ibp.api.domain.ontology.PropertyRequestBase;
+import org.ibp.api.domain.ontology.PropertySummary;
 import org.ibp.builders.PropertyBuilder;
 import org.junit.After;
 import org.junit.Before;
@@ -30,11 +29,16 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.mockito.Mockito.doAnswer;
 
+/**
+ * Tests to check property API Services
+ * Extended from {@link ApiUnitTestBase} for basic mock of services and common methods
+ */
 public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 
 	@Configuration
@@ -83,6 +87,8 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 
 	private static final List<String> classes = new ArrayList<>(Arrays.asList(className1, className2));
 
+	private Set<String> propertyClasses = new HashSet<>();
+
 	@After
 	public void validate() {
 		Mockito.validateMockitoUsage();
@@ -103,10 +109,12 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 				.contentType(this.contentType))
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$",IsCollectionWithSize.hasSize(propertyList.size())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(propertyList.size())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is("1")))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is(propertyList.get(0).getName())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description",Matchers.is(propertyList.get(0).getDefinition())));
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(propertyList.get(0).getDefinition())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].cropOntologyId", Matchers.is(propertyList.get(0).getCropOntologyId())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].classes",IsCollectionWithSize.hasSize(propertyList.get(0).getClasses().size())));
 
 		Mockito.verify(this.ontologyPropertyDataManager, Mockito.times(1)).getAllProperties();
 	}
@@ -131,7 +139,9 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(property.getId()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(property.getName())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.description",Matchers.is(property.getDefinition())));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.description",Matchers.is(property.getDefinition())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.cropOntologyId", Matchers.is(property.getCropOntologyId())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.classes",IsCollectionWithSize.hasSize(property.getClasses().size())));
 
 		Mockito.verify(this.ontologyPropertyDataManager, Mockito.times(1)).getProperty(1);
 	}
@@ -163,11 +173,12 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void addProperty() throws Exception {
 
-		PropertyRequestBase propertyDTO = new PropertyRequestBase();
-		propertyDTO.setName(OntologyPropertyResourceTest.propertyName);
-		propertyDTO.setDescription(OntologyPropertyResourceTest.propertyDescription);
-		propertyDTO.setCropOntologyId("CO:000001");
-		propertyDTO.setClasses(new ArrayList<>(Collections.singletonList(OntologyPropertyResourceTest.className1)));
+		PropertySummary propertySummary = new PropertySummary();
+		propertySummary.setName(OntologyPropertyResourceTest.propertyName);
+		propertySummary.setDescription(OntologyPropertyResourceTest.propertyDescription);
+		propertySummary.setCropOntologyId("CO:000001");
+		propertyClasses.add("Class1");
+		propertySummary.setClasses(propertyClasses);
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(OntologyPropertyResourceTest.propertyName,
@@ -187,7 +198,7 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/properties", cropName)
 				.contentType(this.contentType)
-				.content(this.convertObjectToByte(propertyDTO)))
+				.content(this.convertObjectToByte(propertySummary)))
 				.andExpect(MockMvcResultMatchers.status().isCreated())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(1)))
 				.andDo(MockMvcResultHandlers.print());
@@ -203,13 +214,18 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void updateProperty() throws Exception {
 
-		PropertyRequestBase propertyDTO = new PropertyRequestBase();
-		propertyDTO.setName(OntologyPropertyResourceTest.propertyName);
-		propertyDTO.setDescription(OntologyPropertyResourceTest.propertyDescription);
-		propertyDTO.setCropOntologyId("CO:000001");
-		propertyDTO.setClasses(OntologyPropertyResourceTest.classes);
+		PropertySummary propertySummary = new PropertySummary();
+		propertySummary.setName(OntologyPropertyResourceTest.propertyName);
+		propertySummary.setDescription(OntologyPropertyResourceTest.propertyDescription);
+		propertySummary.setCropOntologyId("CO:000001");
+		propertyClasses.add("Class1");
+		propertySummary.setClasses(propertyClasses);
 
-		Property property = new PropertyBuilder().build(11, propertyDTO.getName(),propertyDTO.getDescription(), propertyDTO.getCropOntologyId(),OntologyPropertyResourceTest.classes);
+		Property property = new PropertyBuilder().build(11, propertySummary.getName(), propertySummary.getDescription(), propertySummary.getCropOntologyId(), OntologyPropertyResourceTest.classes);
+		property.setVocabularyId(1010);
+
+		Term term = new Term(11, "name", "description");
+		term.setVocabularyId(1010);
 
 		ArgumentCaptor<Property> captor = ArgumentCaptor.forClass(Property.class);
 
@@ -217,9 +233,10 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(new Term(11, OntologyPropertyResourceTest.propertyName,OntologyPropertyResourceTest.propertyDescription, CvId.PROPERTIES.getId(),false)).when(this.termDataManager).getTermByNameAndCvId(OntologyPropertyResourceTest.propertyName, CvId.PROPERTIES.getId());
 		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId());
 		Mockito.doNothing().when(this.ontologyPropertyDataManager).updateProperty(org.mockito.Matchers.any(Property.class));
+		Mockito.doReturn(term).when(this.termDataManager).getTermById(property.getId());
 
 		this.mockMvc.perform(MockMvcRequestBuilders.put("/ontology/{cropname}/properties/{id}", cropName, property.getId())
-				.contentType(this.contentType).content(this.convertObjectToByte(propertyDTO)))
+				.contentType(this.contentType).content(this.convertObjectToByte(propertySummary)))
 				.andExpect(MockMvcResultMatchers.status().isNoContent())
 				.andDo(MockMvcResultHandlers.print());
 
@@ -234,15 +251,16 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void deleteProperty() throws Exception {
 
-		PropertyRequest propertyDTO = new PropertyRequest();
-		propertyDTO.setName(OntologyPropertyResourceTest.propertyName);
-		propertyDTO.setDescription(OntologyPropertyResourceTest.propertyDescription);
-		propertyDTO.setCropOntologyId("CO:000001");
-		propertyDTO.setClasses(OntologyPropertyResourceTest.classes);
+		PropertySummary propertySummary = new PropertySummary();
+		propertySummary.setName(OntologyPropertyResourceTest.propertyName);
+		propertySummary.setDescription(OntologyPropertyResourceTest.propertyDescription);
+		propertySummary.setCropOntologyId("CO:000001");
+		propertyClasses.add("Class1");
+		propertySummary.setClasses(propertyClasses);
 
-		Term term = new Term(10, propertyDTO.getName(), propertyDTO.getDescription(),CvId.PROPERTIES.getId(), false);
+		Term term = new Term(10, propertySummary.getName(), propertySummary.getDescription(),CvId.PROPERTIES.getId(), false);
 
-		Property property = new PropertyBuilder().build(10, propertyDTO.getName(),propertyDTO.getDescription(), propertyDTO.getCropOntologyId(),OntologyPropertyResourceTest.classes);
+		Property property = new PropertyBuilder().build(10, propertySummary.getName(),propertySummary.getDescription(), propertySummary.getCropOntologyId(),OntologyPropertyResourceTest.classes);
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(term).when(this.termDataManager).getTermById(term.getId());

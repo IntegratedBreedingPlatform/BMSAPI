@@ -19,6 +19,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.modelmapper.ModelMapper;
 
+/**
+ * Test to check mapping between middleware domain and bmsapi domain
+ */
 //TODO Add tests for mapping detailed entities.
 public class OntologyMapperTest {
 	
@@ -80,8 +83,8 @@ public class OntologyMapperTest {
 		Assert.assertEquals(String.valueOf(property.getId()), propertySummary.getId());
 		Assert.assertEquals(property.getName(), propertySummary.getName());
 		Assert.assertEquals(property.getDefinition(), propertySummary.getDescription());
-		Assert.assertEquals(property.getDateCreated(), ISO8601DateParser.parse(propertySummary.getDateCreated()));
-		Assert.assertEquals(property.getDateLastModified(), ISO8601DateParser.parse(propertySummary.getDateLastModified()));
+		Assert.assertEquals(property.getDateCreated(), ISO8601DateParser.parse(propertySummary.getMetadata().getDateCreated()));
+		Assert.assertEquals(property.getDateLastModified(), ISO8601DateParser.parse(propertySummary.getMetadata().getDateLastModified()));
 	}
 	
 	@Test
