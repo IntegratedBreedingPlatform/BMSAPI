@@ -2,11 +2,11 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
-import org.ibp.api.domain.ontology.ScaleRequest;
+import org.ibp.api.domain.ontology.IdName;
+import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.ibp.api.domain.ontology.VariableCategory;
 import org.junit.After;
@@ -22,23 +22,26 @@ import org.springframework.validation.MapBindingResult;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class ScaleRequestValidatorTest {
+public class ScaleValidatorTest {
 
 	@Mock
 	private TermDataManager termDataManager;
 
-	private ScaleRequestValidator scaleRequestValidator;
-	
-	Integer cvId = CvId.SCALES.getId();
-	String scaleName = "MyScale";
-	String description = "Scale Description";
+	private ScaleValidator scaleValidator;
+
+	private Integer cvId = CvId.SCALES.getId();
+	private String scaleName = "MyScale";
+	private String description = "Scale Description";
+	private IdName categoricalId = new IdName(1048, "Categorical");
+	private IdName numericalId = new IdName(1110, "Numeric");
 
 	@Before
 	public void reset() {
 		MockitoAnnotations .initMocks(this);
-		scaleRequestValidator = new ScaleRequestValidator();
-		scaleRequestValidator.setTermDataManager(termDataManager);
+		scaleValidator = new ScaleValidator();
+		scaleValidator.setTermDataManager(termDataManager);
 	}
 
 	@After
@@ -59,11 +62,14 @@ public class ScaleRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
-		ScaleRequest request = new ScaleRequest();
-		request.setName("");
-		request.setDescription(this.description);
+		ScaleSummary scaleSummary = new ScaleSummary();
+		scaleSummary.setName("");
+		scaleSummary.setDescription(this.description);
+		scaleSummary.setDataType(numericalId);
+		scaleSummary.setMinValue("1");
+		scaleSummary.setMaxValue("10");
 
-		this.scaleRequestValidator.validate(request, bindingResult);
+		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
@@ -81,11 +87,14 @@ public class ScaleRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
-		ScaleRequest request = new ScaleRequest();
-		request.setName(this.scaleName);
-		request.setDescription(this.description);
+		ScaleSummary scaleSummary = new ScaleSummary();
+		scaleSummary.setName(this.scaleName);
+		scaleSummary.setDescription(this.description);
+		scaleSummary.setDataType(numericalId);
+		scaleSummary.setMinValue("1");
+		scaleSummary.setMaxValue("10");
 
-		this.scaleRequestValidator.validate(request, bindingResult);
+		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
@@ -97,12 +106,14 @@ public class ScaleRequestValidatorTest {
 	public void testWithDataTypeRequired() {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
-		ScaleRequest request = new ScaleRequest();
-		request.setName(this.scaleName);
-		request.setDescription(this.description);
-		request.setDataTypeId(null);
+		IdName dataType = new IdName();
 
-		this.scaleRequestValidator.validate(request, bindingResult);
+		ScaleSummary scaleSummary = new ScaleSummary();
+		scaleSummary.setName(this.scaleName);
+		scaleSummary.setDescription(this.description);
+		scaleSummary.setDataType(dataType);
+
+		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("dataTypeId"));
 	}
@@ -114,12 +125,14 @@ public class ScaleRequestValidatorTest {
 	public void testWithValidDataType() {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
-		ScaleRequest request = new ScaleRequest();
-		request.setName(this.scaleName);
-		request.setDescription(this.description);
-		request.setDataTypeId("0");
+		IdName dataType = new IdName(1, "Invalid DataType");
 
-		this.scaleRequestValidator.validate(request, bindingResult);
+		ScaleSummary scaleSummary = new ScaleSummary();
+		scaleSummary.setName(this.scaleName);
+		scaleSummary.setDescription(this.description);
+		scaleSummary.setDataType(dataType);
+
+		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("dataTypeId"));
 	}
@@ -131,15 +144,14 @@ public class ScaleRequestValidatorTest {
 	public void testWithAtLeastOneCategory() {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
-		ScaleRequest request = new ScaleRequest();
-		request.setName(this.scaleName);
-		request.setDescription(this.description);
-		request.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId().toString());
-		ValidValues validValues = new ValidValues();
-		validValues.setCategories(new ArrayList<VariableCategory>());
-		request.setValidValues(validValues);
+		ScaleSummary scaleSummary = new ScaleSummary();
+		scaleSummary.setName(this.scaleName);
+		scaleSummary.setDescription(this.description);
+		scaleSummary.setDataType(categoricalId);
+		Map<String, String> categories = new HashMap<>();
+		scaleSummary.setCategories(categories);
 
-		this.scaleRequestValidator.validate(request, bindingResult);
+		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("validValues.categories"));
 	}
@@ -151,23 +163,19 @@ public class ScaleRequestValidatorTest {
 	@Test
 	public void testWithUniqueLabelNameInCategoricalDataType() {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+		Map<String, String> categories = new HashMap<>();
 
-		List<VariableCategory> categories = new ArrayList<>();
-		categories.add(new VariableCategory("1", "description"));
-		categories.add(new VariableCategory("1", "description1"));
+		ScaleSummary scaleSummary = new ScaleSummary();
+		scaleSummary.setName(this.scaleName);
+		scaleSummary.setDescription(this.description);
+		scaleSummary.setDataType(categoricalId);
+		categories.put("1", "description");
+		categories.put("11", "description");
+		scaleSummary.setCategories(categories);
 
-		ValidValues validValues = new ValidValues();
-		validValues.setCategories(categories);
-
-		ScaleRequest request = new ScaleRequest();
-		request.setName(this.scaleName);
-		request.setDescription(this.description);
-		request.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId().toString());
-		request.setValidValues(validValues);
-
-		this.scaleRequestValidator.validate(request, bindingResult);
+		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
-		Assert.assertNotNull(bindingResult.getFieldError("validValues.categories[2].name"));
+		Assert.assertNotNull(bindingResult.getFieldError("validValues.categories[2].description"));
 	}
 
 	/**
@@ -176,18 +184,23 @@ public class ScaleRequestValidatorTest {
 	@Test
 	public void testWithMinValueGreater() {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+		Map<String, String> categories = new HashMap<>();
 
 		ValidValues validValues = new ValidValues();
 		validValues.setMin("10");
 		validValues.setMax("1");
 
-		ScaleRequest request = new ScaleRequest();
-		request.setName(this.scaleName);
-		request.setDescription(this.description);
-		request.setDataTypeId(DataType.NUMERIC_VARIABLE.getId().toString());
-		request.setValidValues(validValues);
+		ScaleSummary scaleSummary = new ScaleSummary();
+		scaleSummary.setName(this.scaleName);
+		scaleSummary.setDescription(this.description);
+		scaleSummary.setDataType(numericalId);
+		scaleSummary.setMinValue("10");
+		scaleSummary.setMaxValue("1");
+		categories.put("1", "description");
+		categories.put("11", "description");
+		scaleSummary.setCategories(categories);
 
-		this.scaleRequestValidator.validate(request, bindingResult);
+		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("validValues.min"));
 	}
@@ -204,11 +217,14 @@ public class ScaleRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
-		ScaleRequest request = new ScaleRequest();
-		request.setName(RandomStringUtils.random(205));
-		request.setDescription(this.description);
+		ScaleSummary scaleSummary = new ScaleSummary();
+		scaleSummary.setName(RandomStringUtils.random(205));
+		scaleSummary.setDescription(this.description);
+		scaleSummary.setDataType(numericalId);
+		scaleSummary.setMinValue("1");
+		scaleSummary.setMaxValue("10");
 
-		this.scaleRequestValidator.validate(request, bindingResult);
+		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
@@ -225,11 +241,14 @@ public class ScaleRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
-		ScaleRequest request = new ScaleRequest();
-		request.setName(this.scaleName);
-		request.setDescription(RandomStringUtils.random(260));
+		ScaleSummary scaleSummary = new ScaleSummary();
+		scaleSummary.setName(this.scaleName);
+		scaleSummary.setDescription(RandomStringUtils.random(260));
+		scaleSummary.setDataType(numericalId);
+		scaleSummary.setMinValue("1");
+		scaleSummary.setMaxValue("10");
 
-		this.scaleRequestValidator.validate(request, bindingResult);
+		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("description"));
 	}
@@ -248,13 +267,14 @@ public class ScaleRequestValidatorTest {
 		ValidValues validValues = new ValidValues();
 		validValues.setCategories(categories);
 
-		ScaleRequest request = new ScaleRequest();
-		request.setName(this.scaleName);
-		request.setDescription(this.description);
-		request.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId().toString());
-		request.setValidValues(validValues);
+		ScaleSummary scaleSummary = new ScaleSummary();
+		scaleSummary.setName(this.scaleName);
+		scaleSummary.setDescription(this.description);
+		scaleSummary.setDataType(numericalId);
+		scaleSummary.setMinValue("1");
+		scaleSummary.setMaxValue("10");
 
-		this.scaleRequestValidator.validate(request, bindingResult);
+		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertFalse(bindingResult.hasErrors());
 	}
 }

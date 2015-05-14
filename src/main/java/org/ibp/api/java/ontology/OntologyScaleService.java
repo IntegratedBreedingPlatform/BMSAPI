@@ -1,8 +1,7 @@
 package org.ibp.api.java.ontology;
 
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.ScaleRequest;
-import org.ibp.api.domain.ontology.ScaleResponse;
+import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.ScaleSummary;
 
 import java.util.List;
@@ -22,26 +21,26 @@ public interface OntologyScaleService {
 	 * @param id scale id
 	 * @return scale that matches id
 	 */
-	ScaleResponse getScaleById(Integer id);
+	ScaleDetails getScaleById(String id);
 
 	/**
 	 * Adding new scale
 	 *
-	 * @param request ScaleRequest
+	 * @param scaleSummary ScaleSummary
 	 */
-	GenericResponse addScale(ScaleRequest request);
+	GenericResponse addScale(ScaleSummary scaleSummary);
 
 	/**
 	 * update scale with new request data
-	 *
-	 * @param request ScaleRequest instance that have new data
+	 * @param id scale to update
+	 * @param scaleSummary ScaleSummary instance that have new data
 	 */
-	void updateScale(ScaleRequest request);
+	void updateScale(String id, ScaleSummary scaleSummary);
 
 	/**
 	 * Delete a scale using given id
 	 *
 	 * @param id scale to be deleted
 	 */
-	void deleteScale(Integer id);
+	void deleteScale(String id);
 }

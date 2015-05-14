@@ -106,8 +106,8 @@ public class OntologyMapperTest {
 		Assert.assertEquals(String.valueOf(scale.getId()), scaleSummary.getId());
 		Assert.assertEquals(scale.getName(), scaleSummary.getName());
 		Assert.assertEquals(scale.getDefinition(), scaleSummary.getDescription());
-		Assert.assertEquals(scale.getDateCreated(), ISO8601DateParser.parse(scaleSummary.getDateCreated()));
-		Assert.assertEquals(scale.getDateLastModified(), ISO8601DateParser.parse(scaleSummary.getDateLastModified()));
+		Assert.assertEquals(scale.getDateCreated(), ISO8601DateParser.parse(scaleSummary.getMetadata().getDateCreated()));
+		Assert.assertEquals(scale.getDateLastModified(), ISO8601DateParser.parse(scaleSummary.getMetadata().getDateLastModified()));
 	}
 	
 	@Test

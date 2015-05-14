@@ -9,7 +9,7 @@ import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.domain.ontology.PropertySummary;
-import org.ibp.api.domain.ontology.ScaleResponse;
+import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.domain.ontology.VariableResponse;
 import org.ibp.api.domain.ontology.VariableSummary;
@@ -137,10 +137,12 @@ public class OntologyMapper {
 				this.map().setMinValue(this.source.getMinValue());
 				this.map().setMaxValue(this.source.getMaxValue());
 				this.map().setCategories(this.source.getCategories());
+				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
+				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
 			}
 		});
 
-		mapper.addMappings(new PropertyMap<Scale, ScaleResponse>() {
+		mapper.addMappings(new PropertyMap<Scale, ScaleDetails>() {
 			@Override
 			protected void configure() {
 				this.map().setId(String.valueOf(this.source.getId()));
@@ -149,8 +151,10 @@ public class OntologyMapper {
 				this.map().setMinValue(this.source.getMinValue());
 				this.map().setMaxValue(this.source.getMaxValue());
 				this.map().setCategories(this.source.getCategories());
-				this.map().setEditableFields(new ArrayList<String>());
-				this.map().setDeletable(false);
+				this.map().getMetadata().setEditableFields(new ArrayList<String>());
+				this.map().getMetadata().setDeletable(false);
+				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
+				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
 			}
 		});
 	}

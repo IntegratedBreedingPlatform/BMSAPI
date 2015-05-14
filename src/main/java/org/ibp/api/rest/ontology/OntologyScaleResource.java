@@ -1,46 +1,32 @@
 package org.ibp.api.rest.ontology;
 
-import java.util.HashMap;
-import java.util.List;
-
-import org.generationcp.middleware.domain.oms.CvId;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.ScaleRequest;
-import org.ibp.api.domain.ontology.ScaleRequestBase;
-import org.ibp.api.domain.ontology.ScaleResponse;
+import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.ScaleSummary;
-import org.ibp.api.domain.ontology.TermRequest;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.ontology.OntologyMapper;
-import org.ibp.api.java.impl.middleware.ontology.validator.ScaleRequestValidator;
 import org.ibp.api.java.ontology.OntologyScaleService;
-import org.ibp.api.rest.AbstractResource;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.List;
 
 @Api(value = "Ontology Scale Service")
 @Controller
 @RequestMapping("/ontology")
-public class OntologyScaleResource extends AbstractResource {
+public class OntologyScaleResource{
 
   	@Autowired
 	private OntologyScaleService ontologyScaleService;
 
-	@Autowired
-	private ScaleRequestValidator scaleRequestValidator;
 
 	/**
 	 * @param cropname
@@ -61,21 +47,9 @@ public class OntologyScaleResource extends AbstractResource {
 	@ApiOperation(value = "Get Scale", notes = "Get Scale By Id")
 	@RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<ScaleResponse> getScaleById(@PathVariable String cropname,
+	public ResponseEntity<ScaleDetails> getScaleById(@PathVariable String cropname,
 			@PathVariable String id)  {
-
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-		this.requestIdValidator.validate(id, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		TermRequest request = new TermRequest(id, "scale", CvId.SCALES.getId());
-		this.termValidator.validate(request, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		return new ResponseEntity<>(this.ontologyScaleService.getScaleById(Integer.valueOf(id)),
-				HttpStatus.OK);
+		return new ResponseEntity<>(this.ontologyScaleService.getScaleById(id), HttpStatus.OK);
 	}
 
 	/**
@@ -87,17 +61,9 @@ public class OntologyScaleResource extends AbstractResource {
 	@RequestMapping(value = "/{cropname}/scales", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addScale(@PathVariable String cropname,
-			@RequestBody ScaleRequestBase requestBase)  {
+			@RequestBody ScaleSummary scaleSummary)  {
 
-		ModelMapper modelMapper = OntologyMapper.getInstance();
-		ScaleRequest request = modelMapper.map(requestBase, ScaleRequest.class);
-
-	  	BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-		this.scaleRequestValidator.validate(request, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		return new ResponseEntity<>(this.ontologyScaleService.addScale(request), HttpStatus.CREATED);
+		return new ResponseEntity<>(this.ontologyScaleService.addScale(scaleSummary), HttpStatus.CREATED);
 	}
 
 	/**
@@ -110,22 +76,8 @@ public class OntologyScaleResource extends AbstractResource {
 	@RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateScale(@PathVariable String cropname, @PathVariable String id,
-			@RequestBody ScaleRequestBase requestBase) throws ApiRequestValidationException {
-
-		ModelMapper modelMapper = OntologyMapper.getInstance();
-		ScaleRequest request = modelMapper.map(requestBase, ScaleRequest.class);
-
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-		this.requestIdValidator.validate(id, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		request.setId(id);
-		this.scaleRequestValidator.validate(request, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		this.ontologyScaleService.updateScale(request);
+			@RequestBody ScaleSummary scaleSummary) throws ApiRequestValidationException {
+		this.ontologyScaleService.updateScale(id, scaleSummary);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
@@ -140,16 +92,7 @@ public class OntologyScaleResource extends AbstractResource {
 	@ResponseBody
 	public ResponseEntity deleteScale(@PathVariable String cropname, @PathVariable String id)  {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-		this.requestIdValidator.validate(id, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		this.termDeletableValidator.validate(new TermRequest(id, "Scale", CvId.SCALES.getId()), bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		this.ontologyScaleService.deleteScale(Integer.valueOf(id));
+		this.ontologyScaleService.deleteScale(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }

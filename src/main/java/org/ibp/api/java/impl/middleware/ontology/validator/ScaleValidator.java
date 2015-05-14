@@ -5,14 +5,18 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.ibp.api.domain.ontology.ScaleRequest;
+import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.ibp.api.domain.ontology.VariableCategory;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Add Scale/Update Scale Validation rules for Scale request Refer:
@@ -31,8 +35,13 @@ import java.util.*;
  * 12. Name is no more than 200 characters
  * 13. Description is no more than 255 characters
  */
+
+/**
+ * Extended from {@link OntologyValidator} for basic validation functions and error messages
+ */
+
 @Component
-public class ScaleRequestValidator extends OntologyValidator implements
+public class ScaleValidator extends OntologyValidator implements
 org.springframework.validation.Validator {
 
 	private static final Integer NAME_TEXT_LIMIT = 200;
@@ -45,34 +54,34 @@ org.springframework.validation.Validator {
 
 	@Override
 	public boolean supports(Class<?> aClass) {
-		return ScaleRequest.class.equals(aClass);
+		return ScaleSummary.class.equals(aClass);
 	}
 
 	@Override
 	public void validate(Object target, Errors errors) {
 
-		ScaleRequest request = (ScaleRequest) target;
+		ScaleSummary scaleSummary = (ScaleSummary) target;
 
-		boolean nameValidationResult = nameValidationProcessor(request, errors);
+		boolean nameValidationResult = nameValidationProcessor(scaleSummary, errors);
 
-		descriptionValidationProcessor(request, errors);
+		descriptionValidationProcessor(scaleSummary, errors);
 
-		boolean dataTypeValidationResult = dataTypeValidationProcessor(request, errors);
+		boolean dataTypeValidationResult = dataTypeValidationProcessor(scaleSummary, errors);
 
 		if(dataTypeValidationResult){
 
-			Integer dataTypeId = CommonUtil.tryParseSafe(request.getDataTypeId());
+			Integer dataTypeId = scaleSummary.getDataType().getId();
 
 			if (Objects.equals(dataTypeId, DataType.CATEGORICAL_VARIABLE.getId())) {
-				categoricalDataTypeValidationProcessor(request, errors);
+				categoricalDataTypeValidationProcessor(scaleSummary, errors);
 			}
 			if (Objects.equals(dataTypeId, DataType.NUMERIC_VARIABLE.getId())) {
-				numericDataTypeValidationProcessor(request, errors);
+				numericDataTypeValidationProcessor(scaleSummary, errors);
 			}
 		}
 
 		if(nameValidationResult){
-			scaleShouldBeEditable(request, errors);
+			scaleShouldBeEditable(scaleSummary, errors);
 		}
 	}
 
@@ -112,36 +121,36 @@ org.springframework.validation.Validator {
 		}
 	}
 
-	private void scaleShouldBeEditable(ScaleRequest request, Errors errors) {
-		if (request.getId() == null) {
+	private void scaleShouldBeEditable(ScaleSummary scaleSummary, Errors errors) {
+		if (scaleSummary.getId() == null) {
 			return;
 		}
 
 		try {
-			Scale oldScale = this.ontologyScaleDataManager.getScaleById(CommonUtil.tryParseSafe(request.getId()));
+			Scale oldScale = this.ontologyScaleDataManager.getScaleById(CommonUtil.tryParseSafe(scaleSummary.getId()));
 
 			// that method should exist with requestId
 			if (Objects.equals(oldScale, null)) {
-				this.addCustomError(errors, ID_DOES_NOT_EXIST, new Object[] {"Scale", request.getId()});
+				this.addCustomError(errors, ID_DOES_NOT_EXIST, new Object[] {"Scale", scaleSummary.getId()});
 				return;
 			}
 
-			boolean isEditable = !this.termDataManager.isTermReferred(CommonUtil.tryParseSafe(request.getId()));
+			boolean isEditable = !this.termDataManager.isTermReferred(CommonUtil.tryParseSafe(scaleSummary.getId()));
 			if (isEditable) {
 				return;
 			}
 
-			boolean isNameSame = Objects.equals(request.getName(), oldScale.getName());
+			boolean isNameSame = Objects.equals(scaleSummary.getName(), oldScale.getName());
 			if (!isNameSame) {
 				this.addCustomError(errors, "name", RECORD_IS_NOT_EDITABLE,new Object[] { "scale", "Name" });
 			}
 
-			boolean isDataTypeSame = Objects.equals(CommonUtil.tryParseSafe(request.getDataTypeId()), this.getDataTypeIdSafe(oldScale.getDataType()));
+			boolean isDataTypeSame = Objects.equals(scaleSummary.getDataType().getId(), this.getDataTypeIdSafe(oldScale.getDataType()));
 			if (!isDataTypeSame) {
 				this.addCustomError(errors, "dataTypeId", RECORD_IS_NOT_EDITABLE, new Object[] { "scale", "DataTypeId" });
 			}
 
-			ValidValues validValues = request.getValidValues() == null ? new ValidValues() : request.getValidValues();
+			ValidValues validValues = scaleSummary.getValidValues() == null ? new ValidValues() : scaleSummary.getValidValues();
 			boolean minValuesAreEqual = Objects.equals(validValues.getMin(), CommonUtil.tryParseSafe(oldScale.getMinValue()));
 			boolean maxValuesAreEqual = Objects.equals(validValues.getMax(), CommonUtil.tryParseSafe(oldScale.getMaxValue()));
 			List<VariableCategory> categories = validValues.getCategories() == null ? new ArrayList<VariableCategory>() : validValues.getCategories();
@@ -170,54 +179,54 @@ org.springframework.validation.Validator {
 		return dataType == null ? null : dataType.getId();
 	}
 
-	private boolean nameValidationProcessor(ScaleRequest request, Errors errors){
+	private boolean nameValidationProcessor(ScaleSummary scaleSummary, Errors errors){
 
 		Integer initialCount = errors.getErrorCount();
 
 		// 1. Name is required
-		this.shouldNotNullOrEmpty("Name", "name", request.getName(), errors);
+		this.shouldNotNullOrEmpty("Name", "name", scaleSummary.getName(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
 
 		// 12. Name is no more than 200 characters
-		this.fieldShouldNotOverflow("name", request.getName(), NAME_TEXT_LIMIT, errors);
+		this.fieldShouldNotOverflow("name", scaleSummary.getName(), NAME_TEXT_LIMIT, errors);
 
 		// 2. The name must be unique
-		this.checkTermUniqueness("Scale", CommonUtil.tryParseSafe(request.getId()), request.getName(), CvId.SCALES.getId(), errors);
+		this.checkTermUniqueness("Scale", CommonUtil.tryParseSafe(scaleSummary.getId()), scaleSummary.getName(), CvId.SCALES.getId(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
 
 	// 13. Description is no more than 255 characters
-	private boolean descriptionValidationProcessor(ScaleRequest request, Errors errors){
+	private boolean descriptionValidationProcessor(ScaleSummary scaleSummary, Errors errors){
 
 		Integer initialCount = errors.getErrorCount();
 
-		if(Strings.isNullOrEmpty(request.getDescription())) {
-			request.setDescription("");
+		if(Strings.isNullOrEmpty(scaleSummary.getDescription())) {
+			scaleSummary.setDescription("");
 		} else {
-			request.setDescription(request.getDescription().trim());
+			scaleSummary.setDescription(scaleSummary.getDescription().trim());
 		}
 
-		this.fieldShouldNotOverflow("description", request.getDescription(), DESCRIPTION_TEXT_LIMIT, errors);
+		this.fieldShouldNotOverflow("description", scaleSummary.getDescription(), DESCRIPTION_TEXT_LIMIT, errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean dataTypeValidationProcessor(ScaleRequest request, Errors errors){
+	private boolean dataTypeValidationProcessor(ScaleSummary scaleSummary, Errors errors){
 
 		Integer initialCount = errors.getErrorCount();
 
 		// 3. Data type is required
-		this.shouldNotNullOrEmpty("Data Type", "dataTypeId", request.getDataTypeId(), errors);
+		this.shouldNotNullOrEmpty("Data Type", "dataTypeId", scaleSummary.getDataType().getId(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
 
-		if(!this.isNonNullValidNumericString(request.getDataTypeId())){
+		if(!this.isNonNullValidNumericString(scaleSummary.getDataType().getId())){
 			addCustomError(errors, "dataTypeId", INVALID_TYPE_ID, new Object[]{"Data Type"});
 		}
 
@@ -228,20 +237,20 @@ org.springframework.validation.Validator {
 		// 4. The data type ID must correspond to the ID of one of the supported
 		// data types (Numeric, Categorical, Character, DateTime, Person,
 		// Location or any other special data type that we add)
-		if (DataType.getById(CommonUtil.tryParseSafe(request.getDataTypeId())) == null) {
+		if (DataType.getById(scaleSummary.getDataType().getId()) == null) {
 			this.addCustomError(errors, "dataTypeId", INVALID_TYPE_ID, new Object[] {"Data Type"});
 		}
 
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean categoricalDataTypeValidationProcessor(ScaleRequest request, Errors errors){
+	private boolean categoricalDataTypeValidationProcessor(ScaleSummary scaleSummary, Errors errors){
 
 		Integer initialCount = errors.getErrorCount();
 
-		DataType dataType = DataType.getById(CommonUtil.tryParseSafe(request.getDataTypeId()));
+		DataType dataType = DataType.getById(scaleSummary.getDataType().getId());
 
-		ValidValues validValues = request.getValidValues() == null ? new ValidValues() : request.getValidValues();
+		ValidValues validValues = scaleSummary.getValidValues() == null ? new ValidValues() : scaleSummary.getValidValues();
 
 		List<VariableCategory> categories = validValues.getCategories();
 
@@ -264,13 +273,13 @@ org.springframework.validation.Validator {
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean numericDataTypeValidationProcessor(ScaleRequest request, Errors errors){
+	private boolean numericDataTypeValidationProcessor(ScaleSummary scaleSummary, Errors errors){
 
 		Integer initialCount = errors.getErrorCount();
 
-		DataType dataType = DataType.getById(CommonUtil.tryParseSafe(request.getDataTypeId()));
+		DataType dataType = DataType.getById(scaleSummary.getDataType().getId());
 
-		ValidValues validValues = request.getValidValues() == null ? new ValidValues() : request.getValidValues();
+		ValidValues validValues = scaleSummary.getValidValues() == null ? new ValidValues() : scaleSummary.getValidValues();
 
 		String minValue = validValues.getMin() == null ? null : validValues.getMin().toString();
 		String maxValue = validValues.getMax() == null ? null : validValues.getMax().toString();
