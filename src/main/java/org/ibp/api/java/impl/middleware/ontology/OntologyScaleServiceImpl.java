@@ -6,7 +6,6 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
-import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.ScaleSummary;
@@ -15,11 +14,9 @@ import org.ibp.api.domain.ontology.ValidValues;
 import org.ibp.api.domain.ontology.VariableCategory;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
-import org.ibp.api.java.impl.middleware.ontology.validator.MiddlewareIdFormatValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.ScaleValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.ontology.OntologyScaleService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,25 +39,13 @@ import static org.generationcp.middleware.domain.oms.DataType.NUMERIC_VARIABLE;
  */
 
 @Service
-public class OntologyScaleServiceImpl implements OntologyScaleService {
+public class OntologyScaleServiceImpl extends ServiceBaseImpl implements OntologyScaleService {
 
 	@Autowired
 	private OntologyScaleDataManager ontologyScaleDataManager;
 
 	@Autowired
-	private TermDataManager termDataManager;
-
-	@Autowired
 	private ScaleValidator scaleValidator;
-
-	@Autowired
-	protected TermDeletableValidator termDeletableValidator;
-
-	@Autowired
-	protected MiddlewareIdFormatValidator idFormatValidator;
-
-	@Autowired
-	protected TermValidator termValidator;
 
 	@Override
 	public List<ScaleSummary> getAllScales()  {
@@ -82,6 +67,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 
 	@Override
 	public ScaleDetails getScaleById(String id) {
+		validateId(id, "Scale");
 		// Note: Validate Scale Id for valid format and scale exists or not
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Scale");
 		TermRequest term = new TermRequest(id, "Scale", CvId.SCALES.getId());
@@ -151,7 +137,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 
 	@Override
 	public void updateScale(String id,ScaleSummary scaleSummary) {
-		validateId(id);
+		validateId(id, "Scale");
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Scale");
 		TermRequest term = new TermRequest(id, "scale", CvId.SCALES.getId());
 		this.termValidator.validate(term, errors);
@@ -194,7 +180,7 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 	@Override
 	public void deleteScale(String id) {
 		// Note: Validate Id for valid format and check if scale exists or not
-		validateId(id);
+		validateId(id, "Scale");
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
 		// Note: Check if scale is deletable or not by checking its usage in variable
@@ -209,12 +195,4 @@ public class OntologyScaleServiceImpl implements OntologyScaleService {
 		}
 	}
 
-	// Note: Used for validating id format and id exists or not
-	private void validateId(String id) {
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Scale");
-		this.idFormatValidator.validate(id, errors);
-		if (errors.hasErrors()) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-	}
 }

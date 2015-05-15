@@ -8,17 +8,14 @@ import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.TermRequest;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
-import org.ibp.api.java.impl.middleware.ontology.validator.MiddlewareIdFormatValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.ontology.OntologyVariableService;
 import org.modelmapper.ModelMapper;
@@ -38,25 +35,13 @@ import java.util.List;
  */
 
 @Service
-public class OntologyVariableServiceImpl implements OntologyVariableService {
+public class OntologyVariableServiceImpl extends ServiceBaseImpl implements OntologyVariableService{
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
-    @Autowired
-    private TermDataManager termDataManager;
-
 	@Autowired
 	private VariableValidator variableValidator;
-
-	@Autowired
-	protected TermDeletableValidator termDeletableValidator;
-
-	@Autowired
-	protected MiddlewareIdFormatValidator idFormatValidator;
-
-	@Autowired
-	protected TermValidator termValidator;
 
     @Override
     public List<VariableSummary> getAllVariablesByFilter(String programId, Integer propertyId, Boolean favourite) {
@@ -79,7 +64,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
     @Override
     public VariableDetails getVariableById(String programId, String variableId) {
 
-		validateId(variableId);
+		validateId(variableId, "Variable");
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Variable");
 		TermRequest term = new TermRequest(variableId, "variable", CvId.VARIABLES.getId());
 		this.termValidator.validate(term, errors);
@@ -160,7 +145,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
     @Override
     public void updateVariable(String programId, String variableId, VariableSummary variable) {
 
-		validateId(variableId);
+		validateId(variableId, "Variable");
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Variable");
 		TermRequest term = new TermRequest(variableId, "variable", CvId.VARIABLES.getId());
 		this.termValidator.validate(term, errors);
@@ -213,7 +198,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 	public void deleteVariable(String id) {
 
 		// Note: Validate Id for valid format and check if variable exists or not
-		validateId(id);
+		validateId(id, "Variable");
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
 		// Note: Check if variable is deletable or not by checking its usage in variable
@@ -229,11 +214,4 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 		}
 	}
 
-	private void validateId(String id) {
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Variable");
-		this.idFormatValidator.validate(id, errors);
-		if (errors.hasErrors()) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-	}
 }

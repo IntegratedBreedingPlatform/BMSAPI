@@ -10,18 +10,15 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
-import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.domain.ontology.TermRequest;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.ibp.api.java.impl.middleware.ontology.validator.MethodValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.MiddlewareIdFormatValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.ontology.OntologyMethodService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +27,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 @Service
-public class OntologyMethodServiceImpl implements OntologyMethodService {
-
-	@Autowired
-	private TermDataManager termDataManager;
+public class OntologyMethodServiceImpl extends ServiceBaseImpl implements OntologyMethodService {
 
 	@Autowired
 	private OntologyMethodDataManager ontologyMethodDataManager;
@@ -41,15 +35,6 @@ public class OntologyMethodServiceImpl implements OntologyMethodService {
 	@Autowired
 	private MethodValidator methodValidator;
 	
-	@Autowired
-	protected TermDeletableValidator termDeletableValidator;
-	
-	@Autowired
-	protected MiddlewareIdFormatValidator idFormatValidator;
-	
-	@Autowired
-	protected TermValidator termValidator;
-
   	@Override
 	public List<MethodSummary> getAllMethods() {
 		try {
@@ -70,7 +55,7 @@ public class OntologyMethodServiceImpl implements OntologyMethodService {
 
 	@Override
 	public MethodDetails getMethod(String id) {
-		validateId(id);
+		validateId(id, "Method");
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
 		TermRequest term = new TermRequest(id, "method", CvId.METHODS.getId());
 		this.termValidator.validate(term, errors);
@@ -124,7 +109,7 @@ public class OntologyMethodServiceImpl implements OntologyMethodService {
 
 	@Override
 	public void updateMethod(String id, MethodSummary method) {
-		validateId(id);
+		validateId(id, "Method");
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
 		TermRequest term = new TermRequest(id, "method", CvId.METHODS.getId());
 		this.termValidator.validate(term, errors);
@@ -149,7 +134,7 @@ public class OntologyMethodServiceImpl implements OntologyMethodService {
 
 	@Override
 	public void deleteMethod(String id) {
-		validateId(id);
+		validateId(id, "Method");
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
 		this.termDeletableValidator.validate(new TermRequest(String.valueOf(id), "Method", CvId.METHODS.getId()), errors);
 		if (errors.hasErrors()) {
@@ -160,14 +145,6 @@ public class OntologyMethodServiceImpl implements OntologyMethodService {
 			this.ontologyMethodDataManager.deleteMethod(Integer.valueOf(id));
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
-		}
-	}
-	
-	private void validateId(String id) {
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
-		this.idFormatValidator.validate(id, errors);
-		if (errors.hasErrors()) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 }
