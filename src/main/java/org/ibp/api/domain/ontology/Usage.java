@@ -1,6 +1,8 @@
 
 package org.ibp.api.domain.ontology;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +11,7 @@ import java.util.List;
  * Variable Observations and Studies
  * List of variable usage and variable observation and studies are mutually exclusive
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Usage {
 
 	private final List<TermSummary> variables = new ArrayList<>();
