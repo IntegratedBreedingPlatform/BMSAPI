@@ -8,8 +8,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,16 +32,6 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
-
-	@Before
-	public void reset() {
-		Mockito.reset(this.workbenchDataManager);
-	}
-
-	@After
-	public void validate() {
-		Mockito.validateMockitoUsage();
-	}
 
 	@Test
 	public void listAllMethods() throws Exception {
