@@ -4,15 +4,18 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.ontology.TermRequest;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
 import java.util.Objects;
 
 @Component
-public class TermDeletableValidator extends OntologyValidator implements
-org.springframework.validation.Validator {
+public class TermDeletableValidator extends OntologyValidator implements org.springframework.validation.Validator {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(TermDeletableValidator.class);
+	
 	@Override
 	public boolean supports(Class<?> aClass) {
 		return TermRequest.class.equals(aClass);
@@ -44,7 +47,7 @@ org.springframework.validation.Validator {
 			this.addCustomError(errors, RECORD_IS_NOT_DELETABLE, new Object[] { request.getTermName(), request.getId() });
 
 		} catch (MiddlewareException e) {
-			this.log.error("Error while validating object", e);
+			LOGGER.error("Error while validating object", e);
 		}
 	}
 }

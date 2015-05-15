@@ -2,7 +2,6 @@ package org.ibp.api.java.impl.middleware.common.validator;
 
 import com.google.common.base.Strings;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.validation.Errors;
 
 import java.util.Collection;
@@ -12,8 +11,6 @@ import java.util.Map;
  * Helper methods to manage message codes.
  */
 public abstract class BaseValidator {
-
-    protected final Logger log = LoggerFactory.getLogger(getClass());
 
     protected static final String INVALID_ID = "id.is.invalid.format";
     protected static final String INVALID_TYPE_ID = "type.id.is.invalid.format";
@@ -119,13 +116,12 @@ public abstract class BaseValidator {
         errors.reject("request.body.invalid");
     }
 
-    protected void logError(final Throwable cause){
+    protected void logError(final Throwable cause, Logger logger){
         Throwable rootCause = cause;
         while(rootCause.getCause() != null &&  rootCause.getCause() != rootCause){
             rootCause = rootCause.getCause();
         }
-
-        log.error(String.format("Error in %s.%s", rootCause.getStackTrace()[0].getClassName(), rootCause.getStackTrace()[0].getMethodName()), cause);
+        logger.error(String.format("Error in %s.%s", rootCause.getStackTrace()[0].getClassName(), rootCause.getStackTrace()[0].getMethodName()), cause);
     }
 
 }

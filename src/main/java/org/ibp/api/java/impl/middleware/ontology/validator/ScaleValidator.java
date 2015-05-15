@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import com.google.common.base.Strings;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -9,6 +10,8 @@ import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.ibp.api.domain.ontology.VariableCategory;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
@@ -52,6 +55,8 @@ org.springframework.validation.Validator {
 	private static final String SCALE_CATEGORY_DESCRIPTION_REQUIRED = "scale.category.description.required";
 	private static final String SCALE_NAME_DESCRIPTION_REQUIRED = "scale.category.name.required";
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ScaleValidator.class);
+	
 	@Override
 	public boolean supports(Class<?> aClass) {
 		return ScaleSummary.class.equals(aClass);
@@ -170,7 +175,7 @@ org.springframework.validation.Validator {
 			}
 
 		} catch (MiddlewareException e) {
-			this.log.error("Error while executing scaleShouldBeEditable", e);
+			LOGGER.error("Error while executing scaleShouldBeEditable", e);
 			this.addDefaultError(errors);
 		}
 	}

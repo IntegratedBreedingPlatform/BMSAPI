@@ -1,24 +1,27 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import com.google.common.base.Strings;
-import org.generationcp.middleware.domain.ontology.Scale;
-import org.generationcp.middleware.domain.oms.DataType;
+import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.VariableType;
+import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
+import org.generationcp.middleware.domain.oms.VariableType;
+import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.ontology.ExpectedRange;
 import org.ibp.api.domain.ontology.VariableRequest;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.google.common.base.Strings;
 
 /**
  * Add/Update Variable Validation rules for Variable request Refer:
@@ -56,6 +59,8 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 
 	private static final Integer NAME_TEXT_LIMIT = 32;
 	private static final Integer DESCRIPTION_TEXT_LIMIT = 255;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(VariableRequestValidator.class);
 
 	@Override
 	public boolean supports(Class<?> aClass) {
@@ -252,7 +257,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 			}
 
 		} catch (MiddlewareException e) {
-			log.error("Error in validating VariableRequest", e);
+			LOGGER.error("Error in validating VariableRequest", e);
 		}
 
 		return errors.getErrorCount() == initialCount;
@@ -360,7 +365,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 			}
 
 		} catch (Exception e) {
-			this.log.error("Error while executing variableShouldBeEditable", e);
+			LOGGER.error("Error while executing variableShouldBeEditable", e);
 			this.addDefaultError(errors);
 		}
 	}
@@ -392,7 +397,7 @@ public class VariableRequestValidator extends OntologyValidator implements Valid
 				this.addCustomError(errors, VARIABLE_WITH_SAME_COMBINATION_EXISTS, null);
 			}
 		} catch (MiddlewareException e) {
-			this.log.error("Error occur while fetching variable in checkIfMethodPropertyScaleCombination", e);
+			LOGGER.error("Error occur while fetching variable in checkIfMethodPropertyScaleCombination", e);
 		}
 
 		return errors.getErrorCount() == initialCount;

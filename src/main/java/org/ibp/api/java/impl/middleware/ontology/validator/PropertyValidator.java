@@ -1,10 +1,13 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import com.google.common.base.Strings;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.ibp.api.domain.ontology.PropertySummary;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
@@ -36,6 +39,8 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 	private static final Integer DESCRIPTION_TEXT_LIMIT = 255;
 	private static final Integer CLASS_TEXT_LIMIT = 100;
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(PropertyValidator.class); 
+	
 	@Override
 	public boolean supports(Class<?> aClass) {
 		return PropertySummary.class.equals(aClass);
@@ -193,7 +198,7 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 			}
 
 		} catch (Exception e) {
-			this.logError(e);
+			logError(e, LOGGER);
 			this.addDefaultError(errors);
 			return false;
 		}

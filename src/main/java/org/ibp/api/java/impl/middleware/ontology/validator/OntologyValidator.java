@@ -1,10 +1,13 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import com.google.common.base.Strings;
+
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.*;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 
@@ -26,6 +29,8 @@ public abstract class OntologyValidator extends BaseValidator {
 
 	@Autowired
 	protected OntologyMethodDataManager ontologyMethodDataManager;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(OntologyValidator.class);
 
 	protected void checkTermExist(String termName, String id, Integer cvId, Errors errors) {
 		this.checkTermExist(termName, null, id, cvId, errors);
@@ -42,7 +47,7 @@ public abstract class OntologyValidator extends BaseValidator {
 				}
 			}
 		} catch (MiddlewareException e) {
-			this.log.error("Error while validating object", e);
+			LOGGER.error("Error while validating object", e);
 			this.addDefaultError(errors);
 		}
 	}
@@ -65,7 +70,7 @@ public abstract class OntologyValidator extends BaseValidator {
 
 			this.addCustomError(errors, "name", NAME_ALREADY_EXIST, new Object[]{termName});
 		} catch (MiddlewareException e) {
-			this.log.error("Error checking uniqueness of term name", e);
+			LOGGER.error("Error checking uniqueness of term name", e);
 		}
 	}
 

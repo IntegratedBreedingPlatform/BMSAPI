@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import com.google.common.base.Strings;
+
 import java.util.Objects;
 
 import org.generationcp.middleware.domain.oms.CvId;
@@ -8,6 +9,8 @@ import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
@@ -26,6 +29,8 @@ public class MethodValidator extends OntologyValidator implements org.springfram
 	private static final Integer NAME_TEXT_LIMIT = 200;
 	private static final Integer DESCRIPTION_TEXT_LIMIT = 255;
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(MethodValidator.class);
+	
 	@Override
 	public boolean supports(Class<?> aClass) {
 		return MethodSummary.class.equals(aClass);
@@ -70,7 +75,7 @@ public class MethodValidator extends OntologyValidator implements org.springfram
 			}
 
 		} catch (MiddlewareException e) {
-			this.logError(e);
+			logError(e, LOGGER);
 			this.addDefaultError(errors);
 			return;
 		}
