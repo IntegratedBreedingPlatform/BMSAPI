@@ -38,4 +38,12 @@ public class MetadataDetails extends MetadataSummary {
 	public void setDeletable(boolean deletable) {
 		this.deletable = deletable;
 	}
+
+	public void setObservations(Integer observations){
+		this.usage.setObservations(observations);
+	}
+
+	public void setStudies(Integer studies){
+		this.usage.setStudies(studies);
+	}
 }

@@ -13,7 +13,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.domain.ontology.ExpectedRange;
-import org.ibp.api.domain.ontology.VariableRequest;
+import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.ibp.builders.ScaleBuilder;
 import org.junit.After;
@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public class VariableRequestValidatorTest {
+public class VariableValidatorTest {
 
 	@Mock
 	private TermDataManager termDataManager;
@@ -42,7 +42,7 @@ public class VariableRequestValidatorTest {
 	@Mock
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
-	private VariableRequestValidator variableRequestValidator;
+	private VariableValidator variableValidator;
 
 	Integer cvId = CvId.VARIABLES.getId();
 	String variableName = "My Variable";
@@ -57,13 +57,17 @@ public class VariableRequestValidatorTest {
 	String scaleName = "Scale Name";
 	String scaleDescription = "Scale Description";
 
+	private static final org.ibp.api.domain.ontology.TermSummary methodSummary = new org.ibp.api.domain.ontology.TermSummary();
+	private static final org.ibp.api.domain.ontology.TermSummary propertySummary = new org.ibp.api.domain.ontology.TermSummary();
+	private static final org.ibp.api.domain.ontology.ScaleSummary scaleSummary = new org.ibp.api.domain.ontology.ScaleSummary();
+
 	@Before
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
-		variableRequestValidator = new VariableRequestValidator();
-		variableRequestValidator.setTermDataManager(this.termDataManager);
-		variableRequestValidator.setOntologyVariableDataManager(this.ontologyVariableDataManager);
-		variableRequestValidator.setOntologyScaleDataManager(this.ontologyScaleDataManager);
+		variableValidator = new VariableValidator();
+		variableValidator.setTermDataManager(this.termDataManager);
+		variableValidator.setOntologyVariableDataManager(this.ontologyVariableDataManager);
+		variableValidator.setOntologyScaleDataManager(this.ontologyScaleDataManager);
 	}
 
 	@After
@@ -82,18 +86,22 @@ public class VariableRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableRequest request = new VariableRequest();
-		request.setName(this.variableName);
-		request.setDescription(this.description);
-		request.setPropertyId("10");
-		request.setMethodId("20");
-		request.setScaleId("30");
-		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		methodSummary.setId("11");
+		propertySummary.setId("10");
+		scaleSummary.setId("12");
+
+		VariableSummary variable = new VariableSummary();
+		variable.setName(this.variableName);
+		variable.setDescription(this.description);
+		variable.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		variable.setPropertySummary(propertySummary);
+		variable.setMethodSummary(methodSummary);
+		variable.setScaleSummary(scaleSummary);
 
 		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
-		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
-		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
-		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
+		Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
+		Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
@@ -104,7 +112,7 @@ public class VariableRequestValidatorTest {
 		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 		Mockito.doReturn(new Term(10, this.variableName, this.description)).when(this.termDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 
-		this.variableRequestValidator.validate(request, bindingResult);
+		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 	}
 
@@ -116,18 +124,22 @@ public class VariableRequestValidatorTest {
 	@Test
 	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
 
-		VariableRequest request = new VariableRequest();
-		request.setName(RandomStringUtils.random(210));
-		request.setDescription(this.description);
-		request.setPropertyId("10");
-		request.setMethodId("20");
-		request.setScaleId("30");
-		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		methodSummary.setId("11");
+		propertySummary.setId("10");
+		scaleSummary.setId("12");
+
+		VariableSummary variable = new VariableSummary();
+		variable.setName(RandomStringUtils.random(210));
+		variable.setDescription(this.description);
+		variable.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		variable.setPropertySummary(propertySummary);
+		variable.setMethodSummary(methodSummary);
+		variable.setScaleSummary(scaleSummary);
 
 		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
-		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
-		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
-		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
+		Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
+		Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.termDataManager).getTermById(propertyId);
@@ -138,7 +150,7 @@ public class VariableRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		this.variableRequestValidator.validate(request, bindingResult);
+		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
@@ -151,18 +163,22 @@ public class VariableRequestValidatorTest {
 	@Test
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 
-		VariableRequest request = new VariableRequest();
-		request.setName(this.variableName);
-		request.setDescription(RandomStringUtils.random(260));
-		request.setPropertyId("10");
-		request.setMethodId("20");
-		request.setScaleId("30");
-		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		methodSummary.setId("11");
+		propertySummary.setId("10");
+		scaleSummary.setId("12");
+
+		VariableSummary variable = new VariableSummary();
+		variable.setName(this.variableName);
+		variable.setDescription(RandomStringUtils.random(260));
+		variable.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		variable.setPropertySummary(propertySummary);
+		variable.setMethodSummary(methodSummary);
+		variable.setScaleSummary(scaleSummary);
 
 		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
-		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
-		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
-		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
+		Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
+		Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.termDataManager).getTermById(propertyId);
@@ -173,7 +189,7 @@ public class VariableRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		this.variableRequestValidator.validate(request, bindingResult);
+		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("description"));
 	}
@@ -186,18 +202,22 @@ public class VariableRequestValidatorTest {
 	@Test
 	public void testWithUniqueNonNullVariableName() throws MiddlewareException {
 
-		VariableRequest request = new VariableRequest();
-		request.setName(this.variableName);
-		request.setDescription(this.description);
-		request.setPropertyId("10");
-		request.setMethodId("20");
-		request.setScaleId("30");
-		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		methodSummary.setId("11");
+		propertySummary.setId("10");
+		scaleSummary.setId("12");
+
+		VariableSummary variable = new VariableSummary();
+		variable.setName(this.variableName);
+		variable.setDescription(this.description);
+		variable.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		variable.setPropertySummary(propertySummary);
+		variable.setMethodSummary(methodSummary);
+		variable.setScaleSummary(scaleSummary);
 
 		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
-		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
-		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
-		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
+		Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
+		Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.termDataManager).getTermById(propertyId);
@@ -209,7 +229,7 @@ public class VariableRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		this.variableRequestValidator.validate(request, bindingResult);
+		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 	}
 
@@ -218,21 +238,25 @@ public class VariableRequestValidatorTest {
 	 */
 	@Test
 	public void testWithSpecialCharacterAnsStartWithDigitVariableName() throws MiddlewareException {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Variable");
 
-		VariableRequest request = new VariableRequest();
-		request.setName("V@riable");
-		request.setDescription(this.description);
-		request.setPropertyId("10");
-		request.setMethodId("20");
-		request.setScaleId("30");
-		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+		methodSummary.setId("11");
+		propertySummary.setId("10");
+		scaleSummary.setId("12");
+
+		VariableSummary variable = new VariableSummary();
+		variable.setName("V@riable");
+		variable.setDescription(this.description);
+		variable.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		variable.setPropertySummary(propertySummary);
+		variable.setMethodSummary(methodSummary);
+		variable.setScaleSummary(scaleSummary);
 
 		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
-		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
-		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
-		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
+		Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
+		Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.termDataManager).getTermById(propertyId);
@@ -242,7 +266,7 @@ public class VariableRequestValidatorTest {
 		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 		Mockito.doReturn(new Term(10, this.variableName, this.description)).when(this.termDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 
-		this.variableRequestValidator.validate(request, bindingResult);
+		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
@@ -252,21 +276,25 @@ public class VariableRequestValidatorTest {
 	 */
 	@Test
 	public void testWithPropertyIdRequiredRequest() throws MiddlewareException {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Variable");
 
-		VariableRequest request = new VariableRequest();
-		request.setName(this.variableName);
-		request.setDescription(this.description);
-		request.setPropertyId("");
-		request.setMethodId("20");
-		request.setScaleId("30");
-		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+		methodSummary.setId("11");
+		propertySummary.setId("");
+		scaleSummary.setId("12");
+
+		VariableSummary variable = new VariableSummary();
+		variable.setName(this.variableName);
+		variable.setDescription(this.description);
+		variable.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		variable.setPropertySummary(propertySummary);
+		variable.setMethodSummary(methodSummary);
+		variable.setScaleSummary(scaleSummary);
 
 		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
-		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
-		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
-		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
+		Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
+		Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.termDataManager).getTermById(propertyId);
@@ -276,7 +304,7 @@ public class VariableRequestValidatorTest {
 		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 		Mockito.doReturn(new Term(10, this.variableName, this.description)).when(this.termDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 
-		this.variableRequestValidator.validate(request, bindingResult);
+		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 	}
 
@@ -288,18 +316,22 @@ public class VariableRequestValidatorTest {
 	@Test
 	public void testWithPropertyIdExistOrNotRequest() throws MiddlewareException {
 
-		VariableRequest request = new VariableRequest();
-		request.setName(this.variableName);
-		request.setDescription(RandomStringUtils.random(260));
-		request.setPropertyId("10");
-		request.setMethodId("20");
-		request.setScaleId("30");
-		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		methodSummary.setId("11");
+		propertySummary.setId("10");
+		scaleSummary.setId("12");
+
+		VariableSummary variable = new VariableSummary();
+		variable.setName(this.variableName);
+		variable.setDescription(RandomStringUtils.random(260));
+		variable.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		variable.setPropertySummary(propertySummary);
+		variable.setMethodSummary(methodSummary);
+		variable.setScaleSummary(scaleSummary);
 
 		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
-		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
-		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
-		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
+		Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
+		Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 		Mockito.doReturn(null).when(this.termDataManager).getTermById(propertyId);
@@ -309,7 +341,7 @@ public class VariableRequestValidatorTest {
 		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-		this.variableRequestValidator.validate(request, bindingResult);
+		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 	}
 
@@ -321,18 +353,22 @@ public class VariableRequestValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableRequest request = new VariableRequest();
-		request.setName(this.variableName);
-		request.setDescription(this.description);
-		request.setPropertyId("10");
-		request.setMethodId("");
-		request.setScaleId("30");
-		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		methodSummary.setId("");
+		propertySummary.setId("10");
+		scaleSummary.setId("12");
+
+		VariableSummary variable = new VariableSummary();
+		variable.setName(this.variableName);
+		variable.setDescription(this.description);
+		variable.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		variable.setPropertySummary(propertySummary);
+		variable.setMethodSummary(methodSummary);
+		variable.setScaleSummary(scaleSummary);
 
 		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
-		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
-		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
-		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
+		Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
+		Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.termDataManager).getTermById(propertyId);
@@ -342,7 +378,7 @@ public class VariableRequestValidatorTest {
 		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 		Mockito.doReturn(new Term(10, this.variableName, this.description)).when(this.termDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 
-		this.variableRequestValidator.validate(request, bindingResult);
+		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 	}
 
@@ -354,18 +390,22 @@ public class VariableRequestValidatorTest {
 	@Test
 	public void testWithMethodIdExistOrNotRequest() throws MiddlewareException {
 
-		VariableRequest request = new VariableRequest();
-		request.setName(this.variableName);
-		request.setDescription(RandomStringUtils.random(260));
-		request.setPropertyId("10");
-		request.setMethodId("20");
-		request.setScaleId("30");
-		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		methodSummary.setId("11");
+		propertySummary.setId("10");
+		scaleSummary.setId("12");
+
+		VariableSummary variable = new VariableSummary();
+		variable.setName(this.variableName);
+		variable.setDescription(RandomStringUtils.random(260));
+		variable.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		variable.setPropertySummary(propertySummary);
+		variable.setMethodSummary(methodSummary);
+		variable.setScaleSummary(scaleSummary);
 
 		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
-		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
-		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
-		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
+		Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
+		Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.termDataManager).getTermById(propertyId);
@@ -375,7 +415,7 @@ public class VariableRequestValidatorTest {
 		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-		this.variableRequestValidator.validate(request, bindingResult);
+		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 	}
 
@@ -387,18 +427,22 @@ public class VariableRequestValidatorTest {
 	@Test
 	public void testWithScaleIdExistOrNotRequest() throws MiddlewareException {
 
-		VariableRequest request = new VariableRequest();
-		request.setName(this.variableName);
-		request.setDescription(RandomStringUtils.random(260));
-		request.setPropertyId("10");
-		request.setMethodId("20");
-		request.setScaleId("30");
-		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		methodSummary.setId("11");
+		propertySummary.setId("10");
+		scaleSummary.setId("12");
+
+		VariableSummary variable = new VariableSummary();
+		variable.setName(this.variableName);
+		variable.setDescription(RandomStringUtils.random(260));
+		variable.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		variable.setPropertySummary(propertySummary);
+		variable.setMethodSummary(methodSummary);
+		variable.setScaleSummary(scaleSummary);
 
 		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
-		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
-		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
-		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
+		Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
+		Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.variableName, this.cvId);
 		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.termDataManager).getTermById(propertyId);
@@ -408,7 +452,7 @@ public class VariableRequestValidatorTest {
 		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-		this.variableRequestValidator.validate(request, bindingResult);
+		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 	}
 
@@ -421,34 +465,35 @@ public class VariableRequestValidatorTest {
 	@Test
 	public void testWithScaleDataTypeNumericAndExpectedRangeLessThanScaleValidValues()
 			throws MiddlewareException {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Variable");
 
-		ExpectedRange expectedRange = new ExpectedRange();
-		expectedRange.setMin("8");
-		expectedRange.setMax("12");
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableRequest request = new VariableRequest();
-		request.setName(this.variableName);
-		request.setDescription(this.description);
-		request.setPropertyId("10");
-		request.setScaleId("20");
-		request.setMethodId("30");
-		request.setExpectedRange(expectedRange);
-		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		methodSummary.setId("11");
+		propertySummary.setId("10");
+		scaleSummary.setId("12");
+
+		VariableSummary variable = new VariableSummary();
+		variable.setName(this.variableName);
+		variable.setDescription(this.description);
+		variable.setExpectedMin("8");
+		variable.setExpectedMax("12");
+		variable.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		variable.setPropertySummary(propertySummary);
+		variable.setMethodSummary(methodSummary);
+		variable.setScaleSummary(scaleSummary);
 
 		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
 
-		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
-		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
-		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
+		Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
+		Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
 
 		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.termDataManager).getTermById(propertyId);
 		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.termDataManager).getTermById(methodId);
 		Mockito.doReturn(new Term(30, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.termDataManager).getTermById(scaleId);
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
 
-		this.variableRequestValidator.validate(request, bindingResult);
+		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("expectedRange.min"));
 	}
@@ -462,34 +507,35 @@ public class VariableRequestValidatorTest {
 	@Test
 	public void testWithScaleDataTypeNumericAndExpectedRangeMinGreaterThanMax()
 			throws MiddlewareException {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Variable");
 
-		ExpectedRange expectedRange = new ExpectedRange();
-		expectedRange.setMin("16");
-		expectedRange.setMax("12");
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableRequest request = new VariableRequest();
-		request.setName(this.variableName);
-		request.setDescription(this.description);
-		request.setPropertyId("10");
-		request.setScaleId("12");
-		request.setMethodId("30");
-		request.setExpectedRange(expectedRange);
-		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		methodSummary.setId("11");
+		propertySummary.setId("10");
+		scaleSummary.setId("12");
+
+		VariableSummary variable = new VariableSummary();
+		variable.setName(this.variableName);
+		variable.setDescription(this.description);
+		variable.setExpectedMin("16");
+		variable.setExpectedMax("12");
+		variable.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		variable.setPropertySummary(propertySummary);
+		variable.setMethodSummary(methodSummary);
+		variable.setScaleSummary(scaleSummary);
 
 		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 
-		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
-		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
-		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
+		Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
+		Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
 
 		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.termDataManager).getTermById(propertyId);
 		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.termDataManager).getTermById(methodId);
 		Mockito.doReturn(new Term(12, scaleName, scaleDescription, CvId.SCALES.getId(), false)).when(this.termDataManager).getTermById(scaleId);
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
 
-		this.variableRequestValidator.validate(request, bindingResult);
+		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("expectedRange"));
 	}
@@ -502,35 +548,35 @@ public class VariableRequestValidatorTest {
 	 */
 	@Test
 	public void testWithMethodPropertyScaleCombinationExist() throws MiddlewareException {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Variable");
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+		methodSummary.setId("11");
+		propertySummary.setId("10");
+		scaleSummary.setId("12");
 
 		List<OntologyVariableSummary> variableSummaries = new ArrayList<>();
-		OntologyVariableSummary variableSummary = new OntologyVariableSummary(1, "Name",
-				"Description");
+		OntologyVariableSummary variableSummary = new OntologyVariableSummary(1, "Name", "Description");
 		variableSummary.setMethodSummary(new TermSummary(11, methodName, methodDescription));
 		variableSummary.setPropertySummary(new TermSummary(10, propertyName, propertyDescription));
-		variableSummary.setScaleSummary(new TermSummary(12, scaleName, scaleDescription));
+		variableSummary.setScaleSummary(new Scale(new Term(12, scaleName, scaleDescription)));
 		variableSummaries.add(variableSummary);
 
-		ExpectedRange expectedRange = new ExpectedRange();
-		expectedRange.setMin("12");
-		expectedRange.setMax("16");
-
-		VariableRequest request = new VariableRequest();
-		request.setName(this.variableName);
-		request.setDescription(this.description);
-		request.setPropertyId("10");
-		request.setScaleId("20");
-		request.setMethodId("30");
-		request.setExpectedRange(expectedRange);
-		request.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		VariableSummary variable = new VariableSummary();
+		variable.setName(this.variableName);
+		variable.setDescription(this.description);
+		variable.setExpectedMin("12");
+		variable.setExpectedMax("16");
+		variable.setVariableTypeIds(Collections.singletonList(VariableType.getById(1).getId().toString()));
+		variable.setPropertySummary(propertySummary);
+		variable.setMethodSummary(methodSummary);
+		variable.setScaleSummary(scaleSummary);
 
 		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
 
-		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
-		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
-		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
+		Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
+		Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
 
 		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.termDataManager).getTermById(propertyId);
 		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.termDataManager).getTermById(methodId);
@@ -538,7 +584,7 @@ public class VariableRequestValidatorTest {
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
 		Mockito.doReturn(variableSummaries).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 
-		this.variableRequestValidator.validate(request, bindingResult);
+		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 	}
 
@@ -549,8 +595,12 @@ public class VariableRequestValidatorTest {
 	 */
 	@Test
 	public void testWithVariableTypeShouldNotBeNull() throws MiddlewareException {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Variable");
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+		methodSummary.setId("11");
+		propertySummary.setId("10");
+		scaleSummary.setId("12");
 
 		List<OntologyVariableSummary> variableSummaries = new ArrayList<>();
 
@@ -558,20 +608,21 @@ public class VariableRequestValidatorTest {
 		expectedRange.setMin("12");
 		expectedRange.setMax("16");
 
-		VariableRequest request = new VariableRequest();
-		request.setName(this.variableName);
-		request.setDescription(this.description);
-		request.setPropertyId("10");
-		request.setScaleId("20");
-		request.setMethodId("30");
-		request.setExpectedRange(expectedRange);
-	  	request.setVariableTypeIds(new ArrayList<String>());
+		VariableSummary variable = new VariableSummary();
+		variable.setName(this.variableName);
+		variable.setDescription(this.description);
+		variable.setExpectedMin("12");
+		variable.setExpectedMax("16");
+		variable.setVariableTypeIds(new ArrayList<String>());
+		variable.setPropertySummary(propertySummary);
+		variable.setMethodSummary(methodSummary);
+		variable.setScaleSummary(scaleSummary);
 
 		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription,DataType.NUMERIC_VARIABLE, "10", "20", null);
 
-		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
-		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
-		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
+		Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
+		Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
 
 		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.termDataManager).getTermById(propertyId);
 		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.termDataManager).getTermById(methodId);
@@ -579,7 +630,7 @@ public class VariableRequestValidatorTest {
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
 		Mockito.doReturn(variableSummaries).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 
-		this.variableRequestValidator.validate(request, bindingResult);
+		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("variableTypeIds"));
 	}
@@ -591,8 +642,12 @@ public class VariableRequestValidatorTest {
 	 */
 	@Test
 	public void testWithVariableTypeIsNotValid() throws MiddlewareException {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Variable");
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+		methodSummary.setId("11");
+		propertySummary.setId("10");
+		scaleSummary.setId("12");
 
 		List<OntologyVariableSummary> variableSummaries = new ArrayList<>();
 
@@ -600,20 +655,21 @@ public class VariableRequestValidatorTest {
 		expectedRange.setMin("12");
 		expectedRange.setMax("16");
 
-		VariableRequest request = new VariableRequest();
-		request.setName(this.variableName);
-		request.setDescription(this.description);
-		request.setPropertyId("10");
-		request.setScaleId("20");
-		request.setMethodId("30");
-		request.setExpectedRange(expectedRange);
-		request.setVariableTypeIds(Collections.singletonList("12"));
+		VariableSummary variable = new VariableSummary();
+		variable.setName(this.variableName);
+		variable.setDescription(this.description);
+		variable.setExpectedMin("12");
+		variable.setExpectedMax("16");
+		variable.setVariableTypeIds(Collections.singletonList("12"));
+		variable.setPropertySummary(propertySummary);
+		variable.setMethodSummary(methodSummary);
+		variable.setScaleSummary(scaleSummary);
 
 		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
 
-		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
-		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
-		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
+		Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
+		Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
 
 		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.termDataManager).getTermById(propertyId);
 		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.termDataManager).getTermById(methodId);
@@ -621,7 +677,7 @@ public class VariableRequestValidatorTest {
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
 		Mockito.doReturn(variableSummaries).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 
-		this.variableRequestValidator.validate(request, bindingResult);
+		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("variableTypeIds"));
 	}
@@ -633,8 +689,12 @@ public class VariableRequestValidatorTest {
 	 */
 	@Test
 	public void testWithValidRequest() throws MiddlewareException {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(),
-				"Variable");
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+		methodSummary.setId("11");
+		propertySummary.setId("10");
+		scaleSummary.setId("12");
 
 		List<OntologyVariableSummary> variableSummaries = new ArrayList<>();
 
@@ -642,20 +702,21 @@ public class VariableRequestValidatorTest {
 		expectedRange.setMin("12");
 		expectedRange.setMax("16");
 
-		VariableRequest request = new VariableRequest();
-		request.setName(this.variableName);
-		request.setDescription(this.description);
-		request.setPropertyId("10");
-		request.setScaleId("20");
-		request.setMethodId("30");
-		request.setExpectedRange(expectedRange);
-		request.setVariableTypeIds(Collections.singletonList("1"));
+		VariableSummary variable = new VariableSummary();
+		variable.setName(this.variableName);
+		variable.setDescription(this.description);
+		variable.setExpectedMin("12");
+		variable.setExpectedMax("16");
+		variable.setVariableTypeIds(Collections.singletonList("1"));
+		variable.setPropertySummary(propertySummary);
+		variable.setMethodSummary(methodSummary);
+		variable.setScaleSummary(scaleSummary);
 
 		Scale scale = new ScaleBuilder().build(12, scaleName, scaleDescription, DataType.NUMERIC_VARIABLE, "10", "20", null);
 
-		Integer methodId = CommonUtil.tryParseSafe(request.getMethodId());
-		Integer propertyId = CommonUtil.tryParseSafe(request.getPropertyId());
-		Integer scaleId = CommonUtil.tryParseSafe(request.getScaleId());
+		Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
+		Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
+		Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
 
 		Mockito.doReturn(new Term(10, propertyName, propertyDescription, CvId.PROPERTIES.getId(), false)).when(this.termDataManager).getTermById(propertyId);
 		Mockito.doReturn(new Term(20, methodName, methodDescription, CvId.METHODS.getId(), false)).when(this.termDataManager).getTermById(methodId);
@@ -663,7 +724,7 @@ public class VariableRequestValidatorTest {
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId);
 		Mockito.doReturn(variableSummaries).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodId, propertyId, scaleId);
 
-		this.variableRequestValidator.validate(request, bindingResult);
+		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertFalse(bindingResult.hasErrors());
 	}
 }

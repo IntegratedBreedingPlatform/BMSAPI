@@ -6,15 +6,39 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class VariableSummary extends AuditTermSummary {
+/**
+ * Contains basic data used for list, insert and update of variable
+ * Extended from {@link TermSummary} for getting basic fields like id, name and description
+ */
+public class VariableSummary extends TermSummary {
 
 	private String alias;
-	private IdName propertySummary;
-	private IdName methodSummary;
-	private IdName scaleSummary;
-	private List<IdName> variableTypes;
+	private TermSummary propertySummary;
+	private TermSummary methodSummary;
+	private ScaleSummary scaleSummary;
+	private List<IdName> variableTypes = new ArrayList<>();
 	private boolean favourite;
 	private final ExpectedRange expectedRange = new ExpectedRange();
+	private List<String> variableTypeIds;
+	private String programUuid;
+
+	public String getProgramUuid() {
+		return programUuid;
+	}
+
+	public void setProgramUuid(String programUuid) {
+		this.programUuid = programUuid;
+	}
+
+	private MetadataSummary metadata = new MetadataSummary();
+
+	public MetadataSummary getMetadata() {
+		return metadata;
+	}
+
+	public void setMetadata(MetadataSummary metadata) {
+		this.metadata = metadata;
+	}
 
 	public String getAlias() {
 		return this.alias;
@@ -24,27 +48,27 @@ public class VariableSummary extends AuditTermSummary {
 		this.alias = alias;
 	}
 
-	public IdName getPropertySummary() {
+	public TermSummary getPropertySummary() {
 		return this.propertySummary;
 	}
 
-	public void setPropertySummary(IdName propertySummary) {
+	public void setPropertySummary(TermSummary propertySummary) {
 		this.propertySummary = propertySummary;
 	}
 
-	public IdName getMethodSummary() {
+	public TermSummary getMethodSummary() {
 		return this.methodSummary;
 	}
 
-	public void setMethodSummary(IdName methodSummary) {
+	public void setMethodSummary(TermSummary methodSummary) {
 		this.methodSummary = methodSummary;
 	}
 
-	public IdName getScaleSummary() {
+	public ScaleSummary getScaleSummary() {
 		return this.scaleSummary;
 	}
 
-	public void setScaleSummary(IdName scaleSummary) {
+	public void setScaleSummary(ScaleSummary scaleSummary) {
 		this.scaleSummary = scaleSummary;
 	}
 
@@ -52,11 +76,16 @@ public class VariableSummary extends AuditTermSummary {
 		return this.variableTypes;
 	}
 
-	public void setVariableTypes(Set<VariableType> variables) {
-		if (this.variableTypes == null) {
-			this.variableTypes = new ArrayList<>();
-		}
+	public List<String> getVariableTypeIds() {
+		return variableTypeIds;
+	}
 
+	public void setVariableTypeIds(List<String> variableTypeIds) {
+		this.variableTypeIds = variableTypeIds;
+	}
+
+	public void setVariableTypes(Set<VariableType> variables) {
+		// Note: clear list if any exist
 		this.variableTypes.clear();
 		for (VariableType v : variables) {
 			this.variableTypes.add(new IdName(v.getId(), v.getName()));

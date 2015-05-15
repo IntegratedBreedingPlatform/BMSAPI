@@ -13,7 +13,11 @@ public class Usage {
 
 	private final List<TermSummary> variables = new ArrayList<>();
 
-	//TODO: add observation and studies
+	// observations of variable
+	private Integer observations;
+
+	// studies of variable
+	private Integer studies;
 
 	public void addUsage(TermSummary variable) {
 		// Note: Do not add null value of variable
@@ -24,6 +28,22 @@ public class Usage {
 
 	public List<TermSummary> getVariables() {
 		return variables;
+	}
+
+	public Integer getObservations() {
+		return observations;
+	}
+
+	public void setObservations(Integer observations) {
+		this.observations = observations;
+	}
+
+	public Integer getStudies() {
+		return studies;
+	}
+
+	public void setStudies(Integer studies) {
+		this.studies = studies;
 	}
 
 }

@@ -1,7 +1,8 @@
 package org.ibp.api.java.ontology;
 
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.*;
+import org.ibp.api.domain.ontology.VariableDetails;
+import org.ibp.api.domain.ontology.VariableSummary;
 
 import java.util.List;
 
@@ -24,26 +25,29 @@ public interface OntologyVariableService {
 	 * @param variableId id of the variable
 	 * @return variable that matches id
 	 */
-	VariableResponse getVariableById(String programId, Integer variableId);
+	VariableDetails getVariableById(String programId, String variableId);
 
 	/**
 	 * Add variable using given data
 	 *
-	 * @param request data to be added
+	 * @param programId programId
+	 * @param variable data to be added
 	 * @return newly created variable id
 	 */
-	GenericResponse addVariable(VariableRequest request);
+	GenericResponse addVariable(String programId, VariableSummary variable);
 
 	/**
 	 * Add variable using given data
 	 *
-	 * @param request data to be added
+	 * @param programId programId
+	 * @param variableId variable to be updated
+	 * @param variable data to be added
 	 */
-	void updateVariable(VariableRequest request);
+	void updateVariable(String programId, String variableId, VariableSummary variable);
 
 	/**
 	 * Delete variable of given Id
 	 * @param id Variable Id to be deleted
 	 */
-	void deleteVariable(Integer id);
+	void deleteVariable(String id);
 }

@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -112,9 +113,15 @@ public class OntologyMapperTest {
 	
 	@Test
 	public void variableSummaryMapperTest() throws ParseException {
+
+		TermSummary methodSummary = new TermSummary(11, "Method Name", "Method Description");
+		TermSummary propertySummary = new TermSummary(10, "Property Name", "Property Description");
+
 		OntologyVariableSummary variable = new OntologyVariableSummary(1, "name", "description");
 		variable.setDateCreated(new Date());
 		variable.setDateLastModified(new Date());
+		variable.setMethodSummary(methodSummary);
+		variable.setPropertySummary(propertySummary);
 
 		ModelMapper mapper = OntologyMapper.getInstance();
 
@@ -123,7 +130,7 @@ public class OntologyMapperTest {
 		Assert.assertEquals(String.valueOf(variable.getId()), variableSummary.getId());
 		Assert.assertEquals(variable.getName(), variableSummary.getName());
 		Assert.assertEquals(variable.getDescription(), variableSummary.getDescription());
-		Assert.assertEquals(variable.getDateCreated(), ISO8601DateParser.parse(variableSummary.getDateCreated()));
-		Assert.assertEquals(variable.getDateLastModified(), ISO8601DateParser.parse(variableSummary.getDateLastModified()));
+		Assert.assertEquals(variable.getDateCreated(), ISO8601DateParser.parse(variableSummary.getMetadata().getDateCreated()));
+		Assert.assertEquals(variable.getDateLastModified(), ISO8601DateParser.parse(variableSummary.getMetadata().getDateLastModified()));
 	}
 }

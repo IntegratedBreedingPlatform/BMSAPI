@@ -3,21 +3,13 @@ package org.ibp.api.rest.ontology;
 import java.util.HashMap;
 import java.util.List;
 
-import org.generationcp.middleware.domain.oms.CvId;
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.AddVariableRequest;
-import org.ibp.api.domain.ontology.TermRequest;
-import org.ibp.api.domain.ontology.UpdateVariableRequest;
-import org.ibp.api.domain.ontology.VariableRequest;
-import org.ibp.api.domain.ontology.VariableResponse;
+import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
-import org.ibp.api.java.impl.middleware.ontology.OntologyMapper;
-import org.ibp.api.java.impl.middleware.ontology.validator.VariableRequestValidator;
 import org.ibp.api.java.ontology.OntologyVariableService;
 import org.ibp.api.rest.AbstractResource;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,13 +42,8 @@ public class OntologyVariableResource extends AbstractResource {
 	@Autowired
 	private ProgramValidator programValidator;
 
-	@Autowired
-	private VariableRequestValidator variableRequestValidator;
-
-
 	/**
-	 * @param cropname
-	 *            The name of the crop which is we wish to retrieve variables.
+	 * @param cropname The name of the crop which is we wish to retrieve variables.
 	 */
 	@ApiOperation(value = "All variables", notes = "Gets all variables.")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.GET)
@@ -85,57 +72,26 @@ public class OntologyVariableResource extends AbstractResource {
 	}
 
 	/**
-	 * @param cropname
-	 *            The name of the crop which is we wish to retrieve variable.
+	 * @param cropname The name of the crop which is we wish to retrieve variable.
 	 */
 	@ApiOperation(value = "Get Variable", notes = "Get Variable By Id")
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<VariableResponse> getVariableById(@PathVariable String cropname,
+	public ResponseEntity<VariableDetails> getVariableById(@PathVariable String cropname,
 															@RequestParam(value = "programId") String programId,
 															@PathVariable String id) {
-
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-		this.programValidator.validate(programId, bindingResult);
-		this.requestIdValidator.validate(id, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		TermRequest request = new TermRequest(id, "variable", CvId.VARIABLES.getId());
-		this.termValidator.validate(request, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		return new ResponseEntity<>(this.ontologyVariableService.getVariableById(programId, Integer.valueOf(id)), HttpStatus.OK);
+		return new ResponseEntity<>(this.ontologyVariableService.getVariableById(programId, id), HttpStatus.OK);
 	}
 
 	/**
-	 * @param cropname
-	 *            The name of the crop which is we wish to add variable.
+	 * @param cropname The name of the crop which is we wish to add variable.
 	 */
 	@ApiOperation(value = "Add Variable", notes = "Add new variable using given data")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addVariable(@PathVariable String cropname, @RequestParam(value = "programId") String programId,
-													   @RequestBody AddVariableRequest addVariableRequest)  {
-
-		ModelMapper mapper = OntologyMapper.getInstance();
-		VariableRequest request = mapper.map(addVariableRequest, VariableRequest.class);
-
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-		this.programValidator.validate(programId, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-
-		request.setProgramUuid(programId);
-
-		this.variableRequestValidator.validate(request, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-
-		return new ResponseEntity<>(this.ontologyVariableService.addVariable(request), HttpStatus.CREATED);
+													   @RequestBody VariableSummary variable)  {
+		return new ResponseEntity<>(this.ontologyVariableService.addVariable(programId, variable), HttpStatus.CREATED);
 	}
 
 	/**
@@ -148,31 +104,11 @@ public class OntologyVariableResource extends AbstractResource {
 	@ApiOperation(value = "Update Variable", notes = "Update variable using given data")
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<?> updateVariable(@PathVariable String cropname,
+	public ResponseEntity updateVariable(@PathVariable String cropname,
 										 @RequestParam(value = "programId") String programId,
 										 @PathVariable String id,
-										 @RequestBody UpdateVariableRequest updateVariableDetail)  {
-
-		ModelMapper mapper = OntologyMapper.getInstance();
-		VariableRequest request = mapper.map(updateVariableDetail, VariableRequest.class);
-
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-		this.programValidator.validate(programId, bindingResult);
-		this.requestIdValidator.validate(id, bindingResult);
-
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-
-		request.setId(id);
-		request.setProgramUuid(programId);
-
-		this.variableRequestValidator.validate(request, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-
-		this.ontologyVariableService.updateVariable(request);
+										 @RequestBody VariableSummary variable)  {
+		this.ontologyVariableService.updateVariable(programId, id, variable);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
@@ -185,16 +121,7 @@ public class OntologyVariableResource extends AbstractResource {
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteVariable(@PathVariable String cropname, @PathVariable String id)  {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-		this.requestIdValidator.validate(id, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		this.termDeletableValidator.validate(new TermRequest(id, "Variable", CvId.VARIABLES.getId()), bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-		this.ontologyVariableService.deleteVariable(Integer.valueOf(id));
+		this.ontologyVariableService.deleteVariable(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
