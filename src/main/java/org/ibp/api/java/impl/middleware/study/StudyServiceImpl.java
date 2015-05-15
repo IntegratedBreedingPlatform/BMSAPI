@@ -2,13 +2,12 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.service.api.study.TraitDto;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
+import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.service.api.study.TraitDto;
 import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.MeasurementIdentifier;
 import org.ibp.api.domain.study.Observation;
@@ -21,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
-import org.generationcp.middleware.service.api.study.ObservationDto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
