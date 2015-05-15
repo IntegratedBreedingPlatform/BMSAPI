@@ -10,7 +10,6 @@ import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -34,9 +33,6 @@ public class InventoryServiceImpl implements InventoryService {
 
 	@Autowired
 	private LocationDataManager locationDataManager;
-
-	@Autowired
-	private UserDataManager userDataManager;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(InventoryService.class);
 
