@@ -9,7 +9,6 @@ import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.ScaleSummary;
-import org.ibp.api.domain.ontology.TermRequest;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.ibp.api.domain.ontology.VariableCategory;
 import org.ibp.api.exception.ApiRequestValidationException;

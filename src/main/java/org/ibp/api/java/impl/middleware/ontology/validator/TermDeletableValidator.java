@@ -2,8 +2,8 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.ibp.api.domain.ontology.TermRequest;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
+import org.ibp.api.java.impl.middleware.ontology.TermRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

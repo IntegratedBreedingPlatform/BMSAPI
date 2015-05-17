@@ -4,7 +4,7 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
-import org.ibp.api.domain.ontology.TermRequest;
+import org.ibp.api.java.impl.middleware.ontology.TermRequest;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

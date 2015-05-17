@@ -1,4 +1,4 @@
-package org.ibp.api.domain.ontology;
+package org.ibp.api.java.impl.middleware.ontology;
 
 public class TermRequest {
 

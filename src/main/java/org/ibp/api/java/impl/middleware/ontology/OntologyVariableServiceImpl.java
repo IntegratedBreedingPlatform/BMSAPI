@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import com.google.common.base.Strings;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.OntologyVariableInfo;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
@@ -9,7 +10,6 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.ibp.api.domain.common.GenericResponse;
-import org.ibp.api.domain.ontology.TermRequest;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.exception.ApiRequestValidationException;

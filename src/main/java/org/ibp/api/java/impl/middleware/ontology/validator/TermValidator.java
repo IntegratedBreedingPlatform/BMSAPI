@@ -1,6 +1,6 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import org.ibp.api.domain.ontology.TermRequest;
+import org.ibp.api.java.impl.middleware.ontology.TermRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
