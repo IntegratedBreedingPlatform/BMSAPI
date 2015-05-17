@@ -1,12 +1,12 @@
 package org.ibp.api.domain.ontology;
 
-public class VariableTypeResponse {
+public class VariableType {
 
 	private Integer id;
 	private String name;
 	private String description;
 
-	public VariableTypeResponse(Integer id, String name, String description) {
+	public VariableType(Integer id, String name, String description) {
 		this.id = id;
 		this.name = name;
 		this.description = description;

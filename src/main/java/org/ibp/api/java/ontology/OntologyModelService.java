@@ -1,7 +1,7 @@
 package org.ibp.api.java.ontology;
 
 import org.ibp.api.domain.ontology.IdName;
-import org.ibp.api.domain.ontology.VariableTypeResponse;
+import org.ibp.api.domain.ontology.VariableType;
 
 import java.util.List;
 
@@ -26,5 +26,5 @@ public interface OntologyModelService {
 	 *
 	 * @return List of Variable Types
 	 */
-	List<VariableTypeResponse> getAllVariableTypes();
+	List<VariableType> getAllVariableTypes();
 }

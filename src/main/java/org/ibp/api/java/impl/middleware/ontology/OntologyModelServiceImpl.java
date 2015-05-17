@@ -1,15 +1,15 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import com.google.common.base.Function;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.ontology.IdName;
-import org.ibp.api.domain.ontology.VariableTypeResponse;
+import org.ibp.api.domain.ontology.VariableType;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.ontology.OntologyModelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,21 +67,21 @@ public class OntologyModelServiceImpl implements OntologyModelService {
 	}
 
 	@Override
-	public List<VariableTypeResponse> getAllVariableTypes() {
+	public List<VariableType> getAllVariableTypes() {
 
-		List<VariableTypeResponse> variableTypes =  Util.convertAll(Arrays.asList(VariableType.values()),
-				new Function<VariableType, VariableTypeResponse>() {
+		List<VariableType> variableTypes =  Util.convertAll(Arrays.asList(org.generationcp.middleware.domain.oms.VariableType.values()),
+				new Function<org.generationcp.middleware.domain.oms.VariableType, VariableType>() {
 
 					@Override
-					public VariableTypeResponse apply(VariableType variableType) {
-						return new VariableTypeResponse(variableType.getId(), variableType
+					public VariableType apply(org.generationcp.middleware.domain.oms.VariableType variableType) {
+						return new VariableType(variableType.getId(), variableType
 								.getName(), variableType.getDescription());
 					}
 				});
 
-	  	Collections.sort(variableTypes, new Comparator<VariableTypeResponse>() {
+	  	Collections.sort(variableTypes, new Comparator<VariableType>() {
 			@Override
-			public int compare(VariableTypeResponse o1, VariableTypeResponse o2) {
+			public int compare(VariableType o1, VariableType o2) {
 			  	return o1.getName().compareTo(o2.getName());
 			}
 		});
