@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import com.google.common.base.Strings;
-import org.slf4j.Logger;
 import org.springframework.validation.Errors;
 
 import java.util.Collection;
@@ -116,12 +115,12 @@ public abstract class BaseValidator {
         errors.reject("request.body.invalid");
     }
 
-    protected void logError(final Throwable cause, Logger logger){
-        Throwable rootCause = cause;
+    protected Throwable getRootCause(final Throwable cause) {
+		Throwable rootCause = cause;
         while(rootCause.getCause() != null &&  rootCause.getCause() != rootCause){
             rootCause = rootCause.getCause();
         }
-        logger.error(String.format("Error in %s.%s", rootCause.getStackTrace()[0].getClassName(), rootCause.getStackTrace()[0].getMethodName()), cause);
-    }
+		return rootCause;
+	}
 
 }

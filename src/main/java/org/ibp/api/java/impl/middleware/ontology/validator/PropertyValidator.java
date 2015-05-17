@@ -198,7 +198,8 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 			}
 
 		} catch (Exception e) {
-			logError(e, LOGGER);
+			Throwable rootCause = getRootCause(e);
+			LOGGER.error(String.format("Error in %s.%s", rootCause.getStackTrace()[0].getClassName(), rootCause.getStackTrace()[0].getMethodName()), e);
 			this.addDefaultError(errors);
 			return false;
 		}

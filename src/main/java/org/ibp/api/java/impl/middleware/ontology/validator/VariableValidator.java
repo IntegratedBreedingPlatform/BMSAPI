@@ -251,7 +251,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			}
 
 		} catch (MiddlewareException e) {
-			this.LOGGER.error("Error in validating VariableRequest", e);
+			LOGGER.error("Error in validating VariableRequest", e);
 		}
 
 		return errors.getErrorCount() == initialCount;
@@ -359,7 +359,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			}
 
 		} catch (Exception e) {
-			this.LOGGER.error("Error while executing variableShouldBeEditable", e);
+			LOGGER.error("Error while executing variableShouldBeEditable", e);
 			this.addDefaultError(errors);
 		}
 	}
@@ -391,7 +391,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				this.addCustomError(errors, VARIABLE_WITH_SAME_COMBINATION_EXISTS, null);
 			}
 		} catch (MiddlewareException e) {
-			this.LOGGER.error("Error occur while fetching variable in checkIfMethodPropertyScaleCombination", e);
+			LOGGER.error("Error occur while fetching variable in checkIfMethodPropertyScaleCombination", e);
 		}
 
 		return errors.getErrorCount() == initialCount;

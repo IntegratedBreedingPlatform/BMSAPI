@@ -101,6 +101,7 @@ public class OntologyVariableResource extends AbstractResource {
 	 * @param id variable id
 	 * @
 	 */
+	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Update Variable", notes = "Update variable using given data")
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.PUT)
 	@ResponseBody
