@@ -21,6 +21,7 @@ public class VariableSummary extends TermSummary {
 	private final ExpectedRange expectedRange = new ExpectedRange();
 	private List<String> variableTypeIds;
 	private String programUuid;
+	private MetadataSummary metadata = new MetadataSummary();
 
 	public String getProgramUuid() {
 		return programUuid;
@@ -29,8 +30,6 @@ public class VariableSummary extends TermSummary {
 	public void setProgramUuid(String programUuid) {
 		this.programUuid = programUuid;
 	}
-
-	private MetadataSummary metadata = new MetadataSummary();
 
 	public MetadataSummary getMetadata() {
 		return metadata;
