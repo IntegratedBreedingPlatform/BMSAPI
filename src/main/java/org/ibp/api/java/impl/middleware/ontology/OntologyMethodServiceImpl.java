@@ -7,12 +7,15 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.TermRelationship;
+import org.generationcp.middleware.domain.oms.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.MethodSummary;
+import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
@@ -80,6 +83,15 @@ public class OntologyMethodServiceImpl extends ServiceBaseImpl implements Ontolo
 			  	methodDetails.getMetadata().setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
 			}
 			methodDetails.getMetadata().setDeletable(deletable);
+
+			// Note : Get list of relationships related to method Id
+			List<TermRelationship> relationships = termDataManager.getRelationshipsWithObjectAndType(CommonUtil.tryParseSafe(id), TermRelationshipId.HAS_METHOD);
+
+            for(TermRelationship relationship : relationships){
+                TermSummary termSummary = mapper.map(relationship, TermSummary.class);
+                methodDetails.getMetadata().getUsage().addUsage(termSummary);
+            }
+
 			return methodDetails;
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);

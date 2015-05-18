@@ -1,12 +1,15 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.TermRelationship;
+import org.generationcp.middleware.domain.oms.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.domain.ontology.PropertySummary;
+import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
@@ -76,19 +79,28 @@ public class OntologyPropertyServiceImpl extends ServiceBaseImpl implements Onto
 			  	deletable = false;
 			}
 			ModelMapper mapper = OntologyMapper.getInstance();
-			PropertyDetails response = mapper.map(property, PropertyDetails.class);
+			PropertyDetails propertyDetails = mapper.map(property, PropertyDetails.class);
 
 			String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
 
 			// Note: If property is used then description is editable else all fields can be editable
 			if (!deletable) {
-			  	response.getMetadata().setEditableFields(new ArrayList<>(Arrays.asList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED, "classes", "cropOntologyId")));
+			  	propertyDetails.getMetadata().setEditableFields(new ArrayList<>(Arrays.asList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED, "classes", "cropOntologyId")));
 			} else {
-			  	response.getMetadata().setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED,
+			  	propertyDetails.getMetadata().setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED,
 						"classes", "cropOntologyId")));
 			}
-			response.getMetadata().setDeletable(deletable);
-			return response;
+			propertyDetails.getMetadata().setDeletable(deletable);
+
+			// Note : Get list of relationships related to property Id
+			List<TermRelationship> relationships = termDataManager.getRelationshipsWithObjectAndType(CommonUtil.tryParseSafe(id), TermRelationshipId.HAS_PROPERTY);
+
+			for(TermRelationship relationship : relationships){
+                TermSummary termSummary = mapper.map(relationship, TermSummary.class);
+                propertyDetails.getMetadata().getUsage().addUsage(termSummary);
+            }
+
+			return propertyDetails;
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}

@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
+import org.generationcp.middleware.domain.oms.TermRelationship;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -11,6 +12,7 @@ import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.domain.ontology.PropertySummary;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.ScaleSummary;
+import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableSummary;
 import org.modelmapper.ModelMapper;
@@ -48,6 +50,7 @@ public class OntologyMapper {
 					addPropertyMappers(SINGLETON);
 					addScaleMappers(SINGLETON);
 					addVariableMappers(SINGLETON);
+					addTermRelationShipMapper(SINGLETON);
 				}
 			}
 		}
@@ -200,6 +203,22 @@ public class OntologyMapper {
 				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
 				this.map().getMetadata().setEditableFields(new ArrayList<String>());
 				this.map().getMetadata().setDeletable(false);
+			}
+		});
+	}
+
+	/**
+	 * This will map middleware TermRelationship(SubjectTerm) to bmsapi TermSummary
+	 * @param mapper ModelMapper instance
+	 */
+	public static void addTermRelationShipMapper(ModelMapper mapper){
+
+		mapper.addMappings(new PropertyMap<TermRelationship, TermSummary>() {
+			@Override
+			protected void configure() {
+				this.map().setId(String.valueOf(this.source.getSubjectTerm().getId()));
+				this.map().setName(this.source.getSubjectTerm().getName());
+				this.map().setDescription(this.source.getSubjectTerm().getDefinition());
 			}
 		});
 	}

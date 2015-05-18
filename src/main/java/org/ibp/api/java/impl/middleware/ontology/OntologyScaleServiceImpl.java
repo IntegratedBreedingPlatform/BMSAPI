@@ -3,6 +3,8 @@ package org.ibp.api.java.impl.middleware.ontology;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermRelationship;
+import org.generationcp.middleware.domain.oms.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
@@ -94,6 +96,15 @@ public class OntologyScaleServiceImpl extends ServiceBaseImpl implements Ontolog
 				scaleDetails.getMetadata().setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED, "validValues")));
 			}
 			scaleDetails.getMetadata().setDeletable(deletable);
+
+			// Note : Get list of relationships related to scale Id
+			List<TermRelationship> relationships = termDataManager.getRelationshipsWithObjectAndType(CommonUtil.tryParseSafe(id), TermRelationshipId.HAS_SCALE);
+
+            for(TermRelationship relationship : relationships){
+                org.ibp.api.domain.ontology.TermSummary termSummary = mapper.map(relationship, org.ibp.api.domain.ontology.TermSummary.class);
+                scaleDetails.getMetadata().getUsage().addUsage(termSummary);
+            }
+
 			return scaleDetails;
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
