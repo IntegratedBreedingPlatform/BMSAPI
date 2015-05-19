@@ -93,7 +93,7 @@ public class OntologyScaleServiceImpl extends ServiceBaseImpl implements Ontolog
 			if (!deletable) {
 				scaleDetails.getMetadata().setEditableFields(new ArrayList<>(Collections.singletonList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
 			} else {
-				scaleDetails.getMetadata().setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED, "validValues")));
+				scaleDetails.getMetadata().setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED, "dataType","validValues")));
 			}
 			scaleDetails.getMetadata().setDeletable(deletable);
 
