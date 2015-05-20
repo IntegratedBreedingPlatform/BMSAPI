@@ -1,3 +1,4 @@
+
 package org.ibp.api.rest.ontology;
 
 import java.util.List;
@@ -23,10 +24,6 @@ public class OntologyClassResource {
 	@Autowired
 	private OntologyModelService ontologyModelService;
 
-	/**
-	 * @param cropname
-	 * 			The crop for which this rest call is being made
-	 */
 	@ApiOperation(value = "All Classes", notes = "Get all Classes")
 	@RequestMapping(value = "/{cropname}/classes", method = RequestMethod.GET)
 	@ResponseBody

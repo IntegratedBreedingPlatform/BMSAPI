@@ -1,3 +1,4 @@
+
 package org.ibp.api.rest.ontology;
 
 import org.ibp.api.domain.ontology.VariableType;

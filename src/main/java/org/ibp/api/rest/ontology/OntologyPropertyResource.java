@@ -1,3 +1,4 @@
+
 package org.ibp.api.rest.ontology;
 
 import com.google.common.base.Strings;
@@ -24,7 +25,6 @@ import java.util.List;
 @Api(value = "Ontology Property Service")
 @Controller
 @RequestMapping("/ontology")
-
 /**
  * Extended from {@link AbstractResource} for providing basic validations to resource
  */
@@ -33,72 +33,42 @@ public class OntologyPropertyResource extends AbstractResource {
 	@Autowired
 	private OntologyPropertyService ontologyPropertyService;
 
-	/**
-	 * @param cropname
-	 *            The crop for which this rest call is being made
-	 */
 	@ApiOperation(value = "All properties or filter by class name", notes = "Get all properties or filter by class name")
 	@RequestMapping(value = "/{cropname}/properties", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<PropertySummary>> listAllPropertyByClass(
-			@PathVariable String cropname,
-			@RequestParam(value = "class", defaultValue = "", required = false) String className)
-			 {
+	public ResponseEntity<List<PropertySummary>> listAllPropertyByClass(@PathVariable String cropname, @RequestParam(value = "class", defaultValue = "", required = false) String className) {
 		if (Strings.isNullOrEmpty(className)) {
 			List<PropertySummary> propertyList = this.ontologyPropertyService.getAllProperties();
 			return new ResponseEntity<>(propertyList, HttpStatus.OK);
 		}
 		List<PropertySummary> propertyList = this.ontologyPropertyService.getAllPropertiesByClass(className);
 		return new ResponseEntity<>(propertyList, HttpStatus.OK);
-
 	}
 
-	/**
-	 * @param cropname
-	 *            The crop for which this rest call is being made
-	 */
 	@ApiOperation(value = "Get Property by id", notes = "Get Property using given Property id")
 	@RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<PropertyDetails> getPropertyById(@PathVariable String cropname,
-															@PathVariable String id)  {
+	public ResponseEntity<PropertyDetails> getPropertyById(@PathVariable String cropname, @PathVariable String id) {
 		return new ResponseEntity<>(this.ontologyPropertyService.getProperty(id), HttpStatus.OK);
 	}
 
-	/**
-	 * @param cropname
-	 *            The crop for which this rest call is being made
-	 */
-	// TODO: 403 response for user without permission
 	@ApiOperation(value = "Add Property", notes = "Add a Property using Given Data")
 	@RequestMapping(value = "/{cropname}/properties", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> addProperty(@PathVariable String cropname,
-													   @RequestBody PropertySummary property) {
+	public ResponseEntity<GenericResponse> addProperty(@PathVariable String cropname, @RequestBody PropertySummary property) {
 		return new ResponseEntity<>(this.ontologyPropertyService.addProperty(property), HttpStatus.CREATED);
 	}
 
-	/**
-	 * @param cropname
-	 *            The name of the crop which this rest call is being made
-	 */
-	// TODO: 403 response for user without permission
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Update Property", notes = "Update Property using Given Data")
 	@RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity updateProperty(@PathVariable String cropname, @PathVariable String id,
-										 @RequestBody PropertySummary property)  {
+	public ResponseEntity updateProperty(@PathVariable String cropname, @PathVariable String id, @RequestBody PropertySummary property) {
 
 		this.ontologyPropertyService.updateProperty(id, property);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
-	/**
-	 * @param cropname
-	 *            The crop for which this rest call is being made
-	 */
-	// TODO: 403 response for user without permission
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Delete Property", notes = "Delete Property using Given Id")
 	@RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.DELETE)

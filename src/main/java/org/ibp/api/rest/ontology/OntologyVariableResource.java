@@ -1,3 +1,4 @@
+
 package org.ibp.api.rest.ontology;
 
 import java.util.HashMap;
@@ -42,16 +43,12 @@ public class OntologyVariableResource extends AbstractResource {
 	@Autowired
 	private ProgramValidator programValidator;
 
-	/**
-	 * @param cropname The name of the crop which is we wish to retrieve variables.
-	 */
 	@ApiOperation(value = "All variables", notes = "Gets all variables.")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<VariableSummary>> listAllVariables(@PathVariable String cropname,
-																  @RequestParam(value = "property", required = false) String propertyId,
-																  @RequestParam(value = "favourite", required = false) Boolean favourite,
-																  @RequestParam(value = "programId") String programId)  {
+	public ResponseEntity<List<VariableSummary>> listAllVariables(@PathVariable String cropname, @RequestParam(value = "property", required = false) String propertyId,
+			@RequestParam(value = "favourite", required = false) Boolean favourite, @RequestParam(value = "programId") String programId) {
+		
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 		this.programValidator.validate(programId, bindingResult);
 
@@ -71,26 +68,17 @@ public class OntologyVariableResource extends AbstractResource {
 		return new ResponseEntity<>(this.ontologyVariableService.getAllVariablesByFilter(programId, pId, favourite), HttpStatus.OK);
 	}
 
-	/**
-	 * @param cropname The name of the crop which is we wish to retrieve variable.
-	 */
 	@ApiOperation(value = "Get Variable", notes = "Get Variable By Id")
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<VariableDetails> getVariableById(@PathVariable String cropname,
-															@RequestParam(value = "programId") String programId,
-															@PathVariable String id) {
+	public ResponseEntity<VariableDetails> getVariableById(@PathVariable String cropname, @RequestParam(value = "programId") String programId, @PathVariable String id) {
 		return new ResponseEntity<>(this.ontologyVariableService.getVariableById(programId, id), HttpStatus.OK);
 	}
 
-	/**
-	 * @param cropname The name of the crop which is we wish to add variable.
-	 */
 	@ApiOperation(value = "Add Variable", notes = "Add new variable using given data")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> addVariable(@PathVariable String cropname, @RequestParam(value = "programId") String programId,
-													   @RequestBody VariableSummary variable)  {
+	public ResponseEntity<GenericResponse> addVariable(@PathVariable String cropname, @RequestParam(value = "programId") String programId, @RequestBody VariableSummary variable) {
 		return new ResponseEntity<>(this.ontologyVariableService.addVariable(programId, variable), HttpStatus.CREATED);
 	}
 
@@ -99,29 +87,23 @@ public class OntologyVariableResource extends AbstractResource {
 	 * @param cropname The name of the crop which is we wish to add variable.
 	 * @param programId programId to which variable is related
 	 * @param id variable id
-	 * @
+	 * @param variable the variable data to update with.
 	 */
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Update Variable", notes = "Update variable using given data")
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity updateVariable(@PathVariable String cropname,
-										 @RequestParam(value = "programId") String programId,
-										 @PathVariable String id,
-										 @RequestBody VariableSummary variable)  {
+	public ResponseEntity updateVariable(@PathVariable String cropname, @RequestParam(value = "programId") String programId, @PathVariable String id,
+			@RequestBody VariableSummary variable) {
 		this.ontologyVariableService.updateVariable(programId, id, variable);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
-	/**
-	 * @param cropname The crop for which this rest call is being made
-	 */
-	// TODO: 403 response for user without permission
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "Delete Variable", notes = "Delete Variable by Id")
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public ResponseEntity deleteVariable(@PathVariable String cropname, @PathVariable String id)  {
+	public ResponseEntity deleteVariable(@PathVariable String cropname, @PathVariable String id) {
 		this.ontologyVariableService.deleteVariable(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
