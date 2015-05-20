@@ -39,7 +39,7 @@ import static org.mockito.Mockito.doAnswer;
  * Tests to check property API Services
  * Extended from {@link ApiUnitTestBase} for basic mock of services and common methods
  */
-public class OntologyPropertyResourceTest extends ApiUnitTestBase {
+public class PropertyResourceTest extends ApiUnitTestBase {
 
 	@Configuration
 	public static class TestConfiguration {
@@ -127,7 +127,7 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void getPropertyById() throws Exception {
 
-		Property property = new PropertyBuilder().build(1, "property", "description", "CO:000001", OntologyPropertyResourceTest.classes);
+		Property property = new PropertyBuilder().build(1, "property", "description", "CO:000001", PropertyResourceTest.classes);
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(new Term(1, property.getName(), property.getDefinition(), CvId.PROPERTIES.getId(),false)).when(this.termDataManager).getTermById(1);
@@ -174,14 +174,14 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 	public void addProperty() throws Exception {
 
 		PropertySummary propertySummary = new PropertySummary();
-		propertySummary.setName(OntologyPropertyResourceTest.propertyName);
-		propertySummary.setDescription(OntologyPropertyResourceTest.propertyDescription);
+		propertySummary.setName(PropertyResourceTest.propertyName);
+		propertySummary.setDescription(PropertyResourceTest.propertyDescription);
 		propertySummary.setCropOntologyId("CO:000001");
 		propertyClasses.add("Class1");
 		propertySummary.setClasses(propertyClasses);
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
-		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(OntologyPropertyResourceTest.propertyName,
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(PropertyResourceTest.propertyName,
 				CvId.PROPERTIES.getId());
 
 		//Mock Property Class and when addProperty method called it will set id to 1 and return (self member alter if void is return type of method)
@@ -215,13 +215,13 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 	public void updateProperty() throws Exception {
 
 		PropertySummary propertySummary = new PropertySummary();
-		propertySummary.setName(OntologyPropertyResourceTest.propertyName);
-		propertySummary.setDescription(OntologyPropertyResourceTest.propertyDescription);
+		propertySummary.setName(PropertyResourceTest.propertyName);
+		propertySummary.setDescription(PropertyResourceTest.propertyDescription);
 		propertySummary.setCropOntologyId("CO:000001");
 		propertyClasses.add("Class1");
 		propertySummary.setClasses(propertyClasses);
 
-		Property property = new PropertyBuilder().build(11, propertySummary.getName(), propertySummary.getDescription(), propertySummary.getCropOntologyId(), OntologyPropertyResourceTest.classes);
+		Property property = new PropertyBuilder().build(11, propertySummary.getName(), propertySummary.getDescription(), propertySummary.getCropOntologyId(), PropertyResourceTest.classes);
 		property.setVocabularyId(1010);
 
 		Term term = new Term(11, "name", "description");
@@ -230,7 +230,7 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 		ArgumentCaptor<Property> captor = ArgumentCaptor.forClass(Property.class);
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
-		Mockito.doReturn(new Term(11, OntologyPropertyResourceTest.propertyName,OntologyPropertyResourceTest.propertyDescription, CvId.PROPERTIES.getId(),false)).when(this.termDataManager).getTermByNameAndCvId(OntologyPropertyResourceTest.propertyName, CvId.PROPERTIES.getId());
+		Mockito.doReturn(new Term(11, PropertyResourceTest.propertyName,PropertyResourceTest.propertyDescription, CvId.PROPERTIES.getId(),false)).when(this.termDataManager).getTermByNameAndCvId(PropertyResourceTest.propertyName, CvId.PROPERTIES.getId());
 		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId());
 		Mockito.doNothing().when(this.ontologyPropertyDataManager).updateProperty(org.mockito.Matchers.any(Property.class));
 		Mockito.doReturn(term).when(this.termDataManager).getTermById(property.getId());
@@ -252,15 +252,15 @@ public class OntologyPropertyResourceTest extends ApiUnitTestBase {
 	public void deleteProperty() throws Exception {
 
 		PropertySummary propertySummary = new PropertySummary();
-		propertySummary.setName(OntologyPropertyResourceTest.propertyName);
-		propertySummary.setDescription(OntologyPropertyResourceTest.propertyDescription);
+		propertySummary.setName(PropertyResourceTest.propertyName);
+		propertySummary.setDescription(PropertyResourceTest.propertyDescription);
 		propertySummary.setCropOntologyId("CO:000001");
 		propertyClasses.add("Class1");
 		propertySummary.setClasses(propertyClasses);
 
 		Term term = new Term(10, propertySummary.getName(), propertySummary.getDescription(),CvId.PROPERTIES.getId(), false);
 
-		Property property = new PropertyBuilder().build(10, propertySummary.getName(),propertySummary.getDescription(), propertySummary.getCropOntologyId(),OntologyPropertyResourceTest.classes);
+		Property property = new PropertyBuilder().build(10, propertySummary.getName(),propertySummary.getDescription(), propertySummary.getCropOntologyId(),PropertyResourceTest.classes);
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(term).when(this.termDataManager).getTermById(term.getId());

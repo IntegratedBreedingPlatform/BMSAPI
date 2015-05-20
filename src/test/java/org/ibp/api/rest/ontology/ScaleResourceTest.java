@@ -43,7 +43,7 @@ import static org.mockito.Mockito.doAnswer;
  * Tests to check Scale API Services
  * Extended from {@link ApiUnitTestBase} for basic mock of services and common methods
  */
-public class OntologyScaleResourceTest extends ApiUnitTestBase {
+public class ScaleResourceTest extends ApiUnitTestBase {
 
 	@Configuration
 	public static class TestConfiguration {
@@ -79,8 +79,8 @@ public class OntologyScaleResourceTest extends ApiUnitTestBase {
 	private final String scaleName = "scaleName";
 	private final String scaleDescription = "scaleDescription";
 	private final Map<String, String> categories = new HashMap<>();
-	private final IdName categoricalId = new IdName(1048, "Categorical");
-	private final IdName numericalId = new IdName(1110, "Numeric");
+	private final IdName categoricalId = new IdName(DataType.CATEGORICAL_VARIABLE.getId(), "Categorical");
+	private final IdName numericalId = new IdName(DataType.NUMERIC_VARIABLE.getId(), "Numeric");
 
 	@Before
 	public void reset() {

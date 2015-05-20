@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OntologyClassResourceTest extends ApiUnitTestBase {
+public class ClassResourceTest extends ApiUnitTestBase {
 
 	@Configuration
 	public static class TestConfiguration {

@@ -18,7 +18,7 @@ import java.util.List;
 @Api(value = "Ontology Variable Type Service")
 @Controller
 @RequestMapping("/ontology")
-public class OntologyVariableTypeResource {
+public class VariableTypeResource {
 
 	@Autowired
 	private OntologyModelService ontologyModelService;

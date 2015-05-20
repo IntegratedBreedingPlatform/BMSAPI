@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Extended from {@link AbstractResource} for providing basic validations to resource
  */
-public class OntologyPropertyResource extends AbstractResource {
+public class PropertyResource extends AbstractResource {
 
 	@Autowired
 	private OntologyPropertyService ontologyPropertyService;

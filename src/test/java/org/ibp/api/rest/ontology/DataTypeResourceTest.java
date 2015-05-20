@@ -3,6 +3,7 @@ package org.ibp.api.rest.ontology;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
@@ -13,19 +14,19 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 
-public class OntologyDataTypeResourceTest extends ApiUnitTestBase {
+public class DataTypeResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void listAllDataTypes() throws Exception {
 
 		List<Term> termList = new ArrayList<>();
-		Term term = new Term(1048, "Categorical", "");
+		Term term = new Term(DataType.CATEGORICAL_VARIABLE.getId(), "Categorical", "");
 		termList.add(term);
-		term = new Term(1110, "Numeric", "");
+		term = new Term(DataType.NUMERIC_VARIABLE.getId(), "Numeric", "");
 		termList.add(term);
-		term = new Term(1117, "Character", "");
+		term = new Term(DataType.CHARACTER_VARIABLE.getId(), "Character", "");
 		termList.add(term);
-		term = new Term(1120, "Date", "");
+		term = new Term(DataType.DATE_TIME_VARIABLE.getId(), "Date", "");
 		termList.add(term);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/datatypes")

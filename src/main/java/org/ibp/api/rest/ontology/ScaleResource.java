@@ -22,7 +22,7 @@ import java.util.List;
 @Api(value = "Ontology Scale Service")
 @Controller
 @RequestMapping("/ontology")
-public class OntologyScaleResource {
+public class ScaleResource {
 
 	@Autowired
 	private OntologyScaleService ontologyScaleService;

@@ -35,7 +35,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 @Api(value = "Ontology Variable Service")
 @Controller
 @RequestMapping("/ontology")
-public class OntologyVariableResource extends AbstractResource {
+public class VariableResource extends AbstractResource {
 
 	@Autowired
 	private OntologyVariableService ontologyVariableService;

@@ -36,7 +36,7 @@ import java.util.List;
 import static org.mockito.Mockito.doAnswer;
 import static org.hamcrest.Matchers.*;
 
-public class OntologyMethodResourceTest extends ApiUnitTestBase {
+public class MethodResourceTest extends ApiUnitTestBase {
 
 	@Configuration
 	public static class TestConfiguration {

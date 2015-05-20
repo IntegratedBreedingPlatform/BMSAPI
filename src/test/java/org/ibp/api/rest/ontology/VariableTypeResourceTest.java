@@ -10,7 +10,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-public class OntologyVariableTypeResourceTest extends ApiUnitTestBase {
+public class VariableTypeResourceTest extends ApiUnitTestBase {
 
 	@After
 	public void validate() {

@@ -19,7 +19,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 @Api(value = "Ontology Class Service")
 @Controller
 @RequestMapping("/ontology")
-public class OntologyClassResource {
+public class ClassResource {
 
 	@Autowired
 	private OntologyModelService ontologyModelService;

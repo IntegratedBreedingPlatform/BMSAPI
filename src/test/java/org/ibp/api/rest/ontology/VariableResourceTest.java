@@ -47,7 +47,7 @@ import java.util.List;
 
 import static org.mockito.Mockito.doAnswer;
 
-public class OntologyVariableResourceTest extends ApiUnitTestBase {
+public class VariableResourceTest extends ApiUnitTestBase {
 
 	@Configuration
 	public static class TestConfiguration {

@@ -18,7 +18,7 @@ import java.util.List;
 @Api(value = "Ontology Data Type Service")
 @Controller
 @RequestMapping("/ontology")
-public class OntologyDataTypeResource {
+public class DataTypeResource {
 
 	@Autowired
 	private OntologyModelService ontologyModelService;
