@@ -79,6 +79,7 @@ public class StudyServiceImpl implements StudyService {
 			observation.setGermplasmId(measurement.getGid());
 			observation.setPlotNumber(measurement.getPlotNumber());
 			observation.setReplicationNumber(measurement.getRepitionNumber());
+			observation.setSeedSource(measurement.getSeedSource());
 
 			final List<MeasurementDto> traits = measurement.getTraitMeasurements();
 			final List<Measurement> measurements = new ArrayList<Measurement>();
