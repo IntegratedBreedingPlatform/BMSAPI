@@ -6,7 +6,7 @@ import org.ibp.api.domain.ontology.PropertySummary;
 
 import java.util.List;
 
-public interface OntologyPropertyService {
+public interface PropertyService {
 
 	/**
 	 * get all properties

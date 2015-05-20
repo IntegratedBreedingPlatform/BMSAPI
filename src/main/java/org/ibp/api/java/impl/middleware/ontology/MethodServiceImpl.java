@@ -21,7 +21,7 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.ibp.api.java.impl.middleware.ontology.validator.MethodValidator;
-import org.ibp.api.java.ontology.OntologyMethodService;
+import org.ibp.api.java.ontology.MethodService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 @Service
-public class OntologyMethodServiceImpl extends ServiceBaseImpl implements OntologyMethodService {
+public class MethodServiceImpl extends ServiceBaseImpl implements MethodService {
 
 	@Autowired
 	private OntologyMethodDataManager ontologyMethodDataManager;

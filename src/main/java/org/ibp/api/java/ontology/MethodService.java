@@ -6,7 +6,7 @@ import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.MethodSummary;
 
-public interface OntologyMethodService {
+public interface MethodService {
 
 	/**
 	 * Get all Methods

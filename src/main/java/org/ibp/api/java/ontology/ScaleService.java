@@ -6,7 +6,7 @@ import org.ibp.api.domain.ontology.ScaleSummary;
 
 import java.util.List;
 
-public interface OntologyScaleService {
+public interface ScaleService {
 
 	/**
 	 * get all scales with details

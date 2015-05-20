@@ -17,7 +17,7 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
-import org.ibp.api.java.ontology.OntologyVariableService;
+import org.ibp.api.java.ontology.VariableService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +35,7 @@ import java.util.List;
  */
 
 @Service
-public class OntologyVariableServiceImpl extends ServiceBaseImpl implements OntologyVariableService{
+public class VariableServiceImpl extends ServiceBaseImpl implements VariableService{
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;

@@ -6,7 +6,7 @@ import java.util.List;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.MethodSummary;
-import org.ibp.api.java.ontology.OntologyMethodService;
+import org.ibp.api.java.ontology.MethodService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +26,13 @@ import com.wordnik.swagger.annotations.ApiOperation;
 public class MethodResource {
 
 	@Autowired
-	private OntologyMethodService ontologyMethodService;
+	private MethodService methodService;
 
 	@ApiOperation(value = "All Methods", notes = "Get all methods")
 	@RequestMapping(value = "/{cropname}/methods", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<MethodSummary>> listAllMethods(@PathVariable String cropname) {
-		List<MethodSummary> methodList = this.ontologyMethodService.getAllMethods();
+		List<MethodSummary> methodList = this.methodService.getAllMethods();
 		return new ResponseEntity<>(methodList, HttpStatus.OK);
 	}
 
@@ -40,14 +40,14 @@ public class MethodResource {
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<MethodDetails> getMethodById(@PathVariable String cropname, @PathVariable String id) {
-		return new ResponseEntity<>(this.ontologyMethodService.getMethod(id), HttpStatus.OK);
+		return new ResponseEntity<>(this.methodService.getMethod(id), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Add Method", notes = "Add a new Method")
 	@RequestMapping(value = "/{cropname}/methods", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addMethod(@PathVariable String cropname, @RequestBody MethodSummary method) {
-		return new ResponseEntity<>(this.ontologyMethodService.addMethod(method), HttpStatus.CREATED);
+		return new ResponseEntity<>(this.methodService.addMethod(method), HttpStatus.CREATED);
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -55,7 +55,7 @@ public class MethodResource {
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateMethod(@PathVariable String cropname, @PathVariable String id, @RequestBody MethodSummary method) {
-		this.ontologyMethodService.updateMethod(id, method);
+		this.methodService.updateMethod(id, method);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
@@ -64,7 +64,7 @@ public class MethodResource {
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteMethod(@PathVariable String cropname, @PathVariable String id) {
-		this.ontologyMethodService.deleteMethod(id);
+		this.methodService.deleteMethod(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }

@@ -2,7 +2,7 @@
 package org.ibp.api.rest.ontology;
 
 import org.ibp.api.domain.ontology.VariableType;
-import org.ibp.api.java.ontology.OntologyModelService;
+import org.ibp.api.java.ontology.ModelService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,12 +21,12 @@ import java.util.List;
 public class VariableTypeResource {
 
 	@Autowired
-	private OntologyModelService ontologyModelService;
+	private ModelService modelService;
 
 	@ApiOperation(value = "All Variable Types", notes = "Get all Variable Types")
 	@RequestMapping(value = "/variableTypes", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<VariableType>> listAllVariableTypes() {
-		return new ResponseEntity<>(this.ontologyModelService.getAllVariableTypes(), HttpStatus.OK);
+		return new ResponseEntity<>(this.modelService.getAllVariableTypes(), HttpStatus.OK);
 	}
 }

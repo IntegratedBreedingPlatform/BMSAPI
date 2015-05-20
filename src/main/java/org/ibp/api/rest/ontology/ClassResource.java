@@ -3,7 +3,7 @@ package org.ibp.api.rest.ontology;
 
 import java.util.List;
 
-import org.ibp.api.java.ontology.OntologyModelService;
+import org.ibp.api.java.ontology.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +22,12 @@ import com.wordnik.swagger.annotations.ApiOperation;
 public class ClassResource {
 
 	@Autowired
-	private OntologyModelService ontologyModelService;
+	private ModelService modelService;
 
 	@ApiOperation(value = "All Classes", notes = "Get all Classes")
 	@RequestMapping(value = "/{cropname}/classes", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<String>> listAllClasses(@PathVariable String cropname) {
-		return new ResponseEntity<>(this.ontologyModelService.getAllClasses(), HttpStatus.OK);
+		return new ResponseEntity<>(this.modelService.getAllClasses(), HttpStatus.OK);
 	}
 }

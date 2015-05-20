@@ -15,7 +15,7 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.ibp.api.java.impl.middleware.ontology.validator.PropertyValidator;
-import org.ibp.api.java.ontology.OntologyPropertyService;
+import org.ibp.api.java.ontology.PropertyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ import java.util.List;
  */
 
 @Service
-public class OntologyPropertyServiceImpl extends ServiceBaseImpl implements OntologyPropertyService {
+public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyService {
 
 	@Autowired
 	private OntologyPropertyDataManager ontologyPropertyDataManager;

@@ -4,7 +4,7 @@ package org.ibp.api.rest.ontology;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.ibp.api.domain.ontology.IdName;
-import org.ibp.api.java.ontology.OntologyModelService;
+import org.ibp.api.java.ontology.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +21,12 @@ import java.util.List;
 public class DataTypeResource {
 
 	@Autowired
-	private OntologyModelService ontologyModelService;
+	private ModelService modelService;
 
 	@ApiOperation(value = "All Data Types", notes = "Get all Data Types")
 	@RequestMapping(value = "/datatypes", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<IdName>> listAllDataTypes() {
-		return new ResponseEntity<>(this.ontologyModelService.getAllDataTypes(), HttpStatus.OK);
+		return new ResponseEntity<>(this.modelService.getAllDataTypes(), HttpStatus.OK);
 	}
 }

@@ -6,7 +6,7 @@ import org.ibp.api.domain.ontology.VariableSummary;
 
 import java.util.List;
 
-public interface OntologyVariableService {
+public interface VariableService {
 
 	/**
 	 * Get List of variables

@@ -18,7 +18,7 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.ibp.api.java.impl.middleware.ontology.validator.ScaleValidator;
-import org.ibp.api.java.ontology.OntologyScaleService;
+import org.ibp.api.java.ontology.ScaleService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,7 +40,7 @@ import static org.generationcp.middleware.domain.oms.DataType.NUMERIC_VARIABLE;
  */
 
 @Service
-public class OntologyScaleServiceImpl extends ServiceBaseImpl implements OntologyScaleService {
+public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 
 	@Autowired
 	private OntologyScaleDataManager ontologyScaleDataManager;

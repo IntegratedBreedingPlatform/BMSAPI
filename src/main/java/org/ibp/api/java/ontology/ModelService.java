@@ -5,7 +5,7 @@ import org.ibp.api.domain.ontology.VariableType;
 
 import java.util.List;
 
-public interface OntologyModelService {
+public interface ModelService {
 
 	/**
 	 * get all data types

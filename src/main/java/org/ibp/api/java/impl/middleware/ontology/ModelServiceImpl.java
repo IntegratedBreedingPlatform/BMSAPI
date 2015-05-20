@@ -11,7 +11,7 @@ import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.ontology.IdName;
 import org.ibp.api.domain.ontology.VariableType;
 import org.ibp.api.exception.ApiRuntimeException;
-import org.ibp.api.java.ontology.OntologyModelService;
+import org.ibp.api.java.ontology.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-public class OntologyModelServiceImpl implements OntologyModelService {
+public class ModelServiceImpl implements ModelService {
 
 	@Autowired
 	private TermDataManager termDataManager;
