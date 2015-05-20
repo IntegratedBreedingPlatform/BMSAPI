@@ -16,6 +16,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
+import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.ontology.VariableService;
 import org.modelmapper.ModelMapper;
@@ -43,23 +44,38 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	@Autowired
 	private VariableValidator variableValidator;
 
-    @Override
-    public List<VariableSummary> getAllVariablesByFilter(String programId, Integer propertyId, Boolean favourite) {
-        try {
-			List<OntologyVariableSummary> variableSummaries = this.ontologyVariableDataManager.getWithFilter(programId, favourite, null, propertyId, null);
+	@Autowired
+	private ProgramValidator programValidator;
+
+	@Override
+	public List<VariableSummary> getAllVariablesByFilter(String programId, String propertyId, Boolean favourite) {
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		this.programValidator.validate(programId, bindingResult);
+
+		if (bindingResult.hasErrors()) {
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
+		if (!Strings.isNullOrEmpty(propertyId)) {
+			validateId(propertyId, "Variable");
+		}
+
+		try {
+			List<OntologyVariableSummary> variableSummaries = this.ontologyVariableDataManager.getWithFilter(programId, favourite, null, CommonUtil.tryParseSafe(propertyId), null);
 			List<VariableSummary> variableSummaryList = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
 
 			for (OntologyVariableSummary variable : variableSummaries) {
-			    VariableSummary variableSummary = mapper.map(variable, VariableSummary.class);
-			    variableSummaryList.add(variableSummary);
+				VariableSummary variableSummary = mapper.map(variable, VariableSummary.class);
+				variableSummaryList.add(variableSummary);
 			}
 			return variableSummaryList;
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
-    }
+	}
 
     @Override
     public VariableDetails getVariableById(String programId, String variableId) {

@@ -8,7 +8,6 @@ import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.domain.ontology.PropertySummary;
 import org.ibp.api.java.ontology.PropertyService;
-import org.ibp.api.rest.AbstractResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +24,8 @@ import java.util.List;
 @Api(value = "Ontology Property Service")
 @Controller
 @RequestMapping("/ontology")
-/**
- * Extended from {@link AbstractResource} for providing basic validations to resource
- */
-public class PropertyResource extends AbstractResource {
+
+public class PropertyResource {
 
 	@Autowired
 	private PropertyService propertyService;

@@ -1,22 +1,16 @@
 
 package org.ibp.api.rest.ontology;
 
-import java.util.HashMap;
 import java.util.List;
 
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableSummary;
-import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.ontology.VariableService;
-import org.ibp.api.rest.AbstractResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.common.base.Strings;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
@@ -35,37 +28,17 @@ import com.wordnik.swagger.annotations.ApiOperation;
 @Api(value = "Ontology Variable Service")
 @Controller
 @RequestMapping("/ontology")
-public class VariableResource extends AbstractResource {
+public class VariableResource {
 
 	@Autowired
 	private VariableService variableService;
-
-	@Autowired
-	private ProgramValidator programValidator;
 
 	@ApiOperation(value = "All variables", notes = "Gets all variables.")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<VariableSummary>> listAllVariables(@PathVariable String cropname, @RequestParam(value = "property", required = false) String propertyId,
 			@RequestParam(value = "favourite", required = false) Boolean favourite, @RequestParam(value = "programId") String programId) {
-		
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-		this.programValidator.validate(programId, bindingResult);
-
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-
-		Integer pId = null;
-
-		if (!Strings.isNullOrEmpty(propertyId)) {
-			this.requestIdValidator.validate(propertyId, bindingResult);
-			if (bindingResult.hasErrors()) {
-				throw new ApiRequestValidationException(bindingResult.getAllErrors());
-			}
-			pId = Integer.valueOf(propertyId);
-		}
-		return new ResponseEntity<>(this.variableService.getAllVariablesByFilter(programId, pId, favourite), HttpStatus.OK);
+		return new ResponseEntity<>(this.variableService.getAllVariablesByFilter(programId, propertyId, favourite), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get Variable", notes = "Get Variable By Id")
