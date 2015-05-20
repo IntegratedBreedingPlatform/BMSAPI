@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
@@ -34,8 +35,8 @@ public class ScaleValidatorTest {
 	private Integer cvId = CvId.SCALES.getId();
 	private String scaleName = "MyScale";
 	private String description = "Scale Description";
-	private IdName categoricalId = new IdName(1048, "Categorical");
-	private IdName numericalId = new IdName(1110, "Numeric");
+	private IdName categoricalId = new IdName(DataType.CATEGORICAL_VARIABLE.getId(), "Categorical");
+	private IdName numericalId = new IdName(DataType.NUMERIC_VARIABLE.getId(), "Numeric");
 
 	@Before
 	public void reset() {
