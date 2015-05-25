@@ -26,7 +26,7 @@ public class LocationResource {
 
 	@RequestMapping(value = "/{cropname}/types", method = RequestMethod.GET)
 	@ApiOperation(value = "Get all location types", notes = "Returns all location types.")
-	public ResponseEntity<Set<LocationType>> getInventoryLotInfoForGermplasm(@PathVariable String cropname) {
+	public ResponseEntity<Set<LocationType>> getAllLocationTypes(@PathVariable String cropname) {
 		return new ResponseEntity<Set<LocationType>>(this.locationService.getAllLocationTypes(), HttpStatus.OK);
 	}
 
