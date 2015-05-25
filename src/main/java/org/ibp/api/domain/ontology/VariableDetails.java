@@ -1,6 +1,5 @@
 package org.ibp.api.domain.ontology;
 
-import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 
@@ -19,7 +18,7 @@ public class VariableDetails extends TermSummary{
     private final TermSummary methodSummary = new TermSummary();
     private final TermSummary propertySummary = new TermSummary();
     private ScaleSummary scale;
-    private final List<TermSummary> variableTypes = new ArrayList<>();
+    private final List<VariableType> variableTypes = new ArrayList<>();
     private boolean favourite;
     private final ExpectedRange expectedRange = new ExpectedRange();
 
@@ -87,18 +86,14 @@ public class VariableDetails extends TermSummary{
         this.expectedRange.setMax(max);
     }
 
-    public List<TermSummary> getVariableTypes() {
+    public List<org.ibp.api.domain.ontology.VariableType> getVariableTypes() {
         return this.variableTypes;
     }
 
     public void setVariableTypes(Set<VariableType> variables) {
         this.variableTypes.clear();
-        for (VariableType v : variables) {
-            TermSummary termSummary = new TermSummary();
-            termSummary.setId(v.getId().toString());
-            termSummary.setName(v.getName());
-            termSummary.setDescription(v.getDescription());
-            this.variableTypes.add(termSummary);
+        for (VariableType variableType : variables) {
+            this.variableTypes.add(variableType);
         }
     }
 

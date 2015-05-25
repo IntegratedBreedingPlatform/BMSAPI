@@ -6,6 +6,9 @@ public class VariableType {
 	private String name;
 	private String description;
 
+	public VariableType() {
+	}
+
 	public VariableType(Integer id, String name, String description) {
 		this.id = id;
 		this.name = name;

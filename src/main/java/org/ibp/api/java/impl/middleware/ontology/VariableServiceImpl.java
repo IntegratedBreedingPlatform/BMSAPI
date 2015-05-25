@@ -141,14 +141,15 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			variableInfo.setMethodId(methodId);
 			variableInfo.setPropertyId(propertyId);
 			variableInfo.setScaleId(scaleId);
+			variableInfo.setProgramUuid(variable.getProgramUuid());
 
 			if (!Strings.isNullOrEmpty(variable.getExpectedRange().getMin()) && !Strings.isNullOrEmpty(variable.getExpectedRange().getMax())) {
 			    variableInfo.setMinValue(variable.getExpectedRange().getMin());
 			    variableInfo.setMaxValue(variable.getExpectedRange().getMax());
 			}
 
-			for (String i : variable.getVariableTypeIds()) {
-			    variableInfo.addVariableType(VariableType.getById(CommonUtil.tryParseSafe(i)));
+			for (org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
+			    variableInfo.addVariableType(VariableType.getById(variableType.getId()));
 			}
 
 			this.ontologyVariableDataManager.addVariable(variableInfo);
@@ -194,14 +195,15 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			variableInfo.setPropertyId(propertyId);
 			variableInfo.setScaleId(scaleId);
 			variableInfo.setIsFavorite(variable.isFavourite());
+			variableInfo.setProgramUuid(variable.getProgramUuid());
 
 			if (!Strings.isNullOrEmpty(variable.getExpectedRange().getMin()) && !Strings.isNullOrEmpty(variable.getExpectedRange().getMax())) {
 			    variableInfo.setMinValue(variable.getExpectedRange().getMin());
 			    variableInfo.setMaxValue(variable.getExpectedRange().getMax());
 			}
 
-			for (String i : variable.getVariableTypeIds()) {
-			    variableInfo.addVariableType(VariableType.getById(CommonUtil.tryParseSafe(i)));
+			for (org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
+			    variableInfo.addVariableType(VariableType.getById(variableType.getId()));
 			}
 
 			this.ontologyVariableDataManager.updateVariable(variableInfo);

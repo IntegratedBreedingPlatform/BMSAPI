@@ -4,11 +4,11 @@ import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
-import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.ontology.VariableSummary;
+import org.ibp.api.domain.ontology.VariableType;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +89,6 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		boolean combinationValidationResult = propertyValidationResult && methodValidationResult && scaleValidationResult;
 
 		if(combinationValidationResult){
-
 			combinationValidationResult = checkIfMethodPropertyScaleCombination(variable, errors);
 		}
 
@@ -101,7 +100,6 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			this.variableShouldBeEditable(variable, errors);
 		}
 	}
-
 
 	private boolean nameValidationProcessor(VariableSummary variable, Errors errors){
 
@@ -158,14 +156,14 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		Integer initialCount = errors.getErrorCount();
 
 		// 6. Property ID is required
-		this.shouldNotNullOrEmpty("Property", "propertyId", variable.getPropertySummary().getId(), errors);
+		this.shouldNotNullOrEmpty("Property", "propertyId", variable.getPropertySummary(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
 
 		// 7. Property ID must correspond to the ID of an existing property
-		this.checkTermExist("Property", "propertyId", variable.getPropertySummary().getId().toString(), CvId.PROPERTIES.getId(), errors);
+		this.checkTermExist("Property", "propertyId", variable.getPropertySummary().getId(), CvId.PROPERTIES.getId(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
@@ -175,14 +173,14 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		Integer initialCount = errors.getErrorCount();
 
 		// 8. Method ID is required
-		this.shouldNotNullOrEmpty("Method", "methodId", variable.getMethodSummary().getId(), errors);
+		this.shouldNotNullOrEmpty("Method", "methodId", variable.getMethodSummary(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
 
 		// 9. Method ID must correspond to the ID of an existing method
-		this.checkTermExist("Method", "methodId", variable.getMethodSummary().getId().toString(), CvId.METHODS.getId(), errors);
+		this.checkTermExist("Method", "methodId", variable.getMethodSummary().getId(), CvId.METHODS.getId(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
@@ -192,14 +190,14 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		Integer initialCount = errors.getErrorCount();
 
 		// 10. Scale ID is required
-		this.shouldNotNullOrEmpty("Scale", "scaleId", variable.getScaleSummary().getId(), errors);
+		this.shouldNotNullOrEmpty("Scale", "scaleId", variable.getScaleSummary(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
 
 		// 11. Scale ID must correspond to the ID of an existing scale
-		this.checkTermExist("Scale", "scaleId", variable.getScaleSummary().getId().toString(), CvId.SCALES.getId(), errors);
+		this.checkTermExist("Scale", "scaleId", variable.getScaleSummary().getId(), CvId.SCALES.getId(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
@@ -262,7 +260,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		Integer initialCount = errors.getErrorCount();
 
 		// 17. Variable type IDs is required
-		if(variable.getVariableTypeIds().isEmpty()){
+		if(variable.getVariableTypes().isEmpty()){
 			this.addCustomError(errors, "variableTypeIds", LIST_SHOULD_NOT_BE_EMPTY, new Object[]{"variable type"});
 		}
 
@@ -271,8 +269,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// 18. Variable type IDs must be an array of integer values that correspond to the IDs of variable types and contain at least one item
-		for (String i : variable.getVariableTypeIds()) {
-			if (VariableType.getById(CommonUtil.tryParseSafe(i)) == null) {
+		for (VariableType variableType : variable.getVariableTypes()) {
+			if (org.generationcp.middleware.domain.oms.VariableType.getById(variableType.getId()) == null) {
 				this.addCustomError(errors, "variableTypeIds", INVALID_TYPE_ID, new Object[] {"Variable Type"});
 			}
 		}

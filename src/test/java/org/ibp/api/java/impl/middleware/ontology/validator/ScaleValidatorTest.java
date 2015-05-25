@@ -2,14 +2,13 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
-import org.ibp.api.domain.ontology.IdName;
+import org.ibp.api.domain.ontology.DataType;
 import org.ibp.api.domain.ontology.ScaleSummary;
-import org.ibp.api.domain.ontology.ValidValues;
-import org.ibp.api.domain.ontology.VariableCategory;
+import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,9 +19,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ScaleValidatorTest {
@@ -32,17 +29,15 @@ public class ScaleValidatorTest {
 
 	private ScaleValidator scaleValidator;
 
-	private Integer cvId = CvId.SCALES.getId();
-	private String scaleName = "MyScale";
-	private String description = "Scale Description";
-	private IdName categoricalId = new IdName(DataType.CATEGORICAL_VARIABLE.getId(), "Categorical");
-	private IdName numericalId = new IdName(DataType.NUMERIC_VARIABLE.getId(), "Numeric");
+	@Mock
+	private OntologyScaleDataManager ontologyScaleDataManager;
 
 	@Before
 	public void reset() {
-		MockitoAnnotations .initMocks(this);
+		MockitoAnnotations.initMocks(this);
 		scaleValidator = new ScaleValidator();
 		scaleValidator.setTermDataManager(termDataManager);
+		scaleValidator.setOntologyScaleDataManager(ontologyScaleDataManager);
 	}
 
 	@After
@@ -58,17 +53,10 @@ public class ScaleValidatorTest {
 	@Test
 	public void testWithNullNameRequest() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.termDataManager)
-		.getTermByNameAndCvId(this.scaleName, this.cvId);
+		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
+		scaleSummary.setName("");
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-
-		ScaleSummary scaleSummary = new ScaleSummary();
-		scaleSummary.setName("");
-		scaleSummary.setDescription(this.description);
-		scaleSummary.setDataType(numericalId);
-		scaleSummary.setMinValue("1");
-		scaleSummary.setMaxValue("10");
 
 		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -83,17 +71,15 @@ public class ScaleValidatorTest {
 	@Test
 	public void testWithUniqueNonNullScaleName() throws MiddlewareException {
 
-		Mockito.doReturn(new Term(10, this.scaleName, this.description))
-		.when(this.termDataManager).getTermByNameAndCvId(this.scaleName, this.cvId);
+		Term scaleTerm = TestDataProvider.getScaleTerm();
+
+		scaleTerm.setId(scaleTerm.getId() + 100);
+
+		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermByNameAndCvId(scaleTerm.getName(), CvId.SCALES.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
-		ScaleSummary scaleSummary = new ScaleSummary();
-		scaleSummary.setName(this.scaleName);
-		scaleSummary.setDescription(this.description);
-		scaleSummary.setDataType(numericalId);
-		scaleSummary.setMinValue("1");
-		scaleSummary.setMaxValue("10");
+		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
 
 		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -105,15 +91,12 @@ public class ScaleValidatorTest {
 	 */
 	@Test
 	public void testWithDataTypeRequired() {
+
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
-		IdName dataType = new IdName();
-
-		ScaleSummary scaleSummary = new ScaleSummary();
-		scaleSummary.setName(this.scaleName);
-		scaleSummary.setDescription(this.description);
-		scaleSummary.setDataType(dataType);
-
+		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
+		//Remove dataType from test object.
+		scaleSummary.setDataType(null);
 		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("dataTypeId"));
@@ -123,16 +106,12 @@ public class ScaleValidatorTest {
 	 * Test for to Check Valid DataType
 	 */
 	@Test
-	public void testWithValidDataType() {
+	public void testWithInvalidDataType() {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
-		IdName dataType = new IdName(1, "Invalid DataType");
-
-		ScaleSummary scaleSummary = new ScaleSummary();
-		scaleSummary.setName(this.scaleName);
-		scaleSummary.setDescription(this.description);
-		scaleSummary.setDataType(dataType);
-
+		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
+		//Setting invalid dataTypeId
+		scaleSummary.setDataType(new DataType());
 		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("dataTypeId"));
@@ -145,12 +124,8 @@ public class ScaleValidatorTest {
 	public void testWithAtLeastOneCategory() {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
-		ScaleSummary scaleSummary = new ScaleSummary();
-		scaleSummary.setName(this.scaleName);
-		scaleSummary.setDescription(this.description);
-		scaleSummary.setDataType(categoricalId);
-		Map<String, String> categories = new HashMap<>();
-		scaleSummary.setCategories(categories);
+		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
+		scaleSummary.setDataType(TestDataProvider.categoricalDataType);
 
 		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -164,12 +139,11 @@ public class ScaleValidatorTest {
 	@Test
 	public void testWithUniqueLabelNameInCategoricalDataType() {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-		Map<String, String> categories = new HashMap<>();
 
-		ScaleSummary scaleSummary = new ScaleSummary();
-		scaleSummary.setName(this.scaleName);
-		scaleSummary.setDescription(this.description);
-		scaleSummary.setDataType(categoricalId);
+		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
+		scaleSummary.setDataType(TestDataProvider.categoricalDataType);
+
+		Map<String, String> categories = new HashMap<>();
 		categories.put("1", "description");
 		categories.put("11", "description");
 		scaleSummary.setCategories(categories);
@@ -185,21 +159,11 @@ public class ScaleValidatorTest {
 	@Test
 	public void testWithMinValueGreater() {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-		Map<String, String> categories = new HashMap<>();
 
-		ValidValues validValues = new ValidValues();
-		validValues.setMin("10");
-		validValues.setMax("1");
-
-		ScaleSummary scaleSummary = new ScaleSummary();
-		scaleSummary.setName(this.scaleName);
-		scaleSummary.setDescription(this.description);
-		scaleSummary.setDataType(numericalId);
-		scaleSummary.setMinValue("10");
-		scaleSummary.setMaxValue("1");
-		categories.put("1", "description");
-		categories.put("11", "description");
-		scaleSummary.setCategories(categories);
+		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
+		scaleSummary.setId(null);
+		scaleSummary.setMinValue(10);
+		scaleSummary.setMaxValue(5);
 
 		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -214,16 +178,11 @@ public class ScaleValidatorTest {
 	@Test
 	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.scaleName, this.cvId);
+		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
+		scaleSummary.setName(RandomStringUtils.random(205));
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(scaleSummary.getName(), CvId.SCALES.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-
-		ScaleSummary scaleSummary = new ScaleSummary();
-		scaleSummary.setName(RandomStringUtils.random(205));
-		scaleSummary.setDescription(this.description);
-		scaleSummary.setDataType(numericalId);
-		scaleSummary.setMinValue("1");
-		scaleSummary.setMaxValue("10");
 
 		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -238,16 +197,12 @@ public class ScaleValidatorTest {
 	@Test
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.scaleName, this.cvId);
+		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
+		scaleSummary.setDescription(RandomStringUtils.random(260));
+
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(scaleSummary.getName(), CvId.SCALES.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
-
-		ScaleSummary scaleSummary = new ScaleSummary();
-		scaleSummary.setName(this.scaleName);
-		scaleSummary.setDescription(RandomStringUtils.random(260));
-		scaleSummary.setDataType(numericalId);
-		scaleSummary.setMinValue("1");
-		scaleSummary.setMaxValue("10");
 
 		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -258,22 +213,12 @@ public class ScaleValidatorTest {
 	 * Test for valid request
 	 */
 	@Test
-	public void testWithValidRequest() {
+	public void testWithValidRequest() throws  MiddlewareException{
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
-		List<VariableCategory> categories = new ArrayList<>();
-		categories.add(new VariableCategory("1", "description"));
-		categories.add(new VariableCategory("11", "description1"));
-
-		ValidValues validValues = new ValidValues();
-		validValues.setCategories(categories);
-
-		ScaleSummary scaleSummary = new ScaleSummary();
-		scaleSummary.setName(this.scaleName);
-		scaleSummary.setDescription(this.description);
-		scaleSummary.setDataType(numericalId);
-		scaleSummary.setMinValue("1");
-		scaleSummary.setMaxValue("10");
+		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
+		scaleSummary.setId(null);
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(scaleSummary.getName(), CvId.SCALES.getId());
 
 		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertFalse(bindingResult.hasErrors());

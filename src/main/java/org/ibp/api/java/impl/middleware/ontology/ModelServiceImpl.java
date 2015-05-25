@@ -3,12 +3,11 @@ package org.ibp.api.java.impl.middleware.ontology;
 import com.google.common.base.Function;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.util.Util;
-import org.ibp.api.domain.ontology.IdName;
+import org.ibp.api.domain.ontology.DataType;
 import org.ibp.api.domain.ontology.VariableType;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.ontology.ModelService;
@@ -28,12 +27,12 @@ public class ModelServiceImpl implements ModelService {
 	private TermDataManager termDataManager;
 
 	@Override
-	public List<IdName> getAllDataTypes() {
-		return Util.convertAll(Arrays.asList(DataType.values()), new Function<DataType, IdName>() {
+	public List<DataType> getAllDataTypes() {
+		return Util.convertAll(Arrays.asList(org.generationcp.middleware.domain.oms.DataType.values()), new Function<org.generationcp.middleware.domain.oms.DataType, DataType>() {
 
 			@Override
-			public IdName apply(DataType dataType) {
-				return new IdName(dataType.getId(), dataType.getName());
+			public DataType apply(org.generationcp.middleware.domain.oms.DataType dataType) {
+				return new DataType(dataType.getId(), dataType.getName());
 			}
 		});
 	}

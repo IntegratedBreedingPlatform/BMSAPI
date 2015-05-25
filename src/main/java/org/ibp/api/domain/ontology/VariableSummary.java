@@ -1,9 +1,6 @@
 package org.ibp.api.domain.ontology;
 
-import org.generationcp.middleware.domain.oms.VariableType;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -13,14 +10,14 @@ import java.util.Set;
 public class VariableSummary extends TermSummary {
 
 	private String alias;
-	private TermSummary propertySummary;
-	private TermSummary methodSummary;
-	private ScaleSummary scaleSummary;
-	private List<IdName> variableTypes = new ArrayList<>();
+	private String programUuid;
+	private TermSummary propertySummary = new TermSummary();
+	private TermSummary methodSummary = new TermSummary();
+	private TermSummary scaleSummary = new TermSummary();
+	private DataType dataType = new DataType();
+	private Set<VariableType> variableTypes = new HashSet<>();
 	private boolean favourite;
 	private final ExpectedRange expectedRange = new ExpectedRange();
-	private List<String> variableTypeIds;
-	private String programUuid;
 	private MetadataSummary metadata = new MetadataSummary();
 
 	public String getProgramUuid() {
@@ -63,31 +60,36 @@ public class VariableSummary extends TermSummary {
 		this.methodSummary = methodSummary;
 	}
 
-	public ScaleSummary getScaleSummary() {
+	public TermSummary getScaleSummary() {
 		return this.scaleSummary;
 	}
 
-	public void setScaleSummary(ScaleSummary scaleSummary) {
+	public void setScaleSummary(TermSummary scaleSummary) {
 		this.scaleSummary = scaleSummary;
 	}
 
-	public List<IdName> getVariableTypes() {
+	public DataType getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(DataType dataType) {
+		this.dataType = dataType;
+	}
+
+	public Set<VariableType> getVariableTypes() {
 		return this.variableTypes;
-	}
-
-	public List<String> getVariableTypeIds() {
-		return variableTypeIds;
-	}
-
-	public void setVariableTypeIds(List<String> variableTypeIds) {
-		this.variableTypeIds = variableTypeIds;
 	}
 
 	public void setVariableTypes(Set<VariableType> variables) {
 		// Note: clear list if any exist
 		this.variableTypes.clear();
+
+		if (variables == null){
+			return;
+		}
+
 		for (VariableType v : variables) {
-			this.variableTypes.add(new IdName(v.getId(), v.getName()));
+			this.variableTypes.add(new VariableType(v.getId(), v.getName(), v.getDescription()));
 		}
 	}
 

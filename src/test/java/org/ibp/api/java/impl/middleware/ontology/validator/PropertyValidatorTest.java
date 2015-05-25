@@ -8,6 +8,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.domain.ontology.PropertySummary;
+import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,7 +21,6 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Test each property validation
@@ -35,15 +35,9 @@ public class PropertyValidatorTest {
 	@Mock
 	private TermDataManager termDataManager;
 
-	private Set<String> classes = new HashSet<>();
-
-	Integer cvId = CvId.PROPERTIES.getId();
-	String propertyName = "MyProperty";
-	String description = "Property Description";
-
 	@Before
 	public void beforeEachTest() {
-		MockitoAnnotations .initMocks(this);
+		MockitoAnnotations.initMocks(this);
 		propertyValidator = new PropertyValidator();
 		propertyValidator.setTermDataManager(termDataManager);
 		propertyValidator.setOntologyPropertyDataManager(ontologyPropertyDataManager);
@@ -62,14 +56,10 @@ public class PropertyValidatorTest {
 	@Test
 	public void testWithNullNameRequest() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
+		PropertySummary propertySummary = TestDataProvider.getTestPropertySummary();
+		propertySummary.setName("");
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
-
-		PropertySummary propertySummary = new PropertySummary();
-		propertySummary.setName("");
-		propertySummary.setDescription(this.description);
-		propertySummary.setClasses(new HashSet<String>());
 
 		this.propertyValidator.validate(propertySummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -84,18 +74,18 @@ public class PropertyValidatorTest {
 	@Test
 	public void testWithUniqueNonNullPropertyName() throws MiddlewareException {
 
-		Mockito.doReturn(new Term(10, this.propertyName, this.description))
-				.when(this.termDataManager)
-				.getTermByNameAndCvId(this.propertyName, this.cvId);
+		Term propertyTerm = TestDataProvider.getPropertyTerm();
+
+		//Changing term with another id to validate uniqueness by validator
+		propertyTerm.setId(propertyTerm.getId() + 100);
+
+		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermByNameAndCvId(propertyTerm.getName(), CvId.PROPERTIES.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		PropertySummary request = new PropertySummary();
-		request.setName(this.propertyName);
-		request.setDescription(this.description);
-		request.setClasses(new HashSet<String>());
+		PropertySummary propertySummary = TestDataProvider.getTestPropertySummary();
 
-		this.propertyValidator.validate(request, bindingResult);
+		this.propertyValidator.validate(propertySummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
@@ -108,17 +98,16 @@ public class PropertyValidatorTest {
 	@Test
 	public void testWithClassNameNonEmptyUniqueValues() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
+		PropertySummary propertySummary = TestDataProvider.getTestPropertySummary();
 
-		PropertySummary request = new PropertySummary();
-		request.setName(this.propertyName);
-		request.setDescription(this.description);
-		request.setClasses(new HashSet<String>());
+		//Set empty classes to check nonempty
+		propertySummary.setClasses(new HashSet<String>());
 
-		// Assert for no class defined
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(propertySummary.getName(), CvId.PROPERTIES.getId());
+
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		this.propertyValidator.validate(request, bindingResult);
+		this.propertyValidator.validate(propertySummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("classes"));
 	}
@@ -131,25 +120,20 @@ public class PropertyValidatorTest {
 	@Test
 	public void testWithNonEditableRequest() throws MiddlewareException {
 
-		Integer requestId = 10;
+		Property property = TestDataProvider.getTestProperty();
 
-		Term dbTerm = new Term(requestId, this.propertyName, this.description);
-		Property toReturn = new Property(dbTerm);
-
-		PropertySummary request = new PropertySummary();
-		request.setId(String.valueOf(requestId));
-		request.setName(this.propertyName + "0");
-		request.setDescription(this.description);
-		request.setClasses(new HashSet<String>());
-
-		Mockito.doReturn(dbTerm).when(this.termDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
-		Mockito.doReturn(true).when(this.termDataManager).isTermReferred(requestId);
-		Mockito.doReturn(toReturn).when(this.ontologyPropertyDataManager).getProperty(requestId);
+		Mockito.doReturn(TestDataProvider.getPropertyTerm()).when(this.termDataManager).getTermByNameAndCvId(property.getName(), CvId.PROPERTIES.getId());
+		Mockito.doReturn(true).when(this.termDataManager).isTermReferred(property.getId());
+		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		this.propertyValidator.validate(request, bindingResult);
+		PropertySummary propertySummary = TestDataProvider.getTestPropertySummary();
+		propertySummary.setName("ChangedName");
+
+		this.propertyValidator.validate(propertySummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
+		Assert.assertTrue(bindingResult.getAllErrors().size() == 1);
 	}
 
 	/**
@@ -160,16 +144,12 @@ public class PropertyValidatorTest {
 	@Test
 	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
+		PropertySummary propertySummary = TestDataProvider.getTestPropertySummary();
+		propertySummary.setName(RandomStringUtils.random(205));
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		PropertySummary request = new PropertySummary();
-		request.setName(RandomStringUtils.random(205));
-		request.setDescription(this.description);
-		request.setClasses(new HashSet<String>());
-
-		this.propertyValidator.validate(request, bindingResult);
+		this.propertyValidator.validate(propertySummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
@@ -182,16 +162,14 @@ public class PropertyValidatorTest {
 	@Test
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
+		PropertySummary propertySummary = TestDataProvider.getTestPropertySummary();
+		propertySummary.setDescription(RandomStringUtils.random(260));
+
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(propertySummary.getName(), CvId.PROPERTIES.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		PropertySummary request = new PropertySummary();
-		request.setName(this.propertyName);
-		request.setDescription(RandomStringUtils.random(260));
-		request.setClasses(new HashSet<String>());
-
-		this.propertyValidator.validate(request, bindingResult);
+		this.propertyValidator.validate(propertySummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("description"));
 	}
@@ -204,17 +182,14 @@ public class PropertyValidatorTest {
 	@Test
 	public void testWithValidRequest() throws MiddlewareException {
 
-		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(this.propertyName, this.cvId);
+		PropertySummary propertySummary = TestDataProvider.getTestPropertySummary();
+
+		//Post request does not expect property id.
+		propertySummary.setId(null);
+
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(propertySummary.getName(), CvId.PROPERTIES.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
-
-		PropertySummary propertySummary = new PropertySummary();
-		propertySummary.setName(this.propertyName);
-		propertySummary.setDescription(this.description);
-		classes.add("Class1");
-		classes.add("Class2");
-		propertySummary.setClasses(classes);
-
 		this.propertyValidator.validate(propertySummary, bindingResult);
 		Assert.assertFalse(bindingResult.hasErrors());
 	}

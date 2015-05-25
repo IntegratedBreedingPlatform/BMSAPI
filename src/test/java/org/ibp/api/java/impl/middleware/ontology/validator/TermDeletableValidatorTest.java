@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.java.impl.middleware.ontology.TermRequest;
+import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,8 +24,6 @@ public class TermDeletableValidatorTest {
 	private TermDataManager termDataManager;
 
 	private TermDeletableValidator termDeletableValidator;
-
-	Integer cvId = CvId.METHODS.getId();
 
 	@Before
 	public void reset() {
@@ -46,11 +45,11 @@ public class TermDeletableValidatorTest {
 	@Test
 	public void testWithTermReferred() throws MiddlewareException {
 
-		Mockito.doReturn(true).when(this.termDataManager).isTermReferred(10);
+		Term termMethod = TestDataProvider.getMethodTerm();
+		Mockito.doReturn(true).when(this.termDataManager).isTermReferred(termMethod.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-		this.termDeletableValidator.validate(new TermRequest("10", "method", this.cvId),
-				bindingResult);
+		this.termDeletableValidator.validate(new TermRequest(String.valueOf(termMethod.getId()), "method", CvId.METHODS.getId()), bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 	}
 
@@ -62,13 +61,13 @@ public class TermDeletableValidatorTest {
 	@Test
 	public void testWithTermNotReferred() throws MiddlewareException {
 
-		Mockito.doReturn(new Term(10, "name", "", CvId.METHODS.getId(), false))
-		.when(this.termDataManager).getTermById(10);
-		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(10);
+		Term methodTerm = TestDataProvider.getMethodTerm();
+
+		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
+		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(methodTerm.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-		this.termDeletableValidator.validate(new TermRequest("10", "method", this.cvId),
-				bindingResult);
+		this.termDeletableValidator.validate(new TermRequest(String.valueOf(methodTerm.getId()), "method", CvId.METHODS.getId()), bindingResult);
 		Assert.assertFalse(bindingResult.hasErrors());
 	}
 }

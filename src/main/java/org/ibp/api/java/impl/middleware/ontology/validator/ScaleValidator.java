@@ -225,7 +225,7 @@ org.springframework.validation.Validator {
 		Integer initialCount = errors.getErrorCount();
 
 		// 3. Data type is required
-		this.shouldNotNullOrEmpty("Data Type", "dataTypeId", scaleSummary.getDataType().getId(), errors);
+		this.shouldNotNullOrEmpty("Data Type", "dataTypeId", scaleSummary.getDataType(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
@@ -262,7 +262,7 @@ org.springframework.validation.Validator {
 		// 5. If the data type is categorical, at least one category must be
 		// submitted
 		if (Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)) {
-			if (categories.isEmpty()) {
+			if (categories == null || categories.isEmpty()) {
 				this.addCustomError(errors, "validValues.categories", LIST_SHOULD_NOT_BE_EMPTY, new Object[]{"category"});
 			}
 		}

@@ -2,7 +2,6 @@ package org.ibp.api.domain.ontology;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.ibp.api.java.impl.middleware.common.CommonUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,20 +21,16 @@ public class ValidValues {
 		return this.min;
 	}
 
-	public void setMin(String min) {
-		if(min != null){
-			this.min = CommonUtil.tryParseSafe(min);
-		}
+	public void setMin(Integer min) {
+		this.min = min;
 	}
 
 	public Integer getMax() {
 		return this.max;
 	}
 
-	public void setMax(String max) {
-		if(max != null){
-			this.max = CommonUtil.tryParseSafe(max);
-		}
+	public void setMax(Integer max) {
+		this.max = max;
 	}
 
 	public List<VariableCategory> getCategories() {

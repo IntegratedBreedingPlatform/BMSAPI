@@ -12,7 +12,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.MethodSummary;
-import org.ibp.builders.MethodBuilder;
+import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,12 +29,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.doAnswer;
-import static org.hamcrest.Matchers.*;
 
 public class MethodResourceTest extends ApiUnitTestBase {
 
@@ -83,16 +83,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllMethods() throws Exception {
 
-		Calendar dateCreated = Calendar.getInstance();
-		dateCreated.set(2015, Calendar.JANUARY, 1);
-		
-		Calendar dateLastModified = Calendar.getInstance();
-		dateLastModified.set(2015, Calendar.JANUARY, 2);
-			
-		List<Method> methodList = new ArrayList<>();
-		methodList.add(new MethodBuilder().build(1, "m1", "d1", dateCreated.getTime(), dateLastModified.getTime()));
-		methodList.add(new MethodBuilder().build(2, "m2", "d2", dateCreated.getTime(), dateLastModified.getTime()));
-		methodList.add(new MethodBuilder().build(3, "m3", "d3", dateCreated.getTime(), dateLastModified.getTime()));
+		List<Method> methodList = TestDataProvider.getTestMethodList(3);
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(methodList).when(this.ontologyMethodDataManager).getAllMethods();
@@ -101,7 +92,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 				.contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$",IsCollectionWithSize.hasSize(methodList.size())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", is("1")))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", is(String.valueOf(methodList.get(0).getId()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", is(methodList.get(0).getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", is(methodList.get(0).getDefinition())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].metadata.dateCreated", is(ISO8601DateParser.toString(methodList.get(0).getDateCreated()))))
@@ -118,23 +109,17 @@ public class MethodResourceTest extends ApiUnitTestBase {
 	 */
 	@Test
 	public void getMethodById() throws Exception {
-		
-		Calendar dateCreated = Calendar.getInstance();
-		dateCreated.set(2015, Calendar.JANUARY, 1);
-		
-		Calendar dateLastModified = Calendar.getInstance();
-		dateLastModified.set(2015, Calendar.JANUARY, 2);
 
-		Method method = new MethodBuilder().build(1, "m1", "d1", dateCreated.getTime(), dateLastModified.getTime());
+		Method method = TestDataProvider.getTestMethod();
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
-		Mockito.doReturn(new Term(1, method.getName(), method.getDefinition(), CvId.METHODS.getId(), false)).when(this.termDataManager).getTermById(1);
-		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(1);
+		Mockito.doReturn(TestDataProvider.getMethodTerm()).when(this.termDataManager).getTermById(method.getId());
+		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId());
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/methods/{id}", cropName, 1)
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/methods/{id}", cropName, method.getId())
 				.contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is("1")))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(String.valueOf(method.getId()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.name", is(method.getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.description", is(method.getDefinition())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.dateCreated", is(ISO8601DateParser.toString(method.getDateCreated()))))
@@ -144,7 +129,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.usage.variables", empty()))
 				.andDo(MockMvcResultHandlers.print());
 
-		Mockito.verify(this.ontologyMethodDataManager, Mockito.times(1)).getMethod(1);
+		Mockito.verify(this.ontologyMethodDataManager, Mockito.times(1)).getMethod(method.getId());
 	}
 
 	/**
@@ -174,13 +159,12 @@ public class MethodResourceTest extends ApiUnitTestBase {
 	@Test
 	public void addMethod() throws Exception {
 
-		MethodSummary methodDTO = new MethodSummary();
-		methodDTO.setName("methodName");
-		methodDTO.setDescription("methodDescription");
+		final MethodSummary methodSummary = TestDataProvider.getTestMethodSummary();
 
-		Method method = new Method();
-		method.setName(methodDTO.getName());
-		method.setDefinition(methodDTO.getDescription());
+		//Setting id as null to ignore checking editable field validation.
+		methodSummary.setId(null);
+
+		final Method method = TestDataProvider.getTestMethod();
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 
@@ -190,7 +174,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 				Object[] arguments = invocation.getArguments();
 				if (arguments != null && arguments.length > 0 && arguments[0] != null) {
 					Method entity = (Method) arguments[0];
-					entity.setId(1);
+					entity.setId(method.getId());
 				}
 				return null;
 			}
@@ -198,9 +182,9 @@ public class MethodResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/methods", cropName)
 				.contentType(this.contentType)
-				.content(this.convertObjectToByte(methodDTO)))
+				.content(this.convertObjectToByte(methodSummary)))
 				.andExpect(MockMvcResultMatchers.status().isCreated())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(1)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(method.getId())))
 				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyMethodDataManager).addMethod(org.mockito.Matchers.any(Method.class));
@@ -214,11 +198,8 @@ public class MethodResourceTest extends ApiUnitTestBase {
 	@Test
 	public void updateMethod() throws Exception {
 
-		MethodSummary methodDTO = new MethodSummary();
-		methodDTO.setName("methodName");
-		methodDTO.setDescription("methodDescription");
-
-		Method method = new Method(new Term(10, methodDTO.getName(), methodDTO.getDescription()));
+		MethodSummary methodSummary = TestDataProvider.getTestMethodSummary();
+		Method method = TestDataProvider.getTestMethod();
 
 		/**
 		 * We Need equals method inside Method (Middleware) because it throws
@@ -227,19 +208,18 @@ public class MethodResourceTest extends ApiUnitTestBase {
 		 */
 		ArgumentCaptor<Method> captor = ArgumentCaptor.forClass(Method.class);
 
-		Term term = new Term(10, "method name", "methodDescription");
-		term.setVocabularyId(1020);
+		Term methodTerm = TestDataProvider.getMethodTerm();
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
-		Mockito.doReturn(term).when(this.termDataManager).getTermById(method.getId());
-		Mockito.doReturn(new Term(11, "method name", "methodDescription", CvId.METHODS.getId(),false)).when(this.termDataManager).getTermByNameAndCvId("method name", CvId.METHODS.getId());
+		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(method.getId());
+		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermByNameAndCvId("method name", CvId.METHODS.getId());
 		Mockito.doNothing().when(this.ontologyMethodDataManager).updateMethod(org.mockito.Matchers.any(Method.class));
 		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId());
 
 		this.mockMvc.perform(MockMvcRequestBuilders
 				.put("/ontology/{cropname}/methods/{id}", cropName, method.getId())
 				.contentType(this.contentType)
-				.content(this.convertObjectToByte(methodDTO)))
+				.content(this.convertObjectToByte(methodSummary)))
 				.andExpect(MockMvcResultMatchers.status().isNoContent())
 				.andDo(MockMvcResultHandlers.print());
 
@@ -259,11 +239,11 @@ public class MethodResourceTest extends ApiUnitTestBase {
 	@Test
 	public void deleteMethod() throws Exception {
 
-		Term term = new Term(10, "name", "", CvId.METHODS.getId(), false);
-		Method method = new Method(term);
+		Term methodTerm = TestDataProvider.getMethodTerm();
+		Method method = TestDataProvider.getTestMethod();
 
 		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
-		Mockito.doReturn(term).when(this.termDataManager).getTermById(method.getId());
+		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(method.getId());
 		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId());
 		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(method.getId());
 		Mockito.doNothing().when(this.ontologyMethodDataManager).deleteMethod(method.getId());

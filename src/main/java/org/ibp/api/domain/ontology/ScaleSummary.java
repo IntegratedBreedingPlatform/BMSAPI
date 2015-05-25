@@ -10,16 +10,16 @@ import java.util.Map;
  */
 public class ScaleSummary extends TermSummary {
 
-	private IdName dataType;
+	private DataType dataType;
 
 	private final ValidValues validValues = new ValidValues();
 	private MetadataSummary metadata = new MetadataSummary();
 
-	public IdName getDataType() {
+	public DataType getDataType() {
 		return this.dataType;
 	}
 
-	public void setDataType(IdName dataType) {
+	public void setDataType(DataType dataType) {
 		this.dataType = dataType;
 	}
 
@@ -27,11 +27,11 @@ public class ScaleSummary extends TermSummary {
 		return this.validValues;
 	}
 
-	public void setMinValue(String minValue) {
+	public void setMinValue(Integer minValue) {
 		this.validValues.setMin(minValue);
 	}
 
-	public void setMaxValue(String maxValue) {
+	public void setMaxValue(Integer maxValue) {
 		this.validValues.setMax(maxValue);
 	}
 
