@@ -13,8 +13,7 @@ public class VariableSummary extends TermSummary {
 	private String programUuid;
 	private TermSummary propertySummary = new TermSummary();
 	private TermSummary methodSummary = new TermSummary();
-	private TermSummary scaleSummary = new TermSummary();
-	private DataType dataType = new DataType();
+	private ScaleSummary scaleSummary = new ScaleSummary();
 	private Set<VariableType> variableTypes = new HashSet<>();
 	private boolean favourite;
 	private final ExpectedRange expectedRange = new ExpectedRange();
@@ -60,20 +59,12 @@ public class VariableSummary extends TermSummary {
 		this.methodSummary = methodSummary;
 	}
 
-	public TermSummary getScaleSummary() {
-		return this.scaleSummary;
+	public ScaleSummary getScaleSummary() {
+		return scaleSummary;
 	}
 
-	public void setScaleSummary(TermSummary scaleSummary) {
+	public void setScaleSummary(ScaleSummary scaleSummary) {
 		this.scaleSummary = scaleSummary;
-	}
-
-	public DataType getDataType() {
-		return dataType;
-	}
-
-	public void setDataType(DataType dataType) {
-		this.dataType = dataType;
 	}
 
 	public Set<VariableType> getVariableTypes() {

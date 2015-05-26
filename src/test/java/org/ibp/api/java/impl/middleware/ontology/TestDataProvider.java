@@ -39,7 +39,7 @@ public class TestDataProvider {
 
     private static final Integer scaleId = 12;
     private static final String scaleName = "Scale Name";
-    private static final String scaleDescription = "cale Description";
+    private static final String scaleDescription = "Scale Description";
     private static final Integer scaleVocabularyId = 1030;
 
     private static final String scaleMinValue = "10";
@@ -55,7 +55,6 @@ public class TestDataProvider {
 
     public static final TermSummary mwMethodSummary = new TermSummary(methodId, methodName, methodDescription);
     public static final TermSummary mwPropertySummary = new TermSummary(propertyId, propertyName, propertyDescription);
-    public static final TermSummary mwScaleSummary = new TermSummary(scaleId, scaleName, scaleDescription);
 
     public static final org.ibp.api.domain.ontology.DataType numericalDataType = new org.ibp.api.domain.ontology.DataType(DataType.NUMERIC_VARIABLE.getId(), DataType.NUMERIC_VARIABLE.getName());
     public static final org.ibp.api.domain.ontology.DataType categoricalDataType = new org.ibp.api.domain.ontology.DataType(DataType.CATEGORICAL_VARIABLE.getId(), DataType.CATEGORICAL_VARIABLE.getName());
@@ -211,10 +210,9 @@ public class TestDataProvider {
             variable.setDateCreated(getDateCreated());
             variable.setPropertySummary(mwPropertySummary);
             variable.setMethodSummary(mwMethodSummary);
-            variable.setScaleSummary(mwScaleSummary);
+            variable.setScaleSummary(getTestScale());
             variable.setDateCreated(getDateCreated());
             variable.setDateLastModified(getDateModified());
-            variable.setDataType(DataType.NUMERIC_VARIABLE);
             variableList.add(variable);
         }
         return variableList;
@@ -275,11 +273,10 @@ public class TestDataProvider {
         variableSummary.getMethodSummary().setId(String.valueOf(methodId));
         variableSummary.getMethodSummary().setName(methodName);
         variableSummary.getMethodSummary().setDescription(methodDescription);
-        variableSummary.setScaleSummary(new org.ibp.api.domain.ontology.TermSummary());
         variableSummary.getScaleSummary().setId(String.valueOf(scaleId));
         variableSummary.getScaleSummary().setName(scaleName);
         variableSummary.getScaleSummary().setDescription(scaleDescription);
-        variableSummary.setDataType(numericalDataType);
+        variableSummary.getScaleSummary().setDataType(numericalDataType);
         variableSummary.setExpectedMin(variableExpectedMin);
         variableSummary.setExpectedMax(variableExpectedMax);
         variableSummary.setFavourite(variableIsFavourite);

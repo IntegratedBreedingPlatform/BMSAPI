@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.ontology;
 import java.text.ParseException;
 import java.util.Date;
 
-import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Method;
@@ -112,8 +111,7 @@ public class OntologyMapperTest {
 		mVariableSummary.setDateLastModified(new Date());
 		mVariableSummary.setMethodSummary(TestDataProvider.mwMethodSummary);
 		mVariableSummary.setPropertySummary(TestDataProvider.mwPropertySummary);
-		mVariableSummary.setScaleSummary(TestDataProvider.mwScaleSummary);
-		mVariableSummary.setDataType(DataType.NUMERIC_VARIABLE);
+		mVariableSummary.setScaleSummary(TestDataProvider.getTestScale());
 		mVariableSummary.setMinValue("0");
 		mVariableSummary.setMaxValue("10");
 		mVariableSummary.setIsFavorite(true);
@@ -135,8 +133,6 @@ public class OntologyMapperTest {
 		Assert.assertEquals(ibpVariableSummary.getScaleSummary().getId(), String.valueOf(mVariableSummary.getScaleSummary().getId()));
 		Assert.assertEquals(ibpVariableSummary.getScaleSummary().getName(), mVariableSummary.getScaleSummary().getName());
 		Assert.assertEquals(ibpVariableSummary.getScaleSummary().getDescription(), mVariableSummary.getScaleSummary().getDefinition());
-		Assert.assertEquals(ibpVariableSummary.getDataType().getId(), mVariableSummary.getDataType().getId());
-		Assert.assertEquals(ibpVariableSummary.getDataType().getName(), mVariableSummary.getDataType().getName());
 		Assert.assertEquals(ibpVariableSummary.getExpectedRange().getMin(), mVariableSummary.getMinValue());
 		Assert.assertEquals(ibpVariableSummary.getExpectedRange().getMax(), mVariableSummary.getMaxValue());
 		Assert.assertEquals(ibpVariableSummary.getMetadata().getDateCreated(), ISO8601DateParser.toString(mVariableSummary.getDateCreated()));

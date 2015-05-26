@@ -122,8 +122,8 @@ public class VariableResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].methodSummary.name", Matchers.is(variableSummaries.get(0).getMethodSummary().getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].scaleSummary.id", Matchers.is(String.valueOf(variableSummaries.get(0).getScaleSummary().getId()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].scaleSummary.name", Matchers.is(variableSummaries.get(0).getScaleSummary().getName())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].dataType.id", Matchers.is(variableSummaries.get(0).getDataType().getId())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].dataType.name", Matchers.is(variableSummaries.get(0).getDataType().getName())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].scaleSummary.dataType.id", Matchers.is(variableSummaries.get(0).getScaleSummary().getDataType().getId())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].scaleSummary.dataType.name", Matchers.is(variableSummaries.get(0).getScaleSummary().getDataType().getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].variableTypes", IsCollectionWithSize.hasSize(variableSummaries.get(0).getVariableTypes().size())));
 
 		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).getWithFilter(programUuid, null, null, null, null);

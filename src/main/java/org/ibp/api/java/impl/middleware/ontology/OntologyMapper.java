@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.ontology;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.TermRelationship;
 import org.generationcp.middleware.domain.oms.VariableType;
+import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -173,7 +174,6 @@ public class OntologyMapper {
 				this.map().setDescription(this.source.getDescription());
 				this.map().getMethodSummary().setDescription(this.source.getMethodSummary().getDefinition());
 				this.map().getPropertySummary().setDescription(this.source.getPropertySummary().getDefinition());
-				this.map().getScaleSummary().setDescription(this.source.getScaleSummary().getDefinition());
 				this.map().setFavourite(this.source.getIsFavorite());
 				this.map().setAlias(this.source.getAlias());
 				this.map().setExpectedMin(this.source.getMinValue());
