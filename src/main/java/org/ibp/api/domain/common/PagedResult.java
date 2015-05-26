@@ -29,8 +29,10 @@ public class PagedResult<T> {
 		}
 		this.pageSize = pageSize;
 		
-		if (pageNumber < 1 || pageNumber > getTotalPages()) {
-			throw new IllegalArgumentException("A total of " + getTotalPages() + " pages are available, so the page number must between 1 and " + getTotalPages() + ".");
+		if (totalResults != 0) {
+			if (pageNumber < 1 || pageNumber > getTotalPages()) {
+				throw new IllegalArgumentException("A total of " + getTotalPages() + " pages are available, so the page number must between 1 and " + getTotalPages() + ".");
+			}
 		}
 		this.pageNumber = pageNumber;
 	}

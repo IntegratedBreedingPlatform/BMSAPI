@@ -69,4 +69,13 @@ public class PagedResultTest {
 		Assert.assertTrue("Expected to have a next page because I am on some page other than first or last.", pagedResult.isHasNextPage());
 		Assert.assertTrue("Expected to have a previous page because I am on some page other than first or last.", pagedResult.isHasPreviousPage());
 	}
+	
+	/**
+	 * Case when first page with a valid page size is requested but the actural search/listing returns no actual matching results. 
+	 */
+	@Test
+	public void testZeroTotalResults() {
+		PagedResult<String> pagedResult = new PagedResult<>(1, 20, 0);
+		Assert.assertNotNull("Exected PagedResult object initialized as the parameters supplied are valid.", pagedResult);
+	}
 }
