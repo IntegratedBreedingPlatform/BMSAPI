@@ -218,12 +218,16 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 			if (isNumericType) {
 				// 14. If the scale has a numeric data type and a minimum and/or maximum value for the expected range is provided (it is not mandatory), the minimum and/or maximum must be numeric values
-				if (!this.isNonNullValidNumericString(minValue)) {
-					this.addCustomError(errors, "expectedRange.min", FIELD_SHOULD_BE_NUMERIC, null);
+				if(!isNullOrEmpty(minValue)){
+					if (!this.isNonNullValidNumericString(minValue)) {
+						this.addCustomError(errors, "expectedRange.min", FIELD_SHOULD_BE_NUMERIC, null);
+					}
 				}
 
-				if (!this.isNonNullValidNumericString(maxValue)) {
-					this.addCustomError(errors, "expectedRange.max", FIELD_SHOULD_BE_NUMERIC, null);
+				if(!isNullOrEmpty(maxValue)){
+					if (!this.isNonNullValidNumericString(maxValue)) {
+						this.addCustomError(errors, "expectedRange.max", FIELD_SHOULD_BE_NUMERIC, null);
+					}
 				}
 
 				if (errors.getErrorCount() > initialCount) {
@@ -231,11 +235,15 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				}
 
 				// 14. If the scale has a numeric data type and valid values have been set on the scale, the expected range minimum cannot be less than the valid values minimum, and the expected range maximum cannot be larger than the valid values maximum
-				if (this.getIntegerValueSafe(minValue, 0) < this.getIntegerValueSafe(scale.getMinValue(), 0)) {
-					this.addCustomError(errors, "expectedRange.min", VARIABLE_MIN_SHOULD_BE_IN_SCALE_RANGE, new Object[] { scale.getMinValue(), scale.getMaxValue() });
+				if(!isNullOrEmpty(scale.getMinValue())){
+					if (this.getIntegerValueSafe(minValue, 0) < this.getIntegerValueSafe(scale.getMinValue(), 0)) {
+						this.addCustomError(errors, "expectedRange.min", VARIABLE_MIN_SHOULD_BE_IN_SCALE_RANGE, new Object[] { scale.getMinValue(), scale.getMaxValue() });
+					}
 				}
-				if (this.getIntegerValueSafe(variable.getExpectedRange().getMax(), 0) > this.getIntegerValueSafe(scale.getMaxValue(), 0)) {
-					this.addCustomError(errors, "expectedRange.max", VARIABLE_MAX_SHOULD_BE_IN_SCALE_RANGE, new Object[] { scale.getMinValue(), scale.getMaxValue() });
+				if(!isNullOrEmpty(scale.getMaxValue())){
+					if (this.getIntegerValueSafe(variable.getExpectedRange().getMax(), 0) > this.getIntegerValueSafe(scale.getMaxValue(), 0)) {
+						this.addCustomError(errors, "expectedRange.max", VARIABLE_MAX_SHOULD_BE_IN_SCALE_RANGE, new Object[] { scale.getMinValue(), scale.getMaxValue() });
+					}
 				}
 
 				if (errors.getErrorCount() > initialCount) {
