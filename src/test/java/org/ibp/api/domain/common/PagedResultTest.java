@@ -68,6 +68,9 @@ public class PagedResultTest {
 		PagedResult<String> pagedResult = new PagedResult<>(10, 10, 200);
 		Assert.assertTrue("Expected to have a next page because I am on some page other than first or last.", pagedResult.isHasNextPage());
 		Assert.assertTrue("Expected to have a previous page because I am on some page other than first or last.", pagedResult.isHasPreviousPage());
+		
+		Assert.assertFalse("Did not expect to be on the first page.", pagedResult.isFirstPage());
+		Assert.assertFalse("Did not expect to be on the last page.", pagedResult.isLastPage());
 	}
 	
 	/**
