@@ -292,12 +292,16 @@ org.springframework.validation.Validator {
 		// 9. If the data type is numeric and minimum and maximum valid values
 		// are provided (they are not mandatory), they must be numeric values
 		if (Objects.equals(dataType, DataType.NUMERIC_VARIABLE)) {
-			if (!this.isNonNullValidNumericString(minValue)) {
-				this.addCustomError(errors, "validValues.min", FIELD_SHOULD_BE_NUMERIC, null);
+			if(!isNullOrEmpty(minValue)){
+				if (!this.isNonNullValidNumericString(minValue)) {
+					this.addCustomError(errors, "validValues.min", FIELD_SHOULD_BE_NUMERIC, null);
+				}
 			}
 
-			if (!this.isNonNullValidNumericString(maxValue)) {
-				this.addCustomError(errors, "validValues.max", FIELD_SHOULD_BE_NUMERIC, null);
+			if(!isNullOrEmpty(maxValue)){
+				if (!this.isNonNullValidNumericString(maxValue)) {
+					this.addCustomError(errors, "validValues.max", FIELD_SHOULD_BE_NUMERIC, null);
+				}
 			}
 		}
 

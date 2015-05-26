@@ -134,8 +134,10 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 				}
 			}
 			if (Objects.equals(dataTypeId, NUMERIC_VARIABLE.getId())) {
-				scale.setMinValue(scaleSummary.getValidValues().getMin().toString());
-				scale.setMaxValue(scaleSummary.getValidValues().getMax().toString());
+				String min = scaleSummary.getValidValues().getMin() == null ? null : scaleSummary.getValidValues().getMin().toString();
+				String max = scaleSummary.getValidValues().getMax() == null ? null : scaleSummary.getValidValues().getMax().toString();
+				scale.setMinValue(min);
+				scale.setMaxValue(max);
 			}
 
 			this.ontologyScaleDataManager.addScale(scale);
@@ -177,8 +179,10 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 				}
 			}
 			if (Objects.equals(dataTypeId, NUMERIC_VARIABLE.getId())) {
-				scale.setMinValue(validValues.getMin().toString());
-				scale.setMaxValue(validValues.getMax().toString());
+				String min = scaleSummary.getValidValues().getMin() == null ? null : scaleSummary.getValidValues().getMin().toString();
+				String max = scaleSummary.getValidValues().getMax() == null ? null : scaleSummary.getValidValues().getMax().toString();
+				scale.setMinValue(min);
+				scale.setMaxValue(max);
 			}
 
 			this.ontologyScaleDataManager.updateScale(scale);
