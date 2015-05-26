@@ -34,7 +34,7 @@ public class LocationResource {
 	}
 
 	@RequestMapping(value = "/{cropname}", method = RequestMethod.GET, params = {"locationTypeId", "pageNumber", "pageSize"})
-	@ApiOperation(value = "Get all location by type", notes = "Returns all location of a given type.")
+	@ApiOperation(value = "Get locations by location type", notes = "Returns all locations of a given location type.")
 	public ResponseEntity<PagedResult<Location>> getLocationByType(@PathVariable String cropname, @RequestParam(value = "locationTypeId") String locationTypeId, @RequestParam(
 			value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize) {
 
