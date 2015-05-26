@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class MetadataDetails extends MetadataSummary {
 
-	private List<String> editableFields = new ArrayList<>();
+	private final List<String> editableFields = new ArrayList<>();
 	private boolean deletable;
 
 	private Usage usage = new Usage();
@@ -27,8 +27,8 @@ public class MetadataDetails extends MetadataSummary {
 		return this.editableFields;
 	}
 
-	public void setEditableFields(List<String> editableFields) {
-		this.editableFields = editableFields;
+	public void addEditableField(String editableField) {
+		this.editableFields.add(editableField);
 	}
 
 	public boolean isDeletable() {

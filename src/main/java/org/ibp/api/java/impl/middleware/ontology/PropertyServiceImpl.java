@@ -23,7 +23,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -85,10 +84,14 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 
 			// Note: If property is used then description is editable else all fields can be editable
 			if (!deletable) {
-			  	propertyDetails.getMetadata().setEditableFields(new ArrayList<>(Arrays.asList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED, "classes", "cropOntologyId")));
+				propertyDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
+				propertyDetails.getMetadata().addEditableField("classes");
+				propertyDetails.getMetadata().addEditableField("cropOntologyId");
 			} else {
-			  	propertyDetails.getMetadata().setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED,
-						"classes", "cropOntologyId")));
+				propertyDetails.getMetadata().addEditableField("name");
+				propertyDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
+				propertyDetails.getMetadata().addEditableField("classes");
+				propertyDetails.getMetadata().addEditableField("cropOntologyId");
 			}
 			propertyDetails.getMetadata().setDeletable(deletable);
 

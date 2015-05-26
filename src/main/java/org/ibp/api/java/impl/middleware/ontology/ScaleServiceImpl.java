@@ -26,8 +26,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -91,9 +89,12 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			ScaleDetails scaleDetails = mapper.map(scale, ScaleDetails.class);
 			String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
 			if (!deletable) {
-				scaleDetails.getMetadata().setEditableFields(new ArrayList<>(Collections.singletonList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
+				scaleDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
 			} else {
-				scaleDetails.getMetadata().setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED, "dataType","validValues")));
+				scaleDetails.getMetadata().addEditableField("name");
+				scaleDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
+				scaleDetails.getMetadata().addEditableField("dataType");
+				scaleDetails.getMetadata().addEditableField("validValues");
 			}
 			scaleDetails.getMetadata().setDeletable(deletable);
 

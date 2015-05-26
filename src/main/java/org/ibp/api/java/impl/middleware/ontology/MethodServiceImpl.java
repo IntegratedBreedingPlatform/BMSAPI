@@ -1,8 +1,6 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -78,9 +76,10 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 			MethodDetails methodDetails = mapper.map(method, MethodDetails.class);
 			String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
 			if (!deletable) {
-			  methodDetails.getMetadata().setEditableFields(new ArrayList<>(Collections.singletonList(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
+			  methodDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
 			} else {
-			  	methodDetails.getMetadata().setEditableFields(new ArrayList<>(Arrays.asList("name", FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED)));
+				methodDetails.getMetadata().addEditableField("name");
+				methodDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
 			}
 			methodDetails.getMetadata().setDeletable(deletable);
 

@@ -8,15 +8,21 @@ import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.ibp.api.domain.ontology.*;
+import org.ibp.api.domain.ontology.MethodDetails;
+import org.ibp.api.domain.ontology.MethodSummary;
+import org.ibp.api.domain.ontology.PropertyDetails;
+import org.ibp.api.domain.ontology.PropertySummary;
+import org.ibp.api.domain.ontology.ScaleDetails;
+import org.ibp.api.domain.ontology.ScaleSummary;
+import org.ibp.api.domain.ontology.TermSummary;
+import org.ibp.api.domain.ontology.VariableDetails;
+import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.spi.MappingContext;
-
-import java.util.ArrayList;
 
 public class OntologyMapper {
 
@@ -85,7 +91,6 @@ public class OntologyMapper {
 				this.map().setDescription(this.source.getDefinition());
 				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
 				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
-				this.map().getMetadata().setEditableFields(new ArrayList<String>());
 				this.map().getMetadata().setDeletable(false);
 			}
 		});
@@ -117,7 +122,6 @@ public class OntologyMapper {
 				this.map().setDescription(this.source.getDefinition());
 				this.map().setCropOntologyId(this.source.getCropOntologyId());
 				this.map().setClasses(this.source.getClasses());
-				this.map().getMetadata().setEditableFields(new ArrayList<String>());
 				this.map().getMetadata().setDeletable(false);
 				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
 				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
@@ -153,7 +157,6 @@ public class OntologyMapper {
 				this.map().setMinValue(CommonUtil.tryParseSafe(this.source.getMinValue()));
 				this.map().setMaxValue(CommonUtil.tryParseSafe(this.source.getMaxValue()));
 				this.map().setCategories(this.source.getCategories());
-				this.map().getMetadata().setEditableFields(new ArrayList<String>());
 				this.map().getMetadata().setDeletable(false);
 				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
 				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
@@ -198,7 +201,6 @@ public class OntologyMapper {
 				this.map().setExpectedMax(this.source.getMaxValue());
 				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
 				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
-				this.map().getMetadata().setEditableFields(new ArrayList<String>());
 				this.map().getMetadata().setDeletable(false);
 			}
 		});

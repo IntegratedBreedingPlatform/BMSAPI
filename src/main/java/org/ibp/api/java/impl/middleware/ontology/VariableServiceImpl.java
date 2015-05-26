@@ -26,8 +26,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -106,10 +104,17 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			VariableDetails response = mapper.map(ontologyVariable, VariableDetails.class);
 
 			if (!deletable) {
-			    response.getMetadata().setEditableFields(new ArrayList<>(Collections.singletonList("description")));
+				response.getMetadata().addEditableField("description");
 			} else {
-			    response.getMetadata().setEditableFields(new ArrayList<>(Arrays.asList("name", "description", "alias",
-						"cropOntologyId", "variableTypeIds", "propertySummary", "methodSummary", "scale", "expectedRange")));
+				response.getMetadata().addEditableField("name");
+				response.getMetadata().addEditableField("description");
+				response.getMetadata().addEditableField("alias");
+				response.getMetadata().addEditableField("cropOntologyId");
+				response.getMetadata().addEditableField("variableTypeIds");
+				response.getMetadata().addEditableField("propertySummary");
+				response.getMetadata().addEditableField("methodSummary");
+				response.getMetadata().addEditableField("scale");
+				response.getMetadata().addEditableField("expectedRange");
 			}
 			response.getMetadata().setDeletable(deletable);
 			return response;
