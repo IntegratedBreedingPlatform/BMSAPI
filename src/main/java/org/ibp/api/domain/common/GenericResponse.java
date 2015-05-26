@@ -2,17 +2,17 @@ package org.ibp.api.domain.common;
 
 public class GenericResponse {
 
-	private int id;
+	private String id;
 
-	public GenericResponse(int id) {
+	public GenericResponse(String id) {
 		this.setId(id);
 	}
 
-	public int getId() {
+	public String getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 }

@@ -181,7 +181,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 				.contentType(this.contentType)
 				.content(this.convertObjectToByte(propertySummary)))
 				.andExpect(MockMvcResultMatchers.status().isCreated())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(property.getId())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(property.getId()))))
 				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyPropertyDataManager, Mockito.times(1)).addProperty(org.mockito.Matchers.any(Property.class));

@@ -184,7 +184,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 				.contentType(this.contentType)
 				.content(this.convertObjectToByte(methodSummary)))
 				.andExpect(MockMvcResultMatchers.status().isCreated())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(method.getId())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(String.valueOf(method.getId()))))
 				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyMethodDataManager).addMethod(org.mockito.Matchers.any(Method.class));

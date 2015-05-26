@@ -153,7 +153,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			}
 
 			this.ontologyVariableDataManager.addVariable(variableInfo);
-			return new GenericResponse(variableInfo.getId());
+			return new GenericResponse(String.valueOf(variableInfo.getId()));
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}

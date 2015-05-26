@@ -206,7 +206,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 				.content(this.convertObjectToByte(variableSummary)))
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isCreated())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(variableTerm.getId())));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(variableTerm.getId()))));
 
 
 		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).addVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));

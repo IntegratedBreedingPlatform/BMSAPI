@@ -112,7 +112,7 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 			middlewareMethod.setName(method.getName());
 			middlewareMethod.setDefinition(method.getDescription());
 			this.ontologyMethodDataManager.addMethod(middlewareMethod);
-			return new GenericResponse(middlewareMethod.getId());
+			return new GenericResponse(String.valueOf(middlewareMethod.getId()));
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}

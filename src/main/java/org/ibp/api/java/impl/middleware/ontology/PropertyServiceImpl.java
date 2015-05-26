@@ -127,7 +127,7 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 
 			this.ontologyPropertyDataManager.addProperty(property);
 
-			return new GenericResponse(property.getId());
+			return new GenericResponse(String.valueOf(property.getId()));
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}

@@ -141,7 +141,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			}
 
 			this.ontologyScaleDataManager.addScale(scale);
-			return new GenericResponse(scale.getId());
+			return new GenericResponse(String.valueOf(scale.getId()));
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}

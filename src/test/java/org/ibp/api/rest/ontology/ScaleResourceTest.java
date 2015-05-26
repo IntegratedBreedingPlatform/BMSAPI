@@ -164,7 +164,7 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/scales", cropName)
 				.contentType(this.contentType).content(this.convertObjectToByte(scaleSummary)))
 				.andExpect(MockMvcResultMatchers.status().isCreated())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(scale.getId())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(scale.getId()))))
 				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyScaleDataManager).addScale(org.mockito.Matchers.any(Scale.class));
