@@ -14,6 +14,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.domain.common.PagedResult;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -110,9 +111,9 @@ public class LocationResourceTest extends ApiUnitTestBase {
 		mwLocation.setGeoref(georef);
 		
 		List<Location> mwLocationTypes = Lists.newArrayList(mwLocation);
-		Mockito.when(this.locationDataManager.getLocationsByType(Integer.valueOf(locationTypeId), 0, 10)).thenReturn(mwLocationTypes);
+		Mockito.when(this.locationDataManager.getLocationsByType(Integer.valueOf(locationTypeId), 0, PagedResult.DEFAULT_PAGE_SIZE)).thenReturn(mwLocationTypes);
 		
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/location/maize?locationTypeId=146&pageNumber=1&pageSize=10")
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/location/maize?locationTypeId=146")
 				.contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andDo(MockMvcResultHandlers.print())
@@ -126,8 +127,8 @@ public class LocationResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].locationType.id", Matchers.is(udfldLocType.getFldno().toString())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].locationType.name", Matchers.is(udfldLocType.getFcode())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].locationType.description", Matchers.is(udfldLocType.getFname())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber", Matchers.is(1)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.pageSize", Matchers.is(10)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber", Matchers.is(PagedResult.DEFAULT_PAGE_NUMBER)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageSize", Matchers.is(PagedResult.DEFAULT_PAGE_SIZE)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.totalResults", Matchers.is(1)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.totalPages", Matchers.is(1)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.firstPage", Matchers.is(true)))
