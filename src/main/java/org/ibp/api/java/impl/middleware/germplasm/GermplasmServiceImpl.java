@@ -91,4 +91,17 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
+	
+	void setGermplasmDataManager(GermplasmDataManager germplasmDataManager) {
+		this.germplasmDataManager = germplasmDataManager;
+	}
+
+	
+	void setPedigreeService(PedigreeService pedigreeService) {
+		this.pedigreeService = pedigreeService;
+	}
+
+	void setLocationDataManger(LocationDataManager locationDataManger) {
+		this.locationDataManger = locationDataManger;
+	}
 }
