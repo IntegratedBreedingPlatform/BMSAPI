@@ -41,41 +41,16 @@ public class LocationServiceImpl implements LocationService {
 		return locationTypes;
 	}
 
-	//TODO re-use mapLocations() once the issue with location tye (ltype) loading is solved.
 	@Override
 	public List<Location> getLocationsByType(String locationTypeId, int pageNumber, int pageSize) {
-		List<Location> locationsByType = new ArrayList<>();
 		try {
 			Integer locTypeId = Integer.valueOf(locationTypeId);
 			int start = pageSize * (pageNumber - 1);
 			int numOfRows = pageSize;
-
-			List<org.generationcp.middleware.pojos.Location> mwLocationsByType = 
-					this.locationDataManager.getLocationsByType(locTypeId, start, numOfRows);
-
-			UserDefinedField locationTypeUdfld = 
-					this.locationDataManager.getUserDefinedFieldByID(locTypeId);
-
-			LocationType locationType = 
-					new LocationType(locationTypeUdfld.getFldno().toString(), locationTypeUdfld.getFcode(), locationTypeUdfld.getFname());
-
-			for (org.generationcp.middleware.pojos.Location mwLoc : mwLocationsByType) {
-				Location location = new Location();
-				location.setId(mwLoc.getLocid().toString());
-				location.setName(mwLoc.getLname());
-				location.setAbbreviation(mwLoc.getLabbr());
-				if (mwLoc.getGeoref() != null) {
-					location.setAltitude(mwLoc.getGeoref().getAlt());
-					location.setLatitude(mwLoc.getGeoref().getLat());
-					location.setLongitude(mwLoc.getGeoref().getLon());
-				}
-				location.setLocationType(locationType);
-				locationsByType.add(location);
-			}
+			return mapLocations(this.locationDataManager.getLocationsByType(locTypeId, start, numOfRows));
 		} catch (NumberFormatException | MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
-		return locationsByType;
 	}
 
 	private List<Location> mapLocations(List<org.generationcp.middleware.pojos.Location> mwLocations) throws MiddlewareQueryException {

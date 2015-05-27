@@ -165,6 +165,7 @@ public class LocationResourceTest extends ApiUnitTestBase {
 		mwLocation.setLocid(156);
 		mwLocation.setLname("New Zealand");
 		mwLocation.setLabbr("NZL");
+		mwLocation.setLtype(405);
 		Georef georef = new Georef(156, 1, 41.17, 170.27, 10.11);
 		mwLocation.setGeoref(georef);
 		return mwLocation;
