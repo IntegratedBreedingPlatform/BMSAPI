@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
