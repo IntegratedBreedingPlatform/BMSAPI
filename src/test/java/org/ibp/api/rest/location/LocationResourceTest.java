@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Georef;
@@ -61,15 +62,8 @@ public class LocationResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testGetAllLocationTypes() throws Exception {
 
-		UserDefinedField udfld1 = new UserDefinedField();
-		udfld1.setFldno(415);
-		udfld1.setFcode("FIELD");
-		udfld1.setFname("EXPERIMENTAL FIELD");
-
-		UserDefinedField udfld2 = new UserDefinedField();
-		udfld2.setFldno(416);
-		udfld2.setFcode("BLOCK");
-		udfld2.setFname("FIELD BLOCK");
+		UserDefinedField udfld1 = createTestLocTypeUdfld(415, "FIELD", "EXPERIMENTAL FIELD");
+		UserDefinedField udfld2 = createTestLocTypeUdfld(416, "BLOCK", "FIELD BLOCK");
 
 		List<UserDefinedField> mwLocTypes = new ArrayList<>();
 		mwLocTypes.add(udfld1);
@@ -97,18 +91,10 @@ public class LocationResourceTest extends ApiUnitTestBase {
 		String locationTypeId = "146";
 		Mockito.when(this.locationDataManager.countLocationsByType(Integer.valueOf(locationTypeId))).thenReturn(1L);
 	
-		UserDefinedField udfldLocType = new UserDefinedField();
-		udfldLocType.setFldno(415);
-		udfldLocType.setFcode("FIELD");
-		udfldLocType.setFname("EXPERIMENTAL FIELD");
+		UserDefinedField udfldLocType = createTestLocTypeUdfld(415, "FIELD", "EXPERIMENTAL FIELD");
 		Mockito.when(this.locationDataManager.getUserDefinedFieldByID(Integer.valueOf(locationTypeId))).thenReturn(udfldLocType);
 		
-		org.generationcp.middleware.pojos.Location mwLocation = new Location();
-		mwLocation.setLocid(156);
-		mwLocation.setLname("New Zealand");
-		mwLocation.setLabbr("NZL");
-		Georef georef = new Georef(156, 1, 41.17, 170.27, 10.11);
-		mwLocation.setGeoref(georef);
+		org.generationcp.middleware.pojos.Location mwLocation = createTestLocation();
 		
 		List<Location> mwLocationTypes = Lists.newArrayList(mwLocation);
 		Mockito.when(this.locationDataManager.getLocationsByType(Integer.valueOf(locationTypeId), 0, PagedResult.DEFAULT_PAGE_SIZE)).thenReturn(mwLocationTypes);
@@ -135,5 +121,60 @@ public class LocationResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.lastPage", Matchers.is(true)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.hasNextPage", Matchers.is(false)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.hasPreviousPage", Matchers.is(false)));
+	}
+	
+	@Test
+	public void testSearchLocations() throws Exception {
+		String searchString = "New";
+		Mockito.when(this.locationDataManager.countLocationsByName(searchString, Operation.LIKE)).thenReturn(1L);
+	
+		UserDefinedField udfldLocType = createTestLocTypeUdfld(415, "FIELD", "EXPERIMENTAL FIELD");
+		Mockito.when(this.locationDataManager.getUserDefinedFieldByID(Mockito.anyInt())).thenReturn(udfldLocType);
+		
+		org.generationcp.middleware.pojos.Location mwLocation = createTestLocation();
+		
+		List<Location> mwLocations = Lists.newArrayList(mwLocation);
+		Mockito.when(this.locationDataManager.getLocationsByName(searchString, 0, PagedResult.DEFAULT_PAGE_SIZE, Operation.LIKE)).thenReturn(mwLocations);
+		
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/location/maize/search?q=" + searchString)
+				.contentType(this.contentType))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults", IsCollectionWithSize.hasSize(mwLocations.size())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].id", Matchers.is(mwLocation.getLocid().toString())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].name", Matchers.is(mwLocation.getLname())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].abbreviation", Matchers.is(mwLocation.getLabbr())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].latitude", Matchers.is(mwLocation.getLatitude())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].longitude", Matchers.is(mwLocation.getLongitude())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].altitude", Matchers.is(mwLocation.getAltitude())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].locationType.id", Matchers.is(udfldLocType.getFldno().toString())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].locationType.name", Matchers.is(udfldLocType.getFcode())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].locationType.description", Matchers.is(udfldLocType.getFname())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber", Matchers.is(PagedResult.DEFAULT_PAGE_NUMBER)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageSize", Matchers.is(PagedResult.DEFAULT_PAGE_SIZE)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.totalResults", Matchers.is(1)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.totalPages", Matchers.is(1)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.firstPage", Matchers.is(true)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.lastPage", Matchers.is(true)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.hasNextPage", Matchers.is(false)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.hasPreviousPage", Matchers.is(false)));
+	}
+	
+	private org.generationcp.middleware.pojos.Location createTestLocation() {
+		org.generationcp.middleware.pojos.Location mwLocation = new Location();
+		mwLocation.setLocid(156);
+		mwLocation.setLname("New Zealand");
+		mwLocation.setLabbr("NZL");
+		Georef georef = new Georef(156, 1, 41.17, 170.27, 10.11);
+		mwLocation.setGeoref(georef);
+		return mwLocation;
+	}
+
+	private UserDefinedField createTestLocTypeUdfld(Integer fieldNumber, String code, String name) {
+		UserDefinedField udfldLocType = new UserDefinedField();
+		udfldLocType.setFldno(fieldNumber);
+		udfldLocType.setFcode(code);
+		udfldLocType.setFname(name);
+		return udfldLocType;
 	}
 }
