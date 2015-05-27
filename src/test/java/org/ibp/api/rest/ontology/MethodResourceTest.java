@@ -1,14 +1,17 @@
 package org.ibp.api.rest.ontology;
 
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.doAnswer;
+
+import java.util.List;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Method;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
-import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.MethodSummary;
@@ -29,23 +32,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.List;
-
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
-import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.doAnswer;
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 
 public class MethodResourceTest extends ApiUnitTestBase {
 
 	@Configuration
 	public static class TestConfiguration {
-
-		@Bean
-		@Primary
-		public WorkbenchDataManager workbenchDataManager() {
-			return Mockito.mock(WorkbenchDataManager.class);
-		}
 
 		@Bean
 		@Primary
@@ -59,9 +51,6 @@ public class MethodResourceTest extends ApiUnitTestBase {
 			return Mockito.mock(OntologyMethodDataManager.class);
 		}
 	}
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
 	private TermDataManager termDataManager;
@@ -85,7 +74,6 @@ public class MethodResourceTest extends ApiUnitTestBase {
 
 		List<Method> methodList = TestDataProvider.getTestMethodList(3);
 
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(methodList).when(this.ontologyMethodDataManager).getAllMethods();
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/methods", cropName)
@@ -112,7 +100,6 @@ public class MethodResourceTest extends ApiUnitTestBase {
 
 		Method method = TestDataProvider.getTestMethod();
 
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(TestDataProvider.getMethodTerm()).when(this.termDataManager).getTermById(method.getId());
 		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId());
 
@@ -140,7 +127,6 @@ public class MethodResourceTest extends ApiUnitTestBase {
 	@Test
 	public void getMethodById_Should_Respond_With_400_For_Invalid_Id() throws Exception {
 
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(null).when(this.termDataManager).getTermById(1);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/methods/{id}", cropName, 1)
@@ -165,8 +151,6 @@ public class MethodResourceTest extends ApiUnitTestBase {
 		methodSummary.setId(null);
 
 		final Method method = TestDataProvider.getTestMethod();
-
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 
 		//Mock Method Class and when addMethod method called it will set id to 1 and return (self member alter if void is return type of method)
 		doAnswer(new Answer<Void>() {
@@ -210,7 +194,6 @@ public class MethodResourceTest extends ApiUnitTestBase {
 
 		Term methodTerm = TestDataProvider.getMethodTerm();
 
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(method.getId());
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermByNameAndCvId("method name", CvId.METHODS.getId());
 		Mockito.doNothing().when(this.ontologyMethodDataManager).updateMethod(org.mockito.Matchers.any(Method.class));
@@ -242,7 +225,6 @@ public class MethodResourceTest extends ApiUnitTestBase {
 		Term methodTerm = TestDataProvider.getMethodTerm();
 		Method method = TestDataProvider.getTestMethod();
 
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(method.getId());
 		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId());
 		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(method.getId());

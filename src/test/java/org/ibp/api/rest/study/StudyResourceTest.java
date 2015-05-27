@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.oms.StudyType;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.TraitDto;
@@ -28,22 +26,12 @@ public class StudyResourceTest extends ApiUnitTestBase {
 
 	@Configuration
 	public static class TestConfiguration {
-
-		@Bean
-		@Primary
-		public WorkbenchDataManager workbenchDataManager() {
-			return Mockito.mock(WorkbenchDataManager.class);
-		}
-
 		@Bean
 		@Primary
 		public org.generationcp.middleware.service.api.study.StudyService getStudyServiceMW() {
 			return Mockito.mock(org.generationcp.middleware.service.api.study.StudyService.class);
 		}
 	}
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
 	private org.generationcp.middleware.service.api.study.StudyService studyServiceMW;
@@ -62,7 +50,6 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		summaryMW.setEndDate("01012015");
 		summariesMW.add(summaryMW);
 
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.when(this.studyServiceMW.listAllStudies(Mockito.anyString())).thenReturn(summariesMW);
 		
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/study/{cropname}/list", "maize")

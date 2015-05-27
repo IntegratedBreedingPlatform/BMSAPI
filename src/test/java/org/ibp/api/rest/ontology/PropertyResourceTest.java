@@ -1,13 +1,14 @@
 package org.ibp.api.rest.ontology;
 
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import static org.mockito.Mockito.doAnswer;
+
+import java.util.List;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Property;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.PropertySummary;
@@ -27,9 +28,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.List;
-
-import static org.mockito.Mockito.doAnswer;
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 
 /**
  * Tests to check property API Services
@@ -39,12 +38,6 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 	@Configuration
 	public static class TestConfiguration {
-
-		@Bean
-		@Primary
-		public WorkbenchDataManager workbenchDataManager() {
-			return Mockito.mock(WorkbenchDataManager.class);
-		}
 
 		@Bean
 		@Primary
@@ -65,9 +58,6 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 	@Autowired
 	private OntologyPropertyDataManager ontologyPropertyDataManager;
 
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
-
 	@Before
 	public void reset() {
 		Mockito.reset(this.termDataManager);
@@ -84,7 +74,6 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 		List<Property> propertyList = TestDataProvider.getTestProperties(3);
 
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(propertyList).when(this.ontologyPropertyDataManager).getAllProperties();
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/properties", cropName)
@@ -112,7 +101,6 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 		Property property = TestDataProvider.getTestProperty();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
 
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(property.getId());
 		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId());
 
@@ -137,7 +125,6 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void getPropertyById_Should_Respond_With_400_For_Invalid_Id() throws Exception {
 
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(null).when(this.termDataManager).getTermById(1);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/properties/{id}", cropName, 1)
@@ -161,8 +148,6 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 		propertySummary.setId(null);
 
 		final Property property = TestDataProvider.getTestProperty();
-
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 
 		//Mock Property Class and when addProperty method called it will set id to 1 and return (self member alter if void is return type of method)
 		doAnswer(new Answer<Void>() {
@@ -201,7 +186,6 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 		ArgumentCaptor<Property> captor = ArgumentCaptor.forClass(Property.class);
 
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermByNameAndCvId(property.getName(), CvId.PROPERTIES.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(property.getId());
 		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId());
@@ -226,7 +210,6 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 		Property property = TestDataProvider.getTestProperty();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
 
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(property.getId());
 		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId());
 		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(property.getId());

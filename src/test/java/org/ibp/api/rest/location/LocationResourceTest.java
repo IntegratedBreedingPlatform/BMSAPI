@@ -4,19 +4,15 @@ package org.ibp.api.rest.location;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Georef;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.common.PagedResult;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,27 +30,12 @@ public class LocationResourceTest extends ApiUnitTestBase {
 
 	@Configuration
 	public static class TestConfiguration {
-
-		@Bean
-		@Primary
-		public WorkbenchDataManager workbenchDataManager() {
-			return Mockito.mock(WorkbenchDataManager.class);
-		}
-
 		@Bean
 		@Primary
 		public LocationDataManager locationDataManager() {
 			return Mockito.mock(LocationDataManager.class);
 		}
 	}
-
-	@Before
-	public void setUpBeforeEachTest() throws MiddlewareQueryException {
-		Mockito.doReturn(new CropType(this.cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);	
-	}
-	
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
 	private LocationDataManager locationDataManager;

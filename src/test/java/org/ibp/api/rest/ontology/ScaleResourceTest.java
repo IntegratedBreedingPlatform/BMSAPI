@@ -1,12 +1,13 @@
 package org.ibp.api.rest.ontology;
 
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import static org.mockito.Mockito.doAnswer;
+
+import java.util.List;
+
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Scale;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.ScaleSummary;
@@ -28,9 +29,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.List;
-
-import static org.mockito.Mockito.doAnswer;
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 
 /**
  * Tests to check Scale API Services
@@ -40,13 +39,6 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 
 	@Configuration
 	public static class TestConfiguration {
-
-		@Bean
-		@Primary
-		public WorkbenchDataManager workbenchDataManager() {
-			return Mockito.mock(WorkbenchDataManager.class);
-		}
-
 		@Bean
 		@Primary
 		public TermDataManager termDataManager() {
@@ -59,9 +51,6 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 			return Mockito.mock(OntologyScaleDataManager.class);
 		}
 	}
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
 	private  TermDataManager termDataManager;
@@ -90,7 +79,6 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 
 		List<Scale> scaleList = TestDataProvider.getTestScales(3);
 
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(scaleList).when(this.ontologyScaleDataManager).getAllScales();
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/scales", cropName)
@@ -118,7 +106,6 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 		Scale scale = TestDataProvider.getTestScale();
 		Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scale.getId());
 
@@ -143,8 +130,6 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 	public void addScale() throws Exception {
 
 		final Scale scale = TestDataProvider.getTestScale();
-
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 
 		//Mock Scale Class and when addScale method called it will set id to 1 and return (self member alter if void is return type of method)
 		doAnswer(new Answer<Void>() {
@@ -183,7 +168,6 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 
 		ArgumentCaptor<Scale> captor = ArgumentCaptor.forClass(Scale.class);
 
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scale.getId());
 		Mockito.doNothing().when(this.ontologyScaleDataManager).updateScale(org.mockito.Matchers.any(Scale.class));
@@ -215,7 +199,6 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 		Term scaleTerm = TestDataProvider.getScaleTerm();
 		Scale scale = TestDataProvider.getTestScale();
 
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scale.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
 		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(scale.getId());

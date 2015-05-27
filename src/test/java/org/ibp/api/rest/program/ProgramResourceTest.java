@@ -3,36 +3,18 @@ package org.ibp.api.rest.program;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 public class ProgramResourceTest extends ApiUnitTestBase {
-
-	@Configuration
-	public static class TestConfiguration {
-
-		@Bean
-		@Primary
-		public WorkbenchDataManager workbenchDataManager() {
-			return Mockito.mock(WorkbenchDataManager.class);
-		}
-	}
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
-
+	
 	@Test
 	public void listAllMethods() throws Exception {
 

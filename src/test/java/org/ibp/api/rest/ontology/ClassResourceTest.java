@@ -1,10 +1,7 @@
 package org.ibp.api.rest.ontology;
 
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
@@ -20,16 +17,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+
 public class ClassResourceTest extends ApiUnitTestBase {
 
 	@Configuration
 	public static class TestConfiguration {
-
-		@Bean
-		@Primary
-		public WorkbenchDataManager workbenchDataManager() {
-			return Mockito.mock(WorkbenchDataManager.class);
-		}
 
 		@Bean
 		@Primary
@@ -40,10 +33,6 @@ public class ClassResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private TermDataManager termDataManager;
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
-
 
 	@Before
 	public void reset() {
@@ -57,8 +46,6 @@ public class ClassResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void listAllClasses() throws Exception {
-
-		Mockito.doReturn(new CropType(cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
 		Mockito.doReturn(TestDataProvider.mwTermList).when(this.termDataManager).getTermByCvId(CvId.TRAIT_CLASS.getId());
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/classes", cropName)
