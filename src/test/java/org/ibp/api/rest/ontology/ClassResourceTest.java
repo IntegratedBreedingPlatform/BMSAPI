@@ -5,7 +5,6 @@ import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -38,12 +37,7 @@ public class ClassResourceTest extends ApiUnitTestBase {
 	public void reset() {
 		Mockito.reset(this.termDataManager);
 	}
-
-	@After
-	public void validate() {
-		Mockito.validateMockitoUsage();
-	}
-
+	
 	@Test
 	public void listAllClasses() throws Exception {
 		Mockito.doReturn(TestDataProvider.mwTermList).when(this.termDataManager).getTermByCvId(CvId.TRAIT_CLASS.getId());

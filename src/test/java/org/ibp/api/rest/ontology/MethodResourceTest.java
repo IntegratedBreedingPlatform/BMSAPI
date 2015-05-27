@@ -16,7 +16,6 @@ import org.generationcp.middleware.util.ISO8601DateParser;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,12 +62,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 		Mockito.reset(this.termDataManager);
 		Mockito.reset(this.ontologyMethodDataManager);
 	}
-
-	@After
-	public void validate() {
-		Mockito.validateMockitoUsage();
-	}
-
+	
 	@Test
 	public void listAllMethods() throws Exception {
 

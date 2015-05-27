@@ -22,7 +22,6 @@ import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -77,12 +76,6 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		Mockito.reset(this.termDataManager);
 		Mockito.reset(this.ontologyVariableDataManager);
 	}
-
-	@After
-	public void validate() {
-		Mockito.validateMockitoUsage();
-	}
-
 	/**
 	 * List all variables with details with status code 200 : Ok
 	 *

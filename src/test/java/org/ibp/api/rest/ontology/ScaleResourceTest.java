@@ -13,7 +13,6 @@ import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,12 +62,6 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 		Mockito.reset(this.termDataManager);
 		Mockito.reset(this.ontologyScaleDataManager);
 	}
-
-	@After
-	public void validate() {
-		Mockito.validateMockitoUsage();
-	}
-
 	/**
 	 * List all scales with details
 	 *
