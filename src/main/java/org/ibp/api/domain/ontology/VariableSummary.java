@@ -13,8 +13,10 @@ public class VariableSummary extends TermSummary {
 	private String programUuid;
 	private TermSummary propertySummary = new TermSummary();
 	private TermSummary methodSummary = new TermSummary();
+
+	//Note : ScaleSummary that ignore elements except TermSummary and DataType
 	private ScaleSummary scaleSummary = new ScaleSummary();
-	private Set<VariableType> variableTypes = new HashSet<>();
+	private final Set<VariableType> variableTypes = new HashSet<>();
 	private boolean favourite;
 	private final ExpectedRange expectedRange = new ExpectedRange();
 	private MetadataSummary metadata = new MetadataSummary();
