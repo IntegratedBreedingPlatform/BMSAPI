@@ -116,7 +116,7 @@ public class VariableValidatorTest {
 	}
 
 	/**
-	 * Test for to check description length not exceed 255 characters
+	 * Test for to check description length not exceed 1024 characters
 	 *
 	 * @throws org.generationcp.middleware.exceptions.MiddlewareException
 	 */
@@ -127,7 +127,7 @@ public class VariableValidatorTest {
 
 		VariableSummary variable = TestDataProvider.getTestVariableSummary();
 		variable.setId(null);
-		variable.setDescription(RandomStringUtils.random(256));
+		variable.setDescription(RandomStringUtils.random(1025));
 
 		Term methodTerm = TestDataProvider.getMethodTerm();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();

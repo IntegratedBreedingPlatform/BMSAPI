@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
  * 2. Name is no more than 32 characters
  * 3. The name must be unique
  * 4. Name must only contain alphanumeric characters, underscores and cannot start with a number
- * 5. Description is no more than 255 characters
+ * 5. Description is no more than 1024 characters
  * 6. Property ID is required
  * 7. Property ID must correspond to the ID of an existing property
  * 8. Method ID is required
@@ -56,7 +56,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	private static final String VARIABLE_MAX_SHOULD_BE_IN_SCALE_RANGE = "variable.expected.max.should.not.be.greater";
 
 	private static final Integer NAME_TEXT_LIMIT = 32;
-	private static final Integer DESCRIPTION_TEXT_LIMIT = 255;
+	private static final Integer DESCRIPTION_TEXT_LIMIT = 1024;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(VariableValidator.class);
 
@@ -135,7 +135,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		return errors.getErrorCount() == initialCount;
 	}
 
-	// 5. Description is optional and no more than 255 characters
+	// 5. Description is optional and no more than 1024 characters
 	private boolean descriptionValidationProcessor(VariableSummary variable, Errors errors){
 
 		Integer initialCount = errors.getErrorCount();

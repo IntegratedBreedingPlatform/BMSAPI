@@ -22,7 +22,7 @@ import java.util.Set;
  * 1 Name is required
  * 2 Name is no more than 200 characters
  * 3 Name is unique
- * 4 Description is no more than 255 characters
+ * 4 Description is no more than 1024 characters
  * 5 Classes must be an array containing at least one string
  * 6 Each class should contain unique value
  * 7 Name cannot change if the property is already in use
@@ -36,7 +36,7 @@ import java.util.Set;
 public class PropertyValidator extends OntologyValidator implements org.springframework.validation.Validator {
 
 	private static final Integer NAME_TEXT_LIMIT = 200;
-	private static final Integer DESCRIPTION_TEXT_LIMIT = 255;
+	private static final Integer DESCRIPTION_TEXT_LIMIT = 1024;
 	private static final Integer CLASS_TEXT_LIMIT = 100;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PropertyValidator.class); 
@@ -97,7 +97,7 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 			propertySummary.setDescription(propertySummary.getDescription().trim());
 		}
 
-		// 4. Description is no more than 255 characters
+		// 4. Description is no more than 1024 characters
 		this.fieldShouldNotOverflow("description", propertySummary.getDescription(), DESCRIPTION_TEXT_LIMIT, errors);
 
 		return errors.getErrorCount() == initialCount;

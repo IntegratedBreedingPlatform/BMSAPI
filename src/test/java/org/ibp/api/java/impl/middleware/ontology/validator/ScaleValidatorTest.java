@@ -190,7 +190,7 @@ public class ScaleValidatorTest {
 	}
 
 	/**
-	 * Test for to check description length not exceed 255 characters
+	 * Test for to check description length not exceed 1024 characters
 	 *
 	 * @throws org.generationcp.middleware.exceptions.MiddlewareException
 	 */
@@ -198,7 +198,7 @@ public class ScaleValidatorTest {
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 
 		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
-		scaleSummary.setDescription(RandomStringUtils.random(260));
+		scaleSummary.setDescription(RandomStringUtils.random(1025));
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(scaleSummary.getName(), CvId.SCALES.getId());
 

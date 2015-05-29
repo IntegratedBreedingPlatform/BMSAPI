@@ -127,13 +127,13 @@ public class MethodValidatorTest {
 	}
 
 	/**
-	 * Test for to check description length not exceed 255 characters
+	 * Test for to check description length not exceed 1024 characters
 	 */
 	@Test
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 
 		MethodSummary methodSummary = TestDataProvider.getTestMethodSummary();
-		methodSummary.setDescription(RandomStringUtils.random(260));
+		methodSummary.setDescription(RandomStringUtils.random(1025));
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(methodSummary.getName(), CvId.METHODS.getId());
 

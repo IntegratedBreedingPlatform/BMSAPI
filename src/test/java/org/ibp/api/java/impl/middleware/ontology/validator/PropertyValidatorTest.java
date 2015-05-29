@@ -155,7 +155,7 @@ public class PropertyValidatorTest {
 	}
 
 	/**
-	 * Test for to check description length not exceed 255 characters
+	 * Test for to check description length not exceed 1024 characters
 	 * 
 	 * @throws MiddlewareException
 	 */
@@ -163,7 +163,7 @@ public class PropertyValidatorTest {
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 
 		PropertySummary propertySummary = TestDataProvider.getTestPropertySummary();
-		propertySummary.setDescription(RandomStringUtils.random(260));
+		propertySummary.setDescription(RandomStringUtils.random(1025));
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(propertySummary.getName(), CvId.PROPERTIES.getId());
 

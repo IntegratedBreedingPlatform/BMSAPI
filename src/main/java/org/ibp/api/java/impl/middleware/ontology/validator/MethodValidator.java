@@ -20,14 +20,14 @@ import org.springframework.validation.Errors;
  * 2 Name is unique
  * 3 Name cannot change if the method is already in use
  * 4 Name is no more than 200 characters
- * 5 Description is no more than 255 characters
+ * 5 Description is no more than 1024 characters
  * 6 Name and description are textual
  */
 @Component
 public class MethodValidator extends OntologyValidator implements org.springframework.validation.Validator {
 
 	private static final Integer NAME_TEXT_LIMIT = 200;
-	private static final Integer DESCRIPTION_TEXT_LIMIT = 255;
+	private static final Integer DESCRIPTION_TEXT_LIMIT = 1024;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MethodValidator.class);
 	
@@ -111,7 +111,7 @@ public class MethodValidator extends OntologyValidator implements org.springfram
 		return errors.getErrorCount() == initialCount;
 	}
 
-	// 5. Description is optional, when provided no more than 255 characters in length.
+	// 5. Description is optional, when provided no more than 1024 characters in length.
 	private boolean descriptionValidationProcessor(MethodSummary method, Errors errors){
 
 		Integer initialCount = errors.getErrorCount();

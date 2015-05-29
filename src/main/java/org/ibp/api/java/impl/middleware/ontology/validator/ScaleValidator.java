@@ -36,7 +36,7 @@ import java.util.Set;
  * 10. If present, the minimum valid value must be less than or equal to the maximum valid value, and the maximum valid value must be greater than or equal to the minimum valid value
  * 11. The name, data type and valid values cannot be changed if the scale is already in use
  * 12. Name is no more than 200 characters
- * 13. Description is no more than 255 characters
+ * 13. Description is no more than 1024 characters
  */
 
 /**
@@ -48,7 +48,7 @@ public class ScaleValidator extends OntologyValidator implements
 org.springframework.validation.Validator {
 
 	private static final Integer NAME_TEXT_LIMIT = 200;
-	private static final Integer DESCRIPTION_TEXT_LIMIT = 255;
+	private static final Integer DESCRIPTION_TEXT_LIMIT = 1024;
 
 	private static final String SCALE_CATEGORIES_NAME_DUPLICATE = "scale.category.name.duplicate";
 	private static final String SCALE_CATEGORIES_DESCRIPTION_DUPLICATE = "scale.category.description.duplicate";
@@ -204,7 +204,7 @@ org.springframework.validation.Validator {
 		return errors.getErrorCount() == initialCount;
 	}
 
-	// 13. Description is no more than 255 characters
+	// 13. Description is no more than 1024 characters
 	private boolean descriptionValidationProcessor(ScaleSummary scaleSummary, Errors errors){
 
 		Integer initialCount = errors.getErrorCount();
