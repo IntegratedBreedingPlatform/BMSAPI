@@ -50,7 +50,7 @@ public class StudyServiceImplTest {
 
 		@Override
 		public Observation apply(ObservationDto input) {
-			return mapObservationDtoToObservation(input);
+			return StudyServiceImplTest.this.mapObservationDtoToObservation(input);
 		}
 
 	};
@@ -58,8 +58,8 @@ public class StudyServiceImplTest {
 	@Before
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
-		studyServiceImpl = new StudyServiceImpl();
-		studyServiceImpl.setMiddlewareStudyService(this.mockMiddlewareStudyService);
+		this.studyServiceImpl = new StudyServiceImpl();
+		this.studyServiceImpl.setMiddlewareStudyService(this.mockMiddlewareStudyService);
 	}
 
 	@Test
@@ -72,15 +72,15 @@ public class StudyServiceImplTest {
 		studySummary.setName("Study Name");
 		studySummary.setObjective("Study Objective");
 		studySummary.setTitle("Study Title");
-		studySummary.setProgramUUID(programUID);
+		studySummary.setProgramUUID(this.programUID);
 		studySummary.setStartDate("2015-01-01");
 		studySummary.setEndDate("2015-12-31");
 		studySummary.setType(StudyType.T);
 
 		mockResult.add(studySummary);
-		Mockito.when(mockMiddlewareStudyService.listAllStudies(programUID)).thenReturn(mockResult);
+		Mockito.when(this.mockMiddlewareStudyService.listAllStudies(this.programUID)).thenReturn(mockResult);
 
-		List<StudySummary> studySummaries = studyServiceImpl.listAllStudies(programUID);
+		List<StudySummary> studySummaries = this.studyServiceImpl.listAllStudies(this.programUID);
 		Assert.assertEquals(mockResult.size(), studySummaries.size());
 		Assert.assertEquals(studySummary.getId(), studySummaries.get(0).getId());
 		Assert.assertEquals(studySummary.getName(), studySummaries.get(0).getName());
@@ -96,11 +96,14 @@ public class StudyServiceImplTest {
 	public void getStudyGermplasmList() throws MiddlewareQueryException {
 
 		final List<StudyGermplasmDto> studyGermplasmTestData =
-				Lists.newArrayList(factory.manufacturePojo(StudyGermplasmDto.class), factory.manufacturePojo(StudyGermplasmDto.class));
-		Mockito.when(mockMiddlewareStudyService.getStudyGermplasmList(TEST_STUDY_IDENTIFIER)).thenReturn(studyGermplasmTestData);
+				Lists.newArrayList(this.factory.manufacturePojo(StudyGermplasmDto.class),
+						this.factory.manufacturePojo(StudyGermplasmDto.class));
+		Mockito.when(this.mockMiddlewareStudyService.getStudyGermplasmList(StudyServiceImplTest.TEST_STUDY_IDENTIFIER)).thenReturn(
+				studyGermplasmTestData);
 
 		final Function<StudyGermplasmDto, StudyGermplasm> transformFunction = new Function<StudyGermplasmDto, StudyGermplasm>() {
 
+			@Override
 			public StudyGermplasm apply(final StudyGermplasmDto studyGermplasmDto) {
 				final StudyGermplasm studyGermplasm = new StudyGermplasm();
 				studyGermplasm.setEntryNo(studyGermplasmDto.getEntryNo());
@@ -113,7 +116,7 @@ public class StudyServiceImplTest {
 			}
 		};
 
-		final List<StudyGermplasm> studyGermplasmList = studyServiceImpl.getStudyGermplasmList(2013);
+		final List<StudyGermplasm> studyGermplasmList = this.studyServiceImpl.getStudyGermplasmList(2013);
 
 		final List<StudyGermplasm> expectedResults = Lists.transform(studyGermplasmTestData, transformFunction);
 		Assert.assertEquals(expectedResults, studyGermplasmList);
@@ -122,24 +125,28 @@ public class StudyServiceImplTest {
 	@Test
 	public void getObservations() {
 		final List<ObservationDto> observationDtoTestData =
-				Lists.newArrayList(factory.manufacturePojo(ObservationDto.class), factory.manufacturePojo(ObservationDto.class));
-		Mockito.when(mockMiddlewareStudyService.getObservations(TEST_STUDY_IDENTIFIER)).thenReturn(observationDtoTestData);
+				Lists.newArrayList(this.factory.manufacturePojo(ObservationDto.class), this.factory.manufacturePojo(ObservationDto.class));
+		Mockito.when(this.mockMiddlewareStudyService.getObservations(StudyServiceImplTest.TEST_STUDY_IDENTIFIER)).thenReturn(
+				observationDtoTestData);
 
-		final List<Observation> actualObservations = studyServiceImpl.getObservations(TEST_STUDY_IDENTIFIER);
+		final List<Observation> actualObservations = this.studyServiceImpl.getObservations(StudyServiceImplTest.TEST_STUDY_IDENTIFIER);
 
-		Assert.assertEquals(Lists.transform(observationDtoTestData, observationTransformFunction), actualObservations);
+		Assert.assertEquals(Lists.transform(observationDtoTestData, this.observationTransformFunction), actualObservations);
 
 	}
 
 	@Test
 	public void getSingleObservations() {
-		final List<ObservationDto> observationDtoTestData = Lists.newArrayList(factory.manufacturePojo(ObservationDto.class));
-		Mockito.when(mockMiddlewareStudyService.getSingleObservation(TEST_STUDY_IDENTIFIER, TEST_OBSERVATION_IDENTIIFER)).thenReturn(
-				observationDtoTestData);
+		final List<ObservationDto> observationDtoTestData = Lists.newArrayList(this.factory.manufacturePojo(ObservationDto.class));
+		Mockito.when(
+				this.mockMiddlewareStudyService.getSingleObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,
+						StudyServiceImplTest.TEST_OBSERVATION_IDENTIIFER)).thenReturn(observationDtoTestData);
 
-		final Observation actualObservations = studyServiceImpl.getSingleObservation(TEST_STUDY_IDENTIFIER, TEST_OBSERVATION_IDENTIIFER);
+		final Observation actualObservations =
+				this.studyServiceImpl.getSingleObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,
+						StudyServiceImplTest.TEST_OBSERVATION_IDENTIIFER);
 
-		Assert.assertEquals(Lists.transform(observationDtoTestData, observationTransformFunction).get(0), actualObservations);
+		Assert.assertEquals(Lists.transform(observationDtoTestData, this.observationTransformFunction).get(0), actualObservations);
 
 	}
 

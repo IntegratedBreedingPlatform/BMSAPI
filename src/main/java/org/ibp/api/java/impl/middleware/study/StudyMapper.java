@@ -34,12 +34,12 @@ public class StudyMapper {
 	 * Configuring the application wide {@link ModelMapper} with ontology related configuration.
 	 */
 	static {
-		addObservationMapper(applicationWideModelMapper);
-		addStudyGermplasmDtoMapping(applicationWideModelMapper);
+		StudyMapper.addObservationMapper(StudyMapper.applicationWideModelMapper);
+		StudyMapper.addStudyGermplasmDtoMapping(StudyMapper.applicationWideModelMapper);
 	}
 
 	public static ModelMapper getInstance() {
-		return applicationWideModelMapper;
+		return StudyMapper.applicationWideModelMapper;
 	}
 
 	private static class MeasurementDtoConverter implements Converter<List<MeasurementDto>, List<Measurement>> {
@@ -70,13 +70,13 @@ public class StudyMapper {
 				this.map().setPlotNumber(this.source.getPlotNumber());
 				this.map().setReplicationNumber(this.source.getRepitionNumber());
 				this.map().setSeedSource(this.source.getSeedSource());
-				using(new MeasurementDtoConverter()).map(source.getTraitMeasurements()).setMeasurements(null);
+				this.using(new MeasurementDtoConverter()).map(this.source.getTraitMeasurements()).setMeasurements(null);
 			}
 		});
 	}
 
 	private static void addStudyGermplasmDtoMapping(final ModelMapper mapper) {
-		mapper.addMappings(new PropertyMap<StudyGermplasmDto,StudyGermplasm>() {
+		mapper.addMappings(new PropertyMap<StudyGermplasmDto, StudyGermplasm>() {
 
 			@Override
 			protected void configure() {

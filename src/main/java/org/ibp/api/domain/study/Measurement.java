@@ -71,8 +71,8 @@ public class Measurement {
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this).append("measurementIdentifier", measurementIdentifier)
-				.append("measurementValue", measurementValue).toString();
+		return new ToStringBuilder(this).append("measurementIdentifier", this.measurementIdentifier)
+				.append("measurementValue", this.measurementValue).toString();
 	}
 
 }

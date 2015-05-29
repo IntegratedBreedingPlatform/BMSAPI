@@ -69,8 +69,7 @@ public class MeasurementIdentifier {
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this).append("measurementId", measurementId).append("trait", trait).toString();
+		return new ToStringBuilder(this).append("measurementId", this.measurementId).append("trait", this.trait).toString();
 	}
 
-	
 }
