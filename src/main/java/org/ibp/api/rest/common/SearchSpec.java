@@ -5,7 +5,7 @@ import java.util.List;
 import org.ibp.api.domain.common.PagedResult;
 
 /**
- * The call back interface for {@link PaginatedSearchTest}es.
+ * The call back interface for {@link PaginatedSearch}es.
  *
  * @author Naymesh Mistry
  *
