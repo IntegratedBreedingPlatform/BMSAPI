@@ -3,6 +3,7 @@ package org.ibp.api.rest.study;
 import java.util.List;
 
 import org.ibp.api.domain.study.Observation;
+import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,13 @@ public class StudyResource {
 			//TODO: Give back some better error messages.
 		}
 		return new ResponseEntity<>(studyService.updateObsevation(studyId, observation), HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "Get Study Germplasm List", notes = "Returns a list of germplasm used in the study.")
+	@RequestMapping(value = "/{cropname}/{studyId}/germplasm", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<StudyGermplasm>> getStudyGermplasm(@PathVariable String cropname, @PathVariable Integer studyId) {
+		return new ResponseEntity<List<StudyGermplasm>>(studyService.getStudyGermplasmList(studyId), HttpStatus.OK);
 	}
 
 

@@ -36,9 +36,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public List<GermplasmSummary> searchGermplasm(String searchText) {
 		List<GermplasmSummary> results = new ArrayList<GermplasmSummary>();
 		try {
-			List<Germplasm> searchResults = germplasmDataManager.searchForGermplasm(searchText, Operation.LIKE, false, false);
+			List<Germplasm> searchResults = this.germplasmDataManager.searchForGermplasm(searchText, Operation.LIKE, false, false);
 			for (Germplasm germplasm : searchResults) {
-				results.add(populateGermplasmSummary(germplasm));
+				results.add(this.populateGermplasmSummary(germplasm));
 			}
 		} catch (MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
@@ -58,22 +58,22 @@ public class GermplasmServiceImpl implements GermplasmService {
 		CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties();
 		crossExpansionProperties.setDefaultLevel(1);
 		crossExpansionProperties.setWheatLevel(1);
-		summary.setPedigreeString(pedigreeService.getCrossExpansion(germplasm.getGid(), crossExpansionProperties));
+		summary.setPedigreeString(this.pedigreeService.getCrossExpansion(germplasm.getGid(), crossExpansionProperties));
 
 		// FIXME - select in a loop ... Middleware service should handle all this in main query.
-		List<Name> namesByGID = germplasmDataManager.getNamesByGID(new Integer(germplasm.getGid()), null, null);
+		List<Name> namesByGID = this.germplasmDataManager.getNamesByGID(new Integer(germplasm.getGid()), null, null);
 		List<String> names = new ArrayList<String>();
 		for (Name gpName : namesByGID) {
 			names.add(gpName.getNval());
 		}
 		summary.addNames(names);
 
-		Method germplasmMethod = germplasmDataManager.getMethodByID(germplasm.getMethodId());
+		Method germplasmMethod = this.germplasmDataManager.getMethodByID(germplasm.getMethodId());
 		if (germplasmMethod != null && germplasmMethod.getMname() != null) {
 			summary.setBreedingMethod(germplasmMethod.getMname());
 		}
 
-		Location germplasmLocation = locationDataManger.getLocationByID(germplasm.getLocationId());
+		Location germplasmLocation = this.locationDataManger.getLocationByID(germplasm.getLocationId());
 		if (germplasmLocation != null && germplasmLocation.getLname() != null) {
 			summary.setLocation(germplasmLocation.getLname());
 		}
@@ -85,18 +85,16 @@ public class GermplasmServiceImpl implements GermplasmService {
 		Germplasm germplasm;
 		try {
 			germplasm = this.germplasmDataManager.getGermplasmByGID(Integer.valueOf(germplasmId));
-			return populateGermplasmSummary(germplasm);
+			return this.populateGermplasmSummary(germplasm);
 		} catch (NumberFormatException | MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
 	}
 
-	
 	void setGermplasmDataManager(GermplasmDataManager germplasmDataManager) {
 		this.germplasmDataManager = germplasmDataManager;
 	}
 
-	
 	void setPedigreeService(PedigreeService pedigreeService) {
 		this.pedigreeService = pedigreeService;
 	}
