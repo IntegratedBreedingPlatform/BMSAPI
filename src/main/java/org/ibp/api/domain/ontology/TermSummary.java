@@ -1,8 +1,8 @@
 
 package org.ibp.api.domain.ontology;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class TermSummary {
 
@@ -13,7 +13,7 @@ public class TermSummary {
 	private String description;
 
 	public String getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(String id) {
@@ -21,7 +21,7 @@ public class TermSummary {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
@@ -29,7 +29,7 @@ public class TermSummary {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public void setDescription(String description) {
@@ -38,21 +38,22 @@ public class TermSummary {
 
 	@Override
 	public String toString() {
-		return "TermSummary{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", description='" + description + '\'' + '}';
+		return "TermSummary{" + "id='" + this.id + '\'' + ", name='" + this.name + '\'' + ", description='" + this.description + '\'' + '}';
 	}
 
 	@Override
 	public boolean equals(final Object other) {
-		if (!(other instanceof TermSummary))
+		if (!(other instanceof TermSummary)) {
 			return false;
+		}
 		TermSummary castOther = (TermSummary) other;
-		return new EqualsBuilder().append(id, castOther.id).append(name, castOther.name).append(description, castOther.description)
-				.isEquals();
+		return new EqualsBuilder().append(this.id, castOther.id).append(this.name, castOther.name)
+				.append(this.description, castOther.description).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(id).append(name).append(description).toHashCode();
+		return new HashCodeBuilder().append(this.id).append(this.name).append(this.description).toHashCode();
 	}
 
 }

@@ -1,8 +1,8 @@
 
 package org.ibp.api.domain.ontology;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class VariableCategory {
 
@@ -35,15 +35,16 @@ public class VariableCategory {
 
 	@Override
 	public boolean equals(final Object other) {
-		if (!(other instanceof VariableCategory))
+		if (!(other instanceof VariableCategory)) {
 			return false;
+		}
 		VariableCategory castOther = (VariableCategory) other;
-		return new EqualsBuilder().append(name, castOther.name).append(description, castOther.description).isEquals();
+		return new EqualsBuilder().append(this.name, castOther.name).append(this.description, castOther.description).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(name).append(description).toHashCode();
+		return new HashCodeBuilder().append(this.name).append(this.description).toHashCode();
 	}
 
 }

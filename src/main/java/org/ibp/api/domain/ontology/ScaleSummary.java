@@ -1,12 +1,13 @@
-package org.ibp.api.domain.ontology;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+package org.ibp.api.domain.ontology;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
- * Contains basic data used for list, insert and update of scale
- * Extended from {@link TermSummary} for getting basic fields like id, name and description
+ * Contains basic data used for list, insert and update of scale Extended from {@link TermSummary} for getting basic fields like id, name
+ * and description
  */
 public class ScaleSummary extends TermSummary {
 
@@ -41,7 +42,7 @@ public class ScaleSummary extends TermSummary {
 	}
 
 	public MetadataSummary getMetadata() {
-		return metadata;
+		return this.metadata;
 	}
 
 	public void setMetadata(MetadataSummary metadata) {
@@ -50,10 +51,7 @@ public class ScaleSummary extends TermSummary {
 
 	@Override
 	public String toString() {
-		return "ScaleSummary{" +
-				"dataType=" + dataType +
-				", validValues=" + validValues +
-				", metadata=" + metadata +
-				"} " + super.toString();
+		return "ScaleSummary{" + "dataType=" + this.dataType + ", validValues=" + this.validValues + ", metadata=" + this.metadata + "} "
+				+ super.toString();
 	}
 }

@@ -1,15 +1,14 @@
 
 package org.ibp.api.domain.ontology;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
- * List of variables that used in Method, Property and Scale
- * Variable Observations and Studies
- * List of variable usage and variable observation and studies are mutually exclusive
+ * List of variables that used in Method, Property and Scale Variable Observations and Studies List of variable usage and variable
+ * observation and studies are mutually exclusive
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Usage {
@@ -30,11 +29,11 @@ public class Usage {
 	}
 
 	public List<TermSummary> getVariables() {
-		return variables;
+		return this.variables;
 	}
 
 	public Integer getObservations() {
-		return observations;
+		return this.observations;
 	}
 
 	public void setObservations(Integer observations) {
@@ -42,7 +41,7 @@ public class Usage {
 	}
 
 	public Integer getStudies() {
-		return studies;
+		return this.studies;
 	}
 
 	public void setStudies(Integer studies) {

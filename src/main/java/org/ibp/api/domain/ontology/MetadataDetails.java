@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Derived from {@link MetadataSummary} to provide extra information like fields which are editable, record is deletable
- * and variable usage. {@link Usage} only have observations and studies carried out for variable
+ * Derived from {@link MetadataSummary} to provide extra information like fields which are editable, record is deletable and variable usage.
+ * {@link Usage} only have observations and studies carried out for variable
  */
 public class MetadataDetails extends MetadataSummary {
 
@@ -16,7 +16,7 @@ public class MetadataDetails extends MetadataSummary {
 	private Usage usage = new Usage();
 
 	public Usage getUsage() {
-		return usage;
+		return this.usage;
 	}
 
 	public void setUsage(Usage usage) {
@@ -32,18 +32,18 @@ public class MetadataDetails extends MetadataSummary {
 	}
 
 	public boolean isDeletable() {
-		return deletable;
+		return this.deletable;
 	}
 
 	public void setDeletable(boolean deletable) {
 		this.deletable = deletable;
 	}
 
-	public void setObservations(Integer observations){
+	public void setObservations(Integer observations) {
 		this.usage.setObservations(observations);
 	}
 
-	public void setStudies(Integer studies){
+	public void setStudies(Integer studies) {
 		this.usage.setStudies(studies);
 	}
 }

@@ -1,15 +1,15 @@
 
 package org.ibp.api.domain.ontology;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class MethodSummary extends TermSummary {
 
 	private MetadataSummary metadata = new MetadataSummary();
 
 	public MetadataSummary getMetadata() {
-		return metadata;
+		return this.metadata;
 	}
 
 	public void setMetadata(MetadataSummary metadata) {
@@ -23,15 +23,16 @@ public class MethodSummary extends TermSummary {
 
 	@Override
 	public boolean equals(final Object other) {
-		if (!(other instanceof MethodSummary))
+		if (!(other instanceof MethodSummary)) {
 			return false;
+		}
 		MethodSummary castOther = (MethodSummary) other;
-		return new EqualsBuilder().append(metadata, castOther.metadata).isEquals();
+		return new EqualsBuilder().append(this.metadata, castOther.metadata).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(metadata).toHashCode();
+		return new HashCodeBuilder().append(this.metadata).toHashCode();
 	}
 
 }

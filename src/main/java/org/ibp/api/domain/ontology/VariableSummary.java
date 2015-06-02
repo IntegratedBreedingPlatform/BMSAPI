@@ -1,11 +1,12 @@
+
 package org.ibp.api.domain.ontology;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Contains basic data used for list, insert and update of variable
- * Extended from {@link TermSummary} for getting basic fields like id, name and description
+ * Contains basic data used for list, insert and update of variable Extended from {@link TermSummary} for getting basic fields like id, name
+ * and description
  */
 public class VariableSummary extends TermSummary {
 
@@ -14,7 +15,7 @@ public class VariableSummary extends TermSummary {
 	private TermSummary propertySummary = new TermSummary();
 	private TermSummary methodSummary = new TermSummary();
 
-	//Note : ScaleSummary that ignore elements except TermSummary and DataType
+	// Note : ScaleSummary that ignore elements except TermSummary and DataType
 	private ScaleSummary scaleSummary = new ScaleSummary();
 	private final Set<VariableType> variableTypes = new HashSet<>();
 	private boolean favourite;
@@ -22,7 +23,7 @@ public class VariableSummary extends TermSummary {
 	private MetadataSummary metadata = new MetadataSummary();
 
 	public String getProgramUuid() {
-		return programUuid;
+		return this.programUuid;
 	}
 
 	public void setProgramUuid(String programUuid) {
@@ -30,7 +31,7 @@ public class VariableSummary extends TermSummary {
 	}
 
 	public MetadataSummary getMetadata() {
-		return metadata;
+		return this.metadata;
 	}
 
 	public void setMetadata(MetadataSummary metadata) {
@@ -62,7 +63,7 @@ public class VariableSummary extends TermSummary {
 	}
 
 	public ScaleSummary getScaleSummary() {
-		return scaleSummary;
+		return this.scaleSummary;
 	}
 
 	public void setScaleSummary(ScaleSummary scaleSummary) {
@@ -77,7 +78,7 @@ public class VariableSummary extends TermSummary {
 		// Note: clear list if any exist
 		this.variableTypes.clear();
 
-		if (variables == null){
+		if (variables == null) {
 			return;
 		}
 
@@ -108,14 +109,8 @@ public class VariableSummary extends TermSummary {
 
 	@Override
 	public String toString() {
-		return "VariableSummary{" +
-				"alias='" + alias + '\'' +
-				", propertySummary=" + propertySummary +
-				", methodSummary=" + methodSummary +
-				", scaleSummary=" + scaleSummary +
-				", variableTypes=" + variableTypes +
-				", favourite=" + favourite +
-				", expectedRange=" + expectedRange +
-				"} " + super.toString();
+		return "VariableSummary{" + "alias='" + this.alias + '\'' + ", propertySummary=" + this.propertySummary + ", methodSummary="
+				+ this.methodSummary + ", scaleSummary=" + this.scaleSummary + ", variableTypes=" + this.variableTypes + ", favourite="
+				+ this.favourite + ", expectedRange=" + this.expectedRange + "} " + super.toString();
 	}
 }

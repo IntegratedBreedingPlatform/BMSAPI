@@ -1,3 +1,4 @@
+
 package org.ibp.api.domain.ontology;
 
 import java.util.Map;
@@ -37,7 +38,7 @@ public class ScaleDetails extends TermSummary {
 	}
 
 	public MetadataDetails getMetadata() {
-		return metadata;
+		return this.metadata;
 	}
 
 	public void setMetadata(MetadataDetails metadata) {
@@ -46,10 +47,7 @@ public class ScaleDetails extends TermSummary {
 
 	@Override
 	public String toString() {
-		return "ScaleDetails{" +
-				"dataType=" + dataType +
-				", validValues=" + validValues +
-				", metadata=" + metadata +
-				"} " + super.toString();
+		return "ScaleDetails{" + "dataType=" + this.dataType + ", validValues=" + this.validValues + ", metadata=" + this.metadata + "} "
+				+ super.toString();
 	}
 }

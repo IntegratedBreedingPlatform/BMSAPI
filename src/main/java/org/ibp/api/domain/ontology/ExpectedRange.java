@@ -1,8 +1,8 @@
 
 package org.ibp.api.domain.ontology;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class ExpectedRange {
 
@@ -27,15 +27,16 @@ public class ExpectedRange {
 
 	@Override
 	public boolean equals(final Object other) {
-		if (!(other instanceof ExpectedRange))
+		if (!(other instanceof ExpectedRange)) {
 			return false;
+		}
 		ExpectedRange castOther = (ExpectedRange) other;
-		return new EqualsBuilder().append(min, castOther.min).append(max, castOther.max).isEquals();
+		return new EqualsBuilder().append(this.min, castOther.min).append(this.max, castOther.max).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(min).append(max).toHashCode();
+		return new HashCodeBuilder().append(this.min).append(this.max).toHashCode();
 	}
 
 }

@@ -2,8 +2,9 @@
 package org.ibp.api.domain.ontology;
 
 import java.util.Set;
-import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  * Contains basic data used for list, insert and update of property Extended from {@link TermSummary} for getting basic fields like id, name
@@ -33,7 +34,7 @@ public class PropertySummary extends TermSummary {
 	}
 
 	public MetadataSummary getMetadata() {
-		return metadata;
+		return this.metadata;
 	}
 
 	public void setMetadata(MetadataSummary metadata) {
@@ -42,22 +43,23 @@ public class PropertySummary extends TermSummary {
 
 	@Override
 	public String toString() {
-		return "PropertySummary{" + "cropOntologyId='" + cropOntologyId + '\'' + ", classes=" + classes + ", metadata=" + metadata + "} "
-				+ super.toString();
+		return "PropertySummary{" + "cropOntologyId='" + this.cropOntologyId + '\'' + ", classes=" + this.classes + ", metadata="
+				+ this.metadata + "} " + super.toString();
 	}
 
 	@Override
 	public boolean equals(final Object other) {
-		if (!(other instanceof PropertySummary))
+		if (!(other instanceof PropertySummary)) {
 			return false;
+		}
 		PropertySummary castOther = (PropertySummary) other;
-		return new EqualsBuilder().append(cropOntologyId, castOther.cropOntologyId).append(classes, castOther.classes)
-				.append(metadata, castOther.metadata).isEquals();
+		return new EqualsBuilder().append(this.cropOntologyId, castOther.cropOntologyId).append(this.classes, castOther.classes)
+				.append(this.metadata, castOther.metadata).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(cropOntologyId).append(classes).append(metadata).toHashCode();
+		return new HashCodeBuilder().append(this.cropOntologyId).append(this.classes).append(this.metadata).toHashCode();
 	}
 
 }
