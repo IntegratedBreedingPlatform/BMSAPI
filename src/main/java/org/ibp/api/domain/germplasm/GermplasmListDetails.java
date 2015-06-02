@@ -15,7 +15,7 @@ public class GermplasmListDetails extends GermplasmListSummary {
 	}
 
 	public List<GermplasmListEntrySummary> getGermplasmEntries() {
-		return germplasmEntries;
+		return this.germplasmEntries;
 	}
 
 }

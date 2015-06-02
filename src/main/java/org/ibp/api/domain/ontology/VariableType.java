@@ -1,4 +1,8 @@
+
 package org.ibp.api.domain.ontology;
+
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.EqualsBuilder;
 
 public class VariableType {
 
@@ -38,4 +42,19 @@ public class VariableType {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
+	@Override
+	public boolean equals(final Object other) {
+		if (!(other instanceof VariableType))
+			return false;
+		VariableType castOther = (VariableType) other;
+		return new EqualsBuilder().append(id, castOther.id).append(name, castOther.name).append(description, castOther.description)
+				.isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(id).append(name).append(description).toHashCode();
+	}
+
 }

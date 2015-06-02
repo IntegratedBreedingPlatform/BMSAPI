@@ -11,6 +11,10 @@ public class LocationType {
 	private String name;
 	private String description;
 
+	public LocationType() {
+		
+	}
+	
 	public LocationType(String id, String name, String description) {
 		this.id = id;
 		this.name = name;

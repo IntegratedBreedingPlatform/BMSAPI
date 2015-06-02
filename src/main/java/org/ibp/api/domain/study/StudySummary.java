@@ -1,6 +1,9 @@
 
 package org.ibp.api.domain.study;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 /**
  * Summary information about a study (Trials and Nurseries).
  *
@@ -82,5 +85,22 @@ public class StudySummary {
 	@Override
 	public String toString() {
 		return "StudySummary [id=" + this.id + ", name=" + this.name + ", title=" + this.title + ", type=" + this.type + "]";
+	}
+
+	@Override
+	public boolean equals(final Object other) {
+		if (!(other instanceof StudySummary)) {
+			return false;
+		}
+		StudySummary castOther = (StudySummary) other;
+		return new EqualsBuilder().append(this.id, castOther.id).append(this.name, castOther.name).append(this.title, castOther.title)
+				.append(this.objective, castOther.objective).append(this.type, castOther.type).append(this.startDate, castOther.startDate)
+				.append(this.endDate, castOther.endDate).isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(this.id).append(this.name).append(this.title).append(this.objective).append(this.type)
+				.append(this.startDate).append(this.endDate).toHashCode();
 	}
 }
