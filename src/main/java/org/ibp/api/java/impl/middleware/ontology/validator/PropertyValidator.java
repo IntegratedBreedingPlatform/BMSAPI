@@ -4,8 +4,8 @@ import com.google.common.base.Strings;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.ontology.PropertySummary;
-import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -82,7 +82,7 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 		this.fieldShouldNotOverflow("name", propertySummary.getName(), NAME_TEXT_LIMIT, errors);
 
 		// 3. Name is unique
-		this.checkTermUniqueness("Property", CommonUtil.tryParseSafe(propertySummary.getId()), propertySummary.getName(), CvId.PROPERTIES.getId(), errors);
+		this.checkTermUniqueness("Property", StringUtil.parseInt(propertySummary.getId(), null), propertySummary.getName(), CvId.PROPERTIES.getId(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
@@ -174,7 +174,7 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 			return true;
 		}
 
-		Integer propertyId = CommonUtil.tryParseSafe(propertySummary.getId());
+		Integer propertyId = StringUtil.parseInt(propertySummary.getId(), null);
 
 		try {
 

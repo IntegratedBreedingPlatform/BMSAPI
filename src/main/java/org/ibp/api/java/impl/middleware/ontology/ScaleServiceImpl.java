@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.oms.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.ScaleSummary;
@@ -16,7 +17,6 @@ import org.ibp.api.domain.ontology.VariableCategory;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
-import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.ibp.api.java.impl.middleware.ontology.validator.ScaleValidator;
 import org.ibp.api.java.ontology.ScaleService;
 import org.modelmapper.ModelMapper;
@@ -77,12 +77,12 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		try {
-			Scale scale = this.ontologyScaleDataManager.getScaleById(CommonUtil.tryParseSafe(id));
+			Scale scale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(id, null));
 			if (scale == null) {
 				return null;
 			}
 			boolean deletable = true;
-			if (this.termDataManager.isTermReferred(CommonUtil.tryParseSafe(id))) {
+			if (this.termDataManager.isTermReferred(StringUtil.parseInt(id, null))) {
 				deletable = false;
 			}
 			ModelMapper mapper = OntologyMapper.getInstance();
@@ -99,7 +99,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			scaleDetails.getMetadata().setDeletable(deletable);
 
 			// Note : Get list of relationships related to scale Id
-			List<TermRelationship> relationships = termDataManager.getRelationshipsWithObjectAndType(CommonUtil.tryParseSafe(id), TermRelationshipId.HAS_SCALE);
+			List<TermRelationship> relationships = termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_SCALE);
 
             for(TermRelationship relationship : relationships){
                 org.ibp.api.domain.ontology.TermSummary termSummary = mapper.map(relationship, org.ibp.api.domain.ontology.TermSummary.class);
@@ -166,7 +166,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 		}
 
 		try {
-			Scale scale = new Scale(new Term(CommonUtil.tryParseSafe(scaleSummary.getId()), scaleSummary.getName().trim(), scaleSummary.getDescription().trim()));
+			Scale scale = new Scale(new Term(StringUtil.parseInt(scaleSummary.getId(), null), scaleSummary.getName().trim(), scaleSummary.getDescription().trim()));
 
 			Integer dataTypeId = scaleSummary.getDataType().getId();
 
@@ -204,7 +204,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		try {
-			this.ontologyScaleDataManager.deleteScale(CommonUtil.tryParseSafe(id));
+			this.ontologyScaleDataManager.deleteScale(StringUtil.parseInt(id, null));
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}

@@ -17,10 +17,10 @@ import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.util.StringUtil;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.VariableSummary;
-import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.junit.Before;
 import org.junit.Test;
@@ -139,8 +139,8 @@ public class VariableResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.name", Matchers.is(ontologyVariable.getScale().getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.dataType.id", Matchers.is(ontologyVariable.getScale().getDataType().getId())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.dataType.name", Matchers.is(ontologyVariable.getScale().getDataType().getName())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.validValues.min", Matchers.is(CommonUtil.tryParseSafe(ontologyVariable.getScale().getMinValue()))))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.validValues.max", Matchers.is(CommonUtil.tryParseSafe(ontologyVariable.getScale().getMaxValue()))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.validValues.min", Matchers.is(StringUtil.parseInt(ontologyVariable.getScale().getMinValue(), null))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.validValues.max", Matchers.is(StringUtil.parseInt(ontologyVariable.getScale().getMaxValue(), null))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.variableTypes", IsCollectionWithSize.hasSize(ontologyVariable.getVariableTypes().size())));
 
 		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).getVariable(programUuid, ontologyVariable.getId());
@@ -156,9 +156,9 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		VariableSummary variableSummary = TestDataProvider.getTestVariableSummary();
 		//Set variable id to null for post request.
 		variableSummary.setId(null);
-		Integer methodId = CommonUtil.tryParseSafe(variableSummary.getMethodSummary().getId());
-		Integer propertyId = CommonUtil.tryParseSafe(variableSummary.getPropertySummary().getId());
-		Integer scaleId = CommonUtil.tryParseSafe(variableSummary.getScaleSummary().getId());
+		Integer methodId = StringUtil.parseInt(variableSummary.getMethodSummary().getId(), null);
+		Integer propertyId = StringUtil.parseInt(variableSummary.getPropertySummary().getId(), null);
+		Integer scaleId = StringUtil.parseInt(variableSummary.getScaleSummary().getId(), null);
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(variableSummary.getName(), CvId.VARIABLES.getId());
 		Mockito.doReturn(TestDataProvider.getTestScale()).when(this.ontologyScaleDataManager).getScaleById(scaleId);
@@ -210,9 +210,9 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		variable.setProperty(new Property(propertyTerm));
 		variable.setScale(scale);
 
-		Integer methodId = CommonUtil.tryParseSafe(variableSummary.getMethodSummary().getId());
-		Integer propertyId = CommonUtil.tryParseSafe(variableSummary.getPropertySummary().getId());
-		Integer scaleId = CommonUtil.tryParseSafe(variableSummary.getScaleSummary().getId());
+		Integer methodId = StringUtil.parseInt(variableSummary.getMethodSummary().getId(), null);
+		Integer propertyId = StringUtil.parseInt(variableSummary.getPropertySummary().getId(), null);
+		Integer scaleId = StringUtil.parseInt(variableSummary.getScaleSummary().getId(), null);
 
 		Mockito.doReturn(new Project()).when(this.workbenchDataManager).getProjectByUuid(programUuid);
 		Mockito.doReturn(variableTerm).when(this.termDataManager).getTermById(variableTerm.getId());

@@ -9,13 +9,13 @@ import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
-import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.ontology.VariableService;
@@ -60,7 +60,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		}
 
 		try {
-			List<OntologyVariableSummary> variableSummaries = this.ontologyVariableDataManager.getWithFilter(programId, favourite, null, CommonUtil.tryParseSafe(propertyId), null);
+			List<OntologyVariableSummary> variableSummaries = this.ontologyVariableDataManager.getWithFilter(programId, favourite, null, StringUtil.parseInt(propertyId, null), null);
 			List<VariableSummary> variableSummaryList = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
@@ -87,7 +87,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		}
 
         try {
-			Integer id = CommonUtil.tryParseSafe(variableId);
+			Integer id = StringUtil.parseInt(variableId, null);
 
 			Variable ontologyVariable = this.ontologyVariableDataManager.getVariable(programId, id);
 
@@ -136,9 +136,9 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		}
 
         try {
-			Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
-			Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
-			Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
+			Integer methodId = StringUtil.parseInt(variable.getMethodSummary().getId(), null);
+			Integer propertyId = StringUtil.parseInt(variable.getPropertySummary().getId(), null);
+			Integer scaleId = StringUtil.parseInt(variable.getScaleSummary().getId(), null);
 
 			OntologyVariableInfo variableInfo = new OntologyVariableInfo();
 			variableInfo.setName(variable.getName());
@@ -184,11 +184,11 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		}
 
         try {
-			Integer id = CommonUtil.tryParseSafe(variable.getId());
+			Integer id = StringUtil.parseInt(variable.getId(), null);
 
-			Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
-			Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
-			Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
+			Integer methodId = StringUtil.parseInt(variable.getMethodSummary().getId(), null);
+			Integer propertyId = StringUtil.parseInt(variable.getPropertySummary().getId(), null);
+			Integer scaleId = StringUtil.parseInt(variable.getScaleSummary().getId(), null);
 
 			OntologyVariableInfo variableInfo = new OntologyVariableInfo();
 			variableInfo.setId(id);
@@ -231,7 +231,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		}
 
 		try{
-			ontologyVariableDataManager.deleteVariable(CommonUtil.tryParseSafe(id));
+			ontologyVariableDataManager.deleteVariable(StringUtil.parseInt(id, null));
 		}catch (MiddlewareException e){
 			throw new ApiRuntimeException("Error!", e);
 		}

@@ -6,10 +6,10 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.ibp.api.domain.ontology.VariableCategory;
-import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -132,7 +132,7 @@ org.springframework.validation.Validator {
 		}
 
 		try {
-			Scale oldScale = this.ontologyScaleDataManager.getScaleById(CommonUtil.tryParseSafe(scaleSummary.getId()));
+			Scale oldScale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(scaleSummary.getId(), null));
 
 			// that method should exist with requestId
 			if (Objects.equals(oldScale, null)) {
@@ -140,7 +140,7 @@ org.springframework.validation.Validator {
 				return;
 			}
 
-			boolean isEditable = !this.termDataManager.isTermReferred(CommonUtil.tryParseSafe(scaleSummary.getId()));
+			boolean isEditable = !this.termDataManager.isTermReferred(StringUtil.parseInt(scaleSummary.getId(), null));
 			if (isEditable) {
 				return;
 			}
@@ -156,8 +156,8 @@ org.springframework.validation.Validator {
 			}
 
 			ValidValues validValues = scaleSummary.getValidValues() == null ? new ValidValues() : scaleSummary.getValidValues();
-			boolean minValuesAreEqual = Objects.equals(validValues.getMin(), CommonUtil.tryParseSafe(oldScale.getMinValue()));
-			boolean maxValuesAreEqual = Objects.equals(validValues.getMax(), CommonUtil.tryParseSafe(oldScale.getMaxValue()));
+			boolean minValuesAreEqual = Objects.equals(validValues.getMin(), StringUtil.parseInt(oldScale.getMinValue(), null));
+			boolean maxValuesAreEqual = Objects.equals(validValues.getMax(), StringUtil.parseInt(oldScale.getMaxValue(), null));
 			List<VariableCategory> categories = validValues.getCategories() == null ? new ArrayList<VariableCategory>() : validValues.getCategories();
 			boolean categoriesEqualSize = Objects.equals(categories.size(), oldScale .getCategories().size());
 			boolean categoriesValuesAreSame = true;
@@ -199,7 +199,7 @@ org.springframework.validation.Validator {
 		this.fieldShouldNotOverflow("name", scaleSummary.getName(), NAME_TEXT_LIMIT, errors);
 
 		// 2. The name must be unique
-		this.checkTermUniqueness("Scale", CommonUtil.tryParseSafe(scaleSummary.getId()), scaleSummary.getName(), CvId.SCALES.getId(), errors);
+		this.checkTermUniqueness("Scale", StringUtil.parseInt(scaleSummary.getId(), null), scaleSummary.getName(), CvId.SCALES.getId(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}

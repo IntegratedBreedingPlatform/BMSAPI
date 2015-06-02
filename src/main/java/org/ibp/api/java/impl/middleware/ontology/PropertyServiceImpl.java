@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.oms.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.domain.ontology.PropertySummary;
@@ -13,7 +14,6 @@ import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
-import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.ibp.api.java.impl.middleware.ontology.validator.PropertyValidator;
 import org.ibp.api.java.ontology.PropertyService;
 import org.modelmapper.ModelMapper;
@@ -69,12 +69,12 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		try {
-			Property property = this.ontologyPropertyDataManager.getProperty(CommonUtil.tryParseSafe(id));
+			Property property = this.ontologyPropertyDataManager.getProperty(StringUtil.parseInt(id, null));
 			if (property == null) {
 			  	return null;
 			}
 			boolean deletable = true;
-			if (this.termDataManager.isTermReferred(CommonUtil.tryParseSafe(id))) {
+			if (this.termDataManager.isTermReferred(StringUtil.parseInt(id, null))) {
 			  	deletable = false;
 			}
 			ModelMapper mapper = OntologyMapper.getInstance();
@@ -96,7 +96,7 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 			propertyDetails.getMetadata().setDeletable(deletable);
 
 			// Note : Get list of relationships related to property Id
-			List<TermRelationship> relationships = termDataManager.getRelationshipsWithObjectAndType(CommonUtil.tryParseSafe(id), TermRelationshipId.HAS_PROPERTY);
+			List<TermRelationship> relationships = termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_PROPERTY);
 
 			for(TermRelationship relationship : relationships){
                 TermSummary termSummary = mapper.map(relationship, TermSummary.class);
@@ -166,7 +166,7 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		try {
-			this.ontologyPropertyDataManager.deleteProperty(CommonUtil.tryParseSafe(id));
+			this.ontologyPropertyDataManager.deleteProperty(StringUtil.parseInt(id, null));
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
@@ -191,7 +191,7 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 
 		try {
 			Property property = new Property();
-			property.setId(CommonUtil.tryParseSafe(id));
+			property.setId(StringUtil.parseInt(id, null));
 			property.setName(propertySummary.getName());
 			property.setDefinition(propertySummary.getDescription());
 			property.setCropOntologyId(propertySummary.getCropOntologyId());

@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.oms.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.MethodSummary;
@@ -17,7 +18,6 @@ import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
-import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.ibp.api.java.impl.middleware.ontology.validator.MethodValidator;
 import org.ibp.api.java.ontology.MethodService;
 import org.modelmapper.ModelMapper;
@@ -84,7 +84,7 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 			methodDetails.getMetadata().setDeletable(deletable);
 
 			// Note : Get list of relationships related to method Id
-			List<TermRelationship> relationships = termDataManager.getRelationshipsWithObjectAndType(CommonUtil.tryParseSafe(id), TermRelationshipId.HAS_METHOD);
+			List<TermRelationship> relationships = termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_METHOD);
 
             for(TermRelationship relationship : relationships){
                 TermSummary termSummary = mapper.map(relationship, TermSummary.class);
@@ -133,7 +133,7 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 		}
 		try {
 			Method middlewareMethod = new Method();
-			middlewareMethod.setId(CommonUtil.tryParseSafe(method.getId()));
+			middlewareMethod.setId(StringUtil.parseInt(method.getId(), null));
 			middlewareMethod.setName(method.getName());
 			middlewareMethod.setDefinition(method.getDescription());
 			this.ontologyMethodDataManager.updateMethod(middlewareMethod);

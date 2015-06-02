@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.ibp.api.java.impl.middleware.common.CommonUtil;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.java.impl.middleware.ontology.TermRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
 					return;
 				}
 			} else {
-				boolean isReferred = this.termDataManager.isTermReferred(CommonUtil.tryParseSafe(request.getId()));
+				boolean isReferred = this.termDataManager.isTermReferred(StringUtil.parseInt(request.getId(), null));
 				if (!isReferred) {
 					return;
 				}

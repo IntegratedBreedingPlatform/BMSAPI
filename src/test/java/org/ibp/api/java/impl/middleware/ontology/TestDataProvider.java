@@ -10,8 +10,12 @@ import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.ibp.api.domain.ontology.*;
-import org.ibp.api.java.impl.middleware.common.CommonUtil;
+import org.generationcp.middleware.util.StringUtil;
+import org.ibp.api.domain.ontology.MetadataSummary;
+import org.ibp.api.domain.ontology.MethodSummary;
+import org.ibp.api.domain.ontology.PropertySummary;
+import org.ibp.api.domain.ontology.ScaleSummary;
+import org.ibp.api.domain.ontology.VariableSummary;
 
 import java.util.*;
 
@@ -251,8 +255,8 @@ public class TestDataProvider {
         scaleSummary.setName(scaleName);
         scaleSummary.setDescription(scaleDescription);
         scaleSummary.setDataType(numericalDataType);
-        scaleSummary.setMin(CommonUtil.tryParseSafe(scaleMinValue));
-        scaleSummary.setMax(CommonUtil.tryParseSafe(scaleMaxValue));
+        scaleSummary.setMin(StringUtil.parseInt(scaleMinValue, null));
+        scaleSummary.setMax(StringUtil.parseInt(scaleMaxValue, null));
         scaleSummary.setMetadata(getTestMetadataSummary());
         return scaleSummary;
     }

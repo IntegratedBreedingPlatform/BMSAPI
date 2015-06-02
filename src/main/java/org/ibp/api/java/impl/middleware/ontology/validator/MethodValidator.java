@@ -7,8 +7,8 @@ import java.util.Objects;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.ontology.MethodSummary;
-import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -58,14 +58,14 @@ public class MethodValidator extends OntologyValidator implements org.springfram
 
 		try {
 
-			Method existingMethod = this.ontologyMethodDataManager.getMethod(CommonUtil.tryParseSafe(method.getId()));
+			Method existingMethod = this.ontologyMethodDataManager.getMethod(StringUtil.parseInt(method.getId(), null));
 
 			if (existingMethod == null) {
 				this.addCustomError(errors, ID_DOES_NOT_EXIST, new Object[] { "Method", method.getId()});
 				return;
 			}
 
-			boolean isEditable = !this.termDataManager.isTermReferred(CommonUtil.tryParseSafe(method.getId()));
+			boolean isEditable = !this.termDataManager.isTermReferred(StringUtil.parseInt(method.getId(), null));
 			if (isEditable) {
 				return;
 			}
@@ -106,7 +106,7 @@ public class MethodValidator extends OntologyValidator implements org.springfram
 		}
 
 		// 2. Name is unique
-		this.checkTermUniqueness("Method", CommonUtil.tryParseSafe(method.getId()), method.getName(), CvId.METHODS.getId(), errors);
+		this.checkTermUniqueness("Method", StringUtil.parseInt(method.getId(), null), method.getName(), CvId.METHODS.getId(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}

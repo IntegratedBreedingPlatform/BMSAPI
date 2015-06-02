@@ -7,9 +7,9 @@ import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.domain.ontology.VariableType;
-import org.ibp.api.java.impl.middleware.common.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -123,7 +123,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// 3. The name must be unique
-		this.checkTermUniqueness("Variable", CommonUtil.tryParseSafe(variable.getId()), variable.getName(), CvId.VARIABLES.getId(), errors);
+		this.checkTermUniqueness("Variable", StringUtil.parseInt(variable.getId(), null), variable.getName(), CvId.VARIABLES.getId(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
@@ -208,7 +208,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		// 13. The min and max expected range values are only stored if the scales data type is numeric
 		try {
-			Scale scale = this.ontologyScaleDataManager.getScaleById(CommonUtil.tryParseSafe(variable.getScaleSummary().getId()));
+			Scale scale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(variable.getScaleSummary().getId(), null));
 
 			boolean isNumericType = Objects.equals(scale.getDataType(), DataType.NUMERIC_VARIABLE);
 
@@ -309,7 +309,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		try {
 
-			Integer requestId = CommonUtil.tryParseSafe(variable.getId());
+			Integer requestId = StringUtil.parseInt(variable.getId(), null);
 			Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId);
 
 			// that variable should exist with requestId
@@ -329,9 +329,9 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				return;
 			}
 
-			Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
-			Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
-			Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
+			Integer methodId = StringUtil.parseInt(variable.getMethodSummary().getId(), null);
+			Integer propertyId = StringUtil.parseInt(variable.getPropertySummary().getId(), null);
+			Integer scaleId = StringUtil.parseInt(variable.getScaleSummary().getId(), null);
 
 			boolean nameEqual = Objects.equals(variable.getName(), oldVariable.getName());
 			boolean propertyEqual = Objects.equals(propertyId, oldVariable.getProperty().getId());
@@ -386,9 +386,9 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		try {
 
-			Integer methodId = CommonUtil.tryParseSafe(variable.getMethodSummary().getId());
-			Integer propertyId = CommonUtil.tryParseSafe(variable.getPropertySummary().getId());
-			Integer scaleId = CommonUtil.tryParseSafe(variable.getScaleSummary().getId());
+			Integer methodId = StringUtil.parseInt(variable.getMethodSummary().getId(), null);
+			Integer propertyId = StringUtil.parseInt(variable.getPropertySummary().getId(), null);
+			Integer scaleId = StringUtil.parseInt(variable.getScaleSummary().getId(), null);
 
 			List<OntologyVariableSummary> variableSummary = this.ontologyVariableDataManager.getWithFilter(null, null, methodId, propertyId, scaleId);
 
