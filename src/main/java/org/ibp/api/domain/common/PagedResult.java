@@ -19,9 +19,9 @@ public class PagedResult<T> {
 	private final int pageSize;
 	private final long totalResults;
 	
-	public static int MAX_PAGE_SIZE = 200;
-	public static int DEFAULT_PAGE_SIZE = 100;
-	public static int DEFAULT_PAGE_NUMBER = 1;
+	public static final int MAX_PAGE_SIZE = 200;
+	public static final int DEFAULT_PAGE_SIZE = 100;
+	public static final int DEFAULT_PAGE_NUMBER = 1;
 
 	public PagedResult(int pageNumber, int pageSize, long totalResults) {
 		this.totalResults = totalResults;
