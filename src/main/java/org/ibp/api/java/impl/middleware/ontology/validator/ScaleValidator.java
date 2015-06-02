@@ -293,13 +293,15 @@ org.springframework.validation.Validator {
 		// are provided (they are not mandatory), they must be numeric values
 		if (Objects.equals(dataType, DataType.NUMERIC_VARIABLE)) {
 			if(!isNullOrEmpty(minValue)){
-				if (!this.isNonNullValidNumericString(minValue)) {
+				Integer min = StringUtil.parseInt(minValue, null);
+				if(min == null){
 					this.addCustomError(errors, "validValues.min", FIELD_SHOULD_BE_NUMERIC, null);
 				}
 			}
 
 			if(!isNullOrEmpty(maxValue)){
-				if (!this.isNonNullValidNumericString(maxValue)) {
+				Integer max = StringUtil.parseInt(minValue, null);
+				if(max == null){
 					this.addCustomError(errors, "validValues.max", FIELD_SHOULD_BE_NUMERIC, null);
 				}
 			}
