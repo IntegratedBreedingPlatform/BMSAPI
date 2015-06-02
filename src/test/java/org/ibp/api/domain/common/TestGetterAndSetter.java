@@ -2,18 +2,17 @@
 package org.ibp.api.domain.common;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.germplasm.GermplasmListDetails;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 import org.ibp.api.domain.germplasm.GermplasmListSummary;
-import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.domain.location.Location;
 import org.ibp.api.domain.location.LocationType;
 import org.ibp.api.domain.ontology.DataType;
 import org.ibp.api.domain.ontology.ExpectedRange;
-import org.ibp.api.domain.ontology.MetadataSummary;
 import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.domain.ontology.PropertyDetails;
@@ -84,6 +83,8 @@ public class TestGetterAndSetter {
 		final Object destination = klass.newInstance();
 		BeanUtils.copyProperties(destination, source);
 		assertEquals(source, destination);
+		assertNotEquals(source, new Object());
+		source.toString();
 		assertEquals(source.hashCode(), destination.hashCode());
 	}
 }

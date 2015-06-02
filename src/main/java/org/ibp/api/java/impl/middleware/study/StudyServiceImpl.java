@@ -66,7 +66,11 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public Observation getSingleObservation(Integer studyId, Integer obeservationId) {
-		return this.mapObservationDtoToObservation(this.middlewareStudyService.getSingleObservation(studyId, obeservationId).get(0));
+		final List<ObservationDto> singleObservation = this.middlewareStudyService.getSingleObservation(studyId, obeservationId);
+		if(!singleObservation.isEmpty()) {
+			return this.mapObservationDtoToObservation(singleObservation.get(0));
+		}
+		return new Observation();
 	}
 
 	private Observation mapObservationDtoToObservation(ObservationDto measurement) {
