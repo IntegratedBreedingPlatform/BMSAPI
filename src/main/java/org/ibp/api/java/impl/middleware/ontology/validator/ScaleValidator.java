@@ -48,6 +48,7 @@ public class ScaleValidator extends OntologyValidator implements
 org.springframework.validation.Validator {
 
 	private static final Integer NAME_TEXT_LIMIT = 200;
+	private static final Integer CATEGORY_VALUE_TEXT_LIMIT = 255;
 	private static final Integer DESCRIPTION_TEXT_LIMIT = 1024;
 
 	private static final String SCALE_CATEGORIES_NAME_DUPLICATE = "scale.category.name.duplicate";
@@ -106,6 +107,14 @@ org.springframework.validation.Validator {
 				if(isNullOrEmpty(name)){
 					this.addCustomError(errors, "validValues.categories[" + i + "].name", SCALE_NAME_DESCRIPTION_REQUIRED, null);
 				}
+
+				if (errors.hasErrors()) {
+					return;
+				}
+
+				this.fieldShouldNotOverflow("validValues.categories[" + i + "].name", name, NAME_TEXT_LIMIT, errors);
+
+				this.fieldShouldNotOverflow("validValues.categories[" + i + "].description", value, CATEGORY_VALUE_TEXT_LIMIT, errors);
 
 				if (errors.hasErrors()) {
 					return;
