@@ -139,8 +139,8 @@ public class OntologyMapper {
 				this.map().setId(String.valueOf(this.source.getId()));
 				this.map().setName(this.source.getName());
 				this.map().setDescription(this.source.getDefinition());
-				this.map().setMinValue(CommonUtil.tryParseSafe(this.source.getMinValue()));
-				this.map().setMaxValue(CommonUtil.tryParseSafe(this.source.getMaxValue()));
+				this.map().setMin(CommonUtil.tryParseSafe(this.source.getMinValue()));
+				this.map().setMax(CommonUtil.tryParseSafe(this.source.getMaxValue()));
 				this.map().setCategories(this.source.getCategories());
 				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
 				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());

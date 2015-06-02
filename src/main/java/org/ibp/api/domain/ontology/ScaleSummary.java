@@ -28,12 +28,12 @@ public class ScaleSummary extends TermSummary {
 		return this.validValues;
 	}
 
-	public void setMinValue(Integer minValue) {
-		this.validValues.setMin(minValue);
+	public void setMin(Integer min) {
+		this.validValues.setMin(min);
 	}
 
-	public void setMaxValue(Integer maxValue) {
-		this.validValues.setMax(maxValue);
+	public void setMax(Integer max) {
+		this.validValues.setMax(max);
 	}
 
 	@JsonIgnore

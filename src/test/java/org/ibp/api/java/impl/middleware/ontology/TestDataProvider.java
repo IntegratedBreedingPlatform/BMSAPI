@@ -251,8 +251,8 @@ public class TestDataProvider {
         scaleSummary.setName(scaleName);
         scaleSummary.setDescription(scaleDescription);
         scaleSummary.setDataType(numericalDataType);
-        scaleSummary.setMinValue(CommonUtil.tryParseSafe(scaleMinValue));
-        scaleSummary.setMaxValue(CommonUtil.tryParseSafe(scaleMaxValue));
+        scaleSummary.setMin(CommonUtil.tryParseSafe(scaleMinValue));
+        scaleSummary.setMax(CommonUtil.tryParseSafe(scaleMaxValue));
         scaleSummary.setMetadata(getTestMetadataSummary());
         return scaleSummary;
     }
