@@ -16,11 +16,12 @@ public class ApiMapper {
 	
 	private static class ApiMapperInstaceHolder {
 		
+		private static ModelMapper instance = ApiMapper.applyApplicationWideMapperConfiguration(new ModelMapper());
+
 		private ApiMapperInstaceHolder() {
 			
 		}
 		
-		private static ModelMapper instance = ApiMapper.applyApplicationWideMapperConfiguration(new ModelMapper());
 	}
 		
 	/**
