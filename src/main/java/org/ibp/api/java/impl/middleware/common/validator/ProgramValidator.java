@@ -52,4 +52,8 @@ public class ProgramValidator extends BaseValidator implements Validator {
         	LOGGER.error("Error occur while fetching program data", e);
         }
     }
+
+    public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager){
+        this.workbenchDataManager = workbenchDataManager;
+    }
 }
