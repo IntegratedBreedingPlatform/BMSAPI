@@ -18,6 +18,7 @@ import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.TraitDto;
+import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.study.StudyAttribute;
 import org.ibp.api.domain.study.DatasetSummary;
 import org.ibp.api.domain.study.Environment;
@@ -26,7 +27,6 @@ import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
-import org.ibp.api.domain.study.Trait;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.study.StudyService;
@@ -202,9 +202,10 @@ public class StudyServiceImpl implements StudyService {
 			VariableTypeList variates = studyDataManager.getAllStudyVariates(studyIdentifier);
 			List<VariableType> variateDetails = variates.getVariableTypes();
 			for (VariableType variateDetail : variateDetails) {
-				Trait trait = new Trait();
-				trait.setTraitId(variateDetail.getId());
-				trait.setTraitName(variateDetail.getStandardVariable().getName());
+				TermSummary trait = new TermSummary();
+				trait.setId(String.valueOf(variateDetail.getId()));
+				trait.setName(variateDetail.getStandardVariable().getName());
+				trait.setDescription(variateDetail.getStandardVariable().getDescription());
 				studyDetails.addTrait(trait);
 			}
 

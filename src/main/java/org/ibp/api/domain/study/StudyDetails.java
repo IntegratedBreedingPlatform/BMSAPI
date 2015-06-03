@@ -6,11 +6,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.ibp.api.domain.ontology.TermSummary;
+
 public class StudyDetails extends StudySummary {
 
 	private final Set<StudyAttribute> generalInfo = new HashSet<>();
 	private final List<Environment> environments = new ArrayList<>();
-	private final Set<Trait> traits = new HashSet<>();
+	private final Set<TermSummary> traits = new HashSet<>();
 	private final Set<DatasetSummary> datasets = new HashSet<>();
 
 	public Set<StudyAttribute> getGeneralInfo() {
@@ -33,11 +35,11 @@ public class StudyDetails extends StudySummary {
 		}
 	}
 
-	public Set<Trait> getTraits() {
+	public Set<TermSummary> getTraits() {
 		return traits;
 	}
 
-	public void addTrait(Trait trait) {
+	public void addTrait(TermSummary trait) {
 		if (trait != null) {
 			this.traits.add(trait);
 		}
