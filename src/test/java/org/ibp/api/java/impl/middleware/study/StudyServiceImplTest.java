@@ -82,7 +82,7 @@ public class StudyServiceImplTest {
 
 		List<StudySummary> studySummaries = this.studyServiceImpl.listAllStudies(this.programUID);
 		Assert.assertEquals(mockResult.size(), studySummaries.size());
-		Assert.assertEquals(studySummary.getId(), studySummaries.get(0).getId());
+		Assert.assertEquals(studySummary.getId().toString(), studySummaries.get(0).getId());
 		Assert.assertEquals(studySummary.getName(), studySummaries.get(0).getName());
 		Assert.assertEquals(studySummary.getTitle(), studySummaries.get(0).getTitle());
 		Assert.assertEquals(studySummary.getObjective(), studySummaries.get(0).getObjective());
