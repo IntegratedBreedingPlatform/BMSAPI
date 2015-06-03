@@ -154,6 +154,44 @@ public class ScaleValidatorTest {
 	}
 
 	/**
+	 * Test for to Check Category name exceed limit
+	 */
+	@Test
+	public void testWithCategoryNameExceedMaxLimit() {
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+
+		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
+		scaleSummary.setDataType(TestDataProvider.categoricalDataType);
+
+		Map<String, String> categories = new HashMap<>();
+		categories.put(RandomStringUtils.random(205), "description");
+		scaleSummary.setCategories(categories);
+
+		this.scaleValidator.validate(scaleSummary, bindingResult);
+		Assert.assertTrue(bindingResult.hasErrors());
+		Assert.assertNotNull(bindingResult.getFieldError("validValues.categories[1].name"));
+	}
+
+	/**
+	 * Test for to Check Category description exceed limit
+	 */
+	@Test
+	public void testWithCategoryDescriptionExceedMaxLimit() {
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+
+		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
+		scaleSummary.setDataType(TestDataProvider.categoricalDataType);
+
+		Map<String, String> categories = new HashMap<>();
+		categories.put("Name", RandomStringUtils.random(260));
+		scaleSummary.setCategories(categories);
+
+		this.scaleValidator.validate(scaleSummary, bindingResult);
+		Assert.assertTrue(bindingResult.hasErrors());
+		Assert.assertNotNull(bindingResult.getFieldError("validValues.categories[1].description"));
+	}
+
+	/**
 	 * Test for If DataType is Numeric and Min value is Greater than Max value.
 	 */
 	@Test
