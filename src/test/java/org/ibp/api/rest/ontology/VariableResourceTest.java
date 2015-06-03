@@ -120,6 +120,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 		Variable ontologyVariable = TestDataProvider.getTestVariable();
 
+		Mockito.doReturn(new Project()).when(this.workbenchDataManager).getProjectByUuid(programUuid);
 		Mockito.doReturn(ontologyVariable).when(this.ontologyVariableDataManager).getVariable(programUuid, ontologyVariable.getId());
 		Mockito.doReturn(new Term(ontologyVariable.getId(), ontologyVariable.getName(), ontologyVariable.getDefinition(), CvId.VARIABLES.getId(), false)).when(this.termDataManager).getTermById(ontologyVariable.getId());
 
