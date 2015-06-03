@@ -10,7 +10,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  */
 public class StudySummary {
 
-	private Integer id;
+	private String id;
 	private String name;
 	private String title;
 	private String objective;
@@ -22,15 +22,15 @@ public class StudySummary {
 
 	}
 
-	public StudySummary(Integer studyId) {
+	public StudySummary(String studyId) {
 		this.id = studyId;
 	}
 
-	public Integer getId() {
+	public String getId() {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

@@ -55,7 +55,7 @@ public class StudyServiceImpl implements StudyService {
 			List<org.generationcp.middleware.service.api.study.StudySummary> mwStudySummaries = this.middlewareStudyService.listAllStudies(programUniqueId);
 
 			for (org.generationcp.middleware.service.api.study.StudySummary mwStudySummary : mwStudySummaries) {
-				StudySummary summary = new StudySummary(mwStudySummary.getId());
+				StudySummary summary = new StudySummary(String.valueOf(mwStudySummary.getId()));
 				summary.setName(mwStudySummary.getName());
 				summary.setTitle(mwStudySummary.getTitle());
 				summary.setObjective(mwStudySummary.getObjective());
@@ -166,7 +166,7 @@ public class StudyServiceImpl implements StudyService {
 
 			// Basic Info.
 			StudyDetails studyDetails = new StudyDetails();
-			studyDetails.setId(study.getId());
+			studyDetails.setId(String.valueOf(study.getId()));
 			studyDetails.setName(study.getName());
 			studyDetails.setTitle(study.getTitle());
 			studyDetails.setObjective(study.getObjective());
