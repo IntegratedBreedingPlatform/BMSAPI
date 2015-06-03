@@ -214,7 +214,7 @@ public class StudyServiceImpl implements StudyService {
 			if (datasetReferences != null && !datasetReferences.isEmpty()) {
 				for (DatasetReference dsRef : datasetReferences) {
 					DatasetSummary dsSummary = new DatasetSummary();
-					dsSummary.setId(dsRef.getId());
+					dsSummary.setId(dsRef.getId().toString());
 					dsSummary.setName(dsRef.getName());
 					dsSummary.setDescription(dsRef.getDescription());
 					studyDetails.addDataSet(dsSummary);
