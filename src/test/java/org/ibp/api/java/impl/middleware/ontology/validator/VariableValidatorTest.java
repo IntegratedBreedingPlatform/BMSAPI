@@ -3,12 +3,15 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.ontology.Method;
+import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.domain.ontology.VariableType;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
@@ -209,6 +212,43 @@ public class VariableValidatorTest {
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
+	}
+
+	/**
+	 * Test for Alias contain special character and start with digit
+	 */
+	@Test
+	public void testWithSpecialCharacterAnsStartWithDigitVariableAlias() throws MiddlewareException {
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+		VariableSummary variableSummary = TestDataProvider.getTestVariableSummary();
+		variableSummary.setId("11");
+		variableSummary.setProgramUuid("uuid");
+		variableSummary.setName("Variable Name");
+		variableSummary.setAlias("2lia");
+
+		Term methodTerm = TestDataProvider.getMethodTerm();
+		Term propertyTerm = TestDataProvider.getPropertyTerm();
+		Term scaleTerm = TestDataProvider.getScaleTerm();
+
+		Scale scale = TestDataProvider.getTestScale();
+
+		Variable variable = TestDataProvider.getTestVariable();
+		variable.setMethod(new Method(methodTerm));
+		variable.setProperty(new Property(propertyTerm));
+		variable.setScale(scale);
+
+		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
+		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
+		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(variableSummary.getProgramUuid(), StringUtil.parseInt(variableSummary.getId(), null));
+
+		this.variableValidator.validate(variableSummary, bindingResult);
+		Assert.assertTrue(bindingResult.hasErrors());
+		Assert.assertNotNull(bindingResult.getFieldError("alias"));
 	}
 
 	/**

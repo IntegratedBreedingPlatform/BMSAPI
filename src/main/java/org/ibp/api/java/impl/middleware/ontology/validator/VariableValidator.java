@@ -288,8 +288,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 	private void aliasValidationProcessor(VariableSummary variable, Errors errors){
 
-		if(!isNullOrEmpty(variable.getAlias().trim())){
-
+		if(!Objects.equals(variable.getAlias(), null)){
 			// Trim alias
 			variable.setAlias(variable.getAlias().trim());
 
