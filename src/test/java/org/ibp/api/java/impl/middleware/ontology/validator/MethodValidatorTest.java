@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.junit.After;
@@ -163,4 +164,25 @@ public class MethodValidatorTest {
 		Assert.assertFalse(bindingResult.hasErrors());
 	}
 
+	/**
+	 * Test for to check Method is Editable or Not
+	 * @throws MiddlewareException
+	 */
+	@Test
+	public void testWithCheckEditableMethod() throws MiddlewareException {
+
+		MethodSummary methodSummary = TestDataProvider.getTestMethodSummary();
+		Method method = TestDataProvider.getTestMethod();
+
+		Integer methodId = StringUtil.parseInt(methodSummary.getId(), null);
+
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(methodSummary.getName(), CvId.METHODS.getId());
+		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(methodId);
+		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(methodId);
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
+
+		this.methodValidator.validate(methodSummary, bindingResult);
+		Assert.assertFalse(bindingResult.hasErrors());
+	}
 }
