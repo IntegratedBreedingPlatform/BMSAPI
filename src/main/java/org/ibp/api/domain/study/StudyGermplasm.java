@@ -5,6 +5,8 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+
 public class StudyGermplasm {
 
 	private String entryType;
@@ -60,6 +62,7 @@ public class StudyGermplasm {
 	/**
 	 * @return the germplasmListEntrySummary
 	 */
+	@JsonUnwrapped
 	public GermplasmListEntrySummary getGermplasmListEntrySummary() {
 		return this.germplasmListEntrySummary;
 	}
