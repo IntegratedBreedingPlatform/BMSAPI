@@ -62,6 +62,11 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 		Mockito.reset(this.termDataManager);
 		Mockito.reset(this.ontologyPropertyDataManager);
 	}
+
+	/**
+	 * Get All properties. It should respond with 200.
+	 * @throws Exception
+	 */
 	@Test
 	public void listAllProperties() throws Exception {
 
@@ -81,6 +86,33 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].classes", IsCollectionWithSize.hasSize(propertyList.get(0).getClasses().size())));
 
 		Mockito.verify(this.ontologyPropertyDataManager, Mockito.times(1)).getAllProperties();
+	}
+
+	/**
+	 * Get All properties that have given class. It should respond with 200.
+	 * @throws Exception
+	 */
+	@Test
+	public void listAllPropertiesUsingClass() throws Exception {
+
+		String className = "Agronomic";
+
+		List<Property> propertyList = TestDataProvider.getTestProperties(3);
+
+		Mockito.doReturn(propertyList).when(this.ontologyPropertyDataManager).getAllPropertiesWithClass(className);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/properties?class=" + className, cropName)
+				.contentType(this.contentType))
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(propertyList.size())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(String.valueOf(propertyList.get(0).getId()))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is(propertyList.get(0).getName())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(propertyList.get(0).getDefinition())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].cropOntologyId", Matchers.is(propertyList.get(0).getCropOntologyId())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].classes", IsCollectionWithSize.hasSize(propertyList.get(0).getClasses().size())));
+
+		Mockito.verify(this.ontologyPropertyDataManager, Mockito.times(1)).getAllPropertiesWithClass(className);
 	}
 
 	/**
