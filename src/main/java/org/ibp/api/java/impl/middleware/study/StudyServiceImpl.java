@@ -18,7 +18,7 @@ import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.TraitDto;
-import org.ibp.api.domain.study.Attribute;
+import org.ibp.api.domain.study.StudyAttribute;
 import org.ibp.api.domain.study.DatasetSummary;
 import org.ibp.api.domain.study.Environment;
 import org.ibp.api.domain.study.Measurement;
@@ -189,8 +189,10 @@ public class StudyServiceImpl implements StudyService {
 
 				// Only add the attribute if there is a value associated.
 				if (value != null) {
-					Attribute attr = new Attribute();
-					attr.setName(factorDetail.getStandardVariable().getName());
+					StudyAttribute attr = new StudyAttribute();
+					attr.setId(String.valueOf(factorDetail.getId()));
+					attr.setName(factorDetail.getLocalName());
+					attr.setDescription(factorDetail.getLocalDescription());
 					attr.setValue(value);
 					studyDetails.addGeneralInfo(attr);
 				}
@@ -234,7 +236,12 @@ public class StudyServiceImpl implements StudyService {
 
 							Environment env = new Environment();
 							for (Variable variable : variables) {
-								env.addEnvironmentDetail(new Attribute(variable.getVariableType().getLocalName(), variable.getDisplayValue()));
+								StudyAttribute attr = new StudyAttribute();
+								attr.setId(String.valueOf(variable.getVariableType().getId()));
+								attr.setName(variable.getVariableType().getLocalName());
+								attr.setDescription(variable.getVariableType().getLocalDescription());
+								attr.setValue(variable.getDisplayValue());
+								env.addEnvironmentDetail(attr);
 							}
 							studyDetails.addEnvironment(env);
 						}

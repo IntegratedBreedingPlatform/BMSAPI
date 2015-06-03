@@ -10,13 +10,13 @@ import java.util.Set;
  */
 public class Environment {
 
-	private final Set<Attribute> environmentDetails = new HashSet<>();
+	private final Set<StudyAttribute> environmentDetails = new HashSet<>();
 
-	public Set<Attribute> getEnvironmentDetails() {
+	public Set<StudyAttribute> getEnvironmentDetails() {
 		return environmentDetails;
 	}
 
-	public void addEnvironmentDetail(Attribute attr) {
+	public void addEnvironmentDetail(StudyAttribute attr) {
 		if (attr != null) {
 			this.environmentDetails.add(attr);
 		}

@@ -8,16 +8,16 @@ import java.util.Set;
 
 public class StudyDetails extends StudySummary {
 
-	private final Set<Attribute> generalInfo = new HashSet<>();
+	private final Set<StudyAttribute> generalInfo = new HashSet<>();
 	private final List<Environment> environments = new ArrayList<>();
 	private final Set<Trait> traits = new HashSet<>();
 	private final Set<DatasetSummary> datasets = new HashSet<>();
 
-	public Set<Attribute> getGeneralInfo() {
+	public Set<StudyAttribute> getGeneralInfo() {
 		return generalInfo;
 	}
 
-	public void addGeneralInfo(Attribute attr) {
+	public void addGeneralInfo(StudyAttribute attr) {
 		if (attr != null) {
 			this.generalInfo.add(attr);
 		}
