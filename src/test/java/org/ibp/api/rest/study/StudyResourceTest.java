@@ -3,7 +3,11 @@ package org.ibp.api.rest.study;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.TraitDto;
@@ -31,10 +35,19 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		public org.generationcp.middleware.service.api.study.StudyService getStudyServiceMW() {
 			return Mockito.mock(org.generationcp.middleware.service.api.study.StudyService.class);
 		}
+		
+		@Bean
+		@Primary
+		public StudyDataManager studyDataManager() {
+			return Mockito.mock(StudyDataManager.class);
+		}
 	}
 
 	@Autowired
 	private org.generationcp.middleware.service.api.study.StudyService studyServiceMW;
+	
+	@Autowired
+	private StudyDataManager studyDataManager;
 
 	@Test
 	public void testListAllStudies() throws Exception {
@@ -94,5 +107,44 @@ public class StudyResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['measurements'][0].measurementValue", Matchers.is(measurement.getTriatValue())))
 				.andDo(MockMvcResultHandlers.print());
 	}
+	
+	@Test
+	public void testGetStudyDetailsBasic() throws Exception {
+		
+		int studyId = 123;
+		
+		// Study object is Middleware is quite complex to setup so chosing to just mock it instead
+		// so that test does not need too much structural knowledge of Middleware data objects.
+		Study study = Mockito.mock(Study.class);
+		Mockito.when(study.getId()).thenReturn(studyId);
+		Mockito.when(study.getName()).thenReturn("Maizing Trial");
+		Mockito.when(study.getTitle()).thenReturn("Title");
+		Mockito.when(study.getObjective()).thenReturn("Objective");
+		Mockito.when(study.getType()).thenReturn("Trial");
+		Mockito.when(study.getStartDate()).thenReturn(20150101);
+		Mockito.when(study.getEndDate()).thenReturn(20151231);
+		
+		Mockito.when(study.getConditions()).thenReturn(new VariableList());
 
+		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
+		Mockito.when(studyDataManager.getAllStudyFactors(studyId)).thenReturn(new VariableTypeList());
+		Mockito.when(studyDataManager.getAllStudyVariates(studyId)).thenReturn(new VariableTypeList());
+		
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/study/{cropname}/{studyId}", "maize", studyId)
+				.contentType(this.contentType))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(study.getId()))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(study.getName())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.title", Matchers.is(study.getTitle())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.objective", Matchers.is(study.getObjective())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.type", Matchers.is(study.getType())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.startDate", Matchers.is(String.valueOf(study.getStartDate()))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.endDate", Matchers.is(String.valueOf(study.getEndDate()))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.generalInfo", Matchers.empty()))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.environments", Matchers.empty()))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.traits", Matchers.empty()))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.datasets", Matchers.empty()))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.germplasm", Matchers.empty()));
+	}
 }
