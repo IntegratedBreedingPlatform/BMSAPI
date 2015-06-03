@@ -80,8 +80,16 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 		validateId(variableId, "Variable");
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+		this.programValidator.validate(programId, errors);
+
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
 		TermRequest term = new TermRequest(variableId, "variable", CvId.VARIABLES.getId());
 		this.termValidator.validate(term, errors);
+
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
