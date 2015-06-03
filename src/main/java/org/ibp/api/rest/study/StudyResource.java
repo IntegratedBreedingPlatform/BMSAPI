@@ -3,6 +3,7 @@ package org.ibp.api.rest.study;
 import java.util.List;
 
 import org.ibp.api.domain.study.Observation;
+import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.java.study.StudyService;
@@ -73,5 +74,11 @@ public class StudyResource {
 		return new ResponseEntity<List<StudyGermplasm>>(studyService.getStudyGermplasmList(studyId), HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Get Study Details", notes = "Returns detailed information about the study.")
+	@RequestMapping(value = "/{cropname}/{studyId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable String cropname, @PathVariable String studyId) {
+		return new ResponseEntity<StudyDetails>(this.studyService.getStudyDetails(studyId), HttpStatus.OK);
+	}
 
 }
