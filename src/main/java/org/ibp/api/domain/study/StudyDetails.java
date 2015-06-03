@@ -14,6 +14,7 @@ public class StudyDetails extends StudySummary {
 	private final List<Environment> environments = new ArrayList<>();
 	private final Set<TermSummary> traits = new HashSet<>();
 	private final Set<DatasetSummary> datasets = new HashSet<>();
+	private final List<StudyGermplasm> germplasm = new ArrayList<>();
 
 	public Set<StudyAttribute> getGeneralInfo() {
 		return generalInfo;
@@ -54,5 +55,8 @@ public class StudyDetails extends StudySummary {
 			this.datasets.add(dataset);
 		}
 	}
-
+	
+	public List<StudyGermplasm> getGermplasm() {
+		return germplasm;
+	}
 }

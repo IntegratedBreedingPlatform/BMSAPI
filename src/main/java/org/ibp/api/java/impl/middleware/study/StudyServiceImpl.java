@@ -249,6 +249,9 @@ public class StudyServiceImpl implements StudyService {
 					}
 				}
 			}
+			
+			//Germplasm
+			studyDetails.getGermplasm().addAll(getStudyGermplasmList(studyIdentifier));
 			return studyDetails;
 		} catch (NumberFormatException nfe) {
 			throw new ApiRuntimeException("Supplied study identifier [" + studyId + "] is not valid, it must be a numeric value.");
