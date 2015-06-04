@@ -1,4 +1,7 @@
+
 package org.ibp.api.java.impl.middleware.ontology.validator;
+
+import java.util.HashMap;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -16,8 +19,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.HashMap;
-
 public class TermDeletableValidatorTest {
 
 	@Mock
@@ -28,8 +29,8 @@ public class TermDeletableValidatorTest {
 	@Before
 	public void reset() {
 		MockitoAnnotations.initMocks(this);
-		termDeletableValidator = new TermDeletableValidator();
-		termDeletableValidator.setTermDataManager(this.termDataManager);
+		this.termDeletableValidator = new TermDeletableValidator();
+		this.termDeletableValidator.setTermDataManager(this.termDataManager);
 	}
 
 	@After
@@ -49,7 +50,8 @@ public class TermDeletableValidatorTest {
 		Mockito.doReturn(true).when(this.termDataManager).isTermReferred(termMethod.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-		this.termDeletableValidator.validate(new TermRequest(String.valueOf(termMethod.getId()), "method", CvId.METHODS.getId()), bindingResult);
+		this.termDeletableValidator.validate(new TermRequest(String.valueOf(termMethod.getId()), "method", CvId.METHODS.getId()),
+				bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 	}
 
@@ -67,7 +69,8 @@ public class TermDeletableValidatorTest {
 		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(methodTerm.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
-		this.termDeletableValidator.validate(new TermRequest(String.valueOf(methodTerm.getId()), "method", CvId.METHODS.getId()), bindingResult);
+		this.termDeletableValidator.validate(new TermRequest(String.valueOf(methodTerm.getId()), "method", CvId.METHODS.getId()),
+				bindingResult);
 		Assert.assertFalse(bindingResult.hasErrors());
 	}
 }

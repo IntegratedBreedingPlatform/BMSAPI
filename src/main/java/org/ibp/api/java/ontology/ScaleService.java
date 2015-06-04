@@ -1,10 +1,11 @@
+
 package org.ibp.api.java.ontology;
+
+import java.util.List;
 
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.ScaleSummary;
-
-import java.util.List;
 
 public interface ScaleService {
 
@@ -32,6 +33,7 @@ public interface ScaleService {
 
 	/**
 	 * update scale with new request data
+	 * 
 	 * @param id scale to update
 	 * @param scaleSummary ScaleSummary instance that have new data
 	 */

@@ -1,10 +1,11 @@
+
 package org.ibp.api.java.ontology;
+
+import java.util.List;
 
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.domain.ontology.PropertySummary;
-
-import java.util.List;
 
 public interface PropertyService {
 

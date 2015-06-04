@@ -19,11 +19,11 @@ import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.TraitDto;
 import org.ibp.api.domain.ontology.TermSummary;
-import org.ibp.api.domain.study.StudyAttribute;
 import org.ibp.api.domain.study.DatasetSummary;
 import org.ibp.api.domain.study.Environment;
 import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.Observation;
+import org.ibp.api.domain.study.StudyAttribute;
 import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
@@ -52,7 +52,8 @@ public class StudyServiceImpl implements StudyService {
 	public List<StudySummary> listAllStudies(final String programUniqueId) {
 		List<StudySummary> studySummaries = new ArrayList<StudySummary>();
 		try {
-			List<org.generationcp.middleware.service.api.study.StudySummary> mwStudySummaries = this.middlewareStudyService.listAllStudies(programUniqueId);
+			List<org.generationcp.middleware.service.api.study.StudySummary> mwStudySummaries =
+					this.middlewareStudyService.listAllStudies(programUniqueId);
 
 			for (org.generationcp.middleware.service.api.study.StudySummary mwStudySummary : mwStudySummaries) {
 				StudySummary summary = new StudySummary(String.valueOf(mwStudySummary.getId()));
@@ -102,13 +103,14 @@ public class StudyServiceImpl implements StudyService {
 
 		final List<MeasurementDto> traits = new ArrayList<MeasurementDto>();
 		for (Measurement measurement : measurements) {
-			traits.add(new MeasurementDto(new TraitDto(measurement.getMeasurementIdentifier().getTrait().getTraitId(), measurement.getMeasurementIdentifier().getTrait()
-					.getTraitName()), measurement.getMeasurementIdentifier().getMeasurementId(), measurement.getMeasurementValue()));
+			traits.add(new MeasurementDto(new TraitDto(measurement.getMeasurementIdentifier().getTrait().getTraitId(), measurement
+					.getMeasurementIdentifier().getTrait().getTraitName()), measurement.getMeasurementIdentifier().getMeasurementId(),
+					measurement.getMeasurementValue()));
 		}
 		final ObservationDto middlewareMeasurement =
-				new ObservationDto(observation.getUniqueIdentifier(), observation.getEnvironmentNumber(), observation.getEntryType(), observation.getGermplasmId(),
-						observation.getGermplasmDesignation(), observation.getEnrtyNumber(), observation.getSeedSource(), observation.getReplicationNumber(),
-						observation.getPlotNumber(), traits);
+				new ObservationDto(observation.getUniqueIdentifier(), observation.getEnvironmentNumber(), observation.getEntryType(),
+						observation.getGermplasmId(), observation.getGermplasmDesignation(), observation.getEnrtyNumber(),
+						observation.getSeedSource(), observation.getReplicationNumber(), observation.getPlotNumber(), traits);
 
 		return this.mapObservationDtoToObservation(this.middlewareStudyService.updataObservation(studyIdentifier, middlewareMeasurement));
 	}
@@ -129,7 +131,9 @@ public class StudyServiceImpl implements StudyService {
 				} catch (JsonProcessingException e) {
 					throw new ApiRuntimeException("Error mapping measurement to JSON", e);
 				}
-				FieldError objectError = new FieldError("Measurements [" + counter + "]", "Measurement", null, false, array, object.toArray(), "Error processing measurement");
+				FieldError objectError =
+						new FieldError("Measurements [" + counter + "]", "Measurement", null, false, array, object.toArray(),
+								"Error processing measurement");
 				errors.add(objectError);
 				counter++;
 			}
@@ -159,7 +163,7 @@ public class StudyServiceImpl implements StudyService {
 	public StudyDetails getStudyDetails(String studyId) {
 		try {
 			Integer studyIdentifier = Integer.valueOf(studyId);
-			Study study = studyDataManager.getStudy(studyIdentifier);
+			Study study = this.studyDataManager.getStudy(studyIdentifier);
 			if (study == null) {
 				throw new ApiRuntimeException("No study identified by the supplied studyId [" + studyId + "] was found.");
 			}
@@ -176,7 +180,7 @@ public class StudyServiceImpl implements StudyService {
 
 			// Factors, Settings tab.
 			List<Variable> conditions = study.getConditions().getVariables();
-			VariableTypeList factors = studyDataManager.getAllStudyFactors(studyIdentifier);
+			VariableTypeList factors = this.studyDataManager.getAllStudyFactors(studyIdentifier);
 			List<VariableType> factorDetails = factors.getVariableTypes();
 			for (VariableType factorDetail : factorDetails) {
 				String value = null;
@@ -199,7 +203,7 @@ public class StudyServiceImpl implements StudyService {
 			}
 
 			// Variates - Measurements tab.
-			VariableTypeList variates = studyDataManager.getAllStudyVariates(studyIdentifier);
+			VariableTypeList variates = this.studyDataManager.getAllStudyVariates(studyIdentifier);
 			List<VariableType> variateDetails = variates.getVariableTypes();
 			for (VariableType variateDetail : variateDetails) {
 				TermSummary trait = new TermSummary();
@@ -223,7 +227,7 @@ public class StudyServiceImpl implements StudyService {
 					if (dsRef.getName().endsWith("-ENVIRONMENT")) {
 						// Logic derived from by RepresentationDataSetQuery.loadItems(int, int) method of the GermplasmStudyBrowser,
 						// which is used to show dataset tables in the study browser UI.
-						List<Experiment> experiments = studyDataManager.getExperiments(dsRef.getId(), 0, Integer.MAX_VALUE);
+						List<Experiment> experiments = this.studyDataManager.getExperiments(dsRef.getId(), 0, Integer.MAX_VALUE);
 						for (Experiment experiment : experiments) {
 							List<Variable> variables = new ArrayList<Variable>();
 							VariableList fac = experiment.getFactors();
@@ -249,9 +253,9 @@ public class StudyServiceImpl implements StudyService {
 					}
 				}
 			}
-			
-			//Germplasm
-			studyDetails.getGermplasm().addAll(getStudyGermplasmList(studyIdentifier));
+
+			// Germplasm
+			studyDetails.getGermplasm().addAll(this.getStudyGermplasmList(studyIdentifier));
 			return studyDetails;
 		} catch (NumberFormatException nfe) {
 			throw new ApiRuntimeException("Supplied study identifier [" + studyId + "] is not valid, it must be a numeric value.");

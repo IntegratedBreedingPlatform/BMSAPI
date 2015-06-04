@@ -1,4 +1,13 @@
+
 package org.ibp.api.java.impl.middleware.ontology;
+
+import static org.generationcp.middleware.domain.oms.DataType.CATEGORICAL_VARIABLE;
+import static org.generationcp.middleware.domain.oms.DataType.NUMERIC_VARIABLE;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
@@ -25,14 +34,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-
-import static org.generationcp.middleware.domain.oms.DataType.CATEGORICAL_VARIABLE;
-import static org.generationcp.middleware.domain.oms.DataType.NUMERIC_VARIABLE;
-
 /**
  * Validate data of API Services and pass data to middleware services
  */
@@ -47,7 +48,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 	private ScaleValidator scaleValidator;
 
 	@Override
-	public List<ScaleSummary> getAllScales()  {
+	public List<ScaleSummary> getAllScales() {
 		try {
 			List<Scale> scales = this.ontologyScaleDataManager.getAllScales();
 			List<ScaleSummary> scaleSummaries = new ArrayList<>();
@@ -66,7 +67,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 
 	@Override
 	public ScaleDetails getScaleById(String id) {
-		validateId(id, "Scale");
+		this.validateId(id, "Scale");
 		// Note: Validate Scale Id for valid format and scale exists or not
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Scale");
 		TermRequest term = new TermRequest(id, "Scale", CvId.SCALES.getId());
@@ -99,12 +100,14 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			scaleDetails.getMetadata().setDeletable(deletable);
 
 			// Note : Get list of relationships related to scale Id
-			List<TermRelationship> relationships = termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_SCALE);
+			List<TermRelationship> relationships =
+					this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_SCALE);
 
-            for(TermRelationship relationship : relationships){
-                org.ibp.api.domain.ontology.TermSummary termSummary = mapper.map(relationship, org.ibp.api.domain.ontology.TermSummary.class);
-                scaleDetails.getMetadata().getUsage().addUsage(termSummary);
-            }
+			for (TermRelationship relationship : relationships) {
+				org.ibp.api.domain.ontology.TermSummary termSummary =
+						mapper.map(relationship, org.ibp.api.domain.ontology.TermSummary.class);
+				scaleDetails.getMetadata().getUsage().addUsage(termSummary);
+			}
 
 			return scaleDetails;
 		} catch (MiddlewareException e) {
@@ -149,8 +152,8 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 	}
 
 	@Override
-	public void updateScale(String id,ScaleSummary scaleSummary) {
-		validateId(id, "Scale");
+	public void updateScale(String id, ScaleSummary scaleSummary) {
+		this.validateId(id, "Scale");
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Scale");
 		TermRequest term = new TermRequest(id, "scale", CvId.SCALES.getId());
 		this.termValidator.validate(term, errors);
@@ -166,13 +169,16 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 		}
 
 		try {
-			Scale scale = new Scale(new Term(StringUtil.parseInt(scaleSummary.getId(), null), scaleSummary.getName().trim(), scaleSummary.getDescription().trim()));
+			Scale scale =
+					new Scale(new Term(StringUtil.parseInt(scaleSummary.getId(), null), scaleSummary.getName().trim(), scaleSummary
+							.getDescription().trim()));
 
 			Integer dataTypeId = scaleSummary.getDataType().getId();
 
 			scale.setDataType(DataType.getById(dataTypeId));
 
-			ValidValues validValues = Objects.equals(scaleSummary.getValidValues(), null) ? new ValidValues() : scaleSummary.getValidValues();
+			ValidValues validValues =
+					Objects.equals(scaleSummary.getValidValues(), null) ? new ValidValues() : scaleSummary.getValidValues();
 
 			if (Objects.equals(dataTypeId, CATEGORICAL_VARIABLE.getId())) {
 				for (VariableCategory description : validValues.getCategories()) {
@@ -195,7 +201,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 	@Override
 	public void deleteScale(String id) {
 		// Note: Validate Id for valid format and check if scale exists or not
-		validateId(id, "Scale");
+		this.validateId(id, "Scale");
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
 		// Note: Check if scale is deletable or not by checking its usage in variable

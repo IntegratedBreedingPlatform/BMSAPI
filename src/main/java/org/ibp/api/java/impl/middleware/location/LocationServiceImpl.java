@@ -30,7 +30,8 @@ public class LocationServiceImpl implements LocationService {
 		Set<LocationType> locationTypes = new LinkedHashSet<>();
 		try {
 			List<UserDefinedField> locationTypeUdflds =
-					this.locationDataManager.getUserDefinedFieldByFieldTableNameAndType(UDTableType.LOCATION_LTYPE.getTable(), UDTableType.LOCATION_LTYPE.getType());
+					this.locationDataManager.getUserDefinedFieldByFieldTableNameAndType(UDTableType.LOCATION_LTYPE.getTable(),
+							UDTableType.LOCATION_LTYPE.getType());
 
 			for (UserDefinedField udfld : locationTypeUdflds) {
 				locationTypes.add(new LocationType(udfld.getFldno().toString(), udfld.getFcode(), udfld.getFname()));
@@ -47,7 +48,7 @@ public class LocationServiceImpl implements LocationService {
 			Integer locTypeId = Integer.valueOf(locationTypeId);
 			int start = pageSize * (pageNumber - 1);
 			int numOfRows = pageSize;
-			return mapLocations(this.locationDataManager.getLocationsByType(locTypeId, start, numOfRows));
+			return this.mapLocations(this.locationDataManager.getLocationsByType(locTypeId, start, numOfRows));
 		} catch (NumberFormatException | MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
@@ -55,8 +56,8 @@ public class LocationServiceImpl implements LocationService {
 
 	private List<Location> mapLocations(List<org.generationcp.middleware.pojos.Location> mwLocations) throws MiddlewareQueryException {
 		List<Location> locations = new ArrayList<>();
-		
-		if(mwLocations == null) {
+
+		if (mwLocations == null) {
 			return locations;
 		}
 
@@ -70,9 +71,10 @@ public class LocationServiceImpl implements LocationService {
 				location.setLatitude(mwLoc.getGeoref().getLat());
 				location.setLongitude(mwLoc.getGeoref().getLon());
 			}
-			
+
 			UserDefinedField locationTypeUdfld = this.locationDataManager.getUserDefinedFieldByID(mwLoc.getLtype());
-			LocationType locationType = new LocationType(locationTypeUdfld.getFldno().toString(), locationTypeUdfld.getFcode(), locationTypeUdfld.getFname());
+			LocationType locationType =
+					new LocationType(locationTypeUdfld.getFldno().toString(), locationTypeUdfld.getFcode(), locationTypeUdfld.getFname());
 			location.setLocationType(locationType);
 			locations.add(location);
 		}
@@ -93,11 +95,11 @@ public class LocationServiceImpl implements LocationService {
 		if (StringUtils.isEmpty(searchString)) {
 			throw new ApiRuntimeException("Search string must not be null or empty.");
 		}
-		
+
 		try {
 			int start = pageSize * (pageNumber - 1);
 			int numOfRows = pageSize;
-			return mapLocations(this.locationDataManager.getLocationsByName(searchString, start, numOfRows, Operation.LIKE));
+			return this.mapLocations(this.locationDataManager.getLocationsByName(searchString, start, numOfRows, Operation.LIKE));
 		} catch (MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}

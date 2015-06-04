@@ -1,9 +1,10 @@
-package org.ibp.api.domain.inventory;
 
-import com.wordnik.swagger.annotations.ApiModel;
+package org.ibp.api.domain.inventory;
 
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.ibp.api.domain.ontology.TermSummary;
+
+import com.wordnik.swagger.annotations.ApiModel;
 
 @ApiModel("Germplasm Inventory Information")
 public class GermplasmInventory {
@@ -20,22 +21,23 @@ public class GermplasmInventory {
 	private LotStatus lotStatus;
 	private String comments;
 
-	public GermplasmInventory() { }
+	public GermplasmInventory() {
+	}
 
 	public GermplasmInventory(Integer gid) {
 		this.gid = gid;
 	}
 
 	public Integer getGid() {
-		return gid;
+		return this.gid;
 	}
-	
+
 	public void setGid(Integer gid) {
 		this.gid = gid;
 	}
 
 	public Integer getLotId() {
-		return lotId;
+		return this.lotId;
 	}
 
 	public void setLotId(Integer lotId) {
@@ -43,7 +45,7 @@ public class GermplasmInventory {
 	}
 
 	public Double getQuantityAvailable() {
-		return quantityAvailable;
+		return this.quantityAvailable;
 	}
 
 	public void setQuantityAvailable(Double quantityAvailable) {
@@ -51,15 +53,15 @@ public class GermplasmInventory {
 	}
 
 	public Double getQuantityReserved() {
-		return quantityReserved;
+		return this.quantityReserved;
 	}
 
 	public void setQuantityReserved(Double quantityReserved) {
 		this.quantityReserved = quantityReserved;
 	}
-	
+
 	public Double getQuantityTotal() {
-		return quantityTotal;
+		return this.quantityTotal;
 	}
 
 	public void setQuantityTotal(Double quantityTotal) {
@@ -67,7 +69,7 @@ public class GermplasmInventory {
 	}
 
 	public TermSummary getQuantityUnit() {
-		return quantityUnit;
+		return this.quantityUnit;
 	}
 
 	public void setQuantityUnit(TermSummary quantityUnit) {
@@ -75,7 +77,7 @@ public class GermplasmInventory {
 	}
 
 	public Integer getUserId() {
-		return userId;
+		return this.userId;
 	}
 
 	public void setUserId(Integer userId) {
@@ -83,7 +85,7 @@ public class GermplasmInventory {
 	}
 
 	public String getUserName() {
-		return userName;
+		return this.userName;
 	}
 
 	public void setUserName(String userName) {
@@ -91,7 +93,7 @@ public class GermplasmInventory {
 	}
 
 	public InventoryLocation getLocation() {
-		return location;
+		return this.location;
 	}
 
 	public void setLocation(InventoryLocation inventoryLocation) {
@@ -99,7 +101,7 @@ public class GermplasmInventory {
 	}
 
 	public LotStatus getLotStatus() {
-		return lotStatus;
+		return this.lotStatus;
 	}
 
 	public void setLotStatus(LotStatus lotStatus) {
@@ -107,7 +109,7 @@ public class GermplasmInventory {
 	}
 
 	public String getComments() {
-		return comments;
+		return this.comments;
 	}
 
 	public void setComments(String comments) {
@@ -116,10 +118,10 @@ public class GermplasmInventory {
 
 	@Override
 	public String toString() {
-		return "GermplasmInventoryInfo [gid=" + gid + ", lotId=" + lotId + ", quantityAvailable="
-				+ quantityAvailable + ", quantityReserved=" + quantityReserved + ", quantityUnit="
-				+ quantityUnit + ", userId=" + userId + ", userName=" + userName + ", location="
-				+ location + ", lotStatus=" + lotStatus + ", comments=" + comments + "]";
+		return "GermplasmInventoryInfo [gid=" + this.gid + ", lotId=" + this.lotId + ", quantityAvailable=" + this.quantityAvailable
+				+ ", quantityReserved=" + this.quantityReserved + ", quantityUnit=" + this.quantityUnit + ", userId=" + this.userId
+				+ ", userName=" + this.userName + ", location=" + this.location + ", lotStatus=" + this.lotStatus + ", comments="
+				+ this.comments + "]";
 	}
 
 }

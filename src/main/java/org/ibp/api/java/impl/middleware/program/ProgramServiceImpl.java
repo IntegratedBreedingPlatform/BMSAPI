@@ -37,7 +37,7 @@ public class ProgramServiceImpl implements ProgramService {
 					programSummary.setUserId(String.valueOf(workbenchProgram.getUserId()));
 					programSummary.setUniqueID(workbenchProgram.getUniqueID());
 					if (workbenchProgram.getStartDate() != null) {
-						programSummary.setStartDate(DATE_FORMAT.format(workbenchProgram.getStartDate()));
+						programSummary.setStartDate(ProgramServiceImpl.DATE_FORMAT.format(workbenchProgram.getStartDate()));
 					}
 					programSummaries.add(programSummary);
 				}

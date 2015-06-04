@@ -1,9 +1,10 @@
+
 package org.ibp.api.java.ontology;
+
+import java.util.List;
 
 import org.ibp.api.domain.ontology.DataType;
 import org.ibp.api.domain.ontology.VariableType;
-
-import java.util.List;
 
 public interface ModelService {
 

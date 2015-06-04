@@ -7,6 +7,11 @@ package org.ibp.api.exception;
  */
 public class ApiRuntimeException extends RuntimeException {
 
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -7991039875168381487L;
+
 	public ApiRuntimeException(String message) {
 		super(message);
 	}

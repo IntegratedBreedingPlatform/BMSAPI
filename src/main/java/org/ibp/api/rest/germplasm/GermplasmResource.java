@@ -28,29 +28,29 @@ public class GermplasmResource {
 
 	@Autowired
 	private GermplasmService germplasmService;
-	
+
 	@Autowired
 	private ResourceURLLinkProvider resourceURLLinkProvider;
 
 	@ApiOperation(value = "Search germplasm.", notes = "Search germplasm.")
 	@RequestMapping(value = "/{cropname}/search", method = RequestMethod.GET)
 	public ResponseEntity<List<GermplasmSummary>> searchGermplasm(@PathVariable String cropname, @RequestParam String q) {
-		List<GermplasmSummary> searchResults = germplasmService.searchGermplasm(q);
-		for(GermplasmSummary summary : searchResults) {
-			populateParentLinkUrls(cropname, summary);
+		List<GermplasmSummary> searchResults = this.germplasmService.searchGermplasm(q);
+		for (GermplasmSummary summary : searchResults) {
+			this.populateParentLinkUrls(cropname, summary);
 		}
 		return new ResponseEntity<List<GermplasmSummary>>(searchResults, HttpStatus.OK);
 	}
-	
+
 	private void populateParentLinkUrls(String cropname, GermplasmSummary summary) {
 		if (summary.getParent1Id() != null && !summary.getParent1Id().equals("Unknown")) {
-			summary.setParent1Url(resourceURLLinkProvider.getGermplasmByIDUrl(summary.getParent1Id(), cropname));
+			summary.setParent1Url(this.resourceURLLinkProvider.getGermplasmByIDUrl(summary.getParent1Id(), cropname));
 		} else {
 			summary.setParent1Url("Not applicable as parent 1 is is unknown.");
 		}
 
 		if (summary.getParent2Id() != null && !summary.getParent2Id().equals("Unknown")) {
-			summary.setParent2Url(resourceURLLinkProvider.getGermplasmByIDUrl(summary.getParent2Id(), cropname));
+			summary.setParent2Url(this.resourceURLLinkProvider.getGermplasmByIDUrl(summary.getParent2Id(), cropname));
 		} else {
 			summary.setParent2Url("Not applicable as parent 2 is is unknown.");
 		}
@@ -59,9 +59,9 @@ public class GermplasmResource {
 	@ApiOperation(value = "Get germplasm by germplasm id.", notes = "Get germplasm by germplasm id.")
 	@RequestMapping(value = "/{cropname}/{germplasmId}", method = RequestMethod.GET)
 	public ResponseEntity<GermplasmSummary> getGermplasm(@PathVariable String cropname, @PathVariable String germplasmId) {
-		GermplasmSummary summary = germplasmService.getGermplasm(germplasmId);
+		GermplasmSummary summary = this.germplasmService.getGermplasm(germplasmId);
 		if (summary != null) {
-			populateParentLinkUrls(cropname, summary);
+			this.populateParentLinkUrls(cropname, summary);
 			return new ResponseEntity<GermplasmSummary>(summary, HttpStatus.OK);
 		} else {
 			throw new ApiRuntimeException("No germplasm record found for the supplied identifier: " + germplasmId);

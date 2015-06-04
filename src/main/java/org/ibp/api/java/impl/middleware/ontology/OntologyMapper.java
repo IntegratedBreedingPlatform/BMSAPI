@@ -35,19 +35,19 @@ public class OntologyMapper {
 	private OntologyMapper() {
 
 	}
-	
+
 	/**
 	 * Configuring the application wide {@link ModelMapper} with ontology related configuration.
 	 */
 	static {
-		addMethodMappers(applicationWideModelMapper);
-		addPropertyMappers(applicationWideModelMapper);
-		addScaleMappers(applicationWideModelMapper);
-		addVariableMappers(applicationWideModelMapper);
-		addTermRelationShipMapper(applicationWideModelMapper);
-		addVariableTypeMapper(applicationWideModelMapper);
-		addDataTypeMapper(applicationWideModelMapper);
-		
+		OntologyMapper.addMethodMappers(OntologyMapper.applicationWideModelMapper);
+		OntologyMapper.addPropertyMappers(OntologyMapper.applicationWideModelMapper);
+		OntologyMapper.addScaleMappers(OntologyMapper.applicationWideModelMapper);
+		OntologyMapper.addVariableMappers(OntologyMapper.applicationWideModelMapper);
+		OntologyMapper.addTermRelationShipMapper(OntologyMapper.applicationWideModelMapper);
+		OntologyMapper.addVariableTypeMapper(OntologyMapper.applicationWideModelMapper);
+		OntologyMapper.addDataTypeMapper(OntologyMapper.applicationWideModelMapper);
+
 	}
 
 	/**
@@ -56,10 +56,8 @@ public class OntologyMapper {
 	 * @return ModelMapper Instance
 	 */
 	public static ModelMapper getInstance() {
-		return applicationWideModelMapper;
+		return OntologyMapper.applicationWideModelMapper;
 	}
-
-
 
 	/**
 	 * Get ModelMapper instance and add Method related mapping to it
@@ -210,7 +208,7 @@ public class OntologyMapper {
 
 	/**
 	 * This will map middleware TermRelationship(SubjectTerm) to bmsapi TermSummary
-	 * 
+	 *
 	 * @param mapper ModelMapper instance
 	 */
 	private static void addTermRelationShipMapper(ModelMapper mapper) {
@@ -226,12 +224,14 @@ public class OntologyMapper {
 		});
 	}
 
-	public static void addVariableTypeMapper(ModelMapper mapper){
+	public static void addVariableTypeMapper(ModelMapper mapper) {
 		// Note: This will type map middleware VariableType which is enum to BMSAPI VariableType (Both are collections element)
 		mapper.createTypeMap(VariableType.class, org.ibp.api.domain.ontology.VariableType.class).setConverter(
 				new Converter<VariableType, org.ibp.api.domain.ontology.VariableType>() {
+
 					@Override
-					public org.ibp.api.domain.ontology.VariableType convert(MappingContext<VariableType, org.ibp.api.domain.ontology.VariableType> context) {
+					public org.ibp.api.domain.ontology.VariableType convert(
+							MappingContext<VariableType, org.ibp.api.domain.ontology.VariableType> context) {
 						if (context.getSource() == null) {
 							return null;
 						}
@@ -246,12 +246,14 @@ public class OntologyMapper {
 				});
 	}
 
-	public static void addDataTypeMapper(ModelMapper mapper){
+	public static void addDataTypeMapper(ModelMapper mapper) {
 		// Note: This will type map middleware DataType which is enum to BMSAPI DataType (Both are collections element)
 		mapper.createTypeMap(DataType.class, org.ibp.api.domain.ontology.DataType.class).setConverter(
 				new Converter<DataType, org.ibp.api.domain.ontology.DataType>() {
+
 					@Override
-					public org.ibp.api.domain.ontology.DataType convert(MappingContext<DataType, org.ibp.api.domain.ontology.DataType> context) {
+					public org.ibp.api.domain.ontology.DataType convert(
+							MappingContext<DataType, org.ibp.api.domain.ontology.DataType> context) {
 						if (context.getSource() == null) {
 							return null;
 						}

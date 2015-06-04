@@ -12,9 +12,9 @@ public class LocationType {
 	private String description;
 
 	public LocationType() {
-		
+
 	}
-	
+
 	public LocationType(String id, String name, String description) {
 		this.id = id;
 		this.name = name;
@@ -61,7 +61,7 @@ public class LocationType {
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this).append("id", id).append("name", name).append("description", description).toString();
+		return new ToStringBuilder(this).append("id", this.id).append("name", this.name).append("description", this.description).toString();
 	}
 
 }

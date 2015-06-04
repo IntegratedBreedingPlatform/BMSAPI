@@ -1,3 +1,4 @@
+
 package org.ibp.api.java.impl.middleware.ontology;
 
 import java.util.ArrayList;
@@ -31,11 +32,11 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 
 	@Autowired
 	private OntologyMethodDataManager ontologyMethodDataManager;
-	
+
 	@Autowired
 	private MethodValidator methodValidator;
-	
-  	@Override
+
+	@Override
 	public List<MethodSummary> getAllMethods() {
 		try {
 			List<Method> methodList = this.ontologyMethodDataManager.getAllMethods();
@@ -44,8 +45,8 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 			ModelMapper mapper = OntologyMapper.getInstance();
 
 			for (Method method : methodList) {
-			  	MethodSummary methodSummary = mapper.map(method, MethodSummary.class);
-			  	methods.add(methodSummary);
+				MethodSummary methodSummary = mapper.map(method, MethodSummary.class);
+				methods.add(methodSummary);
 			}
 			return methods;
 		} catch (MiddlewareException e) {
@@ -55,28 +56,28 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 
 	@Override
 	public MethodDetails getMethod(String id) {
-		validateId(id, "Method");
+		this.validateId(id, "Method");
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
 		TermRequest term = new TermRequest(id, "method", CvId.METHODS.getId());
 		this.termValidator.validate(term, errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
-		
+
 		try {
 			Method method = this.ontologyMethodDataManager.getMethod(Integer.valueOf(id));
 			if (method == null) {
-			  	return null;
+				return null;
 			}
 			boolean deletable = true;
 			if (this.termDataManager.isTermReferred(Integer.valueOf(id))) {
-			  	deletable = false;
+				deletable = false;
 			}
 			ModelMapper mapper = OntologyMapper.getInstance();
 			MethodDetails methodDetails = mapper.map(method, MethodDetails.class);
 			String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
 			if (!deletable) {
-			  methodDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
+				methodDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
 			} else {
 				methodDetails.getMetadata().addEditableField("name");
 				methodDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
@@ -84,12 +85,13 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 			methodDetails.getMetadata().setDeletable(deletable);
 
 			// Note : Get list of relationships related to method Id
-			List<TermRelationship> relationships = termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_METHOD);
+			List<TermRelationship> relationships =
+					this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_METHOD);
 
-            for(TermRelationship relationship : relationships){
-                TermSummary termSummary = mapper.map(relationship, TermSummary.class);
-                methodDetails.getMetadata().getUsage().addUsage(termSummary);
-            }
+			for (TermRelationship relationship : relationships) {
+				TermSummary termSummary = mapper.map(relationship, TermSummary.class);
+				methodDetails.getMetadata().getUsage().addUsage(termSummary);
+			}
 
 			return methodDetails;
 		} catch (MiddlewareException e) {
@@ -105,7 +107,7 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
-		
+
 		try {
 			Method middlewareMethod = new Method();
 			middlewareMethod.setName(method.getName());
@@ -119,7 +121,7 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 
 	@Override
 	public void updateMethod(String id, MethodSummary method) {
-		validateId(id, "Method");
+		this.validateId(id, "Method");
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
 		TermRequest term = new TermRequest(id, "method", CvId.METHODS.getId());
 		this.termValidator.validate(term, errors);
@@ -144,7 +146,7 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 
 	@Override
 	public void deleteMethod(String id) {
-		validateId(id, "Method");
+		this.validateId(id, "Method");
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
 		this.termDeletableValidator.validate(new TermRequest(String.valueOf(id), "Method", CvId.METHODS.getId()), errors);
 		if (errors.hasErrors()) {

@@ -1,3 +1,4 @@
+
 package org.ibp.api.java.impl.middleware.common;
 
 import org.springframework.beans.factory.annotation.Autowired;

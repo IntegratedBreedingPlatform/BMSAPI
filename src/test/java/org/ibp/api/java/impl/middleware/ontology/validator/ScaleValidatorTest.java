@@ -1,4 +1,8 @@
+
 package org.ibp.api.java.impl.middleware.ontology.validator;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -19,9 +23,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class ScaleValidatorTest {
 
 	@Mock
@@ -35,9 +36,9 @@ public class ScaleValidatorTest {
 	@Before
 	public void reset() {
 		MockitoAnnotations.initMocks(this);
-		scaleValidator = new ScaleValidator();
-		scaleValidator.setTermDataManager(termDataManager);
-		scaleValidator.setOntologyScaleDataManager(ontologyScaleDataManager);
+		this.scaleValidator = new ScaleValidator();
+		this.scaleValidator.setTermDataManager(this.termDataManager);
+		this.scaleValidator.setOntologyScaleDataManager(this.ontologyScaleDataManager);
 	}
 
 	@After
@@ -95,7 +96,7 @@ public class ScaleValidatorTest {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
 		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
-		//Remove dataType from test object.
+		// Remove dataType from test object.
 		scaleSummary.setDataType(null);
 		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -110,7 +111,7 @@ public class ScaleValidatorTest {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
 		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
-		//Setting invalid dataTypeId
+		// Setting invalid dataTypeId
 		scaleSummary.setDataType(new DataType());
 		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -133,8 +134,7 @@ public class ScaleValidatorTest {
 	}
 
 	/**
-	 * Test for to Check Label and Value Uniqueness in Categories if DataType is
-	 * Categorical
+	 * Test for to Check Label and Value Uniqueness in Categories if DataType is Categorical
 	 */
 	@Test
 	public void testWithUniqueLabelNameInCategoricalDataType() {
@@ -251,7 +251,7 @@ public class ScaleValidatorTest {
 	 * Test for valid request
 	 */
 	@Test
-	public void testWithValidRequest() throws  MiddlewareException{
+	public void testWithValidRequest() throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
 		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();

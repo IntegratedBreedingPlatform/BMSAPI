@@ -1,4 +1,9 @@
+
 package org.ibp.api.java.impl.middleware.ontology;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermRelationship;
@@ -22,10 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 /**
  * Validate data of API Services and pass data to middleware services
  */
@@ -39,7 +40,7 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 	@Autowired
 	private PropertyValidator propertyValidator;
 
-  	@Override
+	@Override
 	public List<PropertySummary> getAllProperties() {
 		try {
 			List<Property> propertyList = this.ontologyPropertyDataManager.getAllProperties();
@@ -48,8 +49,8 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 			ModelMapper mapper = OntologyMapper.getInstance();
 
 			for (Property property : propertyList) {
-			  	PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
-			  	properties.add(propertyDTO);
+				PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
+				properties.add(propertyDTO);
 			}
 			return properties;
 		} catch (MiddlewareException e) {
@@ -57,8 +58,9 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 		}
 	}
 
+	@Override
 	public PropertyDetails getProperty(String id) {
-		validateId(id, "Property");
+		this.validateId(id, "Property");
 		// Note: Validate Property Id for valid format and property exists or not
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Property");
 		TermRequest term = new TermRequest(id, "Property", CvId.PROPERTIES.getId());
@@ -71,11 +73,11 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 		try {
 			Property property = this.ontologyPropertyDataManager.getProperty(StringUtil.parseInt(id, null));
 			if (property == null) {
-			  	return null;
+				return null;
 			}
 			boolean deletable = true;
 			if (this.termDataManager.isTermReferred(StringUtil.parseInt(id, null))) {
-			  	deletable = false;
+				deletable = false;
 			}
 			ModelMapper mapper = OntologyMapper.getInstance();
 			PropertyDetails propertyDetails = mapper.map(property, PropertyDetails.class);
@@ -96,12 +98,13 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 			propertyDetails.getMetadata().setDeletable(deletable);
 
 			// Note : Get list of relationships related to property Id
-			List<TermRelationship> relationships = termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_PROPERTY);
+			List<TermRelationship> relationships =
+					this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_PROPERTY);
 
-			for(TermRelationship relationship : relationships){
-                TermSummary termSummary = mapper.map(relationship, TermSummary.class);
-                propertyDetails.getMetadata().getUsage().addUsage(termSummary);
-            }
+			for (TermRelationship relationship : relationships) {
+				TermSummary termSummary = mapper.map(relationship, TermSummary.class);
+				propertyDetails.getMetadata().getUsage().addUsage(termSummary);
+			}
 
 			return propertyDetails;
 		} catch (MiddlewareException e) {
@@ -125,7 +128,7 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 			property.setDefinition(propertySummary.getDescription());
 			property.setCropOntologyId(propertySummary.getCropOntologyId());
 			for (String c : propertySummary.getClasses()) {
-			  	property.addClass(c);
+				property.addClass(c);
 			}
 
 			this.ontologyPropertyDataManager.addProperty(property);
@@ -145,8 +148,8 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 			ModelMapper mapper = OntologyMapper.getInstance();
 
 			for (Property property : propertyList) {
-			  	PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
-			  	properties.add(propertyDTO);
+				PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
+				properties.add(propertyDTO);
 			}
 			return properties;
 		} catch (MiddlewareException e) {
@@ -157,7 +160,7 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 	@Override
 	public void deleteProperty(String id) {
 		// Note: Validate Id for valid format and check if property exists or not
-		validateId(id, "Property");
+		this.validateId(id, "Property");
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Property");
 
 		// Note: Check if property is deletable or not by checking its usage in variable
@@ -174,7 +177,7 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 
 	@Override
 	public void updateProperty(String id, PropertySummary propertySummary) {
-		validateId(id, "Property");
+		this.validateId(id, "Property");
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Property");
 		TermRequest term = new TermRequest(id, "property", CvId.PROPERTIES.getId());
 		this.termValidator.validate(term, errors);
@@ -197,7 +200,7 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 			property.setCropOntologyId(propertySummary.getCropOntologyId());
 
 			for (String c : propertySummary.getClasses()) {
-			  	property.addClass(c);
+				property.addClass(c);
 			}
 
 			this.ontologyPropertyDataManager.updateProperty(property);

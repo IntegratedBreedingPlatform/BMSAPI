@@ -1,3 +1,4 @@
+
 package org.ibp.api.java.impl.middleware.common;
 
 public final class Constants {

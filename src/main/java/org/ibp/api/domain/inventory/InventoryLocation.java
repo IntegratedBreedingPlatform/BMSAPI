@@ -1,3 +1,4 @@
+
 package org.ibp.api.domain.inventory;
 
 import com.wordnik.swagger.annotations.ApiModel;
@@ -12,8 +13,9 @@ public class InventoryLocation {
 	private String label2;
 	private String label3;
 
-	public InventoryLocation() {}
-	
+	public InventoryLocation() {
+	}
+
 	public InventoryLocation(Integer locationId, String locationName) {
 
 		this.id = locationId;
@@ -21,11 +23,11 @@ public class InventoryLocation {
 	}
 
 	public Integer getId() {
-		return id;
+		return this.id;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setId(Integer id) {
@@ -37,7 +39,7 @@ public class InventoryLocation {
 	}
 
 	public String getLabel1() {
-		return label1;
+		return this.label1;
 	}
 
 	public void setLabel1(String label1) {
@@ -45,7 +47,7 @@ public class InventoryLocation {
 	}
 
 	public String getLabel2() {
-		return label2;
+		return this.label2;
 	}
 
 	public void setLabel2(String label2) {
@@ -53,7 +55,7 @@ public class InventoryLocation {
 	}
 
 	public String getLabel3() {
-		return label3;
+		return this.label3;
 	}
 
 	public void setLabel3(String label3) {

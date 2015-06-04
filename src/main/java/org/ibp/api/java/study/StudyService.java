@@ -1,3 +1,4 @@
+
 package org.ibp.api.java.study;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public interface StudyService {
 	 * @return List of {@link StudySummary}ies. Omits deleted studies.
 	 */
 	List<StudySummary> listAllStudies(final String programUniqueId);
-	
+
 	List<Observation> getObservations(Integer studyId);
 
 	Observation getSingleObservation(Integer studyId, Integer obeservationId);
@@ -23,6 +24,6 @@ public interface StudyService {
 	Observation updateObsevation(final Integer studyIdentifier, Observation observation);
 
 	List<StudyGermplasm> getStudyGermplasmList(final Integer studyIdentifer);
-	
+
 	StudyDetails getStudyDetails(String studyId);
 }

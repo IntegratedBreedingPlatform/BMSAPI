@@ -30,6 +30,7 @@ public class LocationResourceTest extends ApiUnitTestBase {
 
 	@Configuration
 	public static class TestConfiguration {
+
 		@Bean
 		@Primary
 		public LocationDataManager locationDataManager() {
@@ -43,45 +44,46 @@ public class LocationResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testGetAllLocationTypes() throws Exception {
 
-		UserDefinedField udfld1 = createTestLocTypeUdfld(415, "FIELD", "EXPERIMENTAL FIELD");
-		UserDefinedField udfld2 = createTestLocTypeUdfld(416, "BLOCK", "FIELD BLOCK");
+		UserDefinedField udfld1 = this.createTestLocTypeUdfld(415, "FIELD", "EXPERIMENTAL FIELD");
+		UserDefinedField udfld2 = this.createTestLocTypeUdfld(416, "BLOCK", "FIELD BLOCK");
 
 		List<UserDefinedField> mwLocTypes = new ArrayList<>();
 		mwLocTypes.add(udfld1);
 		mwLocTypes.add(udfld2);
 
-		Mockito.when(this.locationDataManager.getUserDefinedFieldByFieldTableNameAndType(UDTableType.LOCATION_LTYPE.getTable(), UDTableType.LOCATION_LTYPE.getType())).thenReturn(mwLocTypes);
+		Mockito.when(
+				this.locationDataManager.getUserDefinedFieldByFieldTableNameAndType(UDTableType.LOCATION_LTYPE.getTable(),
+						UDTableType.LOCATION_LTYPE.getType())).thenReturn(mwLocTypes);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/location/{cropname}/types", "maize")
-				.contentType(this.contentType))
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andDo(MockMvcResultHandlers.print())
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/location/{cropname}/types", "maize").contentType(this.contentType))
+				.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(mwLocTypes.size())))
-				
+
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['id']", Matchers.is(udfld1.getFldno().toString())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['name']", Matchers.is(udfld1.getFcode())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['description']", Matchers.is(udfld1.getFname())))
-				
+
 				.andExpect(MockMvcResultMatchers.jsonPath("$[1]['id']", Matchers.is(udfld2.getFldno().toString())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[1]['name']", Matchers.is(udfld2.getFcode())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[1]['description']", Matchers.is(udfld2.getFname())));
 	}
-	
+
 	@Test
 	public void testGetLocationsByType() throws Exception {
 		String locationTypeId = "146";
 		Mockito.when(this.locationDataManager.countLocationsByType(Integer.valueOf(locationTypeId))).thenReturn(1L);
-	
-		UserDefinedField udfldLocType = createTestLocTypeUdfld(415, "FIELD", "EXPERIMENTAL FIELD");
+
+		UserDefinedField udfldLocType = this.createTestLocTypeUdfld(415, "FIELD", "EXPERIMENTAL FIELD");
 		Mockito.when(this.locationDataManager.getUserDefinedFieldByID(Integer.valueOf(locationTypeId))).thenReturn(udfldLocType);
-		
-		org.generationcp.middleware.pojos.Location mwLocation = createTestLocation();
-		
+
+		org.generationcp.middleware.pojos.Location mwLocation = this.createTestLocation();
+
 		List<Location> mwLocationTypes = Lists.newArrayList(mwLocation);
-		Mockito.when(this.locationDataManager.getLocationsByType(Integer.valueOf(locationTypeId), 0, PagedResult.DEFAULT_PAGE_SIZE)).thenReturn(mwLocationTypes);
-		
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/location/maize?locationTypeId=146")
-				.contentType(this.contentType))
+		Mockito.when(this.locationDataManager.getLocationsByType(Integer.valueOf(locationTypeId), 0, PagedResult.DEFAULT_PAGE_SIZE))
+				.thenReturn(mwLocationTypes);
+
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.get("/location/maize?locationTypeId=146").contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults", IsCollectionWithSize.hasSize(mwLocationTypes.size())))
@@ -91,9 +93,11 @@ public class LocationResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].latitude", Matchers.is(mwLocation.getLatitude())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].longitude", Matchers.is(mwLocation.getLongitude())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].altitude", Matchers.is(mwLocation.getAltitude())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].locationType.id", Matchers.is(udfldLocType.getFldno().toString())))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$.pageResults[0].locationType.id", Matchers.is(udfldLocType.getFldno().toString())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].locationType.name", Matchers.is(udfldLocType.getFcode())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].locationType.description", Matchers.is(udfldLocType.getFname())))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$.pageResults[0].locationType.description", Matchers.is(udfldLocType.getFname())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber", Matchers.is(PagedResult.DEFAULT_PAGE_NUMBER)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageSize", Matchers.is(PagedResult.DEFAULT_PAGE_SIZE)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.totalResults", Matchers.is(1)))
@@ -103,22 +107,23 @@ public class LocationResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.hasNextPage", Matchers.is(false)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.hasPreviousPage", Matchers.is(false)));
 	}
-	
+
 	@Test
 	public void testSearchLocations() throws Exception {
 		String searchString = "New";
 		Mockito.when(this.locationDataManager.countLocationsByName(searchString, Operation.LIKE)).thenReturn(1L);
-	
-		UserDefinedField udfldLocType = createTestLocTypeUdfld(415, "FIELD", "EXPERIMENTAL FIELD");
-		Mockito.when(this.locationDataManager.getUserDefinedFieldByID(Mockito.anyInt())).thenReturn(udfldLocType);
-		
-		org.generationcp.middleware.pojos.Location mwLocation = createTestLocation();
-		
+
+		UserDefinedField udfldLocType = this.createTestLocTypeUdfld(415, "FIELD", "EXPERIMENTAL FIELD");
+		Mockito.when(this.locationDataManager.getUserDefinedFieldByID(org.mockito.Matchers.anyInt())).thenReturn(udfldLocType);
+
+		org.generationcp.middleware.pojos.Location mwLocation = this.createTestLocation();
+
 		List<Location> mwLocations = Lists.newArrayList(mwLocation);
-		Mockito.when(this.locationDataManager.getLocationsByName(searchString, 0, PagedResult.DEFAULT_PAGE_SIZE, Operation.LIKE)).thenReturn(mwLocations);
-		
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/location/maize/search?q=" + searchString)
-				.contentType(this.contentType))
+		Mockito.when(this.locationDataManager.getLocationsByName(searchString, 0, PagedResult.DEFAULT_PAGE_SIZE, Operation.LIKE))
+				.thenReturn(mwLocations);
+
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.get("/location/maize/search?q=" + searchString).contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults", IsCollectionWithSize.hasSize(mwLocations.size())))
@@ -128,9 +133,11 @@ public class LocationResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].latitude", Matchers.is(mwLocation.getLatitude())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].longitude", Matchers.is(mwLocation.getLongitude())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].altitude", Matchers.is(mwLocation.getAltitude())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].locationType.id", Matchers.is(udfldLocType.getFldno().toString())))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$.pageResults[0].locationType.id", Matchers.is(udfldLocType.getFldno().toString())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].locationType.name", Matchers.is(udfldLocType.getFcode())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].locationType.description", Matchers.is(udfldLocType.getFname())))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$.pageResults[0].locationType.description", Matchers.is(udfldLocType.getFname())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber", Matchers.is(PagedResult.DEFAULT_PAGE_NUMBER)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageSize", Matchers.is(PagedResult.DEFAULT_PAGE_SIZE)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.totalResults", Matchers.is(1)))
@@ -140,7 +147,7 @@ public class LocationResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.hasNextPage", Matchers.is(false)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.hasPreviousPage", Matchers.is(false)));
 	}
-	
+
 	private org.generationcp.middleware.pojos.Location createTestLocation() {
 		org.generationcp.middleware.pojos.Location mwLocation = new Location();
 		mwLocation.setLocid(156);

@@ -1,3 +1,4 @@
+
 package org.ibp.api.domain.program;
 
 /**
@@ -12,7 +13,7 @@ public class ProgramSummary {
 	private String userId;
 	private String cropType;
 	private String startDate;
-	
+
 	public ProgramSummary() {
 	}
 

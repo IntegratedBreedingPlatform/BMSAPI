@@ -1,4 +1,7 @@
+
 package org.ibp.api.java.impl.middleware.common.validator;
+
+import java.util.HashMap;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -13,11 +16,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.HashMap;
-
-
 public class ProgramValidatorTest {
-	
+
 	@Mock
 	private WorkbenchDataManager workbenchDataManager;
 
@@ -26,8 +26,8 @@ public class ProgramValidatorTest {
 	@Before
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
-		programValidator = new ProgramValidator();
-		programValidator.setWorkbenchDataManager(this.workbenchDataManager);
+		this.programValidator = new ProgramValidator();
+		this.programValidator.setWorkbenchDataManager(this.workbenchDataManager);
 	}
 
 	@After
@@ -36,7 +36,7 @@ public class ProgramValidatorTest {
 	}
 
 	@Test
-	public void testForEmptyProgramId(){
+	public void testForEmptyProgramId() {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Program");
 		String programId = "";

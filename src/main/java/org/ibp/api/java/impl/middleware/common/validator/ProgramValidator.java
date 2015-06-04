@@ -1,4 +1,7 @@
+
 package org.ibp.api.java.impl.middleware.common.validator;
+
+import java.util.Objects;
 
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -10,50 +13,48 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import java.util.Objects;
-
 @Component
 public class ProgramValidator extends BaseValidator implements Validator {
 
-    private static final String PROGRAM_DOES_NOT_EXIST = "program.does.not.exist";
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProgramValidator.class);
+	private static final String PROGRAM_DOES_NOT_EXIST = "program.does.not.exist";
 
-    @Autowired
-    public WorkbenchDataManager workbenchDataManager;
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProgramValidator.class);
 
-    @Override
-    public boolean supports(Class<?> aClass) {
-        return String.class.isAssignableFrom(aClass);
-    }
+	@Autowired
+	public WorkbenchDataManager workbenchDataManager;
 
-    @Override
-    public void validate(Object target, Errors errors) {
+	@Override
+	public boolean supports(Class<?> aClass) {
+		return String.class.isAssignableFrom(aClass);
+	}
 
-        // check for program id should not be null
-        shouldNotNullOrEmpty("Program", "programId", target, errors);
-        if(errors.hasErrors()) {
-            return;
-        }
+	@Override
+	public void validate(Object target, Errors errors) {
 
-        // check if program id is non numeric
-        String id = (String) target;
+		// check for program id should not be null
+		this.shouldNotNullOrEmpty("Program", "programId", target, errors);
+		if (errors.hasErrors()) {
+			return;
+		}
 
-        checkIfProgramExist("programId", id, errors);
-    }
+		// check if program id is non numeric
+		String id = (String) target;
 
-    protected void checkIfProgramExist(String fieldName, String programUuid, Errors errors){
-        try {
-            Project project = workbenchDataManager.getProjectByUuid(programUuid);
-            if(Objects.equals(project, null)){
-                addCustomError(errors, fieldName, PROGRAM_DOES_NOT_EXIST, null);
-            }
-        } catch (MiddlewareException e) {
-        	LOGGER.error("Error occur while fetching program data", e);
-        }
-    }
+		this.checkIfProgramExist("programId", id, errors);
+	}
 
-    public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager){
-        this.workbenchDataManager = workbenchDataManager;
-    }
+	protected void checkIfProgramExist(String fieldName, String programUuid, Errors errors) {
+		try {
+			Project project = this.workbenchDataManager.getProjectByUuid(programUuid);
+			if (Objects.equals(project, null)) {
+				this.addCustomError(errors, fieldName, ProgramValidator.PROGRAM_DOES_NOT_EXIST, null);
+			}
+		} catch (MiddlewareException e) {
+			ProgramValidator.LOGGER.error("Error occur while fetching program data", e);
+		}
+	}
+
+	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
+		this.workbenchDataManager = workbenchDataManager;
+	}
 }

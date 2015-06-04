@@ -1,3 +1,4 @@
+
 package org.ibp.api.java.impl.middleware.ontology;
 
 import java.text.ParseException;
@@ -30,7 +31,7 @@ import org.modelmapper.ModelMapper;
  * Test to check mapping between middleware domain and bmsapi domain
  */
 public class OntologyMapperTest {
-	
+
 	@Test
 	public void methodSummaryMapperTest() throws ParseException {
 
@@ -46,7 +47,7 @@ public class OntologyMapperTest {
 		Assert.assertEquals(method.getDateCreated(), ISO8601DateParser.parse(methodSummary.getMetadata().getDateCreated()));
 		Assert.assertEquals(method.getDateLastModified(), ISO8601DateParser.parse(methodSummary.getMetadata().getDateLastModified()));
 	}
-	
+
 	@Test
 	public void methodDetailsMapperTest() throws ParseException {
 		Method method = TestDataProvider.getTestMethod();
@@ -90,7 +91,7 @@ public class OntologyMapperTest {
 	@Test
 	public void propertyDetailsMapperTest() throws ParseException {
 
-		Property property  = TestDataProvider.getTestProperty();
+		Property property = TestDataProvider.getTestProperty();
 		ModelMapper mapper = OntologyMapper.getInstance();
 
 		PropertyDetails propertyDetails = mapper.map(property, PropertyDetails.class);
@@ -105,7 +106,7 @@ public class OntologyMapperTest {
 		Assert.assertFalse(propertyDetails.getMetadata().isDeletable());
 		Assert.assertTrue(propertyDetails.getMetadata().getUsage().getVariables().isEmpty());
 	}
-	
+
 	@Test
 	public void scaleSummaryMapperTest() throws ParseException {
 		Term term = new Term();
@@ -182,8 +183,10 @@ public class OntologyMapperTest {
 		Assert.assertEquals(ibpVariableSummary.getScaleSummary().getDescription(), mVariableSummary.getScaleSummary().getDefinition());
 		Assert.assertEquals(ibpVariableSummary.getExpectedRange().getMin(), mVariableSummary.getMinValue());
 		Assert.assertEquals(ibpVariableSummary.getExpectedRange().getMax(), mVariableSummary.getMaxValue());
-		Assert.assertEquals(ibpVariableSummary.getMetadata().getDateCreated(), ISO8601DateParser.toString(mVariableSummary.getDateCreated()));
-		Assert.assertEquals(ibpVariableSummary.getMetadata().getDateLastModified(), ISO8601DateParser.toString(mVariableSummary.getDateLastModified()));
+		Assert.assertEquals(ibpVariableSummary.getMetadata().getDateCreated(),
+				ISO8601DateParser.toString(mVariableSummary.getDateCreated()));
+		Assert.assertEquals(ibpVariableSummary.getMetadata().getDateLastModified(),
+				ISO8601DateParser.toString(mVariableSummary.getDateLastModified()));
 	}
 
 	@Test
@@ -218,7 +221,7 @@ public class OntologyMapperTest {
 	}
 
 	@Test
-	public void termRelationShipMapperTest(){
+	public void termRelationShipMapperTest() {
 
 		TermRelationship relationship = new TermRelationship();
 		relationship.setId(100);
@@ -234,7 +237,7 @@ public class OntologyMapperTest {
 	}
 
 	@Test
-	public void variableTypeMapperTest(){
+	public void variableTypeMapperTest() {
 
 		VariableType variableType = VariableType.getById(1);
 
@@ -248,7 +251,7 @@ public class OntologyMapperTest {
 	}
 
 	@Test
-	public void dataTypeMapperTest(){
+	public void dataTypeMapperTest() {
 
 		DataType dataType = DataType.getById(1110);
 

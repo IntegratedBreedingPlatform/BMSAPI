@@ -1,3 +1,4 @@
+
 package org.ibp;
 
 import java.io.IOException;
@@ -13,9 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 
 /**
- * Filter to enable <a
- * href="http://en.wikipedia.org/wiki/Cross-origin_resource_sharing"
- * >Cross-origin resource sharing</a>.
+ * Filter to enable <a href="http://en.wikipedia.org/wiki/Cross-origin_resource_sharing" >Cross-origin resource sharing</a>.
  *
  * @author Naymesh
  */
@@ -23,8 +22,7 @@ import org.springframework.stereotype.Component;
 public class SimpleCORSFilter implements Filter {
 
 	@Override
-	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
-			throws IOException, ServletException {
+	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 		HttpServletResponse response = (HttpServletResponse) res;
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");

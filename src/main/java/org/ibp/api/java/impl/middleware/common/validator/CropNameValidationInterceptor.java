@@ -21,20 +21,20 @@ public class CropNameValidationInterceptor extends HandlerInterceptorAdapter {
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
-	
+
 	@Autowired
 	private RequestInformationProvider requestInformationProvider;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-		final Map<String, String> uriTemplateVars = requestInformationProvider.getUrlTemplateAttributes();
+		final Map<String, String> uriTemplateVars = this.requestInformationProvider.getUrlTemplateAttributes();
 
 		if (uriTemplateVars.containsKey(Constants.CROPNAME_URI_PARAM)) {
 			String cropName = uriTemplateVars.get(Constants.CROPNAME_URI_PARAM);
 			ErrorResponse errorResponse = null;
 			try {
-				CropType cropType = workbenchDataManager.getCropTypeByName(cropName);
+				CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 				if (cropType == null) {
 					errorResponse = new ErrorResponse("error", "Invalid crop name path parameter: " + cropName);
 				}
@@ -48,7 +48,7 @@ public class CropNameValidationInterceptor extends HandlerInterceptorAdapter {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.writeValue(response.getOutputStream(), errorResponse);
 				return false; // abort handling
-			}			
+			}
 		}
 		return true; // continue handling
 	}
@@ -64,7 +64,7 @@ public class CropNameValidationInterceptor extends HandlerInterceptorAdapter {
 		}
 
 		public String getStatus() {
-			return status;
+			return this.status;
 		}
 
 		public void setStatus(String status) {
@@ -72,7 +72,7 @@ public class CropNameValidationInterceptor extends HandlerInterceptorAdapter {
 		}
 
 		public String getMessage() {
-			return message;
+			return this.message;
 		}
 
 		public void setMessage(String message) {
@@ -80,12 +80,10 @@ public class CropNameValidationInterceptor extends HandlerInterceptorAdapter {
 		}
 	}
 
-	
 	protected void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}
 
-	
 	protected void setRequestInformationProvider(RequestInformationProvider requestInformationProvider) {
 		this.requestInformationProvider = requestInformationProvider;
 	}

@@ -1,4 +1,7 @@
+
 package org.ibp.api.java.impl.middleware.ontology.validator;
+
+import java.util.HashMap;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -20,8 +23,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.HashMap;
-
 public class MethodValidatorTest {
 
 	private MethodValidator methodValidator;
@@ -31,15 +32,15 @@ public class MethodValidatorTest {
 
 	@Mock
 	private OntologyMethodDataManager ontologyMethodDataManager;
-	
+
 	@Before
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
-		methodValidator = new MethodValidator();
-		methodValidator.setTermDataManager(termDataManager);
-		methodValidator.setOntologyMethodDataManager(ontologyMethodDataManager);
+		this.methodValidator = new MethodValidator();
+		this.methodValidator.setTermDataManager(this.termDataManager);
+		this.methodValidator.setOntologyMethodDataManager(this.ontologyMethodDataManager);
 	}
-	
+
 	@After
 	public void validate() {
 		Mockito.validateMockitoUsage();
@@ -73,7 +74,7 @@ public class MethodValidatorTest {
 
 		Term methodTerm = TestDataProvider.getMethodTerm();
 
-		//Changing method term with another id to validate uniqueness by validator
+		// Changing method term with another id to validate uniqueness by validator
 		methodTerm.setId(methodTerm.getId() + 100);
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermByNameAndCvId(methodTerm.getName(), CvId.METHODS.getId());
@@ -97,7 +98,8 @@ public class MethodValidatorTest {
 
 		Method method = TestDataProvider.getTestMethod();
 
-		Mockito.doReturn(TestDataProvider.getMethodTerm()).when(this.termDataManager).getTermByNameAndCvId(method.getName(), CvId.METHODS.getId());
+		Mockito.doReturn(TestDataProvider.getMethodTerm()).when(this.termDataManager)
+				.getTermByNameAndCvId(method.getName(), CvId.METHODS.getId());
 		Mockito.doReturn(true).when(this.termDataManager).isTermReferred(method.getId());
 		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId());
 
@@ -153,7 +155,7 @@ public class MethodValidatorTest {
 
 		MethodSummary methodSummary = TestDataProvider.getTestMethodSummary();
 
-		//Post request does not expect method id.
+		// Post request does not expect method id.
 		methodSummary.setId(null);
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(methodSummary.getName(), CvId.METHODS.getId());
@@ -166,6 +168,7 @@ public class MethodValidatorTest {
 
 	/**
 	 * Test for to check Method is Editable or Not
+	 * 
 	 * @throws MiddlewareException
 	 */
 	@Test

@@ -1,21 +1,23 @@
+
 package org.ibp.api.java.impl.middleware.ontology.validator;
+
+import java.util.Objects;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.util.StringUtil;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.ontology.TermRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
-import java.util.Objects;
-
 @Component
 public class TermDeletableValidator extends OntologyValidator implements org.springframework.validation.Validator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TermDeletableValidator.class);
-	
+
 	@Override
 	public boolean supports(Class<?> aClass) {
 		return TermRequest.class.equals(aClass);
@@ -32,9 +34,9 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
 				return;
 			}
 
-			if(Objects.equals(request.getCvId(), CvId.VARIABLES.getId())){
+			if (Objects.equals(request.getCvId(), CvId.VARIABLES.getId())) {
 				int observations = this.ontologyVariableDataManager.getVariableObservations(Integer.valueOf(request.getId()));
-				if(observations == 0){
+				if (observations == 0) {
 					return;
 				}
 			} else {
@@ -44,10 +46,10 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
 				}
 			}
 
-			this.addCustomError(errors, RECORD_IS_NOT_DELETABLE, new Object[] { request.getTermName(), request.getId() });
+			this.addCustomError(errors, BaseValidator.RECORD_IS_NOT_DELETABLE, new Object[] {request.getTermName(), request.getId()});
 
 		} catch (MiddlewareException e) {
-			LOGGER.error("Error while validating object", e);
+			TermDeletableValidator.LOGGER.error("Error while validating object", e);
 		}
 	}
 }

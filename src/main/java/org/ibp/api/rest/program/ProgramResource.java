@@ -1,3 +1,4 @@
+
 package org.ibp.api.rest.program;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class ProgramResource {
 	private ProgramService programService;
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public ResponseEntity<List<ProgramSummary>> listPrograms()  {
-		return new ResponseEntity<>(programService.listAllPrograms(), HttpStatus.OK);
+	public ResponseEntity<List<ProgramSummary>> listPrograms() {
+		return new ResponseEntity<>(this.programService.listAllPrograms(), HttpStatus.OK);
 	}
 }

@@ -19,8 +19,8 @@ public class Location {
 
 	}
 
-	public Location(String id, String name, String abbreviation, LocationType locationType, 
-			Double latitude, Double longitude, Double altitude) {
+	public Location(String id, String name, String abbreviation, LocationType locationType, Double latitude, Double longitude,
+			Double altitude) {
 		this.id = id;
 		this.name = name;
 		this.abbreviation = abbreviation;
@@ -102,7 +102,8 @@ public class Location {
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this).append("id", this.id).append("name", this.name).append("abbreviation", this.abbreviation).append("locationType", this.locationType)
-				.append("latitude", this.latitude).append("longitude", this.longitude).append("altitude", this.altitude).toString();
+		return new ToStringBuilder(this).append("id", this.id).append("name", this.name).append("abbreviation", this.abbreviation)
+				.append("locationType", this.locationType).append("latitude", this.latitude).append("longitude", this.longitude)
+				.append("altitude", this.altitude).toString();
 	}
 }

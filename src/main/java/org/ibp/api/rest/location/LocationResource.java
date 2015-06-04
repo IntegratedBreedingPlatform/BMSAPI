@@ -38,12 +38,17 @@ public class LocationResource {
 	}
 
 	@RequestMapping(value = "/{cropname}", method = RequestMethod.GET, params = {"locationTypeId"})
-	@ApiOperation(value = "Get locations by location type", notes = "Returns all locations of a given location type. Results are paginated. See pageSize and pageNumber parameters.")
-	public ResponseEntity<PagedResult<Location>> getLocationsByType(@PathVariable String cropname, @RequestParam(value = "locationTypeId") final String locationTypeId, 
-			@ApiParam(value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.", required = false) @RequestParam(value = "pageNumber", required = false) Integer pageNumber, 
-			@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.", required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize) {
-	
+	@ApiOperation(value = "Get locations by location type",
+			notes = "Returns all locations of a given location type. Results are paginated. See pageSize and pageNumber parameters.")
+	public ResponseEntity<PagedResult<Location>> getLocationsByType(@PathVariable String cropname,
+			@RequestParam(value = "locationTypeId") final String locationTypeId, @ApiParam(
+					value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.",
+					required = false) @RequestParam(value = "pageNumber", required = false) Integer pageNumber, @ApiParam(
+					value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.",
+					required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+
 		PagedResult<Location> result = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<Location>() {
+
 			@Override
 			public long getCount() {
 				return LocationResource.this.locationService.countLocationByType(locationTypeId);
@@ -51,19 +56,23 @@ public class LocationResource {
 
 			@Override
 			public List<Location> getResults(PagedResult<Location> pagedResult) {
-				return LocationResource.this.locationService.getLocationsByType(locationTypeId, pagedResult.getPageNumber(), pagedResult.getPageSize());
+				return LocationResource.this.locationService.getLocationsByType(locationTypeId, pagedResult.getPageNumber(),
+						pagedResult.getPageSize());
 			}
 		});
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/{cropname}/search", method = RequestMethod.GET, params = {"q"})
 	@ApiOperation(value = "Search locations by name", notes = "Search locations by name.")
 	public ResponseEntity<PagedResult<Location>> searchLocations(@PathVariable String cropname, @RequestParam final String q,
-			@ApiParam(value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.", required = false) @RequestParam(value = "pageNumber", required = false) Integer pageNumber, 
-			@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.", required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize) {
-		
+			@ApiParam(value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.",
+					required = false) @RequestParam(value = "pageNumber", required = false) Integer pageNumber, @ApiParam(
+					value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.",
+					required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+
 		PagedResult<Location> result = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<Location>() {
+
 			@Override
 			public long getCount() {
 				return LocationResource.this.locationService.countLocationsByName(q);

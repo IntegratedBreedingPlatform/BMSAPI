@@ -16,17 +16,18 @@ public class ResourceURLLinkProvider {
 	private HttpServletRequest httpServletRequest;
 
 	public String getBaseUrl() {
-		if (httpServletRequest == null) {
+		if (this.httpServletRequest == null) {
 			return "";
 		}
-		return String.format("%s://%s:%s%s", httpServletRequest.getScheme(), httpServletRequest.getServerName(), httpServletRequest.getServerPort(), httpServletRequest.getContextPath());
+		return String.format("%s://%s:%s%s", this.httpServletRequest.getScheme(), this.httpServletRequest.getServerName(),
+				this.httpServletRequest.getServerPort(), this.httpServletRequest.getContextPath());
 	}
 
 	public String getGermplasmListDetailsUrl(Integer germplasmListId, String cropname) {
-		return String.format("%s%s/%s/%s", getBaseUrl(), GermplasmListResource.URL, cropname, germplasmListId);
+		return String.format("%s%s/%s/%s", this.getBaseUrl(), GermplasmListResource.URL, cropname, germplasmListId);
 	}
-	
+
 	public String getGermplasmByIDUrl(String germplasmId, String cropname) {
-		return String.format("%s%s/%s/%s", getBaseUrl(), GermplasmResource.URL, cropname, germplasmId);
+		return String.format("%s%s/%s/%s", this.getBaseUrl(), GermplasmResource.URL, cropname, germplasmId);
 	}
 }

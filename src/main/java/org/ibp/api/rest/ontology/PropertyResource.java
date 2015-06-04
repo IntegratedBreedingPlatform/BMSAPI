@@ -1,9 +1,8 @@
 
 package org.ibp.api.rest.ontology;
 
-import com.google.common.base.Strings;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.List;
+
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.domain.ontology.PropertySummary;
@@ -19,12 +18,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.List;
+import com.google.common.base.Strings;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 @Api(value = "Ontology Property Service")
 @Controller
 @RequestMapping("/ontology")
-
 public class PropertyResource {
 
 	@Autowired
@@ -33,7 +33,8 @@ public class PropertyResource {
 	@ApiOperation(value = "All properties or filter by class name", notes = "Get all properties or filter by class name")
 	@RequestMapping(value = "/{cropname}/properties", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<PropertySummary>> listAllPropertyByClass(@PathVariable String cropname, @RequestParam(value = "class", defaultValue = "", required = false) String className) {
+	public ResponseEntity<List<PropertySummary>> listAllPropertyByClass(@PathVariable String cropname, @RequestParam(value = "class",
+			defaultValue = "", required = false) String className) {
 		if (Strings.isNullOrEmpty(className)) {
 			List<PropertySummary> propertyList = this.propertyService.getAllProperties();
 			return new ResponseEntity<>(propertyList, HttpStatus.OK);

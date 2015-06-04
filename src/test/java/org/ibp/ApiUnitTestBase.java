@@ -1,3 +1,4 @@
+
 package org.ibp;
 
 import java.nio.charset.Charset;
@@ -27,14 +28,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 /**
- * This class must only be extended by tests which require Spring context to be loaded.  
+ * This class must only be extended by tests which require Spring context to be loaded.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @SpringApplicationConfiguration(classes = Main.class)
 public abstract class ApiUnitTestBase {
 
-	protected final MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
+	protected final MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(),
+			Charset.forName("utf8"));
 
 	protected final String cropName = "maize";
 	protected final String programUuid = UUID.randomUUID().toString();
@@ -43,10 +45,10 @@ public abstract class ApiUnitTestBase {
 
 	@Autowired
 	private WebApplicationContext webApplicationContext;
-	
+
 	@Autowired
 	protected WorkbenchDataManager workbenchDataManager;
-	
+
 	@Configuration
 	public static class TestConfiguration {
 
@@ -61,7 +63,7 @@ public abstract class ApiUnitTestBase {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
-		Mockito.doReturn(new CropType(this.cropName)).when(this.workbenchDataManager).getCropTypeByName(cropName);
+		Mockito.doReturn(new CropType(this.cropName)).when(this.workbenchDataManager).getCropTypeByName(this.cropName);
 	}
 
 	@After

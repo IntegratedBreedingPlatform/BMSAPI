@@ -1,10 +1,11 @@
+
 package org.ibp.api.java.ontology;
+
+import java.util.List;
 
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableSummary;
-
-import java.util.List;
 
 public interface VariableService {
 
@@ -47,6 +48,7 @@ public interface VariableService {
 
 	/**
 	 * Delete variable of given Id
+	 * 
 	 * @param id Variable Id to be deleted
 	 */
 	void deleteVariable(String id);

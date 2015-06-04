@@ -1,3 +1,4 @@
+
 package org.ibp.api.java.impl.middleware.common.validator;
 
 import java.util.Map;
@@ -15,7 +16,8 @@ public class RequestInformationProviderImpl implements RequestInformationProvide
 	@Override
 	public Map<String, String> getUrlTemplateAttributes() {
 		ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-		return(Map<String, String>) requestAttributes.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
+		return (Map<String, String>) requestAttributes.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE,
+				RequestAttributes.SCOPE_REQUEST);
 	}
 
 }

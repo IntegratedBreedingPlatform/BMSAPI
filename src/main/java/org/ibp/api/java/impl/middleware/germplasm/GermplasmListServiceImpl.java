@@ -10,8 +10,8 @@ import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.ibp.api.domain.germplasm.GermplasmListDetails;
-import org.ibp.api.domain.germplasm.GermplasmListSummary;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
+import org.ibp.api.domain.germplasm.GermplasmListSummary;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.germplasm.GermplasmListService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +31,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		} catch (MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
-		return mapResults(matchingLists);
+		return this.mapResults(matchingLists);
 	}
 
 	private List<GermplasmListSummary> mapResults(List<GermplasmList> germplasmLists) {
 		List<GermplasmListSummary> results = new ArrayList<GermplasmListSummary>();
 		if (germplasmLists != null && !germplasmLists.isEmpty()) {
 			for (GermplasmList gpList : germplasmLists) {
-				//FIXME hack to remove folders. Middleware service should offer this option and handle it internally!
+				// FIXME hack to remove folders. Middleware service should offer this option and handle it internally!
 				if (!gpList.getType().equals("FOLDER")) {
 					GermplasmListSummary res = new GermplasmListSummary();
 					res.setListId(gpList.getId());
@@ -88,11 +88,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	public List<GermplasmListSummary> getAllGermplasmLists() {
 		List<GermplasmList> allGermplasmLists;
 		try {
-			allGermplasmLists = germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE);
+			allGermplasmLists = this.germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE);
 		} catch (MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
-		return mapResults(allGermplasmLists);
+		return this.mapResults(allGermplasmLists);
 	}
 
 }

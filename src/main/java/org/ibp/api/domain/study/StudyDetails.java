@@ -17,7 +17,7 @@ public class StudyDetails extends StudySummary {
 	private final List<StudyGermplasm> germplasm = new ArrayList<>();
 
 	public Set<StudyAttribute> getGeneralInfo() {
-		return generalInfo;
+		return this.generalInfo;
 	}
 
 	public void addGeneralInfo(StudyAttribute attr) {
@@ -27,7 +27,7 @@ public class StudyDetails extends StudySummary {
 	}
 
 	public List<Environment> getEnvironments() {
-		return environments;
+		return this.environments;
 	}
 
 	public void addEnvironment(Environment env) {
@@ -37,7 +37,7 @@ public class StudyDetails extends StudySummary {
 	}
 
 	public Set<TermSummary> getTraits() {
-		return traits;
+		return this.traits;
 	}
 
 	public void addTrait(TermSummary trait) {
@@ -47,7 +47,7 @@ public class StudyDetails extends StudySummary {
 	}
 
 	public Set<DatasetSummary> getDatasets() {
-		return datasets;
+		return this.datasets;
 	}
 
 	public void addDataSet(DatasetSummary dataset) {
@@ -55,8 +55,8 @@ public class StudyDetails extends StudySummary {
 			this.datasets.add(dataset);
 		}
 	}
-	
+
 	public List<StudyGermplasm> getGermplasm() {
-		return germplasm;
+		return this.germplasm;
 	}
 }

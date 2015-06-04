@@ -1,6 +1,7 @@
+
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import com.google.common.base.Strings;
+import java.util.Objects;
 
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -15,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 
-import java.util.Objects;
+import com.google.common.base.Strings;
 
 public abstract class OntologyValidator extends BaseValidator {
 
@@ -33,7 +34,7 @@ public abstract class OntologyValidator extends BaseValidator {
 
 	@Autowired
 	protected OntologyMethodDataManager ontologyMethodDataManager;
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(OntologyValidator.class);
 
 	protected void checkTermExist(String termName, String id, Integer cvId, Errors errors) {
@@ -45,13 +46,13 @@ public abstract class OntologyValidator extends BaseValidator {
 			Term term = this.termDataManager.getTermById(Integer.valueOf(id));
 			if (Objects.equals(term, null) || !Objects.equals(term.getVocabularyId(), cvId)) {
 				if (Strings.isNullOrEmpty(fieldName)) {
-					this.addCustomError(errors, ID_DOES_NOT_EXIST, new Object[] { termName, id });
+					this.addCustomError(errors, BaseValidator.ID_DOES_NOT_EXIST, new Object[] {termName, id});
 				} else {
-					this.addCustomError(errors, fieldName, ID_DOES_NOT_EXIST, new Object[] { termName, id });
+					this.addCustomError(errors, fieldName, BaseValidator.ID_DOES_NOT_EXIST, new Object[] {termName, id});
 				}
 			}
 		} catch (MiddlewareException e) {
-			LOGGER.error("Error while validating object", e);
+			OntologyValidator.LOGGER.error("Error while validating object", e);
 			this.addDefaultError(errors);
 		}
 	}
@@ -72,33 +73,31 @@ public abstract class OntologyValidator extends BaseValidator {
 				return;
 			}
 
-			this.addCustomError(errors, "name", NAME_ALREADY_EXIST, new Object[]{termName});
+			this.addCustomError(errors, "name", BaseValidator.NAME_ALREADY_EXIST, new Object[] {termName});
 		} catch (MiddlewareException e) {
-			LOGGER.error("Error checking uniqueness of term name", e);
+			OntologyValidator.LOGGER.error("Error checking uniqueness of term name", e);
 		}
 	}
 
-
-
 	protected void fieldShouldNotOverflow(String fieldName, String value, Integer limit, Errors errors) {
 
-		if(Strings.isNullOrEmpty(value)) {
+		if (Strings.isNullOrEmpty(value)) {
 			return;
 		}
 
 		if (value.length() > limit) {
-			this.addCustomError(errors, fieldName, TEXTUAL_FIELD_IS_TOO_LONG, new Object[] {limit});
+			this.addCustomError(errors, fieldName, BaseValidator.TEXTUAL_FIELD_IS_TOO_LONG, new Object[] {limit});
 		}
 	}
 
 	protected void listShouldNotOverflow(String termName, String fieldName, String value, Integer limit, Errors errors) {
 
-		if(Strings.isNullOrEmpty(value)) {
+		if (Strings.isNullOrEmpty(value)) {
 			return;
 		}
 
 		if (value.length() > limit) {
-			this.addCustomError(errors, fieldName, OntologyValidator.LIST_TEXTUAL_FIELD_IS_TOO_LONG, new Object[] {termName, limit});
+			this.addCustomError(errors, fieldName, BaseValidator.LIST_TEXTUAL_FIELD_IS_TOO_LONG, new Object[] {termName, limit});
 		}
 	}
 
@@ -110,15 +109,15 @@ public abstract class OntologyValidator extends BaseValidator {
 		this.ontologyMethodDataManager = ontologyMethodDataManager;
 	}
 
-	public void setOntologyScaleDataManager(OntologyScaleDataManager ontologyScaleDataManager){
+	public void setOntologyScaleDataManager(OntologyScaleDataManager ontologyScaleDataManager) {
 		this.ontologyScaleDataManager = ontologyScaleDataManager;
 	}
 
-	public void setOntologyPropertyDataManager(OntologyPropertyDataManager ontologyPropertyDataManager){
+	public void setOntologyPropertyDataManager(OntologyPropertyDataManager ontologyPropertyDataManager) {
 		this.ontologyPropertyDataManager = ontologyPropertyDataManager;
 	}
 
-	public void setOntologyVariableDataManager(OntologyVariableDataManager ontologyVariableDataManager){
+	public void setOntologyVariableDataManager(OntologyVariableDataManager ontologyVariableDataManager) {
 		this.ontologyVariableDataManager = ontologyVariableDataManager;
 	}
 }

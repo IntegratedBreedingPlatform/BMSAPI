@@ -29,29 +29,31 @@ public class InventoryResource {
 	private InventoryService inventoryService;
 
 	@RequestMapping(value = "/{cropname}/germplasm/{gid}", method = RequestMethod.GET)
-	@ApiOperation(value = "Get Inventory Information", notes = "Returns information about all inventory lots available for the given germplasm id (gid).")
+	@ApiOperation(value = "Get Inventory Information",
+			notes = "Returns information about all inventory lots available for the given germplasm id (gid).")
 	public List<GermplasmInventory> getInventoryLotInfoForGermplasm(@PathVariable String gid, @PathVariable String cropname) {
-		return inventoryService.getInventoryLotInfoForGermplasm(gid);
+		return this.inventoryService.getInventoryLotInfoForGermplasm(gid);
 	}
 
 	@RequestMapping(value = "/{cropname}/germplasm/{gid}", method = RequestMethod.PUT)
 	@ApiResponses(value = {@ApiResponse(code = 201, message = "Created")})
-	public ResponseEntity<?> createInverntory(@PathVariable String cropname, @RequestBody GermplasmInventory germplasmInventory, @PathVariable String gid)
-			throws MiddlewareQueryException {
-		inventoryService.createInverntory(germplasmInventory, gid);
+	public ResponseEntity<?> createInverntory(@PathVariable String cropname, @RequestBody GermplasmInventory germplasmInventory,
+			@PathVariable String gid) throws MiddlewareQueryException {
+		this.inventoryService.createInverntory(germplasmInventory, gid);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/{cropname}/germplasm/{gid}", method = RequestMethod.POST)
-	public ResponseEntity<?> updateInverntory(@PathVariable String cropname, @RequestBody GermplasmInventory germplasmInventory, @PathVariable String gid) {
-		inventoryService.updateInverntory(germplasmInventory, gid);
+	public ResponseEntity<?> updateInverntory(@PathVariable String cropname, @RequestBody GermplasmInventory germplasmInventory,
+			@PathVariable String gid) {
+		this.inventoryService.updateInverntory(germplasmInventory, gid);
 		return new ResponseEntity<>(HttpStatus.OK);
 
 	}
 
 	@RequestMapping(value = "/{cropname}/germplasm/{gid}", method = RequestMethod.DELETE)
 	public ResponseEntity<?> deleteInverntory(@PathVariable String cropname, @PathVariable String gid) {
-		inventoryService.deleteInverntory(gid);
+		this.inventoryService.deleteInverntory(gid);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

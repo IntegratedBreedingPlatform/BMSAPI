@@ -1,3 +1,4 @@
+
 package org.ibp;
 
 import org.ibp.api.java.impl.middleware.common.validator.CropNameValidationInterceptor;
@@ -26,11 +27,12 @@ import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
 @EnableSwagger
 @Configuration
 public class Main extends WebMvcConfigurerAdapter {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
 	@Autowired
 	private SpringSwaggerConfig springSwaggerConfig;
-	
+
 	public static void main(String[] args) {
 		SpringApplication.run(Main.class, args);
 		Main.LOGGER.info("Startup Complete!");
@@ -46,7 +48,7 @@ public class Main extends WebMvcConfigurerAdapter {
 
 		return templateResolver;
 	}
-	
+
 	@Bean
 	public CropNameValidationInterceptor getCropNameValidationInterceptor() {
 		return new CropNameValidationInterceptor();
@@ -61,10 +63,10 @@ public class Main extends WebMvcConfigurerAdapter {
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/static/**").addResourceLocations("/WEB-INF/static/");
 	}
-	
+
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(getCropNameValidationInterceptor()).addPathPatterns("/**");
+		registry.addInterceptor(this.getCropNameValidationInterceptor()).addPathPatterns("/**");
 	}
 
 	@Bean
@@ -73,9 +75,7 @@ public class Main extends WebMvcConfigurerAdapter {
 	}
 
 	private ApiInfo apiInfo() {
-		return new ApiInfo("Welcome!",
-				"Try out the Breeding Management System API methods listed below!",
-				"http://bit.ly/KQX1nL", "naymesh@leafnode.io", "GNU General Public License",
-				"http://bit.ly/8Ztv8M");
+		return new ApiInfo("Welcome!", "Try out the Breeding Management System API methods listed below!", "http://bit.ly/KQX1nL",
+				"naymesh@leafnode.io", "GNU General Public License", "http://bit.ly/8Ztv8M");
 	}
 }

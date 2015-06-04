@@ -1,3 +1,4 @@
+
 package org.ibp.api.rest.ontology;
 
 import java.util.ArrayList;
@@ -29,8 +30,7 @@ public class DataTypeResourceTest extends ApiUnitTestBase {
 		term = new Term(DataType.DATE_TIME_VARIABLE.getId(), "Date", "");
 		termList.add(term);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/datatypes")
-				.contentType(this.contentType))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/datatypes").contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(termList.size())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(termList.get(0).getId())))

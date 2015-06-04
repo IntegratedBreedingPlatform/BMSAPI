@@ -1,4 +1,7 @@
+
 package org.ibp.api.java.impl.middleware.ontology.validator;
+
+import java.util.HashMap;
 
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.junit.After;
@@ -11,8 +14,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.HashMap;
-
 public class MiddlewareIdFormatValidatorTest {
 
 	@Mock
@@ -23,8 +24,8 @@ public class MiddlewareIdFormatValidatorTest {
 	@Before
 	public void reset() {
 		MockitoAnnotations.initMocks(this);
-		requestIdValidator = new MiddlewareIdFormatValidator();
-		requestIdValidator.setTermDataManager(termDataManager);
+		this.requestIdValidator = new MiddlewareIdFormatValidator();
+		this.requestIdValidator.setTermDataManager(this.termDataManager);
 	}
 
 	@After

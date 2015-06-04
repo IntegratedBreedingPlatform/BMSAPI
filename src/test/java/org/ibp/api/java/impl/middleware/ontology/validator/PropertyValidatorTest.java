@@ -1,4 +1,8 @@
+
 package org.ibp.api.java.impl.middleware.ontology.validator;
+
+import java.util.HashMap;
+import java.util.HashSet;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -19,9 +23,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.HashMap;
-import java.util.HashSet;
-
 /**
  * Test each property validation
  */
@@ -38,9 +39,9 @@ public class PropertyValidatorTest {
 	@Before
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
-		propertyValidator = new PropertyValidator();
-		propertyValidator.setTermDataManager(termDataManager);
-		propertyValidator.setOntologyPropertyDataManager(ontologyPropertyDataManager);
+		this.propertyValidator = new PropertyValidator();
+		this.propertyValidator.setTermDataManager(this.termDataManager);
+		this.propertyValidator.setOntologyPropertyDataManager(this.ontologyPropertyDataManager);
 	}
 
 	@After
@@ -50,7 +51,7 @@ public class PropertyValidatorTest {
 
 	/**
 	 * Test for Name is required
-	 * 
+	 *
 	 * @throws MiddlewareException
 	 */
 	@Test
@@ -68,7 +69,7 @@ public class PropertyValidatorTest {
 
 	/**
 	 * Test for Name is unique
-	 * 
+	 *
 	 * @throws MiddlewareException
 	 */
 	@Test
@@ -76,7 +77,7 @@ public class PropertyValidatorTest {
 
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
 
-		//Changing term with another id to validate uniqueness by validator
+		// Changing term with another id to validate uniqueness by validator
 		propertyTerm.setId(propertyTerm.getId() + 100);
 
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermByNameAndCvId(propertyTerm.getName(), CvId.PROPERTIES.getId());
@@ -92,7 +93,7 @@ public class PropertyValidatorTest {
 
 	/**
 	 * Test for should have at least one class and that is valid
-	 * 
+	 *
 	 * @throws MiddlewareException
 	 */
 	@Test
@@ -100,7 +101,7 @@ public class PropertyValidatorTest {
 
 		PropertySummary propertySummary = TestDataProvider.getTestPropertySummary();
 
-		//Set empty classes to check nonempty
+		// Set empty classes to check nonempty
 		propertySummary.setClasses(new HashSet<String>());
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(propertySummary.getName(), CvId.PROPERTIES.getId());
@@ -114,7 +115,7 @@ public class PropertyValidatorTest {
 
 	/**
 	 * Test for Name cannot change if the property is already in use
-	 * 
+	 *
 	 * @throws MiddlewareException
 	 */
 	@Test
@@ -122,7 +123,8 @@ public class PropertyValidatorTest {
 
 		Property property = TestDataProvider.getTestProperty();
 
-		Mockito.doReturn(TestDataProvider.getPropertyTerm()).when(this.termDataManager).getTermByNameAndCvId(property.getName(), CvId.PROPERTIES.getId());
+		Mockito.doReturn(TestDataProvider.getPropertyTerm()).when(this.termDataManager)
+				.getTermByNameAndCvId(property.getName(), CvId.PROPERTIES.getId());
 		Mockito.doReturn(true).when(this.termDataManager).isTermReferred(property.getId());
 		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId());
 
@@ -138,7 +140,7 @@ public class PropertyValidatorTest {
 
 	/**
 	 * Test for to check name length not exceed 200 characters
-	 * 
+	 *
 	 * @throws MiddlewareException
 	 */
 	@Test
@@ -156,7 +158,7 @@ public class PropertyValidatorTest {
 
 	/**
 	 * Test for to check description length not exceed 1024 characters
-	 * 
+	 *
 	 * @throws MiddlewareException
 	 */
 	@Test
@@ -176,7 +178,7 @@ public class PropertyValidatorTest {
 
 	/**
 	 * Test for valid request
-	 * 
+	 *
 	 * @throws MiddlewareException
 	 */
 	@Test
@@ -184,7 +186,7 @@ public class PropertyValidatorTest {
 
 		PropertySummary propertySummary = TestDataProvider.getTestPropertySummary();
 
-		//Post request does not expect property id.
+		// Post request does not expect property id.
 		propertySummary.setId(null);
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(propertySummary.getName(), CvId.PROPERTIES.getId());

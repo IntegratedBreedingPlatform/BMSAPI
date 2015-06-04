@@ -9,7 +9,7 @@ import org.ibp.api.domain.germplasm.GermplasmListSummary;
 public interface GermplasmListService {
 
 	List<GermplasmListSummary> searchGermplasmLists(String searchText);
-	
+
 	List<GermplasmListSummary> getAllGermplasmLists();
 
 	GermplasmListDetails getGermplasmListDetails(Integer listId);

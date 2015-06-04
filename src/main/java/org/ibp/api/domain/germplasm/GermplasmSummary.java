@@ -19,7 +19,7 @@ public class GermplasmSummary {
 	private String parent2Url;
 
 	public String getGermplasmId() {
-		return germplasmId;
+		return this.germplasmId;
 	}
 
 	public void setGermplasmId(String germplasmId) {
@@ -27,7 +27,7 @@ public class GermplasmSummary {
 	}
 
 	public String getPedigreeString() {
-		return pedigreeString;
+		return this.pedigreeString;
 	}
 
 	public void setPedigreeString(String pedigreeString) {
@@ -35,7 +35,7 @@ public class GermplasmSummary {
 	}
 
 	public String getBreedingMethod() {
-		return breedingMethod;
+		return this.breedingMethod;
 	}
 
 	public void setBreedingMethod(String breedingMethod) {
@@ -43,7 +43,7 @@ public class GermplasmSummary {
 	}
 
 	public List<String> getNames() {
-		return names;
+		return this.names;
 	}
 
 	public void addNames(List<String> names) {
@@ -53,7 +53,7 @@ public class GermplasmSummary {
 	}
 
 	public String getLocation() {
-		return location;
+		return this.location;
 	}
 
 	public void setLocation(String location) {
@@ -61,7 +61,7 @@ public class GermplasmSummary {
 	}
 
 	public String getParent1Id() {
-		return parent1Id;
+		return this.parent1Id;
 	}
 
 	public void setParent1Id(String parent1Id) {
@@ -69,7 +69,7 @@ public class GermplasmSummary {
 	}
 
 	public String getParent2Id() {
-		return parent2Id;
+		return this.parent2Id;
 	}
 
 	public void setParent2Id(String parent2Id) {
@@ -77,7 +77,7 @@ public class GermplasmSummary {
 	}
 
 	public String getParent1Url() {
-		return parent1Url;
+		return this.parent1Url;
 	}
 
 	public void setParent1Url(String parent1Url) {
@@ -85,7 +85,7 @@ public class GermplasmSummary {
 	}
 
 	public String getParent2Url() {
-		return parent2Url;
+		return this.parent2Url;
 	}
 
 	public void setParent2Url(String parent2Url) {

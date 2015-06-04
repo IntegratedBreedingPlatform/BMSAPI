@@ -1,8 +1,9 @@
+
 package org.ibp.api.exception;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+
 import org.ibp.api.domain.common.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,18 +21,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
 @ControllerAdvice
 public class DefaultExceptionHandler {
 
-  	private static final Logger LOG = LoggerFactory.getLogger(DefaultExceptionHandler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DefaultExceptionHandler.class);
 
 	@Autowired
 	ResourceBundleMessageSource messageSource;
 
-	@RequestMapping(produces = { MediaType.APPLICATION_JSON_VALUE })
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(value = INTERNAL_SERVER_ERROR)
 	@ResponseBody
@@ -45,7 +47,7 @@ public class DefaultExceptionHandler {
 		return response;
 	}
 
-	@RequestMapping(produces = { MediaType.APPLICATION_JSON_VALUE })
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	@ResponseStatus(value = BAD_REQUEST)
 	@ResponseBody
@@ -54,7 +56,8 @@ public class DefaultExceptionHandler {
 		Throwable rootCause = ex.getRootCause();
 		if (rootCause instanceof UnrecognizedPropertyException) {
 			UnrecognizedPropertyException unrecognizedPropertyException = (UnrecognizedPropertyException) ex.getCause();
-			response.addError(this.messageSource.getMessage("not.recognised.field", new Object[] {unrecognizedPropertyException.getPropertyName()}, LocaleContextHolder.getLocale()));
+			response.addError(this.messageSource.getMessage("not.recognised.field",
+					new Object[] {unrecognizedPropertyException.getPropertyName()}, LocaleContextHolder.getLocale()));
 		} else if (rootCause instanceof JsonParseException) {
 			response.addError(this.messageSource.getMessage("request.body.invalid", null, LocaleContextHolder.getLocale()));
 		} else if (rootCause instanceof JsonMappingException) {
@@ -63,18 +66,18 @@ public class DefaultExceptionHandler {
 		return response;
 	}
 
-	@RequestMapping(produces = { MediaType.APPLICATION_JSON_VALUE })
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
 	@ResponseStatus(value = BAD_REQUEST)
 	@ResponseBody
 	public ErrorResponse httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
 		ErrorResponse response = new ErrorResponse();
-	  	LOG.error("Request not supported with given input", ex);
+		DefaultExceptionHandler.LOG.error("Request not supported with given input", ex);
 		response.addError(this.messageSource.getMessage("request.method.not.supported", null, LocaleContextHolder.getLocale()));
 		return response;
 	}
 
-	@RequestMapping(produces = { MediaType.APPLICATION_JSON_VALUE })
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
 	@ExceptionHandler(ApiRequestValidationException.class)
 	@ResponseStatus(value = BAD_REQUEST)
 	@ResponseBody
@@ -83,8 +86,7 @@ public class DefaultExceptionHandler {
 		ErrorResponse response = new ErrorResponse();
 
 		for (ObjectError error : ex.getErrors()) {
-			String message = this.messageSource.getMessage(error.getCode(), error.getArguments(),
-					LocaleContextHolder.getLocale());
+			String message = this.messageSource.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale());
 			if (error instanceof FieldError) {
 				FieldError fieldError = (FieldError) error;
 				response.addError(message, fieldError.getField());

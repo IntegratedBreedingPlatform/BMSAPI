@@ -8,7 +8,7 @@ public class DatasetSummary {
 	private String description;
 
 	public String getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(String id) {
@@ -16,7 +16,7 @@ public class DatasetSummary {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
@@ -24,7 +24,7 @@ public class DatasetSummary {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public void setDescription(String description) {

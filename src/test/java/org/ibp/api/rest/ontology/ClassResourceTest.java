@@ -1,3 +1,4 @@
+
 package org.ibp.api.rest.ontology;
 
 import org.generationcp.middleware.domain.oms.CvId;
@@ -37,13 +38,12 @@ public class ClassResourceTest extends ApiUnitTestBase {
 	public void reset() {
 		Mockito.reset(this.termDataManager);
 	}
-	
+
 	@Test
 	public void listAllClasses() throws Exception {
 		Mockito.doReturn(TestDataProvider.mwTermList).when(this.termDataManager).getTermByCvId(CvId.TRAIT_CLASS.getId());
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/classes", cropName)
-				.contentType(this.contentType))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/classes", this.cropName).contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(TestDataProvider.mwTermList.size())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]", Matchers.is(TestDataProvider.mwTermList.get(0).getName())))

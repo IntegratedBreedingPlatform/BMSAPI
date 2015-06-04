@@ -1,4 +1,9 @@
+
 package org.ibp.api.java.impl.middleware.ontology.validator;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
@@ -25,10 +30,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-
 public class VariableValidatorTest {
 
 	@Mock
@@ -45,10 +46,10 @@ public class VariableValidatorTest {
 	@Before
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
-		variableValidator = new VariableValidator();
-		variableValidator.setTermDataManager(this.termDataManager);
-		variableValidator.setOntologyVariableDataManager(this.ontologyVariableDataManager);
-		variableValidator.setOntologyScaleDataManager(this.ontologyScaleDataManager);
+		this.variableValidator = new VariableValidator();
+		this.variableValidator.setTermDataManager(this.termDataManager);
+		this.variableValidator.setOntologyVariableDataManager(this.ontologyVariableDataManager);
+		this.variableValidator.setOntologyScaleDataManager(this.ontologyScaleDataManager);
 	}
 
 	@After
@@ -80,7 +81,8 @@ public class VariableValidatorTest {
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
 
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -111,7 +113,8 @@ public class VariableValidatorTest {
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
 
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -142,7 +145,8 @@ public class VariableValidatorTest {
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
 
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -171,13 +175,13 @@ public class VariableValidatorTest {
 		VariableSummary variableSummary = TestDataProvider.getTestVariableSummary();
 		variableSummary.setName("ChangedName");
 
-
 		Mockito.doReturn(variableTerm).when(this.termDataManager).getTermById(variableTerm.getId());
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
 		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(variableSummary.getProgramUuid(), variable.getId());
 
 		this.variableValidator.validate(variableSummary, bindingResult);
@@ -207,7 +211,8 @@ public class VariableValidatorTest {
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
 
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -243,8 +248,10 @@ public class VariableValidatorTest {
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
-		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(variableSummary.getProgramUuid(), StringUtil.parseInt(variableSummary.getId(), null));
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(variable).when(this.ontologyVariableDataManager)
+				.getVariable(variableSummary.getProgramUuid(), StringUtil.parseInt(variableSummary.getId(), null));
 
 		this.variableValidator.validate(variableSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -272,7 +279,8 @@ public class VariableValidatorTest {
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
 
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -303,7 +311,8 @@ public class VariableValidatorTest {
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
 
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -331,7 +340,8 @@ public class VariableValidatorTest {
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
 
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -361,7 +371,8 @@ public class VariableValidatorTest {
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
 
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -391,7 +402,8 @@ public class VariableValidatorTest {
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
 
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -421,7 +433,8 @@ public class VariableValidatorTest {
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
 
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -429,8 +442,7 @@ public class VariableValidatorTest {
 	}
 
 	/**
-	 * Test for scale data type is Numeric and expected range min is less than
-	 * scale valid values min
+	 * Test for scale data type is Numeric and expected range min is less than scale valid values min
 	 *
 	 * @throws MiddlewareException
 	 */
@@ -453,7 +465,8 @@ public class VariableValidatorTest {
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
 
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -462,8 +475,7 @@ public class VariableValidatorTest {
 	}
 
 	/**
-	 * Test for method, property and scale combination already exist for other
-	 * variable
+	 * Test for method, property and scale combination already exist for other variable
 	 *
 	 * @throws MiddlewareException
 	 */
@@ -486,8 +498,8 @@ public class VariableValidatorTest {
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(new ArrayList<>(Collections.singletonList(summary)))
-				.when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(new ArrayList<>(Collections.singletonList(summary))).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
 
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -516,8 +528,8 @@ public class VariableValidatorTest {
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(new ArrayList<>())
-				.when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
 
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -548,8 +560,8 @@ public class VariableValidatorTest {
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(new ArrayList<>())
-				.when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
 
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -578,8 +590,8 @@ public class VariableValidatorTest {
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
-		Mockito.doReturn(new ArrayList<>())
-				.when(this.ontologyVariableDataManager).getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
 
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertFalse(bindingResult.hasErrors());

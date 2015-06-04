@@ -1,9 +1,6 @@
 
 package org.ibp.api.domain.common;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.germplasm.GermplasmListDetails;
@@ -27,6 +24,7 @@ import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.Trait;
+import org.junit.Assert;
 import org.junit.Test;
 
 import uk.co.jemos.podam.api.PodamFactory;
@@ -42,39 +40,38 @@ public class TestGetterAndSetter {
 
 	@Test
 	public void testGetterAndSetter() throws Exception {
-		testGivenKlass(StudyGermplasmDto.class);
+		this.testGivenKlass(StudyGermplasmDto.class);
 
-		testGivenKlass(Measurement.class);
-		testGivenKlass(MeasurementIdentifier.class);
-		testGivenKlass(Observation.class);
-		testGivenKlass(StudyGermplasm.class);
-		testGivenKlass(StudySummary.class);
-		testGivenKlass(Trait.class);
-		
+		this.testGivenKlass(Measurement.class);
+		this.testGivenKlass(MeasurementIdentifier.class);
+		this.testGivenKlass(Observation.class);
+		this.testGivenKlass(StudyGermplasm.class);
+		this.testGivenKlass(StudySummary.class);
+		this.testGivenKlass(Trait.class);
+
 		// Ontology Domain Testing
-		testGivenKlass(DataType.class);
-		testGivenKlass(ExpectedRange.class);
+		this.testGivenKlass(DataType.class);
+		this.testGivenKlass(ExpectedRange.class);
 
-		testGivenKlass(MethodDetails.class);
-		testGivenKlass(MethodSummary.class);
-		testGivenKlass(PropertyDetails.class);
-		testGivenKlass(PropertySummary.class);
+		this.testGivenKlass(MethodDetails.class);
+		this.testGivenKlass(MethodSummary.class);
+		this.testGivenKlass(PropertyDetails.class);
+		this.testGivenKlass(PropertySummary.class);
 
-		testGivenKlass(TermSummary.class);
-		testGivenKlass(VariableCategory.class);
+		this.testGivenKlass(TermSummary.class);
+		this.testGivenKlass(VariableCategory.class);
 
-		testGivenKlass(VariableType.class);
-		testGivenKlass(VariableUsages.class);
-		
+		this.testGivenKlass(VariableType.class);
+		this.testGivenKlass(VariableUsages.class);
+
 		// Location related tests
-		testGivenKlass(Location.class);
-		testGivenKlass(LocationType.class);
-		
-		// Germplasm related domain testing
-		testGivenKlass(GermplasmListDetails.class);
-		testGivenKlass(GermplasmListEntrySummary.class);
-		testGivenKlass(GermplasmListSummary.class);
+		this.testGivenKlass(Location.class);
+		this.testGivenKlass(LocationType.class);
 
+		// Germplasm related domain testing
+		this.testGivenKlass(GermplasmListDetails.class);
+		this.testGivenKlass(GermplasmListEntrySummary.class);
+		this.testGivenKlass(GermplasmListSummary.class);
 
 	}
 
@@ -82,9 +79,9 @@ public class TestGetterAndSetter {
 		final Object source = this.factory.manufacturePojo(klass);
 		final Object destination = klass.newInstance();
 		BeanUtils.copyProperties(destination, source);
-		assertEquals(source, destination);
-		assertNotEquals(source, new Object());
+		Assert.assertEquals(source, destination);
+		Assert.assertNotEquals(source, new Object());
 		source.toString();
-		assertEquals(source.hashCode(), destination.hashCode());
+		Assert.assertEquals(source.hashCode(), destination.hashCode());
 	}
 }

@@ -1,3 +1,4 @@
+
 package org.ibp.api.domain.common;
 
 public class GenericResponse {
