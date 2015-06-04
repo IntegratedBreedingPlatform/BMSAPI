@@ -4,11 +4,11 @@
  * Generation Challenge Programme (GCP)
  *
  *
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *
  *******************************************************************************/
+
 package org.generationcp.ibpworkbench.rest;
 
 import java.util.ArrayList;
@@ -37,104 +37,96 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 
-
 @Component
 @Api(value = "/breeding_view", description = "Web Services to process the Breeding View output")
 @Path("/breeding_view")
 public class BreedingView {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BreedingView.class);
-	
-    @Autowired
-    private BreedingViewService breedingViewService;
-    
-    @Autowired
-    private DynamicManagerFactoryProvider managerFactoryProvider;
-    
-    @GET
-    @Path("/ssa/save_result_summary")
-    @ApiOperation(value = "Save the Single-Site Analysis CSV output file with heritability", notes = "", response = DataResponse.class)
-    @Produces(MediaType.TEXT_XML)
-    public DataResponse saveSsaResultSummary(
-		  @ApiParam(value = "Path and filename of the SSA output file", required = true)
-		  @QueryParam("mainOutputFilePath") String mainOutputFilePath,
-		  
-		  @ApiParam(value = "Path and filename of the Summary output file", required = true)
-		  @QueryParam("SummaryOutputFilePath") String summaryOutputFilePath,
-		  
-		  @ApiParam(value = "Path and filename of the Outlier output file", required = false)
-		  @QueryParam("OutlierFilePath") String outlierOutputFilePath,
-		  
-		  @ApiParam(value = "Current Project ID", required = true)
-		  @QueryParam("WorkbenchProjectId") String workbenchProjectId,
-		  
-		  @ApiParam(value = "Study ID", required = true)
-	      @QueryParam("StudyId") String studyId,
-	      
-	      @ApiParam(value = "Input Dataset ID", required = true)
-	      @QueryParam("InputDataSetId") String inputDataSetId,
-	      
-	      @ApiParam(value = "Output Dataset ID", required = true)
-	      @QueryParam("OutputDataSetId") String outputDataSetId, @Context UriInfo info) {
-        DataResponse response;
 
-        
-        try {
-            Map<String, String> params = new HashMap<String, String>();
-            List<String> errors = new ArrayList<String>();
-            if(mainOutputFilePath == null || mainOutputFilePath.isEmpty()) {
-                errors.add("mainOutputFilePath is a required field!");
-            }
-            if(summaryOutputFilePath == null || summaryOutputFilePath.isEmpty()) {
-                errors.add("summaryOutputFilePath is a required field!");
-            }
-            if(workbenchProjectId == null || workbenchProjectId.isEmpty()) {
-                errors.add("WorkbenchProjectId is a required field!");
-            }
-            if(studyId == null || studyId.isEmpty()) {
-                errors.add("StudyId is a required field!");
-            }
+	@Autowired
+	private BreedingViewService breedingViewService;
 
-            if(inputDataSetId == null || inputDataSetId.isEmpty()) {
-                errors.add("InputDataSetId is a required field!");
-            }
-            if(outputDataSetId == null || outputDataSetId.isEmpty()) {
-                errors.add("OutputDataSetId is a required field!");
-            }
+	@Autowired
+	private DynamicManagerFactoryProvider managerFactoryProvider;
 
-            if(errors.isEmpty()) {
-            	params.put(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue(), mainOutputFilePath);
-                params.put(WebAPIConstants.SUMMARY_OUTPUT_FILE_PATH.getParamValue(), summaryOutputFilePath);
-                params.put(WebAPIConstants.OUTLIER_OUTPUT_FILE_PATH.getParamValue(), outlierOutputFilePath);
-                params.put(WebAPIConstants.WORKBENCH_PROJECT_ID.getParamValue(), workbenchProjectId);
-                params.put(WebAPIConstants.STUDY_ID.getParamValue(), studyId);
-                params.put(WebAPIConstants.INPUT_DATASET_ID.getParamValue(), inputDataSetId);
-                params.put(WebAPIConstants.OUTPUT_DATASET_ID.getParamValue(), outputDataSetId);
+	@GET
+	@Path("/ssa/save_result_summary")
+	@ApiOperation(value = "Save the Single-Site Analysis CSV output file with heritability", notes = "", response = DataResponse.class)
+	@Produces(MediaType.TEXT_XML)
+	public DataResponse saveSsaResultSummary(
+			@ApiParam(value = "Path and filename of the SSA output file", required = true) @QueryParam("mainOutputFilePath") String mainOutputFilePath,
 
-                breedingViewService.execute(params, errors);
-                response = new DataResponse(true, "Successfully invoked service.");
-            } else {
-                response = new DataResponse(false, "Errors invoking web service: " + errors);
-            }
-        } catch (Exception e) {
-        	LOG.debug(e.getMessage(), e);
-            response = new DataResponse(false, "Failed to invoke service: " + e.toString());
-        }
-        
-        closeManagerFactory();
-        return response;
-    }
+			@ApiParam(value = "Path and filename of the Summary output file", required = true) @QueryParam("SummaryOutputFilePath") String summaryOutputFilePath,
 
-    protected void closeManagerFactory() {
-    	try{
-        	managerFactoryProvider.close();
-        }catch(Exception e){
-        	LOG.debug(e.getMessage(), e);
-        }
-    }
+			@ApiParam(value = "Path and filename of the Outlier output file", required = false) @QueryParam("OutlierFilePath") String outlierOutputFilePath,
+
+			@ApiParam(value = "Current Project ID", required = true) @QueryParam("WorkbenchProjectId") String workbenchProjectId,
+
+			@ApiParam(value = "Study ID", required = true) @QueryParam("StudyId") String studyId,
+
+			@ApiParam(value = "Input Dataset ID", required = true) @QueryParam("InputDataSetId") String inputDataSetId,
+
+			@ApiParam(value = "Output Dataset ID", required = true) @QueryParam("OutputDataSetId") String outputDataSetId,
+			@Context UriInfo info) {
+		DataResponse response;
+
+		try {
+			Map<String, String> params = new HashMap<String, String>();
+			List<String> errors = new ArrayList<String>();
+			if (mainOutputFilePath == null || mainOutputFilePath.isEmpty()) {
+				errors.add("mainOutputFilePath is a required field!");
+			}
+			if (summaryOutputFilePath == null || summaryOutputFilePath.isEmpty()) {
+				errors.add("summaryOutputFilePath is a required field!");
+			}
+			if (workbenchProjectId == null || workbenchProjectId.isEmpty()) {
+				errors.add("WorkbenchProjectId is a required field!");
+			}
+			if (studyId == null || studyId.isEmpty()) {
+				errors.add("StudyId is a required field!");
+			}
+
+			if (inputDataSetId == null || inputDataSetId.isEmpty()) {
+				errors.add("InputDataSetId is a required field!");
+			}
+			if (outputDataSetId == null || outputDataSetId.isEmpty()) {
+				errors.add("OutputDataSetId is a required field!");
+			}
+
+			if (errors.isEmpty()) {
+				params.put(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue(), mainOutputFilePath);
+				params.put(WebAPIConstants.SUMMARY_OUTPUT_FILE_PATH.getParamValue(), summaryOutputFilePath);
+				params.put(WebAPIConstants.OUTLIER_OUTPUT_FILE_PATH.getParamValue(), outlierOutputFilePath);
+				params.put(WebAPIConstants.WORKBENCH_PROJECT_ID.getParamValue(), workbenchProjectId);
+				params.put(WebAPIConstants.STUDY_ID.getParamValue(), studyId);
+				params.put(WebAPIConstants.INPUT_DATASET_ID.getParamValue(), inputDataSetId);
+				params.put(WebAPIConstants.OUTPUT_DATASET_ID.getParamValue(), outputDataSetId);
+
+				this.breedingViewService.execute(params, errors);
+				response = new DataResponse(true, "Successfully invoked service.");
+			} else {
+				response = new DataResponse(false, "Errors invoking web service: " + errors);
+			}
+		} catch (Exception e) {
+			BreedingView.LOG.debug(e.getMessage(), e);
+			response = new DataResponse(false, "Failed to invoke service: " + e.toString());
+		}
+
+		this.closeManagerFactory();
+		return response;
+	}
+
+	protected void closeManagerFactory() {
+		try {
+			this.managerFactoryProvider.close();
+		} catch (Exception e) {
+			BreedingView.LOG.debug(e.getMessage(), e);
+		}
+	}
 
 	public void setBreedingViewService(BreedingViewService breedingViewService) {
 		this.breedingViewService = breedingViewService;
-	}  
+	}
 
 }

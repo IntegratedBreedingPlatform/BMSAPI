@@ -1,3 +1,4 @@
+
 package org.generationcp.ibpworkbench.exceptions;
 
 public class IBPWebServiceException extends Exception {
@@ -7,7 +8,7 @@ public class IBPWebServiceException extends Exception {
 	public IBPWebServiceException() {
 		super();
 	}
-	
+
 	public IBPWebServiceException(String message) {
 		super(message);
 	}
