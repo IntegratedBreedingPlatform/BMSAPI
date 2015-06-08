@@ -251,6 +251,22 @@ public class ScaleValidatorTest {
 	 * Test for valid request
 	 */
 	@Test
+	public void testWithMinNotGivenAndMaxGiven() throws MiddlewareException {
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+
+		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
+		scaleSummary.setId(null);
+		scaleSummary.setMin(null);
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(scaleSummary.getName(), CvId.SCALES.getId());
+
+		this.scaleValidator.validate(scaleSummary, bindingResult);
+		Assert.assertFalse(bindingResult.hasErrors());
+	}
+
+	/**
+	 * Test for valid request
+	 */
+	@Test
 	public void testWithValidRequest() throws MiddlewareException {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 

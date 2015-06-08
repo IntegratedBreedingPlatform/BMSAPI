@@ -312,7 +312,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 			}
 
 			if (!this.isNullOrEmpty(maxValue)) {
-				Integer max = StringUtil.parseInt(minValue, null);
+				Integer max = StringUtil.parseInt(maxValue, null);
 				if (max == null) {
 					this.addCustomError(errors, "validValues.max", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 				}
