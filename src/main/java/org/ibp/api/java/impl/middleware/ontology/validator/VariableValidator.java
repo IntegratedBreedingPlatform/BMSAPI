@@ -208,20 +208,21 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 			boolean isNumericType = Objects.equals(scale.getDataType(), DataType.NUMERIC_VARIABLE);
 
-			String minValue = variable.getExpectedRange().getMin();
-			String maxValue = variable.getExpectedRange().getMax();
-
 			if (isNumericType) {
+
+				Integer variableExpectedMin = StringUtil.parseInt(variable.getExpectedRange().getMin(), null);
+				Integer variableExpectedMax = StringUtil.parseInt(variable.getExpectedRange().getMax(), null);
+
 				// 14. If the scale has a numeric data type and a minimum and/or maximum value for the expected range is provided (it is not
 				// mandatory), the minimum and/or maximum must be numeric values
-				if (!this.isNullOrEmpty(minValue)) {
-					if (!this.isNonNullValidNumericString(minValue)) {
+				if (!this.isNullOrEmpty(variableExpectedMin)) {
+					if (!this.isNonNullValidNumericString(variableExpectedMin)) {
 						this.addCustomError(errors, "expectedRange.min", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 					}
 				}
 
-				if (!this.isNullOrEmpty(maxValue)) {
-					if (!this.isNonNullValidNumericString(maxValue)) {
+				if (!this.isNullOrEmpty(variableExpectedMax)) {
+					if (!this.isNonNullValidNumericString(variableExpectedMax)) {
 						this.addCustomError(errors, "expectedRange.max", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 					}
 				}
@@ -232,18 +233,14 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 				// 14. If the scale has a numeric data type and valid values have been set on the scale, the expected range minimum cannot
 				// be less than the valid values minimum, and the expected range maximum cannot be larger than the valid values maximum
-				if (!this.isNullOrEmpty(scale.getMinValue())) {
-					if (this.getIntegerValueSafe(minValue, 0) < this.getIntegerValueSafe(scale.getMinValue(), 0)) {
-						this.addCustomError(errors, "expectedRange.min", VariableValidator.VARIABLE_MIN_SHOULD_BE_IN_SCALE_RANGE,
-								new Object[] {scale.getMinValue(), scale.getMaxValue()});
-					}
+				Integer scaleMinValue = StringUtil.parseInt(scale.getMinValue(), null);
+				if (scaleMinValue != null && variableExpectedMin != null && scaleMinValue > variableExpectedMin) {
+					this.addCustomError(errors, "expectedRange.min", VariableValidator.VARIABLE_MIN_SHOULD_BE_IN_SCALE_RANGE, new Object[] {scale.getMinValue(), scale.getMaxValue()});
 				}
-				if (!this.isNullOrEmpty(scale.getMaxValue())) {
-					if (this.getIntegerValueSafe(variable.getExpectedRange().getMax(), 0) > this
-							.getIntegerValueSafe(scale.getMaxValue(), 0)) {
-						this.addCustomError(errors, "expectedRange.max", VariableValidator.VARIABLE_MAX_SHOULD_BE_IN_SCALE_RANGE,
-								new Object[] {scale.getMinValue(), scale.getMaxValue()});
-					}
+
+				Integer scaleMaxValue = StringUtil.parseInt(scale.getMaxValue(), null);
+				if (scaleMaxValue != null && variableExpectedMax != null && scaleMaxValue < variableExpectedMax) {
+					this.addCustomError(errors, "expectedRange.max", VariableValidator.VARIABLE_MAX_SHOULD_BE_IN_SCALE_RANGE, new Object[] {scale.getMinValue(), scale.getMaxValue()});
 				}
 
 				if (errors.getErrorCount() > initialCount) {
@@ -252,7 +249,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 				// 15. If provided, the expected range minimum must be less than or equal to the expected range maximum, and the expected
 				// range maximum must be greater than or equal to the expected range minimum
-				if (this.getIntegerValueSafe(minValue, 0) > this.getIntegerValueSafe(maxValue, 0)) {
+				if (variableExpectedMin != null && variableExpectedMax != null && variableExpectedMin > variableExpectedMax) {
 					this.addCustomError(errors, "expectedRange", BaseValidator.MIN_SHOULD_NOT_GREATER_THEN_MAX, null);
 				}
 			}
@@ -290,7 +287,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 	private void aliasValidationProcessor(VariableSummary variable, Errors errors) {
 
-		if (!Objects.equals(variable.getAlias(), null)) {
+		//if (!Objects.equals(variable.getAlias(), null)) {
+		if (!isNullOrEmpty(variable.getAlias())) {
 			// Trim alias
 			variable.setAlias(variable.getAlias().trim());
 
