@@ -475,6 +475,38 @@ public class VariableValidatorTest {
 	}
 
 	/**
+	 * Test for Variable expected min is greater than max
+	 *
+	 * @throws MiddlewareException
+	 */
+	@Test
+	public void testWithExpectedRangeMinGreaterThanMax() throws MiddlewareException {
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		variable.setId(null);
+		variable.setExpectedMin("32");
+		variable.setExpectedMax("18");
+		Term methodTerm = TestDataProvider.getMethodTerm();
+		Term propertyTerm = TestDataProvider.getPropertyTerm();
+		Term scaleTerm = TestDataProvider.getScaleTerm();
+
+		Scale scale = TestDataProvider.getTestScale();
+
+		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
+		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
+		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+
+		this.variableValidator.validate(variable, bindingResult);
+		Assert.assertTrue(bindingResult.hasErrors());
+		Assert.assertNotNull(bindingResult.getFieldError("expectedRange"));
+	}
+
+	/**
 	 * Test for method, property and scale combination already exist for other variable
 	 *
 	 * @throws MiddlewareException
