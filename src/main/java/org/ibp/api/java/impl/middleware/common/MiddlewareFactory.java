@@ -52,8 +52,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 @Configuration
 public class MiddlewareFactory {
@@ -195,16 +193,6 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public DataImportService getDataImportService() throws FileNotFoundException {
 		return new DataImportServiceImpl(this.getCropDatabaseSessionProvider());
-	}
-
-	@Bean
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public JdbcTemplate getJDBCTemplate() {
-		DriverManagerDataSource dataSource =
-				new DriverManagerDataSource(String.format("jdbc:mysql://%s:%s/%s", this.config.getDbHost(), this.config.getDbPort(),
-						this.getCurrentlySelectedCropDBName()), this.config.getDbUsername(), this.config.getDbPassword());
-
-		return new JdbcTemplate(dataSource);
 	}
 
 	@Bean
