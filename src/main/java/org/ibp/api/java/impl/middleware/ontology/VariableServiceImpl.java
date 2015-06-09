@@ -16,7 +16,7 @@ import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableSummary;
-import org.ibp.api.domain.workbench.Program;
+import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
@@ -51,7 +51,12 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	public List<VariableSummary> getAllVariablesByFilter(String cropName, String programId, String propertyId, Boolean favourite) {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-		this.programValidator.validate(new Program(cropName, programId), bindingResult);
+
+		ProgramSummary program = new ProgramSummary();
+		program.setCropType(cropName);
+		program.setUniqueID(programId);
+
+		this.programValidator.validate(program, bindingResult);
 
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
@@ -84,7 +89,11 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		this.validateId(variableId, "Variable");
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		this.programValidator.validate(new Program(cropName, programId), errors);
+		ProgramSummary program = new ProgramSummary();
+		program.setCropType(cropName);
+		program.setUniqueID(programId);
+
+		this.programValidator.validate(program, errors);
 
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -140,8 +149,12 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		variable.setId(null);
 		variable.setProgramUuid(programId);
 
+		ProgramSummary program = new ProgramSummary();
+		program.setCropType(cropName);
+		program.setUniqueID(programId);
+
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Variable");
-		this.programValidator.validate(new Program(cropName, programId), errors);
+		this.programValidator.validate(program, errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -180,7 +193,12 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	public void updateVariable(String cropName, String programId, String variableId, VariableSummary variable) {
 
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Variable");
-		this.programValidator.validate(new Program(cropName, programId), errors);
+
+		ProgramSummary program = new ProgramSummary();
+		program.setCropType(cropName);
+		program.setUniqueID(programId);
+
+		this.programValidator.validate(program, errors);
 
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
