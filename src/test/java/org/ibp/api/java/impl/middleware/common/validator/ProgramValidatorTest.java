@@ -5,7 +5,9 @@ import java.util.HashMap;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.ibp.api.domain.workbench.Program;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,10 +52,30 @@ public class ProgramValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Program");
 		String programId = "uuid";
+		Program program = new Program("maize", programId);
 
 		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectByUuid(programId);
 
-		this.programValidator.validate(programId, bindingResult);
+		this.programValidator.validate(program, bindingResult);
+		Assert.assertTrue(bindingResult.hasErrors());
+	}
+
+	@Test
+	public void testForCropNameOfProgramNotMatch() throws MiddlewareQueryException {
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Program");
+		String programId = "uuid";
+		Program program = new Program("maize", programId);
+
+		Project project = new Project();
+		project.setUniqueID(programId);
+		project.setProjectId(1L);
+		project.setProjectName("Crop_Program");
+		project.setCropType(new CropType("rice"));
+
+		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuid(programId);
+
+		this.programValidator.validate(program, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 	}
 
@@ -62,15 +84,17 @@ public class ProgramValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Program");
 		String programId = "uuid";
+		Program program = new Program("maize", programId);
 
 		Project project = new Project();
 		project.setUniqueID(programId);
 		project.setProjectId(1L);
 		project.setProjectName("Crop_Program");
+		project.setCropType(new CropType("maize"));
 
 		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuid(programId);
 
-		this.programValidator.validate(programId, bindingResult);
+		this.programValidator.validate(program, bindingResult);
 		Assert.assertFalse(bindingResult.hasErrors());
 	}
 }

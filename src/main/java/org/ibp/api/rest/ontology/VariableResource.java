@@ -39,7 +39,7 @@ public class VariableResource {
 	public ResponseEntity<List<VariableSummary>> listAllVariables(@PathVariable String cropname, @RequestParam(value = "property",
 			required = false) String propertyId, @RequestParam(value = "favourite", required = false) Boolean favourite, @RequestParam(
 			value = "programId") String programId) {
-		return new ResponseEntity<>(this.variableService.getAllVariablesByFilter(programId, propertyId, favourite), HttpStatus.OK);
+		return new ResponseEntity<>(this.variableService.getAllVariablesByFilter(cropname, programId, propertyId, favourite), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get Variable", notes = "Get Variable By Id")
@@ -47,7 +47,7 @@ public class VariableResource {
 	@ResponseBody
 	public ResponseEntity<VariableDetails> getVariableById(@PathVariable String cropname,
 			@RequestParam(value = "programId") String programId, @PathVariable String id) {
-		return new ResponseEntity<>(this.variableService.getVariableById(programId, id), HttpStatus.OK);
+		return new ResponseEntity<>(this.variableService.getVariableById(cropname, programId, id), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Add Variable", notes = "Add new variable using given data")
@@ -55,7 +55,7 @@ public class VariableResource {
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addVariable(@PathVariable String cropname, @RequestParam(value = "programId") String programId,
 			@RequestBody VariableSummary variable) {
-		return new ResponseEntity<>(this.variableService.addVariable(programId, variable), HttpStatus.CREATED);
+		return new ResponseEntity<>(this.variableService.addVariable(cropname, programId, variable), HttpStatus.CREATED);
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class VariableResource {
 	@ResponseBody
 	public ResponseEntity updateVariable(@PathVariable String cropname, @RequestParam(value = "programId") String programId,
 			@PathVariable String id, @RequestBody VariableSummary variable) {
-		this.variableService.updateVariable(programId, id, variable);
+		this.variableService.updateVariable(cropname, programId, id, variable);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 

@@ -6,6 +6,7 @@ import java.util.Objects;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.ibp.api.domain.workbench.Program;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,16 +39,22 @@ public class ProgramValidator extends BaseValidator implements Validator {
 		}
 
 		// check if program id is non numeric
-		String id = (String) target;
+		Program program = (Program) target;
 
-		this.checkIfProgramExist("programId", id, errors);
+		this.checkIfProgramExist("programId", program, errors);
 	}
 
-	protected void checkIfProgramExist(String fieldName, String programUuid, Errors errors) {
+	protected void checkIfProgramExist(String fieldName, Program program, Errors errors) {
 		try {
-			Project project = this.workbenchDataManager.getProjectByUuid(programUuid);
+			Project project = this.workbenchDataManager.getProjectByUuid(program.getProgramUuid());
 			if (Objects.equals(project, null)) {
 				this.addCustomError(errors, fieldName, ProgramValidator.PROGRAM_DOES_NOT_EXIST, null);
+				return;
+			}
+
+			if(!Objects.equals(program.getCropName(), project.getCropType().getCropName())){
+				this.addCustomError(errors, fieldName, ProgramValidator.PROGRAM_DOES_NOT_EXIST, null);
+				return;
 			}
 		} catch (MiddlewareException e) {
 			ProgramValidator.LOGGER.error("Error occur while fetching program data", e);
