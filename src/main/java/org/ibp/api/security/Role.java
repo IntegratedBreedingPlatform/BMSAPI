@@ -1,4 +1,4 @@
-package org.ibp;
+package org.ibp.api.security;
 
 
 public enum Role {
