@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -26,6 +27,7 @@ import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
 @ComponentScan
 @EnableSwagger
 @Configuration
+@EnableWebSecurity
 public class Main extends WebMvcConfigurerAdapter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
