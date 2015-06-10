@@ -159,6 +159,11 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
+		this.variableValidator.validate(variable, errors);
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
 		try {
 			Integer methodId = StringUtil.parseInt(variable.getMethodSummary().getId(), null);
 			Integer propertyId = StringUtil.parseInt(variable.getPropertySummary().getId(), null);
