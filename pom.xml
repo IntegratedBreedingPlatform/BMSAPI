@@ -9,7 +9,7 @@
 	<name>Breeding Management System API</name>
 
 	<properties>
-		<spring-boot-version>1.0.1.RELEASE</spring-boot-version>
+		<spring-boot-version>1.1.12.RELEASE</spring-boot-version>
 		<middleware-version>4.1.0.SNAPSHOT</middleware-version>
 		<jsonpath.version>0.8.1</jsonpath.version>
 		<modelmapper.version>0.7.3</modelmapper.version>
