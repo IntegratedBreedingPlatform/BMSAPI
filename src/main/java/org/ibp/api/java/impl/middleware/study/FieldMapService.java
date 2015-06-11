@@ -132,7 +132,6 @@ public class FieldMapService {
 		initFieldPlots(fieldMap, middlewareFieldMapTrialInstanceInfo);
 		FieldPlot[][] fieldPlots = fieldMap.getPlots();
 		for (FieldMapLabel fieldMapLabel : middlewareFieldMapTrialInstanceInfo.getFieldMapLabels()) {
-			System.out.println((fieldMapLabel.getColumn() - 1) + " " + (fieldMapLabel.getRange() - 1));
 			fieldPlots[fieldMapLabel.getRange() - 1][fieldMapLabel.getColumn() - 1] =
 					mapMiddlewareFieldLableToFieldPlot(fieldMapLabel, middlewareFieldMapTrialInstanceInfo, rawDataFromMiddleware);
 		}
