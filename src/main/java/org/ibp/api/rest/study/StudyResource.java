@@ -2,7 +2,9 @@
 package org.ibp.api.rest.study;
 
 import java.util.List;
+import java.util.Map;
 
+import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyGermplasm;
@@ -82,5 +84,11 @@ public class StudyResource {
 		return new ResponseEntity<StudyDetails>(this.studyService.getStudyDetails(studyId), HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/{cropname}/fieldmaps/{studyId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Map<Integer, FieldMap>> getFieldMap(@PathVariable String cropname, @PathVariable String studyId) {
+		return new ResponseEntity<Map<Integer, FieldMap>>(this.studyService.getFieldMap(studyId), HttpStatus.OK);
+	}
+
 
 }

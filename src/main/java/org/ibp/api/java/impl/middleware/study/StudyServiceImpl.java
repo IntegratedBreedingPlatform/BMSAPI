@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.study;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Experiment;
@@ -21,6 +22,7 @@ import org.generationcp.middleware.service.api.study.TraitDto;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.study.DatasetSummary;
 import org.ibp.api.domain.study.Environment;
+import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyAttribute;
@@ -263,4 +265,11 @@ public class StudyServiceImpl implements StudyService {
 			throw new ApiRuntimeException("Error! Caused by: " + e.getMessage(), e);
 		}
 	}
+
+	@Override
+	public Map<Integer, FieldMap> getFieldMap(String studyId) {
+		FieldMapService fieldMapService = new FieldMapService(this.studyDataManager);
+		return fieldMapService.getFieldMap(studyId);
+	}
+
 }
