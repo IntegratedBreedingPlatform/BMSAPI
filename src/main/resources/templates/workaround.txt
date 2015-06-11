@@ -1,0 +1,2 @@
+The only reason this is here is to prevent Theamleaf from throwing an exception.
+Please see https://github.com/spring-projects/spring-boot/issues/424 for further deails.
