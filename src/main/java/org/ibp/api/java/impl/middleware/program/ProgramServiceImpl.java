@@ -33,7 +33,9 @@ public class ProgramServiceImpl implements ProgramService {
 					ProgramSummary programSummary = new ProgramSummary();
 					programSummary.setId(workbenchProgram.getProjectId().toString());
 					programSummary.setProjectName(workbenchProgram.getProjectName());
-					programSummary.setCropType(workbenchProgram.getCropType().getCropName());
+					if(workbenchProgram.getCropType() != null ) {
+						programSummary.setCropType(workbenchProgram.getCropType().getCropName());
+					}
 					programSummary.setUserId(String.valueOf(workbenchProgram.getUserId()));
 					programSummary.setUniqueID(workbenchProgram.getUniqueID());
 					if (workbenchProgram.getStartDate() != null) {
