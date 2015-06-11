@@ -15,6 +15,7 @@ public class StudyGermplasm {
 
 	private String position;
 
+	@JsonUnwrapped
 	private GermplasmListEntrySummary germplasmListEntrySummary;
 
 	/**
