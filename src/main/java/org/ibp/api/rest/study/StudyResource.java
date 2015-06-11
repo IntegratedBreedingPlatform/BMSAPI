@@ -61,8 +61,8 @@ public class StudyResource {
 	@ResponseBody
 	public ResponseEntity<Observation> updateObservation(@PathVariable String cropname, @PathVariable Integer studyId,
 			@PathVariable Integer observationId, @RequestBody Observation observation) {
-		if (observation.getUniqueIdentifier() != observationId) {
-			throw new IllegalArgumentException("The observation identifier must be the same in the object an the url");
+		if (observationId == null || observation.getUniqueIdentifier() == null || !observationId.equals(observation.getUniqueIdentifier() )) {
+			throw new IllegalArgumentException("The observation identifier must be populated and have the same value in the object and the url");
 			// TODO: Give back some better error messages.
 		}
 		return new ResponseEntity<>(this.studyService.updateObsevation(studyId, observation), HttpStatus.OK);
@@ -81,5 +81,6 @@ public class StudyResource {
 	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable String cropname, @PathVariable String studyId) {
 		return new ResponseEntity<StudyDetails>(this.studyService.getStudyDetails(studyId), HttpStatus.OK);
 	}
+	
 
 }
