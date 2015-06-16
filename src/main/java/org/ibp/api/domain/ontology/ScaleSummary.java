@@ -28,11 +28,11 @@ public class ScaleSummary extends TermSummary {
 		return this.validValues;
 	}
 
-	public void setMin(Integer min) {
+	public void setMin(String min) {
 		this.validValues.setMin(min);
 	}
 
-	public void setMax(Integer max) {
+	public void setMax(String max) {
 		this.validValues.setMax(max);
 	}
 

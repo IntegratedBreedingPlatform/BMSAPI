@@ -83,10 +83,10 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(scaleList.get(0).getDefinition())))
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$[0].validValues.min",
-								Matchers.is(StringUtil.parseInt(scaleList.get(0).getMinValue(), null))))
+								Matchers.is(scaleList.get(0).getMinValue())))
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$[0].validValues.max",
-								Matchers.is(StringUtil.parseInt(scaleList.get(0).getMaxValue(), null))))
+								Matchers.is(scaleList.get(0).getMaxValue())))
 				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyScaleDataManager, Mockito.times(1)).getAllScales();
@@ -114,8 +114,8 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 		.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(scale.getId()))))
 		.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(scale.getName())))
 		.andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.is(scale.getDefinition())))
-		.andExpect(MockMvcResultMatchers.jsonPath("$.validValues.min", Matchers.is(StringUtil.parseInt(scale.getMinValue(), null))))
-		.andExpect(MockMvcResultMatchers.jsonPath("$.validValues.max", Matchers.is(StringUtil.parseInt(scale.getMaxValue(), null))))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.validValues.min", Matchers.is(scale.getMinValue())))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.validValues.max", Matchers.is(scale.getMaxValue())))
 		.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyScaleDataManager, Mockito.times(1)).getScaleById(scale.getId());

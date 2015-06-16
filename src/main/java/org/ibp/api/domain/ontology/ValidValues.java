@@ -11,26 +11,26 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ValidValues {
 
-	private Integer min;
-	private Integer max;
+	private String min;
+	private String max;
 	private List<VariableCategory> categories;
 
 	public ValidValues() {
 	}
 
-	public Integer getMin() {
+	public String getMin() {
 		return this.min;
 	}
 
-	public void setMin(Integer min) {
+	public void setMin(String min) {
 		this.min = min;
 	}
 
-	public Integer getMax() {
+	public String getMax() {
 		return this.max;
 	}
 
-	public void setMax(Integer max) {
+	public void setMax(String max) {
 		this.max = max;
 	}
 

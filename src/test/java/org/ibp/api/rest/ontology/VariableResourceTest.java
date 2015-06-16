@@ -185,10 +185,10 @@ public class VariableResourceTest extends ApiUnitTestBase {
 								Matchers.is(ontologyVariable.getScale().getDataType().getName())))
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$.scale.validValues.min",
-								Matchers.is(StringUtil.parseInt(ontologyVariable.getScale().getMinValue(), null))))
+								Matchers.is(ontologyVariable.getScale().getMinValue())))
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$.scale.validValues.max",
-								Matchers.is(StringUtil.parseInt(ontologyVariable.getScale().getMaxValue(), null))))
+								Matchers.is(ontologyVariable.getScale().getMaxValue())))
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$.variableTypes",
 								IsCollectionWithSize.hasSize(ontologyVariable.getVariableTypes().size())));

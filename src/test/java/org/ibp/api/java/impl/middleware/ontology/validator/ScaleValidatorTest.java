@@ -200,8 +200,8 @@ public class ScaleValidatorTest {
 
 		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
 		scaleSummary.setId(null);
-		scaleSummary.setMin(10);
-		scaleSummary.setMax(5);
+		scaleSummary.setMin("10");
+		scaleSummary.setMax("5");
 
 		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
