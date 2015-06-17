@@ -1,0 +1,82 @@
+package org.ibp.api.domain.ontology.serializers;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.google.common.base.Strings;
+import org.ibp.api.domain.ontology.ScaleSummary;
+import org.ibp.api.domain.ontology.VariableCategory;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
+
+public class ScaleSummarySerializer extends JsonSerializer<ScaleSummary>{
+
+	@Override
+	public void serialize(ScaleSummary scaleSummary, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+
+		jsonGenerator.writeStartObject();
+
+		// Added common term field
+		if(!isNullOrEmpty(scaleSummary.getId())){
+			jsonGenerator.writeNumberField("id", Integer.parseInt(scaleSummary.getId()));
+		}
+		jsonGenerator.writeStringField("name", scaleSummary.getName());
+
+		if(!isNullOrEmpty(scaleSummary.getDescription())){
+			jsonGenerator.writeStringField("description", scaleSummary.getDescription());
+		}
+
+		if(scaleSummary.getDataType() != null){
+
+			// If dataType is not null then added data type related details
+			jsonGenerator.writeObjectFieldStart("dataType");
+				jsonGenerator.writeNumberField("id", scaleSummary.getDataType().getId());
+				jsonGenerator.writeStringField("name", scaleSummary.getDataType().getName());
+			jsonGenerator.writeEndObject();
+
+			// Adding valid values
+			jsonGenerator.writeObjectFieldStart("validValues");
+
+			// If numeric data type then adding min and max in valid values
+			if(scaleSummary.getDataType().getId() == 1110){
+				if(!isNullOrEmpty(scaleSummary.getValidValues().getMin())){
+					jsonGenerator.writeNumberField("min", Integer.parseInt(scaleSummary.getValidValues().getMin()));
+				}
+
+				if(!isNullOrEmpty(scaleSummary.getValidValues().getMax())){
+					jsonGenerator.writeNumberField("max", Integer.parseInt(scaleSummary.getValidValues().getMax()));
+				}
+			} else if(scaleSummary.getDataType().getId() == 1130){ // If categorical data type then adding categories in valid values
+				if(!scaleSummary.getValidValues().getCategories().isEmpty()){
+					jsonGenerator.writeArrayFieldStart("categories");
+
+					for (VariableCategory category : scaleSummary.getValidValues().getCategories()){
+						jsonGenerator.writeStartObject();
+							jsonGenerator.writeStringField("name", category.getName());
+							jsonGenerator.writeStringField("description", category.getDescription());
+						jsonGenerator.writeEndObject();
+					}
+
+					jsonGenerator.writeEndArray();
+				}
+			}
+
+			jsonGenerator.writeEndObject();
+		}
+
+		// Adding metadata related to scale
+		jsonGenerator.writeObjectFieldStart("metadata");
+			jsonGenerator.writeStringField("dateCreated", scaleSummary.getMetadata().getDateCreated());
+			jsonGenerator.writeStringField("lastModified", scaleSummary.getMetadata().getDateLastModified());
+		jsonGenerator.writeEndObject();
+
+		jsonGenerator.writeEndObject();
+	}
+
+	protected boolean isNullOrEmpty(Object value) {
+		return value instanceof String && Strings.isNullOrEmpty(((String) value).trim()) || value == null || value instanceof Collection
+				&& ((Collection) value).isEmpty() || value instanceof Map && ((Map) value).isEmpty();
+	}
+}

@@ -185,6 +185,7 @@ public class TestDataProvider {
 			scale.setId(TestDataProvider.scaleId);
 			scale.setName(TestDataProvider.scaleName);
 			scale.setDefinition(TestDataProvider.scaleDescription);
+			scale.setDataType(DataType.NUMERIC_VARIABLE);
 			scale.setMinValue(TestDataProvider.scaleMinValue);
 			scale.setMaxValue(TestDataProvider.scaleMaxValue);
 			scale.addCategory(TestDataProvider.category1, TestDataProvider.category2);

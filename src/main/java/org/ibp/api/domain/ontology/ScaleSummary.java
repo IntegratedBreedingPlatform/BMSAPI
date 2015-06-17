@@ -4,11 +4,15 @@ package org.ibp.api.domain.ontology;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.ibp.api.domain.ontology.serializers.ScaleSummarySerializer;
 
 /**
  * Contains basic data used for list, insert and update of scale Extended from {@link TermSummary} for getting basic fields like id, name
  * and description
  */
+
+@JsonSerialize(using = ScaleSummarySerializer.class)
 public class ScaleSummary extends TermSummary {
 
 	private DataType dataType;

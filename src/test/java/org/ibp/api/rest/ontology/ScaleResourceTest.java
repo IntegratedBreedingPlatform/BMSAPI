@@ -78,15 +78,11 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 				.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/scales", this.cropName).contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(scaleList.size())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(String.valueOf(scaleList.get(0).getId()))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(scaleList.get(0).getId())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is(scaleList.get(0).getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(scaleList.get(0).getDefinition())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].validValues.min",
-								Matchers.is(scaleList.get(0).getMinValue())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].validValues.max",
-								Matchers.is(scaleList.get(0).getMaxValue())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].validValues.min", Matchers.is(StringUtil.parseInt(scaleList.get(0).getMinValue(), null))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].validValues.max", Matchers.is(StringUtil.parseInt(scaleList.get(0).getMaxValue(), null))))
 				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyScaleDataManager, Mockito.times(1)).getAllScales();
