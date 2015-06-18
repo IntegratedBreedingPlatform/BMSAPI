@@ -210,19 +210,23 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 			if (isNumericType) {
 
-				Integer variableExpectedMin = StringUtil.parseInt(variable.getExpectedRange().getMin(), null);
-				Integer variableExpectedMax = StringUtil.parseInt(variable.getExpectedRange().getMax(), null);
+				Double variableExpectedMin = StringUtil.parseDouble(variable.getExpectedRange().getMin(), null);
+				Double variableExpectedMax = StringUtil.parseDouble(variable.getExpectedRange().getMax(), null);
 
-				// 14. If the scale has a numeric data type and a minimum and/or maximum value for the expected range is provided (it is not
-				// mandatory), the minimum and/or maximum must be numeric values
-				if (!this.isNullOrEmpty(variableExpectedMin)) {
-					if (!this.isNonNullValidNumericString(variableExpectedMin)) {
+				String variableMin = variable.getExpectedRange().getMin() == null ? null : variable.getExpectedRange().getMin();
+
+				if (!this.isNullOrEmpty(variableMin)) {
+					Integer min = StringUtil.parseInt(variableMin, null);
+					if (min == null) {
 						this.addCustomError(errors, "expectedRange.min", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 					}
 				}
 
-				if (!this.isNullOrEmpty(variableExpectedMax)) {
-					if (!this.isNonNullValidNumericString(variableExpectedMax)) {
+				String variableMax = variable.getExpectedRange().getMax() == null ? null : variable.getExpectedRange().getMax();
+
+				if (!this.isNullOrEmpty(variableMax)) {
+					Integer min = StringUtil.parseInt(variableMax, null);
+					if (min == null) {
 						this.addCustomError(errors, "expectedRange.max", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 					}
 				}
@@ -233,12 +237,12 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 				// 14. If the scale has a numeric data type and valid values have been set on the scale, the expected range minimum cannot
 				// be less than the valid values minimum, and the expected range maximum cannot be larger than the valid values maximum
-				Integer scaleMinValue = StringUtil.parseInt(scale.getMinValue(), null);
+				Double scaleMinValue = StringUtil.parseDouble(scale.getMinValue(), null);
 				if (scaleMinValue != null && variableExpectedMin != null && scaleMinValue > variableExpectedMin) {
 					this.addCustomError(errors, "expectedRange.min", VariableValidator.VARIABLE_MIN_SHOULD_BE_IN_SCALE_RANGE, new Object[] {scale.getMinValue(), scale.getMaxValue()});
 				}
 
-				Integer scaleMaxValue = StringUtil.parseInt(scale.getMaxValue(), null);
+				Double scaleMaxValue = StringUtil.parseDouble(scale.getMaxValue(), null);
 				if (scaleMaxValue != null && variableExpectedMax != null && scaleMaxValue < variableExpectedMax) {
 					this.addCustomError(errors, "expectedRange.max", VariableValidator.VARIABLE_MAX_SHOULD_BE_IN_SCALE_RANGE, new Object[] {scale.getMinValue(), scale.getMaxValue()});
 				}
