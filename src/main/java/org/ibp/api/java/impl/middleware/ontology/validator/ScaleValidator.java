@@ -326,8 +326,11 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		// 10. If present, the minimum valid value must be less than or equal to
 		// the maximum valid value, and the maximum valid value must be greater
 		// than or equal to the minimum valid value
-		if (this.isNonNullValidNumericString(minValue) && this.isNonNullValidNumericString(maxValue)
-				&& this.getIntegerValueSafe(minValue, 0) > this.getIntegerValueSafe(maxValue, 0)) {
+
+		Integer min = StringUtil.parseInt(minValue, null);
+		Integer max = StringUtil.parseInt(maxValue, null);
+
+		if (min != null && max != null && min > max) {
 			this.addCustomError(errors, "validValues.min", BaseValidator.MIN_MAX_NOT_VALID, null);
 		}
 
