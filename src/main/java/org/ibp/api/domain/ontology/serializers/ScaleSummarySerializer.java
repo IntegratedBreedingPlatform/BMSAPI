@@ -8,6 +8,7 @@ import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.domain.ontology.VariableCategory;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Map;
 
@@ -42,11 +43,13 @@ public class ScaleSummarySerializer extends JsonSerializer<ScaleSummary>{
 			// If numeric data type then adding min and max in valid values
 			if(scaleSummary.getDataType().getId() == 1110){
 				if(!isNullOrEmpty(scaleSummary.getValidValues().getMin())){
-					jsonGenerator.writeNumberField("min", Integer.parseInt(scaleSummary.getValidValues().getMin()));
+					BigDecimal min = new BigDecimal(scaleSummary.getValidValues().getMin());
+					jsonGenerator.writeNumberField("min", min);
 				}
 
 				if(!isNullOrEmpty(scaleSummary.getValidValues().getMax())){
-					jsonGenerator.writeNumberField("max", Integer.parseInt(scaleSummary.getValidValues().getMax()));
+					BigDecimal max = new BigDecimal(scaleSummary.getValidValues().getMax());
+					jsonGenerator.writeNumberField("max", max);
 				}
 			} else if(scaleSummary.getDataType().getId() == 1130){ // If categorical data type then adding categories in valid values
 				if(!scaleSummary.getValidValues().getCategories().isEmpty()){
