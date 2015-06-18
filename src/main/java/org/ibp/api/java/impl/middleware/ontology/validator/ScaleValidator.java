@@ -165,8 +165,8 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 			}
 
 			ValidValues validValues = scaleSummary.getValidValues() == null ? new ValidValues() : scaleSummary.getValidValues();
-			boolean minValuesAreEqual = Objects.equals(validValues.getMin(), StringUtil.parseInt(oldScale.getMinValue(), null));
-			boolean maxValuesAreEqual = Objects.equals(validValues.getMax(), StringUtil.parseInt(oldScale.getMaxValue(), null));
+			boolean minValuesAreEqual = Objects.equals(validValues.getMin(), oldScale.getMinValue());
+			boolean maxValuesAreEqual = Objects.equals(validValues.getMax(), oldScale.getMaxValue());
 			List<VariableCategory> categories =
 					validValues.getCategories() == null ? new ArrayList<VariableCategory>() : validValues.getCategories();
 			boolean categoriesEqualSize = Objects.equals(categories.size(), oldScale.getCategories().size());
@@ -298,21 +298,21 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 		ValidValues validValues = scaleSummary.getValidValues() == null ? new ValidValues() : scaleSummary.getValidValues();
 
-		String minValue = validValues.getMin() == null ? null : validValues.getMin().toString();
-		String maxValue = validValues.getMax() == null ? null : validValues.getMax().toString();
+		String minValue = validValues.getMin() == null ? null : validValues.getMin();
+		String maxValue = validValues.getMax() == null ? null : validValues.getMax();
 
 		// 9. If the data type is numeric and minimum and maximum valid values
 		// are provided (they are not mandatory), they must be numeric values
 		if (Objects.equals(dataType, DataType.NUMERIC_VARIABLE)) {
 			if (!this.isNullOrEmpty(minValue)) {
-				Integer min = StringUtil.parseInt(minValue, null);
+				Float min = StringUtil.parseFloat(minValue, null);
 				if (min == null) {
 					this.addCustomError(errors, "validValues.min", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 				}
 			}
 
 			if (!this.isNullOrEmpty(maxValue)) {
-				Integer max = StringUtil.parseInt(maxValue, null);
+				Float max = StringUtil.parseFloat(maxValue, null);
 				if (max == null) {
 					this.addCustomError(errors, "validValues.max", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 				}
@@ -327,8 +327,8 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		// the maximum valid value, and the maximum valid value must be greater
 		// than or equal to the minimum valid value
 
-		Integer min = StringUtil.parseInt(minValue, null);
-		Integer max = StringUtil.parseInt(maxValue, null);
+		Float min = StringUtil.parseFloat(minValue, null);
+		Float max = StringUtil.parseFloat(maxValue, null);
 
 		if (min != null && max != null && min > max) {
 			this.addCustomError(errors, "validValues.min", BaseValidator.MIN_MAX_NOT_VALID, null);
