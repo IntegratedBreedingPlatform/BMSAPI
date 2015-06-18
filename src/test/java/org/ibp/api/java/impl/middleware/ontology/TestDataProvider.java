@@ -52,8 +52,8 @@ public class TestDataProvider {
 	private static final String scaleDescription = "Scale Description";
 	private static final Integer scaleVocabularyId = 1030;
 
-	private static final String scaleMinValue = "10";
-	private static final String scaleMaxValue = "20";
+	private static final String scaleMinValue = "10.01";
+	private static final String scaleMaxValue = "20.02";
 	private static final String category1 = "Scale Category1";
 	private static final String category2 = "Scale Category2";
 
