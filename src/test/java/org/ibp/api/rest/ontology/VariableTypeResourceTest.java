@@ -23,7 +23,7 @@ public class VariableTypeResourceTest extends ApiUnitTestBase {
 	public void listAllVariableTypes() throws Exception {
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/variableTypes").contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(9)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(10)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is("Analysis"))).andDo(MockMvcResultHandlers.print());
 
 	}
