@@ -4,9 +4,7 @@ package org.ibp.api.java.impl.middleware.study;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -201,8 +199,8 @@ public class FieldMapServiceTest {
 		return counter;
 	}
 
-	private List<FieldMapInfo> getSimpleMiddlewareFieldMapInfoObjectForTest() {
-		return FieldMapTestUtility.getFieldMapInfoFromSeralizedFile("/testData/SimpleMiddlewareFieldMapInfoObjectForTest.ser");
+	private List<FieldMapInfo> getSimpleMiddlewareFieldMapInfoObjectForTest() throws URISyntaxException {
+		return FieldMapTestUtility.getFieldMapInfoFromSerializedFile("/testData/SimpleMiddlewareFieldMapInfoObjectForTest.ser");
 	}
 
 }

@@ -4,6 +4,7 @@ package org.ibp.api.java.impl.middleware.study;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
@@ -44,18 +45,10 @@ public class ComplexFieldMapServiceTest {
 	 */
 	@Test
 	public void testPlotValues() throws Exception {
-
 		Assert.assertEquals("For the test data provided there should be one filed map", 3, simpleFieldMap.size());
-	
 	}
 
-
-
-	private List<FieldMapInfo> getComplexMiddlewareFieldMapInfoObjectForTest() {
-		return FieldMapTestUtility.getFieldMapInfoFromSeralizedFile("/testData/ComplexMiddlewareFieldMapInfoObjectForTest.ser");
+	private List<FieldMapInfo> getComplexMiddlewareFieldMapInfoObjectForTest() throws URISyntaxException {
+		return FieldMapTestUtility.getFieldMapInfoFromSerializedFile("/testData/ComplexMiddlewareFieldMapInfoObjectForTest.ser");
 	}
-
-
-
-
 }
