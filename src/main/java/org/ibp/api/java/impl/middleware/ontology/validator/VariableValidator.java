@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -210,14 +211,14 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 			if (isNumericType) {
 
-				Double variableExpectedMin = StringUtil.parseDouble(variable.getExpectedRange().getMin(), null);
-				Double variableExpectedMax = StringUtil.parseDouble(variable.getExpectedRange().getMax(), null);
+				BigDecimal variableExpectedMin = null;
+				BigDecimal variableExpectedMax = null;
 
 				String variableMin = variable.getExpectedRange().getMin() == null ? null : variable.getExpectedRange().getMin();
 
 				if (!this.isNullOrEmpty(variableMin)) {
-					Integer min = StringUtil.parseInt(variableMin, null);
-					if (min == null) {
+					variableExpectedMin = StringUtil.parseBigDecimal(variableMin, null);
+					if (variableExpectedMin == null) {
 						this.addCustomError(errors, "expectedRange.min", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 					}
 				}
@@ -225,8 +226,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				String variableMax = variable.getExpectedRange().getMax() == null ? null : variable.getExpectedRange().getMax();
 
 				if (!this.isNullOrEmpty(variableMax)) {
-					Integer min = StringUtil.parseInt(variableMax, null);
-					if (min == null) {
+					variableExpectedMax = StringUtil.parseBigDecimal(variableMax, null);
+					if (variableExpectedMax == null) {
 						this.addCustomError(errors, "expectedRange.max", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 					}
 				}
@@ -237,13 +238,13 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 				// 14. If the scale has a numeric data type and valid values have been set on the scale, the expected range minimum cannot
 				// be less than the valid values minimum, and the expected range maximum cannot be larger than the valid values maximum
-				Double scaleMinValue = StringUtil.parseDouble(scale.getMinValue(), null);
-				if (scaleMinValue != null && variableExpectedMin != null && scaleMinValue > variableExpectedMin) {
+				BigDecimal scaleMinValue = StringUtil.parseBigDecimal(scale.getMinValue(), null);
+				if (scaleMinValue != null && variableExpectedMin != null && scaleMinValue.compareTo(variableExpectedMin) != -1) {
 					this.addCustomError(errors, "expectedRange.min", VariableValidator.VARIABLE_MIN_SHOULD_BE_IN_SCALE_RANGE, new Object[] {scale.getMinValue(), scale.getMaxValue()});
 				}
 
-				Double scaleMaxValue = StringUtil.parseDouble(scale.getMaxValue(), null);
-				if (scaleMaxValue != null && variableExpectedMax != null && scaleMaxValue < variableExpectedMax) {
+				BigDecimal scaleMaxValue = StringUtil.parseBigDecimal(scale.getMaxValue(), null);
+				if (scaleMaxValue != null && variableExpectedMax != null && scaleMaxValue.compareTo(variableExpectedMax) != 1) {
 					this.addCustomError(errors, "expectedRange.max", VariableValidator.VARIABLE_MAX_SHOULD_BE_IN_SCALE_RANGE, new Object[] {scale.getMinValue(), scale.getMaxValue()});
 				}
 
@@ -253,7 +254,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 				// 15. If provided, the expected range minimum must be less than or equal to the expected range maximum, and the expected
 				// range maximum must be greater than or equal to the expected range minimum
-				if (variableExpectedMin != null && variableExpectedMax != null && variableExpectedMin > variableExpectedMax) {
+				if (variableExpectedMin != null && variableExpectedMax != null && variableExpectedMin.compareTo(variableExpectedMax) != -1) {
 					this.addCustomError(errors, "expectedRange", BaseValidator.MIN_SHOULD_NOT_GREATER_THEN_MAX, null);
 				}
 			}
@@ -407,4 +408,5 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		return errors.getErrorCount() == initialCount;
 	}
+
 }
