@@ -1,6 +1,9 @@
 
 package org.ibp.api.domain.ontology;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.ibp.api.domain.ontology.serializers.VariableSummarySerializer;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -8,6 +11,8 @@ import java.util.Set;
  * Contains basic data used for list, insert and update of variable Extended from {@link TermSummary} for getting basic fields like id, name
  * and description
  */
+
+@JsonSerialize(using = VariableSummarySerializer.class)
 public class VariableSummary extends TermSummary {
 
 	private String alias;

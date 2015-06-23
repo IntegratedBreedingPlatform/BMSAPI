@@ -108,13 +108,13 @@ public class VariableResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].alias", Matchers.is(variableSummaries.get(0).getAlias())))
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$[0].propertySummary.id",
-								Matchers.is(variableSummaries.get(0).getPropertySummary().getId().toString())))
+								Matchers.is(variableSummaries.get(0).getPropertySummary().getId())))
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$[0].propertySummary.name",
 								Matchers.is(variableSummaries.get(0).getPropertySummary().getName())))
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$[0].methodSummary.id",
-								Matchers.is(variableSummaries.get(0).getMethodSummary().getId().toString())))
+								Matchers.is(variableSummaries.get(0).getMethodSummary().getId())))
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$[0].methodSummary.name",
 								Matchers.is(variableSummaries.get(0).getMethodSummary().getName())))
