@@ -261,7 +261,7 @@ public class StudyServiceImpl implements StudyService {
 			return studyDetails;
 		} catch (NumberFormatException nfe) {
 			throw new ApiRuntimeException("Supplied study identifier [" + studyId + "] is not valid, it must be a numeric value.");
-		} catch (MiddlewareQueryException e) {
+		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error! Caused by: " + e.getMessage(), e);
 		}
 	}
