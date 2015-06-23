@@ -227,7 +227,7 @@ public class TestDataProvider {
 							TestDataProvider.variableDescription + count);
 			variable.setMinValue(TestDataProvider.variableExpectedMin);
 			variable.setMaxValue(TestDataProvider.variableExpectedMax);
-			variable.setAlias(TestDataProvider.variableAlias);
+			variable.setAlias(TestDataProvider.variableAlias + "_" + String.valueOf(count));
 			variable.setIsFavorite(TestDataProvider.variableIsFavourite);
 			variable.setDateCreated(TestDataProvider.getDateCreated());
 			variable.setPropertySummary(TestDataProvider.mwPropertySummary);
@@ -235,6 +235,7 @@ public class TestDataProvider {
 			variable.setScaleSummary(TestDataProvider.getTestScale());
 			variable.setDateCreated(TestDataProvider.getDateCreated());
 			variable.setDateLastModified(TestDataProvider.getDateModified());
+			variable.addVariableType(VariableType.ENVIRONMENT_DETAIL);
 			variableList.add(variable);
 		}
 		return variableList;
