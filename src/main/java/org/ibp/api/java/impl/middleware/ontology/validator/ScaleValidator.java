@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -298,6 +299,9 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 		ValidValues validValues = scaleSummary.getValidValues() == null ? new ValidValues() : scaleSummary.getValidValues();
 
+		BigDecimal min = null;
+		BigDecimal max = null;
+
 		String minValue = validValues.getMin() == null ? null : validValues.getMin();
 		String maxValue = validValues.getMax() == null ? null : validValues.getMax();
 
@@ -305,14 +309,14 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		// are provided (they are not mandatory), they must be numeric values
 		if (Objects.equals(dataType, DataType.NUMERIC_VARIABLE)) {
 			if (!this.isNullOrEmpty(minValue)) {
-				Float min = StringUtil.parseFloat(minValue, null);
+				min = StringUtil.parseBigDecimal(minValue, null);
 				if (min == null) {
 					this.addCustomError(errors, "validValues.min", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 				}
 			}
 
 			if (!this.isNullOrEmpty(maxValue)) {
-				Float max = StringUtil.parseFloat(maxValue, null);
+				max = StringUtil.parseBigDecimal(maxValue, null);
 				if (max == null) {
 					this.addCustomError(errors, "validValues.max", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 				}
@@ -327,10 +331,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		// the maximum valid value, and the maximum valid value must be greater
 		// than or equal to the minimum valid value
 
-		Float min = StringUtil.parseFloat(minValue, null);
-		Float max = StringUtil.parseFloat(maxValue, null);
-
-		if (min != null && max != null && min > max) {
+		if (min != null && max != null && min.compareTo(max) != -1) {
 			this.addCustomError(errors, "validValues.min", BaseValidator.MIN_MAX_NOT_VALID, null);
 		}
 
