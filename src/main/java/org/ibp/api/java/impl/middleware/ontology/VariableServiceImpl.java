@@ -4,13 +4,17 @@ package org.ibp.api.java.impl.middleware.ontology;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.OntologyVariableInfo;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.VariableType;
+import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.common.GenericResponse;
@@ -46,6 +50,9 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 	@Autowired
 	private ProgramValidator programValidator;
+
+	@Autowired
+	private OntologyScaleDataManager ontologyScaleDataManager;
 
 	@Override
 	public List<VariableSummary> getAllVariablesByFilter(String cropName, String programId, String propertyId, Boolean favourite) {
@@ -153,18 +160,21 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		program.setCropType(cropName);
 		program.setUniqueID(programId);
 
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Variable");
-		this.programValidator.validate(program, errors);
-		if (errors.hasErrors()) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-
-		this.variableValidator.validate(variable, errors);
-		if (errors.hasErrors()) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-
 		try {
+
+			BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Variable");
+			this.programValidator.validate(program, errors);
+			if (errors.hasErrors()) {
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+
+			this.variableValidator.validate(variable, errors);
+			if (errors.hasErrors()) {
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+
+			formatVariableSummary(variable);
+
 			Integer methodId = StringUtil.parseInt(variable.getMethodSummary().getId(), null);
 			Integer propertyId = StringUtil.parseInt(variable.getPropertySummary().getId(), null);
 			Integer scaleId = StringUtil.parseInt(variable.getScaleSummary().getId(), null);
@@ -177,9 +187,11 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			variableInfo.setScaleId(scaleId);
 			variableInfo.setProgramUuid(variable.getProgramUuid());
 
-			if (!Strings.isNullOrEmpty(variable.getExpectedRange().getMin())
-					&& !Strings.isNullOrEmpty(variable.getExpectedRange().getMax())) {
+			if (!Strings.isNullOrEmpty(variable.getExpectedRange().getMin())) {
 				variableInfo.setMinValue(variable.getExpectedRange().getMin());
+			}
+
+			if (!Strings.isNullOrEmpty(variable.getExpectedRange().getMax())) {
 				variableInfo.setMaxValue(variable.getExpectedRange().getMax());
 			}
 
@@ -197,35 +209,38 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	@Override
 	public void updateVariable(String cropName, String programId, String variableId, VariableSummary variable) {
 
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		variable.setId(variableId);
+		variable.setProgramUuid(programId);
 
 		ProgramSummary program = new ProgramSummary();
 		program.setCropType(cropName);
 		program.setUniqueID(programId);
 
-		this.programValidator.validate(program, errors);
-
-		if (errors.hasErrors()) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-
-		this.validateId(variableId, "Variable");
-		TermRequest term = new TermRequest(variableId, "variable", CvId.VARIABLES.getId());
-		this.termValidator.validate(term, errors);
-
-		if (errors.hasErrors()) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-
-		variable.setId(variableId);
-		variable.setProgramUuid(programId);
-
-		this.variableValidator.validate(variable, errors);
-		if (errors.hasErrors()) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-
 		try {
+
+			BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+			this.programValidator.validate(program, errors);
+
+			if (errors.hasErrors()) {
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+
+			this.validateId(variableId, "Variable");
+			TermRequest term = new TermRequest(variableId, "variable", CvId.VARIABLES.getId());
+			this.termValidator.validate(term, errors);
+
+			if (errors.hasErrors()) {
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+
+			this.variableValidator.validate(variable, errors);
+			if (errors.hasErrors()) {
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+
+			formatVariableSummary(variable);
+
 			Integer id = StringUtil.parseInt(variable.getId(), null);
 
 			Integer methodId = StringUtil.parseInt(variable.getMethodSummary().getId(), null);
@@ -279,6 +294,26 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			this.ontologyVariableDataManager.deleteVariable(StringUtil.parseInt(id, null));
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
+		}
+	}
+
+	protected void formatVariableSummary(VariableSummary variableSummary){
+
+		Integer scaleId = StringUtil.parseInt(variableSummary.getScaleSummary().getId(), null);
+
+		//Should discard unwanted parameters. We do not want expected min/max values if associated data type is not numeric
+		if(scaleId != null){
+			try {
+				Scale scale = ontologyScaleDataManager.getScaleById(scaleId);
+
+				if(scale != null && !Objects.equals(scale.getDataType().getId(), DataType.NUMERIC_VARIABLE.getId())){
+					variableSummary.setExpectedMin(null);
+					variableSummary.setExpectedMax(null);
+				}
+
+			} catch (MiddlewareException e) {
+				throw new ApiRuntimeException("Error!", e);
+			}
 		}
 	}
 
