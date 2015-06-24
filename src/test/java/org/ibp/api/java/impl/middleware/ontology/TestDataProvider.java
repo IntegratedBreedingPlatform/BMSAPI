@@ -74,7 +74,7 @@ public class TestDataProvider {
 	public static final org.ibp.api.domain.ontology.DataType categoricalDataType = new org.ibp.api.domain.ontology.DataType(
 			DataType.CATEGORICAL_VARIABLE.getId(), DataType.CATEGORICAL_VARIABLE.getName());
 
-	public static final org.ibp.api.domain.ontology.VariableType traitVariable = new org.ibp.api.domain.ontology.VariableType(1,
+	public static final org.ibp.api.domain.ontology.VariableType traitVariable = new org.ibp.api.domain.ontology.VariableType(1808,
 			"Trait Variable", "Variable for trait study");
 
 	public static Term getMethodTerm() {

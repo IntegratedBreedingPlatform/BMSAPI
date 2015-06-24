@@ -239,7 +239,7 @@ public class OntologyMapperTest {
 	@Test
 	public void variableTypeMapperTest() {
 
-		VariableType variableType = VariableType.getById(1);
+		VariableType variableType = VariableType.getById(1801);
 
 		ModelMapper mapper = OntologyMapper.getInstance();
 
