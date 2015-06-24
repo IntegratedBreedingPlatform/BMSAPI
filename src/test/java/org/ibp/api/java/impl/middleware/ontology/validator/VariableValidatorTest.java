@@ -480,6 +480,99 @@ public class VariableValidatorTest {
 	}
 
 	/**
+	 * Test for scale data type is Numeric and expected min can same as expected max
+	 *
+	 * @throws MiddlewareException
+	 */
+	@Test
+	public void testWithEqualExpectedMinAndMaxValues() throws MiddlewareException {
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		variable.setId(null);
+		variable.setExpectedMin("15");
+		variable.setExpectedMax("15");
+		Term methodTerm = TestDataProvider.getMethodTerm();
+		Term propertyTerm = TestDataProvider.getPropertyTerm();
+		Term scaleTerm = TestDataProvider.getScaleTerm();
+
+		Scale scale = TestDataProvider.getTestScale();
+
+		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
+		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
+		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+
+		this.variableValidator.validate(variable, bindingResult);
+		Assert.assertFalse(bindingResult.hasErrors());
+	}
+
+	/**
+	 * Test for scale data type is Numeric and expected min can same as scale min
+	 *
+	 * @throws MiddlewareException
+	 */
+	@Test
+	public void testWithEqualExpectedMinAndScaleMinValue() throws MiddlewareException {
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		variable.setId(null);
+		variable.setExpectedMin("10.01");
+		variable.setExpectedMax("15");
+		Term methodTerm = TestDataProvider.getMethodTerm();
+		Term propertyTerm = TestDataProvider.getPropertyTerm();
+		Term scaleTerm = TestDataProvider.getScaleTerm();
+
+		Scale scale = TestDataProvider.getTestScale();
+
+		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
+		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
+		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+
+		this.variableValidator.validate(variable, bindingResult);
+		Assert.assertFalse(bindingResult.hasErrors());
+	}
+
+	/**
+	 * Test for scale data type is Numeric and expected max can same as scale max
+	 *
+	 * @throws MiddlewareException
+	 */
+	@Test
+	public void testWithEqualExpectedMaxAndScaleMaxValue() throws MiddlewareException {
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		variable.setId(null);
+		variable.setExpectedMin("15");
+		variable.setExpectedMax("20.02");
+		Term methodTerm = TestDataProvider.getMethodTerm();
+		Term propertyTerm = TestDataProvider.getPropertyTerm();
+		Term scaleTerm = TestDataProvider.getScaleTerm();
+
+		Scale scale = TestDataProvider.getTestScale();
+
+		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
+		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
+		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
+		Mockito.doReturn(new ArrayList<OntologyVariableSummary>()).when(this.ontologyVariableDataManager)
+				.getWithFilter(null, null, methodTerm.getId(), propertyTerm.getId(), scale.getId());
+
+		this.variableValidator.validate(variable, bindingResult);
+		Assert.assertFalse(bindingResult.hasErrors());
+	}
+
+	/**
 	 * Test for Variable expected min is greater than max
 	 *
 	 * @throws MiddlewareException

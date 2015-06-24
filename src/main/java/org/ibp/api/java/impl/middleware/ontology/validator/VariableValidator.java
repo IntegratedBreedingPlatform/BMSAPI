@@ -269,12 +269,12 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				// 14. If the scale has a numeric data type and valid values have been set on the scale, the expected range minimum cannot
 				// be less than the valid values minimum, and the expected range maximum cannot be larger than the valid values maximum
 				BigDecimal scaleMinValue = StringUtil.parseBigDecimal(scale.getMinValue(), null);
-				if (scaleMinValue != null && variableExpectedMin != null && scaleMinValue.compareTo(variableExpectedMin) != -1) {
+				if (scaleMinValue != null && variableExpectedMin != null && scaleMinValue.compareTo(variableExpectedMin) == 1) {
 					this.addCustomError(errors, "expectedRange.min", VariableValidator.VARIABLE_MIN_SHOULD_BE_IN_SCALE_RANGE, new Object[] {scale.getMinValue(), scale.getMaxValue()});
 				}
 
 				BigDecimal scaleMaxValue = StringUtil.parseBigDecimal(scale.getMaxValue(), null);
-				if (scaleMaxValue != null && variableExpectedMax != null && scaleMaxValue.compareTo(variableExpectedMax) != 1) {
+				if (scaleMaxValue != null && variableExpectedMax != null && scaleMaxValue.compareTo(variableExpectedMax) == -1) {
 					this.addCustomError(errors, "expectedRange.max", VariableValidator.VARIABLE_MAX_SHOULD_BE_IN_SCALE_RANGE, new Object[] {scale.getMinValue(), scale.getMaxValue()});
 				}
 
@@ -284,7 +284,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 				// 15. If provided, the expected range minimum must be less than or equal to the expected range maximum, and the expected
 				// range maximum must be greater than or equal to the expected range minimum
-				if (variableExpectedMin != null && variableExpectedMax != null && variableExpectedMin.compareTo(variableExpectedMax) != -1) {
+				if (variableExpectedMin != null && variableExpectedMax != null && variableExpectedMin.compareTo(variableExpectedMax) == 1) {
 					this.addCustomError(errors, "expectedRange", BaseValidator.MIN_SHOULD_NOT_GREATER_THEN_MAX, null);
 				}
 			}
