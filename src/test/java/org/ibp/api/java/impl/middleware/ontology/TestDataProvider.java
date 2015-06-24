@@ -28,7 +28,7 @@ import org.ibp.api.domain.ontology.VariableSummary;
 public class TestDataProvider {
 
 	private static final Integer variableId = 15;
-	private static final String variableName = "Variable Name";
+	private static final String variableName = "Variable_Name";
 	private static final String variableDescription = "Variable Description";
 	private static final String variableAlias = "VA";
 	private static final boolean variableIsFavourite = false;

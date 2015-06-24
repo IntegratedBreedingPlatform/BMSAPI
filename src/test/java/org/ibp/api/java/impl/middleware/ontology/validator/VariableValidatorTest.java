@@ -17,6 +17,8 @@ import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.util.StringUtil;
+import org.ibp.api.domain.ontology.ScaleSummary;
+import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.domain.ontology.VariableType;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
@@ -230,7 +232,7 @@ public class VariableValidatorTest {
 		VariableSummary variableSummary = TestDataProvider.getTestVariableSummary();
 		variableSummary.setId("11");
 		variableSummary.setProgramUuid("uuid");
-		variableSummary.setName("Variable Name");
+		variableSummary.setName("Variable_Name");
 		variableSummary.setAlias("2lia");
 
 		Term methodTerm = TestDataProvider.getMethodTerm();
@@ -268,7 +270,8 @@ public class VariableValidatorTest {
 
 		VariableSummary variable = TestDataProvider.getTestVariableSummary();
 		variable.setId(null);
-		variable.setPropertySummary(null);
+		TermSummary propertySummary = new TermSummary();
+		variable.setPropertySummary(propertySummary);
 		Term methodTerm = TestDataProvider.getMethodTerm();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
 		Term scaleTerm = TestDataProvider.getScaleTerm();
@@ -329,7 +332,8 @@ public class VariableValidatorTest {
 
 		VariableSummary variable = TestDataProvider.getTestVariableSummary();
 		variable.setId(null);
-		variable.setMethodSummary(null);
+		TermSummary methodSummary = new TermSummary();
+		variable.setMethodSummary(methodSummary);
 		Term methodTerm = TestDataProvider.getMethodTerm();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
 		Term scaleTerm = TestDataProvider.getScaleTerm();
@@ -391,7 +395,8 @@ public class VariableValidatorTest {
 
 		VariableSummary variable = TestDataProvider.getTestVariableSummary();
 		variable.setId(null);
-		variable.setScaleSummary(null);
+		ScaleSummary scaleSummary = new ScaleSummary();
+		variable.setScaleSummary(scaleSummary);
 		Term methodTerm = TestDataProvider.getMethodTerm();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
 		Term scaleTerm = TestDataProvider.getScaleTerm();

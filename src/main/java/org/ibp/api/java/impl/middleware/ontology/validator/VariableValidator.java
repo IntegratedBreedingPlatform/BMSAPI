@@ -153,7 +153,17 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		Integer initialCount = errors.getErrorCount();
 
 		// 6. Property ID is required
-		this.shouldNotNullOrEmpty("Property", "propertyId", variable.getPropertySummary(), errors);
+		this.shouldNotNullOrEmpty("Property", "propertyId", variable.getPropertySummary().getId(), errors);
+
+		if (errors.getErrorCount() > initialCount) {
+			return false;
+		}
+
+		Integer propertyId = StringUtil.parseInt(variable.getPropertySummary().getId(), null);
+
+		if(propertyId == null){
+			this.addCustomError(errors, "propertyId", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
+		}
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
@@ -170,7 +180,17 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		Integer initialCount = errors.getErrorCount();
 
 		// 8. Method ID is required
-		this.shouldNotNullOrEmpty("Method", "methodId", variable.getMethodSummary(), errors);
+		this.shouldNotNullOrEmpty("Method", "methodId", variable.getMethodSummary().getId(), errors);
+
+		if (errors.getErrorCount() > initialCount) {
+			return false;
+		}
+
+		Integer methodId = StringUtil.parseInt(variable.getMethodSummary().getId(), null);
+
+		if(methodId == null){
+			this.addCustomError(errors, "methodId", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
+		}
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
@@ -187,7 +207,17 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		Integer initialCount = errors.getErrorCount();
 
 		// 10. Scale ID is required
-		this.shouldNotNullOrEmpty("Scale", "scaleId", variable.getScaleSummary(), errors);
+		this.shouldNotNullOrEmpty("Scale", "scaleId", variable.getScaleSummary().getId(), errors);
+
+		if (errors.getErrorCount() > initialCount) {
+			return false;
+		}
+
+		Integer scaleId = StringUtil.parseInt(variable.getScaleSummary().getId(), null);
+
+		if(scaleId == null){
+			this.addCustomError(errors, "scaleId", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
+		}
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
@@ -376,7 +406,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	}
 
 	protected void fieldShouldHaveValidPattern(String fieldName, String value, String termName, Errors errors) {
-		Pattern regex = Pattern.compile("[$&+,./%')\\[}\\]{(*^!`~:;=?@#|]");
+		Pattern regex = Pattern.compile("[$&+,./%')\\[}\\]{(*^!`~:;=?@#|\\s]");
 		Matcher matcher = regex.matcher(value);
 
 		if (matcher.find() || Character.isDigit(value.charAt(0))) {
