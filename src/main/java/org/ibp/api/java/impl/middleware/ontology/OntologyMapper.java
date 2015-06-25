@@ -2,7 +2,7 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
+import org.generationcp.middleware.domain.ontology.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.TermRelationship;
 import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.domain.ontology.Method;

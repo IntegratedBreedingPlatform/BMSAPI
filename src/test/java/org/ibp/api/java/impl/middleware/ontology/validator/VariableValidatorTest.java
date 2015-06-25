@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import org.apache.commons.lang.RandomStringUtils;
-import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
+import org.generationcp.middleware.domain.ontology.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
