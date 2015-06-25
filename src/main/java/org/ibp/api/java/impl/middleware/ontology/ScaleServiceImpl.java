@@ -1,8 +1,8 @@
 
 package org.ibp.api.java.impl.middleware.ontology;
 
-import static org.generationcp.middleware.domain.oms.DataType.CATEGORICAL_VARIABLE;
-import static org.generationcp.middleware.domain.oms.DataType.NUMERIC_VARIABLE;
+import static org.generationcp.middleware.domain.ontology.DataType.CATEGORICAL_VARIABLE;
+import static org.generationcp.middleware.domain.ontology.DataType.NUMERIC_VARIABLE;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.DataType;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermRelationship;
 import org.generationcp.middleware.domain.oms.TermRelationshipId;

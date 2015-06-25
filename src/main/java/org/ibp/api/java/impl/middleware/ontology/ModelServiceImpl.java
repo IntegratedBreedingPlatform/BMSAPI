@@ -29,11 +29,11 @@ public class ModelServiceImpl implements ModelService {
 
 	@Override
 	public List<DataType> getAllDataTypes() {
-		return Util.convertAll(Arrays.asList(org.generationcp.middleware.domain.oms.DataType.values()),
-				new Function<org.generationcp.middleware.domain.oms.DataType, DataType>() {
+		return Util.convertAll(Arrays.asList(org.generationcp.middleware.domain.ontology.DataType.values()),
+				new Function<org.generationcp.middleware.domain.ontology.DataType, DataType>() {
 
 					@Override
-					public DataType apply(org.generationcp.middleware.domain.oms.DataType dataType) {
+					public DataType apply(org.generationcp.middleware.domain.ontology.DataType dataType) {
 						return new DataType(dataType.getId(), dataType.getName());
 					}
 				});

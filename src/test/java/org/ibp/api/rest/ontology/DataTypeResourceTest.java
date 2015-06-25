@@ -4,7 +4,7 @@ package org.ibp.api.rest.ontology;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.domain.oms.DataType;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;

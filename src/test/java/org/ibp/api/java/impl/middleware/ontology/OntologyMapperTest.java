@@ -4,7 +4,7 @@ package org.ibp.api.java.impl.middleware.ontology;
 import java.text.ParseException;
 import java.util.Date;
 
-import org.generationcp.middleware.domain.oms.DataType;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermRelationship;
