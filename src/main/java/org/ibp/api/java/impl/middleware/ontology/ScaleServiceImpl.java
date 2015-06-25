@@ -138,8 +138,8 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 				}
 			}
 			if (Objects.equals(dataTypeId, NUMERIC_VARIABLE.getId())) {
-				String min = scaleSummary.getValidValues().getMin() == null ? null : scaleSummary.getValidValues().getMin().toString();
-				String max = scaleSummary.getValidValues().getMax() == null ? null : scaleSummary.getValidValues().getMax().toString();
+				String min = scaleSummary.getValidValues().getMin() == null ? null : scaleSummary.getValidValues().getMin();
+				String max = scaleSummary.getValidValues().getMax() == null ? null : scaleSummary.getValidValues().getMax();
 				scale.setMinValue(min);
 				scale.setMaxValue(max);
 			}
@@ -186,8 +186,8 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 				}
 			}
 			if (Objects.equals(dataTypeId, NUMERIC_VARIABLE.getId())) {
-				String min = scaleSummary.getValidValues().getMin() == null ? null : scaleSummary.getValidValues().getMin().toString();
-				String max = scaleSummary.getValidValues().getMax() == null ? null : scaleSummary.getValidValues().getMax().toString();
+				String min = scaleSummary.getValidValues().getMin() == null ? null : scaleSummary.getValidValues().getMin();
+				String max = scaleSummary.getValidValues().getMax() == null ? null : scaleSummary.getValidValues().getMax();
 				scale.setMinValue(min);
 				scale.setMaxValue(max);
 			}
