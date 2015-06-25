@@ -312,7 +312,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		// 18. Variable type IDs must be an array of integer values that correspond to the IDs of variable types and contain at least one
 		// item
 		for (VariableType variableType : variable.getVariableTypes()) {
-			if (org.generationcp.middleware.domain.oms.VariableType.getById(variableType.getId()) == null) {
+			if (org.generationcp.middleware.domain.ontology.VariableType.getById(variableType.getId()) == null) {
 				this.addCustomError(errors, "variableTypeIds", BaseValidator.INVALID_TYPE_ID, new Object[] {"Variable Type"});
 			}
 		}

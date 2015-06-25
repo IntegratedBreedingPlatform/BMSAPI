@@ -73,11 +73,11 @@ public class ModelServiceImpl implements ModelService {
 	public List<VariableType> getAllVariableTypes() {
 
 		List<VariableType> variableTypes =
-				Util.convertAll(Arrays.asList(org.generationcp.middleware.domain.oms.VariableType.values()),
-						new Function<org.generationcp.middleware.domain.oms.VariableType, VariableType>() {
+				Util.convertAll(Arrays.asList(org.generationcp.middleware.domain.ontology.VariableType.values()),
+						new Function<org.generationcp.middleware.domain.ontology.VariableType, VariableType>() {
 
 							@Override
-							public VariableType apply(org.generationcp.middleware.domain.oms.VariableType variableType) {
+							public VariableType apply(org.generationcp.middleware.domain.ontology.VariableType variableType) {
 								return new VariableType(variableType.getId(), variableType.getName(), variableType.getDescription());
 							}
 						});
