@@ -1,8 +1,9 @@
 
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -12,6 +13,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.domain.ontology.DataType;
 import org.ibp.api.domain.ontology.ScaleSummary;
+import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.junit.After;
 import org.junit.Assert;
@@ -143,9 +145,15 @@ public class ScaleValidatorTest {
 		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
 		scaleSummary.setDataType(TestDataProvider.categoricalDataType);
 
-		Map<String, String> categories = new HashMap<>();
-		categories.put("1", "description");
-		categories.put("11", "description");
+		List<TermSummary> categories = new ArrayList<>();
+		TermSummary category = new TermSummary();
+		category.setName("1");
+		category.setDescription("description");
+		categories.add(category);
+		category = new TermSummary();
+		category.setName("11");
+		category.setDescription("description");
+		categories.add(category);
 		scaleSummary.setCategories(categories);
 
 		this.scaleValidator.validate(scaleSummary, bindingResult);
@@ -163,8 +171,11 @@ public class ScaleValidatorTest {
 		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
 		scaleSummary.setDataType(TestDataProvider.categoricalDataType);
 
-		Map<String, String> categories = new HashMap<>();
-		categories.put(RandomStringUtils.random(205), "description");
+		List<TermSummary> categories = new ArrayList<>();
+		TermSummary category = new TermSummary();
+		category.setName(RandomStringUtils.random(205));
+		category.setDescription("description");
+		categories.add(category);
 		scaleSummary.setCategories(categories);
 
 		this.scaleValidator.validate(scaleSummary, bindingResult);
@@ -182,8 +193,11 @@ public class ScaleValidatorTest {
 		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
 		scaleSummary.setDataType(TestDataProvider.categoricalDataType);
 
-		Map<String, String> categories = new HashMap<>();
-		categories.put("Name", RandomStringUtils.random(260));
+		List<TermSummary> categories = new ArrayList<>();
+		TermSummary category = new TermSummary();
+		category.setName("Name");
+		category.setDescription(RandomStringUtils.random(260));
+		categories.add(category);
 		scaleSummary.setCategories(categories);
 
 		this.scaleValidator.validate(scaleSummary, bindingResult);

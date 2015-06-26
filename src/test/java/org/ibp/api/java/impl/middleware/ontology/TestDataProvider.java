@@ -54,8 +54,7 @@ public class TestDataProvider {
 
 	private static final String scaleMinValue = "10.01";
 	private static final String scaleMaxValue = "20.02";
-	private static final String category1 = "Scale Category1";
-	private static final String category2 = "Scale Category2";
+	private static final List<TermSummary> scaleCategoricalValues = new ArrayList<>(Arrays.asList(new TermSummary(120, "1", "One"), new TermSummary(121, "2", "Two")));
 
 	private static final String className1 = "Agronomic";
 	private static final String className2 = "Biotic Stress";
@@ -171,7 +170,7 @@ public class TestDataProvider {
 		scale.setDataType(DataType.NUMERIC_VARIABLE);
 		scale.setMinValue(TestDataProvider.scaleMinValue);
 		scale.setMaxValue(TestDataProvider.scaleMaxValue);
-		scale.addCategory(TestDataProvider.category1, TestDataProvider.category2);
+		scale.addCategory(scaleCategoricalValues.get(0));
 		scale.setDateCreated(TestDataProvider.getDateCreated());
 		scale.setDateLastModified(TestDataProvider.getDateModified());
 		return scale;
@@ -188,7 +187,7 @@ public class TestDataProvider {
 			scale.setDataType(DataType.NUMERIC_VARIABLE);
 			scale.setMinValue(TestDataProvider.scaleMinValue);
 			scale.setMaxValue(TestDataProvider.scaleMaxValue);
-			scale.addCategory(TestDataProvider.category1, TestDataProvider.category2);
+			scale.addCategory(scaleCategoricalValues.get(0));
 			scale.setDateCreated(TestDataProvider.getDateCreated());
 			scale.setDateLastModified(TestDataProvider.getDateModified());
 			scaleList.add(scale);

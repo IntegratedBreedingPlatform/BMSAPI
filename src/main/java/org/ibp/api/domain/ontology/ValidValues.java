@@ -3,9 +3,7 @@ package org.ibp.api.domain.ontology;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -13,7 +11,7 @@ public class ValidValues {
 
 	private String min;
 	private String max;
-	private List<VariableCategory> categories;
+	private final List<TermSummary> categories = new ArrayList<>();
 
 	public ValidValues() {
 	}
@@ -34,25 +32,15 @@ public class ValidValues {
 		this.max = max;
 	}
 
-	public List<VariableCategory> getCategories() {
+	public List<TermSummary> getCategories() {
 		return this.categories;
 	}
 
-	@JsonIgnore
-	public void setCategoriesFromMap(Map<String, String> categories) {
-		this.mapCategories(categories);
-	}
-
-	public void setCategories(List<VariableCategory> categories) {
-		this.categories = categories;
-	}
-
-	private void mapCategories(Map<String, String> suppliedCategories) {
-		if (suppliedCategories != null) {
-			this.categories = new ArrayList<>();
-			for (String k : suppliedCategories.keySet()) {
-				this.categories.add(new VariableCategory(k, suppliedCategories.get(k)));
-			}
+	public void setCategories(List<TermSummary> categories){
+		this.categories.clear();
+		for (TermSummary category : categories) {
+			this.categories.add(category);
 		}
 	}
+
 }

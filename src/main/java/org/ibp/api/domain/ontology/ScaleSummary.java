@@ -1,7 +1,7 @@
 
 package org.ibp.api.domain.ontology;
 
-import java.util.Map;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -41,8 +41,8 @@ public class ScaleSummary extends TermSummary {
 	}
 
 	@JsonIgnore
-	public void setCategories(Map<String, String> categories) {
-		this.validValues.setCategoriesFromMap(categories);
+	public void setCategories(List<TermSummary> categories) {
+		this.validValues.setCategories(categories);
 	}
 
 	public MetadataSummary getMetadata() {

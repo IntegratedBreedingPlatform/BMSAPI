@@ -46,6 +46,7 @@ public class OntologyMapper {
 		OntologyMapper.addTermRelationShipMapper(OntologyMapper.applicationWideModelMapper);
 		OntologyMapper.addVariableTypeMapper(OntologyMapper.applicationWideModelMapper);
 		OntologyMapper.addDataTypeMapper(OntologyMapper.applicationWideModelMapper);
+		OntologyMapper.addTermSummaryMapper(OntologyMapper.applicationWideModelMapper);
 	}
 
 	/**
@@ -137,7 +138,6 @@ public class OntologyMapper {
 				this.map().setDescription(this.source.getDefinition());
 				this.map().setMin(this.source.getMinValue());
 				this.map().setMax(this.source.getMaxValue());
-				this.map().setCategories(this.source.getCategories());
 				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
 				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
 			}
@@ -152,7 +152,6 @@ public class OntologyMapper {
 				this.map().setDescription(this.source.getDefinition());
 				this.map().setMinValue(this.source.getMinValue());
 				this.map().setMaxValue(this.source.getMaxValue());
-				this.map().setCategories(this.source.getCategories());
 				this.map().getMetadata().setDeletable(false);
 				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
 				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
@@ -240,6 +239,28 @@ public class OntologyMapper {
 						variableType.setName(variableEnum.getName());
 						variableType.setDescription(variableEnum.getDescription());
 						return variableType;
+					}
+				});
+	}
+
+	public static void addTermSummaryMapper(ModelMapper mapper) {
+		// Note: This will type map middleware TermSummary to BMSAPI TermSummary for scale categorical values.
+		mapper.createTypeMap(org.generationcp.middleware.domain.oms.TermSummary.class, TermSummary.class).setConverter(
+				new Converter<org.generationcp.middleware.domain.oms.TermSummary, TermSummary>() {
+
+					@Override
+					public TermSummary convert(MappingContext<org.generationcp.middleware.domain.oms.TermSummary, TermSummary> context) {
+						if (context.getSource() == null) {
+							return null;
+						}
+
+						org.generationcp.middleware.domain.oms.TermSummary termSummary = context.getSource();
+
+						TermSummary term  = new TermSummary();
+						term.setId(String.valueOf(termSummary.getId()));
+						term.setName(termSummary.getName());
+						term.setDescription(termSummary.getDefinition());
+						return term;
 					}
 				});
 	}

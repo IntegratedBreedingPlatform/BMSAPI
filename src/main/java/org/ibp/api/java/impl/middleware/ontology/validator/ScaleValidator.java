@@ -3,19 +3,21 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.domain.ontology.ValidValues;
-import org.ibp.api.domain.ontology.VariableCategory;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,12 +89,12 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		}
 	}
 
-	private void validateCategoriesForUniqueness(List<VariableCategory> categories, DataType dataType, Errors errors) {
+	private void validateCategoriesForUniqueness(List<org.ibp.api.domain.ontology.TermSummary> categories, DataType dataType, Errors errors) {
 		if (categories != null && Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)) {
 			Set<String> labels = new HashSet<>();
 			Set<String> values = new HashSet<>();
 			for (int i = 1; i <= categories.size(); i++) {
-				VariableCategory category = categories.get(i - 1);
+				org.ibp.api.domain.ontology.TermSummary category = categories.get(i - 1);
 				String name = category.getName().trim();
 				String value = category.getDescription().trim();
 
@@ -168,20 +170,27 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 			ValidValues validValues = scaleSummary.getValidValues() == null ? new ValidValues() : scaleSummary.getValidValues();
 			boolean minValuesAreEqual = Objects.equals(validValues.getMin(), oldScale.getMinValue());
 			boolean maxValuesAreEqual = Objects.equals(validValues.getMax(), oldScale.getMaxValue());
-			List<VariableCategory> categories =
-					validValues.getCategories() == null ? new ArrayList<VariableCategory>() : validValues.getCategories();
+			List<org.ibp.api.domain.ontology.TermSummary> categories = validValues.getCategories() == null ? new ArrayList<org.ibp.api.domain.ontology.TermSummary>() : validValues.getCategories();
 			boolean categoriesEqualSize = Objects.equals(categories.size(), oldScale.getCategories().size());
 			boolean categoriesValuesAreSame = true;
+
 			if (categoriesEqualSize) {
-				for (VariableCategory l : categories) {
-					if (oldScale.getCategories().containsKey(l.getName())
-							&& Objects.equals(oldScale.getCategories().get(l.getName()), l.getDescription())) {
+
+				//Converting old categories to Map for comparing.
+				Map<String, String> oldCategories = new HashMap<>();
+				for(TermSummary t : oldScale.getCategories()){
+					oldCategories.put(t.getName(), t.getDefinition());
+				}
+
+				for (org.ibp.api.domain.ontology.TermSummary l : categories) {
+					if (oldCategories.containsKey(l.getName()) && Objects.equals(oldCategories.get(l.getName()), l.getDescription())) {
 						continue;
 					}
 					categoriesValuesAreSame = false;
 					break;
 				}
 			}
+
 			if (!minValuesAreEqual || !maxValuesAreEqual || !categoriesEqualSize || !categoriesValuesAreSame) {
 				this.addCustomError(errors, "validValues", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {"scale", "ValidValues"});
 			}
@@ -270,7 +279,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 		ValidValues validValues = scaleSummary.getValidValues() == null ? new ValidValues() : scaleSummary.getValidValues();
 
-		List<VariableCategory> categories = validValues.getCategories();
+		List<org.ibp.api.domain.ontology.TermSummary> categories = validValues.getCategories();
 
 		// 5. If the data type is categorical, at least one category must be
 		// submitted

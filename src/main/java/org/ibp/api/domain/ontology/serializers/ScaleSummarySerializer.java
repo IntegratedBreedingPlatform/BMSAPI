@@ -4,8 +4,9 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.google.common.base.Strings;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.ontology.ScaleSummary;
-import org.ibp.api.domain.ontology.VariableCategory;
+import org.ibp.api.domain.ontology.TermSummary;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -55,8 +56,9 @@ public class ScaleSummarySerializer extends JsonSerializer<ScaleSummary>{
 				if(!scaleSummary.getValidValues().getCategories().isEmpty()){
 					jsonGenerator.writeArrayFieldStart("categories");
 
-					for (VariableCategory category : scaleSummary.getValidValues().getCategories()){
+					for (TermSummary category : scaleSummary.getValidValues().getCategories()){
 						jsonGenerator.writeStartObject();
+							jsonGenerator.writeNumberField("id", StringUtil.parseInt(category.getId(), null));
 							jsonGenerator.writeStringField("name", category.getName());
 							jsonGenerator.writeStringField("description", category.getDescription());
 						jsonGenerator.writeEndObject();

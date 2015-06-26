@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermRelationship;
@@ -22,7 +23,6 @@ import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.domain.ontology.ValidValues;
-import org.ibp.api.domain.ontology.VariableCategory;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.ServiceBaseImpl;
@@ -133,8 +133,8 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			scale.setDataType(DataType.getById(dataTypeId));
 
 			if (Objects.equals(dataTypeId, CATEGORICAL_VARIABLE.getId())) {
-				for (VariableCategory category : scaleSummary.getValidValues().getCategories()) {
-					scale.addCategory(category.getName().trim(), category.getDescription().trim());
+				for (org.ibp.api.domain.ontology.TermSummary category : scaleSummary.getValidValues().getCategories()) {
+					scale.addCategory(new TermSummary(null, category.getName().trim(), category.getDescription().trim()));
 				}
 			}
 			if (Objects.equals(dataTypeId, NUMERIC_VARIABLE.getId())) {
@@ -169,9 +169,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 		}
 
 		try {
-			Scale scale =
-					new Scale(new Term(StringUtil.parseInt(scaleSummary.getId(), null), scaleSummary.getName().trim(), scaleSummary
-							.getDescription().trim()));
+			Scale scale = new Scale(new Term(StringUtil.parseInt(scaleSummary.getId(), null), scaleSummary.getName().trim(), scaleSummary.getDescription().trim()));
 
 			Integer dataTypeId = scaleSummary.getDataType().getId();
 
@@ -181,8 +179,8 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 					Objects.equals(scaleSummary.getValidValues(), null) ? new ValidValues() : scaleSummary.getValidValues();
 
 			if (Objects.equals(dataTypeId, CATEGORICAL_VARIABLE.getId())) {
-				for (VariableCategory description : validValues.getCategories()) {
-					scale.addCategory(description.getName().trim(), description.getDescription().trim());
+				for (org.ibp.api.domain.ontology.TermSummary category : validValues.getCategories()) {
+					scale.addCategory(new TermSummary(null, category.getName().trim(), category.getDescription().trim()));
 				}
 			}
 			if (Objects.equals(dataTypeId, NUMERIC_VARIABLE.getId())) {

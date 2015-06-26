@@ -14,7 +14,6 @@ import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.domain.ontology.PropertySummary;
 import org.ibp.api.domain.ontology.TermSummary;
-import org.ibp.api.domain.ontology.VariableCategory;
 import org.ibp.api.domain.ontology.VariableType;
 import org.ibp.api.domain.ontology.VariableUsages;
 import org.ibp.api.domain.study.Measurement;
@@ -58,7 +57,6 @@ public class TestGetterAndSetter {
 		this.testGivenKlass(PropertySummary.class);
 
 		this.testGivenKlass(TermSummary.class);
-		this.testGivenKlass(VariableCategory.class);
 
 		this.testGivenKlass(VariableType.class);
 		this.testGivenKlass(VariableUsages.class);

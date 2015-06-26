@@ -1,7 +1,7 @@
 
 package org.ibp.api.domain.ontology;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * Holds all Scale details. Extended from {@link TermSummary} for basic term details.
@@ -29,12 +29,12 @@ public class ScaleDetails extends TermSummary {
 		this.validValues.setMin(minValue);
 	}
 
-	public void setMaxValue(String maxValue) {
-		this.validValues.setMax(maxValue);
+	public void setCategories(List<TermSummary> categories){
+		this.validValues.setCategories(categories);
 	}
 
-	public void setCategories(Map<String, String> categories) {
-		this.validValues.setCategoriesFromMap(categories);
+	public void setMaxValue(String maxValue) {
+		this.validValues.setMax(maxValue);
 	}
 
 	public MetadataDetails getMetadata() {
