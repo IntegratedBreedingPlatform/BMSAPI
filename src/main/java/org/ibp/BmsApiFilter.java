@@ -14,12 +14,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 
 /**
- * Filter to enable <a href="http://en.wikipedia.org/wiki/Cross-origin_resource_sharing" >Cross-origin resource sharing</a>.
+ * Filter to enable <a href="http://en.wikipedia.org/wiki/Cross-origin_resource_sharing" >Cross-origin resource sharing</a>. This is also
+ * used to set the common API response header settings.
  *
  * @author Naymesh
  */
 @Component
-public class SimpleCORSFilter implements Filter {
+public class BmsApiFilter implements Filter {
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
@@ -28,6 +29,12 @@ public class SimpleCORSFilter implements Filter {
 		response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
 		response.setHeader("Access-Control-Max-Age", "3600");
 		response.setHeader("Access-Control-Allow-Headers", "x-requested-with");
+
+		// Specific Cache control setting. An issue is caused by caching in IE9 and IE10. The GET requests to retrieve the variables,
+		// properties, methods or scales after one has been added are not executed again. IE will only execute the GET request again after
+		// the cache header expires, despite the response changing due to the addition of the new entity.
+		response.setHeader("Cache-Control", "max-age=0, no-cache, no-store");
+
 		chain.doFilter(req, res);
 	}
 
