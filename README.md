@@ -58,6 +58,6 @@ then run with the usual `java -jar bmsapi.war` and BMS API will pick up the appl
 ### Explore the API ###
 Explore and try out the live API documentation (built with [Swagger](https://helloreverb.com/developers/swagger)) at the home page `http://<server.host>:<server.port>/<server.contextPath>`.
 
-Public deployment of the BMS API is available at: [api.leadnode.io](http://api.leafnode.io:19080/bmsapi). 
+Public deployment of the BMS API is available at: [api.leadnode.io](http://api.leafnode.io:10081/bmsapi/). 
 
 
