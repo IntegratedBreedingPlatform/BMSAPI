@@ -2,6 +2,8 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -9,6 +11,7 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermRelationship;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.Method;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.util.StringUtil;
@@ -85,8 +88,15 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 			methodDetails.getMetadata().setDeletable(deletable);
 
 			// Note : Get list of relationships related to method Id
-			List<TermRelationship> relationships =
-					this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_METHOD);
+			List<TermRelationship> relationships = this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_METHOD);
+
+			Collections.sort(relationships, new Comparator<TermRelationship>() {
+
+				@Override
+				public int compare(TermRelationship l, TermRelationship r) {
+					return l.getSubjectTerm().getName().compareToIgnoreCase(r.getSubjectTerm().getName());
+				}
+			});
 
 			for (TermRelationship relationship : relationships) {
 				TermSummary termSummary = mapper.map(relationship, TermSummary.class);

@@ -2,6 +2,8 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -98,8 +100,15 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 			propertyDetails.getMetadata().setDeletable(deletable);
 
 			// Note : Get list of relationships related to property Id
-			List<TermRelationship> relationships =
-					this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_PROPERTY);
+			List<TermRelationship> relationships = this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_PROPERTY);
+
+			Collections.sort(relationships, new Comparator<TermRelationship>() {
+
+				@Override
+				public int compare(TermRelationship l, TermRelationship r) {
+					return l.getSubjectTerm().getName().compareToIgnoreCase(r.getSubjectTerm().getName());
+				}
+			});
 
 			for (TermRelationship relationship : relationships) {
 				TermSummary termSummary = mapper.map(relationship, TermSummary.class);

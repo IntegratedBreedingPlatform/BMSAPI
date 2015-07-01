@@ -5,6 +5,8 @@ import static org.generationcp.middleware.domain.ontology.DataType.CATEGORICAL_V
 import static org.generationcp.middleware.domain.ontology.DataType.NUMERIC_VARIABLE;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -100,12 +102,18 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			scaleDetails.getMetadata().setDeletable(deletable);
 
 			// Note : Get list of relationships related to scale Id
-			List<TermRelationship> relationships =
-					this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_SCALE);
+			List<TermRelationship> relationships = this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_SCALE);
+
+			Collections.sort(relationships, new Comparator<TermRelationship>() {
+
+				@Override
+				public int compare(TermRelationship l, TermRelationship r) {
+					return l.getSubjectTerm().getName().compareToIgnoreCase(r.getSubjectTerm().getName());
+				}
+			});
 
 			for (TermRelationship relationship : relationships) {
-				org.ibp.api.domain.ontology.TermSummary termSummary =
-						mapper.map(relationship, org.ibp.api.domain.ontology.TermSummary.class);
+				org.ibp.api.domain.ontology.TermSummary termSummary = mapper.map(relationship, org.ibp.api.domain.ontology.TermSummary.class);
 				scaleDetails.getMetadata().getUsage().addUsage(termSummary);
 			}
 
