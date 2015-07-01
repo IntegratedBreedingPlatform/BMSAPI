@@ -23,6 +23,18 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Autowired
 	private GermplasmListManager germplasmListManager;
 
+	public GermplasmListServiceImpl() {
+		
+	}
+	
+	/**
+	 * Only used for testing
+	 * @param germplasmListManager the mock germplasm list manager
+	 */
+	GermplasmListServiceImpl(final GermplasmListManager germplasmListManager) {
+		this.germplasmListManager = germplasmListManager;
+	}
+	
 	@Override
 	public List<GermplasmListSummary> searchGermplasmLists(String searchText) {
 		List<GermplasmList> matchingLists;
