@@ -5,7 +5,6 @@ import java.text.ParseException;
 import java.util.Date;
 
 import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.domain.ontology.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermRelationship;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -22,7 +21,6 @@ import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.ontology.VariableDetails;
-import org.ibp.api.domain.ontology.VariableSummary;
 import org.junit.Assert;
 import org.junit.Test;
 import org.modelmapper.ModelMapper;
@@ -148,45 +146,6 @@ public class OntologyMapperTest {
 		Assert.assertTrue(scaleDetails.getMetadata().getEditableFields().isEmpty());
 		Assert.assertFalse(scaleDetails.getMetadata().isDeletable());
 		Assert.assertTrue(scaleDetails.getMetadata().getUsage().getVariables().isEmpty());
-	}
-
-	@Test
-	public void variableSummaryMapperTest() throws ParseException {
-
-		OntologyVariableSummary mVariableSummary = new OntologyVariableSummary(1, "name", "description");
-		mVariableSummary.setAlias("alias");
-		mVariableSummary.setDateCreated(new Date());
-		mVariableSummary.setDateLastModified(new Date());
-		mVariableSummary.setMethodSummary(TestDataProvider.mwMethodSummary);
-		mVariableSummary.setPropertySummary(TestDataProvider.mwPropertySummary);
-		mVariableSummary.setScaleSummary(TestDataProvider.getTestScale());
-		mVariableSummary.setMinValue("0");
-		mVariableSummary.setMaxValue("10");
-		mVariableSummary.setIsFavorite(true);
-
-		ModelMapper mapper = OntologyMapper.getInstance();
-
-		VariableSummary ibpVariableSummary = mapper.map(mVariableSummary, VariableSummary.class);
-
-		Assert.assertEquals(ibpVariableSummary.getId(), String.valueOf(mVariableSummary.getId()));
-		Assert.assertEquals(ibpVariableSummary.getName(), mVariableSummary.getName());
-		Assert.assertEquals(ibpVariableSummary.getAlias(), mVariableSummary.getAlias());
-		Assert.assertEquals(ibpVariableSummary.getDescription(), mVariableSummary.getDescription());
-		Assert.assertEquals(ibpVariableSummary.getMethodSummary().getId(), String.valueOf(mVariableSummary.getMethodSummary().getId()));
-		Assert.assertEquals(ibpVariableSummary.getMethodSummary().getName(), mVariableSummary.getMethodSummary().getName());
-		Assert.assertEquals(ibpVariableSummary.getMethodSummary().getDescription(), mVariableSummary.getMethodSummary().getDefinition());
-		Assert.assertEquals(ibpVariableSummary.getPropertySummary().getId(), String.valueOf(mVariableSummary.getPropertySummary().getId()));
-		Assert.assertEquals(ibpVariableSummary.getPropertySummary().getName(), mVariableSummary.getPropertySummary().getName());
-		Assert.assertEquals(ibpVariableSummary.getPropertySummary().getDescription(), mVariableSummary.getPropertySummary().getDefinition());
-		Assert.assertEquals(ibpVariableSummary.getScaleSummary().getId(), String.valueOf(mVariableSummary.getScaleSummary().getId()));
-		Assert.assertEquals(ibpVariableSummary.getScaleSummary().getName(), mVariableSummary.getScaleSummary().getName());
-		Assert.assertEquals(ibpVariableSummary.getScaleSummary().getDescription(), mVariableSummary.getScaleSummary().getDefinition());
-		Assert.assertEquals(ibpVariableSummary.getExpectedRange().getMin(), mVariableSummary.getMinValue());
-		Assert.assertEquals(ibpVariableSummary.getExpectedRange().getMax(), mVariableSummary.getMaxValue());
-		Assert.assertEquals(ibpVariableSummary.getMetadata().getDateCreated(),
-				ISO8601DateParser.toString(mVariableSummary.getDateCreated()));
-		Assert.assertEquals(ibpVariableSummary.getMetadata().getDateLastModified(),
-				ISO8601DateParser.toString(mVariableSummary.getDateLastModified()));
 	}
 
 	@Test

@@ -18,7 +18,7 @@ public interface VariableService {
 	 * @param favourite favourite variable
 	 * @return list of variables
 	 */
-	List<VariableSummary> getAllVariablesByFilter(String cropName, String programId, String propertyId, Boolean favourite);
+	List<VariableDetails> getAllVariablesByFilter(String cropName, String programId, String propertyId, Boolean favourite);
 
 	/**
 	 * Get variable using given id

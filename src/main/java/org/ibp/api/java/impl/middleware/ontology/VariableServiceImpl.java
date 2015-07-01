@@ -9,13 +9,13 @@ import java.util.Objects;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
-import org.generationcp.middleware.domain.ontology.OntologyVariableSummary;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
@@ -55,7 +55,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	private OntologyScaleDataManager ontologyScaleDataManager;
 
 	@Override
-	public List<VariableSummary> getAllVariablesByFilter(String cropName, String programId, String propertyId, Boolean favourite) {
+	public List<VariableDetails> getAllVariablesByFilter(String cropName, String programId, String propertyId, Boolean favourite) {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
@@ -74,17 +74,26 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		}
 
 		try {
-			List<OntologyVariableSummary> variableSummaries =
-					this.ontologyVariableDataManager.getWithFilter(programId, favourite, null, StringUtil.parseInt(propertyId, null), null);
-			List<VariableSummary> variableSummaryList = new ArrayList<>();
+			VariableFilter variableFilter = new VariableFilter();
+			variableFilter.setProgramUuid(programId);
+			if(favourite != null){
+				variableFilter.setFavoritesOnly(favourite);
+			}
+
+			Integer property = StringUtil.parseInt(propertyId, null);
+			if(property != null){
+				variableFilter.addPropertyId(property);
+			}
+			List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
+			List<VariableDetails> variableDetailsList = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
 
-			for (OntologyVariableSummary variable : variableSummaries) {
-				VariableSummary variableSummary = mapper.map(variable, VariableSummary.class);
-				variableSummaryList.add(variableSummary);
+			for (Variable variable : variables) {
+				VariableDetails variableSummary = mapper.map(variable, VariableDetails.class);
+				variableDetailsList.add(variableSummary);
 			}
-			return variableSummaryList;
+			return variableDetailsList;
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}

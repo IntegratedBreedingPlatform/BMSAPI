@@ -9,10 +9,10 @@ import java.util.regex.Pattern;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.domain.ontology.OntologyVariableSummary;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.domain.ontology.VariableType;
@@ -425,8 +425,12 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			Integer propertyId = StringUtil.parseInt(variable.getPropertySummary().getId(), null);
 			Integer scaleId = StringUtil.parseInt(variable.getScaleSummary().getId(), null);
 
-			List<OntologyVariableSummary> variableSummary =
-					this.ontologyVariableDataManager.getWithFilter(null, null, methodId, propertyId, scaleId);
+			VariableFilter variableFilter = new VariableFilter();
+			variableFilter.addMethodId(methodId);
+			variableFilter.addPropertyId(propertyId);
+			variableFilter.addScaleId(scaleId);
+
+			List<Variable> variableSummary = this.ontologyVariableDataManager.getWithFilter(variableFilter);
 
 			if (variableSummary.size() > 1 || variableSummary.size() == 1
 					&& !Objects.equals(String.valueOf(variableSummary.get(0).getId()), variable.getId())) {

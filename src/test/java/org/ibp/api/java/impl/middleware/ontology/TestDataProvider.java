@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.domain.ontology.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -19,6 +18,7 @@ import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.ibp.api.domain.ontology.MetadataSummary;
 import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.domain.ontology.PropertySummary;
@@ -60,30 +60,19 @@ public class TestDataProvider {
 	private static final String className2 = "Biotic Stress";
 	private static final String className3 = "Study condition";
 
-	public static final List<Term> mwTermList = new ArrayList<>(Arrays.asList(new Term(1, TestDataProvider.className1, ""), new Term(2,
-			TestDataProvider.className2, ""), new Term(3, TestDataProvider.className3, "")));
+	public static final List<Term> mwTermList = new ArrayList<>(Arrays.asList(new Term(1, TestDataProvider.className1, ""), new Term(2, TestDataProvider.className2, ""), new Term(3, TestDataProvider.className3, "")));
 
-	public static final TermSummary mwMethodSummary = new TermSummary(TestDataProvider.methodId, TestDataProvider.methodName,
-			TestDataProvider.methodDescription);
-	public static final TermSummary mwPropertySummary = new TermSummary(TestDataProvider.propertyId, TestDataProvider.propertyName,
-			TestDataProvider.propertyDescription);
+	public static final org.ibp.api.domain.ontology.DataType numericalDataType = new org.ibp.api.domain.ontology.DataType(DataType.NUMERIC_VARIABLE.getId(), DataType.NUMERIC_VARIABLE.getName());
+	public static final org.ibp.api.domain.ontology.DataType categoricalDataType = new org.ibp.api.domain.ontology.DataType(DataType.CATEGORICAL_VARIABLE.getId(), DataType.CATEGORICAL_VARIABLE.getName());
 
-	public static final org.ibp.api.domain.ontology.DataType numericalDataType = new org.ibp.api.domain.ontology.DataType(
-			DataType.NUMERIC_VARIABLE.getId(), DataType.NUMERIC_VARIABLE.getName());
-	public static final org.ibp.api.domain.ontology.DataType categoricalDataType = new org.ibp.api.domain.ontology.DataType(
-			DataType.CATEGORICAL_VARIABLE.getId(), DataType.CATEGORICAL_VARIABLE.getName());
-
-	public static final org.ibp.api.domain.ontology.VariableType traitVariable = new org.ibp.api.domain.ontology.VariableType(1808,
-			"Trait Variable", "Variable for trait study");
+	public static final org.ibp.api.domain.ontology.VariableType traitVariable = new org.ibp.api.domain.ontology.VariableType(1808,	"Trait Variable", "Variable for trait study");
 
 	public static Term getMethodTerm() {
-		return new Term(TestDataProvider.methodId, TestDataProvider.methodName, TestDataProvider.methodDescription, CvId.METHODS.getId(),
-				null);
+		return new Term(TestDataProvider.methodId, TestDataProvider.methodName, TestDataProvider.methodDescription, CvId.METHODS.getId(),null);
 	}
 
 	public static Term getPropertyTerm() {
-		return new Term(TestDataProvider.propertyId, TestDataProvider.propertyName, TestDataProvider.propertyDescription,
-				CvId.PROPERTIES.getId(), null);
+		return new Term(TestDataProvider.propertyId, TestDataProvider.propertyName, TestDataProvider.propertyDescription, CvId.PROPERTIES.getId(), null);
 	}
 
 	public static Term getScaleTerm() {
@@ -91,8 +80,7 @@ public class TestDataProvider {
 	}
 
 	public static Term getVariableTerm() {
-		return new Term(TestDataProvider.variableId, TestDataProvider.variableName, TestDataProvider.variableDescription,
-				CvId.VARIABLES.getId(), false);
+		return new Term(TestDataProvider.variableId, TestDataProvider.variableName, TestDataProvider.variableDescription, CvId.VARIABLES.getId(), false);
 	}
 
 	public static Date getDateCreated() {
@@ -217,21 +205,19 @@ public class TestDataProvider {
 		return variable;
 	}
 
-	public static List<OntologyVariableSummary> getTestVariables(Integer elements) {
-		List<OntologyVariableSummary> variableList = new ArrayList<>();
+	public static List<Variable> getTestVariables(Integer elements) {
+		List<Variable> variableList = new ArrayList<>();
 
 		for (Integer count = 0; count < elements; count++) {
-			OntologyVariableSummary variable =
-					new OntologyVariableSummary(TestDataProvider.variableId + count, TestDataProvider.variableName + count,
-							TestDataProvider.variableDescription + count);
+			Variable variable = new Variable(new Term(TestDataProvider.variableId + count, TestDataProvider.variableName + count, TestDataProvider.variableDescription + count));
 			variable.setMinValue(TestDataProvider.variableExpectedMin);
 			variable.setMaxValue(TestDataProvider.variableExpectedMax);
 			variable.setAlias(TestDataProvider.variableAlias + "_" + String.valueOf(count));
 			variable.setIsFavorite(TestDataProvider.variableIsFavourite);
 			variable.setDateCreated(TestDataProvider.getDateCreated());
-			variable.setPropertySummary(TestDataProvider.mwPropertySummary);
-			variable.setMethodSummary(TestDataProvider.mwMethodSummary);
-			variable.setScaleSummary(TestDataProvider.getTestScale());
+			variable.setProperty(TestDataProvider.getTestProperty());
+			variable.setMethod(TestDataProvider.getTestMethod());
+			variable.setScale(TestDataProvider.getTestScale());
 			variable.setDateCreated(TestDataProvider.getDateCreated());
 			variable.setDateLastModified(TestDataProvider.getDateModified());
 			variable.addVariableType(VariableType.ENVIRONMENT_DETAIL);
@@ -303,5 +289,13 @@ public class TestDataProvider {
 		variableSummary.setExpectedMax(TestDataProvider.variableExpectedMax);
 		variableSummary.setFavourite(TestDataProvider.variableIsFavourite);
 		return variableSummary;
+	}
+
+	public static VariableFilter getVariableFilterForVariableValidator(){
+		VariableFilter variableFilter = new VariableFilter();
+		variableFilter.addMethodId(methodId);
+		variableFilter.addPropertyId(propertyId);
+		variableFilter.addScaleId(scaleId);
+		return variableFilter;
 	}
 }

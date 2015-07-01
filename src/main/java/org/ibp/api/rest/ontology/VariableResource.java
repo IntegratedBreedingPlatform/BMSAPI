@@ -36,7 +36,7 @@ public class VariableResource {
 	@ApiOperation(value = "All variables", notes = "Gets all variables.")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<VariableSummary>> listAllVariables(@PathVariable String cropname, @RequestParam(value = "property",
+	public ResponseEntity<List<VariableDetails>> listAllVariables(@PathVariable String cropname, @RequestParam(value = "property",
 			required = false) String propertyId, @RequestParam(value = "favourite", required = false) Boolean favourite, @RequestParam(
 			value = "programId") String programId) {
 		return new ResponseEntity<>(this.variableService.getAllVariablesByFilter(cropname, programId, propertyId, favourite), HttpStatus.OK);

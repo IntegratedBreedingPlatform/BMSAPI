@@ -2,7 +2,6 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.domain.ontology.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.TermRelationship;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.ontology.Method;
@@ -17,7 +16,6 @@ import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.ontology.VariableDetails;
-import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -163,24 +161,6 @@ public class OntologyMapper {
 	 * Get ModelMapper instance and add Property related mapping to it
 	 */
 	private static void addVariableMappers(ModelMapper mapper) {
-
-		mapper.addMappings(new PropertyMap<OntologyVariableSummary, VariableSummary>() {
-
-			@Override
-			protected void configure() {
-				this.map().setId(String.valueOf(this.source.getId()));
-				this.map().setName(this.source.getName());
-				this.map().setDescription(this.source.getDescription());
-				this.map().getMethodSummary().setDescription(this.source.getMethodSummary().getDefinition());
-				this.map().getPropertySummary().setDescription(this.source.getPropertySummary().getDefinition());
-				this.map().setFavourite(this.source.getIsFavorite());
-				this.map().setAlias(this.source.getAlias());
-				this.map().setExpectedMin(this.source.getMinValue());
-				this.map().setExpectedMax(this.source.getMaxValue());
-				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
-				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
-			}
-		});
 
 		mapper.addMappings(new PropertyMap<Variable, VariableDetails>() {
 
