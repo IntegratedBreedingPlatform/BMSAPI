@@ -29,6 +29,18 @@ public class DataTypeResourceTest extends ApiUnitTestBase {
 		termList.add(term);
 		term = new Term(DataType.DATE_TIME_VARIABLE.getId(), "Date", "");
 		termList.add(term);
+		term = new Term(DataType.LOCATION.getId(), "Location", "");
+		termList.add(term);
+		term = new Term(DataType.PERSON.getId(), "Person", "");
+		termList.add(term);
+		term = new Term(DataType.STUDY.getId(), "Study", "");
+		termList.add(term);
+		term = new Term(DataType.DATASET.getId(), "Dataset", "");
+		termList.add(term);
+		term = new Term(DataType.GERMPLASM_LIST.getId(), "Germplasm", "");
+		termList.add(term);
+		term = new Term(DataType.BREEDING_METHOD.getId(), "Breeding Method", "");
+		termList.add(term);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/datatypes").contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
