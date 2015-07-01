@@ -28,9 +28,7 @@ public class VariableSummarySerializer extends JsonSerializer<VariableSummary>{
 
 		jsonGenerator.writeStringField("alias", variableSummary.getAlias() == null ? "" : variableSummary.getAlias());
 
-		if(!isNullOrEmpty(variableSummary.getDescription())){
-			jsonGenerator.writeStringField("description", variableSummary.getDescription());
-		}
+		jsonGenerator.writeStringField("description", variableSummary.getDescription() == null ? "" : variableSummary.getDescription());
 
 		if(!isNullOrEmpty(variableSummary.getPropertySummary())){
 			jsonGenerator.writeObjectFieldStart("propertySummary");

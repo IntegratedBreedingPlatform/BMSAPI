@@ -26,9 +26,7 @@ public class ScaleSummarySerializer extends JsonSerializer<ScaleSummary>{
 		}
 		jsonGenerator.writeStringField("name", scaleSummary.getName());
 
-		if(!isNullOrEmpty(scaleSummary.getDescription())){
-			jsonGenerator.writeStringField("description", scaleSummary.getDescription());
-		}
+		jsonGenerator.writeStringField("description", scaleSummary.getDescription() == null ? "" : scaleSummary.getDescription());
 
 		if(scaleSummary.getDataType() != null){
 
