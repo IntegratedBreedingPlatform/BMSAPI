@@ -22,7 +22,7 @@ public class ScaleSummarySerializer extends JsonSerializer<ScaleSummary>{
 
 		// Added common term field
 		if(!isNullOrEmpty(scaleSummary.getId())){
-			jsonGenerator.writeNumberField("id", Integer.parseInt(scaleSummary.getId()));
+			jsonGenerator.writeStringField("id", scaleSummary.getId());
 		}
 		jsonGenerator.writeStringField("name", scaleSummary.getName());
 
