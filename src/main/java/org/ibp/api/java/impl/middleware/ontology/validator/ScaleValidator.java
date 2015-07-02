@@ -168,26 +168,47 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 			}
 
 			ValidValues validValues = scaleSummary.getValidValues() == null ? new ValidValues() : scaleSummary.getValidValues();
-			boolean minValuesAreEqual = Objects.equals(validValues.getMin(), oldScale.getMinValue());
-			boolean maxValuesAreEqual = Objects.equals(validValues.getMax(), oldScale.getMaxValue());
-			List<org.ibp.api.domain.ontology.TermSummary> categories = validValues.getCategories() == null ? new ArrayList<org.ibp.api.domain.ontology.TermSummary>() : validValues.getCategories();
-			boolean categoriesEqualSize = Objects.equals(categories.size(), oldScale.getCategories().size());
+
+			boolean minValuesAreEqual = true;
+			boolean maxValuesAreEqual = true;
+			boolean categoriesEqualSize = true;
 			boolean categoriesValuesAreSame = true;
 
-			if (categoriesEqualSize) {
+			DataType dataType = DataType.getById(scaleSummary.getDataType().getId());
 
-				//Converting old categories to Map for comparing.
-				Map<String, String> oldCategories = new HashMap<>();
-				for(TermSummary t : oldScale.getCategories()){
-					oldCategories.put(t.getName(), t.getDefinition());
+			if(Objects.equals(dataType, DataType.NUMERIC_VARIABLE)){
+
+				//Note: Check if oldScale min-max and validValues min-max null or empty. If empty then do not check for equality.
+
+				if(! (isNullOrEmpty(validValues.getMin()) && isNullOrEmpty(oldScale.getMinValue()))){
+					minValuesAreEqual = Objects.equals(validValues.getMin(), oldScale.getMinValue());
 				}
 
-				for (org.ibp.api.domain.ontology.TermSummary l : categories) {
-					if (oldCategories.containsKey(l.getName()) && Objects.equals(oldCategories.get(l.getName()), l.getDescription())) {
-						continue;
+				if(! (isNullOrEmpty(validValues.getMax()) && isNullOrEmpty(oldScale.getMaxValue()))){
+					maxValuesAreEqual = Objects.equals(validValues.getMax(), oldScale.getMaxValue());
+				}
+
+			} else if(Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)){
+				List<org.ibp.api.domain.ontology.TermSummary> categories = validValues.getCategories() == null
+						? new ArrayList<org.ibp.api.domain.ontology.TermSummary>() : validValues.getCategories();
+				categoriesEqualSize = Objects.equals(categories.size(), oldScale.getCategories().size());
+				categoriesValuesAreSame = true;
+
+				if (categoriesEqualSize) {
+
+					//Converting old categories to Map for comparing.
+					Map<String, String> oldCategories = new HashMap<>();
+					for(TermSummary t : oldScale.getCategories()){
+						oldCategories.put(t.getName(), t.getDefinition());
 					}
-					categoriesValuesAreSame = false;
-					break;
+
+					for (org.ibp.api.domain.ontology.TermSummary l : categories) {
+						if (oldCategories.containsKey(l.getName()) && Objects.equals(oldCategories.get(l.getName()), l.getDescription())) {
+							continue;
+						}
+						categoriesValuesAreSame = false;
+						break;
+					}
 				}
 			}
 
