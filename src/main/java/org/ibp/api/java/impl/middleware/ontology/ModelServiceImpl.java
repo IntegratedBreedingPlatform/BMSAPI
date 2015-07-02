@@ -6,11 +6,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.ontology.DataType;
 import org.ibp.api.domain.ontology.VariableType;
@@ -34,9 +36,21 @@ public class ModelServiceImpl implements ModelService {
 
 					@Override
 					public DataType apply(org.generationcp.middleware.domain.ontology.DataType dataType) {
-						return new DataType(dataType.getId(), dataType.getName());
+						return new DataType(String.valueOf(dataType.getId()), dataType.getName());
 					}
 				});
+	}
+
+	@Override
+	public boolean isNumericDataType(String dataTypeId) {
+		Integer id = StringUtil.parseInt(dataTypeId, null);
+		return Objects.equals(id, org.generationcp.middleware.domain.ontology.DataType.NUMERIC_VARIABLE.getId());
+	}
+
+	@Override
+	public boolean isCategoricalDataType(String dataTypeId) {
+		Integer id = StringUtil.parseInt(dataTypeId, null);
+		return Objects.equals(id, org.generationcp.middleware.domain.ontology.DataType.CATEGORICAL_VARIABLE.getId());
 	}
 
 	@Override
