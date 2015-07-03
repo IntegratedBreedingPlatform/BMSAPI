@@ -72,7 +72,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 		boolean dataTypeValidationResult = this.dataTypeValidationProcessor(scaleSummary, errors);
 
-		Integer dataTypeId = parseDataTypeIdAsInteger(scaleSummary);
+		Integer dataTypeId = parseDataTypeIdAsInteger(scaleSummary.getDataType());
 
 		if (dataTypeValidationResult) {
 
@@ -164,7 +164,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 				this.addCustomError(errors, "name", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {"scale", "Name"});
 			}
 
-			Integer dataTypeId = parseDataTypeIdAsInteger(scaleSummary);
+			Integer dataTypeId = parseDataTypeIdAsInteger(scaleSummary.getDataType());
 
 			boolean isDataTypeSame = Objects.equals(dataTypeId, this.getDataTypeIdSafe(oldScale.getDataType()));
 			if (!isDataTypeSame) {
@@ -286,7 +286,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 			return false;
 		}
 
-		Integer dataTypeId = parseDataTypeIdAsInteger(scaleSummary);
+		Integer dataTypeId = parseDataTypeIdAsInteger(scaleSummary.getDataType());
 
 		// 4. The data type ID must correspond to the ID of one of the supported
 		// data types (Numeric, Categorical, Character, DateTime, Person,
@@ -302,7 +302,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 		Integer initialCount = errors.getErrorCount();
 
-		DataType dataType = DataType.getById(parseDataTypeIdAsInteger(scaleSummary));
+		DataType dataType = DataType.getById(parseDataTypeIdAsInteger(scaleSummary.getDataType()));
 
 		ValidValues validValues = scaleSummary.getValidValues() == null ? new ValidValues() : scaleSummary.getValidValues();
 
@@ -331,7 +331,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 		Integer initialCount = errors.getErrorCount();
 
-		DataType dataType = DataType.getById(parseDataTypeIdAsInteger(scaleSummary));
+		DataType dataType = DataType.getById(parseDataTypeIdAsInteger(scaleSummary.getDataType()));
 
 		ValidValues validValues = scaleSummary.getValidValues() == null ? new ValidValues() : scaleSummary.getValidValues();
 
@@ -374,10 +374,10 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private Integer parseDataTypeIdAsInteger(ScaleSummary summary){
-		if(summary == null || summary.getDataType() == null) {
+	private Integer parseDataTypeIdAsInteger(org.ibp.api.domain.ontology.DataType dataType){
+		if(dataType == null) {
 			return null;
 		}
-		return StringUtil.parseInt(summary.getDataType().getId(), null);
+		return StringUtil.parseInt(dataType.getId(), null);
 	}
 }
