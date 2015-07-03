@@ -259,7 +259,7 @@ public class OntologyMapper {
 						DataType dataTypeEnum = context.getSource();
 
 						org.ibp.api.domain.ontology.DataType dataType = new org.ibp.api.domain.ontology.DataType();
-						dataType.setId(dataTypeEnum.getId());
+						dataType.setId(String.valueOf(dataTypeEnum.getId()));
 						dataType.setName(dataTypeEnum.getName());
 						return dataType;
 					}
