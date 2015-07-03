@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.util.Debug;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -49,6 +50,9 @@ public abstract class ApiUnitTestBase {
 	@Autowired
 	protected WorkbenchDataManager workbenchDataManager;
 
+	@Autowired
+	protected ObjectMapper jsonMapper;
+
 	@Configuration
 	public static class TestConfiguration {
 
@@ -72,7 +76,8 @@ public abstract class ApiUnitTestBase {
 	}
 
 	public byte[] convertObjectToByte(Object object) throws JsonProcessingException {
-		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+		ObjectWriter ow = jsonMapper.writer().withDefaultPrettyPrinter();
+		Debug.println("Request:" + ow.writeValueAsString(object));
 		return ow.writeValueAsBytes(object);
 	}
 }
