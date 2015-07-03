@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.google.common.base.Strings;
-import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.domain.ontology.VariableType;
 
@@ -32,26 +31,26 @@ public class VariableSummarySerializer extends JsonSerializer<VariableSummary>{
 
 		if(!isNullOrEmpty(variableSummary.getPropertySummary())){
 			jsonGenerator.writeObjectFieldStart("propertySummary");
-			jsonGenerator.writeNumberField("id", StringUtil.parseInt(variableSummary.getPropertySummary().getId(), null));
+			jsonGenerator.writeStringField("id", variableSummary.getPropertySummary().getId());
 			jsonGenerator.writeStringField("name", variableSummary.getPropertySummary().getName());
 			jsonGenerator.writeEndObject();
 		}
 
 		if(!isNullOrEmpty(variableSummary.getMethodSummary())){
 			jsonGenerator.writeObjectFieldStart("methodSummary");
-			jsonGenerator.writeNumberField("id", StringUtil.parseInt(variableSummary.getMethodSummary().getId(), null));
+			jsonGenerator.writeStringField("id", variableSummary.getMethodSummary().getId());
 			jsonGenerator.writeStringField("name", variableSummary.getMethodSummary().getName());
 			jsonGenerator.writeEndObject();
 		}
 
 		if(!isNullOrEmpty(variableSummary.getScaleSummary())){
 			jsonGenerator.writeObjectFieldStart("scaleSummary");
-			jsonGenerator.writeNumberField("id", StringUtil.parseInt(variableSummary.getScaleSummary().getId(), null));
+			jsonGenerator.writeStringField("id", variableSummary.getScaleSummary().getId());
 			jsonGenerator.writeStringField("name", variableSummary.getScaleSummary().getName());
 
 			if(variableSummary.getScaleSummary().getDataType() != null){
 				jsonGenerator.writeObjectFieldStart("dataType");
-				jsonGenerator.writeNumberField("id", variableSummary.getScaleSummary().getDataType().getId());
+				jsonGenerator.writeStringField("id", variableSummary.getScaleSummary().getDataType().getId());
 				jsonGenerator.writeStringField("name", variableSummary.getScaleSummary().getDataType().getName());
 				jsonGenerator.writeEndObject();
 			}
