@@ -72,9 +72,9 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 		boolean dataTypeValidationResult = this.dataTypeValidationProcessor(scaleSummary, errors);
 
-		if (dataTypeValidationResult) {
+		Integer dataTypeId = parseDataTypeIdAsInteger(scaleSummary);
 
-			Integer dataTypeId = scaleSummary.getDataType().getId();
+		if (dataTypeValidationResult) {
 
 			if (Objects.equals(dataTypeId, DataType.CATEGORICAL_VARIABLE.getId())) {
 				this.categoricalDataTypeValidationProcessor(scaleSummary, errors);
@@ -93,7 +93,9 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		if (categories != null && Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)) {
 			Set<String> labels = new HashSet<>();
 			Set<String> values = new HashSet<>();
+
 			for (int i = 1; i <= categories.size(); i++) {
+
 				org.ibp.api.domain.ontology.TermSummary category = categories.get(i - 1);
 				String name = category.getName().trim();
 				String value = category.getDescription().trim();
@@ -162,7 +164,9 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 				this.addCustomError(errors, "name", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {"scale", "Name"});
 			}
 
-			boolean isDataTypeSame = Objects.equals(scaleSummary.getDataType().getId(), this.getDataTypeIdSafe(oldScale.getDataType()));
+			Integer dataTypeId = parseDataTypeIdAsInteger(scaleSummary);
+
+			boolean isDataTypeSame = Objects.equals(dataTypeId, this.getDataTypeIdSafe(oldScale.getDataType()));
 			if (!isDataTypeSame) {
 				this.addCustomError(errors, "dataTypeId", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {"scale", "DataTypeId"});
 			}
@@ -174,7 +178,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 			boolean categoriesEqualSize = true;
 			boolean categoriesValuesAreSame = true;
 
-			DataType dataType = DataType.getById(scaleSummary.getDataType().getId());
+			DataType dataType = DataType.getById(dataTypeId);
 
 			if(Objects.equals(dataType, DataType.NUMERIC_VARIABLE)){
 
@@ -282,10 +286,12 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 			return false;
 		}
 
+		Integer dataTypeId = parseDataTypeIdAsInteger(scaleSummary);
+
 		// 4. The data type ID must correspond to the ID of one of the supported
 		// data types (Numeric, Categorical, Character, DateTime, Person,
 		// Location or any other special data type that we add)
-		if (DataType.getById(scaleSummary.getDataType().getId()) == null) {
+		if (DataType.getById(dataTypeId) == null) {
 			this.addCustomError(errors, "dataTypeId", BaseValidator.INVALID_TYPE_ID, new Object[] {"Data Type"});
 		}
 
@@ -296,7 +302,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 		Integer initialCount = errors.getErrorCount();
 
-		DataType dataType = DataType.getById(scaleSummary.getDataType().getId());
+		DataType dataType = DataType.getById(parseDataTypeIdAsInteger(scaleSummary));
 
 		ValidValues validValues = scaleSummary.getValidValues() == null ? new ValidValues() : scaleSummary.getValidValues();
 
@@ -325,7 +331,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 		Integer initialCount = errors.getErrorCount();
 
-		DataType dataType = DataType.getById(scaleSummary.getDataType().getId());
+		DataType dataType = DataType.getById(parseDataTypeIdAsInteger(scaleSummary));
 
 		ValidValues validValues = scaleSummary.getValidValues() == null ? new ValidValues() : scaleSummary.getValidValues();
 
@@ -366,5 +372,12 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		}
 
 		return errors.getErrorCount() == initialCount;
+	}
+
+	private Integer parseDataTypeIdAsInteger(ScaleSummary summary){
+		if(summary == null || summary.getDataType() == null) {
+			return null;
+		}
+		return StringUtil.parseInt(summary.getDataType().getId(), null);
 	}
 }
