@@ -49,6 +49,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	private static final String VARIABLE_WITH_SAME_COMBINATION_EXISTS = "variable.method.property.scale.combination.already.exist";
 	private static final String VARIABLE_MIN_SHOULD_BE_IN_SCALE_RANGE = "variable.expected.min.should.not.be.smaller";
 	private static final String VARIABLE_MAX_SHOULD_BE_IN_SCALE_RANGE = "variable.expected.max.should.not.be.greater";
+	private static final String VARIABLE_SCALE_WITH_SYSTEM_DATA_TYPE = "variable.scale.system.datatype";
 
 	private static final Integer NAME_TEXT_LIMIT = 32;
 	private static final Integer DESCRIPTION_TEXT_LIMIT = 1024;
@@ -236,6 +237,14 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		// 13. The min and max expected range values are only stored if the scales data type is numeric
 		try {
 			Scale scale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(variable.getScaleSummary().getId(), null));
+
+			if(scale.getDataType() != null && scale.getDataType().isSystemDataType()){
+				this.addCustomError(errors, VariableValidator.VARIABLE_SCALE_WITH_SYSTEM_DATA_TYPE, null);
+			}
+
+			if (errors.getErrorCount() > initialCount) {
+				return false;
+			}
 
 			boolean isNumericType = Objects.equals(scale.getDataType(), DataType.NUMERIC_VARIABLE);
 
