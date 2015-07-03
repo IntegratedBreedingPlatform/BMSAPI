@@ -90,16 +90,23 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			}
 			ModelMapper mapper = OntologyMapper.getInstance();
 			ScaleDetails scaleDetails = mapper.map(scale, ScaleDetails.class);
-			String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
-			if (!deletable) {
-				scaleDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
-			} else {
-				scaleDetails.getMetadata().addEditableField("name");
-				scaleDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
-				scaleDetails.getMetadata().addEditableField("dataType");
-				scaleDetails.getMetadata().addEditableField("validValues");
+
+			DataType dataType = DataType.getById(scale.getDataType().getId());
+
+			if(!dataType.isSystemDataType()){
+				String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
+				if (!deletable) {
+					scaleDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
+				} else {
+					scaleDetails.getMetadata().addEditableField("name");
+					scaleDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
+					scaleDetails.getMetadata().addEditableField("dataType");
+					scaleDetails.getMetadata().addEditableField("validValues");
+				}
+				scaleDetails.getMetadata().setDeletable(deletable);
+			}else {
+				scaleDetails.getMetadata().setDeletable(false);
 			}
-			scaleDetails.getMetadata().setDeletable(deletable);
 
 			// Note : Get list of relationships related to scale Id
 			List<TermRelationship> relationships = this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_SCALE);

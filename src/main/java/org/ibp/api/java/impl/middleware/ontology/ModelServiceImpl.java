@@ -36,7 +36,7 @@ public class ModelServiceImpl implements ModelService {
 
 					@Override
 					public DataType apply(org.generationcp.middleware.domain.ontology.DataType dataType) {
-						return new DataType(String.valueOf(dataType.getId()), dataType.getName());
+						return new DataType(String.valueOf(dataType.getId()), dataType.getName(), dataType.isSystemDataType());
 					}
 				});
 	}
