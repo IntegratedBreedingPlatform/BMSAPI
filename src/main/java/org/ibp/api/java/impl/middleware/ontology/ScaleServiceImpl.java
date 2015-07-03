@@ -137,7 +137,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			scale.setName(scaleSummary.getName().trim());
 			scale.setDefinition(scaleSummary.getDescription().trim());
 
-			Integer dataTypeId = scaleSummary.getDataType().getId();
+			Integer dataTypeId = StringUtil.parseInt(scaleSummary.getDataType().getId(), null);
 			scale.setDataType(DataType.getById(dataTypeId));
 
 			if (Objects.equals(dataTypeId, CATEGORICAL_VARIABLE.getId())) {
@@ -179,7 +179,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 		try {
 			Scale scale = new Scale(new Term(StringUtil.parseInt(scaleSummary.getId(), null), scaleSummary.getName().trim(), scaleSummary.getDescription().trim()));
 
-			Integer dataTypeId = scaleSummary.getDataType().getId();
+			Integer dataTypeId = StringUtil.parseInt(scaleSummary.getDataType().getId(), null);
 
 			scale.setDataType(DataType.getById(dataTypeId));
 
