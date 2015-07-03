@@ -350,10 +350,20 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			return;
 		}
 
+		Integer initialCount = errors.getErrorCount();
+
 		try {
 
 			Integer requestId = StringUtil.parseInt(variable.getId(), null);
 			Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId);
+
+			if(oldVariable.getScale().getDataType() != null && Objects.equals(oldVariable.getScale().getDataType().isSystemDataType(), true)){
+				this.addCustomError(errors, VariableValidator.VARIABLE_SCALE_WITH_SYSTEM_DATA_TYPE, null);
+			}
+
+			if (errors.getErrorCount() > initialCount) {
+				return;
+			}
 
 			// that variable should exist with requestId
 			if (Objects.equals(oldVariable, null)) {
