@@ -6,22 +6,22 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class DataType {
 
-	private Integer id;
+	private String id;
 	private String name;
 
 	public DataType() {
 	}
 
-	public DataType(Integer id, String name) {
+	public DataType(String id, String name) {
 		this.id = id;
 		this.name = name;
 	}
 
-	public Integer getId() {
+	public String getId() {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
