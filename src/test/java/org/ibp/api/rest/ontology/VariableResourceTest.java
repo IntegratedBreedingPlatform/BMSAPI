@@ -22,6 +22,7 @@ import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
+import org.ibp.api.java.ontology.ModelService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -60,7 +61,15 @@ public class VariableResourceTest extends ApiUnitTestBase {
 			return Mockito.mock(OntologyScaleDataManager.class);
 		}
 
+		@Bean
+		@Primary
+		public ModelService modelService(){
+			return Mockito.mock(ModelService.class);
+		}
 	}
+
+	@Autowired
+	protected ModelService modelService;
 
 	@Autowired
 	private TermDataManager termDataManager;
@@ -73,6 +82,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 	@Before
 	public void reset() {
+		Mockito.reset(this.modelService);
 		Mockito.reset(this.termDataManager);
 		Mockito.reset(this.ontologyVariableDataManager);
 	}
@@ -126,7 +136,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 								.jsonPath("$[0].scale.name", Matchers.is(variables.get(0).getScale().getName())))
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$[0].scale.dataType.id",
-								Matchers.is(variables.get(0).getScale().getDataType().getId())))
+								Matchers.is(String.valueOf(variables.get(0).getScale().getDataType().getId()))))
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$[0].scale.dataType.name",
 								Matchers.is(variables.get(0).getScale().getDataType().getName())))
@@ -156,6 +166,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(
 				new Term(ontologyVariable.getId(), ontologyVariable.getName(), ontologyVariable.getDefinition(), CvId.VARIABLES.getId(),
 						false)).when(this.termDataManager).getTermById(ontologyVariable.getId());
+		Mockito.doReturn(true).when(this.modelService).isNumericDataType(String.valueOf(ontologyVariable.getScale().getDataType().getId()));
 
 		this.mockMvc
 				.perform(
@@ -166,17 +177,23 @@ public class VariableResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(ontologyVariable.getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.is(ontologyVariable.getDefinition())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.alias", Matchers.is(ontologyVariable.getAlias())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.methodSummary.id", Matchers.is(String.valueOf(ontologyVariable.getMethod().getId()))))
+				.andExpect(MockMvcResultMatchers
+						.jsonPath("$.methodSummary.id", Matchers.is(String.valueOf(ontologyVariable.getMethod().getId()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.methodSummary.name", Matchers.is(ontologyVariable.getMethod().getName())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.propertySummary.id", Matchers.is(String.valueOf(ontologyVariable.getProperty().getId()))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.propertySummary.id",
+						Matchers.is(String.valueOf(ontologyVariable.getProperty().getId()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.propertySummary.name", Matchers.is(ontologyVariable.getProperty().getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.id", Matchers.is(String.valueOf(ontologyVariable.getScale().getId()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.name", Matchers.is(ontologyVariable.getScale().getName())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.dataType.id",Matchers.is(ontologyVariable.getScale().getDataType().getId())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.dataType.id",Matchers.is(String.valueOf(
+						ontologyVariable.getScale().getDataType().getId()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.dataType.name",Matchers.is(ontologyVariable.getScale().getDataType().getName())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.validValues.min",Matchers.is(StringUtil.parseDouble(ontologyVariable.getScale().getMinValue(), null))))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.validValues.max",Matchers.is(StringUtil.parseDouble(ontologyVariable.getScale().getMaxValue(), null))))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.variableTypes",IsCollectionWithSize.hasSize(ontologyVariable.getVariableTypes().size())));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.validValues.min",Matchers.is(StringUtil.parseDouble(
+						ontologyVariable.getScale().getMinValue(), null))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.validValues.max",Matchers.is(StringUtil.parseDouble(
+						ontologyVariable.getScale().getMaxValue(), null))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.variableTypes",
+						IsCollectionWithSize.hasSize(ontologyVariable.getVariableTypes().size())));
 
 		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).getVariable(this.programUuid, ontologyVariable.getId());
 	}

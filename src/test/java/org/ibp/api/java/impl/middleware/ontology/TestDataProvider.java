@@ -62,8 +62,8 @@ public class TestDataProvider {
 
 	public static final List<Term> mwTermList = new ArrayList<>(Arrays.asList(new Term(1, TestDataProvider.className1, ""), new Term(2, TestDataProvider.className2, ""), new Term(3, TestDataProvider.className3, "")));
 
-	public static final org.ibp.api.domain.ontology.DataType numericalDataType = new org.ibp.api.domain.ontology.DataType(DataType.NUMERIC_VARIABLE.getId(), DataType.NUMERIC_VARIABLE.getName());
-	public static final org.ibp.api.domain.ontology.DataType categoricalDataType = new org.ibp.api.domain.ontology.DataType(DataType.CATEGORICAL_VARIABLE.getId(), DataType.CATEGORICAL_VARIABLE.getName());
+	public static final org.ibp.api.domain.ontology.DataType numericalDataType = new org.ibp.api.domain.ontology.DataType(String.valueOf(DataType.NUMERIC_VARIABLE.getId()), DataType.NUMERIC_VARIABLE.getName());
+	public static final org.ibp.api.domain.ontology.DataType categoricalDataType = new org.ibp.api.domain.ontology.DataType(String.valueOf(DataType.CATEGORICAL_VARIABLE.getId()), DataType.CATEGORICAL_VARIABLE.getName());
 
 	public static final org.ibp.api.domain.ontology.VariableType traitVariable = new org.ibp.api.domain.ontology.VariableType(1808,	"Trait Variable", "Variable for trait study");
 
@@ -198,7 +198,7 @@ public class TestDataProvider {
 		variable.setIsFavorite(TestDataProvider.variableIsFavourite);
 		variable.setDateCreated(TestDataProvider.getDateCreated());
 		variable.setStudies(TestDataProvider.variableStudies);
-		variable.addVariableType(VariableType.getById(1));
+		variable.addVariableType(VariableType.ANALYSIS);
 		variable.setDateCreated(TestDataProvider.getDateCreated());
 		variable.setDateLastModified(TestDataProvider.getDateModified());
 
@@ -297,5 +297,14 @@ public class TestDataProvider {
 		variableFilter.addPropertyId(propertyId);
 		variableFilter.addScaleId(scaleId);
 		return variableFilter;
+	}
+
+	public static List<org.ibp.api.domain.ontology.VariableType> getVariableTypes(){
+		List<org.ibp.api.domain.ontology.VariableType> variableTypes = new ArrayList<>();
+		org.ibp.api.domain.ontology.VariableType variableType = new org.ibp.api.domain.ontology.VariableType(1, "Variable Type 1", "Variable Type Description");
+		variableTypes.add(variableType);
+		variableType = new org.ibp.api.domain.ontology.VariableType(2, "Variable Type 2", "Variable Type Description 2");
+		variableTypes.add(variableType);
+		return variableTypes;
 	}
 }

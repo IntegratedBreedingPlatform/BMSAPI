@@ -13,6 +13,7 @@ import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.util.ISO8601DateParser;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.domain.ontology.PropertyDetails;
@@ -212,13 +213,13 @@ public class OntologyMapperTest {
 	@Test
 	public void dataTypeMapperTest() {
 
-		DataType dataType = DataType.getById(1110);
+		DataType dataType = DataType.NUMERIC_VARIABLE;
 
 		ModelMapper mapper = OntologyMapper.getInstance();
 
 		org.ibp.api.domain.ontology.DataType dType = mapper.map(dataType, org.ibp.api.domain.ontology.DataType.class);
 
-		Assert.assertEquals(dType.getId(), dataType.getId());
+		Assert.assertEquals(StringUtil.parseInt(dType.getId(), null), dataType.getId());
 		Assert.assertEquals(dType.getName(), dataType.getName());
 	}
 }
