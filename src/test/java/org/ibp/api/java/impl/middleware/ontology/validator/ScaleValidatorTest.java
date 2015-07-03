@@ -121,6 +121,21 @@ public class ScaleValidatorTest {
 	}
 
 	/**
+	 * Test for to Check System DataType
+	 */
+	@Test
+	public void testWithSystemDataType() {
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+
+		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
+		// Setting system dataTypeId
+		scaleSummary.setDataType(new DataType(String.valueOf(org.generationcp.middleware.domain.ontology.DataType.LOCATION.getId()), "", true));
+		this.scaleValidator.validate(scaleSummary, bindingResult);
+		Assert.assertTrue(bindingResult.hasErrors());
+		Assert.assertNotNull(bindingResult.getFieldError("dataTypeId"));
+	}
+
+	/**
 	 * Test for, If DataType is Categorical and No Categorical Valid Values
 	 */
 	@Test

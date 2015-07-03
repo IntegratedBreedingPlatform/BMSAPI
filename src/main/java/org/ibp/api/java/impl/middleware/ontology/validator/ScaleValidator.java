@@ -53,6 +53,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 	private static final String SCALE_CATEGORIES_DESCRIPTION_DUPLICATE = "scale.category.description.duplicate";
 	private static final String SCALE_CATEGORY_DESCRIPTION_REQUIRED = "scale.category.description.required";
 	private static final String SCALE_NAME_DESCRIPTION_REQUIRED = "scale.category.name.required";
+	private static final String SCALE_SYSTEM_DATA_TYPE = "scale.system.datatype";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ScaleValidator.class);
 
@@ -145,12 +146,22 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 			return;
 		}
 
+		Integer initialCount = errors.getErrorCount();
+
 		try {
 			Scale oldScale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(scaleSummary.getId(), null));
 
 			// that method should exist with requestId
 			if (Objects.equals(oldScale, null)) {
 				this.addCustomError(errors, BaseValidator.ID_DOES_NOT_EXIST, new Object[] {"Scale", scaleSummary.getId()});
+				return;
+			}
+
+			if(oldScale.getDataType() != null && oldScale.getDataType().isSystemDataType()){
+				this.addCustomError(errors, "dataTypeId",ScaleValidator.SCALE_SYSTEM_DATA_TYPE, null);
+			}
+
+			if (errors.getErrorCount() > initialCount) {
 				return;
 			}
 
@@ -293,6 +304,14 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		// Location or any other special data type that we add)
 		if (DataType.getById(dataTypeId) == null) {
 			this.addCustomError(errors, "dataTypeId", BaseValidator.INVALID_TYPE_ID, new Object[] {"Data Type"});
+		}
+
+		if (errors.getErrorCount() > initialCount) {
+			return false;
+		}
+
+		if(Objects.equals(DataType.getById(dataTypeId).isSystemDataType(), true)){
+			this.addCustomError(errors, "dataTypeId", ScaleValidator.SCALE_SYSTEM_DATA_TYPE, null);
 		}
 
 		return errors.getErrorCount() == initialCount;
