@@ -36,6 +36,16 @@ public class TermSummary {
 		this.description = description;
 	}
 
+	public TermSummary(){
+
+	}
+
+	public TermSummary(String id, String name, String description) {
+		this.id = id;
+		this.name = name;
+		this.description = description;
+	}
+
 	@Override
 	public String toString() {
 		return "TermSummary{" + "id='" + this.id + '\'' + ", name='" + this.name + '\'' + ", description='" + this.description + '\'' + '}';

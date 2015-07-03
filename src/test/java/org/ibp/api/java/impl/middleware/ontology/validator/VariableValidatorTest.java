@@ -698,7 +698,10 @@ public class VariableValidatorTest {
 		VariableSummary variable = TestDataProvider.getTestVariableSummary();
 		variable.setId(null);
 		variable.setVariableTypes(null);
-		variable.getVariableTypes().add(new VariableType(0, "", ""));
+
+		VariableType variableType = new VariableType("0", "Variable Type 1", "Variable Type Description 1");
+
+		variable.getVariableTypes().add(variableType);
 		Term methodTerm = TestDataProvider.getMethodTerm();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
 		Term scaleTerm = TestDataProvider.getScaleTerm();

@@ -205,7 +205,7 @@ public class OntologyMapperTest {
 
 		org.ibp.api.domain.ontology.VariableType vType = mapper.map(variableType, org.ibp.api.domain.ontology.VariableType.class);
 
-		Assert.assertEquals(vType.getId(), variableType.getId());
+		Assert.assertEquals(StringUtil.parseInt(vType.getId(), null), variableType.getId());
 		Assert.assertEquals(vType.getName(), variableType.getName());
 		Assert.assertEquals(vType.getDescription(), variableType.getDescription());
 	}

@@ -65,7 +65,7 @@ public class TestDataProvider {
 	public static final org.ibp.api.domain.ontology.DataType numericalDataType = new org.ibp.api.domain.ontology.DataType(String.valueOf(DataType.NUMERIC_VARIABLE.getId()), DataType.NUMERIC_VARIABLE.getName());
 	public static final org.ibp.api.domain.ontology.DataType categoricalDataType = new org.ibp.api.domain.ontology.DataType(String.valueOf(DataType.CATEGORICAL_VARIABLE.getId()), DataType.CATEGORICAL_VARIABLE.getName());
 
-	public static final org.ibp.api.domain.ontology.VariableType traitVariable = new org.ibp.api.domain.ontology.VariableType(1808,	"Trait Variable", "Variable for trait study");
+	public static final org.ibp.api.domain.ontology.VariableType traitVariable = new org.ibp.api.domain.ontology.VariableType("1808",	"Trait Variable", "Variable for trait study");
 
 	public static Term getMethodTerm() {
 		return new Term(TestDataProvider.methodId, TestDataProvider.methodName, TestDataProvider.methodDescription, CvId.METHODS.getId(),null);
@@ -272,7 +272,7 @@ public class TestDataProvider {
 		variableSummary.setName(TestDataProvider.variableName);
 		variableSummary.setDescription(TestDataProvider.variableDescription);
 		variableSummary.setAlias(TestDataProvider.variableAlias);
-		variableSummary.setVariableTypes(new HashSet<>(Collections.singletonList(TestDataProvider.traitVariable)));
+		variableSummary.setVariableTypes(new HashSet<>(Collections.singletonList(traitVariable)));
 		variableSummary.setPropertySummary(new org.ibp.api.domain.ontology.TermSummary());
 		variableSummary.getPropertySummary().setId(String.valueOf(TestDataProvider.propertyId));
 		variableSummary.getPropertySummary().setName(TestDataProvider.propertyName);
@@ -301,10 +301,13 @@ public class TestDataProvider {
 
 	public static List<org.ibp.api.domain.ontology.VariableType> getVariableTypes(){
 		List<org.ibp.api.domain.ontology.VariableType> variableTypes = new ArrayList<>();
-		org.ibp.api.domain.ontology.VariableType variableType = new org.ibp.api.domain.ontology.VariableType(1, "Variable Type 1", "Variable Type Description");
+
+		org.ibp.api.domain.ontology.VariableType variableType = new org.ibp.api.domain.ontology.VariableType("1", "Variable Type 1", "Variable Type Description 1");
 		variableTypes.add(variableType);
-		variableType = new org.ibp.api.domain.ontology.VariableType(2, "Variable Type 2", "Variable Type Description 2");
+
+		variableType = new org.ibp.api.domain.ontology.VariableType("2", "Variable Type 2", "Variable Type Description 2");
 		variableTypes.add(variableType);
 		return variableTypes;
 	}
 }
+

@@ -205,7 +205,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			}
 
 			for (org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
-				variableInfo.addVariableType(VariableType.getById(variableType.getId()));
+				variableInfo.addVariableType(VariableType.getById(parseVariableTypeAsInteger(variableType)));
 			}
 
 			this.ontologyVariableDataManager.addVariable(variableInfo);
@@ -277,7 +277,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			}
 
 			for (org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
-				variableInfo.addVariableType(VariableType.getById(variableType.getId()));
+				variableInfo.addVariableType(VariableType.getById(parseVariableTypeAsInteger(variableType)));
 			}
 
 			this.ontologyVariableDataManager.updateVariable(variableInfo);
@@ -324,6 +324,13 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 				throw new ApiRuntimeException("Error!", e);
 			}
 		}
+	}
+
+	private Integer parseVariableTypeAsInteger(org.ibp.api.domain.ontology.VariableType variableType){
+		if(variableType == null) {
+			return null;
+		}
+		return StringUtil.parseInt(variableType.getId(), null);
 	}
 
 }

@@ -92,7 +92,7 @@ public class ModelServiceImpl implements ModelService {
 
 							@Override
 							public VariableType apply(org.generationcp.middleware.domain.ontology.VariableType variableType) {
-								return new VariableType(variableType.getId(), variableType.getName(), variableType.getDescription());
+								return new VariableType(String.valueOf(variableType.getId()), variableType.getName(), variableType.getDescription());
 							}
 						});
 

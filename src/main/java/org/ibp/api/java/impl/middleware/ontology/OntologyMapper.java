@@ -215,7 +215,7 @@ public class OntologyMapper {
 						VariableType variableEnum = context.getSource();
 
 						org.ibp.api.domain.ontology.VariableType variableType = new org.ibp.api.domain.ontology.VariableType();
-						variableType.setId(variableEnum.getId());
+						variableType.setId(String.valueOf(variableEnum.getId()));
 						variableType.setName(variableEnum.getName());
 						variableType.setDescription(variableEnum.getDescription());
 						return variableType;

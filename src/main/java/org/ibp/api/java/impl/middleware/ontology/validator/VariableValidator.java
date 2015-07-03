@@ -309,10 +309,10 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			return false;
 		}
 
-		// 18. Variable type IDs must be an array of integer values that correspond to the IDs of variable types and contain at least one
-		// item
+		// 18. Variable type IDs must be an array of integer values that correspond to the IDs of variable types and contain at least one item
+
 		for (VariableType variableType : variable.getVariableTypes()) {
-			if (org.generationcp.middleware.domain.ontology.VariableType.getById(variableType.getId()) == null) {
+			if (org.generationcp.middleware.domain.ontology.VariableType.getById(parseVariableTypeAsInteger(variableType)) == null) {
 				this.addCustomError(errors, "variableTypeIds", BaseValidator.INVALID_TYPE_ID, new Object[] {"Variable Type"});
 			}
 		}
@@ -441,6 +441,13 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		return errors.getErrorCount() == initialCount;
+	}
+
+	private Integer parseVariableTypeAsInteger(VariableType variableType){
+		if(variableType == null) {
+			return null;
+		}
+		return StringUtil.parseInt(variableType.getId(), null);
 	}
 
 }

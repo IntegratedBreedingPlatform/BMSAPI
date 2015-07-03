@@ -63,7 +63,7 @@ public class VariableSummarySerializer extends JsonSerializer<VariableSummary>{
 
 			for(VariableType variableType : variableSummary.getVariableTypes()){
 				jsonGenerator.writeStartObject();
-				jsonGenerator.writeNumberField("id", variableType.getId());
+				jsonGenerator.writeStringField("id", variableType.getId());
 				jsonGenerator.writeStringField("name", variableType.getName());
 				jsonGenerator.writeStringField("description", variableType.getDescription());
 				jsonGenerator.writeEndObject();
