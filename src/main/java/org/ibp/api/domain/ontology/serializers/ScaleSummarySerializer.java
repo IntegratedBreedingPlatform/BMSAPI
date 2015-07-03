@@ -4,9 +4,10 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.google.common.base.Strings;
-import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.domain.ontology.TermSummary;
+import org.ibp.api.java.ontology.ModelService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -14,6 +15,9 @@ import java.util.Collection;
 import java.util.Map;
 
 public class ScaleSummarySerializer extends JsonSerializer<ScaleSummary>{
+
+	@Autowired
+	private ModelService modelService;
 
 	@Override
 	public void serialize(ScaleSummary scaleSummary, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
@@ -32,7 +36,7 @@ public class ScaleSummarySerializer extends JsonSerializer<ScaleSummary>{
 
 			// If dataType is not null then added data type related details
 			jsonGenerator.writeObjectFieldStart("dataType");
-				jsonGenerator.writeNumberField("id", scaleSummary.getDataType().getId());
+				jsonGenerator.writeStringField("id", scaleSummary.getDataType().getId());
 				jsonGenerator.writeStringField("name", scaleSummary.getDataType().getName());
 			jsonGenerator.writeEndObject();
 
@@ -40,7 +44,7 @@ public class ScaleSummarySerializer extends JsonSerializer<ScaleSummary>{
 			jsonGenerator.writeObjectFieldStart("validValues");
 
 			// If numeric data type then adding min and max in valid values
-			if(scaleSummary.getDataType().getId() == 1110){
+			if(modelService.isNumericDataType(scaleSummary.getDataType().getId())){
 				if(!isNullOrEmpty(scaleSummary.getValidValues().getMin())){
 					BigDecimal min = new BigDecimal(scaleSummary.getValidValues().getMin());
 					jsonGenerator.writeNumberField("min", min);
@@ -50,13 +54,14 @@ public class ScaleSummarySerializer extends JsonSerializer<ScaleSummary>{
 					BigDecimal max = new BigDecimal(scaleSummary.getValidValues().getMax());
 					jsonGenerator.writeNumberField("max", max);
 				}
-			} else if(scaleSummary.getDataType().getId() == 1130){ // If categorical data type then adding categories in valid values
+			} else if(modelService.isCategoricalDataType(scaleSummary.getDataType().getId())){
+				// If categorical data type then adding categories in valid values
 				if(!scaleSummary.getValidValues().getCategories().isEmpty()){
 					jsonGenerator.writeArrayFieldStart("categories");
 
 					for (TermSummary category : scaleSummary.getValidValues().getCategories()){
 						jsonGenerator.writeStartObject();
-							jsonGenerator.writeNumberField("id", StringUtil.parseInt(category.getId(), null));
+							jsonGenerator.writeStringField("id", category.getId());
 							jsonGenerator.writeStringField("name", category.getName());
 							jsonGenerator.writeStringField("description", category.getDescription());
 						jsonGenerator.writeEndObject();
