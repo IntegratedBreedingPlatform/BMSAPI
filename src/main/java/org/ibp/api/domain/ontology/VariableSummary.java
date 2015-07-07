@@ -1,6 +1,7 @@
 
 package org.ibp.api.domain.ontology;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.ibp.api.domain.ontology.serializers.VariableSummarySerializer;
 
@@ -104,10 +105,12 @@ public class VariableSummary extends TermSummary {
 		return this.expectedRange;
 	}
 
+	@JsonIgnore
 	public void setExpectedMin(String min) {
 		this.expectedRange.setMin(min);
 	}
 
+	@JsonIgnore
 	public void setExpectedMax(String max) {
 		this.expectedRange.setMax(max);
 	}
