@@ -3,6 +3,7 @@ package org.ibp.api.java.ontology;
 
 import java.util.List;
 
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableSummary;
@@ -19,6 +20,15 @@ public interface VariableService {
 	 * @return list of variables
 	 */
 	List<VariableDetails> getAllVariablesByFilter(String cropName, String programId, String propertyId, Boolean favourite);
+
+	/**
+	 * Get List of variable by applying filter
+	 * @param cropName name of the crop
+	 * @param programId id of program
+	 * @param variableFilter variable filter that to be applied to get variables
+	 * @return
+	 */
+	List<VariableDetails> getVariablesByFilter(String cropName, String programId, VariableFilter variableFilter);
 
 	/**
 	 * Get variable using given id

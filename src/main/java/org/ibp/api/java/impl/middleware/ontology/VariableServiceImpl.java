@@ -100,6 +100,37 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	}
 
 	@Override
+	public List<VariableDetails> getVariablesByFilter(String cropName, String programId, VariableFilter variableFilter) {
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+		ProgramSummary program = new ProgramSummary();
+		program.setCropType(cropName);
+		program.setUniqueID(programId);
+
+		this.programValidator.validate(program, bindingResult);
+
+		if (bindingResult.hasErrors()) {
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
+		try {
+
+			List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
+			List<VariableDetails> variableDetailsList = new ArrayList<>();
+
+			ModelMapper mapper = OntologyMapper.getInstance();
+
+			for (Variable variable : variables) {
+				VariableDetails variableSummary = mapper.map(variable, VariableDetails.class);
+				variableDetailsList.add(variableSummary);
+			}
+			return variableDetailsList;
+		} catch (MiddlewareException e) {
+			throw new ApiRuntimeException("Error!", e);
+		}
+	}
+
+	@Override
 	public VariableDetails getVariableById(String cropName, String programId, String variableId) {
 
 		this.validateId(variableId, "Variable");
