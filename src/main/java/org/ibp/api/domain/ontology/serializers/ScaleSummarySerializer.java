@@ -38,6 +38,7 @@ public class ScaleSummarySerializer extends JsonSerializer<ScaleSummary>{
 			jsonGenerator.writeObjectFieldStart("dataType");
 				jsonGenerator.writeStringField("id", scaleSummary.getDataType().getId());
 				jsonGenerator.writeStringField("name", scaleSummary.getDataType().getName());
+				jsonGenerator.writeBooleanField("systemDataType", scaleSummary.getDataType().isSystemDataType());
 			jsonGenerator.writeEndObject();
 
 			// Adding valid values
