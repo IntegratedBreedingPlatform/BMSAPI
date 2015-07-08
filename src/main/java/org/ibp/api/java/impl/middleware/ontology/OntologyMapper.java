@@ -170,8 +170,6 @@ public class OntologyMapper {
 				this.map().setDescription(this.source.getDefinition());
 				this.map().setFavourite(this.source.getIsFavorite());
 				this.map().setAlias(this.source.getAlias());
-				this.map().setMethodSummary(this.source.getMethod());
-				this.map().setPropertySummary(this.source.getProperty());
 				this.map().setObservations(this.source.getObservations());
 				this.map().setStudies(this.source.getStudies());
 				this.map().setExpectedMin(this.source.getMinValue());

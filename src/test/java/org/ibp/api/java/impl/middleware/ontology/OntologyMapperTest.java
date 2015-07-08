@@ -160,12 +160,12 @@ public class OntologyMapperTest {
 		Assert.assertEquals(String.valueOf(variable.getId()), variableDetails.getId());
 		Assert.assertEquals(variable.getName(), variableDetails.getName());
 		Assert.assertEquals(variable.getDefinition(), variableDetails.getDescription());
-		Assert.assertEquals(String.valueOf(variable.getMethod().getId()), variableDetails.getMethodSummary().getId());
-		Assert.assertEquals(variable.getMethod().getName(), variableDetails.getMethodSummary().getName());
-		Assert.assertEquals(variable.getMethod().getDefinition(), variableDetails.getMethodSummary().getDescription());
-		Assert.assertEquals(String.valueOf(variable.getProperty().getId()), variableDetails.getPropertySummary().getId());
-		Assert.assertEquals(variable.getProperty().getName(), variableDetails.getPropertySummary().getName());
-		Assert.assertEquals(variable.getProperty().getDefinition(), variableDetails.getPropertySummary().getDescription());
+		Assert.assertEquals(String.valueOf(variable.getMethod().getId()), variableDetails.getMethod().getId());
+		Assert.assertEquals(variable.getMethod().getName(), variableDetails.getMethod().getName());
+		Assert.assertEquals(variable.getMethod().getDefinition(), variableDetails.getMethod().getDescription());
+		Assert.assertEquals(String.valueOf(variable.getProperty().getId()), variableDetails.getProperty().getId());
+		Assert.assertEquals(variable.getProperty().getName(), variableDetails.getProperty().getName());
+		Assert.assertEquals(variable.getProperty().getDefinition(), variableDetails.getProperty().getDescription());
 		Assert.assertEquals(String.valueOf(variable.getScale().getId()), variableDetails.getScale().getId());
 		Assert.assertEquals(variable.getScale().getName(), variableDetails.getScale().getName());
 		Assert.assertEquals(variable.getScale().getDefinition(), variableDetails.getScale().getDescription());

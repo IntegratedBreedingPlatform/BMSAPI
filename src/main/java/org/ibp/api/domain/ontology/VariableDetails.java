@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.domain.ontology.Method;
-import org.generationcp.middleware.domain.ontology.Property;
-
 /**
  * Holds all Variable details. Extended from {@link TermSummary} for basic term details.
  */
@@ -16,8 +13,8 @@ public class VariableDetails extends TermSummary {
 	private MetadataDetails metadata = new MetadataDetails();
 
 	private String alias;
-	private final TermSummary methodSummary = new TermSummary();
-	private final TermSummary propertySummary = new TermSummary();
+	private MethodSummary method;
+	private PropertySummary property;
 	private ScaleSummary scale;
 	private final List<VariableType> variableTypes = new ArrayList<>();
 	private boolean favourite;
@@ -43,24 +40,20 @@ public class VariableDetails extends TermSummary {
 		this.alias = alias;
 	}
 
-	public TermSummary getMethodSummary() {
-		return this.methodSummary;
+	public MethodSummary getMethod() {
+		return method;
 	}
 
-	public void setMethodSummary(Method method) {
-		this.methodSummary.setId(String.valueOf(method.getId()));
-		this.methodSummary.setName(method.getName());
-		this.methodSummary.setDescription(method.getDefinition());
+	public void setMethod(MethodSummary method) {
+		this.method = method;
 	}
 
-	public TermSummary getPropertySummary() {
-		return this.propertySummary;
+	public PropertySummary getProperty() {
+		return property;
 	}
 
-	public void setPropertySummary(Property property) {
-		this.propertySummary.setId(String.valueOf(property.getId()));
-		this.propertySummary.setName(property.getName());
-		this.propertySummary.setDescription(property.getDefinition());
+	public void setProperty(PropertySummary property) {
+		this.property = property;
 	}
 
 	public ScaleSummary getScale() {

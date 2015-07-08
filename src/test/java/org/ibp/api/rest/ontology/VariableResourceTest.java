@@ -118,16 +118,16 @@ public class VariableResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(variables.get(0).getDefinition())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].alias", Matchers.is(variables.get(0).getAlias())))
 				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].propertySummary.id",
+						MockMvcResultMatchers.jsonPath("$[0].property.id",
 								Matchers.is(String.valueOf(variables.get(0).getProperty().getId()))))
 				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].propertySummary.name",
+						MockMvcResultMatchers.jsonPath("$[0].property.name",
 								Matchers.is(variables.get(0).getProperty().getName())))
 				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].methodSummary.id",
+						MockMvcResultMatchers.jsonPath("$[0].method.id",
 								Matchers.is(String.valueOf(variables.get(0).getMethod().getId()))))
 				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].methodSummary.name",
+						MockMvcResultMatchers.jsonPath("$[0].method.name",
 								Matchers.is(variables.get(0).getMethod().getName())))
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$[0].scale.id",
@@ -178,11 +178,11 @@ public class VariableResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.is(ontologyVariable.getDefinition())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.alias", Matchers.is(ontologyVariable.getAlias())))
 				.andExpect(MockMvcResultMatchers
-						.jsonPath("$.methodSummary.id", Matchers.is(String.valueOf(ontologyVariable.getMethod().getId()))))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.methodSummary.name", Matchers.is(ontologyVariable.getMethod().getName())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.propertySummary.id",
+						.jsonPath("$.method.id", Matchers.is(String.valueOf(ontologyVariable.getMethod().getId()))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.method.name", Matchers.is(ontologyVariable.getMethod().getName())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.property.id",
 						Matchers.is(String.valueOf(ontologyVariable.getProperty().getId()))))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.propertySummary.name", Matchers.is(ontologyVariable.getProperty().getName())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.property.name", Matchers.is(ontologyVariable.getProperty().getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.id", Matchers.is(String.valueOf(ontologyVariable.getScale().getId()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.name", Matchers.is(ontologyVariable.getScale().getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.dataType.id",Matchers.is(String.valueOf(
