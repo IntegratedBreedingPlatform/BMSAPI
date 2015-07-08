@@ -1,27 +1,19 @@
 
 package org.ibp.api.domain.common;
 
+import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.beanutils.BeanUtils;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
-import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
-import org.ibp.api.domain.germplasm.GermplasmListSummary;
-import org.ibp.api.domain.location.Location;
-import org.ibp.api.domain.location.LocationType;
-import org.ibp.api.domain.ontology.DataType;
-import org.ibp.api.domain.ontology.ExpectedRange;
-import org.ibp.api.domain.ontology.MethodDetails;
-import org.ibp.api.domain.ontology.MethodSummary;
-import org.ibp.api.domain.ontology.PropertyDetails;
-import org.ibp.api.domain.ontology.PropertySummary;
-import org.ibp.api.domain.ontology.TermSummary;
-import org.ibp.api.domain.ontology.VariableType;
-import org.ibp.api.domain.ontology.VariableUsages;
-import org.ibp.api.domain.study.Measurement;
-import org.ibp.api.domain.study.MeasurementIdentifier;
-import org.ibp.api.domain.study.Observation;
-import org.ibp.api.domain.study.StudyGermplasm;
-import org.ibp.api.domain.study.StudySummary;
-import org.ibp.api.domain.study.Trait;
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,54 +29,98 @@ public class TestGetterAndSetter {
 	final PodamFactory factory = new PodamFactoryImpl();
 
 	@Test
-	public void testGetterAndSetter() throws Exception {
-		this.testGivenKlass(StudyGermplasmDto.class);
-
-		this.testGivenKlass(Measurement.class);
-		this.testGivenKlass(MeasurementIdentifier.class);
-		this.testGivenKlass(Observation.class);
-		this.testGivenKlass(StudyGermplasm.class);
-		this.testGivenKlass(StudySummary.class);
-		this.testGivenKlass(Trait.class);
-
-		// Ontology Domain Testing
-		this.testGivenKlass(DataType.class);
-		this.testGivenKlass(ExpectedRange.class);
-
-		this.testGivenKlass(MethodDetails.class);
-		this.testGivenKlass(MethodSummary.class);
-		this.testGivenKlass(PropertyDetails.class);
-		this.testGivenKlass(PropertySummary.class);
-
-		this.testGivenKlass(TermSummary.class);
-
-		this.testGivenKlass(VariableType.class);
-		this.testGivenKlass(VariableUsages.class);
-
-		// Location related tests
-		this.testGivenKlass(Location.class);
-		this.testGivenKlass(LocationType.class);
-
-		// Germplasm related domain testing
-
-		/**
-		 * FIXME: GermPlasmListDetails have been commented due to BeanUtils's behavioural change while passing different kind of arguments.
-		 * I have also asked question on Stackoverflow related to it.
-		 * @link http://stackoverflow.com/questions/30931035/apache-beanutils-behavioral-conflict-while-copying-list-items-from-different-cla
-		 * @author Keyur
-		 */
-		//this.testGivenKlass(GermplasmListDetails.class);
-		this.testGivenKlass(GermplasmListEntrySummary.class);
-		this.testGivenKlass(GermplasmListSummary.class);
-
+	public void testBmsApiGetterAndSetter() throws Exception {
+		final List<Class<? extends Object>> findAllPojosInPackage = findAllPojosInPackage("org.ibp.api");
+		for (final Class<? extends Object> class1 : findAllPojosInPackage) {
+			testClassesForCodeCoverage(class1);
+		}
 	}
 
-	private void testGivenKlass(final Class<?> klass) throws Exception {
-		final Object source = this.factory.manufacturePojo(klass);
-		final Object destination = klass.newInstance();
-		BeanUtils.copyProperties(destination, source);
-		Assert.assertEquals(source, destination);
+	private Set<Class<? extends Object>> getAllClasses(final String packageName) throws Exception {
+		final Set<Class<? extends Object>> allClasses = new HashSet<Class<? extends Object>>();
+
+		final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+		final URL root = contextClassLoader.getResource(packageName.replace(".", "/"));
+
+		// Look for all Java files under Project_Directory/target/classes/
+		final String rootFolder = root.getFile().replace("test-classes", "classes");
+		final Collection<File> files = FileUtils.listFiles(new File(rootFolder), new String[] {"class"}, true);
+		// Find classes implementing ICommand.
+		for (final File file : files) {
+
+			final String className = getPackageNameFromFilePath(file);
+			if (className.contains("$")) {
+				continue;
+			}
+
+			// Need to load this class dynamically and thus call below.
+			contextClassLoader.getResource(className);
+			final Class<?> cls = Class.forName(className);
+			if (Object.class.isAssignableFrom(cls)) {
+				allClasses.add(cls);
+			}
+		}
+		return allClasses;
+	}
+
+	private String getPackageNameFromFilePath(final File file) {
+		// Remove everything from before Project_Directory/target/classes/ and replaces all / with .
+		return file.getAbsolutePath().replaceAll(".*target\\/classes\\/", "").replace("/", ".").replace(".class", "");
+	}
+
+	private void testClassesForCodeCoverage(final Class<?> klass) throws Exception, Exception {
+		final Object source = factory.manufacturePojo(klass);
+
 		Assert.assertNotEquals(source, new Object());
-		Assert.assertEquals(source.hashCode(), destination.hashCode());
+
+		final Method toStringMethod = getMethodIfItExists(klass, "toString");
+		if (toStringMethod != null) {
+			toStringMethod.invoke(source);
+		}
+
+		final Method equalsMethod = getMethodIfItExists(klass, "equals", Object.class);
+
+		final Object destination = klass.newInstance();
+		privateCopy(destination, source);
+
+		if (equalsMethod != null) {
+			Assert.assertTrue((Boolean) equalsMethod.invoke(source, destination));
+			Assert.assertEquals(source.hashCode(), destination.hashCode());
+		}
+
 	}
+
+	private Method getMethodIfItExists(final Class<?> klass, final String name, final Class<?>... parameterTypes) {
+		try {
+			return klass.getDeclaredMethod(name, parameterTypes);
+		} catch (final Exception e) {
+			// This is only there because if the method does not exist we want to carry on.
+			// Do not need to log anything as this is not an erroneous case
+		}
+		// return null if the method does not exist
+		return null;
+	}
+
+	private void privateCopy(final Object destination, final Object source) throws Exception {
+		final Field[] fields = source.getClass().getDeclaredFields();
+		for (final Field field : fields) {
+
+			if (PropertyUtils.isWriteable(source, field.getName())) {
+				BeanUtils.setProperty(destination, field.getName(), PropertyUtils.getProperty(source, field.getName()));
+			} else {
+
+				if (field.isSynthetic() || Modifier.isStatic(field.getModifiers())) {
+					continue;
+				}
+				field.setAccessible(true);
+				field.set(destination, field.get(source));
+			}
+		}
+	}
+
+	private List<Class<? extends Object>> findAllPojosInPackage(final String packageName) throws Exception {
+		final Set<Class<? extends Object>> allClasses = getAllClasses(packageName);
+		return ReflectionPojoUtilities.getAllPojos(allClasses);
+	}
+
 }
