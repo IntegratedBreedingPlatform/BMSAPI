@@ -63,7 +63,7 @@ public class ModelServiceImpl implements ModelService {
 				classList.add(term.getName());
 			}
 
-			Comparator<String> ALPHABETICAL_ORDER = new Comparator<String>() {
+			Comparator<String> alphabeticalOrder = new Comparator<String>() {
 
 				@Override
 				public int compare(String str1, String str2) {
@@ -75,7 +75,7 @@ public class ModelServiceImpl implements ModelService {
 				}
 			};
 
-			Collections.sort(classList, ALPHABETICAL_ORDER);
+			Collections.sort(classList, alphabeticalOrder);
 
 			return classList;
 		} catch (MiddlewareException e) {

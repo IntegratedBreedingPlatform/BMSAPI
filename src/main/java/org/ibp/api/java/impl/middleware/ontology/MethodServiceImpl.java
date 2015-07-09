@@ -77,12 +77,12 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 			}
 			ModelMapper mapper = OntologyMapper.getInstance();
 			MethodDetails methodDetails = mapper.map(method, MethodDetails.class);
-			String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
+			String fieldToBeEditableIfTermReferred = "description";
 			if (!deletable) {
-				methodDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
+				methodDetails.getMetadata().addEditableField(fieldToBeEditableIfTermReferred);
 			} else {
 				methodDetails.getMetadata().addEditableField("name");
-				methodDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
+				methodDetails.getMetadata().addEditableField(fieldToBeEditableIfTermReferred);
 			}
 			methodDetails.getMetadata().setDeletable(deletable);
 

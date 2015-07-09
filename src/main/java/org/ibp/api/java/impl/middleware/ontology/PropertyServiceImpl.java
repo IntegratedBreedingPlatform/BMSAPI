@@ -84,16 +84,16 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 			ModelMapper mapper = OntologyMapper.getInstance();
 			PropertyDetails propertyDetails = mapper.map(property, PropertyDetails.class);
 
-			String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
+			String fieldToBeEditableIfTermReferred = "description";
 
 			// Note: If property is used then description is editable else all fields can be editable
 			if (!deletable) {
-				propertyDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
+				propertyDetails.getMetadata().addEditableField(fieldToBeEditableIfTermReferred);
 				propertyDetails.getMetadata().addEditableField("classes");
 				propertyDetails.getMetadata().addEditableField("cropOntologyId");
 			} else {
 				propertyDetails.getMetadata().addEditableField("name");
-				propertyDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
+				propertyDetails.getMetadata().addEditableField(fieldToBeEditableIfTermReferred);
 				propertyDetails.getMetadata().addEditableField("classes");
 				propertyDetails.getMetadata().addEditableField("cropOntologyId");
 			}
