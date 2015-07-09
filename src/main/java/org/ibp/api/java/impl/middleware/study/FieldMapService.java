@@ -6,8 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.collections4.map.DefaultedMap;
@@ -22,9 +20,9 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.FieldMapMetaData;
+import org.ibp.api.domain.study.FieldMapPlantingDetails;
 import org.ibp.api.domain.study.FieldMapStudySummary;
 import org.ibp.api.domain.study.FieldPlot;
-import org.ibp.api.domain.study.FieldMapPlantingDetails;
 import org.ibp.api.exception.ApiRuntimeException;
 
 import com.google.common.collect.Lists;
@@ -39,8 +37,8 @@ public class FieldMapService {
 
 	public Map<Integer, FieldMap> getFieldMap(String studyId) {
 
-		final Map<Integer, FieldMap> fieldMaps = getDefaultFieldMap();
-		final StudyFieldMap rawDataFromMiddleware = getRawDataFromMiddleware(studyId);
+		final Map<Integer, FieldMap> fieldMaps = this.getDefaultFieldMap();
+		final StudyFieldMap rawDataFromMiddleware = this.getRawDataFromMiddleware(studyId);
 
 		final FieldMapInfo fieldMapInfo = rawDataFromMiddleware.getMiddlewareFieldMapInfo();
 
@@ -48,9 +46,9 @@ public class FieldMapService {
 			return fieldMaps;
 		}
 
-		populateStudyInformation(fieldMaps, rawDataFromMiddleware);
+		this.populateStudyInformation(fieldMaps, rawDataFromMiddleware);
 
-		extractRangesFromPlotData(fieldMaps);
+		this.extractRangesFromPlotData(fieldMaps);
 
 		return fieldMaps;
 	}
@@ -59,14 +57,14 @@ public class FieldMapService {
 		Collection<FieldMap> createdFieldMaps = fieldMaps.values();
 		for (FieldMap fieldMap : createdFieldMaps) {
 			final FieldPlot[][] fieldPlots = fieldMap.getPlots();
-			
+
 			for (int column = 0; column < fieldPlots.length; column++) {
 				for (int range = 0; range < fieldPlots[column].length; range++) {
 					FieldPlot fieldPlot = fieldPlots[column][range];
-					
-					addToList(getDefaultList(fieldMap.getRange()), range+1, fieldPlot);
 
-					addToList(getDefaultList(fieldMap.getColumns()), column+1, fieldPlot);
+					this.addToList(this.getDefaultList(fieldMap.getRange()), range + 1, fieldPlot);
+
+					this.addToList(this.getDefaultList(fieldMap.getColumns()), column + 1, fieldPlot);
 
 				}
 			}
@@ -98,15 +96,16 @@ public class FieldMapService {
 			}
 
 			final FieldMap fieldMap = filedMaps.get(middlewareFieldMapTrialInstanceInfo.getBlockId());
-			setBlockName(middlewareFieldMapTrialInstanceInfo, fieldMap);
+			this.setBlockName(middlewareFieldMapTrialInstanceInfo, fieldMap);
 
-			mapPlantingDetails(middlewareFieldMapTrialInstanceInfo, fieldMap.getFieldMapMetaData());
+			this.mapPlantingDetails(middlewareFieldMapTrialInstanceInfo, fieldMap.getFieldMapMetaData());
 
-			final FieldMapStudySummary plantingSummary = mapPlantingSummary(rawDataFromMiddleware, middlewareFieldMapTrialInstanceInfo);
+			final FieldMapStudySummary plantingSummary =
+					this.mapPlantingSummary(rawDataFromMiddleware, middlewareFieldMapTrialInstanceInfo);
 
 			fieldMap.getFieldMapMetaData().getRelevantStudies().add(plantingSummary);
-			populateFieldMap(fieldMap, middlewareFieldMapTrialInstanceInfo, rawDataFromMiddleware);
-			updatePlotsDeleted(fieldMap, middlewareFieldMapTrialInstanceInfo);
+			this.populateFieldMap(fieldMap, middlewareFieldMapTrialInstanceInfo, rawDataFromMiddleware);
+			this.updatePlotsDeleted(fieldMap, middlewareFieldMapTrialInstanceInfo);
 
 		}
 	}
@@ -129,11 +128,11 @@ public class FieldMapService {
 	private void populateFieldMap(final FieldMap fieldMap, final FieldMapTrialInstanceInfo middlewareFieldMapTrialInstanceInfo,
 			final StudyFieldMap rawDataFromMiddleware) {
 
-		initFieldPlots(fieldMap, middlewareFieldMapTrialInstanceInfo);
+		this.initFieldPlots(fieldMap, middlewareFieldMapTrialInstanceInfo);
 		FieldPlot[][] fieldPlots = fieldMap.getPlots();
 		for (FieldMapLabel fieldMapLabel : middlewareFieldMapTrialInstanceInfo.getFieldMapLabels()) {
 			fieldPlots[fieldMapLabel.getRange() - 1][fieldMapLabel.getColumn() - 1] =
-					mapMiddlewareFieldLableToFieldPlot(fieldMapLabel, middlewareFieldMapTrialInstanceInfo, rawDataFromMiddleware);
+					this.mapMiddlewareFieldLableToFieldPlot(fieldMapLabel, middlewareFieldMapTrialInstanceInfo, rawDataFromMiddleware);
 		}
 
 	}
@@ -234,7 +233,7 @@ public class FieldMapService {
 							StudyFieldMapUtility.getCrossExpansionProperties());
 			return new StudyFieldMap(studyType, fieldMapInfoOfStudy);
 		} catch (MiddlewareQueryException e) {
-			throw new ApiRuntimeException(String.format("There was an error retriving infomration for studyId %s was found.", studyId));
+			throw new ApiRuntimeException(String.format("There was an error retriving infomration for studyId %s was found.", studyId), e);
 		}
 	}
 
@@ -258,22 +257,22 @@ public class FieldMapService {
 		 * @return the studyType
 		 */
 		public StudyType getStudyType() {
-			return studyType;
+			return this.studyType;
 		}
 
 		/**
 		 * @return the middlewareFieldMapInfo
 		 */
 		public FieldMapInfo getMiddlewareFieldMapInfo() {
-			return middlewareFieldMapInfo.get(0);
+			return this.middlewareFieldMapInfo.get(0);
 		}
 
 		public List<FieldMapTrialInstanceInfo> getMiddlewareTiralInstances() {
-			return getFieldmapDataset().getTrialInstances();
+			return this.getFieldmapDataset().getTrialInstances();
 		}
 
 		public FieldMapDatasetInfo getFieldmapDataset() {
-			return getMiddlewareFieldMapInfo().getDatasets().get(0);
+			return this.getMiddlewareFieldMapInfo().getDatasets().get(0);
 		}
 
 	}
