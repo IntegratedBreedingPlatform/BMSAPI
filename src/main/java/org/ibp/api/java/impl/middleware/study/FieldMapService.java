@@ -116,7 +116,6 @@ public class FieldMapService {
 		final FieldPlot[][] fieldPlots = fieldMap.getPlots();
 		for (String deletedPlot : deletedPlots) {
 			String[] plots = deletedPlot.split(",");
-			// FieldPlot fieldPlot = fieldPlots.get(new FieldCoordinates(Integer.parseInt(plots[0])+1, Integer.parseInt(plots[1])+1));
 			int column = Integer.parseInt(plots[0]);
 			int range = Integer.parseInt(plots[1]);
 			FieldPlot fieldPlot = fieldPlots[column][range];
