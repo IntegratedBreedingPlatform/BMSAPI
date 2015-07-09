@@ -20,28 +20,31 @@ import org.springframework.stereotype.Service;
 @Service
 public class GermplasmListServiceImpl implements GermplasmListService {
 
+	private static final String ERROR_NAME = "Error!";
+
 	@Autowired
 	private GermplasmListManager germplasmListManager;
 
 	public GermplasmListServiceImpl() {
-		
+
 	}
-	
+
 	/**
 	 * Only used for testing
+	 *
 	 * @param germplasmListManager the mock germplasm list manager
 	 */
 	GermplasmListServiceImpl(final GermplasmListManager germplasmListManager) {
 		this.germplasmListManager = germplasmListManager;
 	}
-	
+
 	@Override
 	public List<GermplasmListSummary> searchGermplasmLists(String searchText) {
 		List<GermplasmList> matchingLists;
 		try {
 			matchingLists = this.germplasmListManager.searchForGermplasmList(searchText, Operation.LIKE);
 		} catch (MiddlewareQueryException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(GermplasmListServiceImpl.ERROR_NAME, e);
 		}
 		return this.mapResults(matchingLists);
 	}
@@ -92,7 +95,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			}
 			return listDetails;
 		} catch (MiddlewareQueryException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(GermplasmListServiceImpl.ERROR_NAME, e);
 		}
 	}
 
@@ -102,7 +105,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		try {
 			allGermplasmLists = this.germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE);
 		} catch (MiddlewareQueryException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(GermplasmListServiceImpl.ERROR_NAME, e);
 		}
 		return this.mapResults(allGermplasmLists);
 	}

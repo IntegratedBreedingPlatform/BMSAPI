@@ -9,8 +9,8 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermRelationship;
-import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.util.StringUtil;
@@ -36,6 +36,10 @@ import org.springframework.validation.MapBindingResult;
 @Service
 public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyService {
 
+	private static final String ERROR_MESSAGE = "Error!";
+	private static final String PROPERTY_NAME = "Property";
+	private static final String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
+
 	@Autowired
 	private OntologyPropertyDataManager ontologyPropertyDataManager;
 
@@ -56,16 +60,16 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 			}
 			return properties;
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(PropertyServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
 	public PropertyDetails getProperty(String id) {
-		this.validateId(id, "Property");
+		this.validateId(id, PropertyServiceImpl.PROPERTY_NAME);
 		// Note: Validate Property Id for valid format and property exists or not
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Property");
-		TermRequest term = new TermRequest(id, "Property", CvId.PROPERTIES.getId());
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), PropertyServiceImpl.PROPERTY_NAME);
+		TermRequest term = new TermRequest(id, PropertyServiceImpl.PROPERTY_NAME, CvId.PROPERTIES.getId());
 		this.termValidator.validate(term, errors);
 
 		// Note: If any error occurs then throws Exception with error messages
@@ -84,23 +88,22 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 			ModelMapper mapper = OntologyMapper.getInstance();
 			PropertyDetails propertyDetails = mapper.map(property, PropertyDetails.class);
 
-			String fieldToBeEditableIfTermReferred = "description";
-
 			// Note: If property is used then description is editable else all fields can be editable
 			if (!deletable) {
-				propertyDetails.getMetadata().addEditableField(fieldToBeEditableIfTermReferred);
+				propertyDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
 				propertyDetails.getMetadata().addEditableField("classes");
 				propertyDetails.getMetadata().addEditableField("cropOntologyId");
 			} else {
 				propertyDetails.getMetadata().addEditableField("name");
-				propertyDetails.getMetadata().addEditableField(fieldToBeEditableIfTermReferred);
+				propertyDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
 				propertyDetails.getMetadata().addEditableField("classes");
 				propertyDetails.getMetadata().addEditableField("cropOntologyId");
 			}
 			propertyDetails.getMetadata().setDeletable(deletable);
 
 			// Note : Get list of relationships related to property Id
-			List<TermRelationship> relationships = this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_PROPERTY);
+			List<TermRelationship> relationships =
+					this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_PROPERTY);
 
 			Collections.sort(relationships, new Comparator<TermRelationship>() {
 
@@ -117,7 +120,7 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 
 			return propertyDetails;
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(PropertyServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
@@ -125,7 +128,7 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 	public GenericResponse addProperty(PropertySummary propertySummary) {
 		// Note: Set id to null because add property does not need id
 		propertySummary.setId(null);
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Property");
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), PropertyServiceImpl.PROPERTY_NAME);
 		this.propertyValidator.validate(propertySummary, errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -144,7 +147,7 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 
 			return new GenericResponse(String.valueOf(property.getId()));
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(PropertyServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
@@ -162,33 +165,34 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 			}
 			return properties;
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(PropertyServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
 	public void deleteProperty(String id) {
 		// Note: Validate Id for valid format and check if property exists or not
-		this.validateId(id, "Property");
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Property");
+		this.validateId(id, PropertyServiceImpl.PROPERTY_NAME);
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), PropertyServiceImpl.PROPERTY_NAME);
 
 		// Note: Check if property is deletable or not by checking its usage in variable
-		this.termDeletableValidator.validate(new TermRequest(String.valueOf(id), "Property", CvId.PROPERTIES.getId()), errors);
+		this.termDeletableValidator.validate(
+				new TermRequest(String.valueOf(id), PropertyServiceImpl.PROPERTY_NAME, CvId.PROPERTIES.getId()), errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		try {
 			this.ontologyPropertyDataManager.deleteProperty(StringUtil.parseInt(id, null));
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(PropertyServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
 	public void updateProperty(String id, PropertySummary propertySummary) {
-		this.validateId(id, "Property");
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Property");
-		TermRequest term = new TermRequest(id, "property", CvId.PROPERTIES.getId());
+		this.validateId(id, PropertyServiceImpl.PROPERTY_NAME);
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), PropertyServiceImpl.PROPERTY_NAME);
+		TermRequest term = new TermRequest(id, PropertyServiceImpl.PROPERTY_NAME, CvId.PROPERTIES.getId());
 		this.termValidator.validate(term, errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -214,7 +218,7 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 
 			this.ontologyPropertyDataManager.updateProperty(property);
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(PropertyServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 

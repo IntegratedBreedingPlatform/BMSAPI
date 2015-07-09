@@ -8,13 +8,13 @@ import java.util.Objects;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.common.GenericResponse;
@@ -42,6 +42,9 @@ import com.google.common.base.Strings;
 @Service
 public class VariableServiceImpl extends ServiceBaseImpl implements VariableService {
 
+	private static final String VARIABLE_NAME = "Variable";
+	private static final String ERROR_MESSAGE = "Error!";
+
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
@@ -57,7 +60,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	@Override
 	public List<VariableDetails> getAllVariablesByFilter(String cropName, String programId, String propertyId, Boolean favourite) {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
 
 		ProgramSummary program = new ProgramSummary();
 		program.setCropType(cropName);
@@ -70,18 +73,18 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		}
 
 		if (!Strings.isNullOrEmpty(propertyId)) {
-			this.validateId(propertyId, "Variable");
+			this.validateId(propertyId, VariableServiceImpl.VARIABLE_NAME);
 		}
 
 		try {
 			VariableFilter variableFilter = new VariableFilter();
 			variableFilter.setProgramUuid(programId);
-			if(favourite != null){
+			if (favourite != null) {
 				variableFilter.setFavoritesOnly(favourite);
 			}
 
 			Integer property = StringUtil.parseInt(propertyId, null);
-			if(property != null){
+			if (property != null) {
 				variableFilter.addPropertyId(property);
 			}
 			List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
@@ -95,13 +98,13 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			}
 			return variableDetailsList;
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(VariableServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
 	public List<VariableDetails> getVariablesByFilter(String cropName, String programId, VariableFilter variableFilter) {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
 
 		ProgramSummary program = new ProgramSummary();
 		program.setCropType(cropName);
@@ -126,15 +129,15 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			}
 			return variableDetailsList;
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(VariableServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
 	public VariableDetails getVariableById(String cropName, String programId, String variableId) {
 
-		this.validateId(variableId, "Variable");
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		this.validateId(variableId, VariableServiceImpl.VARIABLE_NAME);
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
 
 		ProgramSummary program = new ProgramSummary();
 		program.setCropType(cropName);
@@ -146,7 +149,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		TermRequest term = new TermRequest(variableId, "variable", CvId.VARIABLES.getId());
+		TermRequest term = new TermRequest(variableId, VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId());
 		this.termValidator.validate(term, errors);
 
 		if (errors.hasErrors()) {
@@ -186,7 +189,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			response.getMetadata().setDeletable(deletable);
 			return response;
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(VariableServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
@@ -202,7 +205,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 		try {
 
-			BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Variable");
+			BindingResult errors = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
 			this.programValidator.validate(program, errors);
 			if (errors.hasErrors()) {
 				throw new ApiRequestValidationException(errors.getAllErrors());
@@ -213,7 +216,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 
-			formatVariableSummary(variable);
+			this.formatVariableSummary(variable);
 
 			Integer methodId = StringUtil.parseInt(variable.getMethodSummary().getId(), null);
 			Integer propertyId = StringUtil.parseInt(variable.getPropertySummary().getId(), null);
@@ -236,13 +239,13 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			}
 
 			for (org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
-				variableInfo.addVariableType(VariableType.getById(parseVariableTypeAsInteger(variableType)));
+				variableInfo.addVariableType(VariableType.getById(this.parseVariableTypeAsInteger(variableType)));
 			}
 
 			this.ontologyVariableDataManager.addVariable(variableInfo);
 			return new GenericResponse(String.valueOf(variableInfo.getId()));
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(VariableServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
@@ -258,7 +261,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 		try {
 
-			BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Variable");
+			BindingResult errors = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
 
 			this.programValidator.validate(program, errors);
 
@@ -266,8 +269,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 
-			this.validateId(variableId, "Variable");
-			TermRequest term = new TermRequest(variableId, "variable", CvId.VARIABLES.getId());
+			this.validateId(variableId, VariableServiceImpl.VARIABLE_NAME);
+			TermRequest term = new TermRequest(variableId, VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId());
 			this.termValidator.validate(term, errors);
 
 			if (errors.hasErrors()) {
@@ -279,7 +282,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 
-			formatVariableSummary(variable);
+			this.formatVariableSummary(variable);
 
 			Integer id = StringUtil.parseInt(variable.getId(), null);
 
@@ -308,12 +311,12 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			}
 
 			for (org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
-				variableInfo.addVariableType(VariableType.getById(parseVariableTypeAsInteger(variableType)));
+				variableInfo.addVariableType(VariableType.getById(this.parseVariableTypeAsInteger(variableType)));
 			}
 
 			this.ontologyVariableDataManager.updateVariable(variableInfo);
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(VariableServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
@@ -321,11 +324,12 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	public void deleteVariable(String id) {
 
 		// Note: Validate Id for valid format and check if variable exists or not
-		this.validateId(id, "Variable");
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		this.validateId(id, VariableServiceImpl.VARIABLE_NAME);
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
 
 		// Note: Check if variable is deletable or not by checking its usage in variable
-		this.termDeletableValidator.validate(new TermRequest(String.valueOf(id), "Variable", CvId.VARIABLES.getId()), errors);
+		this.termDeletableValidator.validate(
+				new TermRequest(String.valueOf(id), VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId()), errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -333,32 +337,32 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		try {
 			this.ontologyVariableDataManager.deleteVariable(StringUtil.parseInt(id, null));
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(VariableServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
-	protected void formatVariableSummary(VariableSummary variableSummary){
+	protected void formatVariableSummary(VariableSummary variableSummary) {
 
 		Integer scaleId = StringUtil.parseInt(variableSummary.getScaleSummary().getId(), null);
 
-		//Should discard unwanted parameters. We do not want expected min/max values if associated data type is not numeric
-		if(scaleId != null){
+		// Should discard unwanted parameters. We do not want expected min/max values if associated data type is not numeric
+		if (scaleId != null) {
 			try {
-				Scale scale = ontologyScaleDataManager.getScaleById(scaleId);
+				Scale scale = this.ontologyScaleDataManager.getScaleById(scaleId);
 
-				if(scale != null && !Objects.equals(scale.getDataType().getId(), DataType.NUMERIC_VARIABLE.getId())){
+				if (scale != null && !Objects.equals(scale.getDataType().getId(), DataType.NUMERIC_VARIABLE.getId())) {
 					variableSummary.setExpectedMin(null);
 					variableSummary.setExpectedMax(null);
 				}
 
 			} catch (MiddlewareException e) {
-				throw new ApiRuntimeException("Error!", e);
+				throw new ApiRuntimeException(VariableServiceImpl.ERROR_MESSAGE, e);
 			}
 		}
 	}
 
-	private Integer parseVariableTypeAsInteger(org.ibp.api.domain.ontology.VariableType variableType){
-		if(variableType == null) {
+	private Integer parseVariableTypeAsInteger(org.ibp.api.domain.ontology.VariableType variableType) {
+		if (variableType == null) {
 			return null;
 		}
 		return StringUtil.parseInt(variableType.getId(), null);

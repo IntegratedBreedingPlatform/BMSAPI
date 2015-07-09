@@ -56,6 +56,12 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(VariableValidator.class);
 
+	private static final String PROPERTY_ID_NAME = "propertyId";
+	private static final String METHOD_ID_NAME = "methodId";
+	private static final String SCALE_ID_NAME = "scaleId";
+	private static final String EXPECTED_RANGE_NAME = "expectedRange";
+	private static final String VARIABLE_NAME = "variable";
+
 	@Override
 	public boolean supports(Class<?> aClass) {
 		return VariableSummary.class.equals(aClass);
@@ -154,7 +160,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		Integer initialCount = errors.getErrorCount();
 
 		// 6. Property ID is required
-		this.shouldNotNullOrEmpty("Property", "propertyId", variable.getPropertySummary().getId(), errors);
+		this.shouldNotNullOrEmpty("Property", VariableValidator.PROPERTY_ID_NAME, variable.getPropertySummary().getId(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
@@ -163,7 +169,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		Integer propertyId = StringUtil.parseInt(variable.getPropertySummary().getId(), null);
 
 		if (propertyId == null) {
-			this.addCustomError(errors, "propertyId", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
+			this.addCustomError(errors, VariableValidator.PROPERTY_ID_NAME, BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 		}
 
 		if (errors.getErrorCount() > initialCount) {
@@ -171,7 +177,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// 7. Property ID must correspond to the ID of an existing property
-		this.checkTermExist("Property", "propertyId", variable.getPropertySummary().getId(), CvId.PROPERTIES.getId(), errors);
+		this.checkTermExist("Property", VariableValidator.PROPERTY_ID_NAME, variable.getPropertySummary().getId(), CvId.PROPERTIES.getId(),
+				errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
@@ -181,7 +188,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		Integer initialCount = errors.getErrorCount();
 
 		// 8. Method ID is required
-		this.shouldNotNullOrEmpty("Method", "methodId", variable.getMethodSummary().getId(), errors);
+		this.shouldNotNullOrEmpty("Method", VariableValidator.METHOD_ID_NAME, variable.getMethodSummary().getId(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
@@ -190,7 +197,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		Integer methodId = StringUtil.parseInt(variable.getMethodSummary().getId(), null);
 
 		if (methodId == null) {
-			this.addCustomError(errors, "methodId", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
+			this.addCustomError(errors, VariableValidator.METHOD_ID_NAME, BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 		}
 
 		if (errors.getErrorCount() > initialCount) {
@@ -198,7 +205,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// 9. Method ID must correspond to the ID of an existing method
-		this.checkTermExist("Method", "methodId", variable.getMethodSummary().getId(), CvId.METHODS.getId(), errors);
+		this.checkTermExist("Method", VariableValidator.METHOD_ID_NAME, variable.getMethodSummary().getId(), CvId.METHODS.getId(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
@@ -208,7 +215,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		Integer initialCount = errors.getErrorCount();
 
 		// 10. Scale ID is required
-		this.shouldNotNullOrEmpty("Scale", "scaleId", variable.getScaleSummary().getId(), errors);
+		this.shouldNotNullOrEmpty("Scale", VariableValidator.SCALE_ID_NAME, variable.getScaleSummary().getId(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
@@ -217,7 +224,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		Integer scaleId = StringUtil.parseInt(variable.getScaleSummary().getId(), null);
 
 		if (scaleId == null) {
-			this.addCustomError(errors, "scaleId", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
+			this.addCustomError(errors, VariableValidator.SCALE_ID_NAME, BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 		}
 
 		if (errors.getErrorCount() > initialCount) {
@@ -225,7 +232,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// 11. Scale ID must correspond to the ID of an existing scale
-		this.checkTermExist("Scale", "scaleId", variable.getScaleSummary().getId(), CvId.SCALES.getId(), errors);
+		this.checkTermExist("Scale", VariableValidator.SCALE_ID_NAME, variable.getScaleSummary().getId(), CvId.SCALES.getId(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
@@ -258,7 +265,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				if (!this.isNullOrEmpty(variableMin)) {
 					variableExpectedMin = StringUtil.parseBigDecimal(variableMin, null);
 					if (variableExpectedMin == null) {
-						this.addCustomError(errors, "expectedRange.min", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
+						this.addCustomError(errors, VariableValidator.EXPECTED_RANGE_NAME + ".min", BaseValidator.FIELD_SHOULD_BE_NUMERIC,
+								null);
 					}
 				}
 
@@ -267,7 +275,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				if (!this.isNullOrEmpty(variableMax)) {
 					variableExpectedMax = StringUtil.parseBigDecimal(variableMax, null);
 					if (variableExpectedMax == null) {
-						this.addCustomError(errors, "expectedRange.max", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
+						this.addCustomError(errors, VariableValidator.EXPECTED_RANGE_NAME + ".max", BaseValidator.FIELD_SHOULD_BE_NUMERIC,
+								null);
 					}
 				}
 
@@ -279,14 +288,16 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				// be less than the valid values minimum, and the expected range maximum cannot be larger than the valid values maximum
 				BigDecimal scaleMinValue = StringUtil.parseBigDecimal(scale.getMinValue(), null);
 				if (scaleMinValue != null && variableExpectedMin != null && scaleMinValue.compareTo(variableExpectedMin) == 1) {
-					this.addCustomError(errors, "expectedRange.min", VariableValidator.VARIABLE_MIN_SHOULD_BE_IN_SCALE_RANGE, new Object[] {
-							scale.getMinValue(), scale.getMaxValue()});
+					this.addCustomError(errors, VariableValidator.EXPECTED_RANGE_NAME + ".min",
+							VariableValidator.VARIABLE_MIN_SHOULD_BE_IN_SCALE_RANGE,
+							new Object[] {scale.getMinValue(), scale.getMaxValue()});
 				}
 
 				BigDecimal scaleMaxValue = StringUtil.parseBigDecimal(scale.getMaxValue(), null);
 				if (scaleMaxValue != null && variableExpectedMax != null && scaleMaxValue.compareTo(variableExpectedMax) == -1) {
-					this.addCustomError(errors, "expectedRange.max", VariableValidator.VARIABLE_MAX_SHOULD_BE_IN_SCALE_RANGE, new Object[] {
-							scale.getMinValue(), scale.getMaxValue()});
+					this.addCustomError(errors, VariableValidator.EXPECTED_RANGE_NAME + ".max",
+							VariableValidator.VARIABLE_MAX_SHOULD_BE_IN_SCALE_RANGE,
+							new Object[] {scale.getMinValue(), scale.getMaxValue()});
 				}
 
 				if (errors.getErrorCount() > initialCount) {
@@ -296,7 +307,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				// 15. If provided, the expected range minimum must be less than or equal to the expected range maximum, and the expected
 				// range maximum must be greater than or equal to the expected range minimum
 				if (variableExpectedMin != null && variableExpectedMax != null && variableExpectedMin.compareTo(variableExpectedMax) == 1) {
-					this.addCustomError(errors, "expectedRange", BaseValidator.MIN_SHOULD_NOT_GREATER_THEN_MAX, null);
+					this.addCustomError(errors, VariableValidator.EXPECTED_RANGE_NAME, BaseValidator.MIN_SHOULD_NOT_GREATER_THEN_MAX, null);
 				}
 			}
 
@@ -370,7 +381,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 			// that variable should exist with requestId
 			if (Objects.equals(oldVariable, null)) {
-				this.addCustomError(errors, BaseValidator.ID_DOES_NOT_EXIST, new Object[] {"Variable", variable.getId()});
+				this.addCustomError(errors, BaseValidator.ID_DOES_NOT_EXIST,
+						new Object[] {VariableValidator.VARIABLE_NAME, variable.getId()});
 				return;
 			}
 
@@ -397,28 +409,32 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			boolean maxValuesEqual = Objects.equals(variable.getExpectedRange().getMax(), oldVariable.getMaxValue());
 
 			if (!nameEqual) {
-				this.addCustomError(errors, "name", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {"variable", "name"});
+				this.addCustomError(errors, "name", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
+						"name"});
 				return;
 			}
 
 			if (!propertyEqual) {
-				this.addCustomError(errors, "propertyId", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {"variable", "property"});
+				this.addCustomError(errors, "propertyId", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
+						VariableValidator.VARIABLE_NAME, "property"});
 				return;
 			}
 
 			if (!methodEqual) {
-				this.addCustomError(errors, "methodId", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {"variable", "method"});
+				this.addCustomError(errors, "methodId", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
+						VariableValidator.VARIABLE_NAME, "method"});
 				return;
 			}
 
 			if (!scaleEqual) {
-				this.addCustomError(errors, "scaleId", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {"variable", "scale"});
+				this.addCustomError(errors, "scaleId", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
+						"scale"});
 				return;
 			}
 
 			if (!minValuesEqual || !maxValuesEqual) {
-				this.addCustomError(errors, "expectedRange", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {"variable",
-				"expectedRange"});
+				this.addCustomError(errors, "expectedRange", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
+						VariableValidator.VARIABLE_NAME, "expectedRange"});
 			}
 
 		} catch (Exception e) {

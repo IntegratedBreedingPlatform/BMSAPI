@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class LocationServiceImpl implements LocationService {
 
+	private static final String ERROR_MESSAGE = "Error!";
+
 	@Autowired
 	private LocationDataManager locationDataManager;
 
@@ -37,7 +39,7 @@ public class LocationServiceImpl implements LocationService {
 				locationTypes.add(new LocationType(udfld.getFldno().toString(), udfld.getFcode(), udfld.getFname()));
 			}
 		} catch (MiddlewareQueryException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(LocationServiceImpl.ERROR_MESSAGE, e);
 		}
 		return locationTypes;
 	}
@@ -50,7 +52,7 @@ public class LocationServiceImpl implements LocationService {
 			int numOfRows = pageSize;
 			return this.mapLocations(this.locationDataManager.getLocationsByType(locTypeId, start, numOfRows));
 		} catch (NumberFormatException | MiddlewareQueryException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(LocationServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
@@ -86,7 +88,7 @@ public class LocationServiceImpl implements LocationService {
 		try {
 			return this.locationDataManager.countLocationsByType(Integer.valueOf(locationTypeId));
 		} catch (NumberFormatException | MiddlewareQueryException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(LocationServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
@@ -101,7 +103,7 @@ public class LocationServiceImpl implements LocationService {
 			int numOfRows = pageSize;
 			return this.mapLocations(this.locationDataManager.getLocationsByName(searchString, start, numOfRows, Operation.LIKE));
 		} catch (MiddlewareQueryException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(LocationServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
@@ -110,7 +112,7 @@ public class LocationServiceImpl implements LocationService {
 		try {
 			return this.locationDataManager.countLocationsByName(searchString, Operation.LIKE);
 		} catch (MiddlewareQueryException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(LocationServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 }

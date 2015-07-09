@@ -9,8 +9,8 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermRelationship;
-import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.Method;
+import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.util.StringUtil;
@@ -32,6 +32,10 @@ import org.springframework.validation.MapBindingResult;
 @Service
 public class MethodServiceImpl extends ServiceBaseImpl implements MethodService {
 
+	private static final String ERROR_MESSAGE = "Error!";
+	private static final String METHOD_NAME = "Method";
+	private static final String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
+
 	@Autowired
 	private OntologyMethodDataManager ontologyMethodDataManager;
 
@@ -52,14 +56,14 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 			}
 			return methods;
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(MethodServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
 	public MethodDetails getMethod(String id) {
-		this.validateId(id, "Method");
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
+		this.validateId(id, MethodServiceImpl.METHOD_NAME);
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), MethodServiceImpl.METHOD_NAME);
 		TermRequest term = new TermRequest(id, "method", CvId.METHODS.getId());
 		this.termValidator.validate(term, errors);
 		if (errors.hasErrors()) {
@@ -77,17 +81,17 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 			}
 			ModelMapper mapper = OntologyMapper.getInstance();
 			MethodDetails methodDetails = mapper.map(method, MethodDetails.class);
-			String fieldToBeEditableIfTermReferred = "description";
 			if (!deletable) {
-				methodDetails.getMetadata().addEditableField(fieldToBeEditableIfTermReferred);
+				methodDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
 			} else {
 				methodDetails.getMetadata().addEditableField("name");
-				methodDetails.getMetadata().addEditableField(fieldToBeEditableIfTermReferred);
+				methodDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
 			}
 			methodDetails.getMetadata().setDeletable(deletable);
 
 			// Note : Get list of relationships related to method Id
-			List<TermRelationship> relationships = this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_METHOD);
+			List<TermRelationship> relationships =
+					this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_METHOD);
 
 			Collections.sort(relationships, new Comparator<TermRelationship>() {
 
@@ -104,14 +108,14 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 
 			return methodDetails;
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(MethodServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
 	public GenericResponse addMethod(MethodSummary method) {
 		method.setId(null);
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), MethodServiceImpl.METHOD_NAME);
 		this.methodValidator.validate(method, errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -124,14 +128,14 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 			this.ontologyMethodDataManager.addMethod(middlewareMethod);
 			return new GenericResponse(String.valueOf(middlewareMethod.getId()));
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(MethodServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
 	public void updateMethod(String id, MethodSummary method) {
-		this.validateId(id, "Method");
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
+		this.validateId(id, MethodServiceImpl.METHOD_NAME);
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), MethodServiceImpl.METHOD_NAME);
 		TermRequest term = new TermRequest(id, "method", CvId.METHODS.getId());
 		this.termValidator.validate(term, errors);
 		if (errors.hasErrors()) {
@@ -149,15 +153,16 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 			middlewareMethod.setDefinition(method.getDescription());
 			this.ontologyMethodDataManager.updateMethod(middlewareMethod);
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(MethodServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
 	public void deleteMethod(String id) {
-		this.validateId(id, "Method");
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");
-		this.termDeletableValidator.validate(new TermRequest(String.valueOf(id), "Method", CvId.METHODS.getId()), errors);
+		this.validateId(id, MethodServiceImpl.METHOD_NAME);
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), MethodServiceImpl.METHOD_NAME);
+		this.termDeletableValidator.validate(new TermRequest(String.valueOf(id), MethodServiceImpl.METHOD_NAME, CvId.METHODS.getId()),
+				errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -165,7 +170,7 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 		try {
 			this.ontologyMethodDataManager.deleteMethod(Integer.valueOf(id));
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(MethodServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 }

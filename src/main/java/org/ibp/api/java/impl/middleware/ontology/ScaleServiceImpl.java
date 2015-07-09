@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.Objects;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.TermSummary;
-import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermRelationship;
-import org.generationcp.middleware.domain.ontology.TermRelationshipId;
+import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.util.StringUtil;
@@ -43,6 +43,10 @@ import org.springframework.validation.MapBindingResult;
 @Service
 public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 
+	private static final String ERROR_MESSAGE = "Error!";
+	private static final String SCALE = "Scale";
+	private static final String FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED = "description";
+
 	@Autowired
 	private OntologyScaleDataManager ontologyScaleDataManager;
 
@@ -63,16 +67,16 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			}
 			return scaleSummaries;
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(ScaleServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
 	public ScaleDetails getScaleById(String id) {
-		this.validateId(id, "Scale");
+		this.validateId(id, ScaleServiceImpl.SCALE);
 		// Note: Validate Scale Id for valid format and scale exists or not
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Scale");
-		TermRequest term = new TermRequest(id, "Scale", CvId.SCALES.getId());
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ScaleServiceImpl.SCALE);
+		TermRequest term = new TermRequest(id, ScaleServiceImpl.SCALE, CvId.SCALES.getId());
 		this.termValidator.validate(term, errors);
 
 		// Note: If any error occurs then throws Exception with error messages
@@ -93,23 +97,23 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 
 			DataType dataType = DataType.getById(scale.getDataType().getId());
 
-			if(!dataType.isSystemDataType()){
-				String fieldToBeEditableIfTermReferred = "description";
+			if (!dataType.isSystemDataType()) {
 				if (!deletable) {
-					scaleDetails.getMetadata().addEditableField(fieldToBeEditableIfTermReferred);
+					scaleDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
 				} else {
 					scaleDetails.getMetadata().addEditableField("name");
-					scaleDetails.getMetadata().addEditableField(fieldToBeEditableIfTermReferred);
+					scaleDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
 					scaleDetails.getMetadata().addEditableField("dataType");
 					scaleDetails.getMetadata().addEditableField("validValues");
 				}
 				scaleDetails.getMetadata().setDeletable(deletable);
-			}else {
+			} else {
 				scaleDetails.getMetadata().setDeletable(false);
 			}
 
 			// Note : Get list of relationships related to scale Id
-			List<TermRelationship> relationships = this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_SCALE);
+			List<TermRelationship> relationships =
+					this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_SCALE);
 
 			Collections.sort(relationships, new Comparator<TermRelationship>() {
 
@@ -120,13 +124,14 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			});
 
 			for (TermRelationship relationship : relationships) {
-				org.ibp.api.domain.ontology.TermSummary termSummary = mapper.map(relationship, org.ibp.api.domain.ontology.TermSummary.class);
+				org.ibp.api.domain.ontology.TermSummary termSummary =
+						mapper.map(relationship, org.ibp.api.domain.ontology.TermSummary.class);
 				scaleDetails.getMetadata().getUsage().addUsage(termSummary);
 			}
 
 			return scaleDetails;
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(ScaleServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
@@ -134,7 +139,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 	public GenericResponse addScale(ScaleSummary scaleSummary) {
 		// Note: Set id to null because add scale does not need id
 		scaleSummary.setId(null);
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Scale");
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ScaleServiceImpl.SCALE);
 		this.scaleValidator.validate(scaleSummary, errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -162,15 +167,15 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			this.ontologyScaleDataManager.addScale(scale);
 			return new GenericResponse(String.valueOf(scale.getId()));
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(ScaleServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
 	public void updateScale(String id, ScaleSummary scaleSummary) {
-		this.validateId(id, "Scale");
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Scale");
-		TermRequest term = new TermRequest(id, "scale", CvId.SCALES.getId());
+		this.validateId(id, ScaleServiceImpl.SCALE);
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ScaleServiceImpl.SCALE);
+		TermRequest term = new TermRequest(id, ScaleServiceImpl.SCALE, CvId.SCALES.getId());
 		this.termValidator.validate(term, errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -184,7 +189,9 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 		}
 
 		try {
-			Scale scale = new Scale(new Term(StringUtil.parseInt(scaleSummary.getId(), null), scaleSummary.getName().trim(), scaleSummary.getDescription().trim()));
+			Scale scale =
+					new Scale(new Term(StringUtil.parseInt(scaleSummary.getId(), null), scaleSummary.getName().trim(), scaleSummary
+							.getDescription().trim()));
 
 			Integer dataTypeId = StringUtil.parseInt(scaleSummary.getDataType().getId(), null);
 
@@ -207,25 +214,25 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 
 			this.ontologyScaleDataManager.updateScale(scale);
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(ScaleServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
 	@Override
 	public void deleteScale(String id) {
 		// Note: Validate Id for valid format and check if scale exists or not
-		this.validateId(id, "Scale");
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Scale");
+		this.validateId(id, ScaleServiceImpl.SCALE);
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ScaleServiceImpl.SCALE);
 
 		// Note: Check if scale is deletable or not by checking its usage in variable
-		this.termDeletableValidator.validate(new TermRequest(String.valueOf(id), "Scale", CvId.SCALES.getId()), errors);
+		this.termDeletableValidator.validate(new TermRequest(String.valueOf(id), ScaleServiceImpl.SCALE, CvId.SCALES.getId()), errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		try {
 			this.ontologyScaleDataManager.deleteScale(StringUtil.parseInt(id, null));
 		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException("Error!", e);
+			throw new ApiRuntimeException(ScaleServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
 
