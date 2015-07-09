@@ -10,6 +10,8 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.ibp.api.java.impl.middleware.common.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -18,6 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class CropNameValidationInterceptor extends HandlerInterceptorAdapter {
+
+	private static final Logger LOG = LoggerFactory.getLogger(CropNameValidationInterceptor.class);
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -39,7 +43,9 @@ public class CropNameValidationInterceptor extends HandlerInterceptorAdapter {
 					errorResponse = new ErrorResponse("error", "Invalid crop name path parameter: " + cropName);
 				}
 			} catch (MiddlewareException e) {
-				errorResponse = new ErrorResponse("error", "Error while validating crop name path parameter: " + e.getMessage());
+				String errorMessage = "Error while validating crop name path parameter";
+				CropNameValidationInterceptor.LOG.error(errorMessage, e);
+				errorResponse = new ErrorResponse("error", errorMessage + ": " + e.getMessage());
 			}
 
 			if (errorResponse != null) {
