@@ -162,7 +162,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		Integer propertyId = StringUtil.parseInt(variable.getPropertySummary().getId(), null);
 
-		if(propertyId == null){
+		if (propertyId == null) {
 			this.addCustomError(errors, "propertyId", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 		}
 
@@ -189,7 +189,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		Integer methodId = StringUtil.parseInt(variable.getMethodSummary().getId(), null);
 
-		if(methodId == null){
+		if (methodId == null) {
 			this.addCustomError(errors, "methodId", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 		}
 
@@ -216,7 +216,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		Integer scaleId = StringUtil.parseInt(variable.getScaleSummary().getId(), null);
 
-		if(scaleId == null){
+		if (scaleId == null) {
 			this.addCustomError(errors, "scaleId", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 		}
 
@@ -238,7 +238,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		try {
 			Scale scale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(variable.getScaleSummary().getId(), null));
 
-			if(scale.getDataType() != null && scale.getDataType().isSystemDataType()){
+			if (scale.getDataType() != null && scale.getDataType().isSystemDataType()) {
 				this.addCustomError(errors, VariableValidator.VARIABLE_SCALE_WITH_SYSTEM_DATA_TYPE, null);
 			}
 
@@ -279,12 +279,14 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				// be less than the valid values minimum, and the expected range maximum cannot be larger than the valid values maximum
 				BigDecimal scaleMinValue = StringUtil.parseBigDecimal(scale.getMinValue(), null);
 				if (scaleMinValue != null && variableExpectedMin != null && scaleMinValue.compareTo(variableExpectedMin) == 1) {
-					this.addCustomError(errors, "expectedRange.min", VariableValidator.VARIABLE_MIN_SHOULD_BE_IN_SCALE_RANGE, new Object[] {scale.getMinValue(), scale.getMaxValue()});
+					this.addCustomError(errors, "expectedRange.min", VariableValidator.VARIABLE_MIN_SHOULD_BE_IN_SCALE_RANGE, new Object[] {
+							scale.getMinValue(), scale.getMaxValue()});
 				}
 
 				BigDecimal scaleMaxValue = StringUtil.parseBigDecimal(scale.getMaxValue(), null);
 				if (scaleMaxValue != null && variableExpectedMax != null && scaleMaxValue.compareTo(variableExpectedMax) == -1) {
-					this.addCustomError(errors, "expectedRange.max", VariableValidator.VARIABLE_MAX_SHOULD_BE_IN_SCALE_RANGE, new Object[] {scale.getMinValue(), scale.getMaxValue()});
+					this.addCustomError(errors, "expectedRange.max", VariableValidator.VARIABLE_MAX_SHOULD_BE_IN_SCALE_RANGE, new Object[] {
+							scale.getMinValue(), scale.getMaxValue()});
 				}
 
 				if (errors.getErrorCount() > initialCount) {
@@ -318,10 +320,11 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			return false;
 		}
 
-		// 18. Variable type IDs must be an array of integer values that correspond to the IDs of variable types and contain at least one item
+		// 18. Variable type IDs must be an array of integer values that correspond to the IDs of variable types and contain at least one
+		// item
 
 		for (VariableType variableType : variable.getVariableTypes()) {
-			if (org.generationcp.middleware.domain.ontology.VariableType.getById(parseVariableTypeAsInteger(variableType)) == null) {
+			if (org.generationcp.middleware.domain.ontology.VariableType.getById(this.parseVariableTypeAsInteger(variableType)) == null) {
 				this.addCustomError(errors, "variableTypeIds", BaseValidator.INVALID_TYPE_ID, new Object[] {"Variable Type"});
 			}
 		}
@@ -331,8 +334,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 	private void aliasValidationProcessor(VariableSummary variable, Errors errors) {
 
-		//if (!Objects.equals(variable.getAlias(), null)) {
-		if (!isNullOrEmpty(variable.getAlias())) {
+		if (!this.isNullOrEmpty(variable.getAlias())) {
 			// Trim alias
 			variable.setAlias(variable.getAlias().trim());
 
@@ -357,7 +359,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			Integer requestId = StringUtil.parseInt(variable.getId(), null);
 			Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId);
 
-			if(oldVariable.getScale().getDataType() != null && Objects.equals(oldVariable.getScale().getDataType().isSystemDataType(), true)){
+			if (oldVariable.getScale().getDataType() != null
+					&& Objects.equals(oldVariable.getScale().getDataType().isSystemDataType(), true)) {
 				this.addCustomError(errors, VariableValidator.VARIABLE_SCALE_WITH_SYSTEM_DATA_TYPE, null);
 			}
 
@@ -415,7 +418,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 			if (!minValuesEqual || !maxValuesEqual) {
 				this.addCustomError(errors, "expectedRange", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {"variable",
-						"expectedRange"});
+				"expectedRange"});
 			}
 
 		} catch (Exception e) {
@@ -462,8 +465,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private Integer parseVariableTypeAsInteger(VariableType variableType){
-		if(variableType == null) {
+	private Integer parseVariableTypeAsInteger(VariableType variableType) {
+		if (variableType == null) {
 			return null;
 		}
 		return StringUtil.parseInt(variableType.getId(), null);
