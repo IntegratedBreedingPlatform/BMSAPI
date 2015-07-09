@@ -11,6 +11,8 @@ public class GermplasmListDetails extends GermplasmListSummary {
 
 	private final List<GermplasmListEntrySummary> germplasmEntries = new ArrayList<GermplasmListEntrySummary>();
 
+	private transient int hashCode;
+
 	public void addGermplasmEntry(GermplasmListEntrySummary germplasmEntry) {
 		if (germplasmEntry != null) {
 			this.germplasmEntries.add(germplasmEntry);
@@ -34,8 +36,6 @@ public class GermplasmListDetails extends GermplasmListSummary {
 		GermplasmListDetails castOther = (GermplasmListDetails) other;
 		return new EqualsBuilder().append(this.germplasmEntries, castOther.germplasmEntries).isEquals();
 	}
-
-	private transient int hashCode;
 
 	/*
 	 * (non-Javadoc)

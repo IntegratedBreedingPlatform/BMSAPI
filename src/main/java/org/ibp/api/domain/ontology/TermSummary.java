@@ -12,6 +12,16 @@ public class TermSummary {
 
 	private String description;
 
+	public TermSummary() {
+
+	}
+
+	public TermSummary(String id, String name, String description) {
+		this.id = id;
+		this.name = name;
+		this.description = description;
+	}
+
 	public String getId() {
 		return this.id;
 	}
@@ -33,16 +43,6 @@ public class TermSummary {
 	}
 
 	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public TermSummary(){
-
-	}
-
-	public TermSummary(String id, String name, String description) {
-		this.id = id;
-		this.name = name;
 		this.description = description;
 	}
 
