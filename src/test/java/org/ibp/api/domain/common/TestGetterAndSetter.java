@@ -26,6 +26,8 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
  */
 public class TestGetterAndSetter {
 
+	private static final String REGEX_ALL = ".*";
+	private static final String REGEX_ESCAPE = "\\";
 	final PodamFactory factory = new PodamFactoryImpl();
 
 	@Test
@@ -65,7 +67,10 @@ public class TestGetterAndSetter {
 
 	private String getPackageNameFromFilePath(final File file) {
 		// Remove everything from before Project_Directory/target/classes/ and replaces all / with .
-		return file.getAbsolutePath().replaceAll(".*target\\/classes\\/", "").replace("/", ".").replace(".class", "");
+		String packageRelatedFileSuffix =
+				file.getAbsolutePath().replaceAll(
+						REGEX_ALL + "target" + REGEX_ESCAPE + File.separator + "classes" + REGEX_ESCAPE + File.separator, "");
+		return packageRelatedFileSuffix.replace(File.separator, ".").replace(".class", "");
 	}
 
 	private void testClassesForCodeCoverage(final Class<?> klass) throws Exception, Exception {
