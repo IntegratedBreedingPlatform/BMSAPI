@@ -11,7 +11,7 @@ import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
-import org.ibp.api.domain.ontology.PropertySummary;
+import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.junit.After;
 import org.junit.Assert;
@@ -57,12 +57,12 @@ public class PropertyValidatorTest {
 	@Test
 	public void testWithNullNameRequest() throws MiddlewareException {
 
-		PropertySummary propertySummary = TestDataProvider.getTestPropertySummary();
-		propertySummary.setName("");
+		PropertyDetails propertyDetails = TestDataProvider.getTestPropertyDetails();
+		propertyDetails.setName("");
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		this.propertyValidator.validate(propertySummary, bindingResult);
+		this.propertyValidator.validate(propertyDetails, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
@@ -84,9 +84,9 @@ public class PropertyValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		PropertySummary propertySummary = TestDataProvider.getTestPropertySummary();
+		PropertyDetails propertyDetails = TestDataProvider.getTestPropertyDetails();
 
-		this.propertyValidator.validate(propertySummary, bindingResult);
+		this.propertyValidator.validate(propertyDetails, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
@@ -99,16 +99,16 @@ public class PropertyValidatorTest {
 	@Test
 	public void testWithClassNameNonEmptyUniqueValues() throws MiddlewareException {
 
-		PropertySummary propertySummary = TestDataProvider.getTestPropertySummary();
+		PropertyDetails propertyDetails = TestDataProvider.getTestPropertyDetails();
 
 		// Set empty classes to check nonempty
-		propertySummary.setClasses(new HashSet<String>());
+		propertyDetails.setClasses(new HashSet<String>());
 
-		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(propertySummary.getName(), CvId.PROPERTIES.getId());
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(propertyDetails.getName(), CvId.PROPERTIES.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		this.propertyValidator.validate(propertySummary, bindingResult);
+		this.propertyValidator.validate(propertyDetails, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("classes"));
 	}
@@ -130,10 +130,10 @@ public class PropertyValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		PropertySummary propertySummary = TestDataProvider.getTestPropertySummary();
-		propertySummary.setName("ChangedName");
+		PropertyDetails propertyDetails = TestDataProvider.getTestPropertyDetails();
+		propertyDetails.setName("ChangedName");
 
-		this.propertyValidator.validate(propertySummary, bindingResult);
+		this.propertyValidator.validate(propertyDetails, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertTrue(bindingResult.getAllErrors().size() == 1);
 	}
@@ -146,12 +146,12 @@ public class PropertyValidatorTest {
 	@Test
 	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
 
-		PropertySummary propertySummary = TestDataProvider.getTestPropertySummary();
-		propertySummary.setName(RandomStringUtils.random(205));
+		PropertyDetails propertyDetails = TestDataProvider.getTestPropertyDetails();
+		propertyDetails.setName(RandomStringUtils.random(205));
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		this.propertyValidator.validate(propertySummary, bindingResult);
+		this.propertyValidator.validate(propertyDetails, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
@@ -164,14 +164,14 @@ public class PropertyValidatorTest {
 	@Test
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 
-		PropertySummary propertySummary = TestDataProvider.getTestPropertySummary();
-		propertySummary.setDescription(RandomStringUtils.random(1025));
+		PropertyDetails propertyDetails = TestDataProvider.getTestPropertyDetails();
+		propertyDetails.setDescription(RandomStringUtils.random(1025));
 
-		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(propertySummary.getName(), CvId.PROPERTIES.getId());
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(propertyDetails.getName(), CvId.PROPERTIES.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
-		this.propertyValidator.validate(propertySummary, bindingResult);
+		this.propertyValidator.validate(propertyDetails, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("description"));
 	}
@@ -184,15 +184,15 @@ public class PropertyValidatorTest {
 	@Test
 	public void testWithValidRequest() throws MiddlewareException {
 
-		PropertySummary propertySummary = TestDataProvider.getTestPropertySummary();
+		PropertyDetails propertyDetails = TestDataProvider.getTestPropertyDetails();
 
 		// Post request does not expect property id.
-		propertySummary.setId(null);
+		propertyDetails.setId(null);
 
-		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(propertySummary.getName(), CvId.PROPERTIES.getId());
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(propertyDetails.getName(), CvId.PROPERTIES.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
-		this.propertyValidator.validate(propertySummary, bindingResult);
+		this.propertyValidator.validate(propertyDetails, bindingResult);
 		Assert.assertFalse(bindingResult.hasErrors());
 	}
 }

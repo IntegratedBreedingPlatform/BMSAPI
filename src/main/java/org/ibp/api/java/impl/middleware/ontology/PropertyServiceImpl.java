@@ -16,7 +16,6 @@ import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataMana
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.PropertyDetails;
-import org.ibp.api.domain.ontology.PropertySummary;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
@@ -47,16 +46,16 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 	private PropertyValidator propertyValidator;
 
 	@Override
-	public List<PropertySummary> getAllProperties() {
+	public List<PropertyDetails> getAllProperties() {
 		try {
 			List<Property> propertyList = this.ontologyPropertyDataManager.getAllProperties();
-			List<PropertySummary> properties = new ArrayList<>();
+			List<PropertyDetails> properties = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
 
 			for (Property property : propertyList) {
-				PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
-				properties.add(propertyDTO);
+				PropertyDetails propertyDetail = mapper.map(property, PropertyDetails.class);
+				properties.add(propertyDetail);
 			}
 			return properties;
 		} catch (MiddlewareException e) {
@@ -125,21 +124,21 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 	}
 
 	@Override
-	public GenericResponse addProperty(PropertySummary propertySummary) {
-		// Note: Set id to null because add property does not need id
-		propertySummary.setId(null);
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), PropertyServiceImpl.PROPERTY_NAME);
-		this.propertyValidator.validate(propertySummary, errors);
+	public GenericResponse addProperty(PropertyDetails propertyDetails) {
+		// Note: Set id to null because add property does not need id		
+		propertyDetails.setId(null);
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Property");
+		this.propertyValidator.validate(propertyDetails, errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
 		try {
 			Property property = new Property();
-			property.setName(propertySummary.getName());
-			property.setDefinition(propertySummary.getDescription());
-			property.setCropOntologyId(propertySummary.getCropOntologyId());
-			for (String c : propertySummary.getClasses()) {
+			property.setName(propertyDetails.getName());
+			property.setDefinition(propertyDetails.getDescription());
+			property.setCropOntologyId(propertyDetails.getCropOntologyId());
+			for (String c : propertyDetails.getClasses()) {
 				property.addClass(c);
 			}
 
@@ -152,15 +151,15 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 	}
 
 	@Override
-	public List<PropertySummary> getAllPropertiesByClass(String propertyClass) {
+	public List<PropertyDetails> getAllPropertiesByClass(String propertyClass) {
 		try {
 			List<Property> propertyList = this.ontologyPropertyDataManager.getAllPropertiesWithClass(propertyClass);
-			List<PropertySummary> properties = new ArrayList<>();
+			List<PropertyDetails> properties = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
 
 			for (Property property : propertyList) {
-				PropertySummary propertyDTO = mapper.map(property, PropertySummary.class);
+				PropertyDetails propertyDTO = mapper.map(property, PropertyDetails.class);
 				properties.add(propertyDTO);
 			}
 			return properties;
@@ -170,37 +169,18 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 	}
 
 	@Override
-	public void deleteProperty(String id) {
-		// Note: Validate Id for valid format and check if property exists or not
-		this.validateId(id, PropertyServiceImpl.PROPERTY_NAME);
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), PropertyServiceImpl.PROPERTY_NAME);
-
-		// Note: Check if property is deletable or not by checking its usage in variable
-		this.termDeletableValidator.validate(
-				new TermRequest(String.valueOf(id), PropertyServiceImpl.PROPERTY_NAME, CvId.PROPERTIES.getId()), errors);
-		if (errors.hasErrors()) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
-		try {
-			this.ontologyPropertyDataManager.deleteProperty(StringUtil.parseInt(id, null));
-		} catch (MiddlewareException e) {
-			throw new ApiRuntimeException(PropertyServiceImpl.ERROR_MESSAGE, e);
-		}
-	}
-
-	@Override
-	public void updateProperty(String id, PropertySummary propertySummary) {
-		this.validateId(id, PropertyServiceImpl.PROPERTY_NAME);
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), PropertyServiceImpl.PROPERTY_NAME);
-		TermRequest term = new TermRequest(id, PropertyServiceImpl.PROPERTY_NAME, CvId.PROPERTIES.getId());
+	public void updateProperty(String id, PropertyDetails propertyDetails) {
+		this.validateId(id, "Property");
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Property");
+		TermRequest term = new TermRequest(id, "property", CvId.PROPERTIES.getId());
 		this.termValidator.validate(term, errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
-		propertySummary.setId(id);
+		propertyDetails.setId(id);
 
 		// Note: Validate property data
-		this.propertyValidator.validate(propertySummary, errors);
+		this.propertyValidator.validate(propertyDetails, errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -208,15 +188,33 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 		try {
 			Property property = new Property();
 			property.setId(StringUtil.parseInt(id, null));
-			property.setName(propertySummary.getName());
-			property.setDefinition(propertySummary.getDescription());
-			property.setCropOntologyId(propertySummary.getCropOntologyId());
+			property.setName(propertyDetails.getName());
+			property.setDefinition(propertyDetails.getDescription());
+			property.setCropOntologyId(propertyDetails.getCropOntologyId());
 
-			for (String c : propertySummary.getClasses()) {
+			for (String c : propertyDetails.getClasses()) {
 				property.addClass(c);
 			}
 
 			this.ontologyPropertyDataManager.updateProperty(property);
+		} catch (MiddlewareException e) {
+			throw new ApiRuntimeException("Error!", e);
+		}
+	}
+
+	@Override
+	public void deleteProperty(String id) {
+		// Note: Validate Id for valid format and check if property exists or not
+		this.validateId(id, "Property");
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Property");
+
+		// Note: Check if property is deletable or not by checking its usage in variable
+		this.termDeletableValidator.validate(new TermRequest(String.valueOf(id), "Property", CvId.PROPERTIES.getId()), errors);
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		try {
+			this.ontologyPropertyDataManager.deleteProperty(StringUtil.parseInt(id, null));
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException(PropertyServiceImpl.ERROR_MESSAGE, e);
 		}

@@ -10,7 +10,7 @@ import java.util.Set;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.util.StringUtil;
-import org.ibp.api.domain.ontology.PropertySummary;
+import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,13 +39,13 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 
 	@Override
 	public boolean supports(Class<?> aClass) {
-		return PropertySummary.class.equals(aClass);
+		return PropertyDetails.class.equals(aClass);
 	}
 
 	@Override
 	public void validate(Object target, Errors errors) {
 
-		PropertySummary propertySummary = (PropertySummary) target;
+		PropertyDetails propertySummary = (PropertyDetails) target;
 
 		boolean nameValidationResult = this.nameValidationProcessor(propertySummary, errors);
 
@@ -60,7 +60,7 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 		}
 	}
 
-	private boolean nameValidationProcessor(PropertySummary propertySummary, Errors errors) {
+	private boolean nameValidationProcessor(PropertyDetails propertySummary, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 
@@ -84,7 +84,7 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean descriptionValidationProcessor(PropertySummary propertySummary, Errors errors) {
+	private boolean descriptionValidationProcessor(PropertyDetails propertySummary, Errors errors) {
 		Integer initialCount = errors.getErrorCount();
 
 		// Note: If Description is null then initialize it with empty value and if not null then trim.
@@ -100,7 +100,7 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean cropOntologyIDValidationProcessor(PropertySummary propertySummary, Errors errors) {
+	private boolean cropOntologyIDValidationProcessor(PropertyDetails propertySummary, Errors errors) {
 		Integer initialCount = errors.getErrorCount();
 
 		// Note: If cropOntologyId is null then initialize it with empty value if not then trim.
@@ -116,7 +116,7 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean classValidationProcessor(PropertySummary propertySummary, Errors errors) {
+	private boolean classValidationProcessor(PropertyDetails propertySummary, Errors errors) {
 		Integer initialCount = errors.getErrorCount();
 
 		Set<String> nonEmptyClasses = new HashSet<>();
@@ -163,7 +163,7 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean propertyShouldBeEditableProcessor(PropertySummary propertySummary, Errors errors) {
+	private boolean propertyShouldBeEditableProcessor(PropertyDetails propertySummary, Errors errors) {
 		Integer initialCount = errors.getErrorCount();
 
 		// Check method for edit request

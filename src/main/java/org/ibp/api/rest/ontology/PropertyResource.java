@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.PropertyDetails;
-import org.ibp.api.domain.ontology.PropertySummary;
 import org.ibp.api.java.ontology.PropertyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,13 +32,13 @@ public class PropertyResource {
 	@ApiOperation(value = "All properties or filter by class name", notes = "Get all properties or filter by class name")
 	@RequestMapping(value = "/{cropname}/properties", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<PropertySummary>> listAllPropertyByClass(@PathVariable String cropname, @RequestParam(value = "class",
+	public ResponseEntity<List<PropertyDetails>> listAllPropertyByClass(@PathVariable String cropname, @RequestParam(value = "class",
 			defaultValue = "", required = false) String className) {
 		if (Strings.isNullOrEmpty(className)) {
-			List<PropertySummary> propertyList = this.propertyService.getAllProperties();
+			List<PropertyDetails> propertyList = this.propertyService.getAllProperties();
 			return new ResponseEntity<>(propertyList, HttpStatus.OK);
 		}
-		List<PropertySummary> propertyList = this.propertyService.getAllPropertiesByClass(className);
+		List<PropertyDetails> propertyList = this.propertyService.getAllPropertiesByClass(className);
 		return new ResponseEntity<>(propertyList, HttpStatus.OK);
 	}
 
@@ -53,7 +52,7 @@ public class PropertyResource {
 	@ApiOperation(value = "Add Property", notes = "Add a Property using Given Data")
 	@RequestMapping(value = "/{cropname}/properties", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> addProperty(@PathVariable String cropname, @RequestBody PropertySummary property) {
+	public ResponseEntity<GenericResponse> addProperty(@PathVariable String cropname, @RequestBody PropertyDetails property) {
 		return new ResponseEntity<>(this.propertyService.addProperty(property), HttpStatus.CREATED);
 	}
 
@@ -61,7 +60,7 @@ public class PropertyResource {
 	@ApiOperation(value = "Update Property", notes = "Update Property using Given Data")
 	@RequestMapping(value = "/{cropname}/properties/{id}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity updateProperty(@PathVariable String cropname, @PathVariable String id, @RequestBody PropertySummary property) {
+	public ResponseEntity updateProperty(@PathVariable String cropname, @PathVariable String id, @RequestBody PropertyDetails property) {
 
 		this.propertyService.updateProperty(id, property);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
