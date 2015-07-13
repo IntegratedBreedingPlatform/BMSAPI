@@ -19,11 +19,7 @@ import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
-import org.ibp.api.domain.ontology.MetadataSummary;
-import org.ibp.api.domain.ontology.MethodSummary;
-import org.ibp.api.domain.ontology.PropertySummary;
-import org.ibp.api.domain.ontology.ScaleSummary;
-import org.ibp.api.domain.ontology.VariableSummary;
+import org.ibp.api.domain.ontology.*;
 
 public class TestDataProvider {
 
@@ -226,69 +222,70 @@ public class TestDataProvider {
 		return variableList;
 	}
 
-	public static MetadataSummary getTestMetadataSummary() {
-		MetadataSummary metadataSummary = new MetadataSummary();
-		metadataSummary.setDateCreated(TestDataProvider.getDateCreated());
-		metadataSummary.setDateLastModified(TestDataProvider.getDateModified());
-		return metadataSummary;
+	public static MetadataDetails getTestMetadataDetails() {
+		MetadataDetails metadataDetails = new MetadataDetails();
+		metadataDetails.setDateCreated(TestDataProvider.getDateCreated());
+		metadataDetails.setDateLastModified(TestDataProvider.getDateModified());
+		return metadataDetails;
 	}
 
-	public static MethodSummary getTestMethodSummary() {
-		MethodSummary methodSummary = new MethodSummary();
-		methodSummary.setId(String.valueOf(TestDataProvider.methodId));
-		methodSummary.setName(TestDataProvider.methodName);
-		methodSummary.setDescription(TestDataProvider.methodDescription);
-		methodSummary.setMetadata(TestDataProvider.getTestMetadataSummary());
-		return methodSummary;
+	public static MethodDetails getTestMethodDetails() {
+		MethodDetails method = new MethodDetails();
+		method.setId(String.valueOf(TestDataProvider.methodId));
+		method.setName(TestDataProvider.methodName);
+		method.setDescription(TestDataProvider.methodDescription);
+		method.setMetadata(TestDataProvider.getTestMetadataDetails());
+		return method;
 	}
 
-	public static PropertySummary getTestPropertySummary() {
-		PropertySummary propertySummary = new PropertySummary();
+	public static PropertyDetails getTestPropertyDetails() {
+		PropertyDetails propertySummary = new PropertyDetails();
 		propertySummary.setId(String.valueOf(TestDataProvider.propertyId));
 		propertySummary.setName(TestDataProvider.propertyName);
 		propertySummary.setDescription(TestDataProvider.propertyDescription);
 		propertySummary.setClasses(new HashSet<>(Collections.singletonList(TestDataProvider.className1)));
 		propertySummary.setCropOntologyId(TestDataProvider.cropOntologyId);
-		propertySummary.setMetadata(TestDataProvider.getTestMetadataSummary());
+		propertySummary.setMetadata(TestDataProvider.getTestMetadataDetails());
 		return propertySummary;
 	}
 
-	public static ScaleSummary getTestScaleSummary() {
-		ScaleSummary scaleSummary = new ScaleSummary();
-		scaleSummary.setId(String.valueOf(TestDataProvider.scaleId));
-		scaleSummary.setName(TestDataProvider.scaleName);
-		scaleSummary.setDescription(TestDataProvider.scaleDescription);
-		scaleSummary.setDataType(TestDataProvider.numericalDataType);
-		scaleSummary.setMin(TestDataProvider.scaleMinValue);
-		scaleSummary.setMax(TestDataProvider.scaleMaxValue);
-		scaleSummary.setMetadata(TestDataProvider.getTestMetadataSummary());
-		return scaleSummary;
+	public static ScaleDetails getTestScaleDetails() {
+		ScaleDetails scaleDetails = new ScaleDetails();
+		scaleDetails.setId(String.valueOf(TestDataProvider.scaleId));
+		scaleDetails.setName(TestDataProvider.scaleName);
+		scaleDetails.setDescription(TestDataProvider.scaleDescription);
+		scaleDetails.setDataType(TestDataProvider.numericalDataType);
+		scaleDetails.setMaxValue(TestDataProvider.scaleMinValue);
+		scaleDetails.setMaxValue(TestDataProvider.scaleMaxValue);
+		scaleDetails.setMetadata(TestDataProvider.getTestMetadataDetails());
+		return scaleDetails;
 	}
 
-	public static VariableSummary getTestVariableSummary() {
-		VariableSummary variableSummary = new VariableSummary();
-		variableSummary.setProgramUuid(TestDataProvider.programUUID);
-		variableSummary.setId(String.valueOf(TestDataProvider.variableId));
-		variableSummary.setName(TestDataProvider.variableName);
-		variableSummary.setDescription(TestDataProvider.variableDescription);
-		variableSummary.setAlias(TestDataProvider.variableAlias);
-		variableSummary.setVariableTypes(new HashSet<>(Collections.singletonList(traitVariable)));
-		variableSummary.setPropertySummary(new org.ibp.api.domain.ontology.TermSummary());
-		variableSummary.getPropertySummary().setId(String.valueOf(TestDataProvider.propertyId));
-		variableSummary.getPropertySummary().setName(TestDataProvider.propertyName);
-		variableSummary.getPropertySummary().setDescription(TestDataProvider.propertyDescription);
-		variableSummary.setMethodSummary(new org.ibp.api.domain.ontology.TermSummary());
-		variableSummary.getMethodSummary().setId(String.valueOf(TestDataProvider.methodId));
-		variableSummary.getMethodSummary().setName(TestDataProvider.methodName);
-		variableSummary.getMethodSummary().setDescription(TestDataProvider.methodDescription);
-		variableSummary.getScaleSummary().setId(String.valueOf(TestDataProvider.scaleId));
-		variableSummary.getScaleSummary().setName(TestDataProvider.scaleName);
-		variableSummary.getScaleSummary().setDescription(TestDataProvider.scaleDescription);
-		variableSummary.getScaleSummary().setDataType(TestDataProvider.numericalDataType);
-		variableSummary.setExpectedMin(TestDataProvider.variableExpectedMin);
-		variableSummary.setExpectedMax(TestDataProvider.variableExpectedMax);
-		variableSummary.setFavourite(TestDataProvider.variableIsFavourite);
-		return variableSummary;
+	public static VariableDetails getTestVariableDetails() {
+		VariableDetails variableDetails = new VariableDetails();
+		variableDetails.setProgramUuid(TestDataProvider.programUUID);
+		variableDetails.setId(String.valueOf(TestDataProvider.variableId));
+		variableDetails.setName(TestDataProvider.variableName);
+		variableDetails.setDescription(TestDataProvider.variableDescription);
+		variableDetails.setAlias(TestDataProvider.variableAlias);
+		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(traitVariable)));
+		variableDetails.setProperty(TestDataProvider.getTestPropertyDetails());
+		//variableDetails.getProperty().setId(String.valueOf(TestDataProvider.propertyId));
+		//variableDetails.getProperty().setName(TestDataProvider.propertyName);
+		//variableDetails.getProperty().setDescription(TestDataProvider.propertyDescription);
+		variableDetails.setMethod(TestDataProvider.getTestMethodDetails());
+		//variableDetails.getMethod().setId(String.valueOf(TestDataProvider.methodId));
+		//variableDetails.getMethod().setName(TestDataProvider.methodName);
+		//variableDetails.getMethod().setDescription(TestDataProvider.methodDescription);
+		variableDetails.setScale(TestDataProvider.getTestScaleDetails());
+		//variableDetails.getScale().setId(String.valueOf(TestDataProvider.scaleId));
+		//variableDetails.getScale().setName(TestDataProvider.scaleName);
+		//variableDetails.getScale().setDescription(TestDataProvider.scaleDescription);
+		//variableDetails.getScale().setDataType(TestDataProvider.numericalDataType);
+		variableDetails.setExpectedMin(TestDataProvider.variableExpectedMin);
+		variableDetails.setExpectedMax(TestDataProvider.variableExpectedMax);
+		variableDetails.setFavourite(TestDataProvider.variableIsFavourite);
+		return variableDetails;
 	}
 
 	public static VariableFilter getVariableFilterForVariableValidator(){

@@ -9,11 +9,8 @@ import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.ibp.api.domain.ontology.MethodDetails;
-import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.domain.ontology.PropertyDetails;
-import org.ibp.api.domain.ontology.PropertySummary;
 import org.ibp.api.domain.ontology.ScaleDetails;
-import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.mapper.ApiMapper;
@@ -61,18 +58,6 @@ public class OntologyMapper {
 	 */
 	private static void addMethodMappers(ModelMapper mapper) {
 
-		mapper.addMappings(new PropertyMap<Method, MethodSummary>() {
-
-			@Override
-			protected void configure() {
-				this.map().setId(String.valueOf(this.source.getId()));
-				this.map().setName(this.source.getName());
-				this.map().setDescription(this.source.getDefinition());
-				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
-				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
-			}
-		});
-
 		mapper.addMappings(new PropertyMap<Method, MethodDetails>() {
 
 			@Override
@@ -91,20 +76,6 @@ public class OntologyMapper {
 	 * Get ModelMapper instance and add Property related mapping to it
 	 */
 	private static void addPropertyMappers(ModelMapper mapper) {
-
-		mapper.addMappings(new PropertyMap<Property, PropertySummary>() {
-
-			@Override
-			protected void configure() {
-				this.map().setId(String.valueOf(this.source.getId()));
-				this.map().setName(this.source.getName());
-				this.map().setDescription(this.source.getDefinition());
-				this.map().setCropOntologyId(this.source.getCropOntologyId());
-				this.map().setClasses(this.source.getClasses());
-				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
-				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
-			}
-		});
 
 		mapper.addMappings(new PropertyMap<Property, PropertyDetails>() {
 
@@ -126,20 +97,6 @@ public class OntologyMapper {
 	 * Get ModelMapper instance and add Scale related mapping to it
 	 */
 	private static void addScaleMappers(ModelMapper mapper) {
-
-		mapper.addMappings(new PropertyMap<Scale, ScaleSummary>() {
-
-			@Override
-			protected void configure() {
-				this.map().setId(String.valueOf(this.source.getId()));
-				this.map().setName(this.source.getName());
-				this.map().setDescription(this.source.getDefinition());
-				this.map().setMin(this.source.getMinValue());
-				this.map().setMax(this.source.getMaxValue());
-				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
-				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
-			}
-		});
 
 		mapper.addMappings(new PropertyMap<Scale, ScaleDetails>() {
 
