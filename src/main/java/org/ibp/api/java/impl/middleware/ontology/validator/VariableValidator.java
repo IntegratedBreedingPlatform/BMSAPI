@@ -14,7 +14,7 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.util.StringUtil;
-import org.ibp.api.domain.ontology.VariableSummary;
+import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableType;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.slf4j.Logger;
@@ -64,13 +64,13 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 	@Override
 	public boolean supports(Class<?> aClass) {
-		return VariableSummary.class.equals(aClass);
+		return VariableDetails.class.equals(aClass);
 	}
 
 	@Override
 	public void validate(Object target, Errors errors) {
 
-		VariableSummary variable = (VariableSummary) target;
+		VariableDetails variable = (VariableDetails) target;
 
 		boolean nameValidationResult = this.nameValidationProcessor(variable, errors);
 
@@ -104,7 +104,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 	}
 
-	private boolean nameValidationProcessor(VariableSummary variable, Errors errors) {
+	private boolean nameValidationProcessor(VariableDetails variable, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 
@@ -140,7 +140,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	}
 
 	// 5. Description is optional and no more than 1024 characters
-	private boolean descriptionValidationProcessor(VariableSummary variable, Errors errors) {
+	private boolean descriptionValidationProcessor(VariableDetails variable, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 
@@ -155,18 +155,18 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean propertyIdValidationProcessor(VariableSummary variable, Errors errors) {
+	private boolean propertyIdValidationProcessor(VariableDetails variable, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 
 		// 6. Property ID is required
-		this.shouldNotNullOrEmpty("Property", VariableValidator.PROPERTY_ID_NAME, variable.getPropertySummary().getId(), errors);
+		this.shouldNotNullOrEmpty("Property", VariableValidator.PROPERTY_ID_NAME, variable.getProperty().getId(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
 
-		Integer propertyId = StringUtil.parseInt(variable.getPropertySummary().getId(), null);
+		Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
 
 		if (propertyId == null) {
 			this.addCustomError(errors, VariableValidator.PROPERTY_ID_NAME, BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
@@ -177,24 +177,23 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// 7. Property ID must correspond to the ID of an existing property
-		this.checkTermExist("Property", VariableValidator.PROPERTY_ID_NAME, variable.getPropertySummary().getId(), CvId.PROPERTIES.getId(),
-				errors);
+		this.checkTermExist("Property", VariableValidator.PROPERTY_ID_NAME, variable.getProperty().getId(), CvId.PROPERTIES.getId(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean methodIdValidationProcessor(VariableSummary variable, Errors errors) {
+	private boolean methodIdValidationProcessor(VariableDetails variable, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 
 		// 8. Method ID is required
-		this.shouldNotNullOrEmpty("Method", VariableValidator.METHOD_ID_NAME, variable.getMethodSummary().getId(), errors);
+		this.shouldNotNullOrEmpty("Method", VariableValidator.METHOD_ID_NAME, variable.getMethod().getId(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
 
-		Integer methodId = StringUtil.parseInt(variable.getMethodSummary().getId(), null);
+		Integer methodId = StringUtil.parseInt(variable.getMethod().getId(), null);
 
 		if (methodId == null) {
 			this.addCustomError(errors, VariableValidator.METHOD_ID_NAME, BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
@@ -205,23 +204,23 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// 9. Method ID must correspond to the ID of an existing method
-		this.checkTermExist("Method", VariableValidator.METHOD_ID_NAME, variable.getMethodSummary().getId(), CvId.METHODS.getId(), errors);
+		this.checkTermExist("Method", VariableValidator.METHOD_ID_NAME, variable.getMethod().getId(), CvId.METHODS.getId(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean scaleIdValidationProcessor(VariableSummary variable, Errors errors) {
+	private boolean scaleIdValidationProcessor(VariableDetails variable, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 
 		// 10. Scale ID is required
-		this.shouldNotNullOrEmpty("Scale", VariableValidator.SCALE_ID_NAME, variable.getScaleSummary().getId(), errors);
+		this.shouldNotNullOrEmpty("Scale", VariableValidator.SCALE_ID_NAME, variable.getScale().getId(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
 
-		Integer scaleId = StringUtil.parseInt(variable.getScaleSummary().getId(), null);
+		Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
 
 		if (scaleId == null) {
 			this.addCustomError(errors, VariableValidator.SCALE_ID_NAME, BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
@@ -232,18 +231,18 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 
 		// 11. Scale ID must correspond to the ID of an existing scale
-		this.checkTermExist("Scale", VariableValidator.SCALE_ID_NAME, variable.getScaleSummary().getId(), CvId.SCALES.getId(), errors);
+		this.checkTermExist("Scale", VariableValidator.SCALE_ID_NAME, variable.getScale().getId(), CvId.SCALES.getId(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean scaleDataTypeValidationProcessor(VariableSummary variable, Errors errors) {
+	private boolean scaleDataTypeValidationProcessor(VariableDetails variable, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 
 		// 13. The min and max expected range values are only stored if the scales data type is numeric
 		try {
-			Scale scale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(variable.getScaleSummary().getId(), null));
+			Scale scale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(variable.getScale().getId(), null));
 
 			if (scale.getDataType() != null && scale.getDataType().isSystemDataType()) {
 				this.addCustomError(errors, VariableValidator.VARIABLE_SCALE_WITH_SYSTEM_DATA_TYPE, null);
@@ -318,7 +317,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean variableTypeValidationProcessor(VariableSummary variable, Errors errors) {
+	private boolean variableTypeValidationProcessor(VariableDetails variable, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 
@@ -343,7 +342,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private void aliasValidationProcessor(VariableSummary variable, Errors errors) {
+	private void aliasValidationProcessor(VariableDetails variable, Errors errors) {
 
 		if (!this.isNullOrEmpty(variable.getAlias())) {
 			// Trim alias
@@ -357,7 +356,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 	}
 
-	private void variableShouldBeEditable(VariableSummary variable, Errors errors) {
+	private void variableShouldBeEditable(VariableDetails variable, Errors errors) {
 
 		if (variable.getId() == null) {
 			return;
@@ -397,9 +396,9 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				return;
 			}
 
-			Integer methodId = StringUtil.parseInt(variable.getMethodSummary().getId(), null);
-			Integer propertyId = StringUtil.parseInt(variable.getPropertySummary().getId(), null);
-			Integer scaleId = StringUtil.parseInt(variable.getScaleSummary().getId(), null);
+			Integer methodId = StringUtil.parseInt(variable.getMethod().getId(), null);
+			Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
+			Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
 
 			boolean nameEqual = Objects.equals(variable.getName(), oldVariable.getName());
 			boolean propertyEqual = Objects.equals(propertyId, oldVariable.getProperty().getId());
@@ -453,15 +452,15 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	}
 
 	// FIXME : Spring Does not allow multiple fields in rejectValue so here fieldNames have been not added
-	protected boolean checkIfMethodPropertyScaleCombination(VariableSummary variable, Errors errors) {
+	protected boolean checkIfMethodPropertyScaleCombination(VariableDetails variable, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 
 		try {
 
-			Integer methodId = StringUtil.parseInt(variable.getMethodSummary().getId(), null);
-			Integer propertyId = StringUtil.parseInt(variable.getPropertySummary().getId(), null);
-			Integer scaleId = StringUtil.parseInt(variable.getScaleSummary().getId(), null);
+			Integer methodId = StringUtil.parseInt(variable.getMethod().getId(), null);
+			Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
+			Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
 
 			VariableFilter variableFilter = new VariableFilter();
 			variableFilter.addMethodId(methodId);

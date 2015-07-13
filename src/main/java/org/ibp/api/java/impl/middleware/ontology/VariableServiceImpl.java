@@ -19,7 +19,6 @@ import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
-import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
@@ -194,7 +193,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	}
 
 	@Override
-	public GenericResponse addVariable(String cropName, String programId, VariableSummary variable) {
+	public GenericResponse addVariable(String cropName, String programId, VariableDetails variable) {
 
 		variable.setId(null);
 		variable.setProgramUuid(programId);
@@ -218,9 +217,9 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 			this.formatVariableSummary(variable);
 
-			Integer methodId = StringUtil.parseInt(variable.getMethodSummary().getId(), null);
-			Integer propertyId = StringUtil.parseInt(variable.getPropertySummary().getId(), null);
-			Integer scaleId = StringUtil.parseInt(variable.getScaleSummary().getId(), null);
+			Integer methodId = StringUtil.parseInt(variable.getMethod().getId(), null);
+			Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
+			Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
 
 			OntologyVariableInfo variableInfo = new OntologyVariableInfo();
 			variableInfo.setName(variable.getName());
@@ -250,7 +249,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	}
 
 	@Override
-	public void updateVariable(String cropName, String programId, String variableId, VariableSummary variable) {
+	public void updateVariable(String cropName, String programId, String variableId, VariableDetails variable) {
 
 		variable.setId(variableId);
 		variable.setProgramUuid(programId);
@@ -286,9 +285,9 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 			Integer id = StringUtil.parseInt(variable.getId(), null);
 
-			Integer methodId = StringUtil.parseInt(variable.getMethodSummary().getId(), null);
-			Integer propertyId = StringUtil.parseInt(variable.getPropertySummary().getId(), null);
-			Integer scaleId = StringUtil.parseInt(variable.getScaleSummary().getId(), null);
+			Integer methodId = StringUtil.parseInt(variable.getMethod().getId(), null);
+			Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
+			Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
 
 			OntologyVariableInfo variableInfo = new OntologyVariableInfo();
 			variableInfo.setId(id);
@@ -341,18 +340,18 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		}
 	}
 
-	protected void formatVariableSummary(VariableSummary variableSummary) {
+	protected void formatVariableSummary(VariableDetails variableDetails){
 
-		Integer scaleId = StringUtil.parseInt(variableSummary.getScaleSummary().getId(), null);
+		Integer scaleId = StringUtil.parseInt(variableDetails.getScale().getId(), null);
 
-		// Should discard unwanted parameters. We do not want expected min/max values if associated data type is not numeric
-		if (scaleId != null) {
+		//Should discard unwanted parameters. We do not want expected min/max values if associated data type is not numeric
+		if(scaleId != null){
 			try {
 				Scale scale = this.ontologyScaleDataManager.getScaleById(scaleId);
 
-				if (scale != null && !Objects.equals(scale.getDataType().getId(), DataType.NUMERIC_VARIABLE.getId())) {
-					variableSummary.setExpectedMin(null);
-					variableSummary.setExpectedMax(null);
+				if(scale != null && !Objects.equals(scale.getDataType().getId(), DataType.NUMERIC_VARIABLE.getId())){
+					variableDetails.setExpectedMin(null);
+					variableDetails.setExpectedMax(null);
 				}
 
 			} catch (MiddlewareException e) {

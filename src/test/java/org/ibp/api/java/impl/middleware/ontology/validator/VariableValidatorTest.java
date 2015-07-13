@@ -17,9 +17,10 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.util.StringUtil;
-import org.ibp.api.domain.ontology.ScaleSummary;
-import org.ibp.api.domain.ontology.TermSummary;
-import org.ibp.api.domain.ontology.VariableSummary;
+import org.ibp.api.domain.ontology.MethodDetails;
+import org.ibp.api.domain.ontology.PropertyDetails;
+import org.ibp.api.domain.ontology.ScaleDetails;
+import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableType;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.junit.After;
@@ -69,7 +70,7 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setName(null);
 		variable.setId(null);
 
@@ -102,7 +103,7 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setName(RandomStringUtils.random(201));
 
@@ -135,7 +136,7 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setDescription(RandomStringUtils.random(1025));
 
@@ -177,8 +178,8 @@ public class VariableValidatorTest {
 		Scale scale = TestDataProvider.getTestScale();
 		Variable variable = TestDataProvider.getTestVariable();
 		variable.setObservations(1);
-		VariableSummary variableSummary = TestDataProvider.getTestVariableSummary();
-		variableSummary.setName("ChangedName");
+		VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
+		variableDetails.setName("ChangedName");
 
 		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
@@ -188,9 +189,9 @@ public class VariableValidatorTest {
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
 		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
-		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(variableSummary.getProgramUuid(), variable.getId());
+		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(variableDetails.getProgramUuid(), variable.getId());
 
-		this.variableValidator.validate(variableSummary, bindingResult);
+		this.variableValidator.validate(variableDetails, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
@@ -203,7 +204,7 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setName("V@riable");
 
@@ -234,11 +235,11 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variableSummary = TestDataProvider.getTestVariableSummary();
-		variableSummary.setId("11");
-		variableSummary.setProgramUuid("uuid");
-		variableSummary.setName("Variable_Name");
-		variableSummary.setAlias("2lia");
+		VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
+		variableDetails.setId("11");
+		variableDetails.setProgramUuid("uuid");
+		variableDetails.setName("Variable_Name");
+		variableDetails.setAlias("2lia");
 
 		Term methodTerm = TestDataProvider.getMethodTerm();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
@@ -258,10 +259,10 @@ public class VariableValidatorTest {
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
 		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
-		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(variableSummary.getProgramUuid(),
-				StringUtil.parseInt(variableSummary.getId(), null));
+		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(variableDetails.getProgramUuid(),
+				StringUtil.parseInt(variableDetails.getId(), null));
 
-		this.variableValidator.validate(variableSummary, bindingResult);
+		this.variableValidator.validate(variableDetails, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("alias"));
 	}
@@ -274,10 +275,9 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
-		TermSummary propertySummary = new TermSummary();
-		variable.setPropertySummary(propertySummary);
+		variable.setProperty(new PropertyDetails());
 		Term methodTerm = TestDataProvider.getMethodTerm();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
 		Term scaleTerm = TestDataProvider.getScaleTerm();
@@ -307,9 +307,9 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
-		variable.getPropertySummary().setId("0");
+		variable.getProperty().setId("0");
 
 		Term methodTerm = TestDataProvider.getMethodTerm();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
@@ -338,10 +338,9 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
-		TermSummary methodSummary = new TermSummary();
-		variable.setMethodSummary(methodSummary);
+		variable.setMethod(new MethodDetails());
 		Term methodTerm = TestDataProvider.getMethodTerm();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
 		Term scaleTerm = TestDataProvider.getScaleTerm();
@@ -371,9 +370,9 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
-		variable.getMethodSummary().setId("0");
+		variable.getMethod().setId("0");
 		Term methodTerm = TestDataProvider.getMethodTerm();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
 		Term scaleTerm = TestDataProvider.getScaleTerm();
@@ -403,10 +402,10 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
-		ScaleSummary scaleSummary = new ScaleSummary();
-		variable.setScaleSummary(scaleSummary);
+		ScaleDetails scaleSummary = new ScaleDetails();
+		variable.setScale(scaleSummary);
 		Term methodTerm = TestDataProvider.getMethodTerm();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
 		Term scaleTerm = TestDataProvider.getScaleTerm();
@@ -436,9 +435,9 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
-		variable.getScaleSummary().setId("0");
+		variable.getScale().setId("0");
 		Term methodTerm = TestDataProvider.getMethodTerm();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
 		Term scaleTerm = TestDataProvider.getScaleTerm();
@@ -468,7 +467,7 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setExpectedMin("9");
 		variable.setExpectedMax("21");
@@ -502,7 +501,7 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setExpectedMin("15");
 		variable.setExpectedMax("15");
@@ -534,7 +533,7 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setExpectedMin("10.01");
 		variable.setExpectedMax("15");
@@ -566,7 +565,7 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setExpectedMin("15");
 		variable.setExpectedMax("20.02");
@@ -598,7 +597,7 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setExpectedMin("32");
 		variable.setExpectedMax("18");
@@ -631,7 +630,7 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		Term methodTerm = TestDataProvider.getMethodTerm();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
@@ -663,7 +662,7 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setVariableTypes(null);
 		Term methodTerm = TestDataProvider.getMethodTerm();
@@ -695,7 +694,7 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setVariableTypes(null);
 
@@ -731,7 +730,7 @@ public class VariableValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableSummary variable = TestDataProvider.getTestVariableSummary();
+		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		Term methodTerm = TestDataProvider.getMethodTerm();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();

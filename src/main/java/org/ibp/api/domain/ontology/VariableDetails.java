@@ -1,6 +1,9 @@
 
 package org.ibp.api.domain.ontology;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.ibp.api.domain.ontology.serializers.VariableDetailsSerializer;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -8,14 +11,17 @@ import java.util.Set;
 /**
  * Holds all Variable details. Extended from {@link TermSummary} for basic term details.
  */
+
+@JsonSerialize(using = VariableDetailsSerializer.class)
 public class VariableDetails extends TermSummary {
 
 	private MetadataDetails metadata = new MetadataDetails();
 
+	private String programUuid;
 	private String alias;
-	private MethodSummary method;
-	private PropertySummary property;
-	private ScaleSummary scale;
+	private MethodDetails method;
+	private PropertyDetails property;
+	private ScaleDetails scale;
 	private final List<VariableType> variableTypes = new ArrayList<>();
 	private boolean favourite;
 	private final ExpectedRange expectedRange = new ExpectedRange();
@@ -32,6 +38,14 @@ public class VariableDetails extends TermSummary {
 		return this.expectedRange;
 	}
 
+	public String getProgramUuid() {
+		return programUuid;
+	}
+
+	public void setProgramUuid(String programUuid) {
+		this.programUuid = programUuid;
+	}
+
 	public String getAlias() {
 		return this.alias;
 	}
@@ -40,27 +54,27 @@ public class VariableDetails extends TermSummary {
 		this.alias = alias;
 	}
 
-	public MethodSummary getMethod() {
+	public MethodDetails getMethod() {
 		return method;
 	}
 
-	public void setMethod(MethodSummary method) {
+	public void setMethod(MethodDetails method) {
 		this.method = method;
 	}
 
-	public PropertySummary getProperty() {
+	public PropertyDetails getProperty() {
 		return property;
 	}
 
-	public void setProperty(PropertySummary property) {
+	public void setProperty(PropertyDetails property) {
 		this.property = property;
 	}
 
-	public ScaleSummary getScale() {
+	public ScaleDetails getScale() {
 		return this.scale;
 	}
 
-	public void setScale(ScaleSummary scale) {
+	public void setScale(ScaleDetails scale) {
 		this.scale = scale;
 	}
 
@@ -86,6 +100,11 @@ public class VariableDetails extends TermSummary {
 
 	public void setVariableTypes(Set<VariableType> variables) {
 		this.variableTypes.clear();
+
+		if (variables == null) {
+			return;
+		}
+
 		for (VariableType variableType : variables) {
 			this.variableTypes.add(variableType);
 		}

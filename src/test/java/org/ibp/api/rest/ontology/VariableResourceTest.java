@@ -20,7 +20,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.util.StringUtil;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.domain.ontology.VariableSummary;
+import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.ibp.api.java.ontology.ModelService;
 import org.junit.Before;
@@ -188,10 +188,8 @@ public class VariableResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.dataType.id",Matchers.is(String.valueOf(
 						ontologyVariable.getScale().getDataType().getId()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.dataType.name",Matchers.is(ontologyVariable.getScale().getDataType().getName())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.validValues.min",Matchers.is(StringUtil.parseDouble(
-						ontologyVariable.getScale().getMinValue(), null))))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.validValues.max",Matchers.is(StringUtil.parseDouble(
-						ontologyVariable.getScale().getMaxValue(), null))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.validValues.min",Matchers.is(StringUtil.parseDouble(ontologyVariable.getScale().getMinValue(), null))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.scale.validValues.max",Matchers.is(StringUtil.parseDouble(ontologyVariable.getScale().getMaxValue(), null))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.variableTypes",
 						IsCollectionWithSize.hasSize(ontologyVariable.getVariableTypes().size())));
 
@@ -206,7 +204,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 	@Test
 	public void addVariable() throws Exception {
 		final Term variableTerm = TestDataProvider.getVariableTerm();
-		VariableSummary variableSummary = TestDataProvider.getTestVariableSummary();
+		VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
 
 		Project project = new Project();
 		project.setCropType(new CropType(this.cropName));
@@ -214,17 +212,17 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		project.setProjectName("project_name");
 
 		// Set variable id to null for post request.
-		variableSummary.setId(null);
-		Integer methodId = StringUtil.parseInt(variableSummary.getMethodSummary().getId(), null);
-		Integer propertyId = StringUtil.parseInt(variableSummary.getPropertySummary().getId(), null);
-		Integer scaleId = StringUtil.parseInt(variableSummary.getScaleSummary().getId(), null);
+		variableDetails.setId(null);
+		Integer methodId = StringUtil.parseInt(variableDetails.getMethod().getId(), null);
+		Integer propertyId = StringUtil.parseInt(variableDetails.getProperty().getId(), null);
+		Integer scaleId = StringUtil.parseInt(variableDetails.getScale().getId(), null);
 
 		VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addMethodId(methodId);
 		variableFilter.addPropertyId(propertyId);
 		variableFilter.addScaleId(scaleId);
 
-		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(variableSummary.getName(), CvId.VARIABLES.getId());
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(variableDetails.getName(), CvId.VARIABLES.getId());
 		Mockito.doReturn(TestDataProvider.getTestScale()).when(this.ontologyScaleDataManager).getScaleById(scaleId);
 		Mockito.doReturn(TestDataProvider.getPropertyTerm()).when(this.termDataManager).getTermById(propertyId);
 		Mockito.doReturn(TestDataProvider.getMethodTerm()).when(this.termDataManager).getTermById(methodId);
@@ -250,7 +248,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 				.perform(
 						MockMvcRequestBuilders.post("/ontology/{cropname}/variables?programId=" + this.programUuid, this.cropName)
-								.contentType(this.contentType).content(this.convertObjectToByte(variableSummary)))
+								.contentType(this.contentType).content(this.convertObjectToByte(variableDetails)))
 				.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isCreated())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(variableTerm.getId()))));
 
@@ -266,7 +264,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 	@Test
 	public void updateVariable() throws Exception {
 
-		VariableSummary variableSummary = TestDataProvider.getTestVariableSummary();
+		VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
 
 		Project project = new Project();
 		project.setCropType(new CropType(this.cropName));
@@ -284,9 +282,9 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		variable.setProperty(new Property(propertyTerm));
 		variable.setScale(scale);
 
-		Integer methodId = StringUtil.parseInt(variableSummary.getMethodSummary().getId(), null);
-		Integer propertyId = StringUtil.parseInt(variableSummary.getPropertySummary().getId(), null);
-		Integer scaleId = StringUtil.parseInt(variableSummary.getScaleSummary().getId(), null);
+		Integer methodId = StringUtil.parseInt(variableDetails.getMethod().getId(), null);
+		Integer propertyId = StringUtil.parseInt(variableDetails.getProperty().getId(), null);
+		Integer scaleId = StringUtil.parseInt(variableDetails.getScale().getId(), null);
 
 		VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addMethodId(methodId);
@@ -309,7 +307,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 						MockMvcRequestBuilders
 								.put("/ontology/{cropname}/variables/{id}?programId=" + this.programUuid, this.cropName,
 										variableTerm.getId()).contentType(this.contentType)
-								.content(this.convertObjectToByte(variableSummary))).andDo(MockMvcResultHandlers.print())
+								.content(this.convertObjectToByte(variableDetails))).andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isNoContent());
 
 		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).updateVariable(

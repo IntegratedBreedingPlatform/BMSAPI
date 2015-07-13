@@ -6,7 +6,6 @@ import java.util.List;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
-import org.ibp.api.domain.ontology.VariableSummary;
 
 public interface VariableService {
 
@@ -48,7 +47,7 @@ public interface VariableService {
 	 * @param variable data to be added
 	 * @return newly created variable id
 	 */
-	GenericResponse addVariable(String cropName, String programId, VariableSummary variable);
+	GenericResponse addVariable(String cropName, String programId, VariableDetails variable);
 
 	/**
 	 * Add variable using given data
@@ -58,7 +57,7 @@ public interface VariableService {
 	 * @param variableId variable to be updated
 	 * @param variable data to be added
 	 */
-	void updateVariable(String cropName, String programId, String variableId, VariableSummary variable);
+	void updateVariable(String cropName, String programId, String variableId, VariableDetails variable);
 
 	/**
 	 * Delete variable of given Id

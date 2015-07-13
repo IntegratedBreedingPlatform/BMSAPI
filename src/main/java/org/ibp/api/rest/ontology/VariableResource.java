@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
-import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -54,7 +53,7 @@ public class VariableResource {
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addVariable(@PathVariable String cropname, @RequestParam(value = "programId") String programId,
-			@RequestBody VariableSummary variable) {
+			@RequestBody VariableDetails variable) {
 		return new ResponseEntity<>(this.variableService.addVariable(cropname, programId, variable), HttpStatus.CREATED);
 	}
 
@@ -70,7 +69,7 @@ public class VariableResource {
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateVariable(@PathVariable String cropname, @RequestParam(value = "programId") String programId,
-			@PathVariable String id, @RequestBody VariableSummary variable) {
+			@PathVariable String id, @RequestBody VariableDetails variable) {
 		this.variableService.updateVariable(cropname, programId, id, variable);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
