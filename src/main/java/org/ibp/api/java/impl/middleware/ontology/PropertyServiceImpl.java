@@ -127,7 +127,7 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 	public GenericResponse addProperty(PropertyDetails propertyDetails) {
 		// Note: Set id to null because add property does not need id		
 		propertyDetails.setId(null);
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Property");
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), PropertyServiceImpl.PROPERTY_NAME);
 		this.propertyValidator.validate(propertyDetails, errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -170,8 +170,8 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 
 	@Override
 	public void updateProperty(String id, PropertyDetails propertyDetails) {
-		this.validateId(id, "Property");
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Property");
+		this.validateId(id, PropertyServiceImpl.PROPERTY_NAME);
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), PropertyServiceImpl.PROPERTY_NAME);
 		TermRequest term = new TermRequest(id, "property", CvId.PROPERTIES.getId());
 		this.termValidator.validate(term, errors);
 		if (errors.hasErrors()) {
@@ -205,11 +205,11 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 	@Override
 	public void deleteProperty(String id) {
 		// Note: Validate Id for valid format and check if property exists or not
-		this.validateId(id, "Property");
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Property");
+		this.validateId(id, PropertyServiceImpl.PROPERTY_NAME);
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), PropertyServiceImpl.PROPERTY_NAME);
 
 		// Note: Check if property is deletable or not by checking its usage in variable
-		this.termDeletableValidator.validate(new TermRequest(String.valueOf(id), "Property", CvId.PROPERTIES.getId()), errors);
+		this.termDeletableValidator.validate(new TermRequest(String.valueOf(id), PropertyServiceImpl.PROPERTY_NAME, CvId.PROPERTIES.getId()), errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
