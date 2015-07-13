@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.MethodDetails;
-import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.java.ontology.MethodService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,9 +30,8 @@ public class MethodResource {
 	@ApiOperation(value = "All Methods", notes = "Get all methods")
 	@RequestMapping(value = "/{cropname}/methods", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<MethodSummary>> listAllMethods(@PathVariable String cropname) {
-		List<MethodSummary> methodList = this.methodService.getAllMethods();
-		return new ResponseEntity<>(methodList, HttpStatus.OK);
+	public ResponseEntity<List<MethodDetails>> listAllMethods(@PathVariable String cropname) {
+		return new ResponseEntity<>(this.methodService.getAllMethods(), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get method by id", notes = "Get method using method id")
@@ -46,7 +44,7 @@ public class MethodResource {
 	@ApiOperation(value = "Add Method", notes = "Add a new Method")
 	@RequestMapping(value = "/{cropname}/methods", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> addMethod(@PathVariable String cropname, @RequestBody MethodSummary method) {
+	public ResponseEntity<GenericResponse> addMethod(@PathVariable String cropname, @RequestBody MethodDetails method) {
 		return new ResponseEntity<>(this.methodService.addMethod(method), HttpStatus.CREATED);
 	}
 
@@ -54,7 +52,7 @@ public class MethodResource {
 	@ApiOperation(value = "Update Method", notes = "Update a Method by Id")
 	@RequestMapping(value = "/{cropname}/methods/{id}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity updateMethod(@PathVariable String cropname, @PathVariable String id, @RequestBody MethodSummary method) {
+	public ResponseEntity updateMethod(@PathVariable String cropname, @PathVariable String id, @RequestBody MethodDetails method) {
 		this.methodService.updateMethod(id, method);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}

@@ -13,7 +13,7 @@ import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsIterableContainingInOrder;
 import org.hamcrest.core.Is;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.domain.ontology.MethodSummary;
+import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.junit.Assert;
 import org.junit.Before;
@@ -148,10 +148,10 @@ public class MethodResourceTest extends ApiUnitTestBase {
 	@Test
 	public void addMethod() throws Exception {
 
-		final MethodSummary methodSummary = TestDataProvider.getTestMethodSummary();
+		final MethodDetails methodDetails = TestDataProvider.getTestMethodDetails();
 
 		// Setting id as null to ignore checking editable field validation.
-		methodSummary.setId(null);
+		methodDetails.setId(null);
 
 		final Method method = TestDataProvider.getTestMethod();
 
@@ -173,7 +173,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 				.perform(
 						MockMvcRequestBuilders.post("/ontology/{cropname}/methods", this.cropName).contentType(this.contentType)
-								.content(this.convertObjectToByte(methodSummary))).andExpect(MockMvcResultMatchers.status().isCreated())
+								.content(this.convertObjectToByte(methodDetails))).andExpect(MockMvcResultMatchers.status().isCreated())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Is.is(String.valueOf(method.getId()))))
 				.andDo(MockMvcResultHandlers.print());
 
@@ -188,7 +188,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 	@Test
 	public void updateMethod() throws Exception {
 
-		MethodSummary methodSummary = TestDataProvider.getTestMethodSummary();
+		MethodDetails methodDetails = TestDataProvider.getTestMethodDetails();
 		Method method = TestDataProvider.getTestMethod();
 
 		/**
@@ -207,7 +207,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 				.perform(
 						MockMvcRequestBuilders.put("/ontology/{cropname}/methods/{id}", this.cropName, method.getId())
-								.contentType(this.contentType).content(this.convertObjectToByte(methodSummary)))
+								.contentType(this.contentType).content(this.convertObjectToByte(methodDetails)))
 				.andExpect(MockMvcResultMatchers.status().isNoContent()).andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyMethodDataManager).updateMethod(captor.capture());

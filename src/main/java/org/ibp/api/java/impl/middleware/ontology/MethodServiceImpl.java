@@ -16,7 +16,6 @@ import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManage
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.MethodDetails;
-import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
@@ -43,15 +42,15 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 	private MethodValidator methodValidator;
 
 	@Override
-	public List<MethodSummary> getAllMethods() {
+	public List<MethodDetails> getAllMethods() {
 		try {
 			List<Method> methodList = this.ontologyMethodDataManager.getAllMethods();
-			List<MethodSummary> methods = new ArrayList<>();
+			List<MethodDetails> methods = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
 
 			for (Method method : methodList) {
-				MethodSummary methodSummary = mapper.map(method, MethodSummary.class);
+				MethodDetails methodSummary = mapper.map(method, MethodDetails.class);
 				methods.add(methodSummary);
 			}
 			return methods;
@@ -113,7 +112,7 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 	}
 
 	@Override
-	public GenericResponse addMethod(MethodSummary method) {
+	public GenericResponse addMethod(MethodDetails method) {
 		method.setId(null);
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), MethodServiceImpl.METHOD_NAME);
 		this.methodValidator.validate(method, errors);
@@ -133,9 +132,9 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 	}
 
 	@Override
-	public void updateMethod(String id, MethodSummary method) {
-		this.validateId(id, MethodServiceImpl.METHOD_NAME);
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), MethodServiceImpl.METHOD_NAME);
+	public void updateMethod(String id, MethodDetails method) {
+		this.validateId(id, "Method");
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");	
 		TermRequest term = new TermRequest(id, "method", CvId.METHODS.getId());
 		this.termValidator.validate(term, errors);
 		if (errors.hasErrors()) {
