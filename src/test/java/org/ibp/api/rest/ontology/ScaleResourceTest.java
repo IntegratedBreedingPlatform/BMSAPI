@@ -10,7 +10,7 @@ import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.util.StringUtil;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.domain.ontology.ScaleSummary;
+import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.ibp.api.java.ontology.ModelService;
 import org.junit.Assert;
@@ -93,10 +93,8 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(String.valueOf(scaleList.get(0).getId()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is(scaleList.get(0).getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(scaleList.get(0).getDefinition())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].validValues.min",
-						Matchers.is(StringUtil.parseDouble(scaleList.get(0).getMinValue(), null))))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].validValues.max", Matchers.is(
-						StringUtil.parseDouble(scaleList.get(0).getMaxValue(), null))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].validValues.min", Matchers.is(StringUtil.parseDouble(scaleList.get(0).getMinValue(), null))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].validValues.max", Matchers.is(StringUtil.parseDouble(scaleList.get(0).getMaxValue(), null))))
 				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyScaleDataManager, Mockito.times(1)).getAllScales();
@@ -115,6 +113,7 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId());
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scale.getId());
+		Mockito.doReturn(true).when(this.modelService).isNumericDataType(String.valueOf(scale.getDataType().getId()));
 
 		this.mockMvc
 				.perform(
@@ -124,8 +123,8 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 		.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(scale.getId()))))
 		.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(scale.getName())))
 		.andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.is(scale.getDefinition())))
-		.andExpect(MockMvcResultMatchers.jsonPath("$.validValues.min", Matchers.is(scale.getMinValue())))
-		.andExpect(MockMvcResultMatchers.jsonPath("$.validValues.max", Matchers.is(scale.getMaxValue())))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.validValues.min", Matchers.is(StringUtil.parseDouble(scale.getMinValue(), null))))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.validValues.max", Matchers.is(StringUtil.parseDouble(scale.getMaxValue(), null))))
 		.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyScaleDataManager, Mockito.times(1)).getScaleById(scale.getId());
@@ -156,15 +155,15 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 			}
 		}).when(this.ontologyScaleDataManager).addScale(org.mockito.Matchers.any(Scale.class));
 
-		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
-		scaleSummary.setId(null);
+		ScaleDetails scaleDetails = TestDataProvider.getTestScaleDetails();
+		scaleDetails.setId(null);
 
-		Mockito.doReturn(true).when(this.modelService).isNumericDataType(String.valueOf(scaleSummary.getDataType().getId()));
+		Mockito.doReturn(true).when(this.modelService).isNumericDataType(String.valueOf(scaleDetails.getDataType().getId()));
 
 		this.mockMvc
 				.perform(
 						MockMvcRequestBuilders.post("/ontology/{cropname}/scales", this.cropName).contentType(this.contentType)
-								.content(this.convertObjectToByte(scaleSummary))).andExpect(MockMvcResultMatchers.status().isCreated())
+								.content(this.convertObjectToByte(scaleDetails))).andExpect(MockMvcResultMatchers.status().isCreated())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(scale.getId()))))
 				.andDo(MockMvcResultHandlers.print());
 
@@ -188,14 +187,14 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scale.getId());
 		Mockito.doNothing().when(this.ontologyScaleDataManager).updateScale(org.mockito.Matchers.any(Scale.class));
 
-		ScaleSummary scaleSummary = TestDataProvider.getTestScaleSummary();
+		ScaleDetails scaleDetails = TestDataProvider.getTestScaleDetails();
 
-		Mockito.doReturn(true).when(this.modelService).isNumericDataType(String.valueOf(scaleSummary.getDataType().getId()));
+		Mockito.doReturn(true).when(this.modelService).isNumericDataType(String.valueOf(scaleDetails.getDataType().getId()));
 
 		this.mockMvc
 				.perform(
 						MockMvcRequestBuilders.put("/ontology/{cropname}/scales/{id}", this.cropName, scale.getId())
-								.contentType(this.contentType).content(this.convertObjectToByte(scaleSummary)))
+								.contentType(this.contentType).content(this.convertObjectToByte(scaleDetails)))
 				.andExpect(MockMvcResultMatchers.status().isNoContent()).andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyScaleDataManager).updateScale(captor.capture());

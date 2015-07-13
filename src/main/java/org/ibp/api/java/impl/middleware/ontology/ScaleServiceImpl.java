@@ -23,7 +23,6 @@ import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.ScaleDetails;
-import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
@@ -54,16 +53,16 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 	private ScaleValidator scaleValidator;
 
 	@Override
-	public List<ScaleSummary> getAllScales() {
+	public List<ScaleDetails> getAllScales() {
 		try {
 			List<Scale> scales = this.ontologyScaleDataManager.getAllScales();
-			List<ScaleSummary> scaleSummaries = new ArrayList<>();
+			List<ScaleDetails> scaleSummaries = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
 
 			for (Scale scale : scales) {
-				ScaleSummary scaleSummary = mapper.map(scale, ScaleSummary.class);
-				scaleSummaries.add(scaleSummary);
+				ScaleDetails scaleDetail = mapper.map(scale, ScaleDetails.class);
+				scaleSummaries.add(scaleDetail);
 			}
 			return scaleSummaries;
 		} catch (MiddlewareException e) {
@@ -136,30 +135,30 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 	}
 
 	@Override
-	public GenericResponse addScale(ScaleSummary scaleSummary) {
+	public GenericResponse addScale(ScaleDetails scaleDetail) {
 		// Note: Set id to null because add scale does not need id
-		scaleSummary.setId(null);
+		scaleDetail.setId(null);
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ScaleServiceImpl.SCALE);
-		this.scaleValidator.validate(scaleSummary, errors);
+		this.scaleValidator.validate(scaleDetail, errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		try {
 			Scale scale = new Scale();
-			scale.setName(scaleSummary.getName().trim());
-			scale.setDefinition(scaleSummary.getDescription().trim());
+			scale.setName(scaleDetail.getName().trim());
+			scale.setDefinition(scaleDetail.getDescription().trim());
 
-			Integer dataTypeId = StringUtil.parseInt(scaleSummary.getDataType().getId(), null);
+			Integer dataTypeId = StringUtil.parseInt(scaleDetail.getDataType().getId(), null);
 			scale.setDataType(DataType.getById(dataTypeId));
 
 			if (Objects.equals(dataTypeId, CATEGORICAL_VARIABLE.getId())) {
-				for (org.ibp.api.domain.ontology.TermSummary category : scaleSummary.getValidValues().getCategories()) {
+				for (org.ibp.api.domain.ontology.TermSummary category : scaleDetail.getValidValues().getCategories()) {
 					scale.addCategory(new TermSummary(null, category.getName().trim(), category.getDescription().trim()));
 				}
 			}
 			if (Objects.equals(dataTypeId, NUMERIC_VARIABLE.getId())) {
-				String min = scaleSummary.getValidValues().getMin() == null ? null : scaleSummary.getValidValues().getMin();
-				String max = scaleSummary.getValidValues().getMax() == null ? null : scaleSummary.getValidValues().getMax();
+				String min = scaleDetail.getValidValues().getMin() == null ? null : scaleDetail.getValidValues().getMin();
+				String max = scaleDetail.getValidValues().getMax() == null ? null : scaleDetail.getValidValues().getMax();
 				scale.setMinValue(min);
 				scale.setMaxValue(max);
 			}
@@ -172,7 +171,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 	}
 
 	@Override
-	public void updateScale(String id, ScaleSummary scaleSummary) {
+	public void updateScale(String id, ScaleDetails scaleDetails) {
 		this.validateId(id, ScaleServiceImpl.SCALE);
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ScaleServiceImpl.SCALE);
 		TermRequest term = new TermRequest(id, ScaleServiceImpl.SCALE, CvId.SCALES.getId());
@@ -180,25 +179,23 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
-		scaleSummary.setId(id);
+		scaleDetails.setId(id);
 
 		// Note: Validate scale data
-		this.scaleValidator.validate(scaleSummary, errors);
+		this.scaleValidator.validate(scaleDetails, errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
 		try {
-			Scale scale =
-					new Scale(new Term(StringUtil.parseInt(scaleSummary.getId(), null), scaleSummary.getName().trim(), scaleSummary
-							.getDescription().trim()));
+			Scale scale = new Scale(new Term(StringUtil.parseInt(scaleDetails.getId(), null), scaleDetails.getName().trim(), scaleDetails.getDescription().trim()));
 
-			Integer dataTypeId = StringUtil.parseInt(scaleSummary.getDataType().getId(), null);
+			Integer dataTypeId = StringUtil.parseInt(scaleDetails.getDataType().getId(), null);
 
 			scale.setDataType(DataType.getById(dataTypeId));
 
 			ValidValues validValues =
-					Objects.equals(scaleSummary.getValidValues(), null) ? new ValidValues() : scaleSummary.getValidValues();
+					Objects.equals(scaleDetails.getValidValues(), null) ? new ValidValues() : scaleDetails.getValidValues();
 
 			if (Objects.equals(dataTypeId, CATEGORICAL_VARIABLE.getId())) {
 				for (org.ibp.api.domain.ontology.TermSummary category : validValues.getCategories()) {
@@ -206,8 +203,8 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 				}
 			}
 			if (Objects.equals(dataTypeId, NUMERIC_VARIABLE.getId())) {
-				String min = scaleSummary.getValidValues().getMin() == null ? null : scaleSummary.getValidValues().getMin();
-				String max = scaleSummary.getValidValues().getMax() == null ? null : scaleSummary.getValidValues().getMax();
+				String min = scaleDetails.getValidValues().getMin() == null ? null : scaleDetails.getValidValues().getMin();
+				String max = scaleDetails.getValidValues().getMax() == null ? null : scaleDetails.getValidValues().getMax();
 				scale.setMinValue(min);
 				scale.setMaxValue(max);
 			}

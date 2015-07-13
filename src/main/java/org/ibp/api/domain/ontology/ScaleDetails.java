@@ -1,11 +1,16 @@
 
 package org.ibp.api.domain.ontology;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.ibp.api.domain.ontology.serializers.ScaleDetailsSerializer;
+
 import java.util.List;
 
 /**
  * Holds all Scale details. Extended from {@link TermSummary} for basic term details.
  */
+
+@JsonSerialize(using = ScaleDetailsSerializer.class)
 public class ScaleDetails extends TermSummary {
 
 	private DataType dataType;
