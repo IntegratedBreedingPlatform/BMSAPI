@@ -270,18 +270,8 @@ public class TestDataProvider {
 		variableDetails.setAlias(TestDataProvider.variableAlias);
 		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(traitVariable)));
 		variableDetails.setProperty(TestDataProvider.getTestPropertyDetails());
-		//variableDetails.getProperty().setId(String.valueOf(TestDataProvider.propertyId));
-		//variableDetails.getProperty().setName(TestDataProvider.propertyName);
-		//variableDetails.getProperty().setDescription(TestDataProvider.propertyDescription);
 		variableDetails.setMethod(TestDataProvider.getTestMethodDetails());
-		//variableDetails.getMethod().setId(String.valueOf(TestDataProvider.methodId));
-		//variableDetails.getMethod().setName(TestDataProvider.methodName);
-		//variableDetails.getMethod().setDescription(TestDataProvider.methodDescription);
 		variableDetails.setScale(TestDataProvider.getTestScaleDetails());
-		//variableDetails.getScale().setId(String.valueOf(TestDataProvider.scaleId));
-		//variableDetails.getScale().setName(TestDataProvider.scaleName);
-		//variableDetails.getScale().setDescription(TestDataProvider.scaleDescription);
-		//variableDetails.getScale().setDataType(TestDataProvider.numericalDataType);
 		variableDetails.setExpectedMin(TestDataProvider.variableExpectedMin);
 		variableDetails.setExpectedMax(TestDataProvider.variableExpectedMax);
 		variableDetails.setFavourite(TestDataProvider.variableIsFavourite);
