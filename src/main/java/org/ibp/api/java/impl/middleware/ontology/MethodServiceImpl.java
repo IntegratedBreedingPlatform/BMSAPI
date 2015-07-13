@@ -133,8 +133,8 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 
 	@Override
 	public void updateMethod(String id, MethodDetails method) {
-		this.validateId(id, "Method");
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "Method");	
+		this.validateId(id, MethodServiceImpl.METHOD_NAME);
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), MethodServiceImpl.METHOD_NAME);
 		TermRequest term = new TermRequest(id, "method", CvId.METHODS.getId());
 		this.termValidator.validate(term, errors);
 		if (errors.hasErrors()) {
