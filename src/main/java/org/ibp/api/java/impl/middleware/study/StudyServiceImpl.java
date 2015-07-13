@@ -167,8 +167,8 @@ public class StudyServiceImpl implements StudyService {
 			// Factors, Settings tab.
 			List<Variable> conditions = study.getConditions().getVariables();
 			VariableTypeList factors = this.studyDataManager.getAllStudyFactors(studyIdentifier);
-			List<DMSVariableType> factorDetails = factors.getVariableTypes();
-			for (DMSVariableType factorDetail : factorDetails) {
+			List<VariableType> factorDetails = factors.getVariableTypes();
+			for (VariableType factorDetail : factorDetails) {
 				String value = null;
 				for (Variable condition : conditions) {
 					String conditionName = condition.getVariableType().getLocalName();
@@ -190,8 +190,8 @@ public class StudyServiceImpl implements StudyService {
 
 			// Variates - Measurements tab.
 			VariableTypeList variates = this.studyDataManager.getAllStudyVariates(studyIdentifier);
-			List<DMSVariableType> variateDetails = variates.getVariableTypes();
-			for (DMSVariableType variateDetail : variateDetails) {
+			List<VariableType> variateDetails = variates.getVariableTypes();
+			for (VariableType variateDetail : variateDetails) {
 				TermSummary trait = new TermSummary();
 				trait.setId(String.valueOf(variateDetail.getId()));
 				trait.setName(variateDetail.getStandardVariable().getName());
