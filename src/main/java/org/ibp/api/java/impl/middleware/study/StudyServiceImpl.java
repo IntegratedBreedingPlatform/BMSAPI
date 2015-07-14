@@ -3,8 +3,11 @@ package org.ibp.api.java.impl.middleware.study;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
@@ -17,6 +20,7 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -32,7 +36,11 @@ public class StudyServiceImpl implements StudyService {
 	private org.generationcp.middleware.service.api.study.StudyService middlewareStudyService;
 
 	@Autowired
-	private StudyDataManager studyDataManager;
+	private StudyDataManager studyDataManager;	
+	
+	@Autowired
+	private ConversionService converter;
+
 
 	@Override
 	public List<StudySummary> listAllStudies(final String programUniqueId) {
@@ -255,5 +263,20 @@ public class StudyServiceImpl implements StudyService {
 		FieldMapService fieldMapService = new FieldMapService(this.studyDataManager);
 		return fieldMapService.getFieldMap(studyId);
 	}
+
+	@Override
+	public String addNewStudy(StudyWorkbook studyWorkbook, String programUUID) {
+		try {
+			
+			Workbook workbook = converter.convert(studyWorkbook, Workbook.class);
+			workbook.getStudyDetails().setProgramUUID(programUUID);
+			
+			return middlewareStudyService.addNewStudy(workbook, programUUID);
+			
+		} catch (MiddlewareQueryException e) {
+			throw new ApiRuntimeException("Error! Caused by: " + e.getMessage(), e);
+		}
+	}
+
 
 }

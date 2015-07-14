@@ -9,6 +9,7 @@ import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
+import org.ibp.api.domain.study.StudyWorkbook;
 import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -90,5 +91,16 @@ public class StudyResource {
 		return new ResponseEntity<Map<Integer, FieldMap>>(this.studyService.getFieldMap(studyId), HttpStatus.OK);
 	}
 
+
+	@ApiOperation(value = "Load a study", notes = "Uploads one study (Nursery, Trial, etc) along with its dependendencies.")
+	@RequestMapping(value = "/{cropname}/{program}/", method = RequestMethod.POST)
+	public ResponseEntity<String> saveStudy(@PathVariable String cropname,
+			@PathVariable(value = "program") String programUUID,
+			@RequestBody StudyWorkbook studyWorkbook) {
+				
+		String response = studyService.addNewStudy(studyWorkbook, programUUID);
+		
+		return new ResponseEntity<String>("{response: " + response, HttpStatus.OK);
+	}
 
 }
