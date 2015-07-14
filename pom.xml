@@ -10,7 +10,7 @@
 		<jersey-version>1.8</jersey-version>
 		<spring.version>3.2.11.RELEASE</spring.version>
 		<ibpcommons.version>4.0.0.M5</ibpcommons.version>
-		<envConfig>release</envConfig>
+		<envConfig>${user.name}</envConfig>
 	</properties>
 
 	<distributionManagement>
