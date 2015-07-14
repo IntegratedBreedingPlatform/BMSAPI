@@ -1,11 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.ontology;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -15,10 +11,11 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
-import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.util.StringUtil;
+import org.ibp.api.Util;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
+import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
@@ -32,7 +29,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import com.google.common.base.Strings;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Validate data of API Services and pass data to middleware services
@@ -76,17 +76,18 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		}
 
 		try {
-			VariableFilter variableFilter = new VariableFilter();
-			variableFilter.setProgramUuid(programId);
+			org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter =
+					new org.generationcp.middleware.manager.ontology.daoElements.VariableFilter();
+			middlewareVariableFilter.setProgramUuid(programId);
 			if (favourite != null) {
-				variableFilter.setFavoritesOnly(favourite);
+				middlewareVariableFilter.setFavoritesOnly(favourite);
 			}
 
 			Integer property = StringUtil.parseInt(propertyId, null);
 			if (property != null) {
-				variableFilter.addPropertyId(property);
+				middlewareVariableFilter.addPropertyId(property);
 			}
-			List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
+			List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(middlewareVariableFilter);
 			List<VariableDetails> variableDetailsList = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
@@ -117,10 +118,15 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 		try {
 
-			List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
-			List<VariableDetails> variableDetailsList = new ArrayList<>();
-
 			ModelMapper mapper = OntologyMapper.getInstance();
+
+			org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter =
+					new org.generationcp.middleware.manager.ontology.daoElements.VariableFilter();
+
+			mapVariableFilter(variableFilter, middlewareVariableFilter);
+
+			List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(middlewareVariableFilter);
+			List<VariableDetails> variableDetailsList = new ArrayList<>();
 
 			for (Variable variable : variables) {
 				VariableDetails variableSummary = mapper.map(variable, VariableDetails.class);
@@ -327,8 +333,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
 
 		// Note: Check if variable is deletable or not by checking its usage in variable
-		this.termDeletableValidator.validate(
-				new TermRequest(String.valueOf(id), VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId()), errors);
+		this.termDeletableValidator
+				.validate(new TermRequest(String.valueOf(id), VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId()), errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -365,6 +371,61 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			return null;
 		}
 		return StringUtil.parseInt(variableType.getId(), null);
+	}
+
+	private void mapVariableFilter(VariableFilter variableFilter,
+			org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter) {
+
+		middlewareVariableFilter.setProgramUuid(variableFilter.getProgramUuid());
+
+		if (!Util.isNullOrEmpty(variableFilter.getPropertyIds())) {
+			for (Integer i : variableFilter.getPropertyIds()) {
+				middlewareVariableFilter.addPropertyId(i);
+			}
+		}
+
+		if (!Util.isNullOrEmpty(variableFilter.getMethodIds())) {
+			for (Integer i : variableFilter.getMethodIds()) {
+				middlewareVariableFilter.addMethodId(i);
+			}
+		}
+
+		if (!Util.isNullOrEmpty(variableFilter.getScaleIds())) {
+			for (Integer i : variableFilter.getScaleIds()) {
+				middlewareVariableFilter.addScaleId(i);
+			}
+		}
+
+		if (!Util.isNullOrEmpty(variableFilter.getVariableIds())) {
+			for (Integer i : variableFilter.getVariableIds()) {
+				middlewareVariableFilter.addVariableId(i);
+			}
+		}
+
+		if (!Util.isNullOrEmpty(variableFilter.getExcludedVariableIds())) {
+			for (Integer i : variableFilter.getExcludedVariableIds()) {
+				middlewareVariableFilter.addExcludedVariableId(i);
+			}
+		}
+
+		if (!Util.isNullOrEmpty(variableFilter.getDataTypes())) {
+			for (Integer i : variableFilter.getDataTypes()) {
+				middlewareVariableFilter.addDataType(DataType.getById(i));
+			}
+		}
+
+		if (!Util.isNullOrEmpty(variableFilter.getVariableTypes())) {
+			for (Integer i : variableFilter.getVariableTypes()) {
+				middlewareVariableFilter.addVariableType(VariableType.getById(i));
+			}
+		}
+
+		if (!Util.isNullOrEmpty(variableFilter.getPropertyClasses())) {
+			for (String s : variableFilter.getPropertyClasses()) {
+				middlewareVariableFilter.addPropertyClass(s);
+			}
+		}
+
 	}
 
 }

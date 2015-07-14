@@ -2,11 +2,9 @@ package org.ibp.api.rest.ontology;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.ibp.api.Util;
 import org.ibp.api.domain.ontology.VariableDetails;
+import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -83,13 +81,13 @@ public class VariableFilterResource {
 
 		if(!Util.isNullOrEmpty(dataTypeIds)){
 			for(Integer i : dataTypeIds){
-				variableFilter.addDataType(DataType.getById(i));
+				variableFilter.addDataType(i);
 			}
 		}
 
 		if(!Util.isNullOrEmpty(variableTypeIds)){
 			for(Integer i : variableTypeIds){
-				variableFilter.addVariableType(VariableType.getById(i));
+				variableFilter.addVariableType(i);
 			}
 		}
 
