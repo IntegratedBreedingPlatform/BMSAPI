@@ -14,7 +14,7 @@
 		<middleware-version>4.0.0.M5</middleware-version>
 		<jsonpath.version>0.8.1</jsonpath.version>
 		<modelmapper.version>0.7.3</modelmapper.version>
-		<envConfig>release</envConfig>
+		<envConfig>${user.name}</envConfig>
 	</properties>
 
 	<distributionManagement>
