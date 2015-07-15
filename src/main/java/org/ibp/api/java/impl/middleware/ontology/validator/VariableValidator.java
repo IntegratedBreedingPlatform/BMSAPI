@@ -1,12 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -23,7 +18,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import com.google.common.base.Strings;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Add/Update Variable Validation rules for Variable request Refer: http://confluence.leafnode.io/display/CD/Services+Validation 1. Name is
@@ -406,10 +405,17 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			boolean scaleEqual = Objects.equals(scaleId, oldVariable.getScale().getId());
 			boolean minValuesEqual = Objects.equals(variable.getExpectedRange().getMin(), oldVariable.getMinValue());
 			boolean maxValuesEqual = Objects.equals(variable.getExpectedRange().getMax(), oldVariable.getMaxValue());
+			boolean aliasEqual = Objects.equals(variable.getAlias(), oldVariable.getAlias());
 
 			if (!nameEqual) {
 				this.addCustomError(errors, "name", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
 						"name"});
+				return;
+			}
+
+			if (!aliasEqual) {
+				this.addCustomError(errors, "alias", BaseValidator.RECORD_IS_NOT_EDITABLE,
+						new Object[] {VariableValidator.VARIABLE_NAME, "alias"});
 				return;
 			}
 
