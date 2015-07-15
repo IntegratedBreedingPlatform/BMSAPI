@@ -3,7 +3,7 @@ package org.ibp.api.domain.ontology.serializers;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.google.common.base.Strings;
+import org.ibp.api.Util;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableType;
@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.Map;
 
 public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 
@@ -26,7 +24,7 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 
 		jsonGenerator.writeStartObject();
 
-		if(!isNullOrEmpty(variableDetails.getId())){
+		if (!Util.isNullOrEmpty(variableDetails.getId())) {
 			jsonGenerator.writeStringField("id", variableDetails.getId());
 		}
 		jsonGenerator.writeStringField("name", variableDetails.getName());
@@ -35,7 +33,7 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 
 		jsonGenerator.writeStringField("description", variableDetails.getDescription() == null ? "" : variableDetails.getDescription());
 
-		if(!isNullOrEmpty(variableDetails.getProperty())){
+		if (!Util.isNullOrEmpty(variableDetails.getProperty())) {
 			jsonGenerator.writeObjectFieldStart("property");
 			jsonGenerator.writeStringField("id", variableDetails.getProperty().getId());
 			jsonGenerator.writeStringField("name", variableDetails.getProperty().getName());
@@ -43,7 +41,7 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 			jsonGenerator.writeStringField("cropOntologyId", variableDetails.getProperty().getCropOntologyId() != null ? variableDetails.getProperty().getCropOntologyId() : null);
 
 			jsonGenerator.writeArrayFieldStart("classes");
-			if(!isNullOrEmpty(variableDetails.getProperty().getClasses().isEmpty())){
+			if (!Util.isNullOrEmpty(variableDetails.getProperty().getClasses().isEmpty())) {
 				for(String propertyClass : variableDetails.getProperty().getClasses()){
 					jsonGenerator.writeString(propertyClass);
 				}
@@ -55,7 +53,7 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 			jsonGenerator.writeStringField("dateCreated", variableDetails.getProperty().getMetadata().getDateCreated());
 			jsonGenerator.writeStringField("lastModified", variableDetails.getProperty().getMetadata().getDateLastModified());
 			jsonGenerator.writeArrayFieldStart("editableFields");
-			if(!isNullOrEmpty(variableDetails.getProperty().getMetadata().getEditableFields())){
+			if (!Util.isNullOrEmpty(variableDetails.getProperty().getMetadata().getEditableFields())) {
 				for(String field : variableDetails.getProperty().getMetadata().getEditableFields()){
 					jsonGenerator.writeString(field);
 				}
@@ -64,10 +62,16 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 			jsonGenerator.writeBooleanField("deletable", variableDetails.getProperty().getMetadata().isDeletable());
 
 			jsonGenerator.writeObjectFieldStart("usage");
-			jsonGenerator.writeNumberField("observations", !isNullOrEmpty(variableDetails.getProperty().getMetadata().getUsage().getObservations()) ? variableDetails.getProperty().getMetadata().getUsage().getObservations() : 0);
-			jsonGenerator.writeNumberField("studies", !isNullOrEmpty(variableDetails.getProperty().getMetadata().getUsage().getObservations()) ? variableDetails.getProperty().getMetadata().getUsage().getObservations() : 0);
+			jsonGenerator.writeNumberField("observations",
+					!Util.isNullOrEmpty(variableDetails.getProperty().getMetadata().getUsage().getObservations()) ?
+							variableDetails.getProperty().getMetadata().getUsage().getObservations() :
+							0);
+			jsonGenerator.writeNumberField("studies",
+					!Util.isNullOrEmpty(variableDetails.getProperty().getMetadata().getUsage().getStudies()) ?
+							variableDetails.getProperty().getMetadata().getUsage().getStudies() :
+							0);
 
-			if(!isNullOrEmpty(variableDetails.getProperty().getMetadata().getUsage().getVariables())){
+			if (!Util.isNullOrEmpty(variableDetails.getProperty().getMetadata().getUsage().getVariables())) {
 				jsonGenerator.writeArrayFieldStart("variables");
 				for(TermSummary variable : variableDetails.getProperty().getMetadata().getUsage().getVariables()){
 					jsonGenerator.writeStartObject();
@@ -85,7 +89,7 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 			jsonGenerator.writeEndObject();
 		}
 
-		if(!isNullOrEmpty(variableDetails.getMethod())){
+		if (!Util.isNullOrEmpty(variableDetails.getMethod())) {
 			jsonGenerator.writeObjectFieldStart("method");
 			jsonGenerator.writeStringField("id", variableDetails.getMethod().getId());
 			jsonGenerator.writeStringField("name", variableDetails.getMethod().getName());
@@ -97,7 +101,7 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 			jsonGenerator.writeStringField("dateCreated", variableDetails.getMethod().getMetadata().getDateCreated());
 			jsonGenerator.writeStringField("lastModified", variableDetails.getMethod().getMetadata().getDateLastModified());
 			jsonGenerator.writeArrayFieldStart("editableFields");
-			if(!isNullOrEmpty(variableDetails.getMethod().getMetadata().getEditableFields())){
+			if (!Util.isNullOrEmpty(variableDetails.getMethod().getMetadata().getEditableFields())) {
 				for(String field : variableDetails.getMethod().getMetadata().getEditableFields()){
 					jsonGenerator.writeString(field);
 				}
@@ -106,10 +110,16 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 			jsonGenerator.writeBooleanField("deletable", variableDetails.getMethod().getMetadata().isDeletable());
 
 			jsonGenerator.writeObjectFieldStart("usage");
-			jsonGenerator.writeNumberField("observations", !isNullOrEmpty(variableDetails.getMethod().getMetadata().getUsage().getObservations()) ? variableDetails.getMethod().getMetadata().getUsage().getObservations() : 0);
-			jsonGenerator.writeNumberField("studies", !isNullOrEmpty(variableDetails.getMethod().getMetadata().getUsage().getObservations()) ? variableDetails.getMethod().getMetadata().getUsage().getObservations() : 0);
+			jsonGenerator.writeNumberField("observations",
+					!Util.isNullOrEmpty(variableDetails.getMethod().getMetadata().getUsage().getObservations()) ?
+							variableDetails.getMethod().getMetadata().getUsage().getObservations() :
+							0);
+			jsonGenerator.writeNumberField("studies",
+					!Util.isNullOrEmpty(variableDetails.getMethod().getMetadata().getUsage().getStudies()) ?
+							variableDetails.getMethod().getMetadata().getUsage().getStudies() :
+							0);
 
-			if(!isNullOrEmpty(variableDetails.getMethod().getMetadata().getUsage().getVariables())){
+			if (!Util.isNullOrEmpty(variableDetails.getMethod().getMetadata().getUsage().getVariables())) {
 				jsonGenerator.writeArrayFieldStart("variables");
 				for(TermSummary variable : variableDetails.getMethod().getMetadata().getUsage().getVariables()){
 					jsonGenerator.writeStartObject();
@@ -127,7 +137,7 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 			jsonGenerator.writeEndObject();
 		}
 
-		if(!isNullOrEmpty(variableDetails.getScale())){
+		if (!Util.isNullOrEmpty(variableDetails.getScale())) {
 			jsonGenerator.writeObjectFieldStart("scale");
 			jsonGenerator.writeStringField("id", variableDetails.getScale().getId());
 			jsonGenerator.writeStringField("name", variableDetails.getScale().getName());
@@ -146,12 +156,12 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 
 			// If numeric data type then adding min and max in valid values
 			if(modelService.isNumericDataType(variableDetails.getScale().getDataType().getId())){
-				if(!isNullOrEmpty(variableDetails.getScale().getValidValues().getMin())){
+				if (!Util.isNullOrEmpty(variableDetails.getScale().getValidValues().getMin())) {
 					BigDecimal min = new BigDecimal(variableDetails.getScale().getValidValues().getMin());
 					jsonGenerator.writeNumberField("min", min);
 				}
 
-				if(!isNullOrEmpty(variableDetails.getScale().getValidValues().getMax())){
+				if (!Util.isNullOrEmpty(variableDetails.getScale().getValidValues().getMax())) {
 					BigDecimal max = new BigDecimal(variableDetails.getScale().getValidValues().getMax());
 					jsonGenerator.writeNumberField("max", max);
 				}
@@ -179,7 +189,7 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 			jsonGenerator.writeStringField("dateCreated", variableDetails.getScale().getMetadata().getDateCreated());
 			jsonGenerator.writeStringField("lastModified", variableDetails.getScale().getMetadata().getDateLastModified());
 			jsonGenerator.writeArrayFieldStart("editableFields");
-			if(!isNullOrEmpty(variableDetails.getScale().getMetadata().getEditableFields())){
+			if (!Util.isNullOrEmpty(variableDetails.getScale().getMetadata().getEditableFields())) {
 				for(String field : variableDetails.getScale().getMetadata().getEditableFields()){
 					jsonGenerator.writeString(field);
 				}
@@ -188,10 +198,16 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 			jsonGenerator.writeBooleanField("deletable", variableDetails.getScale().getMetadata().isDeletable());
 
 			jsonGenerator.writeObjectFieldStart("usage");
-			jsonGenerator.writeNumberField("observations", !isNullOrEmpty(variableDetails.getScale().getMetadata().getUsage().getObservations()) ? variableDetails.getScale().getMetadata().getUsage().getObservations() : 0);
-			jsonGenerator.writeNumberField("studies", !isNullOrEmpty(variableDetails.getScale().getMetadata().getUsage().getObservations()) ? variableDetails.getScale().getMetadata().getUsage().getObservations() : 0);
+			jsonGenerator.writeNumberField("observations",
+					!Util.isNullOrEmpty(variableDetails.getScale().getMetadata().getUsage().getObservations()) ?
+							variableDetails.getScale().getMetadata().getUsage().getObservations() :
+							0);
+			jsonGenerator.writeNumberField("studies",
+					!Util.isNullOrEmpty(variableDetails.getScale().getMetadata().getUsage().getStudies()) ?
+							variableDetails.getScale().getMetadata().getUsage().getStudies() :
+							0);
 
-			if(!isNullOrEmpty(variableDetails.getScale().getMetadata().getUsage().getVariables())){
+			if (!Util.isNullOrEmpty(variableDetails.getScale().getMetadata().getUsage().getVariables())) {
 				jsonGenerator.writeArrayFieldStart("variables");
 				for(TermSummary variable : variableDetails.getScale().getMetadata().getUsage().getVariables()){
 					jsonGenerator.writeStartObject();
@@ -225,17 +241,36 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 
 		jsonGenerator.writeBooleanField("favourite", variableDetails.isFavourite());
 
+		// Adding metadata related to variables
 		jsonGenerator.writeObjectFieldStart("metadata");
-			jsonGenerator.writeStringField("dateCreated", variableDetails.getMetadata().getDateCreated());
-			jsonGenerator.writeStringField("lastModified", variableDetails.getMetadata().getDateLastModified());
+		jsonGenerator.writeArrayFieldStart("editableFields");
+		if (!Util.isNullOrEmpty(variableDetails.getMetadata().getEditableFields())) {
+			for (String field : variableDetails.getMetadata().getEditableFields()) {
+				jsonGenerator.writeString(field);
+			}
+		}
+		jsonGenerator.writeEndArray();
+		jsonGenerator.writeBooleanField("deletable", variableDetails.getMetadata().isDeletable());
+
+		jsonGenerator.writeStringField("dateCreated", variableDetails.getMetadata().getDateCreated());
+		jsonGenerator.writeStringField("lastModified", variableDetails.getMetadata().getDateLastModified());
+
+		jsonGenerator.writeObjectFieldStart("usage");
+		jsonGenerator.writeNumberField("observations", !Util.isNullOrEmpty(variableDetails.getMetadata().getUsage().getObservations()) ?
+				variableDetails.getMetadata().getUsage().getObservations() :
+				0);
+		jsonGenerator.writeNumberField("studies", !Util.isNullOrEmpty(variableDetails.getMetadata().getUsage().getStudies()) ?
+				variableDetails.getMetadata().getUsage().getStudies() :
+				0);
+		jsonGenerator.writeEndObject();
 		jsonGenerator.writeEndObject();
 
 		jsonGenerator.writeObjectFieldStart("expectedRange");
-			if(!isNullOrEmpty(variableDetails.getExpectedRange().getMin())){
+		if (!Util.isNullOrEmpty(variableDetails.getExpectedRange().getMin())) {
 				BigDecimal min = new BigDecimal(variableDetails.getExpectedRange().getMin());
 				jsonGenerator.writeNumberField("min", min);
 			}
-			if(!isNullOrEmpty(variableDetails.getExpectedRange().getMax())){
+		if (!Util.isNullOrEmpty(variableDetails.getExpectedRange().getMax())) {
 				BigDecimal max = new BigDecimal(variableDetails.getExpectedRange().getMax());
 				jsonGenerator.writeNumberField("max", max);
 			}
@@ -245,8 +280,4 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 		jsonGenerator.writeEndObject();
 	}
 
-	protected boolean isNullOrEmpty(Object value) {
-		return value instanceof String && Strings.isNullOrEmpty(((String) value).trim()) || value == null || value instanceof Collection
-				&& ((Collection) value).isEmpty() || value instanceof Map && ((Map) value).isEmpty();
-	}
 }

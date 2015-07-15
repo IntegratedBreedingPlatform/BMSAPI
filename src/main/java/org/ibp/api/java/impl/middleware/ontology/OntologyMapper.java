@@ -115,7 +115,7 @@ public class OntologyMapper {
 	}
 
 	/**
-	 * Get ModelMapper instance and add Property related mapping to it
+	 * Get ModelMapper instance and add Variable related mapping to it
 	 */
 	private static void addVariableMappers(ModelMapper mapper) {
 
