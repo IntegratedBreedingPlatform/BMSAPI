@@ -237,6 +237,7 @@
 				<version>${spring-boot-version}</version>
 				<configuration>
 					<mainClass>org.ibp.Main</mainClass>
+					<addResources>false</addResources>
 				</configuration>
 				<executions>
 					<execution>
