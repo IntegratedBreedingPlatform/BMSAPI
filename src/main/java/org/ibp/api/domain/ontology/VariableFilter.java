@@ -123,33 +123,45 @@ public class VariableFilter {
 	}
 
 	@Override public boolean equals(Object o) {
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (o == null || getClass() != o.getClass())
+		}
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 
 		VariableFilter that = (VariableFilter) o;
 
-		if (fetchAll != that.fetchAll)
+		if (fetchAll != that.fetchAll) {
 			return false;
-		if (favoritesOnly != that.favoritesOnly)
+		}
+		if (favoritesOnly != that.favoritesOnly) {
 			return false;
-		if (programUuid != null ? !programUuid.equals(that.programUuid) : that.programUuid != null)
+		}
+		if (programUuid != null ? !programUuid.equals(that.programUuid) : that.programUuid != null) {
 			return false;
-		if (methodIds != null ? !methodIds.equals(that.methodIds) : that.methodIds != null)
+		}
+		if (methodIds != null ? !methodIds.equals(that.methodIds) : that.methodIds != null) {
 			return false;
-		if (propertyIds != null ? !propertyIds.equals(that.propertyIds) : that.propertyIds != null)
+		}
+		if (propertyIds != null ? !propertyIds.equals(that.propertyIds) : that.propertyIds != null) {
 			return false;
-		if (scaleIds != null ? !scaleIds.equals(that.scaleIds) : that.scaleIds != null)
+		}
+		if (scaleIds != null ? !scaleIds.equals(that.scaleIds) : that.scaleIds != null) {
 			return false;
-		if (variableIds != null ? !variableIds.equals(that.variableIds) : that.variableIds != null)
+		}
+		if (variableIds != null ? !variableIds.equals(that.variableIds) : that.variableIds != null) {
 			return false;
-		if (excludedVariableIds != null ? !excludedVariableIds.equals(that.excludedVariableIds) : that.excludedVariableIds != null)
+		}
+		if (excludedVariableIds != null ? !excludedVariableIds.equals(that.excludedVariableIds) : that.excludedVariableIds != null) {
 			return false;
-		if (dataTypesIds != null ? !dataTypesIds.equals(that.dataTypesIds) : that.dataTypesIds != null)
+		}
+		if (dataTypesIds != null ? !dataTypesIds.equals(that.dataTypesIds) : that.dataTypesIds != null) {
 			return false;
-		if (variableTypeIds != null ? !variableTypeIds.equals(that.variableTypeIds) : that.variableTypeIds != null)
+		}
+		if (variableTypeIds != null ? !variableTypeIds.equals(that.variableTypeIds) : that.variableTypeIds != null) {
 			return false;
+		}
 		return !(propertyClasses != null ? !propertyClasses.equals(that.propertyClasses) : that.propertyClasses != null);
 
 	}
