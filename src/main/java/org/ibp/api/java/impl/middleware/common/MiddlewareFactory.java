@@ -2,14 +2,12 @@
 package org.ibp.api.java.impl.middleware.common;
 
 import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
 
-import javax.annotation.PreDestroy;
+import javax.transaction.TransactionManager;
+import javax.transaction.UserTransaction;
 
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
-import org.generationcp.middleware.hibernate.SessionFactoryUtil;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.hibernate.XADataSources;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmListManagerImpl;
@@ -48,17 +46,25 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.jta.JtaTransactionManager;
+
+import com.atomikos.icatch.jta.UserTransactionImp;
+import com.atomikos.icatch.jta.UserTransactionManager;
 
 @Configuration
+@EnableTransactionManagement
 public class MiddlewareFactory {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MiddlewareFactory.class);
-
-	private final Map<String, SessionFactory> sessionFactoryCache = new HashMap<>();
 
 	@Autowired
 	private ApiEnvironmentConfiguration config;
@@ -66,44 +72,48 @@ public class MiddlewareFactory {
 	@Autowired
 	private ContextResolver contextResolver;
 
-	private SessionFactory workbenchSessionFactory;
+	@Autowired
+	@Qualifier("WORKBENCH_SessionFactory")
+	private SessionFactory WORKBENCH_SessionFactory;
 
-	@PreDestroy
-	public void preDestroy() {
-
-		for (String key : this.sessionFactoryCache.keySet()) {
-			MiddlewareFactory.LOGGER.info("Closing cached session factory for crop database: " + key);
-			this.sessionFactoryCache.get(key).close();
-		}
-
-		if (this.workbenchSessionFactory != null) {
-			MiddlewareFactory.LOGGER.info("Closing session factory for workbench database.");
-			this.workbenchSessionFactory.close();
-		}
+	@Autowired 
+	private ApplicationContext applicationContext;
+	
+	public MiddlewareFactory() {
+		
 	}
-
+	
 	private SessionFactory getSessionFactory() throws FileNotFoundException {
-		String selectedCropDB = this.getCurrentlySelectedCropDBName();
-		SessionFactory sessionFactory;
-
-		if (this.sessionFactoryCache.get(selectedCropDB) == null) {
-
-			DatabaseConnectionParameters connectionParams =
-					new DatabaseConnectionParameters(this.config.getDbHost(), this.config.getDbPort(), selectedCropDB,
-							this.config.getDbUsername(), this.config.getDbPassword());
-
-			sessionFactory = SessionFactoryUtil.openSessionFactory(connectionParams);
-			this.sessionFactoryCache.put(selectedCropDB, sessionFactory);
-		} else {
-			sessionFactory = this.sessionFactoryCache.get(selectedCropDB);
-		}
-		return sessionFactory;
+		return (SessionFactory) applicationContext.getBean(XADataSources.computeSessionFactoryName(getCurrentlySelectedCropDBName()));
 	}
 
 	private String getCurrentlySelectedCropDBName() {
 		return this.contextResolver.resolveDatabaseFromUrl();
 	}
+	
+	
+	@Bean
+	public UserTransaction userTransaction() throws Throwable {
+		UserTransactionImp userTransactionImp = new UserTransactionImp();
+		userTransactionImp.setTransactionTimeout(1000);
+		return userTransactionImp;
+	}
 
+	@Bean(initMethod = "init", destroyMethod = "close")
+	public TransactionManager transactionManager() throws Throwable {
+		UserTransactionManager userTransactionManager = new UserTransactionManager();
+		userTransactionManager.setForceShutdown(false);
+		return userTransactionManager;
+	}
+
+	// We do not want the platform transaction manager created per request but in order to handle different corps we need to seaarch for it
+	// per request. A hash map to cache
+	@Bean
+	public PlatformTransactionManager platformTransactionManager()  throws Throwable {
+		
+		return new JtaTransactionManager(userTransaction(), transactionManager());
+	}
+	
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StudyDataManager getStudyDataManager() throws FileNotFoundException {
@@ -202,26 +212,21 @@ public class MiddlewareFactory {
 		return new PedigreeDefaultServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
-	@Bean(destroyMethod = "close")
+	@Bean()
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public HibernateSessionPerRequestProvider getCropDatabaseSessionProvider() throws FileNotFoundException {
 		return new HibernateSessionPerRequestProvider(this.getSessionFactory());
 	}
 
 	@Bean
+	@DependsOn("WORKBENCH_SessionFactory")
 	public WorkbenchDataManager getWorkbenchDataManager() throws FileNotFoundException {
 		return new WorkbenchDataManagerImpl(this.getWorkbenchSessionProvider());
 	}
+	
 
-	@Bean(destroyMethod = "close")
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public HibernateSessionPerRequestProvider getWorkbenchSessionProvider() throws FileNotFoundException {
-		if (this.workbenchSessionFactory == null) {
-			DatabaseConnectionParameters workbenchConnectionParameters =
-					new DatabaseConnectionParameters(this.config.getDbHost(), this.config.getDbPort(), this.config.getWorkbenchDBName(),
-							this.config.getDbUsername(), this.config.getDbPassword());
-			this.workbenchSessionFactory = SessionFactoryUtil.openSessionFactory(workbenchConnectionParameters);
-		}
-		return new HibernateSessionPerRequestProvider(this.workbenchSessionFactory);
+	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() throws FileNotFoundException {
+		return new HibernateSessionPerRequestProvider(this.WORKBENCH_SessionFactory);
 	}
+	
 }
