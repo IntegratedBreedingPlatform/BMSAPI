@@ -19,8 +19,10 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired

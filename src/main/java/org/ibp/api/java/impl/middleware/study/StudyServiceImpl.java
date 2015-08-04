@@ -34,6 +34,7 @@ import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
@@ -41,6 +42,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
+@Transactional
 public class StudyServiceImpl implements StudyService {
 
 	@Autowired

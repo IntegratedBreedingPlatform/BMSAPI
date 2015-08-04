@@ -18,8 +18,10 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.location.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class LocationServiceImpl implements LocationService {
 
 	private static final String ERROR_MESSAGE = "Error!";
