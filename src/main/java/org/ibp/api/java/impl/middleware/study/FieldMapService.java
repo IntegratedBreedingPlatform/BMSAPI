@@ -190,7 +190,6 @@ public class FieldMapService {
 			plantingDetails.setFieldName(fieldMapTrialInstanceInfo.getFieldName());
 			plantingDetails.setPlotLayout(this.getPlanningOrderString(fieldMapTrialInstanceInfo.getPlantingOrder()));
 			plantingDetails.setRowCapacityOfPlantingMachine(fieldMapTrialInstanceInfo.getMachineRowCapacity());
-			// TODO: Need to find out how this works.
 			plantingDetails.setStartingCoordinates("Column 1, Range 1");
 			fieldMapMetaData.setFieldPlantingDetails(plantingDetails);
 		}
