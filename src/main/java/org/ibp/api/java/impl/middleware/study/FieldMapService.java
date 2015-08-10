@@ -24,9 +24,11 @@ import org.ibp.api.domain.study.FieldMapPlantingDetails;
 import org.ibp.api.domain.study.FieldMapStudySummary;
 import org.ibp.api.domain.study.FieldPlot;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
 
+@Transactional
 public class FieldMapService {
 
 	private StudyDataManager studyDataManager;
