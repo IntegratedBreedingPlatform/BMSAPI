@@ -1,9 +1,17 @@
 
 package org.ibp.api.java.impl.middleware.study;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.generationcp.middleware.domain.dms.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
@@ -11,7 +19,15 @@ import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.TraitDto;
 import org.ibp.api.domain.ontology.TermSummary;
-import org.ibp.api.domain.study.*;
+import org.ibp.api.domain.study.DatasetSummary;
+import org.ibp.api.domain.study.Environment;
+import org.ibp.api.domain.study.FieldMap;
+import org.ibp.api.domain.study.Measurement;
+import org.ibp.api.domain.study.Observation;
+import org.ibp.api.domain.study.StudyAttribute;
+import org.ibp.api.domain.study.StudyDetails;
+import org.ibp.api.domain.study.StudyGermplasm;
+import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.study.StudyService;
@@ -21,9 +37,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class StudyServiceImpl implements StudyService {

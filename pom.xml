@@ -14,6 +14,7 @@
 		<middleware-version>4.1.0.SNAPSHOT</middleware-version>
 		<jsonpath.version>0.8.1</jsonpath.version>
 		<modelmapper.version>0.7.3</modelmapper.version>
+		<envConfig>${user.name}</envConfig>
 	</properties>
 
 	<distributionManagement>
@@ -177,6 +178,58 @@
 
 	<build>
 		<finalName>${project.artifactId}</finalName>
+		<filters>
+			<filter>../BMSConfig/${envConfig}/application.properties</filter>
+			<filter>../BMSConfig/${envConfig}/test.properties</filter>
+		</filters>
+		<resources>
+			<resource>
+				<filtering>false</filtering>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<filtering>true</filtering>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+			<resource>
+				<filtering>false</filtering>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.properties</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<filtering>true</filtering>
+				<directory>src/test/resources</directory>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</testResource>
+			<testResource>
+				<filtering>false</filtering>
+				<directory>src/test/resources</directory>
+				<includes>
+					<include>**</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.properties</exclude>
+				</excludes>
+			</testResource>
+		</testResources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -184,6 +237,7 @@
 				<version>${spring-boot-version}</version>
 				<configuration>
 					<mainClass>org.ibp.Main</mainClass>
+					<addResources>false</addResources>
 				</configuration>
 				<executions>
 					<execution>
@@ -205,32 +259,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.5</version>
-			</plugin>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<phase>generate-resources</phase>
-						<configuration>
-							<tasks>
-								<copy todir="src/main/resources" overwrite="true">
-									<fileset dir="pipeline/config/${envConfig}" id="fromDir">
-										<include name="application.properties" />
-									</fileset>
-								</copy>
-								<copy todir="src/test/resources" overwrite="true">
-									<fileset dir="pipeline/config/${envConfig}" id="fromDir">
-										<include name="test.properties" />
-									</fileset>
-								</copy>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>
