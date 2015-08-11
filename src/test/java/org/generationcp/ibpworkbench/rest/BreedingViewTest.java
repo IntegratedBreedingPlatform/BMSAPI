@@ -38,7 +38,7 @@ public class BreedingViewTest {
 		MockitoAnnotations.initMocks(this);
 		this.breedingView = Mockito.spy(new BreedingView());
 		this.breedingView.setBreedingViewService(this.breedingViewService);
-		Mockito.doNothing().when(this.breedingView).closeManagerFactory();
+		Mockito.doNothing().when(this.breedingView);
 	}
 
 	@Test
