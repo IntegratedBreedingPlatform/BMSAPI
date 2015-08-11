@@ -37,8 +37,10 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 	@Autowired
 	private BreedingViewImportServiceImpl importService;
+	
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
+	
 	@Autowired
 	private Cloner cloner;
 
