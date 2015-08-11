@@ -24,7 +24,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
-import org.generationcp.commons.hibernate.DynamicManagerFactoryProvider;
 import org.generationcp.ibpworkbench.constants.WebAPIConstants;
 import org.generationcp.ibpworkbench.model.DataResponse;
 import org.generationcp.ibpworkbench.service.BreedingViewService;
@@ -46,9 +45,6 @@ public class BreedingView {
 
 	@Autowired
 	private BreedingViewService breedingViewService;
-
-	@Autowired
-	private DynamicManagerFactoryProvider managerFactoryProvider;
 
 	@GET
 	@Path("/ssa/save_result_summary")
@@ -113,16 +109,7 @@ public class BreedingView {
 			response = new DataResponse(false, "Failed to invoke service: " + e.toString());
 		}
 
-		this.closeManagerFactory();
 		return response;
-	}
-
-	protected void closeManagerFactory() {
-		try {
-			this.managerFactoryProvider.close();
-		} catch (Exception e) {
-			BreedingView.LOG.debug(e.getMessage(), e);
-		}
 	}
 
 	public void setBreedingViewService(BreedingViewService breedingViewService) {
