@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.rits.cloning.Cloner;
 
@@ -51,6 +52,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	private static final Logger LOG = LoggerFactory.getLogger(BreedingViewServiceImpl.class);
 
 	@Override
+	@Transactional
 	public void execute(Map<String, String> params, List<String> errors) throws IBPWebServiceException {
 
 		try {
