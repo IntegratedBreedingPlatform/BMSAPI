@@ -34,4 +34,6 @@
     <logger name="org.hibernate" level="WARN"/>
     <logger name="org.springframework" level="WARN"/>
     <logger name="org.generationcp.bms" level="DEBUG"/>
+    <logger name="com.atomikos" level="WARN"/>
+    
 </configuration>
