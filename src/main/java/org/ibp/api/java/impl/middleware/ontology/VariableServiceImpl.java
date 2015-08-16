@@ -1,7 +1,11 @@
 
 package org.ibp.api.java.impl.middleware.ontology;
 
-import com.google.common.base.Strings;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -29,10 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import com.google.common.base.Strings;
 
 /**
  * Validate data of API Services and pass data to middleware services
@@ -123,7 +124,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter =
 					new org.generationcp.middleware.manager.ontology.daoElements.VariableFilter();
 
-			mapVariableFilter(variableFilter, middlewareVariableFilter);
+			this.mapVariableFilter(variableFilter, middlewareVariableFilter);
 
 			List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(middlewareVariableFilter);
 			List<VariableDetails> variableDetailsList = new ArrayList<>();
@@ -333,8 +334,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
 
 		// Note: Check if variable is deletable or not by checking its usage in variable
-		this.termDeletableValidator
-				.validate(new TermRequest(String.valueOf(id), VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId()), errors);
+		this.termDeletableValidator.validate(
+				new TermRequest(String.valueOf(id), VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId()), errors);
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
@@ -346,16 +347,16 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		}
 	}
 
-	protected void formatVariableSummary(VariableDetails variableDetails){
+	protected void formatVariableSummary(VariableDetails variableDetails) {
 
 		Integer scaleId = StringUtil.parseInt(variableDetails.getScale().getId(), null);
 
-		//Should discard unwanted parameters. We do not want expected min/max values if associated data type is not numeric
-		if(scaleId != null){
+		// Should discard unwanted parameters. We do not want expected min/max values if associated data type is not numeric
+		if (scaleId != null) {
 			try {
 				Scale scale = this.ontologyScaleDataManager.getScaleById(scaleId);
 
-				if(scale != null && !Objects.equals(scale.getDataType().getId(), DataType.NUMERIC_VARIABLE.getId())){
+				if (scale != null && !Objects.equals(scale.getDataType().getId(), DataType.NUMERIC_VARIABLE.getId())) {
 					variableDetails.setExpectedMin(null);
 					variableDetails.setExpectedMax(null);
 				}
