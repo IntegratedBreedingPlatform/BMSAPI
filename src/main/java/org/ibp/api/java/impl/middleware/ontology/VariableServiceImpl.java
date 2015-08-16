@@ -187,8 +187,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 				response.getMetadata().addEditableField("alias");
 				response.getMetadata().addEditableField("cropOntologyId");
 				response.getMetadata().addEditableField("variableTypeIds");
-				response.getMetadata().addEditableField("propertySummary");
-				response.getMetadata().addEditableField("methodSummary");
+				response.getMetadata().addEditableField("property");
+				response.getMetadata().addEditableField("method");
 				response.getMetadata().addEditableField("scale");
 				response.getMetadata().addEditableField("expectedRange");
 			}
