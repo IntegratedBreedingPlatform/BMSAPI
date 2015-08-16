@@ -239,14 +239,14 @@ public class TestDataProvider {
 	}
 
 	public static PropertyDetails getTestPropertyDetails() {
-		PropertyDetails propertySummary = new PropertyDetails();
-		propertySummary.setId(String.valueOf(TestDataProvider.propertyId));
-		propertySummary.setName(TestDataProvider.propertyName);
-		propertySummary.setDescription(TestDataProvider.propertyDescription);
-		propertySummary.setClasses(new HashSet<>(Collections.singletonList(TestDataProvider.className1)));
-		propertySummary.setCropOntologyId(TestDataProvider.cropOntologyId);
-		propertySummary.setMetadata(TestDataProvider.getTestMetadataDetails());
-		return propertySummary;
+		PropertyDetails propertyDetails = new PropertyDetails();
+		propertyDetails.setId(String.valueOf(TestDataProvider.propertyId));
+		propertyDetails.setName(TestDataProvider.propertyName);
+		propertyDetails.setDescription(TestDataProvider.propertyDescription);
+		propertyDetails.setClasses(new HashSet<>(Collections.singletonList(TestDataProvider.className1)));
+		propertyDetails.setCropOntologyId(TestDataProvider.cropOntologyId);
+		propertyDetails.setMetadata(TestDataProvider.getTestMetadataDetails());
+		return propertyDetails;
 	}
 
 	public static ScaleDetails getTestScaleDetails() {

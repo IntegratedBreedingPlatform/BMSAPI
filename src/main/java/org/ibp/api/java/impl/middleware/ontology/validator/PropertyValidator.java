@@ -45,85 +45,85 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 	@Override
 	public void validate(Object target, Errors errors) {
 
-		PropertyDetails propertySummary = (PropertyDetails) target;
+		PropertyDetails propertyDetails = (PropertyDetails) target;
 
-		boolean nameValidationResult = this.nameValidationProcessor(propertySummary, errors);
+		boolean nameValidationResult = this.nameValidationProcessor(propertyDetails, errors);
 
-		this.descriptionValidationProcessor(propertySummary, errors);
+		this.descriptionValidationProcessor(propertyDetails, errors);
 
-		this.cropOntologyIDValidationProcessor(propertySummary, errors);
+		this.cropOntologyIDValidationProcessor(propertyDetails, errors);
 
-		this.classValidationProcessor(propertySummary, errors);
+		this.classValidationProcessor(propertyDetails, errors);
 
 		if (nameValidationResult) {
-			this.propertyShouldBeEditableProcessor(propertySummary, errors);
+			this.propertyShouldBeEditableProcessor(propertyDetails, errors);
 		}
 	}
 
-	private boolean nameValidationProcessor(PropertyDetails propertySummary, Errors errors) {
+	private boolean nameValidationProcessor(PropertyDetails propertyDetails, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 
 		// 1. Name is required
-		this.shouldNotNullOrEmpty("Name", "name", propertySummary.getName(), errors);
+		this.shouldNotNullOrEmpty("Name", "name", propertyDetails.getName(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
 
 		// Trim name
-		propertySummary.setName(propertySummary.getName().trim());
+		propertyDetails.setName(propertyDetails.getName().trim());
 
 		// 2. Name is no more than 200 characters
-		this.fieldShouldNotOverflow("name", propertySummary.getName(), PropertyValidator.NAME_TEXT_LIMIT, errors);
+		this.fieldShouldNotOverflow("name", propertyDetails.getName(), PropertyValidator.NAME_TEXT_LIMIT, errors);
 
 		// 3. Name is unique
-		this.checkTermUniqueness("Property", StringUtil.parseInt(propertySummary.getId(), null), propertySummary.getName(),
+		this.checkTermUniqueness("Property", StringUtil.parseInt(propertyDetails.getId(), null), propertyDetails.getName(),
 				CvId.PROPERTIES.getId(), errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean descriptionValidationProcessor(PropertyDetails propertySummary, Errors errors) {
+	private boolean descriptionValidationProcessor(PropertyDetails propertyDetails, Errors errors) {
 		Integer initialCount = errors.getErrorCount();
 
 		// Note: If Description is null then initialize it with empty value and if not null then trim.
-		if (Strings.isNullOrEmpty(propertySummary.getDescription())) {
-			propertySummary.setDescription("");
+		if (Strings.isNullOrEmpty(propertyDetails.getDescription())) {
+			propertyDetails.setDescription("");
 		} else {
-			propertySummary.setDescription(propertySummary.getDescription().trim());
+			propertyDetails.setDescription(propertyDetails.getDescription().trim());
 		}
 
 		// 4. Description is no more than 1024 characters
-		this.fieldShouldNotOverflow("description", propertySummary.getDescription(), PropertyValidator.DESCRIPTION_TEXT_LIMIT, errors);
+		this.fieldShouldNotOverflow("description", propertyDetails.getDescription(), PropertyValidator.DESCRIPTION_TEXT_LIMIT, errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean cropOntologyIDValidationProcessor(PropertyDetails propertySummary, Errors errors) {
+	private boolean cropOntologyIDValidationProcessor(PropertyDetails propertyDetails, Errors errors) {
 		Integer initialCount = errors.getErrorCount();
 
 		// Note: If cropOntologyId is null then initialize it with empty value if not then trim.
-		if (Strings.isNullOrEmpty(propertySummary.getCropOntologyId())) {
-			propertySummary.setCropOntologyId("");
+		if (Strings.isNullOrEmpty(propertyDetails.getCropOntologyId())) {
+			propertyDetails.setCropOntologyId("");
 		} else {
-			propertySummary.setCropOntologyId(propertySummary.getCropOntologyId().trim());
+			propertyDetails.setCropOntologyId(propertyDetails.getCropOntologyId().trim());
 		}
 
 		// 4. Description is no more than 255 characters
-		this.fieldShouldNotOverflow("cropOntologyId", propertySummary.getCropOntologyId(), PropertyValidator.NAME_TEXT_LIMIT, errors);
+		this.fieldShouldNotOverflow("cropOntologyId", propertyDetails.getCropOntologyId(), PropertyValidator.NAME_TEXT_LIMIT, errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean classValidationProcessor(PropertyDetails propertySummary, Errors errors) {
+	private boolean classValidationProcessor(PropertyDetails propertyDetails, Errors errors) {
 		Integer initialCount = errors.getErrorCount();
 
 		Set<String> nonEmptyClasses = new HashSet<>();
 		Set<String> classesSet = new HashSet<>();
 
 		// Note: Iterate through each class
-		for (String c : propertySummary.getClasses()) {
+		for (String c : propertyDetails.getClasses()) {
 			if (this.isNullOrEmpty(c) || classesSet.contains(c.toLowerCase())) {
 				continue;
 			}
@@ -136,10 +136,10 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 			return false;
 		}
 
-		propertySummary.setClasses(nonEmptyClasses);
+		propertyDetails.setClasses(nonEmptyClasses);
 
 		// 5. Classes must be an array containing at least one string
-		if (propertySummary.getClasses().isEmpty()) {
+		if (propertyDetails.getClasses().isEmpty()) {
 			this.addCustomError(errors, "classes", BaseValidator.LIST_SHOULD_NOT_BE_EMPTY, new Object[] {"class"});
 		}
 
@@ -151,7 +151,7 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 
 		// 6 Each class should contain unique values
 		List<String> classes = new ArrayList<>();
-		classes.addAll(propertySummary.getClasses());
+		classes.addAll(propertyDetails.getClasses());
 
 		for (int i = 1; i <= classes.size(); i++) {
 			this.listShouldNotOverflow("class names", "classes", classes.get(i - 1), PropertyValidator.CLASS_TEXT_LIMIT, errors);
@@ -163,15 +163,15 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean propertyShouldBeEditableProcessor(PropertyDetails propertySummary, Errors errors) {
+	private boolean propertyShouldBeEditableProcessor(PropertyDetails propertyDetails, Errors errors) {
 		Integer initialCount = errors.getErrorCount();
 
 		// Check method for edit request
-		if (propertySummary.getId() == null) {
+		if (propertyDetails.getId() == null) {
 			return true;
 		}
 
-		Integer propertyId = StringUtil.parseInt(propertySummary.getId(), null);
+		Integer propertyId = StringUtil.parseInt(propertyDetails.getId(), null);
 
 		try {
 
@@ -179,7 +179,7 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 
 			// that property should exist with requestId
 			if (Objects.equals(oldProperty, null)) {
-				this.addCustomError(errors, BaseValidator.ID_DOES_NOT_EXIST, new Object[] {"Property", propertySummary.getId()});
+				this.addCustomError(errors, BaseValidator.ID_DOES_NOT_EXIST, new Object[] {"Property", propertyDetails.getId()});
 				return false;
 			}
 
@@ -190,7 +190,7 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 			}
 
 			// Term is referred and check for name changes
-			if (Objects.equals(propertySummary.getName(), oldProperty.getName())) {
+			if (Objects.equals(propertyDetails.getName(), oldProperty.getName())) {
 				return true;
 			}
 
