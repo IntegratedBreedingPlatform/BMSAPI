@@ -1,7 +1,8 @@
 package org.ibp.api.rest.ontology;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.List;
+import java.util.Set;
+
 import org.ibp.api.Util;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
@@ -16,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.List;
-import java.util.Set;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 /**
  * This is temporary resource to test get variables using types of filter

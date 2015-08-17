@@ -1,8 +1,8 @@
 package org.ibp.api.domain.ontology.serializers;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import java.io.IOException;
+import java.math.BigDecimal;
+
 import org.ibp.api.Util;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.ontology.VariableDetails;
@@ -10,8 +10,9 @@ import org.ibp.api.domain.ontology.VariableType;
 import org.ibp.api.java.ontology.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
-import java.math.BigDecimal;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
 public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 

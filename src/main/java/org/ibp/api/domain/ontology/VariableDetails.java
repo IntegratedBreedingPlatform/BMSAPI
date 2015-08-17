@@ -1,12 +1,13 @@
 
 package org.ibp.api.domain.ontology;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.ibp.api.domain.ontology.serializers.VariableDetailsSerializer;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import org.ibp.api.domain.ontology.serializers.VariableDetailsSerializer;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Holds all Variable details. Extended from {@link TermSummary} for basic term details.

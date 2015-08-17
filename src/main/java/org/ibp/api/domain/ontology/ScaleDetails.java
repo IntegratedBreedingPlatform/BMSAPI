@@ -1,10 +1,11 @@
 
 package org.ibp.api.domain.ontology;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.util.List;
+
 import org.ibp.api.domain.ontology.serializers.ScaleDetailsSerializer;
 
-import java.util.List;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Holds all Scale details. Extended from {@link TermSummary} for basic term details.

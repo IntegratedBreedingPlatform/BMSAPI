@@ -1,18 +1,19 @@
 package org.ibp.api.domain.ontology.serializers;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.google.common.base.Strings;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.Map;
+
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.java.ontology.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.Map;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.google.common.base.Strings;
 
 public class ScaleDetailsSerializer extends JsonSerializer<ScaleDetails>{
 

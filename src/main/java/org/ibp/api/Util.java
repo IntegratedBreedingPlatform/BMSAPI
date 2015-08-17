@@ -1,9 +1,9 @@
 package org.ibp.api;
 
-import com.google.common.base.Strings;
-
 import java.util.Collection;
 import java.util.Map;
+
+import com.google.common.base.Strings;
 
 public class Util {
 

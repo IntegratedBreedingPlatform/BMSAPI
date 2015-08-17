@@ -1,13 +1,13 @@
 
 package org.ibp.api;
 
-import com.google.common.base.Strings;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+
+import com.google.common.base.Strings;
 
 public class ISO8601DateParser {
 

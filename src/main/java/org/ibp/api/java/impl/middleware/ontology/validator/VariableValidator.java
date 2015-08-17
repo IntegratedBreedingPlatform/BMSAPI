@@ -1,7 +1,12 @@
 
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import com.google.common.base.Strings;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -18,11 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.google.common.base.Strings;
 
 /**
  * Add/Update Variable Validation rules for Variable request Refer: http://confluence.leafnode.io/display/CD/Services+Validation 1. Name is
