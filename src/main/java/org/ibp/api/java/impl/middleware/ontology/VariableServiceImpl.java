@@ -30,6 +30,7 @@ import org.ibp.api.java.ontology.VariableService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -40,6 +41,7 @@ import com.google.common.base.Strings;
  */
 
 @Service
+@Transactional
 public class VariableServiceImpl extends ServiceBaseImpl implements VariableService {
 
 	private static final String VARIABLE_NAME = "Variable";

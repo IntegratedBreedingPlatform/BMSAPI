@@ -20,10 +20,12 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.ontology.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Function;
 
 @Service
+@Transactional
 public class ModelServiceImpl implements ModelService {
 
 	@Autowired

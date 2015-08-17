@@ -1,11 +1,11 @@
 
 package org.ibp.api.java.ontology;
 
+import java.util.List;
+
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
-
-import java.util.List;
 
 public interface VariableService {
 

@@ -25,6 +25,7 @@ import org.ibp.api.java.ontology.PropertyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -33,6 +34,7 @@ import org.springframework.validation.MapBindingResult;
  */
 
 @Service
+@Transactional
 public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyService {
 
 	private static final String ERROR_MESSAGE = "Error!";
