@@ -31,8 +31,6 @@ import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl;
 import org.hibernate.SessionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -51,8 +49,6 @@ import com.atomikos.icatch.jta.UserTransactionManager;
 @Configuration
 @EnableTransactionManagement
 public class MiddlewareFactory {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(MiddlewareFactory.class);
 
 	@Autowired
 	private ApiEnvironmentConfiguration config;
