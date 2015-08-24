@@ -323,7 +323,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		// 17. Variable type IDs is required
 		if (variable.getVariableTypes().isEmpty()) {
-			this.addCustomError(errors, "variableTypeIds", BaseValidator.LIST_SHOULD_NOT_BE_EMPTY, new Object[] {"variable type"});
+			this.addCustomError(errors, "variableTypes", BaseValidator.LIST_SHOULD_NOT_BE_EMPTY, new Object[] {"variable type"});
 		}
 
 		if (errors.getErrorCount() > initialCount) {
@@ -335,7 +335,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		for (VariableType variableType : variable.getVariableTypes()) {
 			if (org.generationcp.middleware.domain.ontology.VariableType.getById(this.parseVariableTypeAsInteger(variableType)) == null) {
-				this.addCustomError(errors, "variableTypeIds", BaseValidator.INVALID_TYPE_ID, new Object[] {"Variable Type"});
+				this.addCustomError(errors, "variableTypes", BaseValidator.INVALID_TYPE_ID, new Object[] {"Variable Type"});
 			}
 		}
 
@@ -410,13 +410,13 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 			if (!nameEqual) {
 				this.addCustomError(errors, "name", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
-						"name"});
+				"name"});
 				return;
 			}
 
 			if (!aliasEqual) {
-				this.addCustomError(errors, "alias", BaseValidator.RECORD_IS_NOT_EDITABLE,
-						new Object[] {VariableValidator.VARIABLE_NAME, "alias"});
+				this.addCustomError(errors, "alias", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
+						"alias"});
 				return;
 			}
 
@@ -434,7 +434,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 			if (!scaleEqual) {
 				this.addCustomError(errors, "scaleId", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
-						"scale"});
+				"scale"});
 				return;
 			}
 
