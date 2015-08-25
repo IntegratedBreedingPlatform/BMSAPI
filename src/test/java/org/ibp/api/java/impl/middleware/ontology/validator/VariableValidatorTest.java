@@ -681,7 +681,7 @@ public class VariableValidatorTest {
 
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
-		Assert.assertNotNull(bindingResult.getFieldError("variableTypeIds"));
+		Assert.assertNotNull(bindingResult.getFieldError("variableTypes"));
 	}
 
 	/**
@@ -717,7 +717,7 @@ public class VariableValidatorTest {
 
 		this.variableValidator.validate(variable, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
-		Assert.assertNotNull(bindingResult.getFieldError("variableTypeIds"));
+		Assert.assertNotNull(bindingResult.getFieldError("variableTypes"));
 	}
 
 	/**
