@@ -43,8 +43,6 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl;
 import org.hibernate.SessionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -64,8 +62,6 @@ import com.atomikos.icatch.jta.UserTransactionManager;
 @EnableTransactionManagement
 public class MiddlewareFactory {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MiddlewareFactory.class);
-
 	@Autowired
 	private ApiEnvironmentConfiguration config;
 
@@ -76,22 +72,22 @@ public class MiddlewareFactory {
 	@Qualifier("WORKBENCH_SessionFactory")
 	private SessionFactory WORKBENCH_SessionFactory;
 
-	@Autowired 
+	@Autowired
 	private ApplicationContext applicationContext;
-	
+
 	public MiddlewareFactory() {
-		
+
 	}
-	
+
 	private SessionFactory getSessionFactory() throws FileNotFoundException {
-		return (SessionFactory) applicationContext.getBean(XADataSources.computeSessionFactoryName(getCurrentlySelectedCropDBName()));
+		return (SessionFactory) this.applicationContext.getBean(XADataSources.computeSessionFactoryName(this
+				.getCurrentlySelectedCropDBName()));
 	}
 
 	private String getCurrentlySelectedCropDBName() {
 		return this.contextResolver.resolveDatabaseFromUrl();
 	}
-	
-	
+
 	@Bean
 	public UserTransaction userTransaction() throws Throwable {
 		UserTransactionImp userTransactionImp = new UserTransactionImp();
@@ -109,11 +105,11 @@ public class MiddlewareFactory {
 	// We do not want the platform transaction manager created per request but in order to handle different corps we need to seaarch for it
 	// per request. A hash map to cache
 	@Bean
-	public PlatformTransactionManager platformTransactionManager()  throws Throwable {
-		
-		return new JtaTransactionManager(userTransaction(), transactionManager());
+	public PlatformTransactionManager platformTransactionManager() throws Throwable {
+
+		return new JtaTransactionManager(this.userTransaction(), this.transactionManager());
 	}
-	
+
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StudyDataManager getStudyDataManager() throws FileNotFoundException {
@@ -223,10 +219,9 @@ public class MiddlewareFactory {
 	public WorkbenchDataManager getWorkbenchDataManager() throws FileNotFoundException {
 		return new WorkbenchDataManagerImpl(this.getWorkbenchSessionProvider());
 	}
-	
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() throws FileNotFoundException {
 		return new HibernateSessionPerRequestProvider(this.WORKBENCH_SessionFactory);
 	}
-	
+
 }
