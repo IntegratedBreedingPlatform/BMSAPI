@@ -10,6 +10,7 @@ import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.StudyWorkbook;
+import org.ibp.api.domain.study.Trait;
 
 public interface StudyService {
 
@@ -32,5 +33,5 @@ public interface StudyService {
 	
 	Map<Integer, FieldMap> getFieldMap(final String studyIdentifier);
 
-	String addNewStudy(final StudyWorkbook studyWorkbook, String programUUID);
+	Integer addNewStudy(final StudyWorkbook studyWorkbook, String programUUID);
 }

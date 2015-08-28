@@ -28,8 +28,10 @@ import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
+import org.generationcp.middleware.service.OntologyServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl;
 import org.hibernate.SessionFactory;
@@ -181,4 +183,11 @@ public class MiddlewareFactory {
 		}
 		return new HibernateSessionPerRequestProvider(this.workbenchSessionFactory);
 	}
+	
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyService getOntologyService() throws FileNotFoundException {
+		return new OntologyServiceImpl(getCropDatabaseSessionProvider());
+	}
+	
 }

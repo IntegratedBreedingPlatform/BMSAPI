@@ -4,17 +4,25 @@ package org.ibp.api.rest.study;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.Valid;
+import javax.validation.ValidationException;
+
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.StudyWorkbook;
+import org.ibp.api.domain.study.Trait;
 import org.ibp.api.java.study.StudyService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +40,8 @@ public class StudyResource {
 
 	@Autowired
 	private StudyService studyService;
+	
+	private Logger LOGGER = LoggerFactory.getLogger(StudyResource.class);
 
 	/**
 	 * @param cropname The crop for which this rest call is being made
@@ -91,16 +101,38 @@ public class StudyResource {
 		return new ResponseEntity<Map<Integer, FieldMap>>(this.studyService.getFieldMap(studyId), HttpStatus.OK);
 	}
 
-
 	@ApiOperation(value = "Load a study", notes = "Uploads one study (Nursery, Trial, etc) along with its dependendencies.")
 	@RequestMapping(value = "/{cropname}/{program}/", method = RequestMethod.POST)
-	public ResponseEntity<String> saveStudy(@PathVariable String cropname,
-			@PathVariable(value = "program") String programUUID,
-			@RequestBody StudyWorkbook studyWorkbook) {
-				
-		String response = studyService.addNewStudy(studyWorkbook, programUUID);
+	public ResponseEntity<String> saveStudy(final @PathVariable String cropname,
+			@PathVariable(value = "program") final String programUUID,
+			@RequestBody @Valid final StudyWorkbook studyWorkbook,
+			BindingResult bindingResult) {
 		
-		return new ResponseEntity<String>("{response: " + response, HttpStatus.OK);
+		if(bindingResult.hasErrors()){
+			String error = getErrorsAsString(bindingResult);
+			
+			LOGGER.error(error);
+			throw new ValidationException(error);
+		}
+		Integer studyId = studyService.addNewStudy(studyWorkbook, programUUID);
+		
+		return new ResponseEntity<String>("{studyId: " + studyId + "}", HttpStatus.OK);
+	}
+	
+	
+	private String getErrorsAsString(final BindingResult bindingResult){
+		StringBuilder validationErrors = new StringBuilder();
+		for(FieldError error : bindingResult.getFieldErrors()){
+			validationErrors
+			.append("[")
+			.append(error.getField())
+			.append(": ")
+			.append(error.getDefaultMessage())
+			.append("]");
+		}
+		
+		return validationErrors.toString();
+
 	}
 
 }

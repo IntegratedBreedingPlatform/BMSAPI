@@ -1,5 +1,12 @@
 package org.ibp.api.domain.study;
 
+import java.util.List;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.ibp.api.rest.study.StudyResource;
 
 /**
@@ -9,14 +16,56 @@ import org.ibp.api.rest.study.StudyResource;
  */
 public class StudyWorkbook {
 
+	@NotBlank
+	@Pattern(regexp="[A-Za-z 0-9]+")
 	private String name;
+
+	@Pattern(regexp="[A-Za-z 0-9]+")
 	private String objective;
+
+	@Pattern(regexp="[0-9]{8}")
 	private String startDate;
+	
+	@Pattern(regexp="[0-9]{8}")
 	private String endDate;
 	private String title;
+	
+	@NotEmpty
+	@Pattern(regexp="[N|T]")
 	private String studyType;
+	
+	@Pattern(regexp="[A-Za-z 0-9]+")
 	private String siteName;
+	
+	@NotEmpty
+	@Valid
+	private List<StudyGermplasm> germplasms;
 
+	@NotEmpty
+	@Valid
+	private List<Trait> traits;
+
+	private String[][] traitValues;
+
+	public List<Trait> getTraits() {
+		return traits;
+	}
+	public void setTraits(List<Trait> traits) {
+		this.traits = traits;
+	}
+	public String[][] getTraitValues() {
+		return traitValues;
+	}
+	public void setTraitValues(String[][] traitValues) {
+		this.traitValues = traitValues;
+	}
+
+	public List<StudyGermplasm> getGermplasms() {
+		return germplasms;
+	}
+	public void setGermplasms(List<StudyGermplasm> germplasms) {
+		this.germplasms = germplasms;
+	}
 	public String getName() {
 		return name;
 	}

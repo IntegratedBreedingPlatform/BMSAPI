@@ -1,8 +1,15 @@
 
 package org.ibp.api.domain.study;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.Range;
 
 /**
  * TODO: Replace with Onotology Domain API entity.
@@ -10,6 +17,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  */
 public class Trait {
 
+	@NotNull
+	@Range(min = 1, max = 999999)
 	private Integer traitId;
 
 	private String traitName;
