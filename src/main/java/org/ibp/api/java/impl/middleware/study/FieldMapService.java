@@ -24,9 +24,11 @@ import org.ibp.api.domain.study.FieldMapPlantingDetails;
 import org.ibp.api.domain.study.FieldMapStudySummary;
 import org.ibp.api.domain.study.FieldPlot;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
 
+@Transactional
 public class FieldMapService {
 
 	private StudyDataManager studyDataManager;
@@ -190,7 +192,6 @@ public class FieldMapService {
 			plantingDetails.setFieldName(fieldMapTrialInstanceInfo.getFieldName());
 			plantingDetails.setPlotLayout(this.getPlanningOrderString(fieldMapTrialInstanceInfo.getPlantingOrder()));
 			plantingDetails.setRowCapacityOfPlantingMachine(fieldMapTrialInstanceInfo.getMachineRowCapacity());
-			// TODO: Need to find out how this works.
 			plantingDetails.setStartingCoordinates("Column 1, Range 1");
 			fieldMapMetaData.setFieldPlantingDetails(plantingDetails);
 		}

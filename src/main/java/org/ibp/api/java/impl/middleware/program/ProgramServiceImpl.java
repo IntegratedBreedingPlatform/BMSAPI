@@ -13,8 +13,10 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.program.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class ProgramServiceImpl implements ProgramService {
 
 	@Autowired

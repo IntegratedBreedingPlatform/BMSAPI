@@ -14,13 +14,7 @@
         <!-- Enable prudent mode if log file will be written from multiple JVMs -->
         <prudent>true</prudent>
         <append>true</append>
-        
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-		    <level>INFO</level>
-		    <onMatch>ACCEPT</onMatch>
-		    <onMismatch>DENY</onMismatch>
-		</filter>
-        
+                
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${log-dir}/%d{yyyy/MM}/system-log.${HOSTNAME}.%d{dd}.log</fileNamePattern>
         </rollingPolicy>
@@ -40,4 +34,6 @@
     <logger name="org.hibernate" level="WARN"/>
     <logger name="org.springframework" level="WARN"/>
     <logger name="org.generationcp.bms" level="DEBUG"/>
+    <logger name="com.atomikos" level="WARN"/>
+    
 </configuration>
