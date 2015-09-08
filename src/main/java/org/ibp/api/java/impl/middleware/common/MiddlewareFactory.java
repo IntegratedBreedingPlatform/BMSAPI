@@ -24,11 +24,23 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.TermDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,22 +72,22 @@ public class MiddlewareFactory {
 	@Qualifier("WORKBENCH_SessionFactory")
 	private SessionFactory WORKBENCH_SessionFactory;
 
-	@Autowired 
+	@Autowired
 	private ApplicationContext applicationContext;
-	
+
 	public MiddlewareFactory() {
-		
+
 	}
-	
+
 	private SessionFactory getSessionFactory() throws FileNotFoundException {
-		return (SessionFactory) applicationContext.getBean(XADataSources.computeSessionFactoryName(getCurrentlySelectedCropDBName()));
+		return (SessionFactory) this.applicationContext.getBean(XADataSources.computeSessionFactoryName(this
+				.getCurrentlySelectedCropDBName()));
 	}
 
 	private String getCurrentlySelectedCropDBName() {
 		return this.contextResolver.resolveDatabaseFromUrl();
 	}
-	
-	
+
 	@Bean
 	public UserTransaction userTransaction() throws Throwable {
 		UserTransactionImp userTransactionImp = new UserTransactionImp();
@@ -93,11 +105,11 @@ public class MiddlewareFactory {
 	// We do not want the platform transaction manager created per request but in order to handle different corps we need to seaarch for it
 	// per request. A hash map to cache
 	@Bean
-	public PlatformTransactionManager platformTransactionManager()  throws Throwable {
-		
-		return new JtaTransactionManager(userTransaction(), transactionManager());
+	public PlatformTransactionManager platformTransactionManager() throws Throwable {
+
+		return new JtaTransactionManager(this.userTransaction(), this.transactionManager());
 	}
-	
+
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StudyDataManager getStudyDataManager() throws FileNotFoundException {
@@ -112,14 +124,45 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public org.generationcp.middleware.service.api.study.StudyService getStudyService() throws FileNotFoundException {
-		return new org.generationcp.middleware.service.impl.study.StudyServiceImpl(this.getCropDatabaseSessionProvider());
+	public StudyService getStudyService() throws FileNotFoundException {
+		return new StudyServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GenotypicDataManager getGenotypicDataManager() throws FileNotFoundException {
 		return new GenotypicDataManagerImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public TermDataManager getTermDataManager() throws FileNotFoundException {
+		return new TermDataManagerImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyMethodDataManager getOntologyMethodDataManager() throws FileNotFoundException {
+		return new OntologyMethodDataManagerImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyPropertyDataManager getOntologyPropertyDataManager() throws FileNotFoundException {
+		return new OntologyPropertyDataManagerImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyScaleDataManager getOntologyScaleDataManager() throws FileNotFoundException {
+		return new OntologyScaleDataManagerImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyVariableDataManager getOntologyVariableDataManager() throws FileNotFoundException {
+		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
+				this.getOntologyScaleDataManager(), this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
@@ -176,10 +219,9 @@ public class MiddlewareFactory {
 	public WorkbenchDataManager getWorkbenchDataManager() throws FileNotFoundException {
 		return new WorkbenchDataManagerImpl(this.getWorkbenchSessionProvider());
 	}
-	
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() throws FileNotFoundException {
 		return new HibernateSessionPerRequestProvider(this.WORKBENCH_SessionFactory);
 	}
-	
+
 }
