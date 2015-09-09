@@ -4,12 +4,12 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>IBPWebService</artifactId>
 	<packaging>war</packaging>
-	<version>4.1.0.SNAPSHOT</version>
+	<version>4.0.0.BETA</version>
 	<name>IBPWebService Jersey Webapp</name>
 	<properties>
 		<jersey-version>1.8</jersey-version>
 		<spring.version>3.2.11.RELEASE</spring.version>
-		<ibpcommons.version>4.1.0.SNAPSHOT</ibpcommons.version>
+		<ibpcommons.version>4.0.0.BETA</ibpcommons.version>
 		<envConfig>${user.name}</envConfig>
 	</properties>
 
