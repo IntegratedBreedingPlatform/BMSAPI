@@ -4,12 +4,12 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>IBPWebService</artifactId>
 	<packaging>war</packaging>
-	<version>4.1.0.SNAPSHOT</version>
+	<version>4.0.0.BETA</version>
 	<name>IBPWebService Jersey Webapp</name>
 	<properties>
 		<jersey-version>1.8</jersey-version>
 		<spring.version>3.2.11.RELEASE</spring.version>
-		<ibpcommons.version>4.1.0.SNAPSHOT</ibpcommons.version>
+		<ibpcommons.version>4.0.0.BETA</ibpcommons.version>
 		<envConfig>${user.name}</envConfig>
 	</properties>
 
@@ -352,7 +352,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- <dependency> <groupId>org.mortbay.jetty</groupId> <artifactId>jetty-embedded</artifactId> 
+		<!-- <dependency> <groupId>org.mortbay.jetty</groupId> <artifactId>jetty-embedded</artifactId>
 			<version>6.1.26</version> </dependency> -->
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -379,7 +379,7 @@
 			<artifactId>org.objectweb.asm</artifactId>
 			<version>3.3.1.v201105211655</version>
 		</dependency>
-		<!-- <dependency> <groupId>org.apache.tomcat</groupId> <artifactId>juli</artifactId> 
+		<!-- <dependency> <groupId>org.apache.tomcat</groupId> <artifactId>juli</artifactId>
 			<version>6.0.26</version> </dependency> -->
 		<!-- Logging -->
 		<dependency>
