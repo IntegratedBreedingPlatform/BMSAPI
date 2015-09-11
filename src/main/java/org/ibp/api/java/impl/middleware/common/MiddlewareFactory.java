@@ -7,7 +7,7 @@ import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
-import org.generationcp.middleware.hibernate.XADataSources;
+import org.generationcp.middleware.hibernate.XADatasourceUtilities;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmListManagerImpl;
@@ -80,8 +80,7 @@ public class MiddlewareFactory {
 	}
 
 	private SessionFactory getSessionFactory() throws FileNotFoundException {
-		return (SessionFactory) this.applicationContext.getBean(XADataSources.computeSessionFactoryName(this
-				.getCurrentlySelectedCropDBName()));
+		return (SessionFactory) this.applicationContext.getBean(XADatasourceUtilities.computeSessionFactoryName(this.getCurrentlySelectedCropDBName()));
 	}
 
 	private String getCurrentlySelectedCropDBName() {
@@ -90,14 +89,14 @@ public class MiddlewareFactory {
 
 	@Bean
 	public UserTransaction userTransaction() throws Throwable {
-		UserTransactionImp userTransactionImp = new UserTransactionImp();
+		final UserTransactionImp userTransactionImp = new UserTransactionImp();
 		userTransactionImp.setTransactionTimeout(1000);
 		return userTransactionImp;
 	}
 
 	@Bean(initMethod = "init", destroyMethod = "close")
 	public TransactionManager transactionManager() throws Throwable {
-		UserTransactionManager userTransactionManager = new UserTransactionManager();
+		final UserTransactionManager userTransactionManager = new UserTransactionManager();
 		userTransactionManager.setForceShutdown(false);
 		return userTransactionManager;
 	}
