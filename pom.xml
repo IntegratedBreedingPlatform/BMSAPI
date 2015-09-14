@@ -6,7 +6,7 @@
 	<artifactId>bmsapi</artifactId>
 	<packaging>${packaging.type}</packaging>
 	<version>4.0.0.BETA</version>
-	<name>Breeding Management System API</name>
+	<name>BMS API</name>
 
 	<properties>
 		<spring-boot-version>1.2.4.RELEASE</spring-boot-version>
