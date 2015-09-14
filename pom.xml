@@ -5,7 +5,7 @@
 	<artifactId>IBPWebService</artifactId>
 	<packaging>war</packaging>
 	<version>4.0.0.BETA</version>
-	<name>Web Service for BreedingView</name>
+	<name>Web Service for Breeding View</name>
 	<properties>
 		<jersey-version>1.8</jersey-version>
 		<spring.version>3.2.11.RELEASE</spring.version>
