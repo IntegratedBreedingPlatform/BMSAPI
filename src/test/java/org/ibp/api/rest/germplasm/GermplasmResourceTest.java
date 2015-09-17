@@ -3,10 +3,18 @@ package org.ibp.api.rest.germplasm;
 
 import java.util.List;
 
+import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.domain.germplasm.GermplasmSummary;
-import org.ibp.api.java.germplasm.GermplasmService;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,73 +35,114 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public GermplasmService getGermplasmService() {
-			return Mockito.mock(GermplasmService.class);
+		public GermplasmDataManager germplasmDataManager() {
+			return Mockito.mock(GermplasmDataManager.class);
+		}
+
+		@Bean
+		@Primary
+		public PedigreeService pedigreeService() {
+			return Mockito.mock(PedigreeService.class);
+		}
+
+		@Bean
+		@Primary
+		public LocationDataManager locationDataManager() {
+			return Mockito.mock(LocationDataManager.class);
 		}
 	}
 
 	@Autowired
-	private GermplasmService germplasmService;
+	private GermplasmDataManager germplasmDataManager;
+
+	@Autowired
+	private PedigreeService pedigreeService;
+
+	@Autowired
+	private LocationDataManager locationDataManger;
+
+	private Germplasm germplasm = new Germplasm();
+	private String pedigreeString = "Test1/Test2";
+	private Method method = new Method();
+	private Location location = new Location();
+
+	@Before
+	public void beforeEachTest() {
+		this.germplasm = new Germplasm();
+		this.germplasm.setGid(3);
+		this.germplasm.setGpid1(1);
+		this.germplasm.setGpid2(2);
+
+		Name n = new Name();
+		n.setNval("Test Germplasm");
+		this.germplasm.setPreferredName(n);
+
+		this.germplasm.setLocationId(1);
+		this.germplasm.setMethodId(1);
+
+		Mockito.when(this.germplasmDataManager.getGermplasmByGID(this.germplasm.getGid())).thenReturn(this.germplasm);
+
+		Mockito.when(this.pedigreeService.getCrossExpansion(Mockito.anyInt(), Mockito.any(CrossExpansionProperties.class))).thenReturn(
+				this.pedigreeString);
+
+		Mockito.when(this.germplasmDataManager.getNamesByGID(this.germplasm.getGid(), null, null)).thenReturn(
+				Lists.newArrayList(this.germplasm.getPreferredName()));
+
+		this.method.setMname("Test Breeding Method");
+		Mockito.when(this.germplasmDataManager.getMethodByID(this.germplasm.getMethodId())).thenReturn(this.method);
+
+		this.location.setLname("Test Location");
+		Mockito.when(this.locationDataManger.getLocationByID(this.germplasm.getLocationId())).thenReturn(this.location);
+	}
 
 	@Test
 	public void testSearchGermplasm() throws Exception {
 
-		GermplasmSummary summary = this.createTestGermplasmSummary();
-
-		List<GermplasmSummary> matchingGermplasm = Lists.newArrayList(summary);
-		Mockito.when(this.germplasmService.searchGermplasm(org.mockito.Matchers.anyString())).thenReturn(matchingGermplasm);
+		String searchString = "Test";
+		List<Germplasm> matchingGermplasm = Lists.newArrayList(this.germplasm);
+		Mockito.when(this.germplasmDataManager.searchForGermplasm(searchString, Operation.LIKE, false, false))
+		.thenReturn(matchingGermplasm);
 
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.get("/germplasm/maize/search?q=CML").contentType(this.contentType))
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(matchingGermplasm.size())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].germplasmId", Matchers.is(summary.getGermplasmId())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].location", Matchers.is(summary.getLocation())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].parent1Id", Matchers.is(summary.getParent1Id())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].parent1Url",
-								Matchers.containsString("/germplasm/maize/" + summary.getParent1Id())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].parent2Id", Matchers.is(summary.getParent2Id())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].parent2Url",
-								Matchers.containsString("/germplasm/maize/" + summary.getParent2Id())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].pedigreeString", Matchers.is(summary.getPedigreeString())));
+		.perform(MockMvcRequestBuilders.get("/germplasm/maize/search?q={searchString}", searchString).contentType(this.contentType))
+		.andExpect(MockMvcResultMatchers.status().isOk())
+		.andDo(MockMvcResultHandlers.print())
+		.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(matchingGermplasm.size())))
+		.andExpect(MockMvcResultMatchers.jsonPath("$[0].germplasmId", Matchers.is(this.germplasm.getGid().toString())))
+		.andExpect(MockMvcResultMatchers.jsonPath("$[0].location", Matchers.is(this.location.getLname())))
+		.andExpect(MockMvcResultMatchers.jsonPath("$[0].parent1Id", Matchers.is(this.germplasm.getGpid1().toString())))
+		.andExpect(
+				MockMvcResultMatchers.jsonPath("$[0].parent1Url",
+						Matchers.containsString("/germplasm/maize/" + this.germplasm.getGpid1().toString())))
+						.andExpect(MockMvcResultMatchers.jsonPath("$[0].parent2Id", Matchers.is(this.germplasm.getGpid2().toString())))
+						.andExpect(
+								MockMvcResultMatchers.jsonPath("$[0].parent2Url",
+										Matchers.containsString("/germplasm/maize/" + this.germplasm.getGpid2().toString())))
+										.andExpect(MockMvcResultMatchers.jsonPath("$[0].pedigreeString", Matchers.is(this.pedigreeString)));
 
 	}
 
 	@Test
 	public void testGetGermplasmSummaryById() throws Exception {
-
-		GermplasmSummary summary = this.createTestGermplasmSummary();
-
-		Mockito.when(this.germplasmService.getGermplasm(org.mockito.Matchers.anyString())).thenReturn(summary);
-
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.get("/germplasm/maize/85").contentType(this.contentType))
-				.andExpect(MockMvcResultMatchers.status().isOk())
+				.perform(
+						MockMvcRequestBuilders.get("/germplasm/{cropName}/{gid}", this.cropName, this.germplasm.getGid()).contentType(
+								this.contentType))
 				.andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.germplasmId", Matchers.is(summary.getGermplasmId())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.location", Matchers.is(summary.getLocation())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.parent1Id", Matchers.is(summary.getParent1Id())))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.germplasmId", Matchers.is(this.germplasm.getGid().toString())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.names", Matchers.contains(this.germplasm.getPreferredName().getNval())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.location", Matchers.is(this.location.getLname())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.breedingMethod", Matchers.is(this.method.getMname())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.parent1Id", Matchers.is(this.germplasm.getGpid1().toString())))
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$.parent1Url",
-								Matchers.containsString("/germplasm/maize/" + summary.getParent1Id())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.parent2Id", Matchers.is(summary.getParent2Id())))
+								Matchers.containsString("/germplasm/maize/" + this.germplasm.getGpid1().toString())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.parent2Id", Matchers.is(this.germplasm.getGpid2().toString())))
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$.parent2Url",
-								Matchers.containsString("/germplasm/maize/" + summary.getParent2Id())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.pedigreeString", Matchers.is(summary.getPedigreeString())));
+								Matchers.containsString("/germplasm/maize/" + this.germplasm.getGpid2().toString())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pedigreeString", Matchers.is(this.pedigreeString)));
 
-	}
-
-	private GermplasmSummary createTestGermplasmSummary() {
-		GermplasmSummary summary = new GermplasmSummary();
-		summary.setGermplasmId("85");
-		summary.setLocation("Mexico");
-		summary.setParent1Id("1");
-		summary.setParent2Id("2");
-		summary.setPedigreeString("CML1/CML2");
-		return summary;
 	}
 }
