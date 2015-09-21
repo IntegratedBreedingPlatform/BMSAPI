@@ -32,5 +32,5 @@ public interface StudyService {
 
 	Map<Integer, FieldMap> getFieldMap(final String studyIdentifier);
 
-	Integer addNewStudy(final StudyImportDTO studyImportDTO, String programUUID);
+	Integer importStudy(final StudyImportDTO studyImportDTO, String programUUID);
 }

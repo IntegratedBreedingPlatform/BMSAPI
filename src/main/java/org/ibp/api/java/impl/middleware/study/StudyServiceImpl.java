@@ -294,7 +294,7 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public Integer addNewStudy(StudyImportDTO studyImportDTO, String programUUID) {
+	public Integer importStudy(StudyImportDTO studyImportDTO, String programUUID) {
 		try {
 			
 			//TODO convert factors, variates, constants, etc, to complete WORKBOOK before saving it

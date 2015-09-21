@@ -11,8 +11,8 @@ import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyGermplasm;
-import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.StudyImportDTO;
+import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.java.study.StudyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,10 +101,12 @@ public class StudyResource {
 		return new ResponseEntity<Map<Integer, FieldMap>>(this.studyService.getFieldMap(studyId), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Load a study", notes = "Uploads one study (Nursery, Trial, etc) along with its dependendencies.")
+	@ApiOperation(value = "Import a study",
+			notes = "Imports one study (Nursery, Trial, etc) along with its constituent parts mainly Germplasm, Traits and Measurements.")
 	@RequestMapping(value = "/{cropname}/{program}/", method = RequestMethod.POST)
-	public ResponseEntity<String> saveStudy(final @PathVariable String cropname, @PathVariable(value = "program") final String programUUID,
-			@RequestBody @Valid final StudyImportDTO studyImportDTO, final BindingResult bindingResult) {
+	public ResponseEntity<String> importStudy(final @PathVariable String cropname,
+			@PathVariable(value = "program") final String programUUID, @RequestBody @Valid final StudyImportDTO studyImportDTO,
+			final BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
 			final String error = this.getErrorsAsString(bindingResult);
@@ -112,7 +114,7 @@ public class StudyResource {
 			this.LOGGER.error(error);
 			throw new ValidationException(error);
 		}
-		final Integer studyId = this.studyService.addNewStudy(studyImportDTO, programUUID);
+		final Integer studyId = this.studyService.importStudy(studyImportDTO, programUUID);
 
 		return new ResponseEntity<String>("{studyId: " + studyId + "}", HttpStatus.OK);
 	}
