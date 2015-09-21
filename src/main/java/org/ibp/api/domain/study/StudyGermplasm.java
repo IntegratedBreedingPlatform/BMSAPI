@@ -1,8 +1,6 @@
 
 package org.ibp.api.domain.study;
 
-import javax.validation.constraints.NotNull;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -34,7 +32,7 @@ public class StudyGermplasm {
 	/**
 	 * @param entryType the entryType to set
 	 */
-	public void setEntryType(String entryType) {
+	public void setEntryType(final String entryType) {
 		this.entryType = entryType;
 	}
 
@@ -48,7 +46,7 @@ public class StudyGermplasm {
 	/**
 	 * @param entryNo the entryNo to set
 	 */
-	public void setEntryNo(String entryNo) {
+	public void setEntryNo(final String entryNo) {
 		this.entryNo = entryNo;
 	}
 
@@ -62,7 +60,7 @@ public class StudyGermplasm {
 	/**
 	 * @param position the position to set
 	 */
-	public void setPosition(String position) {
+	public void setPosition(final String position) {
 		this.position = position;
 	}
 
@@ -77,7 +75,7 @@ public class StudyGermplasm {
 	/**
 	 * @param germplasmListEntrySummary the germplasmListEntrySummary to set
 	 */
-	public void setGermplasmListEntrySummary(GermplasmListEntrySummary germplasmListEntrySummary) {
+	public void setGermplasmListEntrySummary(final GermplasmListEntrySummary germplasmListEntrySummary) {
 		this.germplasmListEntrySummary = germplasmListEntrySummary;
 	}
 
@@ -86,7 +84,7 @@ public class StudyGermplasm {
 		if (!(other instanceof StudyGermplasm)) {
 			return false;
 		}
-		StudyGermplasm castOther = (StudyGermplasm) other;
+		final StudyGermplasm castOther = (StudyGermplasm) other;
 		return new EqualsBuilder().append(this.entryType, castOther.entryType).append(this.entryNo, castOther.entryNo)
 				.append(this.position, castOther.position).append(this.germplasmListEntrySummary, castOther.germplasmListEntrySummary)
 				.isEquals();

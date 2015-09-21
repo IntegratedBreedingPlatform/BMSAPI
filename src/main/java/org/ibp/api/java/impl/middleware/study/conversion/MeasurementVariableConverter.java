@@ -1,3 +1,4 @@
+
 package org.ibp.api.java.impl.middleware.study.conversion;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -7,14 +8,13 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MeasurementVariableConverter implements Converter<Trait, MeasurementVariable>{
+public class MeasurementVariableConverter implements Converter<Trait, MeasurementVariable> {
 
 	@Override
-	public MeasurementVariable convert(Trait source) {
+	public MeasurementVariable convert(final Trait source) {
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
 
-		MeasurementVariable measurementVariable = new MeasurementVariable();
-
-		//TODO get from database by traitId
+		// TODO get from database by traitId
 		measurementVariable.setTermId(source.getTraitId());
 		measurementVariable.setName(source.getTraitName());
 		measurementVariable.setDescription(source.getTraitName());
@@ -24,11 +24,9 @@ public class MeasurementVariableConverter implements Converter<Trait, Measuremen
 		measurementVariable.setDataType("N");
 		measurementVariable.setValue(null);
 		measurementVariable.setLabel(source.getTraitName());
-		
 		measurementVariable.setRole(PhenotypicType.VARIATE);
-
 		measurementVariable.setFactor(false);
-		
+
 		return measurementVariable;
 	}
 

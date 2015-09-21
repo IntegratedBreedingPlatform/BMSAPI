@@ -1,14 +1,10 @@
 
 package org.ibp.api.domain.study;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.Range;
 
 /**
@@ -31,7 +27,7 @@ public class Trait {
 	 * @param traitId
 	 * @param traitName
 	 */
-	public Trait(Integer traitId, String traitName) {
+	public Trait(final Integer traitId, final String traitName) {
 		this.traitId = traitId;
 		this.traitName = traitName;
 	}
@@ -46,7 +42,7 @@ public class Trait {
 	/**
 	 * @param traitId the traitId to set
 	 */
-	public void setTraitId(Integer traitId) {
+	public void setTraitId(final Integer traitId) {
 		this.traitId = traitId;
 	}
 
@@ -60,7 +56,7 @@ public class Trait {
 	/**
 	 * @param traitName the traitName to set
 	 */
-	public void setTraitName(String traitName) {
+	public void setTraitName(final String traitName) {
 		this.traitName = traitName;
 	}
 
@@ -69,7 +65,7 @@ public class Trait {
 		if (!(other instanceof Trait)) {
 			return false;
 		}
-		Trait castOther = (Trait) other;
+		final Trait castOther = (Trait) other;
 		return new EqualsBuilder().append(this.traitId, castOther.traitId).append(this.traitName, castOther.traitName).isEquals();
 	}
 
