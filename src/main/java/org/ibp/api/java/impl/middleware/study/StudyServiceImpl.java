@@ -37,7 +37,7 @@ import org.ibp.api.domain.study.StudyAttribute;
 import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
-import org.ibp.api.domain.study.StudyWorkbook;
+import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.study.StudyService;
@@ -294,16 +294,16 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public Integer addNewStudy(StudyWorkbook studyWorkbook, String programUUID) {
+	public Integer addNewStudy(StudyImportDTO studyImportDTO, String programUUID) {
 		try {
 			
 			//TODO convert factors, variates, constants, etc, to complete WORKBOOK before saving it
 			// do it in converter's logic
-			Workbook workbook = converter.convert(studyWorkbook, Workbook.class);
+			Workbook workbook = converter.convert(studyImportDTO, Workbook.class);
 			workbook.getStudyDetails().setProgramUUID(programUUID);
 			
-			List<ListDataProject> listDataProjects = convert(studyWorkbook.getGermplasms(), ListDataProject.class);
-			GermplasmListType listType = extractGermListType(studyWorkbook);
+			List<ListDataProject> listDataProjects = convert(studyImportDTO.getGermplasms(), ListDataProject.class);
+			GermplasmListType listType = extractGermListType(studyImportDTO);
 
 			// save list in DMS and Chado
 			Integer userId = 1;
@@ -311,14 +311,14 @@ public class StudyServiceImpl implements StudyService {
 			Integer nurseryId = 0;
 			GermplasmList germplasmList;
 
-			germplasmList = converter.convert(studyWorkbook, GermplasmList.class);
+			germplasmList = converter.convert(studyImportDTO, GermplasmList.class);
 			
 			//add study meta
 			nurseryId = middlewareStudyService.addNewStudy(workbook, programUUID);
 			//add list meta
 			listId = germplasmListManager.addGermplasmList(germplasmList);
 
-			List<GermplasmListData> germplasmListDatas = convert(studyWorkbook.getGermplasms(), GermplasmListData.class);
+			List<GermplasmListData> germplasmListDatas = convert(studyImportDTO.getGermplasms(), GermplasmListData.class);
 			for(GermplasmListData germData : germplasmListDatas){
 				germData.setList(germplasmList);
 			}
@@ -340,12 +340,12 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	/**
-	 * Infers the List type for a list, based on the  study type of a given {@link StudyWorkbook}
-	 * @param studyWorkbook
+	 * Infers the List type for a list, based on the  study type of a given {@link StudyImportDTO}
+	 * @param studyImportDTO
 	 * @return the corresponding germplasm list type for a study workbook, or null if no valid type is found. 
 	 */
-	private final GermplasmListType extractGermListType(StudyWorkbook studyWorkbook) {
-		StudyType studyType = StudyType.valueOf(studyWorkbook.getStudyType());
+	private final GermplasmListType extractGermListType(StudyImportDTO studyImportDTO) {
+		StudyType studyType = StudyType.valueOf(studyImportDTO.getStudyType());
 		GermplasmListType listType;
 		
 		switch( studyType ) {

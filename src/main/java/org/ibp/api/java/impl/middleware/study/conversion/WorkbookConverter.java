@@ -17,7 +17,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
-import org.ibp.api.domain.study.StudyWorkbook;
+import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.Trait;
 import org.ibp.api.java.impl.middleware.study.StudyBaseFactors;
 import org.slf4j.Logger;
@@ -27,13 +27,13 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 /**
- * Converts from a front-end rest-domain {@link StudyWorkbook} to a back-end middleware-domain Workbook
+ * Converts from a front-end rest-domain {@link StudyImportDTO} to a back-end middleware-domain Workbook
  *
  * @author j-alberto
  *
  */
 @Component
-public class WorkbookConverter implements Converter<StudyWorkbook, Workbook> {
+public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 
 	@Autowired
 	MeasurementVariableConverter converter;
@@ -43,7 +43,7 @@ public class WorkbookConverter implements Converter<StudyWorkbook, Workbook> {
 	private List<MeasurementVariable> variates;
 
 	@Override
-	public Workbook convert(final StudyWorkbook source) {
+	public Workbook convert(final StudyImportDTO source) {
 
 		this.variates = null;
 		this.workbook = new Workbook();
@@ -58,7 +58,7 @@ public class WorkbookConverter implements Converter<StudyWorkbook, Workbook> {
 		return this.workbook;
 	}
 
-	private void buildStudyDetails(final StudyWorkbook source) {
+	private void buildStudyDetails(final StudyImportDTO source) {
 
 		final StudyDetails studyDetails = new StudyDetails();
 
@@ -84,7 +84,7 @@ public class WorkbookConverter implements Converter<StudyWorkbook, Workbook> {
 	 *
 	 * @param source
 	 */
-	private void buildConditions(final StudyWorkbook source) {
+	private void buildConditions(final StudyImportDTO source) {
 		final List<MeasurementVariable> conditions = new ArrayList<>();
 		conditions.add(STUDY_NAME.asMeasurementVariable(source.getName()));
 		conditions.add(STUDY_TITLE.asMeasurementVariable(source.getTitle()));
@@ -101,7 +101,7 @@ public class WorkbookConverter implements Converter<StudyWorkbook, Workbook> {
 	 *
 	 * @param source
 	 */
-	private void buildConstants(final StudyWorkbook source) {
+	private void buildConstants(final StudyImportDTO source) {
 		final List<MeasurementVariable> constants = new ArrayList<>();
 		constants.add(StudyBaseFactors.TRIAL_INSTANCE.asFactor());
 
@@ -109,7 +109,7 @@ public class WorkbookConverter implements Converter<StudyWorkbook, Workbook> {
 
 	}
 
-	private void buildFactors(final StudyWorkbook source) {
+	private void buildFactors(final StudyImportDTO source) {
 		final List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
 
 		factors.add(StudyBaseFactors.ENTRY_NUMBER.asFactor());
@@ -121,7 +121,7 @@ public class WorkbookConverter implements Converter<StudyWorkbook, Workbook> {
 
 	}
 
-	private void buildVariates(final StudyWorkbook source) {
+	private void buildVariates(final StudyImportDTO source) {
 		this.variates = new ArrayList<>();
 
 		for (final Trait trait : source.getTraits()) {
@@ -132,7 +132,7 @@ public class WorkbookConverter implements Converter<StudyWorkbook, Workbook> {
 
 	}
 
-	private void buildObservations(final StudyWorkbook source) {
+	private void buildObservations(final StudyImportDTO source) {
 		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
 		List<MeasurementData> dataList;
 

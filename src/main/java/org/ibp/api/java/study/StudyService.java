@@ -9,7 +9,7 @@ import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
-import org.ibp.api.domain.study.StudyWorkbook;
+import org.ibp.api.domain.study.StudyImportDTO;
 
 public interface StudyService {
 
@@ -32,5 +32,5 @@ public interface StudyService {
 
 	Map<Integer, FieldMap> getFieldMap(final String studyIdentifier);
 
-	Integer addNewStudy(final StudyWorkbook studyWorkbook, String programUUID);
+	Integer addNewStudy(final StudyImportDTO studyImportDTO, String programUUID);
 }
