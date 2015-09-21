@@ -103,10 +103,9 @@ public class StudyResource {
 
 	@ApiOperation(value = "Import a study",
 			notes = "Imports one study (Nursery, Trial, etc) along with its constituent parts mainly Germplasm, Traits and Measurements.")
-	@RequestMapping(value = "/{cropname}/{program}/", method = RequestMethod.POST)
-	public ResponseEntity<String> importStudy(final @PathVariable String cropname,
-			@PathVariable(value = "program") final String programUUID, @RequestBody @Valid final StudyImportDTO studyImportDTO,
-			final BindingResult bindingResult) {
+	@RequestMapping(value = "/{cropname}/import", method = RequestMethod.POST)
+	public ResponseEntity<String> importStudy(final @PathVariable String cropname, @RequestParam final String programUUID,
+			@RequestBody @Valid final StudyImportDTO studyImportDTO, final BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
 			final String error = this.getErrorsAsString(bindingResult);
