@@ -49,7 +49,7 @@ public class StudyResource {
 	@RequestMapping(value = "/{cropname}/list", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<StudySummary>> listAllStudies(@PathVariable final String cropname, @RequestParam(value = "programUniqueId",
-			required = false) final String programUniqueId) {
+	required = false) final String programUniqueId) {
 		return new ResponseEntity<>(this.studyService.listAllStudies(programUniqueId), HttpStatus.OK);
 	}
 
@@ -104,18 +104,16 @@ public class StudyResource {
 	@ApiOperation(value = "Import a study",
 			notes = "Imports one study (Nursery, Trial, etc) along with its constituent parts mainly Germplasm, Traits and Measurements.")
 	@RequestMapping(value = "/{cropname}/import", method = RequestMethod.POST)
-	public ResponseEntity<String> importStudy(final @PathVariable String cropname, @RequestParam final String programUUID,
+	public ResponseEntity<Integer> importStudy(final @PathVariable String cropname, @RequestParam final String programUUID,
 			@RequestBody @Valid final StudyImportDTO studyImportDTO, final BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
 			final String error = this.getErrorsAsString(bindingResult);
-
 			this.LOGGER.error(error);
 			throw new ValidationException(error);
 		}
 		final Integer studyId = this.studyService.importStudy(studyImportDTO, programUUID);
-
-		return new ResponseEntity<String>("{studyId: " + studyId + "}", HttpStatus.OK);
+		return new ResponseEntity<Integer>(studyId, HttpStatus.CREATED);
 	}
 
 	private String getErrorsAsString(final BindingResult bindingResult) {
