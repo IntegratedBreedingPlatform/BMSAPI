@@ -1,6 +1,8 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import static org.generationcp.middleware.domain.oms.TermId.*;
+
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 
@@ -90,7 +92,7 @@ public enum StudyBaseFactors {
 		variable.setScale(scale);
 		variable.setDataType(dataType);
 		variable.setLabel(label);
-		variable.setStoredIn(storageTerm.getId());
+		variable.setRole(PhenotypicType.VARIATE);
 
 		return variable;
 	}

@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.study.conversion;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.domain.study.Trait;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -25,7 +25,7 @@ public class MeasurementVariableConverter implements Converter<Trait, Measuremen
 		measurementVariable.setValue(null);
 		measurementVariable.setLabel(source.getTraitName());
 		
-		measurementVariable.setStoredIn(TermId.OBSERVATION_VARIATE.getId());
+		measurementVariable.setRole(PhenotypicType.VARIATE);
 
 		measurementVariable.setFactor(false);
 		
