@@ -1,18 +1,24 @@
 
 package org.ibp.api.domain.study;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 public class StudyGermplasm {
 
+	@NotEmpty
 	private String entryType;
 
+	@NotEmpty
 	private String entryNo;
 
+	@NotEmpty
 	private String position;
 
 	@JsonUnwrapped

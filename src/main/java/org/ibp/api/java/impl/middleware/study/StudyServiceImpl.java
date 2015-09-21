@@ -12,8 +12,17 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.gms.GermplasmListType;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
@@ -28,11 +37,13 @@ import org.ibp.api.domain.study.StudyAttribute;
 import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudySummary;
+import org.ibp.api.domain.study.StudyWorkbook;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.FieldError;
@@ -49,7 +60,16 @@ public class StudyServiceImpl implements StudyService {
 	private org.generationcp.middleware.service.api.study.StudyService middlewareStudyService;
 
 	@Autowired
-	private StudyDataManager studyDataManager;
+	private StudyDataManager studyDataManager;	
+	
+	@Autowired
+	private FieldbookService fieldbookService;
+	
+	@Autowired
+	private GermplasmListManager germplasmListManager;
+	
+	@Autowired
+	private ConversionService converter;
 
 	@Override
 	public List<StudySummary> listAllStudies(final String programUniqueId) {
@@ -273,4 +293,82 @@ public class StudyServiceImpl implements StudyService {
 		return fieldMapService.getFieldMap(studyId);
 	}
 
+	@Override
+	public Integer addNewStudy(StudyWorkbook studyWorkbook, String programUUID) {
+		try {
+			
+			//TODO convert factors, variates, constants, etc, to complete WORKBOOK before saving it
+			// do it in converter's logic
+			Workbook workbook = converter.convert(studyWorkbook, Workbook.class);
+			workbook.getStudyDetails().setProgramUUID(programUUID);
+			
+			List<ListDataProject> listDataProjects = convert(studyWorkbook.getGermplasms(), ListDataProject.class);
+			GermplasmListType listType = extractGermListType(studyWorkbook);
+
+			// save list in DMS and Chado
+			Integer userId = 1;
+			Integer listId;
+			Integer nurseryId = 0;
+			GermplasmList germplasmList;
+
+			germplasmList = converter.convert(studyWorkbook, GermplasmList.class);
+			
+			//add study meta
+			nurseryId = middlewareStudyService.addNewStudy(workbook, programUUID);
+			//add list meta
+			listId = germplasmListManager.addGermplasmList(germplasmList);
+
+			List<GermplasmListData> germplasmListDatas = convert(studyWorkbook.getGermplasms(), GermplasmListData.class);
+			for(GermplasmListData germData : germplasmListDatas){
+				germData.setList(germplasmList);
+			}
+			//add list of entries
+			germplasmListManager.addGermplasmListData(germplasmListDatas);
+
+			//add list of entries in project tables
+			fieldbookService.saveOrUpdateListDataProject( nurseryId,
+					listType,
+					listId,
+					listDataProjects,
+					userId );
+
+			return nurseryId;
+			
+		} catch (MiddlewareQueryException e) {
+			throw new ApiRuntimeException("Error caused by: " + e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Infers the List type for a list, based on the  study type of a given {@link StudyWorkbook}
+	 * @param studyWorkbook
+	 * @return the corresponding germplasm list type for a study workbook, or null if no valid type is found. 
+	 */
+	private final GermplasmListType extractGermListType(StudyWorkbook studyWorkbook) {
+		StudyType studyType = StudyType.valueOf(studyWorkbook.getStudyType());
+		GermplasmListType listType;
+		
+		switch( studyType ) {
+			case N :  
+				listType = GermplasmListType.NURSERY;
+				break;
+			case T :  
+				listType = GermplasmListType.TRIAL;
+				break;
+			default: listType = null;
+		}
+		
+		return listType;
+	}
+	
+	private final <T,S>List<T> convert(List<S> beanList, Class<T> clazz){
+        if(null == beanList) return null;
+        
+        List<T> convertedList = new ArrayList<>();
+        for(S s : beanList){
+                convertedList.add(converter.convert(s, clazz));
+        }
+        return convertedList;
+	}
+	
 }
