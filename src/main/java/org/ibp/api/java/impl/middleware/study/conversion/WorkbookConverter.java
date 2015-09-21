@@ -1,4 +1,4 @@
-package org.ibp.api.conversion;
+package org.ibp.api.java.impl.middleware.study.conversion;
 
 import static org.ibp.api.domain.study.StudyConditions.END_DATE;
 import static org.ibp.api.domain.study.StudyConditions.OBJECTIVE;

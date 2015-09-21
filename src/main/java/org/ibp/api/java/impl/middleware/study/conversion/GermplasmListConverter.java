@@ -1,4 +1,4 @@
-package org.ibp.api.conversion;
+package org.ibp.api.java.impl.middleware.study.conversion;
 
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.ibp.api.domain.study.StudyWorkbook;
