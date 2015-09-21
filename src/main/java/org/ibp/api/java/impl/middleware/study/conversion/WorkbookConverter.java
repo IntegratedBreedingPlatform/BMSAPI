@@ -1,10 +1,10 @@
 package org.ibp.api.java.impl.middleware.study.conversion;
 
-import static org.ibp.api.domain.study.StudyConditions.END_DATE;
-import static org.ibp.api.domain.study.StudyConditions.OBJECTIVE;
-import static org.ibp.api.domain.study.StudyConditions.START_DATE;
-import static org.ibp.api.domain.study.StudyConditions.STUDY_NAME;
-import static org.ibp.api.domain.study.StudyConditions.STUDY_TITLE;
+import static org.ibp.api.java.impl.middleware.study.StudyConditions.END_DATE;
+import static org.ibp.api.java.impl.middleware.study.StudyConditions.OBJECTIVE;
+import static org.ibp.api.java.impl.middleware.study.StudyConditions.START_DATE;
+import static org.ibp.api.java.impl.middleware.study.StudyConditions.STUDY_NAME;
+import static org.ibp.api.java.impl.middleware.study.StudyConditions.STUDY_TITLE;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,9 +19,9 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
-import org.ibp.api.domain.study.StudyBaseFactors;
 import org.ibp.api.domain.study.StudyWorkbook;
 import org.ibp.api.domain.study.Trait;
+import org.ibp.api.java.impl.middleware.study.StudyBaseFactors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

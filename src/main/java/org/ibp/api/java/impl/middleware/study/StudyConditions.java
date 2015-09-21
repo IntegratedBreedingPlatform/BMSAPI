@@ -1,4 +1,4 @@
-package org.ibp.api.domain.study;
+package org.ibp.api.java.impl.middleware.study;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
