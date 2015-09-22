@@ -12,13 +12,14 @@ public class ListDataProjectConverter implements Converter<StudyGermplasm, ListD
 	@Override
 	public ListDataProject convert(final StudyGermplasm source) {
 		final ListDataProject target = new ListDataProject();
-		target.setCheckType(0); // unknown?
+		// CheckType = 1 for check entries, 0 for test entries?
+		target.setCheckType(0);
 		target.setGermplasmId(source.getGermplasmListEntrySummary().getGid());
 		target.setDesignation(source.getGermplasmListEntrySummary().getDesignation());
 		target.setEntryId(Integer.valueOf(source.getEntryNo()));
 		target.setEntryCode(source.getGermplasmListEntrySummary().getEntryCode());
 		target.setSeedSource(source.getGermplasmListEntrySummary().getSeedSource());
-		target.setGroupName("0");
+		target.setGroupName(source.getGermplasmListEntrySummary().getCross());
 		return target;
 	}
 
