@@ -23,12 +23,13 @@ import org.generationcp.middleware.domain.oms.TermId;
  *
  */
 public enum StudyBaseFactors {
-	ENTRY_NUMBER("ENTRY_NO", "Germplasm entry - enumerated (number)", ENTRY_NO, ENTRY_NUMBER_STORAGE), DESIGNATION("DESIGNATION",
-			"Germplasm designation - assigned (DBCV)", DESIG, ENTRY_DESIGNATION_STORAGE), CROSS("CROSS",
-			"The pedigree string of the germplasm", TermId.CROSS, GERMPLASM_ENTRY_STORAGE), GID("GID",
-			"Germplasm identifier - assigned (DBID)", TermId.GID, ENTRY_GID_STORAGE), TRIAL_INSTANCE("TRIAL_INSTANCE", "Trial Instance",
-			TRIAL_INSTANCE_FACTOR, TRIAL_INSTANCE_STORAGE), PLOT_NUMBER("PLOT_NO", "Field plot - enumerated (number)", PLOT_NO,
-			TRIAL_DESIGN_INFO_STORAGE);
+
+	ENTRY_NUMBER("ENTRY_NO", "Germplasm entry - enumerated (number)", ENTRY_NO, ENTRY_NUMBER_STORAGE), //
+	DESIGNATION("DESIGNATION", "Germplasm designation - assigned (DBCV)", DESIG, ENTRY_DESIGNATION_STORAGE), //
+	CROSS("CROSS", "The pedigree string of the germplasm", TermId.CROSS, GERMPLASM_ENTRY_STORAGE), //
+	GID("GID", "Germplasm identifier - assigned (DBID)", TermId.GID, ENTRY_GID_STORAGE), //
+	TRIAL_INSTANCE("TRIAL_INSTANCE", "Trial Instance", TRIAL_INSTANCE_FACTOR, TRIAL_INSTANCE_STORAGE), //
+	PLOT_NUMBER("PLOT_NO", "Field plot - enumerated (number)", PLOT_NO, TRIAL_DESIGN_INFO_STORAGE); //
 
 	private static final String DBCV = "DBCV";
 	private static final String DBID = "DBID";
@@ -63,32 +64,33 @@ public enum StudyBaseFactors {
 		switch (this) {
 			case ENTRY_NUMBER:
 				factor =
-						this.createFactor("Germplasm entry", StudyBaseFactors.ENUMERATED, StudyBaseFactors.NUMBER,
-								StudyBaseFactors.NUMERIC, "ENTRY");
+				this.createFactor("Germplasm entry", StudyBaseFactors.ENUMERATED, StudyBaseFactors.NUMBER,
+						StudyBaseFactors.NUMERIC, "ENTRY", PhenotypicType.GERMPLASM);
 				break;
 			case DESIGNATION:
 				factor =
-						this.createFactor("Germplasm Designation", StudyBaseFactors.ASSIGNED, StudyBaseFactors.DBCV, StudyBaseFactors.CHAR,
-								"DESIG");
+				this.createFactor("Germplasm Designation", StudyBaseFactors.ASSIGNED, StudyBaseFactors.DBCV, StudyBaseFactors.CHAR,
+						"DESIG", PhenotypicType.GERMPLASM);
 				break;
 			case CROSS:
 				factor =
-						this.createFactor("Cross history", StudyBaseFactors.ASSIGNED, "PEDIGREE STRING", StudyBaseFactors.CHAR, this.value);
+				this.createFactor("Cross history", StudyBaseFactors.ASSIGNED, "PEDIGREE STRING", StudyBaseFactors.CHAR, this.value,
+								PhenotypicType.GERMPLASM);
 				break;
 			case GID:
 				factor =
-						this.createFactor("Germplasm id", StudyBaseFactors.ASSIGNED, StudyBaseFactors.DBID, StudyBaseFactors.NUMERIC,
-								this.value);
+				this.createFactor("Germplasm id", StudyBaseFactors.ASSIGNED, StudyBaseFactors.DBID, StudyBaseFactors.NUMERIC,
+						this.value, PhenotypicType.GERMPLASM);
 				break;
 			case PLOT_NUMBER:
 				factor =
-						this.createFactor("Field plot", StudyBaseFactors.ENUMERATED, StudyBaseFactors.NUMBER, StudyBaseFactors.NUMERIC,
-								"PLOT");
+				this.createFactor("Field plot", StudyBaseFactors.ENUMERATED, StudyBaseFactors.NUMBER, StudyBaseFactors.NUMERIC,
+						"PLOT", PhenotypicType.TRIAL_DESIGN);
 				break;
 			case TRIAL_INSTANCE:
 				factor =
-						this.createFactor("Trial Instance", StudyBaseFactors.ASSIGNED, StudyBaseFactors.NUMBER, StudyBaseFactors.NUMERIC,
-								this.value);
+				this.createFactor("Trial Instance", StudyBaseFactors.ASSIGNED, StudyBaseFactors.NUMBER, StudyBaseFactors.NUMERIC,
+						this.value, PhenotypicType.TRIAL_ENVIRONMENT);
 				break;
 			default:
 				factor = null;
@@ -98,7 +100,7 @@ public enum StudyBaseFactors {
 	}
 
 	private MeasurementVariable createFactor(final String property, final String method, final String scale, final String dataType,
-			final String label) {
+			final String label, final PhenotypicType role) {
 
 		final MeasurementVariable variable = new MeasurementVariable();
 
@@ -112,7 +114,7 @@ public enum StudyBaseFactors {
 		variable.setScale(scale);
 		variable.setDataType(dataType);
 		variable.setLabel(label);
-		variable.setRole(PhenotypicType.VARIATE);
+		variable.setRole(role);
 
 		return variable;
 	}

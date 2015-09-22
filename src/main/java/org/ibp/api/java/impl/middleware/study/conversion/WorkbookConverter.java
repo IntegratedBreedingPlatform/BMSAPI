@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 
 	@Autowired
-	MeasurementVariableConverter converter;
+	private MeasurementVariableConverter converter;
 
 	private final Logger LOGGER = LoggerFactory.getLogger(WorkbookConverter.class);
 	private Workbook workbook;

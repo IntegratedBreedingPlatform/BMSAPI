@@ -12,8 +12,14 @@ import org.generationcp.middleware.domain.oms.TermId;
  *
  */
 public enum StudyConditions {
-	BREEDING_METHOD("Breeding Method"), INSTITUTE("Institute"), STUDY_NAME("Study"), STUDY_TITLE("Study Title"), START_DATE("Start Date"), END_DATE(
-			"End Date"), OBJECTIVE("Study Objective");
+
+	BREEDING_METHOD("Breeding Method"), //
+	INSTITUTE("Institute"), //
+	STUDY_NAME("Study"), //
+	STUDY_TITLE("Study Title"), //
+	START_DATE("Start Date"), //
+	END_DATE("End Date"), //
+	OBJECTIVE("Study Objective");
 
 	public static final String ASSIGNED = "ASSIGNED";
 	public static final String APPLIED = "APPLIED";
@@ -99,7 +105,7 @@ public enum StudyConditions {
 		variable.setDataType(dataType);
 		variable.setValue(value);
 		variable.setLabel(label);
-		variable.setRole(PhenotypicType.VARIATE);
+		variable.setRole(PhenotypicType.STUDY);
 		variable.setFactor(isFactor);
 
 		return variable;
