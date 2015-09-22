@@ -36,6 +36,9 @@ public class StudyImportDTO {
 	@Pattern(regexp = "[A-Za-z 0-9]+")
 	private String siteName;
 
+	// Default value of 1 is for the virtual "Root study folder" which is always present.
+	private Long folderId = 1L;
+
 	@NotEmpty
 	@Valid
 	private List<StudyGermplasm> germplasms;
@@ -124,5 +127,13 @@ public class StudyImportDTO {
 
 	public void setSiteName(final String siteName) {
 		this.siteName = siteName;
+	}
+
+	public Long getFolderId() {
+		return this.folderId;
+	}
+
+	public void setFolderId(final Long folderId) {
+		this.folderId = folderId;
 	}
 }

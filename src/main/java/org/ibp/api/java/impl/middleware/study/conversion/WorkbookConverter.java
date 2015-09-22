@@ -20,8 +20,6 @@ import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.Trait;
 import org.ibp.api.java.impl.middleware.study.StudyBaseFactors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -38,7 +36,6 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 	@Autowired
 	private MeasurementVariableConverter converter;
 
-	private final Logger LOGGER = LoggerFactory.getLogger(WorkbookConverter.class);
 	private Workbook workbook;
 	private List<MeasurementVariable> variates;
 
@@ -71,9 +68,7 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 		studyDetails.setStartDate(source.getStartDate());
 		studyDetails.setEndDate(source.getEndDate());
 		studyDetails.setSiteName(source.getSiteName());
-
-		this.LOGGER.info("setting default folder: 25133 (folder 'JRNurseriesFolder')");
-		studyDetails.setParentFolderId(25133);
+		studyDetails.setParentFolderId(source.getFolderId());
 
 		this.workbook.setStudyDetails(studyDetails);
 
