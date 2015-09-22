@@ -147,7 +147,7 @@ public class PropertyValidatorTest {
 	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
 
 		PropertyDetails propertyDetails = TestDataProvider.getTestPropertyDetails();
-		propertyDetails.setName(RandomStringUtils.random(205));
+		propertyDetails.setName(RandomStringUtils.randomAlphanumeric(205));
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 
@@ -165,7 +165,7 @@ public class PropertyValidatorTest {
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 
 		PropertyDetails propertyDetails = TestDataProvider.getTestPropertyDetails();
-		propertyDetails.setDescription(RandomStringUtils.random(1025));
+		propertyDetails.setDescription(RandomStringUtils.randomAlphanumeric(1025));
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(propertyDetails.getName(), CvId.PROPERTIES.getId());
 

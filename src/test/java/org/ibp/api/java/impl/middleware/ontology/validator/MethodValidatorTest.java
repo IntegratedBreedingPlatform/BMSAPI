@@ -120,7 +120,7 @@ public class MethodValidatorTest {
 	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
 
 		MethodDetails methodDetails = TestDataProvider.getTestMethodDetails();
-		methodDetails.setName(RandomStringUtils.random(201));
+		methodDetails.setName(RandomStringUtils.randomAlphanumeric(201));
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
@@ -136,7 +136,7 @@ public class MethodValidatorTest {
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 
 		MethodDetails methodSummary = TestDataProvider.getTestMethodDetails();
-		methodSummary.setDescription(RandomStringUtils.random(1025));
+		methodSummary.setDescription(RandomStringUtils.randomAlphanumeric(1025));
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(methodSummary.getName(), CvId.METHODS.getId());
 
@@ -168,7 +168,7 @@ public class MethodValidatorTest {
 
 	/**
 	 * Test for to check Method is Editable or Not
-	 * 
+	 *
 	 * @throws MiddlewareException
 	 */
 	@Test
