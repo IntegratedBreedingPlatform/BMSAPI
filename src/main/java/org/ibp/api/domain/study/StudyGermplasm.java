@@ -10,6 +10,9 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 public class StudyGermplasm {
 
+	@JsonUnwrapped
+	private GermplasmListEntrySummary germplasmListEntrySummary;
+
 	@NotEmpty
 	private String entryType;
 
@@ -18,9 +21,6 @@ public class StudyGermplasm {
 
 	@NotEmpty
 	private String position;
-
-	@JsonUnwrapped
-	private GermplasmListEntrySummary germplasmListEntrySummary;
 
 	/**
 	 * @return the entryType
