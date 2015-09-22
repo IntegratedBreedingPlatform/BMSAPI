@@ -16,7 +16,7 @@ public class ListDataProjectConverter implements Converter<StudyGermplasm, ListD
 		target.setCheckType(0);
 		target.setGermplasmId(source.getGermplasmListEntrySummary().getGid());
 		target.setDesignation(source.getGermplasmListEntrySummary().getDesignation());
-		target.setEntryId(Integer.valueOf(source.getEntryNo()));
+		target.setEntryId(source.getEntryNumber());
 		target.setEntryCode(source.getGermplasmListEntrySummary().getEntryCode());
 		target.setSeedSource(source.getGermplasmListEntrySummary().getSeedSource());
 		target.setGroupName(source.getGermplasmListEntrySummary().getCross());

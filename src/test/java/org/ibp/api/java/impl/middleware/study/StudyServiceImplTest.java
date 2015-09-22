@@ -49,7 +49,7 @@ public class StudyServiceImplTest {
 	final Function<ObservationDto, Observation> observationTransformFunction = new Function<ObservationDto, Observation>() {
 
 		@Override
-		public Observation apply(ObservationDto input) {
+		public Observation apply(final ObservationDto input) {
 			return StudyServiceImplTest.this.mapObservationDtoToObservation(input);
 		}
 
@@ -65,8 +65,8 @@ public class StudyServiceImplTest {
 	@Test
 	public void listAllStudies() throws MiddlewareQueryException {
 
-		List<org.generationcp.middleware.service.api.study.StudySummary> mockResult = new ArrayList<>();
-		org.generationcp.middleware.service.api.study.StudySummary studySummary =
+		final List<org.generationcp.middleware.service.api.study.StudySummary> mockResult = new ArrayList<>();
+		final org.generationcp.middleware.service.api.study.StudySummary studySummary =
 				new org.generationcp.middleware.service.api.study.StudySummary();
 		studySummary.setId(1);
 		studySummary.setName("Study Name");
@@ -80,7 +80,7 @@ public class StudyServiceImplTest {
 		mockResult.add(studySummary);
 		Mockito.when(this.mockMiddlewareStudyService.listAllStudies(this.programUID)).thenReturn(mockResult);
 
-		List<StudySummary> studySummaries = this.studyServiceImpl.listAllStudies(this.programUID);
+		final List<StudySummary> studySummaries = this.studyServiceImpl.listAllStudies(this.programUID);
 		Assert.assertEquals(mockResult.size(), studySummaries.size());
 		Assert.assertEquals(studySummary.getId().toString(), studySummaries.get(0).getId());
 		Assert.assertEquals(studySummary.getName(), studySummaries.get(0).getName());
@@ -106,7 +106,7 @@ public class StudyServiceImplTest {
 			@Override
 			public StudyGermplasm apply(final StudyGermplasmDto studyGermplasmDto) {
 				final StudyGermplasm studyGermplasm = new StudyGermplasm();
-				studyGermplasm.setEntryNo(studyGermplasmDto.getEntryNo());
+				studyGermplasm.setEntryNumber(studyGermplasmDto.getEntryNumber());
 				studyGermplasm.setEntryType(studyGermplasmDto.getEntryType());
 				studyGermplasm.setPosition(studyGermplasmDto.getPosition());
 				studyGermplasm.setGermplasmListEntrySummary(new GermplasmListEntrySummary(studyGermplasmDto.getGermplasmId(),
@@ -150,7 +150,7 @@ public class StudyServiceImplTest {
 
 	}
 
-	private Observation mapObservationDtoToObservation(ObservationDto measurement) {
+	private Observation mapObservationDtoToObservation(final ObservationDto measurement) {
 		final Observation observation = new Observation();
 		if (measurement != null) {
 			observation.setUniqueIdentifier(measurement.getMeasurementId());

@@ -16,8 +16,7 @@ public class StudyGermplasm {
 	@NotEmpty
 	private String entryType;
 
-	@NotEmpty
-	private String entryNo;
+	private Integer entryNumber;
 
 	@NotEmpty
 	private String position;
@@ -36,18 +35,12 @@ public class StudyGermplasm {
 		this.entryType = entryType;
 	}
 
-	/**
-	 * @return the entryNo
-	 */
-	public String getEntryNo() {
-		return this.entryNo;
+	public Integer getEntryNumber() {
+		return this.entryNumber;
 	}
 
-	/**
-	 * @param entryNo the entryNo to set
-	 */
-	public void setEntryNo(final String entryNo) {
-		this.entryNo = entryNo;
+	public void setEntryNumber(final Integer entryNumber) {
+		this.entryNumber = entryNumber;
 	}
 
 	/**
@@ -85,14 +78,14 @@ public class StudyGermplasm {
 			return false;
 		}
 		final StudyGermplasm castOther = (StudyGermplasm) other;
-		return new EqualsBuilder().append(this.entryType, castOther.entryType).append(this.entryNo, castOther.entryNo)
+		return new EqualsBuilder().append(this.entryType, castOther.entryType).append(this.entryNumber, castOther.entryNumber)
 				.append(this.position, castOther.position).append(this.germplasmListEntrySummary, castOther.germplasmListEntrySummary)
 				.isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.entryType).append(this.entryNo).append(this.position)
+		return new HashCodeBuilder().append(this.entryType).append(this.entryNumber).append(this.position)
 				.append(this.germplasmListEntrySummary).toHashCode();
 	}
 
