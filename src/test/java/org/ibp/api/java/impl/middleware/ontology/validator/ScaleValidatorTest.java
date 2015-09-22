@@ -188,7 +188,7 @@ public class ScaleValidatorTest {
 
 		List<TermSummary> categories = new ArrayList<>();
 		TermSummary category = new TermSummary();
-		category.setName(RandomStringUtils.random(205));
+		category.setName(RandomStringUtils.randomAlphanumeric(205));
 		category.setDescription("description");
 		categories.add(category);
 		scaleSummary.setCategories(categories);
@@ -211,7 +211,7 @@ public class ScaleValidatorTest {
 		List<TermSummary> categories = new ArrayList<>();
 		TermSummary category = new TermSummary();
 		category.setName("Name");
-		category.setDescription(RandomStringUtils.random(260));
+		category.setDescription(RandomStringUtils.randomAlphanumeric(256));
 		categories.add(category);
 		scaleSummary.setCategories(categories);
 
@@ -246,7 +246,7 @@ public class ScaleValidatorTest {
 	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
 
 		ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
-		scaleSummary.setName(RandomStringUtils.random(205));
+		scaleSummary.setName(RandomStringUtils.randomAlphanumeric(205));
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(scaleSummary.getName(), CvId.SCALES.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
@@ -265,7 +265,7 @@ public class ScaleValidatorTest {
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 
 		ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
-		scaleSummary.setDescription(RandomStringUtils.random(1025));
+		scaleSummary.setDescription(RandomStringUtils.randomAlphanumeric(1025));
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(scaleSummary.getName(), CvId.SCALES.getId());
 

@@ -105,7 +105,7 @@ public class VariableValidatorTest {
 
 		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
-		variable.setName(RandomStringUtils.random(201));
+		variable.setName(RandomStringUtils.randomAlphanumeric(201));
 
 		Term methodTerm = TestDataProvider.getMethodTerm();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
@@ -138,7 +138,7 @@ public class VariableValidatorTest {
 
 		VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
-		variable.setDescription(RandomStringUtils.random(1025));
+		variable.setDescription(RandomStringUtils.randomAlphanumeric(1025));
 
 		Term methodTerm = TestDataProvider.getMethodTerm();
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
