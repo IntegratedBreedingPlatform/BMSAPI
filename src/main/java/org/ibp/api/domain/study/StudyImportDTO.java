@@ -1,6 +1,7 @@
 
 package org.ibp.api.domain.study;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -41,13 +42,13 @@ public class StudyImportDTO {
 
 	@NotEmpty
 	@Valid
-	private List<StudyGermplasm> germplasms;
+	private List<StudyGermplasm> germplasms = new ArrayList<>();
 
 	@NotEmpty
 	@Valid
 	private List<Trait> traits;
 
-	private String[][] traitValues;
+	private List<ObservationImportDTO> observations = new ArrayList<>();
 
 	public List<Trait> getTraits() {
 		return this.traits;
@@ -55,14 +56,6 @@ public class StudyImportDTO {
 
 	public void setTraits(final List<Trait> traits) {
 		this.traits = traits;
-	}
-
-	public String[][] getTraitValues() {
-		return this.traitValues;
-	}
-
-	public void setTraitValues(final String[][] traitValues) {
-		this.traitValues = traitValues;
 	}
 
 	public List<StudyGermplasm> getGermplasms() {
@@ -135,5 +128,26 @@ public class StudyImportDTO {
 
 	public void setFolderId(final Long folderId) {
 		this.folderId = folderId;
+	}
+
+	public List<ObservationImportDTO> getObservations() {
+		return this.observations;
+	}
+
+	public void setObservations(final List<ObservationImportDTO> observations) {
+		this.observations = observations;
+	}
+
+	public String findTraitValue(final Integer gid, final Integer traitId) {
+		for (final ObservationImportDTO observation : this.observations) {
+			if (observation.getGid().equals(gid)) {
+				for (final MeasurementImportDTO measurement : observation.getMeasurements()) {
+					if (measurement.getTraitId().equals(traitId)) {
+						return measurement.getTraitValue();
+					}
+				}
+			}
+		}
+		return null;
 	}
 }
