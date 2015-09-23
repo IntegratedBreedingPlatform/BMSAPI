@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.NotBlank;
@@ -39,6 +40,10 @@ public class StudyImportDTO {
 
 	// Default value of 1 is for the virtual "Root study folder" which is always present.
 	private Long folderId = 1L;
+
+	// Id of the user record in crop database to associate this study's data (e.g. the Germplasm list that is created) with.
+	@NotNull
+	private Integer userId;
 
 	@NotEmpty
 	@Valid
@@ -132,6 +137,14 @@ public class StudyImportDTO {
 
 	public List<ObservationImportDTO> getObservations() {
 		return this.observations;
+	}
+
+	public Integer getUserId() {
+		return this.userId;
+	}
+
+	public void setUserId(final Integer userId) {
+		this.userId = userId;
 	}
 
 	public void setObservations(final List<ObservationImportDTO> observations) {

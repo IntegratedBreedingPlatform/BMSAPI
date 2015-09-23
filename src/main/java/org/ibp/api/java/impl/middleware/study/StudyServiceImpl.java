@@ -304,7 +304,6 @@ public class StudyServiceImpl implements StudyService {
 			final GermplasmListType listType = this.extractGermListType(studyImportDTO);
 
 			// save list in DMS and Chado
-			final Integer userId = 1;
 			Integer listId;
 			Integer nurseryId = 0;
 			GermplasmList germplasmList;
@@ -324,7 +323,7 @@ public class StudyServiceImpl implements StudyService {
 			this.germplasmListManager.addGermplasmListData(germplasmListDatas);
 
 			// add list of entries in project tables
-			this.fieldbookService.saveOrUpdateListDataProject(nurseryId, listType, listId, listDataProjects, userId);
+			this.fieldbookService.saveOrUpdateListDataProject(nurseryId, listType, listId, listDataProjects, studyImportDTO.getUserId());
 
 			return nurseryId;
 
@@ -335,7 +334,7 @@ public class StudyServiceImpl implements StudyService {
 
 	/**
 	 * Infers the List type for a list, based on the study type of a given {@link StudyImportDTO}
-	 * 
+	 *
 	 * @param studyImportDTO
 	 * @return the corresponding germplasm list type for a study workbook, or null if no valid type is found.
 	 */
