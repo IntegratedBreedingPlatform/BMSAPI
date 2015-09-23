@@ -69,7 +69,7 @@ public class StudyServiceImpl implements StudyService {
 	private GermplasmListManager germplasmListManager;
 
 	@Autowired
-	private ConversionService converter;
+	private ConversionService conversionService;
 
 	@Override
 	public List<StudySummary> listAllStudies(final String programUniqueId) {
@@ -293,39 +293,33 @@ public class StudyServiceImpl implements StudyService {
 		return fieldMapService.getFieldMap(studyId);
 	}
 
+	@Transactional
 	@Override
 	public Integer importStudy(final StudyImportDTO studyImportDTO, final String programUUID) {
 		try {
 
-			final Workbook workbook = this.converter.convert(studyImportDTO, Workbook.class);
+			final Workbook workbook = this.conversionService.convert(studyImportDTO, Workbook.class);
 			workbook.getStudyDetails().setProgramUUID(programUUID);
 
-			final List<ListDataProject> listDataProjects = this.convert(studyImportDTO.getGermplasms(), ListDataProject.class);
-			final GermplasmListType listType = this.extractGermListType(studyImportDTO);
+			// Save the study
+			final Integer studyId = this.middlewareStudyService.addNewStudy(workbook, programUUID);
 
-			// save list in DMS and Chado
-			Integer listId;
-			Integer nurseryId = 0;
-			GermplasmList germplasmList;
-
-			germplasmList = this.converter.convert(studyImportDTO, GermplasmList.class);
-
-			// add study meta
-			nurseryId = this.middlewareStudyService.addNewStudy(workbook, programUUID);
-			// add list meta
-			listId = this.germplasmListManager.addGermplasmList(germplasmList);
+			// Create germplasm list
+			final GermplasmList germplasmList = this.conversionService.convert(studyImportDTO, GermplasmList.class);
+			final Integer listId = this.germplasmListManager.addGermplasmList(germplasmList);
 
 			final List<GermplasmListData> germplasmListDatas = this.convert(studyImportDTO.getGermplasms(), GermplasmListData.class);
 			for (final GermplasmListData germData : germplasmListDatas) {
 				germData.setList(germplasmList);
 			}
-			// add list of entries
 			this.germplasmListManager.addGermplasmListData(germplasmListDatas);
 
-			// add list of entries in project tables
-			this.fieldbookService.saveOrUpdateListDataProject(nurseryId, listType, listId, listDataProjects, studyImportDTO.getUserId());
+			// Create the study's snapshot of the Germplasm list (ListDataProject)
+			final List<ListDataProject> listDataProjects = this.convert(studyImportDTO.getGermplasms(), ListDataProject.class);
+			final GermplasmListType listType = this.extractGermListType(studyImportDTO);
+			this.fieldbookService.saveOrUpdateListDataProject(studyId, listType, listId, listDataProjects, studyImportDTO.getUserId());
 
-			return nurseryId;
+			return studyId;
 
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error caused by: " + e.getMessage(), e);
@@ -363,7 +357,7 @@ public class StudyServiceImpl implements StudyService {
 
 		final List<T> convertedList = new ArrayList<>();
 		for (final S s : beanList) {
-			convertedList.add(this.converter.convert(s, clazz));
+			convertedList.add(this.conversionService.convert(s, clazz));
 		}
 		return convertedList;
 	}
