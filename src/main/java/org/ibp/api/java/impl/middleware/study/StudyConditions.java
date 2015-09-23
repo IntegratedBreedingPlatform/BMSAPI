@@ -55,7 +55,7 @@ public enum StudyConditions {
 				break;
 			case INSTITUTE:
 				measureVariable =
-				this.createMeasurementVariable(8080, "STUDY_INSTITUTE", "Study institute - conducted (DBCV)", this.toString(),
+				this.createMeasurementVariable(TermId.STUDY_INSTITUTE.getId(), "STUDY_INSTITUTE", "Study institute - conducted (DBCV)", this.toString(),
 						CONDUCTED, DBCV, CHAR, "CIMMYT", TEXT_STUDY, TermId.STUDY_INFORMATION.getId(), true);
 				break;
 			case STUDY_NAME:
