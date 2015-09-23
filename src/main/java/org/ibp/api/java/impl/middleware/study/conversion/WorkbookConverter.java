@@ -169,4 +169,8 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 			this.workbook.setObservations(observations);
 		}
 	}
+
+	void setMeasurementVariableConverter(final MeasurementVariableConverter measurementVariableConverter) {
+		this.measurementVariableConverter = measurementVariableConverter;
+	}
 }

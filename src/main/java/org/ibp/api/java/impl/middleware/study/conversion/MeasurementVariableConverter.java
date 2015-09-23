@@ -14,14 +14,10 @@ public class MeasurementVariableConverter implements Converter<Trait, Measuremen
 	public MeasurementVariable convert(final Trait source) {
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 
-		// TODO get from database by traitId
+		// TODO get from database by traitId and populate Property, Method, Scale and DatType
 		measurementVariable.setTermId(source.getTraitId());
 		measurementVariable.setName(source.getTraitName());
 		measurementVariable.setDescription(source.getTraitName());
-		measurementVariable.setProperty("prop");
-		measurementVariable.setMethod("method");
-		measurementVariable.setScale("scale");
-		measurementVariable.setDataType("N");
 		measurementVariable.setValue(null);
 		measurementVariable.setLabel(source.getTraitName());
 		measurementVariable.setRole(PhenotypicType.VARIATE);

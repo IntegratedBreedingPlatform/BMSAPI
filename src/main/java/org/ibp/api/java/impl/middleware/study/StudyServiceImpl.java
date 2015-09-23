@@ -170,10 +170,6 @@ public class StudyServiceImpl implements StudyService {
 		}
 	}
 
-	protected void setMiddlewareStudyService(final org.generationcp.middleware.service.api.study.StudyService middlewareStudyService) {
-		this.middlewareStudyService = middlewareStudyService;
-	}
-
 	@Override
 	public List<StudyGermplasm> getStudyGermplasmList(final Integer studyIdentifer) {
 		final ModelMapper modelMapper = StudyMapper.getInstance();
@@ -364,6 +360,30 @@ public class StudyServiceImpl implements StudyService {
 			convertedList.add(this.conversionService.convert(s, clazz));
 		}
 		return convertedList;
+	}
+
+	void setMiddlewareStudyService(final org.generationcp.middleware.service.api.study.StudyService middlewareStudyService) {
+		this.middlewareStudyService = middlewareStudyService;
+	}
+
+	void setStudyDataManager(final StudyDataManager studyDataManager) {
+		this.studyDataManager = studyDataManager;
+	}
+
+	void setFieldbookService(final FieldbookService fieldbookService) {
+		this.fieldbookService = fieldbookService;
+	}
+
+	void setGermplasmListManager(final GermplasmListManager germplasmListManager) {
+		this.germplasmListManager = germplasmListManager;
+	}
+
+	void setConversionService(final ConversionService conversionService) {
+		this.conversionService = conversionService;
+	}
+
+	void setDataImportService(final DataImportService dataImportService) {
+		this.dataImportService = dataImportService;
 	}
 
 }

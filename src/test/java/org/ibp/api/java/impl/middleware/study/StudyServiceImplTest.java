@@ -5,8 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
@@ -16,6 +24,7 @@ import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.MeasurementIdentifier;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyGermplasm;
+import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.Trait;
 import org.junit.Assert;
@@ -24,6 +33,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.core.convert.ConversionService;
 
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
@@ -41,6 +51,21 @@ public class StudyServiceImplTest {
 
 	@Mock
 	private StudyService mockMiddlewareStudyService;
+
+	@Mock
+	private StudyDataManager studyDataManager;
+
+	@Mock
+	private FieldbookService fieldbookService;
+
+	@Mock
+	private GermplasmListManager germplasmListManager;
+
+	@Mock
+	private ConversionService conversionService;
+
+	@Mock
+	private DataImportService dataImportService;
 
 	private final String programUID = UUID.randomUUID().toString();
 
@@ -60,6 +85,11 @@ public class StudyServiceImplTest {
 		MockitoAnnotations.initMocks(this);
 		this.studyServiceImpl = new StudyServiceImpl();
 		this.studyServiceImpl.setMiddlewareStudyService(this.mockMiddlewareStudyService);
+		this.studyServiceImpl.setConversionService(this.conversionService);
+		this.studyServiceImpl.setFieldbookService(this.fieldbookService);
+		this.studyServiceImpl.setGermplasmListManager(this.germplasmListManager);
+		this.studyServiceImpl.setStudyDataManager(this.studyDataManager);
+		this.studyServiceImpl.setDataImportService(this.dataImportService);
 	}
 
 	@Test
@@ -173,5 +203,31 @@ public class StudyServiceImplTest {
 			observation.setMeasurements(measurements);
 		}
 		return observation;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void importStudy() {
+
+		// Minimal setup
+		final StudyImportDTO studyImportDTO = new StudyImportDTO();
+		studyImportDTO.setStudyType("N");
+		studyImportDTO.setUserId(1);
+
+		final Workbook workbook = new Workbook();
+		final StudyDetails studyDetails = new StudyDetails();
+		workbook.setStudyDetails(studyDetails);
+
+		Mockito.when(this.conversionService.convert(studyImportDTO, Workbook.class)).thenReturn(workbook);
+		this.studyServiceImpl.importStudy(studyImportDTO, this.programUID);
+
+		// Only asserting interactions with key collaborators
+		Mockito.verify(this.conversionService).convert(studyImportDTO, Workbook.class);
+		Mockito.verify(this.dataImportService).saveDataset(workbook, true, false, this.programUID);
+		Mockito.verify(this.conversionService).convert(studyImportDTO, GermplasmList.class);
+		Mockito.verify(this.germplasmListManager).addGermplasmList(Mockito.any(GermplasmList.class));
+		Mockito.verify(this.germplasmListManager).addGermplasmListData(Mockito.anyList());
+		Mockito.verify(this.fieldbookService).saveOrUpdateListDataProject(Mockito.anyInt(), Mockito.any(GermplasmListType.class),
+				Mockito.anyInt(), Mockito.anyList(), Mockito.anyInt());
 	}
 }
