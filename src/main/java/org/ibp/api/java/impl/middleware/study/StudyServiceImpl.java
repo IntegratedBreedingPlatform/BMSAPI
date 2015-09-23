@@ -22,6 +22,7 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
@@ -70,6 +71,9 @@ public class StudyServiceImpl implements StudyService {
 
 	@Autowired
 	private ConversionService conversionService;
+
+	@Autowired
+	private DataImportService dataImportService;
 
 	@Override
 	public List<StudySummary> listAllStudies(final String programUniqueId) {
@@ -302,7 +306,7 @@ public class StudyServiceImpl implements StudyService {
 			workbook.getStudyDetails().setProgramUUID(programUUID);
 
 			// Save the study
-			final Integer studyId = this.middlewareStudyService.addNewStudy(workbook, programUUID);
+			final Integer studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID);
 
 			// Create germplasm list
 			final GermplasmList germplasmList = this.conversionService.convert(studyImportDTO, GermplasmList.class);
