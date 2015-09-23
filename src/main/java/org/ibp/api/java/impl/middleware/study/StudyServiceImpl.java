@@ -36,8 +36,8 @@ import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyAttribute;
 import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyGermplasm;
-import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.StudyImportDTO;
+import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.study.StudyService;
@@ -60,26 +60,26 @@ public class StudyServiceImpl implements StudyService {
 	private org.generationcp.middleware.service.api.study.StudyService middlewareStudyService;
 
 	@Autowired
-	private StudyDataManager studyDataManager;	
-	
+	private StudyDataManager studyDataManager;
+
 	@Autowired
 	private FieldbookService fieldbookService;
-	
+
 	@Autowired
 	private GermplasmListManager germplasmListManager;
-	
+
 	@Autowired
 	private ConversionService converter;
 
 	@Override
 	public List<StudySummary> listAllStudies(final String programUniqueId) {
-		List<StudySummary> studySummaries = new ArrayList<StudySummary>();
+		final List<StudySummary> studySummaries = new ArrayList<StudySummary>();
 		try {
-			List<org.generationcp.middleware.service.api.study.StudySummary> mwStudySummaries =
+			final List<org.generationcp.middleware.service.api.study.StudySummary> mwStudySummaries =
 					this.middlewareStudyService.listAllStudies(programUniqueId);
 
-			for (org.generationcp.middleware.service.api.study.StudySummary mwStudySummary : mwStudySummaries) {
-				StudySummary summary = new StudySummary(String.valueOf(mwStudySummary.getId()));
+			for (final org.generationcp.middleware.service.api.study.StudySummary mwStudySummary : mwStudySummaries) {
+				final StudySummary summary = new StudySummary(String.valueOf(mwStudySummary.getId()));
 				summary.setName(mwStudySummary.getName());
 				summary.setTitle(mwStudySummary.getTitle());
 				summary.setObjective(mwStudySummary.getObjective());
@@ -88,24 +88,24 @@ public class StudyServiceImpl implements StudyService {
 				summary.setType(mwStudySummary.getType().getName());
 				studySummaries.add(summary);
 			}
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 			throw new ApiRuntimeException("Error! Caused by: " + e.getMessage(), e);
 		}
 		return studySummaries;
 	}
 
 	@Override
-	public List<Observation> getObservations(Integer studyId) {
+	public List<Observation> getObservations(final Integer studyId) {
 		final List<ObservationDto> studyMeasurements = this.middlewareStudyService.getObservations(studyId);
 		final List<Observation> observations = new ArrayList<Observation>();
-		for (ObservationDto measurement : studyMeasurements) {
+		for (final ObservationDto measurement : studyMeasurements) {
 			observations.add(this.mapObservationDtoToObservation(measurement));
 		}
 		return observations;
 	}
 
 	@Override
-	public Observation getSingleObservation(Integer studyId, Integer obeservationId) {
+	public Observation getSingleObservation(final Integer studyId, final Integer obeservationId) {
 		final List<ObservationDto> singleObservation = this.middlewareStudyService.getSingleObservation(studyId, obeservationId);
 		if (!singleObservation.isEmpty()) {
 			return this.mapObservationDtoToObservation(singleObservation.get(0));
@@ -113,7 +113,7 @@ public class StudyServiceImpl implements StudyService {
 		return new Observation();
 	}
 
-	private Observation mapObservationDtoToObservation(ObservationDto measurement) {
+	private Observation mapObservationDtoToObservation(final ObservationDto measurement) {
 		return StudyMapper.getInstance().map(measurement, Observation.class);
 	}
 
@@ -125,7 +125,7 @@ public class StudyServiceImpl implements StudyService {
 		final List<Measurement> measurements = observation.getMeasurements();
 
 		final List<MeasurementDto> traits = new ArrayList<MeasurementDto>();
-		for (Measurement measurement : measurements) {
+		for (final Measurement measurement : measurements) {
 			traits.add(new MeasurementDto(new TraitDto(measurement.getMeasurementIdentifier().getTrait().getTraitId(), measurement
 					.getMeasurementIdentifier().getTrait().getTraitName()), measurement.getMeasurementIdentifier().getMeasurementId(),
 					measurement.getMeasurementValue()));
@@ -148,13 +148,13 @@ public class StudyServiceImpl implements StudyService {
 			if (existingMeasurement == null) {
 				final String array[] = {"program.already.inserted"};
 				final List<String> object = new ArrayList<String>();
-				ObjectMapper objectMapper = new ObjectMapper();
+				final ObjectMapper objectMapper = new ObjectMapper();
 				try {
 					object.add(objectMapper.writeValueAsString(measurement));
-				} catch (JsonProcessingException e) {
+				} catch (final JsonProcessingException e) {
 					throw new ApiRuntimeException("Error mapping measurement to JSON", e);
 				}
-				FieldError objectError =
+				final FieldError objectError =
 						new FieldError("Measurements [" + counter + "]", "Measurement", null, false, array, object.toArray(),
 								"Error processing measurement");
 				errors.add(objectError);
@@ -166,12 +166,12 @@ public class StudyServiceImpl implements StudyService {
 		}
 	}
 
-	protected void setMiddlewareStudyService(org.generationcp.middleware.service.api.study.StudyService middlewareStudyService) {
+	protected void setMiddlewareStudyService(final org.generationcp.middleware.service.api.study.StudyService middlewareStudyService) {
 		this.middlewareStudyService = middlewareStudyService;
 	}
 
 	@Override
-	public List<StudyGermplasm> getStudyGermplasmList(Integer studyIdentifer) {
+	public List<StudyGermplasm> getStudyGermplasmList(final Integer studyIdentifer) {
 		final ModelMapper modelMapper = StudyMapper.getInstance();
 		final List<StudyGermplasm> destination = new ArrayList<StudyGermplasm>();
 		final List<StudyGermplasmDto> studyGermplasmList = this.middlewareStudyService.getStudyGermplasmList(studyIdentifer);
@@ -183,16 +183,16 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public StudyDetails getStudyDetails(String studyId) {
+	public StudyDetails getStudyDetails(final String studyId) {
 		try {
-			Integer studyIdentifier = Integer.valueOf(studyId);
-			Study study = this.studyDataManager.getStudy(studyIdentifier);
+			final Integer studyIdentifier = Integer.valueOf(studyId);
+			final Study study = this.studyDataManager.getStudy(studyIdentifier);
 			if (study == null) {
 				throw new ApiRuntimeException("No study identified by the supplied studyId [" + studyId + "] was found.");
 			}
 
 			// Basic Info.
-			StudyDetails studyDetails = new StudyDetails();
+			final StudyDetails studyDetails = new StudyDetails();
 			studyDetails.setId(String.valueOf(study.getId()));
 			studyDetails.setName(study.getName());
 			studyDetails.setTitle(study.getTitle());
@@ -202,13 +202,13 @@ public class StudyServiceImpl implements StudyService {
 			studyDetails.setEndDate(String.valueOf(study.getEndDate()));
 
 			// Factors, Settings tab.
-			List<Variable> conditions = study.getConditions().getVariables();
-			VariableTypeList factors = this.studyDataManager.getAllStudyFactors(studyIdentifier);
-			List<DMSVariableType> factorDetails = factors.getVariableTypes();
-			for (DMSVariableType factorDetail : factorDetails) {
+			final List<Variable> conditions = study.getConditions().getVariables();
+			final VariableTypeList factors = this.studyDataManager.getAllStudyFactors(studyIdentifier);
+			final List<DMSVariableType> factorDetails = factors.getVariableTypes();
+			for (final DMSVariableType factorDetail : factorDetails) {
 				String value = null;
-				for (Variable condition : conditions) {
-					String conditionName = condition.getVariableType().getLocalName();
+				for (final Variable condition : conditions) {
+					final String conditionName = condition.getVariableType().getLocalName();
 					if (factorDetail.getLocalName().equals(conditionName)) {
 						value = condition.getDisplayValue();
 					}
@@ -216,7 +216,7 @@ public class StudyServiceImpl implements StudyService {
 
 				// Only add the attribute if there is a value associated.
 				if (value != null) {
-					StudyAttribute attr = new StudyAttribute();
+					final StudyAttribute attr = new StudyAttribute();
 					attr.setId(String.valueOf(factorDetail.getId()));
 					attr.setName(factorDetail.getLocalName());
 					attr.setDescription(factorDetail.getLocalDescription());
@@ -226,10 +226,10 @@ public class StudyServiceImpl implements StudyService {
 			}
 
 			// Variates - Measurements tab.
-			VariableTypeList variates = this.studyDataManager.getAllStudyVariates(studyIdentifier);
-			List<DMSVariableType> variateDetails = variates.getVariableTypes();
-			for (DMSVariableType variateDetail : variateDetails) {
-				TermSummary trait = new TermSummary();
+			final VariableTypeList variates = this.studyDataManager.getAllStudyVariates(studyIdentifier);
+			final List<DMSVariableType> variateDetails = variates.getVariableTypes();
+			for (final DMSVariableType variateDetail : variateDetails) {
+				final TermSummary trait = new TermSummary();
 				trait.setId(String.valueOf(variateDetail.getId()));
 				trait.setName(variateDetail.getStandardVariable().getName());
 				trait.setDescription(variateDetail.getStandardVariable().getDescription());
@@ -237,10 +237,10 @@ public class StudyServiceImpl implements StudyService {
 			}
 
 			// Datasets
-			List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(studyIdentifier);
+			final List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(studyIdentifier);
 			if (datasetReferences != null && !datasetReferences.isEmpty()) {
-				for (DatasetReference dsRef : datasetReferences) {
-					DatasetSummary dsSummary = new DatasetSummary();
+				for (final DatasetReference dsRef : datasetReferences) {
+					final DatasetSummary dsSummary = new DatasetSummary();
 					dsSummary.setId(dsRef.getId().toString());
 					dsSummary.setName(dsRef.getName());
 					dsSummary.setDescription(dsRef.getDescription());
@@ -250,21 +250,21 @@ public class StudyServiceImpl implements StudyService {
 					if (dsRef.getName().endsWith("-ENVIRONMENT")) {
 						// Logic derived from by RepresentationDataSetQuery.loadItems(int, int) method of the GermplasmStudyBrowser,
 						// which is used to show dataset tables in the study browser UI.
-						List<Experiment> experiments = this.studyDataManager.getExperiments(dsRef.getId(), 0, Integer.MAX_VALUE);
-						for (Experiment experiment : experiments) {
-							List<Variable> variables = new ArrayList<Variable>();
-							VariableList fac = experiment.getFactors();
+						final List<Experiment> experiments = this.studyDataManager.getExperiments(dsRef.getId(), 0, Integer.MAX_VALUE);
+						for (final Experiment experiment : experiments) {
+							final List<Variable> variables = new ArrayList<Variable>();
+							final VariableList fac = experiment.getFactors();
 							if (fac != null) {
 								variables.addAll(fac.getVariables());
 							}
-							VariableList var = experiment.getVariates();
+							final VariableList var = experiment.getVariates();
 							if (var != null) {
 								variables.addAll(var.getVariables());
 							}
 
-							Environment env = new Environment();
-							for (Variable variable : variables) {
-								StudyAttribute attr = new StudyAttribute();
+							final Environment env = new Environment();
+							for (final Variable variable : variables) {
+								final StudyAttribute attr = new StudyAttribute();
 								attr.setId(String.valueOf(variable.getVariableType().getId()));
 								attr.setName(variable.getVariableType().getLocalName());
 								attr.setDescription(variable.getVariableType().getLocalDescription());
@@ -280,95 +280,93 @@ public class StudyServiceImpl implements StudyService {
 			// Germplasm
 			studyDetails.getGermplasm().addAll(this.getStudyGermplasmList(studyIdentifier));
 			return studyDetails;
-		} catch (NumberFormatException nfe) {
+		} catch (final NumberFormatException nfe) {
 			throw new ApiRuntimeException("Supplied study identifier [" + studyId + "] is not valid, it must be a numeric value.");
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 			throw new ApiRuntimeException("Error! Caused by: " + e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public Map<Integer, FieldMap> getFieldMap(String studyId) {
-		FieldMapService fieldMapService = new FieldMapService(this.studyDataManager);
+	public Map<Integer, FieldMap> getFieldMap(final String studyId) {
+		final FieldMapService fieldMapService = new FieldMapService(this.studyDataManager);
 		return fieldMapService.getFieldMap(studyId);
 	}
 
 	@Override
-	public Integer importStudy(StudyImportDTO studyImportDTO, String programUUID) {
+	public Integer importStudy(final StudyImportDTO studyImportDTO, final String programUUID) {
 		try {
-			
-			//TODO convert factors, variates, constants, etc, to complete WORKBOOK before saving it
-			// do it in converter's logic
-			Workbook workbook = converter.convert(studyImportDTO, Workbook.class);
+
+			final Workbook workbook = this.converter.convert(studyImportDTO, Workbook.class);
 			workbook.getStudyDetails().setProgramUUID(programUUID);
-			
-			List<ListDataProject> listDataProjects = convert(studyImportDTO.getGermplasms(), ListDataProject.class);
-			GermplasmListType listType = extractGermListType(studyImportDTO);
+
+			final List<ListDataProject> listDataProjects = this.convert(studyImportDTO.getGermplasms(), ListDataProject.class);
+			final GermplasmListType listType = this.extractGermListType(studyImportDTO);
 
 			// save list in DMS and Chado
-			Integer userId = 1;
+			final Integer userId = 1;
 			Integer listId;
 			Integer nurseryId = 0;
 			GermplasmList germplasmList;
 
-			germplasmList = converter.convert(studyImportDTO, GermplasmList.class);
-			
-			//add study meta
-			nurseryId = middlewareStudyService.addNewStudy(workbook, programUUID);
-			//add list meta
-			listId = germplasmListManager.addGermplasmList(germplasmList);
+			germplasmList = this.converter.convert(studyImportDTO, GermplasmList.class);
 
-			List<GermplasmListData> germplasmListDatas = convert(studyImportDTO.getGermplasms(), GermplasmListData.class);
-			for(GermplasmListData germData : germplasmListDatas){
+			// add study meta
+			nurseryId = this.middlewareStudyService.addNewStudy(workbook, programUUID);
+			// add list meta
+			listId = this.germplasmListManager.addGermplasmList(germplasmList);
+
+			final List<GermplasmListData> germplasmListDatas = this.convert(studyImportDTO.getGermplasms(), GermplasmListData.class);
+			for (final GermplasmListData germData : germplasmListDatas) {
 				germData.setList(germplasmList);
 			}
-			//add list of entries
-			germplasmListManager.addGermplasmListData(germplasmListDatas);
+			// add list of entries
+			this.germplasmListManager.addGermplasmListData(germplasmListDatas);
 
-			//add list of entries in project tables
-			fieldbookService.saveOrUpdateListDataProject( nurseryId,
-					listType,
-					listId,
-					listDataProjects,
-					userId );
+			// add list of entries in project tables
+			this.fieldbookService.saveOrUpdateListDataProject(nurseryId, listType, listId, listDataProjects, userId);
 
 			return nurseryId;
-			
-		} catch (MiddlewareQueryException e) {
+
+		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error caused by: " + e.getMessage(), e);
 		}
 	}
 
 	/**
-	 * Infers the List type for a list, based on the  study type of a given {@link StudyImportDTO}
+	 * Infers the List type for a list, based on the study type of a given {@link StudyImportDTO}
+	 * 
 	 * @param studyImportDTO
-	 * @return the corresponding germplasm list type for a study workbook, or null if no valid type is found. 
+	 * @return the corresponding germplasm list type for a study workbook, or null if no valid type is found.
 	 */
-	private final GermplasmListType extractGermListType(StudyImportDTO studyImportDTO) {
-		StudyType studyType = StudyType.valueOf(studyImportDTO.getStudyType());
+	private final GermplasmListType extractGermListType(final StudyImportDTO studyImportDTO) {
+		final StudyType studyType = StudyType.valueOf(studyImportDTO.getStudyType());
 		GermplasmListType listType;
-		
-		switch( studyType ) {
-			case N :  
+
+		switch (studyType) {
+			case N:
 				listType = GermplasmListType.NURSERY;
 				break;
-			case T :  
+			case T:
 				listType = GermplasmListType.TRIAL;
 				break;
-			default: listType = null;
+			default:
+				listType = null;
 		}
-		
+
 		return listType;
 	}
-	
-	private final <T,S>List<T> convert(List<S> beanList, Class<T> clazz){
-        if(null == beanList) return null;
-        
-        List<T> convertedList = new ArrayList<>();
-        for(S s : beanList){
-                convertedList.add(converter.convert(s, clazz));
-        }
-        return convertedList;
+
+	private final <T, S> List<T> convert(final List<S> beanList, final Class<T> clazz) {
+		if (null == beanList) {
+			return null;
+		}
+
+		final List<T> convertedList = new ArrayList<>();
+		for (final S s : beanList) {
+			convertedList.add(this.converter.convert(s, clazz));
+		}
+		return convertedList;
 	}
-	
+
 }
