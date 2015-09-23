@@ -175,7 +175,7 @@ public class PropertyValidator extends OntologyValidator implements org.springfr
 
 		try {
 
-			Property oldProperty = this.ontologyPropertyDataManager.getProperty(propertyId);
+			Property oldProperty = this.ontologyPropertyDataManager.getProperty(propertyId, true);
 
 			// that property should exist with requestId
 			if (Objects.equals(oldProperty, null)) {

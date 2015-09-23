@@ -167,7 +167,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		try {
 			Integer id = StringUtil.parseInt(variableId, null);
 
-			Variable ontologyVariable = this.ontologyVariableDataManager.getVariable(programId, id);
+			Variable ontologyVariable = this.ontologyVariableDataManager.getVariable(programId, id, true);
 
 			if (ontologyVariable == null) {
 				return null;
@@ -356,7 +356,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		// Should discard unwanted parameters. We do not want expected min/max values if associated data type is not numeric
 		if (scaleId != null) {
 			try {
-				Scale scale = this.ontologyScaleDataManager.getScaleById(scaleId);
+				Scale scale = this.ontologyScaleDataManager.getScaleById(scaleId, true);
 
 				if (scale != null && !Objects.equals(scale.getDataType().getId(), DataType.NUMERIC_VARIABLE.getId())) {
 					variableDetails.setExpectedMin(null);

@@ -98,7 +98,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 		Method method = TestDataProvider.getTestMethod();
 
 		Mockito.doReturn(TestDataProvider.getMethodTerm()).when(this.termDataManager).getTermById(method.getId());
-		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId());
+		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId(), true);
 
 		this.mockMvc
 				.perform(
@@ -120,7 +120,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.usage.variables", Matchers.empty()))
 				.andDo(MockMvcResultHandlers.print());
 
-		Mockito.verify(this.ontologyMethodDataManager, Mockito.times(1)).getMethod(method.getId());
+		Mockito.verify(this.ontologyMethodDataManager, Mockito.times(1)).getMethod(method.getId(), true);
 	}
 
 	/**
@@ -202,7 +202,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(method.getId());
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermByNameAndCvId("method name", CvId.METHODS.getId());
 		Mockito.doNothing().when(this.ontologyMethodDataManager).updateMethod(org.mockito.Matchers.any(Method.class));
-		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId());
+		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId(), true);
 
 		this.mockMvc
 				.perform(
@@ -230,7 +230,7 @@ public class MethodResourceTest extends ApiUnitTestBase {
 		Method method = TestDataProvider.getTestMethod();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(method.getId());
-		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId());
+		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId(), true);
 		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(method.getId());
 		Mockito.doNothing().when(this.ontologyMethodDataManager).deleteMethod(method.getId());
 

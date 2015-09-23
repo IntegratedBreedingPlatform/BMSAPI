@@ -78,7 +78,7 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		try {
-			Property property = this.ontologyPropertyDataManager.getProperty(StringUtil.parseInt(id, null));
+			Property property = this.ontologyPropertyDataManager.getProperty(StringUtil.parseInt(id, null), true);
 			if (property == null) {
 				return null;
 			}
