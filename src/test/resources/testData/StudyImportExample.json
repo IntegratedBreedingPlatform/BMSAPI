@@ -1,0 +1,75 @@
+//http://localhost:19080/bmsapi/study/maize/import?programUUID=e57c7a51-57b7-4db6-9fd0-66727c3d1a18
+
+{
+    "name": "Import Nursery Test",
+    "objective": "Import Nursery Objective",
+    "startDate": "20150101",
+    "endDate": "20150202",
+    "title": "Import Nursery Description",
+    "studyType": "N",
+    "siteName": "CIMMYT",
+    "folderId": 1,
+    "userId" : 1,
+    "germplasms": [
+        {
+            "gid": 1,
+            "designation": "GP-VARIETY-1",
+            "seedSource": "GP-VARIETY-1 Source",
+            "entryCode": "1",
+            "cross": "GP-VARIETY-Group A",
+            "entryType": "Test",
+            "entryNumber": 1,
+            "position": "1"
+        },
+        {
+            "gid": 2,
+            "designation": "GP-VARIETY-2",
+            "seedSource": "GP-VARIETY-2 Source",
+            "entryCode": "2",
+            "cross": "GP-VARIETY-Group A",
+            "entryType": "Test",
+            "entryNumber": 2,
+            "position": "2"
+        }
+    ],
+    "traits": [
+        {
+            "traitId": 18000,
+            "traitName": "GY_kg_ha__DryWB"
+        },
+        {
+            "traitId": 20316,
+            "traitName": "EH_cm"
+        }
+    ],
+
+    "observations": [
+        {
+            "gid": 1,
+            "measurements": [
+                {
+                    "traitId": 18000,
+                    "traitValue": "1111"
+                },
+                {
+                     "traitId": 20316,
+                     "traitValue": "2222"
+                }
+            ]
+        },
+
+        {
+            "gid": 2,
+            "measurements": [
+                {
+                    "traitId": 18000,
+                    "traitValue": "3333"
+                },
+                {
+                     "traitId": 20316,
+                     "traitValue": "4444"
+                }
+            ]
+        }
+    ]
+}
