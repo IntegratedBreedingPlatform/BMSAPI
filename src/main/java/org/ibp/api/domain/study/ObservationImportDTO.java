@@ -4,13 +4,18 @@ package org.ibp.api.domain.study;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 /**
  * A "light" version of {@link Observation} dedicated for use in study import scenario.
  */
 public class ObservationImportDTO {
 
+	@NotNull
 	private Integer gid;
 
+	@Valid
 	private List<MeasurementImportDTO> measurements = new ArrayList<>();
 
 	public Integer getGid() {

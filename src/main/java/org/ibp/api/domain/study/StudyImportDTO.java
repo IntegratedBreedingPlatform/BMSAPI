@@ -7,9 +7,7 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 /**
  * DTO used for importing studies.
@@ -17,7 +15,8 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 public class StudyImportDTO {
 
-	@NotBlank
+	@NotNull
+	@Size(min = 1)
 	@Pattern(regexp = "[A-Za-z 0-9]+")
 	private String name;
 
@@ -31,7 +30,8 @@ public class StudyImportDTO {
 	private String endDate;
 	private String title;
 
-	@NotEmpty
+	@NotNull
+	@Size(min = 1)
 	@Pattern(regexp = "[N|T]")
 	private String studyType;
 
@@ -45,14 +45,13 @@ public class StudyImportDTO {
 	@NotNull
 	private Integer userId;
 
-	@NotEmpty
 	@Valid
 	private List<StudyGermplasm> germplasms = new ArrayList<>();
 
-	@NotEmpty
 	@Valid
-	private List<Trait> traits;
+	private List<Trait> traits = new ArrayList<>();
 
+	@Valid
 	private List<ObservationImportDTO> observations = new ArrayList<>();
 
 	public List<Trait> getTraits() {
