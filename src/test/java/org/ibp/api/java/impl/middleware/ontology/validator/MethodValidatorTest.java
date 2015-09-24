@@ -101,7 +101,7 @@ public class MethodValidatorTest {
 		Mockito.doReturn(TestDataProvider.getMethodTerm()).when(this.termDataManager)
 				.getTermByNameAndCvId(method.getName(), CvId.METHODS.getId());
 		Mockito.doReturn(true).when(this.termDataManager).isTermReferred(method.getId());
-		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId());
+		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId(), true);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
@@ -180,7 +180,7 @@ public class MethodValidatorTest {
 		Integer methodId = StringUtil.parseInt(methodDetails.getId(), null);
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(methodDetails.getName(), CvId.METHODS.getId());
-		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(methodId);
+		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(methodId, true);
 		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(methodId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");

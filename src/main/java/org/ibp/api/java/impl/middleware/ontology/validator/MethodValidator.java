@@ -55,7 +55,7 @@ public class MethodValidator extends OntologyValidator implements org.springfram
 
 		try {
 
-			Method existingMethod = this.ontologyMethodDataManager.getMethod(StringUtil.parseInt(method.getId(), null));
+			Method existingMethod = this.ontologyMethodDataManager.getMethod(StringUtil.parseInt(method.getId(), null), true);
 
 			if (existingMethod == null) {
 				this.addCustomError(errors, BaseValidator.ID_DOES_NOT_EXIST, new Object[] {"Method", method.getId()});

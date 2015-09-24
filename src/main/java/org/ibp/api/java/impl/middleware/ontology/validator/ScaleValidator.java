@@ -78,7 +78,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 		boolean dataTypeValidationResult = this.dataTypeValidationProcessor(scaleDetails, errors);
 
-		Integer dataTypeId = parseDataTypeIdAsInteger(scaleDetails.getDataType());
+		Integer dataTypeId = this.parseDataTypeIdAsInteger(scaleDetails.getDataType());
 
 		if (dataTypeValidationResult) {
 
@@ -150,7 +150,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		Integer initialCount = errors.getErrorCount();
 
 		try {
-			Scale oldScale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(scaleDetails.getId(), null));
+			Scale oldScale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(scaleDetails.getId(), null), true);
 
 			// that method should exist with requestId
 			if (Objects.equals(oldScale, null)) {
@@ -177,7 +177,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 						ScaleValidator.SCALE_NAME, "Name"});
 			}
 
-			Integer dataTypeId = parseDataTypeIdAsInteger(scaleDetails.getDataType());			
+			Integer dataTypeId = this.parseDataTypeIdAsInteger(scaleDetails.getDataType());
 
 			boolean isDataTypeSame = Objects.equals(dataTypeId, this.getDataTypeIdSafe(oldScale.getDataType()));
 			if (!isDataTypeSame) {
@@ -301,7 +301,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 			return false;
 		}
 
-		Integer dataTypeId = parseDataTypeIdAsInteger(scaleDetails.getDataType());
+		Integer dataTypeId = this.parseDataTypeIdAsInteger(scaleDetails.getDataType());
 
 		// 4. The data type ID must correspond to the ID of one of the supported
 		// data types (Numeric, Categorical, Character, DateTime, Person,
@@ -325,7 +325,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 		Integer initialCount = errors.getErrorCount();
 
-		DataType dataType = DataType.getById(parseDataTypeIdAsInteger(scaleDetails.getDataType()));
+		DataType dataType = DataType.getById(this.parseDataTypeIdAsInteger(scaleDetails.getDataType()));
 
 		ValidValues validValues = scaleDetails.getValidValues() == null ? new ValidValues() : scaleDetails.getValidValues();
 
@@ -354,7 +354,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 		Integer initialCount = errors.getErrorCount();
 
-		DataType dataType = DataType.getById(parseDataTypeIdAsInteger(scaleDetails.getDataType()));
+		DataType dataType = DataType.getById(this.parseDataTypeIdAsInteger(scaleDetails.getDataType()));
 
 		ValidValues validValues = scaleDetails.getValidValues() == null ? new ValidValues() : scaleDetails.getValidValues();
 

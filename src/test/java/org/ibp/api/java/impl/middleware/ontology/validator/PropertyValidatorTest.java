@@ -126,7 +126,7 @@ public class PropertyValidatorTest {
 		Mockito.doReturn(TestDataProvider.getPropertyTerm()).when(this.termDataManager)
 				.getTermByNameAndCvId(property.getName(), CvId.PROPERTIES.getId());
 		Mockito.doReturn(true).when(this.termDataManager).isTermReferred(property.getId());
-		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId());
+		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId(), true);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Property");
 

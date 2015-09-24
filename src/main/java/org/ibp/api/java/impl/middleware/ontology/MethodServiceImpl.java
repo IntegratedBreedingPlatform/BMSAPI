@@ -70,7 +70,7 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 		}
 
 		try {
-			Method method = this.ontologyMethodDataManager.getMethod(Integer.valueOf(id));
+			Method method = this.ontologyMethodDataManager.getMethod(Integer.valueOf(id), true);
 			if (method == null) {
 				return null;
 			}

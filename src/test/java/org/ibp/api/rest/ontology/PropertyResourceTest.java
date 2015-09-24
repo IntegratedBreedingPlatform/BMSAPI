@@ -133,7 +133,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
 
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(property.getId());
-		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId());
+		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId(), true);
 
 		this.mockMvc
 				.perform(
@@ -145,7 +145,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.cropOntologyId", Matchers.is(property.getCropOntologyId())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.classes", IsCollectionWithSize.hasSize(property.getClasses().size())));
 
-		Mockito.verify(this.ontologyPropertyDataManager, Mockito.times(1)).getProperty(property.getId());
+		Mockito.verify(this.ontologyPropertyDataManager, Mockito.times(1)).getProperty(property.getId(), true);
 	}
 
 	/**
@@ -220,7 +220,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermByNameAndCvId(property.getName(), CvId.PROPERTIES.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(property.getId());
-		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId());
+		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId(), true);
 		Mockito.doNothing().when(this.ontologyPropertyDataManager).updateProperty(org.mockito.Matchers.any(Property.class));
 
 		this.mockMvc
@@ -244,7 +244,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
 
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(property.getId());
-		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId());
+		Mockito.doReturn(property).when(this.ontologyPropertyDataManager).getProperty(property.getId(), true);
 		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(property.getId());
 		Mockito.doNothing().when(this.ontologyPropertyDataManager).deleteProperty(property.getId());
 
