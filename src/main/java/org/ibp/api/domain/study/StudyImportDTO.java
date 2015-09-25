@@ -9,6 +9,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 /**
  * DTO used for importing studies.
  *
@@ -26,12 +28,15 @@ public class StudyImportDTO {
 	@Size(min = 1)
 	private String title;
 
+	@ApiModelProperty(value = "Study start date in YYYYMMDD format.")
 	@Pattern(regexp = "[0-9]{8}")
 	private String startDate;
 
+	@ApiModelProperty(value = "Study end date in YYYYMMDD format.")
 	@Pattern(regexp = "[0-9]{8}")
 	private String endDate;
 
+	@ApiModelProperty(value = "The type of study. N for nursery. T for trials.")
 	@NotNull
 	@Size(min = 1)
 	@Pattern(regexp = "[N|T]")
@@ -40,19 +45,27 @@ public class StudyImportDTO {
 	@Pattern(regexp = "[A-Za-z 0-9]+")
 	private String siteName;
 
-	// Default value of 1 is for the virtual "Root study folder" which is always present.
+	@ApiModelProperty(
+			value = "The identifier of the study folder to import the study into. Default value of 1 is for the virtual \"Root study folder\" which is always present.")
 	private Long folderId = 1L;
 
-	// Id of the user record in crop database to associate this study's data (e.g. the Germplasm list that is created) with.
+	@ApiModelProperty(
+			value = "Id of the user record in crop database to associate this study's data with such as the owning user of the germplasm list which is created. "
+					+ "Use the /study/{cropname}/folders service to retrieve a list of folders with folders identifiers.")
 	@NotNull
 	private Integer userId;
 
+	@ApiModelProperty(
+			value = "The germplasm used in the study. Each germplasm specified here are assumed to be present in the database already. "
+					+ "A germplasm list will be created with the germplasm specified here.")
 	@Valid
 	private List<StudyGermplasm> germplasm = new ArrayList<>();
 
+	@ApiModelProperty(value = "The traits measured in the study.")
 	@Valid
 	private List<Trait> traits = new ArrayList<>();
 
+	@ApiModelProperty(value = "The measurement values for each trait for each germplasm used in the study.")
 	@Valid
 	private List<ObservationImportDTO> observations = new ArrayList<>();
 

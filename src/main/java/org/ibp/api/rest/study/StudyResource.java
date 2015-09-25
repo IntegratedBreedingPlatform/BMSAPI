@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
 @Api(value = "Study Services")
 @Controller
@@ -49,7 +50,7 @@ public class StudyResource {
 	@RequestMapping(value = "/{cropname}/list", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<StudySummary>> listAllStudies(@PathVariable final String cropname, @RequestParam(value = "programUniqueId",
-	required = false) final String programUniqueId) {
+			required = false) final String programUniqueId) {
 		return new ResponseEntity<>(this.studyService.listAllStudies(programUniqueId), HttpStatus.OK);
 	}
 
@@ -104,7 +105,10 @@ public class StudyResource {
 	@ApiOperation(value = "Import a study",
 			notes = "Imports one study (Nursery, Trial, etc) along with its constituent parts mainly Germplasm, Traits and Measurements.")
 	@RequestMapping(value = "/{cropname}/import", method = RequestMethod.POST)
-	public ResponseEntity<Integer> importStudy(final @PathVariable String cropname, @RequestParam final String programUUID,
+	public ResponseEntity<Integer> importStudy(
+			final @PathVariable String cropname, //
+			@ApiParam(
+					value = "Unique id of the program to import this study into. Use the /programs/list service to list Programs and obtain unique id.") @RequestParam final String programUUID,
 			@RequestBody @Valid final StudyImportDTO studyImportDTO, final BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {

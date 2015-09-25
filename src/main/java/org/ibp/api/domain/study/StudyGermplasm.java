@@ -9,12 +9,14 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
 public class StudyGermplasm {
 
 	@JsonUnwrapped
 	private GermplasmListEntrySummary germplasmListEntrySummary;
 
+	@ApiModelProperty(value = "Type of entry: Check, Test.")
 	@NotNull
 	@Size(min = 1)
 	private String entryType;
