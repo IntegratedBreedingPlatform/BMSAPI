@@ -55,7 +55,7 @@ public class WorkbookConverterTest {
 		g2Summary.setCross("Cross 2");
 		g2.setGermplasmListEntrySummary(g2Summary);
 
-		inputDTO.setGermplasms(Lists.newArrayList(g1, g2));
+		inputDTO.setGermplasm(Lists.newArrayList(g1, g2));
 
 		final WorkbookConverter converter = new WorkbookConverter();
 		// Better to use actual component for MeasurementVariableConverter rather than mocking it as it is a simple collaborator.
@@ -144,6 +144,6 @@ public class WorkbookConverterTest {
 		Assert.assertEquals(inputDTO.getTraits().size(), outputWorkbook.getVariates().size());
 
 		// Observations
-		Assert.assertEquals(inputDTO.getGermplasms().size(), outputWorkbook.getObservations().size());
+		Assert.assertEquals(inputDTO.getGermplasm().size(), outputWorkbook.getObservations().size());
 	}
 }

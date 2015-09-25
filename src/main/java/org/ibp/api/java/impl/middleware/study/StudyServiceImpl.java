@@ -308,14 +308,14 @@ public class StudyServiceImpl implements StudyService {
 			final GermplasmList germplasmList = this.conversionService.convert(studyImportDTO, GermplasmList.class);
 			final Integer listId = this.germplasmListManager.addGermplasmList(germplasmList);
 
-			final List<GermplasmListData> germplasmListDatas = this.convert(studyImportDTO.getGermplasms(), GermplasmListData.class);
+			final List<GermplasmListData> germplasmListDatas = this.convert(studyImportDTO.getGermplasm(), GermplasmListData.class);
 			for (final GermplasmListData germData : germplasmListDatas) {
 				germData.setList(germplasmList);
 			}
 			this.germplasmListManager.addGermplasmListData(germplasmListDatas);
 
 			// Create the study's snapshot of the Germplasm list (ListDataProject)
-			final List<ListDataProject> listDataProjects = this.convert(studyImportDTO.getGermplasms(), ListDataProject.class);
+			final List<ListDataProject> listDataProjects = this.convert(studyImportDTO.getGermplasm(), ListDataProject.class);
 			final GermplasmListType listType = this.extractGermListType(studyImportDTO);
 			this.fieldbookService.saveOrUpdateListDataProject(studyId, listType, listId, listDataProjects, studyImportDTO.getUserId());
 

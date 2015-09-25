@@ -48,7 +48,7 @@ public class StudyImportDTO {
 	private Integer userId;
 
 	@Valid
-	private List<StudyGermplasm> germplasms = new ArrayList<>();
+	private List<StudyGermplasm> germplasm = new ArrayList<>();
 
 	@Valid
 	private List<Trait> traits = new ArrayList<>();
@@ -64,12 +64,12 @@ public class StudyImportDTO {
 		this.traits = traits;
 	}
 
-	public List<StudyGermplasm> getGermplasms() {
-		return this.germplasms;
+	public List<StudyGermplasm> getGermplasm() {
+		return this.germplasm;
 	}
 
-	public void setGermplasms(final List<StudyGermplasm> germplasms) {
-		this.germplasms = germplasms;
+	public void setGermplasm(final List<StudyGermplasm> germplasm) {
+		this.germplasm = germplasm;
 	}
 
 	public String getName() {

@@ -10,7 +10,7 @@
     "siteName": "CIMMYT",
     "folderId": 1,
     "userId" : 1,
-    "germplasms": [
+    "germplasm": [
         {
             "gid": 1,
             "designation": "GP-VARIETY-1",

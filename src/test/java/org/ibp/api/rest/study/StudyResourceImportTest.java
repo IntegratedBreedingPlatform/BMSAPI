@@ -97,7 +97,7 @@ public class StudyResourceImportTest extends ApiUnitTestBase {
 		g2Summary.setCross("Cross 2");
 		g2.setGermplasmListEntrySummary(g2Summary);
 
-		inputDTO.setGermplasms(Lists.newArrayList(g1, g2));
+		inputDTO.setGermplasm(Lists.newArrayList(g1, g2));
 
 		final String inptJSON = new ObjectMapper().writeValueAsString(inputDTO);
 

@@ -129,7 +129,7 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 	private void buildObservations(final StudyImportDTO source) {
 		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
 
-		for (final StudyGermplasm studyGermplasm : source.getGermplasms()) {
+		for (final StudyGermplasm studyGermplasm : source.getGermplasm()) {
 
 			final MeasurementRow row = new MeasurementRow();
 			final List<MeasurementData> dataList = new ArrayList<MeasurementData>();
