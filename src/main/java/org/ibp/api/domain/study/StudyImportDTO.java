@@ -20,15 +20,17 @@ public class StudyImportDTO {
 	@Pattern(regexp = "[A-Za-z 0-9]+")
 	private String name;
 
-	@Pattern(regexp = "[A-Za-z 0-9]+")
 	private String objective;
+
+	@NotNull
+	@Size(min = 1)
+	private String title;
 
 	@Pattern(regexp = "[0-9]{8}")
 	private String startDate;
 
 	@Pattern(regexp = "[0-9]{8}")
 	private String endDate;
-	private String title;
 
 	@NotNull
 	@Size(min = 1)
