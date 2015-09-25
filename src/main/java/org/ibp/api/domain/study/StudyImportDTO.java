@@ -69,6 +69,8 @@ public class StudyImportDTO {
 	@Valid
 	private List<ObservationImportDTO> observations = new ArrayList<>();
 
+	private EnvironmentDetails environmentDetails;
+
 	public List<Trait> getTraits() {
 		return this.traits;
 	}
@@ -163,6 +165,14 @@ public class StudyImportDTO {
 
 	public void setObservations(final List<ObservationImportDTO> observations) {
 		this.observations = observations;
+	}
+
+	public EnvironmentDetails getEnvironmentDetails() {
+		return this.environmentDetails;
+	}
+
+	public void setEnvironmentDetails(final EnvironmentDetails environmentDetails) {
+		this.environmentDetails = environmentDetails;
 	}
 
 	public String findTraitValue(final Integer gid, final Integer traitId) {

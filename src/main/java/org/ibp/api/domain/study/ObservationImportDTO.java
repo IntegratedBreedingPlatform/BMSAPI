@@ -15,6 +15,11 @@ public class ObservationImportDTO {
 	@NotNull
 	private Integer gid;
 
+	private Integer enrtyNumber;
+	private Integer plotNumber;
+	private Integer environmentNumber;
+	private Integer replicationNumber;
+
 	@Valid
 	private List<MeasurementImportDTO> measurements = new ArrayList<>();
 
@@ -24,6 +29,38 @@ public class ObservationImportDTO {
 
 	public void setGid(final Integer gid) {
 		this.gid = gid;
+	}
+
+	public Integer getEnrtyNumber() {
+		return this.enrtyNumber;
+	}
+
+	public void setEnrtyNumber(final Integer enrtyNumber) {
+		this.enrtyNumber = enrtyNumber;
+	}
+
+	public Integer getPlotNumber() {
+		return this.plotNumber;
+	}
+
+	public void setPlotNumber(final Integer plotNumber) {
+		this.plotNumber = plotNumber;
+	}
+
+	public Integer getEnvironmentNumber() {
+		return this.environmentNumber;
+	}
+
+	public void setEnvironmentNumber(final Integer environmentNumber) {
+		this.environmentNumber = environmentNumber;
+	}
+
+	public Integer getReplicationNumber() {
+		return this.replicationNumber;
+	}
+
+	public void setReplicationNumber(final Integer replicationNumber) {
+		this.replicationNumber = replicationNumber;
 	}
 
 	public List<MeasurementImportDTO> getMeasurements() {
