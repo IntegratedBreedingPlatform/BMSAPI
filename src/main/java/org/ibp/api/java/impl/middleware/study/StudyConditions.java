@@ -14,7 +14,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 public enum StudyConditions {
 
 	BREEDING_METHOD("Breeding Method"), //
-	INSTITUTE("Institute"), //
+	STUDY_INSTITUTE("Institute"), //
 	STUDY_NAME("Study"), //
 	STUDY_TITLE("Study Title"), //
 	START_DATE("Start Date"), //
@@ -53,10 +53,10 @@ public enum StudyConditions {
 						"Breeding method applied to all plots in a study (CODE)", this.toString(), APPLIED, "BMETH_CODE", CHAR,
 						null, TEXT_STUDY, TermId.STUDY_INFORMATION.getId(), true);
 				break;
-			case INSTITUTE:
+			case STUDY_INSTITUTE:
 				measureVariable =
 				this.createMeasurementVariable(TermId.STUDY_INSTITUTE.getId(), "STUDY_INSTITUTE", "Study institute - conducted (DBCV)", this.toString(),
-						CONDUCTED, DBCV, CHAR, "CIMMYT", TEXT_STUDY, TermId.STUDY_INFORMATION.getId(), true);
+						CONDUCTED, DBCV, CHAR, initialValue, TEXT_STUDY, TermId.STUDY_INFORMATION.getId(), true);
 				break;
 			case STUDY_NAME:
 				measureVariable =

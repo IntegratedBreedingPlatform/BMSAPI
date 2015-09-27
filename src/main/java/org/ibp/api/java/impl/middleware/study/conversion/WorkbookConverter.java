@@ -4,6 +4,7 @@ package org.ibp.api.java.impl.middleware.study.conversion;
 import static org.ibp.api.java.impl.middleware.study.StudyConditions.END_DATE;
 import static org.ibp.api.java.impl.middleware.study.StudyConditions.OBJECTIVE;
 import static org.ibp.api.java.impl.middleware.study.StudyConditions.START_DATE;
+import static org.ibp.api.java.impl.middleware.study.StudyConditions.STUDY_INSTITUTE;
 import static org.ibp.api.java.impl.middleware.study.StudyConditions.STUDY_NAME;
 import static org.ibp.api.java.impl.middleware.study.StudyConditions.STUDY_TITLE;
 
@@ -87,6 +88,7 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 		conditions.add(START_DATE.asMeasurementVariable(source.getStartDate()));
 		conditions.add(END_DATE.asMeasurementVariable(source.getEndDate()));
 		conditions.add(OBJECTIVE.asMeasurementVariable(source.getObjective()));
+		conditions.add(STUDY_INSTITUTE.asMeasurementVariable(source.getStudyInstitute()));
 
 		this.workbook.setConditions(conditions);
 	}

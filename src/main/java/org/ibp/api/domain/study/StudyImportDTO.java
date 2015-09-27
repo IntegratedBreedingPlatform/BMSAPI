@@ -45,6 +45,8 @@ public class StudyImportDTO {
 	@Pattern(regexp = "[A-Za-z 0-9]+")
 	private String siteName;
 
+	private String studyInstitute;
+
 	@ApiModelProperty(
 			value = "The identifier of the study folder to import the study into. Default value of 1 is for the virtual \"Root study folder\" which is always present.")
 	private Long folderId = 1L;
@@ -141,6 +143,14 @@ public class StudyImportDTO {
 
 	public void setSiteName(final String siteName) {
 		this.siteName = siteName;
+	}
+
+	public String getStudyInstitute() {
+		return this.studyInstitute;
+	}
+
+	public void setStudyInstitute(final String studyInstitute) {
+		this.studyInstitute = studyInstitute;
 	}
 
 	public Long getFolderId() {

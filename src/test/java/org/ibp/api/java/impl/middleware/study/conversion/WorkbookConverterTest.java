@@ -29,7 +29,8 @@ public class WorkbookConverterTest {
 		inputDTO.setEndDate("20151201");
 		inputDTO.setUserId(1);
 		inputDTO.setFolderId(1L);
-		inputDTO.setSiteName("CIMMYT");
+		inputDTO.setSiteName("Mexico");
+		inputDTO.setStudyInstitute("CIMMYT");
 
 		final Trait trait1 = new Trait(1, "Plant Height");
 		final Trait trait2 = new Trait(2, "Grain Yield");
@@ -74,7 +75,7 @@ public class WorkbookConverterTest {
 		Assert.assertEquals(inputDTO.getFolderId(), new Long(outputWorkbook.getStudyDetails().getParentFolderId()));
 
 		// Basic details as MeasurementVariables
-		Assert.assertEquals(5, outputWorkbook.getConditions().size());
+		Assert.assertEquals(6, outputWorkbook.getConditions().size());
 
 		final MeasurementVariable mvName = outputWorkbook.getConditions().get(0);
 		Assert.assertEquals(inputDTO.getName(), mvName.getValue());
@@ -105,6 +106,12 @@ public class WorkbookConverterTest {
 		Assert.assertEquals(PhenotypicType.STUDY, mvObjective.getRole());
 		Assert.assertTrue(mvObjective.isFactor());
 		Assert.assertEquals(TermId.STUDY_OBJECTIVE.getId(), mvObjective.getTermId());
+
+		final MeasurementVariable mvStudyInstitute = outputWorkbook.getConditions().get(5);
+		Assert.assertEquals(inputDTO.getStudyInstitute(), mvStudyInstitute.getValue());
+		Assert.assertEquals(PhenotypicType.STUDY, mvStudyInstitute.getRole());
+		Assert.assertTrue(mvStudyInstitute.isFactor());
+		Assert.assertEquals(TermId.STUDY_INSTITUTE.getId(), mvStudyInstitute.getTermId());
 
 		// Trial instance as factor
 		Assert.assertEquals(1, outputWorkbook.getConstants().size());
