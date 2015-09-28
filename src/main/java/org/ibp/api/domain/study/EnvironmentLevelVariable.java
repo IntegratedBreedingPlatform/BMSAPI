@@ -4,7 +4,7 @@ package org.ibp.api.domain.study;
 public class EnvironmentLevelVariable {
 
 	private Integer variableId;
-	private Integer variableName;
+	private String variableName;
 
 	public Integer getVariableId() {
 		return this.variableId;
@@ -14,11 +14,11 @@ public class EnvironmentLevelVariable {
 		this.variableId = variableId;
 	}
 
-	public Integer getVariableName() {
+	public String getVariableName() {
 		return this.variableName;
 	}
 
-	public void setVariableName(final Integer variableName) {
+	public void setVariableName(final String variableName) {
 		this.variableName = variableName;
 	}
 

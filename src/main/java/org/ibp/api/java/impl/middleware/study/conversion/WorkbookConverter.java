@@ -6,12 +6,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.ibp.api.domain.study.EnvironmentLevelMeasurement;
+import org.ibp.api.domain.study.EnvironmentLevelObservation;
+import org.ibp.api.domain.study.EnvironmentLevelVariable;
 import org.ibp.api.domain.study.MeasurementImportDTO;
 import org.ibp.api.domain.study.ObservationImportDTO;
 import org.ibp.api.domain.study.StudyGermplasm;
@@ -49,7 +53,8 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 		this.buildConstants(source);
 		this.buildFactors(source);
 		this.buildVariates(source);
-		this.buildObservations(source);
+		this.buildPlotObservations(source);
+		this.buildEnvironmentObservations(source);
 
 		return this.workbook;
 	}
@@ -126,7 +131,51 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 		this.workbook.setVariates(variates);
 	}
 
-	private void buildObservations(final StudyImportDTO source) {
+	/**
+	 * These are the environment level observations (such as Soil PH): <code>Workbook.trialObservations</code>.
+	 */
+	private void buildEnvironmentObservations(final StudyImportDTO source) {
+		final List<MeasurementRow> environmentObservations = new ArrayList<MeasurementRow>();
+
+		final Map<Integer, MeasurementVariable> environmentVariablesMap = new HashMap<>();
+		for (final EnvironmentLevelVariable envVar : source.getEnvironmentDetails().getEnvironmentLevelVariables()) {
+			final MeasurementVariable measurementVariable = new MeasurementVariable();
+			measurementVariable.setTermId(envVar.getVariableId());
+			measurementVariable.setName(envVar.getVariableName());
+			measurementVariable.setDescription(envVar.getVariableName());
+			measurementVariable.setValue(null);
+			measurementVariable.setLabel(envVar.getVariableName());
+			measurementVariable.setRole(PhenotypicType.VARIATE);
+			measurementVariable.setFactor(false);
+			environmentVariablesMap.put(envVar.getVariableId(), measurementVariable);
+		}
+
+		for (final EnvironmentLevelObservation envObs : source.getEnvironmentDetails().getEnvironmentLevelObservations()) {
+			final MeasurementRow row = new MeasurementRow();
+			final List<MeasurementData> dataList = new ArrayList<MeasurementData>();
+
+			final MeasurementData instanceData =
+					new MeasurementData(StudyBaseFactors.TRIAL_INSTANCE.name(), String.valueOf(envObs.getEnvironmentNumber()));
+			instanceData.setMeasurementVariable(StudyBaseFactors.TRIAL_INSTANCE.asFactor());
+			dataList.add(instanceData);
+
+			for (final EnvironmentLevelMeasurement measurement : envObs.getMeasurements()) {
+				final MeasurementData envVariateData = new MeasurementData();
+				envVariateData.setMeasurementVariable(environmentVariablesMap.get(measurement.getVariableId()));
+				envVariateData.setLabel(environmentVariablesMap.get(measurement.getVariableId()).getLabel());
+				envVariateData.setValue(measurement.getVariableValue());
+				dataList.add(envVariateData);
+			}
+
+			row.setDataList(dataList);
+		}
+		this.workbook.setTrialObservations(environmentObservations);
+	}
+
+	/**
+	 * These are the plot level observations (such as Plant Height): <code>Workbook.observations</code>
+	 */
+	private void buildPlotObservations(final StudyImportDTO source) {
 		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
 
 		for (final ObservationImportDTO observationUnit : source.getObservations()) {
@@ -146,23 +195,28 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 			replicationData.setMeasurementVariable(StudyBaseFactors.REPLICATION_NO.asFactor());
 			dataList.add(replicationData);
 
-			final MeasurementData entryData = new MeasurementData(StudyBaseFactors.ENTRY_NUMBER.name(), String.valueOf(studyGermplasm.getEntryNumber()));
+			final MeasurementData entryData =
+					new MeasurementData(StudyBaseFactors.ENTRY_NUMBER.name(), String.valueOf(studyGermplasm.getEntryNumber()));
 			entryData.setMeasurementVariable(StudyBaseFactors.ENTRY_NUMBER.asFactor());
 			dataList.add(entryData);
 
-			final MeasurementData designationData = new MeasurementData(StudyBaseFactors.DESIGNATION.name(), studyGermplasm.getGermplasmListEntrySummary().getDesignation());
+			final MeasurementData designationData =
+					new MeasurementData(StudyBaseFactors.DESIGNATION.name(), studyGermplasm.getGermplasmListEntrySummary().getDesignation());
 			designationData.setMeasurementVariable(StudyBaseFactors.DESIGNATION.asFactor());
 			dataList.add(designationData);
 
-			final MeasurementData crossData = new MeasurementData(StudyBaseFactors.CROSS.name(), studyGermplasm.getGermplasmListEntrySummary().getCross());
+			final MeasurementData crossData =
+					new MeasurementData(StudyBaseFactors.CROSS.name(), studyGermplasm.getGermplasmListEntrySummary().getCross());
 			crossData.setMeasurementVariable(StudyBaseFactors.CROSS.asFactor());
 			dataList.add(crossData);
 
-			final MeasurementData gidData = new MeasurementData(StudyBaseFactors.GID.name(), studyGermplasm.getGermplasmListEntrySummary().getGid().toString());
+			final MeasurementData gidData =
+					new MeasurementData(StudyBaseFactors.GID.name(), studyGermplasm.getGermplasmListEntrySummary().getGid().toString());
 			gidData.setMeasurementVariable(StudyBaseFactors.GID.asFactor());
 			dataList.add(gidData);
 
-			final MeasurementData plotData = new MeasurementData(StudyBaseFactors.PLOT_NUMBER.name(), String.valueOf(observationUnit.getPlotNumber()));
+			final MeasurementData plotData =
+					new MeasurementData(StudyBaseFactors.PLOT_NUMBER.name(), String.valueOf(observationUnit.getPlotNumber()));
 			plotData.setMeasurementVariable(StudyBaseFactors.PLOT_NUMBER.asFactor());
 			dataList.add(plotData);
 
