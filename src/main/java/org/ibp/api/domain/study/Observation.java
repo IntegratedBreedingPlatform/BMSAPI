@@ -15,7 +15,7 @@ public class Observation {
 	private Integer uniqueIdentifier;
 	private Integer germplasmId;
 	private String germplasmDesignation;
-	private String enrtyNumber;
+	private String entryNumber;
 	private String entryType;
 	private String plotNumber;
 	private String replicationNumber;
@@ -42,7 +42,7 @@ public class Observation {
 	/**
 	 * @param uniqueIdentifier the uniqueIdentifier to set
 	 */
-	public void setUniqueIdentifier(Integer uniqueIdentifier) {
+	public void setUniqueIdentifier(final Integer uniqueIdentifier) {
 		this.uniqueIdentifier = uniqueIdentifier;
 	}
 
@@ -56,7 +56,7 @@ public class Observation {
 	/**
 	 * @param germplasmId the germplasmId to set
 	 */
-	public void setGermplasmId(Integer germplasmId) {
+	public void setGermplasmId(final Integer germplasmId) {
 		this.germplasmId = germplasmId;
 	}
 
@@ -70,22 +70,22 @@ public class Observation {
 	/**
 	 * @param germplasmDesignation the germplasmDesignation to set
 	 */
-	public void setGermplasmDesignation(String germplasmDesignation) {
+	public void setGermplasmDesignation(final String germplasmDesignation) {
 		this.germplasmDesignation = germplasmDesignation;
 	}
 
 	/**
-	 * @return the enrtyNumber
+	 * @return the entryNumber
 	 */
-	public String getEnrtyNumber() {
-		return this.enrtyNumber;
+	public String getEntryNumber() {
+		return this.entryNumber;
 	}
 
 	/**
-	 * @param enrtyNumber the enrtyNumber to set
+	 * @param entryNumber the enrtyNumber to set
 	 */
-	public void setEnrtyNumber(String enrtyNumber) {
-		this.enrtyNumber = enrtyNumber;
+	public void setEntryNumber(final String entryNumber) {
+		this.entryNumber = entryNumber;
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class Observation {
 	/**
 	 * @param entryType the entryType to set
 	 */
-	public void setEntryType(String entryType) {
+	public void setEntryType(final String entryType) {
 		this.entryType = entryType;
 	}
 
@@ -112,7 +112,7 @@ public class Observation {
 	/**
 	 * @param plotNumber the plotNumber to set
 	 */
-	public void setPlotNumber(String plotNumber) {
+	public void setPlotNumber(final String plotNumber) {
 		this.plotNumber = plotNumber;
 	}
 
@@ -126,7 +126,7 @@ public class Observation {
 	/**
 	 * @param replicationNumber the replicationNumber to set
 	 */
-	public void setReplicationNumber(String replicationNumber) {
+	public void setReplicationNumber(final String replicationNumber) {
 		this.replicationNumber = replicationNumber;
 	}
 
@@ -140,7 +140,7 @@ public class Observation {
 	/**
 	 * @param environmentNumber the environmentNumber to set
 	 */
-	public void setEnvironmentNumber(String environmentNumber) {
+	public void setEnvironmentNumber(final String environmentNumber) {
 		this.environmentNumber = environmentNumber;
 	}
 
@@ -154,7 +154,7 @@ public class Observation {
 	/**
 	 * @param seedSource the seedSource to set
 	 */
-	public void setSeedSource(String seedSource) {
+	public void setSeedSource(final String seedSource) {
 		this.seedSource = seedSource;
 	}
 
@@ -191,10 +191,10 @@ public class Observation {
 		if (!(other instanceof Observation)) {
 			return false;
 		}
-		Observation castOther = (Observation) other;
+		final Observation castOther = (Observation) other;
 		return new EqualsBuilder().append(this.uniqueIdentifier, castOther.uniqueIdentifier)
 				.append(this.germplasmId, castOther.germplasmId).append(this.germplasmDesignation, castOther.germplasmDesignation)
-				.append(this.enrtyNumber, castOther.enrtyNumber).append(this.entryType, castOther.entryType)
+				.append(this.entryNumber, castOther.entryNumber).append(this.entryType, castOther.entryType)
 				.append(this.plotNumber, castOther.plotNumber).append(this.replicationNumber, castOther.replicationNumber)
 				.append(this.environmentNumber, castOther.environmentNumber).append(this.seedSource, castOther.seedSource)
 				.append(this.measurements, castOther.measurements).isEquals();
@@ -203,7 +203,7 @@ public class Observation {
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(this.uniqueIdentifier).append(this.germplasmId).append(this.germplasmDesignation)
-				.append(this.enrtyNumber).append(this.entryType).append(this.plotNumber).append(this.replicationNumber)
+				.append(this.entryNumber).append(this.entryType).append(this.plotNumber).append(this.replicationNumber)
 				.append(this.environmentNumber).append(this.seedSource).append(this.measurements).toHashCode();
 	}
 

@@ -15,7 +15,7 @@ public class ObservationImportDTO {
 	@NotNull
 	private Integer gid;
 
-	private Integer enrtyNumber;
+	private Integer entryNumber;
 	private Integer plotNumber;
 	private Integer environmentNumber;
 	private Integer replicationNumber;
@@ -31,12 +31,12 @@ public class ObservationImportDTO {
 		this.gid = gid;
 	}
 
-	public Integer getEnrtyNumber() {
-		return this.enrtyNumber;
+	public Integer getEntryNumber() {
+		return this.entryNumber;
 	}
 
-	public void setEnrtyNumber(final Integer enrtyNumber) {
-		this.enrtyNumber = enrtyNumber;
+	public void setEntryNumber(final Integer entryNumber) {
+		this.entryNumber = entryNumber;
 	}
 
 	public Integer getPlotNumber() {

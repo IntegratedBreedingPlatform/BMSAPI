@@ -62,7 +62,7 @@ public class StudyMapper {
 			@Override
 			protected void configure() {
 				this.map().setUniqueIdentifier(this.source.getMeasurementId());
-				this.map().setEnrtyNumber(this.source.getEntryNo());
+				this.map().setEntryNumber(this.source.getEntryNo());
 				this.map().setEntryType(this.source.getEntryType());
 				this.map().setEnvironmentNumber(this.source.getTrialInstance());
 				this.map().setGermplasmDesignation(this.source.getDesignation());

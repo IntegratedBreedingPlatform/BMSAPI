@@ -184,7 +184,7 @@ public class StudyServiceImplTest {
 		final Observation observation = new Observation();
 		if (measurement != null) {
 			observation.setUniqueIdentifier(measurement.getMeasurementId());
-			observation.setEnrtyNumber(measurement.getEntryNo());
+			observation.setEntryNumber(measurement.getEntryNo());
 			observation.setEntryType(measurement.getEntryType());
 			observation.setEnvironmentNumber(measurement.getTrialInstance());
 			observation.setGermplasmDesignation(measurement.getDesignation());
