@@ -1,13 +1,6 @@
 
 package org.ibp.api.java.impl.middleware.study.conversion;
 
-import static org.ibp.api.java.impl.middleware.study.StudyConditions.END_DATE;
-import static org.ibp.api.java.impl.middleware.study.StudyConditions.OBJECTIVE;
-import static org.ibp.api.java.impl.middleware.study.StudyConditions.START_DATE;
-import static org.ibp.api.java.impl.middleware.study.StudyConditions.STUDY_INSTITUTE;
-import static org.ibp.api.java.impl.middleware.study.StudyConditions.STUDY_NAME;
-import static org.ibp.api.java.impl.middleware.study.StudyConditions.STUDY_TITLE;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +18,7 @@ import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.Trait;
 import org.ibp.api.java.impl.middleware.study.StudyBaseFactors;
+import org.ibp.api.java.impl.middleware.study.StudyConditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -84,13 +78,12 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 	private void buildConditions(final StudyImportDTO source) {
 
 		final List<MeasurementVariable> conditions = new ArrayList<>();
-		conditions.add(STUDY_NAME.asMeasurementVariable(source.getName()));
-		conditions.add(STUDY_TITLE.asMeasurementVariable(source.getTitle()));
-		conditions.add(START_DATE.asMeasurementVariable(source.getStartDate()));
-		conditions.add(END_DATE.asMeasurementVariable(source.getEndDate()));
-		conditions.add(OBJECTIVE.asMeasurementVariable(source.getObjective()));
-		conditions.add(STUDY_INSTITUTE.asMeasurementVariable(source.getStudyInstitute()));
-
+		conditions.add(StudyConditions.STUDY_NAME.asMeasurementVariable(source.getName()));
+		conditions.add(StudyConditions.STUDY_TITLE.asMeasurementVariable(source.getTitle()));
+		conditions.add(StudyConditions.START_DATE.asMeasurementVariable(source.getStartDate()));
+		conditions.add(StudyConditions.END_DATE.asMeasurementVariable(source.getEndDate()));
+		conditions.add(StudyConditions.OBJECTIVE.asMeasurementVariable(source.getObjective()));
+		conditions.add(StudyConditions.STUDY_INSTITUTE.asMeasurementVariable(source.getStudyInstitute()));
 		this.workbook.setConditions(conditions);
 	}
 
@@ -114,6 +107,10 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 		factors.add(StudyBaseFactors.CROSS.asFactor());
 		factors.add(StudyBaseFactors.GID.asFactor());
 		factors.add(StudyBaseFactors.PLOT_NUMBER.asFactor());
+		factors.add(StudyBaseFactors.REPLICATION_NO.asFactor());
+		final MeasurementVariable numReps = StudyBaseFactors.NREP.asFactor();
+		numReps.setValue(String.valueOf(source.getEnvironmentDetails().getNumberOfReplications()));
+		factors.add(numReps);
 		this.workbook.setFactors(factors);
 	}
 

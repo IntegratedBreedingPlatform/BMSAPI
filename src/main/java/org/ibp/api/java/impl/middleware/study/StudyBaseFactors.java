@@ -7,11 +7,13 @@ import static org.generationcp.middleware.domain.oms.TermId.ENTRY_GID_STORAGE;
 import static org.generationcp.middleware.domain.oms.TermId.ENTRY_NO;
 import static org.generationcp.middleware.domain.oms.TermId.ENTRY_NUMBER_STORAGE;
 import static org.generationcp.middleware.domain.oms.TermId.GERMPLASM_ENTRY_STORAGE;
+import static org.generationcp.middleware.domain.oms.TermId.NUMBER_OF_REPLICATES;
 import static org.generationcp.middleware.domain.oms.TermId.PLOT_NO;
 import static org.generationcp.middleware.domain.oms.TermId.REP_NO;
 import static org.generationcp.middleware.domain.oms.TermId.TRIAL_DESIGN_INFO_STORAGE;
 import static org.generationcp.middleware.domain.oms.TermId.TRIAL_INSTANCE_FACTOR;
 import static org.generationcp.middleware.domain.oms.TermId.TRIAL_INSTANCE_STORAGE;
+import static org.generationcp.middleware.domain.oms.TermId.TRIAL_ENVIRONMENT_INFO_STORAGE;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -31,7 +33,8 @@ public enum StudyBaseFactors {
 	GID("GID", "Germplasm identifier - assigned (DBID)", TermId.GID, ENTRY_GID_STORAGE), //
 	TRIAL_INSTANCE("TRIAL_INSTANCE", "Trial Instance", TRIAL_INSTANCE_FACTOR, TRIAL_INSTANCE_STORAGE), //
 	PLOT_NUMBER("PLOT_NO", "Field plot - enumerated (number)", PLOT_NO, TRIAL_DESIGN_INFO_STORAGE), //
-	REPLICATION_NO("REP_NO", "Replication - assigned (number)", REP_NO, TRIAL_DESIGN_INFO_STORAGE);
+	REPLICATION_NO("REP_NO", "Replication - assigned (number)", REP_NO, TRIAL_DESIGN_INFO_STORAGE), //
+	NREP("NREP", "Number of replications in an experiment", NUMBER_OF_REPLICATES, TRIAL_ENVIRONMENT_INFO_STORAGE);
 
 	private static final String DBCV = "DBCV";
 	private static final String DBID = "DBID";
@@ -98,7 +101,13 @@ public enum StudyBaseFactors {
 			case REPLICATION_NO:
 				factor =
 				this.createFactor("Replication factor", StudyBaseFactors.ENUMERATED, StudyBaseFactors.NUMERIC,
-								StudyBaseFactors.NUMERIC, this.value, PhenotypicType.TRIAL_DESIGN);
+						StudyBaseFactors.NUMERIC, this.value, PhenotypicType.TRIAL_DESIGN);
+				break;
+				
+			case NREP:
+				factor =
+				this.createFactor("ED - nrep", StudyBaseFactors.ASSIGNED, StudyBaseFactors.NUMBER,
+						StudyBaseFactors.NUMERIC, "TRIAL", PhenotypicType.TRIAL_ENVIRONMENT);
 				break;
 			default:
 				factor = null;

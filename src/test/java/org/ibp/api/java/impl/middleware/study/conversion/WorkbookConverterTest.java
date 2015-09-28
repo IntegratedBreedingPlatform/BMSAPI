@@ -150,8 +150,8 @@ public class WorkbookConverterTest {
 		Assert.assertTrue(mvTrialInstance.isFactor());
 		Assert.assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), mvTrialInstance.getTermId());
 
-		// Germplasm Factors
-		Assert.assertEquals(5, outputWorkbook.getFactors().size());
+		// Factors
+		Assert.assertEquals(7, outputWorkbook.getFactors().size());
 		final MeasurementVariable mvEntryNumber = outputWorkbook.getFactors().get(0);
 		Assert.assertEquals(PhenotypicType.GERMPLASM, mvEntryNumber.getRole());
 		Assert.assertTrue(mvEntryNumber.isFactor());
@@ -176,6 +176,17 @@ public class WorkbookConverterTest {
 		Assert.assertEquals(PhenotypicType.TRIAL_DESIGN, mvPlotNo.getRole());
 		Assert.assertTrue(mvPlotNo.isFactor());
 		Assert.assertEquals(TermId.PLOT_NO.getId(), mvPlotNo.getTermId());
+
+		final MeasurementVariable replicationNumber = outputWorkbook.getFactors().get(5);
+		Assert.assertEquals(PhenotypicType.TRIAL_DESIGN, replicationNumber.getRole());
+		Assert.assertTrue(replicationNumber.isFactor());
+		Assert.assertEquals(TermId.REP_NO.getId(), replicationNumber.getTermId());
+
+		final MeasurementVariable numberOfReplications = outputWorkbook.getFactors().get(6);
+		Assert.assertEquals(PhenotypicType.TRIAL_ENVIRONMENT, numberOfReplications.getRole());
+		Assert.assertTrue(numberOfReplications.isFactor());
+		Assert.assertEquals(TermId.NUMBER_OF_REPLICATES.getId(), numberOfReplications.getTermId());
+		Assert.assertEquals(String.valueOf(inputDTO.getEnvironmentDetails().getNumberOfReplications()), numberOfReplications.getValue());
 
 		// Variates
 		Assert.assertEquals(inputDTO.getTraits().size(), outputWorkbook.getVariates().size());
