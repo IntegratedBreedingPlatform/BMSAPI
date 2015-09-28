@@ -1,13 +1,14 @@
 
 package org.ibp.api.domain.study;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EnvironmentLevelObservation {
 
 	private Integer environmentNumber;
 
-	private List<EnvironmentLevelMeasurement> measurements;
+	private List<EnvironmentLevelMeasurement> measurements = new ArrayList<>();
 
 	public Integer getEnvironmentNumber() {
 		return this.environmentNumber;

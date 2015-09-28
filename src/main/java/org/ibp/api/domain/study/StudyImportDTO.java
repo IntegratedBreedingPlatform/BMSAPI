@@ -71,7 +71,7 @@ public class StudyImportDTO {
 	@Valid
 	private List<ObservationImportDTO> observations = new ArrayList<>();
 
-	private EnvironmentDetails environmentDetails;
+	private EnvironmentDetails environmentDetails = new EnvironmentDetails();
 
 	public List<Trait> getTraits() {
 		return this.traits;
@@ -185,14 +185,10 @@ public class StudyImportDTO {
 		this.environmentDetails = environmentDetails;
 	}
 
-	public String findTraitValue(final Integer gid, final Integer traitId) {
-		for (final ObservationImportDTO observation : this.observations) {
-			if (observation.getGid().equals(gid)) {
-				for (final MeasurementImportDTO measurement : observation.getMeasurements()) {
-					if (measurement.getTraitId().equals(traitId)) {
-						return measurement.getTraitValue();
-					}
-				}
+	public StudyGermplasm findStudyGermplasm(final Integer gid) {
+		for (final StudyGermplasm studyGermplasm : this.getGermplasm()) {
+			if (studyGermplasm.getGermplasmListEntrySummary().getGid().equals(gid)) {
+				return studyGermplasm;
 			}
 		}
 		return null;

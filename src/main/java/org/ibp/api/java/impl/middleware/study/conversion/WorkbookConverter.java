@@ -19,7 +19,8 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
-import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
+import org.ibp.api.domain.study.MeasurementImportDTO;
+import org.ibp.api.domain.study.ObservationImportDTO;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.Trait;
@@ -131,37 +132,48 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 	private void buildObservations(final StudyImportDTO source) {
 		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
 
-		for (final StudyGermplasm studyGermplasm : source.getGermplasm()) {
+		for (final ObservationImportDTO observationUnit : source.getObservations()) {
 
 			final MeasurementRow row = new MeasurementRow();
 			final List<MeasurementData> dataList = new ArrayList<MeasurementData>();
-			final GermplasmListEntrySummary germplasm = studyGermplasm.getGermplasmListEntrySummary();
 
-			final MeasurementData entryData = new MeasurementData(StudyBaseFactors.ENTRY_NUMBER.name(), germplasm.getEntryCode());
+			final StudyGermplasm studyGermplasm = source.findStudyGermplasm(observationUnit.getGid());
+
+			final MeasurementData instanceData =
+					new MeasurementData(StudyBaseFactors.TRIAL_INSTANCE.name(), String.valueOf(observationUnit.getEnvironmentNumber()));
+			instanceData.setMeasurementVariable(StudyBaseFactors.TRIAL_INSTANCE.asFactor());
+			dataList.add(instanceData);
+
+			final MeasurementData replicationData =
+					new MeasurementData(StudyBaseFactors.REPLICATION_NO.name(), String.valueOf(observationUnit.getReplicationNumber()));
+			replicationData.setMeasurementVariable(StudyBaseFactors.REPLICATION_NO.asFactor());
+			dataList.add(replicationData);
+
+			final MeasurementData entryData = new MeasurementData(StudyBaseFactors.ENTRY_NUMBER.name(), String.valueOf(studyGermplasm.getEntryNumber()));
 			entryData.setMeasurementVariable(StudyBaseFactors.ENTRY_NUMBER.asFactor());
 			dataList.add(entryData);
 
-			final MeasurementData designationData = new MeasurementData(StudyBaseFactors.DESIGNATION.name(), germplasm.getDesignation());
+			final MeasurementData designationData = new MeasurementData(StudyBaseFactors.DESIGNATION.name(), studyGermplasm.getGermplasmListEntrySummary().getDesignation());
 			designationData.setMeasurementVariable(StudyBaseFactors.DESIGNATION.asFactor());
 			dataList.add(designationData);
 
-			final MeasurementData crossData = new MeasurementData(StudyBaseFactors.CROSS.name(), germplasm.getCross());
+			final MeasurementData crossData = new MeasurementData(StudyBaseFactors.CROSS.name(), studyGermplasm.getGermplasmListEntrySummary().getCross());
 			crossData.setMeasurementVariable(StudyBaseFactors.CROSS.asFactor());
 			dataList.add(crossData);
 
-			final MeasurementData gidData = new MeasurementData(StudyBaseFactors.GID.name(), germplasm.getGid().toString());
+			final MeasurementData gidData = new MeasurementData(StudyBaseFactors.GID.name(), studyGermplasm.getGermplasmListEntrySummary().getGid().toString());
 			gidData.setMeasurementVariable(StudyBaseFactors.GID.asFactor());
 			dataList.add(gidData);
 
-			final MeasurementData plotData = new MeasurementData(StudyBaseFactors.PLOT_NUMBER.name(), germplasm.getEntryCode());
+			final MeasurementData plotData = new MeasurementData(StudyBaseFactors.PLOT_NUMBER.name(), String.valueOf(observationUnit.getPlotNumber()));
 			plotData.setMeasurementVariable(StudyBaseFactors.PLOT_NUMBER.asFactor());
 			dataList.add(plotData);
 
-			for (final Trait trait : source.getTraits()) {
+			for (final MeasurementImportDTO measurement : observationUnit.getMeasurements()) {
 				final MeasurementData variateData = new MeasurementData();
-				variateData.setMeasurementVariable(this.traitVariateMap.get(trait.getTraitId()));
-				variateData.setLabel(this.traitVariateMap.get(trait.getTraitId()).getLabel());
-				variateData.setValue(source.findTraitValue(germplasm.getGid(), trait.getTraitId()));
+				variateData.setMeasurementVariable(this.traitVariateMap.get(measurement.getTraitId()));
+				variateData.setLabel(this.traitVariateMap.get(measurement.getTraitId()).getLabel());
+				variateData.setValue(measurement.getTraitValue());
 				dataList.add(variateData);
 			}
 

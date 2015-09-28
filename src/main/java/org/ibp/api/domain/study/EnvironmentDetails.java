@@ -1,17 +1,19 @@
 
 package org.ibp.api.domain.study;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EnvironmentDetails {
 
-	private Integer numberOfEnvironments;
-	private Integer numberOfReplications;
+	private Integer numberOfEnvironments = new Integer(1);
+	private Integer numberOfReplications = new Integer(1);
+
 	private DesignType designType;
 
-	private List<EnvironmentLevelVariable> environmentLevelVariables;
+	private List<EnvironmentLevelVariable> environmentLevelVariables = new ArrayList<>();
 
-	private List<EnvironmentLevelObservation> environmentLevelObservations;
+	private List<EnvironmentLevelObservation> environmentLevelObservations = new ArrayList<>();
 
 	public Integer getNumberOfEnvironments() {
 		return this.numberOfEnvironments;

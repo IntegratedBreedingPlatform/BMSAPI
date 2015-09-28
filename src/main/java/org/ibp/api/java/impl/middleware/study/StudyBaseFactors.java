@@ -8,6 +8,7 @@ import static org.generationcp.middleware.domain.oms.TermId.ENTRY_NO;
 import static org.generationcp.middleware.domain.oms.TermId.ENTRY_NUMBER_STORAGE;
 import static org.generationcp.middleware.domain.oms.TermId.GERMPLASM_ENTRY_STORAGE;
 import static org.generationcp.middleware.domain.oms.TermId.PLOT_NO;
+import static org.generationcp.middleware.domain.oms.TermId.REP_NO;
 import static org.generationcp.middleware.domain.oms.TermId.TRIAL_DESIGN_INFO_STORAGE;
 import static org.generationcp.middleware.domain.oms.TermId.TRIAL_INSTANCE_FACTOR;
 import static org.generationcp.middleware.domain.oms.TermId.TRIAL_INSTANCE_STORAGE;
@@ -29,7 +30,8 @@ public enum StudyBaseFactors {
 	CROSS("CROSS", "The pedigree string of the germplasm", TermId.CROSS, GERMPLASM_ENTRY_STORAGE), //
 	GID("GID", "Germplasm identifier - assigned (DBID)", TermId.GID, ENTRY_GID_STORAGE), //
 	TRIAL_INSTANCE("TRIAL_INSTANCE", "Trial Instance", TRIAL_INSTANCE_FACTOR, TRIAL_INSTANCE_STORAGE), //
-	PLOT_NUMBER("PLOT_NO", "Field plot - enumerated (number)", PLOT_NO, TRIAL_DESIGN_INFO_STORAGE); //
+	PLOT_NUMBER("PLOT_NO", "Field plot - enumerated (number)", PLOT_NO, TRIAL_DESIGN_INFO_STORAGE), //
+	REPLICATION_NO("REP_NO", "Replication - assigned (number)", REP_NO, TRIAL_DESIGN_INFO_STORAGE);
 
 	private static final String DBCV = "DBCV";
 	private static final String DBID = "DBID";
@@ -91,6 +93,12 @@ public enum StudyBaseFactors {
 				factor =
 				this.createFactor("Trial Instance", StudyBaseFactors.ASSIGNED, StudyBaseFactors.NUMBER, StudyBaseFactors.NUMERIC,
 						this.value, PhenotypicType.TRIAL_ENVIRONMENT);
+				break;
+
+			case REPLICATION_NO:
+				factor =
+				this.createFactor("Replication factor", StudyBaseFactors.ENUMERATED, StudyBaseFactors.NUMERIC,
+								StudyBaseFactors.NUMERIC, this.value, PhenotypicType.TRIAL_DESIGN);
 				break;
 			default:
 				factor = null;
