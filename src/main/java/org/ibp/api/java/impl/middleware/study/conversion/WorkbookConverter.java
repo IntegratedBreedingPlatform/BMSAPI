@@ -89,6 +89,17 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 		conditions.add(StudyConditions.END_DATE.asMeasurementVariable(source.getEndDate()));
 		conditions.add(StudyConditions.OBJECTIVE.asMeasurementVariable(source.getObjective()));
 		conditions.add(StudyConditions.STUDY_INSTITUTE.asMeasurementVariable(source.getStudyInstitute()));
+		conditions.add(StudyBaseFactors.TRIAL_INSTANCE.asFactor());
+		conditions.add(StudyBaseFactors.EXPT_DESIGN.asFactor());
+
+		final MeasurementVariable exptDesign = StudyBaseFactors.EXPT_DESIGN.asFactor();
+		exptDesign.setValue(source.getEnvironmentDetails().getDesignType().getId().toString());
+		conditions.add(exptDesign);
+
+		final MeasurementVariable numReps = StudyBaseFactors.NREP.asFactor();
+		numReps.setValue(String.valueOf(source.getEnvironmentDetails().getNumberOfReplications()));
+		conditions.add(numReps);
+
 		this.workbook.setConditions(conditions);
 	}
 
@@ -100,7 +111,7 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 	private void buildConstants(final StudyImportDTO source) {
 
 		final List<MeasurementVariable> constants = new ArrayList<>();
-		constants.add(StudyBaseFactors.TRIAL_INSTANCE.asFactor());
+		// constants.add(StudyBaseFactors.TRIAL_INSTANCE.asFactor());
 		this.workbook.setConstants(constants);
 	}
 
@@ -113,6 +124,10 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 		factors.add(StudyBaseFactors.GID.asFactor());
 		factors.add(StudyBaseFactors.PLOT_NUMBER.asFactor());
 		factors.add(StudyBaseFactors.REPLICATION_NO.asFactor());
+		factors.add(StudyBaseFactors.TRIAL_INSTANCE.asFactor());
+		final MeasurementVariable exptDesign = StudyBaseFactors.EXPT_DESIGN.asFactor();
+		exptDesign.setValue(source.getEnvironmentDetails().getDesignType().getId().toString());
+		factors.add(exptDesign);
 		final MeasurementVariable numReps = StudyBaseFactors.NREP.asFactor();
 		numReps.setValue(String.valueOf(source.getEnvironmentDetails().getNumberOfReplications()));
 		factors.add(numReps);
@@ -144,9 +159,17 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 			measurementVariable.setName(envVar.getVariableName());
 			measurementVariable.setDescription(envVar.getVariableName());
 			measurementVariable.setValue(null);
-			measurementVariable.setLabel(envVar.getVariableName());
-			measurementVariable.setRole(PhenotypicType.VARIATE);
 			measurementVariable.setFactor(false);
+			measurementVariable.setLabel("TRIAL");
+			// FIXME : Is there a better way to assign a different phenotypic type for some "special" variables such as location?
+			if (envVar.getVariableName().contains("LOCATION")) {
+				measurementVariable.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
+				this.workbook.getConditions().add(measurementVariable);
+			} else {
+				measurementVariable.setRole(PhenotypicType.VARIATE);
+				this.workbook.getConstants().add(measurementVariable);
+			}
+			this.workbook.getFactors().add(measurementVariable);
 			environmentVariablesMap.put(envVar.getVariableId(), measurementVariable);
 		}
 
@@ -159,15 +182,28 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 			instanceData.setMeasurementVariable(StudyBaseFactors.TRIAL_INSTANCE.asFactor());
 			dataList.add(instanceData);
 
+			final MeasurementData numRep =
+					new MeasurementData(StudyBaseFactors.NREP.name(), String.valueOf(source.getEnvironmentDetails()
+							.getNumberOfReplications()));
+			numRep.setMeasurementVariable(StudyBaseFactors.NREP.asFactor());
+			dataList.add(numRep);
+
+			final MeasurementData exptDesign =
+					new MeasurementData(StudyBaseFactors.EXPT_DESIGN.name(), source.getEnvironmentDetails().getDesignType()
+							.getDescription());
+			exptDesign.setMeasurementVariable(StudyBaseFactors.EXPT_DESIGN.asFactor());
+			dataList.add(exptDesign);
+
 			for (final EnvironmentLevelMeasurement measurement : envObs.getMeasurements()) {
 				final MeasurementData envVariateData = new MeasurementData();
 				envVariateData.setMeasurementVariable(environmentVariablesMap.get(measurement.getVariableId()));
-				envVariateData.setLabel(environmentVariablesMap.get(measurement.getVariableId()).getLabel());
+				envVariateData.setLabel(source.getEnvironmentDetails().findVariableName(measurement.getVariableId()));
 				envVariateData.setValue(measurement.getVariableValue());
 				dataList.add(envVariateData);
 			}
 
 			row.setDataList(dataList);
+			environmentObservations.add(row);
 		}
 		this.workbook.setTrialObservations(environmentObservations);
 	}
@@ -230,9 +266,9 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 
 			row.setDataList(dataList);
 			observations.add(row);
-
-			this.workbook.setObservations(observations);
 		}
+
+		this.workbook.setObservations(observations);
 	}
 
 	void setMeasurementVariableConverter(final MeasurementVariableConverter measurementVariableConverter) {

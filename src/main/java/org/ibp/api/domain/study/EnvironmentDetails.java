@@ -55,4 +55,13 @@ public class EnvironmentDetails {
 		this.environmentLevelObservations = environmentLevelObservations;
 	}
 
+	public String findVariableName(final Integer variableId) {
+		for (final EnvironmentLevelVariable var : this.getEnvironmentLevelVariables()) {
+			if (var.getVariableId().equals(variableId)) {
+				return var.getVariableName();
+			}
+		}
+		return "";
+	}
+
 }
