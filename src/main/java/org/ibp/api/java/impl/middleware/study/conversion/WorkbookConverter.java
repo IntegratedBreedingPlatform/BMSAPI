@@ -89,7 +89,6 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 		conditions.add(StudyConditions.END_DATE.asMeasurementVariable(source.getEndDate()));
 		conditions.add(StudyConditions.OBJECTIVE.asMeasurementVariable(source.getObjective()));
 		conditions.add(StudyConditions.STUDY_INSTITUTE.asMeasurementVariable(source.getStudyInstitute()));
-		conditions.add(StudyBaseFactors.TRIAL_INSTANCE.asFactor());
 
 		if (source.getStudyType().equals("T")) {
 			final MeasurementVariable exptDesign = StudyBaseFactors.EXPT_DESIGN.asFactor();
