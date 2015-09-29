@@ -91,12 +91,12 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 		conditions.add(StudyConditions.STUDY_INSTITUTE.asMeasurementVariable(source.getStudyInstitute()));
 
 		if (source.getStudyType().equals("T")) {
-			final MeasurementVariable exptDesign = StudyBaseFactors.EXPT_DESIGN.asFactor();
+			final MeasurementVariable exptDesign = StudyBaseFactors.EXPT_DESIGN.asMeasurementVariable();
 			exptDesign.setValue(source.getEnvironmentDetails().getDesignType() != null ? source.getEnvironmentDetails().getDesignType()
 					.getId().toString() : null);
 			conditions.add(exptDesign);
 
-			final MeasurementVariable numReps = StudyBaseFactors.NREP.asFactor();
+			final MeasurementVariable numReps = StudyBaseFactors.NREP.asMeasurementVariable();
 			numReps.setValue(String.valueOf(source.getEnvironmentDetails().getNumberOfReplications()));
 			conditions.add(numReps);
 		}
@@ -119,23 +119,23 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 	private void buildFactors(final StudyImportDTO source) {
 
 		final List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
-		factors.add(StudyBaseFactors.ENTRY_NUMBER.asFactor());
-		factors.add(StudyBaseFactors.DESIGNATION.asFactor());
-		factors.add(StudyBaseFactors.CROSS.asFactor());
-		factors.add(StudyBaseFactors.GID.asFactor());
-		factors.add(StudyBaseFactors.PLOT_NUMBER.asFactor());
+		factors.add(StudyBaseFactors.ENTRY_NUMBER.asMeasurementVariable());
+		factors.add(StudyBaseFactors.DESIGNATION.asMeasurementVariable());
+		factors.add(StudyBaseFactors.CROSS.asMeasurementVariable());
+		factors.add(StudyBaseFactors.GID.asMeasurementVariable());
+		factors.add(StudyBaseFactors.PLOT_NUMBER.asMeasurementVariable());
 
 		if (source.getStudyType().equals("T")) {
-			factors.add(StudyBaseFactors.REPLICATION_NO.asFactor());
+			factors.add(StudyBaseFactors.REPLICATION_NO.asMeasurementVariable());
 
-			factors.add(StudyBaseFactors.TRIAL_INSTANCE.asFactor());
+			factors.add(StudyBaseFactors.TRIAL_INSTANCE.asMeasurementVariable());
 
-			final MeasurementVariable exptDesign = StudyBaseFactors.EXPT_DESIGN.asFactor();
+			final MeasurementVariable exptDesign = StudyBaseFactors.EXPT_DESIGN.asMeasurementVariable();
 			exptDesign.setValue(source.getEnvironmentDetails().getDesignType() != null ? source.getEnvironmentDetails().getDesignType()
 					.getId().toString() : null);
 			factors.add(exptDesign);
 
-			final MeasurementVariable numReps = StudyBaseFactors.NREP.asFactor();
+			final MeasurementVariable numReps = StudyBaseFactors.NREP.asMeasurementVariable();
 			numReps.setValue(String.valueOf(source.getEnvironmentDetails().getNumberOfReplications()));
 			factors.add(numReps);
 		}
@@ -188,19 +188,19 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 
 			final MeasurementData instanceData =
 					new MeasurementData(StudyBaseFactors.TRIAL_INSTANCE.name(), String.valueOf(envObs.getEnvironmentNumber()));
-			instanceData.setMeasurementVariable(StudyBaseFactors.TRIAL_INSTANCE.asFactor());
+			instanceData.setMeasurementVariable(StudyBaseFactors.TRIAL_INSTANCE.asMeasurementVariable());
 			dataList.add(instanceData);
 
 			final MeasurementData numRep =
 					new MeasurementData(StudyBaseFactors.NREP.name(), String.valueOf(source.getEnvironmentDetails()
 							.getNumberOfReplications()));
-			numRep.setMeasurementVariable(StudyBaseFactors.NREP.asFactor());
+			numRep.setMeasurementVariable(StudyBaseFactors.NREP.asMeasurementVariable());
 			dataList.add(numRep);
 
 			final MeasurementData exptDesign =
 					new MeasurementData(StudyBaseFactors.EXPT_DESIGN.name(), source.getEnvironmentDetails().getDesignType()
 							.getDescription());
-			exptDesign.setMeasurementVariable(StudyBaseFactors.EXPT_DESIGN.asFactor());
+			exptDesign.setMeasurementVariable(StudyBaseFactors.EXPT_DESIGN.asMeasurementVariable());
 			dataList.add(exptDesign);
 
 			for (final EnvironmentLevelMeasurement measurement : envObs.getMeasurements()) {
@@ -233,38 +233,38 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 			if (source.getStudyType().equals("T")) {
 				final MeasurementData instanceData =
 						new MeasurementData(StudyBaseFactors.TRIAL_INSTANCE.name(), String.valueOf(observationUnit.getEnvironmentNumber()));
-				instanceData.setMeasurementVariable(StudyBaseFactors.TRIAL_INSTANCE.asFactor());
+				instanceData.setMeasurementVariable(StudyBaseFactors.TRIAL_INSTANCE.asMeasurementVariable());
 				dataList.add(instanceData);
 
 				final MeasurementData replicationData =
 						new MeasurementData(StudyBaseFactors.REPLICATION_NO.name(), String.valueOf(observationUnit.getReplicationNumber()));
-				replicationData.setMeasurementVariable(StudyBaseFactors.REPLICATION_NO.asFactor());
+				replicationData.setMeasurementVariable(StudyBaseFactors.REPLICATION_NO.asMeasurementVariable());
 				dataList.add(replicationData);
 			}
 
 			final MeasurementData entryData =
 					new MeasurementData(StudyBaseFactors.ENTRY_NUMBER.name(), String.valueOf(studyGermplasm.getEntryNumber()));
-			entryData.setMeasurementVariable(StudyBaseFactors.ENTRY_NUMBER.asFactor());
+			entryData.setMeasurementVariable(StudyBaseFactors.ENTRY_NUMBER.asMeasurementVariable());
 			dataList.add(entryData);
 
 			final MeasurementData designationData =
 					new MeasurementData(StudyBaseFactors.DESIGNATION.name(), studyGermplasm.getGermplasmListEntrySummary().getDesignation());
-			designationData.setMeasurementVariable(StudyBaseFactors.DESIGNATION.asFactor());
+			designationData.setMeasurementVariable(StudyBaseFactors.DESIGNATION.asMeasurementVariable());
 			dataList.add(designationData);
 
 			final MeasurementData crossData =
 					new MeasurementData(StudyBaseFactors.CROSS.name(), studyGermplasm.getGermplasmListEntrySummary().getCross());
-			crossData.setMeasurementVariable(StudyBaseFactors.CROSS.asFactor());
+			crossData.setMeasurementVariable(StudyBaseFactors.CROSS.asMeasurementVariable());
 			dataList.add(crossData);
 
 			final MeasurementData gidData =
 					new MeasurementData(StudyBaseFactors.GID.name(), studyGermplasm.getGermplasmListEntrySummary().getGid().toString());
-			gidData.setMeasurementVariable(StudyBaseFactors.GID.asFactor());
+			gidData.setMeasurementVariable(StudyBaseFactors.GID.asMeasurementVariable());
 			dataList.add(gidData);
 
 			final MeasurementData plotData =
 					new MeasurementData(StudyBaseFactors.PLOT_NUMBER.name(), String.valueOf(observationUnit.getPlotNumber()));
-			plotData.setMeasurementVariable(StudyBaseFactors.PLOT_NUMBER.asFactor());
+			plotData.setMeasurementVariable(StudyBaseFactors.PLOT_NUMBER.asMeasurementVariable());
 			dataList.add(plotData);
 
 			for (final MeasurementImportDTO measurement : observationUnit.getMeasurements()) {

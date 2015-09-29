@@ -65,56 +65,56 @@ public enum StudyBaseFactors {
 		return this.description;
 	}
 
-	public MeasurementVariable asFactor() {
+	public MeasurementVariable asMeasurementVariable() {
 
 		MeasurementVariable factor;
 
 		switch (this) {
 			case ENTRY_NUMBER:
 				factor =
-						this.createFactor("Germplasm entry", StudyBaseFactors.ENUMERATED, StudyBaseFactors.NUMBER,
+						this.createMeasurementVariable("Germplasm entry", StudyBaseFactors.ENUMERATED, StudyBaseFactors.NUMBER,
 								StudyBaseFactors.NUMERIC, PhenotypicType.GERMPLASM);
 				break;
 			case DESIGNATION:
 				factor =
-						this.createFactor("Germplasm Designation", StudyBaseFactors.ASSIGNED, StudyBaseFactors.DBCV, StudyBaseFactors.CHAR,
+						this.createMeasurementVariable("Germplasm Designation", StudyBaseFactors.ASSIGNED, StudyBaseFactors.DBCV, StudyBaseFactors.CHAR,
 						PhenotypicType.GERMPLASM);
 				break;
 			case CROSS:
 				factor =
-						this.createFactor("Cross history", StudyBaseFactors.ASSIGNED, "PEDIGREE STRING", StudyBaseFactors.CHAR,
+						this.createMeasurementVariable("Cross history", StudyBaseFactors.ASSIGNED, "PEDIGREE STRING", StudyBaseFactors.CHAR,
 						PhenotypicType.GERMPLASM);
 				break;
 			case GID:
 				factor =
-						this.createFactor("Germplasm id", StudyBaseFactors.ASSIGNED, StudyBaseFactors.DBID, StudyBaseFactors.NUMERIC,
+						this.createMeasurementVariable("Germplasm id", StudyBaseFactors.ASSIGNED, StudyBaseFactors.DBID, StudyBaseFactors.NUMERIC,
 								PhenotypicType.GERMPLASM);
 				break;
 			case PLOT_NUMBER:
 				factor =
-						this.createFactor("Field plot", StudyBaseFactors.ENUMERATED, StudyBaseFactors.NUMBER, StudyBaseFactors.NUMERIC,
+						this.createMeasurementVariable("Field plot", StudyBaseFactors.ENUMERATED, StudyBaseFactors.NUMBER, StudyBaseFactors.NUMERIC,
 								PhenotypicType.TRIAL_DESIGN);
 				break;
 			case TRIAL_INSTANCE:
 				factor =
-						this.createFactor("Trial Instance", StudyBaseFactors.ASSIGNED, StudyBaseFactors.NUMBER, StudyBaseFactors.NUMERIC,
+						this.createMeasurementVariable("Trial Instance", StudyBaseFactors.ASSIGNED, StudyBaseFactors.NUMBER, StudyBaseFactors.NUMERIC,
 								PhenotypicType.TRIAL_ENVIRONMENT);
 				break;
 
 			case REPLICATION_NO:
 				factor =
-						this.createFactor("Replication factor", StudyBaseFactors.ENUMERATED, StudyBaseFactors.NUMERIC,
+						this.createMeasurementVariable("Replication factor", StudyBaseFactors.ENUMERATED, StudyBaseFactors.NUMERIC,
 								StudyBaseFactors.NUMERIC, PhenotypicType.TRIAL_DESIGN);
 				break;
 
 			case NREP:
 				factor =
-						this.createFactor("ED - nrep", StudyBaseFactors.ASSIGNED, StudyBaseFactors.NUMBER, StudyBaseFactors.NUMERIC,
+						this.createMeasurementVariable("ED - nrep", StudyBaseFactors.ASSIGNED, StudyBaseFactors.NUMBER, StudyBaseFactors.NUMERIC,
 								PhenotypicType.TRIAL_ENVIRONMENT);
 				break;
 			case EXPT_DESIGN:
 				factor =
-						this.createFactor("Experimental design", StudyBaseFactors.ASSIGNED, "Type of EXPT_DESIGN",
+						this.createMeasurementVariable("Experimental design", StudyBaseFactors.ASSIGNED, "Type of EXPT_DESIGN",
 						StudyBaseFactors.CATEGORICAL, PhenotypicType.TRIAL_ENVIRONMENT);
 				break;
 			default:
@@ -124,7 +124,7 @@ public enum StudyBaseFactors {
 		return factor;
 	}
 
-	private MeasurementVariable createFactor(final String property, final String method, final String scale, final String dataType,
+	private MeasurementVariable createMeasurementVariable(final String property, final String method, final String scale, final String dataType,
 			final PhenotypicType role) {
 
 		final MeasurementVariable variable = new MeasurementVariable();
