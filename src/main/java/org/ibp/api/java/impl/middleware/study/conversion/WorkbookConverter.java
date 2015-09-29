@@ -50,7 +50,7 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 
 		this.buildStudyDetails(source);
 		this.buildConditions(source);
-		this.buildConstants(source);
+		this.workbook.setConstants(new ArrayList<MeasurementVariable>());
 		this.buildFactors(source);
 		this.buildVariates(source);
 		this.buildPlotObservations(source);
@@ -102,18 +102,6 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 		}
 
 		this.workbook.setConditions(conditions);
-	}
-
-	/**
-	 * Constan values across a study, apply for the whole experiment.
-	 *
-	 * @param source
-	 */
-	private void buildConstants(final StudyImportDTO source) {
-
-		final List<MeasurementVariable> constants = new ArrayList<>();
-		// constants.add(StudyBaseFactors.TRIAL_INSTANCE.asFactor());
-		this.workbook.setConstants(constants);
 	}
 
 	private void buildFactors(final StudyImportDTO source) {
