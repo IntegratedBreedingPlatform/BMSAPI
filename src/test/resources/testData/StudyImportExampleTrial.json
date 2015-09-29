@@ -1,0 +1,242 @@
+// POST http://<host>:<port>/bmsapi/study/maize/import?programUUID=<programUUID>
+// Content-Type: application/json
+// JSON structure for a Trial with 2 Germplasm, 2 Environments (each with environment variables LOCATION_NAME_ID, LOCATION_NAME and condition SITE_SOIL_PH) , 2 Traits and 2 Replications, RCB Design
+
+{
+    "name": "Trial Import Test",
+    "objective": "Trial Import Test Objective",
+    "startDate": "20150101",
+    "endDate": "20150202",
+    "title": "Trial Import Test Description",
+    "studyType": "T",
+    "siteName": "CIMMYT",
+    "studyInstitute": "CIMMYT",
+    "folderId": 1,
+    "userId": 1,
+    "germplasm": [
+        {
+            "gid": 94,
+            "designation": "CML502",
+            "seedSource": "CML502 Source",
+            "entryCode": "1",
+            "cross": "CML502 Group",
+            "entryType": "Test",
+            "entryNumber": 1,
+            "position": "1"
+        },
+        {
+            "gid": 96,
+            "designation": "CLQRCWQ55",
+            "seedSource": "CLQRCWQ55 Source",
+            "entryCode": "2",
+            "cross": "CLQRCWQ55 Group",
+            "entryType": "Test",
+            "entryNumber": 2,
+            "position": "2"
+        }
+    ],
+    "traits": [
+        {
+            "traitId": 18000,
+            "traitName": "GY_kg_ha__DryWB"
+        },
+        {
+            "traitId": 20316,
+            "traitName": "EH_cm"
+        }
+    ],
+    "environmentDetails": {
+        "designType": "RCBD",
+        "numberOfEnvironments": 2,
+        "numberOfReplications": 2,
+        "environmentLevelVariables": [
+            {
+                "variableId": 8270,
+                "variableName": "SITE_SOIL_PH"
+            },
+            {
+                "variableId": 8180,
+                "variableName": "LOCATION_NAME"
+            },
+            {
+                "variableId": 8190,
+                "variableName": "LOCATION_NAME_ID"
+            }
+        ],
+
+        "environmentLevelObservations": [
+            {
+                "environmentNumber": 1,
+                "measurements": [
+                    {
+                        "variableId": 8270,
+                        "variableValue": "10"
+                    },
+                    {
+                        "variableId": 8180,
+                        "variableValue": "AfricaRice-Africa Rice Centre, Bouaké - (WARDA)"
+                    },
+                    {
+                        "variableId": 8190,
+                        "variableValue": "9001"
+                    }
+                ]
+            },
+            {
+                "environmentNumber": 2,
+                "measurements": [
+                    {
+                        "variableId": 8270,
+                        "variableValue": "14"
+                    },
+                    {
+                        "variableId": 8180,
+                        "variableValue": "CIAT-Centro Internacional de Agricultura Tropical, Cali - (CIAT)"
+                    },
+                    {
+                        "variableId": 8190,
+                        "variableValue": "9003"
+                    }
+                ]
+            }
+        ]
+    },
+    "observations": [
+        {
+            "gid": 94,
+            "entryNumber": 1,
+            "plotNumber": 1,
+            "environmentNumber": 1,
+            "replicationNumber": 1,
+            "measurements": [
+                {
+                    "traitId": 18000,
+                    "traitValue": "1111"
+                },
+                {
+                    "traitId": 20316,
+                    "traitValue": "2222"
+                }
+            ]
+        },
+        {
+            "gid": 94,
+            "entryNumber": 1,
+            "plotNumber": 2,
+            "environmentNumber": 1,
+            "replicationNumber": 2,
+            "measurements": [
+                {
+                    "traitId": 18000,
+                    "traitValue": "3333"
+                },
+                {
+                    "traitId": 20316,
+                    "traitValue": "4444"
+                }
+            ]
+        },
+        {
+            "gid": 94,
+            "entryNumber": 1,
+            "plotNumber": 1,
+            "environmentNumber": 2,
+            "replicationNumber": 1,
+            "measurements": [
+                {
+                    "traitId": 18000,
+                    "traitValue": "5555"
+                },
+                {
+                    "traitId": 20316,
+                    "traitValue": "6666"
+                }
+            ]
+        },
+        {
+            "gid": 94,
+            "entryNumber": 1,
+            "plotNumber": 2,
+            "environmentNumber": 2,
+            "replicationNumber": 2,
+            "measurements": [
+                {
+                    "traitId": 18000,
+                    "traitValue": "7777"
+                },
+                {
+                    "traitId": 20316,
+                    "traitValue": "8888"
+                }
+            ]
+        },
+        {
+            "gid": 96,
+            "entryNumber": 2,
+            "plotNumber": 1,
+            "environmentNumber": 1,
+            "replicationNumber": 1,
+            "measurements": [
+                {
+                    "traitId": 18000,
+                    "traitValue": "9999"
+                },
+                {
+                    "traitId": 20316,
+                    "traitValue": "1111"
+                }
+            ]
+        },
+        {
+            "gid": 96,
+            "entryNumber": 2,
+            "plotNumber": 2,
+            "environmentNumber": 1,
+            "replicationNumber": 2,
+            "measurements": [
+                {
+                    "traitId": 18000,
+                    "traitValue": "2222"
+                },
+                {
+                    "traitId": 20316,
+                    "traitValue": "3333"
+                }
+            ]
+        },
+        {
+            "gid": 96,
+            "entryNumber": 2,
+            "plotNumber": 1,
+            "environmentNumber": 2,
+            "replicationNumber": 1,
+            "measurements": [
+                {
+                    "traitId": 18000,
+                    "traitValue": "4444"
+                },
+                {
+                    "traitId": 20316,
+                    "traitValue": "5555"
+                }
+            ]
+        },
+        {
+            "gid": 96,
+            "entryNumber": 2,
+            "plotNumber": 2,
+            "environmentNumber": 2,
+            "replicationNumber": 2,
+            "measurements": [
+                {
+                    "traitId": 18000,
+                    "traitValue": "6666"
+                },
+                {
+                    "traitId": 20316,
+                    "traitValue": "7777"
+                }
+            ]
+        }
+    ]
+}
