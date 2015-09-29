@@ -14,7 +14,7 @@ import com.wordnik.swagger.annotations.ApiModelProperty;
 public class StudyGermplasm {
 
 	@JsonUnwrapped
-	private GermplasmListEntrySummary germplasmListEntrySummary;
+	private GermplasmListEntrySummary germplasmListEntrySummary = new GermplasmListEntrySummary();
 
 	@ApiModelProperty(value = "Type of entry: Check, Test.")
 	@NotNull
