@@ -157,7 +157,7 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 			measurementVariable.setDescription(envVar.getVariableName());
 			measurementVariable.setValue(null);
 			measurementVariable.setFactor(false);
-			measurementVariable.setLabel("TRIAL");
+			measurementVariable.setLabel(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0));
 			// FIXME : Is there a better way to assign a different phenotypic type for some "special" variables such as location?
 			if (envVar.getVariableName().contains("LOCATION")) {
 				measurementVariable.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
