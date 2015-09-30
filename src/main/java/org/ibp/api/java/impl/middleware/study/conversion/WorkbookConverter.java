@@ -166,6 +166,12 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 				measurementVariable.setRole(PhenotypicType.VARIATE);
 				this.workbook.getConstants().add(measurementVariable);
 			}
+			// FIXME: When saving trial through screen, the environment variables dont seem to be required to be part of factors.
+			// but when saving via the API does seem to need it otherwise the trial headers and measurementData does not match up and
+			// we get "Variables did not match the Measurements Row." exception from
+			// org.generationcp.middleware.operation.transformer.etl.VariableListTransformer.transformTrialEnvironment(MeasurementRow,
+			// VariableTypeList, List<String>)
+			// More debugging to do and clean this up. For now this does the job.
 			this.workbook.getFactors().add(measurementVariable);
 			environmentVariablesMap.put(envVar.getVariableId(), measurementVariable);
 		}
