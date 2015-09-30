@@ -4,10 +4,15 @@ package org.ibp.api.domain.study;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 public class EnvironmentLevelObservation {
 
+	@NotNull
 	private Integer environmentNumber;
 
+	@Valid
 	private List<EnvironmentLevelMeasurement> measurements = new ArrayList<>();
 
 	public Integer getEnvironmentNumber() {

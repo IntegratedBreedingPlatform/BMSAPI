@@ -4,15 +4,22 @@ package org.ibp.api.domain.study;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 public class EnvironmentDetails {
 
+	@ApiModelProperty(value = "Number of environments (instances). Defaults to one environment e.g. in Nurseries.")
 	private Integer numberOfEnvironments = new Integer(1);
+
+	@ApiModelProperty(value = "Number of replications. Defaults to one i.e no repeat plotting.")
 	private Integer numberOfReplications = new Integer(1);
 
 	private DesignType designType;
 
+	@ApiModelProperty(value = "Things measured at an entire environment level (as opposed to plot level) e.g. Soil PH.")
 	private List<EnvironmentLevelVariable> environmentLevelVariables = new ArrayList<>();
 
+	@ApiModelProperty(value = "Actual measurement values for each environmentLevel variable per environment.")
 	private List<EnvironmentLevelObservation> environmentLevelObservations = new ArrayList<>();
 
 	public Integer getNumberOfEnvironments() {
