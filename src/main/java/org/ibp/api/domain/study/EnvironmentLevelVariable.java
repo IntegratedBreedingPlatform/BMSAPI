@@ -1,9 +1,16 @@
 
 package org.ibp.api.domain.study;
 
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotBlank;
+
 public class EnvironmentLevelVariable {
 
+	@NotNull
 	private Integer variableId;
+
+	@NotBlank
 	private String variableName;
 
 	public Integer getVariableId() {

@@ -7,6 +7,8 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 /**
  * A "light" version of {@link Observation} dedicated for use in study import scenario.
  */
@@ -15,12 +17,20 @@ public class ObservationImportDTO {
 	@NotNull
 	private Integer gid;
 
+	@NotNull
 	private Integer entryNumber;
+
+	@NotNull
 	private Integer plotNumber;
+
+	@NotNull
 	private Integer environmentNumber;
+
+	@NotNull
 	private Integer replicationNumber;
 
 	@Valid
+	@NotEmpty
 	private List<MeasurementImportDTO> measurements = new ArrayList<>();
 
 	public Integer getGid() {

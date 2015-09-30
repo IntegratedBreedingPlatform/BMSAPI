@@ -9,6 +9,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
+
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
 /**
@@ -17,15 +20,13 @@ import com.wordnik.swagger.annotations.ApiModelProperty;
  */
 public class StudyImportDTO {
 
-	@NotNull
-	@Size(min = 1)
+	@NotBlank
 	@Pattern(regexp = "[A-Za-z 0-9]+")
 	private String name;
 
 	private String objective;
 
-	@NotNull
-	@Size(min = 1)
+	@NotBlank
 	private String title;
 
 	@ApiModelProperty(value = "Study start date in YYYYMMDD format.")
@@ -38,7 +39,7 @@ public class StudyImportDTO {
 
 	@ApiModelProperty(value = "The type of study. N for nursery. T for trials.")
 	@NotNull
-	@Size(min = 1)
+	@Size(min = 1, max = 1)
 	@Pattern(regexp = "[N|T]")
 	private String studyType;
 
@@ -61,14 +62,17 @@ public class StudyImportDTO {
 			value = "The germplasm used in the study. Each germplasm specified here are assumed to be present in the database already. "
 					+ "A germplasm list will be created with the germplasm specified here.")
 	@Valid
+	@NotEmpty
 	private List<StudyGermplasm> germplasm = new ArrayList<>();
 
 	@ApiModelProperty(value = "The traits measured in the study.")
 	@Valid
+	@NotEmpty
 	private List<Trait> traits = new ArrayList<>();
 
 	@ApiModelProperty(value = "The measurement values for each trait for each germplasm used in the study.")
 	@Valid
+	@NotEmpty
 	private List<ObservationImportDTO> observations = new ArrayList<>();
 
 	private EnvironmentDetails environmentDetails = new EnvironmentDetails();

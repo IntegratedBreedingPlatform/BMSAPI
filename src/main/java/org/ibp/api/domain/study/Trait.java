@@ -2,10 +2,10 @@
 package org.ibp.api.domain.study;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * TODO: Replace with Onotology Domain API entity.
@@ -16,8 +16,7 @@ public class Trait {
 	@NotNull
 	private Integer traitId;
 
-	@NotNull
-	@Size(min = 1)
+	@NotBlank
 	private String traitName;
 
 	public Trait() {

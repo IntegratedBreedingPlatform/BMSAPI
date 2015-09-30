@@ -2,7 +2,8 @@
 package org.ibp.api.domain.study;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * A "light" version of {@link Measurement} dedicated for use in study import scenario.
@@ -12,8 +13,7 @@ public class MeasurementImportDTO {
 	@NotNull
 	private Integer traitId;
 
-	@NotNull
-	@Size(min = 1)
+	@NotBlank
 	private String traitValue;
 
 	public Integer getTraitId() {

@@ -4,6 +4,8 @@ package org.ibp.api.domain.study;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
 public class EnvironmentDetails {
@@ -17,9 +19,11 @@ public class EnvironmentDetails {
 	private DesignType designType;
 
 	@ApiModelProperty(value = "Things measured at an entire environment level (as opposed to plot level) e.g. Soil PH.")
+	@Valid
 	private List<EnvironmentLevelVariable> environmentLevelVariables = new ArrayList<>();
 
 	@ApiModelProperty(value = "Actual measurement values for each environmentLevel variable per environment.")
+	@Valid
 	private List<EnvironmentLevelObservation> environmentLevelObservations = new ArrayList<>();
 
 	public Integer getNumberOfEnvironments() {
