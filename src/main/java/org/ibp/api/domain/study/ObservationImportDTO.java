@@ -23,10 +23,8 @@ public class ObservationImportDTO {
 	@NotNull
 	private Integer plotNumber;
 
-	@NotNull
 	private Integer environmentNumber;
 
-	@NotNull
 	private Integer replicationNumber;
 
 	@Valid

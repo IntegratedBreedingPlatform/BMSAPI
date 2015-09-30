@@ -97,7 +97,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['uniqueIdentifier']", Matchers.is(obsDto.getMeasurementId())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['germplasmId']", Matchers.is(obsDto.getGid())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['germplasmDesignation']", Matchers.is(obsDto.getDesignation())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['enrtyNumber']", Matchers.is(obsDto.getEntryNo())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['entryNumber']", Matchers.is(obsDto.getEntryNo())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['entryType']", Matchers.is(obsDto.getEntryType())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['plotNumber']", Matchers.is(obsDto.getPlotNumber())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['replicationNumber']", Matchers.is(obsDto.getRepitionNumber())))

@@ -6,6 +6,8 @@ import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
+import org.ibp.api.domain.study.MeasurementImportDTO;
+import org.ibp.api.domain.study.ObservationImportDTO;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.Trait;
@@ -56,7 +58,7 @@ public class StudyResourceImportTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testImport() throws Exception {
+	public void testImportNursery() throws Exception {
 
 		final StudyImportDTO inputDTO = new StudyImportDTO();
 		inputDTO.setStudyType("N");
@@ -98,6 +100,38 @@ public class StudyResourceImportTest extends ApiUnitTestBase {
 		g2.setGermplasmListEntrySummary(g2Summary);
 
 		inputDTO.setGermplasm(Lists.newArrayList(g1, g2));
+
+		final ObservationImportDTO observationUnit1 = new ObservationImportDTO();
+		observationUnit1.setGid(g1.getGermplasmListEntrySummary().getGid());
+		observationUnit1.setEntryNumber(g1.getEntryNumber());
+		observationUnit1.setPlotNumber(1);
+
+		final MeasurementImportDTO measurement11 = new MeasurementImportDTO();
+		measurement11.setTraitId(trait1.getTraitId());
+		measurement11.setTraitValue("11");
+
+		final MeasurementImportDTO measurement12 = new MeasurementImportDTO();
+		measurement12.setTraitId(trait2.getTraitId());
+		measurement12.setTraitValue("12");
+
+		observationUnit1.setMeasurements(Lists.newArrayList(measurement11, measurement12));
+
+		final ObservationImportDTO observationUnit2 = new ObservationImportDTO();
+		observationUnit2.setGid(g2.getGermplasmListEntrySummary().getGid());
+		observationUnit2.setEntryNumber(g2.getEntryNumber());
+		observationUnit2.setPlotNumber(2);
+
+		final MeasurementImportDTO measurement21 = new MeasurementImportDTO();
+		measurement21.setTraitId(trait1.getTraitId());
+		measurement21.setTraitValue("21");
+
+		final MeasurementImportDTO measurement22 = new MeasurementImportDTO();
+		measurement22.setTraitId(trait2.getTraitId());
+		measurement22.setTraitValue("22");
+
+		observationUnit2.setMeasurements(Lists.newArrayList(measurement21, measurement22));
+
+		inputDTO.setObservations(Lists.newArrayList(observationUnit1, observationUnit2));
 
 		final String inptJSON = new ObjectMapper().writeValueAsString(inputDTO);
 

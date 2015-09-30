@@ -75,6 +75,7 @@ public class StudyImportDTO {
 	@NotEmpty
 	private List<ObservationImportDTO> observations = new ArrayList<>();
 
+	@Valid
 	private EnvironmentDetails environmentDetails = new EnvironmentDetails();
 
 	public List<Trait> getTraits() {
