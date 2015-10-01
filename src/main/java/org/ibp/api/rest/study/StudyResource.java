@@ -10,6 +10,7 @@ import javax.validation.ValidationException;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyDetails;
+import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudySummary;
@@ -126,5 +127,11 @@ public class StudyResource {
 			validationErrors.append("[").append(error.getField()).append(": ").append(error.getDefaultMessage()).append("]");
 		}
 		return validationErrors.toString();
+	}
+	
+	@RequestMapping(value = "/{cropname}/folders", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<StudyFolder>> listAllFolders(final @PathVariable String cropname) {
+		return new ResponseEntity<List<StudyFolder>>(this.studyService.getAllStudyFolders(), HttpStatus.OK);
 	}
 }

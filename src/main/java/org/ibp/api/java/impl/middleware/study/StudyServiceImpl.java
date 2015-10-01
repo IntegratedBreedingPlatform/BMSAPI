@@ -8,6 +8,7 @@ import java.util.Map;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -36,6 +37,7 @@ import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyAttribute;
 import org.ibp.api.domain.study.StudyDetails;
+import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudySummary;
@@ -384,6 +386,19 @@ public class StudyServiceImpl implements StudyService {
 
 	void setDataImportService(final DataImportService dataImportService) {
 		this.dataImportService = dataImportService;
+	}
+
+	@Override
+	public List<StudyFolder> getAllStudyFolders() {
+		final List<StudyFolder> studyFolders = new ArrayList<>();
+		final List<FolderReference> middlewareFolders = this.studyDataManager.getAllFolders();
+
+		for (final FolderReference folderRef : middlewareFolders) {
+			studyFolders.add(new StudyFolder(folderRef.getId(), folderRef.getName(), folderRef.getDescription(), folderRef
+					.getParentFolderId()));
+		}
+
+		return studyFolders;
 	}
 
 }

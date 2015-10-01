@@ -4,6 +4,7 @@ package org.ibp.api.rest.study;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
@@ -154,5 +155,21 @@ public class StudyResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.traits", Matchers.empty()))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.datasets", Matchers.empty()))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.germplasm", Matchers.empty()));
+	}
+	
+	@Test
+	public void testListAllFolders() throws Exception {
+		
+		FolderReference folderRef = new FolderReference(1, 2, "My Folder", "My Folder Description");
+		Mockito.when(this.studyDataManager.getAllFolders()).thenReturn(Lists.newArrayList(folderRef));
+		
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/study/{cropname}/folders", "maize").contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(1)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].folderId", Matchers.is(folderRef.getId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is(folderRef.getName())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(folderRef.getDescription())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].parentFolderId", Matchers.is(folderRef.getParentFolderId())));
 	}
 }
