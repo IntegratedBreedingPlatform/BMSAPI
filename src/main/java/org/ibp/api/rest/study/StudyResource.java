@@ -128,7 +128,10 @@ public class StudyResource {
 		}
 		return validationErrors.toString();
 	}
-	
+
+	@ApiOperation(
+			value = "List all study folders",
+			notes = "Returns a flat list (no tree structure) of all study folders. The parentFolderId could be used to build a tree if needed.")
 	@RequestMapping(value = "/{cropname}/folders", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<StudyFolder>> listAllFolders(final @PathVariable String cropname) {
