@@ -1,13 +1,18 @@
 
 package org.ibp.api.domain.germplasm;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.validator.constraints.NotBlank;
 
 public class GermplasmListEntrySummary {
 
+	@NotNull
 	private Integer gid;
 
+	@NotBlank
 	private String designation;
 
 	private String seedSource;
@@ -20,7 +25,8 @@ public class GermplasmListEntrySummary {
 
 	}
 
-	public GermplasmListEntrySummary(Integer gid, String designation, String seedSource, String entryCode, String cross) {
+	public GermplasmListEntrySummary(final Integer gid, final String designation, final String seedSource, final String entryCode,
+			final String cross) {
 		this.gid = gid;
 		this.designation = designation;
 		this.seedSource = seedSource;
@@ -32,7 +38,7 @@ public class GermplasmListEntrySummary {
 		return this.gid;
 	}
 
-	public void setGid(Integer gid) {
+	public void setGid(final Integer gid) {
 		this.gid = gid;
 	}
 
@@ -40,7 +46,7 @@ public class GermplasmListEntrySummary {
 		return this.designation;
 	}
 
-	public void setDesignation(String designation) {
+	public void setDesignation(final String designation) {
 		this.designation = designation;
 	}
 
@@ -48,7 +54,7 @@ public class GermplasmListEntrySummary {
 		return this.seedSource;
 	}
 
-	public void setSeedSource(String seedSource) {
+	public void setSeedSource(final String seedSource) {
 		this.seedSource = seedSource;
 	}
 
@@ -56,7 +62,7 @@ public class GermplasmListEntrySummary {
 		return this.entryCode;
 	}
 
-	public void setEntryCode(String entryCode) {
+	public void setEntryCode(final String entryCode) {
 		this.entryCode = entryCode;
 	}
 
@@ -64,7 +70,7 @@ public class GermplasmListEntrySummary {
 		return this.cross;
 	}
 
-	public void setCross(String cross) {
+	public void setCross(final String cross) {
 		this.cross = cross;
 	}
 

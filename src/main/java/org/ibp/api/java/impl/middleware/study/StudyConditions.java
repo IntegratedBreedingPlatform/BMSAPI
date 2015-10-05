@@ -14,7 +14,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 public enum StudyConditions {
 
 	BREEDING_METHOD("Breeding Method"), //
-	INSTITUTE("Institute"), //
+	STUDY_INSTITUTE("Institute"), //
 	STUDY_NAME("Study"), //
 	STUDY_TITLE("Study Title"), //
 	START_DATE("Start Date"), //
@@ -49,41 +49,42 @@ public enum StudyConditions {
 		switch (this) {
 			case BREEDING_METHOD:
 				measureVariable =
-				this.createMeasurementVariable(TermId.BREEDING_METHOD_CODE.getId(), "STUDY_BM_CODE",
-						"Breeding method applied to all plots in a study (CODE)", this.toString(), APPLIED, "BMETH_CODE", CHAR,
-						null, TEXT_STUDY, TermId.STUDY_INFORMATION.getId(), true);
+						this.createMeasurementVariable(TermId.BREEDING_METHOD_CODE.getId(), "STUDY_BM_CODE",
+								"Breeding method applied to all plots in a study (CODE)", this.toString(), APPLIED, "BMETH_CODE", CHAR,
+								null, TEXT_STUDY, TermId.STUDY_INFORMATION.getId(), true);
 				break;
-			case INSTITUTE:
+			case STUDY_INSTITUTE:
 				measureVariable =
-				this.createMeasurementVariable(TermId.STUDY_INSTITUTE.getId(), "STUDY_INSTITUTE", "Study institute - conducted (DBCV)", this.toString(),
-						CONDUCTED, DBCV, CHAR, "CIMMYT", TEXT_STUDY, TermId.STUDY_INFORMATION.getId(), true);
+						this.createMeasurementVariable(TermId.STUDY_INSTITUTE.getId(), "STUDY_INSTITUTE",
+								"Study institute - conducted (DBCV)", this.toString(), CONDUCTED, DBCV, CHAR, initialValue, TEXT_STUDY,
+								TermId.STUDY_INFORMATION.getId(), true);
 				break;
 			case STUDY_NAME:
 				measureVariable =
-				this.createMeasurementVariable(TermId.STUDY_NAME.getId(), "STUDY_NAME", "Study - assigned (DBCV)", this.toString(),
-						ASSIGNED, DBCV, CHAR, initialValue, TEXT_STUDY, TermId.STUDY_NAME_STORAGE.getId(), true);
+						this.createMeasurementVariable(TermId.STUDY_NAME.getId(), "STUDY_NAME", "Study - assigned (DBCV)", this.toString(),
+								ASSIGNED, DBCV, CHAR, initialValue, TEXT_STUDY, TermId.STUDY_NAME_STORAGE.getId(), true);
 				break;
 			case STUDY_TITLE:
 				measureVariable =
-				this.createMeasurementVariable(TermId.STUDY_TITLE.getId(), "STUDY_TITLE", "Study title - assigned (text)",
-						this.toString(), ASSIGNED, SCALE_TEXT, CHAR, initialValue, TEXT_STUDY, TermId.STUDY_TITLE_STORAGE.getId(),
-						true);
+						this.createMeasurementVariable(TermId.STUDY_TITLE.getId(), "STUDY_TITLE", "Study title - assigned (text)",
+								this.toString(), ASSIGNED, SCALE_TEXT, CHAR, initialValue, TEXT_STUDY, TermId.STUDY_TITLE_STORAGE.getId(),
+								true);
 				break;
 			case START_DATE:
 				measureVariable =
-				this.createMeasurementVariable(TermId.START_DATE.getId(), "START_DATE", "Start date - assigned (date)",
-								this.toString(), ASSIGNED, DATE, CHAR, initialValue, TEXT_STUDY, TermId.STUDY_INFORMATION.getId(), true);
+						this.createMeasurementVariable(TermId.START_DATE.getId(), "START_DATE", "Start date - assigned (date)",
+						this.toString(), ASSIGNED, DATE, CHAR, initialValue, TEXT_STUDY, TermId.STUDY_INFORMATION.getId(), true);
 				break;
 			case END_DATE:
 				measureVariable =
-				this.createMeasurementVariable(TermId.END_DATE.getId(), "END_DATE", "End date - assigned (date)", this.toString(),
-						ASSIGNED, DATE, CHAR, initialValue, TEXT_STUDY, TermId.STUDY_INFORMATION.getId(), true);
+						this.createMeasurementVariable(TermId.END_DATE.getId(), "END_DATE", "End date - assigned (date)", this.toString(),
+								ASSIGNED, DATE, CHAR, initialValue, TEXT_STUDY, TermId.STUDY_INFORMATION.getId(), true);
 				break;
 			case OBJECTIVE:
 				measureVariable =
-				this.createMeasurementVariable(TermId.STUDY_OBJECTIVE.getId(), "STUDY_OBJECTIVE", "Objective - described (text)",
-						this.toString(), DESCRIBED, SCALE_TEXT, CHAR, initialValue, TEXT_STUDY, TermId.STUDY_INFORMATION.getId(),
-						true);
+						this.createMeasurementVariable(TermId.STUDY_OBJECTIVE.getId(), "STUDY_OBJECTIVE", "Objective - described (text)",
+								this.toString(), DESCRIBED, SCALE_TEXT, CHAR, initialValue, TEXT_STUDY, TermId.STUDY_INFORMATION.getId(),
+								true);
 				break;
 		}
 
@@ -104,7 +105,7 @@ public enum StudyConditions {
 		variable.setScale(scale);
 		variable.setDataType(dataType);
 		variable.setValue(value);
-		variable.setLabel(label);
+		variable.setLabel(PhenotypicType.STUDY.getLabelList().get(0));
 		variable.setRole(PhenotypicType.STUDY);
 		variable.setFactor(isFactor);
 

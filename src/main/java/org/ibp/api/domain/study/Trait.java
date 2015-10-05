@@ -5,7 +5,7 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.hibernate.validator.constraints.Range;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * TODO: Replace with Onotology Domain API entity.
@@ -14,9 +14,9 @@ import org.hibernate.validator.constraints.Range;
 public class Trait {
 
 	@NotNull
-	@Range(min = 1, max = 999999)
 	private Integer traitId;
 
+	@NotBlank
 	private String traitName;
 
 	public Trait() {

@@ -1,4 +1,5 @@
-//http://localhost:19080/bmsapi/study/maize/import?programUUID=e57c7a51-57b7-4db6-9fd0-66727c3d1a18
+// POST http://<host>:<port>/bmsapi/study/maize/import?programUUID=<programUUID>
+// Content-Type: application/json
 
 {
     "name": "Import Nursery Test",
@@ -8,11 +9,12 @@
     "title": "Import Nursery Description",
     "studyType": "N",
     "siteName": "CIMMYT",
+    "studyInstitute" : "CIMMYT",
     "folderId": 1,
     "userId" : 1,
-    "germplasms": [
+    "germplasm": [
         {
-            "gid": 1,
+            "gid": 219,
             "designation": "GP-VARIETY-1",
             "seedSource": "GP-VARIETY-1 Source",
             "entryCode": "1",
@@ -22,7 +24,7 @@
             "position": "1"
         },
         {
-            "gid": 2,
+            "gid": 220,
             "designation": "GP-VARIETY-2",
             "seedSource": "GP-VARIETY-2 Source",
             "entryCode": "2",
@@ -45,7 +47,9 @@
 
     "observations": [
         {
-            "gid": 1,
+            "gid": 219,
+            "entryNumber": 1,
+            "plotNumber": 1,
             "measurements": [
                 {
                     "traitId": 18000,
@@ -59,7 +63,9 @@
         },
 
         {
-            "gid": 2,
+            "gid": 220,
+            "entryNumber": 2,
+            "plotNumber": 2,
             "measurements": [
                 {
                     "traitId": 18000,

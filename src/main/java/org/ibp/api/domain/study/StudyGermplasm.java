@@ -1,24 +1,29 @@
 
 package org.ibp.api.domain.study;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.NotBlank;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
 public class StudyGermplasm {
 
 	@JsonUnwrapped
-	private GermplasmListEntrySummary germplasmListEntrySummary;
+	private GermplasmListEntrySummary germplasmListEntrySummary = new GermplasmListEntrySummary();
 
-	@NotEmpty
+	@ApiModelProperty(value = "Type of entry: Check, Test.")
+	@NotBlank
 	private String entryType;
 
+	@NotNull
 	private Integer entryNumber;
 
-	@NotEmpty
+	@NotBlank
 	private String position;
 
 	/**

@@ -10,6 +10,7 @@ import javax.validation.ValidationException;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyDetails;
+import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudySummary;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
 @Api(value = "Study Services")
 @Controller
@@ -49,7 +51,7 @@ public class StudyResource {
 	@RequestMapping(value = "/{cropname}/list", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<StudySummary>> listAllStudies(@PathVariable final String cropname, @RequestParam(value = "programUniqueId",
-	required = false) final String programUniqueId) {
+			required = false) final String programUniqueId) {
 		return new ResponseEntity<>(this.studyService.listAllStudies(programUniqueId), HttpStatus.OK);
 	}
 
@@ -104,7 +106,10 @@ public class StudyResource {
 	@ApiOperation(value = "Import a study",
 			notes = "Imports one study (Nursery, Trial, etc) along with its constituent parts mainly Germplasm, Traits and Measurements.")
 	@RequestMapping(value = "/{cropname}/import", method = RequestMethod.POST)
-	public ResponseEntity<Integer> importStudy(final @PathVariable String cropname, @RequestParam final String programUUID,
+	public ResponseEntity<Integer> importStudy(
+			final @PathVariable String cropname, //
+			@ApiParam(
+					value = "Unique id of the program to import this study into. Use the /programs/list service to list Programs and obtain unique id.") @RequestParam final String programUUID,
 			@RequestBody @Valid final StudyImportDTO studyImportDTO, final BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
@@ -122,5 +127,14 @@ public class StudyResource {
 			validationErrors.append("[").append(error.getField()).append(": ").append(error.getDefaultMessage()).append("]");
 		}
 		return validationErrors.toString();
+	}
+
+	@ApiOperation(
+			value = "List all study folders",
+			notes = "Returns a flat list (no tree structure) of all study folders. The parentFolderId could be used to build a tree if needed.")
+	@RequestMapping(value = "/{cropname}/folders", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<StudyFolder>> listAllFolders(final @PathVariable String cropname) {
+		return new ResponseEntity<List<StudyFolder>>(this.studyService.getAllStudyFolders(), HttpStatus.OK);
 	}
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -36,6 +37,7 @@ import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyAttribute;
 import org.ibp.api.domain.study.StudyDetails;
+import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudySummary;
@@ -136,7 +138,7 @@ public class StudyServiceImpl implements StudyService {
 		}
 		final ObservationDto middlewareMeasurement =
 				new ObservationDto(observation.getUniqueIdentifier(), observation.getEnvironmentNumber(), observation.getEntryType(),
-						observation.getGermplasmId(), observation.getGermplasmDesignation(), observation.getEnrtyNumber(),
+						observation.getGermplasmId(), observation.getGermplasmDesignation(), observation.getEntryNumber(),
 						observation.getSeedSource(), observation.getReplicationNumber(), observation.getPlotNumber(), traits);
 
 		return this.mapObservationDtoToObservation(this.middlewareStudyService.updataObservation(studyIdentifier, middlewareMeasurement));
@@ -308,14 +310,14 @@ public class StudyServiceImpl implements StudyService {
 			final GermplasmList germplasmList = this.conversionService.convert(studyImportDTO, GermplasmList.class);
 			final Integer listId = this.germplasmListManager.addGermplasmList(germplasmList);
 
-			final List<GermplasmListData> germplasmListDatas = this.convert(studyImportDTO.getGermplasms(), GermplasmListData.class);
+			final List<GermplasmListData> germplasmListDatas = this.convert(studyImportDTO.getGermplasm(), GermplasmListData.class);
 			for (final GermplasmListData germData : germplasmListDatas) {
 				germData.setList(germplasmList);
 			}
 			this.germplasmListManager.addGermplasmListData(germplasmListDatas);
 
 			// Create the study's snapshot of the Germplasm list (ListDataProject)
-			final List<ListDataProject> listDataProjects = this.convert(studyImportDTO.getGermplasms(), ListDataProject.class);
+			final List<ListDataProject> listDataProjects = this.convert(studyImportDTO.getGermplasm(), ListDataProject.class);
 			final GermplasmListType listType = this.extractGermListType(studyImportDTO);
 			this.fieldbookService.saveOrUpdateListDataProject(studyId, listType, listId, listDataProjects, studyImportDTO.getUserId());
 
@@ -384,6 +386,19 @@ public class StudyServiceImpl implements StudyService {
 
 	void setDataImportService(final DataImportService dataImportService) {
 		this.dataImportService = dataImportService;
+	}
+
+	@Override
+	public List<StudyFolder> getAllStudyFolders() {
+		final List<StudyFolder> studyFolders = new ArrayList<>();
+		final List<FolderReference> middlewareFolders = this.studyDataManager.getAllFolders();
+
+		for (final FolderReference folderRef : middlewareFolders) {
+			studyFolders.add(new StudyFolder(folderRef.getId(), folderRef.getName(), folderRef.getDescription(), folderRef
+					.getParentFolderId()));
+		}
+
+		return studyFolders;
 	}
 
 }

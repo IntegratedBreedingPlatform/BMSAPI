@@ -23,7 +23,7 @@ public class MeasurementVariableConverterTest {
 		Assert.assertEquals(input.getTraitName(), output.getName());
 		Assert.assertEquals(input.getTraitName(), output.getDescription());
 		Assert.assertNull(output.getValue());
-		Assert.assertEquals(input.getTraitName(), output.getLabel());
+		Assert.assertEquals("PLOT", output.getLabel());
 		Assert.assertEquals(PhenotypicType.VARIATE, output.getRole());
 		Assert.assertFalse(output.isFactor());
 

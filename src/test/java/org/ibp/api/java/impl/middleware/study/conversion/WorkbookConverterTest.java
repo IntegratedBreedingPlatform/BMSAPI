@@ -7,6 +7,8 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
+import org.ibp.api.domain.study.MeasurementImportDTO;
+import org.ibp.api.domain.study.ObservationImportDTO;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.Trait;
@@ -18,7 +20,7 @@ import com.google.common.collect.Lists;
 public class WorkbookConverterTest {
 
 	@Test
-	public void testConvert() {
+	public void testConvertNursery() {
 
 		final StudyImportDTO inputDTO = new StudyImportDTO();
 		inputDTO.setStudyType("N");
@@ -29,7 +31,8 @@ public class WorkbookConverterTest {
 		inputDTO.setEndDate("20151201");
 		inputDTO.setUserId(1);
 		inputDTO.setFolderId(1L);
-		inputDTO.setSiteName("CIMMYT");
+		inputDTO.setSiteName("Mexico");
+		inputDTO.setStudyInstitute("CIMMYT");
 
 		final Trait trait1 = new Trait(1, "Plant Height");
 		final Trait trait2 = new Trait(2, "Grain Yield");
@@ -55,7 +58,35 @@ public class WorkbookConverterTest {
 		g2Summary.setCross("Cross 2");
 		g2.setGermplasmListEntrySummary(g2Summary);
 
-		inputDTO.setGermplasms(Lists.newArrayList(g1, g2));
+		inputDTO.setGermplasm(Lists.newArrayList(g1, g2));
+
+		final ObservationImportDTO observationUnit1 = new ObservationImportDTO();
+		observationUnit1.setGid(g1.getGermplasmListEntrySummary().getGid());
+
+		final MeasurementImportDTO measurement11 = new MeasurementImportDTO();
+		measurement11.setTraitId(trait1.getTraitId());
+		measurement11.setTraitValue("11");
+
+		final MeasurementImportDTO measurement12 = new MeasurementImportDTO();
+		measurement12.setTraitId(trait2.getTraitId());
+		measurement12.setTraitValue("12");
+
+		observationUnit1.setMeasurements(Lists.newArrayList(measurement11, measurement12));
+
+		final ObservationImportDTO observationUnit2 = new ObservationImportDTO();
+		observationUnit2.setGid(g2.getGermplasmListEntrySummary().getGid());
+
+		final MeasurementImportDTO measurement21 = new MeasurementImportDTO();
+		measurement21.setTraitId(trait1.getTraitId());
+		measurement21.setTraitValue("21");
+
+		final MeasurementImportDTO measurement22 = new MeasurementImportDTO();
+		measurement22.setTraitId(trait2.getTraitId());
+		measurement22.setTraitValue("22");
+
+		observationUnit2.setMeasurements(Lists.newArrayList(measurement21, measurement22));
+
+		inputDTO.setObservations(Lists.newArrayList(observationUnit1, observationUnit2));
 
 		final WorkbookConverter converter = new WorkbookConverter();
 		// Better to use actual component for MeasurementVariableConverter rather than mocking it as it is a simple collaborator.
@@ -74,7 +105,7 @@ public class WorkbookConverterTest {
 		Assert.assertEquals(inputDTO.getFolderId(), new Long(outputWorkbook.getStudyDetails().getParentFolderId()));
 
 		// Basic details as MeasurementVariables
-		Assert.assertEquals(5, outputWorkbook.getConditions().size());
+		Assert.assertEquals(6, outputWorkbook.getConditions().size());
 
 		final MeasurementVariable mvName = outputWorkbook.getConditions().get(0);
 		Assert.assertEquals(inputDTO.getName(), mvName.getValue());
@@ -106,14 +137,17 @@ public class WorkbookConverterTest {
 		Assert.assertTrue(mvObjective.isFactor());
 		Assert.assertEquals(TermId.STUDY_OBJECTIVE.getId(), mvObjective.getTermId());
 
-		// Trial instance as factor
-		Assert.assertEquals(1, outputWorkbook.getConstants().size());
-		final MeasurementVariable mvTrialInstance = outputWorkbook.getConstants().get(0);
-		Assert.assertEquals(PhenotypicType.TRIAL_ENVIRONMENT, mvTrialInstance.getRole());
-		Assert.assertTrue(mvTrialInstance.isFactor());
-		Assert.assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), mvTrialInstance.getTermId());
+		final MeasurementVariable mvStudyInstitute = outputWorkbook.getConditions().get(5);
+		Assert.assertEquals(inputDTO.getStudyInstitute(), mvStudyInstitute.getValue());
+		Assert.assertEquals(PhenotypicType.STUDY, mvStudyInstitute.getRole());
+		Assert.assertTrue(mvStudyInstitute.isFactor());
+		Assert.assertEquals(TermId.STUDY_INSTITUTE.getId(), mvStudyInstitute.getTermId());
 
-		// Germplasm Factors
+		// Constants - none for Nurseries.
+		Assert.assertNotNull(outputWorkbook.getConstants());
+		Assert.assertEquals(0, outputWorkbook.getConstants().size());
+
+		// Factors
 		Assert.assertEquals(5, outputWorkbook.getFactors().size());
 		final MeasurementVariable mvEntryNumber = outputWorkbook.getFactors().get(0);
 		Assert.assertEquals(PhenotypicType.GERMPLASM, mvEntryNumber.getRole());
@@ -144,6 +178,6 @@ public class WorkbookConverterTest {
 		Assert.assertEquals(inputDTO.getTraits().size(), outputWorkbook.getVariates().size());
 
 		// Observations
-		Assert.assertEquals(inputDTO.getGermplasms().size(), outputWorkbook.getObservations().size());
+		Assert.assertEquals(inputDTO.getGermplasm().size(), outputWorkbook.getObservations().size());
 	}
 }

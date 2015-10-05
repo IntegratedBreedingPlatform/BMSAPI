@@ -19,7 +19,7 @@ public class MeasurementVariableConverter implements Converter<Trait, Measuremen
 		measurementVariable.setName(source.getTraitName());
 		measurementVariable.setDescription(source.getTraitName());
 		measurementVariable.setValue(null);
-		measurementVariable.setLabel(source.getTraitName());
+		measurementVariable.setLabel("PLOT");
 		measurementVariable.setRole(PhenotypicType.VARIATE);
 		measurementVariable.setFactor(false);
 
