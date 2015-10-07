@@ -190,7 +190,7 @@ public class VariableValidatorTest {
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
 		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
 		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(variableDetails.getProgramUuid(), variable.getId(),
-				true);
+				true, true);
 
 		this.variableValidator.validate(variableDetails, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -261,7 +261,7 @@ public class VariableValidatorTest {
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
 		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
 		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(variableDetails.getProgramUuid(),
-				StringUtil.parseInt(variableDetails.getId(), null), true);
+				StringUtil.parseInt(variableDetails.getId(), null), true, false);
 
 		this.variableValidator.validate(variableDetails, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());

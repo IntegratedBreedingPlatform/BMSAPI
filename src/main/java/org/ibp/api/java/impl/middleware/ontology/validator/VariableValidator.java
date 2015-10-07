@@ -367,7 +367,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		try {
 
 			Integer requestId = StringUtil.parseInt(variable.getId(), null);
-			Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId, true);
+			Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId, true, true);
 
 			if (oldVariable.getScale().getDataType() != null
 					&& Objects.equals(oldVariable.getScale().getDataType().isSystemDataType(), true)) {

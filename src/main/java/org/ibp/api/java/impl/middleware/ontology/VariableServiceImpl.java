@@ -167,7 +167,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		try {
 			Integer id = StringUtil.parseInt(variableId, null);
 
-			Variable ontologyVariable = this.ontologyVariableDataManager.getVariable(programId, id, true);
+			Variable ontologyVariable = this.ontologyVariableDataManager.getVariable(programId, id, true, true);
 
 			if (ontologyVariable == null) {
 				return null;

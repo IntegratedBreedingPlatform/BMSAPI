@@ -163,7 +163,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuid(this.programUuid);
 		Mockito.doReturn(ontologyVariable).when(this.ontologyVariableDataManager).getVariable(this.programUuid, ontologyVariable.getId(),
-				true);
+				true, true);
 		Mockito.doReturn(
 				new Term(ontologyVariable.getId(), ontologyVariable.getName(), ontologyVariable.getDefinition(), CvId.VARIABLES.getId(),
 						false)).when(this.termDataManager).getTermById(ontologyVariable.getId());
@@ -194,7 +194,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.variableTypes",
 						IsCollectionWithSize.hasSize(ontologyVariable.getVariableTypes().size())));
 
-		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).getVariable(this.programUuid, ontologyVariable.getId(), true);
+		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).getVariable(this.programUuid, ontologyVariable.getId(), true, false);
 	}
 
 	/**
@@ -300,7 +300,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodId);
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleId);
 		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
-		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(this.programUuid, variable.getId(), true);
+		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(this.programUuid, variable.getId(), true, false);
 		Mockito.doNothing().when(this.ontologyVariableDataManager).updateVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
 
 		this.mockMvc
@@ -329,7 +329,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(term).when(this.termDataManager).getTermById(ontologyVariable.getId());
 		Mockito.doReturn(ontologyVariable).when(this.ontologyVariableDataManager).getVariable(this.programUuid, ontologyVariable.getId(),
-				true);
+				true, true);
 		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(ontologyVariable.getId());
 		Mockito.doNothing().when(this.ontologyVariableDataManager).deleteVariable(ontologyVariable.getId());
 
