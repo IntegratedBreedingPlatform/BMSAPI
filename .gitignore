@@ -9,7 +9,6 @@ logs
 .DS_Store
 
 # PROJECT SPECIFIC IGNORES
-/src/test/resources/*.properties
 
 # INTELLIJ IDEA IGNORES
 *.iml
