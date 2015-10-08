@@ -194,7 +194,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.variableTypes",
 						IsCollectionWithSize.hasSize(ontologyVariable.getVariableTypes().size())));
 
-		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).getVariable(this.programUuid, ontologyVariable.getId(), true, false);
+		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).getVariable(this.programUuid, ontologyVariable.getId(), true, true);
 	}
 
 	/**
@@ -300,7 +300,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodId);
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleId);
 		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
-		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(this.programUuid, variable.getId(), true, false);
+		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(this.programUuid, variable.getId(), true, true);
 		Mockito.doNothing().when(this.ontologyVariableDataManager).updateVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
 
 		this.mockMvc
