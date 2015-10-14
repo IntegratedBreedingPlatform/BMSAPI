@@ -95,7 +95,7 @@ public class VariableDetails extends TermSummary {
 		this.expectedRange.setMax(max);
 	}
 
-	public List<org.ibp.api.domain.ontology.VariableType> getVariableTypes() {
+	public List<VariableType> getVariableTypes() {
 		return this.variableTypes;
 	}
 

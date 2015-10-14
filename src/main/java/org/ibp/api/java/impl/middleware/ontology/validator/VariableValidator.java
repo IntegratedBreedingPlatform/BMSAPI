@@ -39,7 +39,8 @@ import com.google.common.base.Strings;
  * equal to the expected range minimum 17. If present, Variable type IDs must be an array of integer values (or an empty array) 18. Variable
  * type IDs must be an array of integer values that correspond to the IDs of variable types and contain at least one item 19. Name,
  * property, method, scale, alias and expected range cannot be changed if the variable is already in use 20. Alias is no more than 32
- * characters 21. Alias must only contain alphanumeric characters, underscores and cannot start with a number
+ * characters 21. Alias must only contain alphanumeric characters, underscores and cannot start with a number 22. If variable with type
+ * Analysis then we can not use other variable type with it.
  */
 
 @Component
@@ -50,6 +51,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	private static final String VARIABLE_MIN_SHOULD_BE_IN_SCALE_RANGE = "variable.expected.min.should.not.be.smaller";
 	private static final String VARIABLE_MAX_SHOULD_BE_IN_SCALE_RANGE = "variable.expected.max.should.not.be.greater";
 	private static final String VARIABLE_SCALE_WITH_SYSTEM_DATA_TYPE = "variable.scale.system.datatype";
+	private static final String VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE = "variable.type.analysis.can.not.club.with.other";
 
 	private static final Integer NAME_TEXT_LIMIT = 32;
 	private static final Integer DESCRIPTION_TEXT_LIMIT = 1024;
@@ -339,6 +341,10 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			}
 		}
 
+        if(this.isAnalysisVariable(variable) && variable.getVariableTypes().size() > 1) {
+				this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE, new Object[]{"Variable Type"});
+		}
+
 		return errors.getErrorCount() == initialCount;
 	}
 
@@ -493,5 +499,14 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 		return StringUtil.parseInt(variableType.getId(), null);
 	}
+
+	private boolean isAnalysisVariable(VariableDetails variable) {
+        for(org.ibp.api.domain.ontology.VariableType type : variable.getVariableTypes()){
+            if(Objects.equals(StringUtil.parseInt(type.getId(), 0), org.generationcp.middleware.domain.ontology.VariableType.ANALYSIS.getId())){
+                return true;
+            }
+        }
+        return false;
+    }
 
 }
