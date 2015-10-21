@@ -61,7 +61,11 @@ public class TestDataProvider {
 	public static final org.ibp.api.domain.ontology.DataType numericalDataType = new org.ibp.api.domain.ontology.DataType(String.valueOf(DataType.NUMERIC_VARIABLE.getId()), DataType.NUMERIC_VARIABLE.getName(), false);
 	public static final org.ibp.api.domain.ontology.DataType categoricalDataType = new org.ibp.api.domain.ontology.DataType(String.valueOf(DataType.CATEGORICAL_VARIABLE.getId()), DataType.CATEGORICAL_VARIABLE.getName(), false);
 
-	public static final org.ibp.api.domain.ontology.VariableType traitVariable = new org.ibp.api.domain.ontology.VariableType("1808",	"Trait Variable", "Variable for trait study");
+	public static final org.ibp.api.domain.ontology.VariableType traitVariable = new org.ibp.api.domain.ontology.VariableType(VariableType.TRAIT.getId().toString(),
+            VariableType.TRAIT.getName(), VariableType.TRAIT.getDescription());
+
+    public static final org.ibp.api.domain.ontology.VariableType analysisVariable = new org.ibp.api.domain.ontology.VariableType(VariableType.ANALYSIS.getId().toString(),
+            VariableType.ANALYSIS.getName(), VariableType.ANALYSIS.getDescription());
 
 	public static Term getMethodTerm() {
 		return new Term(TestDataProvider.methodId, TestDataProvider.methodName, TestDataProvider.methodDescription, CvId.METHODS.getId(),null);
