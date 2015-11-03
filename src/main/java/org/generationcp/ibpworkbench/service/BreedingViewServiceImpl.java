@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.ehcache.transaction.TransactionException;
+
 import org.generationcp.commons.service.impl.BreedingViewImportServiceImpl;
 import org.generationcp.commons.util.ObjectUtil;
 import org.generationcp.ibpworkbench.constants.WebAPIConstants;
@@ -28,7 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.rits.cloning.Cloner;
 
@@ -43,6 +48,9 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	
 	@Autowired
 	private Cloner cloner;
+	
+	@Autowired
+	private PlatformTransactionManager transactionManager;
 
 	private Map<String, String> nameToAliasMapping;
 
@@ -54,32 +62,45 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	private static final Logger LOG = LoggerFactory.getLogger(BreedingViewServiceImpl.class);
 
 	@Override
-	@Transactional
-	public void execute(Map<String, String> params, List<String> errors) throws IBPWebServiceException {
+	public void execute(final Map<String, String> params, List<String> errors) throws IBPWebServiceException {
 
 		try {
-
-			String mainOutputFilePath = params.get(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue());
-			String summaryOutputFilePath = params.get(WebAPIConstants.SUMMARY_OUTPUT_FILE_PATH.getParamValue());
-			String outlierOutputFilePath = params.get(WebAPIConstants.OUTLIER_OUTPUT_FILE_PATH.getParamValue());
-			int studyId = Integer.valueOf(params.get(WebAPIConstants.STUDY_ID.getParamValue()));
-
-			this.nameToAliasMapping = this.getNameToAliasMapping();
-
-			this.importService.importMeansData(new File(mainOutputFilePath), studyId, this.nameToAliasMapping);
-
-			if (outlierOutputFilePath != null && !outlierOutputFilePath.equals("")) {
-				this.importService.importOutlierData(new File(outlierOutputFilePath), studyId, this.nameToAliasMapping);
-			}
-
-			if (summaryOutputFilePath != null && !summaryOutputFilePath.equals("")) {
-				this.importService.importSummaryStatsData(new File(summaryOutputFilePath), studyId, this.nameToAliasMapping);
-			}
-
+			final TransactionTemplate transactionTemplate = new TransactionTemplate(this.transactionManager);
+			transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+	
+				@Override
+				protected void doInTransactionWithoutResult(TransactionStatus arg0) {
+					try {
+			
+						String mainOutputFilePath = params.get(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue());
+						String summaryOutputFilePath = params.get(WebAPIConstants.SUMMARY_OUTPUT_FILE_PATH.getParamValue());
+						String outlierOutputFilePath = params.get(WebAPIConstants.OUTLIER_OUTPUT_FILE_PATH.getParamValue());
+						int studyId = Integer.valueOf(params.get(WebAPIConstants.STUDY_ID.getParamValue()));
+			
+						nameToAliasMapping = getNameToAliasMapping();
+			
+						importService.importMeansData(new File(mainOutputFilePath), studyId, nameToAliasMapping);
+			
+						if (outlierOutputFilePath != null && !outlierOutputFilePath.equals("")) {
+							importService.importOutlierData(new File(outlierOutputFilePath), studyId, nameToAliasMapping);
+						}
+			
+						if (summaryOutputFilePath != null && !summaryOutputFilePath.equals("")) {
+							importService.importSummaryStatsData(new File(summaryOutputFilePath), studyId, nameToAliasMapping);
+						}
+			
+					} catch (Exception e) {
+						BreedingViewServiceImpl.LOG.error("ERROR:", e);
+						throw new TransactionException(e.getMessage() , e);
+					}
+				}
+			});
+		
 		} catch (Exception e) {
 			BreedingViewServiceImpl.LOG.error("ERROR:", e);
 			throw new IBPWebServiceException(e.getMessage());
 		}
+			
 
 	}
 
