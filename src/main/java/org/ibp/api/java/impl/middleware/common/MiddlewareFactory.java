@@ -163,11 +163,11 @@ public class MiddlewareFactory {
 		return new OntologyScaleDataManagerImpl();
 	}
 
+	//TODO: Make this singleton after re-factoring for variable data manager.
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public OntologyVariableDataManager getOntologyVariableDataManager() {
-		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
-				this.getOntologyScaleDataManager(), this.getCropDatabaseSessionProvider());
+		return new OntologyVariableDataManagerImpl();
 	}
 
 	@Bean
