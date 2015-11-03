@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.common;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.generationcp.middleware.ContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -30,6 +31,7 @@ public class ContextResolverImpl implements ContextResolver {
 			throw new ContextResolutionException("BAD URL:" + path, new Exception("Expecting crop name"));
 		}
 		ContextResolverImpl.LOG.debug("Crop Name: " + parts[2]);
+		ContextHolder.setCurrentCrop(parts[2]);
 		return String.format(Constants.DB_NAME_FORMAT, parts[2]);
 	}
 }
