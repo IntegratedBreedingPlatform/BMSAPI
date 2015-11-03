@@ -24,11 +24,14 @@ import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.manager.ontology.OntologyCommonDAOImpl;
+import org.generationcp.middleware.manager.ontology.OntologyDaoFactory;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.TermDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.api.OntologyCommonDAO;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
@@ -42,6 +45,8 @@ import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl;
+import org.generationcp.middleware.util.Clock;
+import org.generationcp.middleware.util.SystemClock;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -141,21 +146,21 @@ public class MiddlewareFactory {
 	}
 
 	@Bean
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	@Scope(value = "singleton")
 	public OntologyMethodDataManager getOntologyMethodDataManager() {
-		return new OntologyMethodDataManagerImpl(this.getCropDatabaseSessionProvider());
+		return new OntologyMethodDataManagerImpl();
 	}
 
 	@Bean
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	@Scope(value = "singleton")
 	public OntologyPropertyDataManager getOntologyPropertyDataManager() {
-		return new OntologyPropertyDataManagerImpl(this.getCropDatabaseSessionProvider());
+		return new OntologyPropertyDataManagerImpl();
 	}
 
 	@Bean
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	@Scope(value = "singleton")
 	public OntologyScaleDataManager getOntologyScaleDataManager() {
-		return new OntologyScaleDataManagerImpl(this.getCropDatabaseSessionProvider());
+		return new OntologyScaleDataManagerImpl();
 	}
 
 	@Bean
@@ -163,6 +168,28 @@ public class MiddlewareFactory {
 	public OntologyVariableDataManager getOntologyVariableDataManager() {
 		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
 				this.getOntologyScaleDataManager(), this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyDaoFactory getOntologyDaoFactory() {
+		OntologyDaoFactory daoFactory =  new OntologyDaoFactory();
+		daoFactory.setSessionProvider(this.getCropDatabaseSessionProvider());
+		return daoFactory;
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyCommonDAO getOntologyCommonDAO() {
+		OntologyCommonDAOImpl ontologyCommonDAO =  new OntologyCommonDAOImpl();
+		ontologyCommonDAO.setSessionProvider(this.getCropDatabaseSessionProvider());
+		return ontologyCommonDAO;
+	}
+
+	@Bean
+	@Scope(value = "singleton")
+	public Clock getSystemClock() {
+		return new SystemClock();
 	}
 
 	@Bean
