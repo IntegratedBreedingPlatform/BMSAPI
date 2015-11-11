@@ -45,10 +45,10 @@ public class StudyMapper {
 	private static class MeasurementDtoConverter implements Converter<List<MeasurementDto>, List<Measurement>> {
 
 		@Override
-		public List<Measurement> convert(MappingContext<List<MeasurementDto>, List<Measurement>> context) {
+		public List<Measurement> convert(final MappingContext<List<MeasurementDto>, List<Measurement>> context) {
 			final List<Measurement> measurements = new ArrayList<Measurement>();
-			for (MeasurementDto measurementDto : context.getSource()) {
-				TraitDto trait = measurementDto.getTrait();
+			for (final MeasurementDto measurementDto : context.getSource()) {
+				final TraitDto trait = measurementDto.getTrait();
 				measurements.add(new Measurement(new MeasurementIdentifier(measurementDto.getPhenotypeId(), new Trait(trait.getTraitId(),
 						trait.getTraitName())), measurementDto.getTriatValue()));
 			}
@@ -62,7 +62,7 @@ public class StudyMapper {
 			@Override
 			protected void configure() {
 				this.map().setUniqueIdentifier(this.source.getMeasurementId());
-				this.map().setEnrtyNumber(this.source.getEntryNo());
+				this.map().setEntryNumber(this.source.getEntryNo());
 				this.map().setEntryType(this.source.getEntryType());
 				this.map().setEnvironmentNumber(this.source.getTrialInstance());
 				this.map().setGermplasmDesignation(this.source.getDesignation());
@@ -80,7 +80,7 @@ public class StudyMapper {
 
 			@Override
 			protected void configure() {
-				this.map().setEntryNo(this.source.getEntryNo());
+				this.map().setEntryNumber(this.source.getEntryNumber());
 				this.map().setEntryType(this.source.getEntryType());
 				this.map().setPosition(this.source.getPosition());
 				this.map().getGermplasmListEntrySummary().setGid(this.source.getGermplasmId());

@@ -17,11 +17,11 @@ public class StudyMapperTest {
 		final ModelMapper instance = StudyMapper.getInstance();
 		final StudyGermplasmDto studyGermplasmDto = new StudyGermplasmDto();
 		studyGermplasmDto.setCross("Cross");
-		studyGermplasmDto.setEntryNo("1");
+		studyGermplasmDto.setEntryNumber(1);
 		final StudyGermplasm mappedStudyGermplasm = instance.map(studyGermplasmDto, StudyGermplasm.class);
 		Assert.assertEquals("The cross deep mapping has failed", studyGermplasmDto.getCross(), mappedStudyGermplasm
 				.getGermplasmListEntrySummary().getCross());
-		Assert.assertEquals("The entry no mapping has failed.", studyGermplasmDto.getEntryNo(), mappedStudyGermplasm.getEntryNo());
+		Assert.assertEquals("The entry number mapping has failed.", studyGermplasmDto.getEntryNumber(), mappedStudyGermplasm.getEntryNumber());
 
 	}
 }

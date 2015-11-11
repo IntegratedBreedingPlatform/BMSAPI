@@ -13,8 +13,10 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.program.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class ProgramServiceImpl implements ProgramService {
 
 	@Autowired
@@ -33,7 +35,9 @@ public class ProgramServiceImpl implements ProgramService {
 					ProgramSummary programSummary = new ProgramSummary();
 					programSummary.setId(workbenchProgram.getProjectId().toString());
 					programSummary.setProjectName(workbenchProgram.getProjectName());
-					programSummary.setCropType(workbenchProgram.getCropType().getCropName());
+					if(workbenchProgram.getCropType() != null ) {
+						programSummary.setCropType(workbenchProgram.getCropType().getCropName());
+					}
 					programSummary.setUserId(String.valueOf(workbenchProgram.getUserId()));
 					programSummary.setUniqueID(workbenchProgram.getUniqueID());
 					if (workbenchProgram.getStartDate() != null) {

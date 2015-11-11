@@ -10,26 +10,21 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.DataType;
-import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermSummary;
-import org.generationcp.middleware.domain.oms.VariableType;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.util.StringUtil;
-import org.ibp.api.domain.ontology.MetadataSummary;
-import org.ibp.api.domain.ontology.MethodSummary;
-import org.ibp.api.domain.ontology.PropertySummary;
-import org.ibp.api.domain.ontology.ScaleSummary;
-import org.ibp.api.domain.ontology.VariableSummary;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
+import org.ibp.api.domain.ontology.*;
 
 public class TestDataProvider {
 
 	private static final Integer variableId = 15;
-	private static final String variableName = "Variable Name";
+	private static final String variableName = "Variable_Name";
 	private static final String variableDescription = "Variable Description";
 	private static final String variableAlias = "VA";
 	private static final boolean variableIsFavourite = false;
@@ -53,39 +48,31 @@ public class TestDataProvider {
 	private static final String scaleDescription = "Scale Description";
 	private static final Integer scaleVocabularyId = 1030;
 
-	private static final String scaleMinValue = "10";
-	private static final String scaleMaxValue = "20";
-	private static final String category1 = "Scale Category1";
-	private static final String category2 = "Scale Category2";
+	private static final String scaleMinValue = "10.01";
+	private static final String scaleMaxValue = "20.02";
+	private static final List<TermSummary> scaleCategoricalValues = new ArrayList<>(Arrays.asList(new TermSummary(120, "1", "One"), new TermSummary(121, "2", "Two")));
 
 	private static final String className1 = "Agronomic";
 	private static final String className2 = "Biotic Stress";
 	private static final String className3 = "Study condition";
 
-	public static final List<Term> mwTermList = new ArrayList<>(Arrays.asList(new Term(1, TestDataProvider.className1, ""), new Term(2,
-			TestDataProvider.className2, ""), new Term(3, TestDataProvider.className3, "")));
+	public static final List<Term> mwTermList = new ArrayList<>(Arrays.asList(new Term(1, TestDataProvider.className1, ""), new Term(2, TestDataProvider.className2, ""), new Term(3, TestDataProvider.className3, "")));
 
-	public static final TermSummary mwMethodSummary = new TermSummary(TestDataProvider.methodId, TestDataProvider.methodName,
-			TestDataProvider.methodDescription);
-	public static final TermSummary mwPropertySummary = new TermSummary(TestDataProvider.propertyId, TestDataProvider.propertyName,
-			TestDataProvider.propertyDescription);
+	public static final org.ibp.api.domain.ontology.DataType numericalDataType = new org.ibp.api.domain.ontology.DataType(String.valueOf(DataType.NUMERIC_VARIABLE.getId()), DataType.NUMERIC_VARIABLE.getName(), false);
+	public static final org.ibp.api.domain.ontology.DataType categoricalDataType = new org.ibp.api.domain.ontology.DataType(String.valueOf(DataType.CATEGORICAL_VARIABLE.getId()), DataType.CATEGORICAL_VARIABLE.getName(), false);
 
-	public static final org.ibp.api.domain.ontology.DataType numericalDataType = new org.ibp.api.domain.ontology.DataType(
-			DataType.NUMERIC_VARIABLE.getId(), DataType.NUMERIC_VARIABLE.getName());
-	public static final org.ibp.api.domain.ontology.DataType categoricalDataType = new org.ibp.api.domain.ontology.DataType(
-			DataType.CATEGORICAL_VARIABLE.getId(), DataType.CATEGORICAL_VARIABLE.getName());
+	public static final org.ibp.api.domain.ontology.VariableType traitVariable = new org.ibp.api.domain.ontology.VariableType(VariableType.TRAIT.getId().toString(),
+            VariableType.TRAIT.getName(), VariableType.TRAIT.getDescription());
 
-	public static final org.ibp.api.domain.ontology.VariableType traitVariable = new org.ibp.api.domain.ontology.VariableType(1,
-			"Trait Variable", "Variable for trait study");
+    public static final org.ibp.api.domain.ontology.VariableType analysisVariable = new org.ibp.api.domain.ontology.VariableType(VariableType.ANALYSIS.getId().toString(),
+            VariableType.ANALYSIS.getName(), VariableType.ANALYSIS.getDescription());
 
 	public static Term getMethodTerm() {
-		return new Term(TestDataProvider.methodId, TestDataProvider.methodName, TestDataProvider.methodDescription, CvId.METHODS.getId(),
-				null);
+		return new Term(TestDataProvider.methodId, TestDataProvider.methodName, TestDataProvider.methodDescription, CvId.METHODS.getId(),null);
 	}
 
 	public static Term getPropertyTerm() {
-		return new Term(TestDataProvider.propertyId, TestDataProvider.propertyName, TestDataProvider.propertyDescription,
-				CvId.PROPERTIES.getId(), null);
+		return new Term(TestDataProvider.propertyId, TestDataProvider.propertyName, TestDataProvider.propertyDescription, CvId.PROPERTIES.getId(), null);
 	}
 
 	public static Term getScaleTerm() {
@@ -93,8 +80,7 @@ public class TestDataProvider {
 	}
 
 	public static Term getVariableTerm() {
-		return new Term(TestDataProvider.variableId, TestDataProvider.variableName, TestDataProvider.variableDescription,
-				CvId.VARIABLES.getId(), false);
+		return new Term(TestDataProvider.variableId, TestDataProvider.variableName, TestDataProvider.variableDescription, CvId.VARIABLES.getId(), false);
 	}
 
 	public static Date getDateCreated() {
@@ -172,7 +158,7 @@ public class TestDataProvider {
 		scale.setDataType(DataType.NUMERIC_VARIABLE);
 		scale.setMinValue(TestDataProvider.scaleMinValue);
 		scale.setMaxValue(TestDataProvider.scaleMaxValue);
-		scale.addCategory(TestDataProvider.category1, TestDataProvider.category2);
+		scale.addCategory(scaleCategoricalValues.get(0));
 		scale.setDateCreated(TestDataProvider.getDateCreated());
 		scale.setDateLastModified(TestDataProvider.getDateModified());
 		return scale;
@@ -186,9 +172,10 @@ public class TestDataProvider {
 			scale.setId(TestDataProvider.scaleId);
 			scale.setName(TestDataProvider.scaleName);
 			scale.setDefinition(TestDataProvider.scaleDescription);
+			scale.setDataType(DataType.NUMERIC_VARIABLE);
 			scale.setMinValue(TestDataProvider.scaleMinValue);
 			scale.setMaxValue(TestDataProvider.scaleMaxValue);
-			scale.addCategory(TestDataProvider.category1, TestDataProvider.category2);
+			scale.addCategory(scaleCategoricalValues.get(0));
 			scale.setDateCreated(TestDataProvider.getDateCreated());
 			scale.setDateLastModified(TestDataProvider.getDateModified());
 			scaleList.add(scale);
@@ -211,97 +198,107 @@ public class TestDataProvider {
 		variable.setIsFavorite(TestDataProvider.variableIsFavourite);
 		variable.setDateCreated(TestDataProvider.getDateCreated());
 		variable.setStudies(TestDataProvider.variableStudies);
-		variable.addVariableType(VariableType.getById(1));
+		variable.addVariableType(VariableType.ANALYSIS);
 		variable.setDateCreated(TestDataProvider.getDateCreated());
 		variable.setDateLastModified(TestDataProvider.getDateModified());
 
 		return variable;
 	}
 
-	public static List<OntologyVariableSummary> getTestVariables(Integer elements) {
-		List<OntologyVariableSummary> variableList = new ArrayList<>();
+	public static List<Variable> getTestVariables(Integer elements) {
+		List<Variable> variableList = new ArrayList<>();
 
 		for (Integer count = 0; count < elements; count++) {
-			OntologyVariableSummary variable =
-					new OntologyVariableSummary(TestDataProvider.variableId + count, TestDataProvider.variableName + count,
-							TestDataProvider.variableDescription + count);
+			Variable variable = new Variable(new Term(TestDataProvider.variableId + count, TestDataProvider.variableName + count, TestDataProvider.variableDescription + count));
 			variable.setMinValue(TestDataProvider.variableExpectedMin);
 			variable.setMaxValue(TestDataProvider.variableExpectedMax);
-			variable.setAlias(TestDataProvider.variableAlias);
+			variable.setAlias(TestDataProvider.variableAlias + "_" + String.valueOf(count));
 			variable.setIsFavorite(TestDataProvider.variableIsFavourite);
 			variable.setDateCreated(TestDataProvider.getDateCreated());
-			variable.setPropertySummary(TestDataProvider.mwPropertySummary);
-			variable.setMethodSummary(TestDataProvider.mwMethodSummary);
-			variable.setScaleSummary(TestDataProvider.getTestScale());
+			variable.setProperty(TestDataProvider.getTestProperty());
+			variable.setMethod(TestDataProvider.getTestMethod());
+			variable.setScale(TestDataProvider.getTestScale());
 			variable.setDateCreated(TestDataProvider.getDateCreated());
 			variable.setDateLastModified(TestDataProvider.getDateModified());
+			variable.addVariableType(VariableType.ENVIRONMENT_DETAIL);
 			variableList.add(variable);
 		}
 		return variableList;
 	}
 
-	public static MetadataSummary getTestMetadataSummary() {
-		MetadataSummary metadataSummary = new MetadataSummary();
-		metadataSummary.setDateCreated(TestDataProvider.getDateCreated());
-		metadataSummary.setDateLastModified(TestDataProvider.getDateModified());
-		return metadataSummary;
+	public static MetadataDetails getTestMetadataDetails() {
+		MetadataDetails metadataDetails = new MetadataDetails();
+		metadataDetails.setDateCreated(TestDataProvider.getDateCreated());
+		metadataDetails.setDateLastModified(TestDataProvider.getDateModified());
+		return metadataDetails;
 	}
 
-	public static MethodSummary getTestMethodSummary() {
-		MethodSummary methodSummary = new MethodSummary();
-		methodSummary.setId(String.valueOf(TestDataProvider.methodId));
-		methodSummary.setName(TestDataProvider.methodName);
-		methodSummary.setDescription(TestDataProvider.methodDescription);
-		methodSummary.setMetadata(TestDataProvider.getTestMetadataSummary());
-		return methodSummary;
+	public static MethodDetails getTestMethodDetails() {
+		MethodDetails method = new MethodDetails();
+		method.setId(String.valueOf(TestDataProvider.methodId));
+		method.setName(TestDataProvider.methodName);
+		method.setDescription(TestDataProvider.methodDescription);
+		method.setMetadata(TestDataProvider.getTestMetadataDetails());
+		return method;
 	}
 
-	public static PropertySummary getTestPropertySummary() {
-		PropertySummary propertySummary = new PropertySummary();
-		propertySummary.setId(String.valueOf(TestDataProvider.propertyId));
-		propertySummary.setName(TestDataProvider.propertyName);
-		propertySummary.setDescription(TestDataProvider.propertyDescription);
-		propertySummary.setClasses(new HashSet<>(Collections.singletonList(TestDataProvider.className1)));
-		propertySummary.setCropOntologyId(TestDataProvider.cropOntologyId);
-		propertySummary.setMetadata(TestDataProvider.getTestMetadataSummary());
-		return propertySummary;
+	public static PropertyDetails getTestPropertyDetails() {
+		PropertyDetails propertyDetails = new PropertyDetails();
+		propertyDetails.setId(String.valueOf(TestDataProvider.propertyId));
+		propertyDetails.setName(TestDataProvider.propertyName);
+		propertyDetails.setDescription(TestDataProvider.propertyDescription);
+		propertyDetails.setClasses(new HashSet<>(Collections.singletonList(TestDataProvider.className1)));
+		propertyDetails.setCropOntologyId(TestDataProvider.cropOntologyId);
+		propertyDetails.setMetadata(TestDataProvider.getTestMetadataDetails());
+		return propertyDetails;
 	}
 
-	public static ScaleSummary getTestScaleSummary() {
-		ScaleSummary scaleSummary = new ScaleSummary();
-		scaleSummary.setId(String.valueOf(TestDataProvider.scaleId));
-		scaleSummary.setName(TestDataProvider.scaleName);
-		scaleSummary.setDescription(TestDataProvider.scaleDescription);
-		scaleSummary.setDataType(TestDataProvider.numericalDataType);
-		scaleSummary.setMin(StringUtil.parseInt(TestDataProvider.scaleMinValue, null));
-		scaleSummary.setMax(StringUtil.parseInt(TestDataProvider.scaleMaxValue, null));
-		scaleSummary.setMetadata(TestDataProvider.getTestMetadataSummary());
-		return scaleSummary;
+	public static ScaleDetails getTestScaleDetails() {
+		ScaleDetails scaleDetails = new ScaleDetails();
+		scaleDetails.setId(String.valueOf(TestDataProvider.scaleId));
+		scaleDetails.setName(TestDataProvider.scaleName);
+		scaleDetails.setDescription(TestDataProvider.scaleDescription);
+		scaleDetails.setDataType(TestDataProvider.numericalDataType);
+		scaleDetails.setMaxValue(TestDataProvider.scaleMinValue);
+		scaleDetails.setMaxValue(TestDataProvider.scaleMaxValue);
+		scaleDetails.setMetadata(TestDataProvider.getTestMetadataDetails());
+		return scaleDetails;
 	}
 
-	public static VariableSummary getTestVariableSummary() {
-		VariableSummary variableSummary = new VariableSummary();
-		variableSummary.setProgramUuid(TestDataProvider.programUUID);
-		variableSummary.setId(String.valueOf(TestDataProvider.variableId));
-		variableSummary.setName(TestDataProvider.variableName);
-		variableSummary.setDescription(TestDataProvider.variableDescription);
-		variableSummary.setAlias(TestDataProvider.variableAlias);
-		variableSummary.setVariableTypes(new HashSet<>(Collections.singletonList(TestDataProvider.traitVariable)));
-		variableSummary.setPropertySummary(new org.ibp.api.domain.ontology.TermSummary());
-		variableSummary.getPropertySummary().setId(String.valueOf(TestDataProvider.propertyId));
-		variableSummary.getPropertySummary().setName(TestDataProvider.propertyName);
-		variableSummary.getPropertySummary().setDescription(TestDataProvider.propertyDescription);
-		variableSummary.setMethodSummary(new org.ibp.api.domain.ontology.TermSummary());
-		variableSummary.getMethodSummary().setId(String.valueOf(TestDataProvider.methodId));
-		variableSummary.getMethodSummary().setName(TestDataProvider.methodName);
-		variableSummary.getMethodSummary().setDescription(TestDataProvider.methodDescription);
-		variableSummary.getScaleSummary().setId(String.valueOf(TestDataProvider.scaleId));
-		variableSummary.getScaleSummary().setName(TestDataProvider.scaleName);
-		variableSummary.getScaleSummary().setDescription(TestDataProvider.scaleDescription);
-		variableSummary.getScaleSummary().setDataType(TestDataProvider.numericalDataType);
-		variableSummary.setExpectedMin(TestDataProvider.variableExpectedMin);
-		variableSummary.setExpectedMax(TestDataProvider.variableExpectedMax);
-		variableSummary.setFavourite(TestDataProvider.variableIsFavourite);
-		return variableSummary;
+	public static VariableDetails getTestVariableDetails() {
+		VariableDetails variableDetails = new VariableDetails();
+		variableDetails.setProgramUuid(TestDataProvider.programUUID);
+		variableDetails.setId(String.valueOf(TestDataProvider.variableId));
+		variableDetails.setName(TestDataProvider.variableName);
+		variableDetails.setDescription(TestDataProvider.variableDescription);
+		variableDetails.setAlias(TestDataProvider.variableAlias);
+		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(traitVariable)));
+		variableDetails.setProperty(TestDataProvider.getTestPropertyDetails());
+		variableDetails.setMethod(TestDataProvider.getTestMethodDetails());
+		variableDetails.setScale(TestDataProvider.getTestScaleDetails());
+		variableDetails.setExpectedMin(TestDataProvider.variableExpectedMin);
+		variableDetails.setExpectedMax(TestDataProvider.variableExpectedMax);
+		variableDetails.setFavourite(TestDataProvider.variableIsFavourite);
+		return variableDetails;
+	}
+
+	public static VariableFilter getVariableFilterForVariableValidator(){
+		VariableFilter variableFilter = new VariableFilter();
+		variableFilter.addMethodId(methodId);
+		variableFilter.addPropertyId(propertyId);
+		variableFilter.addScaleId(scaleId);
+		return variableFilter;
+	}
+
+	public static List<org.ibp.api.domain.ontology.VariableType> getVariableTypes(){
+		List<org.ibp.api.domain.ontology.VariableType> variableTypes = new ArrayList<>();
+
+		org.ibp.api.domain.ontology.VariableType variableType = new org.ibp.api.domain.ontology.VariableType("1", "Variable Type 1", "Variable Type Description 1");
+		variableTypes.add(variableType);
+
+		variableType = new org.ibp.api.domain.ontology.VariableType("2", "Variable Type 2", "Variable Type Description 2");
+		variableTypes.add(variableType);
+		return variableTypes;
 	}
 }
+

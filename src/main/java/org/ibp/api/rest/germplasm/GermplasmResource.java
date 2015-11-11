@@ -4,6 +4,7 @@ package org.ibp.api.rest.germplasm;
 import java.util.List;
 
 import org.ibp.api.domain.germplasm.GermplasmSummary;
+import org.ibp.api.domain.germplasm.PedigreeTree;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.rest.ResourceURLLinkProvider;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
 @Api(value = "Germplasm Services")
 @RestController
@@ -66,5 +68,17 @@ public class GermplasmResource {
 		} else {
 			throw new ApiRuntimeException("No germplasm record found for the supplied identifier: " + germplasmId);
 		}
+	}
+
+	@ApiOperation(value = "Get germplasm pedigree tree by germplasm id.", notes = "Get germplasm pedigree tree by germplasm id.")
+	@RequestMapping(value = "/{cropname}/pedigree/{germplasmId}", method = RequestMethod.GET)
+	public ResponseEntity<PedigreeTree> getPedigreeTree(
+			@PathVariable String cropname, 
+			@PathVariable String germplasmId,
+			
+			@RequestParam(required = false) 
+			@ApiParam(name = "levels", value = "Optional. If not specified default number of levels are 20.") 
+			Integer levels) {
+		return new ResponseEntity<PedigreeTree>(this.germplasmService.getPedigreeTree(germplasmId, levels), HttpStatus.OK);
 	}
 }

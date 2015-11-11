@@ -3,7 +3,7 @@ package org.ibp.api.domain.ontology;
 
 import java.util.Date;
 
-import org.generationcp.middleware.util.ISO8601DateParser;
+import org.ibp.api.ISO8601DateParser;
 
 public class MetadataSummary {
 

@@ -1,20 +1,23 @@
 
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.DataType;
+import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.util.StringUtil;
-import org.ibp.api.domain.ontology.ScaleSummary;
+import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.ValidValues;
-import org.ibp.api.domain.ontology.VariableCategory;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,84 +53,88 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 	private static final String SCALE_CATEGORIES_DESCRIPTION_DUPLICATE = "scale.category.description.duplicate";
 	private static final String SCALE_CATEGORY_DESCRIPTION_REQUIRED = "scale.category.description.required";
 	private static final String SCALE_NAME_DESCRIPTION_REQUIRED = "scale.category.name.required";
+	private static final String SCALE_SYSTEM_DATA_TYPE = "scale.system.datatype";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ScaleValidator.class);
 
+	private static final String ERROR_NAME = "dataTypeId";
+	private static final String NAME = "name";
+	private static final String SCALE_NAME = "scale";
+	private static final String DESCRIPTION = "description";
+
 	@Override
 	public boolean supports(Class<?> aClass) {
-		return ScaleSummary.class.equals(aClass);
+		return ScaleDetails.class.equals(aClass);
 	}
 
 	@Override
 	public void validate(Object target, Errors errors) {
 
-		ScaleSummary scaleSummary = (ScaleSummary) target;
+		ScaleDetails scaleDetails = (ScaleDetails) target;
 
-		boolean nameValidationResult = this.nameValidationProcessor(scaleSummary, errors);
+		boolean nameValidationResult = this.nameValidationProcessor(scaleDetails, errors);
 
-		this.descriptionValidationProcessor(scaleSummary, errors);
+		this.descriptionValidationProcessor(scaleDetails, errors);
 
-		boolean dataTypeValidationResult = this.dataTypeValidationProcessor(scaleSummary, errors);
+		boolean dataTypeValidationResult = this.dataTypeValidationProcessor(scaleDetails, errors);
+
+		Integer dataTypeId = this.parseDataTypeIdAsInteger(scaleDetails.getDataType());
 
 		if (dataTypeValidationResult) {
 
-			Integer dataTypeId = scaleSummary.getDataType().getId();
-
 			if (Objects.equals(dataTypeId, DataType.CATEGORICAL_VARIABLE.getId())) {
-				this.categoricalDataTypeValidationProcessor(scaleSummary, errors);
+				this.categoricalDataTypeValidationProcessor(scaleDetails, errors);
 			}
 			if (Objects.equals(dataTypeId, DataType.NUMERIC_VARIABLE.getId())) {
-				this.numericDataTypeValidationProcessor(scaleSummary, errors);
+				this.numericDataTypeValidationProcessor(scaleDetails, errors);
 			}
 		}
 
 		if (nameValidationResult) {
-			this.scaleShouldBeEditable(scaleSummary, errors);
+			this.scaleShouldBeEditable(scaleDetails, errors);
 		}
 	}
 
-	private void validateCategoriesForUniqueness(List<VariableCategory> categories, DataType dataType, Errors errors) {
+	private void validateCategoriesForUniqueness(List<org.ibp.api.domain.ontology.TermSummary> categories, DataType dataType, Errors errors) {
 		if (categories != null && Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)) {
 			Set<String> labels = new HashSet<>();
 			Set<String> values = new HashSet<>();
+
 			for (int i = 1; i <= categories.size(); i++) {
-				VariableCategory category = categories.get(i - 1);
+
+				org.ibp.api.domain.ontology.TermSummary category = categories.get(i - 1);
 				String name = category.getName().trim();
 				String value = category.getDescription().trim();
+				String errorNamePrefix = "validValues.categories[" + i + "].";
 
 				if (this.isNullOrEmpty(value)) {
-					this.addCustomError(errors, "validValues.categories[" + i + "].description",
-							ScaleValidator.SCALE_CATEGORY_DESCRIPTION_REQUIRED, null);
+					this.addCustomError(errors, errorNamePrefix + DESCRIPTION, ScaleValidator.SCALE_CATEGORY_DESCRIPTION_REQUIRED, null);
 				}
 
 				if (this.isNullOrEmpty(name)) {
-					this.addCustomError(errors, "validValues.categories[" + i + "].name", ScaleValidator.SCALE_NAME_DESCRIPTION_REQUIRED,
-							null);
+					this.addCustomError(errors, errorNamePrefix + NAME, ScaleValidator.SCALE_NAME_DESCRIPTION_REQUIRED, null);
 				}
 
 				if (errors.hasErrors()) {
 					return;
 				}
 
-				this.fieldShouldNotOverflow("validValues.categories[" + i + "].name", name, ScaleValidator.NAME_TEXT_LIMIT, errors);
+				this.fieldShouldNotOverflow(errorNamePrefix + NAME, name, ScaleValidator.NAME_TEXT_LIMIT, errors);
 
-				this.fieldShouldNotOverflow("validValues.categories[" + i + "].description", value,
-						ScaleValidator.CATEGORY_VALUE_TEXT_LIMIT, errors);
+				this.fieldShouldNotOverflow(errorNamePrefix + DESCRIPTION, value, ScaleValidator.CATEGORY_VALUE_TEXT_LIMIT, errors);
 
 				if (errors.hasErrors()) {
 					return;
 				}
 
 				if (labels.contains(name)) {
-					this.addCustomError(errors, "validValues.categories[" + i + "].name", ScaleValidator.SCALE_CATEGORIES_NAME_DUPLICATE,
-							null);
+					this.addCustomError(errors, errorNamePrefix + NAME, ScaleValidator.SCALE_CATEGORIES_NAME_DUPLICATE, null);
 				} else {
 					labels.add(category.getName().trim());
 				}
 
 				if (values.contains(value)) {
-					this.addCustomError(errors, "validValues.categories[" + i + "].description",
-							ScaleValidator.SCALE_CATEGORIES_DESCRIPTION_DUPLICATE, null);
+					this.addCustomError(errors, errorNamePrefix + DESCRIPTION, ScaleValidator.SCALE_CATEGORIES_DESCRIPTION_DUPLICATE, null);
 				} else {
 					values.add(category.getDescription().trim());
 				}
@@ -135,52 +142,95 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		}
 	}
 
-	private void scaleShouldBeEditable(ScaleSummary scaleSummary, Errors errors) {
-		if (scaleSummary.getId() == null) {
+	private void scaleShouldBeEditable(ScaleDetails scaleDetails, Errors errors) {
+		if (scaleDetails.getId() == null) {
 			return;
 		}
 
+		Integer initialCount = errors.getErrorCount();
+
 		try {
-			Scale oldScale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(scaleSummary.getId(), null));
+			Scale oldScale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(scaleDetails.getId(), null), true);
 
 			// that method should exist with requestId
 			if (Objects.equals(oldScale, null)) {
-				this.addCustomError(errors, BaseValidator.ID_DOES_NOT_EXIST, new Object[] {"Scale", scaleSummary.getId()});
+				this.addCustomError(errors, BaseValidator.ID_DOES_NOT_EXIST, new Object[] {"Scale", scaleDetails.getId()});
 				return;
 			}
 
-			boolean isEditable = !this.termDataManager.isTermReferred(StringUtil.parseInt(scaleSummary.getId(), null));
+			if (oldScale.getDataType() != null && oldScale.getDataType().isSystemDataType()) {
+				this.addCustomError(errors, ScaleValidator.ERROR_NAME, ScaleValidator.SCALE_SYSTEM_DATA_TYPE, null);
+			}
+
+			if (errors.getErrorCount() > initialCount) {
+				return;
+			}
+
+			boolean isEditable = !this.termDataManager.isTermReferred(StringUtil.parseInt(scaleDetails.getId(), null));
 			if (isEditable) {
 				return;
 			}
 
-			boolean isNameSame = Objects.equals(scaleSummary.getName(), oldScale.getName());
+			boolean isNameSame = Objects.equals(scaleDetails.getName(), oldScale.getName());
 			if (!isNameSame) {
-				this.addCustomError(errors, "name", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {"scale", "Name"});
+				this.addCustomError(errors, ScaleValidator.NAME, BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
+						ScaleValidator.SCALE_NAME, "Name"});
 			}
 
-			boolean isDataTypeSame = Objects.equals(scaleSummary.getDataType().getId(), this.getDataTypeIdSafe(oldScale.getDataType()));
+			Integer dataTypeId = this.parseDataTypeIdAsInteger(scaleDetails.getDataType());
+
+			boolean isDataTypeSame = Objects.equals(dataTypeId, this.getDataTypeIdSafe(oldScale.getDataType()));
 			if (!isDataTypeSame) {
-				this.addCustomError(errors, "dataTypeId", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {"scale", "DataTypeId"});
+				this.addCustomError(errors, ScaleValidator.ERROR_NAME, BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
+						ScaleValidator.SCALE_NAME, "DataTypeId"});
 			}
 
-			ValidValues validValues = scaleSummary.getValidValues() == null ? new ValidValues() : scaleSummary.getValidValues();
-			boolean minValuesAreEqual = Objects.equals(validValues.getMin(), StringUtil.parseInt(oldScale.getMinValue(), null));
-			boolean maxValuesAreEqual = Objects.equals(validValues.getMax(), StringUtil.parseInt(oldScale.getMaxValue(), null));
-			List<VariableCategory> categories =
-					validValues.getCategories() == null ? new ArrayList<VariableCategory>() : validValues.getCategories();
-			boolean categoriesEqualSize = Objects.equals(categories.size(), oldScale.getCategories().size());
+			ValidValues validValues = scaleDetails.getValidValues() == null ? new ValidValues() : scaleDetails.getValidValues();
+
+			boolean minValuesAreEqual = true;
+			boolean maxValuesAreEqual = true;
+			boolean categoriesEqualSize = true;
 			boolean categoriesValuesAreSame = true;
-			if (categoriesEqualSize) {
-				for (VariableCategory l : categories) {
-					if (oldScale.getCategories().containsKey(l.getName())
-							&& Objects.equals(oldScale.getCategories().get(l.getName()), l.getDescription())) {
-						continue;
-					}
-					categoriesValuesAreSame = false;
-					break;
+
+			DataType dataType = DataType.getById(dataTypeId);
+
+			if (Objects.equals(dataType, DataType.NUMERIC_VARIABLE)) {
+
+				// Note: Check if oldScale min-max and validValues min-max null or empty. If empty then do not check for equality.
+
+				if (!(this.isNullOrEmpty(validValues.getMin()) && this.isNullOrEmpty(oldScale.getMinValue()))) {
+					minValuesAreEqual = Objects.equals(validValues.getMin(), oldScale.getMinValue());
 				}
+
+				if (!(this.isNullOrEmpty(validValues.getMax()) && this.isNullOrEmpty(oldScale.getMaxValue()))) {
+					maxValuesAreEqual = Objects.equals(validValues.getMax(), oldScale.getMaxValue());
+				}
+
+			} else if (Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)) {
+				List<org.ibp.api.domain.ontology.TermSummary> categories =
+						validValues.getCategories() == null ? new ArrayList<org.ibp.api.domain.ontology.TermSummary>() : validValues
+								.getCategories();
+						categoriesEqualSize = Objects.equals(categories.size(), oldScale.getCategories().size());
+						categoriesValuesAreSame = true;
+
+						if (categoriesEqualSize) {
+
+							// Converting old categories to Map for comparing.
+							Map<String, String> oldCategories = new HashMap<>();
+							for (TermSummary t : oldScale.getCategories()) {
+								oldCategories.put(t.getName(), t.getDefinition());
+							}
+
+							for (org.ibp.api.domain.ontology.TermSummary l : categories) {
+								if (oldCategories.containsKey(l.getName()) && Objects.equals(oldCategories.get(l.getName()), l.getDescription())) {
+									continue;
+								}
+								categoriesValuesAreSame = false;
+								break;
+							}
+						}
 			}
+
 			if (!minValuesAreEqual || !maxValuesAreEqual || !categoriesEqualSize || !categoriesValuesAreSame) {
 				this.addCustomError(errors, "validValues", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {"scale", "ValidValues"});
 			}
@@ -195,81 +245,91 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		return dataType == null ? null : dataType.getId();
 	}
 
-	private boolean nameValidationProcessor(ScaleSummary scaleSummary, Errors errors) {
+	private boolean nameValidationProcessor(ScaleDetails scaleDetails, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 
 		// 1. Name is required
-		this.shouldNotNullOrEmpty("Name", "name", scaleSummary.getName(), errors);
+		this.shouldNotNullOrEmpty("Name", ScaleValidator.NAME, scaleDetails.getName(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
 
 		// 12. Name is no more than 200 characters
-		this.fieldShouldNotOverflow("name", scaleSummary.getName(), ScaleValidator.NAME_TEXT_LIMIT, errors);
+		this.fieldShouldNotOverflow(ScaleValidator.NAME, scaleDetails.getName(), ScaleValidator.NAME_TEXT_LIMIT, errors);
 
 		// 2. The name must be unique
-		this.checkTermUniqueness("Scale", StringUtil.parseInt(scaleSummary.getId(), null), scaleSummary.getName(), CvId.SCALES.getId(),
+		this.checkTermUniqueness("Scale", StringUtil.parseInt(scaleDetails.getId(), null), scaleDetails.getName(), CvId.SCALES.getId(),
 				errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
 
 	// 13. Description is no more than 1024 characters
-	private boolean descriptionValidationProcessor(ScaleSummary scaleSummary, Errors errors) {
+	private boolean descriptionValidationProcessor(ScaleDetails scaleDetails, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 
-		if (Strings.isNullOrEmpty(scaleSummary.getDescription())) {
-			scaleSummary.setDescription("");
+		if (Strings.isNullOrEmpty(scaleDetails.getDescription())) {
+			scaleDetails.setDescription("");
 		} else {
-			scaleSummary.setDescription(scaleSummary.getDescription().trim());
+			scaleDetails.setDescription(scaleDetails.getDescription().trim());
 		}
 
-		this.fieldShouldNotOverflow("description", scaleSummary.getDescription(), ScaleValidator.DESCRIPTION_TEXT_LIMIT, errors);
+		this.fieldShouldNotOverflow("description", scaleDetails.getDescription(), ScaleValidator.DESCRIPTION_TEXT_LIMIT, errors);
 
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean dataTypeValidationProcessor(ScaleSummary scaleSummary, Errors errors) {
+	private boolean dataTypeValidationProcessor(ScaleDetails scaleDetails, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 
 		// 3. Data type is required
-		this.shouldNotNullOrEmpty("Data Type", "dataTypeId", scaleSummary.getDataType(), errors);
+		this.shouldNotNullOrEmpty("Data Type", ScaleValidator.ERROR_NAME, scaleDetails.getDataType(), errors);
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
 
-		if (!this.isNonNullValidNumericString(scaleSummary.getDataType().getId())) {
-			this.addCustomError(errors, "dataTypeId", BaseValidator.INVALID_TYPE_ID, new Object[] {"Data Type"});
+		if (!this.isNonNullValidNumericString(scaleDetails.getDataType().getId())) {
+			this.addCustomError(errors, ScaleValidator.ERROR_NAME, BaseValidator.INVALID_TYPE_ID, new Object[] {"Data Type"});
 		}
 
 		if (errors.getErrorCount() > initialCount) {
 			return false;
 		}
+
+		Integer dataTypeId = this.parseDataTypeIdAsInteger(scaleDetails.getDataType());
 
 		// 4. The data type ID must correspond to the ID of one of the supported
 		// data types (Numeric, Categorical, Character, DateTime, Person,
 		// Location or any other special data type that we add)
-		if (DataType.getById(scaleSummary.getDataType().getId()) == null) {
-			this.addCustomError(errors, "dataTypeId", BaseValidator.INVALID_TYPE_ID, new Object[] {"Data Type"});
+		if (DataType.getById(dataTypeId) == null) {
+			this.addCustomError(errors, ScaleValidator.ERROR_NAME, BaseValidator.INVALID_TYPE_ID, new Object[] {"Data Type"});
+		}
+
+		if (errors.getErrorCount() > initialCount) {
+			return false;
+		}
+
+		if (Objects.equals(DataType.getById(dataTypeId).isSystemDataType(), true)) {
+			this.addCustomError(errors, ScaleValidator.ERROR_NAME, ScaleValidator.SCALE_SYSTEM_DATA_TYPE, null);
 		}
 
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean categoricalDataTypeValidationProcessor(ScaleSummary scaleSummary, Errors errors) {
+	private boolean categoricalDataTypeValidationProcessor(ScaleDetails scaleDetails, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 
-		DataType dataType = DataType.getById(scaleSummary.getDataType().getId());
+		DataType dataType = DataType.getById(this.parseDataTypeIdAsInteger(scaleDetails.getDataType()));
 
-		ValidValues validValues = scaleSummary.getValidValues() == null ? new ValidValues() : scaleSummary.getValidValues();
+		ValidValues validValues = scaleDetails.getValidValues() == null ? new ValidValues() : scaleDetails.getValidValues();
 
-		List<VariableCategory> categories = validValues.getCategories();
+		List<org.ibp.api.domain.ontology.TermSummary> categories = validValues.getCategories();
 
 		// 5. If the data type is categorical, at least one category must be
 		// submitted
@@ -290,29 +350,32 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean numericDataTypeValidationProcessor(ScaleSummary scaleSummary, Errors errors) {
+	private boolean numericDataTypeValidationProcessor(ScaleDetails scaleDetails, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 
-		DataType dataType = DataType.getById(scaleSummary.getDataType().getId());
+		DataType dataType = DataType.getById(this.parseDataTypeIdAsInteger(scaleDetails.getDataType()));
 
-		ValidValues validValues = scaleSummary.getValidValues() == null ? new ValidValues() : scaleSummary.getValidValues();
+		ValidValues validValues = scaleDetails.getValidValues() == null ? new ValidValues() : scaleDetails.getValidValues();
 
-		String minValue = validValues.getMin() == null ? null : validValues.getMin().toString();
-		String maxValue = validValues.getMax() == null ? null : validValues.getMax().toString();
+		BigDecimal min = null;
+		BigDecimal max = null;
+
+		String minValue = validValues.getMin() == null ? null : validValues.getMin();
+		String maxValue = validValues.getMax() == null ? null : validValues.getMax();
 
 		// 9. If the data type is numeric and minimum and maximum valid values
 		// are provided (they are not mandatory), they must be numeric values
 		if (Objects.equals(dataType, DataType.NUMERIC_VARIABLE)) {
 			if (!this.isNullOrEmpty(minValue)) {
-				Integer min = StringUtil.parseInt(minValue, null);
+				min = StringUtil.parseBigDecimal(minValue, null);
 				if (min == null) {
 					this.addCustomError(errors, "validValues.min", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 				}
 			}
 
 			if (!this.isNullOrEmpty(maxValue)) {
-				Integer max = StringUtil.parseInt(maxValue, null);
+				max = StringUtil.parseBigDecimal(maxValue, null);
 				if (max == null) {
 					this.addCustomError(errors, "validValues.max", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 				}
@@ -326,11 +389,18 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		// 10. If present, the minimum valid value must be less than or equal to
 		// the maximum valid value, and the maximum valid value must be greater
 		// than or equal to the minimum valid value
-		if (this.isNonNullValidNumericString(minValue) && this.isNonNullValidNumericString(maxValue)
-				&& this.getIntegerValueSafe(minValue, 0) > this.getIntegerValueSafe(maxValue, 0)) {
+
+		if (min != null && max != null && min.compareTo(max) != -1) {
 			this.addCustomError(errors, "validValues.min", BaseValidator.MIN_MAX_NOT_VALID, null);
 		}
 
 		return errors.getErrorCount() == initialCount;
+	}
+
+	private Integer parseDataTypeIdAsInteger(org.ibp.api.domain.ontology.DataType dataType) {
+		if (dataType == null) {
+			return null;
+		}
+		return StringUtil.parseInt(dataType.getId(), null);
 	}
 }

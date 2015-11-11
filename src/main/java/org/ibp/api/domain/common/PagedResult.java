@@ -34,13 +34,13 @@ public class PagedResult<T> {
 		}
 		this.pageSize = pageSize;
 
-		if (totalResults != 0) {
-			if (pageNumber < 1 || pageNumber > this.getTotalPages()) {
-				throw new IllegalArgumentException("A total of " + this.getTotalPages()
-						+ " pages are available, so the page number must between 1 and " + this.getTotalPages() + ".");
-			}
+		if ((totalResults != 0) && (pageNumber < 1 || pageNumber > this.getTotalPages())) {
+			throw new IllegalArgumentException("A total of " + this.getTotalPages()
+					+ " pages are available, so the page number must between 1 and " + this.getTotalPages() + ".");
 		}
+
 		this.pageNumber = pageNumber;
+
 	}
 
 	public List<T> getPageResults() {

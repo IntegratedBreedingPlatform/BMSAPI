@@ -6,22 +6,24 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class DataType {
 
-	private Integer id;
+	private String id;
 	private String name;
+	private boolean systemDataType;
 
 	public DataType() {
 	}
 
-	public DataType(Integer id, String name) {
+	public DataType(String id, String name, boolean systemDataType) {
 		this.id = id;
 		this.name = name;
+		this.systemDataType = systemDataType;
 	}
 
-	public Integer getId() {
+	public String getId() {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -33,18 +35,26 @@ public class DataType {
 		this.name = name;
 	}
 
+	public boolean isSystemDataType() {
+		return systemDataType;
+	}
+
+	public void setSystemDataType(boolean systemDataType) {
+		this.systemDataType = systemDataType;
+	}
+
 	@Override
 	public boolean equals(final Object other) {
 		if (!(other instanceof DataType)) {
 			return false;
 		}
 		DataType castOther = (DataType) other;
-		return new EqualsBuilder().append(this.id, castOther.id).append(this.name, castOther.name).isEquals();
+		return new EqualsBuilder().append(this.id, castOther.id).append(this.name, castOther.name).append(this.systemDataType, castOther.systemDataType).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.id).append(this.name).toHashCode();
+		return new HashCodeBuilder().append(this.id).append(this.name).append(this.systemDataType).toHashCode();
 	}
 
 }

@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.ScaleDetails;
-import org.ibp.api.domain.ontology.ScaleSummary;
 
 public interface ScaleService {
 
@@ -14,7 +13,7 @@ public interface ScaleService {
 	 *
 	 * @return list of scales
 	 */
-	List<ScaleSummary> getAllScales();
+	List<ScaleDetails> getAllScales();
 
 	/**
 	 * get scale using given id
@@ -27,17 +26,17 @@ public interface ScaleService {
 	/**
 	 * Adding new scale
 	 *
-	 * @param scaleSummary ScaleSummary
+	 * @param scaleDetails ScaleDetails
 	 */
-	GenericResponse addScale(ScaleSummary scaleSummary);
+	GenericResponse addScale(ScaleDetails scaleDetails);
 
 	/**
 	 * update scale with new request data
 	 * 
 	 * @param id scale to update
-	 * @param scaleSummary ScaleSummary instance that have new data
+	 * @param scaleDetails ScaleDetails instance that have new data
 	 */
-	void updateScale(String id, ScaleSummary scaleSummary);
+	void updateScale(String id, ScaleDetails scaleDetails);
 
 	/**
 	 * Delete a scale using given id

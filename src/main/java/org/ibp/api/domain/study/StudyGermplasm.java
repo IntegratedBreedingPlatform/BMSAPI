@@ -1,21 +1,30 @@
 
 package org.ibp.api.domain.study;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.validator.constraints.NotBlank;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
 public class StudyGermplasm {
 
+	@JsonUnwrapped
+	private GermplasmListEntrySummary germplasmListEntrySummary = new GermplasmListEntrySummary();
+
+	@ApiModelProperty(value = "Type of entry: Check, Test.")
+	@NotBlank
 	private String entryType;
 
-	private String entryNo;
+	@NotNull
+	private Integer entryNumber;
 
+	@NotBlank
 	private String position;
-
-	private GermplasmListEntrySummary germplasmListEntrySummary;
 
 	/**
 	 * @return the entryType
@@ -27,22 +36,16 @@ public class StudyGermplasm {
 	/**
 	 * @param entryType the entryType to set
 	 */
-	public void setEntryType(String entryType) {
+	public void setEntryType(final String entryType) {
 		this.entryType = entryType;
 	}
 
-	/**
-	 * @return the entryNo
-	 */
-	public String getEntryNo() {
-		return this.entryNo;
+	public Integer getEntryNumber() {
+		return this.entryNumber;
 	}
 
-	/**
-	 * @param entryNo the entryNo to set
-	 */
-	public void setEntryNo(String entryNo) {
-		this.entryNo = entryNo;
+	public void setEntryNumber(final Integer entryNumber) {
+		this.entryNumber = entryNumber;
 	}
 
 	/**
@@ -55,7 +58,7 @@ public class StudyGermplasm {
 	/**
 	 * @param position the position to set
 	 */
-	public void setPosition(String position) {
+	public void setPosition(final String position) {
 		this.position = position;
 	}
 
@@ -70,7 +73,7 @@ public class StudyGermplasm {
 	/**
 	 * @param germplasmListEntrySummary the germplasmListEntrySummary to set
 	 */
-	public void setGermplasmListEntrySummary(GermplasmListEntrySummary germplasmListEntrySummary) {
+	public void setGermplasmListEntrySummary(final GermplasmListEntrySummary germplasmListEntrySummary) {
 		this.germplasmListEntrySummary = germplasmListEntrySummary;
 	}
 
@@ -79,15 +82,15 @@ public class StudyGermplasm {
 		if (!(other instanceof StudyGermplasm)) {
 			return false;
 		}
-		StudyGermplasm castOther = (StudyGermplasm) other;
-		return new EqualsBuilder().append(this.entryType, castOther.entryType).append(this.entryNo, castOther.entryNo)
+		final StudyGermplasm castOther = (StudyGermplasm) other;
+		return new EqualsBuilder().append(this.entryType, castOther.entryType).append(this.entryNumber, castOther.entryNumber)
 				.append(this.position, castOther.position).append(this.germplasmListEntrySummary, castOther.germplasmListEntrySummary)
 				.isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.entryType).append(this.entryNo).append(this.position)
+		return new HashCodeBuilder().append(this.entryType).append(this.entryNumber).append(this.position)
 				.append(this.germplasmListEntrySummary).toHashCode();
 	}
 

@@ -1,20 +1,17 @@
 
 package org.ibp.api.java.impl.middleware.common;
 
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.PreDestroy;
+import javax.transaction.TransactionManager;
+import javax.transaction.UserTransaction;
 
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
-import org.generationcp.middleware.hibernate.SessionFactoryUtil;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.hibernate.XADatasourceUtilities;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmListManagerImpl;
 import org.generationcp.middleware.manager.InventoryDataManagerImpl;
 import org.generationcp.middleware.manager.LocationDataManagerImpl;
+import org.generationcp.middleware.manager.PedigreeDataManagerImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.UserDataManagerImpl;
 import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
@@ -23,6 +20,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -45,20 +43,24 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl;
 import org.hibernate.SessionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.jta.JtaTransactionManager;
+
+import com.atomikos.icatch.jta.UserTransactionImp;
+import com.atomikos.icatch.jta.UserTransactionManager;
 
 @Configuration
+@EnableTransactionManagement
 public class MiddlewareFactory {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(MiddlewareFactory.class);
-
-	private final Map<String, SessionFactory> sessionFactoryCache = new HashMap<>();
 
 	@Autowired
 	private ApiEnvironmentConfiguration config;
@@ -66,38 +68,20 @@ public class MiddlewareFactory {
 	@Autowired
 	private ContextResolver contextResolver;
 
-	private SessionFactory workbenchSessionFactory;
+	@Autowired
+	@Qualifier("WORKBENCH_SessionFactory")
+	private SessionFactory WORKBENCH_SessionFactory;
 
-	@PreDestroy
-	public void preDestroy() {
+	@Autowired
+	private ApplicationContext applicationContext;
 
-		for (String key : this.sessionFactoryCache.keySet()) {
-			MiddlewareFactory.LOGGER.info("Closing cached session factory for crop database: " + key);
-			this.sessionFactoryCache.get(key).close();
-		}
+	public MiddlewareFactory() {
 
-		if (this.workbenchSessionFactory != null) {
-			MiddlewareFactory.LOGGER.info("Closing session factory for workbench database.");
-			this.workbenchSessionFactory.close();
-		}
 	}
 
-	private SessionFactory getSessionFactory() throws FileNotFoundException {
-		String selectedCropDB = this.getCurrentlySelectedCropDBName();
-		SessionFactory sessionFactory;
-
-		if (this.sessionFactoryCache.get(selectedCropDB) == null) {
-
-			DatabaseConnectionParameters connectionParams =
-					new DatabaseConnectionParameters(this.config.getDbHost(), this.config.getDbPort(), selectedCropDB,
-							this.config.getDbUsername(), this.config.getDbPassword());
-
-			sessionFactory = SessionFactoryUtil.openSessionFactory(connectionParams);
-			this.sessionFactoryCache.put(selectedCropDB, sessionFactory);
-		} else {
-			sessionFactory = this.sessionFactoryCache.get(selectedCropDB);
-		}
-		return sessionFactory;
+	private SessionFactory getSessionFactory() {
+		return (SessionFactory) this.applicationContext.getBean(XADatasourceUtilities.computeSessionFactoryName(this
+				.getCurrentlySelectedCropDBName()));
 	}
 
 	private String getCurrentlySelectedCropDBName() {
@@ -105,123 +89,148 @@ public class MiddlewareFactory {
 	}
 
 	@Bean
+	public UserTransaction userTransaction() throws Throwable {
+		final UserTransactionImp userTransactionImp = new UserTransactionImp();
+		userTransactionImp.setTransactionTimeout(1000);
+		return userTransactionImp;
+	}
+
+	@Bean(initMethod = "init", destroyMethod = "close")
+	public TransactionManager transactionManager() throws Throwable {
+		final UserTransactionManager userTransactionManager = new UserTransactionManager();
+		userTransactionManager.setForceShutdown(false);
+		return userTransactionManager;
+	}
+
+	// We do not want the platform transaction manager created per request but in order to handle different corps we need to seaarch for it
+	// per request. A hash map to cache
+	@Bean
+	public PlatformTransactionManager platformTransactionManager() throws Throwable {
+
+		return new JtaTransactionManager(this.userTransaction(), this.transactionManager());
+	}
+
+	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public StudyDataManager getStudyDataManager() throws FileNotFoundException {
+	public StudyDataManager getStudyDataManager() {
 		return new StudyDataManagerImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public FieldbookService getFieldbookService() throws FileNotFoundException {
+	public FieldbookService getFieldbookService() {
 		return new FieldbookServiceImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public StudyService getStudyService() throws FileNotFoundException {
+	public StudyService getStudyService() {
 		return new StudyServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public GenotypicDataManager getGenotypicDataManager() throws FileNotFoundException {
+	public GenotypicDataManager getGenotypicDataManager() {
 		return new GenotypicDataManagerImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public TermDataManager getTermDataManager() throws FileNotFoundException {
+	public TermDataManager getTermDataManager() {
 		return new TermDataManagerImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public OntologyMethodDataManager getOntologyMethodDataManager() throws FileNotFoundException {
+	public OntologyMethodDataManager getOntologyMethodDataManager() {
 		return new OntologyMethodDataManagerImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public OntologyPropertyDataManager getOntologyPropertyDataManager() throws FileNotFoundException {
+	public OntologyPropertyDataManager getOntologyPropertyDataManager() {
 		return new OntologyPropertyDataManagerImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public OntologyScaleDataManager getOntologyScaleDataManager() throws FileNotFoundException {
+	public OntologyScaleDataManager getOntologyScaleDataManager() {
 		return new OntologyScaleDataManagerImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public OntologyVariableDataManager getOntologyVariableDataManager() throws FileNotFoundException {
+	public OntologyVariableDataManager getOntologyVariableDataManager() {
 		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
 				this.getOntologyScaleDataManager(), this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public InventoryDataManager getInventoryDataManager() throws FileNotFoundException {
+	public InventoryDataManager getInventoryDataManager() {
 		return new InventoryDataManagerImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public LocationDataManager getLocationDataManager() throws FileNotFoundException {
+	public LocationDataManager getLocationDataManager() {
 		return new LocationDataManagerImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public UserDataManager getUserDataManager() throws FileNotFoundException {
+	public UserDataManager getUserDataManager() {
 		return new UserDataManagerImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public GermplasmListManager getGermplasmListManager() throws FileNotFoundException {
+	public GermplasmListManager getGermplasmListManager() {
 		return new GermplasmListManagerImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public GermplasmDataManager getGermplasmDataManager() throws FileNotFoundException {
+	public GermplasmDataManager getGermplasmDataManager() {
 		return new GermplasmDataManagerImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public DataImportService getDataImportService() throws FileNotFoundException {
+	public PedigreeDataManager getPedigreeDataManager() {
+		PedigreeDataManagerImpl pedigreeDataManager =
+				new PedigreeDataManagerImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
+		pedigreeDataManager.setGermplasmDataManager(this.getGermplasmDataManager());
+		return pedigreeDataManager;
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public DataImportService getDataImportService() {
 		return new DataImportServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public PedigreeService getPedigreeService() throws FileNotFoundException {
+	public PedigreeService getPedigreeService() {
 		// FIXME - producing the default pedigree service impl. Make it configurable for CIMMYT wheat pedigree generation.
 		return new PedigreeDefaultServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
-	@Bean(destroyMethod = "close")
+	@Bean()
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public HibernateSessionPerRequestProvider getCropDatabaseSessionProvider() throws FileNotFoundException {
+	public HibernateSessionPerRequestProvider getCropDatabaseSessionProvider() {
 		return new HibernateSessionPerRequestProvider(this.getSessionFactory());
 	}
 
 	@Bean
-	public WorkbenchDataManager getWorkbenchDataManager() throws FileNotFoundException {
+	@DependsOn("WORKBENCH_SessionFactory")
+	public WorkbenchDataManager getWorkbenchDataManager() {
 		return new WorkbenchDataManagerImpl(this.getWorkbenchSessionProvider());
 	}
 
-	@Bean(destroyMethod = "close")
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public HibernateSessionPerRequestProvider getWorkbenchSessionProvider() throws FileNotFoundException {
-		if (this.workbenchSessionFactory == null) {
-			DatabaseConnectionParameters workbenchConnectionParameters =
-					new DatabaseConnectionParameters(this.config.getDbHost(), this.config.getDbPort(), this.config.getWorkbenchDBName(),
-							this.config.getDbUsername(), this.config.getDbPassword());
-			this.workbenchSessionFactory = SessionFactoryUtil.openSessionFactory(workbenchConnectionParameters);
-		}
-		return new HibernateSessionPerRequestProvider(this.workbenchSessionFactory);
+	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {
+		return new HibernateSessionPerRequestProvider(this.WORKBENCH_SessionFactory);
 	}
+
 }

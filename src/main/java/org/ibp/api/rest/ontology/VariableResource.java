@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
-import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,10 +35,10 @@ public class VariableResource {
 	@ApiOperation(value = "All variables", notes = "Gets all variables.")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<VariableSummary>> listAllVariables(@PathVariable String cropname, @RequestParam(value = "property",
+	public ResponseEntity<List<VariableDetails>> listAllVariables(@PathVariable String cropname, @RequestParam(value = "property",
 			required = false) String propertyId, @RequestParam(value = "favourite", required = false) Boolean favourite, @RequestParam(
 			value = "programId") String programId) {
-		return new ResponseEntity<>(this.variableService.getAllVariablesByFilter(programId, propertyId, favourite), HttpStatus.OK);
+		return new ResponseEntity<>(this.variableService.getAllVariablesByFilter(cropname, programId, propertyId, favourite), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get Variable", notes = "Get Variable By Id")
@@ -47,15 +46,15 @@ public class VariableResource {
 	@ResponseBody
 	public ResponseEntity<VariableDetails> getVariableById(@PathVariable String cropname,
 			@RequestParam(value = "programId") String programId, @PathVariable String id) {
-		return new ResponseEntity<>(this.variableService.getVariableById(programId, id), HttpStatus.OK);
+		return new ResponseEntity<>(this.variableService.getVariableById(cropname, programId, id), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Add Variable", notes = "Add new variable using given data")
 	@RequestMapping(value = "/{cropname}/variables", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<GenericResponse> addVariable(@PathVariable String cropname, @RequestParam(value = "programId") String programId,
-			@RequestBody VariableSummary variable) {
-		return new ResponseEntity<>(this.variableService.addVariable(programId, variable), HttpStatus.CREATED);
+			@RequestBody VariableDetails variable) {
+		return new ResponseEntity<>(this.variableService.addVariable(cropname, programId, variable), HttpStatus.CREATED);
 	}
 
 	/**
@@ -70,8 +69,8 @@ public class VariableResource {
 	@RequestMapping(value = "/{cropname}/variables/{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateVariable(@PathVariable String cropname, @RequestParam(value = "programId") String programId,
-			@PathVariable String id, @RequestBody VariableSummary variable) {
-		this.variableService.updateVariable(programId, id, variable);
+			@PathVariable String id, @RequestBody VariableDetails variable) {
+		this.variableService.updateVariable(cropname, programId, id, variable);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 

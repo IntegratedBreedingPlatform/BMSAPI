@@ -5,8 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
@@ -16,6 +24,7 @@ import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.MeasurementIdentifier;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyGermplasm;
+import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.Trait;
 import org.junit.Assert;
@@ -24,6 +33,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.core.convert.ConversionService;
 
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
@@ -42,6 +52,21 @@ public class StudyServiceImplTest {
 	@Mock
 	private StudyService mockMiddlewareStudyService;
 
+	@Mock
+	private StudyDataManager studyDataManager;
+
+	@Mock
+	private FieldbookService fieldbookService;
+
+	@Mock
+	private GermplasmListManager germplasmListManager;
+
+	@Mock
+	private ConversionService conversionService;
+
+	@Mock
+	private DataImportService dataImportService;
+
 	private final String programUID = UUID.randomUUID().toString();
 
 	final PodamFactory factory = new PodamFactoryImpl();
@@ -49,7 +74,7 @@ public class StudyServiceImplTest {
 	final Function<ObservationDto, Observation> observationTransformFunction = new Function<ObservationDto, Observation>() {
 
 		@Override
-		public Observation apply(ObservationDto input) {
+		public Observation apply(final ObservationDto input) {
 			return StudyServiceImplTest.this.mapObservationDtoToObservation(input);
 		}
 
@@ -60,13 +85,18 @@ public class StudyServiceImplTest {
 		MockitoAnnotations.initMocks(this);
 		this.studyServiceImpl = new StudyServiceImpl();
 		this.studyServiceImpl.setMiddlewareStudyService(this.mockMiddlewareStudyService);
+		this.studyServiceImpl.setConversionService(this.conversionService);
+		this.studyServiceImpl.setFieldbookService(this.fieldbookService);
+		this.studyServiceImpl.setGermplasmListManager(this.germplasmListManager);
+		this.studyServiceImpl.setStudyDataManager(this.studyDataManager);
+		this.studyServiceImpl.setDataImportService(this.dataImportService);
 	}
 
 	@Test
 	public void listAllStudies() throws MiddlewareQueryException {
 
-		List<org.generationcp.middleware.service.api.study.StudySummary> mockResult = new ArrayList<>();
-		org.generationcp.middleware.service.api.study.StudySummary studySummary =
+		final List<org.generationcp.middleware.service.api.study.StudySummary> mockResult = new ArrayList<>();
+		final org.generationcp.middleware.service.api.study.StudySummary studySummary =
 				new org.generationcp.middleware.service.api.study.StudySummary();
 		studySummary.setId(1);
 		studySummary.setName("Study Name");
@@ -80,7 +110,7 @@ public class StudyServiceImplTest {
 		mockResult.add(studySummary);
 		Mockito.when(this.mockMiddlewareStudyService.listAllStudies(this.programUID)).thenReturn(mockResult);
 
-		List<StudySummary> studySummaries = this.studyServiceImpl.listAllStudies(this.programUID);
+		final List<StudySummary> studySummaries = this.studyServiceImpl.listAllStudies(this.programUID);
 		Assert.assertEquals(mockResult.size(), studySummaries.size());
 		Assert.assertEquals(studySummary.getId().toString(), studySummaries.get(0).getId());
 		Assert.assertEquals(studySummary.getName(), studySummaries.get(0).getName());
@@ -106,7 +136,7 @@ public class StudyServiceImplTest {
 			@Override
 			public StudyGermplasm apply(final StudyGermplasmDto studyGermplasmDto) {
 				final StudyGermplasm studyGermplasm = new StudyGermplasm();
-				studyGermplasm.setEntryNo(studyGermplasmDto.getEntryNo());
+				studyGermplasm.setEntryNumber(studyGermplasmDto.getEntryNumber());
 				studyGermplasm.setEntryType(studyGermplasmDto.getEntryType());
 				studyGermplasm.setPosition(studyGermplasmDto.getPosition());
 				studyGermplasm.setGermplasmListEntrySummary(new GermplasmListEntrySummary(studyGermplasmDto.getGermplasmId(),
@@ -150,11 +180,11 @@ public class StudyServiceImplTest {
 
 	}
 
-	private Observation mapObservationDtoToObservation(ObservationDto measurement) {
+	private Observation mapObservationDtoToObservation(final ObservationDto measurement) {
 		final Observation observation = new Observation();
 		if (measurement != null) {
 			observation.setUniqueIdentifier(measurement.getMeasurementId());
-			observation.setEnrtyNumber(measurement.getEntryNo());
+			observation.setEntryNumber(measurement.getEntryNo());
 			observation.setEntryType(measurement.getEntryType());
 			observation.setEnvironmentNumber(measurement.getTrialInstance());
 			observation.setGermplasmDesignation(measurement.getDesignation());
@@ -173,5 +203,31 @@ public class StudyServiceImplTest {
 			observation.setMeasurements(measurements);
 		}
 		return observation;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void importStudy() {
+
+		// Minimal setup
+		final StudyImportDTO studyImportDTO = new StudyImportDTO();
+		studyImportDTO.setStudyType("N");
+		studyImportDTO.setUserId(1);
+
+		final Workbook workbook = new Workbook();
+		final StudyDetails studyDetails = new StudyDetails();
+		workbook.setStudyDetails(studyDetails);
+
+		Mockito.when(this.conversionService.convert(studyImportDTO, Workbook.class)).thenReturn(workbook);
+		this.studyServiceImpl.importStudy(studyImportDTO, this.programUID);
+
+		// Only asserting interactions with key collaborators
+		Mockito.verify(this.conversionService).convert(studyImportDTO, Workbook.class);
+		Mockito.verify(this.dataImportService).saveDataset(workbook, true, false, this.programUID);
+		Mockito.verify(this.conversionService).convert(studyImportDTO, GermplasmList.class);
+		Mockito.verify(this.germplasmListManager).addGermplasmList(Mockito.any(GermplasmList.class));
+		Mockito.verify(this.germplasmListManager).addGermplasmListData(Mockito.anyList());
+		Mockito.verify(this.fieldbookService).saveOrUpdateListDataProject(Mockito.anyInt(), Mockito.any(GermplasmListType.class),
+				Mockito.anyInt(), Mockito.anyList(), Mockito.anyInt());
 	}
 }

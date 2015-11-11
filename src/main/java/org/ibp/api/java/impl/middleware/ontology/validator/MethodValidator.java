@@ -7,7 +7,7 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.util.StringUtil;
-import org.ibp.api.domain.ontology.MethodSummary;
+import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +30,13 @@ public class MethodValidator extends OntologyValidator implements org.springfram
 
 	@Override
 	public boolean supports(Class<?> aClass) {
-		return MethodSummary.class.equals(aClass);
+		return MethodDetails.class.equals(aClass);
 	}
 
 	@Override
 	public void validate(Object target, Errors errors) {
 
-		MethodSummary method = (MethodSummary) target;
+		MethodDetails method = (MethodDetails) target;
 
 		boolean nameValidationResult = this.nameValidationProcessor(method, errors);
 
@@ -47,7 +47,7 @@ public class MethodValidator extends OntologyValidator implements org.springfram
 		}
 	}
 
-	private void methodShouldBeEditable(MethodSummary method, Errors errors) {
+	private void methodShouldBeEditable(MethodDetails method, Errors errors) {
 
 		if (method.getId() == null) {
 			return;
@@ -55,7 +55,7 @@ public class MethodValidator extends OntologyValidator implements org.springfram
 
 		try {
 
-			Method existingMethod = this.ontologyMethodDataManager.getMethod(StringUtil.parseInt(method.getId(), null));
+			Method existingMethod = this.ontologyMethodDataManager.getMethod(StringUtil.parseInt(method.getId(), null), true);
 
 			if (existingMethod == null) {
 				this.addCustomError(errors, BaseValidator.ID_DOES_NOT_EXIST, new Object[] {"Method", method.getId()});
@@ -83,7 +83,7 @@ public class MethodValidator extends OntologyValidator implements org.springfram
 		this.addCustomError(errors, "name", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {"method", "Name"});
 	}
 
-	private boolean nameValidationProcessor(MethodSummary method, Errors errors) {
+	private boolean nameValidationProcessor(MethodDetails method, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 
@@ -111,7 +111,7 @@ public class MethodValidator extends OntologyValidator implements org.springfram
 	}
 
 	// 5. Description is optional, when provided no more than 1024 characters in length.
-	private boolean descriptionValidationProcessor(MethodSummary method, Errors errors) {
+	private boolean descriptionValidationProcessor(MethodDetails method, Errors errors) {
 
 		Integer initialCount = errors.getErrorCount();
 

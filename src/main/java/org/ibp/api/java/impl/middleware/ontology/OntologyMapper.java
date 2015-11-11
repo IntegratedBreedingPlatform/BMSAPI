@@ -1,24 +1,18 @@
 
 package org.ibp.api.java.impl.middleware.ontology;
 
-import org.generationcp.middleware.domain.oms.DataType;
-import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.domain.oms.TermRelationship;
-import org.generationcp.middleware.domain.oms.VariableType;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.util.StringUtil;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.ibp.api.domain.ontology.MethodDetails;
-import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.domain.ontology.PropertyDetails;
-import org.ibp.api.domain.ontology.PropertySummary;
 import org.ibp.api.domain.ontology.ScaleDetails;
-import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.ontology.VariableDetails;
-import org.ibp.api.domain.ontology.VariableSummary;
 import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -47,7 +41,7 @@ public class OntologyMapper {
 		OntologyMapper.addTermRelationShipMapper(OntologyMapper.applicationWideModelMapper);
 		OntologyMapper.addVariableTypeMapper(OntologyMapper.applicationWideModelMapper);
 		OntologyMapper.addDataTypeMapper(OntologyMapper.applicationWideModelMapper);
-
+		OntologyMapper.addTermSummaryMapper(OntologyMapper.applicationWideModelMapper);
 	}
 
 	/**
@@ -63,18 +57,6 @@ public class OntologyMapper {
 	 * Get ModelMapper instance and add Method related mapping to it
 	 */
 	private static void addMethodMappers(ModelMapper mapper) {
-
-		mapper.addMappings(new PropertyMap<Method, MethodSummary>() {
-
-			@Override
-			protected void configure() {
-				this.map().setId(String.valueOf(this.source.getId()));
-				this.map().setName(this.source.getName());
-				this.map().setDescription(this.source.getDefinition());
-				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
-				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
-			}
-		});
 
 		mapper.addMappings(new PropertyMap<Method, MethodDetails>() {
 
@@ -94,20 +76,6 @@ public class OntologyMapper {
 	 * Get ModelMapper instance and add Property related mapping to it
 	 */
 	private static void addPropertyMappers(ModelMapper mapper) {
-
-		mapper.addMappings(new PropertyMap<Property, PropertySummary>() {
-
-			@Override
-			protected void configure() {
-				this.map().setId(String.valueOf(this.source.getId()));
-				this.map().setName(this.source.getName());
-				this.map().setDescription(this.source.getDefinition());
-				this.map().setCropOntologyId(this.source.getCropOntologyId());
-				this.map().setClasses(this.source.getClasses());
-				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
-				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
-			}
-		});
 
 		mapper.addMappings(new PropertyMap<Property, PropertyDetails>() {
 
@@ -130,21 +98,6 @@ public class OntologyMapper {
 	 */
 	private static void addScaleMappers(ModelMapper mapper) {
 
-		mapper.addMappings(new PropertyMap<Scale, ScaleSummary>() {
-
-			@Override
-			protected void configure() {
-				this.map().setId(String.valueOf(this.source.getId()));
-				this.map().setName(this.source.getName());
-				this.map().setDescription(this.source.getDefinition());
-				this.map().setMin(StringUtil.parseInt(this.source.getMinValue(), null));
-				this.map().setMax(StringUtil.parseInt(this.source.getMaxValue(), null));
-				this.map().setCategories(this.source.getCategories());
-				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
-				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
-			}
-		});
-
 		mapper.addMappings(new PropertyMap<Scale, ScaleDetails>() {
 
 			@Override
@@ -152,9 +105,8 @@ public class OntologyMapper {
 				this.map().setId(String.valueOf(this.source.getId()));
 				this.map().setName(this.source.getName());
 				this.map().setDescription(this.source.getDefinition());
-				this.map().setMinValue(StringUtil.parseInt(this.source.getMinValue(), null));
-				this.map().setMaxValue(StringUtil.parseInt(this.source.getMaxValue(), null));
-				this.map().setCategories(this.source.getCategories());
+				this.map().setMinValue(this.source.getMinValue());
+				this.map().setMaxValue(this.source.getMaxValue());
 				this.map().getMetadata().setDeletable(false);
 				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
 				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
@@ -163,27 +115,9 @@ public class OntologyMapper {
 	}
 
 	/**
-	 * Get ModelMapper instance and add Property related mapping to it
+	 * Get ModelMapper instance and add Variable related mapping to it
 	 */
 	private static void addVariableMappers(ModelMapper mapper) {
-
-		mapper.addMappings(new PropertyMap<OntologyVariableSummary, VariableSummary>() {
-
-			@Override
-			protected void configure() {
-				this.map().setId(String.valueOf(this.source.getId()));
-				this.map().setName(this.source.getName());
-				this.map().setDescription(this.source.getDescription());
-				this.map().getMethodSummary().setDescription(this.source.getMethodSummary().getDefinition());
-				this.map().getPropertySummary().setDescription(this.source.getPropertySummary().getDefinition());
-				this.map().setFavourite(this.source.getIsFavorite());
-				this.map().setAlias(this.source.getAlias());
-				this.map().setExpectedMin(this.source.getMinValue());
-				this.map().setExpectedMax(this.source.getMaxValue());
-				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
-				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
-			}
-		});
 
 		mapper.addMappings(new PropertyMap<Variable, VariableDetails>() {
 
@@ -193,8 +127,6 @@ public class OntologyMapper {
 				this.map().setDescription(this.source.getDefinition());
 				this.map().setFavourite(this.source.getIsFavorite());
 				this.map().setAlias(this.source.getAlias());
-				this.map().setMethodSummary(this.source.getMethod());
-				this.map().setPropertySummary(this.source.getProperty());
 				this.map().setObservations(this.source.getObservations());
 				this.map().setStudies(this.source.getStudies());
 				this.map().setExpectedMin(this.source.getMinValue());
@@ -238,10 +170,32 @@ public class OntologyMapper {
 						VariableType variableEnum = context.getSource();
 
 						org.ibp.api.domain.ontology.VariableType variableType = new org.ibp.api.domain.ontology.VariableType();
-						variableType.setId(variableEnum.getId());
+						variableType.setId(String.valueOf(variableEnum.getId()));
 						variableType.setName(variableEnum.getName());
 						variableType.setDescription(variableEnum.getDescription());
 						return variableType;
+					}
+				});
+	}
+
+	public static void addTermSummaryMapper(ModelMapper mapper) {
+		// Note: This will type map middleware TermSummary to BMSAPI TermSummary for scale categorical values.
+		mapper.createTypeMap(org.generationcp.middleware.domain.oms.TermSummary.class, TermSummary.class).setConverter(
+				new Converter<org.generationcp.middleware.domain.oms.TermSummary, TermSummary>() {
+
+					@Override
+					public TermSummary convert(MappingContext<org.generationcp.middleware.domain.oms.TermSummary, TermSummary> context) {
+						if (context.getSource() == null) {
+							return null;
+						}
+
+						org.generationcp.middleware.domain.oms.TermSummary termSummary = context.getSource();
+
+						TermSummary term  = new TermSummary();
+						term.setId(String.valueOf(termSummary.getId()));
+						term.setName(termSummary.getName());
+						term.setDescription(termSummary.getDefinition());
+						return term;
 					}
 				});
 	}
@@ -260,7 +214,7 @@ public class OntologyMapper {
 						DataType dataTypeEnum = context.getSource();
 
 						org.ibp.api.domain.ontology.DataType dataType = new org.ibp.api.domain.ontology.DataType();
-						dataType.setId(dataTypeEnum.getId());
+						dataType.setId(String.valueOf(dataTypeEnum.getId()));
 						dataType.setName(dataTypeEnum.getName());
 						return dataType;
 					}

@@ -2,27 +2,22 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import java.text.ParseException;
-import java.util.Date;
 
-import org.generationcp.middleware.domain.oms.DataType;
-import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermRelationship;
-import org.generationcp.middleware.domain.oms.VariableType;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.util.ISO8601DateParser;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.ontology.MethodDetails;
-import org.ibp.api.domain.ontology.MethodSummary;
 import org.ibp.api.domain.ontology.PropertyDetails;
-import org.ibp.api.domain.ontology.PropertySummary;
 import org.ibp.api.domain.ontology.ScaleDetails;
-import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.ontology.VariableDetails;
-import org.ibp.api.domain.ontology.VariableSummary;
 import org.junit.Assert;
 import org.junit.Test;
 import org.modelmapper.ModelMapper;
@@ -31,22 +26,6 @@ import org.modelmapper.ModelMapper;
  * Test to check mapping between middleware domain and bmsapi domain
  */
 public class OntologyMapperTest {
-
-	@Test
-	public void methodSummaryMapperTest() throws ParseException {
-
-		Method method = TestDataProvider.getTestMethod();
-
-		ModelMapper mapper = OntologyMapper.getInstance();
-
-		MethodSummary methodSummary = mapper.map(method, MethodSummary.class);
-
-		Assert.assertEquals(String.valueOf(method.getId()), methodSummary.getId());
-		Assert.assertEquals(method.getName(), methodSummary.getName());
-		Assert.assertEquals(method.getDefinition(), methodSummary.getDescription());
-		Assert.assertEquals(method.getDateCreated(), ISO8601DateParser.parse(methodSummary.getMetadata().getDateCreated()));
-		Assert.assertEquals(method.getDateLastModified(), ISO8601DateParser.parse(methodSummary.getMetadata().getDateLastModified()));
-	}
 
 	@Test
 	public void methodDetailsMapperTest() throws ParseException {
@@ -66,29 +45,6 @@ public class OntologyMapperTest {
 	}
 
 	@Test
-	public void propertySummaryMapperTest() throws ParseException {
-		Term term = new Term();
-
-		term.setId(1);
-		term.setName("name");
-		term.setDefinition("definition");
-
-		Property property = new Property(term);
-		property.setDateCreated(new Date());
-		property.setDateLastModified(new Date());
-
-		ModelMapper mapper = OntologyMapper.getInstance();
-
-		PropertySummary propertySummary = mapper.map(property, PropertySummary.class);
-
-		Assert.assertEquals(String.valueOf(property.getId()), propertySummary.getId());
-		Assert.assertEquals(property.getName(), propertySummary.getName());
-		Assert.assertEquals(property.getDefinition(), propertySummary.getDescription());
-		Assert.assertEquals(property.getDateCreated(), ISO8601DateParser.parse(propertySummary.getMetadata().getDateCreated()));
-		Assert.assertEquals(property.getDateLastModified(), ISO8601DateParser.parse(propertySummary.getMetadata().getDateLastModified()));
-	}
-
-	@Test
 	public void propertyDetailsMapperTest() throws ParseException {
 
 		Property property = TestDataProvider.getTestProperty();
@@ -105,29 +61,6 @@ public class OntologyMapperTest {
 		Assert.assertTrue(propertyDetails.getMetadata().getEditableFields().isEmpty());
 		Assert.assertFalse(propertyDetails.getMetadata().isDeletable());
 		Assert.assertTrue(propertyDetails.getMetadata().getUsage().getVariables().isEmpty());
-	}
-
-	@Test
-	public void scaleSummaryMapperTest() throws ParseException {
-		Term term = new Term();
-
-		term.setId(1);
-		term.setName("name");
-		term.setDefinition("definition");
-
-		Scale scale = new Scale(term);
-		scale.setDateCreated(new Date());
-		scale.setDateLastModified(new Date());
-
-		ModelMapper mapper = OntologyMapper.getInstance();
-
-		ScaleSummary scaleSummary = mapper.map(scale, ScaleSummary.class);
-
-		Assert.assertEquals(String.valueOf(scale.getId()), scaleSummary.getId());
-		Assert.assertEquals(scale.getName(), scaleSummary.getName());
-		Assert.assertEquals(scale.getDefinition(), scaleSummary.getDescription());
-		Assert.assertEquals(scale.getDateCreated(), ISO8601DateParser.parse(scaleSummary.getMetadata().getDateCreated()));
-		Assert.assertEquals(scale.getDateLastModified(), ISO8601DateParser.parse(scaleSummary.getMetadata().getDateLastModified()));
 	}
 
 	@Test
@@ -151,45 +84,6 @@ public class OntologyMapperTest {
 	}
 
 	@Test
-	public void variableSummaryMapperTest() throws ParseException {
-
-		OntologyVariableSummary mVariableSummary = new OntologyVariableSummary(1, "name", "description");
-		mVariableSummary.setAlias("alias");
-		mVariableSummary.setDateCreated(new Date());
-		mVariableSummary.setDateLastModified(new Date());
-		mVariableSummary.setMethodSummary(TestDataProvider.mwMethodSummary);
-		mVariableSummary.setPropertySummary(TestDataProvider.mwPropertySummary);
-		mVariableSummary.setScaleSummary(TestDataProvider.getTestScale());
-		mVariableSummary.setMinValue("0");
-		mVariableSummary.setMaxValue("10");
-		mVariableSummary.setIsFavorite(true);
-
-		ModelMapper mapper = OntologyMapper.getInstance();
-
-		VariableSummary ibpVariableSummary = mapper.map(mVariableSummary, VariableSummary.class);
-
-		Assert.assertEquals(ibpVariableSummary.getId(), String.valueOf(mVariableSummary.getId()));
-		Assert.assertEquals(ibpVariableSummary.getName(), mVariableSummary.getName());
-		Assert.assertEquals(ibpVariableSummary.getAlias(), mVariableSummary.getAlias());
-		Assert.assertEquals(ibpVariableSummary.getDescription(), mVariableSummary.getDescription());
-		Assert.assertEquals(ibpVariableSummary.getMethodSummary().getId(), String.valueOf(mVariableSummary.getMethodSummary().getId()));
-		Assert.assertEquals(ibpVariableSummary.getMethodSummary().getName(), mVariableSummary.getMethodSummary().getName());
-		Assert.assertEquals(ibpVariableSummary.getMethodSummary().getDescription(), mVariableSummary.getMethodSummary().getDefinition());
-		Assert.assertEquals(ibpVariableSummary.getPropertySummary().getId(), String.valueOf(mVariableSummary.getPropertySummary().getId()));
-		Assert.assertEquals(ibpVariableSummary.getPropertySummary().getName(), mVariableSummary.getPropertySummary().getName());
-		Assert.assertEquals(ibpVariableSummary.getPropertySummary().getDescription(), mVariableSummary.getPropertySummary().getDefinition());
-		Assert.assertEquals(ibpVariableSummary.getScaleSummary().getId(), String.valueOf(mVariableSummary.getScaleSummary().getId()));
-		Assert.assertEquals(ibpVariableSummary.getScaleSummary().getName(), mVariableSummary.getScaleSummary().getName());
-		Assert.assertEquals(ibpVariableSummary.getScaleSummary().getDescription(), mVariableSummary.getScaleSummary().getDefinition());
-		Assert.assertEquals(ibpVariableSummary.getExpectedRange().getMin(), mVariableSummary.getMinValue());
-		Assert.assertEquals(ibpVariableSummary.getExpectedRange().getMax(), mVariableSummary.getMaxValue());
-		Assert.assertEquals(ibpVariableSummary.getMetadata().getDateCreated(),
-				ISO8601DateParser.toString(mVariableSummary.getDateCreated()));
-		Assert.assertEquals(ibpVariableSummary.getMetadata().getDateLastModified(),
-				ISO8601DateParser.toString(mVariableSummary.getDateLastModified()));
-	}
-
-	@Test
 	public void variableDetailsMapperTest() throws ParseException {
 
 		Variable variable = TestDataProvider.getTestVariable();
@@ -200,12 +94,12 @@ public class OntologyMapperTest {
 		Assert.assertEquals(String.valueOf(variable.getId()), variableDetails.getId());
 		Assert.assertEquals(variable.getName(), variableDetails.getName());
 		Assert.assertEquals(variable.getDefinition(), variableDetails.getDescription());
-		Assert.assertEquals(String.valueOf(variable.getMethod().getId()), variableDetails.getMethodSummary().getId());
-		Assert.assertEquals(variable.getMethod().getName(), variableDetails.getMethodSummary().getName());
-		Assert.assertEquals(variable.getMethod().getDefinition(), variableDetails.getMethodSummary().getDescription());
-		Assert.assertEquals(String.valueOf(variable.getProperty().getId()), variableDetails.getPropertySummary().getId());
-		Assert.assertEquals(variable.getProperty().getName(), variableDetails.getPropertySummary().getName());
-		Assert.assertEquals(variable.getProperty().getDefinition(), variableDetails.getPropertySummary().getDescription());
+		Assert.assertEquals(String.valueOf(variable.getMethod().getId()), variableDetails.getMethod().getId());
+		Assert.assertEquals(variable.getMethod().getName(), variableDetails.getMethod().getName());
+		Assert.assertEquals(variable.getMethod().getDefinition(), variableDetails.getMethod().getDescription());
+		Assert.assertEquals(String.valueOf(variable.getProperty().getId()), variableDetails.getProperty().getId());
+		Assert.assertEquals(variable.getProperty().getName(), variableDetails.getProperty().getName());
+		Assert.assertEquals(variable.getProperty().getDefinition(), variableDetails.getProperty().getDescription());
 		Assert.assertEquals(String.valueOf(variable.getScale().getId()), variableDetails.getScale().getId());
 		Assert.assertEquals(variable.getScale().getName(), variableDetails.getScale().getName());
 		Assert.assertEquals(variable.getScale().getDefinition(), variableDetails.getScale().getDescription());
@@ -239,13 +133,13 @@ public class OntologyMapperTest {
 	@Test
 	public void variableTypeMapperTest() {
 
-		VariableType variableType = VariableType.getById(1);
+		VariableType variableType = VariableType.getById(1801);
 
 		ModelMapper mapper = OntologyMapper.getInstance();
 
 		org.ibp.api.domain.ontology.VariableType vType = mapper.map(variableType, org.ibp.api.domain.ontology.VariableType.class);
 
-		Assert.assertEquals(vType.getId(), variableType.getId());
+		Assert.assertEquals(StringUtil.parseInt(vType.getId(), null), variableType.getId());
 		Assert.assertEquals(vType.getName(), variableType.getName());
 		Assert.assertEquals(vType.getDescription(), variableType.getDescription());
 	}
@@ -253,13 +147,13 @@ public class OntologyMapperTest {
 	@Test
 	public void dataTypeMapperTest() {
 
-		DataType dataType = DataType.getById(1110);
+		DataType dataType = DataType.NUMERIC_VARIABLE;
 
 		ModelMapper mapper = OntologyMapper.getInstance();
 
 		org.ibp.api.domain.ontology.DataType dType = mapper.map(dataType, org.ibp.api.domain.ontology.DataType.class);
 
-		Assert.assertEquals(dType.getId(), dataType.getId());
+		Assert.assertEquals(StringUtil.parseInt(dType.getId(), null), dataType.getId());
 		Assert.assertEquals(dType.getName(), dataType.getName());
 	}
 }

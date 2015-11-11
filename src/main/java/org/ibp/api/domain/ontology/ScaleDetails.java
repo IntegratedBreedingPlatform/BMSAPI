@@ -1,11 +1,17 @@
 
 package org.ibp.api.domain.ontology;
 
-import java.util.Map;
+import java.util.List;
+
+import org.ibp.api.domain.ontology.serializers.ScaleDetailsSerializer;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Holds all Scale details. Extended from {@link TermSummary} for basic term details.
  */
+
+@JsonSerialize(using = ScaleDetailsSerializer.class)
 public class ScaleDetails extends TermSummary {
 
 	private DataType dataType;
@@ -25,16 +31,16 @@ public class ScaleDetails extends TermSummary {
 		return this.validValues;
 	}
 
-	public void setMinValue(Integer minValue) {
+	public void setMinValue(String minValue) {
 		this.validValues.setMin(minValue);
 	}
 
-	public void setMaxValue(Integer maxValue) {
-		this.validValues.setMax(maxValue);
+	public void setCategories(List<TermSummary> categories){
+		this.validValues.setCategories(categories);
 	}
 
-	public void setCategories(Map<String, String> categories) {
-		this.validValues.setCategoriesFromMap(categories);
+	public void setMaxValue(String maxValue) {
+		this.validValues.setMax(maxValue);
 	}
 
 	public MetadataDetails getMetadata() {

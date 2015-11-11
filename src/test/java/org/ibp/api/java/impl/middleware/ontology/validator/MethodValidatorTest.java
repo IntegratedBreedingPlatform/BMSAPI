@@ -11,7 +11,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.util.StringUtil;
-import org.ibp.api.domain.ontology.MethodSummary;
+import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.junit.After;
 import org.junit.Assert;
@@ -54,12 +54,12 @@ public class MethodValidatorTest {
 	@Test
 	public void testWithNullNameRequest() throws MiddlewareException {
 
-		MethodSummary methodSummary = TestDataProvider.getTestMethodSummary();
-		methodSummary.setName("");
+		MethodDetails methodDetails = TestDataProvider.getTestMethodDetails();
+		methodDetails.setName("");
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
-		this.methodValidator.validate(methodSummary, bindingResult);
+		this.methodValidator.validate(methodDetails, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
@@ -81,9 +81,9 @@ public class MethodValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
-		MethodSummary methodSummary = TestDataProvider.getTestMethodSummary();
+		MethodDetails methodDetails = TestDataProvider.getTestMethodDetails();
 
-		this.methodValidator.validate(methodSummary, bindingResult);
+		this.methodValidator.validate(methodDetails, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
@@ -101,14 +101,14 @@ public class MethodValidatorTest {
 		Mockito.doReturn(TestDataProvider.getMethodTerm()).when(this.termDataManager)
 				.getTermByNameAndCvId(method.getName(), CvId.METHODS.getId());
 		Mockito.doReturn(true).when(this.termDataManager).isTermReferred(method.getId());
-		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId());
+		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(method.getId(), true);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
-		MethodSummary methodSummary = TestDataProvider.getTestMethodSummary();
-		methodSummary.setName("ChangedName");
+		MethodDetails methodDetails = TestDataProvider.getTestMethodDetails();
+		methodDetails.setName("ChangedName");
 
-		this.methodValidator.validate(methodSummary, bindingResult);
+		this.methodValidator.validate(methodDetails, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertTrue(bindingResult.getAllErrors().size() == 1);
 	}
@@ -119,12 +119,12 @@ public class MethodValidatorTest {
 	@Test
 	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
 
-		MethodSummary methodSummary = TestDataProvider.getTestMethodSummary();
-		methodSummary.setName(RandomStringUtils.random(201));
+		MethodDetails methodDetails = TestDataProvider.getTestMethodDetails();
+		methodDetails.setName(RandomStringUtils.randomAlphanumeric(201));
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
-		this.methodValidator.validate(methodSummary, bindingResult);
+		this.methodValidator.validate(methodDetails, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
@@ -135,8 +135,8 @@ public class MethodValidatorTest {
 	@Test
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 
-		MethodSummary methodSummary = TestDataProvider.getTestMethodSummary();
-		methodSummary.setDescription(RandomStringUtils.random(1025));
+		MethodDetails methodSummary = TestDataProvider.getTestMethodDetails();
+		methodSummary.setDescription(RandomStringUtils.randomAlphanumeric(1025));
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(methodSummary.getName(), CvId.METHODS.getId());
 
@@ -153,39 +153,39 @@ public class MethodValidatorTest {
 	@Test
 	public void testWithValidRequest() throws MiddlewareException {
 
-		MethodSummary methodSummary = TestDataProvider.getTestMethodSummary();
+		MethodDetails methodDetails = TestDataProvider.getTestMethodDetails();
 
 		// Post request does not expect method id.
-		methodSummary.setId(null);
+		methodDetails.setId(null);
 
-		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(methodSummary.getName(), CvId.METHODS.getId());
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(methodDetails.getName(), CvId.METHODS.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
-		this.methodValidator.validate(methodSummary, bindingResult);
+		this.methodValidator.validate(methodDetails, bindingResult);
 		Assert.assertFalse(bindingResult.hasErrors());
 	}
 
 	/**
 	 * Test for to check Method is Editable or Not
-	 * 
+	 *
 	 * @throws MiddlewareException
 	 */
 	@Test
 	public void testWithCheckEditableMethod() throws MiddlewareException {
 
-		MethodSummary methodSummary = TestDataProvider.getTestMethodSummary();
+		MethodDetails methodDetails = TestDataProvider.getTestMethodDetails();
 		Method method = TestDataProvider.getTestMethod();
 
-		Integer methodId = StringUtil.parseInt(methodSummary.getId(), null);
+		Integer methodId = StringUtil.parseInt(methodDetails.getId(), null);
 
-		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(methodSummary.getName(), CvId.METHODS.getId());
-		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(methodId);
+		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(methodDetails.getName(), CvId.METHODS.getId());
+		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(methodId, true);
 		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(methodId);
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 
-		this.methodValidator.validate(methodSummary, bindingResult);
+		this.methodValidator.validate(methodDetails, bindingResult);
 		Assert.assertFalse(bindingResult.hasErrors());
 	}
 }

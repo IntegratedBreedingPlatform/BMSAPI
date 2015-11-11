@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.PropertyDetails;
-import org.ibp.api.domain.ontology.PropertySummary;
 
 public interface PropertyService {
 
@@ -14,7 +13,7 @@ public interface PropertyService {
 	 *
 	 * @return list of properties
 	 */
-	List<PropertySummary> getAllProperties();
+	List<PropertyDetails> getAllProperties();
 
 	/**
 	 * get property by given property id
@@ -30,7 +29,7 @@ public interface PropertyService {
 	 * @param request property data to be added
 	 * @return newly created property id
 	 */
-	GenericResponse addProperty(PropertySummary request);
+	GenericResponse addProperty(PropertyDetails request);
 
 	/**
 	 * get all properties containing class name
@@ -38,7 +37,7 @@ public interface PropertyService {
 	 * @param propertyClass class name to be search in property
 	 * @return list of properties
 	 */
-	List<PropertySummary> getAllPropertiesByClass(String propertyClass);
+	List<PropertyDetails> getAllPropertiesByClass(String propertyClass);
 
 	/**
 	 * delete property if not used
@@ -52,5 +51,5 @@ public interface PropertyService {
 	 * @param id property to update
 	 * @param request property data to update
 	 */
-	void updateProperty(String id, PropertySummary request);
+	void updateProperty(String id, PropertyDetails request);
 }

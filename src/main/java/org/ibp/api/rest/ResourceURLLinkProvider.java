@@ -8,7 +8,6 @@ import org.ibp.api.rest.germplasm.GermplasmResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-// FIXME replace with http://en.wikipedia.org/wiki/HATEOAS
 @Component
 public class ResourceURLLinkProvider {
 

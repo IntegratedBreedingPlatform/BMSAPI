@@ -6,11 +6,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.ontology.DataType;
 import org.ibp.api.domain.ontology.VariableType;
@@ -18,10 +20,12 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.ontology.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Function;
 
 @Service
+@Transactional
 public class ModelServiceImpl implements ModelService {
 
 	@Autowired
@@ -29,14 +33,26 @@ public class ModelServiceImpl implements ModelService {
 
 	@Override
 	public List<DataType> getAllDataTypes() {
-		return Util.convertAll(Arrays.asList(org.generationcp.middleware.domain.oms.DataType.values()),
-				new Function<org.generationcp.middleware.domain.oms.DataType, DataType>() {
+		return Util.convertAll(Arrays.asList(org.generationcp.middleware.domain.ontology.DataType.values()),
+				new Function<org.generationcp.middleware.domain.ontology.DataType, DataType>() {
 
 					@Override
-					public DataType apply(org.generationcp.middleware.domain.oms.DataType dataType) {
-						return new DataType(dataType.getId(), dataType.getName());
+					public DataType apply(org.generationcp.middleware.domain.ontology.DataType dataType) {
+						return new DataType(String.valueOf(dataType.getId()), dataType.getName(), dataType.isSystemDataType());
 					}
 				});
+	}
+
+	@Override
+	public boolean isNumericDataType(String dataTypeId) {
+		Integer id = StringUtil.parseInt(dataTypeId, null);
+		return Objects.equals(id, org.generationcp.middleware.domain.ontology.DataType.NUMERIC_VARIABLE.getId());
+	}
+
+	@Override
+	public boolean isCategoricalDataType(String dataTypeId) {
+		Integer id = StringUtil.parseInt(dataTypeId, null);
+		return Objects.equals(id, org.generationcp.middleware.domain.ontology.DataType.CATEGORICAL_VARIABLE.getId());
 	}
 
 	@Override
@@ -49,7 +65,7 @@ public class ModelServiceImpl implements ModelService {
 				classList.add(term.getName());
 			}
 
-			Comparator<String> ALPHABETICAL_ORDER = new Comparator<String>() {
+			Comparator<String> alphabeticalOrder = new Comparator<String>() {
 
 				@Override
 				public int compare(String str1, String str2) {
@@ -61,7 +77,7 @@ public class ModelServiceImpl implements ModelService {
 				}
 			};
 
-			Collections.sort(classList, ALPHABETICAL_ORDER);
+			Collections.sort(classList, alphabeticalOrder);
 
 			return classList;
 		} catch (MiddlewareException e) {
@@ -73,12 +89,12 @@ public class ModelServiceImpl implements ModelService {
 	public List<VariableType> getAllVariableTypes() {
 
 		List<VariableType> variableTypes =
-				Util.convertAll(Arrays.asList(org.generationcp.middleware.domain.oms.VariableType.values()),
-						new Function<org.generationcp.middleware.domain.oms.VariableType, VariableType>() {
+				Util.convertAll(Arrays.asList(org.generationcp.middleware.domain.ontology.VariableType.values()),
+						new Function<org.generationcp.middleware.domain.ontology.VariableType, VariableType>() {
 
 							@Override
-							public VariableType apply(org.generationcp.middleware.domain.oms.VariableType variableType) {
-								return new VariableType(variableType.getId(), variableType.getName(), variableType.getDescription());
+							public VariableType apply(org.generationcp.middleware.domain.ontology.VariableType variableType) {
+								return new VariableType(String.valueOf(variableType.getId()), variableType.getName(), variableType.getDescription());
 							}
 						});
 

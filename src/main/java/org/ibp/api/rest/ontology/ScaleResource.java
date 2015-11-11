@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.ScaleDetails;
-import org.ibp.api.domain.ontology.ScaleSummary;
 import org.ibp.api.java.ontology.ScaleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,7 +30,7 @@ public class ScaleResource {
 	@ApiOperation(value = "All Scales", notes = "Get all scales")
 	@RequestMapping(value = "/{cropname}/scales", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<ScaleSummary>> listAllScale(@PathVariable String cropname) {
+	public ResponseEntity<List<ScaleDetails>> listAllScale(@PathVariable String cropname) {
 		return new ResponseEntity<>(this.scaleService.getAllScales(), HttpStatus.OK);
 	}
 
@@ -45,7 +44,7 @@ public class ScaleResource {
 	@ApiOperation(value = "Add Scale", notes = "Add new scale using detail")
 	@RequestMapping(value = "/{cropname}/scales", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> addScale(@PathVariable String cropname, @RequestBody ScaleSummary scaleSummary) {
+	public ResponseEntity<GenericResponse> addScale(@PathVariable String cropname, @RequestBody ScaleDetails scaleSummary) {
 
 		return new ResponseEntity<>(this.scaleService.addScale(scaleSummary), HttpStatus.CREATED);
 	}
@@ -54,7 +53,7 @@ public class ScaleResource {
 	@ApiOperation(value = "Update Scale", notes = "Update existing scale using detail")
 	@RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity updateScale(@PathVariable String cropname, @PathVariable String id, @RequestBody ScaleSummary scaleSummary) {
+	public ResponseEntity updateScale(@PathVariable String cropname, @PathVariable String id, @RequestBody ScaleDetails scaleSummary) {
 		this.scaleService.updateScale(id, scaleSummary);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}

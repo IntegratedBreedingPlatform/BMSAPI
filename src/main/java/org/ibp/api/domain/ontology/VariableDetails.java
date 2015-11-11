@@ -5,20 +5,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.domain.ontology.Method;
-import org.generationcp.middleware.domain.ontology.Property;
+import org.ibp.api.domain.ontology.serializers.VariableDetailsSerializer;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Holds all Variable details. Extended from {@link TermSummary} for basic term details.
  */
+
+@JsonSerialize(using = VariableDetailsSerializer.class)
 public class VariableDetails extends TermSummary {
 
 	private MetadataDetails metadata = new MetadataDetails();
 
+	private String programUuid;
 	private String alias;
-	private final TermSummary methodSummary = new TermSummary();
-	private final TermSummary propertySummary = new TermSummary();
-	private ScaleSummary scale;
+	private MethodDetails method;
+	private PropertyDetails property;
+	private ScaleDetails scale;
 	private final List<VariableType> variableTypes = new ArrayList<>();
 	private boolean favourite;
 	private final ExpectedRange expectedRange = new ExpectedRange();
@@ -35,6 +39,14 @@ public class VariableDetails extends TermSummary {
 		return this.expectedRange;
 	}
 
+	public String getProgramUuid() {
+		return programUuid;
+	}
+
+	public void setProgramUuid(String programUuid) {
+		this.programUuid = programUuid;
+	}
+
 	public String getAlias() {
 		return this.alias;
 	}
@@ -43,31 +55,27 @@ public class VariableDetails extends TermSummary {
 		this.alias = alias;
 	}
 
-	public TermSummary getMethodSummary() {
-		return this.methodSummary;
+	public MethodDetails getMethod() {
+		return method;
 	}
 
-	public void setMethodSummary(Method method) {
-		this.methodSummary.setId(String.valueOf(method.getId()));
-		this.methodSummary.setName(method.getName());
-		this.methodSummary.setDescription(method.getDefinition());
+	public void setMethod(MethodDetails method) {
+		this.method = method;
 	}
 
-	public TermSummary getPropertySummary() {
-		return this.propertySummary;
+	public PropertyDetails getProperty() {
+		return property;
 	}
 
-	public void setPropertySummary(Property property) {
-		this.propertySummary.setId(String.valueOf(property.getId()));
-		this.propertySummary.setName(property.getName());
-		this.propertySummary.setDescription(property.getDefinition());
+	public void setProperty(PropertyDetails property) {
+		this.property = property;
 	}
 
-	public ScaleSummary getScale() {
+	public ScaleDetails getScale() {
 		return this.scale;
 	}
 
-	public void setScale(ScaleSummary scale) {
+	public void setScale(ScaleDetails scale) {
 		this.scale = scale;
 	}
 
@@ -87,12 +95,17 @@ public class VariableDetails extends TermSummary {
 		this.expectedRange.setMax(max);
 	}
 
-	public List<org.ibp.api.domain.ontology.VariableType> getVariableTypes() {
+	public List<VariableType> getVariableTypes() {
 		return this.variableTypes;
 	}
 
 	public void setVariableTypes(Set<VariableType> variables) {
 		this.variableTypes.clear();
+
+		if (variables == null) {
+			return;
+		}
+
 		for (VariableType variableType : variables) {
 			this.variableTypes.add(variableType);
 		}
