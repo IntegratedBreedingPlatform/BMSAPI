@@ -28,13 +28,13 @@
 	
 	<script type="text/javascript">
 		$(function () {
-		 	  var apiUrl = window.location.protocol + "//" + window.location.host;
-		 	  if (window.location.pathname.indexOf('/api') > 0) {
-		 	    apiUrl += window.location.pathname.substring(0, window.location.pathname.indexOf('/api'))
-		 	  }
+		 	var apiUrl = window.location.protocol + "//" + window.location.host;
+		 	if (window.location.pathname.indexOf('/api') > 0) {
+		 	  apiUrl += window.location.pathname.substring(0, window.location.pathname.indexOf('/api'))
+		 	}
 		 	  
-		 	  var contextPath = $("#contextPath").attr("href");
-		 	  apiUrl += contextPath + "api-docs";
+		 	var contextPath = $("#contextPath").attr("href");
+		 	apiUrl += contextPath + "api-docs";
 		  	  
 		    window.swaggerUi = new SwaggerUi({
 		    url: apiUrl,
@@ -42,16 +42,6 @@
 		    supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
 		    onComplete: function(swaggerApi, swaggerUi){
 		      log("Loaded SwaggerUI");
-		
-		      if(typeof initOAuth == "function") {
-		        /*
-		        initOAuth({
-		          clientId: "my-client-with-secret",
-		          realm: "your-realms",
-		          appName: "bmsapi"
-		        });
-		        */
-		      }
 		      $('pre code').each(function(i, e) {
 		        hljs.highlightBlock(e)
 		      });
@@ -62,7 +52,16 @@
 		    docExpansion: "none",
 		    sorter : "alpha"
 		  });
+		  
 		  window.swaggerUi.load();
+            
+		  function addApiKeyAuthorization() {
+		    var authToken = JSON.parse(localStorage.getItem("bms.xAuthToken")).token;
+			window.authorizations.add("key", new ApiKeyAuthorization("x-auth-token", authToken, "header"));
+		  }
+		  
+		  addApiKeyAuthorization();
+		
 		});
 	</script>
 	<!-- Swagger End-->
