@@ -74,15 +74,6 @@
 			<div class="navbar-header">
 				<a class="navbar-brand" th:href="@{/}">BMS API</a>
 			</div>
-			<div sec:authorize="isAuthenticated()">
-				Hi! <span sec:authentication="name">Username</span>
-				<form th:action="@{/logout}" method="post">
-					<input type="submit" value="Log Out" class="btn btn-default" />
-				</form>
-			</div>
-			<div sec:authorize="!isAuthenticated()">
-				<a class="btn btn-default" th:href="@{/login}" role="button">Log In</a>
-			</div>
 		</div>
 	</nav>
 	<div class="container swagger-section">
