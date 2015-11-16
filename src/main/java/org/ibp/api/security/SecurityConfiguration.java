@@ -55,24 +55,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
-		.exceptionHandling()
-		.authenticationEntryPoint(this.authenticationEntryPoint)
+			.exceptionHandling()
+			.authenticationEntryPoint(this.authenticationEntryPoint)
 		.and()
-		.csrf()
-		.disable()
+			.csrf().disable()
 		.headers()
-		.frameOptions()
-		.disable()
+			.frameOptions().disable()
 		.and()
-		.sessionManagement()
-		.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		.and()
-		.authorizeRequests()
-		.antMatchers("/", "/api-docs/**", "/authenticate").permitAll()
-		.anyRequest().hasAnyAuthority("ADMIN", "TECHNICIAN", "BREEDER")
+			.authorizeRequests()
+			.antMatchers("/", "/api-docs/**", "/authenticate").permitAll()
+			.anyRequest().hasAnyAuthority("ADMIN", "TECHNICIAN", "BREEDER")
 		.and()
-		.apply(this.securityConfigurerAdapter());
-
+			.apply(this.securityConfigurerAdapter());
 	}
 
 	private XAuthTokenConfigurer securityConfigurerAdapter() {
