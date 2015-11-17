@@ -30,7 +30,7 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 
 	}
 
-	public WorkbenchUserDetailsService(WorkbenchDataManager workbenchDataManager) {
+	public WorkbenchUserDetailsService(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}
 
@@ -40,25 +40,25 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 			// username must be converted from html-encode to utf-8 string to support chinese/utf-8 languages
 			username = StringEscapeUtils.unescapeHtml(username);
 
-			List<User> matchingUsers = this.workbenchDataManager.getUserByName(username, 0, 1, Operation.EQUAL);
+			final List<User> matchingUsers = this.workbenchDataManager.getUserByName(username, 0, 1, Operation.EQUAL);
 			if (matchingUsers != null && !matchingUsers.isEmpty()) {
-				User workbenchUser = matchingUsers.get(0);
+				final User workbenchUser = matchingUsers.get(0);
 				// FIXME Populate flags for accountNonExpired, credentialsNonExpired, accountNonLocked properly, all true for now.
 				return new org.springframework.security.core.userdetails.User(workbenchUser.getName(), workbenchUser.getPassword(),
 						this.getRolesAsAuthorities(workbenchUser));
 			}
 			throw new UsernameNotFoundException("Invalid username/password.");
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			throw new AuthenticationServiceException("Data access error while authenticaing user against Workbench.", e);
 		}
 	}
 
-	private Collection<? extends GrantedAuthority> getRolesAsAuthorities(User workbenchUser) {
-		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+	private Collection<? extends GrantedAuthority> getRolesAsAuthorities(final User workbenchUser) {
+		final List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 		if (workbenchUser != null) {
-			List<UserRole> userRoles = workbenchUser.getRoles();
+			final List<UserRole> userRoles = workbenchUser.getRoles();
 			if (userRoles != null && !userRoles.isEmpty()) {
-				for (UserRole role : userRoles) {
+				for (final UserRole role : userRoles) {
 					authorities.add(new SimpleGrantedAuthority(role.getRole()));
 				}
 			}

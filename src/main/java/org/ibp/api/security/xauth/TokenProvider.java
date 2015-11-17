@@ -1,50 +1,51 @@
-package org.ibp.api.security.xauth;
 
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.codec.Hex;
+package org.ibp.api.security.xauth;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.codec.Hex;
+
 public class TokenProvider {
 
-    private final String secretKey;
-    private final int tokenValidity;
+	private final String secretKey;
+	private final int tokenValidity;
 
-    public TokenProvider(String secretKey, int tokenValidity) {
-        this.secretKey = secretKey;
-        this.tokenValidity = tokenValidity;
-    }
+	public TokenProvider(final String secretKey, final int tokenValidity) {
+		this.secretKey = secretKey;
+		this.tokenValidity = tokenValidity;
+	}
 
-    public Token createToken(UserDetails userDetails) {
-        long expires = System.currentTimeMillis() + 1000L * tokenValidity;
-        String token = userDetails.getUsername() + ":" + expires + ":" + computeSignature(userDetails, expires);
-        return new Token(token, expires);
-    }
+	public Token createToken(final UserDetails userDetails) {
+		final long expires = System.currentTimeMillis() + 1000L * this.tokenValidity;
+		final String token = userDetails.getUsername() + ":" + expires + ":" + this.computeSignature(userDetails, expires);
+		return new Token(token, expires);
+	}
 
-    public String computeSignature(UserDetails userDetails, long expires) {
-        StringBuilder signatureBuilder = new StringBuilder();
-        signatureBuilder.append(userDetails.getUsername()).append(":");
-        signatureBuilder.append(expires).append(":");
-        signatureBuilder.append(userDetails.getPassword()).append(":");
-        signatureBuilder.append(secretKey);
+	public String computeSignature(final UserDetails userDetails, final long expires) {
+		final StringBuilder signatureBuilder = new StringBuilder();
+		signatureBuilder.append(userDetails.getUsername()).append(":");
+		signatureBuilder.append(expires).append(":");
+		signatureBuilder.append(userDetails.getPassword()).append(":");
+		signatureBuilder.append(this.secretKey);
 
-        MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("No MD5 algorithm available!");
-        }
-        return new String(Hex.encode(digest.digest(signatureBuilder.toString().getBytes())));
-    }
+		MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance("MD5");
+		} catch (final NoSuchAlgorithmException e) {
+			throw new IllegalStateException("No MD5 algorithm available!");
+		}
+		return new String(Hex.encode(digest.digest(signatureBuilder.toString().getBytes())));
+	}
 
-    public String getUserNameFromToken(String authToken) {
-        if (null == authToken) {
-            return null;
-        }
-        String[] parts = authToken.split(":");
-        return parts[0];
-    }
+	public String getUserNameFromToken(final String authToken) {
+		if (null == authToken) {
+			return null;
+		}
+		final String[] parts = authToken.split(":");
+		return parts[0];
+	}
 
 	public boolean validateToken(final String authToken, final UserDetails userDetails) {
 		final String[] parts = authToken.split(":");

@@ -1,3 +1,4 @@
+
 package org.ibp.api.security;
 
 import org.ibp.api.security.xauth.TokenProvider;
@@ -39,17 +40,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	}
 
 	@Autowired
-	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		auth
-		.userDetailsService(this.userDetailsService)
-		.passwordEncoder(this.passwordEncoder());
+	public void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
+		auth.userDetailsService(this.userDetailsService).passwordEncoder(this.passwordEncoder());
 	}
 
 	@Override
-	public void configure(WebSecurity web) throws Exception {
-		web.ignoring()
-		.antMatchers("/static/**")
-		.antMatchers("/api-docs/**");
+	public void configure(final WebSecurity web) throws Exception {
+		web.ignoring().antMatchers("/static/**").antMatchers("/api-docs/**");
 	}
 
 	@Override

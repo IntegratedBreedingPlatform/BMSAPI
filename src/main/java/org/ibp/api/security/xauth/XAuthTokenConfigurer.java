@@ -1,3 +1,4 @@
+
 package org.ibp.api.security.xauth;
 
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
@@ -8,18 +9,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 public class XAuthTokenConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
-    private TokenProvider tokenProvider;
+	private final TokenProvider tokenProvider;
 
-    private UserDetailsService detailsService;
+	private final UserDetailsService detailsService;
 
-    public XAuthTokenConfigurer(UserDetailsService detailsService, TokenProvider tokenProvider) {
-        this.detailsService = detailsService;
-        this.tokenProvider = tokenProvider;
-    }
+	public XAuthTokenConfigurer(final UserDetailsService detailsService, final TokenProvider tokenProvider) {
+		this.detailsService = detailsService;
+		this.tokenProvider = tokenProvider;
+	}
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
-        XAuthTokenFilter customFilter = new XAuthTokenFilter(detailsService, tokenProvider);
-        http.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
-    }
+	@Override
+	public void configure(final HttpSecurity http) throws Exception {
+		final XAuthTokenFilter customFilter = new XAuthTokenFilter(this.detailsService, this.tokenProvider);
+		http.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
+	}
 }

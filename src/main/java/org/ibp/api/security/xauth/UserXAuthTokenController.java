@@ -29,11 +29,11 @@ public class UserXAuthTokenController {
 
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
 	@ApiIgnore
-	public Token authenticate(@RequestParam String username, @RequestParam String password) {
-		UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(username, password);
-		Authentication authentication = this.authenticationManager.authenticate(credentials);
+	public Token authenticate(@RequestParam final String username, @RequestParam final String password) {
+		final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(username, password);
+		final Authentication authentication = this.authenticationManager.authenticate(credentials);
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		UserDetails details = this.userDetailsService.loadUserByUsername(username);
+		final UserDetails details = this.userDetailsService.loadUserByUsername(username);
 		return this.tokenProvider.createToken(details);
 	}
 }
