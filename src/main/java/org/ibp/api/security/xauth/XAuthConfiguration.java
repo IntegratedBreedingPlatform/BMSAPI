@@ -21,7 +21,7 @@ public class XAuthConfiguration implements EnvironmentAware {
 
     @Bean
     public TokenProvider tokenProvider(){
-        String secret = this.propertyResolver.getProperty("secret", String.class, "mySecretXAuthSecret");
+        String secret = this.propertyResolver.getProperty("secret", String.class, "bmsXAuthSecret");
         int validityInSeconds = this.propertyResolver.getProperty("tokenValidityInSeconds", Integer.class, 3600);
         return new TokenProvider(secret, validityInSeconds);
     }
