@@ -46,11 +46,28 @@ public class TokenProvider {
         return parts[0];
     }
 
-    public boolean validateToken(String authToken, UserDetails userDetails) {
-        String[] parts = authToken.split(":");
-        long expires = Long.parseLong(parts[1]);
-        String signature = parts[2];
-        String signatureToMatch = computeSignature(userDetails, expires);
-        return expires >= System.currentTimeMillis() && signature.equals(signatureToMatch);
-    }
+	public boolean validateToken(final String authToken, final UserDetails userDetails) {
+		final String[] parts = authToken.split(":");
+		final long expires = Long.parseLong(parts[1]);
+		final String signature = parts[2];
+		final String signatureToMatch = this.computeSignature(userDetails, expires);
+		return expires >= System.currentTimeMillis() && this.constantTimeEquals(signature, signatureToMatch);
+	}
+
+	/**
+	 * String comparison that doesn't stop at the first character that is different but instead always iterates the whole string length to
+	 * prevent timing attacks (http://codahale.com/a-lesson-in-timing-attacks/).
+	 */
+	private boolean constantTimeEquals(final String a, final String b) {
+		if (a.length() != b.length()) {
+			return false;
+		} else {
+			int equal = 0;
+			for (int i = 0; i < a.length(); i++) {
+				equal |= a.charAt(i) ^ b.charAt(i);
+			}
+			return equal == 0;
+		}
+	}
+
 }
