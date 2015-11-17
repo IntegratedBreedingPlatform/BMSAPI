@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
+
 @RestController
 public class UserXAuthTokenController {
 
@@ -26,6 +28,7 @@ public class UserXAuthTokenController {
 	private UserDetailsService userDetailsService;
 
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+	@ApiIgnore
 	public Token authenticate(@RequestParam String username, @RequestParam String password) {
 		UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(username, password);
 		Authentication authentication = this.authenticationManager.authenticate(credentials);
