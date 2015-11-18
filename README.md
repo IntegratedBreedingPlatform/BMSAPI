@@ -2,6 +2,87 @@ Breeding Management System API
 ==============================
 BMS API is a set of RESTful web services to interact with the data in BMS database.
 
+### Authentication ###
+BMS API services expose operations on data created by registered BMS users as they carry out breeding programs and studies for various crops. Hence access to the BMS API services require authentication as the same registered user. BMS API uses a light-weight variant of the popular OAuth protocol known as X-Auth. In exchange of valid users credentials (Workbench user name and password) BMS API issues a fixed time window (configurable per deployment) ticket/token which is then required to be provided for **each and every**  BMS API service invocation as part of `X-Auth-Token` request header. Example below illustrates the scenario of a command line client (curl) accessing the API:
+
+**Request a listing of programs without authentication:**
+Request: 
+```
+curl http://localhost:19080/bmsapi/program/list
+```
+Response: 
+```
+Code: 401
+Response Body:
+{
+  "timestamp": 1447884520756,
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "Access Denied"
+}
+```
+This is because there is no authentication header provided as part of the request.
+
+**Request a listing of programs with authentication:**
+
+First, authenticate with credentials of a registered Workbench user:
+
+Request :
+```
+curl -X POST -H "Content-Type: multipart/form-data;" -F "username=naymesh" -F "password=naymeshspassword" 'http://localhost:19080/bmsapi/authenticate'`
+```
+Response (if credentials are correct):
+```
+Code: 200
+Response Body:
+{
+  "token": "naymesh:1447886088052:fdd12b1069a9f28ddee2f8d42d30dde5",
+  "expires": 1447886088052
+}
+```
+
+Now make the program listing API request with the authentication header using the token provided in response to successful authentication as in example above:
+
+Request:
+
+```
+curl -X GET -H "X-Auth-Token: naymesh:1447886088052:fdd12b1069a9f28ddee2f8d42d30dde5"'http://localhost:19080/bmsapi/program/list'`
+```
+
+Response:
+```
+Code: 200
+Response Body:
+[
+  {
+    "id": "1",
+    "uniqueID": "fb0783d2-dc82-4db6-a36e-7554d3740092",
+    "projectName": "aMaizingCorn",
+    "userId": "4",
+    "cropType": "maize",
+    "startDate": "2015-11-10"
+  },
+  {
+    "id": "3",
+    "uniqueID": "749847a1-6a86-4cc0-82ce-dd36d0cd985c",
+    "projectName": "Maizing",
+    "userId": "3",
+    "cropType": "maize",
+    "startDate": "2015-11-12"
+  },
+  {
+    "id": "2",
+    "uniqueID": "57b8f271-56db-448e-ad8d-528ac4d80f04",
+    "projectName": "Wheatio",
+    "userId": "4",
+    "cropType": "wheat",
+    "startDate": "2015-11-11"
+  }
+]
+```
+## Authorization ##
+Based on the details of the user making requests to BMSAPI, the data returned is restricted and filtered in the same way as the data is filtered/restricted when user interacts with the same data via the BMS application user interface. For example, users only see the data for the programs/studies they have created or the programs/studies that they are part of.
+
 ### Pre Requisites ###
 * Git
 * Maven
@@ -55,6 +136,6 @@ then run with the usual `java -jar bmsapi.war` and BMS API will pick up the `app
 ### Explore the API ###
 Explore and try out the live API documentation (built with [Swagger](https://helloreverb.com/developers/swagger)) at the home page `http://<server.host>:<server.port>/<server.contextPath>`.
 
-Public deployment of the BMS API is available at: [api.leadnode.io](http://api.leafnode.io:10081/bmsapi/). 
+Public deployment of the BMS API is available at: [api.leadnode.io](http://api.leafnode.io:10081/bmsapi/). Access to invoke the API operations via Swagger UI requires the user to first authenticate by logging into the Workbench in same browser window.
 
 
