@@ -10,6 +10,7 @@
 
 	<properties>
 		<spring-boot-version>1.2.4.RELEASE</spring-boot-version>
+		<spring-security-version>4.0.2.RELEASE</spring-security-version>
 		<tomcat.version>7.0.50</tomcat.version>
 		<middleware-version>4.0.0.BETA</middleware-version>
 		<jsonpath.version>0.8.1</jsonpath.version>
@@ -88,13 +89,20 @@
 	    <dependency>
 	        <groupId>org.springframework.security</groupId>
 	        <artifactId>spring-security-web</artifactId>
-	        <version>4.0.2.RELEASE</version>
-		    </dependency>
+	        <version>${spring-security-version}</version>
+		</dependency>
 	
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
-			<version>4.0.2.RELEASE</version>
+			<version>${spring-security-version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<version>${spring-security-version}</version>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
