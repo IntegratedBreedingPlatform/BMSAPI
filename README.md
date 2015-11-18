@@ -29,7 +29,7 @@ First, authenticate with credentials of a registered Workbench user:
 
 Request :
 ```
-curl -X POST -H "Content-Type: multipart/form-data;" -F "username=naymesh" -F "password=naymeshspassword" 'http://localhost:19080/bmsapi/authenticate'`
+curl -X POST -H "Content-Type: multipart/form-data;" -F "username=naymesh" -F "password=naymeshspassword" 'http://localhost:19080/bmsapi/authenticate'
 ```
 Response (if credentials are correct):
 ```
@@ -46,7 +46,7 @@ Now make the program listing API request with the authentication header using th
 Request:
 
 ```
-curl -X GET -H "X-Auth-Token: naymesh:1447886088052:fdd12b1069a9f28ddee2f8d42d30dde5"'http://localhost:19080/bmsapi/program/list'`
+curl -X GET -H "X-Auth-Token: naymesh:1447886088052:fdd12b1069a9f28ddee2f8d42d30dde5" 'http://localhost:19080/bmsapi/program/list'
 ```
 
 Response:
