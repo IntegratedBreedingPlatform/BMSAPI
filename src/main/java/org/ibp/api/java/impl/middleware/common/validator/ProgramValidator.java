@@ -52,7 +52,7 @@ public class ProgramValidator extends BaseValidator implements Validator {
 				return;
 			}
 
-			if(!Objects.equals(program.getCropType(), project.getCropType().getCropName())){
+			if (!Objects.equals(program.getCrop(), project.getCropType().getCropName())) {
 				this.addCustomError(errors, fieldName, ProgramValidator.PROGRAM_DOES_NOT_EXIST, null);
 				return;
 			}

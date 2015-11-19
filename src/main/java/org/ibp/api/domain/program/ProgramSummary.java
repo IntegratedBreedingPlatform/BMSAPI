@@ -1,6 +1,9 @@
 
 package org.ibp.api.domain.program;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Summary information about breeding program.
  *
@@ -9,9 +12,10 @@ public class ProgramSummary {
 
 	private String id;
 	private String uniqueID;
-	private String projectName;
-	private String userId;
-	private String cropType;
+	private String name;
+	private String createdBy;
+	private Set<String> members = new HashSet<>();
+	private String crop;
 	private String startDate;
 
 	public ProgramSummary() {
@@ -33,28 +37,36 @@ public class ProgramSummary {
 		this.uniqueID = uniqueID;
 	}
 
-	public String getProjectName() {
-		return this.projectName;
+	public String getName() {
+		return this.name;
 	}
 
-	public void setProjectName(String projectName) {
-		this.projectName = projectName;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getUserId() {
-		return this.userId;
+	public String getCreatedBy() {
+		return this.createdBy;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
 	}
 
-	public String getCropType() {
-		return this.cropType;
+	public Set<String> getMembers() {
+		return this.members;
 	}
 
-	public void setCropType(String cropType) {
-		this.cropType = cropType;
+	public void setMembers(Set<String> members) {
+		this.members = members;
+	}
+
+	public String getCrop() {
+		return this.crop;
+	}
+
+	public void setCrop(String crop) {
+		this.crop = crop;
 	}
 
 	public String getStartDate() {
@@ -64,4 +76,5 @@ public class ProgramSummary {
 	public void setStartDate(String startDate) {
 		this.startDate = startDate;
 	}
+
 }
