@@ -54,34 +54,33 @@ Response:
 Code: 200
 Response Body:
 [
-  {
-    "id": "1",
-    "uniqueID": "fb0783d2-dc82-4db6-a36e-7554d3740092",
-    "projectName": "aMaizingCorn",
-    "userId": "4",
-    "cropType": "maize",
-    "startDate": "2015-11-10"
-  },
-  {
-    "id": "3",
-    "uniqueID": "749847a1-6a86-4cc0-82ce-dd36d0cd985c",
-    "projectName": "Maizing",
-    "userId": "3",
-    "cropType": "maize",
-    "startDate": "2015-11-12"
-  },
-  {
-    "id": "2",
-    "uniqueID": "57b8f271-56db-448e-ad8d-528ac4d80f04",
-    "projectName": "Wheatio",
-    "userId": "4",
-    "cropType": "wheat",
-    "startDate": "2015-11-11"
-  }
+    {
+        "id": "1",
+        "uniqueID": "fb0783d2-dc82-4db6-a36e-7554d3740092",
+        "name": "Naymesh's Program",
+        "createdBy": "naymesh",
+        "members": [
+            "naymesh"
+        ],
+        "crop": "maize",
+        "startDate": "2015-11-11"
+    },
+    {
+        "id": "2",
+        "uniqueID": "57b8f271-56db-448e-ad8d-528ac4d80f04",
+        "name": "Akhil's Program",
+        "createdBy": "akhil",
+        "members": [
+            "akhil",
+            "naymesh"
+        ],
+        "crop": "maize",
+        "startDate": "2015-12-12"
+    }
 ]
 ```
 ## Authorization ##
-Based on the details of the user making requests to BMSAPI, the data returned is restricted and filtered in the same way as the data is filtered/restricted when user interacts with the same data via the BMS application user interface. For example, users only see the data for the programs/studies they have created or the programs/studies that they are part of.
+Based on the details of the user making requests to BMSAPI, the data returned is restricted and filtered in the same way as the data is filtered/restricted when user interacts with the same data via the BMS application user interface. For example, users only see the data for the programs/studies they have created or the programs/studies that they are part of. As shown in example above, the listing returned two programs one which the authenticated user (naymesh) has created and one where the user is a member.
 
 ### Pre Requisites ###
 * Git
