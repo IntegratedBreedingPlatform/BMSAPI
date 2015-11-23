@@ -36,4 +36,17 @@ public class UserXAuthTokenController {
 		final UserDetails details = this.userDetailsService.loadUserByUsername(username);
 		return this.tokenProvider.createToken(details);
 	}
+
+	public void setTokenProvider(TokenProvider tokenProvider) {
+		this.tokenProvider = tokenProvider;
+	}
+
+	public void setAuthenticationManager(AuthenticationManager authenticationManager) {
+		this.authenticationManager = authenticationManager;
+	}
+
+	public void setUserDetailsService(UserDetailsService userDetailsService) {
+		this.userDetailsService = userDetailsService;
+	}
+
 }

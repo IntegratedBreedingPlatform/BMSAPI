@@ -21,7 +21,7 @@ import org.springframework.web.filter.GenericFilterBean;
  */
 public class XAuthTokenFilter extends GenericFilterBean {
 
-	private final static String XAUTH_TOKEN_HEADER_NAME = "x-auth-token";
+	final static String XAUTH_TOKEN_HEADER_NAME = "x-auth-token";
 
 	private final UserDetailsService detailsService;
 

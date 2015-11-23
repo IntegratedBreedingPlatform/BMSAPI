@@ -71,4 +71,11 @@ public class TokenProvider {
 		}
 	}
 
+	public String getSecretKey() {
+		return this.secretKey;
+	}
+
+	public int getTokenValidity() {
+		return this.tokenValidity;
+	}
 }

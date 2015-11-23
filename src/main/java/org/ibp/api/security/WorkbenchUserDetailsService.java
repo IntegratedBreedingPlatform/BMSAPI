@@ -65,4 +65,8 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 		}
 		return authorities;
 	}
+
+	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
+		this.workbenchDataManager = workbenchDataManager;
+	}
 }
