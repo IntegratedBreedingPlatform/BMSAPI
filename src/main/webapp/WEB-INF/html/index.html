@@ -56,8 +56,16 @@
 		  window.swaggerUi.load();
             
 		  function addApiKeyAuthorization() {
-		    var authToken = JSON.parse(localStorage.getItem("bms.xAuthToken")).token;
-			window.authorizations.add("key", new ApiKeyAuthorization("x-auth-token", authToken, "header"));
+			var authToken = localStorage.getItem("bms.xAuthToken")
+		    if (authToken) {
+		    	var authTokenJSON = JSON.parse(authToken);
+				window.authorizations.add("key", new ApiKeyAuthorization("x-auth-token", authTokenJSON.token, "header"));
+		    } else {
+		    	// Swagger front-end is not part of product so we as such do not expect users to see this screen. 
+		    	// This should happen only in cases where BMSAPI swagger front-end is loaded directly 
+		    	//  which should only happen for demo/development environments hence is fair enough to require being logged in to Workbench first.
+		    	alert("You don't seem to have logged in. Please login to Workbench first, then refresh this page.")
+		    }
 		  }
 		  
 		  addApiKeyAuthorization();
