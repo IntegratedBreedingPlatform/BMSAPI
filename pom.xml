@@ -5,13 +5,13 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>bmsapi</artifactId>
 	<packaging>${packaging.type}</packaging>
-    <version>4.0.0.BETA.4</version>
+    <version>4.0.0.BETA.5</version>
 	<name>BMS API</name>
 
 	<properties>
 		<spring-boot-version>1.2.4.RELEASE</spring-boot-version>
 		<tomcat.version>7.0.50</tomcat.version>
-        <mi0.0ddleware-version>4.0.0.BETA.4</mi0.0ddleware-version>
+        <mi0.0ddleware-version>4.0.0.BETA.5</mi0.0ddleware-version>
 		<jsonpath.version>0.8.1</jsonpath.version>
 		<modelmapper.version>0.7.3</modelmapper.version>
 		<envConfig>${user.name}</envConfig>
