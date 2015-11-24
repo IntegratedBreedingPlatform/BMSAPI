@@ -21,9 +21,7 @@
 
     <bean id="cloner" class="com.rits.cloning.Cloner"/>
 
-    <bean id="breedingViewService" class="org.generationcp.ibpworkbench.service.BreedingViewServiceImpl" scope="request">
-    	<aop:scoped-proxy/>
-    </bean>
+    <bean id="breedingViewService" class="org.generationcp.ibpworkbench.service.BreedingViewServiceImpl"/>
 
 	<bean id="workbenchDataManager"
 		class="org.generationcp.middleware.manager.WorkbenchDataManagerImpl"
@@ -45,7 +43,9 @@
     	<aop:scoped-proxy/>
     </bean>
     
-    <bean id="importService" class="org.generationcp.commons.service.impl.BreedingViewImportServiceImpl"/>
+    <bean id="importService" class="org.generationcp.commons.service.impl.BreedingViewImportServiceImpl" scope="request">
+    	<aop:scoped-proxy/>
+    </bean>
     
     <bean id="springAppContextProvider" class="org.generationcp.commons.util.SpringAppContextProvider"></bean>
 
