@@ -4,12 +4,12 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>IBPWebService</artifactId>
 	<packaging>war</packaging>
-	<version>4.0.0.BETA</version>
+    <version>4.0.0.BETA.5</version>
 	<name>Web Service for Breeding View</name>
 	<properties>
 		<jersey-version>1.8</jersey-version>
 		<spring.version>3.2.11.RELEASE</spring.version>
-		<ibpcommons.version>4.0.0.BETA</ibpcommons.version>
+        <ibpcommons.version>4.0.0.BETA.5</ibpcommons.version>
 		<envConfig>${user.name}</envConfig>
 	</properties>
 
