@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
 /**
  * This is temporary resource to test get variables using types of filter
@@ -36,16 +37,44 @@ public class VariableFilterResource {
 	@RequestMapping(value = "/{cropname}/filtervariables", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<VariableDetails>> listAllVariablesUsingFilter(
+			@ApiParam(value = "Use <code>GET /crop/list</code> service to retrieve possible crop name values that can be supplied here.")
 			@PathVariable String cropname,
+
+			@ApiParam(value = "Use <code>GET /program/list</code> service to retrieve program uuid that can be supplied here.")
+			@RequestParam(value = "programId") String programId,
+
+			@ApiParam(value = "Use <code>GET /ontology/{cropname}/properties</code> service "
+					+ " to retrieve possible property ids that can be supplied here as a comma separated list.")
 			@RequestParam(value = "propertyIds", required = false) Set<Integer> propertyIds,
+
+			@ApiParam(value = "Use <code>GET /ontology/{cropname}/methods</code> service "
+					+ " to retrieve possible method ids that can be supplied here as a comma separated list.")
 			@RequestParam(value = "methodIds", required = false) Set<Integer> methodIds,
+
+			@ApiParam(value = "Use <code>GET /ontology/{cropname}/scales</code> service "
+					+ " to retrieve possible scale ids that can be supplied here as a comma separated list.")
 			@RequestParam(value = "scaleIds", required = false) Set<Integer> scaleIds,
+
+			@ApiParam(value = "Use <code>GET /ontology/{cropname}/variables</code> service "
+					+ " to retrieve possible variable ids that can be supplied here as a comma separated list.")
 			@RequestParam(value = "variableIds", required = false) Set<Integer> variableIds,
+
+			@ApiParam(value = "Specify ids of variables to exclude."
+					+ " Use <code>GET /ontology/{cropname}/variables</code> service"
+					+ " to retrieve possible variable ids that can be supplied here as a comma separated list.")
 			@RequestParam(value = "exclusionVariableIds", required = false) Set<Integer> exclusionVariableIds,
+
+			@ApiParam(value = "Use <code>GET /ontology/datatypes</code> service "
+					+ " to retrieve possible data type ids that can be supplied here as a comma separated list.")
 			@RequestParam(value = "dataTypeIds", required = false) Set<Integer> dataTypeIds,
+
+			@ApiParam(value = "Use <code>GET /ontology/variableTypes</code> service "
+					+ " to list possible variable type ids that can be supplied here as a comma separated list. ")
 			@RequestParam(value = "variableTypeIds", required = false) Set<Integer> variableTypeIds,
-			@RequestParam(value = "propertyClasses", required = false) Set<String> propertyClasses,
-			@RequestParam(value = "programId") String programId) {
+
+			@ApiParam(value = "Use <code>GET /ontology/{cropname}/classes</code> service "
+					+ " to retrieve possible property class values that can be supplied here as a comma separated list.")
+			@RequestParam(value = "propertyClasses", required = false) Set<String> propertyClasses) {
 
 		VariableFilter variableFilter = new VariableFilter();
 		variableFilter.setProgramUuid(programId);
