@@ -13,10 +13,9 @@ import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.program.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +26,9 @@ public class ProgramServiceImpl implements ProgramService {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
+	@Autowired
+	private SecurityService securityService;
+
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	@Override
@@ -34,10 +36,7 @@ public class ProgramServiceImpl implements ProgramService {
 		List<Project> workbenchProgramList;
 		List<ProgramSummary> programSummaries = new ArrayList<>();
 		try {
-
-			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			User loggedInUser = this.workbenchDataManager.getUserByUsername(authentication.getName());
-
+			User loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 			workbenchProgramList = this.workbenchDataManager.getProjectsByUser(loggedInUser);
 			if (!workbenchProgramList.isEmpty()) {
 				for (Project workbenchProgram : workbenchProgramList) {
