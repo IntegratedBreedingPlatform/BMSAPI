@@ -396,6 +396,10 @@ public class StudyServiceImpl implements StudyService {
 		this.dataImportService = dataImportService;
 	}
 
+	void setSecurityService(SecurityService securityService) {
+		this.securityService = securityService;
+	}
+
 	@Override
 	public List<StudyFolder> getAllStudyFolders() {
 		final List<StudyFolder> studyFolders = new ArrayList<>();
