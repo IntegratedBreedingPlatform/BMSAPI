@@ -43,6 +43,7 @@ import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +78,9 @@ public class StudyServiceImpl implements StudyService {
 	@Autowired
 	private DataImportService dataImportService;
 
+	@Autowired
+	private SecurityService securityService;
+
 	@Override
 	public List<StudySummary> listAllStudies(final String programUniqueId) {
 		final List<StudySummary> studySummaries = new ArrayList<StudySummary>();
@@ -85,6 +89,10 @@ public class StudyServiceImpl implements StudyService {
 					this.middlewareStudyService.listAllStudies(programUniqueId);
 
 			for (final org.generationcp.middleware.service.api.study.StudySummary mwStudySummary : mwStudySummaries) {
+				if (!this.securityService.isAccessible(mwStudySummary)) {
+					continue;
+				}
+
 				final StudySummary summary = new StudySummary(String.valueOf(mwStudySummary.getId()));
 				summary.setName(mwStudySummary.getName());
 				summary.setTitle(mwStudySummary.getTitle());
