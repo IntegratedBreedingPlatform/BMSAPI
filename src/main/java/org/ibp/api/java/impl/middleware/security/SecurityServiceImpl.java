@@ -40,4 +40,7 @@ public class SecurityServiceImpl implements SecurityService {
 		return this.workbenchDataManager.getUserByUsername(authentication.getName());
 	}
 
+	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
+		this.workbenchDataManager = workbenchDataManager;
+	}
 }
