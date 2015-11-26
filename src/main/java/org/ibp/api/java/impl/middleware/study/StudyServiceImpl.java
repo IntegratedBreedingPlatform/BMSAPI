@@ -28,6 +28,7 @@ import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.TraitDto;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.study.DatasetSummary;
@@ -85,8 +86,10 @@ public class StudyServiceImpl implements StudyService {
 	public List<StudySummary> listAllStudies(final String programUniqueId) {
 		final List<StudySummary> studySummaries = new ArrayList<StudySummary>();
 		try {
+			StudySearchParameters searchParameters = new StudySearchParameters();
+			searchParameters.setProgramUniqueId(programUniqueId);
 			final List<org.generationcp.middleware.service.api.study.StudySummary> mwStudySummaries =
-					this.middlewareStudyService.listAllStudies(programUniqueId);
+					this.middlewareStudyService.listAllStudies(searchParameters);
 
 			for (final org.generationcp.middleware.service.api.study.StudySummary mwStudySummary : mwStudySummaries) {
 				if (!this.securityService.isAccessible(mwStudySummary)) {

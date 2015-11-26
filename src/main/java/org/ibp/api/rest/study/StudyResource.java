@@ -50,8 +50,12 @@ public class StudyResource {
 	@ApiOperation(value = "List all studies", notes = "Returns summary information for all studies (Nurseries and Trials).")
 	@RequestMapping(value = "/{cropname}/list", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<StudySummary>> listAllStudies(@PathVariable final String cropname, @RequestParam(value = "programUniqueId",
-			required = false) final String programUniqueId) {
+	public ResponseEntity<List<StudySummary>> listAllStudies(
+			@PathVariable final String cropname, //
+			@ApiParam(
+					value = "Optional parameter. "
+							+ "If provided the results are filtered to only return studies that belong to the program identified by this unique id.")//
+			@RequestParam(value = "programUniqueId",required = false) final String programUniqueId) {
 		return new ResponseEntity<>(this.studyService.listAllStudies(programUniqueId), HttpStatus.OK);
 	}
 

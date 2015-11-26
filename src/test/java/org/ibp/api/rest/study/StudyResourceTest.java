@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.TraitDto;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
@@ -67,7 +68,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		summaryMW.setEndDate("01012015");
 		summariesMW.add(summaryMW);
 
-		Mockito.when(this.studyServiceMW.listAllStudies(org.mockito.Matchers.anyString())).thenReturn(summariesMW);
+		Mockito.when(this.studyServiceMW.listAllStudies(org.mockito.Matchers.any(StudySearchParameters.class))).thenReturn(summariesMW);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/study/{cropname}/list", "maize").contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
@@ -81,7 +82,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['endDate']", Matchers.is(summaryMW.getEndDate())))
 				.andDo(MockMvcResultHandlers.print());
 
-		Mockito.verify(this.studyServiceMW).listAllStudies(org.mockito.Matchers.anyString());
+		Mockito.verify(this.studyServiceMW).listAllStudies(org.mockito.Matchers.any(StudySearchParameters.class));
 	}
 
 	@Test
