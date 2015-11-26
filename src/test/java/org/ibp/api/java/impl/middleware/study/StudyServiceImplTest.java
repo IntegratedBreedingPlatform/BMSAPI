@@ -119,9 +119,9 @@ public class StudyServiceImplTest {
 
 		mockResult.add(studySummary);
 
-		Mockito.when(this.mockMiddlewareStudyService.listAllStudies(Mockito.any(StudySearchParameters.class))).thenReturn(mockResult);
+		Mockito.when(this.mockMiddlewareStudyService.search(Mockito.any(StudySearchParameters.class))).thenReturn(mockResult);
 
-		final List<StudySummary> studySummaries = this.studyServiceImpl.listAllStudies(this.programUID);
+		final List<StudySummary> studySummaries = this.studyServiceImpl.search(this.programUID, null, null, null);
 		Assert.assertEquals(mockResult.size(), studySummaries.size());
 		Assert.assertEquals(studySummary.getId().toString(), studySummaries.get(0).getId());
 		Assert.assertEquals(studySummary.getName(), studySummaries.get(0).getName());
