@@ -16,91 +16,96 @@ import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 import org.ibp.api.domain.germplasm.GermplasmListSummary;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.germplasm.GermplasmListService;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 public class GermplasmListServiceImplTest {
-	
+
 	private GermplasmListManager germplasmListManager;
 	private GermplasmListService germplasmListService;
+	private SecurityService securityService;
 
 	@Before
 	public void before() {
-		germplasmListManager = Mockito.mock(GermplasmListManager.class);
-		germplasmListService = new GermplasmListServiceImpl(germplasmListManager);	
+		this.germplasmListManager = Mockito.mock(GermplasmListManager.class);
+		this.securityService = Mockito.mock(SecurityService.class);
+		// Make all lists accessible
+		Mockito.when(this.securityService.isAccessible(Mockito.any(GermplasmList.class))).thenReturn(true);
+		this.germplasmListService = new GermplasmListServiceImpl(this.germplasmListManager, this.securityService);
 	}
-	
+
 	@Test
 	public void getAllGermplasmListTest() throws Exception {
 		List<GermplasmList> allGermplasmLists = new ArrayList<GermplasmList>();
 		GermplasmList germplasmList = new GermplasmList();
-		setData(germplasmList);
-		
+		this.setData(germplasmList);
+
 		allGermplasmLists.add(germplasmList);
 
-		when(germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE)).thenReturn(allGermplasmLists);
-		List<GermplasmListSummary> returnedValues = germplasmListService.getAllGermplasmLists();
+		when(this.germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE)).thenReturn(allGermplasmLists);
+		List<GermplasmListSummary> returnedValues = this.germplasmListService.list();
 
 		// First assert that the right number of summary objects are returned
 		assertEquals(1, returnedValues.size());
 
 		//assert that the list fields of the first list in the array is returned
-		getAllGermplamListAssertStatements(returnedValues);
+		this.getAllGermplamListAssertStatements(returnedValues);
 	}
-	
+
 	@Test
 	public void searchGermplasmListTest() throws Exception {
 		List<GermplasmList> matchingLists = new ArrayList<GermplasmList>();
 		GermplasmList germplasmList = new GermplasmList();
-		setData(germplasmList);
-		
+		this.setData(germplasmList);
+
 		matchingLists.add(germplasmList);
-		
-		when(germplasmListManager.searchForGermplasmList("searchText", Operation.LIKE)).thenReturn(matchingLists);
-		List<GermplasmListSummary> returnedValues = germplasmListService.searchGermplasmLists("searchText");
-		
-		getAllGermplamListAssertStatements(returnedValues);
+
+		when(this.germplasmListManager.searchForGermplasmList("searchText", Operation.LIKE)).thenReturn(matchingLists);
+		List<GermplasmListSummary> returnedValues = this.germplasmListService.searchGermplasmLists("searchText");
+
+		this.getAllGermplamListAssertStatements(returnedValues);
 	}
-	
+
 	@Test(expected = ApiRuntimeException.class)
 	public void getAllGermplasmListThrowsApiRuntimeExceptionTest() throws Exception {
 		List<GermplasmList> allGermplasmLists = new ArrayList<GermplasmList>();
 		GermplasmList germplasmList = new GermplasmList();
-		setData(germplasmList);
-		
+		this.setData(germplasmList);
+
 		allGermplasmLists.add(germplasmList);
 
-		when(germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE)).thenThrow(new MiddlewareQueryException("Error!"));
+		when(this.germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE)).thenThrow(new MiddlewareQueryException("Error!"));
 
-		germplasmListService.getAllGermplasmLists();
+		this.germplasmListService.list();
 	}
-	
+
 	@Test(expected = ApiRuntimeException.class)
 	public void searchGermplasmListThrowsApiRuntimeExceptionTest() throws Exception {
-		when(germplasmListManager.searchForGermplasmList("searchText", Operation.LIKE)).thenThrow(new MiddlewareQueryException("Error!"));
-		
-		germplasmListService.searchGermplasmLists("searchText");
+		when(this.germplasmListManager.searchForGermplasmList("searchText", Operation.LIKE)).thenThrow(new MiddlewareQueryException("Error!"));
+
+		this.germplasmListService.searchGermplasmLists("searchText");
 	}
-	
+
 	@Test
 	public void getGermplasmListDetailsTest() throws Exception {
-		GermplasmList germplasmList = new GermplasmList();		
-		setData(germplasmList);
-		
-		when(germplasmListManager.getGermplasmListById(3)).thenReturn(germplasmList);
-		GermplasmListDetails actual = germplasmListService.getGermplasmListDetails(3);
-		
+		GermplasmList germplasmList = new GermplasmList();
+		this.setData(germplasmList);
+
+		when(this.germplasmListManager.getGermplasmListById(3)).thenReturn(germplasmList);
+		GermplasmListDetails actual = this.germplasmListService.getGermplasmListDetails(3);
+
 		assertEquals(3, actual.getListId().intValue());
 		assertEquals("newName", actual.getListName());
 		assertEquals("newDescription", actual.getDescription());
 		assertEquals("newNotes", actual.getNotes());
-				
+
 	}
-	
+
 	@Test
 	public void getGermplasmListDetailsEntryMappingTest() throws Exception {
-		GermplasmList germplasmList = new GermplasmList();		
+		GermplasmList germplasmList = new GermplasmList();
 		GermplasmListData gpld = new GermplasmListData();
 		gpld.setGid(10);
 		gpld.setDesignation("newDesignation");
@@ -110,47 +115,47 @@ public class GermplasmListServiceImplTest {
 		List<GermplasmListData> listData = new ArrayList<GermplasmListData>();
 		listData.add(gpld);
 		germplasmList.setListData(listData);
-				
-		when(germplasmListManager.getGermplasmListById(3)).thenReturn(germplasmList);
-		GermplasmListDetails actual = germplasmListService.getGermplasmListDetails(3);
-		
+
+		when(this.germplasmListManager.getGermplasmListById(3)).thenReturn(germplasmList);
+		GermplasmListDetails actual = this.germplasmListService.getGermplasmListDetails(3);
+
 		GermplasmListEntrySummary germplasmListEntrySummary = actual.getGermplasmEntries().get(0);
-		assertEquals(10, germplasmListEntrySummary.getGid().intValue());	
+		assertEquals(10, germplasmListEntrySummary.getGid().intValue());
 		assertEquals("newDesignation", germplasmListEntrySummary.getDesignation());
 		assertEquals("newEntryCode", germplasmListEntrySummary.getEntryCode());
 		assertEquals("newSeedSource", germplasmListEntrySummary.getSeedSource());
 		assertEquals("newGroupName", germplasmListEntrySummary.getCross());
 	}
-	
+
 	@Test(expected = ApiRuntimeException.class)
 	public void getGermplasmListDetailsApiRuntimeExceptionTest() throws Exception {
-		when(germplasmListManager.getGermplasmListById(3)).thenThrow(new MiddlewareQueryException("Error!"));
-		
-		germplasmListService.getGermplasmListDetails(3);	
+		when(this.germplasmListManager.getGermplasmListById(3)).thenThrow(new MiddlewareQueryException("Error!"));
+
+		this.germplasmListService.getGermplasmListDetails(3);
 	}
-	
+
 	@Test
 	public void getGermplasmListDetailsWithNullGermplasmListTest() throws Exception {
-		GermplasmList germplasmList = new GermplasmList();		
+		GermplasmList germplasmList = new GermplasmList();
 		germplasmList = null;
-		
-		when(germplasmListManager.getGermplasmListById(3)).thenReturn(germplasmList);
-		GermplasmListDetails actual = germplasmListService.getGermplasmListDetails(3);
+
+		when(this.germplasmListManager.getGermplasmListById(3)).thenReturn(germplasmList);
+		GermplasmListDetails actual = this.germplasmListService.getGermplasmListDetails(3);
 
 		assertEquals(null, actual.getListId());
 	}
-	
+
 	@Test
 	public void getAllGermplasmListWithNullGermplasmListsTest() throws Exception {
 		List<GermplasmList> allGermplasmLists = new ArrayList<GermplasmList>();
 		allGermplasmLists = null;
 
-		when(germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE)).thenReturn(allGermplasmLists);
-		List<GermplasmListSummary> actual = germplasmListService.getAllGermplasmLists();
+		when(this.germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE)).thenReturn(allGermplasmLists);
+		List<GermplasmListSummary> actual = this.germplasmListService.list();
 
 		assertEquals(true, actual.isEmpty());
 	}
-	
+
 	@Test
 	public void getAllGermplasmListWithWithEmptyGermplasmListTest() throws Exception {
 		GermplasmList germplasmList = new GermplasmList();
@@ -161,27 +166,27 @@ public class GermplasmListServiceImplTest {
 		germplasmList.setNotes("");
 		germplasmList.setType("TEST_TYPE");
 
-		when(germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE)).thenReturn(allGermplasmLists);
-		List<GermplasmListSummary> actual = germplasmListService.getAllGermplasmLists();
+		when(this.germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE)).thenReturn(allGermplasmLists);
+		List<GermplasmListSummary> actual = this.germplasmListService.list();
 
 		assertEquals(true, actual.isEmpty());
 	}
-	
+
 	@Test
 	public void getAllGermplasmListWithTypeAsFolderTest() throws Exception {
 		List<GermplasmList> allGermplasmLists = new ArrayList<GermplasmList>();
 		GermplasmList germplasmList = new GermplasmList();
 		germplasmList.setId(3);
 		germplasmList.setType("FOLDER");
-		
+
 		allGermplasmLists.add(germplasmList);
 
-		when(germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE)).thenReturn(allGermplasmLists);
-		List<GermplasmListSummary> actual = germplasmListService.getAllGermplasmLists();
+		when(this.germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE)).thenReturn(allGermplasmLists);
+		List<GermplasmListSummary> actual = this.germplasmListService.list();
 
 		assertEquals(true, actual.isEmpty());
 	}
-	
+
 	private void getAllGermplamListAssertStatements(List<GermplasmListSummary> returnedValues) {
 		GermplasmListSummary germplasmListSummary = returnedValues.get(0);
 		assertEquals(3, germplasmListSummary.getListId().intValue());

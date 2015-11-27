@@ -1,6 +1,8 @@
 package org.ibp.api.java.impl.middleware.security;
 
+import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.study.StudySummary;
@@ -21,6 +23,9 @@ public class SecurityServiceImplTest {
 
 	@Mock
 	private WorkbenchDataManager workbenchDataManager;
+
+	@Mock
+	private UserDataManager userDataManager;
 
 	@InjectMocks
 	private SecurityServiceImpl securityServiceImpl = new SecurityServiceImpl();
@@ -126,5 +131,72 @@ public class SecurityServiceImplTest {
 		// We want that cleared for this test case.
 		SecurityContextHolder.getContext().setAuthentication(null);
 		this.securityServiceImpl.getCurrentlyLoggedInUser();
+	}
+
+	/**
+	 * Case 1 Logged in user is the list owner.
+	 */
+	@Test
+	public void testGermplasmListIsAccessibleToOwner() {
+		GermplasmList list = new GermplasmList();
+		list.setUserId(this.me.getUserid());
+		Mockito.when(this.userDataManager.getUserById(this.me.getUserid())).thenReturn(this.me);
+		Assert.assertTrue("Lists owned by logged in user should be accessible.", this.securityServiceImpl.isAccessible(list));
+	}
+
+	/**
+	 * Case 2 Logged in user is not the list owner.
+	 */
+	@Test
+	public void testGermplasmListIsNotAccessibleIfNotOwner() {
+		GermplasmList list = new GermplasmList();
+		list.setUserId(this.otherBreeder.getUserid());
+		list.setProgramUUID(this.programUUID);
+
+		final Project listProgram = new Project();
+		listProgram.setProjectId(2L);
+		listProgram.setUniqueID(list.getProgramUUID());
+		Mockito.when(this.workbenchDataManager.getProjectByUuid(list.getProgramUUID())).thenReturn(listProgram);
+		// Logged in user = me is not a the member
+		Mockito.when(this.workbenchDataManager.getUsersByProjectId(listProgram.getProjectId())).thenReturn(
+				Lists.newArrayList(this.otherBreeder));
+
+		Mockito.when(this.userDataManager.getUserById(this.otherBreeder.getUserid())).thenReturn(this.otherBreeder);
+		Assert.assertFalse("Lists not owned by logged in user should not be accessible.", this.securityServiceImpl.isAccessible(list));
+	}
+
+	/**
+	 * Case 3 Logged in user is not the list owner but is member of program where list belongs.
+	 */
+	@Test
+	public void testGermplasmListIsAccessibleToProgramMembers() {
+		GermplasmList list = new GermplasmList();
+		list.setUserId(this.otherBreeder.getUserid());
+		list.setProgramUUID(this.programUUID);
+
+		Mockito.when(this.userDataManager.getUserById(this.otherBreeder.getUserid())).thenReturn(this.otherBreeder);
+
+		final Project listProgram = new Project();
+		listProgram.setProjectId(2L);
+		listProgram.setUniqueID(list.getProgramUUID());
+
+		Mockito.when(this.workbenchDataManager.getProjectByUuid(list.getProgramUUID())).thenReturn(listProgram);
+
+		// Logged in user = me is a the member
+		Mockito.when(this.workbenchDataManager.getUsersByProjectId(listProgram.getProjectId())).thenReturn(
+				Lists.newArrayList(this.me));
+
+		Assert.assertTrue("Lists which are part of programs that logged in user is member of, should be accessible.",
+				this.securityServiceImpl.isAccessible(list));
+	}
+
+	/**
+	 * Case 4 Lists with no program reference.
+	 */
+	@Test
+	public void testGermplasmListIsAccessibleIfNoProgramReference() {
+		GermplasmList list = new GermplasmList();
+		list.setProgramUUID(null);
+		Assert.assertTrue("Lists with no program reference should be accessible to all.", this.securityServiceImpl.isAccessible(list));
 	}
 }
