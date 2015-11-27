@@ -82,7 +82,8 @@ public class SecurityServiceImplTest {
 				Lists.newArrayList(this.me));
 
 		// Hence accessible
-		Assert.assertTrue(this.securityServiceImpl.isAccessible(summaryStudy));
+		Assert.assertTrue("Studies that are part of programs created by me, or I am a meber of, should be accessible to me.",
+				this.securityServiceImpl.isAccessible(summaryStudy));
 	}
 
 	/**
@@ -104,7 +105,8 @@ public class SecurityServiceImplTest {
 				Lists.newArrayList(this.otherBreeder));
 
 		// Hence not accessible
-		Assert.assertFalse(this.securityServiceImpl.isAccessible(summaryStudy));
+		Assert.assertFalse("Studies that are part of programs I have not created nor I am a member of,  should not be accessible to me.",
+				this.securityServiceImpl.isAccessible(summaryStudy));
 	}
 
 	/**
@@ -116,7 +118,8 @@ public class SecurityServiceImplTest {
 		summary.setProgramUUID(null);
 
 		// Accessible to all
-		Assert.assertTrue(this.securityServiceImpl.isAccessible(summary));
+		Assert.assertTrue("Studies with no pgoram reference (e.g. Templates) should be accessible to all.",
+				this.securityServiceImpl.isAccessible(summary));
 	}
 
 	@Test
