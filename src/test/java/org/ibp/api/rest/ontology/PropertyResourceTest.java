@@ -101,7 +101,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 
 		List<Property> propertyList = TestDataProvider.getTestProperties(3);
 
-		Mockito.doReturn(propertyList).when(this.ontologyPropertyDataManager).getAllPropertiesWithClass(className);
+		Mockito.doReturn(propertyList).when(this.ontologyPropertyDataManager).getAllPropertiesWithClassAndVariableType(new String[] { className }, new String[] {});
 
 		this.mockMvc
 				.perform(
@@ -118,7 +118,7 @@ public class PropertyResourceTest extends ApiUnitTestBase {
 						MockMvcResultMatchers.jsonPath("$[0].classes",
 								IsCollectionWithSize.hasSize(propertyList.get(0).getClasses().size())));
 
-		Mockito.verify(this.ontologyPropertyDataManager, Mockito.times(1)).getAllPropertiesWithClass(className);
+		Mockito.verify(this.ontologyPropertyDataManager, Mockito.times(1)).getAllPropertiesWithClassAndVariableType(new String[] { className }, new String[] {});
 	}
 
 	/**

@@ -155,7 +155,7 @@ public class PropertyServiceImpl extends ServiceBaseImpl implements PropertyServ
 	@Override
 	public List<PropertyDetails> getAllPropertiesByClass(String propertyClass) {
 		try {
-			List<Property> propertyList = this.ontologyPropertyDataManager.getAllPropertiesWithClass(propertyClass);
+			List<Property> propertyList = this.ontologyPropertyDataManager.getAllPropertiesWithClassAndVariableType(new String[] {propertyClass}, new String[] {});
 			List<PropertyDetails> properties = new ArrayList<>();
 
 			ModelMapper mapper = OntologyMapper.getInstance();
