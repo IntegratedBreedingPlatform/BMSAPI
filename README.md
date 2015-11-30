@@ -6,6 +6,9 @@ BMS API is a set of RESTful web services to interact with the data in BMS databa
 BMS API services expose operations on data created by registered BMS users as they carry out breeding programs and studies for various crops. Hence access to the BMS API services require authentication as the same registered user. BMS API uses a light-weight variant of the popular OAuth protocol known as X-Auth. In exchange of valid users credentials (Workbench user name and password) BMS API issues a fixed time window (configurable per deployment) ticket/token which is then required to be provided for **each and every**  BMS API service invocation as part of `X-Auth-Token` request header. Example below illustrates the scenario of a command line client (curl) accessing the API:
 
 **Request a listing of programs without authentication:**
+
+We are using curl to demonstrate the request/response behaviour. You can also put the URLs provided directly into your browser URL navigation bar.
+
 Request: 
 ```
 curl http://<host>:<port>/bmsapi/program/list
