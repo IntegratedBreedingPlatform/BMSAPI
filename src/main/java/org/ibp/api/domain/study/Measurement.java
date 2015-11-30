@@ -1,7 +1,6 @@
 
 package org.ibp.api.domain.study;
 
-import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
