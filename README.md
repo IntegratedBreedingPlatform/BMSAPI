@@ -85,7 +85,9 @@ Response Body:
 ## Authorization ##
 Based on the details of the user making requests to BMSAPI, the data returned is restricted and filtered in the same way as the data is filtered/restricted when user interacts with the same data via the BMS application user interface. For example, users only see the data for the programs/studies they have created or the programs/studies that they are part of. As shown in example above, the listing returned two programs one which the authenticated user (naymesh) has created and one where the user is a member.
 
-### Pre Requisites ###
+# BMSAPI Build and Install/Deploy #
+
+## Pre Requisites ##
 * Git
 * Maven
 * MySQL
