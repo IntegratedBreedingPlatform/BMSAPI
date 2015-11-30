@@ -4,13 +4,13 @@ package org.ibp.api.domain.study.validators;
 import org.springframework.validation.Errors;
 
 /**
- * Observation data type based validation
+ * Measurement validation based on observation data type.
  *
  */
 public interface DataTypeValidator {
 
 	/**
-	 * Validates observations according to its data type
+	 * Validates measurement values according to its data type
 	 * @param measurementVariableDetails observations variable details
 	 * @param measurementIndex the array index so that we can construct an appropriate error message
 	 * @param observationId the observationId we are do the validation for
