@@ -1,0 +1,78 @@
+  {
+    "id": "29004",
+    "name": "AcdTol _E_1to5",
+    "alias": "",
+    "description": "Acid soil tolerance-BY-AcdTol  Estimation-IN-1-5 TOL scale",
+    "property": {
+      "id": "25019",
+      "name": "Acid soil tolerance",
+      "description": "An assessment of the plants tolerance to acid soil.",
+      "cropOntologyId": "CO_321:0000078",
+      "classes": [
+        "Abiotic stress traits"
+      ]
+    },
+    "method": {
+      "id": "26033",
+      "name": "AcdTol  Estimation",
+      "description": "Observe the growth of plants per plot/entry in a low pH (acid) soil field and rate the tolerance. "
+    },
+    "scale": {
+      "id": "27054",
+      "name": "1-5 TOL scale",
+      "description": "1-5 TOL scale",
+      "dataType": {
+        "id": "1130",
+        "name": "Categorical",
+        "systemDataType": false
+      },
+      "validValues": {
+        "categories": [
+          {
+            "id": "36272",
+            "name": "4",
+            "description": "4= tolerant"
+          },
+          {
+            "id": "36273",
+            "name": "5",
+            "description": "5= highly tolerant"
+          },
+          {
+            "id": "36274",
+            "name": "3",
+            "description": "3= intermediate"
+          },
+          {
+            "id": "36275",
+            "name": "1",
+            "description": "1= highly susceptible "
+          },
+          {
+            "id": "36276",
+            "name": "2",
+            "description": "2= susceptible "
+          }
+        ]
+      }
+    },
+    "variableTypes": [
+      {
+        "id": "1808",
+        "name": "Trait",
+        "description": "Characteristics of a germplasm to be recorded during a study."
+      },
+      {
+        "id": "1803",
+        "name": "Nursery Condition",
+        "description": "Observations made of conditions in a nursery."
+      },
+      {
+        "id": "1802",
+        "name": "Trial Condition",
+        "description": "Observations made of conditions in an individual environment involved in a trial."
+      }
+    ],
+    "favourite": false,
+    "expectedRange": {}
+  }
