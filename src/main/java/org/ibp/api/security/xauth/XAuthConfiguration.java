@@ -26,7 +26,8 @@ public class XAuthConfiguration implements EnvironmentAware {
 	@Bean
 	public TokenProvider tokenProvider() {
 		final String secret = this.propertyResolver.getProperty("secret", String.class, "bmsXAuthSecret");
-		final int validityInSeconds = this.propertyResolver.getProperty("tokenValidityInSeconds", Integer.class, 3600);
+		// authentication.xauth.tokenValidityInSeconds is configured in application.properties. Default is 21600 seconds = 6 Hours.
+		final int validityInSeconds = this.propertyResolver.getProperty("tokenValidityInSeconds", Integer.class, 21600);
 		return new TokenProvider(secret, validityInSeconds);
 	}
 }
