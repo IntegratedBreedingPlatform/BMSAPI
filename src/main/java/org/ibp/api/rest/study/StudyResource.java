@@ -14,6 +14,7 @@ import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudySummary;
+import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.java.study.StudyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,8 +44,16 @@ public class StudyResource {
 
 	@Autowired
 	private StudyService studyService;
+	
+	@Autowired
+	private ObservationValidator studyValidator;
 
 	private final Logger LOGGER = LoggerFactory.getLogger(StudyResource.class);
+	
+	@InitBinder
+	protected void initBinder(final WebDataBinder binder) {
+	    binder.addValidators(studyValidator);
+	}
 
 	/**
 	 * @param cropname The crop for which this rest call is being made
@@ -61,7 +72,7 @@ public class StudyResource {
 	public ResponseEntity<List<Observation>> getObservations(@PathVariable final String cropname, @PathVariable final Integer studyId) {
 		return new ResponseEntity<>(this.studyService.getObservations(studyId), HttpStatus.OK);
 	}
-
+	
 	@ApiOperation(value = "Get a observations", notes = "Returns the requested observation in the study.")
 	@RequestMapping(value = "/{cropname}/{studyId}/observations/{observationId}", method = RequestMethod.GET)
 	@ResponseBody
@@ -71,10 +82,12 @@ public class StudyResource {
 	}
 
 	@ApiOperation(value = "Update an observation", notes = "Returns observations available in the study.")
-	@RequestMapping(value = "/{cropname}/{studyId}/observations/{observationId}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/{cropname}/{programId}/{studyId}/observations/{observationId}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<Observation> updateObservation(@PathVariable final String cropname, @PathVariable final Integer studyId,
-			@PathVariable final Integer observationId, @RequestBody final Observation observation) {
+	public ResponseEntity<Observation> updateObservation(@PathVariable final String cropname, 
+			@PathVariable final String programId, 
+			@PathVariable final Integer studyId,
+			@PathVariable final Integer observationId, @Valid @RequestBody final Observation observation) {
 		if (observationId == null || observation.getUniqueIdentifier() == null || !observationId.equals(observation.getUniqueIdentifier())) {
 			throw new IllegalArgumentException(
 					"The observation identifier must be populated and have the same value in the object and the url");
@@ -82,6 +95,7 @@ public class StudyResource {
 		}
 		return new ResponseEntity<>(this.studyService.updateObsevation(studyId, observation), HttpStatus.OK);
 	}
+
 
 	@ApiOperation(value = "Get Study Germplasm List", notes = "Returns a list of germplasm used in the study.")
 	@RequestMapping(value = "/{cropname}/{studyId}/germplasm", method = RequestMethod.GET)
