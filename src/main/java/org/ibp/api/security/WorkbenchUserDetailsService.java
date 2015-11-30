@@ -20,6 +20,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+// **Important note for developers** : This class is central to the authentication framework of BMSAPI. Please do not alter it without a
+// good understanding of Spring Security in general and BMS X-Auth-Token based authentication workflow in particular, otherwise there will
+// be MAJOR breakages in the functioning of BMS components. Consult your friendly senior developer first if you are unsure.
 @Component
 public class WorkbenchUserDetailsService implements UserDetailsService {
 

@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mangofactory.swagger.annotations.ApiIgnore;
 
+// **Important note for developers** : This class is central to the authentication framework of BMSAPI. Please do not alter it without a
+// good understanding of Spring Security in general and BMS X-Auth-Token based authentication workflow in particular, otherwise there will
+// be MAJOR breakages in the functioning of BMS components. Consult your friendly senior developer first if you are unsure.
 @RestController
 public class UserXAuthTokenController {
 

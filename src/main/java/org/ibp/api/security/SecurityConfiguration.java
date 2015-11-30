@@ -17,6 +17,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+// **Important note for developers** : This class is central to the authentication framework of BMSAPI. Please do not alter it without a
+// good understanding of Spring Security in general and BMS X-Auth-Token based authentication workflow in particular, otherwise there will
+// be MAJOR breakages in the functioning of BMS components. Consult your friendly senior developer first if you are unsure.
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
@@ -52,20 +55,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
-			.exceptionHandling()
-			.authenticationEntryPoint(this.authenticationEntryPoint)
+		.exceptionHandling()
+		.authenticationEntryPoint(this.authenticationEntryPoint)
 		.and()
-			.csrf().disable()
+		.csrf().disable()
 		.headers()
-			.frameOptions().disable()
+		.frameOptions().disable()
 		.and()
-			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		.and()
-			.authorizeRequests()
-			.antMatchers("/", "/api-docs/**", "/authenticate").permitAll()
-			.anyRequest().hasAnyAuthority("ADMIN", "TECHNICIAN", "BREEDER")
+		.authorizeRequests()
+		.antMatchers("/", "/api-docs/**", "/authenticate").permitAll()
+		.anyRequest().hasAnyAuthority("ADMIN", "TECHNICIAN", "BREEDER")
 		.and()
-			.apply(this.securityConfigurerAdapter());
+		.apply(this.securityConfigurerAdapter());
 	}
 
 	private XAuthTokenConfigurer securityConfigurerAdapter() {

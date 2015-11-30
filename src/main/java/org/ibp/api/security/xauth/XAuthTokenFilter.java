@@ -19,6 +19,9 @@ import org.springframework.web.filter.GenericFilterBean;
 /**
  * Filters incoming requests and installs a Spring Security principal if a header corresponding to a valid user is found.
  */
+// **Important note for developers** : This class is central to the authentication framework of BMSAPI. Please do not alter it without a
+// good understanding of Spring Security in general and BMS X-Auth-Token based authentication workflow in particular, otherwise there will
+// be MAJOR breakages in the functioning of BMS components. Consult your friendly senior developer first if you are unsure.
 public class XAuthTokenFilter extends GenericFilterBean {
 
 	final static String XAUTH_TOKEN_HEADER_NAME = "x-auth-token";
