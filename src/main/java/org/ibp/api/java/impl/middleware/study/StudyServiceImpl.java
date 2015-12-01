@@ -152,6 +152,15 @@ public class StudyServiceImpl implements StudyService {
 		return this.mapObservationDtoToObservation(this.middlewareStudyService.updataObservation(studyIdentifier, middlewareMeasurement));
 	}
 
+	@Override
+	public List<Observation> updateObsevations(Integer studyIdentifier, List<Observation> observations) {
+		List<Observation> returnList = new ArrayList<>();
+		for (Observation obs : observations) {
+			returnList.add(this.updateObsevation(studyIdentifier, obs));
+		}
+		return returnList;
+	}
+
 	private void validateMeasurementSubmitted(final Integer studyIdentifier, final Observation observation) {
 		final Observation existingObservation = this.getSingleObservation(studyIdentifier, observation.getUniqueIdentifier());
 		final List<Measurement> measurements = observation.getMeasurements();

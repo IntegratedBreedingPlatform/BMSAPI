@@ -27,6 +27,8 @@ public interface StudyService {
 
 	Observation updateObsevation(final Integer studyIdentifier, Observation observation);
 
+	List<Observation> updateObsevations(final Integer studyIdentifier, List<Observation> observation);
+
 	List<StudyGermplasm> getStudyGermplasmList(final Integer studyIdentifer);
 
 	StudyDetails getStudyDetails(String studyId);

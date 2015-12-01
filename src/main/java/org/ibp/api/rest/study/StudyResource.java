@@ -96,6 +96,14 @@ public class StudyResource {
 		return new ResponseEntity<>(this.studyService.updateObsevation(studyId, observation), HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Add or update multiple observations", notes = "Returns observations added/updated.")
+	@RequestMapping(value = "/{cropname}/{studyId}/observations", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity<List<Observation>> addOrUpdateMultipleObservations(@PathVariable final String cropname,
+			@PathVariable final Integer studyId, @RequestBody final List<Observation> observation) {
+		return new ResponseEntity<>(this.studyService.updateObsevations(studyId, observation), HttpStatus.OK);
+	}
+
 
 	@ApiOperation(value = "Get Study Germplasm List", notes = "Returns a list of germplasm used in the study.")
 	@RequestMapping(value = "/{cropname}/{studyId}/germplasm", method = RequestMethod.GET)
