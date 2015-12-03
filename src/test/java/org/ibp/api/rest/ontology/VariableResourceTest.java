@@ -224,7 +224,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		variableFilter.addScaleId(scaleId);
 
 		Mockito.doReturn(null).when(this.termDataManager).getTermByNameAndCvId(variableDetails.getName(), CvId.VARIABLES.getId());
-		Mockito.doReturn(TestDataProvider.getTestScale()).when(this.ontologyScaleDataManager).getScaleById(scaleId, true);
+		Mockito.doReturn(TestDataProvider.getTestScale()).when(this.ontologyScaleDataManager).getScale(scaleId, true);
 		Mockito.doReturn(TestDataProvider.getPropertyTerm()).when(this.termDataManager).getTermById(propertyId);
 		Mockito.doReturn(TestDataProvider.getMethodTerm()).when(this.termDataManager).getTermById(methodId);
 		Mockito.doReturn(TestDataProvider.getScaleTerm()).when(this.termDataManager).getTermById(scaleId);
@@ -295,7 +295,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuid(this.programUuid);
 		Mockito.doReturn(variableTerm).when(this.termDataManager).getTermById(variableTerm.getId());
 		Mockito.doReturn(variableTerm).when(this.termDataManager).getTermByNameAndCvId(variable.getName(), CvId.VARIABLES.getId());
-		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleId, true);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScale(scaleId, true);
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyId);
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodId);
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleId);

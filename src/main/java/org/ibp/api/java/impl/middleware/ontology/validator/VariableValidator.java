@@ -244,7 +244,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		// 13. The min and max expected range values are only stored if the scales data type is numeric
 		try {
-			Scale scale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(variable.getScale().getId(), null), true);
+			Scale scale = this.ontologyScaleDataManager.getScale(StringUtil.parseInt(variable.getScale().getId(), null), true);
 
 			if (scale.getDataType() != null && scale.getDataType().isSystemDataType()) {
 				this.addCustomError(errors, VariableValidator.VARIABLE_SCALE_WITH_SYSTEM_DATA_TYPE, null);
