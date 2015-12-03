@@ -27,6 +27,7 @@ import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.Trait;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,6 +68,9 @@ public class StudyServiceImplTest {
 	@Mock
 	private DataImportService dataImportService;
 
+	@Mock
+	private SecurityService securityService;
+
 	private final String programUID = UUID.randomUUID().toString();
 
 	final PodamFactory factory = new PodamFactoryImpl();
@@ -90,6 +94,11 @@ public class StudyServiceImplTest {
 		this.studyServiceImpl.setGermplasmListManager(this.germplasmListManager);
 		this.studyServiceImpl.setStudyDataManager(this.studyDataManager);
 		this.studyServiceImpl.setDataImportService(this.dataImportService);
+		this.studyServiceImpl.setSecurityService(this.securityService);
+
+		// Make all test data accessible
+		Mockito.when(this.securityService.isAccessible(Mockito.any(org.generationcp.middleware.service.api.study.StudySummary.class)))
+		.thenReturn(true);
 	}
 
 	@Test

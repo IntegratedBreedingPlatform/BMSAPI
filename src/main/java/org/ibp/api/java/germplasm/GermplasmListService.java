@@ -10,7 +10,7 @@ public interface GermplasmListService {
 
 	List<GermplasmListSummary> searchGermplasmLists(String searchText);
 
-	List<GermplasmListSummary> getAllGermplasmLists();
+	List<GermplasmListSummary> list();
 
 	GermplasmListDetails getGermplasmListDetails(Integer listId);
 }

@@ -65,7 +65,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
 
 		ProgramSummary program = new ProgramSummary();
-		program.setCropType(cropName);
+		program.setCrop(cropName);
 		program.setUniqueID(programId);
 
 		this.programValidator.validate(program, bindingResult);
@@ -110,7 +110,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
 
 		ProgramSummary program = new ProgramSummary();
-		program.setCropType(cropName);
+		program.setCrop(cropName);
 		program.setUniqueID(programId);
 
 		this.programValidator.validate(program, bindingResult);
@@ -148,7 +148,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
 
 		ProgramSummary program = new ProgramSummary();
-		program.setCropType(cropName);
+		program.setCrop(cropName);
 		program.setUniqueID(programId);
 
 		this.programValidator.validate(program, errors);
@@ -208,7 +208,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		variable.setProgramUuid(programId);
 
 		ProgramSummary program = new ProgramSummary();
-		program.setCropType(cropName);
+		program.setCrop(cropName);
 		program.setUniqueID(programId);
 
 		try {
@@ -264,7 +264,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		variable.setProgramUuid(programId);
 
 		ProgramSummary program = new ProgramSummary();
-		program.setCropType(cropName);
+		program.setCrop(cropName);
 		program.setUniqueID(programId);
 
 		try {

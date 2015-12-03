@@ -5,13 +5,14 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>bmsapi</artifactId>
 	<packaging>${packaging.type}</packaging>
-        <version>4.0.0.BETA.5</version>
+    <version>4.0.0.BETA.5</version>
 	<name>BMS API</name>
 
 	<properties>
 		<spring-boot-version>1.2.4.RELEASE</spring-boot-version>
+		<spring-security-version>4.0.2.RELEASE</spring-security-version>
 		<tomcat.version>7.0.50</tomcat.version>
-                <middleware-version>4.0.0.BETA.5</middleware-version>
+        <middleware-version>4.0.0.BETA.5</middleware-version>
 		<jsonpath.version>0.8.1</jsonpath.version>
 		<modelmapper.version>0.7.3</modelmapper.version>
 		<envConfig>${user.name}</envConfig>
@@ -84,7 +85,32 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 			<version>${spring-boot-version}</version>
 		</dependency>
+		
+	    <dependency>
+	        <groupId>org.springframework.security</groupId>
+	        <artifactId>spring-security-web</artifactId>
+	        <version>${spring-security-version}</version>
+		</dependency>
+	
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>${spring-security-version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<version>${spring-security-version}</version>
+			<scope>test</scope>
+		</dependency>
 
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity4</artifactId>
+			<version>2.1.2.RELEASE</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>

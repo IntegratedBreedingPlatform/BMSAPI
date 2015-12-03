@@ -43,7 +43,7 @@ public class ProgramValidatorTest {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Program");
 
 		ProgramSummary program = new ProgramSummary();
-		program.setCropType("maize");
+		program.setCrop("maize");
 		program.setUniqueID("");
 
 		this.programValidator.validate(program, bindingResult);
@@ -57,7 +57,7 @@ public class ProgramValidatorTest {
 		String programId = "uuid";
 
 		ProgramSummary program = new ProgramSummary();
-		program.setCropType("maize");
+		program.setCrop("maize");
 		program.setUniqueID(programId);
 
 		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectByUuid(programId);
@@ -74,7 +74,7 @@ public class ProgramValidatorTest {
 		String programId = "uuid";
 
 		ProgramSummary program = new ProgramSummary();
-		program.setCropType("maize");
+		program.setCrop("maize");
 		program.setUniqueID(programId);
 
 		Project project = new Project();
@@ -96,7 +96,7 @@ public class ProgramValidatorTest {
 
 		String programId = "uuid";
 		ProgramSummary program = new ProgramSummary();
-		program.setCropType("maize");
+		program.setCrop("maize");
 		program.setUniqueID(programId);
 
 		Project project = new Project();

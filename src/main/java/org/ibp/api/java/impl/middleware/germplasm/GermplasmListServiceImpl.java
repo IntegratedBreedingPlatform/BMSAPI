@@ -14,6 +14,7 @@ import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 import org.ibp.api.domain.germplasm.GermplasmListSummary;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.germplasm.GermplasmListService;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Autowired
 	private GermplasmListManager germplasmListManager;
 
+	@Autowired
+	private SecurityService securityService;
+
 	public GermplasmListServiceImpl() {
 
 	}
@@ -36,8 +40,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	 *
 	 * @param germplasmListManager the mock germplasm list manager
 	 */
-	GermplasmListServiceImpl(final GermplasmListManager germplasmListManager) {
+	GermplasmListServiceImpl(final GermplasmListManager germplasmListManager, final SecurityService securityService) {
 		this.germplasmListManager = germplasmListManager;
+		this.securityService = securityService;
 	}
 
 	@Override
@@ -55,6 +60,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		List<GermplasmListSummary> results = new ArrayList<GermplasmListSummary>();
 		if (germplasmLists != null && !germplasmLists.isEmpty()) {
 			for (GermplasmList gpList : germplasmLists) {
+				if (!this.securityService.isAccessible(gpList)) {
+					continue;
+				}
 				// FIXME hack to remove folders. Middleware service should offer this option and handle it internally!
 				if (!gpList.getType().equals("FOLDER")) {
 					GermplasmListSummary res = new GermplasmListSummary();
@@ -102,7 +110,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public List<GermplasmListSummary> getAllGermplasmLists() {
+	public List<GermplasmListSummary> list() {
 		List<GermplasmList> allGermplasmLists;
 		try {
 			allGermplasmLists = this.germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE);
