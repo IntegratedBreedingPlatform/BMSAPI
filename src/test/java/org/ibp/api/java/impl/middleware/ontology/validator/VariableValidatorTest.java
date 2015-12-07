@@ -128,6 +128,45 @@ public class VariableValidatorTest {
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
 
+    @Test
+    public void testEmptyStringAgainstNullDBValue() throws MiddlewareException {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+        VariableDetails variable = TestDataProvider.getTestVariableDetails();
+        variable.setAlias("");
+
+        Variable dbVariable = TestDataProvider.getTestVariable();
+        dbVariable.setAlias(null);
+        dbVariable.setObservations(5);
+
+        Mockito.when(ontologyVariableDataManager.getVariable(variable.getProgramUuid(), Integer.parseInt(variable.getId()), true, true)).thenReturn(dbVariable);
+
+        this.variableValidator.validate(variable, bindingResult);
+
+        Mockito.verify(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), Integer.parseInt(variable.getId()), true, true);
+
+        Assert.assertNull("Validator throws a false negative for equality of empty value / string", bindingResult.getFieldError("alias"));
+    }
+
+    @Test
+    public void testVariableShouldBeEditableNewValue() throws MiddlewareException {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+        VariableDetails variable = TestDataProvider.getTestVariableDetails();
+        variable.setAlias("");
+
+        Variable dbVariable = TestDataProvider.getTestVariable();
+        dbVariable.setObservations(5);
+
+        dbVariable.setAlias("TEST");
+
+        Mockito.when(ontologyVariableDataManager.getVariable(variable.getProgramUuid(), Integer.parseInt(variable.getId()), true, true)).thenReturn(dbVariable);
+
+        this.variableValidator.validate(variable, bindingResult);
+
+        Mockito.verify(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), Integer.parseInt(variable.getId()), true, true);
+
+        Assert.assertNotNull("Validator unable to catch change in alias value between user input and current db state", bindingResult.getFieldError("alias"));
+    }
+
 	/**
 	 * Test for to check description length not exceed 1024 characters
 	 *
