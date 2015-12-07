@@ -362,7 +362,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 	}
 
-	private void variableShouldBeEditable(VariableDetails variable, Errors errors) {
+	void variableShouldBeEditable(VariableDetails variable, Errors errors) {
 
 		if (variable.getId() == null) {
 			return;
@@ -406,13 +406,13 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
 			Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
 
-			boolean nameEqual = Objects.equals(variable.getName(), oldVariable.getName());
+			boolean nameEqual = StringUtil.areEqualOrBothEmpty(variable.getName(), oldVariable.getName());
 			boolean propertyEqual = Objects.equals(propertyId, oldVariable.getProperty().getId());
 			boolean methodEqual = Objects.equals(methodId, oldVariable.getMethod().getId());
 			boolean scaleEqual = Objects.equals(scaleId, oldVariable.getScale().getId());
-			boolean minValuesEqual = Objects.equals(variable.getExpectedRange().getMin(), oldVariable.getMinValue());
-			boolean maxValuesEqual = Objects.equals(variable.getExpectedRange().getMax(), oldVariable.getMaxValue());
-			boolean aliasEqual = Objects.equals(variable.getAlias(), oldVariable.getAlias());
+			boolean minValuesEqual = StringUtil.areEqualOrBothEmpty(variable.getExpectedRange().getMin(), oldVariable.getMinValue());
+			boolean maxValuesEqual = StringUtil.areEqualOrBothEmpty(variable.getExpectedRange().getMax(), oldVariable.getMaxValue());
+			boolean aliasEqual = StringUtil.areEqualOrBothEmpty(variable.getAlias(), oldVariable.getAlias());
 
 			if (!nameEqual) {
 				this.addCustomError(errors, "name", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
