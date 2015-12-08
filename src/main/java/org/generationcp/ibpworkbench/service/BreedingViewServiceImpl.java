@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.generationcp.commons.service.impl.BreedingViewImportServiceImpl;
+import org.generationcp.commons.service.BreedingViewImportService;
 import org.generationcp.commons.util.ObjectUtil;
 import org.generationcp.ibpworkbench.constants.WebAPIConstants;
 import org.generationcp.ibpworkbench.exceptions.IBPWebServiceException;
@@ -36,7 +36,7 @@ import com.rits.cloning.Cloner;
 public class BreedingViewServiceImpl implements BreedingViewService {
 
 	@Autowired
-	private BreedingViewImportServiceImpl importService;
+	private BreedingViewImportService importService;
 	
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
