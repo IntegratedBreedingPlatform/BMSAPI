@@ -18,6 +18,7 @@ import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 import org.ibp.api.domain.study.Measurement;
@@ -117,9 +118,10 @@ public class StudyServiceImplTest {
 		studySummary.setType(StudyType.T);
 
 		mockResult.add(studySummary);
-		Mockito.when(this.mockMiddlewareStudyService.listAllStudies(this.programUID)).thenReturn(mockResult);
 
-		final List<StudySummary> studySummaries = this.studyServiceImpl.listAllStudies(this.programUID);
+		Mockito.when(this.mockMiddlewareStudyService.search(Mockito.any(StudySearchParameters.class))).thenReturn(mockResult);
+
+		final List<StudySummary> studySummaries = this.studyServiceImpl.search(this.programUID, null, null, null);
 		Assert.assertEquals(mockResult.size(), studySummaries.size());
 		Assert.assertEquals(studySummary.getId().toString(), studySummaries.get(0).getId());
 		Assert.assertEquals(studySummary.getName(), studySummaries.get(0).getName());

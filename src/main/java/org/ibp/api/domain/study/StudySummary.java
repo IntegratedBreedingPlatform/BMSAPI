@@ -3,6 +3,7 @@ package org.ibp.api.domain.study;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 /**
  * Summary information about a study (Trials and Nurseries).
@@ -17,6 +18,9 @@ public class StudySummary {
 	private String type;
 	private String startDate;
 	private String endDate;
+	private String principalInvestigator;
+	private String location;
+	private String season;
 
 	public StudySummary() {
 
@@ -82,9 +86,33 @@ public class StudySummary {
 		this.endDate = endDate;
 	}
 
+	public String getPrincipalInvestigator() {
+		return this.principalInvestigator;
+	}
+
+	public void setPrincipalInvestigator(String principalInvestigator) {
+		this.principalInvestigator = principalInvestigator;
+	}
+
+	public String getLocation() {
+		return this.location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public String getSeason() {
+		return this.season;
+	}
+
+	public void setSeason(String season) {
+		this.season = season;
+	}
+
 	@Override
 	public String toString() {
-		return "StudySummary [id=" + this.id + ", name=" + this.name + ", title=" + this.title + ", type=" + this.type + "]";
+		return new ReflectionToStringBuilder(this).toString();
 	}
 
 	@Override
@@ -93,14 +121,11 @@ public class StudySummary {
 			return false;
 		}
 		StudySummary castOther = (StudySummary) other;
-		return new EqualsBuilder().append(this.id, castOther.id).append(this.name, castOther.name).append(this.title, castOther.title)
-				.append(this.objective, castOther.objective).append(this.type, castOther.type).append(this.startDate, castOther.startDate)
-				.append(this.endDate, castOther.endDate).isEquals();
+		return new EqualsBuilder().append(this.id, castOther.id).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.id).append(this.name).append(this.title).append(this.objective).append(this.type)
-				.append(this.startDate).append(this.endDate).toHashCode();
+		return new HashCodeBuilder().append(this.id).toHashCode();
 	}
 }
