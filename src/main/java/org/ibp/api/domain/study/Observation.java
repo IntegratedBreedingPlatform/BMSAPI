@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
@@ -12,16 +15,27 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Observation {
 
+	@NotNull
 	private Integer uniqueIdentifier;
+
 	private Integer germplasmId;
+
 	private String germplasmDesignation;
+
 	private String entryNumber;
+
 	private String entryType;
+	
 	private String plotNumber;
+
 	private String replicationNumber;
+	
 	private String environmentNumber;
+
 	private String seedSource;
 
+	@Valid
+	@NotNull
 	private List<Measurement> measurements;
 
 	@JsonIgnore

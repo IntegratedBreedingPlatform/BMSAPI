@@ -1,6 +1,8 @@
 
 package org.ibp.api.domain.study;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -13,8 +15,10 @@ public class Measurement {
 	/**
 	 * The measurement identifier can only be compared within an observation.
 	 */
+	@NotNull
 	private MeasurementIdentifier measurementIdentifier;
 
+	@NotNull
 	private String measurementValue;
 
 	public Measurement() {
