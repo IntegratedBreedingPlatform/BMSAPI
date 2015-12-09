@@ -55,7 +55,7 @@ public class ObservationValidationDataExtractorTest {
 		this.observation.setMeasurements(this.measurements);
 
 		this.testVariableDetails =
-				new ObjectMapper().readValue(this.getClass().getResourceAsStream("acdTolVariable.json"), VariableDetails.class);
+				new ObjectMapper().readValue(this.getClass().getResourceAsStream("/testData/acdTolVariable.json"), VariableDetails.class);
 
 		Mockito.when(
 				this.variableService.getVariableById(TestValidatorConstants.CROP_NAME, TestValidatorConstants.PROGRAM_ID,
