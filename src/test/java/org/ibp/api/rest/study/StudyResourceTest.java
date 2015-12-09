@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.TraitDto;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
@@ -65,11 +66,14 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		summaryMW.setType(StudyType.T);
 		summaryMW.setStartDate("01012015");
 		summaryMW.setEndDate("01012015");
+		summaryMW.setPrincipalInvestigator("Mr. Breeder");
+		summaryMW.setLocation("Auckland");
+		summaryMW.setSeason("Summer");
 		summariesMW.add(summaryMW);
 
-		Mockito.when(this.studyServiceMW.listAllStudies(org.mockito.Matchers.anyString())).thenReturn(summariesMW);
+		Mockito.when(this.studyServiceMW.search(org.mockito.Matchers.any(StudySearchParameters.class))).thenReturn(summariesMW);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/study/{cropname}/list", "maize").contentType(this.contentType))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/study/{cropname}/search", "maize").contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(summariesMW.size())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['id']", Matchers.is(summaryMW.getId().toString())))
@@ -79,9 +83,12 @@ public class StudyResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['type']", Matchers.is(summaryMW.getType().getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['startDate']", Matchers.is(summaryMW.getStartDate())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['endDate']", Matchers.is(summaryMW.getEndDate())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['principalInvestigator']", Matchers.is(summaryMW.getPrincipalInvestigator())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['location']", Matchers.is(summaryMW.getLocation())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['season']", Matchers.is(summaryMW.getSeason())))
 				.andDo(MockMvcResultHandlers.print());
 
-		Mockito.verify(this.studyServiceMW).listAllStudies(org.mockito.Matchers.anyString());
+		Mockito.verify(this.studyServiceMW).search(org.mockito.Matchers.any(StudySearchParameters.class));
 	}
 
 	@Test
