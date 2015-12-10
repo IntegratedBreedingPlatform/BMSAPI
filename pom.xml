@@ -9,7 +9,7 @@
 	<properties>
 		<jersey-version>1.8</jersey-version>
 		<spring.version>3.2.11.RELEASE</spring.version>
-        <ibpcommons.version>${version}</ibpcommons.version>
+        <ibpcommons.version>${project.version}</ibpcommons.version>
 		<envConfig>${user.name}</envConfig>
 	</properties>
 
