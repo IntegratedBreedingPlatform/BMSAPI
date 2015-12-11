@@ -5,14 +5,14 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>bmsapi</artifactId>
 	<packaging>${packaging.type}</packaging>
-    <version>4.0.0.BETA.5</version>
+    <version>4.0.0.BETA.6</version>
 	<name>BMS API</name>
 
 	<properties>
 		<spring-boot-version>1.2.4.RELEASE</spring-boot-version>
 		<spring-security-version>4.0.2.RELEASE</spring-security-version>
 		<tomcat.version>7.0.50</tomcat.version>
-        <middleware-version>4.0.0.BETA.5</middleware-version>
+        <middleware-version>${project.version}</middleware-version>
 		<jsonpath.version>0.8.1</jsonpath.version>
 		<modelmapper.version>0.7.3</modelmapper.version>
 		<envConfig>${user.name}</envConfig>
@@ -217,6 +217,12 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-collections4</artifactId>
 			<version>4.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-validator</groupId>
+			<artifactId>commons-validator</artifactId>
+			<version>1.4.0</version>
 		</dependency>
 
 		<dependency>

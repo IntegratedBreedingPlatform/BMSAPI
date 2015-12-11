@@ -44,15 +44,35 @@ public class StudyResource {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(StudyResource.class);
 
-	/**
-	 * @param cropname The crop for which this rest call is being made
-	 */
-	@ApiOperation(value = "List all studies", notes = "Returns summary information for all studies (Nurseries and Trials).")
-	@RequestMapping(value = "/{cropname}/list", method = RequestMethod.GET)
+	@ApiOperation(value = "Search studies",
+			notes = "Search studies (Nurseries and Trials) by various criteria (see parameter documentation).")
+	@RequestMapping(value = "/{cropname}/search", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<StudySummary>> listAllStudies(@PathVariable final String cropname, @RequestParam(value = "programUniqueId",
-			required = false) final String programUniqueId) {
-		return new ResponseEntity<>(this.studyService.listAllStudies(programUniqueId), HttpStatus.OK);
+	public ResponseEntity<List<StudySummary>> search(
+			@ApiParam(value = "Required parameter. Must specify the crop database to query. "
+					+ "Use <code>GET /crop/list</code> service to retrieve possible crop name values that can be supplied here.")
+			@PathVariable final String cropname, //
+			@ApiParam(
+					value = "Optional parameter. "
+							+ "If provided the results are filtered to only return studies that belong to the program identified by this unique id.")//
+			@RequestParam(value = "programUniqueId", required = false) final String programUniqueId,
+
+			@ApiParam(
+					value = "Optional parameter. If provided the results are filtered to only return studies with specified principal investigator. "
+							+ "Matches against value of study level attribute identified by ontology term id 8100 (PI_NAME).")//
+			@RequestParam(value = "principalInvestigator", required = false) final String principalInvestigator,
+
+			@ApiParam(value = "Optional parameter. If provided the results are filtered to only return studies at the specified location. "
+					+ "Matches against value of study level attribute identified by ontology term id 8180 (LOCATION_NAME).")//
+			@RequestParam(value = "location", required = false) final String location,
+
+			@ApiParam(
+					value = "Optional parameter. If provided the results are filtered to only return studies in conducted in specified season."
+							+ "Matches against value of study level attribute identified by ontology term id 8370 (CROP_SEASON).")//
+			@RequestParam(value = "season", required = false) final String season) {
+
+		return new ResponseEntity<>(this.studyService.search(programUniqueId, principalInvestigator, location, season),
+				HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get all observations", notes = "Returns observations available in the study.")
@@ -61,7 +81,7 @@ public class StudyResource {
 	public ResponseEntity<List<Observation>> getObservations(@PathVariable final String cropname, @PathVariable final Integer studyId) {
 		return new ResponseEntity<>(this.studyService.getObservations(studyId), HttpStatus.OK);
 	}
-
+	
 	@ApiOperation(value = "Get a observations", notes = "Returns the requested observation in the study.")
 	@RequestMapping(value = "/{cropname}/{studyId}/observations/{observationId}", method = RequestMethod.GET)
 	@ResponseBody
@@ -82,6 +102,15 @@ public class StudyResource {
 		}
 		return new ResponseEntity<>(this.studyService.updateObsevation(studyId, observation), HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Add or update multiple observations", notes = "Returns observations added/updated.")
+	@RequestMapping(value = "/{cropname}/{studyId}/observations", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity<List<Observation>> addOrUpdateMultipleObservations(@PathVariable final String cropname,
+			@PathVariable final Integer studyId, @RequestBody final List<Observation> observation) {
+		return new ResponseEntity<>(this.studyService.updateObsevations(studyId, observation), HttpStatus.OK);
+	}
+
 
 	@ApiOperation(value = "Get Study Germplasm List", notes = "Returns a list of germplasm used in the study.")
 	@RequestMapping(value = "/{cropname}/{studyId}/germplasm", method = RequestMethod.GET)
@@ -110,7 +139,7 @@ public class StudyResource {
 			final @PathVariable String cropname, //
 			@ApiParam(
 					value = "Unique id of the program to import this study into. Use the /programs/list service to list Programs and obtain unique id.") @RequestParam final String programUUID,
-			@RequestBody @Valid final StudyImportDTO studyImportDTO, final BindingResult bindingResult) {
+					@RequestBody @Valid final StudyImportDTO studyImportDTO, final BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
 			final String error = this.getErrorsAsString(bindingResult);

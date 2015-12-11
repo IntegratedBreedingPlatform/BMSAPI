@@ -28,6 +28,7 @@ import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.TraitDto;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.study.DatasetSummary;
@@ -82,11 +83,16 @@ public class StudyServiceImpl implements StudyService {
 	private SecurityService securityService;
 
 	@Override
-	public List<StudySummary> listAllStudies(final String programUniqueId) {
+	public List<StudySummary> search(final String programUniqueId, String principalInvestigator, String location, String season) {
 		final List<StudySummary> studySummaries = new ArrayList<StudySummary>();
 		try {
+			StudySearchParameters searchParameters = new StudySearchParameters();
+			searchParameters.setProgramUniqueId(programUniqueId);
+			searchParameters.setPrincipalInvestigator(principalInvestigator);
+			searchParameters.setLocation(location);
+			searchParameters.setSeason(season);
 			final List<org.generationcp.middleware.service.api.study.StudySummary> mwStudySummaries =
-					this.middlewareStudyService.listAllStudies(programUniqueId);
+					this.middlewareStudyService.search(searchParameters);
 
 			for (final org.generationcp.middleware.service.api.study.StudySummary mwStudySummary : mwStudySummaries) {
 				if (!this.securityService.isAccessible(mwStudySummary)) {
@@ -100,6 +106,9 @@ public class StudyServiceImpl implements StudyService {
 				summary.setStartDate(mwStudySummary.getStartDate());
 				summary.setEndDate(mwStudySummary.getEndDate());
 				summary.setType(mwStudySummary.getType().getName());
+				summary.setPrincipalInvestigator(mwStudySummary.getPrincipalInvestigator());
+				summary.setLocation(mwStudySummary.getLocation());
+				summary.setSeason(mwStudySummary.getSeason());
 				studySummaries.add(summary);
 			}
 		} catch (final MiddlewareException e) {
@@ -150,6 +159,15 @@ public class StudyServiceImpl implements StudyService {
 						observation.getSeedSource(), observation.getReplicationNumber(), observation.getPlotNumber(), traits);
 
 		return this.mapObservationDtoToObservation(this.middlewareStudyService.updataObservation(studyIdentifier, middlewareMeasurement));
+	}
+
+	@Override
+	public List<Observation> updateObsevations(Integer studyIdentifier, List<Observation> observations) {
+		List<Observation> returnList = new ArrayList<>();
+		for (Observation obs : observations) {
+			returnList.add(this.updateObsevation(studyIdentifier, obs));
+		}
+		return returnList;
 	}
 
 	private void validateMeasurementSubmitted(final Integer studyIdentifier, final Observation observation) {
