@@ -138,11 +138,18 @@ public class VariableValidatorTest {
         dbVariable.setAlias(null);
         dbVariable.setObservations(5);
 
-        Mockito.when(ontologyVariableDataManager.getVariable(variable.getProgramUuid(), Integer.parseInt(variable.getId()), true, true)).thenReturn(dbVariable);
+    		Term methodTerm = TestDataProvider.getMethodTerm();
+    		Term propertyTerm = TestDataProvider.getPropertyTerm();
+    		Term scaleTerm = TestDataProvider.getScaleTerm();
+    		Scale scale = TestDataProvider.getTestScale();
+
+    		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
+    		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
+    		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());    		
+    		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleTerm.getId(), true);
+    		Mockito.doReturn(dbVariable).when(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), dbVariable.getId(), true, true);
 
         this.variableValidator.validate(variable, bindingResult);
-
-        Mockito.verify(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), Integer.parseInt(variable.getId()), true, true);
 
         Assert.assertNull("Validator throws a false negative for equality of empty value / string", bindingResult.getFieldError("alias"));
     }
@@ -157,13 +164,22 @@ public class VariableValidatorTest {
         dbVariable.setObservations(5);
 
         dbVariable.setAlias("TEST");
+        
+    		Term methodTerm = TestDataProvider.getMethodTerm();
+    		Term propertyTerm = TestDataProvider.getPropertyTerm();
+    		Term scaleTerm = TestDataProvider.getScaleTerm();
+    		Scale scale = TestDataProvider.getTestScale();
 
-        Mockito.when(ontologyVariableDataManager.getVariable(variable.getProgramUuid(), Integer.parseInt(variable.getId()), true, true)).thenReturn(dbVariable);
+
+    		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
+    		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
+    		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());    		
+    		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleTerm.getId(), true);
+    		Mockito.doReturn(dbVariable).when(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), dbVariable.getId(), true, true);
 
         this.variableValidator.validate(variable, bindingResult);
-
-        Mockito.verify(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), Integer.parseInt(variable.getId()), true, true);
-
+        
+        Assert.assertEquals(1, bindingResult.getErrorCount());
         Assert.assertNotNull("Validator unable to catch change in alias value between user input and current db state", bindingResult.getFieldError("alias"));
     }
 
