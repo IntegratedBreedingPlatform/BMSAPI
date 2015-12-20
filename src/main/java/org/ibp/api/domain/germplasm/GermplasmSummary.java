@@ -8,7 +8,7 @@ public class GermplasmSummary {
 
 	private String germplasmId;
 	private String pedigreeString;
-	private final List<String> names = new ArrayList<String>();
+	private final List<GermplasmName> names = new ArrayList<GermplasmName>();
 	private String breedingMethod;
 	private String location;
 
@@ -42,11 +42,11 @@ public class GermplasmSummary {
 		this.breedingMethod = breedingMethod;
 	}
 
-	public List<String> getNames() {
+	public List<GermplasmName> getNames() {
 		return this.names;
 	}
 
-	public void addNames(List<String> names) {
+	public void addNames(List<GermplasmName> names) {
 		if (names != null) {
 			this.names.addAll(names);
 		}

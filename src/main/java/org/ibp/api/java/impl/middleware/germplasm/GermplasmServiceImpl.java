@@ -15,8 +15,10 @@ import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.ibp.api.domain.germplasm.GermplasmName;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.domain.germplasm.PedigreeTree;
 import org.ibp.api.domain.germplasm.PedigreeTreeNode;
@@ -72,9 +74,16 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		// FIXME - select in a loop ... Middleware service should handle all this in main query.
 		List<Name> namesByGID = this.germplasmDataManager.getNamesByGID(new Integer(germplasm.getGid()), null, null);
-		List<String> names = new ArrayList<String>();
+		List<GermplasmName> names = new ArrayList<GermplasmName>();
 		for (Name gpName : namesByGID) {
-			names.add(gpName.getNval());
+			GermplasmName germplasmName = new GermplasmName();
+			germplasmName.setName(gpName.getNval());
+			UserDefinedField nameType = this.germplasmDataManager.getUserDefinedFieldByID(gpName.getTypeId());
+			if (nameType != null) {
+				germplasmName.setNameTypeCode(nameType.getFcode());
+				germplasmName.setNameTypeDescription(nameType.getFname());
+			}
+			names.add(germplasmName);
 		}
 		summary.addNames(names);
 
