@@ -131,7 +131,7 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.germplasmId", Matchers.is(this.germplasm.getGid().toString())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.names", Matchers.contains(this.germplasm.getPreferredName().getNval())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.names[0].name", Matchers.is(this.germplasm.getPreferredName().getNval())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.location", Matchers.is(this.location.getLname())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.breedingMethod", Matchers.is(this.method.getMname())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.parent1Id", Matchers.is(this.germplasm.getGpid1().toString())))
