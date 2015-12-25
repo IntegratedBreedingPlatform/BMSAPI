@@ -128,6 +128,61 @@ public class VariableValidatorTest {
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
 	}
 
+    @Test
+    public void testEmptyStringAgainstNullDBValue() throws MiddlewareException {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+        VariableDetails variable = TestDataProvider.getTestVariableDetails();
+        variable.setAlias("");
+
+        Variable dbVariable = TestDataProvider.getTestVariable();
+        dbVariable.setAlias(null);
+        dbVariable.setObservations(5);
+
+    		Term methodTerm = TestDataProvider.getMethodTerm();
+    		Term propertyTerm = TestDataProvider.getPropertyTerm();
+    		Term scaleTerm = TestDataProvider.getScaleTerm();
+    		Scale scale = TestDataProvider.getTestScale();
+
+    		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
+    		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
+    		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());    		
+    		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleTerm.getId(), true);
+    		Mockito.doReturn(dbVariable).when(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), dbVariable.getId(), true, true);
+
+        this.variableValidator.validate(variable, bindingResult);
+
+        Assert.assertNull("Validator throws a false negative for equality of empty value / string", bindingResult.getFieldError("alias"));
+    }
+
+    @Test
+    public void testVariableShouldBeEditableNewValue() throws MiddlewareException {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+        VariableDetails variable = TestDataProvider.getTestVariableDetails();
+        variable.setAlias("");
+
+        Variable dbVariable = TestDataProvider.getTestVariable();
+        dbVariable.setObservations(5);
+
+        dbVariable.setAlias("TEST");
+        
+    		Term methodTerm = TestDataProvider.getMethodTerm();
+    		Term propertyTerm = TestDataProvider.getPropertyTerm();
+    		Term scaleTerm = TestDataProvider.getScaleTerm();
+    		Scale scale = TestDataProvider.getTestScale();
+
+
+    		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
+    		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
+    		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());    		
+    		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleTerm.getId(), true);
+    		Mockito.doReturn(dbVariable).when(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), dbVariable.getId(), true, true);
+
+        this.variableValidator.validate(variable, bindingResult);
+        
+        Assert.assertEquals(1, bindingResult.getErrorCount());
+        Assert.assertNotNull("Validator unable to catch change in alias value between user input and current db state", bindingResult.getFieldError("alias"));
+    }
+
 	/**
 	 * Test for to check description length not exceed 1024 characters
 	 *
