@@ -33,4 +33,6 @@ public interface StudyService {
 	Integer importStudy(final StudyImportDTO studyImportDTO, String programUUID);
 
 	List<StudyFolder> getAllStudyFolders();
+
+	String getProgramUUID(Integer studyIdentifier);
 }
