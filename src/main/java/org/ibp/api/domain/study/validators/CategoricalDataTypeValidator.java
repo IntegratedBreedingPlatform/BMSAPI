@@ -32,8 +32,7 @@ public class CategoricalDataTypeValidator implements DataTypeValidator {
 			if (StringUtils.isNotBlank(measurementVariableDetails.getMeasurementValue())) {
 				final TermSummary termSummary = mappedCategories.get(measurementVariableDetails.getMeasurementValue().trim());
 				if (termSummary == null) {
-					errors.rejectValue(
-							"Observation.measurement[" + measurementIndex + "]",
+					errors.rejectValue("measurementValue",
 							"invalid.measurement.categorical.value",
 							new Object[] {measurementVariableDetails.getMeasurementValue(), observationId,
 									measurementVariableDetails.getMeasurementId(), measurementVariableDetails.getVariableId()},

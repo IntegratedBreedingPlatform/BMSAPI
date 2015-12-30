@@ -64,7 +64,7 @@ public class CategoricalDataTypeValidatorTest {
 		this.categoricalDataTypeValidator.validateValues(measurementVariableDetails, 0,
 				TestValidatorConstants.TEST_OBSERVATION_IDENTIFIER, mockErrors);
 		Mockito.verify(mockErrors).rejectValue(
-				"Observation.measurement[" + TestValidatorConstants.TEST_MEASUREMENT_INDEX + "]",
+				"measurementValue",
 				"invalid.measurement.categorical.value",
 				new Object[] {measurementVariableDetails.getMeasurementValue(), TestValidatorConstants.TEST_OBSERVATION_IDENTIFIER,
 						TestValidatorConstants.TEST_MEASUREMENT_ID, TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_ID},

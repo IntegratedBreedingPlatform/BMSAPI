@@ -22,7 +22,7 @@ public class DateVariableDataTypeValidator implements DataTypeValidator {
 	public void validateValues(MeasurementVariableDetails measurementVariableDetails, int measurementIndex, int observationId, Errors errors) {
 		ensureDateDataType(measurementVariableDetails);
 		if (!dateValidator.isValid(measurementVariableDetails.getMeasurementValue().trim(), "yyyyMMdd")) {
-			errors.rejectValue("Observation.measurement[" + measurementIndex + "]", "invalid.measurement.date.value", new Object[] {
+			errors.rejectValue("measurementValue","invalid.measurement.date.value", new Object[] {
 					measurementVariableDetails.getMeasurementValue(), observationId, measurementVariableDetails.getMeasurementId()},
 					"Invalid date value found.");
 		}

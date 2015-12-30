@@ -17,7 +17,7 @@ public class CharacterVariableDataTypeValidator implements DataTypeValidator {
 	public void validateValues(MeasurementVariableDetails measurementVariableDetails, int measurementIndex, int observationId, Errors errors) {
 		ensureCharacterDataType(measurementVariableDetails);
 		if (measurementVariableDetails.getMeasurementValue().length() > 255) {
-			errors.rejectValue("Observation.measurement[" + measurementIndex + "]", "invalid.measurement.character.value", new Object[] {
+			errors.rejectValue("measurementValue","invalid.measurement.character.value", new Object[] {
 					measurementVariableDetails.getMeasurementValue(), observationId, measurementVariableDetails.getMeasurementId()},
 					"Invalid character value found.");
 		}

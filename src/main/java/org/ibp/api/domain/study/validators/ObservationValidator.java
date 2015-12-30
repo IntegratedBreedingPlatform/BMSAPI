@@ -1,15 +1,23 @@
 
 package org.ibp.api.domain.study.validators;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.lang3.StringUtils;
 import org.ibp.api.domain.common.BmsRequestAttributeImpl;
 import org.ibp.api.domain.common.BmsRequestAttributes;
 import org.ibp.api.domain.ontology.DataType;
+import org.ibp.api.domain.study.Measurement;
+import org.ibp.api.domain.study.MeasurementIdentifier;
 import org.ibp.api.domain.study.Observation;
+import org.ibp.api.domain.study.Trait;
 import org.ibp.api.java.ontology.VariableService;
+import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -21,16 +29,27 @@ public class ObservationValidator implements Validator {
 	@Autowired
 	private VariableService variableService;
 
-	final ObservationValidationDataExtractor observationValidationDataExtractor;
+	@Autowired
+	private StudyService studyService;
+
+	ObservationValidationDataExtractor observationValidationDataExtractor;
 
 	final BmsRequestAttributes bmsRequestAttributes;
 
 	private final MeasurementDataValidatorFactory measurementDataValidatorFactory;
 
 	ObservationValidator() {
-		this.observationValidationDataExtractor = new ObservationValidationDataExtractor();
 		this.bmsRequestAttributes = new BmsRequestAttributeImpl();
 		this.measurementDataValidatorFactory = new MeasurementDataValidatorFactoryImpl();
+	}
+
+	/**
+	 * This need to be post construct because the variable service and study service are not available on object creation.
+	 * @throws Exception
+	 */
+	@PostConstruct
+	public void initIt() throws Exception {
+		this.observationValidationDataExtractor = new ObservationValidationDataExtractor(variableService, studyService);
 	}
 
 	public ObservationValidator(final VariableService variableService, final BmsRequestAttributes bmsRequestAttributes,
@@ -52,9 +71,14 @@ public class ObservationValidator implements Validator {
 	public void validate(final Object target, final Errors errors) {
 
 		final Observation observation = (Observation) target;
+		validateInputData(observation, errors);
+		if(!errors.getAllErrors().isEmpty()) {
+			// No point since we have null values;
+			return;
+		}
 		final ObservationValidationData observationValidationData =
 				this.observationValidationDataExtractor.getObservationValidationData(observation,
-						this.bmsRequestAttributes.getRequestAttributes(), this.variableService);
+						this.bmsRequestAttributes.getRequestAttributes());
 		final Map<Integer, MeasurementVariableDetails> measurementVariableDetailsList =
 				observationValidationData.getMeasurementVariableDetailsList();
 		final Set<Entry<Integer, MeasurementVariableDetails>> measurmentVariableDetails = measurementVariableDetailsList.entrySet();
@@ -64,8 +88,60 @@ public class ObservationValidator implements Validator {
 			final DataType measurementVariableDataType = measurementVariableDetails.getVariableDataType();
 			final DataTypeValidator measurementValidator =
 					this.measurementDataValidatorFactory.getMeasurementValidator(measurementVariableDataType);
+			errors.pushNestedPath("measurement[" + measurementEntry.getKey() + "]");
 			measurementValidator.validateValues(measurementVariableDetails, measurementEntry.getKey(),
 					observation.getUniqueIdentifier(), errors);
+			errors.popNestedPath();
+		}
+	}
+
+	void validateInputData(final Observation observation, Errors errors) {
+
+		if (observation.getUniqueIdentifier() == null) {
+			errors.rejectValue("uniqueIdentifier", "invalid.value.null");
+		}
+
+		final List<Measurement> measurements = observation.getMeasurements();
+		if (measurements == null || observation.getMeasurements().isEmpty()) {
+			errors.rejectValue("measurements", "invalid.value.null");
+			return;
+		}
+
+		int measurementCounter = 0;
+		for (Measurement measurement : measurements) {
+			validateMeasurementValue(errors, measurementCounter, measurement);
+			validateMeasurementIdentifier(errors, measurementCounter, measurement);
+			measurementCounter++;
+		}
+	}
+
+	private void validateMeasurementIdentifier(Errors errors, int measurementCounter, Measurement measurement) {
+		final MeasurementIdentifier measurementIdentifier = measurement.getMeasurementIdentifier();
+		if (measurementIdentifier == null) {
+			errors.rejectValue("measurements[" + measurementCounter + "].measurementIdentifier", "invalid.value.null");
+		} else {
+			validateTrait(errors, measurementCounter, measurementIdentifier);
+		}
+	}
+
+	private void validateTrait(Errors errors, int measurementCounter, final MeasurementIdentifier measurementIdentifier) {
+		final Trait trait = measurementIdentifier.getTrait();
+		if (trait == null) {
+			errors.rejectValue("measurements[" + measurementCounter + "].trait", "invalid.value.null");
+		} else {
+			if (trait.getTraitId() == null) {
+				errors.rejectValue("measurements[" + measurementCounter + "].trait.traitId", "invalid.value.null");
+			}
+
+			if (StringUtils.isEmpty(trait.getTraitName())) {
+				errors.rejectValue("measurements[" + measurementCounter + "].trait.traitName", "invalid.value.null");
+			}
+		}
+	}
+
+	private void validateMeasurementValue(Errors errors, int measurementCounter, Measurement measurement) {
+		if (StringUtils.isEmpty(measurement.getMeasurementValue())) {
+			errors.rejectValue("measurements[" + measurementCounter + "].measurementValue", "invalid.value.null");
 		}
 	}
 
