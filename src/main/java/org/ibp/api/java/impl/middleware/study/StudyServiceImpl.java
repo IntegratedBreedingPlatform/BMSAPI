@@ -2,6 +2,7 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,8 @@ import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.TraitDto;
+import org.ibp.api.domain.common.Command;
+import org.ibp.api.domain.common.ValidationUtil;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.study.DatasetSummary;
 import org.ibp.api.domain.study.Environment;
@@ -42,8 +45,10 @@ import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudySummary;
+import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.impl.middleware.ontology.MethodServiceImpl;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
@@ -51,8 +56,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.validation.SmartValidator;
+import org.springframework.validation.Validator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -81,6 +91,13 @@ public class StudyServiceImpl implements StudyService {
 
 	@Autowired
 	private SecurityService securityService;
+
+	@Autowired
+	private ObservationValidator observationValidator;
+
+	@Autowired
+	private ValidationUtil validationUtil;
+
 
 	@Override
 	public List<StudySummary> search(final String programUniqueId, String principalInvestigator, String location, String season) {
@@ -143,6 +160,16 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public Observation updateObsevation(final Integer studyIdentifier, final Observation observation) {
 
+		validationUtil.invokeValidation("StudyServiceImpl", new Command() {
+			@Override
+			public void execute(final Errors errors) {
+				observationValidator.validate(observation, errors);
+			}
+		});
+		return putInTheDamObservations(studyIdentifier, observation);
+	}
+
+	private Observation putInTheDamObservations(final Integer studyIdentifier, final Observation observation) {
 		this.validateMeasurementSubmitted(studyIdentifier, observation);
 
 		final List<Measurement> measurements = observation.getMeasurements();
@@ -162,10 +189,22 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<Observation> updateObsevations(Integer studyIdentifier, List<Observation> observations) {
+	public List<Observation> updateObsevations(final Integer studyIdentifier, final List<Observation> observations) {
+		validationUtil.invokeValidation("StudyServiceImpl", new Command() {
+			@Override
+			public void execute(Errors errors) {
+				int counter = 0;
+				for (final Observation observation : observations) {
+					errors.pushNestedPath("Observation[" + counter++ + "]");
+					observationValidator.validate(observation, errors);
+					errors.popNestedPath();
+				}
+			}
+		});
+
 		List<Observation> returnList = new ArrayList<>();
 		for (Observation obs : observations) {
-			returnList.add(this.updateObsevation(studyIdentifier, obs));
+			returnList.add(this.putInTheDamObservations(studyIdentifier, obs));
 		}
 		return returnList;
 	}
@@ -173,6 +212,7 @@ public class StudyServiceImpl implements StudyService {
 	private void validateMeasurementSubmitted(final Integer studyIdentifier, final Observation observation) {
 		final Observation existingObservation = this.getSingleObservation(studyIdentifier, observation.getUniqueIdentifier());
 		final List<Measurement> measurements = observation.getMeasurements();
+		// If null do something
 		final List<ObjectError> errors = new ArrayList<ObjectError>();
 		int counter = 0;
 		for (final Measurement measurement : measurements) {
@@ -429,6 +469,11 @@ public class StudyServiceImpl implements StudyService {
 		}
 
 		return studyFolders;
+	}
+
+	@Override
+	public String getProgramUUID(final Integer studyIdentifier) {
+		return middlewareStudyService.getProgramUUID(studyIdentifier);
 	}
 
 }
