@@ -15,10 +15,8 @@ public class Measurement {
 	/**
 	 * The measurement identifier can only be compared within an observation.
 	 */
-	@NotNull
 	private MeasurementIdentifier measurementIdentifier;
 
-	@NotNull
 	private String measurementValue;
 
 	public Measurement() {
