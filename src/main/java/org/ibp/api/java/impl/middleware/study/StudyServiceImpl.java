@@ -166,10 +166,10 @@ public class StudyServiceImpl implements StudyService {
 				observationValidator.validate(observation, errors);
 			}
 		});
-		return putInTheDamObservations(studyIdentifier, observation);
+		return mapAndUpdateObservation(studyIdentifier, observation);
 	}
 
-	private Observation putInTheDamObservations(final Integer studyIdentifier, final Observation observation) {
+	private Observation mapAndUpdateObservation(final Integer studyIdentifier, final Observation observation) {
 		this.validateMeasurementSubmitted(studyIdentifier, observation);
 
 		final List<Measurement> measurements = observation.getMeasurements();
@@ -204,21 +204,40 @@ public class StudyServiceImpl implements StudyService {
 
 		List<Observation> returnList = new ArrayList<>();
 		for (Observation obs : observations) {
-			returnList.add(this.putInTheDamObservations(studyIdentifier, obs));
+			returnList.add(this.mapAndUpdateObservation(studyIdentifier, obs));
 		}
 		return returnList;
 	}
 
+	/**
+	 * Essentially makes sure that the underlying observation has not changed
+	 * @param studyIdentifier the study in which the observation is being updated
+	 * @param observation the actual observation update.
+	 */
 	private void validateMeasurementSubmitted(final Integer studyIdentifier, final Observation observation) {
-		final Observation existingObservation = this.getSingleObservation(studyIdentifier, observation.getUniqueIdentifier());
-		final List<Measurement> measurements = observation.getMeasurements();
 		// If null do something
+		final Observation existingObservation = this.getSingleObservation(studyIdentifier, observation.getUniqueIdentifier());
 		final List<ObjectError> errors = new ArrayList<ObjectError>();
+		if (existingObservation == null) {
+			validateExistingObservation(studyIdentifier, observation, errors);
+		} else {
+			validateMeasurementHasNotBeenCreated(observation, existingObservation, errors);
+		}
+		if (!errors.isEmpty()) {
+			throw new ApiRequestValidationException(errors);
+		}
+
+	}
+
+	private void validateMeasurementHasNotBeenCreated(final Observation observation, final Observation existingObservation,
+			final List<ObjectError> errors) {
+		final List<Measurement> measurements = observation.getMeasurements();
 		int counter = 0;
 		for (final Measurement measurement : measurements) {
+			// Relies on the hash coded generated in the MeasurementIdentifier object
 			final Measurement existingMeasurement = existingObservation.getMeasurement(measurement.getMeasurementIdentifier());
 			if (existingMeasurement == null) {
-				final String array[] = {"program.already.inserted"};
+				final String array[] = {"measurement.already.inserted"};
 				final List<String> object = new ArrayList<String>();
 				final ObjectMapper objectMapper = new ObjectMapper();
 				try {
@@ -233,9 +252,15 @@ public class StudyServiceImpl implements StudyService {
 				counter++;
 			}
 		}
-		if (!errors.isEmpty()) {
-			throw new ApiRequestValidationException(errors);
-		}
+	}
+
+	private void validateExistingObservation(final Integer studyIdentifier, final Observation observation, final List<ObjectError> errors) {
+		final String errorKey[] = {"no.observation.found"};
+		final Object erroyKeyArguments[] = {studyIdentifier, observation.getUniqueIdentifier()};
+		final FieldError observationIdentifierError =
+				new FieldError("Observation", "uniqueIdentifier", null, false, errorKey, erroyKeyArguments,
+						"Error retrieving observation");
+		errors.add(observationIdentifierError);
 	}
 
 	@Override
