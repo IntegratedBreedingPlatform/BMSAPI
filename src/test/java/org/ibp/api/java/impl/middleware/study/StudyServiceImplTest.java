@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.validation.Errors;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
@@ -20,6 +21,8 @@ import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.api.study.TraitDto;
+import org.ibp.api.domain.common.ValidationUtil;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.MeasurementIdentifier;
@@ -28,6 +31,8 @@ import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.Trait;
+import org.ibp.api.domain.study.validators.ObservationValidator;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,6 +41,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.validation.ObjectError;
 
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
@@ -72,6 +78,9 @@ public class StudyServiceImplTest {
 	@Mock
 	private SecurityService securityService;
 
+	@Mock
+	private ObservationValidator observationValidator;
+
 	private final String programUID = UUID.randomUUID().toString();
 
 	final PodamFactory factory = new PodamFactoryImpl();
@@ -96,10 +105,11 @@ public class StudyServiceImplTest {
 		this.studyServiceImpl.setStudyDataManager(this.studyDataManager);
 		this.studyServiceImpl.setDataImportService(this.dataImportService);
 		this.studyServiceImpl.setSecurityService(this.securityService);
-
+		this.studyServiceImpl.setValidationUtil(new ValidationUtil());
+		this.studyServiceImpl.setObservationValidator(this.observationValidator);
 		// Make all test data accessible
 		Mockito.when(this.securityService.isAccessible(Mockito.any(org.generationcp.middleware.service.api.study.StudySummary.class)))
-		.thenReturn(true);
+				.thenReturn(true);
 	}
 
 	@Test
@@ -173,6 +183,102 @@ public class StudyServiceImplTest {
 		final List<Observation> actualObservations = this.studyServiceImpl.getObservations(StudyServiceImplTest.TEST_STUDY_IDENTIFIER);
 
 		Assert.assertEquals(Lists.transform(observationDtoTestData, this.observationTransformFunction), actualObservations);
+
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void updateObservationWhichDoesNotExist() {
+		final Integer studyIdentifier = new Integer(5);
+		Observation manufacturePojo = this.factory.manufacturePojo(Observation.class);
+
+		try {
+			this.studyServiceImpl.updateObservation(studyIdentifier, manufacturePojo);
+		} catch (final ApiRequestValidationException apiRequestValidationException) {
+			List<ObjectError> errors = apiRequestValidationException.getErrors();
+			Assert.assertEquals("We should only have one error", 1, errors.size());
+			Assert.assertEquals("The error should have the code", "no.observation.found", errors.get(0).getCode());
+			Assert.assertEquals("The error have the study identifier as its first parameter", studyIdentifier,
+					errors.get(0).getArguments()[0]);
+			Assert.assertEquals("The error have the observation unique identifier as its second parameter",
+					manufacturePojo.getUniqueIdentifier(), errors.get(0).getArguments()[1]);
+			throw apiRequestValidationException;
+		}
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void updateObservationsWhichDoesNotExist() {
+		final Integer studyIdentifier = new Integer(5);
+		Observation manufacturePojo = this.factory.manufacturePojo(Observation.class);
+		Observation manufacturePojo1 = this.factory.manufacturePojo(Observation.class);
+		Observation manufacturePojo2 = this.factory.manufacturePojo(Observation.class);
+		try {
+			this.studyServiceImpl.updateObservations(studyIdentifier,
+					Lists.newArrayList(manufacturePojo, manufacturePojo1, manufacturePojo2));
+		} catch (final ApiRequestValidationException apiRequestValidationException) {
+			List<ObjectError> errors = apiRequestValidationException.getErrors();
+			// This is because we are just stopping at the first error
+			Assert.assertEquals("We should only have one error", 1, errors.size());
+			Assert.assertEquals("The error should have the code", "no.observation.found", errors.get(0).getCode());
+			Assert.assertEquals("The error have the study identifier as its first parameter", studyIdentifier,
+					errors.get(0).getArguments()[0]);
+			Assert.assertEquals("The error have the observation unique identifier as its second parameter",
+					manufacturePojo.getUniqueIdentifier(), errors.get(0).getArguments()[1]);
+			throw apiRequestValidationException;
+		}
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void updateAnAlreadyInsertedMeasurement() {
+		final MeasurementDto databaseReturnedMeasurement = new MeasurementDto(new TraitDto(1, "Plant Height"), 1, "123");
+		final ObservationDto databaseReturnedObservationValue =
+				new ObservationDto(1, "1", "Test", 1, "CML123", "1", "CIMMYT Seed Bank", "1", "1", Lists.newArrayList(databaseReturnedMeasurement));
+		final List<ObservationDto> observationDtoTestData = Lists.newArrayList(databaseReturnedObservationValue);
+		Mockito.when(
+				this.mockMiddlewareStudyService.getSingleObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,
+						databaseReturnedObservationValue.getMeasurementId())).thenReturn(observationDtoTestData);
+		try {
+			final Observation observation = Lists.transform(observationDtoTestData, this.observationTransformFunction).get(0);
+			observation.getMeasurements().get(0).getMeasurementIdentifier().setMeasurementId(null);
+			this.studyServiceImpl.updateObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,observation);
+		} catch (final ApiRequestValidationException apiRequestValidationException) {
+			List<ObjectError> errors = apiRequestValidationException.getErrors();
+			// This is because we are just stopping at the first error
+			Assert.assertEquals("We should only have one error", 1, errors.size());
+			Assert.assertEquals("The error should have the code", "measurement.already.inserted", errors.get(0).getCode());
+			throw apiRequestValidationException;
+		}
+	}
+
+	@Test
+	public void ensureValidationInvokedOnUpdateObservation() {
+		final ObservationDto manufacturePojo = this.factory.manufacturePojo(ObservationDto.class);
+		final List<ObservationDto> observationDtoTestData = Lists.newArrayList(manufacturePojo);
+		Mockito.when(
+				this.mockMiddlewareStudyService.getSingleObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,
+						manufacturePojo.getMeasurementId())).thenReturn(observationDtoTestData);
+		Mockito.when(this.mockMiddlewareStudyService.updataObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, manufacturePojo))
+				.thenReturn(manufacturePojo);
+
+		final Observation observation = Lists.transform(observationDtoTestData, this.observationTransformFunction).get(0);
+		this.studyServiceImpl.updateObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, observation);
+		Mockito.verify(observationValidator, Mockito.times(1)).validate(Mockito.eq(observation), Mockito.any(Errors.class));
+	}
+
+	@Test
+	public void ensureValidationInvokedOnUpdateObservations() {
+
+		final ObservationDto manufacturePojo = this.factory.manufacturePojo(ObservationDto.class);
+		Mockito.when(
+				this.mockMiddlewareStudyService.getSingleObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,
+						manufacturePojo.getMeasurementId())).thenReturn(Lists.newArrayList(manufacturePojo));
+		Mockito.when(this.mockMiddlewareStudyService.updataObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, manufacturePojo))
+				.thenReturn(manufacturePojo);
+		final List<Observation> observations =
+				Lists.transform(Lists.newArrayList(manufacturePojo, manufacturePojo), this.observationTransformFunction);
+		this.studyServiceImpl.updateObservations(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, observations);
+
+		observations.get(0).equals(observations.get(1));
+		Mockito.verify(observationValidator, Mockito.times(2)).validate(Mockito.eq(observations.get(0)), Mockito.any(Errors.class));
 
 	}
 
