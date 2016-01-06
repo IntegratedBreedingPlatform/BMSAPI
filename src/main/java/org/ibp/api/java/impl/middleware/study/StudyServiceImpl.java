@@ -189,6 +189,8 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public List<Observation> updateObservations(final Integer studyIdentifier, final List<Observation> observations) {
+		final List<Observation> returnList = new ArrayList<>();
+
 		validationUtil.invokeValidation("StudyServiceImpl", new Command() {
 			@Override
 			public void execute(Errors errors) {
@@ -196,15 +198,11 @@ public class StudyServiceImpl implements StudyService {
 				for (final Observation observation : observations) {
 					errors.pushNestedPath("Observation[" + counter++ + "]");
 					observationValidator.validate(observation, errors);
+					returnList.add(StudyServiceImpl.this.mapAndUpdateObservation(studyIdentifier, observation));
 					errors.popNestedPath();
 				}
 			}
 		});
-
-		List<Observation> returnList = new ArrayList<>();
-		for (Observation obs : observations) {
-			returnList.add(this.mapAndUpdateObservation(studyIdentifier, obs));
-		}
 		return returnList;
 	}
 
@@ -245,7 +243,7 @@ public class StudyServiceImpl implements StudyService {
 					throw new ApiRuntimeException("Error mapping measurement to JSON", e);
 				}
 				final FieldError objectError =
-						new FieldError("Measurements [" + counter + "]", "Measurement", null, false, array, object.toArray(),
+						new FieldError("Observation" , "Measurements [" + counter + "]", null, false, array, object.toArray(),
 								"Error processing measurement");
 				errors.add(objectError);
 				counter++;

@@ -21,6 +21,7 @@ import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.Validator;
 
 @Component
@@ -71,8 +72,12 @@ public class ObservationValidator implements Validator {
 	public void validate(final Object target, final Errors errors) {
 
 		final Observation observation = (Observation) target;
+		final int errorCountBeforeNullValidation = errors.getErrorCount();
 		validateInputData(observation, errors);
-		if(!errors.getAllErrors().isEmpty()) {
+		final int errorCountAfterNullValidation = errors.getErrorCount();
+
+		List<ObjectError> allErrors = errors.getAllErrors();
+		if(errorCountAfterNullValidation - errorCountBeforeNullValidation > 0) {
 			// No point since we have null values;
 			return;
 		}
