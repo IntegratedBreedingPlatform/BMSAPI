@@ -158,8 +158,7 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public Observation updateObsevation(final Integer studyIdentifier, final Observation observation) {
-
+	public Observation updateObservation(final Integer studyIdentifier, final Observation observation) {
 		validationUtil.invokeValidation("StudyServiceImpl", new Command() {
 			@Override
 			public void execute(final Errors errors) {
@@ -189,7 +188,7 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<Observation> updateObsevations(final Integer studyIdentifier, final List<Observation> observations) {
+	public List<Observation> updateObservations(final Integer studyIdentifier, final List<Observation> observations) {
 		validationUtil.invokeValidation("StudyServiceImpl", new Command() {
 			@Override
 			public void execute(Errors errors) {
@@ -218,7 +217,7 @@ public class StudyServiceImpl implements StudyService {
 		// If null do something
 		final Observation existingObservation = this.getSingleObservation(studyIdentifier, observation.getUniqueIdentifier());
 		final List<ObjectError> errors = new ArrayList<ObjectError>();
-		if (existingObservation == null) {
+		if (existingObservation == null || existingObservation.getUniqueIdentifier() == null) {
 			validateExistingObservation(studyIdentifier, observation, errors);
 		} else {
 			validateMeasurementHasNotBeenCreated(observation, existingObservation, errors);
@@ -482,6 +481,15 @@ public class StudyServiceImpl implements StudyService {
 	void setSecurityService(SecurityService securityService) {
 		this.securityService = securityService;
 	}
+
+	void setValidationUtil(final ValidationUtil validationUtil) {
+		this.validationUtil = validationUtil;
+	}
+
+	void setObservationValidator(final ObservationValidator observationValidator) {
+		this.observationValidator = observationValidator;
+	}
+
 
 	@Override
 	public List<StudyFolder> getAllStudyFolders() {

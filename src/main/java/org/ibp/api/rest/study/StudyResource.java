@@ -100,7 +100,7 @@ public class StudyResource {
 					"The observation identifier must be populated and have the same value in the object and the url");
 			// TODO: Give back some better error messages.
 		}
-		return new ResponseEntity<>(this.studyService.updateObsevation(studyId, observation), HttpStatus.OK);
+		return new ResponseEntity<>(this.studyService.updateObservation(studyId, observation), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Add or update multiple observations", notes = "Returns observations added/updated.")
@@ -108,7 +108,7 @@ public class StudyResource {
 	@ResponseBody
 	public ResponseEntity<List<Observation>> addOrUpdateMultipleObservations(@PathVariable final String cropname,
 			@PathVariable final Integer studyId, @RequestBody final List<Observation> observation) {
-		return new ResponseEntity<>(this.studyService.updateObsevations(studyId, observation), HttpStatus.OK);
+		return new ResponseEntity<>(this.studyService.updateObservations(studyId, observation), HttpStatus.OK);
 	}
 
 
