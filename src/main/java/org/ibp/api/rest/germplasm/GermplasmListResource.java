@@ -34,8 +34,9 @@ public class GermplasmListResource {
 
 	@ApiOperation(value = "Search germplasm lists.", notes = "Search germplasm lists.")
 	@RequestMapping(value = "/{cropname}/search", method = RequestMethod.GET)
-	public ResponseEntity<List<GermplasmListSummary>> searchGermplasmLists(@PathVariable String cropname, @RequestParam String q) {
-		List<GermplasmListSummary> searchResults = this.germplasmListService.searchGermplasmLists(q);
+	public ResponseEntity<List<GermplasmListSummary>> searchGermplasmLists(@PathVariable String cropname, @RequestParam String q,
+			@RequestParam String programUUID) {
+		List<GermplasmListSummary> searchResults = this.germplasmListService.searchGermplasmLists(q, programUUID);
 		this.populateResourceLinkURLs(searchResults, cropname);
 		return new ResponseEntity<List<GermplasmListSummary>>(searchResults, HttpStatus.OK);
 	}

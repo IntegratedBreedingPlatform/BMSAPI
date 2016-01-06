@@ -46,10 +46,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public List<GermplasmListSummary> searchGermplasmLists(String searchText) {
+	public List<GermplasmListSummary> searchGermplasmLists(String searchText, String programUUID) {
 		List<GermplasmList> matchingLists;
 		try {
-			matchingLists = this.germplasmListManager.searchForGermplasmList(searchText, Operation.LIKE);
+			matchingLists = this.germplasmListManager.searchForGermplasmList(searchText, programUUID, Operation.LIKE);
 		} catch (MiddlewareQueryException e) {
 			throw new ApiRuntimeException(GermplasmListServiceImpl.ERROR_NAME, e);
 		}

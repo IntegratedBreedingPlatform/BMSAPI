@@ -26,6 +26,7 @@ public class GermplasmListServiceImplTest {
 	private GermplasmListManager germplasmListManager;
 	private GermplasmListService germplasmListService;
 	private SecurityService securityService;
+	private static final String PROGRAM_UUID = "a7433c01-4f46-4bc8-ae3a-678f0b62ac23";
 
 	@Before
 	public void before() {
@@ -62,8 +63,10 @@ public class GermplasmListServiceImplTest {
 
 		matchingLists.add(germplasmList);
 
-		when(this.germplasmListManager.searchForGermplasmList("searchText", Operation.LIKE)).thenReturn(matchingLists);
-		List<GermplasmListSummary> returnedValues = this.germplasmListService.searchGermplasmLists("searchText");
+		when(this.germplasmListManager.searchForGermplasmList("searchText", GermplasmListServiceImplTest.PROGRAM_UUID, Operation.LIKE))
+				.thenReturn(matchingLists);
+		List<GermplasmListSummary> returnedValues =
+				this.germplasmListService.searchGermplasmLists("searchText", GermplasmListServiceImplTest.PROGRAM_UUID);
 
 		this.getAllGermplamListAssertStatements(returnedValues);
 	}
@@ -83,9 +86,10 @@ public class GermplasmListServiceImplTest {
 
 	@Test(expected = ApiRuntimeException.class)
 	public void searchGermplasmListThrowsApiRuntimeExceptionTest() throws Exception {
-		when(this.germplasmListManager.searchForGermplasmList("searchText", Operation.LIKE)).thenThrow(new MiddlewareQueryException("Error!"));
+		when(this.germplasmListManager.searchForGermplasmList("searchText", GermplasmListServiceImplTest.PROGRAM_UUID, Operation.LIKE))
+				.thenThrow(new MiddlewareQueryException("Error!"));
 
-		this.germplasmListService.searchGermplasmLists("searchText");
+		this.germplasmListService.searchGermplasmLists("searchText", GermplasmListServiceImplTest.PROGRAM_UUID);
 	}
 
 	@Test
