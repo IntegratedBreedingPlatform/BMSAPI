@@ -46,26 +46,26 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public List<GermplasmListSummary> searchGermplasmLists(String searchText, String programUUID) {
+	public List<GermplasmListSummary> searchGermplasmLists(final String searchText, final String programUUID) {
 		List<GermplasmList> matchingLists;
 		try {
 			matchingLists = this.germplasmListManager.searchForGermplasmList(searchText, programUUID, Operation.LIKE);
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException(GermplasmListServiceImpl.ERROR_NAME, e);
 		}
 		return this.mapResults(matchingLists);
 	}
 
-	private List<GermplasmListSummary> mapResults(List<GermplasmList> germplasmLists) {
-		List<GermplasmListSummary> results = new ArrayList<GermplasmListSummary>();
+	private List<GermplasmListSummary> mapResults(final List<GermplasmList> germplasmLists) {
+		final List<GermplasmListSummary> results = new ArrayList<GermplasmListSummary>();
 		if (germplasmLists != null && !germplasmLists.isEmpty()) {
-			for (GermplasmList gpList : germplasmLists) {
+			for (final GermplasmList gpList : germplasmLists) {
 				if (!this.securityService.isAccessible(gpList)) {
 					continue;
 				}
 				// FIXME hack to remove folders. Middleware service should offer this option and handle it internally!
 				if (!gpList.getType().equals("FOLDER")) {
-					GermplasmListSummary res = new GermplasmListSummary();
+					final GermplasmListSummary res = new GermplasmListSummary();
 					res.setListId(gpList.getId());
 					res.setListName(gpList.getName());
 					res.setDescription(gpList.getDescription());
@@ -79,9 +79,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public GermplasmListDetails getGermplasmListDetails(Integer listId) {
+	public GermplasmListDetails getGermplasmListDetails(final Integer listId) {
 
-		GermplasmListDetails listDetails = new GermplasmListDetails();
+		final GermplasmListDetails listDetails = new GermplasmListDetails();
 		GermplasmList gpList;
 		try {
 			gpList = this.germplasmListManager.getGermplasmListById(listId);
@@ -93,8 +93,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				listDetails.setNotes(gpList.getNotes());
 				listDetails.setListSize(gpList.getListData().size());
 
-				for (GermplasmListData gpListData : gpList.getListData()) {
-					GermplasmListEntrySummary gpEntry = new GermplasmListEntrySummary();
+				for (final GermplasmListData gpListData : gpList.getListData()) {
+					final GermplasmListEntrySummary gpEntry = new GermplasmListEntrySummary();
 					gpEntry.setGid(gpListData.getGid());
 					gpEntry.setDesignation(gpListData.getDesignation());
 					gpEntry.setEntryCode(gpListData.getEntryCode());
@@ -104,7 +104,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				}
 			}
 			return listDetails;
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException(GermplasmListServiceImpl.ERROR_NAME, e);
 		}
 	}
@@ -114,7 +114,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		List<GermplasmList> allGermplasmLists;
 		try {
 			allGermplasmLists = this.germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE);
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException(GermplasmListServiceImpl.ERROR_NAME, e);
 		}
 		return this.mapResults(allGermplasmLists);
