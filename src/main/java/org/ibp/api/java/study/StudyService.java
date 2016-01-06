@@ -20,9 +20,9 @@ public interface StudyService {
 
 	Observation getSingleObservation(Integer studyId, Integer obeservationId);
 
-	Observation updateObsevation(final Integer studyIdentifier, Observation observation);
+	Observation updateObservation(final Integer studyIdentifier, Observation observation);
 
-	List<Observation> updateObsevations(final Integer studyIdentifier, List<Observation> observation);
+	List<Observation> updateObservations(final Integer studyIdentifier, List<Observation> observation);
 
 	List<StudyGermplasm> getStudyGermplasmList(final Integer studyIdentifer);
 
