@@ -57,8 +57,8 @@ public class ObservationValidatorTest {
 				mockObservationValidationDataExtractor.getObservationValidationData(Matchers.<Observation>anyObject(),
 						Matchers.<Map<?, ?>>anyObject())).thenReturn(mockObservationValidationData);
 
-		final MeasurementVariableDetails measurementVariableDetails =
-				new MeasurementVariableDetails(TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_ID,
+		final MeasurementDetails measurementVariableDetails =
+				new MeasurementDetails(TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_ID,
 						TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_NAME, TestValidatorConstants.CHARACTER_DATA_TYPE,
 						Mockito.mock(ValidValues.class), TestValidatorConstants.TEST_MEASUREMENT_ID,
 						TestValidatorConstants.TEST_MEASUREMENT_VALUE);

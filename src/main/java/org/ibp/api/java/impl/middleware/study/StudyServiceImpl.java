@@ -168,6 +168,12 @@ public class StudyServiceImpl implements StudyService {
 		return mapAndUpdateObservation(studyIdentifier, observation);
 	}
 
+	/**
+	 * Translates to the middleware pojo. Updates the database and then translates back the results.
+	 * @param studyIdentifier
+	 * @param observation
+	 * @return
+	 */
 	private Observation mapAndUpdateObservation(final Integer studyIdentifier, final Observation observation) {
 		this.validateMeasurementSubmitted(studyIdentifier, observation);
 

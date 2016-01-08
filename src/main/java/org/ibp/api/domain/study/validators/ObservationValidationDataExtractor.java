@@ -47,11 +47,11 @@ public class ObservationValidationDataExtractor {
 
 		final int measurementListSize = measurements.size();
 
-		final Map<Integer, MeasurementVariableDetails> measurementVariableDetailsList = new HashMap<>();
+		final Map<Integer, MeasurementDetails> measurementVariableDetailsList = new HashMap<>();
 		for (int counter = 0; counter < measurementListSize; counter++) {
 			final VariableDetails variableDetails = this.getVariableDetails(measurements, counter, requestAttributes);
 			final Measurement measurement = measurements.get(counter);
-			measurementVariableDetailsList.put(counter, new MeasurementVariableDetails(variableDetails.getId(), variableDetails.getName(),
+			measurementVariableDetailsList.put(counter, new MeasurementDetails(variableDetails.getId(), variableDetails.getName(),
 					this.getVariableDataType(variableDetails), this.getVariableValidValues(variableDetails), measurement
 							.getMeasurementIdentifier().getMeasurementId(), measurement.getMeasurementValue()));
 		}

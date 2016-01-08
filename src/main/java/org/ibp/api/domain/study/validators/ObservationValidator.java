@@ -76,7 +76,6 @@ public class ObservationValidator implements Validator {
 		validateInputData(observation, errors);
 		final int errorCountAfterNullValidation = errors.getErrorCount();
 
-		List<ObjectError> allErrors = errors.getAllErrors();
 		if(errorCountAfterNullValidation - errorCountBeforeNullValidation > 0) {
 			// No point since we have null values;
 			return;
@@ -84,12 +83,12 @@ public class ObservationValidator implements Validator {
 		final ObservationValidationData observationValidationData =
 				this.observationValidationDataExtractor.getObservationValidationData(observation,
 						this.bmsRequestAttributes.getRequestAttributes());
-		final Map<Integer, MeasurementVariableDetails> measurementVariableDetailsList =
+		final Map<Integer, MeasurementDetails> measurementVariableDetailsList =
 				observationValidationData.getMeasurementVariableDetailsList();
-		final Set<Entry<Integer, MeasurementVariableDetails>> measurmentVariableDetails = measurementVariableDetailsList.entrySet();
+		final Set<Entry<Integer, MeasurementDetails>> measurmentVariableDetails = measurementVariableDetailsList.entrySet();
 
-		for (final Entry<Integer, MeasurementVariableDetails> measurementEntry : measurmentVariableDetails) {
-			final MeasurementVariableDetails measurementVariableDetails = measurementEntry.getValue();
+		for (final Entry<Integer, MeasurementDetails> measurementEntry : measurmentVariableDetails) {
+			final MeasurementDetails measurementVariableDetails = measurementEntry.getValue();
 			final DataType measurementVariableDataType = measurementVariableDetails.getVariableDataType();
 			final DataTypeValidator measurementValidator =
 					this.measurementDataValidatorFactory.getMeasurementValidator(measurementVariableDataType);
