@@ -87,7 +87,7 @@ public class GermplasmServiceImplTest {
 		Assert.assertEquals(gpPedigree, germplasmSummaries.get(0).getPedigreeString());
 		Assert.assertEquals(gpMethod.getMname(), germplasmSummaries.get(0).getBreedingMethod());
 		Assert.assertEquals(gpLocation.getLname(), germplasmSummaries.get(0).getLocation());
-		Assert.assertEquals(gpName.getNval(), germplasmSummaries.get(0).getNames().get(0));
+		Assert.assertEquals(gpName.getNval(), germplasmSummaries.get(0).getNames().get(0).getName());
 	}
 
 }
