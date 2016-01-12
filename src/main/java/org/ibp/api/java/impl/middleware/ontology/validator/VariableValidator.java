@@ -416,37 +416,37 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 			if (!nameEqual) {
 				this.addCustomError(errors, "name", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
-				"name"});
+				"Name"});
 				return;
 			}
 
 			if (!aliasEqual) {
 				this.addCustomError(errors, "alias", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
-						"alias"});
+						"Alias"});
 				return;
 			}
 
 			if (!propertyEqual) {
-				this.addCustomError(errors, "propertyId", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
-						VariableValidator.VARIABLE_NAME, "property"});
+				this.addCustomError(errors, "property", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
+						VariableValidator.VARIABLE_NAME, "Property"});
 				return;
 			}
 
 			if (!methodEqual) {
-				this.addCustomError(errors, "methodId", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
-						VariableValidator.VARIABLE_NAME, "method"});
+				this.addCustomError(errors, "method", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
+						VariableValidator.VARIABLE_NAME, "Method"});
 				return;
 			}
 
 			if (!scaleEqual) {
-				this.addCustomError(errors, "scaleId", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
-				"scale"});
+				this.addCustomError(errors, "scale", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
+				"Scale"});
 				return;
 			}
 
 			if (!minValuesEqual || !maxValuesEqual) {
 				this.addCustomError(errors, "expectedRange", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
-						VariableValidator.VARIABLE_NAME, "expectedRange"});
+						VariableValidator.VARIABLE_NAME, "Expected range"});
 			}
 
 		} catch (Exception e) {
