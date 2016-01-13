@@ -4,6 +4,7 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -448,6 +449,10 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				this.addCustomError(errors, "expectedRange", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
 						VariableValidator.VARIABLE_NAME, "Expected range"});
 			}
+            
+            if (! areAllPreviousVariableTypesPresent(oldVariable.getVariableTypes(), variable.getVariableTypes())) {
+                this.addCustomError(errors, "variableTypes", "variable.type.in.use", new Object[] {});
+            }
 
 		} catch (final Exception e) {
 			VariableValidator.LOGGER.error("Error while executing variableShouldBeEditable", e);
@@ -507,6 +512,24 @@ public class VariableValidator extends OntologyValidator implements Validator {
             }
         }
         return false;
+    }
+
+    private boolean areAllPreviousVariableTypesPresent(Set<org.generationcp.middleware.domain.ontology.VariableType> previousTypeList, List<VariableType> currentTypeList){
+        for (org.generationcp.middleware.domain.ontology.VariableType variableType : previousTypeList) {
+            boolean found = false;
+
+			for (VariableType type : currentTypeList) {
+				if (type.getName().equals(variableType.getName())) {
+                    found = true;
+                }
+			}
+
+            if (!found) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }
