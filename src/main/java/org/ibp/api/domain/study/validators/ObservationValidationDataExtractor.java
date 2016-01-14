@@ -15,6 +15,7 @@ import org.ibp.api.domain.study.MeasurementIdentifier;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.Trait;
 import org.ibp.api.java.ontology.VariableService;
+import org.ibp.api.java.study.StudyService;
 
 import com.google.common.base.Preconditions;
 
@@ -23,16 +24,21 @@ public class ObservationValidationDataExtractor {
 	private static final String CANNOT_BE_NULL = "cannot be null. ";
 	private static final String PLEASE_CONTACT_ADMINISTRATOR_FOR_FURTHER_ASSISTANCE =
 			"Please contact administrator for further assistance.";
+	private VariableService variableService;
+	private StudyService studyService;
 
-	ObservationValidationDataExtractor() {
+	ObservationValidationDataExtractor(final VariableService variableService, final StudyService studyService) {
+		Preconditions.checkNotNull(variableService, "Variable Service parameter cannot be null");
+		Preconditions.checkNotNull(studyService, "Study Service parameter cannot be null");
+
+		this.variableService = variableService;
+		this.studyService = studyService;
 
 	}
 
-	ObservationValidationData getObservationValidationData(final Observation observation, final Map<?, ?> requestAttributes,
-			final VariableService variableService) {
+	ObservationValidationData getObservationValidationData(final Observation observation, final Map<?, ?> requestAttributes) {
 		Preconditions.checkNotNull(observation, "Observation parameter cannot be null");
 		Preconditions.checkNotNull(requestAttributes, "Request attributes parameter cannot be null");
-		Preconditions.checkNotNull(variableService, "Variable Service parameter cannot be null");
 
 		List<Measurement> measurements = observation.getMeasurements();
 		if (measurements == null) {
@@ -41,16 +47,16 @@ public class ObservationValidationDataExtractor {
 
 		final int measurementListSize = measurements.size();
 
-		final Map<Integer, MeasurementVariableDetails> measurementVariableDetailsList = new HashMap<>();
+		final Map<Integer, MeasurementDetails> measurementVariableDetailsList = new HashMap<>();
 		for (int counter = 0; counter < measurementListSize; counter++) {
-			final VariableDetails variableDetails = this.getVariableDetails(measurements, counter, requestAttributes, variableService);
+			final VariableDetails variableDetails = this.getVariableDetails(measurements, counter, requestAttributes);
 			final Measurement measurement = measurements.get(counter);
-			measurementVariableDetailsList.put(counter, new MeasurementVariableDetails(variableDetails.getId(), variableDetails.getName(),
+			measurementVariableDetailsList.put(counter, new MeasurementDetails(variableDetails.getId(), variableDetails.getName(),
 					this.getVariableDataType(variableDetails), this.getVariableValidValues(variableDetails), measurement
 							.getMeasurementIdentifier().getMeasurementId(), measurement.getMeasurementValue()));
 		}
 
-		return new ObservationValidationData(this.getCropName(requestAttributes), this.getProgramId(requestAttributes),
+		return new ObservationValidationData(this.getCropName(requestAttributes), studyService.getProgramUUID(Integer.parseInt(this.getStudyId(requestAttributes))),
 				this.getStudyId(requestAttributes), this.getObservationId(observation), measurementVariableDetailsList);
 
 	}
@@ -70,8 +76,7 @@ public class ObservationValidationDataExtractor {
 	}
 
 	String getProgramId(final Map<?, ?> requestAttributes) {
-		return this.getRequestAttributeValue("programId", "ProgramId " + ObservationValidationDataExtractor.CANNOT_BE_NULL
-				+ ObservationValidationDataExtractor.PLEASE_CONTACT_ADMINISTRATOR_FOR_FURTHER_ASSISTANCE, requestAttributes);
+		return studyService.getProgramUUID(Integer.parseInt(this.getStudyId(requestAttributes)));
 	}
 
 	String getStudyId(final Map<?, ?> requestAttributes) {
@@ -79,8 +84,7 @@ public class ObservationValidationDataExtractor {
 				+ ObservationValidationDataExtractor.PLEASE_CONTACT_ADMINISTRATOR_FOR_FURTHER_ASSISTANCE, requestAttributes);
 	}
 
-	VariableDetails getVariableDetails(final List<Measurement> measurements, final int measurementIndex, final Map<?, ?> requestAttributes,
-			final VariableService variableService) {
+	VariableDetails getVariableDetails(final List<Measurement> measurements, final int measurementIndex, final Map<?, ?> requestAttributes) {
 
 		final Measurement measurement = measurements.get(measurementIndex);
 
@@ -88,7 +92,7 @@ public class ObservationValidationDataExtractor {
 		final MeasurementIdentifier measurementIdentifier = measurement.getMeasurementIdentifier();
 		final Trait trait = measurementIdentifier.getTrait();
 		final Integer traitId = trait.getTraitId();
-		return variableService.getVariableById(this.getCropName(requestAttributes), this.getProgramId(requestAttributes),
+		return variableService.getVariableById(this.getCropName(requestAttributes), studyService.getProgramUUID(Integer.parseInt(this.getStudyId(requestAttributes))),
 				traitId.toString());
 	}
 
@@ -107,6 +111,6 @@ public class ObservationValidationDataExtractor {
 	private String getRequestAttributeValue(final String attributeName, final String errorMessage, final Map<?, ?> requestAttributes) {
 		final String returnValue = (String) requestAttributes.get(attributeName);
 		Preconditions.checkNotNull(returnValue, errorMessage);
-		return returnValue;
+		return returnValue.trim();
 	}
 }

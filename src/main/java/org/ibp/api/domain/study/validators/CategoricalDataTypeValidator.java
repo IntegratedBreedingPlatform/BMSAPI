@@ -22,7 +22,7 @@ public class CategoricalDataTypeValidator implements DataTypeValidator {
 	 * MeasurementVariableDetails, int, int, org.springframework.validation.Errors)
 	 */
 	@Override
-	public void validateValues(final MeasurementVariableDetails measurementVariableDetails, final int measurementIndex,
+	public void validateValues(final MeasurementDetails measurementVariableDetails, final int measurementIndex,
 			final int observationId, final Errors errors) {
 
 		this.ensureCategoricalValue(measurementVariableDetails);
@@ -32,8 +32,7 @@ public class CategoricalDataTypeValidator implements DataTypeValidator {
 			if (StringUtils.isNotBlank(measurementVariableDetails.getMeasurementValue())) {
 				final TermSummary termSummary = mappedCategories.get(measurementVariableDetails.getMeasurementValue().trim());
 				if (termSummary == null) {
-					errors.rejectValue(
-							"Observation.measurement[" + measurementIndex + "]",
+					errors.rejectValue("measurementValue",
 							"invalid.measurement.categorical.value",
 							new Object[] {measurementVariableDetails.getMeasurementValue(), observationId,
 									measurementVariableDetails.getMeasurementId(), measurementVariableDetails.getVariableId()},
@@ -48,7 +47,7 @@ public class CategoricalDataTypeValidator implements DataTypeValidator {
 		}
 	}
 
-	private void ensureCategoricalValue(final MeasurementVariableDetails measurementVariableDetails) {
+	private void ensureCategoricalValue(final MeasurementDetails measurementVariableDetails) {
 		if (!(Integer.parseInt(measurementVariableDetails.getVariableDataType().getId()) == org.generationcp.middleware.domain.ontology.DataType.CATEGORICAL_VARIABLE
 				.getId())) {
 			throw new IllegalStateException("The validateCategoricalValues method must never be called for non categorical variables. "

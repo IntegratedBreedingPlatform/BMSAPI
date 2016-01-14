@@ -16,7 +16,7 @@ public interface DataTypeValidator {
 	 * @param observationId the observationId we are do the validation for
 	 * @param errors All errors are updated into this collection. 
 	 */
-	public void validateValues(MeasurementVariableDetails measurementVariableDetails, int measurementIndex, int observationId,
+	public void validateValues(MeasurementDetails measurementVariableDetails, int measurementIndex, int observationId,
 			Errors errors);
 
 }

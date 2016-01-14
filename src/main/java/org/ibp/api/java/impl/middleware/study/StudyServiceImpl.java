@@ -2,6 +2,7 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,8 @@ import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.TraitDto;
+import org.ibp.api.domain.common.Command;
+import org.ibp.api.domain.common.ValidationUtil;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.study.DatasetSummary;
 import org.ibp.api.domain.study.Environment;
@@ -42,8 +45,10 @@ import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudySummary;
+import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.ibp.api.java.impl.middleware.ontology.MethodServiceImpl;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
@@ -51,8 +56,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.validation.SmartValidator;
+import org.springframework.validation.Validator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -81,6 +91,13 @@ public class StudyServiceImpl implements StudyService {
 
 	@Autowired
 	private SecurityService securityService;
+
+	@Autowired
+	private ObservationValidator observationValidator;
+
+	@Autowired
+	private ValidationUtil validationUtil;
+
 
 	@Override
 	public List<StudySummary> search(final String programUniqueId, String principalInvestigator, String location, String season) {
@@ -141,8 +158,23 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public Observation updateObsevation(final Integer studyIdentifier, final Observation observation) {
+	public Observation updateObservation(final Integer studyIdentifier, final Observation observation) {
+		validationUtil.invokeValidation("StudyServiceImpl", new Command() {
+			@Override
+			public void execute(final Errors errors) {
+				observationValidator.validate(observation, errors);
+			}
+		});
+		return mapAndUpdateObservation(studyIdentifier, observation);
+	}
 
+	/**
+	 * Translates to the middleware pojo. Updates the database and then translates back the results.
+	 * @param studyIdentifier
+	 * @param observation
+	 * @return
+	 */
+	private Observation mapAndUpdateObservation(final Integer studyIdentifier, final Observation observation) {
 		this.validateMeasurementSubmitted(studyIdentifier, observation);
 
 		final List<Measurement> measurements = observation.getMeasurements();
@@ -162,23 +194,53 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<Observation> updateObsevations(Integer studyIdentifier, List<Observation> observations) {
-		List<Observation> returnList = new ArrayList<>();
-		for (Observation obs : observations) {
-			returnList.add(this.updateObsevation(studyIdentifier, obs));
-		}
+	public List<Observation> updateObservations(final Integer studyIdentifier, final List<Observation> observations) {
+		final List<Observation> returnList = new ArrayList<>();
+
+		validationUtil.invokeValidation("StudyServiceImpl", new Command() {
+			@Override
+			public void execute(Errors errors) {
+				int counter = 0;
+				for (final Observation observation : observations) {
+					errors.pushNestedPath("Observation[" + counter++ + "]");
+					observationValidator.validate(observation, errors);
+					returnList.add(StudyServiceImpl.this.mapAndUpdateObservation(studyIdentifier, observation));
+					errors.popNestedPath();
+				}
+			}
+		});
 		return returnList;
 	}
 
+	/**
+	 * Essentially makes sure that the underlying observation has not changed
+	 * @param studyIdentifier the study in which the observation is being updated
+	 * @param observation the actual observation update.
+	 */
 	private void validateMeasurementSubmitted(final Integer studyIdentifier, final Observation observation) {
+		// If null do something
 		final Observation existingObservation = this.getSingleObservation(studyIdentifier, observation.getUniqueIdentifier());
-		final List<Measurement> measurements = observation.getMeasurements();
 		final List<ObjectError> errors = new ArrayList<ObjectError>();
+		if (existingObservation == null || existingObservation.getUniqueIdentifier() == null) {
+			validateExistingObservation(studyIdentifier, observation, errors);
+		} else {
+			validateMeasurementHasNotBeenCreated(observation, existingObservation, errors);
+		}
+		if (!errors.isEmpty()) {
+			throw new ApiRequestValidationException(errors);
+		}
+
+	}
+
+	private void validateMeasurementHasNotBeenCreated(final Observation observation, final Observation existingObservation,
+			final List<ObjectError> errors) {
+		final List<Measurement> measurements = observation.getMeasurements();
 		int counter = 0;
 		for (final Measurement measurement : measurements) {
+			// Relies on the hash coded generated in the MeasurementIdentifier object
 			final Measurement existingMeasurement = existingObservation.getMeasurement(measurement.getMeasurementIdentifier());
 			if (existingMeasurement == null) {
-				final String array[] = {"program.already.inserted"};
+				final String array[] = {"measurement.already.inserted"};
 				final List<String> object = new ArrayList<String>();
 				final ObjectMapper objectMapper = new ObjectMapper();
 				try {
@@ -187,15 +249,21 @@ public class StudyServiceImpl implements StudyService {
 					throw new ApiRuntimeException("Error mapping measurement to JSON", e);
 				}
 				final FieldError objectError =
-						new FieldError("Measurements [" + counter + "]", "Measurement", null, false, array, object.toArray(),
+						new FieldError("Observation" , "Measurements [" + counter + "]", null, false, array, object.toArray(),
 								"Error processing measurement");
 				errors.add(objectError);
 				counter++;
 			}
 		}
-		if (!errors.isEmpty()) {
-			throw new ApiRequestValidationException(errors);
-		}
+	}
+
+	private void validateExistingObservation(final Integer studyIdentifier, final Observation observation, final List<ObjectError> errors) {
+		final String errorKey[] = {"no.observation.found"};
+		final Object erroyKeyArguments[] = {studyIdentifier, observation.getUniqueIdentifier()};
+		final FieldError observationIdentifierError =
+				new FieldError("Observation", "uniqueIdentifier", null, false, errorKey, erroyKeyArguments,
+						"Error retrieving observation");
+		errors.add(observationIdentifierError);
 	}
 
 	@Override
@@ -418,6 +486,15 @@ public class StudyServiceImpl implements StudyService {
 		this.securityService = securityService;
 	}
 
+	void setValidationUtil(final ValidationUtil validationUtil) {
+		this.validationUtil = validationUtil;
+	}
+
+	void setObservationValidator(final ObservationValidator observationValidator) {
+		this.observationValidator = observationValidator;
+	}
+
+
 	@Override
 	public List<StudyFolder> getAllStudyFolders() {
 		final List<StudyFolder> studyFolders = new ArrayList<>();
@@ -429,6 +506,11 @@ public class StudyServiceImpl implements StudyService {
 		}
 
 		return studyFolders;
+	}
+
+	@Override
+	public String getProgramUUID(final Integer studyIdentifier) {
+		return middlewareStudyService.getProgramUUID(studyIdentifier);
 	}
 
 }

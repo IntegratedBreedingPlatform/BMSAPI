@@ -19,16 +19,16 @@ public class DateVariableDataTypeValidator implements DataTypeValidator {
 	}
 
 	@Override
-	public void validateValues(MeasurementVariableDetails measurementVariableDetails, int measurementIndex, int observationId, Errors errors) {
+	public void validateValues(MeasurementDetails measurementVariableDetails, int measurementIndex, int observationId, Errors errors) {
 		ensureDateDataType(measurementVariableDetails);
 		if (!dateValidator.isValid(measurementVariableDetails.getMeasurementValue().trim(), "yyyyMMdd")) {
-			errors.rejectValue("Observation.measurement[" + measurementIndex + "]", "invalid.measurement.date.value", new Object[] {
+			errors.rejectValue("measurementValue","invalid.measurement.date.value", new Object[] {
 					measurementVariableDetails.getMeasurementValue(), observationId, measurementVariableDetails.getMeasurementId()},
 					"Invalid date value found.");
 		}
 	}
 
-	private void ensureDateDataType(final MeasurementVariableDetails measurementVariableDetails) {
+	private void ensureDateDataType(final MeasurementDetails measurementVariableDetails) {
 		if (!(Integer.parseInt(measurementVariableDetails.getVariableDataType().getId()) == org.generationcp.middleware.domain.ontology.DataType.DATE_TIME_VARIABLE
 				.getId())) {
 			throw new IllegalStateException("The ensureDateDataType method must never be called for non numeric variables. "

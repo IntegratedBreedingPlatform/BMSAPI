@@ -32,10 +32,10 @@ public class ObservationValidationData {
 	/**
 	 * Map of array index to measurement variable details.  
 	 */
-	private Map<Integer, MeasurementVariableDetails> measurementVariableDetailsList;
+	private Map<Integer, MeasurementDetails> measurementVariableDetailsList;
 
 	public ObservationValidationData(final String cropName, final String programId, final String studyId, final Integer observationId,
-			final Map<Integer, MeasurementVariableDetails> measurementVariableDetailsList) {
+			final Map<Integer, MeasurementDetails> measurementVariableDetailsList) {
 		this.cropName = cropName;
 		this.programId = programId;
 		this.studyId = studyId;
@@ -59,7 +59,7 @@ public class ObservationValidationData {
 		return this.observationId;
 	}
 
-	public Map<Integer, MeasurementVariableDetails> getMeasurementVariableDetailsList() {
+	public Map<Integer, MeasurementDetails> getMeasurementVariableDetailsList() {
 		return this.measurementVariableDetailsList;
 	}
 
