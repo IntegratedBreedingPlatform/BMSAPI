@@ -4,6 +4,7 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,24 +66,24 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	private static final String VARIABLE_NAME = "variable";
 
 	@Override
-	public boolean supports(Class<?> aClass) {
+	public boolean supports(final Class<?> aClass) {
 		return VariableDetails.class.equals(aClass);
 	}
 
 	@Override
-	public void validate(Object target, Errors errors) {
+	public void validate(final Object target, final Errors errors) {
 
-		VariableDetails variable = (VariableDetails) target;
+		final VariableDetails variable = (VariableDetails) target;
 
-		boolean nameValidationResult = this.nameValidationProcessor(variable, errors);
+		final boolean nameValidationResult = this.nameValidationProcessor(variable, errors);
 
-		boolean descriptionValidationResult = this.descriptionValidationProcessor(variable, errors);
+		final boolean descriptionValidationResult = this.descriptionValidationProcessor(variable, errors);
 
-		boolean propertyValidationResult = this.propertyIdValidationProcessor(variable, errors);
+		final boolean propertyValidationResult = this.propertyIdValidationProcessor(variable, errors);
 
-		boolean methodValidationResult = this.methodIdValidationProcessor(variable, errors);
+		final boolean methodValidationResult = this.methodIdValidationProcessor(variable, errors);
 
-		boolean scaleValidationResult = this.scaleIdValidationProcessor(variable, errors);
+		final boolean scaleValidationResult = this.scaleIdValidationProcessor(variable, errors);
 
 		boolean scaleDataTypeValidationResult = false;
 
@@ -96,7 +97,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			combinationValidationResult = this.checkIfMethodPropertyScaleCombination(variable, errors);
 		}
 
-		boolean variableTypeValidationResult = this.variableTypeValidationProcessor(variable, errors);
+		final boolean variableTypeValidationResult = this.variableTypeValidationProcessor(variable, errors);
 
 		if (nameValidationResult && descriptionValidationResult && combinationValidationResult && scaleDataTypeValidationResult
 				&& variableTypeValidationResult) {
@@ -106,9 +107,9 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 	}
 
-	private boolean nameValidationProcessor(VariableDetails variable, Errors errors) {
+	private boolean nameValidationProcessor(final VariableDetails variable, final Errors errors) {
 
-		Integer initialCount = errors.getErrorCount();
+		final Integer initialCount = errors.getErrorCount();
 
 		// 1. Name is required
 		this.shouldNotNullOrEmpty("Name", "name", variable.getName(), errors);
@@ -142,9 +143,9 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	}
 
 	// 5. Description is optional and no more than 1024 characters
-	private boolean descriptionValidationProcessor(VariableDetails variable, Errors errors) {
+	private boolean descriptionValidationProcessor(final VariableDetails variable, final Errors errors) {
 
-		Integer initialCount = errors.getErrorCount();
+		final Integer initialCount = errors.getErrorCount();
 
 		if (Strings.isNullOrEmpty(variable.getDescription())) {
 			variable.setDescription("");
@@ -157,9 +158,9 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean propertyIdValidationProcessor(VariableDetails variable, Errors errors) {
+	private boolean propertyIdValidationProcessor(final VariableDetails variable, final Errors errors) {
 
-		Integer initialCount = errors.getErrorCount();
+		final Integer initialCount = errors.getErrorCount();
 
 		// 6. Property ID is required
 		this.shouldNotNullOrEmpty("Property", VariableValidator.PROPERTY_ID_NAME, variable.getProperty().getId(), errors);
@@ -168,7 +169,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			return false;
 		}
 
-		Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
+		final Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
 
 		if (propertyId == null) {
 			this.addCustomError(errors, VariableValidator.PROPERTY_ID_NAME, BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
@@ -184,9 +185,9 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean methodIdValidationProcessor(VariableDetails variable, Errors errors) {
+	private boolean methodIdValidationProcessor(final VariableDetails variable, final Errors errors) {
 
-		Integer initialCount = errors.getErrorCount();
+		final Integer initialCount = errors.getErrorCount();
 
 		// 8. Method ID is required
 		this.shouldNotNullOrEmpty("Method", VariableValidator.METHOD_ID_NAME, variable.getMethod().getId(), errors);
@@ -195,7 +196,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			return false;
 		}
 
-		Integer methodId = StringUtil.parseInt(variable.getMethod().getId(), null);
+		final Integer methodId = StringUtil.parseInt(variable.getMethod().getId(), null);
 
 		if (methodId == null) {
 			this.addCustomError(errors, VariableValidator.METHOD_ID_NAME, BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
@@ -211,9 +212,9 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean scaleIdValidationProcessor(VariableDetails variable, Errors errors) {
+	private boolean scaleIdValidationProcessor(final VariableDetails variable, final Errors errors) {
 
-		Integer initialCount = errors.getErrorCount();
+		final Integer initialCount = errors.getErrorCount();
 
 		// 10. Scale ID is required
 		this.shouldNotNullOrEmpty("Scale", VariableValidator.SCALE_ID_NAME, variable.getScale().getId(), errors);
@@ -222,7 +223,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			return false;
 		}
 
-		Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
+		final Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
 
 		if (scaleId == null) {
 			this.addCustomError(errors, VariableValidator.SCALE_ID_NAME, BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
@@ -238,13 +239,13 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean scaleDataTypeValidationProcessor(VariableDetails variable, Errors errors) {
+	private boolean scaleDataTypeValidationProcessor(final VariableDetails variable, final Errors errors) {
 
-		Integer initialCount = errors.getErrorCount();
+		final Integer initialCount = errors.getErrorCount();
 
 		// 13. The min and max expected range values are only stored if the scales data type is numeric
 		try {
-			Scale scale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(variable.getScale().getId(), null), true);
+			final Scale scale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(variable.getScale().getId(), null), true);
 
 			if (scale.getDataType() != null && scale.getDataType().isSystemDataType()) {
 				this.addCustomError(errors, VariableValidator.VARIABLE_SCALE_WITH_SYSTEM_DATA_TYPE, null);
@@ -254,14 +255,14 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				return false;
 			}
 
-			boolean isNumericType = Objects.equals(scale.getDataType(), DataType.NUMERIC_VARIABLE);
+			final boolean isNumericType = Objects.equals(scale.getDataType(), DataType.NUMERIC_VARIABLE);
 
 			if (isNumericType) {
 
 				BigDecimal variableExpectedMin = null;
 				BigDecimal variableExpectedMax = null;
 
-				String variableMin = variable.getExpectedRange().getMin() == null ? null : variable.getExpectedRange().getMin();
+				final String variableMin = variable.getExpectedRange().getMin() == null ? null : variable.getExpectedRange().getMin();
 
 				if (!this.isNullOrEmpty(variableMin)) {
 					variableExpectedMin = StringUtil.parseBigDecimal(variableMin, null);
@@ -271,7 +272,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 					}
 				}
 
-				String variableMax = variable.getExpectedRange().getMax() == null ? null : variable.getExpectedRange().getMax();
+				final String variableMax = variable.getExpectedRange().getMax() == null ? null : variable.getExpectedRange().getMax();
 
 				if (!this.isNullOrEmpty(variableMax)) {
 					variableExpectedMax = StringUtil.parseBigDecimal(variableMax, null);
@@ -287,14 +288,14 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 				// 14. If the scale has a numeric data type and valid values have been set on the scale, the expected range minimum cannot
 				// be less than the valid values minimum, and the expected range maximum cannot be larger than the valid values maximum
-				BigDecimal scaleMinValue = StringUtil.parseBigDecimal(scale.getMinValue(), null);
+				final BigDecimal scaleMinValue = StringUtil.parseBigDecimal(scale.getMinValue(), null);
 				if (scaleMinValue != null && variableExpectedMin != null && scaleMinValue.compareTo(variableExpectedMin) == 1) {
 					this.addCustomError(errors, VariableValidator.EXPECTED_RANGE_NAME + ".min",
 							VariableValidator.VARIABLE_MIN_SHOULD_BE_IN_SCALE_RANGE,
 							new Object[] {scale.getMinValue(), scale.getMaxValue()});
 				}
 
-				BigDecimal scaleMaxValue = StringUtil.parseBigDecimal(scale.getMaxValue(), null);
+				final BigDecimal scaleMaxValue = StringUtil.parseBigDecimal(scale.getMaxValue(), null);
 				if (scaleMaxValue != null && variableExpectedMax != null && scaleMaxValue.compareTo(variableExpectedMax) == -1) {
 					this.addCustomError(errors, VariableValidator.EXPECTED_RANGE_NAME + ".max",
 							VariableValidator.VARIABLE_MAX_SHOULD_BE_IN_SCALE_RANGE,
@@ -312,16 +313,16 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				}
 			}
 
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 			VariableValidator.LOGGER.error("Error in validating VariableRequest", e);
 		}
 
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean variableTypeValidationProcessor(VariableDetails variable, Errors errors) {
+	private boolean variableTypeValidationProcessor(final VariableDetails variable, final Errors errors) {
 
-		Integer initialCount = errors.getErrorCount();
+		final Integer initialCount = errors.getErrorCount();
 
 		// 17. Variable type IDs is required
 		if (variable.getVariableTypes().isEmpty()) {
@@ -335,7 +336,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		// 18. Variable type IDs must be an array of integer values that correspond to the IDs of variable types and contain at least one
 		// item
 
-		for (VariableType variableType : variable.getVariableTypes()) {
+		for (final VariableType variableType : variable.getVariableTypes()) {
 			if (org.generationcp.middleware.domain.ontology.VariableType.getById(this.parseVariableTypeAsInteger(variableType)) == null) {
 				this.addCustomError(errors, "variableTypes", BaseValidator.INVALID_TYPE_ID, new Object[] {"Variable Type"});
 			}
@@ -348,7 +349,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private void aliasValidationProcessor(VariableDetails variable, Errors errors) {
+	private void aliasValidationProcessor(final VariableDetails variable, final Errors errors) {
 
 		if (!this.isNullOrEmpty(variable.getAlias())) {
 			// Trim alias
@@ -362,18 +363,18 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 	}
 
-	void variableShouldBeEditable(VariableDetails variable, Errors errors) {
+	void variableShouldBeEditable(final VariableDetails variable, final Errors errors) {
 
 		if (variable.getId() == null) {
 			return;
 		}
 
-		Integer initialCount = errors.getErrorCount();
+		final Integer initialCount = errors.getErrorCount();
 
 		try {
 
-			Integer requestId = StringUtil.parseInt(variable.getId(), null);
-			Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId, true, true);
+			final Integer requestId = StringUtil.parseInt(variable.getId(), null);
+			final Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId, true, true);
 
 			if (oldVariable.getScale().getDataType() != null
 					&& Objects.equals(oldVariable.getScale().getDataType().isSystemDataType(), true)) {
@@ -395,69 +396,73 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				oldVariable.setObservations(0);
 			}
 
-			boolean isEditable = oldVariable.getObservations() == 0;
+			final boolean isEditable = oldVariable.getObservations() == 0;
 			if (isEditable) {
 				// Alias validation
 				this.aliasValidationProcessor(variable, errors);
 				return;
 			}
 
-			Integer methodId = StringUtil.parseInt(variable.getMethod().getId(), null);
-			Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
-			Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
+			final Integer methodId = StringUtil.parseInt(variable.getMethod().getId(), null);
+			final Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
+			final Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
 
-			boolean nameEqual = StringUtil.areBothEmptyOrEqual(variable.getName(), oldVariable.getName());
-			boolean propertyEqual = Objects.equals(propertyId, oldVariable.getProperty().getId());
-			boolean methodEqual = Objects.equals(methodId, oldVariable.getMethod().getId());
-			boolean scaleEqual = Objects.equals(scaleId, oldVariable.getScale().getId());
-			boolean minValuesEqual = StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMin(), oldVariable.getMinValue());
-			boolean maxValuesEqual = StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMax(), oldVariable.getMaxValue());
-			boolean aliasEqual = StringUtil.areBothEmptyOrEqual(variable.getAlias(), oldVariable.getAlias());
+			final boolean nameEqual = StringUtil.areBothEmptyOrEqual(variable.getName(), oldVariable.getName());
+			final boolean propertyEqual = Objects.equals(propertyId, oldVariable.getProperty().getId());
+			final boolean methodEqual = Objects.equals(methodId, oldVariable.getMethod().getId());
+			final boolean scaleEqual = Objects.equals(scaleId, oldVariable.getScale().getId());
+			final boolean minValuesEqual = StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMin(), oldVariable.getMinValue());
+			final boolean maxValuesEqual = StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMax(), oldVariable.getMaxValue());
+			final boolean aliasEqual = StringUtil.areBothEmptyOrEqual(variable.getAlias(), oldVariable.getAlias());
 
 			if (!nameEqual) {
 				this.addCustomError(errors, "name", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
-				"name"});
+				"Name"});
 				return;
 			}
 
 			if (!aliasEqual) {
 				this.addCustomError(errors, "alias", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
-						"alias"});
+						"Alias"});
 				return;
 			}
 
 			if (!propertyEqual) {
-				this.addCustomError(errors, "propertyId", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
-						VariableValidator.VARIABLE_NAME, "property"});
+				this.addCustomError(errors, "property", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
+						VariableValidator.VARIABLE_NAME, "Property"});
 				return;
 			}
 
 			if (!methodEqual) {
-				this.addCustomError(errors, "methodId", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
-						VariableValidator.VARIABLE_NAME, "method"});
+				this.addCustomError(errors, "method", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
+						VariableValidator.VARIABLE_NAME, "Method"});
 				return;
 			}
 
 			if (!scaleEqual) {
-				this.addCustomError(errors, "scaleId", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
-				"scale"});
+				this.addCustomError(errors, "scale", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
+				"Scale"});
 				return;
 			}
 
 			if (!minValuesEqual || !maxValuesEqual) {
 				this.addCustomError(errors, "expectedRange", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
-						VariableValidator.VARIABLE_NAME, "expectedRange"});
+						VariableValidator.VARIABLE_NAME, "Expected range"});
 			}
+            
+            if (! areAllPreviousVariableTypesPresent(oldVariable.getVariableTypes(), variable.getVariableTypes())) {
+                this.addCustomError(errors, "variableTypes", "variable.type.in.use", new Object[] {});
+            }
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			VariableValidator.LOGGER.error("Error while executing variableShouldBeEditable", e);
 			this.addDefaultError(errors);
 		}
 	}
 
-	protected void fieldShouldHaveValidPattern(String fieldName, String value, String termName, Errors errors) {
-		Pattern regex = Pattern.compile("[$&+,./%')\\[}\\]{(*^!`~:;=?@#|\\s]");
-		Matcher matcher = regex.matcher(value);
+	protected void fieldShouldHaveValidPattern(final String fieldName, final String value, final String termName, final Errors errors) {
+		final Pattern regex = Pattern.compile("[$&+,./%')\\[}\\]{(*^!`~:;=?@#|\\s]");
+		final Matcher matcher = regex.matcher(value);
 
 		if (matcher.find() || Character.isDigit(value.charAt(0))) {
 			this.addCustomError(errors, fieldName, VariableValidator.VARIABLE_FIELD_SHOULD_HAVE_VALID_PATTERN, new Object[] {termName});
@@ -465,48 +470,66 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	}
 
 	// FIXME : Spring Does not allow multiple fields in rejectValue so here fieldNames have been not added
-	protected boolean checkIfMethodPropertyScaleCombination(VariableDetails variable, Errors errors) {
+	protected boolean checkIfMethodPropertyScaleCombination(final VariableDetails variable, final Errors errors) {
 
-		Integer initialCount = errors.getErrorCount();
+		final Integer initialCount = errors.getErrorCount();
 
 		try {
 
-			Integer methodId = StringUtil.parseInt(variable.getMethod().getId(), null);
-			Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
-			Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
+			final Integer methodId = StringUtil.parseInt(variable.getMethod().getId(), null);
+			final Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
+			final Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
 
-			VariableFilter variableFilter = new VariableFilter();
+			final VariableFilter variableFilter = new VariableFilter();
 			variableFilter.addMethodId(methodId);
 			variableFilter.addPropertyId(propertyId);
 			variableFilter.addScaleId(scaleId);
 
-			List<Variable> variableSummary = this.ontologyVariableDataManager.getWithFilter(variableFilter);
+			final List<Variable> variableSummary = this.ontologyVariableDataManager.getWithFilter(variableFilter);
 
 			if (variableSummary.size() > 1 || variableSummary.size() == 1
 					&& !Objects.equals(String.valueOf(variableSummary.get(0).getId()), variable.getId())) {
 				this.addCustomError(errors, VariableValidator.VARIABLE_WITH_SAME_COMBINATION_EXISTS, null);
 			}
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 			VariableValidator.LOGGER.error("Error occur while fetching variable in checkIfMethodPropertyScaleCombination", e);
 		}
 
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private Integer parseVariableTypeAsInteger(VariableType variableType) {
+	private Integer parseVariableTypeAsInteger(final VariableType variableType) {
 		if (variableType == null) {
 			return null;
 		}
 		return StringUtil.parseInt(variableType.getId(), null);
 	}
 
-	private boolean isAnalysisVariable(VariableDetails variable) {
-        for(org.ibp.api.domain.ontology.VariableType type : variable.getVariableTypes()){
+	private boolean isAnalysisVariable(final VariableDetails variable) {
+        for(final org.ibp.api.domain.ontology.VariableType type : variable.getVariableTypes()){
             if(Objects.equals(StringUtil.parseInt(type.getId(), 0), org.generationcp.middleware.domain.ontology.VariableType.ANALYSIS.getId())){
                 return true;
             }
         }
         return false;
+    }
+
+    private boolean areAllPreviousVariableTypesPresent(Set<org.generationcp.middleware.domain.ontology.VariableType> previousTypeList, List<VariableType> currentTypeList){
+        for (org.generationcp.middleware.domain.ontology.VariableType variableType : previousTypeList) {
+            boolean found = false;
+
+			for (VariableType type : currentTypeList) {
+				if (type.getName().equals(variableType.getName())) {
+                    found = true;
+                }
+			}
+
+            if (!found) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }

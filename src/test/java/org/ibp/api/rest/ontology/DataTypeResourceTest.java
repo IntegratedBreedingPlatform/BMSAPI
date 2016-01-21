@@ -39,9 +39,9 @@ public class DataTypeResourceTest extends ApiUnitTestBase {
 	public void listAllDataTypes() throws Exception {
 
 		List<DataType> dataTypes = new ArrayList<>();
-		DataType dataType = TestDataProvider.numericalDataType;
+		DataType dataType = TestDataProvider.NUMERICAL_DATA_TYPE;
 		dataTypes.add(dataType);
-		dataType = TestDataProvider.categoricalDataType;
+		dataType = TestDataProvider.CATEGORICAL_DATA_TYPE;
 		dataTypes.add(dataType);
 
 		Mockito.doReturn(dataTypes).when(this.modelService).getAllDataTypes();
