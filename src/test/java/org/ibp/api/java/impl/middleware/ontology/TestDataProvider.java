@@ -201,7 +201,7 @@ public class TestDataProvider {
 		variable.setIsFavorite(TestDataProvider.VARIABLE_IS_FAVOURITE);
 		variable.setDateCreated(TestDataProvider.getDateCreated());
 		variable.setStudies(TestDataProvider.VARIABLE_STUDIES);
-		variable.addVariableType(VariableType.ANALYSIS);
+		variable.addVariableType(VariableType.TRAIT);
 		variable.setDateCreated(TestDataProvider.getDateCreated());
 		variable.setDateLastModified(TestDataProvider.getDateModified());
 
