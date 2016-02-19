@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>IBPWebService</artifactId>
 	<packaging>war</packaging>
-        <version>4.0.0.BETA.9</version>
+        <version>4.0.0.BETA.10</version>
 	<name>Web Service for Breeding View</name>
 	<properties>
 		<jersey-version>1.8</jersey-version>
