@@ -7,7 +7,7 @@ BMS API services expose operations on data created by registered BMS users as th
 
 **Request a listing of programs without authentication:**
 
-We are using curl to demonstrate the request/response behaviour. You can also put the URLs provided directly into your browser URL navigation bar.
+We are using curl to demonstrate the request/response behaviour. Any equivalant HTTP client (e.g. [Postman](http://www.getpostman.com/)) which allows user to specify HTTP request headers can be used.
 
 Request: 
 ```
