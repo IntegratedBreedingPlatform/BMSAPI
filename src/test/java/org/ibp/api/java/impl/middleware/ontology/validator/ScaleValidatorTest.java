@@ -143,7 +143,7 @@ public class ScaleValidatorTest {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
 		ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
-		scaleSummary.setDataType(TestDataProvider.categoricalDataType);
+		scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
 
 		this.scaleValidator.validate(scaleSummary, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -158,7 +158,7 @@ public class ScaleValidatorTest {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
 		ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
-		scaleSummary.setDataType(TestDataProvider.categoricalDataType);
+		scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
 
 		List<TermSummary> categories = new ArrayList<>();
 		TermSummary category = new TermSummary();
@@ -184,7 +184,7 @@ public class ScaleValidatorTest {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
 		ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
-		scaleSummary.setDataType(TestDataProvider.categoricalDataType);
+		scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
 
 		List<TermSummary> categories = new ArrayList<>();
 		TermSummary category = new TermSummary();
@@ -206,7 +206,7 @@ public class ScaleValidatorTest {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
 
 		ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
-		scaleSummary.setDataType(TestDataProvider.categoricalDataType);
+		scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
 
 		List<TermSummary> categories = new ArrayList<>();
 		TermSummary category = new TermSummary();

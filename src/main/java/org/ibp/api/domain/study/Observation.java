@@ -15,7 +15,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Observation {
 
-	@NotNull
 	private Integer uniqueIdentifier;
 
 	private Integer germplasmId;
@@ -25,17 +24,15 @@ public class Observation {
 	private String entryNumber;
 
 	private String entryType;
-	
+
 	private String plotNumber;
 
 	private String replicationNumber;
-	
+
 	private String environmentNumber;
 
 	private String seedSource;
 
-	@Valid
-	@NotNull
 	private List<Measurement> measurements;
 
 	@JsonIgnore

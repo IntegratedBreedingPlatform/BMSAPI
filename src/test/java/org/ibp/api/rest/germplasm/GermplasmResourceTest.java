@@ -10,6 +10,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hamcrest.Matchers;
@@ -65,6 +66,7 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 	private String pedigreeString = "Test1/Test2";
 	private Method method = new Method();
 	private Location location = new Location();
+	private UserDefinedField nameType = new UserDefinedField(0);
 
 	@Before
 	public void beforeEachTest() {
@@ -74,6 +76,7 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 		this.germplasm.setGpid2(2);
 
 		Name n = new Name();
+		n.setTypeId(1);
 		n.setNval("Test Germplasm");
 		this.germplasm.setPreferredName(n);
 
@@ -93,6 +96,11 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 
 		this.location.setLname("Test Location");
 		Mockito.when(this.locationDataManger.getLocationByID(this.germplasm.getLocationId())).thenReturn(this.location);
+		
+		this.nameType.setFcode("SELHIS");
+		this.nameType.setFname("Selection History");
+		Mockito.when(this.germplasmDataManager.getUserDefinedFieldByID(n.getTypeId())).thenReturn(this.nameType);
+		
 	}
 
 	@Test
@@ -109,6 +117,9 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 		.andDo(MockMvcResultHandlers.print())
 		.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(matchingGermplasm.size())))
 		.andExpect(MockMvcResultMatchers.jsonPath("$[0].germplasmId", Matchers.is(this.germplasm.getGid().toString())))
+		.andExpect(MockMvcResultMatchers.jsonPath("$[0].names[0].name", Matchers.is(this.germplasm.getPreferredName().getNval())))
+		.andExpect(MockMvcResultMatchers.jsonPath("$[0].names[0].nameTypeCode", Matchers.is(this.nameType.getFcode())))
+		.andExpect(MockMvcResultMatchers.jsonPath("$[0].names[0].nameTypeDescription", Matchers.is(this.nameType.getFname())))
 		.andExpect(MockMvcResultMatchers.jsonPath("$[0].location", Matchers.is(this.location.getLname())))
 		.andExpect(MockMvcResultMatchers.jsonPath("$[0].parent1Id", Matchers.is(this.germplasm.getGpid1().toString())))
 		.andExpect(
@@ -131,7 +142,9 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.germplasmId", Matchers.is(this.germplasm.getGid().toString())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.names", Matchers.contains(this.germplasm.getPreferredName().getNval())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.names[0].name", Matchers.is(this.germplasm.getPreferredName().getNval())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.names[0].nameTypeCode", Matchers.is(this.nameType.getFcode())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.names[0].nameTypeDescription", Matchers.is(this.nameType.getFname())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.location", Matchers.is(this.location.getLname())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.breedingMethod", Matchers.is(this.method.getMname())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.parent1Id", Matchers.is(this.germplasm.getGpid1().toString())))

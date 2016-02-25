@@ -38,17 +38,17 @@ public class ClassResourceTest extends ApiUnitTestBase {
 	public void listAllClasses() throws Exception {
 
 		List<String> classes = new ArrayList<>();
-		classes.add(TestDataProvider.mwTermList.get(0).getName());
-		classes.add(TestDataProvider.mwTermList.get(1).getName());
-		classes.add(TestDataProvider.mwTermList.get(2).getName());
+		classes.add(TestDataProvider.MW_TERM_LIST.get(0).getName());
+		classes.add(TestDataProvider.MW_TERM_LIST.get(1).getName());
+		classes.add(TestDataProvider.MW_TERM_LIST.get(2).getName());
 
-		Mockito.doReturn(TestDataProvider.mwTermList).when(this.termDataManager).getTermByCvId(CvId.TRAIT_CLASS.getId());
+		Mockito.doReturn(TestDataProvider.MW_TERM_LIST).when(this.termDataManager).getTermByCvId(CvId.TRAIT_CLASS.getId());
 		Mockito.doReturn(classes).when(this.modelService).getAllClasses();
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/classes", this.cropName).contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(TestDataProvider.mwTermList.size())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0]", Matchers.is(TestDataProvider.mwTermList.get(0).getName())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(TestDataProvider.MW_TERM_LIST.size())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0]", Matchers.is(TestDataProvider.MW_TERM_LIST.get(0).getName())))
 				.andDo(MockMvcResultHandlers.print());
 	}
 }

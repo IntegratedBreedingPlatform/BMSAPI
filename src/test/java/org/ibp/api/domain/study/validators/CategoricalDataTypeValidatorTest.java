@@ -21,8 +21,8 @@ public class CategoricalDataTypeValidatorTest {
 
 	@Test(expected = IllegalStateException.class)
 	public void testInvalidDataTypeProvidedToTheCategoricalValidator() throws Exception {
-		final MeasurementVariableDetails measurementVariableDetails =
-				new MeasurementVariableDetails(TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_ID,
+		final MeasurementDetails measurementVariableDetails =
+				new MeasurementDetails(TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_ID,
 						TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_NAME, TestValidatorConstants.CHARACTER_DATA_TYPE,
 						Mockito.mock(ValidValues.class), TestValidatorConstants.TEST_MEASUREMENT_ID,
 						TestValidatorConstants.TEST_MEASUREMENT_VALUE);
@@ -33,8 +33,8 @@ public class CategoricalDataTypeValidatorTest {
 
 	@Test
 	public void testVariableWithBlankCategoricalValues() throws Exception {
-		final MeasurementVariableDetails measurementVariableDetails =
-				new MeasurementVariableDetails(TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_ID,
+		final MeasurementDetails measurementVariableDetails =
+				new MeasurementDetails(TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_ID,
 						TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_NAME, TestValidatorConstants.CATEGORICAL_VARIABLE,
 						Mockito.mock(ValidValues.class), TestValidatorConstants.TEST_MEASUREMENT_ID,
 						TestValidatorConstants.TEST_MEASUREMENT_VALUE);
@@ -53,8 +53,8 @@ public class CategoricalDataTypeValidatorTest {
 	public void testInvalidCategoricalValueProvidedByTheUser() throws Exception {
 		this.categoricalDataTypeValidator = new CategoricalDataTypeValidator();
 		final ValidValues mockValidValues = Mockito.mock(ValidValues.class);
-		final MeasurementVariableDetails measurementVariableDetails =
-				new MeasurementVariableDetails(TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_ID,
+		final MeasurementDetails measurementVariableDetails =
+				new MeasurementDetails(TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_ID,
 						TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_NAME, TestValidatorConstants.CATEGORICAL_VARIABLE,
 						mockValidValues, TestValidatorConstants.TEST_MEASUREMENT_ID, TestValidatorConstants.TEST_MEASUREMENT_VALUE);
 		Mockito.when(mockValidValues.getCategories()).thenReturn(
@@ -64,7 +64,7 @@ public class CategoricalDataTypeValidatorTest {
 		this.categoricalDataTypeValidator.validateValues(measurementVariableDetails, 0,
 				TestValidatorConstants.TEST_OBSERVATION_IDENTIFIER, mockErrors);
 		Mockito.verify(mockErrors).rejectValue(
-				"Observation.measurement[" + TestValidatorConstants.TEST_MEASUREMENT_INDEX + "]",
+				"measurementValue",
 				"invalid.measurement.categorical.value",
 				new Object[] {measurementVariableDetails.getMeasurementValue(), TestValidatorConstants.TEST_OBSERVATION_IDENTIFIER,
 						TestValidatorConstants.TEST_MEASUREMENT_ID, TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_ID},
@@ -75,8 +75,8 @@ public class CategoricalDataTypeValidatorTest {
 	public void testValidCategoricalValueCausesNoException() throws Exception {
 		this.categoricalDataTypeValidator = new CategoricalDataTypeValidator();
 		final ValidValues mockValidValues = Mockito.mock(ValidValues.class);
-		final MeasurementVariableDetails measurementVariableDetails =
-				new MeasurementVariableDetails(TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_ID,
+		final MeasurementDetails measurementVariableDetails =
+				new MeasurementDetails(TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_ID,
 						TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_NAME, TestValidatorConstants.CATEGORICAL_VARIABLE,
 						mockValidValues, TestValidatorConstants.TEST_MEASUREMENT_ID, TestValidatorConstants.TERM_SUMMARY_NAME);
 		Mockito.when(mockValidValues.getCategories()).thenReturn(

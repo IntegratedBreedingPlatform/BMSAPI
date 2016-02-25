@@ -21,8 +21,8 @@ public class NumericVariablDataTypeValidatorTest {
 
 	@Test(expected = IllegalStateException.class)
 	public void testInvalidDataTypeProvidedToTheNumericValidator() throws Exception {
-		final MeasurementVariableDetails measurementVariableDetails =
-				new MeasurementVariableDetails(TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_ID,
+		final MeasurementDetails measurementVariableDetails =
+				new MeasurementDetails(TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_ID,
 						TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_NAME, TestValidatorConstants.CHARACTER_DATA_TYPE,
 						Mockito.mock(ValidValues.class), TestValidatorConstants.TEST_MEASUREMENT_ID,
 						TestValidatorConstants.TEST_MEASUREMENT_VALUE);

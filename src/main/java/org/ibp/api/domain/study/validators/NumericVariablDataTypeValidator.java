@@ -11,12 +11,11 @@ import org.springframework.validation.Errors;
 public class NumericVariablDataTypeValidator implements DataTypeValidator {
 
 	@Override
-	public void validateValues(final MeasurementVariableDetails measurementVariableDetails, final int measurementIndex,
+	public void validateValues(final MeasurementDetails measurementVariableDetails, final int measurementIndex,
 			final int observationId, final Errors errors) {
-		ensureNumbericDataType(measurementVariableDetails); 
+		ensureNumericDataType(measurementVariableDetails);
 		if(!NumberUtils.isNumber(measurementVariableDetails.getMeasurementValue().trim())) {
-			errors.rejectValue(
-					"Observation.measurement[" + measurementIndex + "]",
+			errors.rejectValue("measurementValue",
 					"invalid.measurement.numeric.value",
 					new Object[] {measurementVariableDetails.getMeasurementValue(), observationId,
 							measurementVariableDetails.getMeasurementId()},
@@ -24,10 +23,10 @@ public class NumericVariablDataTypeValidator implements DataTypeValidator {
 		}
 	}
 
-	private void ensureNumbericDataType(final MeasurementVariableDetails measurementVariableDetails) {
+	private void ensureNumericDataType(final MeasurementDetails measurementVariableDetails) {
 		if (!(Integer.parseInt(measurementVariableDetails.getVariableDataType().getId()) == org.generationcp.middleware.domain.ontology.DataType.NUMERIC_VARIABLE
 				.getId())) {
-			throw new IllegalStateException("The ensureNumbericDataType method must never be called for non numeric variables. "
+			throw new IllegalStateException("The ensureNumericDataType method must never be called for non numeric variables. "
 					+ "Please report this error to your administrator.");
 		}
 	}

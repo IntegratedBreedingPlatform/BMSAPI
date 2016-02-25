@@ -27,14 +27,16 @@ import org.ibp.api.domain.ontology.VariableType;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+@RunWith(MockitoJUnitRunner.class)
 public class VariableValidatorTest {
 
 	@Mock
@@ -46,16 +48,8 @@ public class VariableValidatorTest {
 	@Mock
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
+    @InjectMocks
 	private VariableValidator variableValidator;
-
-	@Before
-	public void beforeEachTest() {
-		MockitoAnnotations.initMocks(this);
-		this.variableValidator = new VariableValidator();
-		this.variableValidator.setTermDataManager(this.termDataManager);
-		this.variableValidator.setOntologyVariableDataManager(this.ontologyVariableDataManager);
-		this.variableValidator.setOntologyScaleDataManager(this.ontologyScaleDataManager);
-	}
 
 	@After
 	public void validate() {
@@ -791,7 +785,7 @@ public class VariableValidatorTest {
         VariableDetails variable = TestDataProvider.getTestVariableDetails();
         variable.setId(null);
         List<VariableType> variableTypes = variable.getVariableTypes();
-        variableTypes.add(TestDataProvider.analysisVariable);
+        variableTypes.add(TestDataProvider.ANALYSIS_VARIABLE);
         variable.setVariableTypes(new HashSet<>(variableTypes));
 
         Term methodTerm = TestDataProvider.getMethodTerm();
@@ -811,6 +805,73 @@ public class VariableValidatorTest {
         this.variableValidator.validate(variable, bindingResult);
         Assert.assertTrue(bindingResult.hasErrors());
         Assert.assertNotNull(bindingResult.getFieldError("variableTypes"));
+    }
+
+    @Test
+    public void testPreviousVariableTypesShouldBePresentPositive() {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+        VariableDetails variable = TestDataProvider.getTestVariableDetails();
+        List<VariableType> variableTypes = variable.getVariableTypes();
+        // adding a new variable type
+        variableTypes.add(TestDataProvider.NURSERY_CONDITION_VARIABLE);
+        variable.setVariableTypes(new HashSet<>(variableTypes));
+
+        Term methodTerm = TestDataProvider.getMethodTerm();
+        Term propertyTerm = TestDataProvider.getPropertyTerm();
+        Term scaleTerm = TestDataProvider.getScaleTerm();
+
+        Scale scale = TestDataProvider.getTestScale();
+        VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+        Variable originalVariable = TestDataProvider.getTestVariable();
+
+        // providing observations to indicate that the variable is already in use
+        originalVariable.setObservations(15);
+
+        Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
+        Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
+        Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
+        Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
+        Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
+        Mockito.doReturn(originalVariable).when(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), originalVariable.getId(), true, true);
+
+        this.variableValidator.validate(variable, bindingResult);
+        Assert.assertFalse("Validation should still pass even with new variable types as previous types are retained", bindingResult.hasErrors());
+    }
+
+    @Test
+    public void testPreviousVariableTypesShouldBePresentNegative() {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+
+        VariableDetails variable = TestDataProvider.getTestVariableDetails();
+
+        List<VariableType> variableTypes = new ArrayList<>();
+
+        // changing variable types so that nursery condition is the only type
+        variableTypes.add(TestDataProvider.NURSERY_CONDITION_VARIABLE);
+        variable.setVariableTypes(new HashSet<>(variableTypes));
+
+        Term methodTerm = TestDataProvider.getMethodTerm();
+        Term propertyTerm = TestDataProvider.getPropertyTerm();
+        Term scaleTerm = TestDataProvider.getScaleTerm();
+
+        Scale scale = TestDataProvider.getTestScale();
+        VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+        Variable originalVariable = TestDataProvider.getTestVariable();
+
+        // providing observations to indicate that the variable is already in use
+        originalVariable.setObservations(15);
+
+        Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
+        Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
+        Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
+        Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
+        Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
+        Mockito.doReturn(originalVariable).when(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), originalVariable.getId(), true, true);
+
+        this.variableValidator.validate(variable, bindingResult);
+        Assert.assertTrue("Validation should fail if previous type is no longer present", bindingResult.hasErrors());
+        Assert.assertNotNull("Validation should fail if previous type is no longer present", bindingResult.getFieldError("variableTypes"));
     }
 
 	/**

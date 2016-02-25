@@ -23,64 +23,67 @@ import org.ibp.api.domain.ontology.*;
 
 public class TestDataProvider {
 
-	private static final Integer variableId = 15;
-	private static final String variableName = "Variable_Name";
-	private static final String variableDescription = "Variable Description";
-	private static final String variableAlias = "VA";
-	private static final boolean variableIsFavourite = false;
-	private static final String programUUID = "abcd";
-	private static final Integer variableObservations = 0;
-	private static final Integer variableStudies = 0;
-	private static final String variableExpectedMin = "12";
-	private static final String variableExpectedMax = "16";
+	private static final Integer VARIABLE_ID = 15;
+	private static final String VARIABLE_NAME = "Variable_Name";
+	private static final String VARIABLE_DESCRIPTION = "Variable Description";
+	private static final String VARIABLE_ALIAS = "VA";
+	private static final boolean VARIABLE_IS_FAVOURITE = false;
+	private static final String PROGRAM_UUID = "abcd";
+	private static final Integer VARIABLE_OBSERVATIONS = 0;
+	private static final Integer VARIABLE_STUDIES = 0;
+	private static final String VARIABLE_EXPECTED_MIN = "12";
+	private static final String VARIABLE_EXPECTED_MAX = "16";
 
-	private static final Integer methodId = 10;
-	private static final String methodName = "Method Name";
-	private static final String methodDescription = "Method Description";
+	private static final Integer METHOD_ID = 10;
+	private static final String METHOD_NAME = "Method Name";
+	private static final String METHOD_DESCRIPTION = "Method Description";
 
-	private static final Integer propertyId = 11;
-	private static final String propertyName = "Property Name";
-	private static final String propertyDescription = "Property Description";
-	private static final String cropOntologyId = "CO:1234567890";
+	private static final Integer PROPERTY_ID = 11;
+	private static final String PROPERTY_NAME = "Property Name";
+	private static final String PROPERTY_DESCRIPTION = "Property Description";
+	private static final String CROP_ONTOLOGY_ID = "CO:1234567890";
 
-	private static final Integer scaleId = 12;
-	private static final String scaleName = "Scale Name";
-	private static final String scaleDescription = "Scale Description";
-	private static final Integer scaleVocabularyId = 1030;
+	private static final Integer SCALE_ID = 12;
+	private static final String SCALE_NAME = "Scale Name";
+	private static final String SCALE_DESCRIPTION = "Scale Description";
+	private static final Integer SCALE_VOCABULARY_ID = 1030;
 
-	private static final String scaleMinValue = "10.01";
-	private static final String scaleMaxValue = "20.02";
-	private static final List<TermSummary> scaleCategoricalValues = new ArrayList<>(Arrays.asList(new TermSummary(120, "1", "One"), new TermSummary(121, "2", "Two")));
+	private static final String SCALE_MIN_VALUE = "10.01";
+	private static final String SCALE_MAX_VALUE = "20.02";
+	private static final List<TermSummary> SCALE_CATEGORICAL_VALUES = new ArrayList<>(Arrays.asList(new TermSummary(120, "1", "One"), new TermSummary(121, "2", "Two")));
 
-	private static final String className1 = "Agronomic";
-	private static final String className2 = "Biotic Stress";
-	private static final String className3 = "Study condition";
+	private static final String CLASS_NAME_1 = "Agronomic";
+	private static final String CLASS_NAME_2 = "Biotic Stress";
+	private static final String CLASS_NAME_3 = "Study condition";
 
-	public static final List<Term> mwTermList = new ArrayList<>(Arrays.asList(new Term(1, TestDataProvider.className1, ""), new Term(2, TestDataProvider.className2, ""), new Term(3, TestDataProvider.className3, "")));
+	public static final List<Term> MW_TERM_LIST = new ArrayList<>(Arrays.asList(new Term(1, TestDataProvider.CLASS_NAME_1, ""), new Term(2, TestDataProvider.CLASS_NAME_2, ""), new Term(3, TestDataProvider.CLASS_NAME_3, "")));
 
-	public static final org.ibp.api.domain.ontology.DataType numericalDataType = new org.ibp.api.domain.ontology.DataType(String.valueOf(DataType.NUMERIC_VARIABLE.getId()), DataType.NUMERIC_VARIABLE.getName(), false);
-	public static final org.ibp.api.domain.ontology.DataType categoricalDataType = new org.ibp.api.domain.ontology.DataType(String.valueOf(DataType.CATEGORICAL_VARIABLE.getId()), DataType.CATEGORICAL_VARIABLE.getName(), false);
+	public static final org.ibp.api.domain.ontology.DataType NUMERICAL_DATA_TYPE = new org.ibp.api.domain.ontology.DataType(String.valueOf(DataType.NUMERIC_VARIABLE.getId()), DataType.NUMERIC_VARIABLE.getName(), false);
+	public static final org.ibp.api.domain.ontology.DataType CATEGORICAL_DATA_TYPE = new org.ibp.api.domain.ontology.DataType(String.valueOf(DataType.CATEGORICAL_VARIABLE.getId()), DataType.CATEGORICAL_VARIABLE.getName(), false);
 
-	public static final org.ibp.api.domain.ontology.VariableType traitVariable = new org.ibp.api.domain.ontology.VariableType(VariableType.TRAIT.getId().toString(),
+	public static final org.ibp.api.domain.ontology.VariableType TRAIT_VARIABLE = new org.ibp.api.domain.ontology.VariableType(VariableType.TRAIT.getId().toString(),
             VariableType.TRAIT.getName(), VariableType.TRAIT.getDescription());
 
-    public static final org.ibp.api.domain.ontology.VariableType analysisVariable = new org.ibp.api.domain.ontology.VariableType(VariableType.ANALYSIS.getId().toString(),
+    public static final org.ibp.api.domain.ontology.VariableType ANALYSIS_VARIABLE = new org.ibp.api.domain.ontology.VariableType(VariableType.ANALYSIS.getId().toString(),
             VariableType.ANALYSIS.getName(), VariableType.ANALYSIS.getDescription());
 
+    public static final org.ibp.api.domain.ontology.VariableType NURSERY_CONDITION_VARIABLE = new org.ibp.api.domain.ontology.VariableType(VariableType.NURSERY_CONDITION.getId().toString(),
+            VariableType.NURSERY_CONDITION.getName(), VariableType.NURSERY_CONDITION.getDescription());
+
 	public static Term getMethodTerm() {
-		return new Term(TestDataProvider.methodId, TestDataProvider.methodName, TestDataProvider.methodDescription, CvId.METHODS.getId(),null);
+		return new Term(TestDataProvider.METHOD_ID, TestDataProvider.METHOD_NAME, TestDataProvider.METHOD_DESCRIPTION, CvId.METHODS.getId(),null);
 	}
 
 	public static Term getPropertyTerm() {
-		return new Term(TestDataProvider.propertyId, TestDataProvider.propertyName, TestDataProvider.propertyDescription, CvId.PROPERTIES.getId(), null);
+		return new Term(TestDataProvider.PROPERTY_ID, TestDataProvider.PROPERTY_NAME, TestDataProvider.PROPERTY_DESCRIPTION, CvId.PROPERTIES.getId(), null);
 	}
 
 	public static Term getScaleTerm() {
-		return new Term(TestDataProvider.scaleId, TestDataProvider.scaleName, TestDataProvider.scaleDescription, CvId.SCALES.getId(), null);
+		return new Term(TestDataProvider.SCALE_ID, TestDataProvider.SCALE_NAME, TestDataProvider.SCALE_DESCRIPTION, CvId.SCALES.getId(), null);
 	}
 
 	public static Term getVariableTerm() {
-		return new Term(TestDataProvider.variableId, TestDataProvider.variableName, TestDataProvider.variableDescription, CvId.VARIABLES.getId(), false);
+		return new Term(TestDataProvider.VARIABLE_ID, TestDataProvider.VARIABLE_NAME, TestDataProvider.VARIABLE_DESCRIPTION, CvId.VARIABLES.getId(), false);
 	}
 
 	public static Date getDateCreated() {
@@ -97,9 +100,9 @@ public class TestDataProvider {
 
 	public static Method getTestMethod() {
 		Method method = new Method();
-		method.setId(TestDataProvider.methodId);
-		method.setName(TestDataProvider.methodName);
-		method.setDefinition(TestDataProvider.methodDescription);
+		method.setId(TestDataProvider.METHOD_ID);
+		method.setName(TestDataProvider.METHOD_NAME);
+		method.setDefinition(TestDataProvider.METHOD_DESCRIPTION);
 		method.setDateCreated(TestDataProvider.getDateCreated());
 		method.setDateLastModified(TestDataProvider.getDateModified());
 		return method;
@@ -111,8 +114,8 @@ public class TestDataProvider {
 			Integer methodId = 100 + count;
 			Method method = new Method();
 			method.setId(methodId);
-			method.setName(TestDataProvider.methodName + methodId);
-			method.setDefinition(TestDataProvider.methodDescription);
+			method.setName(TestDataProvider.METHOD_NAME + methodId);
+			method.setDefinition(TestDataProvider.METHOD_DESCRIPTION);
 			method.setDateCreated(TestDataProvider.getDateCreated());
 			method.setDateLastModified(TestDataProvider.getDateModified());
 			methods.add(method);
@@ -122,11 +125,11 @@ public class TestDataProvider {
 
 	public static Property getTestProperty() {
 		Property property = new Property();
-		property.setId(TestDataProvider.propertyId);
-		property.setName(TestDataProvider.propertyName);
-		property.setDefinition(TestDataProvider.propertyDescription);
-		property.setCropOntologyId(TestDataProvider.cropOntologyId);
-		property.addClass(TestDataProvider.className1);
+		property.setId(TestDataProvider.PROPERTY_ID);
+		property.setName(TestDataProvider.PROPERTY_NAME);
+		property.setDefinition(TestDataProvider.PROPERTY_DESCRIPTION);
+		property.setCropOntologyId(TestDataProvider.CROP_ONTOLOGY_ID);
+		property.addClass(TestDataProvider.CLASS_NAME_1);
 		property.setDateCreated(TestDataProvider.getDateCreated());
 		property.setDateLastModified(TestDataProvider.getDateModified());
 		return property;
@@ -137,11 +140,11 @@ public class TestDataProvider {
 
 		for (Integer count = 0; count < elements; count++) {
 			Property property = new Property();
-			property.setId(TestDataProvider.propertyId);
-			property.setName(TestDataProvider.propertyName);
-			property.setDefinition(TestDataProvider.propertyDescription);
-			property.setCropOntologyId(TestDataProvider.cropOntologyId);
-			property.addClass(TestDataProvider.className1);
+			property.setId(TestDataProvider.PROPERTY_ID);
+			property.setName(TestDataProvider.PROPERTY_NAME);
+			property.setDefinition(TestDataProvider.PROPERTY_DESCRIPTION);
+			property.setCropOntologyId(TestDataProvider.CROP_ONTOLOGY_ID);
+			property.addClass(TestDataProvider.CLASS_NAME_1);
 			property.setDateCreated(TestDataProvider.getDateCreated());
 			property.setDateLastModified(TestDataProvider.getDateModified());
 			properties.add(property);
@@ -151,14 +154,14 @@ public class TestDataProvider {
 
 	public static Scale getTestScale() {
 		Scale scale = new Scale();
-		scale.setId(TestDataProvider.scaleId);
-		scale.setName(TestDataProvider.scaleName);
-		scale.setVocabularyId(TestDataProvider.scaleVocabularyId);
-		scale.setDefinition(TestDataProvider.scaleDescription);
+		scale.setId(TestDataProvider.SCALE_ID);
+		scale.setName(TestDataProvider.SCALE_NAME);
+		scale.setVocabularyId(TestDataProvider.SCALE_VOCABULARY_ID);
+		scale.setDefinition(TestDataProvider.SCALE_DESCRIPTION);
 		scale.setDataType(DataType.NUMERIC_VARIABLE);
-		scale.setMinValue(TestDataProvider.scaleMinValue);
-		scale.setMaxValue(TestDataProvider.scaleMaxValue);
-		scale.addCategory(scaleCategoricalValues.get(0));
+		scale.setMinValue(TestDataProvider.SCALE_MIN_VALUE);
+		scale.setMaxValue(TestDataProvider.SCALE_MAX_VALUE);
+		scale.addCategory(SCALE_CATEGORICAL_VALUES.get(0));
 		scale.setDateCreated(TestDataProvider.getDateCreated());
 		scale.setDateLastModified(TestDataProvider.getDateModified());
 		return scale;
@@ -169,13 +172,13 @@ public class TestDataProvider {
 
 		for (Integer count = 0; count < elements; count++) {
 			Scale scale = new Scale();
-			scale.setId(TestDataProvider.scaleId);
-			scale.setName(TestDataProvider.scaleName);
-			scale.setDefinition(TestDataProvider.scaleDescription);
+			scale.setId(TestDataProvider.SCALE_ID);
+			scale.setName(TestDataProvider.SCALE_NAME);
+			scale.setDefinition(TestDataProvider.SCALE_DESCRIPTION);
 			scale.setDataType(DataType.NUMERIC_VARIABLE);
-			scale.setMinValue(TestDataProvider.scaleMinValue);
-			scale.setMaxValue(TestDataProvider.scaleMaxValue);
-			scale.addCategory(scaleCategoricalValues.get(0));
+			scale.setMinValue(TestDataProvider.SCALE_MIN_VALUE);
+			scale.setMaxValue(TestDataProvider.SCALE_MAX_VALUE);
+			scale.addCategory(SCALE_CATEGORICAL_VALUES.get(0));
 			scale.setDateCreated(TestDataProvider.getDateCreated());
 			scale.setDateLastModified(TestDataProvider.getDateModified());
 			scaleList.add(scale);
@@ -185,20 +188,20 @@ public class TestDataProvider {
 
 	public static Variable getTestVariable() {
 		Variable variable = new Variable();
-		variable.setId(TestDataProvider.variableId);
-		variable.setName(TestDataProvider.variableName);
-		variable.setDefinition(TestDataProvider.variableDescription);
-		variable.setObservations(TestDataProvider.variableObservations);
+		variable.setId(TestDataProvider.VARIABLE_ID);
+		variable.setName(TestDataProvider.VARIABLE_NAME);
+		variable.setDefinition(TestDataProvider.VARIABLE_DESCRIPTION);
+		variable.setObservations(TestDataProvider.VARIABLE_OBSERVATIONS);
 		variable.setProperty(TestDataProvider.getTestProperty());
 		variable.setMethod(TestDataProvider.getTestMethod());
 		variable.setScale(TestDataProvider.getTestScale());
-		variable.setMinValue(TestDataProvider.variableExpectedMin);
-		variable.setMaxValue(TestDataProvider.variableExpectedMax);
-		variable.setAlias(TestDataProvider.variableAlias);
-		variable.setIsFavorite(TestDataProvider.variableIsFavourite);
+		variable.setMinValue(TestDataProvider.VARIABLE_EXPECTED_MIN);
+		variable.setMaxValue(TestDataProvider.VARIABLE_EXPECTED_MAX);
+		variable.setAlias(TestDataProvider.VARIABLE_ALIAS);
+		variable.setIsFavorite(TestDataProvider.VARIABLE_IS_FAVOURITE);
 		variable.setDateCreated(TestDataProvider.getDateCreated());
-		variable.setStudies(TestDataProvider.variableStudies);
-		variable.addVariableType(VariableType.ANALYSIS);
+		variable.setStudies(TestDataProvider.VARIABLE_STUDIES);
+		variable.addVariableType(VariableType.TRAIT);
 		variable.setDateCreated(TestDataProvider.getDateCreated());
 		variable.setDateLastModified(TestDataProvider.getDateModified());
 
@@ -209,11 +212,11 @@ public class TestDataProvider {
 		List<Variable> variableList = new ArrayList<>();
 
 		for (Integer count = 0; count < elements; count++) {
-			Variable variable = new Variable(new Term(TestDataProvider.variableId + count, TestDataProvider.variableName + count, TestDataProvider.variableDescription + count));
-			variable.setMinValue(TestDataProvider.variableExpectedMin);
-			variable.setMaxValue(TestDataProvider.variableExpectedMax);
-			variable.setAlias(TestDataProvider.variableAlias + "_" + String.valueOf(count));
-			variable.setIsFavorite(TestDataProvider.variableIsFavourite);
+			Variable variable = new Variable(new Term(TestDataProvider.VARIABLE_ID + count, TestDataProvider.VARIABLE_NAME + count, TestDataProvider.VARIABLE_DESCRIPTION + count));
+			variable.setMinValue(TestDataProvider.VARIABLE_EXPECTED_MIN);
+			variable.setMaxValue(TestDataProvider.VARIABLE_EXPECTED_MAX);
+			variable.setAlias(TestDataProvider.VARIABLE_ALIAS + "_" + String.valueOf(count));
+			variable.setIsFavorite(TestDataProvider.VARIABLE_IS_FAVOURITE);
 			variable.setDateCreated(TestDataProvider.getDateCreated());
 			variable.setProperty(TestDataProvider.getTestProperty());
 			variable.setMethod(TestDataProvider.getTestMethod());
@@ -235,58 +238,58 @@ public class TestDataProvider {
 
 	public static MethodDetails getTestMethodDetails() {
 		MethodDetails method = new MethodDetails();
-		method.setId(String.valueOf(TestDataProvider.methodId));
-		method.setName(TestDataProvider.methodName);
-		method.setDescription(TestDataProvider.methodDescription);
+		method.setId(String.valueOf(TestDataProvider.METHOD_ID));
+		method.setName(TestDataProvider.METHOD_NAME);
+		method.setDescription(TestDataProvider.METHOD_DESCRIPTION);
 		method.setMetadata(TestDataProvider.getTestMetadataDetails());
 		return method;
 	}
 
 	public static PropertyDetails getTestPropertyDetails() {
 		PropertyDetails propertyDetails = new PropertyDetails();
-		propertyDetails.setId(String.valueOf(TestDataProvider.propertyId));
-		propertyDetails.setName(TestDataProvider.propertyName);
-		propertyDetails.setDescription(TestDataProvider.propertyDescription);
-		propertyDetails.setClasses(new HashSet<>(Collections.singletonList(TestDataProvider.className1)));
-		propertyDetails.setCropOntologyId(TestDataProvider.cropOntologyId);
+		propertyDetails.setId(String.valueOf(TestDataProvider.PROPERTY_ID));
+		propertyDetails.setName(TestDataProvider.PROPERTY_NAME);
+		propertyDetails.setDescription(TestDataProvider.PROPERTY_DESCRIPTION);
+		propertyDetails.setClasses(new HashSet<>(Collections.singletonList(TestDataProvider.CLASS_NAME_1)));
+		propertyDetails.setCropOntologyId(TestDataProvider.CROP_ONTOLOGY_ID);
 		propertyDetails.setMetadata(TestDataProvider.getTestMetadataDetails());
 		return propertyDetails;
 	}
 
 	public static ScaleDetails getTestScaleDetails() {
 		ScaleDetails scaleDetails = new ScaleDetails();
-		scaleDetails.setId(String.valueOf(TestDataProvider.scaleId));
-		scaleDetails.setName(TestDataProvider.scaleName);
-		scaleDetails.setDescription(TestDataProvider.scaleDescription);
-		scaleDetails.setDataType(TestDataProvider.numericalDataType);
-		scaleDetails.setMaxValue(TestDataProvider.scaleMinValue);
-		scaleDetails.setMaxValue(TestDataProvider.scaleMaxValue);
+		scaleDetails.setId(String.valueOf(TestDataProvider.SCALE_ID));
+		scaleDetails.setName(TestDataProvider.SCALE_NAME);
+		scaleDetails.setDescription(TestDataProvider.SCALE_DESCRIPTION);
+		scaleDetails.setDataType(TestDataProvider.NUMERICAL_DATA_TYPE);
+		scaleDetails.setMaxValue(TestDataProvider.SCALE_MIN_VALUE);
+		scaleDetails.setMaxValue(TestDataProvider.SCALE_MAX_VALUE);
 		scaleDetails.setMetadata(TestDataProvider.getTestMetadataDetails());
 		return scaleDetails;
 	}
 
 	public static VariableDetails getTestVariableDetails() {
 		VariableDetails variableDetails = new VariableDetails();
-		variableDetails.setProgramUuid(TestDataProvider.programUUID);
-		variableDetails.setId(String.valueOf(TestDataProvider.variableId));
-		variableDetails.setName(TestDataProvider.variableName);
-		variableDetails.setDescription(TestDataProvider.variableDescription);
-		variableDetails.setAlias(TestDataProvider.variableAlias);
-		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(traitVariable)));
+		variableDetails.setProgramUuid(TestDataProvider.PROGRAM_UUID);
+		variableDetails.setId(String.valueOf(TestDataProvider.VARIABLE_ID));
+		variableDetails.setName(TestDataProvider.VARIABLE_NAME);
+		variableDetails.setDescription(TestDataProvider.VARIABLE_DESCRIPTION);
+		variableDetails.setAlias(TestDataProvider.VARIABLE_ALIAS);
+		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(TRAIT_VARIABLE)));
 		variableDetails.setProperty(TestDataProvider.getTestPropertyDetails());
 		variableDetails.setMethod(TestDataProvider.getTestMethodDetails());
 		variableDetails.setScale(TestDataProvider.getTestScaleDetails());
-		variableDetails.setExpectedMin(TestDataProvider.variableExpectedMin);
-		variableDetails.setExpectedMax(TestDataProvider.variableExpectedMax);
-		variableDetails.setFavourite(TestDataProvider.variableIsFavourite);
+		variableDetails.setExpectedMin(TestDataProvider.VARIABLE_EXPECTED_MIN);
+		variableDetails.setExpectedMax(TestDataProvider.VARIABLE_EXPECTED_MAX);
+		variableDetails.setFavourite(TestDataProvider.VARIABLE_IS_FAVOURITE);
 		return variableDetails;
 	}
 
 	public static VariableFilter getVariableFilterForVariableValidator(){
 		VariableFilter variableFilter = new VariableFilter();
-		variableFilter.addMethodId(methodId);
-		variableFilter.addPropertyId(propertyId);
-		variableFilter.addScaleId(scaleId);
+		variableFilter.addMethodId(METHOD_ID);
+		variableFilter.addPropertyId(PROPERTY_ID);
+		variableFilter.addScaleId(SCALE_ID);
 		return variableFilter;
 	}
 

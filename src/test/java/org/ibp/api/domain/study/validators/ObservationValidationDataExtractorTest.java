@@ -14,6 +14,7 @@ import org.ibp.api.domain.study.MeasurementIdentifier;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.Trait;
 import org.ibp.api.java.ontology.VariableService;
+import org.ibp.api.java.study.StudyService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,18 +36,20 @@ public class ObservationValidationDataExtractorTest {
 
 	private final VariableService variableService = Mockito.mock(VariableService.class);
 
+	private StudyService studyService = Mockito.mock(StudyService.class);
+
 	private ObservationValidationDataExtractor observationValidationDataExtractor;
 
 	private VariableDetails testVariableDetails;
 
 	private List<Measurement> measurements;
 
+
 	@Before
 	public void createObservationValidationDataExtractor() throws Exception {
 
 		this.requestAttributes.put("cropname", TestValidatorConstants.CROP_NAME);
 		this.requestAttributes.put("studyId", TestValidatorConstants.STUDY_ID);
-		this.requestAttributes.put("programId", TestValidatorConstants.PROGRAM_ID);
 		this.observation.setUniqueIdentifier(ObservationValidationDataExtractorTest.OBSERVATION_UNIQUE_ID);
 
 		final Measurement measurement = this.getTestMeasurementData();
@@ -60,8 +63,9 @@ public class ObservationValidationDataExtractorTest {
 		Mockito.when(
 				this.variableService.getVariableById(TestValidatorConstants.CROP_NAME, TestValidatorConstants.PROGRAM_ID,
 						ObservationValidationDataExtractorTest.TEST_TRAIT_ID.toString())).thenReturn(this.testVariableDetails);
-
-		this.observationValidationDataExtractor = new ObservationValidationDataExtractor();
+		Mockito.when(
+				this.studyService.getProgramUUID(Integer.parseInt(TestValidatorConstants.STUDY_ID))).thenReturn(TestValidatorConstants.PROGRAM_ID);
+		this.observationValidationDataExtractor = new ObservationValidationDataExtractor(variableService, studyService);
 	}
 
 	private Measurement getTestMeasurementData() {
@@ -118,13 +122,6 @@ public class ObservationValidationDataExtractorTest {
 	}
 
 	@Test(expected = NullPointerException.class)
-	public void testNullProgramIdThrowsException() throws Exception {
-		this.requestAttributes.put("programId", null);
-		this.observationValidationDataExtractor.getProgramId(this.requestAttributes);
-		Assert.fail("We should have nerve got to this point. The getProgramId method should have throw a null pointer execption.");
-	}
-
-	@Test(expected = NullPointerException.class)
 	public void testNullObservationIdThrowsException() throws Exception {
 		this.observation.setUniqueIdentifier(null);
 		this.observationValidationDataExtractor.getObservationId(this.observation);
@@ -140,29 +137,27 @@ public class ObservationValidationDataExtractorTest {
 
 	@Test
 	public void testGetVariableDetails() throws Exception {
-		Assert.assertThat(this.observationValidationDataExtractor.getVariableDetails(this.measurements, 0, this.requestAttributes,
-				this.variableService), CoreMatchers.equalTo(this.testVariableDetails));
+		Assert.assertThat(this.observationValidationDataExtractor.getVariableDetails(this.measurements, 0, this.requestAttributes), CoreMatchers.equalTo(this.testVariableDetails));
 	}
 
 	@Test
 	public void testGetVariableDateType() throws Exception {
 		Assert.assertThat(this.observationValidationDataExtractor.getVariableDataType(this.observationValidationDataExtractor
-				.getVariableDetails(this.measurements, 0, this.requestAttributes, this.variableService)), CoreMatchers
+				.getVariableDetails(this.measurements, 0, this.requestAttributes)), CoreMatchers
 				.equalTo(this.testVariableDetails.getScale().getDataType()));
 	}
 
 	@Test
 	public void testGetValidValues() throws Exception {
 		Assert.assertThat(this.observationValidationDataExtractor.getVariableValidValues(this.observationValidationDataExtractor
-				.getVariableDetails(this.measurements, 0, this.requestAttributes, this.variableService)), CoreMatchers
+				.getVariableDetails(this.measurements, 0, this.requestAttributes)), CoreMatchers
 				.equalTo(this.testVariableDetails.getScale().getValidValues()));
 	}
 
 	@Test
 	public void testGetObservationValidationData() throws Exception {
 		final ObservationValidationData observationValidationData =
-				this.observationValidationDataExtractor.getObservationValidationData(this.observation, this.requestAttributes,
-						this.variableService);
+				this.observationValidationDataExtractor.getObservationValidationData(this.observation, this.requestAttributes);
 		Assert.assertThat(observationValidationData.getCropName(), CoreMatchers.equalTo(TestValidatorConstants.CROP_NAME));
 		Assert.assertThat(observationValidationData.getStudyId(), CoreMatchers.equalTo(TestValidatorConstants.STUDY_ID));
 		Assert.assertThat(observationValidationData.getProgramId(), CoreMatchers.equalTo(TestValidatorConstants.PROGRAM_ID));
