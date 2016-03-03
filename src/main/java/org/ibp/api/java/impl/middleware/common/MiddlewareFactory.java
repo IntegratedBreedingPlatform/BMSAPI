@@ -44,6 +44,7 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.pedigree.ConfigurablePedigreeService;
 import org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl;
+import org.generationcp.middleware.service.pedigree.PedigreeServiceImpl;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -216,7 +217,7 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public PedigreeService getPedigreeService() {
 		// FIXME - producing the default pedigree service impl. Make it configurable for CIMMYT wheat pedigree generation.
-		return new ConfigurablePedigreeService(this.getCropDatabaseSessionProvider(), ContextHolder.getCurrentCrop());
+		return new PedigreeServiceImpl(this.getCropDatabaseSessionProvider(), ContextHolder.getCurrentCrop());
 	}
 
 	@Bean()
