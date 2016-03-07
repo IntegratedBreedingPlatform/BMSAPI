@@ -138,7 +138,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		Mockito.when(study.getName()).thenReturn("Maizing Trial");
 		Mockito.when(study.getTitle()).thenReturn("Title");
 		Mockito.when(study.getObjective()).thenReturn("Objective");
-		Mockito.when(study.getType()).thenReturn("Trial");
+		Mockito.when(study.getType()).thenReturn(StudyType.T);
 		Mockito.when(study.getStartDate()).thenReturn(20150101);
 		Mockito.when(study.getEndDate()).thenReturn(20151231);
 
