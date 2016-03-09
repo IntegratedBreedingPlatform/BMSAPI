@@ -1,6 +1,8 @@
 // Get JSON data
 treeJSON = d3.json("descendantTree.json", function(error, treeData) {
 
+	//descendantTree.json is a dump of response from http://localhost:8080/bmsapi/germplasm/maize/descendants/235551
+
     // Calculate total nodes, max label length
     var totalNodes = 0;
     var maxLabelLength = 0;
@@ -352,7 +354,7 @@ treeJSON = d3.json("descendantTree.json", function(error, treeData) {
             }
         };
         childCount(0, root);
-        var newHeight = d3.max(levelWidth) * 25; // 25 pixels per line
+        var newHeight = d3.max(levelWidth) * 40; // 25 pixels per line // distance between branches
         tree = tree.size([newHeight, viewerWidth]);
 
         // Compute the new tree layout.
@@ -361,7 +363,7 @@ treeJSON = d3.json("descendantTree.json", function(error, treeData) {
 
         // Set widths between levels based on maxLabelLength.
         nodes.forEach(function(d) {
-            d.y = (d.depth * (maxLabelLength * 10)); //maxLabelLength * 10px
+            d.y = (d.depth * (maxLabelLength * 5)); //maxLabelLength * 10px // distance beteween levels
             // alternatively to keep a fixed scale one can set a fixed depth per level
             // Normalize for fixed-depth by commenting out below line
             // d.y = (d.depth * 500); //500px per level.
@@ -399,7 +401,7 @@ treeJSON = d3.json("descendantTree.json", function(error, treeData) {
                 return d.children || d._children ? "end" : "start";
             })
             .text(function(d) {
-                return d.name + '(' + d.germplasmId + ')';
+                return d.name + '(gid: ' + d.germplasmId + ', mgid: ' + d.managementGroupId + ')';
             })
             .style("fill-opacity", 0);
 
@@ -426,7 +428,8 @@ treeJSON = d3.json("descendantTree.json", function(error, treeData) {
                 return d.children || d._children ? "end" : "start";
             })
             .text(function(d) {
-                return d.name + '(' + d.germplasmId + ')';
+                return d.name + '(gid: ' + d.germplasmId + ', mgid: ' + d.managementGroupId + ')';
+                //return d.name + '(' + d.germplasmId + ')';
             });
 
         // Change the circle fill depending on whether it has children and is collapsed
