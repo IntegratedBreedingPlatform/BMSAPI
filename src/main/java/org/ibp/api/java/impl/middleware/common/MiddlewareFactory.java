@@ -4,7 +4,6 @@ package org.ibp.api.java.impl.middleware.common;
 import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
-import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.XADatasourceUtilities;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
@@ -42,8 +41,6 @@ import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
-import org.generationcp.middleware.service.pedigree.ConfigurablePedigreeService;
-import org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeServiceImpl;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -217,7 +214,7 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public PedigreeService getPedigreeService() {
 		// FIXME - producing the default pedigree service impl. Make it configurable for CIMMYT wheat pedigree generation.
-		return new PedigreeServiceImpl(this.getCropDatabaseSessionProvider(), ContextHolder.getCurrentCrop());
+		return new PedigreeServiceImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
 	}
 
 	@Bean()
