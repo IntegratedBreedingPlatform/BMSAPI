@@ -41,7 +41,9 @@ import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
+import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.service.pedigree.PedigreeServiceImpl;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -198,7 +200,7 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public PedigreeDataManager getPedigreeDataManager() {
-		PedigreeDataManagerImpl pedigreeDataManager =
+		final PedigreeDataManagerImpl pedigreeDataManager =
 				new PedigreeDataManagerImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
 		pedigreeDataManager.setGermplasmDataManager(this.getGermplasmDataManager());
 		return pedigreeDataManager;
@@ -213,11 +215,11 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public PedigreeService getPedigreeService() {
-		// FIXME - producing the default pedigree service impl. Make it configurable for CIMMYT wheat pedigree generation.
-		return new PedigreeServiceImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
+		return PedigreeFactory.getPedigreeService(this.getCropDatabaseSessionProvider(),
+				this.getCrossExpansionProperties().getProfile(), this.getCurrentlySelectedCropDBName());
 	}
 
-	@Bean()
+	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public HibernateSessionPerRequestProvider getCropDatabaseSessionProvider() {
 		return new HibernateSessionPerRequestProvider(this.getSessionFactory());
@@ -227,6 +229,12 @@ public class MiddlewareFactory {
 	@DependsOn("WORKBENCH_SessionFactory")
 	public WorkbenchDataManager getWorkbenchDataManager() {
 		return new WorkbenchDataManagerImpl(this.getWorkbenchSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "singleton", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public CrossExpansionProperties getCrossExpansionProperties() {
+		return new CrossExpansionProperties();
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {

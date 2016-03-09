@@ -43,7 +43,7 @@ public class FieldMapServiceTest {
 		when(
 				studyDataManager.getFieldMapInfoOfStudy(Matchers.<List<Integer>>any(), any(StudyType.class),
 						any(CrossExpansionProperties.class))).thenReturn(testFieldMapInfo);
-		FieldMapService fieldMapService = new FieldMapService(studyDataManager);
+		FieldMapService fieldMapService = new FieldMapService(studyDataManager, Mockito.mock(CrossExpansionProperties.class));
 		simpleFieldMap = fieldMapService.getFieldMap("123");
 	}
 

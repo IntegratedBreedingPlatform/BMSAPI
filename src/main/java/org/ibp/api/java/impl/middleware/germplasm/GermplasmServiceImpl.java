@@ -43,6 +43,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private PedigreeDataManager pedigreeDataManager;
 
 	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
+
+	@Autowired
 	private LocationDataManager locationDataManger;
 
 	@Override
@@ -67,11 +70,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 		summary.setGermplasmId(germplasm.getGid().toString());
 		summary.setParent1Id(germplasm.getGpid1() != null && germplasm.getGpid1() != 0 ? germplasm.getGpid1().toString() : "Unknown");
 		summary.setParent2Id(germplasm.getGpid2() != null && germplasm.getGpid2() != 0 ? germplasm.getGpid2().toString() : "Unknown");
-
-		final Properties properties = new Properties();
-		properties.setProperty("wheat.generation.level", "1");
-		final CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties(properties);
-		crossExpansionProperties.setDefaultLevel(1);
 
 		summary.setPedigreeString(this.pedigreeService.getCrossExpansion(germplasm.getGid(), crossExpansionProperties));
 
@@ -127,6 +125,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public PedigreeTree getPedigreeTree(String germplasmId, Integer levels) {
+		String crossExpansion = pedigreeService.getCrossExpansion(Integer.valueOf(germplasmId), new Integer(5), new CrossExpansionProperties(new Properties()));
+		System.out.println(crossExpansion);
 		if (levels == null) {
 			levels = DEFAULT_PEDIGREE_LEVELS;
 		}

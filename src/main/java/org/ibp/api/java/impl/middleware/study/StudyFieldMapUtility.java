@@ -1,9 +1,6 @@
 package org.ibp.api.java.impl.middleware.study;
 
-import java.util.Properties;
-
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
-import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.domain.study.FieldPlot;
 
 
@@ -29,11 +26,4 @@ public class StudyFieldMapUtility {
 
 	}
 
-	static CrossExpansionProperties getCrossExpansionProperties() {
-		final Properties properties = new Properties();
-		properties.setProperty("wheat.generation.level", "1");
-		final CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties(properties);
-		crossExpansionProperties.setDefaultLevel(1);
-		return crossExpansionProperties;
-	}
 }
