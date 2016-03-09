@@ -3,6 +3,7 @@ package org.ibp.api.rest.germplasm;
 
 import java.util.List;
 
+import org.ibp.api.domain.germplasm.DescendantTree;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.domain.germplasm.PedigreeTree;
 import org.ibp.api.exception.ApiRuntimeException;
@@ -80,5 +81,11 @@ public class GermplasmResource {
 			@ApiParam(name = "levels", value = "Optional. If not specified default number of levels are 20.") 
 			Integer levels) {
 		return new ResponseEntity<PedigreeTree>(this.germplasmService.getPedigreeTree(germplasmId, levels), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get germplasm descendant tree by germplasm id.", notes = "Get germplasm descendant tree by germplasm id.")
+	@RequestMapping(value = "/{cropname}/descendants/{germplasmId}", method = RequestMethod.GET)
+	public ResponseEntity<DescendantTree> getDescendantTree(@PathVariable String cropname, @PathVariable String germplasmId) {
+		return new ResponseEntity<DescendantTree>(this.germplasmService.getDescendantTree(germplasmId), HttpStatus.OK);
 	}
 }
