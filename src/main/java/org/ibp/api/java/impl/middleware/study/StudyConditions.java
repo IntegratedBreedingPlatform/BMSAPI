@@ -86,6 +86,8 @@ public enum StudyConditions {
 								this.toString(), DESCRIBED, SCALE_TEXT, CHAR, initialValue, TEXT_STUDY, TermId.STUDY_INFORMATION.getId(),
 								true);
 				break;
+			default:
+				//Adding default block empty as SonarQube report that default block is required in switch: Add a default case to this switch.
 		}
 
 		return measureVariable;

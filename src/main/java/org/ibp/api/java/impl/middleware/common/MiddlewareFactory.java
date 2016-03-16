@@ -65,9 +65,6 @@ import org.springframework.transaction.jta.JtaTransactionManager;
 public class MiddlewareFactory {
 
 	@Autowired
-	private ApiEnvironmentConfiguration config;
-
-	@Autowired
 	private ContextResolver contextResolver;
 
 	@Autowired
