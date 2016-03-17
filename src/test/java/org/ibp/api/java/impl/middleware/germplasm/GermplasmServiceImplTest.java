@@ -59,14 +59,9 @@ public class GermplasmServiceImplTest {
 	@Test
 	public void testSearchGermplasm() throws MiddlewareQueryException {
 
-		Germplasm gp = new Germplasm();
-		gp.setGid(3);
-		gp.setGpid1(1);
-		gp.setGpid2(2);
-		gp.setMethodId(1);
-		gp.setLocationId(1);
+		Germplasm germplasm = this.createGermplasm();
 
-		List<Germplasm> middlewareSearchResults = Lists.newArrayList(gp);
+		List<Germplasm> middlewareSearchResults = Lists.newArrayList(germplasm);
 		middlewareSearchResults.add(null);
 
 		Mockito.when(this.germplasmDataManager.searchForGermplasm("CML", Operation.LIKE, false, false)).thenReturn(middlewareSearchResults);
@@ -74,7 +69,7 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.pedigreeService.getCrossExpansion(Matchers.anyInt(), Matchers.any(CrossExpansionProperties.class))).thenReturn(
 				gpPedigree);
 
-		Name gpName = this.createName(gp.getGid());
+		Name gpName = this.createName(germplasm.getGid());
 		List<Name> gpNames = Lists.newArrayList(gpName);
 		Mockito.when(this.germplasmDataManager.getNamesByGID(Matchers.anyInt(), Matchers.anyInt(), Matchers.any(GermplasmNameType.class)))
 				.thenReturn(gpNames);
@@ -91,9 +86,9 @@ public class GermplasmServiceImplTest {
 		List<GermplasmSummary> germplasmSummaries = this.germplasmServiceImpl.searchGermplasm("CML");
 		Assert.assertTrue(!germplasmSummaries.isEmpty());
 
-		Assert.assertEquals(gp.getGid().toString(), germplasmSummaries.get(0).getGermplasmId());
-		Assert.assertEquals(gp.getGpid1().toString(), germplasmSummaries.get(0).getParent1Id());
-		Assert.assertEquals(gp.getGpid2().toString(), germplasmSummaries.get(0).getParent2Id());
+		Assert.assertEquals(germplasm.getGid().toString(), germplasmSummaries.get(0).getGermplasmId());
+		Assert.assertEquals(germplasm.getGpid1().toString(), germplasmSummaries.get(0).getParent1Id());
+		Assert.assertEquals(germplasm.getGpid2().toString(), germplasmSummaries.get(0).getParent2Id());
 		Assert.assertEquals(gpPedigree, germplasmSummaries.get(0).getPedigreeString());
 		Assert.assertEquals(gpMethod.getMname(), germplasmSummaries.get(0).getBreedingMethod());
 		Assert.assertEquals(gpLocation.getLname(), germplasmSummaries.get(0).getLocation());
@@ -110,12 +105,7 @@ public class GermplasmServiceImplTest {
 	@Test
 	public void testGetGermplasm(){
 
-		Germplasm germplasm = new Germplasm();
-		germplasm.setGid(3);
-		germplasm.setGpid1(1);
-		germplasm.setGpid2(2);
-		germplasm.setMethodId(1);
-		germplasm.setLocationId(1);
+		Germplasm germplasm = this.createGermplasm();
 
 		Mockito.when(this.germplasmDataManager.getGermplasmByGID(germplasm.getGid())).thenReturn(germplasm);
 
@@ -160,12 +150,7 @@ public class GermplasmServiceImplTest {
 	@Test
 	public void testGetPedigreeTree(){
 
-		Germplasm germplasm = new Germplasm();
-		germplasm.setGid(3);
-		germplasm.setGpid1(1);
-		germplasm.setGpid2(2);
-		germplasm.setMethodId(1);
-		germplasm.setLocationId(1);
+		Germplasm germplasm = this.createGermplasm();
 		germplasm.setPreferredName(this.createName(germplasm.getGid()));
 
 		String gpPedigree = "CML1/CML2";
@@ -199,6 +184,16 @@ public class GermplasmServiceImplTest {
 		Assert.assertEquals(String.valueOf(newGermplasmId), pedigreeTreeHandlesNullLevels.getRoot().getGermplasmId());
 	}
 
+	private Germplasm createGermplasm(){
+		Germplasm germplasm = new Germplasm();
+		germplasm.setGid(3);
+		germplasm.setGpid1(1);
+		germplasm.setGpid2(2);
+		germplasm.setMethodId(1);
+		germplasm.setLocationId(1);
+		germplasm.setGnpgs(4);
+		return germplasm;
+	}
 	private UserDefinedField createUserDefinedField(){
 		UserDefinedField udf = new UserDefinedField();
 		udf.setFcode("FCode");
