@@ -9,7 +9,10 @@ import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
+import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -17,6 +20,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
+import org.ibp.api.domain.germplasm.PedigreeTree;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,6 +41,9 @@ public class GermplasmServiceImplTest {
 	private PedigreeService pedigreeService;
 
 	@Mock
+	private PedigreeDataManager pedigreeDataManager;
+
+	@Mock
 	private LocationDataManager locationDataManger;
 
 	@Before
@@ -46,6 +53,7 @@ public class GermplasmServiceImplTest {
 		this.germplasmServiceImpl.setGermplasmDataManager(this.germplasmDataManager);
 		this.germplasmServiceImpl.setPedigreeService(this.pedigreeService);
 		this.germplasmServiceImpl.setLocationDataManger(this.locationDataManger);
+		this.germplasmServiceImpl.setPedigreeDataManager(this.pedigreeDataManager);
 	}
 
 	@Test
@@ -147,6 +155,48 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.germplasmDataManager.getGermplasmByGID(germplasmId)).thenThrow(MiddlewareQueryException.class);
 
 		GermplasmSummary germplasm = this.germplasmServiceImpl.getGermplasm(String.valueOf(germplasmId));
+	}
+
+	@Test
+	public void testGetPedigreeTree(){
+
+		Germplasm germplasm = new Germplasm();
+		germplasm.setGid(3);
+		germplasm.setGpid1(1);
+		germplasm.setGpid2(2);
+		germplasm.setMethodId(1);
+		germplasm.setLocationId(1);
+		germplasm.setPreferredName(this.createName(germplasm.getGid()));
+
+		String gpPedigree = "CML1/CML2";
+
+		GermplasmPedigreeTree germplasmPedigreeTree = new GermplasmPedigreeTree();
+
+		GermplasmPedigreeTreeNode germplasmPedigreeTreeNode = new GermplasmPedigreeTreeNode();
+		germplasmPedigreeTreeNode.setGermplasm(germplasm);
+
+		germplasmPedigreeTree.setRoot(germplasmPedigreeTreeNode);
+
+		Mockito.when(this.pedigreeService.getCrossExpansion(Matchers.anyInt(), Matchers.anyInt(), Matchers.any(CrossExpansionProperties.class))).thenReturn(
+				gpPedigree);
+		Mockito.when(this.pedigreeDataManager.generatePedigreeTree(Matchers.anyInt(), Matchers.anyInt())).thenReturn(germplasmPedigreeTree);
+
+		Integer levels = 10;
+
+		PedigreeTree pedigreeTree = this.germplasmServiceImpl.getPedigreeTree(String.valueOf(germplasm.getGid()), levels);
+
+		Assert.assertEquals(germplasm.getPreferredName().getNval(), pedigreeTree.getRoot().getName());
+		Assert.assertEquals(String.valueOf(germplasm.getGid()), pedigreeTree.getRoot().getGermplasmId());
+
+		Integer newGermplasmId = 20;
+		//Update germplasmId as above case have same data to assert
+		germplasm.setGid(newGermplasmId);
+		//This will call to cover when levels is null
+		PedigreeTree pedigreeTreeHandlesNullLevels = this.germplasmServiceImpl.getPedigreeTree(String.valueOf(germplasm.getGid()), null);
+
+		//This will assert updated germplasm Id
+		Assert.assertEquals(germplasm.getPreferredName().getNval(), pedigreeTreeHandlesNullLevels.getRoot().getName());
+		Assert.assertEquals(String.valueOf(newGermplasmId), pedigreeTreeHandlesNullLevels.getRoot().getGermplasmId());
 	}
 
 	private UserDefinedField createUserDefinedField(){
