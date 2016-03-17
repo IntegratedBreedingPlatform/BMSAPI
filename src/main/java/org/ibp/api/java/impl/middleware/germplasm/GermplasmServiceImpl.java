@@ -133,6 +133,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 		this.pedigreeDataManager = pedigreeDataManager;
 	}
 
+	void setGermplasmGroupingService(GermplasmGroupingService germplasmGroupingService){
+		this.germplasmGroupingService = germplasmGroupingService;
+	}
+
 	@Override
 	public PedigreeTree getPedigreeTree(String germplasmId, Integer levels) {
 		String crossExpansion = pedigreeService.getCrossExpansion(Integer.valueOf(germplasmId), new Integer(5), new CrossExpansionProperties(new Properties()));

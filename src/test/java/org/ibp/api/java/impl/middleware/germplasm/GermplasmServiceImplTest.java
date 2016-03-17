@@ -17,8 +17,10 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.ibp.api.domain.germplasm.DescendantTree;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.domain.germplasm.PedigreeTree;
 import org.ibp.api.exception.ApiRuntimeException;
@@ -46,6 +48,9 @@ public class GermplasmServiceImplTest {
 	@Mock
 	private LocationDataManager locationDataManger;
 
+	@Mock
+	private GermplasmGroupingService germplasmGroupingService;
+
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
@@ -54,6 +59,7 @@ public class GermplasmServiceImplTest {
 		this.germplasmServiceImpl.setPedigreeService(this.pedigreeService);
 		this.germplasmServiceImpl.setLocationDataManger(this.locationDataManger);
 		this.germplasmServiceImpl.setPedigreeDataManager(this.pedigreeDataManager);
+		this.germplasmServiceImpl.setGermplasmGroupingService(this.germplasmGroupingService);
 	}
 
 	@Test
@@ -182,6 +188,30 @@ public class GermplasmServiceImplTest {
 		//This will assert updated germplasm Id
 		Assert.assertEquals(germplasm.getPreferredName().getNval(), pedigreeTreeHandlesNullLevels.getRoot().getName());
 		Assert.assertEquals(String.valueOf(newGermplasmId), pedigreeTreeHandlesNullLevels.getRoot().getGermplasmId());
+	}
+
+
+	@Test
+	public void testGetDescendantTree(){
+
+		Germplasm germplasm = this.createGermplasm();
+
+		GermplasmPedigreeTree germplasmPedigreeTree = new GermplasmPedigreeTree();
+
+		GermplasmPedigreeTreeNode germplasmPedigreeTreeNode = new GermplasmPedigreeTreeNode();
+		germplasmPedigreeTreeNode.setGermplasm(germplasm);
+
+		germplasmPedigreeTree.setRoot(germplasmPedigreeTreeNode);
+
+		Mockito.when(this.germplasmDataManager.getGermplasmByGID(germplasm.getGid())).thenReturn(germplasm);
+		Mockito.when(this.germplasmGroupingService.getDescendantTree(germplasm)).thenReturn(germplasmPedigreeTree);
+
+		DescendantTree descendantTree = this.germplasmServiceImpl.getDescendantTree(String.valueOf(germplasm.getGid()));
+
+		Assert.assertEquals(germplasm.getGid(), descendantTree.getRoot().getGermplasmId());
+		Assert.assertEquals(germplasm.getGpid1(), descendantTree.getRoot().getParent1Id());
+		Assert.assertEquals(germplasm.getGpid2(), descendantTree.getRoot().getParent2Id());
+		Assert.assertEquals(germplasm.getGnpgs(), descendantTree.getRoot().getProgenitors());
 	}
 
 	private Germplasm createGermplasm(){
