@@ -38,12 +38,12 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String username) {
 		try {
 			// username must be converted from html-encode to utf-8 string to support chinese/utf-8 languages
-			username = StringEscapeUtils.unescapeHtml(username);
+			String userName = StringEscapeUtils.unescapeHtml(username);
 
-			final List<User> matchingUsers = this.workbenchDataManager.getUserByName(username, 0, 1, Operation.EQUAL);
+			final List<User> matchingUsers = this.workbenchDataManager.getUserByName(userName, 0, 1, Operation.EQUAL);
 			if (matchingUsers != null && !matchingUsers.isEmpty()) {
 				final User workbenchUser = matchingUsers.get(0);
 				// FIXME Populate flags for accountNonExpired, credentialsNonExpired, accountNonLocked properly, all true for now.

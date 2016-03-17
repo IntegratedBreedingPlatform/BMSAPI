@@ -2,7 +2,6 @@
 package org.ibp.api.security.xauth;
 
 import java.io.IOException;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -24,11 +23,11 @@ import org.springframework.web.filter.GenericFilterBean;
 // be MAJOR breakages in the functioning of BMS components. Consult your friendly senior developer first if you are unsure.
 public class XAuthTokenFilter extends GenericFilterBean {
 
-	final static String XAUTH_TOKEN_HEADER_NAME = "x-auth-token";
-
 	private final UserDetailsService detailsService;
 
 	private final TokenProvider tokenProvider;
+
+	final static String XAUTH_TOKEN_HEADER_NAME = "x-auth-token";
 
 	public XAuthTokenFilter(final UserDetailsService detailsService, final TokenProvider tokenProvider) {
 		this.detailsService = detailsService;
