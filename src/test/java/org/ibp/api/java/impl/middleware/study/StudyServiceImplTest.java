@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.validation.Errors;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
@@ -27,12 +29,14 @@ import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.MeasurementIdentifier;
 import org.ibp.api.domain.study.Observation;
+import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.Trait;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,13 +45,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
-
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 
 public class StudyServiceImplTest {
 
@@ -141,6 +142,19 @@ public class StudyServiceImplTest {
 		Assert.assertEquals(studySummary.getEndDate(), studySummaries.get(0).getEndDate());
 		Assert.assertEquals(studySummary.getType().toString(), studySummaries.get(0).getType());
 
+	}
+
+	@Test(expected = ApiRuntimeException.class)
+	public void testSearchThrowsException() throws MiddlewareQueryException {
+
+		final List<org.generationcp.middleware.service.api.study.StudySummary> mockResult = new ArrayList<>();
+		final org.generationcp.middleware.service.api.study.StudySummary studySummary =
+				new org.generationcp.middleware.service.api.study.StudySummary();
+		mockResult.add(studySummary);
+
+		Mockito.when(this.mockMiddlewareStudyService.search(Mockito.any(StudySearchParameters.class))).thenThrow(MiddlewareQueryException.class);
+
+		this.studyServiceImpl.search(this.programUID, null, null, null);
 	}
 
 	@Test
@@ -346,5 +360,36 @@ public class StudyServiceImplTest {
 		Mockito.verify(this.germplasmListManager).addGermplasmListData(Mockito.anyList());
 		Mockito.verify(this.fieldbookService).saveOrUpdateListDataProject(Mockito.anyInt(), Mockito.any(GermplasmListType.class),
 				Mockito.anyInt(), Mockito.anyList(), Mockito.anyInt());
+	}
+
+	@Test(expected = ApiRuntimeException.class)
+	public void testImportStudyThrowsException() {
+
+		// Minimal setup
+		final StudyImportDTO studyImportDTO = new StudyImportDTO();
+		studyImportDTO.setStudyType("N");
+		studyImportDTO.setUserId(1);
+
+		final Workbook workbook = new Workbook();
+		final StudyDetails studyDetails = new StudyDetails();
+		workbook.setStudyDetails(studyDetails);
+
+		Mockito.when(this.conversionService.convert(studyImportDTO, Workbook.class)).thenThrow(MiddlewareQueryException.class);
+		this.studyServiceImpl.importStudy(studyImportDTO, this.programUID);
+	}
+
+	@Test
+	public void testGetAllStudyFolders(){
+
+		FolderReference folderRef = new FolderReference(1, 2, "My Folder", "My Folder Description");
+		Mockito.when(this.studyDataManager.getAllFolders()).thenReturn(Lists.newArrayList(folderRef));
+
+		List<StudyFolder> allStudyFolders = this.studyServiceImpl.getAllStudyFolders();
+
+		Assert.assertNotNull(allStudyFolders);
+		Assert.assertEquals(folderRef.getParentFolderId(), allStudyFolders.get(0).getParentFolderId());
+		Assert.assertEquals(folderRef.getId(), allStudyFolders.get(0).getFolderId());
+		Assert.assertEquals(folderRef.getName(), allStudyFolders.get(0).getName());
+		Assert.assertEquals(folderRef.getDescription(), allStudyFolders.get(0).getDescription());
 	}
 }
