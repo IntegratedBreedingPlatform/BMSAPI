@@ -11,7 +11,7 @@ public enum DesignType {
 	NRIBD(10140, "NRIBD", "Non resolvable incomplete block design"), //
 	RRCD(10145, "RRCD", "Resolvable row-column design"), //
 	NRRCD(10150, "NRRCD", "Non resolvable row-column design"), //
-	Augmented(10160, "Augmented", "Augmented design"), //
+	AUGMENTED(10160, "Augmented", "Augmented design"), //
 	SP(10165, "SP", "Split-plot design"), //
 	RIBDL(10166, "RIBDL", "Resolvable Incomplete Block Design (Latinized)"), //
 	RRCDL(10167, "RRCDL", "Resolvable Row-and-Column Design (Latinized)");
