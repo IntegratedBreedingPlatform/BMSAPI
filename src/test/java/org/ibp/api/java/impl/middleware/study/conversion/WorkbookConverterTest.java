@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.study.conversion;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
@@ -15,12 +16,10 @@ import org.ibp.api.domain.study.Trait;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-
 public class WorkbookConverterTest {
 
 	@Test
-	public void testConvertNursery() {
+	public void testConvertNurseryAndTrail() {
 
 		final StudyImportDTO inputDTO = new StudyImportDTO();
 		inputDTO.setStudyType("N");
@@ -179,5 +178,42 @@ public class WorkbookConverterTest {
 
 		// Observations
 		Assert.assertEquals(inputDTO.getGermplasm().size(), outputWorkbook.getObservations().size());
+
+		//For Trial
+		inputDTO.setStudyType("T");
+		inputDTO.setName("Maize Trail");
+		inputDTO.setObjective("Grow more seeds.");
+		inputDTO.setTitle("Maize Trail title.");
+		inputDTO.setStartDate("20150101");
+		inputDTO.setEndDate("20151201");
+		inputDTO.setUserId(1);
+		inputDTO.setFolderId(1L);
+		inputDTO.setSiteName("Mexico");
+		inputDTO.setStudyInstitute("CIMMYT");
+
+		final Workbook outputWorkbookForTrail = converter.convert(inputDTO);
+
+		// If Trail then it will have 8 measurement variables. 6 common between Nursery and Trail. 2 Added if Study is Trail.
+		Assert.assertEquals(8, outputWorkbookForTrail.getConditions().size());
+		// StudyDetail mapping
+		Assert.assertEquals(StudyType.T, outputWorkbookForTrail.getStudyDetails().getStudyType());
+		Assert.assertEquals(inputDTO.getName(), outputWorkbookForTrail.getStudyDetails().getStudyName());
+		Assert.assertEquals(inputDTO.getObjective(), outputWorkbookForTrail.getStudyDetails().getObjective());
+		Assert.assertEquals(inputDTO.getTitle(), outputWorkbookForTrail.getStudyDetails().getTitle());
+		Assert.assertEquals(inputDTO.getStartDate(), outputWorkbookForTrail.getStudyDetails().getStartDate());
+		Assert.assertEquals(inputDTO.getEndDate(), outputWorkbookForTrail.getStudyDetails().getEndDate());
+		Assert.assertEquals(inputDTO.getSiteName(), outputWorkbookForTrail.getStudyDetails().getSiteName());
+		Assert.assertEquals(inputDTO.getFolderId(), new Long(outputWorkbookForTrail.getStudyDetails().getParentFolderId()));
+
+		final MeasurementVariable mvExpDesign = outputWorkbookForTrail.getConditions().get(6);
+		Assert.assertEquals(PhenotypicType.TRIAL_ENVIRONMENT, mvExpDesign.getRole());
+		Assert.assertTrue(mvExpDesign.isFactor());
+		Assert.assertEquals(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), mvExpDesign.getTermId());
+
+		final MeasurementVariable mvNREP = outputWorkbookForTrail.getConditions().get(7);
+		Assert.assertEquals(inputDTO.getEnvironmentDetails().getNumberOfReplications().toString(), mvNREP.getValue());
+		Assert.assertEquals(PhenotypicType.TRIAL_ENVIRONMENT, mvNREP.getRole());
+		Assert.assertTrue(mvNREP.isFactor());
+		Assert.assertEquals(TermId.NUMBER_OF_REPLICATES.getId(), mvNREP.getTermId());
 	}
 }
