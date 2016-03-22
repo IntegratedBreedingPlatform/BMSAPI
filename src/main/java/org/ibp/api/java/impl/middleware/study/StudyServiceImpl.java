@@ -31,6 +31,7 @@ import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.TraitDto;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.domain.common.Command;
 import org.ibp.api.domain.common.ValidationUtil;
 import org.ibp.api.domain.ontology.TermSummary;
@@ -97,6 +98,9 @@ public class StudyServiceImpl implements StudyService {
 
 	@Autowired
 	private ValidationUtil validationUtil;
+
+	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
 
 
 	@Override
@@ -385,7 +389,7 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public Map<Integer, FieldMap> getFieldMap(final String studyId) {
-		final FieldMapService fieldMapService = new FieldMapService(this.studyDataManager);
+		final FieldMapService fieldMapService = new FieldMapService(this.studyDataManager, crossExpansionProperties);
 		return fieldMapService.getFieldMap(studyId);
 	}
 

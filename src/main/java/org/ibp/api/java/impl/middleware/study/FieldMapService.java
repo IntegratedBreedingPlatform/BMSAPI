@@ -18,6 +18,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.FieldMapMetaData;
 import org.ibp.api.domain.study.FieldMapPlantingDetails;
@@ -32,9 +33,11 @@ import com.google.common.collect.Lists;
 public class FieldMapService {
 
 	private StudyDataManager studyDataManager;
+	private CrossExpansionProperties crossExpansionProperties;
 
-	public FieldMapService(final StudyDataManager studyDataManager) {
+	public FieldMapService(final StudyDataManager studyDataManager, final CrossExpansionProperties crossExpansionProperties) {
 		this.studyDataManager = studyDataManager;
+		this.crossExpansionProperties = crossExpansionProperties;
 	}
 
 	public Map<Integer, FieldMap> getFieldMap(String studyId) {
@@ -230,7 +233,7 @@ public class FieldMapService {
 
 			final List<FieldMapInfo> fieldMapInfoOfStudy =
 					this.studyDataManager.getFieldMapInfoOfStudy(Lists.newArrayList(studyIdentifier), studyType,
-							StudyFieldMapUtility.getCrossExpansionProperties());
+							crossExpansionProperties);
 			return new StudyFieldMap(studyType, fieldMapInfoOfStudy);
 		} catch (MiddlewareQueryException e) {
 			throw new ApiRuntimeException(String.format("There was an error retriving infomration for studyId %s was found.", studyId), e);
