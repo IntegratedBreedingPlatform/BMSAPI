@@ -3,16 +3,15 @@ package org.ibp.api.domain.ontology.serializers;
 import java.io.IOException;
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import org.ibp.api.Util;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableType;
 import org.ibp.api.java.ontology.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 
 public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 
@@ -75,11 +74,7 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 			if (!Util.isNullOrEmpty(variableDetails.getProperty().getMetadata().getUsage().getVariables())) {
 				jsonGenerator.writeArrayFieldStart("variables");
 				for(TermSummary variable : variableDetails.getProperty().getMetadata().getUsage().getVariables()){
-					jsonGenerator.writeStartObject();
-					jsonGenerator.writeStringField("id", variable.getId());
-					jsonGenerator.writeStringField("name", variable.getName());
-					jsonGenerator.writeStringField("description", variable.getDescription());
-					jsonGenerator.writeEndObject();
+					Util.serializeTermSummary(jsonGenerator, variable);
 				}
 				jsonGenerator.writeEndArray();
 			}
@@ -123,11 +118,7 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 			if (!Util.isNullOrEmpty(variableDetails.getMethod().getMetadata().getUsage().getVariables())) {
 				jsonGenerator.writeArrayFieldStart("variables");
 				for(TermSummary variable : variableDetails.getMethod().getMetadata().getUsage().getVariables()){
-					jsonGenerator.writeStartObject();
-					jsonGenerator.writeStringField("id", variable.getId());
-					jsonGenerator.writeStringField("name", variable.getName());
-					jsonGenerator.writeStringField("description", variable.getDescription());
-					jsonGenerator.writeEndObject();
+					Util.serializeTermSummary(jsonGenerator, variable);
 				}
 				jsonGenerator.writeEndArray();
 			}
@@ -172,11 +163,7 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 					jsonGenerator.writeArrayFieldStart("categories");
 
 					for (TermSummary category : variableDetails.getScale().getValidValues().getCategories()){
-						jsonGenerator.writeStartObject();
-						jsonGenerator.writeStringField("id", category.getId());
-						jsonGenerator.writeStringField("name", category.getName());
-						jsonGenerator.writeStringField("description", category.getDescription());
-						jsonGenerator.writeEndObject();
+						Util.serializeTermSummary(jsonGenerator, category);
 					}
 
 					jsonGenerator.writeEndArray();
@@ -211,11 +198,7 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 			if (!Util.isNullOrEmpty(variableDetails.getScale().getMetadata().getUsage().getVariables())) {
 				jsonGenerator.writeArrayFieldStart("variables");
 				for(TermSummary variable : variableDetails.getScale().getMetadata().getUsage().getVariables()){
-					jsonGenerator.writeStartObject();
-					jsonGenerator.writeStringField("id", variable.getId());
-					jsonGenerator.writeStringField("name", variable.getName());
-					jsonGenerator.writeStringField("description", variable.getDescription());
-					jsonGenerator.writeEndObject();
+					Util.serializeTermSummary(jsonGenerator, variable);
 				}
 				jsonGenerator.writeEndArray();
 			}
@@ -230,11 +213,7 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 			jsonGenerator.writeArrayFieldStart("variableTypes");
 
 			for(VariableType variableType : variableDetails.getVariableTypes()){
-				jsonGenerator.writeStartObject();
-				jsonGenerator.writeStringField("id", variableType.getId());
-				jsonGenerator.writeStringField("name", variableType.getName());
-				jsonGenerator.writeStringField("description", variableType.getDescription());
-				jsonGenerator.writeEndObject();
+				Util.serializeTermSummary(jsonGenerator, variableType);
 			}
 
 			jsonGenerator.writeEndArray();
