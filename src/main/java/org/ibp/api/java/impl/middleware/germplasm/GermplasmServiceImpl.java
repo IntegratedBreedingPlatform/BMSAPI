@@ -57,18 +57,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public List<GermplasmSummary> searchGermplasm(String searchText) {
 		List<GermplasmSummary> results = new ArrayList<GermplasmSummary>();
-		try {
 			List<Germplasm> searchResults = this.germplasmDataManager.searchForGermplasm(searchText, Operation.LIKE, false, false);
 			for (Germplasm germplasm : searchResults) {
 				results.add(this.populateGermplasmSummary(germplasm));
 			}
-		} catch (MiddlewareQueryException e) {
-			throw new ApiRuntimeException("Error!", e);
-		}
 		return results;
 	}
 
-	private GermplasmSummary populateGermplasmSummary(Germplasm germplasm) throws MiddlewareQueryException {
+	private GermplasmSummary populateGermplasmSummary(Germplasm germplasm) {
 		if (germplasm == null) {
 			return null;
 		}

@@ -3,7 +3,10 @@ package org.ibp.api.rest.inventory;
 
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.ibp.api.domain.inventory.GermplasmInventory;
 import org.ibp.api.java.Inventory.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
 
 @Api(value = "Inventory Services")
 @RestController
@@ -38,7 +36,7 @@ public class InventoryResource {
 	@RequestMapping(value = "/{cropname}/germplasm/{gid}", method = RequestMethod.PUT)
 	@ApiResponses(value = {@ApiResponse(code = 201, message = "Created")})
 	public ResponseEntity<?> createInverntory(@PathVariable String cropname, @RequestBody GermplasmInventory germplasmInventory,
-			@PathVariable String gid) throws MiddlewareQueryException {
+			@PathVariable String gid) {
 		this.inventoryService.createInverntory(germplasmInventory, gid);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}

@@ -101,13 +101,6 @@ public class GermplasmServiceImplTest {
 		Assert.assertEquals(gpName.getNval(), germplasmSummaries.get(0).getNames().get(0).getName());
 	}
 
-	@Test(expected = ApiRuntimeException.class)
-	public void testSearchGermplasmThrowsException() throws MiddlewareQueryException {
-		Mockito.when(this.germplasmDataManager.searchForGermplasm("CML", Operation.LIKE, false, false)).thenThrow(MiddlewareQueryException.class);
-
-		List<GermplasmSummary> germplasmSummaries = this.germplasmServiceImpl.searchGermplasm("CML");
-	}
-
 	@Test
 	public void testGetGermplasm(){
 
