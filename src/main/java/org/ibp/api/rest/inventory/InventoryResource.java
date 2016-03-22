@@ -8,7 +8,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.ibp.api.domain.inventory.GermplasmInventory;
-import org.ibp.api.java.Inventory.InventoryService;
+import org.ibp.api.java.inventory.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
