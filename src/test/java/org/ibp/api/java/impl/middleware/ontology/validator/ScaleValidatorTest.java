@@ -221,6 +221,29 @@ public class ScaleValidatorTest {
 	}
 
 	/**
+	 * Test for to check Category name and description is null or empty
+	 */
+	@Test
+	public void testWithCategoryNameNull() {
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+
+		ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
+		scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
+
+		List<TermSummary> categories = new ArrayList<>();
+		TermSummary category = new TermSummary();
+		category.setName("");
+		category.setDescription("");
+		categories.add(category);
+		scaleSummary.setCategories(categories);
+
+		this.scaleValidator.validate(scaleSummary, bindingResult);
+		Assert.assertTrue(bindingResult.hasErrors());
+		Assert.assertNotNull(bindingResult.getFieldError("validValues.categories[1].name"));
+		Assert.assertNotNull(bindingResult.getFieldError("validValues.categories[1].description"));
+	}
+
+	/**
 	 * Test for If DataType is Numeric and Min value is Greater than Max value.
 	 */
 	@Test
