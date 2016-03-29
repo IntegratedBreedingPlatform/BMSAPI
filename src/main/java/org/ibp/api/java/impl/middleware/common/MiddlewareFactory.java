@@ -44,7 +44,6 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
-import org.generationcp.middleware.service.pedigree.PedigreeServiceImpl;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -240,7 +239,6 @@ public class MiddlewareFactory {
 	}
 
 	@Bean
-	@Scope(value = "singleton", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public CrossExpansionProperties getCrossExpansionProperties() {
 		return new CrossExpansionProperties();
 	}

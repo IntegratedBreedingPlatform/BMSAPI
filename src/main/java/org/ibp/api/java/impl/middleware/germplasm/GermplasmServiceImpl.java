@@ -131,8 +131,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public PedigreeTree getPedigreeTree(String germplasmId, Integer levels) {
-		String crossExpansion = pedigreeService.getCrossExpansion(Integer.valueOf(germplasmId), new Integer(5), new CrossExpansionProperties(new Properties()));
-		System.out.println(crossExpansion);
+
 		if (levels == null) {
 			levels = DEFAULT_PEDIGREE_LEVELS;
 		}
