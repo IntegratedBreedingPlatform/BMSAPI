@@ -1,8 +1,11 @@
 Breeding Management System API
 ==============================
-BMS API is a set of RESTful web services to interact with the data in BMS database.
+BMS API is a set of RESTful web services that allow access to data in the BMS database.
 
-### Authentication ###
+For API Consumers
+=================
+
+### Understanding Authentication ###
 BMS API services expose operations on data created by registered BMS users as they carry out breeding programs and studies for various crops. Hence access to the BMS API services require authentication as the same registered user. BMS API uses a light-weight variant of the popular OAuth protocol known as X-Auth. In exchange of valid users credentials (Workbench user name and password) BMS API issues a fixed time window (configurable per deployment) ticket/token which is then required to be provided for **each and every**  BMS API service invocation as part of `X-Auth-Token` request header. Example below illustrates the scenario of a command line client (curl) accessing the API:
 
 **Request a listing of programs without authentication:**
@@ -82,10 +85,30 @@ Response Body:
     }
 ]
 ```
-## Authorization ##
+### Authorization ###
 Based on the details of the user making requests to BMSAPI, the data returned is restricted and filtered in the same way as the data is filtered/restricted when user interacts with the same data via the BMS application user interface. For example, users only see the data for the programs/studies they have created or the programs/studies that they are part of. As shown in example above, the listing returned two programs one which the authenticated user (naymesh) has created and one where the user is a member.
 
-# BMSAPI Build and Install/Deploy #
+
+Using the BMSAPI Swagger UI
+===========================
+
+BMSAPI ships with a user interface that allows easy exploration and interaction with variout API resources/entities and operations we expose. This user interface also acts as live documentation of various resources/methods/parameters etc. This user interface is built with [Swagger](http://swagger.io/) which is a standard in REST API live documentation. It can be accessed at: `http://<server.host>:<server.port>/bmsapi/`. Access to the BMSAPI Swagger user interface requires the user to first authenticate by logging into the BMS deployed on **the same server** and **in the same browser window/tab**. If that is not the case, an alert message will be shown saying **Authentication has expired. Please login to Workbench again, then refresh this page."**. Upon "OK"ing this alert message you will notice that you can still see the API listings and "Try it out!" button etc. under each resource, but upon invoking any API method with "Try it out!" button, authentication error response will be returned which looks like:
+```
+{
+  "timestamp": 1459727366021,
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "Access Denied"
+}
+```
+So, go to the usual BMS login page **of the same server deployment** at `http://<server.host>:<server.port>/ibpworkbench/controller/auth/login/` **in the same browser window/tab** and login as a valid BMS user first. Once successfullu logged into BMS, reload the API home page `http://<server.host>:<server.port>/bmsapi/` in the same browser window (different tab is fine, but must be same browser window). You should then no longer see the alert message regarding authentication. The BMSAPI user interface now (magically) knows that you are authenticated on same server as a valid user. So now when invoking the API methods using the "Try it out!" button, you should expect to see appropriate data response.
+
+As an example, Leafnode development team's nightly deploy of the BMSAPI can be seen at: http://api.leafnode.io:10081/bmsapi/. As explained above, to successfully invoke the operations as an authenticated user, you need to first login as that user at http://api.leafnode.io:10081/ibpworkbench/controller/auth/login, then reload http://api.leafnode.io:10081/bmsapi/ in the same browser window. **Please note** that http://api.leafnode.io:10081/bmsapi/ was shown here purely as an example to demonstrate the use of BMSAPI Swagger user interface. It is not intended to be used for client demos or actual development against it. Because it is a development team's nightly deploy, it will be restarted/redeployed frequently without any notice. You are welcome to play around with it while it is up :)
+
+ 
+For Code Contributing Developers
+================================
+Setup, build from source, install and deploy.
 
 ## Pre Requisites ##
 * Git
@@ -104,7 +127,6 @@ Based on the details of the user making requests to BMSAPI, the data returned is
 * First run `mvn clean install` on Middleware.
 * Then run `mvn clean install` on BMSAPI.
 
-### Run ###
 #### Building and running from source ####
 In standalone mode, application uses the embeded Tomcat from Spring-Boot and automatically deploys to it.
 * At the root of the checkout directory run `mvn clean install -DenvConfig={yourConfigFolderName}`. 
@@ -112,12 +134,12 @@ In standalone mode, application uses the embeded Tomcat from Spring-Boot and aut
 * Note that this is an executable war file and can be run using `java -jar bmsapi.war` command which launches BMS API standlone with embedded tomcat provided by Sprint-Boot.
 * Alternatively, copy bmsapi.war file to the `webapps` directory of your Tomcat installation, in this case the embedded tomcat will automatically be disabled and BMS API will be deployed as a web application within external Tomcat under context path equal to the name of the war file (without the .war extension) as usual.
 
-#### Within Eclipse ####
+#### Running from within Eclipse ####
 * Import the BMSAPI Maven project from the checkout.
 * Run `mvn clean install` via command line on BMSAPI project so that `application.properties` are set and configured in build folder from your BMSConfig folder.
 * Run `org.ibp.Main` as a java application.
 
-#### General Notes ###
+#### General Notes ####
 The default database connection parameters BMS API uses are the same as the default BMS MySQL database parameters (localhost, port 43306 with user name root and no password). If you are running BMS API alongside your BMS installation, make sure that BMS is started first (mainly so that the BMS MySQL database is up). 
 
 If you have not installed BMS with default database settings, create `application.properties` file in same directory as the BMS API executable war file and update db.* property values as per your environment:
@@ -137,9 +159,5 @@ db.workbench.name=workbench
 ```
 then run with the usual `java -jar bmsapi.war` and BMS API will pick up the `application.properties` file from local directory and override the defaults.
 
-### Explore the API ###
-Explore and try out the live API documentation (built with [Swagger](https://helloreverb.com/developers/swagger)) at the home page `http://<server.host>:<server.port>/<server.contextPath>`.
-
-Public deployment of the BMS API is available at: [api.leadnode.io](http://api.leafnode.io:10081/bmsapi/). Access to invoke the API operations via Swagger UI requires the user to first authenticate by logging into the Workbench in same browser window.
 
 
