@@ -92,7 +92,12 @@ Based on the details of the user making requests to BMSAPI, the data returned is
 Using the BMSAPI Swagger UI
 ===========================
 
-BMSAPI ships with a user interface that allows easy exploration and interaction with variout API resources/entities and operations we expose. This user interface also acts as live documentation of various resources/methods/parameters etc. This user interface is built with [Swagger](http://swagger.io/) which is a standard in REST API live documentation. It can be accessed at: `http://<server.host>:<server.port>/bmsapi/`. Access to the BMSAPI Swagger user interface requires the user to first authenticate by logging into the BMS deployed on **the same server** and **in the same browser window/tab**. If that is not the case, an alert message will be shown saying **Authentication has expired. Please login to Workbench again, then refresh this page."**. Upon "OK"ing this alert message you will notice that you can still see the API listings and "Try it out!" button etc. under each resource, but upon invoking any API method with "Try it out!" button, authentication error response will be returned which looks like:
+BMSAPI ships with a user interface that allows easy exploration and interaction with various API resources/entities and operations that are exposed. It can be accessed at following URL in any BMS v4.x deployment: `http://<server.host>:<server.port>/bmsapi/`. This user interface also acts as live documentation of the API resources, methods, and parameters etc. It is built using [Swagger](http://swagger.io/) which is a standard in REST API live documentation.
+
+Like in the case of direct access (e.g. the cURL examples in previous section) access to BMSAPI methods using this Swagger UI requires the user to first authenticate by logging into the BMS deployed on **the same server** and **in the same browser window/tab**. 
+
+If you access the Swagger UI  without login, an alert message will be shown saying **Authentication has expired. Please login to Workbench again, then refresh this page."**. Upon "OK"ing this alert message you will notice that you can still see the API listings and "Try it out!" button etc. under each resource, but upon invoking any API method by clocking the "Try it out!" button, authentication error response will be returned which looks like:
+
 ```
 {
   "timestamp": 1459727366021,
@@ -101,9 +106,16 @@ BMSAPI ships with a user interface that allows easy exploration and interaction 
   "message": "Access Denied"
 }
 ```
-So, go to the usual BMS login page **of the same server deployment** at `http://<server.host>:<server.port>/ibpworkbench/controller/auth/login/` **in the same browser window/tab** and login as a valid BMS user first. Once successfullu logged into BMS, reload the API home page `http://<server.host>:<server.port>/bmsapi/` in the same browser window (different tab is fine, but must be same browser window). You should then no longer see the alert message regarding authentication. The BMSAPI user interface now (magically) knows that you are authenticated on same server as a valid user. So now when invoking the API methods using the "Try it out!" button, you should expect to see appropriate data response.
 
-As an example, Leafnode development team's nightly deploy of the BMSAPI can be seen at: http://api.leafnode.io:10081/bmsapi/. As explained above, to successfully invoke the operations as an authenticated user, you need to first login as that user at http://api.leafnode.io:10081/ibpworkbench/controller/auth/login, then reload http://api.leafnode.io:10081/bmsapi/ in the same browser window. **Please note** that http://api.leafnode.io:10081/bmsapi/ was shown here purely as an example to demonstrate the use of BMSAPI Swagger user interface. It is not intended to be used for client demos or actual development against it. Because it is a development team's nightly deploy, it will be restarted/redeployed frequently without any notice. You are welcome to play around with it while it is up :)
+So, go to the usual BMS login page **of the same server deployment** at `http://<server.host>:<server.port>/ibpworkbench/controller/auth/login/` **in the same browser window/tab** and login as a valid BMS user first. Once successfully logged into BMS, reload the Swagger UI home page `http://<server.host>:<server.port>/bmsapi/` in the same browser window (different tab is fine, but must be same browser window). You should then no longer see the alert message regarding authentication. The Swagger UI now detects that you are authenticated on same server as a valid user. Now invoking the API methods using the "Try it out!" button, you should expect to see appropriate data response.
+
+**EXAMPLE**
+
+Leafnode development team's nightly deploy of the BMSAPI can be seen at: http://api.leafnode.io:10081/bmsapi/. As explained above, you will see  **Authentication has expired. Please login to Workbench again, then refresh this page."** alert message because you are not yet logged in. You can see the API resources and method listings etc. but trying to invoke any of the methods using the "Try it out!" button, you will see HTTP 401, Unauthorized, Access Denied response as shown above.
+
+To successfully invoke the operations as an authenticated user, you need to first login as that user at http://api.leafnode.io:10081/ibpworkbench/controller/auth/login, then reload http://api.leafnode.io:10081/bmsapi/ in the same browser window. You should now be able to see actual data responses based on what the logged in user has access to.
+
+**Please note** that http://api.leafnode.io:10081/bmsapi/ was shown here purely as an example to demonstrate the use of BMSAPI Swagger user interface. It is not intended to be used for client demos or actual development against it. Because it is a development team's nightly deploy, it will be restarted/redeployed frequently without any notice. You are welcome to play around with it while it is up :)
 
  
 For Code Contributing Developers
