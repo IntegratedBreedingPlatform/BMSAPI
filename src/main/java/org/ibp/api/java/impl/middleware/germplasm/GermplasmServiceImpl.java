@@ -58,7 +58,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public List<GermplasmSummary> searchGermplasm(String searchText) {
 		List<GermplasmSummary> results = new ArrayList<GermplasmSummary>();
 		try {
-			List<Germplasm> searchResults = this.germplasmDataManager.searchForGermplasm(searchText, Operation.LIKE, false, false);
+			List<Germplasm> searchResults = this.germplasmDataManager.searchForGermplasm(searchText, Operation.LIKE, false, false, false);
 			for (Germplasm germplasm : searchResults) {
 				results.add(this.populateGermplasmSummary(germplasm));
 			}

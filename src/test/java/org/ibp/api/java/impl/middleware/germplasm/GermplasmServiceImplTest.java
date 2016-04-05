@@ -58,7 +58,7 @@ public class GermplasmServiceImplTest {
 		gp.setLocationId(1);
 
 		List<Germplasm> middlewareSearchResults = Lists.newArrayList(gp);
-		Mockito.when(this.germplasmDataManager.searchForGermplasm("CML", Operation.LIKE, false, false)).thenReturn(middlewareSearchResults);
+		Mockito.when(this.germplasmDataManager.searchForGermplasm("CML", Operation.LIKE, false, false, false)).thenReturn(middlewareSearchResults);
 		String gpPedigree = "CML1/CML2";
 		Mockito.when(this.pedigreeService.getCrossExpansion(Matchers.anyInt(), Matchers.any(CrossExpansionProperties.class))).thenReturn(
 				gpPedigree);
