@@ -154,7 +154,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(study.getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.title", Matchers.is(study.getTitle())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.objective", Matchers.is(study.getObjective())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.type", Matchers.is(study.getType())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.type", Matchers.is(study.getType().getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.startDate", Matchers.is(String.valueOf(study.getStartDate()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.endDate", Matchers.is(String.valueOf(study.getEndDate()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.generalInfo", Matchers.empty()))
