@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
@@ -16,8 +17,11 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.ibp.api.domain.germplasm.DescendantTree;
+import org.ibp.api.domain.germplasm.DescendantTreeTreeNode;
 import org.ibp.api.domain.germplasm.GermplasmName;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.domain.germplasm.PedigreeTree;
@@ -42,7 +46,13 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private PedigreeDataManager pedigreeDataManager;
 
 	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
+
+	@Autowired
 	private LocationDataManager locationDataManger;
+
+	@Autowired
+	private GermplasmGroupingService germplasmGroupingService;
 
 	@Override
 	public List<GermplasmSummary> searchGermplasm(String searchText) {
@@ -67,9 +77,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 		summary.setParent1Id(germplasm.getGpid1() != null && germplasm.getGpid1() != 0 ? germplasm.getGpid1().toString() : "Unknown");
 		summary.setParent2Id(germplasm.getGpid2() != null && germplasm.getGpid2() != 0 ? germplasm.getGpid2().toString() : "Unknown");
 
-		CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties();
-		crossExpansionProperties.setDefaultLevel(1);
-		crossExpansionProperties.setWheatLevel(1);
 		summary.setPedigreeString(this.pedigreeService.getCrossExpansion(germplasm.getGid(), crossExpansionProperties));
 
 		// FIXME - select in a loop ... Middleware service should handle all this in main query.
@@ -124,6 +131,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public PedigreeTree getPedigreeTree(String germplasmId, Integer levels) {
+
 		if (levels == null) {
 			levels = DEFAULT_PEDIGREE_LEVELS;
 		}
@@ -133,6 +141,37 @@ public class GermplasmServiceImpl implements GermplasmService {
 		pedigreeTree.setRoot(this.traversePopulate(mwTree.getRoot()));
 
 		return pedigreeTree;
+	}
+
+	@Override
+	public DescendantTree getDescendantTree(String germplasmId) {
+		Germplasm germplasm = this.germplasmDataManager.getGermplasmByGID(Integer.valueOf(germplasmId));
+		GermplasmPedigreeTree mwTree = this.germplasmGroupingService.getDescendantTree(germplasm);
+
+		DescendantTree descendantTree = new DescendantTree();
+		descendantTree.setRoot(this.traversePopulateDescendatTree(mwTree.getRoot()));
+
+		return descendantTree;
+	}
+
+	private DescendantTreeTreeNode traversePopulateDescendatTree(GermplasmPedigreeTreeNode mwTreeNode) {
+		DescendantTreeTreeNode treeNode = new DescendantTreeTreeNode();
+		treeNode.setGermplasmId(mwTreeNode.getGermplasm().getGid());
+		treeNode.setProgenitors(mwTreeNode.getGermplasm().getGnpgs());
+		treeNode.setMethodId(mwTreeNode.getGermplasm().getMethodId());
+		treeNode.setParent1Id(mwTreeNode.getGermplasm().getGpid1());
+		treeNode.setParent2Id(mwTreeNode.getGermplasm().getGpid2());
+		treeNode.setManagementGroupId(mwTreeNode.getGermplasm().getMgid());
+
+		Name preferredName = mwTreeNode.getGermplasm().findPreferredName();
+		treeNode.setName(preferredName != null ? preferredName.getNval() : null);
+
+		List<DescendantTreeTreeNode> nodeChildren = new ArrayList<>();
+		for (GermplasmPedigreeTreeNode mwChild : mwTreeNode.getLinkedNodes()) {
+			nodeChildren.add(this.traversePopulateDescendatTree(mwChild));
+		}
+		treeNode.setChildren(nodeChildren);
+		return treeNode;
 	}
 
 	private PedigreeTreeNode traversePopulate(GermplasmPedigreeTreeNode mwTreeNode) {
