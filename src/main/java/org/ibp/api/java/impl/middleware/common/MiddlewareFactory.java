@@ -223,7 +223,7 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public PedigreeService getPedigreeService() {
 		return PedigreeFactory.getPedigreeService(this.getCropDatabaseSessionProvider(),
-				this.getCrossExpansionProperties().getProfile(), this.getCurrentlySelectedCropDBName());
+				this.getCrossExpansionProperties().getProfile(), contextResolver.resolveCropName());
 	}
 
 	@Bean
