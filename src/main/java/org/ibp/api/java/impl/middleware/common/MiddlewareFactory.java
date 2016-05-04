@@ -4,6 +4,8 @@ package org.ibp.api.java.impl.middleware.common;
 import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
+import com.atomikos.icatch.jta.UserTransactionImp;
+import com.atomikos.icatch.jta.UserTransactionManager;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.XADatasourceUtilities;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
@@ -58,15 +60,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
-import com.atomikos.icatch.jta.UserTransactionImp;
-import com.atomikos.icatch.jta.UserTransactionManager;
-
 @Configuration
 @EnableTransactionManagement
 public class MiddlewareFactory {
-
-	@Autowired
-	private ApiEnvironmentConfiguration config;
 
 	@Autowired
 	private ContextResolver contextResolver;

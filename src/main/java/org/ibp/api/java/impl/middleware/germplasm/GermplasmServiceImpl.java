@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
