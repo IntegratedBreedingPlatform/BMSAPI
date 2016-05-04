@@ -235,7 +235,6 @@ public class MiddlewareFactory {
 	}
 
 	@Bean
-	@Scope(value = "singleton", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public CrossExpansionProperties getCrossExpansionProperties() {
 		return new CrossExpansionProperties();
 	}

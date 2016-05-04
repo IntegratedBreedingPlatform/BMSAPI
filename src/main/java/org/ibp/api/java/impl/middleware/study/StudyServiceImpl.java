@@ -290,7 +290,7 @@ public class StudyServiceImpl implements StudyService {
 			studyDetails.setName(study.getName());
 			studyDetails.setTitle(study.getTitle());
 			studyDetails.setObjective(study.getObjective());
-			studyDetails.setType(study.getType());
+			studyDetails.setType(study.getType().getName());
 			studyDetails.setStartDate(String.valueOf(study.getStartDate()));
 			studyDetails.setEndDate(String.valueOf(study.getEndDate()));
 

@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
@@ -131,7 +130,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public PedigreeTree getPedigreeTree(String germplasmId, Integer levels) {
-		String crossExpansion = pedigreeService.getCrossExpansion(Integer.valueOf(germplasmId), new Integer(5), new CrossExpansionProperties(new Properties()));
+
 		if (levels == null) {
 			levels = DEFAULT_PEDIGREE_LEVELS;
 		}
