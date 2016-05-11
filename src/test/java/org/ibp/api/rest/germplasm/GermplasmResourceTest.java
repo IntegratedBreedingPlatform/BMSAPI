@@ -108,7 +108,7 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 
 		String searchString = "Test";
 		List<Germplasm> matchingGermplasm = Lists.newArrayList(this.germplasm);
-		Mockito.when(this.germplasmDataManager.searchForGermplasm(searchString, Operation.LIKE, false, false))
+		Mockito.when(this.germplasmDataManager.searchForGermplasm(searchString, Operation.LIKE, false, false, false))
 		.thenReturn(matchingGermplasm);
 
 		this.mockMvc
