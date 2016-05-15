@@ -7,7 +7,7 @@ import javax.transaction.UserTransaction;
 import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
-import org.generationcp.middleware.hibernate.XADatasourceUtilities;
+import org.generationcp.middleware.hibernate.DatasourceUtilities;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmListManagerImpl;
@@ -79,7 +79,7 @@ public class MiddlewareFactory {
 	}
 
 	private SessionFactory getSessionFactory() {
-		return (SessionFactory) this.applicationContext.getBean(XADatasourceUtilities.computeSessionFactoryName(this
+		return (SessionFactory) this.applicationContext.getBean(DatasourceUtilities.computeSessionFactoryName(this
 				.getCurrentlySelectedCropDBName()));
 	}
 
