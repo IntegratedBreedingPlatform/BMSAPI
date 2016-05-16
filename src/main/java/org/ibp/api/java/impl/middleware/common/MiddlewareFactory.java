@@ -68,23 +68,12 @@ public class MiddlewareFactory {
 	}
 
 	@Bean
-	public Cloner cloner(){
-		return new Cloner();
-	}
-
-
-	@Bean
 	public UserTransaction userTransaction() throws Throwable {
 		final UserTransactionImp userTransactionImp = new UserTransactionImp();
 		userTransactionImp.setTransactionTimeout(1000);
 		return userTransactionImp;
 	}
 
-	@Bean
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public BreedingViewImportServiceImpl importService(){
-		return new BreedingViewImportServiceImpl();
-	}
 	@Bean(initMethod = "init", destroyMethod = "close")
 	public TransactionManager transactionManager() throws Throwable {
 		final UserTransactionManager userTransactionManager = new UserTransactionManager();
@@ -106,11 +95,6 @@ public class MiddlewareFactory {
 		return new StudyDataManagerImpl(this.getCropDatabaseSessionProvider());
 	}
 
-	@Bean
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public OntologyDataManager getOntologyDataManager() {
-		return new OntologyDataManagerImpl(this.getCropDatabaseSessionProvider());
-	}
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public FieldbookService getFieldbookService() {
@@ -231,6 +215,25 @@ public class MiddlewareFactory {
 	}
 
 	@Bean
+	public CrossExpansionProperties getCrossExpansionProperties() {
+		return new CrossExpansionProperties();
+	}
+	@Bean
+	public Cloner cloner(){
+		return new Cloner();
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public BreedingViewImportServiceImpl importService(){
+		return new BreedingViewImportServiceImpl();
+	}
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyDataManager getOntologyDataManager() {
+		return new OntologyDataManagerImpl(this.getCropDatabaseSessionProvider());
+	}
+	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public OntologyDaoFactory ontologyDaoFactory() {
 		return new OntologyDaoFactory(this.getCropDatabaseSessionProvider());
@@ -240,11 +243,6 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StandardVariableTransformer standardVariableTransformer() {
 		return new StandardVariableTransformer(this.getCropDatabaseSessionProvider());
-	}
-
-	@Bean
-	public CrossExpansionProperties getCrossExpansionProperties() {
-		return new CrossExpansionProperties();
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {
