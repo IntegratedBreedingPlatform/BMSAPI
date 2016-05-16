@@ -7,10 +7,10 @@ import java.util.Map;
 
 import javax.ws.rs.core.UriInfo;
 
-import org.generationcp.ibpworkbench.constants.WebAPIConstants;
-import org.generationcp.ibpworkbench.exceptions.IBPWebServiceException;
-import org.generationcp.ibpworkbench.model.DataResponse;
-import org.generationcp.ibpworkbench.service.BreedingViewService;
+import org.ibp.api.ibpworkbench.constants.WebAPIConstants;
+import org.ibp.api.ibpworkbench.exceptions.IBPWebServiceException;
+import org.ibp.api.ibpworkbench.model.DataResponse;
+import org.ibp.api.ibpworkbench.service.BreedingViewService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +38,7 @@ public class BreedingViewTest {
 		MockitoAnnotations.initMocks(this);
 		this.breedingView = Mockito.spy(new BreedingView());
 		this.breedingView.setBreedingViewService(this.breedingViewService);
-		Mockito.doNothing().when(this.breedingView);
+
 	}
 
 	@Test
