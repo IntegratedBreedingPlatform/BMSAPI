@@ -9,10 +9,30 @@ import com.atomikos.icatch.jta.UserTransactionManager;
 import com.rits.cloning.Cloner;
 import org.generationcp.commons.service.impl.BreedingViewImportServiceImpl;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
-import org.generationcp.middleware.hibernate.XADatasourceUtilities;
-import org.generationcp.middleware.manager.*;
-import org.generationcp.middleware.manager.api.*;
-import org.generationcp.middleware.manager.ontology.*;
+import org.generationcp.middleware.hibernate.DatasourceUtilities;
+import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
+import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
+import org.generationcp.middleware.manager.GermplasmListManagerImpl;
+import org.generationcp.middleware.manager.InventoryDataManagerImpl;
+import org.generationcp.middleware.manager.LocationDataManagerImpl;
+import org.generationcp.middleware.manager.PedigreeDataManagerImpl;
+import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.UserDataManagerImpl;
+import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
+import org.generationcp.middleware.manager.api.GenotypicDataManager;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.manager.api.InventoryDataManager;
+import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.manager.api.PedigreeDataManager;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.TermDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
@@ -59,7 +79,7 @@ public class MiddlewareFactory {
 	}
 
 	private SessionFactory getSessionFactory() {
-		return (SessionFactory) this.applicationContext.getBean(XADatasourceUtilities.computeSessionFactoryName(this
+		return (SessionFactory) this.applicationContext.getBean(DatasourceUtilities.computeSessionFactoryName(this
 				.getCurrentlySelectedCropDBName()));
 	}
 
