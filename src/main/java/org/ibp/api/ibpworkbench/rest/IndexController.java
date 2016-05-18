@@ -11,10 +11,10 @@ import com.sun.jersey.api.view.Viewable;
 public class IndexController {
 
 	@GET
-	@Path("/index")
+	@Path("/breeding-view-index")
 	@Produces("text/html")
 	public Viewable index() {
-		return new Viewable("/index");
+		return new Viewable("/breeding-view-index");
 	}
 
 }
