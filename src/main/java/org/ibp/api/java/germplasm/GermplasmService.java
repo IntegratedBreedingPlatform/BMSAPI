@@ -9,7 +9,9 @@ import org.ibp.api.domain.germplasm.PedigreeTree;
 
 public interface GermplasmService {
 
-	List<GermplasmSummary> searchGermplasm(String searchText);
+	int searchGermplasmCount(String searchText);
+
+	List<GermplasmSummary> searchGermplasm(String searchText, int pageNumber, int pageSize);
 
 	GermplasmSummary getGermplasm(String germplasmId);
 

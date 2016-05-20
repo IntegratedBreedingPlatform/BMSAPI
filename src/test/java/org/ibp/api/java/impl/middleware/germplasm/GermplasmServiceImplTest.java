@@ -3,9 +3,9 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
-import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -58,7 +58,7 @@ public class GermplasmServiceImplTest {
 		gp.setLocationId(1);
 
 		List<Germplasm> middlewareSearchResults = Lists.newArrayList(gp);
-		Mockito.when(this.germplasmDataManager.searchForGermplasm("CML", Operation.LIKE, false, false, false))
+		Mockito.when(this.germplasmDataManager.searchForGermplasm(Mockito.any(GermplasmSearchParameter.class)))
 				.thenReturn(middlewareSearchResults);
 		String gpPedigree = "CML1/CML2";
 		Mockito.when(this.pedigreeService.getCrossExpansion(Matchers.anyInt(), Matchers.any(CrossExpansionProperties.class))).thenReturn(
@@ -79,7 +79,7 @@ public class GermplasmServiceImplTest {
 		gpLocation.setLname("Mexico");
 		Mockito.when(this.locationDataManger.getLocationByID(Matchers.anyInt())).thenReturn(gpLocation);
 
-		List<GermplasmSummary> germplasmSummaries = this.germplasmServiceImpl.searchGermplasm("CML");
+		List<GermplasmSummary> germplasmSummaries = this.germplasmServiceImpl.searchGermplasm("CML", 1, 20);
 		Assert.assertTrue(!germplasmSummaries.isEmpty());
 
 		Assert.assertEquals(gp.getGid().toString(), germplasmSummaries.get(0).getGermplasmId());
