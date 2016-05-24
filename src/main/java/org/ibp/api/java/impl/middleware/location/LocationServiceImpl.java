@@ -58,7 +58,7 @@ public class LocationServiceImpl implements LocationService {
 		}
 	}
 
-	private List<Location> mapLocations(List<org.generationcp.middleware.pojos.Location> mwLocations) throws MiddlewareQueryException {
+	private List<Location> mapLocations(List<org.generationcp.middleware.pojos.Location> mwLocations) {
 		List<Location> locations = new ArrayList<>();
 
 		if (mwLocations == null) {

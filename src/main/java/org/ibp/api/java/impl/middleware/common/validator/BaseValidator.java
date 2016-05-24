@@ -1,12 +1,8 @@
 
 package org.ibp.api.java.impl.middleware.common.validator;
 
-import java.util.Collection;
-import java.util.Map;
-
+import org.ibp.api.Util;
 import org.springframework.validation.Errors;
-
-import com.google.common.base.Strings;
 
 /**
  * Helper methods to manage message codes.
@@ -64,8 +60,7 @@ public abstract class BaseValidator {
 	 */
 	@SuppressWarnings("rawtypes")
 	protected boolean isNullOrEmpty(Object value) {
-		return value instanceof String && Strings.isNullOrEmpty(((String) value).trim()) || value == null || value instanceof Collection
-				&& ((Collection) value).isEmpty() || value instanceof Map && ((Map) value).isEmpty();
+		return Util.isNullOrEmpty(value);
 	}
 
 	/**

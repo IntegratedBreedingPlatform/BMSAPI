@@ -9,11 +9,11 @@ import org.ibp.api.domain.germplasm.PedigreeTree;
 
 public interface GermplasmService {
 
+	Integer DEFAULT_PEDIGREE_LEVELS = 20;
+
 	List<GermplasmSummary> searchGermplasm(String searchText);
 
 	GermplasmSummary getGermplasm(String germplasmId);
-
-	Integer DEFAULT_PEDIGREE_LEVELS = 20;
 
 	PedigreeTree getPedigreeTree(String germplasmId, Integer levels);
 

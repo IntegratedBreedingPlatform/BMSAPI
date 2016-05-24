@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.CoreMatchers;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.ontology.VariableDetails;
@@ -19,8 +20,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ObservationValidationDataExtractorTest {
 
@@ -68,7 +67,7 @@ public class ObservationValidationDataExtractorTest {
 		this.observationValidationDataExtractor = new ObservationValidationDataExtractor(variableService, studyService);
 	}
 
-	private Measurement getTestMeasurementData() {
+	public static Measurement getTestMeasurementData() {
 		final Measurement measurement = new Measurement();
 		final MeasurementIdentifier measurementIdentifier = new MeasurementIdentifier();
 		measurement.setMeasurementIdentifier(measurementIdentifier);

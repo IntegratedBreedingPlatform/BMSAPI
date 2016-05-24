@@ -16,7 +16,7 @@ public class ContextResolverImpl implements ContextResolver {
 	private static final Logger LOG = LoggerFactory.getLogger(ContextResolverImpl.class);
 
 	@Override
-	public String resolveDatabaseFromUrl() throws ContextResolutionException {
+	public String resolveDatabaseFromUrl() {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
 		if (request == null) {
