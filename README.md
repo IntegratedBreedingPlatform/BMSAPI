@@ -173,3 +173,12 @@ then run with the usual `java -jar bmsapi.war` and BMS API will pick up the `app
 
 
 
+BreedingView Webservices
+=========================
+
+Overview
+----------
+IBPWebService is a RESTful web service that aims to integrate Breeding View application with the Breeding Management System (BMS). It provides services for saving the analysis result to the BMS's database.
+
+For API Documentation, run the IBPWebService and go to the following URL:
+<pre>http:/localhost:8080/bmsapi/rest/index</pre>
