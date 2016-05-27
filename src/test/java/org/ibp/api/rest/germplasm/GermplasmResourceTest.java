@@ -3,6 +3,7 @@ package org.ibp.api.rest.germplasm;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -108,28 +109,39 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 
 		String searchString = "Test";
 		List<Germplasm> matchingGermplasm = Lists.newArrayList(this.germplasm);
-		Mockito.when(this.germplasmDataManager.searchForGermplasm(searchString, Operation.LIKE, false, false))
-		.thenReturn(matchingGermplasm);
+		Mockito.when(this.germplasmDataManager.searchForGermplasm(Mockito.any(GermplasmSearchParameter.class)))
+				.thenReturn(matchingGermplasm);
+
+		Mockito.when(this.germplasmDataManager.countSearchForGermplasm(searchString, Operation.LIKE, false, false, false)).thenReturn(1);
 
 		this.mockMvc
 		.perform(MockMvcRequestBuilders.get("/germplasm/maize/search?q={searchString}", searchString).contentType(this.contentType))
 		.andExpect(MockMvcResultMatchers.status().isOk())
 		.andDo(MockMvcResultHandlers.print())
-		.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(matchingGermplasm.size())))
-		.andExpect(MockMvcResultMatchers.jsonPath("$[0].germplasmId", Matchers.is(this.germplasm.getGid().toString())))
-		.andExpect(MockMvcResultMatchers.jsonPath("$[0].names[0].name", Matchers.is(this.germplasm.getPreferredName().getNval())))
-		.andExpect(MockMvcResultMatchers.jsonPath("$[0].names[0].nameTypeCode", Matchers.is(this.nameType.getFcode())))
-		.andExpect(MockMvcResultMatchers.jsonPath("$[0].names[0].nameTypeDescription", Matchers.is(this.nameType.getFname())))
-		.andExpect(MockMvcResultMatchers.jsonPath("$[0].location", Matchers.is(this.location.getLname())))
-		.andExpect(MockMvcResultMatchers.jsonPath("$[0].parent1Id", Matchers.is(this.germplasm.getGpid1().toString())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults", IsCollectionWithSize.hasSize(matchingGermplasm.size())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber", Matchers.is(1)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageSize", Matchers.is(100)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.totalResults", Matchers.is(1)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.firstPage", Matchers.is(true)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.lastPage", Matchers.is(true)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.hasNextPage", Matchers.is(false)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.hasPreviousPage", Matchers.is(false)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].germplasmId", Matchers.is(this.germplasm.getGid().toString())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].names[0].name",
+						Matchers.is(this.germplasm.getPreferredName().getNval())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].names[0].nameTypeCode", Matchers.is(this.nameType.getFcode())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].names[0].nameTypeDescription",
+						Matchers.is(this.nameType.getFname())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].location", Matchers.is(this.location.getLname())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].parent1Id", Matchers.is(this.germplasm.getGpid1().toString())))
 		.andExpect(
-				MockMvcResultMatchers.jsonPath("$[0].parent1Url",
+						MockMvcResultMatchers.jsonPath("$.pageResults[0].parent1Url",
 						Matchers.containsString("/germplasm/maize/" + this.germplasm.getGpid1().toString())))
-						.andExpect(MockMvcResultMatchers.jsonPath("$[0].parent2Id", Matchers.is(this.germplasm.getGpid2().toString())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].parent2Id", Matchers.is(this.germplasm.getGpid2().toString())))
 						.andExpect(
-								MockMvcResultMatchers.jsonPath("$[0].parent2Url",
+						MockMvcResultMatchers.jsonPath("$.pageResults[0].parent2Url",
 										Matchers.containsString("/germplasm/maize/" + this.germplasm.getGpid2().toString())))
-										.andExpect(MockMvcResultMatchers.jsonPath("$[0].pedigreeString", Matchers.is(this.pedigreeString)));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0].pedigreeString", Matchers.is(this.pedigreeString)));
 
 	}
 
