@@ -3,8 +3,8 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
+import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -55,10 +55,15 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private GermplasmGroupingService germplasmGroupingService;
 
 	@Override
-	public List<GermplasmSummary> searchGermplasm(String searchText) {
+	public List<GermplasmSummary> searchGermplasm(String searchText, int pageNumber, int pageSize) {
 		List<GermplasmSummary> results = new ArrayList<GermplasmSummary>();
 		try {
-			List<Germplasm> searchResults = this.germplasmDataManager.searchForGermplasm(searchText, Operation.LIKE, false, false);
+			GermplasmSearchParameter searchParams = new GermplasmSearchParameter(searchText, Operation.LIKE);
+			int start = pageSize * (pageNumber - 1);
+			int numOfRows = pageSize;
+			searchParams.setStartingRow(start);
+			searchParams.setNumberOfEntries(numOfRows);
+			List<Germplasm> searchResults = this.germplasmDataManager.searchForGermplasm(searchParams);
 			for (Germplasm germplasm : searchResults) {
 				results.add(this.populateGermplasmSummary(germplasm));
 			}
@@ -131,8 +136,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public PedigreeTree getPedigreeTree(String germplasmId, Integer levels) {
-		String crossExpansion = pedigreeService.getCrossExpansion(Integer.valueOf(germplasmId), new Integer(5), new CrossExpansionProperties(new Properties()));
-		System.out.println(crossExpansion);
+
 		if (levels == null) {
 			levels = DEFAULT_PEDIGREE_LEVELS;
 		}
@@ -187,5 +191,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 		treeNode.setParents(nodeParents);
 		return treeNode;
+	}
+
+	@Override
+	public int searchGermplasmCount(String searchText) {
+		return this.germplasmDataManager.countSearchForGermplasm(searchText, Operation.LIKE, false, false, false);
 	}
 }

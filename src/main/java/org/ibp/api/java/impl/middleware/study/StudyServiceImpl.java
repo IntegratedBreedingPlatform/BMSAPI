@@ -2,10 +2,11 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Experiment;
@@ -49,7 +50,6 @@ import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
-import org.ibp.api.java.impl.middleware.ontology.MethodServiceImpl;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
@@ -57,16 +57,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.MapBindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.validation.SmartValidator;
-import org.springframework.validation.Validator;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 @Transactional
@@ -297,7 +290,7 @@ public class StudyServiceImpl implements StudyService {
 			studyDetails.setName(study.getName());
 			studyDetails.setTitle(study.getTitle());
 			studyDetails.setObjective(study.getObjective());
-			studyDetails.setType(study.getType());
+			studyDetails.setType(study.getType().getName());
 			studyDetails.setStartDate(String.valueOf(study.getStartDate()));
 			studyDetails.setEndDate(String.valueOf(study.getEndDate()));
 
