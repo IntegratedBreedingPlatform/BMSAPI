@@ -1,7 +1,11 @@
 
 package org.ibp.api.rest.study;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import com.google.common.collect.Lists;
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
@@ -35,7 +39,18 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
-import org.ibp.api.domain.study.*;
+import org.ibp.api.domain.study.FieldMap;
+import org.ibp.api.domain.study.FieldMapMetaData;
+import org.ibp.api.domain.study.FieldMapPlantingDetails;
+import org.ibp.api.domain.study.FieldMapStudySummary;
+import org.ibp.api.domain.study.Measurement;
+import org.ibp.api.domain.study.MeasurementIdentifier;
+import org.ibp.api.domain.study.MeasurementImportDTO;
+import org.ibp.api.domain.study.Observation;
+import org.ibp.api.domain.study.ObservationImportDTO;
+import org.ibp.api.domain.study.StudyGermplasm;
+import org.ibp.api.domain.study.StudyImportDTO;
+import org.ibp.api.domain.study.Trait;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.ibp.api.java.impl.middleware.study.FieldMapService;

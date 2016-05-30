@@ -8,7 +8,16 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
-import org.ibp.api.domain.study.*;
+import org.ibp.api.domain.study.DesignType;
+import org.ibp.api.domain.study.EnvironmentDetails;
+import org.ibp.api.domain.study.EnvironmentLevelMeasurement;
+import org.ibp.api.domain.study.EnvironmentLevelObservation;
+import org.ibp.api.domain.study.EnvironmentLevelVariable;
+import org.ibp.api.domain.study.MeasurementImportDTO;
+import org.ibp.api.domain.study.ObservationImportDTO;
+import org.ibp.api.domain.study.StudyGermplasm;
+import org.ibp.api.domain.study.StudyImportDTO;
+import org.ibp.api.domain.study.Trait;
 import org.junit.Assert;
 import org.junit.Test;
 
