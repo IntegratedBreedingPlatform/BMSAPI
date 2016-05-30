@@ -21,9 +21,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.validation.ObjectError;
-
-import com.google.common.collect.Lists;
 
 public class ObservationValidatorTest {
 
