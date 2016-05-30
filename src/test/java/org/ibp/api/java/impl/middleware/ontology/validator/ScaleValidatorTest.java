@@ -8,9 +8,11 @@ import java.util.List;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.ontology.DataType;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.TermSummary;
@@ -175,6 +177,188 @@ public class ScaleValidatorTest {
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("validValues.categories[2].description"));
 	}
+
+    @Test
+    public void testWithUniqueLabelNameWithoutDescription() {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+
+        ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
+        scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
+
+        List<TermSummary> categories = new ArrayList<>();
+        TermSummary category = new TermSummary();
+        category.setName("1");
+        category.setDescription("");
+        categories.add(category);
+        category = new TermSummary();
+        category.setName("11");
+        category.setDescription("description");
+        categories.add(category);
+        scaleSummary.setCategories(categories);
+
+        this.scaleValidator.validate(scaleSummary, bindingResult);
+        Assert.assertTrue(bindingResult.hasErrors());
+    }
+
+    @Test
+    public void testWithSameLabelName() {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+
+        ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
+        scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
+
+        List<TermSummary> categories = new ArrayList<>();
+        TermSummary category = new TermSummary();
+        category.setName("11");
+        category.setDescription("Description");
+        categories.add(category);
+        category = new TermSummary();
+        category.setName("11");
+        category.setDescription("description");
+        categories.add(category);
+        scaleSummary.setCategories(categories);
+
+        Scale scale = TestDataProvider.getTestScale();
+
+        Mockito.when(this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(scaleSummary.getId(), null), true)).thenReturn(scale);
+
+        this.scaleValidator.validate(scaleSummary, bindingResult);
+        Assert.assertTrue(bindingResult.hasErrors());
+    }
+
+    @Test
+    public void testScaleWithSystemDataType() {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+
+        ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
+
+        Scale scale = TestDataProvider.getTestScale();
+        scale.setDataType(org.generationcp.middleware.domain.ontology.DataType.LOCATION);
+
+        Mockito.when(this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(scaleSummary.getId(), null), true)).thenReturn(scale);
+
+        this.scaleValidator.validate(scaleSummary, bindingResult);
+        Assert.assertTrue(bindingResult.hasErrors());
+    }
+
+    @Test
+    public void testScaleWithSameName() {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+
+        ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
+        scaleSummary.setDataType(TestDataProvider.NUMERICAL_DATA_TYPE);
+        scaleSummary.setMinValue("Min");
+        scaleSummary.setMaxValue("Max");
+        scaleSummary.setName("Test ScaleDetails");
+
+        Scale scale = TestDataProvider.getTestScale();
+        scale.setName("Test Scale");
+
+        Mockito.when(this.termDataManager.isTermReferred(Integer.parseInt(scaleSummary.getId()))).thenReturn(true);
+        Mockito.when(this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(scaleSummary.getId(), null), true)).thenReturn(scale);
+
+        this.scaleValidator.validate(scaleSummary, bindingResult);
+        Assert.assertTrue(bindingResult.hasErrors());
+    }
+
+    @Test
+    public void testScaleWithCategoricalVariable() {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+
+        ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
+        scaleSummary.setDescription(null);
+        DataType categoricalVariable = new DataType(String.valueOf(org.generationcp.middleware.domain.ontology.DataType.CATEGORICAL_VARIABLE.getId()), org.generationcp.middleware.domain.ontology.DataType.CATEGORICAL_VARIABLE.getName(), false);
+        scaleSummary.setDataType(categoricalVariable);
+
+        List<TermSummary> categories = new ArrayList<>();
+        TermSummary category = new TermSummary();
+        category.setName("name");
+        category.setDescription("description");
+        categories.add(category);
+        category = new TermSummary();
+        category.setName("1");
+        category.setDescription("Term summary");
+        categories.add(category);
+        scaleSummary.setCategories(categories);
+
+        org.generationcp.middleware.domain.oms.TermSummary categoryValue =
+                new org.generationcp.middleware.domain.oms.TermSummary(1 , "name" , "description");
+
+        Scale scale = TestDataProvider.getTestScale();
+        scale.addCategory(categoryValue);
+        scale.setDataType(org.generationcp.middleware.domain.ontology.DataType.NUMERIC_VARIABLE);
+
+        Mockito.when(this.termDataManager.isTermReferred(Integer.parseInt(scaleSummary.getId()))).thenReturn(true);
+        Mockito.when(this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(scaleSummary.getId(), null), true)).thenReturn(scale);
+
+        this.scaleValidator.validate(scaleSummary, bindingResult);
+        Assert.assertTrue(bindingResult.hasErrors());
+    }
+
+    @Test
+    public void testScaleWithOtherDatatypeId() {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+
+        ScaleDetails scaleSummary = new ScaleDetails();
+        scaleSummary.setId("1");
+        scaleSummary.setName("Name");
+        DataType dataType = new DataType("9" , "Des" , true);
+        scaleSummary.setDataType(dataType);
+
+        List<TermSummary> categories = new ArrayList<>();
+        TermSummary category = new TermSummary();
+        category.setName("name");
+        category.setDescription("description");
+        categories.add(category);
+        category = new TermSummary();
+        category.setName("1");
+        category.setDescription("Term summary");
+        categories.add(category);
+        scaleSummary.setCategories(categories);
+
+        org.generationcp.middleware.domain.oms.TermSummary categoryValue =
+                new org.generationcp.middleware.domain.oms.TermSummary(1 , "name" , "description");
+
+        Scale scale = TestDataProvider.getTestScale();
+        scale.addCategory(categoryValue);
+        scale.setDataType(org.generationcp.middleware.domain.ontology.DataType.NUMERIC_VARIABLE);
+
+        Mockito.when(this.termDataManager.isTermReferred(Integer.parseInt(scaleSummary.getId()))).thenReturn(true);
+        Mockito.when(this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(scaleSummary.getId(), null), true)).thenReturn(scale);
+
+        this.scaleValidator.validate(scaleSummary, bindingResult);
+        Assert.assertTrue(bindingResult.hasErrors());
+    }
+
+    @Test
+    public void testWithNonNumericMinMaxValue() {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Scale");
+
+        ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
+        scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
+        scaleSummary.setMinValue("Min");
+        scaleSummary.setMaxValue("Max");
+
+        List<TermSummary> categories = new ArrayList<>();
+        TermSummary category = new TermSummary();
+        category.setName("");
+        category.setDescription("Description");
+        categories.add(category);
+        category = new TermSummary();
+        category.setName("11");
+        category.setDescription("description");
+        categories.add(category);
+        scaleSummary.setCategories(categories);
+
+        Scale scale = TestDataProvider.getTestScale();
+
+        Mockito.when(this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(scaleSummary.getId(), null), true)).thenReturn(scale);
+
+        this.scaleValidator.validate(scaleSummary, bindingResult);
+        Assert.assertTrue(bindingResult.hasErrors());
+    }
+
+
 
 	/**
 	 * Test for to Check Category name exceed limit

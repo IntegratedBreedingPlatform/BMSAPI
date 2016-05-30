@@ -10,22 +10,11 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
-import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.ibp.api.domain.germplasm.DescendantTree;
-import org.ibp.api.domain.germplasm.DescendantTreeTreeNode;
-import org.ibp.api.domain.germplasm.GermplasmName;
-import org.ibp.api.domain.germplasm.GermplasmSummary;
-import org.ibp.api.domain.germplasm.PedigreeTree;
-import org.ibp.api.domain.germplasm.PedigreeTreeNode;
+import org.ibp.api.domain.germplasm.*;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,6 +122,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 	void setLocationDataManger(LocationDataManager locationDataManger) {
 		this.locationDataManger = locationDataManger;
 	}
+
+    void setPedigreeDataManager(PedigreeDataManager pedigreeDataManager) {
+        this.pedigreeDataManager = pedigreeDataManager;
+    }
+
+    void setGermplasmGroupingService(GermplasmGroupingService germplasmGroupingService) {
+        this.germplasmGroupingService = germplasmGroupingService;
+    }
 
 	@Override
 	public PedigreeTree getPedigreeTree(String germplasmId, Integer levels) {

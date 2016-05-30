@@ -1,23 +1,14 @@
 
 package org.ibp.api.java.impl.middleware.ontology;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.*;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.ontology.Method;
-import org.generationcp.middleware.domain.ontology.Property;
-import org.generationcp.middleware.domain.ontology.Scale;
-import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.ibp.api.domain.ontology.*;
 
