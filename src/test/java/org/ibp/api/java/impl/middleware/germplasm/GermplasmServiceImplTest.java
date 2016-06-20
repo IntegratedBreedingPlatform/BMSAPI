@@ -3,14 +3,13 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import java.util.List;
 
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -38,17 +37,21 @@ public class GermplasmServiceImplTest {
 	@Mock
 	private LocationDataManager locationDataManger;
 
+  	@Mock
+	private CrossExpansionProperties crossExpansionProperties;
+
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		this.germplasmServiceImpl = new GermplasmServiceImpl();
 		this.germplasmServiceImpl.setGermplasmDataManager(this.germplasmDataManager);
 		this.germplasmServiceImpl.setPedigreeService(this.pedigreeService);
-		this.germplasmServiceImpl.setLocationDataManger(this.locationDataManger);
+	  	this.germplasmServiceImpl.setCrossExpansionProperties(this.crossExpansionProperties);
 	}
 
 	@Test
 	public void testSearchGermplasm() throws MiddlewareQueryException {
+	  	ContextHolder.setCurrentCrop("wheat");
 
 		Germplasm gp = new Germplasm();
 		gp.setGid(3);
@@ -56,6 +59,8 @@ public class GermplasmServiceImplTest {
 		gp.setGpid2(2);
 		gp.setMethodId(1);
 		gp.setLocationId(1);
+	  	gp.setLocationName("locationName");
+	  	gp.setMethodName("methodName");
 
 		List<Germplasm> middlewareSearchResults = Lists.newArrayList(gp);
 		Mockito.when(this.germplasmDataManager.searchForGermplasm(Mockito.any(GermplasmSearchParameter.class)))
@@ -71,13 +76,14 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.germplasmDataManager.getNamesByGID(Matchers.anyInt(), Matchers.anyInt(), Matchers.any(GermplasmNameType.class)))
 				.thenReturn(gpNames);
 
-		Method gpMethod = new Method();
-		gpMethod.setMname("Backcross");
-		Mockito.when(this.germplasmDataManager.getMethodByID(Matchers.anyInt())).thenReturn(gpMethod);
+	  	Mockito.when(this.crossExpansionProperties.getProfile()).thenReturn("default");
 
-		Location gpLocation = new Location();
-		gpLocation.setLname("Mexico");
-		Mockito.when(this.locationDataManger.getLocationByID(Matchers.anyInt())).thenReturn(gpLocation);
+	  	Mockito.when(this.crossExpansionProperties.getCropGenerationLevel(Mockito.isA(String.class))).thenReturn(0);
+
+	  	Mockito.doNothing().when(this.germplasmDataManager).addPedigreeString(Mockito.isA(Germplasm.class), Mockito.isA(String.class),
+				Mockito.isA(String.class), Mockito.anyInt());
+
+
 
 		List<GermplasmSummary> germplasmSummaries = this.germplasmServiceImpl.searchGermplasm("CML", 1, 20);
 		Assert.assertTrue(!germplasmSummaries.isEmpty());
@@ -86,8 +92,8 @@ public class GermplasmServiceImplTest {
 		Assert.assertEquals(gp.getGpid1().toString(), germplasmSummaries.get(0).getParent1Id());
 		Assert.assertEquals(gp.getGpid2().toString(), germplasmSummaries.get(0).getParent2Id());
 		Assert.assertEquals(gpPedigree, germplasmSummaries.get(0).getPedigreeString());
-		Assert.assertEquals(gpMethod.getMname(), germplasmSummaries.get(0).getBreedingMethod());
-		Assert.assertEquals(gpLocation.getLname(), germplasmSummaries.get(0).getLocation());
+		Assert.assertEquals(gp.getMethodName(), germplasmSummaries.get(0).getBreedingMethod());
+		Assert.assertEquals(gp.getLocationName(), germplasmSummaries.get(0).getLocation());
 		Assert.assertEquals(gpName.getNval(), germplasmSummaries.get(0).getNames().get(0).getName());
 	}
 

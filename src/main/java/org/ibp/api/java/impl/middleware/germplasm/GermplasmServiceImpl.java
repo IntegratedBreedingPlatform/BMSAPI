@@ -4,17 +4,15 @@ package org.ibp.api.java.impl.middleware.germplasm;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
@@ -49,9 +47,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private CrossExpansionProperties crossExpansionProperties;
 
 	@Autowired
-	private LocationDataManager locationDataManger;
-
-	@Autowired
 	private GermplasmGroupingService germplasmGroupingService;
 
 	@Override
@@ -82,7 +77,18 @@ public class GermplasmServiceImpl implements GermplasmService {
 		summary.setParent1Id(germplasm.getGpid1() != null && germplasm.getGpid1() != 0 ? germplasm.getGpid1().toString() : "Unknown");
 		summary.setParent2Id(germplasm.getGpid2() != null && germplasm.getGpid2() != 0 ? germplasm.getGpid2().toString() : "Unknown");
 
-		summary.setPedigreeString(this.pedigreeService.getCrossExpansion(germplasm.getGid(), crossExpansionProperties));
+	  	final String crossExpansion;
+
+	  	if(germplasm.getPedigree() != null){
+			crossExpansion = germplasm.getPedigree().getPedigreeString();
+	  	}
+	  	else{
+			crossExpansion = this.pedigreeService.getCrossExpansion(germplasm.getGid(), this.crossExpansionProperties);
+			germplasmDataManager.addPedigreeString(germplasm, crossExpansion, this.crossExpansionProperties.getProfile(),
+				this.crossExpansionProperties.getCropGenerationLevel(ContextHolder.getCurrentCrop()));
+
+	  	}
+		summary.setPedigreeString(crossExpansion);
 
 		// FIXME - select in a loop ... Middleware service should handle all this in main query.
 		List<Name> namesByGID = this.germplasmDataManager.getNamesByGID(new Integer(germplasm.getGid()), null, null);
@@ -99,15 +105,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 		summary.addNames(names);
 
-		Method germplasmMethod = this.germplasmDataManager.getMethodByID(germplasm.getMethodId());
-		if (germplasmMethod != null && germplasmMethod.getMname() != null) {
-			summary.setBreedingMethod(germplasmMethod.getMname());
-		}
+	  	summary.setBreedingMethod(germplasm.getMethodName());
+	  	summary.setLocation(germplasm.getLocationName());
 
-		Location germplasmLocation = this.locationDataManger.getLocationByID(germplasm.getLocationId());
-		if (germplasmLocation != null && germplasmLocation.getLname() != null) {
-			summary.setLocation(germplasmLocation.getLname());
-		}
 		return summary;
 	}
 
@@ -130,8 +130,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		this.pedigreeService = pedigreeService;
 	}
 
-	void setLocationDataManger(LocationDataManager locationDataManger) {
-		this.locationDataManger = locationDataManger;
+  	void setCrossExpansionProperties(CrossExpansionProperties crossExpansionProperties){
+	  	this.crossExpansionProperties = crossExpansionProperties;
 	}
 
 	@Override
