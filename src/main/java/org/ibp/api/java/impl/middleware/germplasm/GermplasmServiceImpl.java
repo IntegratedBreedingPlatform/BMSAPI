@@ -10,6 +10,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
+import org.generationcp.middleware.pedigree.Pedigree;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
@@ -77,16 +78,24 @@ public class GermplasmServiceImpl implements GermplasmService {
 		summary.setParent1Id(germplasm.getGpid1() != null && germplasm.getGpid1() != 0 ? germplasm.getGpid1().toString() : "Unknown");
 		summary.setParent2Id(germplasm.getGpid2() != null && germplasm.getGpid2() != 0 ? germplasm.getGpid2().toString() : "Unknown");
 
+	  	final String currentProfile = crossExpansionProperties.getProfile();
+	  	final int currentCropGenerationLevel = crossExpansionProperties.getCropGenerationLevel(ContextHolder.getCurrentCrop());
+
 	  	final String crossExpansion;
 
-	  	if(germplasm.getPedigree() != null){
-			crossExpansion = germplasm.getPedigree().getPedigreeString();
+	  	final Pedigree pedigree = germplasm.getPedigree();
+
+	  	if(pedigree != null){
+			if(!currentProfile.equals(pedigree.getAlgorithmUsed()) || pedigree.getLevels() != currentCropGenerationLevel || pedigree.getInvalidate() == 1){
+		  		crossExpansion = this.pedigreeService.getCrossExpansion(germplasm.getGid(), this.crossExpansionProperties);
+		  		germplasmDataManager.updatePedigreeString(pedigree, crossExpansion, currentProfile, currentCropGenerationLevel);
+			} else {
+		  		crossExpansion = germplasm.getPedigree().getPedigreeString();
+			}
 	  	}
 	  	else{
 			crossExpansion = this.pedigreeService.getCrossExpansion(germplasm.getGid(), this.crossExpansionProperties);
-			germplasmDataManager.addPedigreeString(germplasm, crossExpansion, this.crossExpansionProperties.getProfile(),
-				this.crossExpansionProperties.getCropGenerationLevel(ContextHolder.getCurrentCrop()));
-
+			germplasmDataManager.addPedigreeString(germplasm, crossExpansion, currentProfile, currentCropGenerationLevel);
 	  	}
 		summary.setPedigreeString(crossExpansion);
 
