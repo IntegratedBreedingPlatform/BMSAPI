@@ -2,6 +2,7 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.generationcp.middleware.ContextHolder;
@@ -60,16 +61,23 @@ public class GermplasmServiceImpl implements GermplasmService {
 			searchParams.setStartingRow(start);
 			searchParams.setNumberOfEntries(numOfRows);
 			List<Germplasm> searchResults = this.germplasmDataManager.searchForGermplasm(searchParams);
-			for (Germplasm germplasm : searchResults) {
-				results.add(this.populateGermplasmSummary(germplasm));
+		  	final String currentProfile = crossExpansionProperties.getProfile();
+		  	final int cropGenerationLevel = crossExpansionProperties.getCropGenerationLevel(ContextHolder.getCurrentCrop());
+		  	HashMap<Germplasm, String> germplasmPedigreeStringMap = new HashMap<>();
+
+		  	for (Germplasm germplasm : searchResults) {
+				results.add(this.populateGermplasmSummary(germplasm, currentProfile, cropGenerationLevel,  germplasmPedigreeStringMap));
 			}
+
+		  	this.germplasmDataManager.addPedigreeString(germplasmPedigreeStringMap, currentProfile, cropGenerationLevel);
+
 		} catch (MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
 		return results;
 	}
 
-	private GermplasmSummary populateGermplasmSummary(Germplasm germplasm) throws MiddlewareQueryException {
+	private GermplasmSummary populateGermplasmSummary(Germplasm germplasm, String currentProfile, int cropGenerationLevel, HashMap<Germplasm, String> germplasmPedigreeStringMap) throws MiddlewareQueryException {
 		if (germplasm == null) {
 			return null;
 		}
@@ -78,24 +86,21 @@ public class GermplasmServiceImpl implements GermplasmService {
 		summary.setParent1Id(germplasm.getGpid1() != null && germplasm.getGpid1() != 0 ? germplasm.getGpid1().toString() : "Unknown");
 		summary.setParent2Id(germplasm.getGpid2() != null && germplasm.getGpid2() != 0 ? germplasm.getGpid2().toString() : "Unknown");
 
-	  	final String currentProfile = crossExpansionProperties.getProfile();
-	  	final int currentCropGenerationLevel = crossExpansionProperties.getCropGenerationLevel(ContextHolder.getCurrentCrop());
-
 	  	final String crossExpansion;
 
 	  	final Pedigree pedigree = germplasm.getPedigree();
 
 	  	if(pedigree != null){
-			if(!currentProfile.equals(pedigree.getAlgorithmUsed()) || pedigree.getLevels() != currentCropGenerationLevel || pedigree.getInvalidate() == 1){
+			if(!currentProfile.equals(pedigree.getAlgorithmUsed()) || pedigree.getLevels() != cropGenerationLevel || pedigree.getInvalidate() == 1){
 		  		crossExpansion = this.pedigreeService.getCrossExpansion(germplasm.getGid(), this.crossExpansionProperties);
-		  		germplasmDataManager.updatePedigreeString(pedigree, crossExpansion, currentProfile, currentCropGenerationLevel);
+		  		germplasmDataManager.updatePedigreeString(pedigree, crossExpansion, currentProfile, cropGenerationLevel);
 			} else {
 		  		crossExpansion = germplasm.getPedigree().getPedigreeString();
 			}
 	  	}
 	  	else{
 			crossExpansion = this.pedigreeService.getCrossExpansion(germplasm.getGid(), this.crossExpansionProperties);
-			germplasmDataManager.addPedigreeString(germplasm, crossExpansion, currentProfile, currentCropGenerationLevel);
+		  	germplasmPedigreeStringMap.put(germplasm, crossExpansion);
 	  	}
 		summary.setPedigreeString(crossExpansion);
 
@@ -124,8 +129,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public GermplasmSummary getGermplasm(String germplasmId) {
 		Germplasm germplasm;
 		try {
+		  	final String currentProfile = crossExpansionProperties.getProfile();
+		  	final int cropGenerationLevel = crossExpansionProperties.getCropGenerationLevel(ContextHolder.getCurrentCrop());
+		  	HashMap<Germplasm, String> germplasmPedigreeStringMap = new HashMap<>();
 			germplasm = this.germplasmDataManager.getGermplasmByGID(Integer.valueOf(germplasmId));
-			return this.populateGermplasmSummary(germplasm);
+		  	GermplasmSummary germplasmSummary =
+				  this.populateGermplasmSummary(germplasm, currentProfile, cropGenerationLevel, germplasmPedigreeStringMap);
+		  	this.germplasmDataManager.addPedigreeString(germplasmPedigreeStringMap, currentProfile, cropGenerationLevel);
+		  	return  germplasmSummary;
 		} catch (NumberFormatException | MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}

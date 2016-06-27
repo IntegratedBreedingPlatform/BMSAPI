@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.generationcp.middleware.ContextHolder;
@@ -80,8 +81,7 @@ public class GermplasmServiceImplTest {
 
 	  	Mockito.when(this.crossExpansionProperties.getCropGenerationLevel(Mockito.isA(String.class))).thenReturn(0);
 
-	  	Mockito.doNothing().when(this.germplasmDataManager).addPedigreeString(Mockito.isA(Germplasm.class), Mockito.isA(String.class),
-				Mockito.isA(String.class), Mockito.anyInt());
+	  	Mockito.doNothing().when(this.germplasmDataManager).addPedigreeString(Mockito.isA(HashMap.class), Mockito.isA(String.class), Mockito.anyInt());
 
 
 
