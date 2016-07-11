@@ -85,7 +85,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		try {
-			Scale scale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(id, null), true);
+			Scale scale = this.ontologyScaleDataManager.getScale(StringUtil.parseInt(id, null), true);
 			if (scale == null) {
 				return null;
 			}

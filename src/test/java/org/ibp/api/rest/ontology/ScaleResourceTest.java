@@ -111,7 +111,7 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 		Scale scale = TestDataProvider.getTestScale();
 		Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScale(scale.getId(), true);
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scale.getId());
 		Mockito.doReturn(true).when(this.modelService).isNumericDataType(String.valueOf(scale.getDataType().getId()));
 
@@ -127,7 +127,7 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 		.andExpect(MockMvcResultMatchers.jsonPath("$.validValues.max", Matchers.is(StringUtil.parseDouble(scale.getMaxValue(), null))))
 		.andDo(MockMvcResultHandlers.print());
 
-		Mockito.verify(this.ontologyScaleDataManager, Mockito.times(1)).getScaleById(scale.getId(), true);
+		Mockito.verify(this.ontologyScaleDataManager, Mockito.times(1)).getScale(scale.getId(), true);
 	}
 
 	/**
@@ -183,7 +183,7 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 
 		ArgumentCaptor<Scale> captor = ArgumentCaptor.forClass(Scale.class);
 
-		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScale(scale.getId(), true);
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scale.getId());
 		Mockito.doNothing().when(this.ontologyScaleDataManager).updateScale(org.mockito.Matchers.any(Scale.class));
 
@@ -217,7 +217,7 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 		Scale scale = TestDataProvider.getTestScale();
 
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scale.getId());
-		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScale(scale.getId(), true);
 		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(scale.getId());
 		Mockito.doNothing().when(this.ontologyScaleDataManager).deleteScale(scale.getId());
 

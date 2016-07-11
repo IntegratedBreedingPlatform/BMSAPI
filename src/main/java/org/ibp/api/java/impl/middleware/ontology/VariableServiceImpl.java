@@ -356,7 +356,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		// Should discard unwanted parameters. We do not want expected min/max values if associated data type is not numeric
 		if (scaleId != null) {
 			try {
-				Scale scale = this.ontologyScaleDataManager.getScaleById(scaleId, true);
+				Scale scale = this.ontologyScaleDataManager.getScale(scaleId, true);
 
 				if (scale != null && !Objects.equals(scale.getDataType().getId(), DataType.NUMERIC_VARIABLE.getId())) {
 					variableDetails.setExpectedMin(null);

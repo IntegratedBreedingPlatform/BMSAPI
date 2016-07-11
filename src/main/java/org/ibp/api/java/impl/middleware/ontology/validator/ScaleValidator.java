@@ -150,7 +150,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		Integer initialCount = errors.getErrorCount();
 
 		try {
-			Scale oldScale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(scaleDetails.getId(), null), true);
+			Scale oldScale = this.ontologyScaleDataManager.getScale(StringUtil.parseInt(scaleDetails.getId(), null), true);
 
 			// that method should exist with requestId
 			if (Objects.equals(oldScale, null)) {
