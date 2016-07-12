@@ -1,7 +1,6 @@
 
 package org.ibp.api.java.impl.middleware.study.conversion;
 
-import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
@@ -20,6 +19,8 @@ import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.Trait;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.google.common.collect.Lists;
 
 public class WorkbookConverterTest {
 
@@ -227,22 +228,12 @@ public class WorkbookConverterTest {
 
         final StudyGermplasm g1 = new StudyGermplasm();
         g1.setEntryNumber(1);
-        final GermplasmListEntrySummary g1Summary = new GermplasmListEntrySummary();
-        g1Summary.setGid(1);
-        g1Summary.setEntryCode("Entry Code 1");
-        g1Summary.setSeedSource("Seed Source 1");
-        g1Summary.setDesignation("Designation 1");
-        g1Summary.setCross("Cross 1");
+        final GermplasmListEntrySummary g1Summary = this.createGermplasmListEntrySummary(1);
         g1.setGermplasmListEntrySummary(g1Summary);
 
         final StudyGermplasm g2 = new StudyGermplasm();
         g2.setEntryNumber(2);
-        final GermplasmListEntrySummary g2Summary = new GermplasmListEntrySummary();
-        g2Summary.setGid(2);
-        g2Summary.setEntryCode("Entry Code 2");
-        g2Summary.setSeedSource("Seed Source 2");
-        g2Summary.setDesignation("Designation 2");
-        g2Summary.setCross("Cross 2");
+        final GermplasmListEntrySummary g2Summary = this.createGermplasmListEntrySummary(2);
         g2.setGermplasmListEntrySummary(g2Summary);
 
         inputDTO.setGermplasm(Lists.newArrayList(g1, g2));
@@ -366,5 +357,16 @@ public class WorkbookConverterTest {
 
 		// Observations
 		Assert.assertEquals(inputDTO.getGermplasm().size(), outputWorkbook.getObservations().size());
+	}
+
+	private GermplasmListEntrySummary createGermplasmListEntrySummary(Integer value) {
+		final GermplasmListEntrySummary germplasmListEntrySummary = new GermplasmListEntrySummary();
+		germplasmListEntrySummary.setGid(value);
+		germplasmListEntrySummary.setEntryCode("Entry Code " + value);
+		germplasmListEntrySummary.setSeedSource("Seed Source " + value);
+		germplasmListEntrySummary.setDesignation("Designation "+ value);
+		germplasmListEntrySummary.setCross("Cross " + value);
+
+		return germplasmListEntrySummary;
 	}
 }
