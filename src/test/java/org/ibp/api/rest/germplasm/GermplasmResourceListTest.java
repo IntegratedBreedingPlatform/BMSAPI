@@ -2,7 +2,6 @@ package org.ibp.api.rest.germplasm;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
@@ -15,6 +14,7 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.Name;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.data.initializer.GermplasmTestDataProvider;
 import org.ibp.api.domain.germplasm.GermplasmListSummary;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import com.google.common.collect.Lists;
 
 public class GermplasmResourceListTest extends ApiUnitTestBase{
 
@@ -53,12 +55,7 @@ public class GermplasmResourceListTest extends ApiUnitTestBase{
 
     @Test
     public void testSearchGermplasmList() throws Exception{
-        Germplasm gp = new Germplasm();
-        gp.setGid(3);
-        gp.setGpid1(1);
-        gp.setGpid2(2);
-        gp.setMethodId(1);
-        gp.setLocationId(1);
+        Germplasm gp = GermplasmTestDataProvider.createGermplasm();
 
         List<Germplasm> middlewareSearchResults = Lists.newArrayList(gp);
 

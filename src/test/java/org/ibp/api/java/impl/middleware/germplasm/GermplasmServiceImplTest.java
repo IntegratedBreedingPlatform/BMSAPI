@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -20,6 +19,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.ibp.api.data.initializer.GermplasmTestDataProvider;
 import org.ibp.api.domain.germplasm.DescendantTree;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.domain.germplasm.PedigreeTree;
@@ -32,6 +32,8 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
+import com.google.common.collect.Lists;
 
 public class GermplasmServiceImplTest {
 
@@ -66,12 +68,7 @@ public class GermplasmServiceImplTest {
 	@Test
 	public void testSearchGermplasm() throws MiddlewareQueryException {
 
-		Germplasm gp = new Germplasm();
-		gp.setGid(3);
-		gp.setGpid1(1);
-		gp.setGpid2(2);
-		gp.setMethodId(1);
-		gp.setLocationId(1);
+		Germplasm gp = GermplasmTestDataProvider.createGermplasm();
 
 		List<Germplasm> middlewareSearchResults = Lists.newArrayList(gp);
 		Mockito.when(this.germplasmDataManager.searchForGermplasm(Mockito.any(GermplasmSearchParameter.class)))
@@ -129,12 +126,7 @@ public class GermplasmServiceImplTest {
     @Test
     public void testGetGermplasm() throws Exception{
 
-        Germplasm germplasm = new Germplasm();
-        germplasm.setGid(3);
-        germplasm.setGpid1(1);
-        germplasm.setGpid2(2);
-        germplasm.setMethodId(1);
-        germplasm.setLocationId(1);
+        Germplasm germplasm = GermplasmTestDataProvider.createGermplasm();
 
         Mockito.when(this.germplasmDataManager.getGermplasmByGID(germplasm.getGid())).thenReturn(germplasm);
 
@@ -172,12 +164,7 @@ public class GermplasmServiceImplTest {
     @Test
     public void testGeneratePedigreeTree() throws Exception{
 
-        Germplasm germplasm = new Germplasm();
-        germplasm.setGid(3);
-        germplasm.setGpid1(1);
-        germplasm.setGpid2(2);
-        germplasm.setMethodId(1);
-        germplasm.setLocationId(1);
+        Germplasm germplasm = GermplasmTestDataProvider.createGermplasm();
 
         GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
         String mainNodeName = "Test Germplasm", firstChildName = "Test Gerplasm first child", secondChildName = "Test Gerplasm second child";
@@ -231,12 +218,7 @@ public class GermplasmServiceImplTest {
     @Test
     public void testGetDescendantTree() throws Exception{
 
-        Germplasm germplasm = new Germplasm();
-        germplasm.setGid(3);
-        germplasm.setGpid1(1);
-        germplasm.setGpid2(2);
-        germplasm.setMethodId(1);
-        germplasm.setLocationId(1);
+        Germplasm germplasm = GermplasmTestDataProvider.createGermplasm();
 
         GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
         String mainNodeName = "Test Germplasm", parent1Name = "Test Gerplasm Male Parent", parent2Name = "Test Gerplasm Female Parent";
