@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.google.common.collect.Lists;
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -66,6 +64,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import com.google.common.collect.Lists;
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 
 public class StudyResourceTest extends ApiUnitTestBase {
 
@@ -604,7 +605,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
         }
 
         Mockito.when(this.mapService.getFieldMap("9")).thenReturn(fieldMapValue);
-        Mockito.when(this.studyDataManager.getFieldMapInfoOfStudy(studyList, StudyType.T , crossExpansionProperties)).thenReturn(fieldMapInfos);
+        Mockito.when(this.studyDataManager.getFieldMapInfoOfStudy(studyList, StudyType.T , crossExpansionProperties, true)).thenReturn(fieldMapInfos);
         Mockito.when(this.studyDataManager.getStudyType(1)).thenReturn(StudyType.T);
 
          this.mockMvc.perform(MockMvcRequestBuilders.get("/study/{cropname}/fieldmaps/{studyId}" , this.cropName , 1).contentType(this.contentType))

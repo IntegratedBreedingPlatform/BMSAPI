@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -75,6 +73,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
@@ -867,7 +868,7 @@ public class StudyServiceImplTest {
 
         Mockito.when(this.mapService.getFieldMap("9"))
                 .thenReturn(fieldMapValue);
-        Mockito.doReturn(Lists.newArrayList(fieldMapInfo)).when(this.studyDataManager).getFieldMapInfoOfStudy(studyList, StudyType.T , null);
+        Mockito.doReturn(Lists.newArrayList(fieldMapInfo)).when(this.studyDataManager).getFieldMapInfoOfStudy(studyList, StudyType.T , null, true);
         Mockito.when(this.studyDataManager.getStudyType(9))
                 .thenReturn(StudyType.T);
 
