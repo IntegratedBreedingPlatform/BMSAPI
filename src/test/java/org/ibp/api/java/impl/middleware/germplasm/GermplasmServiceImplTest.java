@@ -111,14 +111,6 @@ public class GermplasmServiceImplTest {
 
     @Test(expected = ApiRuntimeException.class)
     public void testSearchGermplasmException() throws MiddlewareQueryException {
-
-        Germplasm gp = new Germplasm();
-        gp.setGid(3);
-        gp.setGpid1(1);
-        gp.setGpid2(2);
-        gp.setMethodId(1);
-        gp.setLocationId(1);
-
         Mockito.when(this.germplasmDataManager.searchForGermplasm(Mockito.any(GermplasmSearchParameter.class))).thenThrow(new MiddlewareQueryException("MiddleQuery Exception"));
         this.germplasmServiceImpl.searchGermplasm("CML", 1, 20);
     }
