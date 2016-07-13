@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Cool Tools</title>
+</head>
+
+<body>
+	<h3>Germplasm Ancestor Tree</h3>
+	<ul>
+		<li><a th:href="@{/cooltools/ancestorTreeSimple}">Simple</a></li>
+		<li><a th:href="@{/cooltools/ancestorTree/CROP/GID}">Advanced (With Pan &amp; Zoom)</a></li>
+	</ul>
+	
+	<h3>Germplasm Descendants Tree</h3>
+	<ul>
+		<li><a th:href="@{/cooltools/descendantTreeSimple}">Simple</a></li>
+		<li><a th:href="@{/cooltools/descendantTree/CROP/GID}">Advanced (With Pan &amp; Zoom)</a></li>
+	</ul>
+</body>
+</html>
