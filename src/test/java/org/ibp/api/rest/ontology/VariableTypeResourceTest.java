@@ -1,10 +1,12 @@
 
 package org.ibp.api.rest.ontology;
 
+import java.util.List;
+
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.data.initializer.TestDataProvider;
 import org.ibp.api.domain.ontology.VariableType;
-import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.ibp.api.java.ontology.ModelService;
 import org.junit.After;
 import org.junit.Before;
@@ -16,8 +18,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
-
-import java.util.List;
 
 public class VariableTypeResourceTest extends ApiUnitTestBase {
 

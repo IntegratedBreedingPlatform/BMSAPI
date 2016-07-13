@@ -10,8 +10,8 @@ import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataMana
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.data.initializer.TestDataProvider;
 import org.ibp.api.domain.ontology.PropertyDetails;
-import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;

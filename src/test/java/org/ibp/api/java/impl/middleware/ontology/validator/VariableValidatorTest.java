@@ -19,12 +19,12 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.util.StringUtil;
+import org.ibp.api.data.initializer.TestDataProvider;
 import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableType;
-import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;

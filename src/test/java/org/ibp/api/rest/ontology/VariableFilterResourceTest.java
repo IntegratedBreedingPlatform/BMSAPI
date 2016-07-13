@@ -12,7 +12,7 @@ import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
+import org.ibp.api.data.initializer.TestDataProvider;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;

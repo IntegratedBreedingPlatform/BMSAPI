@@ -1,11 +1,14 @@
 
 package org.ibp.api.rest.ontology;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
+import org.ibp.api.data.initializer.TestDataProvider;
 import org.ibp.api.java.ontology.ModelService;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,9 +19,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ClassResourceTest extends ApiUnitTestBase {
 

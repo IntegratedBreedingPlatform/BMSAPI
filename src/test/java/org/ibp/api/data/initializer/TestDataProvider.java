@@ -1,5 +1,5 @@
 
-package org.ibp.api.java.impl.middleware.ontology;
+package org.ibp.api.data.initializer;
 
 import java.util.ArrayList;
 import java.util.Arrays;

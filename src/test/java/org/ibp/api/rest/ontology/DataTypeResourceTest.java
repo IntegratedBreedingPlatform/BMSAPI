@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.data.initializer.TestDataProvider;
 import org.ibp.api.domain.ontology.DataType;
-import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.ibp.api.java.ontology.ModelService;
 import org.junit.After;
 import org.junit.Before;

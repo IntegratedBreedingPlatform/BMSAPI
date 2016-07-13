@@ -3,16 +3,17 @@ package org.ibp.api.java.impl.middleware.ontology;
 
 import java.text.ParseException;
 
-import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermRelationship;
-import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.StringUtil;
+import org.ibp.api.data.initializer.TestDataProvider;
 import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.domain.ontology.ScaleDetails;
