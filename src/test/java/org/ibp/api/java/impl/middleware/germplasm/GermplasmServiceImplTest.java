@@ -161,7 +161,7 @@ public class GermplasmServiceImplTest {
         GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
         String mainNodeName = "Test Germplasm", firstChildName = "Test Gerplasm first child", secondChildName = "Test Gerplasm second child";
         Integer mainNodeGid = 3, firstGid = 2, secondGid = 1;
-        GermplasmPedigreeTreeNode rootNode = this.createNode(mainNodeGid, mainNodeName, firstGid, firstChildName, secondGid, secondChildName);
+        GermplasmPedigreeTreeNode rootNode = GermplasmTestDataProvider.createNode(mainNodeGid, mainNodeName, firstGid, firstChildName, secondGid, secondChildName);
         tree.setRoot(rootNode);
 
         Mockito.when(this.pedigreeDataManager.generatePedigreeTree(germplasm.getGid(), GermplasmService.DEFAULT_PEDIGREE_LEVELS)).thenReturn(tree);
@@ -176,37 +176,6 @@ public class GermplasmServiceImplTest {
         Assert.assertEquals(pedigreeTree.getRoot().getParents().get(1).getName(), secondChildName);
     }
 
-    private GermplasmPedigreeTreeNode createNode(Integer gid, String name, Integer parent1Gid, String parent1Name, Integer parent2Gid,
-                                                 String parent2Name) {
-        GermplasmPedigreeTreeNode mainNode = new GermplasmPedigreeTreeNode();
-        Germplasm germplasm = new Germplasm();
-        germplasm.setGid(gid);
-        Name preferredName = new Name();
-        preferredName.setNval(name);
-        germplasm.setPreferredName(preferredName);
-        mainNode.setGermplasm(germplasm);
-
-        GermplasmPedigreeTreeNode parent1Node = new GermplasmPedigreeTreeNode();
-        Germplasm germplasmParent1 = new Germplasm();
-        germplasmParent1.setGid(parent1Gid);
-        Name germplasmParent1Name = new Name();
-        germplasmParent1Name.setNval(parent1Name);
-        germplasmParent1.setPreferredName(germplasmParent1Name);
-        parent1Node.setGermplasm(germplasmParent1);
-
-        GermplasmPedigreeTreeNode parent2Node = new GermplasmPedigreeTreeNode();
-        Germplasm germplasmParent2 = new Germplasm();
-        germplasmParent2.setGid(parent2Gid);
-        Name germplasmParent2Name = new Name();
-        germplasmParent2Name.setNval(parent2Name);
-        germplasmParent2.setPreferredName(germplasmParent2Name);
-        parent2Node.setGermplasm(germplasmParent2);
-
-        mainNode.setLinkedNodes(Lists.newArrayList(parent1Node, parent2Node));
-
-        return mainNode;
-    }
-
     @Test
     public void testGetDescendantTree() throws Exception{
 
@@ -215,7 +184,7 @@ public class GermplasmServiceImplTest {
         GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
         String mainNodeName = "Test Germplasm", parent1Name = "Test Gerplasm Male Parent", parent2Name = "Test Gerplasm Female Parent";
         Integer mainNodeGid = 3, parent1Gid = 2, parent2Gid = 1;
-        GermplasmPedigreeTreeNode rootNode = this.createNode(mainNodeGid, mainNodeName, parent1Gid, parent1Name, parent2Gid, parent2Name);
+        GermplasmPedigreeTreeNode rootNode = GermplasmTestDataProvider.createNode(mainNodeGid, mainNodeName, parent1Gid, parent1Name, parent2Gid, parent2Name);
         tree.setRoot(rootNode);
 
         Mockito.when(this.germplasmDataManager.getGermplasmByGID(germplasm.getGid())).thenReturn(germplasm);
