@@ -163,13 +163,9 @@ public class ScaleValidatorTest {
 		scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
 
 		List<TermSummary> categories = new ArrayList<>();
-		TermSummary category = new TermSummary();
-		category.setName("1");
-		category.setDescription("description");
+		TermSummary category = new TermSummary("", "1", "description");
 		categories.add(category);
-		category = new TermSummary();
-		category.setName("11");
-		category.setDescription("description");
+		category = new TermSummary("", "11", "description");
 		categories.add(category);
 		scaleSummary.setCategories(categories);
 
@@ -186,13 +182,9 @@ public class ScaleValidatorTest {
         scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
 
         List<TermSummary> categories = new ArrayList<>();
-        TermSummary category = new TermSummary();
-        category.setName("1");
-        category.setDescription("");
+        TermSummary category = new TermSummary("", "1", "");
         categories.add(category);
-        category = new TermSummary();
-        category.setName("11");
-        category.setDescription("description");
+        category = new TermSummary("", "11", "description");
         categories.add(category);
         scaleSummary.setCategories(categories);
 
@@ -208,13 +200,9 @@ public class ScaleValidatorTest {
         scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
 
         List<TermSummary> categories = new ArrayList<>();
-        TermSummary category = new TermSummary();
-        category.setName("11");
-        category.setDescription("Description");
+        TermSummary category = new TermSummary("", "11", "Description");
         categories.add(category);
-        category = new TermSummary();
-        category.setName("11");
-        category.setDescription("description");
+        category = new TermSummary("", "11", "description");
         categories.add(category);
         scaleSummary.setCategories(categories);
 
@@ -271,13 +259,9 @@ public class ScaleValidatorTest {
         scaleSummary.setDataType(categoricalVariable);
 
         List<TermSummary> categories = new ArrayList<>();
-        TermSummary category = new TermSummary();
-        category.setName("name");
-        category.setDescription("description");
+        TermSummary category = new TermSummary("", "name", "description");
         categories.add(category);
-        category = new TermSummary();
-        category.setName("1");
-        category.setDescription("Term summary");
+        category = new TermSummary("", "1", "Term summary");
         categories.add(category);
         scaleSummary.setCategories(categories);
 
@@ -306,13 +290,9 @@ public class ScaleValidatorTest {
         scaleSummary.setDataType(dataType);
 
         List<TermSummary> categories = new ArrayList<>();
-        TermSummary category = new TermSummary();
-        category.setName("name");
-        category.setDescription("description");
+        TermSummary category = new TermSummary("", "name", "description");
         categories.add(category);
-        category = new TermSummary();
-        category.setName("1");
-        category.setDescription("Term summary");
+        category = new TermSummary("", "1", "Term summary");
         categories.add(category);
         scaleSummary.setCategories(categories);
 
@@ -340,13 +320,9 @@ public class ScaleValidatorTest {
         scaleSummary.setMaxValue("Max");
 
         List<TermSummary> categories = new ArrayList<>();
-        TermSummary category = new TermSummary();
-        category.setName("");
-        category.setDescription("Description");
+        TermSummary category = new TermSummary("", "", "Description");
         categories.add(category);
-        category = new TermSummary();
-        category.setName("11");
-        category.setDescription("description");
+        category = new TermSummary("", "11", "description");
         categories.add(category);
         scaleSummary.setCategories(categories);
 
@@ -393,9 +369,7 @@ public class ScaleValidatorTest {
 		scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
 
 		List<TermSummary> categories = new ArrayList<>();
-		TermSummary category = new TermSummary();
-		category.setName("Name");
-		category.setDescription(RandomStringUtils.randomAlphanumeric(256));
+		TermSummary category = new TermSummary("", "Name", RandomStringUtils.randomAlphanumeric(256));
 		categories.add(category);
 		scaleSummary.setCategories(categories);
 
