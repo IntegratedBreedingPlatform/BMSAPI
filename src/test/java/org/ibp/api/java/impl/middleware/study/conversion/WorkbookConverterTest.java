@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.ibp.api.data.initializer.StudyTestDataProvider;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 import org.ibp.api.domain.study.DesignType;
 import org.ibp.api.domain.study.EnvironmentDetails;
@@ -211,16 +212,8 @@ public class WorkbookConverterTest {
     public void testConvertNurseryWithTrialStudyType() {
 
         final StudyImportDTO inputDTO = new StudyImportDTO();
-        inputDTO.setStudyType("T");
-        inputDTO.setName("Maize Nursery");
-        inputDTO.setObjective("Grow more seeds.");
-        inputDTO.setTitle("Maize Nursery title.");
-        inputDTO.setStartDate("20150101");
-        inputDTO.setEndDate("20151201");
-        inputDTO.setUserId(1);
-        inputDTO.setFolderId(1L);
-        inputDTO.setSiteName("Mexico");
-        inputDTO.setStudyInstitute("CIMMYT");
+		StudyTestDataProvider.fillStudyImportDTO(inputDTO, "T", "Maize Nursery", "Grow more seeds.", "Maize Nursery title.", "20150101", "20151201", 1, 1L,
+				"Mexico", "CIMMYT");
 
         final Trait trait1 = new Trait(1, "Plant Height");
         final Trait trait2 = new Trait(2, "Grain Yield");
