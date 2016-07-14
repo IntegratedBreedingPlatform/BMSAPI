@@ -601,15 +601,7 @@ public class StudyServiceImplTest {
         Term methodTerm = TestDataProvider.getMethodTerm();
 
         //Setting values for standardVariables
-        StandardVariable standardVariable = new StandardVariable();
-        standardVariable.setId(6);
-        standardVariable.setConstraints(constraints);
-        standardVariable.setCropOntologyId("CO:001");
-        standardVariable.setDataType(term);
-        standardVariable.setName("Standard Variable");
-        standardVariable.setDescription("Description");
-        standardVariable.setMethod(methodTerm);
-        standardVariable.setPhenotypicType(PhenotypicType.getPhenotypicTypeById(term.getId()));
+        StandardVariable standardVariable = this.createStdVariableUsingConstraintsTermAndMethodTerm(constraints, term, methodTerm);
 
         //Setting values for DMSVariableType
         DMSVariableType variableType = new DMSVariableType();
@@ -828,5 +820,19 @@ public class StudyServiceImplTest {
 		Assert.assertEquals("The error have the observation unique identifier as its second parameter",
 				manufacturePojo.getUniqueIdentifier(), errors.get(0).getArguments()[1]);
 
+	}
+
+	private StandardVariable createStdVariableUsingConstraintsTermAndMethodTerm(final VariableConstraints constraints, final Term term, final Term methodTerm) {
+		final StandardVariable standardVariable = new StandardVariable();
+		standardVariable.setId(6);
+		standardVariable.setConstraints(constraints);
+		standardVariable.setCropOntologyId("CO:001");
+		standardVariable.setDataType(term);
+		standardVariable.setName("Standard Variable");
+		standardVariable.setDescription("Description");
+		standardVariable.setMethod(methodTerm);
+		standardVariable.setPhenotypicType(PhenotypicType.getPhenotypicTypeById(term.getId()));
+
+		return standardVariable;
 	}
 }
