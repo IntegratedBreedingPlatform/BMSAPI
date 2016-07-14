@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.manager.Season;
 import org.ibp.api.domain.study.FieldMapPlantingDetails;
 import org.ibp.api.domain.study.FieldMapStudySummary;
+import org.ibp.api.domain.study.Observation;
 
 import com.google.common.collect.Lists;
 
@@ -100,5 +101,18 @@ public class StudyTestDataProvider {
 		studySummary.setType("Type");
 
 		return studySummary;
+	}
+
+	public static void fillObservationData(Observation observation, Integer measurementId, String entryNumber, String entryType, String trialInstance,
+			String designation,	Integer gid, String plotNumber, String repitionNumber, String seedSource) {
+		observation.setUniqueIdentifier(measurementId);
+		observation.setEntryNumber(entryNumber);
+		observation.setEntryType(entryType);
+		observation.setEnvironmentNumber(trialInstance);
+		observation.setGermplasmDesignation(designation);
+		observation.setGermplasmId(gid);
+		observation.setPlotNumber(plotNumber);
+		observation.setReplicationNumber(repitionNumber);
+		observation.setSeedSource(seedSource);
 	}
 }

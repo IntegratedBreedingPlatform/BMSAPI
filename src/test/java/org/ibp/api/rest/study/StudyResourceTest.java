@@ -321,15 +321,9 @@ public class StudyResourceTest extends ApiUnitTestBase {
 
 
         final Observation observation = new Observation();
-        observation.setUniqueIdentifier(observationDto.getMeasurementId());
-        observation.setEntryNumber(observationDto.getEntryNo());
-        observation.setEntryType(observationDto.getEntryType());
-        observation.setEnvironmentNumber(observationDto.getTrialInstance());
-        observation.setGermplasmDesignation(observationDto.getDesignation());
-        observation.setGermplasmId(observationDto.getGid());
-        observation.setPlotNumber(observationDto.getPlotNumber());
-        observation.setReplicationNumber(observationDto.getRepitionNumber());
-        observation.setSeedSource(observationDto.getSeedSource());
+		StudyTestDataProvider.fillObservationData(observation, observationDto.getMeasurementId(), observationDto.getEntryNo(), observationDto.getEntryType(),
+				observationDto.getTrialInstance(), observationDto.getDesignation(), observationDto.getGid(), observationDto.getPlotNumber(),
+				observationDto.getRepitionNumber(), observationDto.getSeedSource());
 
         final List<Measurement> measurements = new ArrayList<Measurement>();
         for (final MeasurementDto traitValue : traits) {
@@ -420,15 +414,9 @@ public class StudyResourceTest extends ApiUnitTestBase {
         List<MeasurementDto> traits = observationDto.getTraitMeasurements();
 
         Observation observation = new Observation();
-        observation.setUniqueIdentifier(observationDto.getMeasurementId());
-        observation.setEntryNumber(observationDto.getEntryNo());
-        observation.setEntryType(observationDto.getEntryType());
-        observation.setEnvironmentNumber(observationDto.getTrialInstance());
-        observation.setGermplasmDesignation(observationDto.getDesignation());
-        observation.setGermplasmId(observationDto.getGid());
-        observation.setPlotNumber(observationDto.getPlotNumber());
-        observation.setReplicationNumber(observationDto.getRepitionNumber());
-        observation.setSeedSource(observationDto.getSeedSource());
+		StudyTestDataProvider.fillObservationData(observation, observationDto.getMeasurementId(), observationDto.getEntryNo(), observationDto.getEntryType(),
+				observationDto.getTrialInstance(), observationDto.getDesignation(), observationDto.getGid(), observationDto.getPlotNumber(),
+				observationDto.getRepitionNumber(), observationDto.getSeedSource());
 
         List<Measurement> measurements = new ArrayList<Measurement>();
         for (final MeasurementDto traitValue : traits) {

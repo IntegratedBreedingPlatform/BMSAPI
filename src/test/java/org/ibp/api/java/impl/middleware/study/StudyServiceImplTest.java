@@ -394,15 +394,9 @@ public class StudyServiceImplTest {
 	private Observation mapObservationDtoToObservation(final ObservationDto measurement) {
 		final Observation observation = new Observation();
 		if (measurement != null) {
-			observation.setUniqueIdentifier(measurement.getMeasurementId());
-			observation.setEntryNumber(measurement.getEntryNo());
-			observation.setEntryType(measurement.getEntryType());
-			observation.setEnvironmentNumber(measurement.getTrialInstance());
-			observation.setGermplasmDesignation(measurement.getDesignation());
-			observation.setGermplasmId(measurement.getGid());
-			observation.setPlotNumber(measurement.getPlotNumber());
-			observation.setReplicationNumber(measurement.getRepitionNumber());
-			observation.setSeedSource(measurement.getSeedSource());
+			StudyTestDataProvider.fillObservationData(observation, measurement.getMeasurementId(), measurement.getEntryNo(), measurement.getEntryType(),
+					measurement.getTrialInstance(), measurement.getDesignation(), measurement.getGid(), measurement.getPlotNumber(),
+					measurement.getRepitionNumber(), measurement.getSeedSource());
 
 			final List<MeasurementDto> traits = measurement.getTraitMeasurements();
 			final List<Measurement> measurements = new ArrayList<Measurement>();
