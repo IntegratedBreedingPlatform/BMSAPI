@@ -3,7 +3,6 @@ package org.ibp.api.rest.inventory;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
@@ -24,6 +23,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 
 public class InventoryResourceTest extends ApiUnitTestBase {
 
@@ -51,12 +52,7 @@ public class InventoryResourceTest extends ApiUnitTestBase {
         location.setLname("Location name");
         location.setLabbr("lbbr");
 
-        LotDetails lotDetails = new LotDetails();
-        lotDetails.setLotId(1);
-        lotDetails.setAvailableLotBalance(10d);
-        lotDetails.setReservedTotal(11d);
-        lotDetails.setScaleOfLot(term);
-        lotDetails.setLocationOfLot(location);
+        LotDetails lotDetails = this.createLotDetails(term, location);
 
         List<LotDetails> lotDetailsList = new ArrayList<>();
         lotDetailsList.add(lotDetails);
@@ -92,20 +88,7 @@ public class InventoryResourceTest extends ApiUnitTestBase {
         TermSummary termSummary = new TermSummary();
         termSummary.setId("1");
 
-        GermplasmInventory germplasmInventory = new GermplasmInventory();
-        germplasmInventory.setGid(1);
-        germplasmInventory.setLotId(2);
-        germplasmInventory.setQuantityAvailable(1d);
-        germplasmInventory.setQuantityReserved(4d);
-        germplasmInventory.setQuantityTotal(germplasmInventory.getQuantityAvailable() + germplasmInventory.getQuantityReserved());
-        germplasmInventory.setUserId(99);
-        germplasmInventory.setUserName("Username");
-        germplasmInventory.setLocation(location);
-        germplasmInventory.setQuantityUnit(termSummary);
-        germplasmInventory.setLotId(1);
-        germplasmInventory.setLotStatus(LotStatus.ACTIVE);
-        germplasmInventory.setComments("Comments");
-
+        GermplasmInventory germplasmInventory = this.createGermplasmInventory(location, termSummary);
 
         this.mockMvc.perform(MockMvcRequestBuilders.put("/inventory/{cropname}/germplasm/{gid}", this.cropName, germplasmInventory.getGid()).contentType(this.contentType).content(this.convertObjectToByte(germplasmInventory))) //
                 .andDo(MockMvcResultHandlers.print())
@@ -131,5 +114,34 @@ public class InventoryResourceTest extends ApiUnitTestBase {
                 .andExpect(MockMvcResultMatchers.status().is5xxServerError())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", Matchers.is("This operation has not yet been implemented.")));
     }
+
+	private LotDetails createLotDetails(Term scaleOfLog, Location locationOfLot) {
+		LotDetails lotDetails = new LotDetails();
+		lotDetails.setLotId(1);
+		lotDetails.setAvailableLotBalance(10d);
+		lotDetails.setReservedTotal(11d);
+		lotDetails.setScaleOfLot(scaleOfLog);
+		lotDetails.setLocationOfLot(locationOfLot);
+
+		return lotDetails;
+	}
+
+	private GermplasmInventory createGermplasmInventory(InventoryLocation location, TermSummary termSummary) {
+		GermplasmInventory germplasmInventory = new GermplasmInventory();
+		germplasmInventory.setGid(1);
+		germplasmInventory.setLotId(2);
+		germplasmInventory.setQuantityAvailable(1d);
+		germplasmInventory.setQuantityReserved(4d);
+		germplasmInventory.setQuantityTotal(germplasmInventory.getQuantityAvailable() + germplasmInventory.getQuantityReserved());
+		germplasmInventory.setUserId(99);
+		germplasmInventory.setUserName("Username");
+		germplasmInventory.setLocation(location);
+		germplasmInventory.setQuantityUnit(termSummary);
+		germplasmInventory.setLotId(1);
+		germplasmInventory.setLotStatus(LotStatus.ACTIVE);
+		germplasmInventory.setComments("Comments");
+
+		return germplasmInventory;
+	}
 }
 
