@@ -565,13 +565,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
         measurementImportDTO.setTraitId(1);
         measurementImportDTO.setTraitValue("Plant height");
 
-        ObservationImportDTO observationImportDTO = new ObservationImportDTO();
-        observationImportDTO.setGid(1);
-        observationImportDTO.setEntryNumber(1);
-        observationImportDTO.setEnvironmentNumber(1);
-        observationImportDTO.setMeasurements(Lists.newArrayList(measurementImportDTO));
-        observationImportDTO.setPlotNumber(11);
-        observationImportDTO.setReplicationNumber(9);
+        ObservationImportDTO observationImportDTO = this.createObservationImportDTO(measurementImportDTO);
 
         Trait trait = new Trait();
         trait.setTraitId(1);
@@ -609,4 +603,16 @@ public class StudyResourceTest extends ApiUnitTestBase {
                 .andExpect(MockMvcResultMatchers.status().is5xxServerError());
 
     }
+
+	private ObservationImportDTO createObservationImportDTO(MeasurementImportDTO measurementImportDTO) {
+		ObservationImportDTO observationImportDTO = new ObservationImportDTO();
+		observationImportDTO.setGid(1);
+		observationImportDTO.setEntryNumber(1);
+		observationImportDTO.setEnvironmentNumber(1);
+		observationImportDTO.setMeasurements(Lists.newArrayList(measurementImportDTO));
+		observationImportDTO.setPlotNumber(11);
+		observationImportDTO.setReplicationNumber(9);
+
+		return observationImportDTO;
+	}
 }
