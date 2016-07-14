@@ -451,12 +451,7 @@ public class StudyServiceImplTest {
         studyGermplasm.setPosition("Position");
 
         //GermplasmListEntrySummary Data
-        GermplasmListEntrySummary listEntrySummary = new GermplasmListEntrySummary();
-        listEntrySummary.setGid(1);
-        listEntrySummary.setCross("Cross");
-        listEntrySummary.setDesignation("Designation");
-        listEntrySummary.setSeedSource("Seed source");
-        listEntrySummary.setEntryCode("Entry code");
+		GermplasmListEntrySummary listEntrySummary = new GermplasmListEntrySummary(1, "Designation", "Seed source", "Entry code", "Cross");
 
         //Setting germplasmListEntrySummary to studyGermplasm
         studyGermplasm.setGermplasmListEntrySummary(listEntrySummary);
@@ -465,12 +460,7 @@ public class StudyServiceImplTest {
         studyImportDTO.setGermplasm(Lists.newArrayList(studyGermplasm));
 
         //Setting values for GermplasmListData
-        GermplasmListData listData = new GermplasmListData();
-        listData.setGid(1);
-        listData.setId(2);
-        listData.setEntryCode("Entry Code");
-        listData.setSeedSource("Seed source");
-        listData.setDesignation("Designation");
+		GermplasmListData listData = new GermplasmListData(2, null, 1, 1, "Entry Code", "Seed source", "Designation", "", 0, 0);
         listData.setFgid(1);
         listData.setFemaleParent("Female Parent");
 
@@ -500,18 +490,9 @@ public class StudyServiceImplTest {
         workbook.setStudyDetails(studyDetails);
 
         //Setting values for germplasm list
-        GermplasmList germplasmList = new GermplasmList();
-        germplasmList.setId(1);
-        germplasmList.setDescription("Description");
-        germplasmList.setDate(20150301L);
-        germplasmList.setListData(Lists.newArrayList(listData));
-        germplasmList.seteDate(20150320);
-        germplasmList.setListLocation(1);
-        germplasmList.setListRef(1);
-        germplasmList.setName("List Name");
-        germplasmList.setNotes("Notes");
+		GermplasmList germplasmList = new GermplasmList(1, "List Name", 20150301L, "", 1, "Description", null, 1, 0, 20150320, 1, 1, 1,
+				"Notes", Lists.newArrayList(listData));
         germplasmList.setParent(germplasmList);
-        germplasmList.setListData((Lists.newArrayList(listData)));
 
         //Setting list in germplasmListData
         listData.setList(germplasmList);
@@ -583,19 +564,10 @@ public class StudyServiceImplTest {
         int studyId = 9;
 
         //Setting values for VariableConstraints
-        VariableConstraints constraints = new VariableConstraints();
-        constraints.setMinValueId(2);
-        constraints.setMinValue(9.0);
-        constraints.setMaxValueId(3);
-        constraints.setMaxValue(19.0);
+		VariableConstraints constraints = new VariableConstraints(2, 3, 9.0, 19.0);
 
         //Setting values for term
-        Term term = new Term();
-        term.setId(4);
-        term.setName("Term name");
-        term.setDefinition("Definition");
-        term.setObsolete(false);
-        term.setVocabularyId(5);
+		Term term = new Term(4, "Term name", "Definition", 5, false);
 
         Term methodTerm = TestDataProvider.getMethodTerm();
 

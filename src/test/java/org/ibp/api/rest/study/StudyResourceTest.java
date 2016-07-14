@@ -536,12 +536,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
     @Test
     public void testImportStudy() throws Exception{
 
-        GermplasmListEntrySummary summary = new GermplasmListEntrySummary();
-        summary.setGid(1);
-        summary.setCross("Cross");
-        summary.setDesignation("Designation");
-        summary.setEntryCode("Entry Code");
-        summary.setSeedSource("Seed source");
+		GermplasmListEntrySummary summary = new GermplasmListEntrySummary(1, "Designation", "Seed source", "Entry Code", "Cross");
 
         StudyGermplasm studyGermplasm = new StudyGermplasm();
         studyGermplasm.setEntryNumber(1);
