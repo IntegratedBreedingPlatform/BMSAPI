@@ -181,8 +181,7 @@ public class StudyServiceImplTest {
     @Test
     public void testSearch() throws Exception{
         final List<org.generationcp.middleware.service.api.study.StudySummary> mockResult = new ArrayList<>();
-        final org.generationcp.middleware.service.api.study.StudySummary studySummary =
-                new org.generationcp.middleware.service.api.study.StudySummary();
+		final org.generationcp.middleware.service.api.study.StudySummary studySummary = this.createStudySummary();
         studySummary.setId(1);
         studySummary.setPrincipalInvestigator("PITest");
         studySummary.setType(StudyType.S);
@@ -834,5 +833,17 @@ public class StudyServiceImplTest {
 		standardVariable.setPhenotypicType(PhenotypicType.getPhenotypicTypeById(term.getId()));
 
 		return standardVariable;
+	}
+
+	private org.generationcp.middleware.service.api.study.StudySummary createStudySummary() {
+		final org.generationcp.middleware.service.api.study.StudySummary studySummary =
+				new org.generationcp.middleware.service.api.study.StudySummary();
+		studySummary.setId(1);
+		studySummary.setPrincipalInvestigator("PITest");
+		studySummary.setType(StudyType.S);
+		studySummary.setLocation("Loc");
+		studySummary.setSeason("sea");
+
+		return studySummary;
 	}
 }
