@@ -293,26 +293,21 @@ public class StudyServiceImplTest {
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void updateObservationWhichDoesNotExist() {
-		final Integer studyIdentifier = new Integer(5);
+		final Integer studyIdentifier = 5;
 		Observation manufacturePojo = this.factory.manufacturePojo(Observation.class);
 
 		try {
 			this.studyServiceImpl.updateObservation(studyIdentifier, manufacturePojo);
 		} catch (final ApiRequestValidationException apiRequestValidationException) {
 			List<ObjectError> errors = apiRequestValidationException.getErrors();
-			Assert.assertEquals("We should only have one error", 1, errors.size());
-			Assert.assertEquals("The error should have the code", "no.observation.found", errors.get(0).getCode());
-			Assert.assertEquals("The error have the study identifier as its first parameter", studyIdentifier,
-					errors.get(0).getArguments()[0]);
-			Assert.assertEquals("The error have the observation unique identifier as its second parameter",
-					manufacturePojo.getUniqueIdentifier(), errors.get(0).getArguments()[1]);
+			this.assertApiRequestValidationExceptionErrors(errors, studyIdentifier, manufacturePojo);
 			throw apiRequestValidationException;
 		}
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void updateObservationsWhichDoesNotExist() {
-		final Integer studyIdentifier = new Integer(5);
+		final Integer studyIdentifier = 5;
 		Observation manufacturePojo = this.factory.manufacturePojo(Observation.class);
 		Observation manufacturePojo1 = this.factory.manufacturePojo(Observation.class);
 		Observation manufacturePojo2 = this.factory.manufacturePojo(Observation.class);
@@ -321,13 +316,7 @@ public class StudyServiceImplTest {
 					Lists.newArrayList(manufacturePojo, manufacturePojo1, manufacturePojo2));
 		} catch (final ApiRequestValidationException apiRequestValidationException) {
 			List<ObjectError> errors = apiRequestValidationException.getErrors();
-			// This is because we are just stopping at the first error
-			Assert.assertEquals("We should only have one error", 1, errors.size());
-			Assert.assertEquals("The error should have the code", "no.observation.found", errors.get(0).getCode());
-			Assert.assertEquals("The error have the study identifier as its first parameter", studyIdentifier,
-					errors.get(0).getArguments()[0]);
-			Assert.assertEquals("The error have the observation unique identifier as its second parameter",
-					manufacturePojo.getUniqueIdentifier(), errors.get(0).getArguments()[1]);
+			this.assertApiRequestValidationExceptionErrors(errors, studyIdentifier, manufacturePojo);
 			throw apiRequestValidationException;
 		}
 	}
@@ -835,4 +824,15 @@ public class StudyServiceImplTest {
 
         Assert.assertNotNull(programUUID);
     }
+
+	private void assertApiRequestValidationExceptionErrors(final List<ObjectError> errors, final Integer studyIdentifier, final Observation manufacturePojo) {
+		// This is because we are just stopping at the first error
+		Assert.assertEquals("We should only have one error", 1, errors.size());
+		Assert.assertEquals("The error should have the code", "no.observation.found", errors.get(0).getCode());
+		Assert.assertEquals("The error have the study identifier as its first parameter", studyIdentifier,
+				errors.get(0).getArguments()[0]);
+		Assert.assertEquals("The error have the observation unique identifier as its second parameter",
+				manufacturePojo.getUniqueIdentifier(), errors.get(0).getArguments()[1]);
+
+	}
 }
