@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.manager.Season;
@@ -13,8 +14,6 @@ import org.ibp.api.domain.study.FieldMapPlantingDetails;
 import org.ibp.api.domain.study.FieldMapStudySummary;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyImportDTO;
-
-import com.google.common.collect.Lists;
 
 public class StudyTestDataProvider {
 
@@ -104,8 +103,10 @@ public class StudyTestDataProvider {
 		return studySummary;
 	}
 
-	public static void fillObservationData(Observation observation, Integer measurementId, String entryNumber, String entryType, String trialInstance,
+	public static Observation createObservationData(Integer measurementId, String entryNumber, String entryType, String trialInstance,
 			String designation,	Integer gid, String plotNumber, String repitionNumber, String seedSource) {
+
+		final Observation observation = new Observation();
 		observation.setUniqueIdentifier(measurementId);
 		observation.setEntryNumber(entryNumber);
 		observation.setEntryType(entryType);
@@ -115,6 +116,8 @@ public class StudyTestDataProvider {
 		observation.setPlotNumber(plotNumber);
 		observation.setReplicationNumber(repitionNumber);
 		observation.setSeedSource(seedSource);
+
+		return observation;
 	}
 
 	public static void fillStudyImportDTO(StudyImportDTO studyImportDTO, final String studyType, final String name, final String objective,

@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -63,9 +65,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import com.google.common.collect.Lists;
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 
 public class StudyResourceTest extends ApiUnitTestBase {
 
@@ -319,11 +318,10 @@ public class StudyResourceTest extends ApiUnitTestBase {
                 new ObservationDto(1, "e1", "Test", 1, "CML123", "01", "CIMMYT Seed Bank", "R1", "p1", Lists.newArrayList(measurement));
         final List<MeasurementDto> traits = observationDto.getTraitMeasurements();
 
-
-        final Observation observation = new Observation();
-		StudyTestDataProvider.fillObservationData(observation, observationDto.getMeasurementId(), observationDto.getEntryNo(), observationDto.getEntryType(),
-				observationDto.getTrialInstance(), observationDto.getDesignation(), observationDto.getGid(), observationDto.getPlotNumber(),
-				observationDto.getRepitionNumber(), observationDto.getSeedSource());
+		final Observation observation = StudyTestDataProvider
+				.createObservationData(observationDto.getMeasurementId(), observationDto.getEntryNo(), observationDto.getEntryType(),
+						observationDto.getTrialInstance(), observationDto.getDesignation(), observationDto.getGid(),
+						observationDto.getPlotNumber(), observationDto.getRepitionNumber(), observationDto.getSeedSource());
 
         final List<Measurement> measurements = new ArrayList<Measurement>();
         for (final MeasurementDto traitValue : traits) {
@@ -413,10 +411,10 @@ public class StudyResourceTest extends ApiUnitTestBase {
 
         List<MeasurementDto> traits = observationDto.getTraitMeasurements();
 
-        Observation observation = new Observation();
-		StudyTestDataProvider.fillObservationData(observation, observationDto.getMeasurementId(), observationDto.getEntryNo(), observationDto.getEntryType(),
-				observationDto.getTrialInstance(), observationDto.getDesignation(), observationDto.getGid(), observationDto.getPlotNumber(),
-				observationDto.getRepitionNumber(), observationDto.getSeedSource());
+		final Observation observation = StudyTestDataProvider
+				.createObservationData(observationDto.getMeasurementId(), observationDto.getEntryNo(), observationDto.getEntryType(),
+						observationDto.getTrialInstance(), observationDto.getDesignation(), observationDto.getGid(),
+						observationDto.getPlotNumber(), observationDto.getRepitionNumber(), observationDto.getSeedSource());
 
         List<Measurement> measurements = new ArrayList<Measurement>();
         for (final MeasurementDto traitValue : traits) {

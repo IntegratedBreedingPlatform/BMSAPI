@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -73,9 +75,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
@@ -391,11 +390,12 @@ public class StudyServiceImplTest {
 	}
 
 	private Observation mapObservationDtoToObservation(final ObservationDto measurement) {
-		final Observation observation = new Observation();
+		Observation observation = new Observation();
 		if (measurement != null) {
-			StudyTestDataProvider.fillObservationData(observation, measurement.getMeasurementId(), measurement.getEntryNo(), measurement.getEntryType(),
-					measurement.getTrialInstance(), measurement.getDesignation(), measurement.getGid(), measurement.getPlotNumber(),
-					measurement.getRepitionNumber(), measurement.getSeedSource());
+			observation = StudyTestDataProvider
+					.createObservationData(measurement.getMeasurementId(), measurement.getEntryNo(), measurement.getEntryType(),
+							measurement.getTrialInstance(), measurement.getDesignation(), measurement.getGid(), measurement.getPlotNumber(),
+							measurement.getRepitionNumber(), measurement.getSeedSource());
 
 			final List<MeasurementDto> traits = measurement.getTraitMeasurements();
 			final List<Measurement> measurements = new ArrayList<Measurement>();
