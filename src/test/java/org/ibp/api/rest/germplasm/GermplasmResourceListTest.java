@@ -103,12 +103,7 @@ public class GermplasmResourceListTest extends ApiUnitTestBase{
         n.setNval("Test Germplasm");
         this.germplasm.setPreferredName(n);
 
-        GermplasmListSummary summary = new GermplasmListSummary();
-        summary.setListId(1);
-        summary.setListName("Germplasm");
-        summary.setListSize(1);
-        summary.setDescription("Germplasm List");
-        summary.setNotes("Notes");
+        GermplasmListSummary summary = this.createGermplasmListSummary();
 
         GermplasmList list = new GermplasmList();
         list.setId(1);
@@ -161,5 +156,16 @@ public class GermplasmResourceListTest extends ApiUnitTestBase{
                 .andExpect(MockMvcResultMatchers.jsonPath("$.germplasmEntries[0].entryCode", org.hamcrest.Matchers.is(listData.getEntryCode())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.germplasmEntries[0].cross", org.hamcrest.Matchers.is(listData.getGroupName())));
     }
+
+	private GermplasmListSummary createGermplasmListSummary() {
+		GermplasmListSummary summary = new GermplasmListSummary();
+		summary.setListId(1);
+		summary.setListName("Germplasm");
+		summary.setListSize(1);
+		summary.setDescription("Germplasm List");
+		summary.setNotes("Notes");
+
+		return summary;
+	}
 
 }
