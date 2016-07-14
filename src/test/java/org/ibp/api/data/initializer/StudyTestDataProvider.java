@@ -12,6 +12,7 @@ import org.generationcp.middleware.manager.Season;
 import org.ibp.api.domain.study.FieldMapPlantingDetails;
 import org.ibp.api.domain.study.FieldMapStudySummary;
 import org.ibp.api.domain.study.Observation;
+import org.ibp.api.domain.study.StudyImportDTO;
 
 import com.google.common.collect.Lists;
 
@@ -114,5 +115,20 @@ public class StudyTestDataProvider {
 		observation.setPlotNumber(plotNumber);
 		observation.setReplicationNumber(repitionNumber);
 		observation.setSeedSource(seedSource);
+	}
+
+	public static void fillStudyImportDTO(StudyImportDTO studyImportDTO, final String studyType, final String name, final String objective,
+			final String title, final String startdate, final String endDate, final Integer userId, final Long folderId,
+			final String siteName, final String studyInstitute) {
+		studyImportDTO.setStudyType(studyType);
+		studyImportDTO.setName(name);
+		studyImportDTO.setObjective(objective);
+		studyImportDTO.setTitle(title);
+		studyImportDTO.setStartDate(startdate);
+		studyImportDTO.setEndDate(endDate);
+		studyImportDTO.setUserId(userId);
+		studyImportDTO.setFolderId(folderId);
+		studyImportDTO.setSiteName(siteName);
+		studyImportDTO.setStudyInstitute(studyInstitute);
 	}
 }

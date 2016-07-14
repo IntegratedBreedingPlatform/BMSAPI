@@ -560,17 +560,11 @@ public class StudyResourceTest extends ApiUnitTestBase {
         trait.setTraitName("Trait name");
 
         StudyImportDTO studyImportDTO = new StudyImportDTO();
-        studyImportDTO.setName("Study Name");
-        studyImportDTO.setTitle("Study Title");
-        studyImportDTO.setStartDate("20160420");
-        studyImportDTO.setEndDate("20160423");
-        studyImportDTO.setStudyType(StudyType.N.getName());
-        studyImportDTO.setSiteName("Site Name");
-        studyImportDTO.setStudyInstitute("Study Institute");
-        studyImportDTO.setGermplasm(Lists.newArrayList(studyGermplasm));
-        studyImportDTO.setObservations(Lists.newArrayList(observationImportDTO));
-        studyImportDTO.setUserId(99);
-        studyImportDTO.setTraits(Lists.newArrayList(trait));
+		StudyTestDataProvider.fillStudyImportDTO(studyImportDTO, StudyType.N.getName(), "Study Name", "Objective", "Study Title", "20160420", "20160423",
+				99, 1L, "Site Name", "Study Institute");
+		studyImportDTO.setGermplasm(Lists.newArrayList(studyGermplasm));
+		studyImportDTO.setObservations(Lists.newArrayList(observationImportDTO));
+		studyImportDTO.setTraits(Lists.newArrayList(trait));
 
         this.mockMvc.perform(MockMvcRequestBuilders.post("/study/{cropname}/import?programUUID=" +this.programUuid , this.cropName )
                 .contentType(this.contentType)
