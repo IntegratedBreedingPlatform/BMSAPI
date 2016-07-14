@@ -54,19 +54,7 @@ public class VariableFilterResourceTest extends ApiUnitTestBase {
 
         List<Variable> variables = TestDataProvider.getTestVariables(1);
 
-        VariableFilter variableFilter = new VariableFilter();
-        variableFilter.setProgramUuid(this.programUuid);
-        variableFilter.setFetchAll(true);
-        variableFilter.setFavoritesOnly(false);
-        variableFilter.addVariableId(variables.get(0).getId());
-        variableFilter.addVariableType(VariableType.ANALYSIS);
-        variableFilter.addDataType(DataType.NUMERIC_VARIABLE);
-        variableFilter.addExcludedVariableId(1000);
-        variableFilter.addMethodId(1);
-        variableFilter.addPropertyId(propertySet.iterator().next());
-        variableFilter.addPropertyClass("Property Class");
-        variableFilter.addScaleId(1030);
-
+        VariableFilter variableFilter = this.createVariableFilter(variables.get(0).getId(), propertySet.iterator().next());
 
         Mockito.when(this.ontologyVariableDataManager.getWithFilter(variableFilter)).thenReturn(variables);
 
@@ -76,4 +64,21 @@ public class VariableFilterResourceTest extends ApiUnitTestBase {
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
     }
+
+	private VariableFilter createVariableFilter(Integer variableId, Integer propertyId) {
+		VariableFilter variableFilter = new VariableFilter();
+		variableFilter.setProgramUuid(this.programUuid);
+		variableFilter.setFetchAll(true);
+		variableFilter.setFavoritesOnly(false);
+		variableFilter.addVariableId(variableId);
+		variableFilter.addVariableType(VariableType.ANALYSIS);
+		variableFilter.addDataType(DataType.NUMERIC_VARIABLE);
+		variableFilter.addExcludedVariableId(1000);
+		variableFilter.addMethodId(1);
+		variableFilter.addPropertyId(propertyId);
+		variableFilter.addPropertyClass("Property Class");
+		variableFilter.addScaleId(1030);
+
+		return variableFilter;
+	}
 }
