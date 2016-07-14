@@ -552,9 +552,9 @@ public class StudyResourceTest extends ApiUnitTestBase {
         trait.setTraitId(1);
         trait.setTraitName("Trait name");
 
-        StudyImportDTO studyImportDTO = new StudyImportDTO();
-		StudyTestDataProvider.fillStudyImportDTO(studyImportDTO, StudyType.N.getName(), "Study Name", "Objective", "Study Title", "20160420", "20160423",
-				99, 1L, "Site Name", "Study Institute");
+		final StudyImportDTO studyImportDTO = StudyTestDataProvider
+				.createStudyImportDTO(StudyType.N.getName(), "Study Name", "Objective", "Study Title", "20160420", "20160423", 99, 1L,
+						"Site Name", "Study Institute");
 		studyImportDTO.setGermplasm(Lists.newArrayList(studyGermplasm));
 		studyImportDTO.setObservations(Lists.newArrayList(observationImportDTO));
 		studyImportDTO.setTraits(Lists.newArrayList(trait));

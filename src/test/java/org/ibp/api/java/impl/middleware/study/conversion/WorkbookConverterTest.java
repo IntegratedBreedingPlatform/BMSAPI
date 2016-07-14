@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.study.conversion;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
@@ -20,8 +21,6 @@ import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.Trait;
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.google.common.collect.Lists;
 
 public class WorkbookConverterTest {
 
@@ -211,9 +210,9 @@ public class WorkbookConverterTest {
     @Test
     public void testConvertNurseryWithTrialStudyType() {
 
-        final StudyImportDTO inputDTO = new StudyImportDTO();
-		StudyTestDataProvider.fillStudyImportDTO(inputDTO, "T", "Maize Nursery", "Grow more seeds.", "Maize Nursery title.", "20150101", "20151201", 1, 1L,
-				"Mexico", "CIMMYT");
+		final StudyImportDTO inputDTO = StudyTestDataProvider
+				.createStudyImportDTO("T", "Maize Nursery", "Grow more seeds.", "Maize Nursery title.", "20150101", "20151201", 1, 1L,
+						"Mexico", "CIMMYT");
 
         final Trait trait1 = new Trait(1, "Plant Height");
         final Trait trait2 = new Trait(2, "Grain Yield");

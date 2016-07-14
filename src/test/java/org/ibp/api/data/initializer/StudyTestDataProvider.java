@@ -120,9 +120,11 @@ public class StudyTestDataProvider {
 		return observation;
 	}
 
-	public static void fillStudyImportDTO(StudyImportDTO studyImportDTO, final String studyType, final String name, final String objective,
+	public static StudyImportDTO createStudyImportDTO(final String studyType, final String name, final String objective,
 			final String title, final String startdate, final String endDate, final Integer userId, final Long folderId,
 			final String siteName, final String studyInstitute) {
+
+		final StudyImportDTO studyImportDTO = new StudyImportDTO();
 		studyImportDTO.setStudyType(studyType);
 		studyImportDTO.setName(name);
 		studyImportDTO.setObjective(objective);
@@ -133,5 +135,7 @@ public class StudyTestDataProvider {
 		studyImportDTO.setFolderId(folderId);
 		studyImportDTO.setSiteName(siteName);
 		studyImportDTO.setStudyInstitute(studyInstitute);
+
+		return studyImportDTO;
 	}
 }
