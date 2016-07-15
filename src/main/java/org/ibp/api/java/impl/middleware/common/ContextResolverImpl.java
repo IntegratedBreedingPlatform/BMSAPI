@@ -30,8 +30,17 @@ public class ContextResolverImpl implements ContextResolver {
 			ContextResolverImpl.LOG.error("BAD URL Request :" + path);
 			throw new ContextResolutionException("BAD URL:" + path, new Exception("Expecting crop name"));
 		}
-		ContextResolverImpl.LOG.debug("Crop Name: " + parts[2]);
-		ContextHolder.setCurrentCrop(parts[2]);
-		return String.format(Constants.DB_NAME_FORMAT, parts[2]);
+
+		String cropName = "";
+		if ("brapi".equals(parts[2])) {
+			// BrAPI calls put crop name as first path parameter after context path e.g. /bmsapi/maize/brapi/v1/locations
+			cropName = parts[1];
+		} else {
+			// internal BMSAPI calls put crop name as second path parameter after context path e.g. /bmsapi/locations/maize/list
+			cropName = parts[2];
+		}
+		ContextHolder.setCurrentCrop(cropName);
+		ContextResolverImpl.LOG.debug("Crop Name: " + cropName);
+		return String.format(Constants.DB_NAME_FORMAT, cropName);
 	}
 }
