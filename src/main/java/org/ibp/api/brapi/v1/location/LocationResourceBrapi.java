@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Country;
+import org.ibp.api.brapi.v1.common.Metadata;
+import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;

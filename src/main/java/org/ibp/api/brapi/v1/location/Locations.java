@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.annotation.Generated;
 
+import org.ibp.api.brapi.v1.common.Metadata;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
