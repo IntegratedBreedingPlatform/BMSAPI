@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Generated;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,26 +14,33 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({"locationDbId", "name", "countryCode", "countryName", "latitude", "longitude", "altitude", "attributes"})
 public class Location {
 
 	@JsonProperty("locationDbId")
 	private Integer locationDbId;
+
 	@JsonProperty("name")
 	private String name;
+
 	@JsonProperty("countryCode")
 	private String countryCode;
+
 	@JsonProperty("countryName")
 	private String countryName;
+
 	@JsonProperty("latitude")
 	private Double latitude;
+
 	@JsonProperty("longitude")
 	private Double longitude;
+
 	@JsonProperty("altitude")
 	private Double altitude;
+
 	@JsonProperty("attributes")
 	private List<Object> attributes = new ArrayList<Object>();
+
 	@JsonIgnore
 	private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 

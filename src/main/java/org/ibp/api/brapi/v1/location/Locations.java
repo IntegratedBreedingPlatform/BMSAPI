@@ -1,32 +1,22 @@
 
 package org.ibp.api.brapi.v1.location;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.Generated;
-
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Result;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({"metadata", "result"})
 public class Locations {
 
 	@JsonProperty("metadata")
 	private Metadata metadata;
+
 	@JsonProperty("result")
 	private Result<Location> result;
-	@JsonIgnore
-	private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 	/**
 	 * No args constructor for use in serialization
@@ -90,20 +80,4 @@ public class Locations {
 		this.result = result;
 		return this;
 	}
-
-	@JsonAnyGetter
-	public Map<String, Object> getAdditionalProperties() {
-		return this.additionalProperties;
-	}
-
-	@JsonAnySetter
-	public void setAdditionalProperty(final String name, final Object value) {
-		this.additionalProperties.put(name, value);
-	}
-
-	public Locations withAdditionalProperty(final String name, final Object value) {
-		this.additionalProperties.put(name, value);
-		return this;
-	}
-
 }
