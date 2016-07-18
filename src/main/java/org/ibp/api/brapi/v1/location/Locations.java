@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.annotation.Generated;
 
 import org.ibp.api.brapi.v1.common.Metadata;
+import org.ibp.api.brapi.v1.common.Result;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;

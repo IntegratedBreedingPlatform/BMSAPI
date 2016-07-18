@@ -1,5 +1,5 @@
 
-package org.ibp.api.brapi.v1.location;
+package org.ibp.api.brapi.v1.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;
