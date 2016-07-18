@@ -36,7 +36,7 @@ public class LocationResourceBrapi {
 	@ResponseBody
 	public ResponseEntity<Locations> listLocations(@PathVariable final String crop) {
 
-		final List<org.generationcp.middleware.pojos.Location> allLocations = this.locationDataManager.getAllLocalLocations(0, 20);
+		final List<org.generationcp.middleware.pojos.Location> allLocations = this.locationDataManager.getAllLocations(0, 20);
 		List<Location> locations = new ArrayList<>();
 
 		for (org.generationcp.middleware.pojos.Location mwLoc : allLocations) {
