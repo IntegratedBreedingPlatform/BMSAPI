@@ -46,13 +46,13 @@ public class LocationResourceBrapi {
 
 			// FIXME This is (n+1) query in loop pattern which is bad. This is just temporary. Do not follow this pattern.
 			// TODO Implement a middleware method that retrieves location/country in one query.
-			if (mwLoc.getCntryid() != 0) {
+			if (mwLoc.getCntryid() == null || mwLoc.getCntryid().equals(0)) {
+				location.setCountryCode("Unknown");
+				location.setCountryName("Unknown");
+			} else {
 				Country country = this.locationDataManager.getCountryById(mwLoc.getCntryid());
 				location.setCountryCode(country.getIsothree());
 				location.setCountryName(country.getIsoabbr());
-			} else {
-				location.setCountryCode("Unknown");
-				location.setCountryName("Unknown");
 			}
 
 			location.setLatitude(mwLoc.getLatitude());
