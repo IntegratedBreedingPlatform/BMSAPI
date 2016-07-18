@@ -134,6 +134,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 		this.locationDataManger = locationDataManger;
 	}
 
+    void setPedigreeDataManager(PedigreeDataManager pedigreeDataManager) {
+        this.pedigreeDataManager = pedigreeDataManager;
+    }
+
+    void setGermplasmGroupingService(GermplasmGroupingService germplasmGroupingService) {
+        this.germplasmGroupingService = germplasmGroupingService;
+    }
+
 	@Override
 	public PedigreeTree getPedigreeTree(String germplasmId, Integer levels) {
 

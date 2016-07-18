@@ -1,9 +1,6 @@
 
 package org.ibp.api.domain.study.validators;
 
-import java.util.Collections;
-
-import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.junit.Before;
 import org.junit.Test;
