@@ -50,15 +50,15 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 		location1.setGeoref(new Georef(156, 1, 41.17, 170.27, 10.11));
 
 		List<Location> mwLocations = Lists.newArrayList(location1);
-		Mockito.when(this.locationDataManager.getAllLocations(Mockito.anyInt(), Mockito.anyInt()))
-				.thenReturn(mwLocations);
+		Mockito.when(this.locationDataManager.getAllLocations(Mockito.anyInt(), Mockito.anyInt())).thenReturn(mwLocations);
+		Mockito.when(this.locationDataManager.countAllLocations()).thenReturn(200L);
 		
 		Country country1 = new Country(countryId);
 		country1.setIsothree("NZL");
 		country1.setIsoabbr("NZ");
 		Mockito.when(this.locationDataManager.getCountryById(countryId)).thenReturn(country1);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/locations").contentType(this.contentType)) //
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/locations?pageNumber=1&pageSize=10").contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isOk()) //
 				.andDo(MockMvcResultHandlers.print()) //
 				.andExpect(jsonPath("$.result.data", IsCollectionWithSize.hasSize(mwLocations.size()))) //

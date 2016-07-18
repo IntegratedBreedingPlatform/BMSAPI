@@ -23,7 +23,7 @@ public class Pagination {
 	@JsonProperty("pageSize")
 	private Integer pageSize;
 	@JsonProperty("totalCount")
-	private Integer totalCount;
+	private Long totalCount;
 	@JsonProperty("totalPages")
 	private Integer totalPages;
 	@JsonIgnore
@@ -43,7 +43,7 @@ public class Pagination {
 	 * @param pageNumber
 	 * @param totalPages
 	 */
-	public Pagination(final Integer pageNumber, final Integer pageSize, final Integer totalCount, final Integer totalPages) {
+	public Pagination(final Integer pageNumber, final Integer pageSize, final Long totalCount, final Integer totalPages) {
 		this.pageNumber = pageNumber;
 		this.pageSize = pageSize;
 		this.totalCount = totalCount;
@@ -101,7 +101,7 @@ public class Pagination {
 	 * @return The totalCount
 	 */
 	@JsonProperty("totalCount")
-	public Integer getTotalCount() {
+	public Long getTotalCount() {
 		return this.totalCount;
 	}
 
@@ -110,11 +110,11 @@ public class Pagination {
 	 * @param totalCount The totalCount
 	 */
 	@JsonProperty("totalCount")
-	public void setTotalCount(final Integer totalCount) {
+	public void setTotalCount(final Long totalCount) {
 		this.totalCount = totalCount;
 	}
 
-	public Pagination withTotalCount(final Integer totalCount) {
+	public Pagination withTotalCount(final Long totalCount) {
 		this.totalCount = totalCount;
 		return this;
 	}
