@@ -88,7 +88,7 @@ public class LocationResourceBrapi {
 			locations.add(location);
 		}
 		
-		Result results = new Result().withData(locations);
+		Result<Location> results = new Result<Location>().withData(locations);
 		Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 

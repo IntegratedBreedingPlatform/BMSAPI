@@ -23,7 +23,7 @@ public class Locations {
 	@JsonProperty("metadata")
 	private Metadata metadata;
 	@JsonProperty("result")
-	private Result result;
+	private Result<Location> result;
 	@JsonIgnore
 	private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -39,7 +39,7 @@ public class Locations {
 	 * @param result
 	 * @param metadata
 	 */
-	public Locations(final Metadata metadata, final Result result) {
+	public Locations(final Metadata metadata, final Result<Location> result) {
 		this.metadata = metadata;
 		this.result = result;
 	}
@@ -72,7 +72,7 @@ public class Locations {
 	 * @return The result
 	 */
 	@JsonProperty("result")
-	public Result getResult() {
+	public Result<Location> getResult() {
 		return this.result;
 	}
 
@@ -81,11 +81,11 @@ public class Locations {
 	 * @param result The result
 	 */
 	@JsonProperty("result")
-	public void setResult(final Result result) {
+	public void setResult(final Result<Location> result) {
 		this.result = result;
 	}
 
-	public Locations withResult(final Result result) {
+	public Locations withResult(final Result<Location> result) {
 		this.result = result;
 		return this;
 	}

@@ -15,13 +15,22 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+/**
+ * 
+ * Generic result object to be used for BrAPI responses where "result" is a collection of type T.
+ *
+ * @param <T> the type of the object that the "data" collection holds.
+ * 
+ * @author Naymesh Mistry
+ * 
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({"data"})
-public class Result {
+public class Result<T> {
 
 	@JsonProperty("data")
-	private List<Location> data = new ArrayList<Location>();
+	private List<T> data = new ArrayList<T>();
 	@JsonIgnore
 	private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -36,7 +45,7 @@ public class Result {
 	 *
 	 * @param data
 	 */
-	public Result(final List<Location> data) {
+	public Result(final List<T> data) {
 		this.data = data;
 	}
 
@@ -45,7 +54,7 @@ public class Result {
 	 * @return The data
 	 */
 	@JsonProperty("data")
-	public List<Location> getData() {
+	public List<T> getData() {
 		return this.data;
 	}
 
@@ -54,11 +63,11 @@ public class Result {
 	 * @param data The data
 	 */
 	@JsonProperty("data")
-	public void setData(final List<Location> data) {
+	public void setData(final List<T> data) {
 		this.data = data;
 	}
 
-	public Result withData(final List<Location> data) {
+	public Result<T> withData(final List<T> data) {
 		this.data = data;
 		return this;
 	}
@@ -73,7 +82,7 @@ public class Result {
 		this.additionalProperties.put(name, value);
 	}
 
-	public Result withAdditionalProperty(final String name, final Object value) {
+	public Result<T> withAdditionalProperty(final String name, final Object value) {
 		this.additionalProperties.put(name, value);
 		return this;
 	}
