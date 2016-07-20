@@ -1,6 +1,8 @@
 
 package org.ibp.api.brapi.v1.location;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Result;
 
@@ -79,5 +81,10 @@ public class Locations {
 	public Locations withResult(final Result<Location> result) {
 		this.result = result;
 		return this;
+	}
+
+	@Override
+	public String toString() {
+		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
 	}
 }
