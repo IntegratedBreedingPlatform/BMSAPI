@@ -59,15 +59,15 @@ public class StudySummaryResourceBrapi {
                     @Override
                     public List<StudySummary> getResults(
                             PagedResult<StudySummary> pagedResult) {
-                        return StudySummaryResourceBrapi.this.studyDataManager.findPagedProjects(programDbId, locationDbId, seasonDbId, pagedResult.getPageNumber(),
-                                pagedResult.getPageSize());
+                        return StudySummaryResourceBrapi.this.studyDataManager.findPagedProjects(programDbId, locationDbId, seasonDbId,
+                                pagedResult.getPageSize(), pagedResult.getPageNumber());
                     }
                 });
 
         List<StudySummaryDto> studies = new ArrayList<>();
         PropertyMap<StudySummary, StudySummaryDto> studySummaryMapper = new PropertyMap<StudySummary, StudySummaryDto>() {
             protected void configure() {
-                map().setLocationDbId(Integer.parseInt(source.getLocationId()));
+                map().setLocationDbId(source.getLocationId());
                 map().setSeasons(source.getSeasons());
                 map().setYears(source.getYears());
                 map().setName(source.getName());
