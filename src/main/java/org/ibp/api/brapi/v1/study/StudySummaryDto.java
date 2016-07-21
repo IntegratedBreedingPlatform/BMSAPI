@@ -26,8 +26,7 @@ public class StudySummaryDto {
 
     private Integer programDbId;
 
-    @JsonIgnore
-    private Map<String, Object> optionalInfo;
+    private Map<String, String> optionalInfo;
 
     /**
      *
@@ -159,8 +158,7 @@ public class StudySummaryDto {
      *
      * @return The map with the optional info
      */
-    @JsonAnyGetter
-    public Map<String, Object> getOptionalInfo() {
+    public Map<String, String> getOptionalInfo() {
         return optionalInfo;
     }
 
@@ -169,8 +167,7 @@ public class StudySummaryDto {
      * @param name Key of the optional info
      * @param value Value of the optional info
      */
-    @JsonAnySetter
-    public void setOptionalInfo(final String name, final Object value) {
+    public void setOptionalInfo(final String name, final String value) {
         optionalInfo.put(name, value);
     }
 
@@ -180,7 +177,7 @@ public class StudySummaryDto {
      * @param value Value of the optional info
      * @return this
      */
-    public StudySummaryDto addOptionalInfo(final String name, final Object value) {
+    public StudySummaryDto addOptionalInfo(final String name, final String value) {
         optionalInfo.put(name, value);
         return this;
     }
@@ -190,7 +187,7 @@ public class StudySummaryDto {
      * @param optionalInfo
      * @return this
      */
-    public StudySummaryDto setOptionalInfo(final Map<String, Object> optionalInfo) {
+    public StudySummaryDto setOptionalInfo(final Map<String, String> optionalInfo) {
         this.optionalInfo = optionalInfo;
         return this;
     }
