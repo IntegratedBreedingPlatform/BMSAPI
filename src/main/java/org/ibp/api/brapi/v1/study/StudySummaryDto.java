@@ -24,7 +24,7 @@ public class StudySummaryDto {
 
     private Integer locationDbId;
 
-    private Integer programDbId;
+    private String programDbId;
 
     private Map<String, String> optionalInfo;
 
@@ -140,7 +140,7 @@ public class StudySummaryDto {
      *
      * @return The program db id
      */
-    public Integer getProgramDbId() {
+    public String getProgramDbId() {
         return programDbId;
     }
 
@@ -149,7 +149,7 @@ public class StudySummaryDto {
      * @param programDbId
      * @return this
      */
-    public StudySummaryDto setProgramDbId(final Integer programDbId) {
+    public StudySummaryDto setProgramDbId(final String programDbId) {
         this.programDbId = programDbId;
         return this;
     }
