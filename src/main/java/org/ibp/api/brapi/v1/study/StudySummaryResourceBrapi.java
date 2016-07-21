@@ -53,7 +53,7 @@ public class StudySummaryResourceBrapi {
 
                     @Override
                     public long getCount() {
-                        return StudySummaryResourceBrapi.this.studyDataManager.countAllPrograms(programDbId, locationDbId, seasonDbId);
+                        return StudySummaryResourceBrapi.this.studyDataManager.countAllStudies(programDbId, locationDbId, seasonDbId);
                     }
 
                     @Override
