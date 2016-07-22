@@ -27,7 +27,7 @@ import java.util.List;
  */
 @Api(value = "BrAPI Study Summary Services")
 @Controller
-public class StudySummaryResourceBrapi {
+public class StudyResourceBrapi {
 
     @Autowired
     private StudyDataManager studyDataManager;
@@ -53,13 +53,13 @@ public class StudySummaryResourceBrapi {
 
                     @Override
                     public long getCount() {
-                        return StudySummaryResourceBrapi.this.studyDataManager.countAllStudies(programDbId, locationDbId, seasonDbId);
+                        return StudyResourceBrapi.this.studyDataManager.countAllStudies(programDbId, locationDbId, seasonDbId);
                     }
 
                     @Override
                     public List<StudySummary> getResults(
                             PagedResult<StudySummary> pagedResult) {
-                        return StudySummaryResourceBrapi.this.studyDataManager.findPagedProjects(programDbId, locationDbId, seasonDbId,
+                        return StudyResourceBrapi.this.studyDataManager.findPagedProjects(programDbId, locationDbId, seasonDbId,
                                 pagedResult.getPageSize(), pagedResult.getPageNumber());
                     }
                 });
@@ -67,14 +67,14 @@ public class StudySummaryResourceBrapi {
         List<StudySummaryDto> studies = new ArrayList<>();
         PropertyMap<StudySummary, StudySummaryDto> studySummaryMapper = new PropertyMap<StudySummary, StudySummaryDto>() {
             protected void configure() {
-                map().setLocationDbId(source.getLocationId());
-                map().setSeasons(source.getSeasons());
-                map().setYears(source.getYears());
-                map().setName(source.getName());
-                map().setOptionalInfo(source.getOptionalInfo());
-                map().setProgramDbId(source.getProgramDbId());
-                map().setStudyDbId(source.getStudyDbid());
-                map().setStudyType(source.getType());
+                map(source.getLocationId(), destination.getLocationDbId());
+                map(source.getSeasons(), destination.getSeasons());
+                map(source.getYears(), destination.getYears());
+                map(source.getName(), destination.getName());
+                map(source.getOptionalInfo(), destination.getOptionalInfo());
+                map(source.getProgramDbId(), destination.getProgramDbId());
+                map(source.getStudyDbid(), destination.getStudyDbId());
+                map(source.getType(), destination.getStudyType());
             }
         };
 
@@ -88,11 +88,14 @@ public class StudySummaryResourceBrapi {
         }
 
         Result<org.ibp.api.brapi.v1.study.StudySummaryDto> results = new Result<StudySummaryDto>().withData(studies);
-        Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
-                .withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+        Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber())
+                .withPageSize(resultPage.getPageSize())
+                .withTotalCount(resultPage.getTotalResults())
+                .withTotalPages(resultPage.getTotalPages());
 
         Metadata metadata = new Metadata().withPagination(pagination);
-        StudySummariesDto studiesList = new StudySummariesDto().setMetadata(metadata).setResult(results);
+        StudySummariesDto studiesList = new StudySummariesDto().setMetadata(metadata)
+                .setResult(results);
 
         return new ResponseEntity<StudySummariesDto>(studiesList, HttpStatus.OK);
     }
