@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -38,13 +39,22 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public StudyDataManager studyDataManager() {
-			return Mockito.mock(StudyDataManager.class);
+		public org.generationcp.middleware.service.api.study.StudyService getStudyServiceMW() {
+			return Mockito.mock(org.generationcp.middleware.service.api.study.StudyService.class);
+		}
+
+		@Bean
+		@Primary
+		public StudyService studyDataManager()  {
+			return Mockito.mock(StudyService.class);
 		}
 	}
 
 	@Autowired
 	private StudyDataManager studyDataManager;
+
+	@Autowired
+	private StudyService studyServiceMW;
 
 	@Test
 	public void testListStudySummaries() throws Exception {
@@ -93,17 +103,21 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString())
 				.contentType(this.contentType)) //
-				.andExpect(MockMvcResultMatchers.status().isOk()) //
+				.andExpect(MockMvcResultMatchers.status()
+						.isOk()) //
 				.andDo(MockMvcResultHandlers.print()) //
 				.andExpect(jsonPath("$.result.data", IsCollectionWithSize.hasSize(mwStudySummary.size()))) //
 				.andExpect(jsonPath("$.result.data[0].studyDbId", is(studySummary.getStudyDbid()))) //
 				.andExpect(jsonPath("$.result.data[0].name", is(studySummary.getName()))) //
 				.andExpect(jsonPath("$.result.data[0].studyType", is(studySummary.getType()))) //
+				.andExpect(jsonPath("$.result.data[0].locationDbId", is(studySummary.getLocationId()))) //
 				.andExpect(jsonPath("$.result.data[0].programDbId", is(studySummary.getProgramDbId()))) //
 				.andExpect(jsonPath("$.result.data[0].years", IsCollectionWithSize.hasSize(studySummary.getYears().size()))) //
 				.andExpect(jsonPath("$.result.data[0].years[0]", is(studySummary.getYears().get(0)))) //
-				.andExpect(jsonPath("$.result.data[0].seasons", IsCollectionWithSize.hasSize(studySummary.getSeasons().size()))) //
-				.andExpect(jsonPath("$.result.data[0].seasons[0]", is(studySummary.getSeasons().get(0)))) //
+				.andExpect(jsonPath("$.result.data[0].seasons", IsCollectionWithSize.hasSize(studySummary.getSeasons()
+						.size()))) //
+				.andExpect(jsonPath("$.result.data[0].seasons[0]", is(studySummary.getSeasons()
+						.get(0)))) //
 				.andExpect(jsonPath("$.result.data[0].optionalInfo", hasKey(optionalInfoKey)))
 				.andExpect(jsonPath("$.metadata.pagination.pageNumber", is(1))) //
 				.andExpect(jsonPath("$.metadata.pagination.pageSize", is(10))) //
@@ -114,4 +128,45 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 
 	}
 
+	@Test
+	public void testListStudyDetailsAsTable() throws Exception {
+
+		final int studyDbId = current().nextInt();
+
+		final List<Integer> observationVariablesId= ImmutableList.<Integer>builder()
+				.add(current().nextInt())
+				.build();
+
+
+		final List<String> observationVariableName = ImmutableList.<String>builder()
+				.add(randomAlphabetic(5))
+				.build();
+
+		final List<List<String>> data = ImmutableList.<List<String>>builder()
+				.add(ImmutableList.<String>builder()
+						.add(randomAlphabetic(5))
+						.build())
+				.build();
+
+		org.generationcp.middleware.service.api.study.StudyDetailDto mwStudyDetailDto = new org.generationcp.middleware.service.api.study.StudyDetailDto(studyDbId, observationVariablesId, observationVariableName, data);
+
+		Mockito.when(this.studyServiceMW.getStudyDetails(studyDbId))
+				.thenReturn(mwStudyDetailDto);
+
+		UriComponents uriComponents =
+				UriComponentsBuilder.newInstance()
+						.path("/maize/brapi/v1/studies/{studyDbId}/table")
+						.buildAndExpand(ImmutableMap.<String, Object>builder()
+								.put("studyDbId", studyDbId)
+								.build())
+						.encode();
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString())
+				.contentType(this.contentType)) //
+				.andExpect(MockMvcResultMatchers.status()
+						.isOk()) //
+				.andDo(MockMvcResultHandlers.print()) ;
+
+
+	}
 }

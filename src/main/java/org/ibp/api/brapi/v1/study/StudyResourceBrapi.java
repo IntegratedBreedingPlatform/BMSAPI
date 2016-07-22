@@ -32,6 +32,9 @@ public class StudyResourceBrapi {
     @Autowired
     private StudyDataManager studyDataManager;
 
+    @Autowired
+    private org.generationcp.middleware.service.api.study.StudyService studyServiceMW;
+
     @ApiOperation(value = "List of study summaries", notes = "Get a list of study summaries.")
     @RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
     @ResponseBody
@@ -97,7 +100,38 @@ public class StudyResourceBrapi {
         StudySummariesDto studiesList = new StudySummariesDto().setMetadata(metadata)
                 .setResult(results);
 
-        return new ResponseEntity<StudySummariesDto>(studiesList, HttpStatus.OK);
+        return new ResponseEntity<>(studiesList, HttpStatus.OK);
     }
+
+
+    @ApiOperation(value = "List of study details", notes = "Get a list of the traits and values associated to a given study.")
+    @RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/table", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<StudyDetailsDto> listStudyDetailsAsTable(@PathVariable final String crop,
+                                                                   @PathVariable final Integer studyDbId) {
+
+        org.ibp.api.brapi.v1.study.StudyDetailDto brapiStudyDetailDto = new org.ibp.api.brapi.v1.study.StudyDetailDto();
+
+        org.generationcp.middleware.service.api.study.StudyDetailDto mwStudyDetailDto = this.studyServiceMW.getStudyDetails(studyDbId);
+
+        int resultNumber = (mwStudyDetailDto == null) ? 0 : 1;
+
+        if (resultNumber != 0) {
+            ModelMapper modelMapper = new ModelMapper();
+            brapiStudyDetailDto = modelMapper.map(mwStudyDetailDto, org.ibp.api.brapi.v1.study.StudyDetailDto.class);
+        }
+
+        Pagination pagination = new Pagination().withPageNumber(1)
+                .withPageSize(resultNumber)
+                .withTotalCount((long) resultNumber)
+                .withTotalPages(1);
+
+        Metadata metadata = new Metadata().withPagination(pagination);
+        StudyDetailsDto studyDetailsDto = new StudyDetailsDto().setMetadata(metadata)
+                .setResult(brapiStudyDetailDto);
+        return new ResponseEntity<>(studyDetailsDto, HttpStatus.OK);
+    }
+
 }
+
 
