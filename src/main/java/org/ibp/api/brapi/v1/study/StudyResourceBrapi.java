@@ -9,6 +9,7 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -33,7 +34,7 @@ public class StudyResourceBrapi {
     private StudyDataManager studyDataManager;
 
     @Autowired
-    private org.generationcp.middleware.service.api.study.StudyService studyServiceMW;
+    private StudyService studyService;
 
     @ApiOperation(value = "List of study summaries", notes = "Get a list of study summaries.")
     @RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
@@ -103,22 +104,21 @@ public class StudyResourceBrapi {
         return new ResponseEntity<>(studiesList, HttpStatus.OK);
     }
 
-
     @ApiOperation(value = "List of study details", notes = "Get a list of the traits and values associated to a given study.")
     @RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/table", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<StudyDetailsDto> listStudyDetailsAsTable(@PathVariable final String crop,
                                                                    @PathVariable final Integer studyDbId) {
 
-        org.ibp.api.brapi.v1.study.StudyDetailDto brapiStudyDetailDto = new org.ibp.api.brapi.v1.study.StudyDetailDto();
+        StudyDetailDto brapiStudyDetailDto = new StudyDetailDto();
 
-        org.generationcp.middleware.service.api.study.StudyDetailDto mwStudyDetailDto = this.studyServiceMW.getStudyDetails(studyDbId);
+        org.generationcp.middleware.service.api.study.StudyDetailDto mwStudyDetailDto = this.studyService.getStudyDetails(studyDbId);
 
         int resultNumber = (mwStudyDetailDto == null) ? 0 : 1;
 
         if (resultNumber != 0) {
             ModelMapper modelMapper = new ModelMapper();
-            brapiStudyDetailDto = modelMapper.map(mwStudyDetailDto, org.ibp.api.brapi.v1.study.StudyDetailDto.class);
+            brapiStudyDetailDto = modelMapper.map(mwStudyDetailDto, StudyDetailDto.class);
         }
 
         Pagination pagination = new Pagination().withPageNumber(1)

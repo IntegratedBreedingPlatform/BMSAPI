@@ -19,6 +19,7 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.generationcp.middleware.service.api.study.StudyDetailDto;
 
 import java.util.List;
 
@@ -129,7 +130,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testListStudyDetailsAsTable() throws Exception {
+	public void testListStudyDetailsAsTableNotNullResults() throws Exception {
 
 		final int studyDbId = current().nextInt();
 
@@ -145,10 +146,16 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final List<List<String>> data = ImmutableList.<List<String>>builder()
 				.add(ImmutableList.<String>builder()
 						.add(randomAlphabetic(5))
+						.add(randomAlphabetic(5))
+						.add(randomAlphabetic(5))
+						.add(randomAlphabetic(5))
 						.build())
 				.build();
 
-		org.generationcp.middleware.service.api.study.StudyDetailDto mwStudyDetailDto = new org.generationcp.middleware.service.api.study.StudyDetailDto(studyDbId, observationVariablesId, observationVariableName, data);
+		StudyDetailDto mwStudyDetailDto = new StudyDetailDto().setStudyDbId(studyDbId)
+				.setObservationVariableDbId(observationVariablesId)
+				.setObservationVariableName(observationVariableName)
+				.setData(data);
 
 		Mockito.when(this.studyServiceMW.getStudyDetails(studyDbId))
 				.thenReturn(mwStudyDetailDto);
@@ -165,8 +172,62 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 				.contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status()
 						.isOk()) //
-				.andDo(MockMvcResultHandlers.print()) ;
-
-
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(jsonPath("$.result.studyDbId", is(mwStudyDetailDto.getStudyDbId()))) //
+				.andExpect(jsonPath("$.result.observationVariableDbId", IsCollectionWithSize.hasSize(observationVariablesId.size()))) //
+				.andExpect(jsonPath("$.result.observationVariableDbId[0]", is(observationVariablesId.get(0)))) //
+				.andExpect(jsonPath("$.result.observationVariableName", IsCollectionWithSize.hasSize(observationVariableName.size()))) //
+				.andExpect(jsonPath("$.result.observationVariableName[0]", is(observationVariableName.get(0)))) //
+				.andExpect(jsonPath("$.result.data", IsCollectionWithSize.hasSize(data.size()))) //
+				.andExpect(jsonPath("$.result.data[0][0]", is(data.get(0).get(0)))) //
+				.andExpect(jsonPath("$.result.data[0][1]", is(data.get(0)
+						.get(1)))) //
+				.andExpect(jsonPath("$.result.data[0][2]", is(data.get(0).get(2)))) //
+				.andExpect(jsonPath("$.result.data[0][3]", is(data.get(0)
+						.get(3)))) //
+				.andExpect(jsonPath("$.metadata.pagination.pageNumber", is(1))) //
+				.andExpect(jsonPath("$.metadata.pagination.pageSize", is(1))) //
+				.andExpect(jsonPath("$.metadata.pagination.totalCount", is(1))) //
+				.andExpect(jsonPath("$.metadata.pagination.totalPages", is(1))) //
+				.andExpect(jsonPath("$.metadata.status", is(IsCollectionWithSize.hasSize(0))));
 	}
+
+	@Test
+	public void testListStudyDetailsAsTableNullResults() throws Exception {
+
+		final int studyDbId = current().nextInt();
+
+		StudyDetailDto mwStudyDetailDto = new StudyDetailDto().setStudyDbId(studyDbId)
+				.setObservationVariableDbId(Lists.<Integer>newArrayList())
+				.setObservationVariableName(Lists.<String>newArrayList())
+				.setData(Lists.<List<String>>newArrayList());
+
+		Mockito.when(this.studyServiceMW.getStudyDetails(studyDbId))
+				.thenReturn(mwStudyDetailDto);
+
+		UriComponents uriComponents =
+				UriComponentsBuilder.newInstance()
+						.path("/maize/brapi/v1/studies/{studyDbId}/table")
+						.buildAndExpand(ImmutableMap.<String, Object>builder()
+								.put("studyDbId", studyDbId)
+								.build())
+						.encode();
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString())
+				.contentType(this.contentType)) //
+				.andExpect(MockMvcResultMatchers.status()
+						.isOk()) //
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(jsonPath("$.result.studyDbId", is(mwStudyDetailDto.getStudyDbId()))) //
+				.andExpect(jsonPath("$.result.observationVariableDbId", IsCollectionWithSize.hasSize(0))) //
+				.andExpect(jsonPath("$.result.observationVariableName", IsCollectionWithSize.hasSize(0))) //
+				.andExpect(jsonPath("$.result.data", IsCollectionWithSize.hasSize(0))) //
+				.andExpect(jsonPath("$.metadata.pagination.pageNumber", is(1))) //
+				.andExpect(jsonPath("$.metadata.pagination.pageSize", is(1))) //
+				.andExpect(jsonPath("$.metadata.pagination.totalCount", is(1))) //
+				.andExpect(jsonPath("$.metadata.pagination.totalPages", is(1))) //
+				.andExpect(jsonPath("$.metadata.status", is(IsCollectionWithSize.hasSize(0))));
+	}
+
+
 }
