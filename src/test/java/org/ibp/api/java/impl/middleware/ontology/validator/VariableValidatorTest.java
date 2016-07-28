@@ -155,7 +155,7 @@ public class VariableValidatorTest {
         variable.setAlias("");
 
         Variable dbVariable = TestDataProvider.getTestVariable();
-        dbVariable.setObservations(5);
+        dbVariable.setStudies(5);
 
         dbVariable.setAlias("TEST");
         
@@ -228,7 +228,7 @@ public class VariableValidatorTest {
 
 		Scale scale = TestDataProvider.getTestScale();
 		Variable variable = TestDataProvider.getTestVariable();
-		variable.setObservations(1);
+		variable.setStudies(1);
 		VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
 		variableDetails.setName("ChangedName");
 
@@ -859,8 +859,8 @@ public class VariableValidatorTest {
         VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
         Variable originalVariable = TestDataProvider.getTestVariable();
 
-        // providing observations to indicate that the variable is already in use
-        originalVariable.setObservations(15);
+        // providing studies to indicate that the variable is already in use
+        originalVariable.setStudies(15);
 
         Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
         Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
