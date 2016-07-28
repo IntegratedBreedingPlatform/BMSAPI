@@ -10,86 +10,56 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "studyDbId", "observationVariableDbId", "observationVariableName", "data" })
+@JsonPropertyOrder({"studyDbId", "headerRow", "observationVariableDbIds", "observationVariableNames", "data"})
 public class StudyDetailDto {
 
-	private Long studyDbId;
+	private Integer studyDbId;
 
-	private List<Long> observationVariableDbId;
+	private List<Integer> observationVariableDbIds;
 
-	private List<String> observationVariableName;
+	private List<String> observationVariableNames;
+
+	private List<String> headerRow;
 
 	private List<List<String>> data;
 
-	/**
-	 *
-	 * @return The study db id
-	 */
-	public Long getStudyDbId() {
+	public Integer getStudyDbId() {
 		return studyDbId;
 	}
 
-	/**
-	 *
-	 * @param studyDbId
-	 *            The study db id
-	 * @return this
-	 */
-	public StudyDetailDto setStudyDbId(final Long studyDbId) {
+	public StudyDetailDto setStudyDbId(final Integer studyDbId) {
 		this.studyDbId = studyDbId;
 		return this;
 	}
 
-	/**
-	 *
-	 * @return the observation variables id
-	 */
-	public List<Long> getObservationVariableDbId() {
-		return observationVariableDbId;
+	public List<Integer> getObservationVariableDbIds() {
+		return observationVariableDbIds;
 	}
 
-	/**
-	 *
-	 * @param observationVariableDbId
-	 * @return this
-	 */
-	public StudyDetailDto setObservationVariableDbId(final List<Long> observationVariableDbId) {
-		this.observationVariableDbId = observationVariableDbId;
-		return this;
+	public void setObservationVariableDbIds(List<Integer> observationVariableDbIds) {
+		this.observationVariableDbIds = observationVariableDbIds;
 	}
 
-	/**
-	 *
-	 * @return The observation variable names
-	 */
-	public List<String> getObservationVariableName() {
-		return observationVariableName;
+	public List<String> getObservationVariableNames() {
+		return observationVariableNames;
 	}
 
-	/**
-	 *
-	 * @param observationVariableName
-	 * @return this
-	 */
-	public StudyDetailDto setObservationVariableName(final List<String> observationVariableName) {
-		this.observationVariableName = observationVariableName;
-		return this;
+	public void setObservationVariableNames(List<String> observationVariableNames) {
+		this.observationVariableNames = observationVariableNames;
 	}
 
-	/**
-	 *
-	 * @return List of lists of the measurement values for every trait in the
-	 *         observation variables ids
-	 */
+	public List<String> getHeaderRow() {
+		return headerRow;
+	}
+
+	public void setHeaderRow(List<String> headerRow) {
+		this.headerRow = headerRow;
+	}
+
 	public List<List<String>> getData() {
 		return data;
 	}
 
-	/**
-	 *
-	 * @param data
-	 * @return this
-	 */
 	public StudyDetailDto setData(final List<List<String>> data) {
 		this.data = data;
 		return this;

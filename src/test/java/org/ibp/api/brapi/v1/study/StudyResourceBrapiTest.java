@@ -105,7 +105,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 				.build();
 
 		StudyDetailDto mwStudyDetailDto = new StudyDetailDto().setStudyDbId(studyDbId)
-				.setObservationVariableDbId(observationVariablesId).setObservationVariableName(observationVariableName)
+				.setObservationVariableDbIds(observationVariablesId).setObservationVariableNames(observationVariableName)
 				.setData(data);
 
 		Mockito.when(this.studyServiceMW.getStudyDetails(studyDbId)).thenReturn(mwStudyDetailDto);
@@ -118,12 +118,12 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.status().isOk()) //
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(jsonPath("$.result.studyDbId", is(mwStudyDetailDto.getStudyDbId()))) //
-				.andExpect(jsonPath("$.result.observationVariableDbId",
+				.andExpect(jsonPath("$.result.observationVariableDbIds",
 						IsCollectionWithSize.hasSize(observationVariablesId.size()))) //
-				.andExpect(jsonPath("$.result.observationVariableDbId[0]", is(observationVariablesId.get(0)))) //
-				.andExpect(jsonPath("$.result.observationVariableName",
+				.andExpect(jsonPath("$.result.observationVariableDbIds[0]", is(observationVariablesId.get(0)))) //
+				.andExpect(jsonPath("$.result.observationVariableNames",
 						IsCollectionWithSize.hasSize(observationVariableName.size()))) //
-				.andExpect(jsonPath("$.result.observationVariableName[0]", is(observationVariableName.get(0)))) //
+				.andExpect(jsonPath("$.result.observationVariableNames[0]", is(observationVariableName.get(0)))) //
 				.andExpect(jsonPath("$.result.data", IsCollectionWithSize.hasSize(data.size()))) //
 				.andExpect(jsonPath("$.result.data[0][0]", is(data.get(0).get(0)))) //
 				.andExpect(jsonPath("$.result.data[0][1]", is(data.get(0).get(1)))) //
@@ -142,8 +142,8 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final int studyDbId = current().nextInt();
 
 		StudyDetailDto mwStudyDetailDto = new StudyDetailDto().setStudyDbId(studyDbId)
-				.setObservationVariableDbId(Lists.<Integer>newArrayList())
-				.setObservationVariableName(Lists.<String>newArrayList()).setData(Lists.<List<String>>newArrayList());
+				.setObservationVariableDbIds(Lists.<Integer>newArrayList()).setObservationVariableNames(Lists.<String>newArrayList())
+				.setData(Lists.<List<String>>newArrayList());
 
 		Mockito.when(this.studyServiceMW.getStudyDetails(studyDbId)).thenReturn(mwStudyDetailDto);
 
@@ -155,8 +155,8 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.status().isOk()) //
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(jsonPath("$.result.studyDbId", is(mwStudyDetailDto.getStudyDbId()))) //
-				.andExpect(jsonPath("$.result.observationVariableDbId", IsCollectionWithSize.hasSize(0))) //
-				.andExpect(jsonPath("$.result.observationVariableName", IsCollectionWithSize.hasSize(0))) //
+				.andExpect(jsonPath("$.result.observationVariableDbIds", IsCollectionWithSize.hasSize(0))) //
+				.andExpect(jsonPath("$.result.observationVariableNames", IsCollectionWithSize.hasSize(0))) //
 				.andExpect(jsonPath("$.result.data", IsCollectionWithSize.hasSize(0))) //
 				.andExpect(jsonPath("$.metadata.pagination.pageNumber", is(1))) //
 				.andExpect(jsonPath("$.metadata.pagination.pageSize", is(1))) //
