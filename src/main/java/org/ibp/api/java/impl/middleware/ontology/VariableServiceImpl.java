@@ -174,7 +174,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			}
 
 			boolean deletable = true;
-			if (!ontologyVariable.getHasUsage()) {
+			if (ontologyVariable.getHasUsage()) {
 				deletable = false;
 			}
 
