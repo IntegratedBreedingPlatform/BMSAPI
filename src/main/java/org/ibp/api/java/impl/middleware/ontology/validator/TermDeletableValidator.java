@@ -35,7 +35,7 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
 			}
 
 			if (Objects.equals(request.getCvId(), CvId.VARIABLES.getId())) {
-				boolean hasUsage = this.ontologyVariableDataManager.isVariableUsed(Integer.valueOf(request.getId()));
+				boolean hasUsage = this.ontologyVariableDataManager.isVariableUsedInStudy(Integer.valueOf(request.getId()));
 				if (!hasUsage) {
 					return;
 				}

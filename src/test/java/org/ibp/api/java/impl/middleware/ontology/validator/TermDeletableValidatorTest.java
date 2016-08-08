@@ -25,7 +25,7 @@ public class TermDeletableValidatorTest {
 	@Mock
 	private TermDataManager termDataManager;
 
-  	@Mock
+	@Mock
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	private TermDeletableValidator termDeletableValidator;
@@ -35,7 +35,7 @@ public class TermDeletableValidatorTest {
 		MockitoAnnotations.initMocks(this);
 		this.termDeletableValidator = new TermDeletableValidator();
 		this.termDeletableValidator.setTermDataManager(this.termDataManager);
-	  	this.termDeletableValidator.setOntologyVariableDataManager(ontologyVariableDataManager);
+		this.termDeletableValidator.setOntologyVariableDataManager(ontologyVariableDataManager);
 	}
 
 	@After
@@ -79,27 +79,27 @@ public class TermDeletableValidatorTest {
 		Assert.assertFalse(bindingResult.hasErrors());
 	}
 
-  	@Test
-  	public void testWithVariableTermHasNoUsage() throws MiddlewareException {
-	  	Term variableTerm = TestDataProvider.getVariableTerm();
-	  	Mockito.doReturn(variableTerm).when(this.termDataManager).getTermById(variableTerm.getId());
-		Mockito.doReturn(false).when(this.ontologyVariableDataManager).isVariableUsed(variableTerm.getId());
-
-	  	BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-	  	this.termDeletableValidator.validate(new TermRequest(String.valueOf(variableTerm.getId()), "variableName", CvId.VARIABLES.getId()),
-			  bindingResult);
-	  	Assert.assertFalse(bindingResult.hasErrors());
-	}
-
-  	@Test
-  	public void testWithVariableTermHasUsage() throws MiddlewareException {
+	@Test
+	public void testWithVariableTermHasNoUsage() throws MiddlewareException {
 		Term variableTerm = TestDataProvider.getVariableTerm();
 		Mockito.doReturn(variableTerm).when(this.termDataManager).getTermById(variableTerm.getId());
-		Mockito.doReturn(true).when(this.ontologyVariableDataManager).isVariableUsed(variableTerm.getId());
+		Mockito.doReturn(false).when(this.ontologyVariableDataManager).isVariableUsedInStudy(variableTerm.getId());
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		this.termDeletableValidator.validate(new TermRequest(String.valueOf(variableTerm.getId()), "variableName", CvId.VARIABLES.getId()),
+				bindingResult);
+		Assert.assertFalse(bindingResult.hasErrors());
+	}
+
+	@Test
+	public void testWithVariableTermHasUsage() throws MiddlewareException {
+		Term variableTerm = TestDataProvider.getVariableTerm();
+		Mockito.doReturn(variableTerm).when(this.termDataManager).getTermById(variableTerm.getId());
+		Mockito.doReturn(true).when(this.ontologyVariableDataManager).isVariableUsedInStudy(variableTerm.getId());
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 		this.termDeletableValidator.validate(new TermRequest(String.valueOf(variableTerm.getId()), "variableName", CvId.VARIABLES.getId()),
 				bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
-  }
+	}
 }
