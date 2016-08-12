@@ -41,7 +41,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 	public void testListStudySummaries() throws Exception {
 
 		final int studyDbId = current().nextInt();
-		final int locationId = current().nextInt();
+		final String locationId = randomAlphabetic(5);
 		final String programDbId = randomAlphanumeric(5);
 		final String name = randomAlphabetic(5);
 		final String season = randomAlphabetic(5);

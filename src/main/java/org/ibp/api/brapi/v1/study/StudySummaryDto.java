@@ -25,7 +25,7 @@ public class StudySummaryDto {
 
 	private List<String> seasons;
 
-	private Integer locationDbId;
+	private String locationDbId;
 
 	private String programDbId;
 
@@ -125,7 +125,7 @@ public class StudySummaryDto {
 	 *
 	 * @return The location db id
 	 */
-	public Integer getLocationDbId() {
+	public String getLocationDbId() {
 		return locationDbId;
 	}
 
@@ -134,7 +134,7 @@ public class StudySummaryDto {
 	 * @param locationDbId
 	 * @return this
 	 */
-	public StudySummaryDto setLocationDbId(final Integer locationDbId) {
+	public StudySummaryDto setLocationDbId(final String locationDbId) {
 		this.locationDbId = locationDbId;
 		return this;
 	}
