@@ -27,7 +27,6 @@ import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class})
 @EnableSwagger
-@Configuration
 public class Main extends WebMvcConfigurerAdapter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
