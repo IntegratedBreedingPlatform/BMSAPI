@@ -52,11 +52,11 @@ public class GermplasmResourcePedigreeTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.root", Matchers.notNullValue()))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.root.germplasmId", Matchers.is(mainNodeGid.toString())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.root.name", Matchers.is(mainNodeName)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.root.parents", IsCollectionWithSize.hasSize(2)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.root.parents[0].germplasmId", Matchers.is(parent1Gid.toString())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.root.parents[0].name", Matchers.is(parent1Name)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.root.parents[1].germplasmId", Matchers.is(parent2Gid.toString())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.root.parents[1].name", Matchers.is(parent2Name)));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.root.children", IsCollectionWithSize.hasSize(2)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.root.children[0].germplasmId", Matchers.is(parent1Gid.toString())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.root.children[0].name", Matchers.is(parent1Name)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.root.children[1].germplasmId", Matchers.is(parent2Gid.toString())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.root.children[1].name", Matchers.is(parent2Name)));
 	}
 
 	private GermplasmPedigreeTreeNode createNode(Integer gid, String name, Integer parent1Gid, String parent1Name, Integer parent2Gid,

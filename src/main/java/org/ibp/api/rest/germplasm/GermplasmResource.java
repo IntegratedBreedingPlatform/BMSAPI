@@ -3,12 +3,15 @@ package org.ibp.api.rest.germplasm;
 
 import java.util.List;
 
+import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.germplasm.DescendantTree;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.domain.germplasm.PedigreeTree;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.rest.ResourceURLLinkProvider;
+import org.ibp.api.rest.common.PaginatedSearch;
+import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,12 +40,30 @@ public class GermplasmResource {
 
 	@ApiOperation(value = "Search germplasm.", notes = "Search germplasm.")
 	@RequestMapping(value = "/{cropname}/search", method = RequestMethod.GET)
-	public ResponseEntity<List<GermplasmSummary>> searchGermplasm(@PathVariable String cropname, @RequestParam String q) {
-		List<GermplasmSummary> searchResults = this.germplasmService.searchGermplasm(q);
-		for (GermplasmSummary summary : searchResults) {
-			this.populateParentLinkUrls(cropname, summary);
-		}
-		return new ResponseEntity<List<GermplasmSummary>>(searchResults, HttpStatus.OK);
+	public ResponseEntity<PagedResult<GermplasmSummary>> searchGermplasm(@PathVariable final String cropname, @RequestParam final String q,
+			@ApiParam(value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.",
+					required = false) @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+			@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.",
+					required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+
+		PagedResult<GermplasmSummary> result = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<GermplasmSummary>() {
+
+			@Override
+			public long getCount() {
+				return GermplasmResource.this.germplasmService.searchGermplasmCount(q);
+			}
+
+			@Override
+			public List<GermplasmSummary> getResults(PagedResult<GermplasmSummary> pagedResult) {
+				final List<GermplasmSummary> pageResults = GermplasmResource.this.germplasmService.searchGermplasm(q, pagedResult.getPageNumber(),
+						pagedResult.getPageSize());
+				for (GermplasmSummary summary : pageResults) {
+					GermplasmResource.this.populateParentLinkUrls(cropname, summary);
+				}
+				return pageResults;
+			}
+		});
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
 	private void populateParentLinkUrls(String cropname, GermplasmSummary summary) {
