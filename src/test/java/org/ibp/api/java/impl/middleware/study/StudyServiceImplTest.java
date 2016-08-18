@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.validation.Errors;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
@@ -41,13 +40,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
-
-import uk.co.jemos.podam.api.PodamFactory;
-import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+
+import uk.co.jemos.podam.api.PodamFactory;
+import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 public class StudyServiceImplTest {
 
@@ -177,10 +177,12 @@ public class StudyServiceImplTest {
 	public void getObservations() {
 		final List<ObservationDto> observationDtoTestData =
 				Lists.newArrayList(this.factory.manufacturePojo(ObservationDto.class), this.factory.manufacturePojo(ObservationDto.class));
-		Mockito.when(this.mockMiddlewareStudyService.getObservations(StudyServiceImplTest.TEST_STUDY_IDENTIFIER)).thenReturn(
+		Mockito.when(this.mockMiddlewareStudyService.getObservations(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, 1, 1, 100))
+				.thenReturn(
 				observationDtoTestData);
 
-		final List<Observation> actualObservations = this.studyServiceImpl.getObservations(StudyServiceImplTest.TEST_STUDY_IDENTIFIER);
+		final List<Observation> actualObservations =
+				this.studyServiceImpl.getObservations(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, 1, 1, 100);
 
 		Assert.assertEquals(Lists.transform(observationDtoTestData, this.observationTransformFunction), actualObservations);
 

@@ -3,12 +3,11 @@ package org.ibp.api.rest.study;
 
 import java.util.List;
 import java.util.Map;
+
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyDetails;
@@ -31,6 +30,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
 @Api(value = "Study Services")
 @Controller
@@ -76,8 +79,24 @@ public class StudyResource {
 	@ApiOperation(value = "Get all observations", notes = "Returns observations available in the study.")
 	@RequestMapping(value = "/{cropname}/{studyId}/observations", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<Observation>> getObservations(@PathVariable final String cropname, @PathVariable final Integer studyId) {
-		return new ResponseEntity<>(this.studyService.getObservations(studyId), HttpStatus.OK);
+	public ResponseEntity<List<Observation>> getObservations(@PathVariable final String cropname, @PathVariable final Integer studyId,
+			@ApiParam(
+					value = "One study can have multiple instances. Supply the instance number for which the observations need to be retrieved.") @RequestParam(
+							value = "instanceNumber", required = false) Integer instanceNumber,
+			@ApiParam(value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.",
+					required = false) @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+			@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.",
+					required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+		// TODO use PaginatedSearch template pattern once we have the count query available.
+		// Default page parameters if not supplied.
+		if (pageNumber == null) {
+			pageNumber = new Integer(PagedResult.DEFAULT_PAGE_NUMBER);
+		}
+
+		if (pageSize == null) {
+			pageSize = new Integer(PagedResult.DEFAULT_PAGE_SIZE);
+		}
+		return new ResponseEntity<>(this.studyService.getObservations(studyId, instanceNumber, pageNumber, pageSize), HttpStatus.OK);
 	}
 	
 	@ApiOperation(value = "Get a observations", notes = "Returns the requested observation in the study.")
@@ -141,7 +160,7 @@ public class StudyResource {
 
 		if (bindingResult.hasErrors()) {
 			final String error = this.getErrorsAsString(bindingResult);
-			this.LOGGER.error(error);
+			LOGGER.error(error);
 			throw new ValidationException(error);
 		}
 		final Integer studyId = this.studyService.importStudy(studyImportDTO, programUUID);

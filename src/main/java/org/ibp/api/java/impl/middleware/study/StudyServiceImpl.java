@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Experiment;
@@ -60,6 +58,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 @Transactional
@@ -132,8 +133,9 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<Observation> getObservations(final Integer studyId) {
-		final List<ObservationDto> studyMeasurements = this.middlewareStudyService.getObservations(studyId);
+	public List<Observation> getObservations(final Integer studyId, final int instanceNumber, final int pageNumber, final int pageSize) {
+		final List<ObservationDto> studyMeasurements =
+				this.middlewareStudyService.getObservations(studyId, instanceNumber, pageNumber, pageSize);
 		final List<Observation> observations = new ArrayList<Observation>();
 		for (final ObservationDto measurement : studyMeasurements) {
 			observations.add(this.mapObservationDtoToObservation(measurement));

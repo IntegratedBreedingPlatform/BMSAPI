@@ -97,9 +97,12 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		ObservationDto obsDto =
 				new ObservationDto(1, "1", "Test", 1, "CML123", "1", "CIMMYT Seed Bank", "1", "1", Lists.newArrayList(measurement));
 
-		Mockito.when(this.studyServiceMW.getObservations(org.mockito.Matchers.anyInt())).thenReturn(Lists.newArrayList(obsDto));
+		Mockito.when(this.studyServiceMW.getObservations(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
+				org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt())).thenReturn(Lists.newArrayList(obsDto));
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.get("/study/{cropname}/{studyId}/observations", "maize", "1").contentType(this.contentType))
+				.perform(MockMvcRequestBuilders
+						.get("/study/{cropname}/{studyId}/observations?instanceNumber=1", "maize", "1")
+						.contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(1)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['uniqueIdentifier']", Matchers.is(obsDto.getMeasurementId())))
