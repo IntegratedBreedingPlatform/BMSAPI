@@ -133,6 +133,11 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
+	public int countTotalObservationUnits(int studyIdentifier, int instanceNumber) {
+		return this.middlewareStudyService.countTotalObservationUnits(studyIdentifier, instanceNumber);
+	}
+
+	@Override
 	public List<Observation> getObservations(final Integer studyId, final int instanceNumber, final int pageNumber, final int pageSize) {
 		final List<ObservationDto> studyMeasurements =
 				this.middlewareStudyService.getObservations(studyId, instanceNumber, pageNumber, pageSize);

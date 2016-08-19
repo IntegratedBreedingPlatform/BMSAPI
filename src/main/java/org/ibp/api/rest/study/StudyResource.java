@@ -16,6 +16,8 @@ import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.java.study.StudyService;
+import org.ibp.api.rest.common.PaginatedSearch;
+import org.ibp.api.rest.common.SearchSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,24 +81,30 @@ public class StudyResource {
 	@ApiOperation(value = "Get all observations", notes = "Returns observations available in the study.")
 	@RequestMapping(value = "/{cropname}/{studyId}/observations", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<Observation>> getObservations(@PathVariable final String cropname, @PathVariable final Integer studyId,
-			@ApiParam(
-					value = "One study can have multiple instances. Supply the instance number for which the observations need to be retrieved.") @RequestParam(
-							value = "instanceNumber") Integer instanceNumber,
+	public ResponseEntity<PagedResult<Observation>> getObservations(@PathVariable final String cropname, //
+			@PathVariable final Integer studyId, //
+			@ApiParam(value = "One study can have multiple instances. Supply the instance number for which the observations need to be retrieved.")  //
+			@RequestParam(value = "instanceNumber") final Integer instanceNumber, //
 			@ApiParam(value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.",
-					required = false) @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
-			@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.",
-					required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize) {
-		// TODO use PaginatedSearch template pattern once we have the count query available.
-		// Default page parameters if not supplied.
-		if (pageNumber == null) {
-			pageNumber = new Integer(PagedResult.DEFAULT_PAGE_NUMBER);
-		}
+					required = false) //
+			@RequestParam(value = "pageNumber", required = false) Integer pageNumber, //
+			@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.", required = false) //
+			@RequestParam(value = "pageSize", required = false) Integer pageSize) {
 
-		if (pageSize == null) {
-			pageSize = new Integer(PagedResult.DEFAULT_PAGE_SIZE);
-		}
-		return new ResponseEntity<>(this.studyService.getObservations(studyId, instanceNumber, pageNumber, pageSize), HttpStatus.OK);
+		PagedResult<Observation> pageResult = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<Observation>() {
+
+			@Override
+			public long getCount() {
+				return StudyResource.this.studyService.countTotalObservationUnits(studyId, instanceNumber);
+			}
+
+			@Override
+			public List<Observation> getResults(PagedResult<Observation> pagedResult) {
+				return StudyResource.this.studyService.getObservations(studyId, instanceNumber, pagedResult.getPageNumber(),
+						pagedResult.getPageSize());
+			}
+		});
+		return new ResponseEntity<>(pageResult, HttpStatus.OK);
 	}
 	
 	@ApiOperation(value = "Get a observations", notes = "Returns the requested observation in the study.")

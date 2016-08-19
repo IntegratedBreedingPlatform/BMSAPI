@@ -16,6 +16,8 @@ public interface StudyService {
 
 	List<StudySummary> search(final String programUniqueId, String principalInvestigator, String location, String season);
 
+	int countTotalObservationUnits(final int studyIdentifier, final int instanceNumber);
+
 	List<Observation> getObservations(final Integer studyId, final int instanceNumber, final int pageNumber, final int pageSize);
 
 	Observation getSingleObservation(Integer studyId, Integer obeservationId);
