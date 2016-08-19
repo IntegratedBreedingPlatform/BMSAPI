@@ -41,21 +41,17 @@ public class ProgramValidator extends BaseValidator implements Validator {
 		// check if program id is non numeric
 		ProgramSummary program = (ProgramSummary) target;
 
-		this.checkIfProgramExist("programId", program, errors);
+		this.checkIfProgramExists("programId", program, errors);
 	}
 
-	protected void checkIfProgramExist(String fieldName, ProgramSummary program, Errors errors) {
+	protected void checkIfProgramExists(String fieldName, ProgramSummary program, Errors errors) {
 		try {
-			Project project = this.workbenchDataManager.getProjectByUuid(program.getUniqueID());
+			Project project = this.workbenchDataManager.getProgramByUuidAndCrop(program.getUniqueID(), program.getCrop());
 			if (Objects.equals(project, null)) {
 				this.addCustomError(errors, fieldName, ProgramValidator.PROGRAM_DOES_NOT_EXIST, null);
 				return;
 			}
 
-			if (!Objects.equals(program.getCrop(), project.getCropType().getCropName())) {
-				this.addCustomError(errors, fieldName, ProgramValidator.PROGRAM_DOES_NOT_EXIST, null);
-				return;
-			}
 		} catch (MiddlewareException e) {
 			ProgramValidator.LOGGER.error("Error occur while fetching program data", e);
 		}
