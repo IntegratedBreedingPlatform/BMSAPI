@@ -82,7 +82,7 @@ public class StudyResource {
 	public ResponseEntity<List<Observation>> getObservations(@PathVariable final String cropname, @PathVariable final Integer studyId,
 			@ApiParam(
 					value = "One study can have multiple instances. Supply the instance number for which the observations need to be retrieved.") @RequestParam(
-							value = "instanceNumber", required = false) Integer instanceNumber,
+							value = "instanceNumber") Integer instanceNumber,
 			@ApiParam(value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.",
 					required = false) @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
 			@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.",
