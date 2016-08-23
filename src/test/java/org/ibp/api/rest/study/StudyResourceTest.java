@@ -14,6 +14,7 @@ import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.TraitDto;
+import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.junit.Test;
@@ -192,5 +193,25 @@ public class StudyResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is(folderRef.getName())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(folderRef.getDescription())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].parentFolderId", Matchers.is(folderRef.getParentFolderId())));
+	}
+
+	@Test
+	public void testListStudyInstances() throws Exception {
+
+		final StudyInstance studyInstance = new StudyInstance(1, "Gujarat, India", "GUJ", 1);
+		Mockito.when(this.studyServiceMW.getStudyInstances(Mockito.anyInt()))
+				.thenReturn(Lists.newArrayList(studyInstance));
+
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.get("/study/{cropname}/{studyId}/instances", "maize", "1")
+				.contentType(this.contentType))
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(1)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].instanceDbId", Matchers.is(studyInstance.getInstanceDbId())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].locationName", Matchers.is(studyInstance.getLocationName())))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$[0].locationAbbreviation", Matchers.is(studyInstance.getLocationAbbreviation())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].instanceNumber", Matchers.is(studyInstance.getInstanceNumber())));
 	}
 }
