@@ -44,6 +44,7 @@ import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
+import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -61,6 +62,8 @@ import org.springframework.validation.ObjectError;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 
 @Service
 @Transactional
@@ -515,6 +518,23 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public String getProgramUUID(final Integer studyIdentifier) {
 		return middlewareStudyService.getProgramUUID(studyIdentifier);
+	}
+
+	@Override
+	public List<StudyInstance> getStudyInstances(int studyId) {
+		final List<org.generationcp.middleware.service.impl.study.StudyInstance> studyInstancesMW =
+				this.middlewareStudyService.getStudyInstances(studyId);
+
+		final Function<org.generationcp.middleware.service.impl.study.StudyInstance, StudyInstance> transformer =
+				new Function<org.generationcp.middleware.service.impl.study.StudyInstance, StudyInstance>() {
+
+			@Override
+			public StudyInstance apply(org.generationcp.middleware.service.impl.study.StudyInstance input) {
+				return new StudyInstance(input.getInstanceDbId(), input.getLocationName(), input.getLocationAbbreviation(),
+						input.getInstanceNumber());
+			}
+		};
+		return Lists.transform(studyInstancesMW, transformer);
 	}
 
 }

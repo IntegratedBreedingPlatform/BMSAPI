@@ -10,6 +10,7 @@ import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
+import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
 
 public interface StudyService {
@@ -37,4 +38,6 @@ public interface StudyService {
 	List<StudyFolder> getAllStudyFolders();
 
 	String getProgramUUID(Integer studyIdentifier);
+
+	List<StudyInstance> getStudyInstances(int studyId);
 }

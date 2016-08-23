@@ -14,6 +14,7 @@ import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
+import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -83,7 +84,9 @@ public class StudyResource {
 	@ResponseBody
 	public ResponseEntity<PagedResult<Observation>> getObservations(@PathVariable final String cropname, //
 			@PathVariable final Integer studyId, //
-			@ApiParam(value = "One study can have multiple instances. Supply the instance number for which the observations need to be retrieved.")  //
+			@ApiParam(
+					value = "One study can have multiple instances. Supply the instance number for which the observations need to be retrieved."
+							+ " Use <code>GET /study/{cropname}/{studyId}/instances</code> service to retrieve a list of instances with basic metadata.") //
 			@RequestParam(value = "instanceNumber") final Integer instanceNumber, //
 			@ApiParam(value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.",
 					required = false) //
@@ -190,5 +193,14 @@ public class StudyResource {
 	@ResponseBody
 	public ResponseEntity<List<StudyFolder>> listAllFolders(final @PathVariable String cropname) {
 		return new ResponseEntity<List<StudyFolder>>(this.studyService.getAllStudyFolders(), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "List all study instances with basic metadata.",
+			notes = "Returns list of all study instances with basic metadata.")
+	@RequestMapping(value = "/{cropname}/{studyId}/instances", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<StudyInstance>> listStudyInstances(final @PathVariable String cropname,
+			@PathVariable final Integer studyId) {
+		return new ResponseEntity<List<StudyInstance>>(this.studyService.getStudyInstances(studyId), HttpStatus.OK);
 	}
 }
