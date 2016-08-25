@@ -14,16 +14,16 @@ package org.ibp.api.ibpworkbench.service;
 import com.rits.cloning.Cloner;
 import org.generationcp.commons.service.BreedingViewImportService;
 import org.generationcp.commons.util.ObjectUtil;
-import org.generationcp.ibpworkbench.constants.WebAPIConstants;
-import org.generationcp.ibpworkbench.exceptions.IBPWebServiceException;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.ibp.api.ibpworkbench.constants.WebAPIConstants;
+import org.ibp.api.ibpworkbench.exceptions.IBPWebServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Configurable
+@Component
 public class BreedingViewServiceImpl implements BreedingViewService {
 
 	@Autowired

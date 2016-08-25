@@ -11,7 +11,7 @@
 
 package org.ibp.api.ibpworkbench.service;
 
-import org.generationcp.ibpworkbench.exceptions.IBPWebServiceException;
+import org.ibp.api.ibpworkbench.exceptions.IBPWebServiceException;
 
 import java.util.List;
 import java.util.Map;

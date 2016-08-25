@@ -14,29 +14,27 @@ package org.ibp.api.ibpworkbench.rest;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-import org.generationcp.ibpworkbench.constants.WebAPIConstants;
-import org.generationcp.ibpworkbench.model.DataResponse;
-import org.generationcp.ibpworkbench.service.BreedingViewService;
+import org.ibp.api.ibpworkbench.constants.WebAPIConstants;
+import org.ibp.api.ibpworkbench.model.DataResponse;
+import org.ibp.api.ibpworkbench.service.BreedingViewService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
-@Api(value = "/breeding_view", description = "Web Services to process the Breeding View output")
-@Path("/breeding_view")
+@Api(value = "Breeding View", description = "Web Services to process the Breeding View output")
+@RestController
+@RequestMapping("/rest/breeding_view")
 public class BreedingView {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BreedingView.class);
@@ -44,25 +42,24 @@ public class BreedingView {
 	@Autowired
 	private BreedingViewService breedingViewService;
 
-	@GET
-	@Path("/ssa/save_result_summary")
 	@ApiOperation(value = "Save the Single-Site Analysis CSV output file with heritability", notes = "", response = DataResponse.class)
-	@Produces(MediaType.TEXT_XML)
+	@RequestMapping(value = "/ssa/save_result_summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_XML_VALUE})
+	@ResponseBody
 	public DataResponse saveSsaResultSummary(
-			@ApiParam(value = "Path and filename of the SSA output file", required = true) @QueryParam("mainOutputFilePath") String mainOutputFilePath,
+			@ApiParam(value = "Path and filename of the SSA output file", required = true) @RequestParam("mainOutputFilePath") String mainOutputFilePath,
 
-			@ApiParam(value = "Path and filename of the Summary output file", required = true) @QueryParam("SummaryOutputFilePath") String summaryOutputFilePath,
+			@ApiParam(value = "Path and filename of the Summary output file", required = true) @RequestParam("SummaryOutputFilePath") String summaryOutputFilePath,
 
-			@ApiParam(value = "Path and filename of the Outlier output file", required = false) @QueryParam("OutlierFilePath") String outlierOutputFilePath,
+			@ApiParam(value = "Path and filename of the Outlier output file", required = false) @RequestParam("OutlierFilePath") String outlierOutputFilePath,
 
-			@ApiParam(value = "Current Project ID", required = true) @QueryParam("WorkbenchProjectId") String workbenchProjectId,
+			@ApiParam(value = "Current Project ID", required = true) @RequestParam("WorkbenchProjectId") String workbenchProjectId,
 
-			@ApiParam(value = "Study ID", required = true) @QueryParam("StudyId") String studyId,
+			@ApiParam(value = "Study ID", required = true) @RequestParam("StudyId") String studyId,
 
-			@ApiParam(value = "Input Dataset ID", required = true) @QueryParam("InputDataSetId") String inputDataSetId,
+			@ApiParam(value = "Input Dataset ID", required = true) @RequestParam("InputDataSetId") String inputDataSetId,
 
-			@ApiParam(value = "Output Dataset ID", required = true) @QueryParam("OutputDataSetId") String outputDataSetId,
-			@Context UriInfo info) {
+			@ApiParam(value = "Output Dataset ID", required = true) @RequestParam("OutputDataSetId") String outputDataSetId
+	) {
 		DataResponse response;
 
 		try {
