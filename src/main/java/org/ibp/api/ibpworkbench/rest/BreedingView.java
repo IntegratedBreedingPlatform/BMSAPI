@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,7 +35,7 @@ import java.util.Map;
 
 @Api(value = "Breeding View", description = "Web Services to process the Breeding View output")
 @RestController
-@RequestMapping("/rest/breeding_view")
+@RequestMapping("/breeding_view")
 public class BreedingView {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BreedingView.class);
@@ -43,14 +44,14 @@ public class BreedingView {
 	private BreedingViewService breedingViewService;
 
 	@ApiOperation(value = "Save the Single-Site Analysis CSV output file with heritability", notes = "", response = DataResponse.class)
-	@RequestMapping(value = "/ssa/save_result_summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_XML_VALUE})
+	@RequestMapping(value = "{cropName}/ssa/save_result_summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_XML_VALUE})
 	@ResponseBody
 	public DataResponse saveSsaResultSummary(
 			@ApiParam(value = "Path and filename of the SSA output file", required = true) @RequestParam("mainOutputFilePath") String mainOutputFilePath,
 
 			@ApiParam(value = "Path and filename of the Summary output file", required = true) @RequestParam("SummaryOutputFilePath") String summaryOutputFilePath,
 
-			@ApiParam(value = "Path and filename of the Outlier output file", required = false) @RequestParam("OutlierFilePath") String outlierOutputFilePath,
+			@ApiParam(value = "Path and filename of the Outlier output file", required = false) @RequestParam(value = "OutlierFilePath", required = false) String outlierOutputFilePath,
 
 			@ApiParam(value = "Current Project ID", required = true) @RequestParam("WorkbenchProjectId") String workbenchProjectId,
 
@@ -58,7 +59,9 @@ public class BreedingView {
 
 			@ApiParam(value = "Input Dataset ID", required = true) @RequestParam("InputDataSetId") String inputDataSetId,
 
-			@ApiParam(value = "Output Dataset ID", required = true) @RequestParam("OutputDataSetId") String outputDataSetId
+			@ApiParam(value = "Output Dataset ID", required = true) @RequestParam("OutputDataSetId") String outputDataSetId,
+
+			@PathVariable(value = "cropName") String cropName
 	) {
 		DataResponse response;
 
