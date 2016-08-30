@@ -30,6 +30,7 @@ import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.manager.ontology.OntologyDaoFactory;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
@@ -40,6 +41,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataMana
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
@@ -260,6 +262,17 @@ public class MiddlewareFactory {
 		return new OntologyDataManagerImpl(this.getCropDatabaseSessionProvider());
 	}
 
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyDaoFactory ontologyDaoFactory() {
+		return new OntologyDaoFactory(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public StandardVariableTransformer standardVariableTransformer() {
+		return new StandardVariableTransformer(this.getCropDatabaseSessionProvider());
+	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {
 		return new HibernateSessionPerRequestProvider(this.WORKBENCH_SessionFactory);
