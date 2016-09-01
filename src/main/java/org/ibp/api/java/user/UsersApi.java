@@ -21,7 +21,7 @@ public class UsersApi {
 
 	@ApiOperation(value = "List all users", notes = "List all users in this deployment instance of BMSAPI. ")
 	@RequestMapping(value = "/listUsers", method = RequestMethod.GET)
-	public ResponseEntity<List<UserData>> listAvailableusers() {
+	public ResponseEntity<List<UserData>> listUsers() {
 		return new ResponseEntity<List<UserData>>(this.userService.getAllUserDtosSorted(), HttpStatus.OK);
 	}
 
