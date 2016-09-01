@@ -204,6 +204,7 @@ public class TestDataProvider {
 		variable.addVariableType(VariableType.TRAIT);
 		variable.setDateCreated(TestDataProvider.getDateCreated());
 		variable.setDateLastModified(TestDataProvider.getDateModified());
+	  	variable.setHasUsage(false);
 
 		return variable;
 	}
