@@ -60,7 +60,7 @@ public class LocationResourceBrapi {
 					@Override
 					public List<org.generationcp.middleware.pojos.Location> getResults(
 							PagedResult<org.generationcp.middleware.pojos.Location> pagedResult) {
-						return LocationResourceBrapi.this.locationDataManager.getAllLocations(pagedResult.getPageNumber(),
+						return LocationResourceBrapi.this.locationDataManager.getAllLocalLocations(pagedResult.getPageNumber(),
 								pagedResult.getPageSize());
 					}
 				});
