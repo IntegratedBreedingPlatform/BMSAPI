@@ -88,8 +88,8 @@ public class StudyResource {
 			@PathVariable final Integer studyId, //
 			@ApiParam(
 					value = "One study can have multiple instances. Supply the instance number for which the observations need to be retrieved."
-							+ " Use <code>GET /study/{cropname}/{studyId}/instances</code> service to retrieve a list of instances with basic metadata.") //
-			@RequestParam(value = "instanceNumber") final Integer instanceNumber, //
+							+ " Use <code>GET /study/{cropname}/{studyId}/instances</code> service to retrieve a list of instances with instanceId and basic metadata.") //
+			@RequestParam(value = "instanceId") final Integer instanceId, //
 			@ApiParam(value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.",
 					required = false) //
 			@RequestParam(value = "pageNumber", required = false) Integer pageNumber, //
@@ -100,12 +100,12 @@ public class StudyResource {
 
 			@Override
 			public long getCount() {
-				return StudyResource.this.studyService.countTotalObservationUnits(studyId, instanceNumber);
+				return StudyResource.this.studyService.countTotalObservationUnits(studyId, instanceId);
 			}
 
 			@Override
 			public List<Observation> getResults(PagedResult<Observation> pagedResult) {
-				return StudyResource.this.studyService.getObservations(studyId, instanceNumber, pagedResult.getPageNumber(),
+				return StudyResource.this.studyService.getObservations(studyId, instanceId, pagedResult.getPageNumber(),
 						pagedResult.getPageSize());
 			}
 		});
