@@ -392,11 +392,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				return;
 			}
 
-			if (oldVariable.getObservations() == null) {
-				oldVariable.setObservations(0);
-			}
 
-			final boolean isEditable = oldVariable.getObservations() == 0;
+			final boolean isEditable = !oldVariable.getHasUsage();
 			if (isEditable) {
 				// Alias validation
 				this.aliasValidationProcessor(variable, errors);

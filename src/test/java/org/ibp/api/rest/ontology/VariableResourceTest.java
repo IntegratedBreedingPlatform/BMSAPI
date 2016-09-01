@@ -282,6 +282,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		variable.setMethod(new Method(methodTerm));
 		variable.setProperty(new Property(propertyTerm));
 		variable.setScale(scale);
+	  	variable.setHasUsage(false);
 
 		Integer methodId = StringUtil.parseInt(variableDetails.getMethod().getId(), null);
 		Integer propertyId = StringUtil.parseInt(variableDetails.getProperty().getId(), null);

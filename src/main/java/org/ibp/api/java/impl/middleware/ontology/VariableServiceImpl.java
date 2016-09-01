@@ -174,7 +174,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			}
 
 			boolean deletable = true;
-			if (this.termDataManager.isTermReferred(id)) {
+			if (ontologyVariable.getHasUsage()) {
 				deletable = false;
 			}
 

@@ -155,7 +155,7 @@ public class VariableValidatorTest {
         variable.setAlias("");
 
         Variable dbVariable = TestDataProvider.getTestVariable();
-        dbVariable.setObservations(5);
+        dbVariable.setHasUsage(true);
 
         dbVariable.setAlias("TEST");
         
@@ -228,7 +228,7 @@ public class VariableValidatorTest {
 
 		Scale scale = TestDataProvider.getTestScale();
 		Variable variable = TestDataProvider.getTestVariable();
-		variable.setObservations(1);
+		variable.setHasUsage(true);
 		VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
 		variableDetails.setName("ChangedName");
 
@@ -303,6 +303,7 @@ public class VariableValidatorTest {
 		variable.setMethod(new Method(methodTerm));
 		variable.setProperty(new Property(propertyTerm));
 		variable.setScale(scale);
+	  	variable.setHasUsage(true);
 
 		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
@@ -825,8 +826,7 @@ public class VariableValidatorTest {
         VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
         Variable originalVariable = TestDataProvider.getTestVariable();
 
-        // providing observations to indicate that the variable is already in use
-        originalVariable.setObservations(15);
+        originalVariable.setHasUsage(true);
 
         Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
         Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -859,8 +859,7 @@ public class VariableValidatorTest {
         VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
         Variable originalVariable = TestDataProvider.getTestVariable();
 
-        // providing observations to indicate that the variable is already in use
-        originalVariable.setObservations(15);
+        originalVariable.setHasUsage(true);
 
         Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
         Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
