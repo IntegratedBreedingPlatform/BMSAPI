@@ -1,11 +1,10 @@
 
-package org.ibp.api.ibpworkbench;
+package org.ibp.api.ibpworkbench.service;
 
 import org.ibp.api.ibpworkbench.constants.WebAPIConstants;
 import org.ibp.api.ibpworkbench.exceptions.IBPWebServiceException;
 import org.ibp.api.ibpworkbench.model.DataResponse;
 import org.ibp.api.ibpworkbench.rest.BreedingView;
-import org.ibp.api.ibpworkbench.service.BreedingViewService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
