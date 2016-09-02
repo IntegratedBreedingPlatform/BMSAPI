@@ -48,7 +48,14 @@ public class UserServiceImpl implements UserService {
 		for (final Iterator<UserDto> iterator = users.iterator(); iterator.hasNext();) {
 			final UserDto userDto = iterator.next();
 			final UserData userInfo = modelMapper.map(userDto, UserData.class);
-
+			
+			if(userDto.getStatus() == 0){
+				userInfo.setStatus("true");
+			}
+			else{
+				userInfo.setStatus("false");
+			}
+				
 			result.add(userInfo);
 		}
 
