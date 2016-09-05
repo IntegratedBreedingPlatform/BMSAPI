@@ -11,6 +11,7 @@ import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmListManagerImpl;
 import org.generationcp.middleware.manager.InventoryDataManagerImpl;
 import org.generationcp.middleware.manager.LocationDataManagerImpl;
+import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.PedigreeDataManagerImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.UserDataManagerImpl;
@@ -20,10 +21,12 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.manager.ontology.OntologyDaoFactory;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
@@ -34,6 +37,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataMana
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
@@ -48,6 +52,7 @@ import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hibernate.SessionFactory;
+import org.ibp.api.ibpworkbench.service.BreedingViewImportServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -62,6 +67,7 @@ import org.springframework.transaction.jta.JtaTransactionManager;
 
 import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
+import com.rits.cloning.Cloner;
 
 @Configuration
 @EnableTransactionManagement
@@ -246,6 +252,35 @@ public class MiddlewareFactory {
 	@Bean
 	public CrossExpansionProperties getCrossExpansionProperties() {
 		return new CrossExpansionProperties();
+	}
+
+	@Bean
+	public Cloner cloner(){
+		return new Cloner();
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public BreedingViewImportServiceImpl importService(){
+		return new BreedingViewImportServiceImpl();
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyDataManager getOntologyDataManager() {
+		return new OntologyDataManagerImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public OntologyDaoFactory ontologyDaoFactory() {
+		return new OntologyDaoFactory(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public StandardVariableTransformer standardVariableTransformer() {
+		return new StandardVariableTransformer(this.getCropDatabaseSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {
