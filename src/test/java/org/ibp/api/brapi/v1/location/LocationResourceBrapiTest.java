@@ -8,6 +8,7 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Georef;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.junit.Test;
@@ -47,12 +48,17 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 		location1.setLocid(156);
 		location1.setLname("New Zealand");
 		location1.setLtype(405);
+		location1.setLabbr("NZ");
 		location1.setGeoref(new Georef(156, 1, 41.17, 170.27, 10.11));
 
 		List<Location> mwLocations = Lists.newArrayList(location1);
 		Mockito.when(this.locationDataManager.getAllLocalLocations(Mockito.anyInt(), Mockito.anyInt())).thenReturn(mwLocations);
 		Mockito.when(this.locationDataManager.countAllLocations()).thenReturn(200L);
 		
+		final UserDefinedField locTypeUDFLD = new UserDefinedField(location1.getLtype());
+		locTypeUDFLD.setFname("Breeding Location");
+		Mockito.when(this.locationDataManager.getUserDefinedFieldByID(location1.getLtype())).thenReturn(locTypeUDFLD);
+
 		Country country1 = new Country(countryId);
 		country1.setIsothree("NZL");
 		country1.setIsoabbr("NZ");
@@ -63,7 +69,9 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 				.andDo(MockMvcResultHandlers.print()) //
 				.andExpect(jsonPath("$.result.data", IsCollectionWithSize.hasSize(mwLocations.size()))) //
 				.andExpect(jsonPath("$.result.data[0].locationDbId", Matchers.is(location1.getLocid()))) //
+				.andExpect(jsonPath("$.result.data[0].locationType", Matchers.is(locTypeUDFLD.getFname()))) //
 				.andExpect(jsonPath("$.result.data[0].name", Matchers.is(location1.getLname()))) //
+				.andExpect(jsonPath("$.result.data[0].abbreviation", Matchers.is(location1.getLabbr()))) //
 				.andExpect(jsonPath("$.result.data[0].countryCode", Matchers.is(country1.getIsothree()))) //
 				.andExpect(jsonPath("$.result.data[0].countryName", Matchers.is(country1.getIsoabbr()))) //
 				.andExpect(jsonPath("$.result.data[0].latitude", Matchers.is(location1.getLatitude()))) //

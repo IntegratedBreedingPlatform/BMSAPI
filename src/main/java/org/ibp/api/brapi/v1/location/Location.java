@@ -19,14 +19,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"locationDbId", "name", "countryCode", "countryName", "latitude", "longitude", "altitude", "attributes"})
+@JsonPropertyOrder({"locationDbId", "locationType", "name", "abbreviation", "countryCode", "countryName", "latitude", "longitude",
+		"altitude", "attributes"})
 public class Location {
 
 	@JsonProperty("locationDbId")
 	private Integer locationDbId;
 
+	@JsonProperty("locationType")
+	private String locationType;
+
 	@JsonProperty("name")
 	private String name;
+
+	@JsonProperty("abbreviation")
+	private String abbreviation;
 
 	@JsonProperty("countryCode")
 	private String countryCode;
@@ -56,21 +63,13 @@ public class Location {
 	public Location() {
 	}
 
-	/**
-	 *
-	 * @param countryName
-	 * @param altitude
-	 * @param name
-	 * @param countryCode
-	 * @param longitude
-	 * @param attributes
-	 * @param latitude
-	 * @param locationDbId
-	 */
-	public Location(final Integer locationDbId, final String name, final String countryCode, final String countryName, final Double latitude,
-			final Double longitude, final Double altitude, final List<Object> attributes) {
+	public Location(final Integer locationDbId, final String locationType, final String name, final String abbreviation,
+			final String countryCode, final String countryName, final Double latitude, final Double longitude, final Double altitude,
+			final List<Object> attributes) {
 		this.locationDbId = locationDbId;
+		this.locationType = locationType;
 		this.name = name;
+		this.abbreviation = abbreviation;
 		this.countryCode = countryCode;
 		this.countryName = countryName;
 		this.latitude = latitude;
@@ -276,6 +275,22 @@ public class Location {
 	public Location withAdditionalProperty(final String name, final Object value) {
 		this.additionalProperties.put(name, value);
 		return this;
+	}
+
+	public String getLocationType() {
+		return this.locationType;
+	}
+
+	public void setLocationType(final String locationType) {
+		this.locationType = locationType;
+	}
+
+	public String getAbbreviation() {
+		return this.abbreviation;
+	}
+
+	public void setAbbreviation(final String abbreviation) {
+		this.abbreviation = abbreviation;
 	}
 
 	@Override
