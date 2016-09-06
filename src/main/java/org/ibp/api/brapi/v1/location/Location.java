@@ -2,20 +2,14 @@
 package org.ibp.api.brapi.v1.location;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -23,42 +17,28 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 		"altitude", "attributes"})
 public class Location {
 
-	@JsonProperty("locationDbId")
 	private Integer locationDbId;
 
-	@JsonProperty("locationType")
 	private String locationType;
 
-	@JsonProperty("name")
 	private String name;
 
-	@JsonProperty("abbreviation")
 	private String abbreviation;
 
-	@JsonProperty("countryCode")
 	private String countryCode;
 
-	@JsonProperty("countryName")
 	private String countryName;
 
-	@JsonProperty("latitude")
 	private Double latitude;
 
-	@JsonProperty("longitude")
 	private Double longitude;
 
-	@JsonProperty("altitude")
 	private Double altitude;
 
-	@JsonProperty("attributes")
 	private List<Object> attributes = new ArrayList<Object>();
 
-	@JsonIgnore
-	private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
 	/**
-	 * No args constructor for use in serialization
-	 *
+	 * No args constructor required by serialization libraries.
 	 */
 	public Location() {
 	}
@@ -82,7 +62,6 @@ public class Location {
 	 *
 	 * @return The locationDbId
 	 */
-	@JsonProperty("locationDbId")
 	public Integer getLocationDbId() {
 		return this.locationDbId;
 	}
@@ -91,7 +70,6 @@ public class Location {
 	 *
 	 * @param locationDbId The locationDbId
 	 */
-	@JsonProperty("locationDbId")
 	public void setLocationDbId(final Integer locationDbId) {
 		this.locationDbId = locationDbId;
 	}
@@ -105,7 +83,6 @@ public class Location {
 	 *
 	 * @return The name
 	 */
-	@JsonProperty("name")
 	public String getName() {
 		return this.name;
 	}
@@ -114,7 +91,6 @@ public class Location {
 	 *
 	 * @param name The name
 	 */
-	@JsonProperty("name")
 	public void setName(final String name) {
 		this.name = name;
 	}
@@ -128,7 +104,6 @@ public class Location {
 	 *
 	 * @return The countryCode
 	 */
-	@JsonProperty("countryCode")
 	public String getCountryCode() {
 		return this.countryCode;
 	}
@@ -137,7 +112,6 @@ public class Location {
 	 *
 	 * @param countryCode The countryCode
 	 */
-	@JsonProperty("countryCode")
 	public void setCountryCode(final String countryCode) {
 		this.countryCode = countryCode;
 	}
@@ -151,7 +125,6 @@ public class Location {
 	 *
 	 * @return The countryName
 	 */
-	@JsonProperty("countryName")
 	public String getCountryName() {
 		return this.countryName;
 	}
@@ -160,7 +133,6 @@ public class Location {
 	 *
 	 * @param countryName The countryName
 	 */
-	@JsonProperty("countryName")
 	public void setCountryName(final String countryName) {
 		this.countryName = countryName;
 	}
@@ -174,7 +146,6 @@ public class Location {
 	 *
 	 * @return The latitude
 	 */
-	@JsonProperty("latitude")
 	public Double getLatitude() {
 		return this.latitude;
 	}
@@ -183,7 +154,6 @@ public class Location {
 	 *
 	 * @param latitude The latitude
 	 */
-	@JsonProperty("latitude")
 	public void setLatitude(final Double latitude) {
 		this.latitude = latitude;
 	}
@@ -197,7 +167,6 @@ public class Location {
 	 *
 	 * @return The longitude
 	 */
-	@JsonProperty("longitude")
 	public Double getLongitude() {
 		return this.longitude;
 	}
@@ -206,7 +175,6 @@ public class Location {
 	 *
 	 * @param longitude The longitude
 	 */
-	@JsonProperty("longitude")
 	public void setLongitude(final Double longitude) {
 		this.longitude = longitude;
 	}
@@ -220,7 +188,6 @@ public class Location {
 	 *
 	 * @return The altitude
 	 */
-	@JsonProperty("altitude")
 	public Double getAltitude() {
 		return this.altitude;
 	}
@@ -229,7 +196,6 @@ public class Location {
 	 *
 	 * @param altitude The altitude
 	 */
-	@JsonProperty("altitude")
 	public void setAltitude(final Double altitude) {
 		this.altitude = altitude;
 	}
@@ -243,7 +209,6 @@ public class Location {
 	 *
 	 * @return The attributes
 	 */
-	@JsonProperty("attributes")
 	public List<Object> getAttributes() {
 		return this.attributes;
 	}
@@ -252,28 +217,12 @@ public class Location {
 	 *
 	 * @param attributes The attributes
 	 */
-	@JsonProperty("attributes")
 	public void setAttributes(final List<Object> attributes) {
 		this.attributes = attributes;
 	}
 
 	public Location withAttributes(final List<Object> attributes) {
 		this.attributes = attributes;
-		return this;
-	}
-
-	@JsonAnyGetter
-	public Map<String, Object> getAdditionalProperties() {
-		return this.additionalProperties;
-	}
-
-	@JsonAnySetter
-	public void setAdditionalProperty(final String name, final Object value) {
-		this.additionalProperties.put(name, value);
-	}
-
-	public Location withAdditionalProperty(final String name, final Object value) {
-		this.additionalProperties.put(name, value);
 		return this;
 	}
 

@@ -5,17 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"pagination", "status"})
 public class Metadata {
 
-	@JsonProperty("pagination")
 	private Pagination pagination;
 
-	@JsonProperty("status")
 	private List<Object> status = new ArrayList<Object>();
 
 	/**
@@ -39,7 +36,6 @@ public class Metadata {
 	 *
 	 * @return The pagination
 	 */
-	@JsonProperty("pagination")
 	public Pagination getPagination() {
 		return this.pagination;
 	}
@@ -48,7 +44,6 @@ public class Metadata {
 	 *
 	 * @param pagination The pagination
 	 */
-	@JsonProperty("pagination")
 	public void setPagination(final Pagination pagination) {
 		this.pagination = pagination;
 	}
@@ -62,7 +57,6 @@ public class Metadata {
 	 *
 	 * @return The status
 	 */
-	@JsonProperty("status")
 	public List<Object> getStatus() {
 		return this.status;
 	}
@@ -71,7 +65,6 @@ public class Metadata {
 	 *
 	 * @param status The status
 	 */
-	@JsonProperty("status")
 	public void setStatus(final List<Object> status) {
 		this.status = status;
 	}
