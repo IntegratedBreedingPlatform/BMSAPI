@@ -233,7 +233,7 @@ public class FieldMapService {
 
 			final List<FieldMapInfo> fieldMapInfoOfStudy =
 					this.studyDataManager.getFieldMapInfoOfStudy(Lists.newArrayList(studyIdentifier), studyType,
-							crossExpansionProperties, true);
+							crossExpansionProperties);
 			return new StudyFieldMap(studyType, fieldMapInfoOfStudy);
 		} catch (MiddlewareQueryException e) {
 			throw new ApiRuntimeException(String.format("There was an error retriving infomration for studyId %s was found.", studyId), e);

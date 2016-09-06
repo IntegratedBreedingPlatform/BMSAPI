@@ -19,9 +19,6 @@ import org.ibp.ApiUnitTestBase;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -30,22 +27,6 @@ import com.google.common.collect.Lists;
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 
 public class StudyResourceTest extends ApiUnitTestBase {
-
-	@Configuration
-	public static class TestConfiguration {
-
-		@Bean
-		@Primary
-		public org.generationcp.middleware.service.api.study.StudyService getStudyServiceMW() {
-			return Mockito.mock(org.generationcp.middleware.service.api.study.StudyService.class);
-		}
-
-		@Bean
-		@Primary
-		public StudyDataManager studyDataManager() {
-			return Mockito.mock(StudyDataManager.class);
-		}
-	}
 
 	@Autowired
 	private org.generationcp.middleware.service.api.study.StudyService studyServiceMW;

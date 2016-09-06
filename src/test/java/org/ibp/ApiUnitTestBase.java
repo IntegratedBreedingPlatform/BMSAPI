@@ -4,6 +4,7 @@ package org.ibp;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.Debug;
@@ -60,6 +61,18 @@ public abstract class ApiUnitTestBase {
 		@Primary
 		public WorkbenchDataManager workbenchDataManager() {
 			return Mockito.mock(WorkbenchDataManager.class);
+		}
+
+		@Bean
+		@Primary
+		public org.generationcp.middleware.service.api.study.StudyService getStudyServiceMW() {
+			return Mockito.mock(org.generationcp.middleware.service.api.study.StudyService.class);
+		}
+
+		@Bean
+		@Primary
+		public StudyDataManager studyDataManager() {
+			return Mockito.mock(StudyDataManager.class);
 		}
 	}
 
