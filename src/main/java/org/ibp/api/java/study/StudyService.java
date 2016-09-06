@@ -4,6 +4,7 @@ package org.ibp.api.java.study;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.service.api.study.StudyDetailDto;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyDetails;
@@ -30,6 +31,8 @@ public interface StudyService {
 	List<StudyGermplasm> getStudyGermplasmList(final Integer studyIdentifer);
 
 	StudyDetails getStudyDetails(String studyId);
+
+	StudyDetailDto getStudyDetails(final int studyIdentifier);
 
 	Map<Integer, FieldMap> getFieldMap(final String studyIdentifier);
 

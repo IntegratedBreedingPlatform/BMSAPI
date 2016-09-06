@@ -27,6 +27,7 @@ import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.service.api.study.StudyDetailDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.TraitDto;
@@ -123,7 +124,8 @@ public class StudyServiceImpl implements StudyService {
 				summary.setObjective(mwStudySummary.getObjective());
 				summary.setStartDate(mwStudySummary.getStartDate());
 				summary.setEndDate(mwStudySummary.getEndDate());
-				summary.setType(mwStudySummary.getType().getName());
+				summary.setType(mwStudySummary.getType()
+						.getName());
 				summary.setPrincipalInvestigator(mwStudySummary.getPrincipalInvestigator());
 				summary.setLocation(mwStudySummary.getLocation());
 				summary.setSeason(mwStudySummary.getSeason());
@@ -161,7 +163,8 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	private Observation mapObservationDtoToObservation(final ObservationDto measurement) {
-		return StudyMapper.getInstance().map(measurement, Observation.class);
+		return StudyMapper.getInstance()
+				.map(measurement, Observation.class);
 	}
 
 	@Override
@@ -177,6 +180,7 @@ public class StudyServiceImpl implements StudyService {
 
 	/**
 	 * Translates to the middleware pojo. Updates the database and then translates back the results.
+	 *
 	 * @param studyIdentifier
 	 * @param observation
 	 * @return
@@ -188,8 +192,13 @@ public class StudyServiceImpl implements StudyService {
 
 		final List<MeasurementDto> traits = new ArrayList<MeasurementDto>();
 		for (final Measurement measurement : measurements) {
-			traits.add(new MeasurementDto(new TraitDto(measurement.getMeasurementIdentifier().getTrait().getTraitId(), measurement
-					.getMeasurementIdentifier().getTrait().getTraitName()), measurement.getMeasurementIdentifier().getMeasurementId(),
+			traits.add(new MeasurementDto(new TraitDto(measurement.getMeasurementIdentifier()
+					.getTrait()
+					.getTraitId(), measurement
+					.getMeasurementIdentifier()
+					.getTrait()
+					.getTraitName()), measurement.getMeasurementIdentifier()
+					.getMeasurementId(),
 					measurement.getMeasurementValue()));
 		}
 		final ObservationDto middlewareMeasurement =
@@ -221,8 +230,9 @@ public class StudyServiceImpl implements StudyService {
 
 	/**
 	 * Essentially makes sure that the underlying observation has not changed
+	 *
 	 * @param studyIdentifier the study in which the observation is being updated
-	 * @param observation the actual observation update.
+	 * @param observation     the actual observation update.
 	 */
 	private void validateMeasurementSubmitted(final Integer studyIdentifier, final Observation observation) {
 		// If null do something
@@ -240,7 +250,7 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	private void validateMeasurementHasNotBeenCreated(final Observation observation, final Observation existingObservation,
-			final List<ObjectError> errors) {
+													  final List<ObjectError> errors) {
 		final List<Measurement> measurements = observation.getMeasurements();
 		int counter = 0;
 		for (final Measurement measurement : measurements) {
@@ -256,7 +266,7 @@ public class StudyServiceImpl implements StudyService {
 					throw new ApiRuntimeException("Error mapping measurement to JSON", e);
 				}
 				final FieldError objectError =
-						new FieldError("Observation" , "Measurements [" + counter + "]", null, false, array, object.toArray(),
+						new FieldError("Observation", "Measurements [" + counter + "]", null, false, array, object.toArray(),
 								"Error processing measurement");
 				errors.add(objectError);
 				counter++;
@@ -300,19 +310,23 @@ public class StudyServiceImpl implements StudyService {
 			studyDetails.setName(study.getName());
 			studyDetails.setTitle(study.getTitle());
 			studyDetails.setObjective(study.getObjective());
-			studyDetails.setType(study.getType().getName());
+			studyDetails.setType(study.getType()
+					.getName());
 			studyDetails.setStartDate(String.valueOf(study.getStartDate()));
 			studyDetails.setEndDate(String.valueOf(study.getEndDate()));
 
 			// Factors, Settings tab.
-			final List<Variable> conditions = study.getConditions().getVariables();
+			final List<Variable> conditions = study.getConditions()
+					.getVariables();
 			final VariableTypeList factors = this.studyDataManager.getAllStudyFactors(studyIdentifier);
 			final List<DMSVariableType> factorDetails = factors.getVariableTypes();
 			for (final DMSVariableType factorDetail : factorDetails) {
 				String value = null;
 				for (final Variable condition : conditions) {
-					final String conditionName = condition.getVariableType().getLocalName();
-					if (factorDetail.getLocalName().equals(conditionName)) {
+					final String conditionName = condition.getVariableType()
+							.getLocalName();
+					if (factorDetail.getLocalName()
+							.equals(conditionName)) {
 						value = condition.getDisplayValue();
 					}
 				}
@@ -334,8 +348,10 @@ public class StudyServiceImpl implements StudyService {
 			for (final DMSVariableType variateDetail : variateDetails) {
 				final TermSummary trait = new TermSummary();
 				trait.setId(String.valueOf(variateDetail.getId()));
-				trait.setName(variateDetail.getStandardVariable().getName());
-				trait.setDescription(variateDetail.getStandardVariable().getDescription());
+				trait.setName(variateDetail.getStandardVariable()
+						.getName());
+				trait.setDescription(variateDetail.getStandardVariable()
+						.getDescription());
 				studyDetails.addTrait(trait);
 			}
 
@@ -344,13 +360,15 @@ public class StudyServiceImpl implements StudyService {
 			if (datasetReferences != null && !datasetReferences.isEmpty()) {
 				for (final DatasetReference dsRef : datasetReferences) {
 					final DatasetSummary dsSummary = new DatasetSummary();
-					dsSummary.setId(dsRef.getId().toString());
+					dsSummary.setId(dsRef.getId()
+							.toString());
 					dsSummary.setName(dsRef.getName());
 					dsSummary.setDescription(dsRef.getDescription());
 					studyDetails.addDataSet(dsSummary);
 
 					// FIXME : Is there a cleaner way to tell whether a DataSet is an Environment dataset?
-					if (dsRef.getName().endsWith("-ENVIRONMENT")) {
+					if (dsRef.getName()
+							.endsWith("-ENVIRONMENT")) {
 						// Logic derived from by RepresentationDataSetQuery.loadItems(int, int) method of the GermplasmStudyBrowser,
 						// which is used to show dataset tables in the study browser UI.
 						final List<Experiment> experiments = this.studyDataManager.getExperiments(dsRef.getId(), 0, Integer.MAX_VALUE);
@@ -368,9 +386,12 @@ public class StudyServiceImpl implements StudyService {
 							final Environment env = new Environment();
 							for (final Variable variable : variables) {
 								final StudyAttribute attr = new StudyAttribute();
-								attr.setId(String.valueOf(variable.getVariableType().getId()));
-								attr.setName(variable.getVariableType().getLocalName());
-								attr.setDescription(variable.getVariableType().getLocalDescription());
+								attr.setId(String.valueOf(variable.getVariableType()
+										.getId()));
+								attr.setName(variable.getVariableType()
+										.getLocalName());
+								attr.setDescription(variable.getVariableType()
+										.getLocalDescription());
 								attr.setValue(variable.getDisplayValue());
 								env.addEnvironmentDetail(attr);
 							}
@@ -381,7 +402,8 @@ public class StudyServiceImpl implements StudyService {
 			}
 
 			// Germplasm
-			studyDetails.getGermplasm().addAll(this.getStudyGermplasmList(studyIdentifier));
+			studyDetails.getGermplasm()
+					.addAll(this.getStudyGermplasmList(studyIdentifier));
 			return studyDetails;
 		} catch (final NumberFormatException nfe) {
 			throw new ApiRuntimeException("Supplied study identifier [" + studyId + "] is not valid, it must be a numeric value.");
@@ -402,7 +424,8 @@ public class StudyServiceImpl implements StudyService {
 		try {
 
 			final Workbook workbook = this.conversionService.convert(studyImportDTO, Workbook.class);
-			workbook.getStudyDetails().setProgramUUID(programUUID);
+			workbook.getStudyDetails()
+					.setProgramUUID(programUUID);
 
 			// Save the study
 			final Integer studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID);
@@ -537,4 +560,7 @@ public class StudyServiceImpl implements StudyService {
 		return Lists.transform(studyInstancesMW, transformer);
 	}
 
+	public StudyDetailDto getStudyDetails(final int studyIdentifier) {
+		return middlewareStudyService.getStudyDetails(studyIdentifier);
+	}
 }

@@ -6,6 +6,7 @@ import org.ibp.api.security.xauth.XAuthTokenConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -65,7 +66,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		.and()
 		.authorizeRequests()
-				.antMatchers("/", "/api-docs/**", "/authenticate", "/cooltools/**").permitAll()
+				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+				.antMatchers("/", "/api-docs/**", "/authenticate", "/cooltools/**", "/breeding_view/**").permitAll()
 		.anyRequest().hasAnyAuthority("ADMIN", "TECHNICIAN", "BREEDER")
 		.and()
 		.apply(this.securityConfigurerAdapter());
