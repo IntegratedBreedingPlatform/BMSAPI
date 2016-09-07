@@ -14,6 +14,8 @@ public class UserData {
 	private String role;
 
 	private String status;
+	
+	private String email;
 
 	public Integer getUserId() {
 		return this.userId;
@@ -61,6 +63,16 @@ public class UserData {
 
 	public void setStatus(final String status) {
 		this.status = status;
+	}
+
+	
+	public String getEmail() {
+		return email;
+	}
+
+	
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 }

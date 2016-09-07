@@ -39,6 +39,7 @@ public class UserServiceImpl implements UserService {
 				this.map(this.source.getUsername(), this.destination.getUsername());
 				this.map(this.source.getRole(), this.destination.getRole());
 				this.map(this.source.getStatus() == 0 ? "true" : "false", this.destination.getStatus());
+				this.map(this.source.getEmail(), this.destination.getEmail());
 			}
 		};
 
