@@ -7,11 +7,13 @@ import java.util.List;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.study.StudyDetailDto;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.study.StudySummaryDto;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -39,6 +41,9 @@ public class TrialResourceBrapi {
 
 	@Autowired
 	private StudyDataManager studyDataManager;
+
+	@Autowired
+	private StudyService studyService;
 
 	@ApiOperation(value = "List of trial summaries", notes = "Get a list of trial summaries.")
 	@RequestMapping(value = "/{crop}/brapi/v1/trials", method = RequestMethod.GET)
@@ -106,5 +111,38 @@ public class TrialResourceBrapi {
 
 		return new ResponseEntity<TrialSummaries>(trialSummaries, HttpStatus.OK);
 
+	}
+
+	@ApiOperation(value = "Get trial observation details as table", notes = "Get trial observation details as table")
+	@RequestMapping(value = "/{crop}/brapi/v1/trials/{trialDbId}/table", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<TrialObservations> getTrialObservationsAsTable(@PathVariable final String crop,
+			@PathVariable final Integer trialDbId) {
+
+		TrialObservationTable trialObservationsTable = new TrialObservationTable();
+
+		org.generationcp.middleware.service.api.study.StudyDetailDto mwStudyDetailDto = this.studyService.getStudyDetails(trialDbId);
+
+		int resultNumber = (mwStudyDetailDto == null) ? 0 : 1;
+
+		if (resultNumber != 0) {
+			PropertyMap<StudyDetailDto, TrialObservationTable> mappingSpec = new PropertyMap<StudyDetailDto, TrialObservationTable>() {
+
+				@Override
+				protected void configure() {
+					map(source.getStudyDbId(), destination.getTrialDbId());
+				}
+			};
+			ModelMapper modelMapper = new ModelMapper();
+			modelMapper.addMappings(mappingSpec);
+			trialObservationsTable = modelMapper.map(mwStudyDetailDto, TrialObservationTable.class);
+		}
+
+		Pagination pagination =
+				new Pagination().withPageNumber(1).withPageSize(resultNumber).withTotalCount((long) resultNumber).withTotalPages(1);
+
+		Metadata metadata = new Metadata().withPagination(pagination);
+		TrialObservations trialObservations = new TrialObservations().setMetadata(metadata).setResult(trialObservationsTable);
+		return new ResponseEntity<>(trialObservations, HttpStatus.OK);
 	}
 }
