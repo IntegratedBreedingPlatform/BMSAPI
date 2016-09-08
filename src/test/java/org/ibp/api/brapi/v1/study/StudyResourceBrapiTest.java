@@ -70,7 +70,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 				.andDo(MockMvcResultHandlers.print()) //
 				.andExpect(jsonPath("$.result.data", IsCollectionWithSize.hasSize(mwStudySummary.size()))) //
 				.andExpect(jsonPath("$.result.data[0].studyDbId", is(studySummary.getStudyDbid()))) //
-				.andExpect(jsonPath("$.result.data[0].name", is(studySummary.getName()))) //
+				.andExpect(jsonPath("$.result.data[0].studyName", is(studySummary.getName()))) //
 				.andExpect(jsonPath("$.result.data[0].studyType", is(studySummary.getType()))) //
 				.andExpect(jsonPath("$.result.data[0].locationDbId", is(studySummary.getLocationId()))) //
 				.andExpect(jsonPath("$.result.data[0].programDbId", is(studySummary.getProgramDbId()))) //

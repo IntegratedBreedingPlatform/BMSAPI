@@ -89,7 +89,7 @@ public class TrialResourceBrapi {
 			for (InstanceMetadata instance : mwStudy.getInstanceMetaData()) {
 				StudySummaryDto studyMetadata = new StudySummaryDto();
 				studyMetadata.setStudyDbId(instance.getInstanceDbId());
-				studyMetadata.setName(instance.getTrialName() + " Environment Number " + instance.getInstanceNumber());
+				studyMetadata.setStudyName(instance.getTrialName() + " Environment Number " + instance.getInstanceNumber());
 				studyMetadata.setLocationName(
 						instance.getLocationName() != null ? instance.getLocationName() : instance.getLocationAbbreviation());
 				trialSummaryDto.addStudy(studyMetadata);

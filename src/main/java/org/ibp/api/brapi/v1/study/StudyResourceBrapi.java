@@ -74,7 +74,7 @@ public class StudyResourceBrapi {
 				map(source.getLocationId(), destination.getLocationDbId());
 				map(source.getSeasons(), destination.getSeasons());
 				map(source.getYears(), destination.getYears());
-				map(source.getName(), destination.getName());
+				map(source.getName(), destination.getStudyName());
 				map(source.getOptionalInfo(), destination.getOptionalInfo());
 				map(source.getProgramDbId(), destination.getProgramDbId());
 				map(source.getStudyDbid(), destination.getStudyDbId());

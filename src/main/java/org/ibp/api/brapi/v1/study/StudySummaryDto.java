@@ -17,7 +17,7 @@ public class StudySummaryDto {
 
 	private Integer studyDbId;
 
-	private String name;
+	private String studyName;
 
 	private String studyType;
 
@@ -53,19 +53,19 @@ public class StudySummaryDto {
 
 	/**
 	 *
-	 * @return The name
+	 * @return The studyName
 	 */
-	public String getName() {
-		return name;
+	public String getStudyName() {
+		return studyName;
 	}
 
 	/**
 	 *
-	 * @param name
+	 * @param studyName
 	 * @return this
 	 */
-	public StudySummaryDto setName(final String name) {
-		this.name = name;
+	public StudySummaryDto setStudyName(final String studyName) {
+		this.studyName = studyName;
 		return this;
 	}
 
