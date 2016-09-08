@@ -4,11 +4,13 @@ package org.ibp.api.brapi.v1.trial;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
+import org.ibp.api.brapi.v1.study.StudySummaryDto;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -75,7 +77,6 @@ public class TrialResourceBrapi {
 				map(source.getEndDate(), destination.getEndDate());
 				map(source.isActive(), destination.isActive());
 				map(source.getOptionalInfo(), destination.getAdditionalInfo());
-				// TODO map studies collection once it is available in middleware source obj
 			}
 		};
 
@@ -84,8 +85,16 @@ public class TrialResourceBrapi {
 		modelMapper.addMappings(mappingSpec);
 
 		for (StudySummary mwStudy : resultPage.getPageResults()) {
-			TrialSummary studySummaryDto = modelMapper.map(mwStudy, TrialSummary.class);
-			trialSummaryList.add(studySummaryDto);
+			TrialSummary trialSummaryDto = modelMapper.map(mwStudy, TrialSummary.class);
+			for (InstanceMetadata instance : mwStudy.getInstanceMetaData()) {
+				StudySummaryDto studyMetadata = new StudySummaryDto();
+				studyMetadata.setStudyDbId(instance.getInstanceDbId());
+				studyMetadata.setName(instance.getTrialName() + " Environment Number " + instance.getInstanceNumber());
+				studyMetadata.setLocationName(
+						instance.getLocationName() != null ? instance.getLocationName() : instance.getLocationAbbreviation());
+				trialSummaryDto.addStudy(studyMetadata);
+			}
+			trialSummaryList.add(trialSummaryDto);
 		}
 
 		final Result<TrialSummary> results = new Result<TrialSummary>().withData(trialSummaryList);

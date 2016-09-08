@@ -27,6 +27,8 @@ public class StudySummaryDto {
 
 	private String locationDbId;
 
+	private String locationName;
+
 	private String programDbId;
 
 	private Map<String, String> optionalInfo;
@@ -136,6 +138,15 @@ public class StudySummaryDto {
 	 */
 	public StudySummaryDto setLocationDbId(final String locationDbId) {
 		this.locationDbId = locationDbId;
+		return this;
+	}
+
+	public String getLocationName() {
+		return this.locationName;
+	}
+
+	public StudySummaryDto setLocationName(String locationName) {
+		this.locationName = locationName;
 		return this;
 	}
 
