@@ -5,7 +5,9 @@ import java.util.List;
 
 import org.ibp.api.java.role.RoleData;
 import org.ibp.api.java.role.RoleService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class RoleServiceImpl implements RoleService {
 
 	public static final String ADMIN = "ADMIN";

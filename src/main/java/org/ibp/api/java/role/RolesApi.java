@@ -20,7 +20,7 @@ public class RolesApi {
 
 	@ApiOperation(value = "List all roles", notes = "List all roles in this deployment instance of BMSAPI. ")
 	@RequestMapping(value = "/listRoles", method = RequestMethod.GET)
-	public ResponseEntity<List<RoleData>> listAvailableusers() {
+	public ResponseEntity<List<RoleData>> listRoles() {
 		return new ResponseEntity<List<RoleData>>(this.roleService.getAllRoles(), HttpStatus.OK);
 	}
 
