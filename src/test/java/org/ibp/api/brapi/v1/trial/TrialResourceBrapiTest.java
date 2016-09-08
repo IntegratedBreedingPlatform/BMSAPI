@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 
+import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.ibp.ApiUnitTestBase;
@@ -55,6 +56,12 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 				.setProgramDbId(programDbId).setProgramName(programName).setStartDate(startDate).setEndDate(endDate).setActive(true)
 				.setOptionalInfo(ImmutableMap.<String, String>builder().put(additionalInfoKey, additionalInfoValue).build());
 		
+		final InstanceMetadata instanceMetadata = new InstanceMetadata();
+		instanceMetadata.setInstanceDbId(1234);
+		instanceMetadata.setTrialName(name);
+		instanceMetadata.setInstanceNumber("111");
+		instanceMetadata.setLocationName("INDIA");
+		studySummary.setInstanceMetaData(Lists.newArrayList(instanceMetadata));
 
 		List<StudySummary> mwStudySummary = Lists.newArrayList(studySummary);
 		Mockito.when(this.studyDataManager.findPagedProjects(programDbId, String.valueOf(locationId), season, 10, 1))
@@ -76,7 +83,11 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(jsonPath("$.result.data[0].startDate", is(studySummary.getStartDate()))) //
 				.andExpect(jsonPath("$.result.data[0].endDate", is(studySummary.getEndDate()))) //
 				.andExpect(jsonPath("$.result.data[0].active", is(studySummary.isActive()))) //
-				.andExpect(jsonPath("$.result.data[0].studies", is(IsCollectionWithSize.hasSize(0)))) //
+				.andExpect(jsonPath("$.result.data[0].studies", is(IsCollectionWithSize.hasSize(1)))) //
+				.andExpect(jsonPath("$.result.data[0].studies[0].studyDbId", is(instanceMetadata.getInstanceDbId()))) //
+				.andExpect(jsonPath("$.result.data[0].studies[0].studyName",
+						is(name + " Environment Number " + instanceMetadata.getInstanceNumber()))) //
+				.andExpect(jsonPath("$.result.data[0].studies[0].locationName", is(instanceMetadata.getLocationName()))) //
 				.andExpect(jsonPath("$.result.data[0].additionalInfo", hasKey(additionalInfoKey)))
 				.andExpect(jsonPath("$.result.data[0].additionalInfo", hasValue(additionalInfoValue)))
 				.andExpect(jsonPath("$.metadata.pagination.pageNumber", is(1))) //
