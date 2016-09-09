@@ -27,9 +27,9 @@ public class BmsApiFilterTest {
 				Mockito.mock(FilterChain.class));
 		// CORS Access Control
 		Mockito.verify(servletResponseMock).setHeader("Access-Control-Allow-Origin", "*");
-		Mockito.verify(servletResponseMock).setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+		Mockito.verify(servletResponseMock).setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE");
 		Mockito.verify(servletResponseMock).setHeader("Access-Control-Max-Age", "3600");
-		Mockito.verify(servletResponseMock).setHeader("Access-Control-Allow-Headers", "x-requested-with");
+		Mockito.verify(servletResponseMock).setHeader("Access-Control-Allow-Headers", "x-requested-with, x-auth-token");
 		
 		// Cache control. Please see https://leafnode.atlassian.net/browse/BMS-1117
 		Mockito.verify(servletResponseMock).setHeader("Cache-Control", "max-age=0, no-cache, no-store");

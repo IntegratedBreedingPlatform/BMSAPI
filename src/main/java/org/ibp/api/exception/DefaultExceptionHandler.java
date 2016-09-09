@@ -38,6 +38,7 @@ public class DefaultExceptionHandler {
 	@ResponseStatus(value = INTERNAL_SERVER_ERROR)
 	@ResponseBody
 	public ErrorResponse handleUncaughtException(Exception ex) {
+		LOG.error("Error executing the API call.", ex);
 		ErrorResponse response = new ErrorResponse();
 		if (ex.getCause() != null) {
 			response.addError(ex.getCause().getMessage());

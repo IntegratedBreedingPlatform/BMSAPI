@@ -79,6 +79,16 @@ public class SecurityIntegrationTest {
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/datatypes").contentType(this.contentType))
 		.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isUnauthorized());
 	}
+	
+	@Test
+	public void testOptionsRequestsAlwaysPermitted() throws Exception {
+		// Make an OPTIONS request (crop listing service chosen at random). It should always be allowed without authentication token.
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.options("/crop/list") //
+				.contentType(this.contentType)) //
+				.andDo(MockMvcResultHandlers.print()) //
+				.andExpect(MockMvcResultMatchers.status().isOk());
+	}
 
 	@Test
 	public void testAuthorizedRequest() throws Exception {
