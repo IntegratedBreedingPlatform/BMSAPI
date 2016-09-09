@@ -99,7 +99,6 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(jsonPath("$.metadata.pagination.pageSize", is(10))) //
 				.andExpect(jsonPath("$.metadata.pagination.totalCount", is(200))) //
 				.andExpect(jsonPath("$.metadata.pagination.totalPages", is(20))) //
-				.andExpect(jsonPath("$.metadata.status", is(IsCollectionWithSize.hasSize(0)))) //
 		;
 
 	}
@@ -140,7 +139,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(jsonPath("$.metadata.pagination.pageSize", is(1))) //
 				.andExpect(jsonPath("$.metadata.pagination.totalCount", is(1))) //
 				.andExpect(jsonPath("$.metadata.pagination.totalPages", is(1))) //
-				.andExpect(jsonPath("$.metadata.status", is(IsCollectionWithSize.hasSize(0))));
+		;
 	}
 
 	@Test
@@ -167,6 +166,6 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(jsonPath("$.metadata.pagination.pageSize", is(1))) //
 				.andExpect(jsonPath("$.metadata.pagination.totalCount", is(1))) //
 				.andExpect(jsonPath("$.metadata.pagination.totalPages", is(1))) //
-				.andExpect(jsonPath("$.metadata.status", is(IsCollectionWithSize.hasSize(0))));
+		;
 	}
 }

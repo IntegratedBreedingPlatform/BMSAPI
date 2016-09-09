@@ -1,7 +1,6 @@
 
 package org.ibp.api.brapi.v1.common;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -13,7 +12,7 @@ public class Metadata {
 
 	private Pagination pagination;
 
-	private Map<String, String> status = new HashMap<>();
+	private Map<String, String> status;
 
 	/**
 	 * No args constructor for use in serialization

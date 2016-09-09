@@ -82,7 +82,6 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(jsonPath("$.metadata.pagination.pageSize", Matchers.is(10))) //
 				.andExpect(jsonPath("$.metadata.pagination.totalCount", Matchers.is(200))) //
 				.andExpect(jsonPath("$.metadata.pagination.totalPages", Matchers.is(20))) //
-				.andExpect(jsonPath("$.metadata.status", Matchers.is(IsCollectionWithSize.hasSize(0)))) //
 		;
 	}
 
