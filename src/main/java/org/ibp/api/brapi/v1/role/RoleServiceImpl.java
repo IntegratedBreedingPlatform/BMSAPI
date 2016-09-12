@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class RoleServiceImpl implements RoleService {
 
-	public static final String ADMIN = "ADMIN";
-	public static final String BREEDER = "BREEDER";
-	public static final String TECHNICIAN = "TECHNICIAN";
+	public static final String ADMIN = "Admin";
+	public static final String BREEDER = "Breeder";
+	public static final String TECHNICIAN = "Techician";
 
 	@Override
 	public List<RoleData> getAllRoles() {

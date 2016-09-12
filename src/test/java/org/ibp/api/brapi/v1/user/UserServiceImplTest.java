@@ -1,5 +1,5 @@
 
-package org.ibp.api.java.impl.middleware.user;
+package org.ibp.api.brapi.v1.user;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -34,7 +34,7 @@ public class UserServiceImplTest extends ApiUnitTestBase {
 		final String lastName = RandomStringUtils.randomAlphabetic(5);
 		user.setLastName(lastName);
 		user.setStatus(0);
-		user.setRole("BREEDER");
+		user.setRole("Breeder");
 		final Integer userId = ThreadLocalRandom.current().nextInt();
 		user.setUserId(userId);
 		final String username = RandomStringUtils.randomAlphabetic(5);
@@ -44,7 +44,7 @@ public class UserServiceImplTest extends ApiUnitTestBase {
 
 		Mockito.when(this.workbenchDataManager.getAllUserDtosSorted()).thenReturn(users);
 
-		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/users/listUsers").build().encode();
+		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/brapi/v1/users").build().encode();
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print())

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.modelmapper.ModelMapper;
@@ -35,7 +36,7 @@ public class UserServiceImpl implements UserService {
 				this.map(this.source.getLastName(), this.destination.getLastName());
 				this.map(this.source.getUserId(), this.destination.getUserId());
 				this.map(this.source.getUsername(), this.destination.getUsername());
-				this.map(this.source.getRole(), this.destination.getRole());
+				this.map(this.source.getRole(), WordUtils.capitalize(this.destination.getRole()));
 				this.map(this.source.getStatus() == 0 ? "true" : "false", this.destination.getStatus());
 				this.map(this.source.getEmail(), this.destination.getEmail());
 			}
