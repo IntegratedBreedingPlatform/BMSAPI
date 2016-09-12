@@ -1,5 +1,5 @@
 
-package org.ibp.api.java.user;
+package org.ibp.api.brapi.v1.user;
 
 import java.util.List;
 

@@ -1,5 +1,5 @@
 
-package org.ibp.api.java.impl.middleware.user;
+package org.ibp.api.brapi.v1.user;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -7,8 +7,6 @@ import java.util.List;
 
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.service.api.user.UserDto;
-import org.ibp.api.java.user.UserData;
-import org.ibp.api.java.user.UserService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.springframework.beans.factory.annotation.Autowired;
