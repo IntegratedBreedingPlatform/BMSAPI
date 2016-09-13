@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
-@Api(value = "BrAPI Study Services")
+@Api(value = "BrAPI Role Services")
 @Controller
 public class RolesApi {
 
