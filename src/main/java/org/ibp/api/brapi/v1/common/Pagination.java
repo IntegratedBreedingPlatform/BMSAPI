@@ -2,23 +2,18 @@
 package org.ibp.api.brapi.v1.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"pageNumber", "pageSize", "totalCount", "totalPages"})
 public class Pagination {
 
-	@JsonProperty("pageNumber")
 	private Integer pageNumber;
 
-	@JsonProperty("pageSize")
 	private Integer pageSize;
 
-	@JsonProperty("totalCount")
 	private Long totalCount;
 
-	@JsonProperty("totalPages")
 	private Integer totalPages;
 
 	/**
@@ -46,7 +41,6 @@ public class Pagination {
 	 *
 	 * @return The pageNumber
 	 */
-	@JsonProperty("pageNumber")
 	public Integer getPageNumber() {
 		return this.pageNumber;
 	}
@@ -55,7 +49,6 @@ public class Pagination {
 	 *
 	 * @param pageNumber The pageNumber
 	 */
-	@JsonProperty("pageNumber")
 	public void setPageNumber(final Integer pageNumber) {
 		this.pageNumber = pageNumber;
 	}
@@ -69,7 +62,6 @@ public class Pagination {
 	 *
 	 * @return The pageSize
 	 */
-	@JsonProperty("pageSize")
 	public Integer getPageSize() {
 		return this.pageSize;
 	}
@@ -78,7 +70,6 @@ public class Pagination {
 	 *
 	 * @param pageSize The pageSize
 	 */
-	@JsonProperty("pageSize")
 	public void setPageSize(final Integer pageSize) {
 		this.pageSize = pageSize;
 	}
@@ -92,7 +83,6 @@ public class Pagination {
 	 *
 	 * @return The totalCount
 	 */
-	@JsonProperty("totalCount")
 	public Long getTotalCount() {
 		return this.totalCount;
 	}
@@ -101,7 +91,6 @@ public class Pagination {
 	 *
 	 * @param totalCount The totalCount
 	 */
-	@JsonProperty("totalCount")
 	public void setTotalCount(final Long totalCount) {
 		this.totalCount = totalCount;
 	}
@@ -115,7 +104,6 @@ public class Pagination {
 	 *
 	 * @return The totalPages
 	 */
-	@JsonProperty("totalPages")
 	public Integer getTotalPages() {
 		return this.totalPages;
 	}
@@ -124,7 +112,6 @@ public class Pagination {
 	 *
 	 * @param totalPages The totalPages
 	 */
-	@JsonProperty("totalPages")
 	public void setTotalPages(final Integer totalPages) {
 		this.totalPages = totalPages;
 	}

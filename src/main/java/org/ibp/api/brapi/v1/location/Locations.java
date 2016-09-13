@@ -7,22 +7,18 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Result;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"metadata", "result"})
 public class Locations {
 
-	@JsonProperty("metadata")
 	private Metadata metadata;
 
-	@JsonProperty("result")
 	private Result<Location> result;
 
 	/**
-	 * No args constructor for use in serialization
-	 *
+	 * No args constructor required by serialization libraries.
 	 */
 	public Locations() {
 	}
@@ -41,7 +37,6 @@ public class Locations {
 	 *
 	 * @return The metadata
 	 */
-	@JsonProperty("metadata")
 	public Metadata getMetadata() {
 		return this.metadata;
 	}
@@ -50,7 +45,6 @@ public class Locations {
 	 *
 	 * @param metadata The metadata
 	 */
-	@JsonProperty("metadata")
 	public void setMetadata(final Metadata metadata) {
 		this.metadata = metadata;
 	}
@@ -64,7 +58,6 @@ public class Locations {
 	 *
 	 * @return The result
 	 */
-	@JsonProperty("result")
 	public Result<Location> getResult() {
 		return this.result;
 	}
@@ -73,7 +66,6 @@ public class Locations {
 	 *
 	 * @param result The result
 	 */
-	@JsonProperty("result")
 	public void setResult(final Result<Location> result) {
 		this.result = result;
 	}
