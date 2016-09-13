@@ -17,7 +17,7 @@ public class StudySummaryDto {
 
 	private Integer studyDbId;
 
-	private String name;
+	private String studyName;
 
 	private String studyType;
 
@@ -26,6 +26,8 @@ public class StudySummaryDto {
 	private List<String> seasons;
 
 	private String locationDbId;
+
+	private String locationName;
 
 	private String programDbId;
 
@@ -51,19 +53,19 @@ public class StudySummaryDto {
 
 	/**
 	 *
-	 * @return The name
+	 * @return The studyName
 	 */
-	public String getName() {
-		return name;
+	public String getStudyName() {
+		return studyName;
 	}
 
 	/**
 	 *
-	 * @param name
+	 * @param studyName
 	 * @return this
 	 */
-	public StudySummaryDto setName(final String name) {
-		this.name = name;
+	public StudySummaryDto setStudyName(final String studyName) {
+		this.studyName = studyName;
 		return this;
 	}
 
@@ -136,6 +138,15 @@ public class StudySummaryDto {
 	 */
 	public StudySummaryDto setLocationDbId(final String locationDbId) {
 		this.locationDbId = locationDbId;
+		return this;
+	}
+
+	public String getLocationName() {
+		return this.locationName;
+	}
+
+	public StudySummaryDto setLocationName(String locationName) {
+		this.locationName = locationName;
 		return this;
 	}
 

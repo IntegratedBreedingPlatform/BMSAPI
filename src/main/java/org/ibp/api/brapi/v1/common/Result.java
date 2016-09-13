@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
@@ -21,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({"data"})
 public class Result<T> {
 
-	@JsonProperty("data")
 	private List<T> data = new ArrayList<T>();
 
 	/**
@@ -43,7 +41,6 @@ public class Result<T> {
 	 *
 	 * @return The data
 	 */
-	@JsonProperty("data")
 	public List<T> getData() {
 		return this.data;
 	}
@@ -52,7 +49,6 @@ public class Result<T> {
 	 *
 	 * @param data The data
 	 */
-	@JsonProperty("data")
 	public void setData(final List<T> data) {
 		this.data = data;
 	}

@@ -7,25 +7,20 @@ import java.util.Map;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 
-import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
-import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.java.study.StudyService;
-import org.ibp.api.rest.common.PaginatedSearch;
-import org.ibp.api.rest.common.SearchSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,7 +42,7 @@ public class StudyResource {
 	@Autowired
 	private StudyService studyService;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(StudyResource.class);
+	private static final Logger LOG = LoggerFactory.getLogger(StudyResource.class);
 
 	@ApiOperation(value = "Search studies",
 			notes = "Search studies (Nurseries and Trials) by various criteria (see parameter documentation).")
@@ -83,33 +78,8 @@ public class StudyResource {
 	@ApiOperation(value = "Get all observations", notes = "Returns observations available in the study.")
 	@RequestMapping(value = "/{cropname}/{studyId}/observations", method = RequestMethod.GET)
 	@ResponseBody
-	@Transactional
-	public ResponseEntity<PagedResult<Observation>> getObservations(@PathVariable final String cropname, //
-			@PathVariable final Integer studyId, //
-			@ApiParam(
-					value = "One study can have multiple instances. Supply the instance number for which the observations need to be retrieved."
-							+ " Use <code>GET /study/{cropname}/{studyId}/instances</code> service to retrieve a list of instances with instanceId and basic metadata.") //
-			@RequestParam(value = "instanceId") final Integer instanceId, //
-			@ApiParam(value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.",
-					required = false) //
-			@RequestParam(value = "pageNumber", required = false) Integer pageNumber, //
-			@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.", required = false) //
-			@RequestParam(value = "pageSize", required = false) Integer pageSize) {
-
-		PagedResult<Observation> pageResult = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<Observation>() {
-
-			@Override
-			public long getCount() {
-				return StudyResource.this.studyService.countTotalObservationUnits(studyId, instanceId);
-			}
-
-			@Override
-			public List<Observation> getResults(PagedResult<Observation> pagedResult) {
-				return StudyResource.this.studyService.getObservations(studyId, instanceId, pagedResult.getPageNumber(),
-						pagedResult.getPageSize());
-			}
-		});
-		return new ResponseEntity<>(pageResult, HttpStatus.OK);
+	public ResponseEntity<List<Observation>> getObservations(@PathVariable final String cropname, @PathVariable final Integer studyId) {
+		return new ResponseEntity<>(this.studyService.getObservations(studyId), HttpStatus.OK);
 	}
 	
 	@ApiOperation(value = "Get a observations", notes = "Returns the requested observation in the study.")
@@ -173,7 +143,7 @@ public class StudyResource {
 
 		if (bindingResult.hasErrors()) {
 			final String error = this.getErrorsAsString(bindingResult);
-			LOGGER.error(error);
+			StudyResource.LOG.error(error);
 			throw new ValidationException(error);
 		}
 		final Integer studyId = this.studyService.importStudy(studyImportDTO, programUUID);
@@ -195,14 +165,5 @@ public class StudyResource {
 	@ResponseBody
 	public ResponseEntity<List<StudyFolder>> listAllFolders(final @PathVariable String cropname) {
 		return new ResponseEntity<List<StudyFolder>>(this.studyService.getAllStudyFolders(), HttpStatus.OK);
-	}
-
-	@ApiOperation(value = "List all study instances with basic metadata.",
-			notes = "Returns list of all study instances with basic metadata.")
-	@RequestMapping(value = "/{cropname}/{studyId}/instances", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<List<StudyInstance>> listStudyInstances(final @PathVariable String cropname,
-			@PathVariable final Integer studyId) {
-		return new ResponseEntity<List<StudyInstance>>(this.studyService.getStudyInstances(studyId), HttpStatus.OK);
 	}
 }
