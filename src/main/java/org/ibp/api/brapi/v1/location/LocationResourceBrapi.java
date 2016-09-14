@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Country;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
@@ -71,9 +72,19 @@ public class LocationResourceBrapi {
 			Location location = new Location();
 			location.setLocationDbId(mwLoc.getLocid());
 			location.setName(mwLoc.getLname());
+			location.setAbbreviation(mwLoc.getLabbr());
 
 			// FIXME This is (n+1) query in loop pattern which is bad. This is just temporary. Do not follow this pattern.
-			// TODO Implement a middleware method that retrieves location/country in one query.
+			// TODO Implement a middleware method that retrieves location type and country in one query.
+			if (mwLoc.getLtype() != null && !mwLoc.getLtype().equals(0)) {
+				UserDefinedField loacationTypeUDFLD = this.locationDataManager.getUserDefinedFieldByID(mwLoc.getLtype());
+				if (loacationTypeUDFLD != null) {
+					location.setLocationType(loacationTypeUDFLD.getFname());
+				}
+			} else {
+				location.setLocationType("Unknown");
+			}
+
 			if (mwLoc.getCntryid() == null || mwLoc.getCntryid().equals(0)) {
 				location.setCountryCode("Unknown");
 				location.setCountryName("Unknown");

@@ -3,12 +3,10 @@ package org.ibp.api.rest.study;
 
 import java.util.List;
 import java.util.Map;
+
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyDetails;
@@ -32,6 +30,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+
 @Api(value = "Study Services")
 @Controller
 @RequestMapping("/study")
@@ -40,7 +42,7 @@ public class StudyResource {
 	@Autowired
 	private StudyService studyService;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(StudyResource.class);
+	private static final Logger LOG = LoggerFactory.getLogger(StudyResource.class);
 
 	@ApiOperation(value = "Search studies",
 			notes = "Search studies (Nurseries and Trials) by various criteria (see parameter documentation).")
@@ -141,7 +143,7 @@ public class StudyResource {
 
 		if (bindingResult.hasErrors()) {
 			final String error = this.getErrorsAsString(bindingResult);
-			this.LOGGER.error(error);
+			StudyResource.LOG.error(error);
 			throw new ValidationException(error);
 		}
 		final Integer studyId = this.studyService.importStudy(studyImportDTO, programUUID);
