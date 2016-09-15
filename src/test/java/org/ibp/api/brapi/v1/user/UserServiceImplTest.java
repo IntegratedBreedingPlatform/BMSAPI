@@ -5,13 +5,11 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -22,9 +20,6 @@ import com.google.common.collect.Lists;
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 
 public class UserServiceImplTest extends ApiUnitTestBase {
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
 
 	@Test
 	public void testGetAllUsers() throws Exception {
@@ -53,5 +48,19 @@ public class UserServiceImplTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].username", Matchers.is(user.getUsername())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].lastName", Matchers.is(user.getLastName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].role", Matchers.is(user.getRole())));
+	}
+
+	@Test
+	public void testCreateUser() throws Exception {
+
+	}
+
+	@Test
+	public void testUpdateUser() throws Exception {
+
+	}
+
+	public void inicializeNewUser() {
+
 	}
 }

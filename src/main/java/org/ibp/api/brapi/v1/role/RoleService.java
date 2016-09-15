@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface RoleService {
 	
-	public List<RoleData> getAllRoles();
+	public List<RoleDto> getAllRoles();
 
 }

@@ -13,12 +13,12 @@ public class RoleServiceImpl implements RoleService {
 	public static final String TECHNICIAN = "Technician";
 
 	@Override
-	public List<RoleData> getAllRoles() {
-		List<RoleData> roles = new ArrayList<RoleData>();
+	public List<RoleDto> getAllRoles() {
+		List<RoleDto> roles = new ArrayList<RoleDto>();
 
-		RoleData admin = new RoleData(1, ADMIN);
-		RoleData breeder = new RoleData(2, BREEDER);
-		RoleData technician = new RoleData(3, TECHNICIAN);
+		RoleDto admin = new RoleDto(1, ADMIN);
+		RoleDto breeder = new RoleDto(2, BREEDER);
+		RoleDto technician = new RoleDto(3, TECHNICIAN);
 
 		roles.add(admin);
 		roles.add(breeder);

@@ -16,7 +16,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 
 @Api(value = "BrAPI Role Services")
 @Controller
-public class RolesApi {
+public class RoleResourceBrapi {
 
 	@Autowired
 	private RoleService roleService;
@@ -24,8 +24,8 @@ public class RolesApi {
 	@ApiOperation(value = "List all roles", notes = "List all roles in this deployment instance of BMSAPI. ")
 	@RequestMapping(value = "brapi/v1/roles", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<RoleData>> listRoles() {
-		return new ResponseEntity<List<RoleData>>(this.roleService.getAllRoles(), HttpStatus.OK);
+	public ResponseEntity<List<RoleDto>> listRoles() {
+		return new ResponseEntity<List<RoleDto>>(this.roleService.getAllRoles(), HttpStatus.OK);
 	}
 
 }
