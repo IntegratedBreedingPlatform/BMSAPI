@@ -2,6 +2,7 @@
 package org.ibp.api.brapi.v1.user;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -10,23 +11,31 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.common.GenericResponse;
-import org.jfree.util.Log;
+import org.ibp.api.java.impl.middleware.manager.UserValidator;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-	public static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
+	private static final String USER_NAME = "User";
 
-	// @Autowired
-	// private UserDataManager userDataManager;
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	protected UserValidator userValidator;
+
+	private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 	@Override
 	public List<UserDetailDto> getAllUserDtosSorted() {
@@ -68,58 +77,61 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public GenericResponse createUser(final UserDetailsDto user) {
-		LOGGER.info(user.toString());
+		LOG.debug(user.toString());
 		final UserDto userdto = new UserDto();
-		final List<String> Errors = new ArrayList<String>();
-		final GenericResponse gResponse = new GenericResponse(String.valueOf(0));
+		GenericResponse gResponse = new GenericResponse(String.valueOf(0));
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
 
 		Integer newUserId = null;
+		userdto.setUserId(0);
 		userdto.setUsername(user.getUsername());
 		userdto.setFirstName(user.getFirstName());
 		userdto.setLastName(user.getLastName());
 		userdto.setRole(user.getRole());
 		userdto.setEmail(user.getEmail());
 		userdto.setStatus(user.getStatus().equals("true") ? 0 : 1);
-
-		if (ValidatorUserHelper.validate(userdto, Errors)) {
-
-			try {
-				newUserId = this.workbenchDataManager.addNewUser(userdto);
-				gResponse.setId(String.valueOf(newUserId));
-			} catch (MiddlewareQueryException e) {
-				Log.info("Error on createUser");
-			}
-			LOGGER.info("Validación OK");
+		userdto.setPassword(passwordEncoder.encode(userdto.getUsername()));
+		userValidator.validate(userdto, errors);
+		if (errors.hasErrors()) {
+			LOG.debug("UserValidator returns errors");
 			return gResponse;
 		}
-		LOGGER.info("Validación NOK");
+		try {
+			newUserId = this.workbenchDataManager.addNewUser(userdto);
+			gResponse.setId(String.valueOf(newUserId));
+		} catch (MiddlewareQueryException e) {
+			LOG.info("Error on workbenchDataManager.addNewUser " + e.getMessage());
+		}
+
 		return gResponse;
 	}
 
 	@Override
 	public GenericResponse updateUser(final UserDetailsDto user) {
-		LOGGER.info(user.toString());
+		LOG.debug(user.toString());
 		final UserDto userdto = new UserDto();
-		final List<String> Errors = new ArrayList<String>();
-		final GenericResponse gResponse = new GenericResponse(String.valueOf(0));
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
+
+		GenericResponse gResponse = new GenericResponse(String.valueOf(0));
 		Integer updateUserId = null;
+		userdto.setUserId(user.getUserId());
 		userdto.setUsername(user.getUsername());
 		userdto.setFirstName(user.getFirstName());
 		userdto.setLastName(user.getLastName());
 		userdto.setRole(user.getRole());
 		userdto.setEmail(user.getEmail());
 		userdto.setStatus(user.getStatus().equals("true") ? 0 : 1);
-		if (ValidatorUserHelper.validate(userdto, Errors)) {
-			LOGGER.info("Validación OK");
-			try {
-				updateUserId = this.workbenchDataManager.updateUser(userdto);
-				gResponse.setId(String.valueOf(updateUserId));
-			} catch (MiddlewareQueryException e) {
-				Log.info("Error on createUser");
-			}
+		userValidator.validate(userdto, errors);
+		if (errors.hasErrors()) {
+			LOG.debug("UserValidator returns errors");
 			return gResponse;
 		}
-		LOGGER.info("Validación NOK");
+		try {
+			updateUserId = this.workbenchDataManager.updateUser(userdto);
+			gResponse.setId(String.valueOf(updateUserId));
+		} catch (MiddlewareQueryException e) {
+			LOG.info("Error on workbenchDataManager.updateUser" + e.getMessage());
+		}
 		return gResponse;
 	}
 }

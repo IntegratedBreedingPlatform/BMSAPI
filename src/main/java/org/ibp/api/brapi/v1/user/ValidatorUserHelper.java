@@ -60,7 +60,7 @@ public abstract class ValidatorUserHelper {
 	}
 
 	private static void validateUserRole(List<String> errors, String fieldvalue) {
-		if (!fieldvalue.equals("ADMIN") && !fieldvalue.equals("BREEDER") && !fieldvalue.equals("TECHNICIAN")) {
+		if (!fieldvalue.equalsIgnoreCase("ADMIN") && !fieldvalue.equalsIgnoreCase("BREEDER") && !fieldvalue.equalsIgnoreCase("TECHNICIAN")) {
 			errors.add(ROLE_STR + " = " + SIGNUP_FIELD_INVALID_ROLE);
 			LOG.info(ROLE_STR + " = " + SIGNUP_FIELD_INVALID_ROLE);
 		}
