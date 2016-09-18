@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 
+import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyDetails;
@@ -15,12 +16,15 @@ import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.java.study.StudyService;
+import org.ibp.api.rest.common.PaginatedSearch;
+import org.ibp.api.rest.common.SearchSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -78,8 +82,33 @@ public class StudyResource {
 	@ApiOperation(value = "Get all observations", notes = "Returns observations available in the study.")
 	@RequestMapping(value = "/{cropname}/{studyId}/observations", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<Observation>> getObservations(@PathVariable final String cropname, @PathVariable final Integer studyId) {
-		return new ResponseEntity<>(this.studyService.getObservations(studyId), HttpStatus.OK);
+	@Transactional
+	public ResponseEntity<PagedResult<Observation>> getObservations(@PathVariable final String cropname, //
+			@PathVariable final Integer studyId, //
+			@ApiParam(
+					value = "One study can have multiple instances. Supply the instance number for which the observations need to be retrieved."
+							+ " Use <code>GET /study/{cropname}/{studyId}/instances</code> service to retrieve a list of instances with instanceId and basic metadata.") //
+			@RequestParam(value = "instanceId") final Integer instanceId, //
+			@ApiParam(value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.",
+					required = false) //
+			@RequestParam(value = "pageNumber", required = false) Integer pageNumber, //
+			@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.", required = false) //
+			@RequestParam(value = "pageSize", required = false) Integer pageSize) {
+
+		PagedResult<Observation> pageResult = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<Observation>() {
+
+			@Override
+			public long getCount() {
+				return StudyResource.this.studyService.countTotalObservationUnits(studyId, instanceId);
+			}
+
+			@Override
+			public List<Observation> getResults(PagedResult<Observation> pagedResult) {
+				return StudyResource.this.studyService.getObservations(studyId, instanceId, pagedResult.getPageNumber(),
+						pagedResult.getPageSize());
+			}
+		});
+		return new ResponseEntity<>(pageResult, HttpStatus.OK);
 	}
 	
 	@ApiOperation(value = "Get a observations", notes = "Returns the requested observation in the study.")
