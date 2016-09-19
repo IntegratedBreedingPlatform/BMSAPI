@@ -45,7 +45,7 @@ public class UserResourceBrapi {
 	@ApiOperation(value = "Update user", notes = "Update user in this deployment instance of BMSAPI. ")
 	@RequestMapping(value = "/brapi/v1/users/{id}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> updateUserfinal(final @PathVariable String id, @RequestBody UserDetailsDto user) {
+	public ResponseEntity<GenericResponse> updateUser(final @PathVariable String id, @RequestBody UserDetailsDto user) {
 		GenericResponse response = this.userService.updateUser(user);
 		if (!id.equals(response.getId())) {
 			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);

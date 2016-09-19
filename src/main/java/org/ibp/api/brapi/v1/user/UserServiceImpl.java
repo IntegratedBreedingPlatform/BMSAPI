@@ -41,7 +41,6 @@ public class UserServiceImpl implements UserService {
 	public List<UserDetailDto> getAllUserDtosSorted() {
 		final List<UserDetailDto> result = new ArrayList<>();
 		final List<UserDto> users = this.workbenchDataManager.getAllUserDtosSorted();
-
 		final PropertyMap<UserDto, UserDetailDto> userMapper = new PropertyMap<UserDto, UserDetailDto>() {
 
 			@Override
@@ -78,42 +77,54 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public GenericResponse createUser(final UserDetailsDto user) {
 		LOG.debug(user.toString());
-		final UserDto userdto = new UserDto();
-		GenericResponse gResponse = new GenericResponse(String.valueOf(0));
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
+		GenericResponse gResponse = null;
 
-		Integer newUserId = null;
-		userdto.setUserId(0);
-		userdto.setUsername(user.getUsername());
-		userdto.setFirstName(user.getFirstName());
-		userdto.setLastName(user.getLastName());
-		userdto.setRole(user.getRole());
-		userdto.setEmail(user.getEmail());
-		userdto.setStatus(user.getStatus().equals("true") ? 0 : 1);
-		userdto.setPassword(passwordEncoder.encode(userdto.getUsername()));
-		userValidator.validate(userdto, errors);
+		userValidator.validate(user, errors);
 		if (errors.hasErrors()) {
 			LOG.debug("UserValidator returns errors");
+			gResponse = new GenericResponse(String.valueOf(0));
 			return gResponse;
 		}
+
+		final UserDto userdto = translateUserDetailsDtoToUserDto(user);
+		userdto.setPassword(passwordEncoder.encode(userdto.getUsername()));
+
 		try {
-			newUserId = this.workbenchDataManager.addNewUser(userdto);
-			gResponse.setId(String.valueOf(newUserId));
+			final Integer newUserId = this.workbenchDataManager.createUser(userdto);
+			gResponse = new GenericResponse(String.valueOf(newUserId));
 		} catch (MiddlewareQueryException e) {
 			LOG.info("Error on workbenchDataManager.addNewUser " + e.getMessage());
 		}
-
 		return gResponse;
 	}
 
 	@Override
 	public GenericResponse updateUser(final UserDetailsDto user) {
 		LOG.debug(user.toString());
-		final UserDto userdto = new UserDto();
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
+		GenericResponse gResponse = null;
 
-		GenericResponse gResponse = new GenericResponse(String.valueOf(0));
-		Integer updateUserId = null;
+		userValidator.validate(user, errors);
+		if (errors.hasErrors()) {
+			LOG.debug("UserValidator returns errors");
+			gResponse = new GenericResponse(String.valueOf(0));
+			return gResponse;
+		}
+
+		final UserDto userdto = translateUserDetailsDtoToUserDto(user);
+
+		try {
+			final Integer updateUserId = this.workbenchDataManager.updateUser(userdto);
+			gResponse = new GenericResponse(String.valueOf(updateUserId));
+		} catch (MiddlewareQueryException e) {
+			LOG.info("Error on workbenchDataManager.updateUser" + e.getMessage());
+		}
+		return gResponse;
+	}
+
+	private UserDto translateUserDetailsDtoToUserDto(final UserDetailsDto user) {
+		final UserDto userdto = new UserDto();
 		userdto.setUserId(user.getUserId());
 		userdto.setUsername(user.getUsername());
 		userdto.setFirstName(user.getFirstName());
@@ -121,17 +132,19 @@ public class UserServiceImpl implements UserService {
 		userdto.setRole(user.getRole());
 		userdto.setEmail(user.getEmail());
 		userdto.setStatus(user.getStatus().equals("true") ? 0 : 1);
-		userValidator.validate(userdto, errors);
-		if (errors.hasErrors()) {
-			LOG.debug("UserValidator returns errors");
-			return gResponse;
-		}
-		try {
-			updateUserId = this.workbenchDataManager.updateUser(userdto);
-			gResponse.setId(String.valueOf(updateUserId));
-		} catch (MiddlewareQueryException e) {
-			LOG.info("Error on workbenchDataManager.updateUser" + e.getMessage());
-		}
-		return gResponse;
+		return userdto;
 	}
+
+	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
+		this.workbenchDataManager = workbenchDataManager;
+	}
+
+	public void setUserValidator(final UserValidator userValidator) {
+		this.userValidator = userValidator;
+	}
+
+	public void setPasswordEncoder(final PasswordEncoder passwordEncoder) {
+		this.passwordEncoder = passwordEncoder;
+	}
+
 }
