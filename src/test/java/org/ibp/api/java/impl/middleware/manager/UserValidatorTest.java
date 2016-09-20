@@ -6,12 +6,9 @@ import static org.hamcrest.Matchers.equalTo;
 
 import java.util.HashMap;
 
-import org.apache.http.impl.conn.SystemDefaultDnsResolver;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.brapi.v1.user.UserDetailsDto;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,12 +48,12 @@ public class UserValidatorTest {
 	public void testValidateFieldLength() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailsDto userdto = new UserDetailsDto();
-		
+
 		userdto.setLastName("zxcvbnmaaskjhdfsgeeqwfsafsafg6tk6kglkugt8oljhhlly11");
 		userdto.setUsername("wertyuioiuytredsdfrtghjuklsl123");
 		this.uservalidator.validate(userdto, bindingResult);
 
-		assertThat(7,equalTo(bindingResult.getAllErrors().size()));
+		assertThat(7, equalTo(bindingResult.getAllErrors().size()));
 		assertThat(null, equalTo(bindingResult.getFieldError("firstName").getRejectedValue()));
 		assertThat("signup.field.length.exceed", equalTo(bindingResult.getFieldError("lastName").getCode()));
 		assertThat("30", equalTo(bindingResult.getFieldError("username").getArguments()[0]));
@@ -78,11 +75,11 @@ public class UserValidatorTest {
 		final UserDetailsDto userdto = inicializeUserDetailDto(10);
 		userdto.setRole("Breeeder");
 		this.uservalidator.validate(userdto, bindingResult);
-		
-		assertThat(1,equalTo(bindingResult.getAllErrors().size()));
+
+		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.invalid.role", equalTo(bindingResult.getFieldError("role").getCode()));
 	}
-	
+
 	/**
 	 * Should validate the Email Format.* *
 	 *
@@ -94,11 +91,11 @@ public class UserValidatorTest {
 		final UserDetailsDto userdto = inicializeUserDetailDto(10);
 		userdto.setEmail("cuenya.diego!@leafnode.io");
 		this.uservalidator.validate(userdto, bindingResult);
-		
-		assertThat(1,equalTo(bindingResult.getAllErrors().size()));
+
+		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.email.invalid", equalTo(bindingResult.getFieldError("email").getCode()));
 	}
-	
+
 	/**
 	 * Should validate the UserId.* *
 	 *
@@ -110,11 +107,11 @@ public class UserValidatorTest {
 		final UserDetailsDto userdto = inicializeUserDetailDto(null);
 
 		this.uservalidator.validate(userdto, bindingResult);
-		
-		assertThat(1,equalTo(bindingResult.getAllErrors().size()));
+
+		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.required", equalTo(bindingResult.getFieldError("userId").getCode()));
 	}
-	
+
 	/**
 	 * Should validate the status allow.* *
 	 *
@@ -126,11 +123,11 @@ public class UserValidatorTest {
 		final UserDetailsDto userdto = inicializeUserDetailDto(20);
 		userdto.setStatus("truee");
 		this.uservalidator.validate(userdto, bindingResult);
-		
-		assertThat(1,equalTo(bindingResult.getAllErrors().size()));
+
+		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.invalid.status", equalTo(bindingResult.getFieldError("status").getCode()));
 	}
-	
+
 	/**
 	 * Should validate if username and email exists.* *
 	 *
@@ -140,16 +137,16 @@ public class UserValidatorTest {
 	public void testValidateUserAndPeronalEmailExists() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailsDto userdto = inicializeUserDetailDto(0);
-		
+
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(true);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(true);
 		this.uservalidator.validate(userdto, bindingResult);
-		
-		assertThat(2,equalTo(bindingResult.getAllErrors().size()));
+
+		assertThat(2, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.username.exists", equalTo(bindingResult.getFieldError("username").getCode()));
 		assertThat("signup.field.email.exists", equalTo(bindingResult.getFieldError("email").getCode()));
 	}
-	
+
 	/**
 	 * Should validate update user.* *
 	 *
@@ -159,15 +156,15 @@ public class UserValidatorTest {
 	public void testValidateUpdateUser() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailsDto userdto = inicializeUserDetailDto(10);
-		
+
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(false);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(false);
 		this.uservalidator.validate(userdto, bindingResult);
-		
-		assertThat(0,equalTo(bindingResult.getAllErrors().size()));
+
+		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
 
 	}
-	
+
 	/**
 	 * Should validate create user.* *
 	 *
@@ -177,13 +174,13 @@ public class UserValidatorTest {
 	public void testValidateCreateUser() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailsDto userdto = inicializeUserDetailDto(0);
-		
+
 		this.uservalidator.validate(userdto, bindingResult);
-		
-		assertThat(0,equalTo(bindingResult.getAllErrors().size()));
+
+		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
 
 	}
-	
+
 	/**
 	 * Inicialize UserDetailsDto
 	 * 
