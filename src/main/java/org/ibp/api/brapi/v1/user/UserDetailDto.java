@@ -3,7 +3,7 @@ package org.ibp.api.brapi.v1.user;
 
 public class UserDetailDto {
 
-	private Integer userId;
+	private Integer id;
 
 	private String username;
 
@@ -18,13 +18,13 @@ public class UserDetailDto {
 	private String email;
 
 	
-	public Integer getUserId() {
-		return userId;
+	public Integer getId() {
+		return id;
 	}
 
 	
-	public void setUserId(Integer userId) {
-		this.userId = userId;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	
@@ -91,7 +91,7 @@ public class UserDetailDto {
 	public String toString(){
 		StringBuffer str= new StringBuffer();
 		str.append("UserDetails ")
-		.append("[ userId= ").append(userId)
+		.append("[ id= ").append(id)
 		.append(" ,username= ").append(username)
 		.append(" ,firstName= ").append(firstName)
 		.append(" ,lastName= ").append(lastName)

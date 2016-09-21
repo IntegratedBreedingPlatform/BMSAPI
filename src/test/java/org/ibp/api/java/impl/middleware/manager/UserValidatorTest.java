@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.equalTo;
 import java.util.HashMap;
 
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.ibp.api.brapi.v1.user.UserDetailsDto;
+import org.ibp.api.brapi.v1.user.UserDetailDto;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateFieldLength() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailsDto userdto = new UserDetailsDto();
+		final UserDetailDto userdto = new UserDetailDto();
 
 		userdto.setLastName("zxcvbnmaaskjhdfsgeeqwfsafsafg6tk6kglkugt8oljhhlly11");
 		userdto.setUsername("wertyuioiuytredsdfrtghjuklsl123");
@@ -72,7 +72,7 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateRole() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailsDto userdto = inicializeUserDetailDto(10);
+		final UserDetailDto userdto = inicializeUserDetailDto(10);
 		userdto.setRole("Breeeder");
 		this.uservalidator.validate(userdto, bindingResult);
 
@@ -88,7 +88,7 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateEmail() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailsDto userdto = inicializeUserDetailDto(10);
+		final UserDetailDto userdto = inicializeUserDetailDto(10);
 		userdto.setEmail("cuenya.diego!@leafnode.io");
 		this.uservalidator.validate(userdto, bindingResult);
 
@@ -104,7 +104,7 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUserId() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailsDto userdto = inicializeUserDetailDto(null);
+		final UserDetailDto userdto = inicializeUserDetailDto(null);
 
 		this.uservalidator.validate(userdto, bindingResult);
 
@@ -120,7 +120,7 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateStatus() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailsDto userdto = inicializeUserDetailDto(20);
+		final UserDetailDto userdto = inicializeUserDetailDto(20);
 		userdto.setStatus("truee");
 		this.uservalidator.validate(userdto, bindingResult);
 
@@ -136,7 +136,7 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUserAndPeronalEmailExists() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailsDto userdto = inicializeUserDetailDto(0);
+		final UserDetailDto userdto = inicializeUserDetailDto(0);
 
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(true);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(true);
@@ -155,7 +155,7 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUpdateUser() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailsDto userdto = inicializeUserDetailDto(10);
+		final UserDetailDto userdto = inicializeUserDetailDto(10);
 
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(false);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(false);
@@ -173,7 +173,7 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateCreateUser() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailsDto userdto = inicializeUserDetailDto(0);
+		final UserDetailDto userdto = inicializeUserDetailDto(0);
 
 		this.uservalidator.validate(userdto, bindingResult);
 
@@ -182,20 +182,19 @@ public class UserValidatorTest {
 	}
 
 	/**
-	 * Inicialize UserDetailsDto
+	 * Inicialize UserDetailDto
 	 * 
-	 * @return UserDetailsDto
+	 * @return UserDetailDto
 	 */
-	public UserDetailsDto inicializeUserDetailDto(final Integer userId) {
-		UserDetailsDto user = new UserDetailsDto();
+	public UserDetailDto inicializeUserDetailDto(final Integer userId) {
+		UserDetailDto user = new UserDetailDto();
 		user.setFirstName("Diego");
 		user.setLastName("Cuenya");
 		user.setStatus("true");
 		user.setRole("Breeder");
-		user.setUserId(userId);
+		user.setId(userId);
 		user.setUsername("Cuenyad");
 		user.setEmail("diego.cuenya@leafnode.io");
-		user.setSendEmail(Boolean.FALSE);
 		return user;
 	}
 }

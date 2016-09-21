@@ -50,7 +50,7 @@ public class UserServiceTest {
 		assertThat(usersDto.get(0).getFirstName(), equalTo(usersDtlsDto.get(0).getFirstName()));
 		assertThat(usersDto.get(0).getLastName(), equalTo(usersDtlsDto.get(0).getLastName()));
 		assertThat(usersDto.get(0).getUsername(), equalTo(usersDtlsDto.get(0).getUsername()));
-		assertThat(usersDto.get(0).getUserId(), equalTo(usersDtlsDto.get(0).getUserId()));
+		assertThat(usersDto.get(0).getUserId(), equalTo(usersDtlsDto.get(0).getId()));
 		assertThat(usersDto.get(0).getEmail(), equalTo(usersDtlsDto.get(0).getEmail()));
 		assertThat("true", equalTo(usersDtlsDto.get(0).getStatus()));
 		assertThat(usersDto.get(0).getRole(), equalTo(usersDtlsDto.get(0).getRole()));
@@ -58,7 +58,7 @@ public class UserServiceTest {
 
 	@Test
 	public void testCreateUser() throws Exception {
-		final UserDetailsDto usrDtlsDto = inicializeUserDetailDto(0);
+		final UserDetailDto usrDtlsDto = inicializeUserDetailDto(0);
 		final UserDto userDto = inicializeUserDto(0);
 		Mockito.when(this.workbenchDataManager.createUser(userDto)).thenReturn(new Integer(7));
 		GenericResponse response = this.userServiceImpl.createUser(usrDtlsDto);
@@ -67,7 +67,7 @@ public class UserServiceTest {
 
 	@Test
 	public void testCreateUserValidateError() throws Exception {
-		final UserDetailsDto usrDtlsDto = inicializeUserDetailDto(0);
+		final UserDetailDto usrDtlsDto = inicializeUserDetailDto(0);
 		
 		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlsDto.getUsername())).thenReturn(true);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlsDto.getEmail())).thenReturn(true);
@@ -78,7 +78,7 @@ public class UserServiceTest {
 
 	@Test
 	public void testUpdateUser() throws Exception {
-		final UserDetailsDto usrDtlsDto = inicializeUserDetailDto(12);
+		final UserDetailDto usrDtlsDto = inicializeUserDetailDto(12);
 		final UserDto userDto = inicializeUserDto(12);
 		Mockito.when(this.workbenchDataManager.updateUser(userDto)).thenReturn(new Integer(8));
 		GenericResponse response = this.userServiceImpl.updateUser(usrDtlsDto);
@@ -87,7 +87,7 @@ public class UserServiceTest {
 
 	@Test
 	public void testUpdateUserValidateError() throws Exception {
-		UserDetailsDto usrDtlsDto = inicializeUserDetailDto(10);
+		UserDetailDto usrDtlsDto = inicializeUserDetailDto(10);
 
 		GenericResponse response = this.userServiceImpl.updateUser(usrDtlsDto);
 		assertThat(response.getId(), equalTo("0"));
@@ -116,16 +116,15 @@ public class UserServiceTest {
 		return user;
 	}
 
-	public UserDetailsDto inicializeUserDetailDto(final Integer userId) {
-		UserDetailsDto user = new UserDetailsDto();
+	public UserDetailDto inicializeUserDetailDto(final Integer userId) {
+		UserDetailDto user = new UserDetailDto();
 		user.setFirstName("Diego");
 		user.setLastName("Cuenya");
 		user.setStatus("true");
 		user.setRole("Breeder");
-		user.setUserId(userId);
+		user.setId(userId);
 		user.setUsername("Cuenyad");
 		user.setEmail("diego.cuenya@leafnode.io");
-		user.setSendEmail(Boolean.FALSE);
 		return user;
 	}
 

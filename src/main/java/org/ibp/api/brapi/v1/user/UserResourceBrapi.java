@@ -34,7 +34,7 @@ public class UserResourceBrapi {
 	@ApiOperation(value = "Create user", notes = "Create user in this deployment instance of BMSAPI. ")
 	@RequestMapping(value = "/brapi/v1/users", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> createUser(@RequestBody UserDetailsDto user) {
+	public ResponseEntity<GenericResponse> createUser(@RequestBody UserDetailDto user) {
 		GenericResponse response = this.userService.createUser(user);
 		if ("0".equals(response.getId())) {
 			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
@@ -45,9 +45,9 @@ public class UserResourceBrapi {
 	@ApiOperation(value = "Update user", notes = "Update user in this deployment instance of BMSAPI. ")
 	@RequestMapping(value = "/brapi/v1/users/{id}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> updateUser(final @PathVariable String id, @RequestBody UserDetailsDto user) {
+	public ResponseEntity<GenericResponse> updateUser(final @PathVariable String id, @RequestBody UserDetailDto user) {
 		GenericResponse response = this.userService.updateUser(user);
-		if (!id.equals(response.getId())) {
+		if ("0".equals(response.getId()) || !id.equals(response.getId())) {
 			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 		}
 		return new ResponseEntity<GenericResponse>(response, HttpStatus.OK);

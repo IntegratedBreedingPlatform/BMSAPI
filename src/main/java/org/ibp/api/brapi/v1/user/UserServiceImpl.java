@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 			protected void configure() {
 				this.map(this.source.getFirstName(), this.destination.getFirstName());
 				this.map(this.source.getLastName(), this.destination.getLastName());
-				this.map(this.source.getUserId(), this.destination.getUserId());
+				this.map(this.source.getUserId(), this.destination.getId());
 				this.map(this.source.getUsername(), this.destination.getUsername());
 				this.map(this.source.getRole(), this.destination.getRole());
 				this.map(this.source.getStatus() == 0 ? "true" : "false", this.destination.getStatus());
@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public GenericResponse createUser(final UserDetailsDto user) {
+	public GenericResponse createUser(final UserDetailDto user) {
 		LOG.debug(user.toString());
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
 		GenericResponse gResponse = null;
@@ -100,7 +100,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public GenericResponse updateUser(final UserDetailsDto user) {
+	public GenericResponse updateUser(final UserDetailDto user) {
 		LOG.debug(user.toString());
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
 		GenericResponse gResponse = null;
@@ -123,9 +123,9 @@ public class UserServiceImpl implements UserService {
 		return gResponse;
 	}
 
-	private UserDto translateUserDetailsDtoToUserDto(final UserDetailsDto user) {
+	private UserDto translateUserDetailsDtoToUserDto(final UserDetailDto user) {
 		final UserDto userdto = new UserDto();
-		userdto.setUserId(user.getUserId());
+		userdto.setUserId(user.getId());
 		userdto.setUsername(user.getUsername());
 		userdto.setFirstName(user.getFirstName());
 		userdto.setLastName(user.getLastName());

@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.ibp.api.brapi.v1.user.UserDetailsDto;
+import org.ibp.api.brapi.v1.user.UserDetailDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,12 +55,12 @@ public class UserValidator implements Validator {
 
 	@Override
 	public boolean supports(Class<?> aClass) {
-		return UserDetailsDto.class.equals(aClass);
+		return UserDetailDto.class.equals(aClass);
 	}
 
 	@Override
 	public void validate(Object o, Errors errors) {
-		UserDetailsDto user = (UserDetailsDto) o;
+		UserDetailDto user = (UserDetailDto) o;
 
 		this.validateFieldLength(errors, user.getFirstName(), FIRST_NAME, FIRST_NAME_STR, 20);
 		this.validateFieldLength(errors, user.getLastName(), LAST_NAME, LAST_NAME_STR, 50);
@@ -73,9 +73,9 @@ public class UserValidator implements Validator {
 
 		this.validateEmailFormat(errors, user.getEmail());
 		
-		this.validateUserId(errors, user.getUserId());
+		this.validateUserId(errors, user.getId());
 		
-		if (user.getUserId() != null && 0 == user.getUserId()) {
+		if (user.getId() != null && 0 == user.getId()) {
 			this.validateUsernameIfExists(errors, user.getUsername());
 
 			this.validatePersonEmailIfExists(errors, user.getEmail());
