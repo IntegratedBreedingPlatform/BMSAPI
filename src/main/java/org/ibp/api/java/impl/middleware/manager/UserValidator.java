@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.User;
 import org.ibp.api.brapi.v1.user.UserDetailDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,32 +73,50 @@ public class UserValidator implements Validator {
 		this.validateUserRole(errors, user.getRole());
 
 		this.validateEmailFormat(errors, user.getEmail());
-		
+
 		this.validateUserId(errors, user.getId());
-		
-		if (user.getId() != null && 0 == user.getId()) {
+
+		if (validateUserCreate(user)) {
 			this.validateUsernameIfExists(errors, user.getUsername());
 
 			this.validatePersonEmailIfExists(errors, user.getEmail());
+		} else {
+			this.validateUserUpdate(errors, user);
 		}
 
 		this.validateUserStatus(errors, user.getStatus());
 	}
 
-	private void validateUserId(Errors errors, Integer userId) {
+	private boolean validateUserCreate(final UserDetailDto user) {
+		return user.getId() != null && 0 == user.getId();
+	}
+
+	private void validateUserUpdate(Errors errors, UserDetailDto user) {
+		User userUpdate = this.workbenchDataManager.getUserById(user.getId());
+
+		if (!userUpdate.getName().equalsIgnoreCase(user.getUsername())) {
+			this.validateUsernameIfExists(errors, user.getUsername());
+		}
+
+		if (!userUpdate.getPerson().getEmail().equalsIgnoreCase(user.getEmail())) {
+			this.validatePersonEmailIfExists(errors, user.getEmail());
+		}
+	}
+
+	private void validateUserId(final Errors errors, final Integer userId) {
 		if (null == userId) {
 			errors.rejectValue(USER_ID, SIGNUP_FIELD_REQUIRED);
 		}
-		
+
 	}
 
-	protected void validateEmailFormat(Errors errors, final String eMail) {
+	protected void validateEmailFormat(final Errors errors, final String eMail) {
 		if (null != eMail && !Pattern.compile(EMAIL_PATTERN).matcher(eMail).matches()) {
 			errors.rejectValue(EMAIL, SIGNUP_FIELD_INVALID_EMAIL_FORMAT);
 		}
 	}
 
-	protected void validateFieldLength(Errors errors, final String fieldValue, final String fieldProperty, final String fieldName,
+	protected void validateFieldLength(final Errors errors, final String fieldValue, final String fieldProperty, final String fieldName,
 			final Integer maxLength) {
 
 		if (null == fieldValue || 0 == fieldValue.trim().length()) {
@@ -110,7 +129,7 @@ public class UserValidator implements Validator {
 
 	}
 
-	protected void validateUsernameIfExists(Errors errors, final String userName) {
+	protected void validateUsernameIfExists(final Errors errors, final String userName) {
 		try {
 			if (this.workbenchDataManager.isUsernameExists(userName)) {
 				errors.rejectValue(USERNAME, SIGNUP_FIELD_USERNAME_EXISTS, new String[] {userName}, null);
@@ -121,7 +140,7 @@ public class UserValidator implements Validator {
 		}
 	}
 
-	protected void validatePersonEmailIfExists(Errors errors, final String eMail) {
+	protected void validatePersonEmailIfExists(final Errors errors, final String eMail) {
 		try {
 			if (this.workbenchDataManager.isPersonWithEmailExists(eMail)) {
 				errors.rejectValue(EMAIL, SIGNUP_FIELD_EMAIL_EXISTS);
@@ -131,14 +150,14 @@ public class UserValidator implements Validator {
 		}
 	}
 
-	protected void validateUserRole(Errors errors, final String fieldvalue) {
+	protected void validateUserRole(final Errors errors, final String fieldvalue) {
 		if (fieldvalue != null && !fieldvalue.equalsIgnoreCase("ADMIN") && !fieldvalue.equalsIgnoreCase("BREEDER")
 				&& !fieldvalue.equalsIgnoreCase("TECHNICIAN")) {
 			errors.rejectValue(ROLE, SIGNUP_FIELD_INVALID_ROLE);
 		}
 	}
 
-	protected void validateUserStatus(Errors errors, final String fieldvalue) {
+	protected void validateUserStatus(final Errors errors, final String fieldvalue) {
 		if (fieldvalue != null && !fieldvalue.equalsIgnoreCase("true") && !fieldvalue.equalsIgnoreCase("false")) {
 			errors.rejectValue(STATUS, SIGNUP_FIELD_INVALID_STATUS);
 		}
