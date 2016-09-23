@@ -26,6 +26,7 @@ public class UserValidator implements Validator {
 	private static final String SIGNUP_FIELD_USERNAME_EXISTS = "signup.field.username.exists";
 	private static final String SIGNUP_FIELD_INVALID_ROLE = "signup.field.invalid.role";
 	private static final String SIGNUP_FIELD_INVALID_STATUS = "signup.field.invalid.status";
+	private static final String SIGNUP_FIELD_INVALID_USER_ID = "signup.field.invalid.userId";
 
 	private static final String DATABASE_ERROR = "database.error";
 
@@ -76,6 +77,8 @@ public class UserValidator implements Validator {
 
 		this.validateUserId(errors, user.getId());
 
+		this.validateUserStatus(errors, user.getStatus());
+
 		if (validateUserCreate(user)) {
 			this.validateUsernameIfExists(errors, user.getUsername());
 
@@ -84,22 +87,25 @@ public class UserValidator implements Validator {
 			this.validateUserUpdate(errors, user);
 		}
 
-		this.validateUserStatus(errors, user.getStatus());
 	}
 
 	private boolean validateUserCreate(final UserDetailDto user) {
-		return user.getId() != null && 0 == user.getId();
+		return user.getId() == null || 0 == user.getId();
 	}
 
 	private void validateUserUpdate(Errors errors, UserDetailDto user) {
 		User userUpdate = this.workbenchDataManager.getUserById(user.getId());
 
-		if (!userUpdate.getName().equalsIgnoreCase(user.getUsername())) {
-			this.validateUsernameIfExists(errors, user.getUsername());
-		}
+		if (userUpdate != null) {
+			if (!userUpdate.getName().equalsIgnoreCase(user.getUsername())) {
+				this.validateUsernameIfExists(errors, user.getUsername());
+			}
 
-		if (!userUpdate.getPerson().getEmail().equalsIgnoreCase(user.getEmail())) {
-			this.validatePersonEmailIfExists(errors, user.getEmail());
+			if (!userUpdate.getPerson().getEmail().equalsIgnoreCase(user.getEmail())) {
+				this.validatePersonEmailIfExists(errors, user.getEmail());
+			}
+		} else {
+			errors.rejectValue(USER_ID, SIGNUP_FIELD_INVALID_USER_ID);
 		}
 	}
 

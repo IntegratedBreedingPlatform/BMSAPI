@@ -7,6 +7,8 @@ import static org.hamcrest.Matchers.equalTo;
 import java.util.HashMap;
 
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.User;
 import org.ibp.api.brapi.v1.user.UserDetailDto;
 import org.junit.After;
 import org.junit.Before;
@@ -73,7 +75,11 @@ public class UserValidatorTest {
 	public void testValidateRole() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userdto = inicializeUserDetailDto(10);
+		final User user = inicializeUser(10);
+
 		userdto.setRole("Breeeder");
+		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
+
 		this.uservalidator.validate(userdto, bindingResult);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
@@ -89,7 +95,11 @@ public class UserValidatorTest {
 	public void testValidateEmail() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userdto = inicializeUserDetailDto(10);
+		final User user = inicializeUser(10);
+
+		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
 		userdto.setEmail("cuenya.diego!@leafnode.io");
+
 		this.uservalidator.validate(userdto, bindingResult);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
@@ -113,6 +123,22 @@ public class UserValidatorTest {
 	}
 
 	/**
+	 * Should validate the userId inexistent.* *
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testValidateUserIdInexistent() throws Exception {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final UserDetailDto userdto = inicializeUserDetailDto(10);
+		final User user = inicializeUser(5);
+		this.uservalidator.validate(userdto, bindingResult);
+		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
+		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
+		assertThat("signup.field.invalid.userId", equalTo(bindingResult.getFieldError("userId").getCode()));
+	}
+
+	/**
 	 * Should validate the status allow.* *
 	 *
 	 * @throws Exception
@@ -121,7 +147,9 @@ public class UserValidatorTest {
 	public void testValidateStatus() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userdto = inicializeUserDetailDto(20);
+		final User user = inicializeUser(20);
 		userdto.setStatus("truee");
+		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
 		this.uservalidator.validate(userdto, bindingResult);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
@@ -156,7 +184,71 @@ public class UserValidatorTest {
 	public void testValidateUpdateUser() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userdto = inicializeUserDetailDto(10);
+		final User user = inicializeUser(20);
 
+		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
+		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(false);
+		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(false);
+		this.uservalidator.validate(userdto, bindingResult);
+
+		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
+
+	}
+
+	/**
+	 * Should validate update user with diferent Email* *
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testValidateUpdateUserEmailExists() throws Exception {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final UserDetailDto userdto = inicializeUserDetailDto(10);
+		final User user = inicializeUser(10);
+		user.getPerson().setEmail("user@leafnode.io");
+		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
+		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(false);
+		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(true);
+		this.uservalidator.validate(userdto, bindingResult);
+
+		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
+		assertThat("signup.field.email.exists", equalTo(bindingResult.getFieldError("email").getCode()));
+
+	}
+
+	/**
+	 * Should validate update user with diferent username* *
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testValidateUpdateUserUsernameExists() throws Exception {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final UserDetailDto userdto = inicializeUserDetailDto(10);
+		final User user = inicializeUser(10);
+		user.setName("Nahuel");
+		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
+		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(true);
+		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(false);
+		this.uservalidator.validate(userdto, bindingResult);
+
+		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
+		assertThat("signup.field.username.exists", equalTo(bindingResult.getFieldError("username").getCode()));
+
+	}
+
+	/**
+	 * Should validate update user.* *
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testValidateInvalidUserUpdate() throws Exception {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final UserDetailDto userdto = inicializeUserDetailDto(10);
+		final User user = inicializeUser(20);
+
+		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(false);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(false);
 		this.uservalidator.validate(userdto, bindingResult);
@@ -195,6 +287,34 @@ public class UserValidatorTest {
 		user.setId(userId);
 		user.setUsername("Cuenyad");
 		user.setEmail("diego.cuenya@leafnode.io");
+		return user;
+	}
+
+	public User inicializeUser(final Integer userId) {
+		User user = new User();
+		Person person = new Person();
+		person.setId(2);
+		person.setFirstName("Diego");
+		person.setMiddleName("");
+		person.setLastName("Cuenya");
+		person.setEmail("diego.cuenya@leafnode.io");
+		person.setTitle("-");
+		person.setContact("-");
+		person.setExtension("-");
+		person.setFax("-");
+		person.setInstituteId(0);
+		person.setLanguage(0);
+		person.setNotes("-");
+		person.setPositionName("-");
+		person.setPhone("-");
+		user.setPerson(person);
+
+		user.setPersonid(person.getId());
+		user.setPerson(person);
+		user.setName("Cuenyad");
+		user.setAccess(0);
+		user.setInstalid(0);
+		user.setType(0);
 		return user;
 	}
 }
