@@ -7,6 +7,8 @@ import static org.hamcrest.Matchers.equalTo;
 import java.util.List;
 
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.java.impl.middleware.manager.UserValidator;
@@ -78,9 +80,11 @@ public class UserServiceTest {
 
 	@Test
 	public void testUpdateUser() throws Exception {
-		final UserDetailDto usrDtlsDto = inicializeUserDetailDto(12);
-		final UserDto userDto = inicializeUserDto(12);
+		final UserDetailDto usrDtlsDto = inicializeUserDetailDto(8);
+		final UserDto userDto = inicializeUserDto(8);
+		final User user = inicializeUser(8);
 		Mockito.when(this.workbenchDataManager.updateUser(userDto)).thenReturn(new Integer(8));
+		Mockito.when(this.workbenchDataManager.getUserById(8)).thenReturn(user);
 		GenericResponse response = this.userServiceImpl.updateUser(usrDtlsDto);
 		assertThat(response.getId(), equalTo("8"));
 	}
@@ -125,6 +129,34 @@ public class UserServiceTest {
 		user.setId(userId);
 		user.setUsername("Cuenyad");
 		user.setEmail("diego.cuenya@leafnode.io");
+		return user;
+	}
+	
+	public User inicializeUser(final Integer userId) {
+		User user = new User();
+		Person person = new Person();
+		person.setId(2);
+		person.setFirstName("Diego");
+		person.setMiddleName("");
+		person.setLastName("Cuenya");
+		person.setEmail("diego.cuenya@leafnode.io");
+		person.setTitle("-");
+		person.setContact("-");
+		person.setExtension("-");
+		person.setFax("-");
+		person.setInstituteId(0);
+		person.setLanguage(0);
+		person.setNotes("-");
+		person.setPositionName("-");
+		person.setPhone("-");
+		user.setPerson(person);
+
+		user.setPersonid(person.getId());
+		user.setPerson(person);
+		user.setName("Cuenyad");
+		user.setAccess(0);
+		user.setInstalid(0);
+		user.setType(0);
 		return user;
 	}
 
