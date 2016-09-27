@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 import java.util.HashMap;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
@@ -74,8 +75,8 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateRole() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = inicializeUserDetailDto(10);
-		final User user = inicializeUser(10);
+		final UserDetailDto userdto = initializeUserDetailDto(10);
+		final User user = initializeUser(10);
 
 		userdto.setRole("Breeeder");
 		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
@@ -94,8 +95,8 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateEmail() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = inicializeUserDetailDto(10);
-		final User user = inicializeUser(10);
+		final UserDetailDto userdto = initializeUserDetailDto(10);
+		final User user = initializeUser(10);
 
 		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
 		userdto.setEmail("cuenya.diego!@leafnode.io");
@@ -114,7 +115,7 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUserId() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = inicializeUserDetailDto(null);
+		final UserDetailDto userdto = initializeUserDetailDto(null);
 
 		this.uservalidator.validate(userdto, bindingResult);
 
@@ -130,8 +131,8 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUserIdInexistent() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = inicializeUserDetailDto(10);
-		final User user = inicializeUser(5);
+		final UserDetailDto userdto = initializeUserDetailDto(10);
+		final User user = initializeUser(5);
 		this.uservalidator.validate(userdto, bindingResult);
 		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
@@ -146,8 +147,8 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateStatus() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = inicializeUserDetailDto(20);
-		final User user = inicializeUser(20);
+		final UserDetailDto userdto = initializeUserDetailDto(20);
+		final User user = initializeUser(20);
 		userdto.setStatus("truee");
 		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
 		this.uservalidator.validate(userdto, bindingResult);
@@ -164,7 +165,7 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUserAndPeronalEmailExists() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = inicializeUserDetailDto(0);
+		final UserDetailDto userdto = initializeUserDetailDto(0);
 
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(true);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(true);
@@ -183,8 +184,8 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUpdateUser() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = inicializeUserDetailDto(10);
-		final User user = inicializeUser(20);
+		final UserDetailDto userdto = initializeUserDetailDto(10);
+		final User user = initializeUser(20);
 
 		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(false);
@@ -203,8 +204,8 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUpdateUserEmailExists() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = inicializeUserDetailDto(10);
-		final User user = inicializeUser(10);
+		final UserDetailDto userdto = initializeUserDetailDto(10);
+		final User user = initializeUser(10);
 		user.getPerson().setEmail("user@leafnode.io");
 		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(false);
@@ -224,8 +225,8 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUpdateUserUsernameExists() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = inicializeUserDetailDto(10);
-		final User user = inicializeUser(10);
+		final UserDetailDto userdto = initializeUserDetailDto(10);
+		final User user = initializeUser(10);
 		user.setName("Nahuel");
 		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(true);
@@ -245,8 +246,8 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateInvalidUserUpdate() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = inicializeUserDetailDto(10);
-		final User user = inicializeUser(20);
+		final UserDetailDto userdto = initializeUserDetailDto(10);
+		final User user = initializeUser(20);
 
 		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(false);
@@ -265,7 +266,7 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateCreateUser() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = inicializeUserDetailDto(0);
+		final UserDetailDto userdto = initializeUserDetailDto(0);
 
 		this.uservalidator.validate(userdto, bindingResult);
 
@@ -274,30 +275,37 @@ public class UserValidatorTest {
 	}
 
 	/**
-	 * Inicialize UserDetailDto
+	 * Initialize UserDetailDto
 	 * 
 	 * @return UserDetailDto
 	 */
-	public UserDetailDto inicializeUserDetailDto(final Integer userId) {
+	public UserDetailDto initializeUserDetailDto(final Integer userId) {
 		UserDetailDto user = new UserDetailDto();
-		user.setFirstName("Diego");
-		user.setLastName("Cuenya");
+		final String firstName = RandomStringUtils.randomAlphanumeric(20);
+		user.setFirstName(firstName);
+		final String lastName = RandomStringUtils.randomAlphanumeric(50);
+		user.setLastName(lastName);
 		user.setStatus("true");
 		user.setRole("Breeder");
 		user.setId(userId);
-		user.setUsername("Cuenyad");
-		user.setEmail("diego.cuenya@leafnode.io");
+		final String username = RandomStringUtils.randomAlphanumeric(30);
+		user.setUsername(username);
+		final String email = RandomStringUtils.randomAlphanumeric(24);
+		user.setEmail("test" + email + "@leafnode.io");
 		return user;
 	}
 
-	public User inicializeUser(final Integer userId) {
+	public User initializeUser(final Integer userId) {
 		User user = new User();
 		Person person = new Person();
 		person.setId(2);
-		person.setFirstName("Diego");
+		final String firstName = RandomStringUtils.randomAlphanumeric(20);
+		person.setFirstName(firstName);
 		person.setMiddleName("");
-		person.setLastName("Cuenya");
-		person.setEmail("diego.cuenya@leafnode.io");
+		final String lastName = RandomStringUtils.randomAlphanumeric(50);
+		person.setLastName(lastName);
+		final String email = RandomStringUtils.randomAlphanumeric(24);
+		person.setEmail("test" + email + "@leafnode.io");
 		person.setTitle("-");
 		person.setContact("-");
 		person.setExtension("-");
@@ -311,7 +319,8 @@ public class UserValidatorTest {
 
 		user.setPersonid(person.getId());
 		user.setPerson(person);
-		user.setName("Cuenyad");
+		final String username = RandomStringUtils.randomAlphanumeric(30);
+		user.setName(username);
 		user.setAccess(0);
 		user.setInstalid(0);
 		user.setType(0);
