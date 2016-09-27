@@ -43,6 +43,11 @@ public class UserServiceTest {
 		this.userServiceImpl.setUserValidator(this.userValidator);
 	}
 
+	/**
+	 * Should return the list of users.
+	 *
+	 * @throws Exception
+	 */
 	@Test
 	public void testGetAllUsers() throws Exception {
 		final List<UserDto> usersDto = getAllListUser();
@@ -58,18 +63,30 @@ public class UserServiceTest {
 		assertThat(usersDto.get(0).getRole(), equalTo(usersDtlsDto.get(0).getRole()));
 	}
 
+	/**
+	 * Should create the new user, 
+	 * and return the new userId.
+	 *
+	 * @throws Exception
+	 */
 	@Test
 	public void testCreateUser() throws Exception {
-		final UserDetailDto usrDtlsDto = inicializeUserDetailDto(0);
-		final UserDto userDto = inicializeUserDto(0);
+		final UserDetailDto usrDtlsDto = initializeUserDetailDto(0);
+		final UserDto userDto = initializeUserDto(0);
 		Mockito.when(this.workbenchDataManager.createUser(userDto)).thenReturn(new Integer(7));
 		GenericResponse response = this.userServiceImpl.createUser(usrDtlsDto);
 		assertThat(response.getId(), equalTo("7"));
 	}
 
+	/**
+	 * Should return the id 0, 
+	 * because happened a error during the creation user.
+	 *
+	 * @throws Exception
+	 */
 	@Test
 	public void testCreateUserValidateError() throws Exception {
-		final UserDetailDto usrDtlsDto = inicializeUserDetailDto(0);
+		final UserDetailDto usrDtlsDto = initializeUserDetailDto(0);
 		
 		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlsDto.getUsername())).thenReturn(true);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlsDto.getEmail())).thenReturn(true);
@@ -78,37 +95,54 @@ public class UserServiceTest {
 		assertThat(response.getId(), equalTo("0"));
 	}
 
+	/**
+	 * Should update the user, 
+	 * and return the same userId.
+	 *
+	 * @throws Exception
+	 */
 	@Test
 	public void testUpdateUser() throws Exception {
-		final UserDetailDto usrDtlsDto = inicializeUserDetailDto(8);
-		final UserDto userDto = inicializeUserDto(8);
-		final User user = inicializeUser(8);
+		final UserDetailDto usrDtlsDto = initializeUserDetailDto(8);
+		final UserDto userDto = initializeUserDto(8);
+		final User user = initializeUser(8);
 		Mockito.when(this.workbenchDataManager.updateUser(userDto)).thenReturn(new Integer(8));
 		Mockito.when(this.workbenchDataManager.getUserById(8)).thenReturn(user);
 		GenericResponse response = this.userServiceImpl.updateUser(usrDtlsDto);
 		assertThat(response.getId(), equalTo("8"));
 	}
 
+	/**
+	 * Should return the id 0, 
+	 * because happened a error during the update user.
+	 *
+	 * @throws Exception
+	 */
 	@Test
 	public void testUpdateUserValidateError() throws Exception {
-		UserDetailDto usrDtlsDto = inicializeUserDetailDto(10);
+		UserDetailDto usrDtlsDto = initializeUserDetailDto(10);
 
 		GenericResponse response = this.userServiceImpl.updateUser(usrDtlsDto);
 		assertThat(response.getId(), equalTo("0"));
 	}
 
 	/**
-	 * Inicialize List all user
+	 * initialize List all user
 	 * 
 	 * @return List<UserDto>
 	 */
 	public List<UserDto> getAllListUser() {
-		UserDto user = inicializeUserDto(10);
+		UserDto user = initializeUserDto(10);
 		final List<UserDto> users = Lists.newArrayList(user);
 		return users;
 	}
 
-	public UserDto inicializeUserDto(final Integer userId) {
+	/**
+	 * initialize UserDto
+	 * 
+	 * @return user UserDto
+	 */
+	public UserDto initializeUserDto(final Integer userId) {
 		UserDto user = new UserDto();
 		user.setFirstName("Diego");
 		user.setLastName("Cuenya");
@@ -120,7 +154,14 @@ public class UserServiceTest {
 		return user;
 	}
 
-	public UserDetailDto inicializeUserDetailDto(final Integer userId) {
+
+	/**
+	 * initialize UserDetailDto
+	 * 
+	 * @param userId Integer
+	 * @return userDetailDto UserDetailDto
+	 */
+	public UserDetailDto initializeUserDetailDto(final Integer userId) {
 		UserDetailDto user = new UserDetailDto();
 		user.setFirstName("Diego");
 		user.setLastName("Cuenya");
@@ -132,7 +173,13 @@ public class UserServiceTest {
 		return user;
 	}
 	
-	public User inicializeUser(final Integer userId) {
+	/**
+	 * initialize User
+	 * 
+	 * @param userId Integer
+	 * @return user User
+	 */
+	public User initializeUser(final Integer userId) {
 		User user = new User();
 		Person person = new Person();
 		person.setId(2);

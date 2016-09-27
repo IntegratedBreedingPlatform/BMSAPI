@@ -66,7 +66,7 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 	 */
 	@Test
 	public void testCreateUser() throws Exception {
-		final UserDetailDto user = inicializeUser();
+		final UserDetailDto user = initializeUser();
 		final GenericResponse response = new GenericResponse("10");
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/brapi/v1/users").build().encode();
 
@@ -86,7 +86,7 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 	 */
 	@Test
 	public void testCreateUserError() throws Exception {
-		final UserDetailDto user = inicializeUser();
+		final UserDetailDto user = initializeUser();
 		final GenericResponse response = new GenericResponse("0");
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/brapi/v1/users").build().encode();
 
@@ -107,7 +107,7 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 	@Test
 	public void testUpdateUser() throws Exception {
 		final String id = "7";
-		final UserDetailDto user = inicializeUser();
+		final UserDetailDto user = initializeUser();
 		final GenericResponse response = new GenericResponse("7");
 		
 		Mockito.when(this.userService.updateUser(Mockito.any(org.ibp.api.brapi.v1.user.UserDetailDto.class))).thenReturn(response);
@@ -127,7 +127,7 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 	@Test
 	public void testUpdateUserError() throws Exception {
 		final String id = "7";
-		final UserDetailDto user = inicializeUser();
+		final UserDetailDto user = initializeUser();
 		final GenericResponse response = new GenericResponse("0");
 
 		Mockito.when(this.userService.updateUser(Mockito.any(org.ibp.api.brapi.v1.user.UserDetailDto.class))).thenReturn(response);
@@ -139,10 +139,10 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	/**
-	 * Inicialize UserDetailDto
+	 * initialize UserDetailDto
 	 * @return UserDetailDto 
 	 */
-	public UserDetailDto inicializeUser() {
+	public UserDetailDto initializeUser() {
 		UserDetailDto user = new UserDetailDto();
 		final String firstName = RandomStringUtils.randomAlphabetic(5);
 		user.setFirstName(firstName);
@@ -158,7 +158,7 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	/**
-	 * Inicialize List UserDetailDto
+	 * initialize List UserDetailDto
 	 * @return List<UserDetailDto> 
 	 */
 	public List<UserDetailDto>  responseListUser() {
