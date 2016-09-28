@@ -19,31 +19,31 @@ public class UserValidator implements Validator {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserValidator.class);
 
-	private static final String SIGNUP_FIELD_INVALID_EMAIL_FORMAT = "signup.field.email.invalid";
-	private static final String SIGNUP_FIELD_REQUIRED = "signup.field.required";
-	private static final String SIGNUP_FIELD_LENGTH_EXCEED = "signup.field.length.exceed";
-	private static final String SIGNUP_FIELD_EMAIL_EXISTS = "signup.field.email.exists";
-	private static final String SIGNUP_FIELD_USERNAME_EXISTS = "signup.field.username.exists";
-	private static final String SIGNUP_FIELD_INVALID_ROLE = "signup.field.invalid.role";
-	private static final String SIGNUP_FIELD_INVALID_STATUS = "signup.field.invalid.status";
-	private static final String SIGNUP_FIELD_INVALID_USER_ID = "signup.field.invalid.userId";
+	public static final String SIGNUP_FIELD_INVALID_EMAIL_FORMAT = "signup.field.email.invalid";
+	public static final String SIGNUP_FIELD_REQUIRED = "signup.field.required";
+	public static final String SIGNUP_FIELD_LENGTH_EXCEED = "signup.field.length.exceed";
+	public static final String SIGNUP_FIELD_EMAIL_EXISTS = "signup.field.email.exists";
+	public static final String SIGNUP_FIELD_USERNAME_EXISTS = "signup.field.username.exists";
+	public static final String SIGNUP_FIELD_INVALID_ROLE = "signup.field.invalid.role";
+	public static final String SIGNUP_FIELD_INVALID_STATUS = "signup.field.invalid.status";
+	public static final String SIGNUP_FIELD_INVALID_USER_ID = "signup.field.invalid.userId";
 
-	private static final String DATABASE_ERROR = "database.error";
+	public static final String DATABASE_ERROR = "database.error";
 
-	private static final String FIRST_NAME_STR = "First Name";
-	private static final String LAST_NAME_STR = "Last Name";
-	private static final String USERNAME_STR = "Username";
-	private static final String EMAIL_STR = "Email";
-	private static final String ROLE_STR = "Role";
-	private static final String STATUS_STR = "Status";
+	public static final String FIRST_NAME_STR = "First Name";
+	public static final String LAST_NAME_STR = "Last Name";
+	public static final String USERNAME_STR = "Username";
+	public static final String EMAIL_STR = "Email";
+	public static final String ROLE_STR = "Role";
+	public static final String STATUS_STR = "Status";
 
-	private static final String FIRST_NAME = "firstName";
-	private static final String LAST_NAME = "lastName";
-	private static final String EMAIL = "email";
-	private static final String USERNAME = "username";
-	private static final String ROLE = "role";
-	private static final String STATUS = "status";
-	private static final String USER_ID = "userId";
+	public static final String FIRST_NAME = "firstName";
+	public static final String LAST_NAME = "lastName";
+	public static final String EMAIL = "email";
+	public static final String USERNAME = "username";
+	public static final String ROLE = "role";
+	public static final String STATUS = "status";
+	public static final String USER_ID = "userId";
 
 	private static final String EMAIL_PATTERN =
 			"^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
@@ -61,7 +61,11 @@ public class UserValidator implements Validator {
 	}
 
 	@Override
-	public void validate(Object o, Errors errors) {
+	public void validate(final Object o, final Errors errors) {
+
+	}
+
+	public void validate(final Object o, final Errors errors, final boolean createUser) {
 		UserDetailDto user = (UserDetailDto) o;
 
 		this.validateFieldLength(errors, user.getFirstName(), FIRST_NAME, FIRST_NAME_STR, 20);
@@ -75,37 +79,41 @@ public class UserValidator implements Validator {
 
 		this.validateEmailFormat(errors, user.getEmail());
 
-		this.validateUserId(errors, user.getId());
-
 		this.validateUserStatus(errors, user.getStatus());
 
-		if (validateUserCreate(user)) {
+		if (createUser) {
 			this.validateUsernameIfExists(errors, user.getUsername());
 
 			this.validatePersonEmailIfExists(errors, user.getEmail());
 		} else {
+			this.validateUserId(errors, user.getId());
+
 			this.validateUserUpdate(errors, user);
 		}
 
 	}
 
-	private boolean validateUserCreate(final UserDetailDto user) {
-		return user.getId() == null || 0 == user.getId();
-	}
-
 	private void validateUserUpdate(Errors errors, UserDetailDto user) {
-		User userUpdate = this.workbenchDataManager.getUserById(user.getId());
-
-		if (userUpdate != null) {
-			if (!userUpdate.getName().equalsIgnoreCase(user.getUsername())) {
-				this.validateUsernameIfExists(errors, user.getUsername());
+		User userUpdate = null;
+		if (null == errors.getFieldError(USER_ID)) {
+			try {
+				userUpdate = this.workbenchDataManager.getUserById(user.getId());
+			} catch (MiddlewareQueryException e) {
+				errors.rejectValue(USER_ID, DATABASE_ERROR);
+				LOG.error(e.getMessage(), e);
 			}
 
-			if (!userUpdate.getPerson().getEmail().equalsIgnoreCase(user.getEmail())) {
-				this.validatePersonEmailIfExists(errors, user.getEmail());
+			if (userUpdate != null) {
+				if (!userUpdate.getName().equalsIgnoreCase(user.getUsername())) {
+					this.validateUsernameIfExists(errors, user.getUsername());
+				}
+
+				if (!userUpdate.getPerson().getEmail().equalsIgnoreCase(user.getEmail())) {
+					this.validatePersonEmailIfExists(errors, user.getEmail());
+				}
+			} else {
+				errors.rejectValue(USER_ID, SIGNUP_FIELD_INVALID_USER_ID);
 			}
-		} else {
-			errors.rejectValue(USER_ID, SIGNUP_FIELD_INVALID_USER_ID);
 		}
 	}
 
@@ -117,7 +125,7 @@ public class UserValidator implements Validator {
 	}
 
 	protected void validateEmailFormat(final Errors errors, final String eMail) {
-		if (null != eMail && !Pattern.compile(EMAIL_PATTERN).matcher(eMail).matches()) {
+		if (null == errors.getFieldError(EMAIL) && null != eMail && !Pattern.compile(EMAIL_PATTERN).matcher(eMail).matches()) {
 			errors.rejectValue(EMAIL, SIGNUP_FIELD_INVALID_EMAIL_FORMAT);
 		}
 	}
@@ -137,7 +145,7 @@ public class UserValidator implements Validator {
 
 	protected void validateUsernameIfExists(final Errors errors, final String userName) {
 		try {
-			if (this.workbenchDataManager.isUsernameExists(userName)) {
+			if (null == errors.getFieldError(USERNAME) && this.workbenchDataManager.isUsernameExists(userName)) {
 				errors.rejectValue(USERNAME, SIGNUP_FIELD_USERNAME_EXISTS, new String[] {userName}, null);
 			}
 		} catch (MiddlewareQueryException e) {
@@ -148,23 +156,25 @@ public class UserValidator implements Validator {
 
 	protected void validatePersonEmailIfExists(final Errors errors, final String eMail) {
 		try {
-			if (this.workbenchDataManager.isPersonWithEmailExists(eMail)) {
+			if (null == errors.getFieldError(EMAIL) && this.workbenchDataManager.isPersonWithEmailExists(eMail)) {
 				errors.rejectValue(EMAIL, SIGNUP_FIELD_EMAIL_EXISTS);
 			}
 		} catch (MiddlewareQueryException e) {
+			errors.rejectValue(EMAIL, DATABASE_ERROR);
 			LOG.error(e.getMessage(), e);
 		}
 	}
 
 	protected void validateUserRole(final Errors errors, final String fieldvalue) {
-		if (fieldvalue != null && !fieldvalue.equalsIgnoreCase("ADMIN") && !fieldvalue.equalsIgnoreCase("BREEDER")
-				&& !fieldvalue.equalsIgnoreCase("TECHNICIAN")) {
+		if (null == errors.getFieldError(ROLE) && fieldvalue != null && !fieldvalue.equalsIgnoreCase("ADMIN")
+				&& !fieldvalue.equalsIgnoreCase("BREEDER") && !fieldvalue.equalsIgnoreCase("TECHNICIAN")) {
 			errors.rejectValue(ROLE, SIGNUP_FIELD_INVALID_ROLE);
 		}
 	}
 
 	protected void validateUserStatus(final Errors errors, final String fieldvalue) {
-		if (fieldvalue != null && !fieldvalue.equalsIgnoreCase("true") && !fieldvalue.equalsIgnoreCase("false")) {
+		if (null == errors.getFieldError(STATUS) && fieldvalue != null && !fieldvalue.equalsIgnoreCase("true")
+				&& !fieldvalue.equalsIgnoreCase("false")) {
 			errors.rejectValue(STATUS, SIGNUP_FIELD_INVALID_STATUS);
 		}
 	}

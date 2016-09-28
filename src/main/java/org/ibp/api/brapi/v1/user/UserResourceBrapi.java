@@ -2,8 +2,8 @@
 package org.ibp.api.brapi.v1.user;
 
 import java.util.List;
+import java.util.Map;
 
-import org.ibp.api.domain.common.GenericResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,22 +34,23 @@ public class UserResourceBrapi {
 	@ApiOperation(value = "Create user", notes = "Create user in this deployment instance of BMSAPI. ")
 	@RequestMapping(value = "/brapi/v1/users", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> createUser(@RequestBody UserDetailDto user) {
-		GenericResponse response = this.userService.createUser(user);
-		if ("0".equals(response.getId())) {
-			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+	public ResponseEntity<Map<String, Object>> createUser(@RequestBody UserDetailDto user) {
+		final Map<String, Object> map = this.userService.createUser(user);
+
+		if (map.get("ERROR") != null) {
+			return new ResponseEntity<Map<String, Object>>(map, HttpStatus.CONFLICT);
 		}
-		return new ResponseEntity<GenericResponse>(response, HttpStatus.CREATED);
+		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.CREATED);
 	}
 
 	@ApiOperation(value = "Update user", notes = "Update user in this deployment instance of BMSAPI. ")
 	@RequestMapping(value = "/brapi/v1/users/{id}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<GenericResponse> updateUser(final @PathVariable String id, @RequestBody UserDetailDto user) {
-		GenericResponse response = this.userService.updateUser(user);
-		if ("0".equals(response.getId()) || !id.equals(response.getId())) {
-			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+	public ResponseEntity<Map<String, Object>> updateUser(final @PathVariable String id, @RequestBody UserDetailDto user) {
+		Map<String, Object> map = this.userService.updateUser(user);
+		if (map.get("ERROR") != null) {
+			return new ResponseEntity<Map<String, Object>>(map, HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<GenericResponse>(response, HttpStatus.OK);
+		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
 	}
 }

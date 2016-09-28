@@ -5,12 +5,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.service.api.user.UserDto;
-import org.ibp.api.domain.common.GenericResponse;
+import org.ibp.api.domain.common.ErrorResponse;
 import org.ibp.api.java.impl.middleware.manager.UserValidator;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,7 +54,8 @@ public class UserServiceTest {
 		final List<UserDto> usersDto = getAllListUser();
 
 		Mockito.when(this.workbenchDataManager.getAllUserDtosSorted()).thenReturn(usersDto);
-		List<UserDetailDto> usersDtlsDto = this.userServiceImpl.getAllUserDtosSorted();
+		final List<UserDetailDto> usersDtlsDto = this.userServiceImpl.getAllUserDtosSorted();
+		
 		assertThat(usersDto.get(0).getFirstName(), equalTo(usersDtlsDto.get(0).getFirstName()));
 		assertThat(usersDto.get(0).getLastName(), equalTo(usersDtlsDto.get(0).getLastName()));
 		assertThat(usersDto.get(0).getUsername(), equalTo(usersDtlsDto.get(0).getUsername()));
@@ -64,8 +66,7 @@ public class UserServiceTest {
 	}
 
 	/**
-	 * Should create the new user, 
-	 * and return the new userId.
+	 * Should create the new user, and return the new userId.
 	 *
 	 * @throws Exception
 	 */
@@ -73,31 +74,34 @@ public class UserServiceTest {
 	public void testCreateUser() throws Exception {
 		final UserDetailDto usrDtlsDto = initializeUserDetailDto(0);
 		final UserDto userDto = initializeUserDto(0);
+		
 		Mockito.when(this.workbenchDataManager.createUser(userDto)).thenReturn(new Integer(7));
-		GenericResponse response = this.userServiceImpl.createUser(usrDtlsDto);
-		assertThat(response.getId(), equalTo("7"));
+		
+		final Map<String, Object> mapResponse = this.userServiceImpl.createUser(usrDtlsDto);
+		assertThat((String) mapResponse.get("id"), equalTo("7"));
 	}
 
 	/**
-	 * Should return the id 0, 
-	 * because happened a error during the creation user.
+	 * Should return the id 0, because happened a error during the creation user.
 	 *
 	 * @throws Exception
 	 */
 	@Test
 	public void testCreateUserValidateError() throws Exception {
 		final UserDetailDto usrDtlsDto = initializeUserDetailDto(0);
-		
+
 		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlsDto.getUsername())).thenReturn(true);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlsDto.getEmail())).thenReturn(true);
+
+		final Map<String, Object> mapResponse = this.userServiceImpl.createUser(usrDtlsDto);
+		final ErrorResponse error = (ErrorResponse)mapResponse.get("ERROR");
 		
-		GenericResponse response = this.userServiceImpl.createUser(usrDtlsDto);
-		assertThat(response.getId(), equalTo("0"));
+		assertThat((String) mapResponse.get("id"), equalTo("0"));
+		assertThat(error.getErrors().size(), equalTo(2));
 	}
 
 	/**
-	 * Should update the user, 
-	 * and return the same userId.
+	 * Should update the user, and return the same userId.
 	 *
 	 * @throws Exception
 	 */
@@ -106,24 +110,33 @@ public class UserServiceTest {
 		final UserDetailDto usrDtlsDto = initializeUserDetailDto(8);
 		final UserDto userDto = initializeUserDto(8);
 		final User user = initializeUser(8);
+		
 		Mockito.when(this.workbenchDataManager.updateUser(userDto)).thenReturn(new Integer(8));
 		Mockito.when(this.workbenchDataManager.getUserById(8)).thenReturn(user);
-		GenericResponse response = this.userServiceImpl.updateUser(usrDtlsDto);
-		assertThat(response.getId(), equalTo("8"));
+		
+		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlsDto);
+		assertThat((String) mapResponse.get("id"), equalTo("8"));
 	}
 
 	/**
-	 * Should return the id 0, 
-	 * because happened a error during the update user.
+	 * Should return the id 0, because happened a error during the update user.
 	 *
 	 * @throws Exception
 	 */
 	@Test
 	public void testUpdateUserValidateError() throws Exception {
-		UserDetailDto usrDtlsDto = initializeUserDetailDto(10);
-
-		GenericResponse response = this.userServiceImpl.updateUser(usrDtlsDto);
-		assertThat(response.getId(), equalTo("0"));
+		final UserDetailDto usrDtlsDto = initializeUserDetailDto(10);
+		final User usr = initializeUser(10);
+		usr.getPerson().setEmail("diego.nicolas.cuenya@leafnode.io");
+		Mockito.when(this.workbenchDataManager.getUserById(usrDtlsDto.getId())).thenReturn(usr);
+		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlsDto.getUsername())).thenReturn(false);
+		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlsDto.getEmail())).thenReturn(true);
+		
+		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlsDto);
+		final ErrorResponse error = (ErrorResponse)mapResponse.get("ERROR");
+		
+		assertThat((String) mapResponse.get("id"), equalTo("0"));
+		assertThat(error.getErrors().size(), equalTo(1));
 	}
 
 	/**
@@ -132,8 +145,9 @@ public class UserServiceTest {
 	 * @return List<UserDto>
 	 */
 	public List<UserDto> getAllListUser() {
-		UserDto user = initializeUserDto(10);
+		final UserDto user = initializeUserDto(10);
 		final List<UserDto> users = Lists.newArrayList(user);
+		
 		return users;
 	}
 
@@ -143,7 +157,8 @@ public class UserServiceTest {
 	 * @return user UserDto
 	 */
 	public UserDto initializeUserDto(final Integer userId) {
-		UserDto user = new UserDto();
+		final UserDto user = new UserDto();
+		
 		user.setFirstName("Diego");
 		user.setLastName("Cuenya");
 		user.setStatus(0);
@@ -151,9 +166,9 @@ public class UserServiceTest {
 		user.setUserId(userId);
 		user.setUsername("Cuenyad");
 		user.setEmail("diego.cuenya@leafnode.io");
+		
 		return user;
 	}
-
 
 	/**
 	 * initialize UserDetailDto
@@ -162,7 +177,8 @@ public class UserServiceTest {
 	 * @return userDetailDto UserDetailDto
 	 */
 	public UserDetailDto initializeUserDetailDto(final Integer userId) {
-		UserDetailDto user = new UserDetailDto();
+		final UserDetailDto user = new UserDetailDto();
+		
 		user.setFirstName("Diego");
 		user.setLastName("Cuenya");
 		user.setStatus("true");
@@ -170,9 +186,10 @@ public class UserServiceTest {
 		user.setId(userId);
 		user.setUsername("Cuenyad");
 		user.setEmail("diego.cuenya@leafnode.io");
+		
 		return user;
 	}
-	
+
 	/**
 	 * initialize User
 	 * 
@@ -180,8 +197,9 @@ public class UserServiceTest {
 	 * @return user User
 	 */
 	public User initializeUser(final Integer userId) {
-		User user = new User();
-		Person person = new Person();
+		final User user = new User();
+		final Person person = new Person();
+		
 		person.setId(2);
 		person.setFirstName("Diego");
 		person.setMiddleName("");
@@ -204,6 +222,7 @@ public class UserServiceTest {
 		user.setAccess(0);
 		user.setInstalid(0);
 		user.setType(0);
+		
 		return user;
 	}
 

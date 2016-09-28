@@ -54,16 +54,16 @@ public class UserValidatorTest {
 
 		userdto.setLastName("zxcvbnmaaskjhdfsgeeqwfsafsafg6tk6kglkugt8oljhhlly11");
 		userdto.setUsername("wertyuioiuytredsdfrtghjuklsl123");
-		this.uservalidator.validate(userdto, bindingResult);
+		
+		this.uservalidator.validate(userdto, bindingResult,true);
 
-		assertThat(7, equalTo(bindingResult.getAllErrors().size()));
+		assertThat(6, equalTo(bindingResult.getAllErrors().size()));
 		assertThat(null, equalTo(bindingResult.getFieldError("firstName").getRejectedValue()));
 		assertThat("signup.field.length.exceed", equalTo(bindingResult.getFieldError("lastName").getCode()));
 		assertThat("30", equalTo(bindingResult.getFieldError("username").getArguments()[0]));
 		assertThat("Username", equalTo(bindingResult.getFieldError("username").getArguments()[1]));
 		assertThat(null, equalTo(bindingResult.getFieldError("email").getRejectedValue()));
 		assertThat(null, equalTo(bindingResult.getFieldError("role").getRejectedValue()));
-		assertThat("signup.field.required", equalTo(bindingResult.getFieldError("userId").getCode()));
 		assertThat("signup.field.required", equalTo(bindingResult.getFieldError("status").getCode()));
 	}
 
@@ -81,7 +81,7 @@ public class UserValidatorTest {
 		userdto.setRole("Breeeder");
 		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
 
-		this.uservalidator.validate(userdto, bindingResult);
+		this.uservalidator.validate(userdto, bindingResult,false);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.invalid.role", equalTo(bindingResult.getFieldError("role").getCode()));
@@ -101,7 +101,7 @@ public class UserValidatorTest {
 		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
 		userdto.setEmail("cuenya.diego!@leafnode.io");
 
-		this.uservalidator.validate(userdto, bindingResult);
+		this.uservalidator.validate(userdto, bindingResult,false);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.email.invalid", equalTo(bindingResult.getFieldError("email").getCode()));
@@ -115,12 +115,12 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUserId() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = initializeUserDetailDto(null);
+		final UserDetailDto userdto = initializeUserDetailDto(777);
 
-		this.uservalidator.validate(userdto, bindingResult);
+		this.uservalidator.validate(userdto, bindingResult,false);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
-		assertThat("signup.field.required", equalTo(bindingResult.getFieldError("userId").getCode()));
+		assertThat("signup.field.invalid.userId", equalTo(bindingResult.getFieldError("userId").getCode()));
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class UserValidatorTest {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userdto = initializeUserDetailDto(10);
 		final User user = initializeUser(5);
-		this.uservalidator.validate(userdto, bindingResult);
+		this.uservalidator.validate(userdto, bindingResult,false);
 		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.invalid.userId", equalTo(bindingResult.getFieldError("userId").getCode()));
@@ -151,7 +151,7 @@ public class UserValidatorTest {
 		final User user = initializeUser(20);
 		userdto.setStatus("truee");
 		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
-		this.uservalidator.validate(userdto, bindingResult);
+		this.uservalidator.validate(userdto, bindingResult,false);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.invalid.status", equalTo(bindingResult.getFieldError("status").getCode()));
@@ -169,7 +169,7 @@ public class UserValidatorTest {
 
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(true);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(true);
-		this.uservalidator.validate(userdto, bindingResult);
+		this.uservalidator.validate(userdto, bindingResult,true);
 
 		assertThat(2, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.username.exists", equalTo(bindingResult.getFieldError("username").getCode()));
@@ -190,7 +190,7 @@ public class UserValidatorTest {
 		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(false);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(false);
-		this.uservalidator.validate(userdto, bindingResult);
+		this.uservalidator.validate(userdto, bindingResult,false);
 
 		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
 
@@ -210,7 +210,7 @@ public class UserValidatorTest {
 		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(false);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(true);
-		this.uservalidator.validate(userdto, bindingResult);
+		this.uservalidator.validate(userdto, bindingResult,false);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.email.exists", equalTo(bindingResult.getFieldError("email").getCode()));
@@ -231,7 +231,7 @@ public class UserValidatorTest {
 		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(true);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(false);
-		this.uservalidator.validate(userdto, bindingResult);
+		this.uservalidator.validate(userdto, bindingResult,false);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.username.exists", equalTo(bindingResult.getFieldError("username").getCode()));
@@ -252,7 +252,7 @@ public class UserValidatorTest {
 		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(false);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(false);
-		this.uservalidator.validate(userdto, bindingResult);
+		this.uservalidator.validate(userdto, bindingResult,false);
 
 		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
 
@@ -268,7 +268,7 @@ public class UserValidatorTest {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userdto = initializeUserDetailDto(0);
 
-		this.uservalidator.validate(userdto, bindingResult);
+		this.uservalidator.validate(userdto, bindingResult, true);
 
 		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
 

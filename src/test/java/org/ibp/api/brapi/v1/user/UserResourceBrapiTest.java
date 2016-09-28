@@ -1,13 +1,14 @@
 
 package org.ibp.api.brapi.v1.user;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.domain.common.GenericResponse;
+import org.ibp.api.domain.common.ErrorResponse;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,37 +67,41 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 	 */
 	@Test
 	public void testCreateUser() throws Exception {
+		final String id = "10";
 		final UserDetailDto user = initializeUser();
-		final GenericResponse response = new GenericResponse("10");
+		final HashMap<String, Object> mapResponse = initializeResponse(id);
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/brapi/v1/users").build().encode();
 
-		Mockito.when(this.userService.createUser(Mockito.any(org.ibp.api.brapi.v1.user.UserDetailDto.class))).thenReturn(response);
+		Mockito.when(this.userService.createUser(Mockito.any(org.ibp.api.brapi.v1.user.UserDetailDto.class))).thenReturn(mapResponse);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType)
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType)
 						.content(this.convertObjectToByte(user)))
 				.andExpect(MockMvcResultMatchers.status().isCreated()).andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(response.getId())));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(id)));
 	}
 
 	/**
-	 * Should respond with 409 and return the id 0, 
-	 * because happened a error during the creation user. * *
+	 * Should respond with 409 and return the id 0, because happened a error during the creation user. * *
 	 *
 	 * @throws Exception
 	 */
 	@Test
 	public void testCreateUserError() throws Exception {
 		final UserDetailDto user = initializeUser();
-		final GenericResponse response = new GenericResponse("0");
+		final HashMap<String, Object> mapResponse = initializeResponseError("email", "exists");
+
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/brapi/v1/users").build().encode();
 
-		Mockito.when(this.userService.createUser(Mockito.any(org.ibp.api.brapi.v1.user.UserDetailDto.class))).thenReturn(response);
+		Mockito.when(this.userService.createUser(Mockito.any(org.ibp.api.brapi.v1.user.UserDetailDto.class))).thenReturn(mapResponse);
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType)
 						.content(this.convertObjectToByte(user)))
 				.andExpect(MockMvcResultMatchers.status().isConflict()).andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(response.getId())));
+				.andExpect(MockMvcResultMatchers.jsonPath("$ERROR.errors.[0].fieldNames.[0]", Matchers.is("email")))
+				.andExpect(MockMvcResultMatchers.jsonPath("$ERROR.errors.[0].message", Matchers.is("exists")))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is((String) mapResponse.get("id"))));
 	}
 
 	/**
@@ -108,19 +113,19 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 	public void testUpdateUser() throws Exception {
 		final String id = "7";
 		final UserDetailDto user = initializeUser();
-		final GenericResponse response = new GenericResponse("7");
-		
-		Mockito.when(this.userService.updateUser(Mockito.any(org.ibp.api.brapi.v1.user.UserDetailDto.class))).thenReturn(response);
-		
-		this.mockMvc.perform(MockMvcRequestBuilders.put("/brapi/v1/users/{id}", id).contentType(this.contentType)
-				.content(this.convertObjectToByte(user)))
+		final HashMap<String, Object> mapResponse = initializeResponse(id);
+
+		Mockito.when(this.userService.updateUser(Mockito.any(org.ibp.api.brapi.v1.user.UserDetailDto.class))).thenReturn(mapResponse);
+
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.put("/brapi/v1/users/{id}", id).contentType(this.contentType)
+						.content(this.convertObjectToByte(user)))
 				.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is("7")));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(id)));
 	}
 
 	/**
-	 * Should respond with 404 and return the id 0, 
-	 * because happened a error during the creation user. * *
+	 * Should respond with 404 and return the id 0, because happened a error during the creation user. * *
 	 *
 	 * @throws Exception
 	 */
@@ -128,54 +133,87 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 	public void testUpdateUserError() throws Exception {
 		final String id = "7";
 		final UserDetailDto user = initializeUser();
-		final GenericResponse response = new GenericResponse("0");
+		final HashMap<String, Object> mapResponse = initializeResponseError("username", "exists");
+		Mockito.when(this.userService.updateUser(Mockito.any(org.ibp.api.brapi.v1.user.UserDetailDto.class))).thenReturn(mapResponse);
 
-		Mockito.when(this.userService.updateUser(Mockito.any(org.ibp.api.brapi.v1.user.UserDetailDto.class))).thenReturn(response);
-
-		this.mockMvc.perform(MockMvcRequestBuilders.put("/brapi/v1/users/{id}", id).contentType(this.contentType)
-				.content(this.convertObjectToByte(user)))
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.put("/brapi/v1/users/{id}", id).contentType(this.contentType)
+						.content(this.convertObjectToByte(user)))
 				.andExpect(MockMvcResultMatchers.status().isNotFound()).andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.jsonPath("$ERROR.errors.[0].fieldNames.[0]", Matchers.is("username")))
+				.andExpect(MockMvcResultMatchers.jsonPath("$ERROR.errors.[0].message", Matchers.is("exists")))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is("0")));
 	}
 
 	/**
 	 * initialize UserDetailDto
-	 * @return UserDetailDto 
+	 * 
+	 * @return UserDetailDto
 	 */
 	public UserDetailDto initializeUser() {
-		UserDetailDto user = new UserDetailDto();
+		final UserDetailDto user = new UserDetailDto();
 		final String firstName = RandomStringUtils.randomAlphabetic(5);
-		user.setFirstName(firstName);
 		final String lastName = RandomStringUtils.randomAlphabetic(5);
+		final Integer userId = ThreadLocalRandom.current().nextInt();
+		final String username = RandomStringUtils.randomAlphabetic(5);
+
+		user.setFirstName(firstName);
 		user.setLastName(lastName);
 		user.setStatus("true");
 		user.setRole("Breeder");
-		final Integer userId = ThreadLocalRandom.current().nextInt();
 		user.setId(userId);
-		final String username = RandomStringUtils.randomAlphabetic(5);
 		user.setUsername(username);
 		return user;
 	}
 
 	/**
 	 * initialize List UserDetailDto
-	 * @return List<UserDetailDto> 
+	 * 
+	 * @return List<UserDetailDto>
 	 */
-	public List<UserDetailDto>  responseListUser() {
-		UserDetailDto user = new UserDetailDto();
+	public List<UserDetailDto> responseListUser() {
+		final UserDetailDto user = new UserDetailDto();
 		final String firstName = RandomStringUtils.randomAlphabetic(5);
-		user.setFirstName(firstName);
 		final String lastName = RandomStringUtils.randomAlphabetic(5);
+		final Integer userId = ThreadLocalRandom.current().nextInt();
+		final String username = RandomStringUtils.randomAlphabetic(5);
+
+		user.setFirstName(firstName);
 		user.setLastName(lastName);
 		user.setStatus("true");
 		user.setRole("Breeder");
-		final Integer userId = ThreadLocalRandom.current().nextInt();
 		user.setId(userId);
-		final String username = RandomStringUtils.randomAlphabetic(5);
 		user.setUsername(username);
-		
+
 		final List<UserDetailDto> users = Lists.newArrayList(user);
 		return users;
+	}
+
+	/**
+	 * initialize Response error
+	 * 
+	 * @return HashMap<String, Object>
+	 */
+	public HashMap<String, Object> initializeResponseError(final String fieldname, final String message) {
+		final HashMap<String, Object> mapResponse = new HashMap<String, Object>();
+		final ErrorResponse errResponse = new ErrorResponse();
+
+		errResponse.addError(message, fieldname);
+		mapResponse.put("ERROR", errResponse);
+		mapResponse.put("id", "0");
+		return mapResponse;
+	}
+
+	/**
+	 * initialize Response
+	 * 
+	 * @return HashMap<String, Object>
+	 */
+	public HashMap<String, Object> initializeResponse(final String id) {
+		final HashMap<String, Object> mapResponse = new HashMap<String, Object>();
+
+		mapResponse.put("id", id);
+		return mapResponse;
 	}
 
 }
