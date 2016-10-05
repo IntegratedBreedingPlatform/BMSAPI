@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface UserService {
 
-	public List<UserDetailDto> getAllUserDtosSorted();
+	public List<UserDetailDto> getAllUsersSortedByLastName();
 
 	public Map<String, Object> createUser(final UserDetailDto user);
 

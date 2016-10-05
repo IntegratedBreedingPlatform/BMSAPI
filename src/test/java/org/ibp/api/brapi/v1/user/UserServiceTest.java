@@ -56,7 +56,7 @@ public class UserServiceTest {
 		final List<UserDto> usersDto = getAllListUser();
 
 		Mockito.when(this.workbenchDataManager.getAllUsersSortedByLastName()).thenReturn(usersDto);
-		final List<UserDetailDto> usersDtlsDto = this.userServiceImpl.getAllUserDtosSorted();
+		final List<UserDetailDto> usersDtlsDto = this.userServiceImpl.getAllUsersSortedByLastName();
 		
 		assertThat(usersDto.get(0).getFirstName(), equalTo(usersDtlsDto.get(0).getFirstName()));
 		assertThat(usersDto.get(0).getLastName(), equalTo(usersDtlsDto.get(0).getLastName()));

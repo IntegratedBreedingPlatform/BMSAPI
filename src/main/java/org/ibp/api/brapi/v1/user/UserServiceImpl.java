@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
 	private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 	@Override
-	public List<UserDetailDto> getAllUserDtosSorted() {
+	public List<UserDetailDto> getAllUsersSortedByLastName() {
 		final List<UserDetailDto> result = new ArrayList<>();
 		final List<UserDto> users = this.workbenchDataManager.getAllUsersSortedByLastName();
 		final PropertyMap<UserDto, UserDetailDto> userMapper = new PropertyMap<UserDto, UserDetailDto>() {

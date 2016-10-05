@@ -28,7 +28,7 @@ public class UserResourceBrapi {
 	@RequestMapping(value = "/brapi/v1/users", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<UserDetailDto>> listUsers() {
-		return new ResponseEntity<List<UserDetailDto>>(this.userService.getAllUserDtosSorted(), HttpStatus.OK);
+		return new ResponseEntity<List<UserDetailDto>>(this.userService.getAllUsersSortedByLastName(), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Create user", notes = "Create user in this deployment instance of BMSAPI. ")

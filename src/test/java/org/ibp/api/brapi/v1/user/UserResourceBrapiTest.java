@@ -49,7 +49,7 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 		final List<UserDetailDto> users = responseListUser();
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/brapi/v1/users").build().encode();
 
-		Mockito.when(this.userService.getAllUserDtosSorted()).thenReturn(users);
+		Mockito.when(this.userService.getAllUsersSortedByLastName()).thenReturn(users);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print())
