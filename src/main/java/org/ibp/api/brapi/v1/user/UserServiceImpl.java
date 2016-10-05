@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<UserDetailDto> getAllUserDtosSorted() {
 		final List<UserDetailDto> result = new ArrayList<>();
-		final List<UserDto> users = this.workbenchDataManager.getAllUserDtosSorted();
+		final List<UserDto> users = this.workbenchDataManager.getAllUsersSortedByLastName();
 		final PropertyMap<UserDto, UserDetailDto> userMapper = new PropertyMap<UserDto, UserDetailDto>() {
 
 			@Override
