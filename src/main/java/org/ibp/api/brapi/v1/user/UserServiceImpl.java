@@ -86,19 +86,23 @@ public class UserServiceImpl implements UserService {
 		if (errors.hasErrors()) {
 			LOG.debug("UserValidator returns errors");
 			translateErrorToMap(errors, mapResponse);
-			return mapResponse;
+			
+		} else {
+
+			final UserDto userdto = translateUserDetailsDtoToUserDto(user);
+			userdto.setPassword(passwordEncoder.encode(userdto.getUsername()));
+
+			try {
+				final Integer newUserId = this.workbenchDataManager.createUser(userdto);
+				mapResponse.put("id", String.valueOf(newUserId));
+
+			} catch (MiddlewareQueryException e) {
+				LOG.info("Error on workbenchDataManager.createUser " + e.getMessage());
+				errors.rejectValue(UserValidator.USER_ID, UserValidator.DATABASE_ERROR);
+				translateErrorToMap(errors, mapResponse);
+			}
 		}
-
-		final UserDto userdto = translateUserDetailsDtoToUserDto(user);
-		userdto.setPassword(passwordEncoder.encode(userdto.getUsername()));
-
-		try {
-			final Integer newUserId = this.workbenchDataManager.createUser(userdto);
-			mapResponse.put("id", String.valueOf(newUserId));
-
-		} catch (MiddlewareQueryException e) {
-			LOG.info("Error on workbenchDataManager.addNewUser " + e.getMessage());
-		}
+		
 		return mapResponse;
 	}
 
@@ -112,19 +116,22 @@ public class UserServiceImpl implements UserService {
 		userValidator.validate(user, errors, false);
 		if (errors.hasErrors()) {
 			LOG.debug("UserValidator returns errors");
-
 			translateErrorToMap(errors, mapResponse);
-			return mapResponse;
-		}
+			
+		} else {
 
-		final UserDto userdto = translateUserDetailsDtoToUserDto(user);
+			final UserDto userdto = translateUserDetailsDtoToUserDto(user);
 
-		try {
-			final Integer updateUserId = this.workbenchDataManager.updateUser(userdto);
-			mapResponse.put("id", String.valueOf(updateUserId));
-		} catch (MiddlewareQueryException e) {
-			LOG.info("Error on workbenchDataManager.updateUser" + e.getMessage());
+			try {
+				final Integer updateUserId = this.workbenchDataManager.updateUser(userdto);
+				mapResponse.put("id", String.valueOf(updateUserId));
+			} catch (MiddlewareQueryException e) {
+				LOG.info("Error on workbenchDataManager.updateUser" + e.getMessage());
+				errors.rejectValue(UserValidator.USER_ID, UserValidator.DATABASE_ERROR);
+				translateErrorToMap(errors, mapResponse);
+			}
 		}
+		
 		return mapResponse;
 	}
 

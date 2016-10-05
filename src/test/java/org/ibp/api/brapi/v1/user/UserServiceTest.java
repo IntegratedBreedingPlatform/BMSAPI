@@ -7,6 +7,8 @@ import static org.hamcrest.Matchers.equalTo;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
@@ -87,6 +89,29 @@ public class UserServiceTest {
 	 * @throws Exception
 	 */
 	@Test
+	public void testCreateUserError() throws Exception {
+		final UserDetailDto usrDtlsDto = initializeUserDetailDto(0);
+		final UserDto userDto = initializeUserDto(0);
+
+		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlsDto.getUsername())).thenReturn(false);
+		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlsDto.getEmail())).thenReturn(false);
+		Mockito.when(this.workbenchDataManager.createUser(userDto)).thenThrow(new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + userDto.getUsername() + "): "));
+		
+		final Map<String, Object> mapResponse = this.userServiceImpl.createUser(usrDtlsDto);
+		final ErrorResponse error = (ErrorResponse)mapResponse.get("ERROR");
+		
+		assertThat((String) mapResponse.get("id"), equalTo("0"));
+		assertThat(error.getErrors().size(), equalTo(1));
+		assertThat(error.getErrors().get(0).getFieldNames()[0], equalTo("userId"));
+		assertThat((String) error.getErrors().get(0).getMessage(), 	equalTo("DB error"));			
+	}
+	
+	/**
+	 * Should return the id 0, because happened a error during the creation user.
+	 *
+	 * @throws Exception
+	 */
+	@Test
 	public void testCreateUserValidateError() throws Exception {
 		final UserDetailDto usrDtlsDto = initializeUserDetailDto(0);
 
@@ -140,6 +165,31 @@ public class UserServiceTest {
 	}
 
 	/**
+	 * Should return the id 0, because happened a error during the update user.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testUpdateUserError() throws Exception {
+		final UserDetailDto usrDtlsDto = initializeUserDetailDto(10);
+		final User usr = initializeUser(10);
+		final UserDto userDto = initializeUserDto(10);
+		usr.getPerson().setEmail("diego.nicolas.cuenya@leafnode.io");
+		Mockito.when(this.workbenchDataManager.getUserById(usrDtlsDto.getId())).thenReturn(usr);
+		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlsDto.getUsername())).thenReturn(false);
+		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlsDto.getEmail())).thenReturn(false);
+		Mockito.when(this.workbenchDataManager.updateUser(userDto)).thenThrow(new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + userDto.getUsername() + "): "));
+		
+		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlsDto);
+		final ErrorResponse error = (ErrorResponse)mapResponse.get("ERROR");
+		
+		assertThat((String) mapResponse.get("id"), equalTo("0"));
+		assertThat(error.getErrors().size(), equalTo(1));
+		assertThat(error.getErrors().get(0).getFieldNames()[0], equalTo("userId"));
+		assertThat((String) error.getErrors().get(0).getMessage(), 	equalTo("DB error"));			
+	}
+	
+	/**
 	 * initialize List all user
 	 * 
 	 * @return List<UserDto>
@@ -159,37 +209,53 @@ public class UserServiceTest {
 	public UserDto initializeUserDto(final Integer userId) {
 		final UserDto user = new UserDto();
 		
-		user.setFirstName("Diego");
-		user.setLastName("Cuenya");
+		final String firstName = RandomStringUtils.randomAlphanumeric(20);
+		user.setFirstName(firstName);
+		
+		final String lastName = RandomStringUtils.randomAlphanumeric(50);
+		user.setLastName(lastName);
+		
 		user.setStatus(0);
 		user.setRole("Breeder");
 		user.setUserId(userId);
-		user.setUsername("Cuenyad");
-		user.setEmail("diego.cuenya@leafnode.io");
 		
+		final String username = RandomStringUtils.randomAlphanumeric(30);
+		user.setUsername(username);
+		
+		final String email = RandomStringUtils.randomAlphanumeric(24);
+		user.setEmail("test" + email + "@leafnode.io");
+
 		return user;
 	}
 
 	/**
-	 * initialize UserDetailDto
+	 * Initialize UserDetailDto
 	 * 
 	 * @param userId Integer
-	 * @return userDetailDto UserDetailDto
+	 * @return UserDetailDto
 	 */
 	public UserDetailDto initializeUserDetailDto(final Integer userId) {
 		final UserDetailDto user = new UserDetailDto();
 		
-		user.setFirstName("Diego");
-		user.setLastName("Cuenya");
+		final String firstName = RandomStringUtils.randomAlphanumeric(20);
+		user.setFirstName(firstName);
+		
+		final String lastName = RandomStringUtils.randomAlphanumeric(50);
+		user.setLastName(lastName);
+		
 		user.setStatus("true");
 		user.setRole("Breeder");
 		user.setId(userId);
-		user.setUsername("Cuenyad");
-		user.setEmail("diego.cuenya@leafnode.io");
+		
+		final String username = RandomStringUtils.randomAlphanumeric(30);
+		user.setUsername(username);
+		
+		final String email = RandomStringUtils.randomAlphanumeric(24);
+		user.setEmail("test" + email + "@leafnode.io");
 		
 		return user;
 	}
-
+	
 	/**
 	 * initialize User
 	 * 
@@ -201,10 +267,17 @@ public class UserServiceTest {
 		final Person person = new Person();
 		
 		person.setId(2);
-		person.setFirstName("Diego");
+		
+		final String firstName = RandomStringUtils.randomAlphanumeric(20);
+		person.setFirstName(firstName);
+		
 		person.setMiddleName("");
-		person.setLastName("Cuenya");
-		person.setEmail("diego.cuenya@leafnode.io");
+		final String lastName = RandomStringUtils.randomAlphanumeric(50);
+		person.setLastName(lastName);
+		
+		final String email = RandomStringUtils.randomAlphanumeric(24);
+		person.setEmail("test" + email + "@leafnode.io");
+		
 		person.setTitle("-");
 		person.setContact("-");
 		person.setExtension("-");
@@ -218,7 +291,9 @@ public class UserServiceTest {
 
 		user.setPersonid(person.getId());
 		user.setPerson(person);
-		user.setName("Cuenyad");
+		
+		final String username = RandomStringUtils.randomAlphanumeric(30);
+		user.setName(username);
 		user.setAccess(0);
 		user.setInstalid(0);
 		user.setType(0);
