@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermRelationship;
@@ -20,6 +22,7 @@ import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.ScaleDetails;
@@ -50,6 +53,9 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 
 	@Autowired
 	private OntologyScaleDataManager ontologyScaleDataManager;
+	
+	@Autowired
+	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Autowired
 	private ScaleValidator scaleValidator;
@@ -72,6 +78,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ScaleDetails getScaleById(String id) {
 		this.validateId(id, ScaleServiceImpl.SCALE);
@@ -89,28 +96,11 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			if (scale == null) {
 				return null;
 			}
-			boolean deletable = true;
-			if (this.termDataManager.isTermReferred(StringUtil.parseInt(id, null))) {
-				deletable = false;
-			}
+
 			ModelMapper mapper = OntologyMapper.getInstance();
 			ScaleDetails scaleDetails = mapper.map(scale, ScaleDetails.class);
 
-			DataType dataType = DataType.getById(scale.getDataType().getId());
-
-			if (!dataType.isSystemDataType()) {
-				if (!deletable) {
-					scaleDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
-				} else {
-					scaleDetails.getMetadata().addEditableField("name");
-					scaleDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
-					scaleDetails.getMetadata().addEditableField("dataType");
-					scaleDetails.getMetadata().addEditableField("validValues");
-				}
-				scaleDetails.getMetadata().setDeletable(deletable);
-			} else {
-				scaleDetails.getMetadata().setDeletable(false);
-			}
+			DataType dataType = DataType.getById(scale.getDataType().getId());			
 
 			// Note : Get list of relationships related to scale Id
 			List<TermRelationship> relationships =
@@ -124,10 +114,55 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 				}
 			});
 
+			/* variables of scale */
 			for (TermRelationship relationship : relationships) {
 				org.ibp.api.domain.ontology.TermSummary termSummary =
 						mapper.map(relationship, org.ibp.api.domain.ontology.TermSummary.class);
 				scaleDetails.getMetadata().getUsage().addUsage(termSummary);
+			}
+
+			boolean deletable = true;
+			boolean editable = true;
+			
+			if (!this.termDataManager.isTermReferred(StringUtil.parseInt(id, null))) {
+				// scale is not used in any variable
+				deletable = true;
+			} else {
+				// Given the scale is used in one or more variables
+				deletable = false;
+				
+				if (Objects.equals(scale.getDataType().getId(), CATEGORICAL_VARIABLE.getId())) {
+					List<Integer> variablesIds = (List<Integer>) CollectionUtils.collect(relationships, new Transformer() {
+
+						@Override
+						public Integer transform(Object input) {
+							TermRelationship termRelationship = (TermRelationship) input;
+							return Integer.valueOf(termRelationship.getSubjectTerm().getId());
+						}
+
+					});
+
+					editable = this.ontologyVariableDataManager.areVariablesUsedInStudy(variablesIds);
+
+					if(!editable){
+						List<String> categories = this.termDataManager.getCategoriesReferredInPhenotype(StringUtil.parseInt(id, null));	
+					}					
+				}				
+			}		
+			
+			
+			if (!dataType.isSystemDataType()) {
+				if (!deletable) {
+					scaleDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
+				} else {
+					scaleDetails.getMetadata().addEditableField("name");
+					scaleDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
+					scaleDetails.getMetadata().addEditableField("dataType");
+					scaleDetails.getMetadata().addEditableField("validValues");
+				}
+				scaleDetails.getMetadata().setDeletable(deletable);
+			} else {
+				scaleDetails.getMetadata().setDeletable(false);
 			}
 
 			return scaleDetails;
