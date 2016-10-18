@@ -9,8 +9,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -25,6 +28,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.common.GenericResponse;
+import org.ibp.api.domain.ontology.Category;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -145,8 +149,19 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 					editable = this.ontologyVariableDataManager.areVariablesUsedInStudy(variablesIds);
 
 					if(!editable){
-						List<String> categories = this.termDataManager.getCategoriesReferredInPhenotype(StringUtil.parseInt(id, null));	
-					}					
+						List<String> categories = this.termDataManager.getCategoriesReferredInPhenotype(StringUtil.parseInt(id, null));
+						Map<String,String> mappedCategories = Maps.uniqueIndex(categories, new Function<String, String>() {
+
+							public String apply(String from) {
+								return from;
+							}
+						});
+						for (Category category: scaleDetails.getValidValues().getCategories()) {
+							if (mappedCategories.containsKey(category)) {
+								category.setEditable(Boolean.FALSE);
+							}
+						}
+					}
 				}				
 			}		
 			
@@ -161,6 +176,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 					scaleDetails.getMetadata().addEditableField("validValues");
 				}
 				scaleDetails.getMetadata().setDeletable(deletable);
+				scaleDetails.getMetadata().setEditable(editable);
 			} else {
 				scaleDetails.getMetadata().setDeletable(false);
 			}

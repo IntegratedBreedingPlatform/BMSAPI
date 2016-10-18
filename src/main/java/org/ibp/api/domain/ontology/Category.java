@@ -11,9 +11,16 @@ public class Category extends TermSummary {
 
 	private boolean editable;
 
-	Category() {
+	public Category() {
 		super();
 		this.editable = Boolean.TRUE;
+	}
+
+	public Category (TermSummary termSummary) {
+		this.setEditable(Boolean.TRUE);
+		super.setId(termSummary.getId());
+		super.setName(termSummary.getName());
+		super.setDescription(termSummary.getDescription());
 	}
 
 	public boolean isEditable() {
