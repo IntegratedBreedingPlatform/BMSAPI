@@ -12,6 +12,7 @@ import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.TermSummary;
+import org.ibp.api.domain.ontology.Category;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.Converter;
@@ -42,6 +43,8 @@ public class OntologyMapper {
 		OntologyMapper.addVariableTypeMapper(OntologyMapper.applicationWideModelMapper);
 		OntologyMapper.addDataTypeMapper(OntologyMapper.applicationWideModelMapper);
 		OntologyMapper.addTermSummaryMapper(OntologyMapper.applicationWideModelMapper);
+		OntologyMapper.addCategoryMapper(OntologyMapper.applicationWideModelMapper);
+
 	}
 
 	/**
@@ -161,8 +164,7 @@ public class OntologyMapper {
 		mapper.createTypeMap(VariableType.class, org.ibp.api.domain.ontology.VariableType.class).setConverter(
 				new Converter<VariableType, org.ibp.api.domain.ontology.VariableType>() {
 
-					@Override
-					public org.ibp.api.domain.ontology.VariableType convert(
+					@Override public org.ibp.api.domain.ontology.VariableType convert(
 							MappingContext<VariableType, org.ibp.api.domain.ontology.VariableType> context) {
 						if (context.getSource() == null) {
 							return null;
@@ -217,6 +219,29 @@ public class OntologyMapper {
 						dataType.setId(String.valueOf(dataTypeEnum.getId()));
 						dataType.setName(dataTypeEnum.getName());
 						return dataType;
+					}
+				});
+	}
+
+	public static void addCategoryMapper(ModelMapper mapper) {
+		// Note: This will type map middleware TermSummary to BMSAPI Category for scale categorical values.
+		mapper.createTypeMap(org.generationcp.middleware.domain.oms.TermSummary.class, Category.class).setConverter(
+				new Converter<org.generationcp.middleware.domain.oms.TermSummary, Category>() {
+
+					@Override
+					public Category convert(MappingContext<org.generationcp.middleware.domain.oms.TermSummary, Category> context) {
+						if (context.getSource() == null) {
+							return null;
+						}
+
+						org.generationcp.middleware.domain.oms.TermSummary termSummary = context.getSource();
+
+						Category category  = new Category();
+						category.setId(String.valueOf(termSummary.getId()));
+						category.setName(termSummary.getName());
+						category.setDescription(termSummary.getDefinition());
+						category.setEditable(Boolean.TRUE);
+						return category;
 					}
 				});
 	}
