@@ -35,7 +35,7 @@ public class ScaleDetails extends TermSummary {
 		this.validValues.setMin(minValue);
 	}
 
-	public void setCategories(List<TermSummary> categories){
+	public void setCategories(List<Category> categories){
 		this.validValues.setCategories(categories);
 	}
 

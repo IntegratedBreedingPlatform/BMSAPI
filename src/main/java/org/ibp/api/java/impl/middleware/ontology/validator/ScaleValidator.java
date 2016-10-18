@@ -95,7 +95,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		}
 	}
 
-	private void validateCategoriesForUniqueness(List<org.ibp.api.domain.ontology.TermSummary> categories, DataType dataType, Errors errors) {
+	private void validateCategoriesForUniqueness(List<org.ibp.api.domain.ontology.Category> categories, DataType dataType, Errors errors) {
 		if (categories != null && Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)) {
 			Set<String> labels = new HashSet<>();
 			Set<String> values = new HashSet<>();
@@ -207,8 +207,8 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 				}
 
 			} else if (Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)) {
-				List<org.ibp.api.domain.ontology.TermSummary> categories =
-						validValues.getCategories() == null ? new ArrayList<org.ibp.api.domain.ontology.TermSummary>() : validValues
+				List<org.ibp.api.domain.ontology.Category> categories =
+						validValues.getCategories() == null ? new ArrayList<org.ibp.api.domain.ontology.Category>() : validValues
 								.getCategories();
 						categoriesEqualSize = Objects.equals(categories.size(), oldScale.getCategories().size());
 						categoriesValuesAreSame = true;
@@ -329,7 +329,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 		ValidValues validValues = scaleDetails.getValidValues() == null ? new ValidValues() : scaleDetails.getValidValues();
 
-		List<org.ibp.api.domain.ontology.TermSummary> categories = validValues.getCategories();
+		List<org.ibp.api.domain.ontology.Category> categories = validValues.getCategories();
 
 		// 5. If the data type is categorical, at least one category must be
 		// submitted

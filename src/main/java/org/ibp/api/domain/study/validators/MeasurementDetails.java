@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ibp.api.domain.ontology.Category;
 import org.ibp.api.domain.ontology.DataType;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.ontology.ValidValues;
@@ -46,7 +47,7 @@ public class MeasurementDetails {
 	/**
 	 * For categorical variable this is a map of categorical variable names to term summaries.
 	 */
-	private final Map<String, TermSummary> mappedCategories = new HashMap<>();
+	private final Map<String, Category> mappedCategories = new HashMap<>();
 
 	/**
 	 * The id of the measurement. This can be null.
@@ -84,13 +85,13 @@ public class MeasurementDetails {
 		return this.measurementId;
 	}
 
-	public Map<String, TermSummary> getMappedCategories() {
-		final List<TermSummary> categories = this.variableValidValues.getCategories();
+	public Map<String, Category> getMappedCategories() {
+		final List<Category> categories = this.variableValidValues.getCategories();
 		if (this.variableValidValues != null && this.variableValidValues.getCategories() != null
 				&& !this.variableValidValues.getCategories().isEmpty()) {
-			return Maps.uniqueIndex(categories, new Function<TermSummary, String>() {
+			return Maps.uniqueIndex(categories, new Function<Category, String>() {
 				@Override
-				public String apply(final TermSummary termSummary) {
+				public String apply(final Category termSummary) {
 					return termSummary.getName().trim();
 				}
 			});

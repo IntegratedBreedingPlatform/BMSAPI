@@ -4,6 +4,7 @@ package org.ibp.api.domain.study.validators;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ibp.api.domain.ontology.Category;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.springframework.validation.Errors;
 
@@ -27,10 +28,10 @@ public class CategoricalDataTypeValidator implements DataTypeValidator {
 
 		this.ensureCategoricalValue(measurementVariableDetails);
 
-		final Map<String, TermSummary> mappedCategories = measurementVariableDetails.getMappedCategories();
+		final Map<String, Category> mappedCategories = measurementVariableDetails.getMappedCategories();
 		if (!mappedCategories.isEmpty()) {
 			if (StringUtils.isNotBlank(measurementVariableDetails.getMeasurementValue())) {
-				final TermSummary termSummary = mappedCategories.get(measurementVariableDetails.getMeasurementValue().trim());
+				final Category termSummary = mappedCategories.get(measurementVariableDetails.getMeasurementValue().trim());
 				if (termSummary == null) {
 					errors.rejectValue("measurementValue",
 							"invalid.measurement.categorical.value",

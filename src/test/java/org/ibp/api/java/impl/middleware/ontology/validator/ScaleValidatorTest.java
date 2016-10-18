@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.ibp.api.domain.ontology.Category;
 import org.ibp.api.domain.ontology.DataType;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.TermSummary;
@@ -160,12 +161,12 @@ public class ScaleValidatorTest {
 		ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
 		scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
 
-		List<TermSummary> categories = new ArrayList<>();
-		TermSummary category = new TermSummary();
+		List<Category> categories = new ArrayList<>();
+		Category category = new Category();
 		category.setName("1");
 		category.setDescription("description");
 		categories.add(category);
-		category = new TermSummary();
+		category = new Category();
 		category.setName("11");
 		category.setDescription("description");
 		categories.add(category);
@@ -186,8 +187,8 @@ public class ScaleValidatorTest {
 		ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
 		scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
 
-		List<TermSummary> categories = new ArrayList<>();
-		TermSummary category = new TermSummary();
+		List<Category> categories = new ArrayList<>();
+		Category category = new Category();
 		category.setName(RandomStringUtils.randomAlphanumeric(205));
 		category.setDescription("description");
 		categories.add(category);
@@ -208,8 +209,8 @@ public class ScaleValidatorTest {
 		ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
 		scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
 
-		List<TermSummary> categories = new ArrayList<>();
-		TermSummary category = new TermSummary();
+		List<Category> categories = new ArrayList<>();
+		Category category = new Category();
 		category.setName("Name");
 		category.setDescription(RandomStringUtils.randomAlphanumeric(256));
 		categories.add(category);

@@ -4,31 +4,27 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Category extends TermSummary {
 
-	private boolean editable;
+	private Boolean isEditable;
 
 	public Category() {
 		super();
-		this.editable = Boolean.TRUE;
+		this.isEditable = Boolean.TRUE;
 	}
 
-	public Category (TermSummary termSummary) {
-		this.setEditable(Boolean.TRUE);
-		super.setId(termSummary.getId());
-		super.setName(termSummary.getName());
-		super.setDescription(termSummary.getDescription());
+	public Category(
+	final String id, final String name, final String description, final boolean isEditable) {
+		super(id, name, description);
+		this.isEditable = isEditable;
 	}
 
 	public boolean isEditable() {
-		return editable;
+		return isEditable;
 	}
 
-	public void setEditable(final boolean editable) {
-		this.editable = editable;
+	public void setEditable(final Boolean isEditable) {
+		this.isEditable = isEditable;
 	}
 
 	@Override public String toString() {

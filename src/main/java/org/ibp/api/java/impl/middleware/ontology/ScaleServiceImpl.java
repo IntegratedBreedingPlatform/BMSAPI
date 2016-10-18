@@ -125,16 +125,14 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 				scaleDetails.getMetadata().getUsage().addUsage(termSummary);
 			}
 
-			boolean deletable = true;
-			boolean editable = true;
+			Boolean deletable = Boolean.TRUE;
+			Boolean editable = Boolean.TRUE;
 			
-			if (!this.termDataManager.isTermReferred(StringUtil.parseInt(id, null))) {
+			if (this.termDataManager.isTermReferred(StringUtil.parseInt(id, null))) {
 				// scale is not used in any variable
-				deletable = true;
-			} else {
 				// Given the scale is used in one or more variables
 				deletable = false;
-				
+
 				if (Objects.equals(scale.getDataType().getId(), CATEGORICAL_VARIABLE.getId())) {
 					List<Integer> variablesIds = (List<Integer>) CollectionUtils.collect(relationships, new Transformer() {
 
@@ -146,7 +144,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 
 					});
 
-					editable = this.ontologyVariableDataManager.areVariablesUsedInStudy(variablesIds);
+					editable = !this.ontologyVariableDataManager.areVariablesUsedInStudy(variablesIds);
 
 					if(!editable){
 						List<String> categories = this.termDataManager.getCategoriesReferredInPhenotype(StringUtil.parseInt(id, null));
@@ -157,18 +155,19 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 							}
 						});
 						for (Category category: scaleDetails.getValidValues().getCategories()) {
-							if (mappedCategories.containsKey(category)) {
+							if (mappedCategories.containsKey(category.getName())) {
 								category.setEditable(Boolean.FALSE);
 							}
 						}
 					}
-				}				
-			}		
+				}
+			}
 			
 			
 			if (!dataType.isSystemDataType()) {
 				if (!deletable) {
 					scaleDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
+					scaleDetails.getMetadata().addEditableField("validValues");
 				} else {
 					scaleDetails.getMetadata().addEditableField("name");
 					scaleDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
@@ -176,10 +175,10 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 					scaleDetails.getMetadata().addEditableField("validValues");
 				}
 				scaleDetails.getMetadata().setDeletable(deletable);
-				scaleDetails.getMetadata().setEditable(editable);
 			} else {
 				scaleDetails.getMetadata().setDeletable(false);
 			}
+			scaleDetails.getMetadata().setEditable(editable);
 
 			return scaleDetails;
 		} catch (MiddlewareException e) {
