@@ -8,12 +8,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -26,6 +25,7 @@ import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.Category;
@@ -42,6 +42,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 
 /**
  * Validate data of API Services and pass data to middleware services
@@ -84,11 +87,11 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ScaleDetails getScaleById(String id) {
+	public ScaleDetails getScaleById(final String id) {
 		this.validateId(id, ScaleServiceImpl.SCALE);
 		// Note: Validate Scale Id for valid format and scale exists or not
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ScaleServiceImpl.SCALE);
-		TermRequest term = new TermRequest(id, ScaleServiceImpl.SCALE, CvId.SCALES.getId());
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ScaleServiceImpl.SCALE);
+		final TermRequest term = new TermRequest(id, ScaleServiceImpl.SCALE, CvId.SCALES.getId());
 		this.termValidator.validate(term, errors);
 
 		// Note: If any error occurs then throws Exception with error messages
@@ -96,81 +99,105 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		try {
-			Scale scale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(id, null), true);
+			final Scale scale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(id, null), true);
 			if (scale == null) {
 				return null;
 			}
 
-			ModelMapper mapper = OntologyMapper.getInstance();
-			ScaleDetails scaleDetails = mapper.map(scale, ScaleDetails.class);
+			final ModelMapper mapper = OntologyMapper.getInstance();
+			final ScaleDetails scaleDetails = mapper.map(scale, ScaleDetails.class);
 
-			DataType dataType = DataType.getById(scale.getDataType().getId());			
+			final DataType dataType = DataType.getById(scale.getDataType().getId());
 
 			// Note : Get list of relationships related to scale Id
-			List<TermRelationship> relationships =
+			final List<TermRelationship> relationships =
 					this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_SCALE);
 
 			Collections.sort(relationships, new Comparator<TermRelationship>() {
 
 				@Override
-				public int compare(TermRelationship l, TermRelationship r) {
+				public int compare(final TermRelationship l, final TermRelationship r) {
 					return l.getSubjectTerm().getName().compareToIgnoreCase(r.getSubjectTerm().getName());
 				}
 			});
 
 			/* variables of scale */
-			for (TermRelationship relationship : relationships) {
-				org.ibp.api.domain.ontology.TermSummary termSummary =
+			for (final TermRelationship relationship : relationships) {
+				final org.ibp.api.domain.ontology.TermSummary termSummary =
 						mapper.map(relationship, org.ibp.api.domain.ontology.TermSummary.class);
 				scaleDetails.getMetadata().getUsage().addUsage(termSummary);
 			}
 
 			Boolean deletable = Boolean.TRUE;
 			Boolean editable = Boolean.TRUE;
-			
+
 			if (this.termDataManager.isTermReferred(StringUtil.parseInt(id, null))) {
 				// scale is not used in any variable
 				// Given the scale is used in one or more variables
 				deletable = false;
 
+				final List<Integer> variablesIds = (List<Integer>) CollectionUtils.collect(relationships, new Transformer() {
+
+					@Override
+					public Integer transform(final Object input) {
+						final TermRelationship termRelationship = (TermRelationship) input;
+						return Integer.valueOf(termRelationship.getSubjectTerm().getId());
+					}
+
+				});
+
 				if (Objects.equals(scale.getDataType().getId(), CATEGORICAL_VARIABLE.getId())) {
-					List<Integer> variablesIds = (List<Integer>) CollectionUtils.collect(relationships, new Transformer() {
-
-						@Override
-						public Integer transform(Object input) {
-							TermRelationship termRelationship = (TermRelationship) input;
-							return Integer.valueOf(termRelationship.getSubjectTerm().getId());
-						}
-
-					});
+					// if scale is categorical
 
 					editable = !this.ontologyVariableDataManager.areVariablesUsedInStudy(variablesIds);
 
-					if(!editable){
-						List<String> categories = this.termDataManager.getCategoriesReferredInPhenotype(StringUtil.parseInt(id, null));
-						Map<String,String> mappedCategories = Maps.uniqueIndex(categories, new Function<String, String>() {
+					if (!editable) {
 
-							public String apply(String from) {
+						final List<String> categories =
+								this.termDataManager.getCategoriesReferredInPhenotype(StringUtil.parseInt(id, null));
+						final Map<String, String> mappedCategories = Maps.uniqueIndex(categories, new Function<String, String>() {
+
+							@Override
+							public String apply(final String from) {
 								return from;
 							}
 						});
-						for (Category category: scaleDetails.getValidValues().getCategories()) {
+						for (final Category category : scaleDetails.getValidValues().getCategories()) {
 							if (mappedCategories.containsKey(category.getName())) {
 								category.setEditable(Boolean.FALSE);
 							}
 						}
 					}
 				}
+
+				else if (Objects.equals(scale.getDataType().getId(), NUMERIC_VARIABLE.getId())) {
+					// if scale is numerical
+					final List<VariableOverrides> overrides =
+							this.ontologyVariableDataManager.getVariableOverridesByVariableIds(variablesIds);
+
+					final Iterator<VariableOverrides> it = overrides.iterator();
+					while (it.hasNext() && editable) {
+						final VariableOverrides override = it.next();
+						final Float scaleMinValue = Float.valueOf(scale.getMinValue());
+						final Float scaleMaxValue = Float.valueOf(scale.getMaxValue());
+						final Float overrideMinValue = Float.valueOf(override.getExpectedMin());
+						final Float overrideMaxValue = Float.valueOf(override.getExpectedMax());
+						if (!(scaleMinValue.compareTo(overrideMinValue) <= 0 && scaleMaxValue.compareTo(overrideMaxValue) >= 0)) {
+							// variable expected range not included in scale range
+							editable = false;
+						}
+
+					}
+				}
 			}
-			
-			
+
 			if (!dataType.isSystemDataType()) {
 				if (!deletable) {
-					scaleDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
+					scaleDetails.getMetadata().addEditableField(ScaleServiceImpl.FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
 					scaleDetails.getMetadata().addEditableField("validValues");
 				} else {
 					scaleDetails.getMetadata().addEditableField("name");
-					scaleDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
+					scaleDetails.getMetadata().addEditableField(ScaleServiceImpl.FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
 					scaleDetails.getMetadata().addEditableField("dataType");
 					scaleDetails.getMetadata().addEditableField("validValues");
 				}
@@ -181,7 +208,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			scaleDetails.getMetadata().setEditable(editable);
 
 			return scaleDetails;
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 			throw new ApiRuntimeException(ScaleServiceImpl.ERROR_MESSAGE, e);
 		}
 	}
