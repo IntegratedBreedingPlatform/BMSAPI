@@ -356,19 +356,19 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean numericDataTypeValidationProcessor(ScaleDetails scaleDetails, Errors errors) {
+	private boolean numericDataTypeValidationProcessor(final ScaleDetails scaleDetails, final Errors errors) {
 
-		Integer initialCount = errors.getErrorCount();
+		final Integer initialCount = errors.getErrorCount();
 
-		DataType dataType = DataType.getById(this.parseDataTypeIdAsInteger(scaleDetails.getDataType()));
+		final DataType dataType = DataType.getById(this.parseDataTypeIdAsInteger(scaleDetails.getDataType()));
 
-		ValidValues validValues = scaleDetails.getValidValues() == null ? new ValidValues() : scaleDetails.getValidValues();
+		final ValidValues validValues = scaleDetails.getValidValues() == null ? new ValidValues() : scaleDetails.getValidValues();
 
 		BigDecimal min = null;
 		BigDecimal max = null;
 
-		String minValue = validValues.getMin() == null ? null : validValues.getMin();
-		String maxValue = validValues.getMax() == null ? null : validValues.getMax();
+		final String minValue = validValues.getMin() == null ? null : validValues.getMin();
+		final String maxValue = validValues.getMax() == null ? null : validValues.getMax();
 
 		// 9. If the data type is numeric and minimum and maximum valid values
 		// are provided (they are not mandatory), they must be numeric values
@@ -386,8 +386,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 					this.addCustomError(errors, "validValues.max", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 				}
 			}
-			
-			
+
 		}
 
 		if (errors.getErrorCount() > initialCount) {
@@ -401,30 +400,23 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		if (min != null && max != null && min.compareTo(max) != -1) {
 			this.addCustomError(errors, "validValues.min", BaseValidator.MIN_MAX_NOT_VALID, null);
 		}
-		
+
 		// 11. If present, the minimum and maximun valid value must be between the min and max values of the scale that variable belongs
-		if (min != null && max != null && checkScaleRangesWithVariableRanges(scaleDetails.getId(), scaleDetails.getValidValues().getMin(),
-				scaleDetails.getValidValues().getMax())) {
+		if (min != null && max != null && this.checkScaleRangesWithVariableRanges(scaleDetails.getId(),
+				scaleDetails.getValidValues().getMin(), scaleDetails.getValidValues().getMax())) {
 			this.addCustomError(errors, "validValues.ranges", BaseValidator.RANGE_NOT_VALID, null);
 		}
-		
+
 		return errors.getErrorCount() == initialCount;
 	}
-
-	private Integer parseDataTypeIdAsInteger(org.ibp.api.domain.ontology.DataType dataType) {
-		if (dataType == null) {
-			return null;
-		}
-		return StringUtil.parseInt(dataType.getId(), null);
-	}
 	
-	private boolean checkScaleRangesWithVariableRanges(String scaleId, String minValue, String maxValue) {
+	private boolean checkScaleRangesWithVariableRanges(final String scaleId, final String minValue, final String maxValue) {
 		boolean ok = true;
 		// Note : Get list of relationships related to scale Id
 		final List<TermRelationship> relationships =
 				this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(scaleId, null), TermRelationshipId.HAS_SCALE);
 
-		final List<Integer> variablesIds = getVariablesIds(relationships);
+		final List<Integer> variablesIds = this.getVariablesIds(relationships);
 		final List<VariableOverrides> overrides = this.ontologyVariableDataManager.getVariableOverridesByVariableIds(variablesIds);
 
 		final Iterator<VariableOverrides> it = overrides.iterator();
@@ -434,7 +426,8 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 			final BigDecimal scaleMaxValue = StringUtil.parseBigDecimal(maxValue, null);
 			final BigDecimal overrideMinValue = StringUtil.parseBigDecimal(override.getExpectedMin(), null);
 			final BigDecimal overrideMaxValue = StringUtil.parseBigDecimal(override.getExpectedMax(), null);
-			if (!(scaleMinValue.compareTo(overrideMinValue) <= 0 && scaleMaxValue.compareTo(overrideMaxValue) >= 0)) {
+			if (scaleMinValue != null && scaleMaxValue != null && overrideMinValue != null && overrideMaxValue != null
+					&& !(scaleMinValue.compareTo(overrideMinValue) <= 0 && scaleMaxValue.compareTo(overrideMaxValue) >= 0)) {
 				// variable expected range not included in scale range
 				ok = false;
 			}
