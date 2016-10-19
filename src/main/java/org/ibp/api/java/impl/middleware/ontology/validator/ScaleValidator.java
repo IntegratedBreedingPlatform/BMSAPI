@@ -409,6 +409,13 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 		return errors.getErrorCount() == initialCount;
 	}
+
+	private Integer parseDataTypeIdAsInteger(org.ibp.api.domain.ontology.DataType dataType) {
+		if (dataType == null) {
+			return null;
+		}
+		return StringUtil.parseInt(dataType.getId(), null);
+	}
 	
 	private boolean checkScaleRangesWithVariableRanges(final String scaleId, final String minValue, final String maxValue) {
 		boolean ok = true;
@@ -435,6 +442,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		}
 		return ok;
 	}
+
 	
 	@SuppressWarnings("unchecked")
 	private List<Integer> getVariablesIds(final List<TermRelationship> relationships) {
