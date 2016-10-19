@@ -26,10 +26,8 @@ import org.ibp.api.domain.ontology.Category;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
-import org.ibp.api.java.ontology.ScaleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
@@ -76,8 +74,6 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 	private static final String SCALE_NAME = "scale";
 	private static final String DESCRIPTION = "description";
 
-	@Autowired
-	private ScaleService scaleService;
 
 	@Override
 	public boolean supports(Class<?> aClass) {
@@ -190,7 +186,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		Integer initialCount = errors.getErrorCount();
 
 		try {
-			ScaleDetails oldScale = this.scaleService.getScaleById(scaleDetails.getId());
+			ScaleDetails oldScale = scaleService.getScaleById(scaleDetails.getId());
 
 			// that method should exist with requestId
 			if (Objects.equals(oldScale, null)) {
@@ -471,7 +467,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 				this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(scaleId, null), TermRelationshipId.HAS_SCALE);
 
 		final List<Integer> variablesIds = this.getVariablesIds(relationships);
-		final List<VariableOverrides> overrides = this.ontologyVariableDataManager.getVariableOverridesByVariableIds(variablesIds);
+		final List<VariableOverrides> overrides = ontologyVariableDataManager.getVariableOverridesByVariableIds(variablesIds);
 
 		final Iterator<VariableOverrides> it = overrides.iterator();
 		while (it.hasNext() && ok) {
