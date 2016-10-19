@@ -165,13 +165,19 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			if (!dataType.isSystemDataType()) {
 				if (!deletable) {
 					scaleDetails.getMetadata().addEditableField(ScaleServiceImpl.FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
-					scaleDetails.getMetadata().addEditableField("validValues");
+					
 				} else {
 					scaleDetails.getMetadata().addEditableField("name");
 					scaleDetails.getMetadata().addEditableField(ScaleServiceImpl.FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
 					scaleDetails.getMetadata().addEditableField("dataType");
+					
+				}
+				
+				if ((editable && Objects.equals(scale.getDataType().getId(), NUMERIC_VARIABLE.getId()))
+						|| Objects.equals(scale.getDataType().getId(), CATEGORICAL_VARIABLE.getId())) {
 					scaleDetails.getMetadata().addEditableField("validValues");
 				}
+				
 				scaleDetails.getMetadata().setDeletable(deletable);
 			} else {
 				scaleDetails.getMetadata().setDeletable(false);
