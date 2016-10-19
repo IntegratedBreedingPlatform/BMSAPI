@@ -17,9 +17,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermRelationship;
-import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
@@ -36,6 +34,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
 import com.google.common.base.Strings;
+
+import static org.generationcp.middleware.domain.ontology.DataType.CATEGORICAL_VARIABLE;
+import static org.generationcp.middleware.domain.ontology.DataType.NUMERIC_VARIABLE;
 
 /**
  * Add Scale/Update Scale Validation rules for Scale request Refer: http://confluence.leafnode.io/display/CD/Services+Validation 1. Name is
@@ -66,6 +67,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 	private static final String SCALE_NAME_DESCRIPTION_REQUIRED = "scale.category.name.required";
 	private static final String SCALE_SYSTEM_DATA_TYPE = "scale.system.datatype";
 	private static final String SCALE_CATEGORY_NOT_ALLOWED_TO_EDIT = "scale.category.name.measured";
+	protected static final String SCALE_RANGE_NOT_VALID = "scale.range.not.valid";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ScaleValidator.class);
 
@@ -158,19 +160,23 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 	}
 
 	private void validateUpdatedCategoriesNotMeasured(ScaleDetails oldScale, ScaleDetails scaleDetails, Errors errors) {
-		final Map<String, Category> mappedCategories = Maps.uniqueIndex(oldScale.getValidValues().getCategories(),
-				new Function<Category, String>() {
 
-					@Override public String apply(final Category from) {
-						return from.getId();
+		if (Objects.equals(scaleDetails.getDataType().getId(), String.valueOf(CATEGORICAL_VARIABLE.getId())) ) {
+			final Map<String, Category> mappedCategories =
+					Maps.uniqueIndex(oldScale.getValidValues().getCategories(), new Function<Category, String>() {
+
+						@Override public String apply(final Category from) {
+							return from.getId();
+						}
+					});
+			for (Category category : scaleDetails.getValidValues().getCategories()) {
+				if (category.getId() != null) {
+					Category savedCategory = mappedCategories.get(category.getId());
+					if (savedCategory != null && !category.getName().equals(savedCategory.getName()) && !savedCategory.isEditable()) {
+						this.addCustomError(errors, "validValues.categories", ScaleValidator.SCALE_CATEGORY_NOT_ALLOWED_TO_EDIT,
+								new Object[] {"category"});
+						return;
 					}
-				});
-		for (Category category: scaleDetails.getValidValues().getCategories()) {
-			if (category.getId()!=null) {
-				Category savedCategory = mappedCategories.get(category.getId());
-				if (savedCategory!=null && !category.getName().equals(savedCategory.getName()) && !savedCategory.isEditable()) {
-					this.addCustomError(errors, "validValues.categories", ScaleValidator.SCALE_CATEGORY_NOT_ALLOWED_TO_EDIT, new Object[] {"category"});
-					return;
 				}
 			}
 		}
@@ -196,21 +202,22 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 				this.addCustomError(errors, ScaleValidator.ERROR_NAME, ScaleValidator.SCALE_SYSTEM_DATA_TYPE, null);
 			}
 
+			this.validateUpdatedCategoriesNotMeasured (oldScale, scaleDetails, errors);
+
+
 			if (errors.getErrorCount() > initialCount) {
 				return;
 			}
 
-			Integer newDataTypeId = this.parseDataTypeIdAsInteger(scaleDetails.getDataType());
-			Integer oldDataTypeId = this.parseDataTypeIdAsInteger(oldScale.getDataType());
 
-
-			boolean isDataTypeSame = Objects.equals(newDataTypeId, oldDataTypeId);
-
-			boolean referred = !this.termDataManager.isTermReferred(StringUtil.parseInt(scaleDetails.getId(), null));
+			boolean referred = this.termDataManager.isTermReferred(StringUtil.parseInt(scaleDetails.getId(), null));
 			if (referred) {
-				if (!scaleDetails.getDataType().equals(DataType.CATEGORICAL_VARIABLE) && !scaleDetails.getDataType().equals(DataType.NUMERIC_VARIABLE)) {
+				if (Objects.equals(scaleDetails.getDataType().getId(), String.valueOf(CATEGORICAL_VARIABLE.getId())) || Objects.equals(scaleDetails.getDataType().getId(), String.valueOf(
+						NUMERIC_VARIABLE.getId()))) {
 					return;
 				}
+			} else {
+				return;
 			}
 
 			boolean isNameSame = Objects.equals(scaleDetails.getName(), oldScale.getName());
@@ -219,6 +226,11 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 						ScaleValidator.SCALE_NAME, "Name"});
 			}
 
+			Integer newDataTypeId = this.parseDataTypeIdAsInteger(scaleDetails.getDataType());
+			Integer oldDataTypeId = this.parseDataTypeIdAsInteger(oldScale.getDataType());
+
+
+			boolean isDataTypeSame = Objects.equals(newDataTypeId, oldDataTypeId);
 
 			if (!isDataTypeSame) {
 				this.addCustomError(errors, ScaleValidator.ERROR_NAME, BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
@@ -270,7 +282,6 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 							}
 						}
 
-				 this.validateUpdatedCategoriesNotMeasured (oldScale, scaleDetails, errors);
 			}
 
 			if (!minValuesAreEqual || !maxValuesAreEqual || !categoriesEqualSize || !categoriesValuesAreSame) {
@@ -392,19 +403,19 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		return errors.getErrorCount() == initialCount;
 	}
 
-	private boolean numericDataTypeValidationProcessor(ScaleDetails scaleDetails, Errors errors) {
+	private boolean numericDataTypeValidationProcessor(final ScaleDetails scaleDetails, final Errors errors) {
 
-		Integer initialCount = errors.getErrorCount();
+		final Integer initialCount = errors.getErrorCount();
 
-		DataType dataType = DataType.getById(this.parseDataTypeIdAsInteger(scaleDetails.getDataType()));
+		final DataType dataType = DataType.getById(this.parseDataTypeIdAsInteger(scaleDetails.getDataType()));
 
-		ValidValues validValues = scaleDetails.getValidValues() == null ? new ValidValues() : scaleDetails.getValidValues();
+		final ValidValues validValues = scaleDetails.getValidValues() == null ? new ValidValues() : scaleDetails.getValidValues();
 
 		BigDecimal min = null;
 		BigDecimal max = null;
 
-		String minValue = validValues.getMin() == null ? null : validValues.getMin();
-		String maxValue = validValues.getMax() == null ? null : validValues.getMax();
+		final String minValue = validValues.getMin() == null ? null : validValues.getMin();
+		final String maxValue = validValues.getMax() == null ? null : validValues.getMax();
 
 		// 9. If the data type is numeric and minimum and maximum valid values
 		// are provided (they are not mandatory), they must be numeric values
@@ -422,8 +433,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 					this.addCustomError(errors, "validValues.max", BaseValidator.FIELD_SHOULD_BE_NUMERIC, null);
 				}
 			}
-			
-			
+
 		}
 
 		if (errors.getErrorCount() > initialCount) {
@@ -437,13 +447,13 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		if (min != null && max != null && min.compareTo(max) != -1) {
 			this.addCustomError(errors, "validValues.min", BaseValidator.MIN_MAX_NOT_VALID, null);
 		}
-		
+
 		// 11. If present, the minimum and maximun valid value must be between the min and max values of the scale that variable belongs
-		if (min != null && max != null && checkScaleRangesWithVariableRanges(scaleDetails.getId(), scaleDetails.getValidValues().getMin(),
-				scaleDetails.getValidValues().getMax())) {
-			this.addCustomError(errors, "validValues.ranges", BaseValidator.RANGE_NOT_VALID, null);
+		if (min != null && max != null && this.checkScaleRangesWithVariableRanges(scaleDetails.getId(),
+				scaleDetails.getValidValues().getMin(), scaleDetails.getValidValues().getMax())) {
+			this.addCustomError(errors, "validValues.ranges", ScaleValidator.SCALE_RANGE_NOT_VALID, null);
 		}
-		
+
 		return errors.getErrorCount() == initialCount;
 	}
 
@@ -454,13 +464,13 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		return StringUtil.parseInt(dataType.getId(), null);
 	}
 	
-	private boolean checkScaleRangesWithVariableRanges(String scaleId, String minValue, String maxValue) {
+	private boolean checkScaleRangesWithVariableRanges(final String scaleId, final String minValue, final String maxValue) {
 		boolean ok = true;
 		// Note : Get list of relationships related to scale Id
 		final List<TermRelationship> relationships =
 				this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(scaleId, null), TermRelationshipId.HAS_SCALE);
 
-		final List<Integer> variablesIds = getVariablesIds(relationships);
+		final List<Integer> variablesIds = this.getVariablesIds(relationships);
 		final List<VariableOverrides> overrides = this.ontologyVariableDataManager.getVariableOverridesByVariableIds(variablesIds);
 
 		final Iterator<VariableOverrides> it = overrides.iterator();
@@ -470,7 +480,8 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 			final BigDecimal scaleMaxValue = StringUtil.parseBigDecimal(maxValue, null);
 			final BigDecimal overrideMinValue = StringUtil.parseBigDecimal(override.getExpectedMin(), null);
 			final BigDecimal overrideMaxValue = StringUtil.parseBigDecimal(override.getExpectedMax(), null);
-			if (!(scaleMinValue.compareTo(overrideMinValue) <= 0 && scaleMaxValue.compareTo(overrideMaxValue) >= 0)) {
+			if (scaleMinValue != null && scaleMaxValue != null && overrideMinValue != null && overrideMaxValue != null
+					&& !(scaleMinValue.compareTo(overrideMinValue) <= 0 && scaleMaxValue.compareTo(overrideMaxValue) >= 0)) {
 				// variable expected range not included in scale range
 				ok = false;
 			}
@@ -478,6 +489,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		}
 		return ok;
 	}
+
 	
 	@SuppressWarnings("unchecked")
 	private List<Integer> getVariablesIds(final List<TermRelationship> relationships) {
