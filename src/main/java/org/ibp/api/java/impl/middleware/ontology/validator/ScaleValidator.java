@@ -60,6 +60,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 	private static final String SCALE_CATEGORY_DESCRIPTION_REQUIRED = "scale.category.description.required";
 	private static final String SCALE_NAME_DESCRIPTION_REQUIRED = "scale.category.name.required";
 	private static final String SCALE_SYSTEM_DATA_TYPE = "scale.system.datatype";
+	protected static final String RANGE_NOT_VALID = "range.not.valid";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ScaleValidator.class);
 
@@ -404,7 +405,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		// 11. If present, the minimum and maximun valid value must be between the min and max values of the scale that variable belongs
 		if (min != null && max != null && this.checkScaleRangesWithVariableRanges(scaleDetails.getId(),
 				scaleDetails.getValidValues().getMin(), scaleDetails.getValidValues().getMax())) {
-			this.addCustomError(errors, "validValues.ranges", BaseValidator.RANGE_NOT_VALID, null);
+			this.addCustomError(errors, "validValues.ranges", ScaleValidator.RANGE_NOT_VALID, null);
 		}
 
 		return errors.getErrorCount() == initialCount;
