@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -22,11 +24,14 @@ import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.generationcp.middleware.util.StringUtil;
+import org.ibp.api.domain.ontology.Category;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.ontology.ScaleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
@@ -60,6 +65,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 	private static final String SCALE_CATEGORY_DESCRIPTION_REQUIRED = "scale.category.description.required";
 	private static final String SCALE_NAME_DESCRIPTION_REQUIRED = "scale.category.name.required";
 	private static final String SCALE_SYSTEM_DATA_TYPE = "scale.system.datatype";
+	private static final String SCALE_CATEGORY_NOT_ALLOWED_TO_EDIT = "scale.category.name.measured";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ScaleValidator.class);
 
@@ -67,6 +73,9 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 	private static final String NAME = "name";
 	private static final String SCALE_NAME = "scale";
 	private static final String DESCRIPTION = "description";
+
+	@Autowired
+	private ScaleService scaleService;
 
 	@Override
 	public boolean supports(Class<?> aClass) {
@@ -148,6 +157,25 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		}
 	}
 
+	private void validateUpdatedCategoriesNotMeasured(ScaleDetails oldScale, ScaleDetails scaleDetails, Errors errors) {
+		final Map<String, Category> mappedCategories = Maps.uniqueIndex(oldScale.getValidValues().getCategories(),
+				new Function<Category, String>() {
+
+					@Override public String apply(final Category from) {
+						return from.getId();
+					}
+				});
+		for (Category category: scaleDetails.getValidValues().getCategories()) {
+			if (category.getId()!=null) {
+				Category savedCategory = mappedCategories.get(category.getId());
+				if (savedCategory!=null && !category.getName().equals(savedCategory.getName()) && !savedCategory.isEditable()) {
+					this.addCustomError(errors, "validValues.categories", ScaleValidator.SCALE_CATEGORY_NOT_ALLOWED_TO_EDIT, new Object[] {"category"});
+					return;
+				}
+			}
+		}
+	}
+
 	private void scaleShouldBeEditable(ScaleDetails scaleDetails, Errors errors) {
 		if (scaleDetails.getId() == null) {
 			return;
@@ -156,7 +184,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		Integer initialCount = errors.getErrorCount();
 
 		try {
-			Scale oldScale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(scaleDetails.getId(), null), true);
+			ScaleDetails oldScale = this.scaleService.getScaleById(scaleDetails.getId());
 
 			// that method should exist with requestId
 			if (Objects.equals(oldScale, null)) {
@@ -172,9 +200,17 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 				return;
 			}
 
-			boolean isEditable = !this.termDataManager.isTermReferred(StringUtil.parseInt(scaleDetails.getId(), null));
-			if (isEditable) {
-				return;
+			Integer newDataTypeId = this.parseDataTypeIdAsInteger(scaleDetails.getDataType());
+			Integer oldDataTypeId = this.parseDataTypeIdAsInteger(oldScale.getDataType());
+
+
+			boolean isDataTypeSame = Objects.equals(newDataTypeId, oldDataTypeId);
+
+			boolean referred = !this.termDataManager.isTermReferred(StringUtil.parseInt(scaleDetails.getId(), null));
+			if (referred) {
+				if (!scaleDetails.getDataType().equals(DataType.CATEGORICAL_VARIABLE) && !scaleDetails.getDataType().equals(DataType.NUMERIC_VARIABLE)) {
+					return;
+				}
 			}
 
 			boolean isNameSame = Objects.equals(scaleDetails.getName(), oldScale.getName());
@@ -183,9 +219,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 						ScaleValidator.SCALE_NAME, "Name"});
 			}
 
-			Integer dataTypeId = this.parseDataTypeIdAsInteger(scaleDetails.getDataType());
 
-			boolean isDataTypeSame = Objects.equals(dataTypeId, this.getDataTypeIdSafe(oldScale.getDataType()));
 			if (!isDataTypeSame) {
 				this.addCustomError(errors, ScaleValidator.ERROR_NAME, BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {
 						ScaleValidator.SCALE_NAME, "DataTypeId"});
@@ -198,36 +232,36 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 			boolean categoriesEqualSize = true;
 			boolean categoriesValuesAreSame = true;
 
-			DataType dataType = DataType.getById(dataTypeId);
+			DataType dataType = DataType.getById(newDataTypeId);
 
 			if (Objects.equals(dataType, DataType.NUMERIC_VARIABLE)) {
 
 				// Note: Check if oldScale min-max and validValues min-max null or empty. If empty then do not check for equality.
 
-				if (!(this.isNullOrEmpty(validValues.getMin()) && this.isNullOrEmpty(oldScale.getMinValue()))) {
-					minValuesAreEqual = Objects.equals(validValues.getMin(), oldScale.getMinValue());
+				if (!(this.isNullOrEmpty(validValues.getMin()) && this.isNullOrEmpty(oldScale.getValidValues().getMin()))) {
+					minValuesAreEqual = Objects.equals(validValues.getMin(), oldScale.getValidValues().getMin());
 				}
 
-				if (!(this.isNullOrEmpty(validValues.getMax()) && this.isNullOrEmpty(oldScale.getMaxValue()))) {
-					maxValuesAreEqual = Objects.equals(validValues.getMax(), oldScale.getMaxValue());
+				if (!(this.isNullOrEmpty(validValues.getMax()) && this.isNullOrEmpty(oldScale.getValidValues().getMax()))) {
+					maxValuesAreEqual = Objects.equals(validValues.getMax(), oldScale.getValidValues().getMax());
 				}
 
 			} else if (Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)) {
 				List<org.ibp.api.domain.ontology.Category> categories =
 						validValues.getCategories() == null ? new ArrayList<org.ibp.api.domain.ontology.Category>() : validValues
 								.getCategories();
-						categoriesEqualSize = Objects.equals(categories.size(), oldScale.getCategories().size());
+						categoriesEqualSize = Objects.equals(categories.size(), oldScale.getValidValues().getCategories().size());
 						categoriesValuesAreSame = true;
 
 						if (categoriesEqualSize) {
 
 							// Converting old categories to Map for comparing.
 							Map<String, String> oldCategories = new HashMap<>();
-							for (TermSummary t : oldScale.getCategories()) {
-								oldCategories.put(t.getName(), t.getDefinition());
+							for (Category t : oldScale.getValidValues().getCategories()) {
+								oldCategories.put(t.getName(), t.getDescription());
 							}
 
-							for (org.ibp.api.domain.ontology.TermSummary l : categories) {
+							for (Category l : categories) {
 								if (oldCategories.containsKey(l.getName()) && Objects.equals(oldCategories.get(l.getName()), l.getDescription())) {
 									continue;
 								}
@@ -235,6 +269,8 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 								break;
 							}
 						}
+
+				 this.validateUpdatedCategoriesNotMeasured (oldScale, scaleDetails, errors);
 			}
 
 			if (!minValuesAreEqual || !maxValuesAreEqual || !categoriesEqualSize || !categoriesValuesAreSame) {
