@@ -201,8 +201,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 			this.validateUpdatedCategoriesNotMeasured (oldScale, scaleDetails, errors);
 
 
-
-            //TODO moiver check numerico aqui
+			this.validateUpdatedRanges(scaleDetails, errors);
 
 			if (errors.getErrorCount() > initialCount) {
 				return;
@@ -256,13 +255,6 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 				if (!(this.isNullOrEmpty(validValues.getMax()) && this.isNullOrEmpty(oldScale.getValidValues().getMax()))) {
 					maxValuesAreEqual = Objects.equals(validValues.getMax(), oldScale.getValidValues().getMax());
 				}
-				
-				// If present, the minimum and maximun valid value must be between the min and max values of the scale that variable belongs
-				String min = validValues.getMin();
-				String max = validValues.getMax();
-				if (min != null && max != null && this.checkScaleRangesWithVariableRanges(scaleDetails.getId(), min, max)) {
-					this.addCustomError(errors, "validValues.ranges", ScaleValidator.SCALE_RANGE_NOT_VALID, null);
-				}
 
 			} else if (Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)) {
 				List<org.ibp.api.domain.ontology.Category> categories =
@@ -297,6 +289,17 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		} catch (MiddlewareException e) {
 			ScaleValidator.LOGGER.error("Error while executing scaleShouldBeEditable", e);
 			this.addDefaultError(errors);
+		}
+	}
+
+	private void validateUpdatedRanges(ScaleDetails scaleDetails, Errors errors) {
+		if (Objects.equals(scaleDetails.getDataType().getId(), String.valueOf(NUMERIC_VARIABLE.getId()))) {
+			// If present, the minimum and maximun valid value must be between the min and max values of the scale that variable belongs
+			String min = scaleDetails.getValidValues().getMin();
+			String max = scaleDetails.getValidValues().getMax();
+			if (min != null && max != null && this.checkScaleRangesWithVariableRanges(scaleDetails.getId(), min, max)) {
+				this.addCustomError(errors, "validValues.ranges", ScaleValidator.SCALE_RANGE_NOT_VALID, null);
+			}
 		}
 	}
 
