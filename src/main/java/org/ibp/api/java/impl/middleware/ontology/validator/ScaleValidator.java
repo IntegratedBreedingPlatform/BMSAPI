@@ -201,6 +201,9 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 			this.validateUpdatedCategoriesNotMeasured (oldScale, scaleDetails, errors);
 
 
+
+            //TODO moiver check numerico aqui
+
 			if (errors.getErrorCount() > initialCount) {
 				return;
 			}
@@ -252,6 +255,13 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 				if (!(this.isNullOrEmpty(validValues.getMax()) && this.isNullOrEmpty(oldScale.getValidValues().getMax()))) {
 					maxValuesAreEqual = Objects.equals(validValues.getMax(), oldScale.getValidValues().getMax());
+				}
+				
+				// If present, the minimum and maximun valid value must be between the min and max values of the scale that variable belongs
+				String min = validValues.getMin();
+				String max = validValues.getMax();
+				if (min != null && max != null && this.checkScaleRangesWithVariableRanges(scaleDetails.getId(), min, max)) {
+					this.addCustomError(errors, "validValues.ranges", ScaleValidator.SCALE_RANGE_NOT_VALID, null);
 				}
 
 			} else if (Objects.equals(dataType, DataType.CATEGORICAL_VARIABLE)) {
@@ -442,12 +452,6 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 		if (min != null && max != null && min.compareTo(max) != -1) {
 			this.addCustomError(errors, "validValues.min", BaseValidator.MIN_MAX_NOT_VALID, null);
-		}
-
-		// 11. If present, the minimum and maximun valid value must be between the min and max values of the scale that variable belongs
-		if (min != null && max != null && this.checkScaleRangesWithVariableRanges(scaleDetails.getId(),
-				scaleDetails.getValidValues().getMin(), scaleDetails.getValidValues().getMax())) {
-			this.addCustomError(errors, "validValues.ranges", ScaleValidator.SCALE_RANGE_NOT_VALID, null);
 		}
 
 		return errors.getErrorCount() == initialCount;
