@@ -296,7 +296,8 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 			final String min = scaleDetails.getValidValues().getMin();
 			final String max = scaleDetails.getValidValues().getMax();
 			if (min != null && max != null && !this.checkScaleRangesWithVariableRanges(scaleDetails.getId(), min, max, variablesIds)) {
-				this.addCustomError(errors, "validValues.ranges", ScaleValidator.SCALE_RANGE_NOT_VALID, null);
+				this.addCustomError(errors, "validValues", ScaleValidator.SCALE_RANGE_NOT_VALID, new Object[] {"scale", "ValidValues"});
+			
 			}
 		}
 	}
