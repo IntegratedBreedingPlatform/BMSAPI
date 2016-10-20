@@ -12,6 +12,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
@@ -64,7 +66,8 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 	private static final String SCALE_CATEGORY_DESCRIPTION_REQUIRED = "scale.category.description.required";
 	private static final String SCALE_NAME_DESCRIPTION_REQUIRED = "scale.category.name.required";
 	private static final String SCALE_SYSTEM_DATA_TYPE = "scale.system.datatype";
-	private static final String SCALE_CATEGORY_NOT_ALLOWED_TO_EDIT = "scale.category.name.measured";
+	private static final String SCALE_CATEGORY_NOT_ALLOWED_TO_EDIT = "scale.category.measured.updated";
+	private static final String SCALE_CATEGORY_NOT_ALLOWED_TO_DELETE = "scale.category.measured.deleted";
 	protected static final String SCALE_RANGE_NOT_VALID = "scale.range.not.valid";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ScaleValidator.class);
@@ -157,22 +160,45 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 	private void validateUpdatedCategoriesNotMeasured(ScaleDetails oldScale, ScaleDetails scaleDetails, Errors errors) {
 
-		if (Objects.equals(scaleDetails.getDataType().getId(), String.valueOf(CATEGORICAL_VARIABLE.getId())) ) {
-			final Map<String, Category> mappedCategories =
+		if (Objects.equals(scaleDetails.getDataType().getId(), String.valueOf(CATEGORICAL_VARIABLE.getId()))) {
+			final Map<String, Category> oldCategories =
 					Maps.uniqueIndex(oldScale.getValidValues().getCategories(), new Function<Category, String>() {
 
 						@Override public String apply(final Category from) {
 							return from.getId();
 						}
 					});
+			// Comparing that categories that were updated do not have any relation in phenotype table
 			for (Category category : scaleDetails.getValidValues().getCategories()) {
 				if (category.getId() != null) {
-					Category savedCategory = mappedCategories.get(category.getId());
+					Category savedCategory = oldCategories.get(category.getId());
 					if (savedCategory != null && !category.getName().equals(savedCategory.getName()) && !savedCategory.isEditable()) {
-						this.addCustomError(errors, "validValues.categories", ScaleValidator.SCALE_CATEGORY_NOT_ALLOWED_TO_EDIT,
-								new Object[] {"category"});
+						this.addCustomError(errors, "validValues", ScaleValidator.SCALE_CATEGORY_NOT_ALLOWED_TO_EDIT,
+								new Object[] {"scale", "ValidValues"});
 						return;
 					}
+				}
+			}
+			Predicate<Category> predicate = new Predicate<Category>() {
+
+				@Override public boolean apply(Category input) {
+					return !Strings.isNullOrEmpty(input.getId());
+				}
+			};
+			final Map<String, Category> newCategories =
+					Maps.uniqueIndex(Collections2.filter(scaleDetails.getValidValues().getCategories(), predicate),
+							new Function<Category, String>() {
+
+								@Override public String apply(final Category from) {
+									return from.getId();
+								}
+							});
+			// Comparing that none of the categories that have relations in phenotype are going to be deleted
+			for (Category category : oldScale.getValidValues().getCategories()) {
+				if (!category.isEditable() && !newCategories.containsKey(category.getId())) {
+					this.addCustomError(errors, "validValues", ScaleValidator.SCALE_CATEGORY_NOT_ALLOWED_TO_DELETE,
+							new Object[] {"scale", "ValidValues"});
+					return;
 				}
 			}
 		}
