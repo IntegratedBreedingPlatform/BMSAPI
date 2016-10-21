@@ -29,6 +29,8 @@ import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.ontology.Category;
 import org.ibp.api.domain.ontology.ScaleDetails;
+import org.ibp.api.domain.ontology.TermSummary;
+import org.ibp.api.domain.ontology.Usage;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.slf4j.Logger;
@@ -226,11 +228,7 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 
 			this.validateUpdatedCategoriesNotMeasured(oldScale, scaleDetails, errors);
 
-			final List<Integer> variablesIds = this.getVariablesIds(oldScale.getMetadata().getUsage().getVariables());
-
-			if (!isEmpty(variablesIds)) {
-				this.validateUpdatedRanges(scaleDetails, variablesIds, errors);
-			}
+			this.validateUpdatedRanges(scaleDetails, oldScale, errors);
 
 			if (errors.getErrorCount() > initialCount) {
 				return;
@@ -318,15 +316,28 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 		}
 	}
 
-	private void validateUpdatedRanges(final ScaleDetails scaleDetails, final List<Integer> variablesIds, final Errors errors) {
+	private void validateUpdatedRanges(final ScaleDetails scaleDetails, final ScaleDetails oldScale, final Errors errors) {
 		if (Objects.equals(scaleDetails.getDataType().getId(), String.valueOf(NUMERIC_VARIABLE.getId()))) {
-			// If present, the minimum and maximun valid value must be between the min and max values of the scale that variable belongs
-			final String min = scaleDetails.getValidValues().getMin();
-			final String max = scaleDetails.getValidValues().getMax();
-			if (min != null && max != null && !this.checkScaleRangesWithVariableRanges(scaleDetails.getId(), min, max, variablesIds)) {
-				this.addCustomError(errors, "validValues", ScaleValidator.SCALE_RANGE_NOT_VALID, new Object[] {"scale", "ValidValues"});
-			
+			Usage usage = oldScale.getMetadata().getUsage();
+			List<TermSummary> variables = usage.getVariables();
+			if (usage != null && variables != null && variables.size() > 0) {
+				final List<Integer> variablesIds = this.getVariablesIds(variables);
+
+				if (variablesIds != null && variablesIds.size() > 0) {
+
+					// If present, the minimum and maximun valid value must be between the min and max values of the scale that variable
+					// belongs
+					final String min = scaleDetails.getValidValues().getMin();
+					final String max = scaleDetails.getValidValues().getMax();
+					if (min != null && max != null
+							&& !this.checkScaleRangesWithVariableRanges(scaleDetails.getId(), min, max, variablesIds)) {
+						this.addCustomError(errors, "validValues", ScaleValidator.SCALE_RANGE_NOT_VALID,
+								new Object[] {"scale", "ValidValues"});
+
+					}
+				}
 			}
+
 		}
 	}
 
