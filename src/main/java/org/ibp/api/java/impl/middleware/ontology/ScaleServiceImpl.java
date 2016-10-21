@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -43,6 +44,8 @@ import org.springframework.validation.MapBindingResult;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
+
+import javax.annotation.Nullable;
 
 /**
  * Validate data of API Services and pass data to middleware services
@@ -192,14 +195,10 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 
 	@SuppressWarnings("unchecked")
 	private List<Integer> getVariablesIds(final List<TermRelationship> relationships) {
-		return (List<Integer>) CollectionUtils.collect(relationships, new Transformer() {
-
-			@Override
-			public Integer transform(final Object input) {
-				final TermRelationship termRelationship = (TermRelationship) input;
-				return Integer.valueOf(termRelationship.getSubjectTerm().getId());
+		return Lists.transform(relationships, new Function<TermRelationship, Integer> () {
+			@Nullable @Override public Integer apply(final TermRelationship termRelationship) {
+				return termRelationship.getSubjectTerm().getId();
 			}
-
 		});
 	}
 

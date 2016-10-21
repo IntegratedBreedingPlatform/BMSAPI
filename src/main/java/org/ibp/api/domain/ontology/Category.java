@@ -1,49 +1,44 @@
 package org.ibp.api.domain.ontology;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
-
+@AutoProperty
 public class Category extends TermSummary {
 
-	private Boolean isEditable;
+	private Boolean editable = Boolean.TRUE;
 
 	public Category() {
-		super();
-		this.isEditable = Boolean.TRUE;
 	}
 
-	public Category(
-	final String id, final String name, final String description, final boolean isEditable) {
+	public Category(final String id, final String name, final String description, final boolean editable) {
 		super(id, name, description);
-		this.isEditable = isEditable;
+		this.editable = editable;
 	}
 
-	public boolean isEditable() {
-		return isEditable;
+	public Boolean getEditable() {
+		return editable;
 	}
 
-	public void setEditable(final Boolean isEditable) {
-		this.isEditable = isEditable;
+	public Boolean isEditable() {
+		return editable;
 	}
 
-	@Override public String toString() {
-		return "TermSummary{" + "id='" + super.getId() + '\'' + ", name='" + super.getName() + '\'' + ", description='" + super
-				.getDescription() + '\'' + ", editable='" + this.isEditable() + '\'' + '}';
-	}
-
-	@Override public boolean equals(final Object other) {
-		if (!(other instanceof Category)) {
-			return false;
-		}
-		Category castOther = (Category) other;
-		return new EqualsBuilder().append(super.getId(), castOther.getId()).append(super.getName(), castOther.getName())
-				.append(super.getDescription(), castOther.getDescription()).append(this.isEditable(), castOther.isEditable()).isEquals();
+	public Category setEditable(final Boolean editable) {
+		this.editable = editable;
+		return this;
 	}
 
 	@Override public int hashCode() {
-		return new HashCodeBuilder().append(super.getId()).append(super.getName()).append(super.getDescription()).append(this.isEditable())
-				.toHashCode();
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override public boolean equals(Object o) {
+		return Pojomatic.equals(this, o);
 	}
 
 }

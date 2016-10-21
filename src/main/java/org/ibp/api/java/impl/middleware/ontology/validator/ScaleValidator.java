@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import static org.generationcp.middleware.domain.ontology.DataType.CATEGORICAL_VARIABLE;
 import static org.generationcp.middleware.domain.ontology.DataType.NUMERIC_VARIABLE;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -224,9 +225,10 @@ public class ScaleValidator extends OntologyValidator implements org.springframe
 			}
 
 			this.validateUpdatedCategoriesNotMeasured(oldScale, scaleDetails, errors);
+
 			final List<Integer> variablesIds = this.getVariablesIds(oldScale.getMetadata().getUsage().getVariables());
 
-			if (variablesIds != null && variablesIds.size() > 0) {
+			if (!isEmpty(variablesIds)) {
 				this.validateUpdatedRanges(scaleDetails, variablesIds, errors);
 			}
 

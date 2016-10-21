@@ -3,6 +3,8 @@ package org.ibp.api.java.impl.middleware.ontology;
 
 import java.text.ParseException;
 
+import org.apache.commons.lang.math.RandomUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermRelationship;
@@ -13,6 +15,7 @@ import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.StringUtil;
+import org.ibp.api.domain.ontology.Category;
 import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.domain.ontology.ScaleDetails;
@@ -155,5 +158,23 @@ public class OntologyMapperTest {
 
 		Assert.assertEquals(StringUtil.parseInt(dType.getId(), null), dataType.getId());
 		Assert.assertEquals(dType.getName(), dataType.getName());
+	}
+
+	@Test
+	public void categoryMapperTest() {
+		final String name = RandomStringUtils.randomAlphabetic(5);
+		final String description = RandomStringUtils.randomAlphabetic(5);
+		final Integer id = RandomUtils.nextInt();
+		final org.generationcp.middleware.domain.oms.TermSummary termSummary =
+				new org.generationcp.middleware.domain.oms.TermSummary(id, name, description);
+
+		final ModelMapper mapper = OntologyMapper.getInstance();
+
+		final Category category = mapper.map(termSummary, Category.class);
+
+		Assert.assertEquals(category.getId(), String.valueOf(termSummary.getId()));
+		Assert.assertEquals(category.getName(), termSummary.getName());
+		Assert.assertEquals(category.getDescription(), termSummary.getDefinition());
+		Assert.assertEquals(category.isEditable(), Boolean.TRUE);
 	}
 }

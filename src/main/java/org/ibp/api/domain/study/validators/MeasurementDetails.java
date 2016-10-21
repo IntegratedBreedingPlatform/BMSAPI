@@ -91,8 +91,8 @@ public class MeasurementDetails {
 				&& !this.variableValidValues.getCategories().isEmpty()) {
 			return Maps.uniqueIndex(categories, new Function<Category, String>() {
 				@Override
-				public String apply(final Category termSummary) {
-					return termSummary.getName().trim();
+				public String apply(final Category category) {
+					return category.getName().trim();
 				}
 			});
 		}
