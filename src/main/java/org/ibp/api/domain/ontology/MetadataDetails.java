@@ -12,6 +12,7 @@ public class MetadataDetails extends MetadataSummary {
 
 	private final List<String> editableFields = new ArrayList<>();
 	private boolean deletable;
+	private boolean editable;
 
 	private Usage usage = new Usage();
 
@@ -45,5 +46,14 @@ public class MetadataDetails extends MetadataSummary {
 
 	public void setStudies(Integer studies) {
 		this.usage.setStudies(studies);
+	}
+
+	public boolean isEditable() {
+		return editable;
+	}
+
+	public MetadataDetails setEditable(final boolean editable) {
+		this.editable = editable;
+		return this;
 	}
 }

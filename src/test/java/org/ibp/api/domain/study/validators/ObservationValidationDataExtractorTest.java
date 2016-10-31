@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hamcrest.CoreMatchers;
+import org.ibp.api.domain.ontology.Category;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.study.Measurement;
@@ -172,7 +173,7 @@ public class ObservationValidationDataExtractorTest {
 		Assert.assertThat(observationValidationData.getMeasurementVariableDetailsList().get(0).getVariableValidValues(),
 				CoreMatchers.equalTo(this.testVariableDetails.getScale().getValidValues()));
 
-		final Map<String, TermSummary> mappedCategories =
+		final Map<String, Category> mappedCategories =
 				observationValidationData.getMeasurementVariableDetailsList().get(0).getMappedCategories();
 
 		// Please note these values are coming out of acdTolVariable.json

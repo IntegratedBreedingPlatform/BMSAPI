@@ -11,7 +11,7 @@ public class ValidValues {
 
 	private String min;
 	private String max;
-	private final List<TermSummary> categories = new ArrayList<>();
+	private final List<Category> categories = new ArrayList<>();
 
 	public ValidValues() {
 	}
@@ -32,15 +32,16 @@ public class ValidValues {
 		this.max = max;
 	}
 
-	public List<TermSummary> getCategories() {
-		return this.categories;
-	}
 
-	public void setCategories(List<TermSummary> categories){
+	public void setCategories(List<Category> categories){
 		this.categories.clear();
-		for (TermSummary category : categories) {
+		for (Category category : categories) {
 			this.categories.add(category);
 		}
+	}
+
+	public List<Category> getCategories() {
+		return this.categories;
 	}
 
 }

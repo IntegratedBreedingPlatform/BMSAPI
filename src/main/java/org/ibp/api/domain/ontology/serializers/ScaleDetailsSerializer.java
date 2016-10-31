@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Map;
 
+import org.ibp.api.domain.ontology.Category;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.java.ontology.ModelService;
@@ -61,11 +62,12 @@ public class ScaleDetailsSerializer extends JsonSerializer<ScaleDetails>{
 				if(!scaleDetails.getValidValues().getCategories().isEmpty()){
 					jsonGenerator.writeArrayFieldStart("categories");
 
-					for (TermSummary category : scaleDetails.getValidValues().getCategories()){
+					for (Category category : scaleDetails.getValidValues().getCategories()){
 						jsonGenerator.writeStartObject();
 							jsonGenerator.writeStringField("id", category.getId());
 							jsonGenerator.writeStringField("name", category.getName());
 							jsonGenerator.writeStringField("description", category.getDescription());
+						    jsonGenerator.writeBooleanField("editable", category.isEditable());
 						jsonGenerator.writeEndObject();
 					}
 
@@ -88,6 +90,7 @@ public class ScaleDetailsSerializer extends JsonSerializer<ScaleDetails>{
 			}
 			jsonGenerator.writeEndArray();
 			jsonGenerator.writeBooleanField("deletable", scaleDetails.getMetadata().isDeletable());
+			jsonGenerator.writeBooleanField("editable", scaleDetails.getMetadata().isEditable());
 
 			jsonGenerator.writeObjectFieldStart("usage");
 				jsonGenerator.writeNumberField("observations", !isNullOrEmpty(scaleDetails.getMetadata().getUsage().getObservations()) ? scaleDetails.getMetadata().getUsage().getObservations() : 0);
