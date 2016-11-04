@@ -1,34 +1,34 @@
 package org.ibp.controller;
 
-import java.util.List;
-
-import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/**
- * This is not part of the formal API
- * It's a workaround to delete VariableCache
- * of BMSAPI
- *
- */
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+
+@Api(value = "Variable Cache Controller")
 @Controller
 @RequestMapping(value = "/variableCache")
 public class VariableCacheController {
 
 	@Autowired
-	private OntologyVariableDataManager ontologyVariableDataManager;
+	private VariableService variableService;
 
 	@ResponseBody
-	@RequestMapping(value = "/deleteVariablesFromCache", method = RequestMethod.POST)
-	public ResponseEntity<String> deleteVariablesFromCache(@RequestBody final List<Integer> variablesIds) {
-		this.ontologyVariableDataManager.deleteVariablesFromCache(variablesIds);
-		return new ResponseEntity<>(HttpStatus.OK);
+	@ApiOperation(value = "Delete Variables from VariableCache", notes = "Remove Variables from VariableCache by Ids")
+	@RequestMapping(value = "/{cropName}/{variablesIds}", method = RequestMethod.DELETE)
+	public ResponseEntity<String> deleteVariablesFromCache(
+			@ApiParam(value = "name of the crop", required = true) @PathVariable final String cropName,
+			@ApiParam(value = "Comma separated list of variable ids", required = true) @PathVariable final Integer[] variablesIds) {
+		this.variableService.deleteVariablesFromCache(cropName, variablesIds);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }
