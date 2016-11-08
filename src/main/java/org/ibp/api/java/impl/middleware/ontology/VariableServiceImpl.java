@@ -2,6 +2,7 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -347,6 +348,24 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		} catch (MiddlewareException e) {
 			throw new ApiRuntimeException(VariableServiceImpl.ERROR_MESSAGE, e);
 		}
+	}
+
+	@Override
+	public void deleteVariablesFromCache(final String cropname, final Integer[] variablesIds) {
+
+		for (final Integer variableId : variablesIds) {
+			this.validateId(String.valueOf(variableId), VariableServiceImpl.VARIABLE_NAME);
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
+
+			final TermRequest term = new TermRequest(String.valueOf(variableId), VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId());
+			this.termValidator.validate(term, errors);
+
+			if (errors.hasErrors()) {
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+		}
+
+		this.ontologyVariableDataManager.deleteVariablesFromCache(Arrays.asList(variablesIds));
 	}
 
 	protected void formatVariableSummary(VariableDetails variableDetails) {
