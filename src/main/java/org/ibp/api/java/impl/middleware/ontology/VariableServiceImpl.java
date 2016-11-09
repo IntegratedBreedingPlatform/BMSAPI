@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -70,6 +71,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 		this.programValidator.validate(program, bindingResult);
 
+		setCurrentProgram(programId);
+
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
@@ -115,6 +118,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 		this.programValidator.validate(program, bindingResult);
 
+		setCurrentProgram(programId);
+
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
@@ -152,6 +157,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		program.setUniqueID(programId);
 
 		this.programValidator.validate(program, errors);
+
+		setCurrentProgram(programId);
 
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -219,6 +226,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 
+			setCurrentProgram(programId);
+
 			this.variableValidator.validate(variable, errors);
 			if (errors.hasErrors()) {
 				throw new ApiRequestValidationException(errors.getAllErrors());
@@ -276,6 +285,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			if (errors.hasErrors()) {
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
+
+			setCurrentProgram(programId);
 
 			this.validateId(variableId, VariableServiceImpl.VARIABLE_NAME);
 			TermRequest term = new TermRequest(variableId, VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId());
@@ -367,6 +378,24 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 				throw new ApiRuntimeException(VariableServiceImpl.ERROR_MESSAGE, e);
 			}
 		}
+	}
+
+
+	/**
+	 * <p>
+	 * Set current program in ContextHolder
+	 * </p>
+	 *
+	 * <p>
+	 * XXX: <br/>
+	 * Perhaps this should be a url part the same way as cropName and extracted in ContextResolverImpl.resolveDatabaseFromUrl() but that
+	 * would be a more extensive API change
+	 * </p>
+	 *
+	 * @param programId the program unique id
+	 */
+	private void setCurrentProgram(String programId) {
+		ContextHolder.setCurrentProgram(programId);
 	}
 
 	private Integer parseVariableTypeAsInteger(org.ibp.api.domain.ontology.VariableType variableType) {
