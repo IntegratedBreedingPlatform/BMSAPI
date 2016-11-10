@@ -1,3 +1,4 @@
+
 package org.ibp.controller;
 
 import org.ibp.api.java.ontology.VariableService;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wordnik.swagger.annotations.Api;
@@ -27,8 +29,9 @@ public class VariableCacheController {
 	@RequestMapping(value = "/{cropName}/{variablesIds}", method = RequestMethod.DELETE)
 	public ResponseEntity<String> deleteVariablesFromCache(
 			@ApiParam(value = "name of the crop", required = true) @PathVariable final String cropName,
-			@ApiParam(value = "Comma separated list of variable ids", required = true) @PathVariable final Integer[] variablesIds) {
-		this.variableService.deleteVariablesFromCache(cropName, variablesIds);
+			@ApiParam(value = "Comma separated list of variable ids", required = true) @PathVariable final Integer[] variablesIds,
+			@RequestParam(value = "programId") String programId) {
+		this.variableService.deleteVariablesFromCache(cropName, variablesIds, programId);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }

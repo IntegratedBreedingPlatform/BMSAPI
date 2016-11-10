@@ -72,11 +72,11 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 		this.programValidator.validate(program, bindingResult);
 
-		setCurrentProgram(programId);
-
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
+
+		setCurrentProgram(programId);
 
 		if (!Strings.isNullOrEmpty(propertyId)) {
 			this.validateId(propertyId, VariableServiceImpl.VARIABLE_NAME);
@@ -119,11 +119,11 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 		this.programValidator.validate(program, bindingResult);
 
-		setCurrentProgram(programId);
-
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
+
+		setCurrentProgram(programId);
 
 		try {
 
@@ -159,11 +159,11 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 		this.programValidator.validate(program, errors);
 
-		setCurrentProgram(programId);
-
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
+
+		setCurrentProgram(programId);
 
 		TermRequest term = new TermRequest(variableId, VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId());
 		this.termValidator.validate(term, errors);
@@ -362,7 +362,21 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	}
 
 	@Override
-	public void deleteVariablesFromCache(final String cropname, final Integer[] variablesIds) {
+	public void deleteVariablesFromCache(final String cropName, final Integer[] variablesIds, String programId) {
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
+
+		ProgramSummary program = new ProgramSummary();
+		program.setCrop(cropName);
+		program.setUniqueID(programId);
+
+		this.programValidator.validate(program, bindingResult);
+
+		if (bindingResult.hasErrors()) {
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
+		setCurrentProgram(programId);
 
 		for (final Integer variableId : variablesIds) {
 			this.validateId(String.valueOf(variableId), VariableServiceImpl.VARIABLE_NAME);
