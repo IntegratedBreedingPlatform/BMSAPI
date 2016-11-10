@@ -65,4 +65,11 @@ public interface VariableService {
 	 * @param id Variable Id to be deleted
 	 */
 	void deleteVariable(String id);
+
+	/**
+	 * Remove variable from cache
+	 * @param cropname name of the crop
+	 * @param variablesIds array of ids to remove
+	 */
+	void deleteVariablesFromCache(String cropname, final Integer[] variablesIds);
 }
