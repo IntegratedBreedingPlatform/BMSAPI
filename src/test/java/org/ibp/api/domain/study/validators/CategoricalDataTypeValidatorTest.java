@@ -3,6 +3,7 @@ package org.ibp.api.domain.study.validators;
 
 import java.util.Collections;
 
+import org.ibp.api.domain.ontology.Category;
 import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.domain.ontology.ValidValues;
 import org.junit.Before;
@@ -58,8 +59,8 @@ public class CategoricalDataTypeValidatorTest {
 						TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_NAME, TestValidatorConstants.CATEGORICAL_VARIABLE,
 						mockValidValues, TestValidatorConstants.TEST_MEASUREMENT_ID, TestValidatorConstants.TEST_MEASUREMENT_VALUE);
 		Mockito.when(mockValidValues.getCategories()).thenReturn(
-				Collections.singletonList(new TermSummary(TestValidatorConstants.TERM_SUMMART_ID, TestValidatorConstants.TERM_SUMMARY_NAME,
-						TestValidatorConstants.TERM_SUMMARY_DEFINITION)));
+				Collections.singletonList(new Category(TestValidatorConstants.TERM_SUMMART_ID, TestValidatorConstants.TERM_SUMMARY_NAME,
+						TestValidatorConstants.TERM_SUMMARY_DEFINITION, Boolean.TRUE)));
 		final Errors mockErrors = Mockito.mock(Errors.class);
 		this.categoricalDataTypeValidator.validateValues(measurementVariableDetails, 0,
 				TestValidatorConstants.TEST_OBSERVATION_IDENTIFIER, mockErrors);
@@ -80,8 +81,8 @@ public class CategoricalDataTypeValidatorTest {
 						TestValidatorConstants.TEST_MEASUREMENT_VARIABLE_NAME, TestValidatorConstants.CATEGORICAL_VARIABLE,
 						mockValidValues, TestValidatorConstants.TEST_MEASUREMENT_ID, TestValidatorConstants.TERM_SUMMARY_NAME);
 		Mockito.when(mockValidValues.getCategories()).thenReturn(
-				Collections.singletonList(new TermSummary(TestValidatorConstants.TERM_SUMMART_ID, TestValidatorConstants.TERM_SUMMARY_NAME,
-						TestValidatorConstants.TERM_SUMMARY_DEFINITION)));
+				Collections.singletonList(new Category(TestValidatorConstants.TERM_SUMMART_ID, TestValidatorConstants.TERM_SUMMARY_NAME,
+						TestValidatorConstants.TERM_SUMMARY_DEFINITION, Boolean.TRUE)));
 		final Errors mockErrors = Mockito.mock(Errors.class);
 		this.categoricalDataTypeValidator.validateValues(measurementVariableDetails, 0,
 				TestValidatorConstants.TEST_OBSERVATION_IDENTIFIER, mockErrors);

@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.util.UUID;
 
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.Debug;
@@ -50,6 +51,8 @@ public abstract class ApiUnitTestBase {
 
 	@Autowired
 	protected WorkbenchDataManager workbenchDataManager;
+	@Autowired
+	protected UserDataManager userDataManager;
 
 	@Autowired
 	protected ObjectMapper jsonMapper;
@@ -73,6 +76,12 @@ public abstract class ApiUnitTestBase {
 		@Primary
 		public StudyDataManager studyDataManager() {
 			return Mockito.mock(StudyDataManager.class);
+		}
+		
+		@Bean
+		@Primary
+		public UserDataManager userDataManager() {
+			return Mockito.mock(UserDataManager.class);
 		}
 	}
 
