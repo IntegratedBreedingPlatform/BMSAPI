@@ -1,11 +1,14 @@
 
 package org.ibp.api.security;
 
+import static org.hamcrest.Matchers.emptyCollectionOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import java.net.URL;
 import java.nio.charset.Charset;
 
 import org.ibp.Main;
@@ -134,6 +137,9 @@ public class SecurityIntegrationTest {
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(jsonPath("$.userDisplayName", is(TEST_USER)))
 				.andExpect(jsonPath("$.access_token", not(isEmptyOrNullString())))
+				.andExpect(jsonPath("$.metadata.datafiles", emptyCollectionOf(URL.class)))
+				.andExpect(jsonPath("$.metadata.pagination", nullValue()))
+				.andExpect(jsonPath("$.metadata.status", nullValue()))
 				.andExpect(jsonPath("$.expires_in", not(isEmptyOrNullString())));
 	}
 }

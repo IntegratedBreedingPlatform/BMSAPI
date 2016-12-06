@@ -52,7 +52,7 @@ public class UserXAuthTokenControllerBrapi {
 		final UserDetails details = this.userDetailsService.loadUserByUsername(username);
 		final Token token = this.tokenProvider.createToken(details);
 
-		return new TokenResponse(new Metadata(), username, token.getToken(), token.getExpires());
+		return new TokenResponse(new Metadata(null, null, new URL[] {}), username, token.getToken(), token.getExpires());
 	}
 
 	public void setTokenProvider(final TokenProvider tokenProvider) {
