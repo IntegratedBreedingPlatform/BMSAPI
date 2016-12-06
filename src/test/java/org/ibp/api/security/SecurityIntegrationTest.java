@@ -1,9 +1,15 @@
 
 package org.ibp.api.security;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.not;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
 import java.nio.charset.Charset;
 
 import org.ibp.Main;
+import org.ibp.api.brapi.v1.security.xauth.TokenRequest;
 import org.ibp.api.security.xauth.Token;
 import org.junit.Assert;
 import org.junit.Before;
@@ -108,5 +114,26 @@ public class SecurityIntegrationTest {
 				.header("X-Auth-Token", token.getToken()))
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+
+	@Test
+	public void testAuthenticateBrapi() throws Exception {
+		final TokenRequest tokenRequest = new TokenRequest();
+		tokenRequest.setUsername(TEST_USER);
+		tokenRequest.setPassword(TEST_PASS);
+
+		final String body = "{\n" +
+				"    \"grant_type\" : \"password\",\n" +
+				"    \"username\" : \""+ TEST_USER +"\",\n" +
+				"    \"password\" : \""+ TEST_PASS +"\",\n" +
+				"    \"client_id\" : \"\"\n" +
+				"}\n" +
+				"";
+
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/brapi/v1/token").content(body.getBytes()).contentType(this.contentType))
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(jsonPath("$.userDisplayName", is(TEST_USER)))
+				.andExpect(jsonPath("$.access_token", not(isEmptyOrNullString())))
+				.andExpect(jsonPath("$.expires_in", not(isEmptyOrNullString())));
 	}
 }
