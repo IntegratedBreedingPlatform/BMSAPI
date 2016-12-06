@@ -41,8 +41,8 @@ public class UserXAuthTokenControllerTest {
 
 	@After
 	public void afterEachTest() {
+		// so that other tests don't get side effects of this test.
 		SecurityContextHolder.getContext().setAuthentication(null);
-		// so that other tests dont get side effects of this test.
 	}
 
 	@Test
@@ -56,8 +56,8 @@ public class UserXAuthTokenControllerTest {
 		Mockito.when(this.userDetailsService.loadUserByUsername(testUser)).thenReturn(userDetails);
 
 		Token token = this.controller.authenticate(testUser, testPassword);
-		Assert.assertNotNull("Expceting a non-null token for successful authetication scenario.", token);
-		Assert.assertNotNull("Expceting a non-null token for successful authetication scenario.", token.getToken());
+		Assert.assertNotNull("Expecting a non-null token for successful authentication scenario.", token);
+		Assert.assertNotNull("Expecting a non-null token for successful authentication scenario.", token.getToken());
 		Assert.assertTrue(token.getToken().startsWith(testUser + ":"));
 		Assert.assertEquals(2, StringUtils.countMatches(token.getToken(), ":"));
 		// Just asserting that expiry is sometime in future.
