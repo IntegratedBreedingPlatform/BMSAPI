@@ -1,16 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0.0 http://maven.apache.org/maven-v4.0.0.0.xsd">
-	<modelVersion>4.0.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.generationcp</groupId>
 	<artifactId>bmsapi</artifactId>
 	<packaging>${packaging.type}</packaging>
-        <version>4.0.0.0</version>
+        <version>4.0.0</version>
 	<name>BMS API</name>
 
 	<properties>
 		<spring-boot-version>1.2.4.RELEASE</spring-boot-version>
-		<spring-security-version>4.0.0.0.2.RELEASE</spring-security-version>
+		<spring-security-version>4.0.2.RELEASE</spring-security-version>
 		<tomcat.version>7.0.50</tomcat.version>
 		<ibpcommons.version>${project.version}</ibpcommons.version>
 		<jsonpath.version>0.8.1</jsonpath.version>
@@ -216,13 +216,13 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-collections4</artifactId>
-			<version>4.0.0.0</version>
+			<version>4.0.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-validator</groupId>
 			<artifactId>commons-validator</artifactId>
-			<version>1.4.0.0.0</version>
+			<version>1.4.0</version>
 		</dependency>
 
 		<dependency>
