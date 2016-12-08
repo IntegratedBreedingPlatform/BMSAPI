@@ -2,10 +2,12 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -74,6 +76,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 
+		setCurrentProgram(programId);
+
 		if (!Strings.isNullOrEmpty(propertyId)) {
 			this.validateId(propertyId, VariableServiceImpl.VARIABLE_NAME);
 		}
@@ -119,6 +123,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 
+		setCurrentProgram(programId);
+
 		try {
 
 			ModelMapper mapper = OntologyMapper.getInstance();
@@ -156,6 +162,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
+
+		setCurrentProgram(programId);
 
 		TermRequest term = new TermRequest(variableId, VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId());
 		this.termValidator.validate(term, errors);
@@ -219,6 +227,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 
+			setCurrentProgram(programId);
+
 			this.variableValidator.validate(variable, errors);
 			if (errors.hasErrors()) {
 				throw new ApiRequestValidationException(errors.getAllErrors());
@@ -276,6 +286,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			if (errors.hasErrors()) {
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
+
+			setCurrentProgram(programId);
 
 			this.validateId(variableId, VariableServiceImpl.VARIABLE_NAME);
 			TermRequest term = new TermRequest(variableId, VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId());
@@ -349,6 +361,38 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		}
 	}
 
+	@Override
+	public void deleteVariablesFromCache(final String cropName, final Integer[] variablesIds, String programId) {
+
+		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
+
+		ProgramSummary program = new ProgramSummary();
+		program.setCrop(cropName);
+		program.setUniqueID(programId);
+
+		this.programValidator.validate(program, bindingResult);
+
+		if (bindingResult.hasErrors()) {
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
+		setCurrentProgram(programId);
+
+		for (final Integer variableId : variablesIds) {
+			this.validateId(String.valueOf(variableId), VariableServiceImpl.VARIABLE_NAME);
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), VariableServiceImpl.VARIABLE_NAME);
+
+			final TermRequest term = new TermRequest(String.valueOf(variableId), VariableServiceImpl.VARIABLE_NAME, CvId.VARIABLES.getId());
+			this.termValidator.validate(term, errors);
+
+			if (errors.hasErrors()) {
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+		}
+
+		this.ontologyVariableDataManager.deleteVariablesFromCache(Arrays.asList(variablesIds));
+	}
+
 	protected void formatVariableSummary(VariableDetails variableDetails) {
 
 		Integer scaleId = StringUtil.parseInt(variableDetails.getScale().getId(), null);
@@ -367,6 +411,24 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 				throw new ApiRuntimeException(VariableServiceImpl.ERROR_MESSAGE, e);
 			}
 		}
+	}
+
+
+	/**
+	 * <p>
+	 * Set current program in ContextHolder
+	 * </p>
+	 *
+	 * <p>
+	 * XXX: <br/>
+	 * Perhaps this should be a url part the same way as cropName and extracted in ContextResolverImpl.resolveDatabaseFromUrl() but that
+	 * would be a more extensive API change
+	 * </p>
+	 *
+	 * @param programId the program unique id
+	 */
+	private void setCurrentProgram(String programId) {
+		ContextHolder.setCurrentProgram(programId);
 	}
 
 	private Integer parseVariableTypeAsInteger(org.ibp.api.domain.ontology.VariableType variableType) {

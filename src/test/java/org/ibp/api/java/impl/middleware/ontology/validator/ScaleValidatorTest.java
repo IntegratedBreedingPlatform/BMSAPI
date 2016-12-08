@@ -10,11 +10,13 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.ibp.api.domain.ontology.Category;
 import org.ibp.api.domain.ontology.DataType;
 import org.ibp.api.domain.ontology.ScaleDetails;
-import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
+import org.ibp.api.java.ontology.ScaleService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,12 +37,20 @@ public class ScaleValidatorTest {
 	@Mock
 	private OntologyScaleDataManager ontologyScaleDataManager;
 
+	@Mock
+	private ScaleService scaleService;
+
+	@Mock
+	private OntologyVariableDataManager ontologyVariableDataManager;
+
 	@Before
 	public void reset() {
 		MockitoAnnotations.initMocks(this);
 		this.scaleValidator = new ScaleValidator();
 		this.scaleValidator.setTermDataManager(this.termDataManager);
 		this.scaleValidator.setOntologyScaleDataManager(this.ontologyScaleDataManager);
+		this.scaleValidator.setScaleService(scaleService);
+		this.scaleValidator.setOntologyVariableDataManager(ontologyVariableDataManager);
 	}
 
 	@After
@@ -160,12 +170,12 @@ public class ScaleValidatorTest {
 		ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
 		scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
 
-		List<TermSummary> categories = new ArrayList<>();
-		TermSummary category = new TermSummary();
+		List<Category> categories = new ArrayList<>();
+		Category category = new Category();
 		category.setName("1");
 		category.setDescription("description");
 		categories.add(category);
-		category = new TermSummary();
+		category = new Category();
 		category.setName("11");
 		category.setDescription("description");
 		categories.add(category);
@@ -186,8 +196,8 @@ public class ScaleValidatorTest {
 		ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
 		scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
 
-		List<TermSummary> categories = new ArrayList<>();
-		TermSummary category = new TermSummary();
+		List<Category> categories = new ArrayList<>();
+		Category category = new Category();
 		category.setName(RandomStringUtils.randomAlphanumeric(205));
 		category.setDescription("description");
 		categories.add(category);
@@ -208,8 +218,8 @@ public class ScaleValidatorTest {
 		ScaleDetails scaleSummary = TestDataProvider.getTestScaleDetails();
 		scaleSummary.setDataType(TestDataProvider.CATEGORICAL_DATA_TYPE);
 
-		List<TermSummary> categories = new ArrayList<>();
-		TermSummary category = new TermSummary();
+		List<Category> categories = new ArrayList<>();
+		Category category = new Category();
 		category.setName("Name");
 		category.setDescription(RandomStringUtils.randomAlphanumeric(256));
 		categories.add(category);

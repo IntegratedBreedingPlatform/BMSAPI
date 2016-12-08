@@ -11,6 +11,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.ontology.ScaleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ public abstract class OntologyValidator extends BaseValidator {
 
 	@Autowired
 	protected OntologyMethodDataManager ontologyMethodDataManager;
+
+	@Autowired
+	protected ScaleService scaleService;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(OntologyValidator.class);
 
@@ -120,4 +124,9 @@ public abstract class OntologyValidator extends BaseValidator {
 	public void setOntologyVariableDataManager(OntologyVariableDataManager ontologyVariableDataManager) {
 		this.ontologyVariableDataManager = ontologyVariableDataManager;
 	}
+
+	public void setScaleService (ScaleService scaleService) {
+		this.scaleService = scaleService;
+	}
+
 }
