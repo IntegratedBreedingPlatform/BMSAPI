@@ -77,7 +77,6 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(jsonPath("$.result.data[0].latitude", Matchers.is(location1.getLatitude()))) //
 				.andExpect(jsonPath("$.result.data[0].longitude", Matchers.is(location1.getLongitude()))) //
 				.andExpect(jsonPath("$.result.data[0].altitude", Matchers.is(location1.getAltitude()))) //
-				.andExpect(jsonPath("$.result.data[0].attributes", Matchers.is(IsCollectionWithSize.hasSize(0))))
 				.andExpect(jsonPath("$.metadata.pagination.pageNumber", Matchers.is(1))) //
 				.andExpect(jsonPath("$.metadata.pagination.pageSize", Matchers.is(10))) //
 				.andExpect(jsonPath("$.metadata.pagination.totalCount", Matchers.is(200))) //
