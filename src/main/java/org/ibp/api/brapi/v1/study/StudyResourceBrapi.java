@@ -94,4 +94,13 @@ public class StudyResourceBrapi {
 		return new ResponseEntity<>(studyDetailsDto, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Get study details", notes = "Get study details")
+	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}", method = RequestMethod.GET)
+	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable final String crop, @PathVariable final String studyDbId) {
+
+		StudyDetails studyDetails = new StudyDetails();
+		return new ResponseEntity<StudyDetails>(studyDetails, HttpStatus.OK);
+	}
+
+
 }
