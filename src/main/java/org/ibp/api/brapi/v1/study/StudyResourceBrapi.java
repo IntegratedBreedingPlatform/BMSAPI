@@ -74,7 +74,7 @@ public class StudyResourceBrapi {
 	@ApiOperation(value = "Get study observation details as table", notes = "Get study observation details as table")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/table", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<StudyDetailsDto> getStudyObservationsAsTable(@PathVariable final String crop,
+	public ResponseEntity<StudyObservations> getStudyObservationsAsTable(@PathVariable final String crop,
 			@PathVariable final Integer studyDbId) {
 
 		/***
@@ -85,12 +85,12 @@ public class StudyResourceBrapi {
 		 * 
 		 * For now, just returning an empty place holder message with status.
 		 */
-		StudyDetailDto brapiStudyDetailDto = new StudyDetailDto();
+		StudyObservationTable brapiStudyDetailDto = new StudyObservationTable();
 
 		Pagination pagination = new Pagination();
 		Metadata metadata = new Metadata().withPagination(pagination)
 				.withStatus(Maps.newHashMap(ImmutableMap.of("message", "This call is not yet implemented.")));
-		StudyDetailsDto studyDetailsDto = new StudyDetailsDto().setMetadata(metadata).setResult(brapiStudyDetailDto);
+		StudyObservations studyDetailsDto = new StudyObservations().setMetadata(metadata).setResult(brapiStudyDetailDto);
 		return new ResponseEntity<>(studyDetailsDto, HttpStatus.OK);
 	}
 
