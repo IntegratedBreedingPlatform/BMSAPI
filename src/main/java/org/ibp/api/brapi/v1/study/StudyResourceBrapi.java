@@ -5,6 +5,7 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.java.study.StudyService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,6 @@ public class StudyResourceBrapi {
 	@Autowired
 	private StudyDataManager studyDataManager;
 
-	@SuppressWarnings("unused") // temporary
 	@Autowired
 	private StudyService studyService;
 
@@ -75,23 +75,29 @@ public class StudyResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/table", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<StudyObservations> getStudyObservationsAsTable(@PathVariable final String crop,
-			@PathVariable final Integer studyDbId) {
+			@PathVariable final int studyDbId,
+			@ApiParam(
+					value = "Studies are contained within a trial. Provide the db id of the trial to list summary of studies within the trial. "
+							+ "Use <code>GET /{crop}/brapi/v1/trials</code> service to retrieve trial summaries first to obtain trialDbIds to supply here. ",
+					required = true) @RequestParam(value = "trialDbId", required = true) final int trialDbId) {
 
-		/***
-		 * Study in BrAPI land = Environment/Instance in BMS/Middleware land. We need to build new services in Middleware to get
-		 * Environment/Instance level measurement details as table.
-		 * 
-		 * studyDbId in BrAPI will map to nd_geolocation_id in Middleware.
-		 * 
-		 * For now, just returning an empty place holder message with status.
-		 */
-		StudyObservationTable brapiStudyDetailDto = new StudyObservationTable();
+		StudyObservationTable studyObservationsTable = new StudyObservationTable();
 
-		Pagination pagination = new Pagination();
-		Metadata metadata = new Metadata().withPagination(pagination)
-				.withStatus(Maps.newHashMap(ImmutableMap.of("message", "This call is not yet implemented.")));
-		StudyObservations studyDetailsDto = new StudyObservations().setMetadata(metadata).setResult(brapiStudyDetailDto);
-		return new ResponseEntity<>(studyDetailsDto, HttpStatus.OK);
+		org.generationcp.middleware.service.api.study.StudyDetailDto studyDetailDto = this.studyService.getStudyDetails(trialDbId, studyDbId);
+
+		int resultNumber = (studyDetailDto == null) ? 0 : 1;
+
+		if (resultNumber != 0) {
+			ModelMapper modelMapper = new ModelMapper();
+			studyObservationsTable = modelMapper.map(studyDetailDto, StudyObservationTable.class);
+		}
+
+		Pagination pagination =
+				new Pagination().withPageNumber(1).withPageSize(resultNumber).withTotalCount((long) resultNumber).withTotalPages(1);
+
+		Metadata metadata = new Metadata().withPagination(pagination);
+		StudyObservations studyObservations = new StudyObservations().setMetadata(metadata).setResult(studyObservationsTable);
+		return new ResponseEntity<>(studyObservations, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get study details", notes = "Get study details")

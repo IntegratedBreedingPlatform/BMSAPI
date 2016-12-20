@@ -533,4 +533,9 @@ public class StudyServiceImpl implements StudyService {
 		return middlewareStudyService.getStudyDetails(studyIdentifier);
 	}
 
+	@Override
+	public StudyDetailDto getStudyDetails(final int studyIdentifier, final Integer studyDbId) {
+		return middlewareStudyService.getStudyDetails(studyIdentifier, studyDbId);
+	}
+
 }
