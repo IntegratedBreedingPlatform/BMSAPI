@@ -2,11 +2,13 @@
 package org.ibp.api.brapi.v1.location;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.pojos.Country;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.LocationFilters;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
@@ -47,59 +49,56 @@ public class LocationResourceBrapi {
 			@ApiParam(value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.",
 					required = false) @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
 			@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.",
-					required = false) 
-			@RequestParam(value = "pageSize", required = false) Integer pageSize) {
+					required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize,
+			@ApiParam(value = "name of location type", required = false) @RequestParam(value = "locationType",
+					required = false) String locationType) {
 
-		PagedResult<org.generationcp.middleware.pojos.Location> resultPage =
-				new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<org.generationcp.middleware.pojos.Location>() {
+		final HashMap<String, String> filtersMap = new HashMap<String, String>();
+		if (!StringUtils.isBlank(locationType)) {
+			final Integer locationTypeId =
+					LocationResourceBrapi.this.locationDataManager.getUserDefinedFieldIdOfName(org.generationcp.middleware.pojos.UDTableType.LOCATION_LTYPE, locationType);
+			if (locationTypeId != null) {
+				filtersMap.put("locationType", locationTypeId.toString());
 
-					@Override
-					public long getCount() {
-						return LocationResourceBrapi.this.locationDataManager.countAllLocations();
-					}
+			} else {
+				throw new IllegalArgumentException("the filter do not return values");
+			}
+		}
 
-					@Override
-					public List<org.generationcp.middleware.pojos.Location> getResults(
-							PagedResult<org.generationcp.middleware.pojos.Location> pagedResult) {
-						return LocationResourceBrapi.this.locationDataManager.getAllLocalLocations(pagedResult.getPageNumber(),
-								pagedResult.getPageSize());
-					}
-				});
+		PagedResult<LocationFilters> resultPage = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<LocationFilters>() {
+
+			@Override
+			public long getCount() {
+				return LocationResourceBrapi.this.locationDataManager.countLocationsByFilter(filtersMap);
+			}
+
+			@Override
+			public List<LocationFilters> getResults(PagedResult<LocationFilters> pagedResult) {
+				return LocationResourceBrapi.this.locationDataManager.getLocalLocationsByFilter(pagedResult.getPageNumber(),
+						pagedResult.getPageSize(), filtersMap);
+			}
+		});
 
 		List<Location> locations = new ArrayList<>();
 
-		for (org.generationcp.middleware.pojos.Location mwLoc : resultPage.getPageResults()) {
+		for (org.generationcp.middleware.pojos.LocationFilters mwLoc : resultPage.getPageResults()) {
 			Location location = new Location();
-			location.setLocationDbId(mwLoc.getLocid());
-			location.setName(mwLoc.getLname());
-			location.setAbbreviation(mwLoc.getLabbr());
+			location.setLocationDbId(mwLoc.getLocationDbId());
+			location.setName(mwLoc.getName());
+			location.setAbbreviation(mwLoc.getAbbreviation());
 
-			// FIXME This is (n+1) query in loop pattern which is bad. This is just temporary. Do not follow this pattern.
-			// TODO Implement a middleware method that retrieves location type and country in one query.
-			if (mwLoc.getLtype() != null && !mwLoc.getLtype().equals(0)) {
-				UserDefinedField loacationTypeUDFLD = this.locationDataManager.getUserDefinedFieldByID(mwLoc.getLtype());
-				if (loacationTypeUDFLD != null) {
-					location.setLocationType(loacationTypeUDFLD.getFname());
-				}
-			} else {
-				location.setLocationType("Unknown");
-			}
+			location.setLocationType(
+					!StringUtils.isBlank(mwLoc.getLocationType()) ? WordUtils.capitalize(mwLoc.getLocationType().toLowerCase()) : "Unknown");
 
-			if (mwLoc.getCntryid() == null || mwLoc.getCntryid().equals(0)) {
-				location.setCountryCode("Unknown");
-				location.setCountryName("Unknown");
-			} else {
-				Country country = this.locationDataManager.getCountryById(mwLoc.getCntryid());
-				location.setCountryCode(country.getIsothree());
-				location.setCountryName(country.getIsoabbr());
-			}
+			location.setCountryCode(!StringUtils.isBlank(mwLoc.getCountryCode()) ? mwLoc.getCountryCode() : "Unknown");
+			location.setCountryName(!StringUtils.isBlank(mwLoc.getCountryName()) ? mwLoc.getCountryName() : "Unknown");
 
 			location.setLatitude(mwLoc.getLatitude());
 			location.setLongitude(mwLoc.getLongitude());
 			location.setAltitude(mwLoc.getAltitude());
 			locations.add(location);
 		}
-		
+
 		Result<Location> results = new Result<Location>().withData(locations);
 		Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
