@@ -55,8 +55,8 @@ public class LocationResourceBrapi {
 
 		final HashMap<String, String> filtersMap = new HashMap<String, String>();
 		if (!StringUtils.isBlank(locationType)) {
-			final Integer locationTypeId =
-					LocationResourceBrapi.this.locationDataManager.getUserDefinedFieldIdOfName(org.generationcp.middleware.pojos.UDTableType.LOCATION_LTYPE, locationType);
+			final Integer locationTypeId = LocationResourceBrapi.this.locationDataManager
+					.getUserDefinedFieldIdOfName(org.generationcp.middleware.pojos.UDTableType.LOCATION_LTYPE, locationType);
 			if (locationTypeId != null) {
 				filtersMap.put("locationType", locationTypeId.toString());
 
@@ -87,8 +87,8 @@ public class LocationResourceBrapi {
 			location.setName(mwLoc.getName());
 			location.setAbbreviation(mwLoc.getAbbreviation());
 
-			location.setLocationType(
-					!StringUtils.isBlank(mwLoc.getLocationType()) ? WordUtils.capitalize(mwLoc.getLocationType().toLowerCase()) : "Unknown");
+			location.setLocationType(!StringUtils.isBlank(mwLoc.getLocationType())
+					? WordUtils.capitalize(mwLoc.getLocationType().toLowerCase()) : "Unknown");
 
 			location.setCountryCode(!StringUtils.isBlank(mwLoc.getCountryCode()) ? mwLoc.getCountryCode() : "Unknown");
 			location.setCountryName(!StringUtils.isBlank(mwLoc.getCountryName()) ? mwLoc.getCountryName() : "Unknown");
