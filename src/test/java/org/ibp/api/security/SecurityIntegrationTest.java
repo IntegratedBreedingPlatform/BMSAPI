@@ -12,7 +12,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 
 import org.ibp.Main;
-import org.ibp.api.brapi.v1.security.xauth.TokenRequest;
+import org.ibp.api.brapi.v1.security.auth.TokenRequest;
 import org.ibp.api.security.xauth.Token;
 import org.junit.Assert;
 import org.junit.Before;

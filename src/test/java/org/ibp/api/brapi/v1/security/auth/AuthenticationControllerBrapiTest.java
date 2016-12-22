@@ -1,14 +1,16 @@
 
-package org.ibp.api.brapi.v1.security.xauth;
+package org.ibp.api.brapi.v1.security.auth;
 
 import java.util.Collections;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ibp.api.brapi.v1.security.auth.AuthenticationControllerBrapi;
+import org.ibp.api.brapi.v1.security.auth.TokenRequest;
+import org.ibp.api.brapi.v1.security.auth.TokenResponse;
 import org.ibp.api.security.xauth.TokenProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -23,7 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-public class UserXAuthTokenControllerBrapiTest {
+public class AuthenticationControllerBrapiTest {
 
 	@Mock
 	private AuthenticationManager authenticationManager;
@@ -32,7 +34,7 @@ public class UserXAuthTokenControllerBrapiTest {
 	private UserDetailsService userDetailsService;
 
 	@InjectMocks
-	private final UserXAuthTokenControllerBrapi controller = new UserXAuthTokenControllerBrapi();
+	private final AuthenticationControllerBrapi controller = new AuthenticationControllerBrapi();
 
 	@Before
 	public void beforeEachTest() {

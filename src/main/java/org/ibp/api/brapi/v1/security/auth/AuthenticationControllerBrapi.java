@@ -1,5 +1,5 @@
 
-package org.ibp.api.brapi.v1.security.xauth;
+package org.ibp.api.brapi.v1.security.auth;
 
 import java.net.URL;
 
@@ -28,7 +28,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  */
 @Api(value = "BrAPI Authentication Service")
 @Controller
-public class UserXAuthTokenControllerBrapi {
+public class AuthenticationControllerBrapi {
 
 	@Autowired
 	private TokenProvider tokenProvider;
@@ -39,7 +39,7 @@ public class UserXAuthTokenControllerBrapi {
 	@Autowired
 	private UserDetailsService userDetailsService;
 
-	@ApiOperation(value = "Get X-Auth token")
+	@ApiOperation(value = "Get token")
 	@RequestMapping(value = "/brapi/v1/token", method = RequestMethod.POST)
 	@ResponseBody
 	public TokenResponse authenticate(@RequestBody final TokenRequest tokenRequest) {

@@ -1,5 +1,5 @@
 
-package org.ibp.api.brapi.v1.security.xauth;
+package org.ibp.api.brapi.v1.security.auth;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

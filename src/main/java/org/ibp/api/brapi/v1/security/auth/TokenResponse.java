@@ -1,5 +1,5 @@
 
-package org.ibp.api.brapi.v1.security.xauth;
+package org.ibp.api.brapi.v1.security.auth;
 
 import org.ibp.api.brapi.v1.common.Metadata;
 
