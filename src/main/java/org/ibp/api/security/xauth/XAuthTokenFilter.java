@@ -26,6 +26,10 @@ public class XAuthTokenFilter extends GenericFilterBean {
 
 	final static String XAUTH_TOKEN_HEADER_NAME = "x-auth-token";
 
+	// BrAPI
+	final static String AUTH_TOKEN_HEADER_NAME = "Authorization";
+	final static String BEARER_PREFIX = "Bearer ";
+
 	private final UserDetailsService detailsService;
 
 	private final TokenProvider tokenProvider;
@@ -40,7 +44,19 @@ public class XAuthTokenFilter extends GenericFilterBean {
 			throws IOException, ServletException {
 		try {
 			final HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
-			final String authToken = httpServletRequest.getHeader(XAuthTokenFilter.XAUTH_TOKEN_HEADER_NAME);
+
+			String authToken = null;
+
+			if (httpServletRequest.getRequestURI().contains("/brapi")) {
+				final String tokenHeader = httpServletRequest.getHeader(XAuthTokenFilter.AUTH_TOKEN_HEADER_NAME);
+				if (tokenHeader != null) {
+					authToken = tokenHeader.substring(BEARER_PREFIX.length());
+				}
+			} else {
+				authToken = httpServletRequest.getHeader(XAuthTokenFilter.XAUTH_TOKEN_HEADER_NAME);
+			}
+
+
 			if (StringUtils.hasText(authToken)) {
 				final String username = this.tokenProvider.getUserNameFromToken(authToken);
 				final UserDetails details = this.detailsService.loadUserByUsername(username);
