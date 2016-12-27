@@ -42,7 +42,7 @@ public class Location {
 	@JsonInclude(Include.NON_EMPTY)
 	private List<Object> attributes = new ArrayList<Object>();
 
-	private Map<String, Object> additionalInfo = new HashMap<>();
+	private Map<String, String> additionalInfo = new HashMap<>();
 
 	/**
 	 * No args constructor required by serialization libraries.
@@ -52,7 +52,7 @@ public class Location {
 
 	public Location(final Integer locationDbId, final String locationType, final String name, final String abbreviation,
 			final String countryCode, final String countryName, final Double latitude, final Double longitude, final Double altitude,
-			final List<Object> attributes, final Map<String, Object> additionalInfo) {
+			final List<Object> attributes, final Map<String, String> additionalInfo) {
 		this.locationDbId = locationDbId;
 		this.locationType = locationType;
 		this.name = name;
@@ -250,11 +250,11 @@ public class Location {
 		this.abbreviation = abbreviation;
 	}
 
-	public Map<String, Object> getAdditionalInfo() {
+	public Map<String, String> getAdditionalInfo() {
 		return additionalInfo;
 	}
 
-	public void setAdditionalInfo(final Map<String, Object> additionalInfo) {
+	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
 		this.additionalInfo = additionalInfo;
 	}
 
