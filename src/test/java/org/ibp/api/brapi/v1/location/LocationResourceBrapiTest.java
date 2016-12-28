@@ -11,7 +11,7 @@ import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.location.AdditionalInfoDto;
-import org.generationcp.middleware.service.api.location.LocationFiltersDto;
+import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 		String locType = "Breeding Location";
 		Integer locationTypeId = 410;
 		Integer countryId = 123;
-		LocationFiltersDto location1 = new LocationFiltersDto();
+		LocationDetailsDto location1 = new LocationDetailsDto();
 		location1.setCountryCode("NZL");
 		location1.setLocationDbId(156);
 		location1.setName("New Zealand");
@@ -62,7 +62,7 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 		final UserDefinedField locTypeUDFLD = new UserDefinedField(locationTypeId);
 		locTypeUDFLD.setFname(locType);
 
-		List<LocationFiltersDto> mwLocations = Lists.newArrayList(location1);
+		List<LocationDetailsDto> mwLocations = Lists.newArrayList(location1);
 		Mockito.when(this.locationDataManager.getLocalLocationsByFilter(Mockito.anyInt(), Mockito.anyInt(),
 				Mockito.anyMapOf(String.class, String.class))).thenReturn(mwLocations);
 		Mockito.when(this.locationDataManager.countLocationsByFilter(Mockito.anyMapOf(String.class, String.class))).thenReturn(1L);
@@ -109,8 +109,8 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 	public void testListLocationsWithAdditionalInfo() throws Exception {
 
 		String locType = "Breeding Location";
-		LocationFiltersDto location1 = new LocationFiltersDto(156,locType,"New Zealand","NZL","NZL","NZ",156.2,58.6,5.2);
-		LocationFiltersDto location2 = new LocationFiltersDto(100," ","Bernal","ARG"," "," ",-34.7108688,-58.280082,24.000);
+		LocationDetailsDto location1 = new LocationDetailsDto(156,locType,"New Zealand","NZL","NZL","NZ",156.2,58.6,5.2);
+		LocationDetailsDto location2 = new LocationDetailsDto(100," ","Bernal","ARG"," "," ",-34.7108688,-58.280082,24.000);
 
 		AdditionalInfoDto additionalInfoDto = new AdditionalInfoDto();
 		additionalInfoDto.addInfo(LocdesType.FIELD_PARENT.getCode(), "FiledParent");
@@ -123,7 +123,7 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 		final HashMap<Integer, AdditionalInfoDto> mapAdditionalInfo = new HashMap<Integer, AdditionalInfoDto>();
 		mapAdditionalInfo.put(100, additionalInfoDto);
 		Mockito.when(this.locationDataManager.getListAdditinalInfoLocation()).thenReturn(mapAdditionalInfo);
-		List<LocationFiltersDto> mwLocations = Lists.newArrayList(location1, location2);
+		List<LocationDetailsDto> mwLocations = Lists.newArrayList(location1, location2);
 		Mockito.when(this.locationDataManager.getLocalLocationsByFilter(Mockito.anyInt(), Mockito.anyInt(),
 				Mockito.anyMapOf(String.class, String.class))).thenReturn(mwLocations);
 		Mockito.when(this.locationDataManager.countLocationsByFilter(Mockito.anyMapOf(String.class, String.class))).thenReturn(1L);

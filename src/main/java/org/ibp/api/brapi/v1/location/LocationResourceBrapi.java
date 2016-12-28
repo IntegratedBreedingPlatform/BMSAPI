@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.service.api.location.AdditionalInfoDto;
-import org.generationcp.middleware.service.api.location.LocationFiltersDto;
+import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
@@ -75,8 +75,8 @@ public class LocationResourceBrapi {
 		final HashMap<Integer, AdditionalInfoDto> mapAdditionalInfo = (HashMap<Integer, AdditionalInfoDto>)LocationResourceBrapi.this.locationDataManager.getListAdditinalInfoLocation();
 
 		
-		PagedResult<LocationFiltersDto> resultPage =
-				new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<LocationFiltersDto>() {
+		PagedResult<LocationDetailsDto> resultPage =
+				new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<LocationDetailsDto>() {
 
 					@Override
 					public long getCount() {
@@ -84,7 +84,7 @@ public class LocationResourceBrapi {
 					}
 
 					@Override
-					public List<LocationFiltersDto> getResults(PagedResult<LocationFiltersDto> pagedResult) {
+					public List<LocationDetailsDto> getResults(PagedResult<LocationDetailsDto> pagedResult) {
 						return LocationResourceBrapi.this.locationDataManager.getLocalLocationsByFilter(pagedResult.getPageNumber(),
 								pagedResult.getPageSize(), filtersMap);
 					}
@@ -92,7 +92,7 @@ public class LocationResourceBrapi {
 
 		List<Location> locations = new ArrayList<>();
 
-		for (org.generationcp.middleware.service.api.location.LocationFiltersDto mwLoc : resultPage.getPageResults()) {
+		for (org.generationcp.middleware.service.api.location.LocationDetailsDto mwLoc : resultPage.getPageResults()) {
 			Location location = new Location();
 			location.setLocationDbId(mwLoc.getLocationDbId());
 			location.setName(mwLoc.getName());
