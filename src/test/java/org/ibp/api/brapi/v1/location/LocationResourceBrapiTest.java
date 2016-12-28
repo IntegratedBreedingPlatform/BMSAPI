@@ -112,7 +112,7 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 		LocationDetailsDto location1 = new LocationDetailsDto(156,locType,"New Zealand","NZL","NZL","NZ",156.2,58.6,5.2);
 		LocationDetailsDto location2 = new LocationDetailsDto(100," ","Bernal","ARG"," "," ",-34.7108688,-58.280082,24.000);
 
-		AdditionalInfoDto additionalInfoDto = new AdditionalInfoDto();
+		AdditionalInfoDto additionalInfoDto = new AdditionalInfoDto(100);
 		additionalInfoDto.addInfo(LocdesType.FIELD_PARENT.getCode(), "FiledParent");
 		additionalInfoDto.addInfo(LocdesType.BLOCK_PARENT.getCode(), "BlockParent");
 		additionalInfoDto.addInfo(LocdesType.ROWS_IN_BLOCK.getCode(), "1");
