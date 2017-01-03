@@ -4,11 +4,13 @@ package org.ibp.api.brapi.v1.location;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.pojos.LocationFilters;
+import org.generationcp.middleware.service.api.location.AdditionalInfoDto;
+import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
@@ -54,6 +56,7 @@ public class LocationResourceBrapi {
 					required = false) String locationType) {
 
 		final HashMap<String, String> filtersMap = new HashMap<String, String>();
+		
 		if (!StringUtils.isBlank(locationType)) {
 			final Integer locationTypeId = LocationResourceBrapi.this.locationDataManager
 					.getUserDefinedFieldIdOfName(org.generationcp.middleware.pojos.UDTableType.LOCATION_LTYPE, locationType);
@@ -61,27 +64,35 @@ public class LocationResourceBrapi {
 				filtersMap.put("locationType", locationTypeId.toString());
 
 			} else {
-				throw new IllegalArgumentException("the filter do not return values");
+				Map<String, String> status = new HashMap<String, String>();
+				status.put("message", "the filter do not return values");
+				Metadata metadata = new Metadata(null,status);
+				Locations locationList = new Locations().withMetadata(metadata);
+				return new ResponseEntity<Locations>(locationList, HttpStatus.NOT_FOUND);
 			}
 		}
 
-		PagedResult<LocationFilters> resultPage = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<LocationFilters>() {
+		final HashMap<Integer, AdditionalInfoDto> mapAdditionalInfo = (HashMap<Integer, AdditionalInfoDto>)LocationResourceBrapi.this.locationDataManager.getListAdditinalInfoLocation();
 
-			@Override
-			public long getCount() {
-				return LocationResourceBrapi.this.locationDataManager.countLocationsByFilter(filtersMap);
-			}
+		
+		PagedResult<LocationDetailsDto> resultPage =
+				new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<LocationDetailsDto>() {
 
-			@Override
-			public List<LocationFilters> getResults(PagedResult<LocationFilters> pagedResult) {
-				return LocationResourceBrapi.this.locationDataManager.getLocalLocationsByFilter(pagedResult.getPageNumber(),
-						pagedResult.getPageSize(), filtersMap);
-			}
-		});
+					@Override
+					public long getCount() {
+						return LocationResourceBrapi.this.locationDataManager.countLocationsByFilter(filtersMap);
+					}
+
+					@Override
+					public List<LocationDetailsDto> getResults(PagedResult<LocationDetailsDto> pagedResult) {
+						return LocationResourceBrapi.this.locationDataManager.getLocalLocationsByFilter(pagedResult.getPageNumber(),
+								pagedResult.getPageSize(), filtersMap);
+					}
+				});
 
 		List<Location> locations = new ArrayList<>();
 
-		for (org.generationcp.middleware.pojos.LocationFilters mwLoc : resultPage.getPageResults()) {
+		for (org.generationcp.middleware.service.api.location.LocationDetailsDto mwLoc : resultPage.getPageResults()) {
 			Location location = new Location();
 			location.setLocationDbId(mwLoc.getLocationDbId());
 			location.setName(mwLoc.getName());
@@ -96,6 +107,12 @@ public class LocationResourceBrapi {
 			location.setLatitude(mwLoc.getLatitude());
 			location.setLongitude(mwLoc.getLongitude());
 			location.setAltitude(mwLoc.getAltitude());
+
+			final Integer idLocation = mwLoc.getLocationDbId();
+			if (!mapAdditionalInfo.isEmpty() && mapAdditionalInfo.containsKey(idLocation)) {
+				final AdditionalInfoDto additionalInfo = (AdditionalInfoDto) mapAdditionalInfo.get(idLocation);
+				location.setAdditionalInfo(additionalInfo.getToMap());
+			}
 			locations.add(location);
 		}
 
@@ -108,4 +125,5 @@ public class LocationResourceBrapi {
 
 		return new ResponseEntity<Locations>(locationList, HttpStatus.OK);
 	}
+
 }
