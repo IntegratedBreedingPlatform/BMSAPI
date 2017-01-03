@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.service.api.study.StudyDetailDto;
+import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.ibp.ApiUnitTestBase;
@@ -53,10 +53,10 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final List<List<String>> data = ImmutableList.<List<String>>builder().add(ImmutableList.<String>builder().add(randomAlphabetic(5))
 				.add(randomAlphabetic(5)).add(randomAlphabetic(5)).add(randomAlphabetic(5)).build()).build();
 
-		StudyDetailDto studyDetailDto = new StudyDetailDto().setStudyDbId(trialDbId).setObservationVariableDbIds(observationVariablesId)
+		TrialObservationTable trialObservationTable = new TrialObservationTable().setStudyDbId(trialDbId).setObservationVariableDbIds(observationVariablesId)
 				.setObservationVariableNames(observationVariableName).setData(data);
 
-		Mockito.when(this.studyServiceMW.getStudyDetails(trialDbId, studyDbId)).thenReturn(studyDetailDto);
+		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(trialObservationTable);
 
 		UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies/{studyDbId}/table")
 				.queryParam("trialDbId", trialDbId)
@@ -64,7 +64,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andDo(MockMvcResultHandlers.print()).andExpect(jsonPath("$.result.studyDbId", is(studyDetailDto.getStudyDbId())))
+				.andDo(MockMvcResultHandlers.print()).andExpect(jsonPath("$.result.studyDbId", is(trialObservationTable.getStudyDbId())))
 				.andExpect(jsonPath("$.result.observationVariableDbIds", IsCollectionWithSize.hasSize(observationVariablesId.size())))
 				.andExpect(jsonPath("$.result.observationVariableDbIds[0]", is(observationVariablesId.get(0))))
 				.andExpect(jsonPath("$.result.observationVariableNames", IsCollectionWithSize.hasSize(observationVariableName.size())))
@@ -79,6 +79,11 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(jsonPath("$.metadata.pagination.totalCount", is(1)))
 				.andExpect(jsonPath("$.metadata.pagination.totalPages", is(1)))
 		;
+	}
+
+	@Test
+	public void testGetStudyDetails() throws Exception {
+		// TODO with StudyResourceBrapi implementation
 	}
 
 }

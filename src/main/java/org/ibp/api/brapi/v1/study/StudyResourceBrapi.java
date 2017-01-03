@@ -1,6 +1,8 @@
 package org.ibp.api.brapi.v1.study;
 
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.study.StudyDetailsDto;
+import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
@@ -21,6 +23,8 @@ import com.google.common.collect.Maps;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+
+import java.util.HashMap;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a>
@@ -83,13 +87,13 @@ public class StudyResourceBrapi {
 
 		StudyObservationTable studyObservationsTable = new StudyObservationTable();
 
-		org.generationcp.middleware.service.api.study.StudyDetailDto studyDetailDto = this.studyService.getStudyDetails(trialDbId, studyDbId);
+		TrialObservationTable trialObservationTable = this.studyService.getTrialObservationTable(trialDbId, studyDbId);
 
-		int resultNumber = (studyDetailDto == null) ? 0 : 1;
+		int resultNumber = (trialObservationTable == null) ? 0 : 1;
 
 		if (resultNumber != 0) {
 			ModelMapper modelMapper = new ModelMapper();
-			studyObservationsTable = modelMapper.map(studyDetailDto, StudyObservationTable.class);
+			studyObservationsTable = modelMapper.map(trialObservationTable, StudyObservationTable.class);
 		}
 
 		Pagination pagination =
@@ -102,10 +106,21 @@ public class StudyResourceBrapi {
 
 	@ApiOperation(value = "Get study details", notes = "Get study details")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}", method = RequestMethod.GET)
-	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable final String crop, @PathVariable final String studyDbId) {
+	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
 
 		StudyDetails studyDetails = new StudyDetails();
-		return new ResponseEntity<StudyDetails>(studyDetails, HttpStatus.OK);
+		Metadata metadata = new Metadata();
+		Pagination pagination = new Pagination().withPageNumber(1).withPageSize(0).withTotalCount(0L).withTotalPages(0);
+		metadata.setPagination(pagination);
+		metadata.setStatus(new HashMap<String, String>());
+		studyDetails.setMetadata(metadata);
+		StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsDto(studyDbId);
+		if (mwStudyDetails != null) {
+			final ModelMapper mapper = StudyDetailsDataMapper.getInstance();
+			StudyDetailsData result = mapper.map(mwStudyDetails, StudyDetailsData.class);
+			studyDetails.setResult(result);
+		}
+		return new ResponseEntity<>(studyDetails, HttpStatus.OK);
 	}
 
 

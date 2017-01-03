@@ -6,14 +6,14 @@ import org.ibp.api.brapi.v1.location.Location;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@AutoProperty
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@AutoProperty @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"studyDbId", "studyName", "studyType", "seasons", "trialDbId", "trialName", "startDate", "endDate", "active",
-		"location", "contacts", "additionalInfo"})
-public class StudyDetailsData {
+		"location", "contacts", "additionalInfo"}) public class StudyDetailsData {
 
 	private Integer studyDbId;
 
@@ -35,9 +35,9 @@ public class StudyDetailsData {
 
 	private Location location;
 
-	private List<Contact> contacts;
+	private List<Contact> contacts = new ArrayList<>();
 
-	private Map<String, String> additionalInfo;
+	private Map<String, String> additionalInfo = new HashMap<>();
 
 	/**
 	 * Empty constructor
@@ -268,6 +268,10 @@ public class StudyDetailsData {
 	public StudyDetailsData setTrialName(final String trialName) {
 		this.trialName = trialName;
 		return this;
+	}
+
+	public void addContact(final Contact contact) {
+		this.contacts.add(contact);
 	}
 
 	@Override public int hashCode() {

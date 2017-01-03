@@ -6,14 +6,11 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-@AutoProperty
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"metadata", "result"})
-public class StudyDetails {
+@AutoProperty @JsonInclude(JsonInclude.Include.NON_NULL) @JsonPropertyOrder({"metadata", "result"}) public class StudyDetails {
 
-	private Metadata metadata;
+	private Metadata metadata = new Metadata();
 
-	private StudyDetailsData result;
+	private StudyDetailsData result = new StudyDetailsData();
 
 	/**
 	 * Empty constructor

@@ -5,12 +5,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-@AutoProperty
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"contactDbId", "name", "email", "type", "orcid"})
+@AutoProperty @JsonInclude(JsonInclude.Include.NON_NULL) @JsonPropertyOrder({"contactDbId", "name", "email", "type", "orcid"})
 public class Contact {
 
-	private String contactDbId;
+	private Integer contactDbId;
 
 	private String name;
 
@@ -35,7 +33,7 @@ public class Contact {
 	 * @param type
 	 * @param orcid
 	 */
-	public Contact(final String contactDbId, final String email, final String name, final String type, final String orcid) {
+	public Contact(final Integer contactDbId, final String email, final String name, final String type, final String orcid) {
 		this.contactDbId = contactDbId;
 		this.email = email;
 		this.name = name;
@@ -46,7 +44,7 @@ public class Contact {
 	/**
 	 * @return the contactDBId
 	 */
-	public String getContactDbId() {
+	public Integer getContactDbId() {
 		return contactDbId;
 	}
 
@@ -54,7 +52,7 @@ public class Contact {
 	 * @param contactDbId
 	 * @return Contact
 	 */
-	public Contact setContactDbId(final String contactDbId) {
+	public Contact setContactDbId(final Integer contactDbId) {
 		this.contactDbId = contactDbId;
 		return this;
 	}

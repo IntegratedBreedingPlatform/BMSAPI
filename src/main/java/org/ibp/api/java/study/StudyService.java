@@ -4,7 +4,8 @@ package org.ibp.api.java.study;
 import java.util.List;
 import java.util.Map;
 
-import org.generationcp.middleware.service.api.study.StudyDetailDto;
+import org.generationcp.middleware.service.api.study.StudyDetailsDto;
+import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyDetails;
@@ -29,7 +30,7 @@ public interface StudyService {
 
 	StudyDetails getStudyDetails(String studyId);
 
-	StudyDetailDto getStudyDetails(final int studyIdentifier);
+	TrialObservationTable getTrialObservationTable(final int studyIdentifier);
 
 	/**
 	 *
@@ -37,7 +38,7 @@ public interface StudyService {
 	 * @param instanceDbId id for a Trial instance of a Trial (Nursery has 1 instance). If present studyIdentifier will not be used
 	 * @return
 	 */
-	StudyDetailDto getStudyDetails(int studyIdentifier, Integer instanceDbId);
+	TrialObservationTable getTrialObservationTable(int studyIdentifier, Integer instanceDbId);
 
 	Map<Integer, FieldMap> getFieldMap(final String studyIdentifier);
 
@@ -46,5 +47,7 @@ public interface StudyService {
 	List<StudyFolder> getAllStudyFolders();
 
 	String getProgramUUID(Integer studyIdentifier);
+
+	StudyDetailsDto getStudyDetailsDto (final Integer studyId);
 
 }
