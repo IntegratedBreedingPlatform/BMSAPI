@@ -114,10 +114,10 @@ public class StudyResourceBrapi {
 		metadata.setPagination(pagination);
 		metadata.setStatus(new HashMap<String, String>());
 		studyDetails.setMetadata(metadata);
-		StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsDto(studyDbId);
+		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsDto(studyDbId);
 		if (mwStudyDetails != null) {
 			final ModelMapper mapper = StudyDetailsDataMapper.getInstance();
-			StudyDetailsData result = mapper.map(mwStudyDetails, StudyDetailsData.class);
+			final StudyDetailsData result = mapper.map(mwStudyDetails, StudyDetailsData.class);
 			studyDetails.setResult(result);
 			return ResponseEntity.ok(studyDetails);
 		} else {
