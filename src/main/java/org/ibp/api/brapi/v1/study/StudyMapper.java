@@ -2,6 +2,7 @@ package org.ibp.api.brapi.v1.study;
 
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.user.UserDto;
+import org.ibp.api.brapi.v1.location.Location;
 import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -11,19 +12,19 @@ import org.modelmapper.spi.MappingContext;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StudyDetailsDataMapper {
+public class StudyMapper {
 
 	private static ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
 
-	private StudyDetailsDataMapper() {
+	private StudyMapper() {
 	}
 
 	static {
-		StudyDetailsDataMapper.addStudyDetailsDataMapping(StudyDetailsDataMapper.applicationWideModelMapper);
+		StudyMapper.addStudyDetailsDataMapping(StudyMapper.applicationWideModelMapper);
 	}
 
 	public static ModelMapper getInstance() {
-		return StudyDetailsDataMapper.applicationWideModelMapper;
+		return StudyMapper.applicationWideModelMapper;
 	}
 
 	private static class ContactConverter implements Converter<List<UserDto>, List<Contact>> {
@@ -37,6 +38,15 @@ public class StudyDetailsDataMapper {
 			return context.getMappingEngine().map(context.create(contacts, context.getDestinationType()));
 		}
 
+	}
+
+	private static class LocationConverter implements Converter<Integer, Location> {
+
+		@Override public Location convert(final MappingContext<Integer, Location> mappingContext) {
+			Location location = new Location();
+			location.setLocationDbId(mappingContext.getSource());
+			return mappingContext.getMappingEngine().map(mappingContext.create(location, mappingContext.getDestinationType()));
+		}
 	}
 
 	private static void addStudyDetailsDataMapping(final ModelMapper mapper) {
@@ -54,6 +64,7 @@ public class StudyDetailsDataMapper {
 				this.map().setTrialName(this.source.getMetadata().getTrialName());
 				this.map().setTrialDbId(this.source.getMetadata().getTrialDbId());
 				this.using(new ContactConverter()).map(this.source.getContacts()).setContacts(null);
+				this.using(new LocationConverter()).map(this.source.getMetadata().getLocationId()).setLocation(null);
 
 			}
 		});

@@ -116,7 +116,7 @@ public class StudyResourceBrapi {
 		studyDetails.setMetadata(metadata);
 		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsDto(studyDbId);
 		if (mwStudyDetails != null) {
-			final ModelMapper mapper = StudyDetailsDataMapper.getInstance();
+			final ModelMapper mapper = StudyMapper.getInstance();
 			final StudyDetailsData result = mapper.map(mwStudyDetails, StudyDetailsData.class);
 			studyDetails.setResult(result);
 			return ResponseEntity.ok(studyDetails);
