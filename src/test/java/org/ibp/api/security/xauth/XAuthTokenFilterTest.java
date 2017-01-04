@@ -66,6 +66,31 @@ public class XAuthTokenFilterTest {
 	}
 
 	@Test
+	public void testDoFilterValidBrAPIRequest() throws IOException, ServletException {
+		String testUser = "admin";
+
+		User userDetails = new User(testUser, "password", Collections.<GrantedAuthority>emptyList());
+		Mockito.when(this.userDetailsService.loadUserByUsername(testUser)).thenReturn(userDetails);
+
+		// Generate a valid token
+		Token token = this.tokenProvider.createToken(userDetails);
+
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		MockFilterChain filterChain = new MockFilterChain();
+
+		request.setRequestURI("/brapi");
+		request.addHeader(XAuthTokenFilter.AUTH_TOKEN_HEADER_NAME, XAuthTokenFilter.BEARER_PREFIX + token.getToken());
+
+		XAuthTokenFilter filter = new XAuthTokenFilter(this.userDetailsService, this.tokenProvider);
+		filter.doFilter(request, response, filterChain);
+
+		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Assert.assertNotNull("Expected security context to have authenticated principal.", authentication);
+		Assert.assertEquals(testUser, authentication.getName());
+	}
+
+	@Test
 	public void testDoFilterInValidRequest() throws IOException, ServletException {
 		MockHttpServletRequest request = new MockHttpServletRequest(); // No token added to request
 		MockHttpServletResponse response = new MockHttpServletResponse();

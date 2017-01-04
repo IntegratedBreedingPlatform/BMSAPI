@@ -1,9 +1,13 @@
 
-package org.ibp.api.security.xauth;
+package org.ibp.api.brapi.v1.security.auth;
 
 import java.util.Collections;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ibp.api.brapi.v1.security.auth.AuthenticationControllerBrapi;
+import org.ibp.api.brapi.v1.security.auth.TokenRequest;
+import org.ibp.api.brapi.v1.security.auth.TokenResponse;
+import org.ibp.api.security.xauth.TokenProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,7 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-public class UserXAuthTokenControllerTest {
+public class AuthenticationControllerBrapiTest {
 
 	@Mock
 	private AuthenticationManager authenticationManager;
@@ -30,7 +34,7 @@ public class UserXAuthTokenControllerTest {
 	private UserDetailsService userDetailsService;
 
 	@InjectMocks
-	private UserXAuthTokenController controller = new UserXAuthTokenController();
+	private final AuthenticationControllerBrapi controller = new AuthenticationControllerBrapi();
 
 	@Before
 	public void beforeEachTest() {
@@ -47,21 +51,25 @@ public class UserXAuthTokenControllerTest {
 
 	@Test
 	public void testAuthenticateSuccess() {
-		String testUser = "admin";
-		String testPassword = "password";
-		Authentication credentials = new UsernamePasswordAuthenticationToken(testUser, testPassword);
-		Mockito.when(this.authenticationManager.authenticate(Mockito.any(Authentication.class))).thenReturn(credentials);
+		final String testUser = "admin";
+		final String testPassword = "password";
+		final TokenRequest tokenRequest = new TokenRequest();
+		tokenRequest.setUsername(testUser);
+		tokenRequest.setPassword(testPassword);
 
-		User userDetails = new User(testUser, testPassword, Collections.<GrantedAuthority>emptyList());
+		final Authentication credentials = new UsernamePasswordAuthenticationToken(testUser, testPassword);
+		Mockito.when(this.authenticationManager.authenticate(org.mockito.Matchers.any(Authentication.class))).thenReturn(credentials);
+
+		final User userDetails = new User(testUser, testPassword, Collections.<GrantedAuthority>emptyList());
 		Mockito.when(this.userDetailsService.loadUserByUsername(testUser)).thenReturn(userDetails);
 
-		Token token = this.controller.authenticate(testUser, testPassword);
+		final TokenResponse token = this.controller.authenticate(tokenRequest);
 		Assert.assertNotNull("Expecting a non-null token for successful authentication scenario.", token);
-		Assert.assertNotNull("Expecting a non-null token for successful authentication scenario.", token.getToken());
-		Assert.assertTrue(token.getToken().startsWith(testUser + ":"));
-		Assert.assertEquals(2, StringUtils.countMatches(token.getToken(), ":"));
+		Assert.assertNotNull("Expecting a non-null token for successful authentication scenario.", token.getAccessToken());
+		Assert.assertTrue(token.getAccessToken().startsWith(testUser + ":"));
+		Assert.assertEquals(2, StringUtils.countMatches(token.getAccessToken(), ":"));
 		// Just asserting that expiry is sometime in future.
-		Assert.assertTrue(token.getExpires() > System.currentTimeMillis());
+		Assert.assertTrue(token.getExpiresIn() > System.currentTimeMillis());
 
 		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		Assert.assertNotNull("Expected security context to have authenticated principal.", authentication);
@@ -70,13 +78,16 @@ public class UserXAuthTokenControllerTest {
 
 	@Test(expected = BadCredentialsException.class)
 	public void testAuthenticateFailure() {
-		String testUser = "admin";
-		String testPassword = "password";
+		final String testUser = "admin";
+		final String testPassword = "password";
+		final TokenRequest tokenRequest = new TokenRequest();
+		tokenRequest.setUsername(testUser);
+		tokenRequest.setPassword(testPassword);
 
-		Mockito.when(this.authenticationManager.authenticate(Mockito.any(Authentication.class))).thenThrow(
-				new BadCredentialsException("Authentication failure!"));
+		Mockito.when(this.authenticationManager.authenticate(org.mockito.Matchers.any(Authentication.class)))
+				.thenThrow(new BadCredentialsException("Authentication failure!"));
 
-		this.controller.authenticate(testUser, testPassword);
+		this.controller.authenticate(tokenRequest);
 	}
 
 }
