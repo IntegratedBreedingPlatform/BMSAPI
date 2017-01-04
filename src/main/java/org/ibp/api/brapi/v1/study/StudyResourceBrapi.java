@@ -119,8 +119,11 @@ public class StudyResourceBrapi {
 			final ModelMapper mapper = StudyDetailsDataMapper.getInstance();
 			StudyDetailsData result = mapper.map(mwStudyDetails, StudyDetailsData.class);
 			studyDetails.setResult(result);
+			return ResponseEntity.ok(studyDetails);
+		} else {
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<>(studyDetails, HttpStatus.OK);
+
 	}
 
 
