@@ -68,11 +68,11 @@ public class LocationResourceBrapi {
 				status.put("message", "the filter do not return values");
 				Metadata metadata = new Metadata(null,status);
 				Locations locationList = new Locations().withMetadata(metadata);
-				return new ResponseEntity<Locations>(locationList, HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(locationList, HttpStatus.NOT_FOUND);
 			}
 		}
 
-		final HashMap<Integer, AdditionalInfoDto> mapAdditionalInfo = (HashMap<Integer, AdditionalInfoDto>)LocationResourceBrapi.this.locationDataManager.getListAdditinalInfoLocation();
+		final Map<Integer, AdditionalInfoDto> mapAdditionalInfo = this.locationDataManager.getListAdditinalInfoLocation();
 
 		
 		PagedResult<LocationDetailsDto> resultPage =
@@ -110,7 +110,7 @@ public class LocationResourceBrapi {
 
 			final Integer idLocation = mwLoc.getLocationDbId();
 			if (!mapAdditionalInfo.isEmpty() && mapAdditionalInfo.containsKey(idLocation)) {
-				final AdditionalInfoDto additionalInfo = (AdditionalInfoDto) mapAdditionalInfo.get(idLocation);
+				final AdditionalInfoDto additionalInfo = mapAdditionalInfo.get(idLocation);
 				location.setAdditionalInfo(additionalInfo.getToMap());
 			}
 			locations.add(location);

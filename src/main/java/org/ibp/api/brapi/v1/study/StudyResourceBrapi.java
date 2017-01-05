@@ -1,11 +1,14 @@
 package org.ibp.api.brapi.v1.study;
 
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
+import org.ibp.api.brapi.v1.location.Location;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,8 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a>
@@ -40,6 +45,9 @@ public class StudyResourceBrapi {
 
 	@Autowired
 	private StudyService studyService;
+
+	@Autowired
+	private LocationDataManager locationDataManager;
 
 	@ApiOperation(value = "List of study summaries", notes = "Get a list of study summaries.")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
@@ -114,11 +122,23 @@ public class StudyResourceBrapi {
 		metadata.setPagination(pagination);
 		metadata.setStatus(new HashMap<String, String>());
 		studyDetails.setMetadata(metadata);
+
 		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsDto(studyDbId);
 		if (mwStudyDetails != null) {
 			final ModelMapper mapper = StudyMapper.getInstance();
 			final StudyDetailsData result = mapper.map(mwStudyDetails, StudyDetailsData.class);
+
+			if (mwStudyDetails.getMetadata().getLocationId() != null) {
+				Map<String, String> filters = new HashMap<>();
+				filters.put("locId", String.valueOf(mwStudyDetails.getMetadata().getLocationId()));
+				List<LocationDetailsDto> locations = locationDataManager.getLocalLocationsByFilter(0, 1, filters);
+				if (locations.size() > 0) {
+					Location location = mapper.map(locations.get(0), Location.class);
+					result.setLocation(location);
+				}
+			}
 			studyDetails.setResult(result);
+
 			return ResponseEntity.ok(studyDetails);
 		} else {
 			return new ResponseEntity(HttpStatus.NOT_FOUND);
