@@ -1,18 +1,19 @@
 
 package org.ibp.api.brapi.v1.common;
 
+import java.net.URL;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"pagination", "status"})
+@JsonPropertyOrder({"pagination", "status", "datafiles"})
 public class Metadata {
 
 	private Pagination pagination;
 
 	private Map<String, String> status;
+
+	private URL[] datafiles;
 
 	/**
 	 * No args constructor for use in serialization
@@ -29,6 +30,18 @@ public class Metadata {
 	public Metadata(final Pagination pagination, final Map<String, String> status) {
 		this.pagination = pagination;
 		this.status = status;
+	}
+
+	/**
+	 *
+	 * @param pagination
+	 * @param status
+	 * @param datafiles
+	 */
+	public Metadata(final Pagination pagination, final Map<String, String> status, URL[] datafiles) {
+		this.pagination = pagination;
+		this.status = status;
+		this.datafiles = datafiles;
 	}
 
 	/**
@@ -70,6 +83,28 @@ public class Metadata {
 
 	public Metadata withStatus(final Map<String, String> status) {
 		this.status = status;
+		return this;
+	}
+
+	/**
+	 * @return the datafiles
+	 */
+	public URL[] getDatafiles() {
+		return datafiles;
+	}
+
+	/**
+	 * @param datafiles the datafiles to set
+	 */
+	public void setDatafiles(URL[] datafiles) {
+		this.datafiles = datafiles;
+	}
+
+	/**
+	 * @return the datafiles
+	 */
+	public Metadata withDatafiles(URL[] datafiles) {
+		this.datafiles = datafiles;
 		return this;
 	}
 }

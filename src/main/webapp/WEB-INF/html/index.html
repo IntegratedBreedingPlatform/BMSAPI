@@ -64,6 +64,7 @@
 			    	var authTokenJSON = JSON.parse(authToken);
 			    	if (authTokenJSON.expires && authTokenJSON.expires > new Date().getTime()) {
 						window.authorizations.add("key", new ApiKeyAuthorization("x-auth-token", authTokenJSON.token, "header"));
+						window.authorizations.add("brapiKey", new ApiKeyAuthorization("Authorization", "Bearer " + authTokenJSON.token, "header"));
 			    	} else {
 			    		alert("Authentication has expired. Please login to Workbench again, then refresh this page.");
 			    	}
