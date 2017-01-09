@@ -7,16 +7,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.service.api.location.AdditionalInfoDto;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,26 +55,23 @@ public class LocationResourceBrapi {
 			@ApiParam(value = "name of location type", required = false) @RequestParam(value = "locationType",
 					required = false) String locationType) {
 
-		final HashMap<String, String> filtersMap = new HashMap<String, String>();
-		
+		final HashMap<LocationFilters, String> filtersMap = new HashMap<LocationFilters, String>();
+
 		if (!StringUtils.isBlank(locationType)) {
 			final Integer locationTypeId = LocationResourceBrapi.this.locationDataManager
 					.getUserDefinedFieldIdOfName(org.generationcp.middleware.pojos.UDTableType.LOCATION_LTYPE, locationType);
 			if (locationTypeId != null) {
-				filtersMap.put("locationType", locationTypeId.toString());
+				filtersMap.put(LocationFilters.LOCATION_TYPE, locationTypeId.toString());
 
 			} else {
 				Map<String, String> status = new HashMap<String, String>();
-				status.put("message", "the filter do not return values");
-				Metadata metadata = new Metadata(null,status);
+				status.put("message", "not found locations");
+				Metadata metadata = new Metadata(null, status);
 				Locations locationList = new Locations().withMetadata(metadata);
 				return new ResponseEntity<>(locationList, HttpStatus.NOT_FOUND);
 			}
 		}
 
-		final Map<Integer, AdditionalInfoDto> mapAdditionalInfo = this.locationDataManager.getListAdditinalInfoLocation();
-
-		
 		PagedResult<LocationDetailsDto> resultPage =
 				new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<LocationDetailsDto>() {
 
@@ -90,40 +87,31 @@ public class LocationResourceBrapi {
 					}
 				});
 
-		List<Location> locations = new ArrayList<>();
+		if (resultPage.getTotalResults() > 0) {
+			
+			final ModelMapper mapper = LocationMapper.getInstance();
+			final List<Location> locations = new ArrayList<>();
 
-		for (org.generationcp.middleware.service.api.location.LocationDetailsDto mwLoc : resultPage.getPageResults()) {
-			Location location = new Location();
-			location.setLocationDbId(mwLoc.getLocationDbId());
-			location.setName(mwLoc.getName());
-			location.setAbbreviation(mwLoc.getAbbreviation());
-
-			location.setLocationType(!StringUtils.isBlank(mwLoc.getLocationType())
-					? WordUtils.capitalize(mwLoc.getLocationType().toLowerCase()) : "Unknown");
-
-			location.setCountryCode(!StringUtils.isBlank(mwLoc.getCountryCode()) ? mwLoc.getCountryCode() : "Unknown");
-			location.setCountryName(!StringUtils.isBlank(mwLoc.getCountryName()) ? mwLoc.getCountryName() : "Unknown");
-
-			location.setLatitude(mwLoc.getLatitude());
-			location.setLongitude(mwLoc.getLongitude());
-			location.setAltitude(mwLoc.getAltitude());
-
-			final Integer idLocation = mwLoc.getLocationDbId();
-			if (!mapAdditionalInfo.isEmpty() && mapAdditionalInfo.containsKey(idLocation)) {
-				final AdditionalInfoDto additionalInfo = mapAdditionalInfo.get(idLocation);
-				location.setAdditionalInfo(additionalInfo.getToMap());
+			for (org.generationcp.middleware.service.api.location.LocationDetailsDto locationDetailsDto : resultPage.getPageResults()) {
+				final Location location = mapper.map(locationDetailsDto, Location.class);
+				locations.add(location);
 			}
-			locations.add(location);
+
+			Result<Location> results = new Result<Location>().withData(locations);
+			Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+					.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+
+			Metadata metadata = new Metadata().withPagination(pagination);
+			Locations locationList = new Locations().withMetadata(metadata).withResult(results);
+			return new ResponseEntity<Locations>(locationList, HttpStatus.OK);
+			
+		} else {
+			Map<String, String> status = new HashMap<String, String>();
+			status.put("message", "not found locations");
+			Metadata metadata = new Metadata(null, status);
+			Locations locationList = new Locations().withMetadata(metadata);
+			return new ResponseEntity<>(locationList, HttpStatus.NOT_FOUND);
 		}
-
-		Result<Location> results = new Result<Location>().withData(locations);
-		Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
-				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
-
-		Metadata metadata = new Metadata().withPagination(pagination);
-		Locations locationList = new Locations().withMetadata(metadata).withResult(results);
-
-		return new ResponseEntity<Locations>(locationList, HttpStatus.OK);
 	}
 
 }
