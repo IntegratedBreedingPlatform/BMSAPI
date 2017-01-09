@@ -3,6 +3,7 @@ package org.ibp.api.brapi.v1.study;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -129,8 +130,8 @@ public class StudyResourceBrapi {
 			final StudyDetailsData result = mapper.map(mwStudyDetails, StudyDetailsData.class);
 
 			if (mwStudyDetails.getMetadata().getLocationId() != null) {
-				Map<String, String> filters = new HashMap<>();
-				filters.put("locId", String.valueOf(mwStudyDetails.getMetadata().getLocationId()));
+				Map<LocationFilters, String> filters = new HashMap<>();
+				filters.put(LocationFilters.LOCATIONS_ID, String.valueOf(mwStudyDetails.getMetadata().getLocationId()));
 				List<LocationDetailsDto> locations = locationDataManager.getLocalLocationsByFilter(0, 1, filters);
 				if (locations.size() > 0) {
 					Location location = mapper.map(locations.get(0), Location.class);
