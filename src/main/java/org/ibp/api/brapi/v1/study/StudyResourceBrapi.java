@@ -87,13 +87,15 @@ public class StudyResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/table", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<StudyObservations> getStudyObservationsAsTable(@PathVariable final String crop,
-			@PathVariable final int studyDbId,
-			@ApiParam(
-					value = "Studies are contained within a trial. Provide the db id of the trial to list summary of studies within the trial. "
-							+ "Use <code>GET /{crop}/brapi/v1/trials</code> service to retrieve trial summaries first to obtain trialDbIds to supply here. ",
-					required = true) @RequestParam(value = "trialDbId", required = true) final int trialDbId) {
+			@PathVariable final int studyDbId) throws Exception {
 
 		StudyObservationTable studyObservationsTable = new StudyObservationTable();
+
+		Integer trialDbId = this.studyDataManager.getProjectIdByStudyDbId(studyDbId);
+
+		if (trialDbId == null) {
+			throw new Exception("studyDbId " + studyDbId + " does not exist");
+		}
 
 		TrialObservationTable trialObservationTable = this.studyService.getTrialObservationTable(trialDbId, studyDbId);
 
