@@ -6,7 +6,7 @@ For API Consumers
 =================
 
 ### Understanding Authentication ###
-BMS API services expose operations on data created by registered BMS users as they carry out breeding programs and studies for various crops. Hence access to the BMS API services require authentication as the same registered user. BMS API uses a light-weight variant of the popular OAuth protocol known as X-Auth. In exchange of valid users credentials (Workbench user name and password) BMS API issues a fixed time window (configurable per deployment) ticket/token which is then required to be provided for **each and every**  BMS API service invocation as part of `X-Auth-Token` request header. Example below illustrates the scenario of a command line client (curl) accessing the API:
+BMS API services expose operations on data created by registered BMS users as they carry out breeding programs and studies for various crops. Hence access to the BMS API services require authentication as the same registered user. BMS API uses a light-weight variant of the popular OAuth protocol known as X-Auth. In exchange of valid users credentials (Workbench user name and password) BMS API issues a fixed time window (configurable per deployment) ticket/token which is then required to be provided for **each and every**  BMS API service invocation as part of `X-Auth-Token` request header (or`Authorization` in the case of [BrAPI](http://docs.brapi.apiary.io/#) Resources). Example below illustrates the scenario of a command line client (curl) accessing the API:
 
 **Request a listing of programs without authentication:**
 
@@ -85,6 +85,93 @@ Response Body:
     }
 ]
 ```
+
+**BrAPI Compliant Authentication**
+
+BMSAPI also supports [BrAPI Compliant Authentication](http://docs.brapi.apiary.io/#reference/authentication) for its BrAPI resources (`/bmsapi/brapi/`).
+
+Authenticate with credentials of a registered Workbench user:
+
+Request :
+```
+curl \
+'http://<host>:<port>/bmsapi/brapi/v1/token' \
+-H 'Content-Type: application/json' \
+-d @- << EOF
+{
+    "username": "naymesh",
+    "password": "naymeshpassword",
+    "grant_type": "password",
+    "client_id": ""
+}
+EOF
+```
+or
+```
+curl \
+'http://<host>:<port>/bmsapi/brapi/v1/token' \
+-H 'Content-Type: application/json' \
+-d $'{ "username": "naymesh",  "password": "naymeshpassword",  "grant_type": "password",  "client_id": ""}'
+```
+Response (if credentials are correct):
+```
+Code: 200
+Response Body:
+{
+  "metadata": {
+    "pagination": null,
+    "status": null,
+    "datafiles": []
+  },
+  "userDisplayName": "naymesh",
+  "access_token": "naymesh:1484079802532:bfe0f2886a18c6e8dea0e8e0be2292bc",
+  "expires_in": 1484079802532
+}
+```
+
+Now make the request to a BrAPI service with the authentication header using the token provided in response to successful authentication as in example above:
+
+Request:
+
+```
+curl -X GET -H "Authorization: Bearer naymesh:1484079802532:bfe0f2886a18c6e8dea0e8e0be2292bc" 'http://<host>:<port>/bmsapi/wheat/brapi/v1/locations'
+```
+
+Response:
+```
+Code: 200
+Response Body:
+{
+  "metadata": {
+    "pagination": {
+      "pageNumber": 1,
+      "pageSize": 100,
+      "totalCount": 5086,
+      "totalPages": 51
+    },
+    "status": null,
+    "datafiles": null
+  },
+  "result": {
+    "data": [
+      {
+        "locationDbId": 1,
+        "locationType": "COUNTRY",
+        "name": "Afghanistan",
+        "abbreviation": "AFG",
+        "countryCode": "AFG",
+        "countryName": "Afghanistan",
+        "latitude": 33,
+        "longitude": 65,
+        "attributes": []
+      }
+	  // etc
+    ]
+  }
+}
+```
+
+
 ### Authorization ###
 Based on the details of the user making requests to BMSAPI, the data returned is restricted and filtered in the same way as the data is filtered/restricted when user interacts with the same data via the BMS application user interface. For example, users only see the data for the programs/studies they have created or the programs/studies that they are part of. As shown in example above, the listing returned two programs one which the authenticated user (naymesh) has created and one where the user is a member.
 
