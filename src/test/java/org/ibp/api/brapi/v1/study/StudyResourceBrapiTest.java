@@ -53,13 +53,14 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		final List<List<String>> data = ImmutableList.<List<String>>builder().add(ImmutableList.<String>builder().add(randomAlphabetic(5))
 				.add(randomAlphabetic(5)).add(randomAlphabetic(5)).add(randomAlphabetic(5)).build()).build();
 
-		TrialObservationTable trialObservationTable = new TrialObservationTable().setStudyDbId(trialDbId).setObservationVariableDbIds(observationVariablesId)
+		TrialObservationTable trialObservationTable = new TrialObservationTable().setStudyDbId(studyDbId).setObservationVariableDbIds(observationVariablesId)
 				.setObservationVariableNames(observationVariableName).setData(data);
 
 		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(trialObservationTable);
 
+		Mockito.when(this.studyDataManager.getProjectIdByStudyDbId(studyDbId)).thenReturn(trialDbId);
+
 		UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies/{studyDbId}/table")
-				.queryParam("trialDbId", trialDbId)
 				.buildAndExpand(ImmutableMap.<String, Object>builder().put("studyDbId", studyDbId).build()).encode();
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
