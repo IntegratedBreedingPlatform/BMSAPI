@@ -134,9 +134,9 @@ public class StudyResourceBrapi {
 			final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
 
 			if (mwStudyDetails.getMetadata().getLocationId() != null) {
-				Map<LocationFilters, String> filters = new HashMap<>();
-				filters.put(LocationFilters.LOCATIONS_ID, String.valueOf(mwStudyDetails.getMetadata().getLocationId()));
-				List<LocationDetailsDto> locations = locationDataManager.getLocalLocationsByFilter(0, 1, filters);
+				Map<LocationFilters, Object> filters = new HashMap<>();
+				filters.put(LocationFilters.LOCATION_ID, String.valueOf(mwStudyDetails.getMetadata().getLocationId()));
+				List<LocationDetailsDto> locations = locationDataManager.getLocationsByFilter(0, 1, filters);
 				if (locations.size() > 0) {
 					Location location = locationMapper.map(locations.get(0), Location.class);
 					result.setLocation(location);

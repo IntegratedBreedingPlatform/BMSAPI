@@ -82,7 +82,7 @@ public class LocationResourceBrapi {
 
 					@Override
 					public List<LocationDetailsDto> getResults(PagedResult<LocationDetailsDto> pagedResult) {
-						return LocationResourceBrapi.this.locationDataManager.getLocalLocationsByFilter(pagedResult.getPageNumber(),
+						return LocationResourceBrapi.this.locationDataManager.getLocationsByFilter(pagedResult.getPageNumber(),
 								pagedResult.getPageSize(), filters);
 					}
 				});
