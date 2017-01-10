@@ -55,13 +55,13 @@ public class LocationResourceBrapi {
 			@ApiParam(value = "name of location type", required = false) @RequestParam(value = "locationType",
 					required = false) String locationType) {
 
-		final HashMap<LocationFilters, String> filtersMap = new HashMap<LocationFilters, String>();
-
+		final Map<LocationFilters, Object> filters = new HashMap<>();
+		
 		if (!StringUtils.isBlank(locationType)) {
 			final Integer locationTypeId = LocationResourceBrapi.this.locationDataManager
 					.getUserDefinedFieldIdOfName(org.generationcp.middleware.pojos.UDTableType.LOCATION_LTYPE, locationType);
 			if (locationTypeId != null) {
-				filtersMap.put(LocationFilters.LOCATION_TYPE, locationTypeId.toString());
+				filters.put(LocationFilters.LOCATION_TYPE, locationTypeId.toString());
 
 			} else {
 				Map<String, String> status = new HashMap<String, String>();
@@ -77,13 +77,13 @@ public class LocationResourceBrapi {
 
 					@Override
 					public long getCount() {
-						return LocationResourceBrapi.this.locationDataManager.countLocationsByFilter(filtersMap);
+						return LocationResourceBrapi.this.locationDataManager.countLocationsByFilter(filters);
 					}
 
 					@Override
 					public List<LocationDetailsDto> getResults(PagedResult<LocationDetailsDto> pagedResult) {
 						return LocationResourceBrapi.this.locationDataManager.getLocalLocationsByFilter(pagedResult.getPageNumber(),
-								pagedResult.getPageSize(), filtersMap);
+								pagedResult.getPageSize(), filters);
 					}
 				});
 
