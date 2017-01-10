@@ -120,17 +120,16 @@ public class StudyResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}", method = RequestMethod.GET)
 	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
 
-		StudyDetails studyDetails = new StudyDetails();
-		Metadata metadata = new Metadata();
-		Pagination pagination = new Pagination().withPageNumber(1).withPageSize(0).withTotalCount(0L).withTotalPages(0);
-		metadata.setPagination(pagination);
-		metadata.setStatus(new HashMap<String, String>());
-		studyDetails.setMetadata(metadata);
-
 		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsDto(studyDbId);
+
 		if (mwStudyDetails != null) {
+			StudyDetails studyDetails = new StudyDetails();
+			Metadata metadata = new Metadata();
+			Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
+			metadata.setPagination(pagination);
+			metadata.setStatus(new HashMap<String, String>());
+			studyDetails.setMetadata(metadata);
 			final ModelMapper studyMapper = StudyMapper.getInstance();
-			final ModelMapper locationMapper = LocationMapper.getInstance();
 			final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
 
 			if (mwStudyDetails.getMetadata().getLocationId() != null) {
@@ -138,6 +137,7 @@ public class StudyResourceBrapi {
 				filters.put(LocationFilters.LOCATION_ID, String.valueOf(mwStudyDetails.getMetadata().getLocationId()));
 				List<LocationDetailsDto> locations = locationDataManager.getLocationsByFilter(0, 1, filters);
 				if (locations.size() > 0) {
+					final ModelMapper locationMapper = LocationMapper.getInstance();
 					Location location = locationMapper.map(locations.get(0), Location.class);
 					result.setLocation(location);
 				}

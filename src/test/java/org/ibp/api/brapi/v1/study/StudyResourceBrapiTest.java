@@ -2,12 +2,20 @@ package org.ibp.api.brapi.v1.study;
 
 import static java.util.concurrent.ThreadLocalRandom.current;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasValue;
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.service.api.location.LocationFilters;
+import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.hamcrest.collection.IsCollectionWithSize;
@@ -15,6 +23,9 @@ import org.ibp.ApiUnitTestBase;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -39,6 +50,18 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		// TODO with StudyResourceBrapi implementation
 	}
 
+	@Configuration
+	public static class TestConfiguration {
+
+		@Bean
+		@Primary
+		public LocationDataManager locationDataManager() {
+			return Mockito.mock(LocationDataManager.class);
+		}
+	}
+
+	@Autowired
+	private LocationDataManager locationDataManager;
 
 	@Test
 	public void testGetStudyObservationsAsTable() throws Exception {
@@ -84,7 +107,54 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 
 	@Test
 	public void testGetStudyDetails() throws Exception {
-		// TODO with StudyResourceBrapi implementation
+
+		final StudyDetailsDto studyDetailsDto = StudyTestDataProvider.getStudyDetailsDto();
+		Map<LocationFilters, Object> filters = new HashMap<>();
+		filters.put(LocationFilters.LOCATION_ID, String.valueOf(studyDetailsDto.getMetadata().getLocationId()));
+		final List<LocationDetailsDto> locations = StudyTestDataProvider.getListLocationDetailsDto();
+		final LocationDetailsDto location = locations.get(0);
+
+
+		Mockito.when(this.studyServiceMW.getStudyDetails(studyDetailsDto.getMetadata().getStudyDbId())).thenReturn(studyDetailsDto);
+		Mockito.when(locationDataManager.getLocationsByFilter(0, 1, filters)).thenReturn(locations);
+
+		UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies/{studyDbId}")
+				.buildAndExpand(ImmutableMap.<String, Object>builder().put("studyDbId", studyDetailsDto.getMetadata().getStudyDbId()).build()).encode();
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andDo(MockMvcResultHandlers.print()).andExpect(
+				jsonPath("$.result.studyDbId", is(studyDetailsDto.getMetadata().getStudyDbId())))
+				.andExpect(jsonPath("$.result.studyName", is(studyDetailsDto.getMetadata().getStudyName())))
+				.andExpect(jsonPath("$.result.studyType", is(studyDetailsDto.getMetadata().getStudyType())))
+				.andExpect(jsonPath("$.result.seasons", IsCollectionWithSize.hasSize(studyDetailsDto.getMetadata().getSeasons().size())))
+				.andExpect(jsonPath("$.result.seasons[0]", is(studyDetailsDto.getMetadata().getSeasons().get(0))))
+				.andExpect(jsonPath("$.result.trialDbId", is(studyDetailsDto.getMetadata().getTrialDbId())))
+				.andExpect(jsonPath("$.result.trialName", is(studyDetailsDto.getMetadata().getTrialName())))
+				.andExpect(jsonPath("$.result.startDate", is(studyDetailsDto.getMetadata().getStartDate())))
+				.andExpect(jsonPath("$.result.endDate", is(studyDetailsDto.getMetadata().getEndDate())))
+				.andExpect(jsonPath("$.result.active", is(studyDetailsDto.getMetadata().getActive())))
+				.andExpect(jsonPath("$.result.location.locationDbId", is(location.getLocationDbId())))
+				.andExpect(jsonPath("$.result.location.locationType", is(location.getLocationType())))
+				.andExpect(jsonPath("$.result.location.name", is(location.getName())))
+				.andExpect(jsonPath("$.result.location.abbreviation", is(location.getAbbreviation())))
+				.andExpect(jsonPath("$.result.location.countryCode", is(location.getCountryCode())))
+				.andExpect(jsonPath("$.result.location.countryName", is(location.getCountryName())))
+				.andExpect(jsonPath("$.result.location.latitude", is(location.getLatitude())))
+				.andExpect(jsonPath("$.result.location.longitude", is(location.getLongitude())))
+				.andExpect(jsonPath("$.result.location.altitude", is(location.getAltitude())))
+				.andExpect(jsonPath("$.result.contacts[0].contactDbId", is(studyDetailsDto.getContacts().get(0).getUserId())))
+				.andExpect(jsonPath("$.result.contacts[0].name", is(studyDetailsDto.getContacts().get(0).getFirstName() + " " + studyDetailsDto.getContacts().get(0).getLastName())))
+				.andExpect(jsonPath("$.result.contacts[0].email", is(studyDetailsDto.getContacts().get(0).getEmail())))
+				.andExpect(jsonPath("$.result.contacts[0].type", is(studyDetailsDto.getContacts().get(0).getRole())))
+				.andExpect(jsonPath("$.result.contacts[0].orcid", is("")))
+				.andExpect(jsonPath("$.result.additionalInfo", hasKey("prop1")))
+				.andExpect(jsonPath("$.result.additionalInfo", hasValue("val1")))
+				.andExpect(jsonPath("$.metadata.pagination.pageNumber", is(1)))
+				.andExpect(jsonPath("$.metadata.pagination.pageSize", is(1)))
+				.andExpect(jsonPath("$.metadata.pagination.totalCount", is(1)))
+				.andExpect(jsonPath("$.metadata.pagination.totalPages", is(1)));
+
 	}
 
 }
