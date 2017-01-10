@@ -64,7 +64,7 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 		locTypeUDFLD.setFname(locType);
 
 		List<LocationDetailsDto> mwLocations = Lists.newArrayList(location1);
-		Mockito.when(this.locationDataManager.getLocalLocationsByFilter(Mockito.anyInt(), Mockito.anyInt(),
+		Mockito.when(this.locationDataManager.getLocationsByFilter(Mockito.anyInt(), Mockito.anyInt(),
 				Mockito.anyMapOf(LocationFilters.class, Object.class))).thenReturn(mwLocations);
 		Mockito.when(this.locationDataManager.countLocationsByFilter(Mockito.anyMapOf(LocationFilters.class, Object.class))).thenReturn(1L);
 		
@@ -124,7 +124,7 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 		final HashMap<Integer, AdditionalInfoDto> mapAdditionalInfo = new HashMap<Integer, AdditionalInfoDto>();
 		mapAdditionalInfo.put(100, additionalInfoDto);
 		List<LocationDetailsDto> mwLocations = Lists.newArrayList(location1, location2);
-		Mockito.when(this.locationDataManager.getLocalLocationsByFilter(Mockito.anyInt(), Mockito.anyInt(),
+		Mockito.when(this.locationDataManager.getLocationsByFilter(Mockito.anyInt(), Mockito.anyInt(),
 				Mockito.anyMapOf(LocationFilters.class, Object.class))).thenReturn(mwLocations);
 		Mockito.when(this.locationDataManager.countLocationsByFilter(Mockito.anyMapOf(LocationFilters.class, Object.class))).thenReturn(1L);
 	
