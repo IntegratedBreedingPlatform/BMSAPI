@@ -10,6 +10,7 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.location.Location;
+import org.ibp.api.brapi.v1.location.LocationMapper;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,15 +127,16 @@ public class StudyResourceBrapi {
 
 		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsDto(studyDbId);
 		if (mwStudyDetails != null) {
-			final ModelMapper mapper = StudyMapper.getInstance();
-			final StudyDetailsData result = mapper.map(mwStudyDetails, StudyDetailsData.class);
+			final ModelMapper studyMapper = StudyMapper.getInstance();
+			final ModelMapper locationMapper = LocationMapper.getInstance();
+			final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
 
 			if (mwStudyDetails.getMetadata().getLocationId() != null) {
 				Map<LocationFilters, String> filters = new HashMap<>();
 				filters.put(LocationFilters.LOCATIONS_ID, String.valueOf(mwStudyDetails.getMetadata().getLocationId()));
 				List<LocationDetailsDto> locations = locationDataManager.getLocalLocationsByFilter(0, 1, filters);
 				if (locations.size() > 0) {
-					Location location = mapper.map(locations.get(0), Location.class);
+					Location location = locationMapper.map(locations.get(0), Location.class);
 					result.setLocation(location);
 				}
 			}

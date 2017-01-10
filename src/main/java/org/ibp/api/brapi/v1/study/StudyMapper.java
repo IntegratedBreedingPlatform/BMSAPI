@@ -1,11 +1,7 @@
 package org.ibp.api.brapi.v1.study;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
-import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.user.UserDto;
-import org.ibp.api.brapi.v1.location.Location;
 import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -24,6 +20,7 @@ public class StudyMapper {
 
 	static {
 		StudyMapper.addStudyDetailsDataMapping(StudyMapper.applicationWideModelMapper);
+//		StudyMapper.addLocationDataMapping(StudyMapper.applicationWideModelMapper);
 	}
 
 	public static ModelMapper getInstance() {
@@ -41,25 +38,6 @@ public class StudyMapper {
 			return context.getMappingEngine().map(context.create(contacts, context.getDestinationType()));
 		}
 
-	}
-
-	private static void addLocationDataMapping (final ModelMapper mapper) {
-		mapper.addMappings(new PropertyMap<LocationDetailsDto, Location>() {
-
-			@Override protected void configure() {
-				this.map().setLocationDbId(this.source.getLocationDbId());
-				this.map().setAbbreviation(this.source.getAbbreviation());
-				this.map().setAltitude(this.source.getAltitude());
-				this.map().setCountryCode(!StringUtils.isBlank(this.source.getCountryCode()) ? this.source.getCountryCode() : "Unknown");
-				this.map().setCountryName(!StringUtils.isBlank(this.source.getCountryName()) ? this.source.getCountryName() : "Unknown");
-				this.map().setName(this.source.getName());
-				this.map().setLongitude(this.source.getLongitude());
-				this.map().setLatitude(this.source.getLatitude());
-				this.map().setLocationType(!StringUtils.isBlank(this.source.getLocationType())
-						? WordUtils.capitalize(this.source.getLocationType().toLowerCase()) : "Unknown");
-			}
-
-		});
 	}
 
 	private static void addStudyDetailsDataMapping(final ModelMapper mapper) {
