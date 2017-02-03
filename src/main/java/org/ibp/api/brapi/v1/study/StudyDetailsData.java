@@ -11,9 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@AutoProperty @JsonInclude(JsonInclude.Include.NON_NULL)
+@AutoProperty
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"studyDbId", "studyName", "studyType", "seasons", "trialDbId", "trialName", "startDate", "endDate", "active",
-		"location", "contacts", "additionalInfo"}) public class StudyDetailsData {
+	"location", "contacts", "additionalInfo"})
+public class StudyDetailsData {
 
 	private Integer studyDbId;
 

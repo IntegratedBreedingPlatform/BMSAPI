@@ -20,7 +20,6 @@ public class StudyMapper {
 
 	static {
 		StudyMapper.addStudyDetailsDataMapping(StudyMapper.applicationWideModelMapper);
-//		StudyMapper.addLocationDataMapping(StudyMapper.applicationWideModelMapper);
 	}
 
 	public static ModelMapper getInstance() {
