@@ -15,19 +15,19 @@ public class LocationMapper {
 	private static ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
 
 	private static Converter<String, String> toUnknown = new AbstractConverter<String, String>() {
+
 		protected String convert(String source) {
 			return !StringUtils.isBlank(source) ? source : "Unknown";
 		}
 	};
 
 	private static Converter<String, String> toCapitalize = new AbstractConverter<String, String>() {
+
 		protected String convert(String source) {
 			return !StringUtils.isBlank(source)
-									? WordUtils.capitalize(source.toLowerCase()) : "Unknown";
+				? WordUtils.capitalize(source.toLowerCase()) : "Unknown";
 		}
 	};
-
-
 
 	private LocationMapper() {
 
@@ -42,7 +42,6 @@ public class LocationMapper {
 	}
 
 	private static void addLocationDetailsDataMapping(final ModelMapper mapper) {
-
 
 		mapper.addMappings(new PropertyMap<LocationDetailsDto, Location>() {
 
