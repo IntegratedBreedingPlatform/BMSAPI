@@ -14,7 +14,7 @@ import java.util.List;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.service.api.study.StudyDetailDto;
+import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.ApiUnitTestBase;
 import org.junit.Test;
@@ -115,17 +115,17 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		final List<List<String>> data = ImmutableList.<List<String>>builder().add(ImmutableList.<String>builder().add(randomAlphabetic(5))
 				.add(randomAlphabetic(5)).add(randomAlphabetic(5)).add(randomAlphabetic(5)).build()).build();
 
-		StudyDetailDto mwStudyDetailDto = new StudyDetailDto().setStudyDbId(trialDbId).setObservationVariableDbIds(observationVariablesId)
+		TrialObservationTable mwTrialObservationTable = new TrialObservationTable().setStudyDbId(trialDbId).setObservationVariableDbIds(observationVariablesId)
 				.setObservationVariableNames(observationVariableName).setData(data);
 
-		Mockito.when(this.studyServiceMW.getStudyDetails(trialDbId)).thenReturn(mwStudyDetailDto);
+		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId)).thenReturn(mwTrialObservationTable);
 
 		UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/trials/{trialDbId}/table")
 				.buildAndExpand(ImmutableMap.<String, Object>builder().put("trialDbId", trialDbId).build()).encode();
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isOk()) //
-				.andDo(MockMvcResultHandlers.print()).andExpect(jsonPath("$.result.trialDbId", is(mwStudyDetailDto.getStudyDbId()))) //
+				.andDo(MockMvcResultHandlers.print()).andExpect(jsonPath("$.result.trialDbId", is(mwTrialObservationTable.getStudyDbId()))) //
 				.andExpect(jsonPath("$.result.observationVariableDbIds", IsCollectionWithSize.hasSize(observationVariablesId.size()))) //
 				.andExpect(jsonPath("$.result.observationVariableDbIds[0]", is(observationVariablesId.get(0)))) //
 				.andExpect(jsonPath("$.result.observationVariableNames", IsCollectionWithSize.hasSize(observationVariableName.size()))) //
@@ -147,18 +147,18 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 
 		final int trialDbId = current().nextInt();
 
-		StudyDetailDto mwStudyDetailDto =
-				new StudyDetailDto().setStudyDbId(trialDbId).setObservationVariableDbIds(Lists.<Integer>newArrayList())
+		TrialObservationTable mwTrialObservationTable =
+				new TrialObservationTable().setStudyDbId(trialDbId).setObservationVariableDbIds(Lists.<Integer>newArrayList())
 						.setObservationVariableNames(Lists.<String>newArrayList()).setData(Lists.<List<String>>newArrayList());
 
-		Mockito.when(this.studyServiceMW.getStudyDetails(trialDbId)).thenReturn(mwStudyDetailDto);
+		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId)).thenReturn(mwTrialObservationTable);
 
 		UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/trials/{trialDbId}/table")
 				.buildAndExpand(ImmutableMap.<String, Object>builder().put("trialDbId", trialDbId).build()).encode();
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isOk()) //
-				.andDo(MockMvcResultHandlers.print()).andExpect(jsonPath("$.result.trialDbId", is(mwStudyDetailDto.getStudyDbId()))) //
+				.andDo(MockMvcResultHandlers.print()).andExpect(jsonPath("$.result.trialDbId", is(mwTrialObservationTable.getStudyDbId()))) //
 				.andExpect(jsonPath("$.result.observationVariableDbIds", IsCollectionWithSize.hasSize(0))) //
 				.andExpect(jsonPath("$.result.observationVariableNames", IsCollectionWithSize.hasSize(0))) //
 				.andExpect(jsonPath("$.result.data", IsCollectionWithSize.hasSize(0))) //

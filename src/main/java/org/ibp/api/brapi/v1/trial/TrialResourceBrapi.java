@@ -7,7 +7,7 @@ import java.util.List;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.service.api.study.StudyDetailDto;
+import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
@@ -119,14 +119,14 @@ public class TrialResourceBrapi {
 	public ResponseEntity<TrialObservations> getTrialObservationsAsTable(@PathVariable final String crop,
 			@PathVariable final Integer trialDbId) {
 
-		TrialObservationTable trialObservationsTable = new TrialObservationTable();
+		org.ibp.api.brapi.v1.trial.TrialObservationTable trialObservationsTable = new org.ibp.api.brapi.v1.trial.TrialObservationTable();
 
-		org.generationcp.middleware.service.api.study.StudyDetailDto mwStudyDetailDto = this.studyService.getStudyDetails(trialDbId);
+		TrialObservationTable mwTrialObservationTable = this.studyService.getTrialObservationTable(trialDbId);
 
-		int resultNumber = (mwStudyDetailDto == null) ? 0 : 1;
+		int resultNumber = (mwTrialObservationTable == null) ? 0 : 1;
 
 		if (resultNumber != 0) {
-			PropertyMap<StudyDetailDto, TrialObservationTable> mappingSpec = new PropertyMap<StudyDetailDto, TrialObservationTable>() {
+			PropertyMap<TrialObservationTable, org.ibp.api.brapi.v1.trial.TrialObservationTable> mappingSpec = new PropertyMap<TrialObservationTable, org.ibp.api.brapi.v1.trial.TrialObservationTable>() {
 
 				@Override
 				protected void configure() {
@@ -135,7 +135,7 @@ public class TrialResourceBrapi {
 			};
 			ModelMapper modelMapper = new ModelMapper();
 			modelMapper.addMappings(mappingSpec);
-			trialObservationsTable = modelMapper.map(mwStudyDetailDto, TrialObservationTable.class);
+			trialObservationsTable = modelMapper.map(mwTrialObservationTable, org.ibp.api.brapi.v1.trial.TrialObservationTable.class);
 		}
 
 		Pagination pagination =

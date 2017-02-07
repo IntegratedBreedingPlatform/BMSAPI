@@ -29,6 +29,7 @@ import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.*;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.ibp.api.brapi.v1.study.StudyDetailsData;
 import org.ibp.api.domain.common.Command;
 import org.ibp.api.domain.common.ValidationUtil;
 import org.ibp.api.domain.ontology.TermSummary;
@@ -529,8 +530,19 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public StudyDetailDto getStudyDetails(final int studyIdentifier) {
-		return middlewareStudyService.getStudyDetails(studyIdentifier);
+	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
+		return middlewareStudyService.getTrialObservationTable(studyIdentifier);
 	}
+
+	@Override
+	public TrialObservationTable getTrialObservationTable(final int studyIdentifier, final Integer studyDbId) {
+		return middlewareStudyService.getTrialObservationTable(studyIdentifier, studyDbId);
+	}
+
+	@Override
+	public StudyDetailsDto getStudyDetailsDto(final Integer studyId) {
+		return middlewareStudyService.getStudyDetails(studyId);
+	}
+
 
 }

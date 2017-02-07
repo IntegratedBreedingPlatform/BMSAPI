@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"studyDbId", "headerRow", "observationVariableDbIds", "observationVariableNames", "data"})
-public class StudyDetailDto {
+public class StudyObservationTable {
 
 	private Integer studyDbId;
 
@@ -27,7 +27,7 @@ public class StudyDetailDto {
 		return studyDbId;
 	}
 
-	public StudyDetailDto setStudyDbId(final Integer studyDbId) {
+	public StudyObservationTable setStudyDbId(final Integer studyDbId) {
 		this.studyDbId = studyDbId;
 		return this;
 	}
@@ -60,7 +60,7 @@ public class StudyDetailDto {
 		return data;
 	}
 
-	public StudyDetailDto setData(final List<List<String>> data) {
+	public StudyObservationTable setData(final List<List<String>> data) {
 		this.data = data;
 		return this;
 	}

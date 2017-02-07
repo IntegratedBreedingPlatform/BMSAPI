@@ -1,10 +1,18 @@
 package org.ibp.api.brapi.v1.study;
 
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.service.api.location.LocationFilters;
+import org.generationcp.middleware.service.api.study.StudyDetailsDto;
+import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
+import org.ibp.api.brapi.v1.location.Location;
+import org.ibp.api.brapi.v1.location.LocationMapper;
 import org.ibp.api.java.study.StudyService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +29,10 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a>
  * Study services.
@@ -33,9 +45,11 @@ public class StudyResourceBrapi {
 	@Autowired
 	private StudyDataManager studyDataManager;
 
-	@SuppressWarnings("unused") // temporary
 	@Autowired
 	private StudyService studyService;
+
+	@Autowired
+	private LocationDataManager locationDataManager;
 
 	@ApiOperation(value = "List of study summaries", notes = "Get a list of study summaries.")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
@@ -74,24 +88,68 @@ public class StudyResourceBrapi {
 	@ApiOperation(value = "Get study observation details as table", notes = "Get study observation details as table")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/table", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<StudyDetailsDto> getStudyObservationsAsTable(@PathVariable final String crop,
-			@PathVariable final Integer studyDbId) {
+	public ResponseEntity<StudyObservations> getStudyObservationsAsTable(@PathVariable final String crop,
+			@PathVariable final int studyDbId) throws Exception {
 
-		/***
-		 * Study in BrAPI land = Environment/Instance in BMS/Middleware land. We need to build new services in Middleware to get
-		 * Environment/Instance level measurement details as table.
-		 * 
-		 * studyDbId in BrAPI will map to nd_geolocation_id in Middleware.
-		 * 
-		 * For now, just returning an empty place holder message with status.
-		 */
-		StudyDetailDto brapiStudyDetailDto = new StudyDetailDto();
+		StudyObservationTable studyObservationsTable = new StudyObservationTable();
 
-		Pagination pagination = new Pagination();
-		Metadata metadata = new Metadata().withPagination(pagination)
-				.withStatus(Maps.newHashMap(ImmutableMap.of("message", "This call is not yet implemented.")));
-		StudyDetailsDto studyDetailsDto = new StudyDetailsDto().setMetadata(metadata).setResult(brapiStudyDetailDto);
-		return new ResponseEntity<>(studyDetailsDto, HttpStatus.OK);
+		Integer trialDbId = this.studyDataManager.getProjectIdByStudyDbId(studyDbId);
+
+		if (trialDbId == null) {
+			throw new Exception("studyDbId " + studyDbId + " does not exist");
+		}
+
+		TrialObservationTable trialObservationTable = this.studyService.getTrialObservationTable(trialDbId, studyDbId);
+
+		int resultNumber = (trialObservationTable == null) ? 0 : 1;
+
+		if (resultNumber != 0) {
+			ModelMapper modelMapper = new ModelMapper();
+			studyObservationsTable = modelMapper.map(trialObservationTable, StudyObservationTable.class);
+		}
+
+		Pagination pagination =
+				new Pagination().withPageNumber(1).withPageSize(resultNumber).withTotalCount((long) resultNumber).withTotalPages(1);
+
+		Metadata metadata = new Metadata().withPagination(pagination);
+		StudyObservations studyObservations = new StudyObservations().setMetadata(metadata).setResult(studyObservationsTable);
+		return new ResponseEntity<>(studyObservations, HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Get study details", notes = "Get study details")
+	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}", method = RequestMethod.GET)
+	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
+
+		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsDto(studyDbId);
+
+		if (mwStudyDetails != null) {
+			StudyDetails studyDetails = new StudyDetails();
+			Metadata metadata = new Metadata();
+			Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
+			metadata.setPagination(pagination);
+			metadata.setStatus(new HashMap<String, String>());
+			studyDetails.setMetadata(metadata);
+			final ModelMapper studyMapper = StudyMapper.getInstance();
+			final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
+
+			if (mwStudyDetails.getMetadata().getLocationId() != null) {
+				Map<LocationFilters, Object> filters = new HashMap<>();
+				filters.put(LocationFilters.LOCATION_ID, String.valueOf(mwStudyDetails.getMetadata().getLocationId()));
+				List<LocationDetailsDto> locations = locationDataManager.getLocationsByFilter(0, 1, filters);
+				if (locations.size() > 0) {
+					final ModelMapper locationMapper = LocationMapper.getInstance();
+					Location location = locationMapper.map(locations.get(0), Location.class);
+					result.setLocation(location);
+				}
+			}
+			studyDetails.setResult(result);
+
+			return ResponseEntity.ok(studyDetails);
+		} else {
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		}
+
+	}
+
 
 }
