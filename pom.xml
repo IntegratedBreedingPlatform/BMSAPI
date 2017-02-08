@@ -5,7 +5,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>bmsapi</artifactId>
 	<packaging>${packaging.type}</packaging>
-        <version>4.1</version>
+        <version>4.2</version>
 	<name>BMS API</name>
 
 	<properties>
@@ -134,13 +134,13 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-orm</artifactId>
-			<version>4.1.6.RELEASE</version>
+			<version>4.2.6.RELEASE</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
-			<version>4.1.6.RELEASE</version>
+			<version>4.2.6.RELEASE</version>
 		</dependency>
 
 		<dependency>
@@ -202,14 +202,14 @@
 		<dependency>
 			<groupId>uk.co.jemos.podam</groupId>
 			<artifactId>podam</artifactId>
-			<version>5.4.1.RELEASE</version>
+			<version>5.4.2.RELEASE</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.11</version>
+			<version>4.21</version>
 			<scope>test</scope>
 		</dependency>
 
