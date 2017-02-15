@@ -2,7 +2,9 @@
 package org.ibp.api.brapi.v1.location;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -10,11 +12,13 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"locationDbId", "locationType", "name", "abbreviation", "countryCode", "countryName", "latitude", "longitude",
-		"altitude", "attributes"})
+		"altitude", "attributes", "additionalInfo"})
 public class Location {
 
 	private Integer locationDbId;
@@ -35,7 +39,10 @@ public class Location {
 
 	private Double altitude;
 
+	@JsonInclude(Include.NON_EMPTY)
 	private List<Object> attributes = new ArrayList<Object>();
+
+	private Map<String, String> additionalInfo = new HashMap<>();
 
 	/**
 	 * No args constructor required by serialization libraries.
@@ -45,7 +52,7 @@ public class Location {
 
 	public Location(final Integer locationDbId, final String locationType, final String name, final String abbreviation,
 			final String countryCode, final String countryName, final Double latitude, final Double longitude, final Double altitude,
-			final List<Object> attributes) {
+			final List<Object> attributes, final Map<String, String> additionalInfo) {
 		this.locationDbId = locationDbId;
 		this.locationType = locationType;
 		this.name = name;
@@ -56,6 +63,7 @@ public class Location {
 		this.longitude = longitude;
 		this.altitude = altitude;
 		this.attributes = attributes;
+		this.additionalInfo = additionalInfo;
 	}
 
 	/**
@@ -240,6 +248,14 @@ public class Location {
 
 	public void setAbbreviation(final String abbreviation) {
 		this.abbreviation = abbreviation;
+	}
+
+	public Map<String, String> getAdditionalInfo() {
+		return additionalInfo;
+	}
+
+	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
+		this.additionalInfo = additionalInfo;
 	}
 
 	@Override

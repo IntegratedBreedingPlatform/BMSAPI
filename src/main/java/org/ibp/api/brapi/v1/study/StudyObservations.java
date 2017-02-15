@@ -8,11 +8,11 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "metadata", "result" })
-public class StudyDetailsDto {
+public class StudyObservations {
 
 	private Metadata metadata;
 
-	private StudyDetailDto result;
+	private StudyObservationTable result;
 
 	/**
 	 *
@@ -28,7 +28,7 @@ public class StudyDetailsDto {
 	 *            The metadata
 	 * @return this
 	 */
-	public StudyDetailsDto setMetadata(final Metadata metadata) {
+	public StudyObservations setMetadata(final Metadata metadata) {
 		this.metadata = metadata;
 		return this;
 	}
@@ -37,7 +37,7 @@ public class StudyDetailsDto {
 	 *
 	 * @return The result
 	 */
-	public StudyDetailDto getResult() {
+	public StudyObservationTable getResult() {
 		return result;
 	}
 
@@ -47,7 +47,7 @@ public class StudyDetailsDto {
 	 *            The result
 	 * @return this
 	 */
-	public StudyDetailsDto setResult(final StudyDetailDto result) {
+	public StudyObservations setResult(final StudyObservationTable result) {
 		this.result = result;
 		return this;
 	}
