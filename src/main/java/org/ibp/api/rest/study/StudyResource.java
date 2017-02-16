@@ -14,6 +14,7 @@ import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
+import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -194,5 +195,14 @@ public class StudyResource {
 	@ResponseBody
 	public ResponseEntity<List<StudyFolder>> listAllFolders(final @PathVariable String cropname) {
 		return new ResponseEntity<List<StudyFolder>>(this.studyService.getAllStudyFolders(), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "List all study instances with basic metadata.",
+			notes = "Returns list of all study instances with basic metadata.")
+	@RequestMapping(value = "/{cropname}/{studyId}/instances", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<StudyInstance>> listStudyInstances(final @PathVariable String cropname,
+			@PathVariable final Integer studyId) {
+		return new ResponseEntity<List<StudyInstance>>(this.studyService.getStudyInstances(studyId), HttpStatus.OK);
 	}
 }

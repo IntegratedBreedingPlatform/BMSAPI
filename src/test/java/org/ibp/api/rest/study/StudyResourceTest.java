@@ -77,7 +77,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 	public void testGetObservations() throws Exception {
 		MeasurementDto measurement = new MeasurementDto(new TraitDto(1, "Plant Height"), 1, "123");
 		ObservationDto obsDto =
-				new ObservationDto(1, "1", "Test", 1, "CML123", "1", "CIMMYT Seed Bank", "1", "1", Lists.newArrayList(measurement));
+				new ObservationDto(1, "1", "Test", 1, "CML123", "1", "CIMMYT Seed Bank", "1", "1", "2", Lists.newArrayList(measurement));
 
 		Mockito.when(this.studyServiceMW.countTotalObservationUnits(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt()))
 				.thenReturn(100);
@@ -86,7 +86,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders
-						.get("/study/{cropname}/{studyId}/observations?instanceNumber=1", "maize", "1")
+						.get("/study/{cropname}/{studyId}/observations?instanceId=1", "maize", "1")
 						.contentType(this.contentType))
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk())
@@ -105,6 +105,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['entryNumber']", Matchers.is(obsDto.getEntryNo())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['entryType']", Matchers.is(obsDto.getEntryType())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['plotNumber']", Matchers.is(obsDto.getPlotNumber())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['blockNumber']", Matchers.is(obsDto.getBlockNumber())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['replicationNumber']", Matchers.is(obsDto.getRepitionNumber())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['environmentNumber']", Matchers.is(obsDto.getTrialInstance())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['seedSource']", Matchers.is(obsDto.getSeedSource())))

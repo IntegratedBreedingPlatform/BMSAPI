@@ -233,7 +233,8 @@ public class StudyServiceImplTest {
 	public void updateAnAlreadyInsertedMeasurement() {
 		final MeasurementDto databaseReturnedMeasurement = new MeasurementDto(new TraitDto(1, "Plant Height"), 1, "123");
 		final ObservationDto databaseReturnedObservationValue =
-				new ObservationDto(1, "1", "Test", 1, "CML123", "1", "CIMMYT Seed Bank", "1", "1", Lists.newArrayList(databaseReturnedMeasurement));
+				new ObservationDto(1, "1", "Test", 1, "CML123", "1", "CIMMYT Seed Bank", "1", "1", "2",
+						Lists.newArrayList(databaseReturnedMeasurement));
 		final List<ObservationDto> observationDtoTestData = Lists.newArrayList(databaseReturnedObservationValue);
 		Mockito.when(
 				this.mockMiddlewareStudyService.getSingleObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,

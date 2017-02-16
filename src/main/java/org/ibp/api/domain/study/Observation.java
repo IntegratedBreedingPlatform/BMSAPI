@@ -5,9 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Observation {
 
@@ -22,6 +23,8 @@ public class Observation {
 	private String entryType;
 
 	private String plotNumber;
+
+	private String blockNumber;
 
 	private String replicationNumber;
 
@@ -121,6 +124,14 @@ public class Observation {
 	 */
 	public void setPlotNumber(final String plotNumber) {
 		this.plotNumber = plotNumber;
+	}
+
+	public String getBlockNumber() {
+		return this.blockNumber;
+	}
+
+	public void setBlockNumber(String blockNumber) {
+		this.blockNumber = blockNumber;
 	}
 
 	/**
