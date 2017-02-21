@@ -5,7 +5,7 @@ BMS API is a set of RESTful web services that allow access to data in the BMS da
 Authentication
 ==============
 
-All BMS API calls require authentication and valid access token provided. Please refer to the public Wiki documentation: [BMSAPI - Authentication](https://github.com/IntegratedBreedingPlatform/Documentation/wiki/BMSAPI---Authentication) for detauls.
+All BMS API calls require authentication and valid access token provided. Please refer to the public Wiki documentation: [BMSAPI - Authentication](https://github.com/IntegratedBreedingPlatform/Documentation/wiki/BMSAPI---Authentication) for details.
 
 
 Using the BMSAPI Swagger UI
