@@ -106,7 +106,7 @@ public class StudyResource {
 			@Override
 			public List<Observation> getResults(PagedResult<Observation> pagedResult) {
 				return StudyResource.this.studyService.getObservations(studyId, instanceId, pagedResult.getPageNumber(),
-						pagedResult.getPageSize());
+						pagedResult.getPageSize(), pagedResult.getSortBy(), pagedResult.getSortOrder());
 			}
 		});
 		return new ResponseEntity<>(pageResult, HttpStatus.OK);

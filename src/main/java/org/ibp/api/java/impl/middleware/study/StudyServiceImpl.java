@@ -144,9 +144,10 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<Observation> getObservations(final Integer studyId, final int instanceId, final int pageNumber, final int pageSize) {
+	public List<Observation> getObservations(final Integer studyId, final int instanceId, final int pageNumber, final int pageSize,
+			final String sortBy, final String sortOrder) {
 		final List<ObservationDto> studyMeasurements =
-				this.middlewareStudyService.getObservations(studyId, instanceId, pageNumber, pageSize);
+				this.middlewareStudyService.getObservations(studyId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
 		final List<Observation> observations = new ArrayList<Observation>();
 		for (final ObservationDto measurement : studyMeasurements) {
 			observations.add(this.mapObservationDtoToObservation(measurement));

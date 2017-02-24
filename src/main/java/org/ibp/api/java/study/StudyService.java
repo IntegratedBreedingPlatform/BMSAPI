@@ -21,7 +21,8 @@ public interface StudyService {
 
 	int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
 
-	List<Observation> getObservations(final Integer studyId, final int instanceId, final int pageNumber, final int pageSize);
+	List<Observation> getObservations(final Integer studyId, final int instanceId, final int pageNumber, final int pageSize,
+			final String sortBy, final String sortOrder);
 
 	Observation getSingleObservation(Integer studyId, Integer obeservationId);
 

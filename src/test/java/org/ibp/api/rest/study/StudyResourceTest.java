@@ -82,7 +82,8 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		Mockito.when(this.studyServiceMW.countTotalObservationUnits(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt()))
 				.thenReturn(100);
 		Mockito.when(this.studyServiceMW.getObservations(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
-				org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt())).thenReturn(Lists.newArrayList(obsDto));
+				org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyString(),
+				org.mockito.Matchers.anyString())).thenReturn(Lists.newArrayList(obsDto));
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders
