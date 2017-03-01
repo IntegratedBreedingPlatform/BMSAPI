@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.security;
 
 import java.util.List;
 
+import ch.qos.logback.core.util.ContextUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -25,16 +26,16 @@ public class SecurityServiceImpl implements SecurityService {
 	private UserDataManager userDataManager;
 
 	@Override
-	public boolean isAccessible(StudySummary study) {
+	public boolean isAccessible(StudySummary study, String cropname) {
 		if (StringUtils.isBlank(study.getProgramUUID())) {
 			// Blank program UUID == templates, allowed for all.
 			return true;
 		}
-		return this.loggedInUserIsMemberOf(study.getProgramUUID());
+		return this.loggedInUserIsMemberOf(study.getProgramUUID(), cropname);
 	}
 
 	@Override
-	public boolean isAccessible(GermplasmList germplasmList) {
+	public boolean isAccessible(GermplasmList germplasmList, String cropname) {
 
 		if (StringUtils.isBlank(germplasmList.getProgramUUID())) {
 			// Blank program UUID means this could be historic data loaded in crop db. Allow access to all such lists.
@@ -51,13 +52,13 @@ public class SecurityServiceImpl implements SecurityService {
 			return true;
 		}
 
-		return this.loggedInUserIsMemberOf(germplasmList.getProgramUUID());
+		return this.loggedInUserIsMemberOf(germplasmList.getProgramUUID(), cropname);
 	}
 
-	private boolean loggedInUserIsMemberOf(String programUniqueId) {
+	private boolean loggedInUserIsMemberOf(String programUniqueId, String cropname) {
 		if (!StringUtils.isBlank(programUniqueId)) {
 			User loggedInUser = this.getCurrentlyLoggedInUser();
-			Project program = this.workbenchDataManager.getProjectByUuid(programUniqueId);
+			Project program = this.workbenchDataManager.getProjectByUuid(programUniqueId, cropname);
 			List<User> allProgramMembers = this.workbenchDataManager.getUsersByProjectId(program.getProjectId());
 			return allProgramMembers.contains(loggedInUser);
 		}

@@ -46,21 +46,21 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public List<GermplasmListSummary> searchGermplasmLists(String searchText) {
+	public List<GermplasmListSummary> searchGermplasmLists(String searchText, String cropname) {
 		List<GermplasmList> matchingLists;
 		try {
 			matchingLists = this.germplasmListManager.searchForGermplasmList(searchText, Operation.LIKE);
 		} catch (MiddlewareQueryException e) {
 			throw new ApiRuntimeException(GermplasmListServiceImpl.ERROR_NAME, e);
 		}
-		return this.mapResults(matchingLists);
+		return this.mapResults(matchingLists, cropname);
 	}
 
-	private List<GermplasmListSummary> mapResults(List<GermplasmList> germplasmLists) {
+	private List<GermplasmListSummary> mapResults(List<GermplasmList> germplasmLists, String cropType) {
 		List<GermplasmListSummary> results = new ArrayList<GermplasmListSummary>();
 		if (germplasmLists != null && !germplasmLists.isEmpty()) {
 			for (GermplasmList gpList : germplasmLists) {
-				if (!this.securityService.isAccessible(gpList)) {
+				if (!this.securityService.isAccessible(gpList, cropType)) {
 					continue;
 				}
 				// FIXME hack to remove folders. Middleware service should offer this option and handle it internally!
@@ -110,14 +110,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public List<GermplasmListSummary> list() {
+	public List<GermplasmListSummary> list(String cropname) {
 		List<GermplasmList> allGermplasmLists;
 		try {
 			allGermplasmLists = this.germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE);
 		} catch (MiddlewareQueryException e) {
 			throw new ApiRuntimeException(GermplasmListServiceImpl.ERROR_NAME, e);
 		}
-		return this.mapResults(allGermplasmLists);
+		return this.mapResults(allGermplasmLists, cropname);
 	}
 
 }
