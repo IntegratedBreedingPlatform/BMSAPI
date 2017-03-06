@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.security;
 
 import java.util.List;
 
-import ch.qos.logback.core.util.ContextUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -58,7 +57,7 @@ public class SecurityServiceImpl implements SecurityService {
 	private boolean loggedInUserIsMemberOf(String programUniqueId, String cropname) {
 		if (!StringUtils.isBlank(programUniqueId)) {
 			User loggedInUser = this.getCurrentlyLoggedInUser();
-			Project program = this.workbenchDataManager.getProjectByUuid(programUniqueId, cropname);
+			Project program = this.workbenchDataManager.getProjectByUuidAndCrop(programUniqueId, cropname);
 			List<User> allProgramMembers = this.workbenchDataManager.getUsersByProjectId(program.getProjectId());
 			return allProgramMembers.contains(loggedInUser);
 		}

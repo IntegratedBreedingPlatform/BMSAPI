@@ -4,7 +4,6 @@ import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.junit.After;
@@ -78,7 +77,7 @@ public class SecurityServiceImplTest {
 		summaryStudyProgram.setProjectId(2L);
 		summaryStudyProgram.setUniqueID(summaryStudy.getProgramUUID());
 
-		Mockito.when(this.workbenchDataManager.getProjectByUuid(summaryStudy.getProgramUUID(), this.cropname)).thenReturn(summaryStudyProgram);
+		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(summaryStudy.getProgramUUID(), this.cropname)).thenReturn(summaryStudyProgram);
 
 		// Logged in user = me is a the member
 		Mockito.when(this.workbenchDataManager.getUsersByProjectId(summaryStudyProgram.getProjectId())).thenReturn(
@@ -102,7 +101,7 @@ public class SecurityServiceImplTest {
 		summaryStudyProgram.setProjectId(2L);
 		summaryStudyProgram.setUniqueID(summaryStudy.getProgramUUID());
 
-		Mockito.when(this.workbenchDataManager.getProjectByUuid(summaryStudy.getProgramUUID(), this.cropname)).thenReturn(summaryStudyProgram);
+		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(summaryStudy.getProgramUUID(), this.cropname)).thenReturn(summaryStudyProgram);
 
 		// Logged in user = me is not the member, some other breeder is
 		Mockito.when(this.workbenchDataManager.getUsersByProjectId(summaryStudyProgram.getProjectId())).thenReturn(
@@ -163,7 +162,7 @@ public class SecurityServiceImplTest {
 		final Project listProgram = new Project();
 		listProgram.setProjectId(2L);
 		listProgram.setUniqueID(list.getProgramUUID());
-		Mockito.when(this.workbenchDataManager.getProjectByUuid(list.getProgramUUID(), this.cropname)).thenReturn(listProgram);
+		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(list.getProgramUUID(), this.cropname)).thenReturn(listProgram);
 		// Logged in user = me is not a the member
 		Mockito.when(this.workbenchDataManager.getUsersByProjectId(listProgram.getProjectId())).thenReturn(
 				Lists.newArrayList(this.otherBreeder));
@@ -187,7 +186,7 @@ public class SecurityServiceImplTest {
 		listProgram.setProjectId(2L);
 		listProgram.setUniqueID(list.getProgramUUID());
 
-		Mockito.when(this.workbenchDataManager.getProjectByUuid(list.getProgramUUID(), this.cropname)).thenReturn(listProgram);
+		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(list.getProgramUUID(), this.cropname)).thenReturn(listProgram);
 
 		// Logged in user = me is a the member
 		Mockito.when(this.workbenchDataManager.getUsersByProjectId(listProgram.getProjectId())).thenReturn(

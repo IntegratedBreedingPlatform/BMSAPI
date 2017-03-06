@@ -61,7 +61,7 @@ public class ProgramValidatorTest {
 		program.setCrop(cropname);
 		program.setUniqueID(programId);
 
-		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectByUuid(programId, cropname);
+		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectByUuidAndCrop(programId, cropname);
 
 		this.programValidator.validate(program, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -85,7 +85,7 @@ public class ProgramValidatorTest {
 		project.setProjectName("Crop_Program");
 		project.setCropType(new CropType("rice"));
 
-		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuid(programId, cropname);
+		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuidAndCrop(programId, cropname);
 
 		this.programValidator.validate(program, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -109,7 +109,7 @@ public class ProgramValidatorTest {
 		project.setProjectName("Crop_Program");
 		project.setCropType(new CropType(cropname));
 
-		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuid(programId, cropname);
+		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuidAndCrop(programId, cropname);
 
 		this.programValidator.validate(program, bindingResult);
 		Assert.assertFalse(bindingResult.hasErrors());
