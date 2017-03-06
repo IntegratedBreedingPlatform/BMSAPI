@@ -85,6 +85,8 @@ public class StudyServiceImplTest {
 
 	final PodamFactory factory = new PodamFactoryImpl();
 
+	private final String cropPrefix = "ABCD";
+	
 	final Function<ObservationDto, Observation> observationTransformFunction = new Function<ObservationDto, Observation>() {
 
 		@Override
@@ -93,10 +95,12 @@ public class StudyServiceImplTest {
 		}
 
 	};
+	
 
 	@Before
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
+		
 		this.studyServiceImpl = new StudyServiceImpl();
 		this.studyServiceImpl.setMiddlewareStudyService(this.mockMiddlewareStudyService);
 		this.studyServiceImpl.setConversionService(this.conversionService);
@@ -336,11 +340,11 @@ public class StudyServiceImplTest {
 		workbook.setStudyDetails(studyDetails);
 
 		Mockito.when(this.conversionService.convert(studyImportDTO, Workbook.class)).thenReturn(workbook);
-		this.studyServiceImpl.importStudy(studyImportDTO, this.programUID);
+		this.studyServiceImpl.importStudy(studyImportDTO, this.programUID, cropPrefix);
 
 		// Only asserting interactions with key collaborators
 		Mockito.verify(this.conversionService).convert(studyImportDTO, Workbook.class);
-		Mockito.verify(this.dataImportService).saveDataset(workbook, true, false, this.programUID);
+		Mockito.verify(this.dataImportService).saveDataset(workbook, true, false, this.programUID, cropPrefix);
 		Mockito.verify(this.conversionService).convert(studyImportDTO, GermplasmList.class);
 		Mockito.verify(this.germplasmListManager).addGermplasmList(Mockito.any(GermplasmList.class));
 		Mockito.verify(this.germplasmListManager).addGermplasmListData(Mockito.anyList());

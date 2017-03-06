@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyDetails;
@@ -41,6 +42,9 @@ public class StudyResource {
 
 	@Autowired
 	private StudyService studyService;
+
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
 
 	private static final Logger LOG = LoggerFactory.getLogger(StudyResource.class);
 
@@ -146,7 +150,8 @@ public class StudyResource {
 			StudyResource.LOG.error(error);
 			throw new ValidationException(error);
 		}
-		final Integer studyId = this.studyService.importStudy(studyImportDTO, programUUID);
+
+		final Integer studyId = this.studyService.importStudy(studyImportDTO, programUUID, workbenchDataManager.getCropTypeByName(cropname).getPlotCodePrefix());
 		return new ResponseEntity<Integer>(studyId, HttpStatus.CREATED);
 	}
 

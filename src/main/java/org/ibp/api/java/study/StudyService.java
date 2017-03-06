@@ -42,7 +42,7 @@ public interface StudyService {
 
 	Map<Integer, FieldMap> getFieldMap(final String studyIdentifier);
 
-	Integer importStudy(final StudyImportDTO studyImportDTO, String programUUID);
+	Integer importStudy(final StudyImportDTO studyImportDTO, final String programUUID, final String cropPrefix);
 
 	List<StudyFolder> getAllStudyFolders();
 

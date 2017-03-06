@@ -29,7 +29,6 @@ import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.*;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.ibp.api.brapi.v1.study.StudyDetailsData;
 import org.ibp.api.domain.common.Command;
 import org.ibp.api.domain.common.ValidationUtil;
 import org.ibp.api.domain.ontology.TermSummary;
@@ -406,7 +405,7 @@ public class StudyServiceImpl implements StudyService {
 
 	@Transactional
 	@Override
-	public Integer importStudy(final StudyImportDTO studyImportDTO, final String programUUID) {
+	public Integer importStudy(final StudyImportDTO studyImportDTO, final String programUUID, final String cropPrefix) {
 		try {
 
 			final Workbook workbook = this.conversionService.convert(studyImportDTO, Workbook.class);
@@ -414,7 +413,7 @@ public class StudyServiceImpl implements StudyService {
 					.setProgramUUID(programUUID);
 
 			// Save the study
-			final Integer studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID);
+			final Integer studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, cropPrefix);
 
 			// Create germplasm list
 			final GermplasmList germplasmList = this.conversionService.convert(studyImportDTO, GermplasmList.class);
