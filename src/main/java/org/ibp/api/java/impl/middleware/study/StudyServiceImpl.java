@@ -206,7 +206,7 @@ public class StudyServiceImpl implements StudyService {
 		final ObservationDto middlewareMeasurement =
 				new ObservationDto(observation.getUniqueIdentifier(), observation.getEnvironmentNumber(), observation.getEntryType(),
 						observation.getGermplasmId(), observation.getGermplasmDesignation(), observation.getEntryNumber(),
-						observation.getSeedSource(), observation.getReplicationNumber(), observation.getPlotNumber(),
+						observation.getEntryCode(), observation.getReplicationNumber(), observation.getPlotNumber(),
 						observation.getBlockNumber(), traits);
 
 		return this.mapObservationDtoToObservation(this.middlewareStudyService.updataObservation(studyIdentifier, middlewareMeasurement));

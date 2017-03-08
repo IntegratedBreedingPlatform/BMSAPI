@@ -109,7 +109,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['blockNumber']", Matchers.is(obsDto.getBlockNumber())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['replicationNumber']", Matchers.is(obsDto.getRepitionNumber())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['environmentNumber']", Matchers.is(obsDto.getTrialInstance())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['seedSource']", Matchers.is(obsDto.getSeedSource())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['entryCode']", Matchers.is(obsDto.getEntryCode())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['measurements']", IsCollectionWithSize.hasSize(1)))
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$.pageResults[0]['measurements'][0].measurementIdentifier.measurementId",

@@ -69,7 +69,7 @@ public class StudyMapper {
 				this.map().setGermplasmId(this.source.getGid());
 				this.map().setPlotNumber(this.source.getPlotNumber());
 				this.map().setReplicationNumber(this.source.getRepitionNumber());
-				this.map().setSeedSource(this.source.getSeedSource());
+				this.map().setEntryCode(this.source.getEntryCode());
 				this.using(new MeasurementDtoConverter()).map(this.source.getTraitMeasurements()).setMeasurements(null);
 			}
 		});

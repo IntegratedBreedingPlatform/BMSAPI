@@ -311,7 +311,7 @@ public class StudyServiceImplTest {
 			observation.setGermplasmId(measurement.getGid());
 			observation.setPlotNumber(measurement.getPlotNumber());
 			observation.setReplicationNumber(measurement.getRepitionNumber());
-			observation.setSeedSource(measurement.getSeedSource());
+			observation.setEntryCode(measurement.getEntryCode());
 
 			final List<MeasurementDto> traits = measurement.getTraitMeasurements();
 			final List<Measurement> measurements = new ArrayList<Measurement>();

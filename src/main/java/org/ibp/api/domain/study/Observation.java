@@ -30,12 +30,12 @@ public class Observation {
 
 	private String environmentNumber;
 
-	private String seedSource;
+	private String entryCode;
 
 	private List<Measurement> measurements;
 
 	@JsonIgnore
-	private final Map<MeasurementIdentifier, Measurement> measurementsMap = new HashMap<MeasurementIdentifier, Measurement>();
+	private final Map<MeasurementIdentifier, Measurement> measurementsMap = new HashMap<>();
 
 	public Observation() {
 
@@ -130,7 +130,7 @@ public class Observation {
 		return this.blockNumber;
 	}
 
-	public void setBlockNumber(String blockNumber) {
+	public void setBlockNumber(final String blockNumber) {
 		this.blockNumber = blockNumber;
 	}
 
@@ -162,18 +162,12 @@ public class Observation {
 		this.environmentNumber = environmentNumber;
 	}
 
-	/**
-	 * @return the seedSource
-	 */
-	public String getSeedSource() {
-		return this.seedSource;
+	public String getEntryCode() {
+		return this.entryCode;
 	}
 
-	/**
-	 * @param seedSource the seedSource to set
-	 */
-	public void setSeedSource(final String seedSource) {
-		this.seedSource = seedSource;
+	public void setEntryCode(final String entryCode) {
+		this.entryCode = entryCode;
 	}
 
 	/**
@@ -210,19 +204,18 @@ public class Observation {
 			return false;
 		}
 		final Observation castOther = (Observation) other;
-		return new EqualsBuilder().append(this.uniqueIdentifier, castOther.uniqueIdentifier)
-				.append(this.germplasmId, castOther.germplasmId).append(this.germplasmDesignation, castOther.germplasmDesignation)
-				.append(this.entryNumber, castOther.entryNumber).append(this.entryType, castOther.entryType)
-				.append(this.plotNumber, castOther.plotNumber).append(this.replicationNumber, castOther.replicationNumber)
-				.append(this.environmentNumber, castOther.environmentNumber).append(this.seedSource, castOther.seedSource)
-				.append(this.measurements, castOther.measurements).isEquals();
+		return new EqualsBuilder().append(this.uniqueIdentifier, castOther.uniqueIdentifier).append(this.germplasmId, castOther.germplasmId)
+				.append(this.germplasmDesignation, castOther.germplasmDesignation).append(this.entryNumber, castOther.entryNumber)
+				.append(this.entryType, castOther.entryType).append(this.plotNumber, castOther.plotNumber)
+				.append(this.replicationNumber, castOther.replicationNumber).append(this.environmentNumber, castOther.environmentNumber)
+				.append(this.entryCode, castOther.entryCode).append(this.measurements, castOther.measurements).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(this.uniqueIdentifier).append(this.germplasmId).append(this.germplasmDesignation)
 				.append(this.entryNumber).append(this.entryType).append(this.plotNumber).append(this.replicationNumber)
-				.append(this.environmentNumber).append(this.seedSource).append(this.measurements).toHashCode();
+				.append(this.environmentNumber).append(this.entryCode).append(this.measurements).toHashCode();
 	}
 
 }
