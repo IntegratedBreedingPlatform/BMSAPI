@@ -32,7 +32,7 @@ public class GermplasmListServiceImplTest {
 		this.germplasmListManager = Mockito.mock(GermplasmListManager.class);
 		this.securityService = Mockito.mock(SecurityService.class);
 		// Make all lists accessible
-		Mockito.when(this.securityService.isAccessible(Mockito.any(GermplasmList.class))).thenReturn(true);
+		Mockito.when(this.securityService.isAccessible(Mockito.any(GermplasmList.class), Mockito.anyString())).thenReturn(true);
 		this.germplasmListService = new GermplasmListServiceImpl(this.germplasmListManager, this.securityService);
 	}
 
@@ -45,7 +45,7 @@ public class GermplasmListServiceImplTest {
 		allGermplasmLists.add(germplasmList);
 
 		when(this.germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE)).thenReturn(allGermplasmLists);
-		List<GermplasmListSummary> returnedValues = this.germplasmListService.list();
+		List<GermplasmListSummary> returnedValues = this.germplasmListService.list("maize");
 
 		// First assert that the right number of summary objects are returned
 		assertEquals(1, returnedValues.size());
@@ -63,7 +63,7 @@ public class GermplasmListServiceImplTest {
 		matchingLists.add(germplasmList);
 
 		when(this.germplasmListManager.searchForGermplasmList("searchText", Operation.LIKE)).thenReturn(matchingLists);
-		List<GermplasmListSummary> returnedValues = this.germplasmListService.searchGermplasmLists("searchText");
+		List<GermplasmListSummary> returnedValues = this.germplasmListService.searchGermplasmLists("searchText", "maize");
 
 		this.getAllGermplamListAssertStatements(returnedValues);
 	}
@@ -78,14 +78,14 @@ public class GermplasmListServiceImplTest {
 
 		when(this.germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE)).thenThrow(new MiddlewareQueryException("Error!"));
 
-		this.germplasmListService.list();
+		this.germplasmListService.list("maize");
 	}
 
 	@Test(expected = ApiRuntimeException.class)
 	public void searchGermplasmListThrowsApiRuntimeExceptionTest() throws Exception {
 		when(this.germplasmListManager.searchForGermplasmList("searchText", Operation.LIKE)).thenThrow(new MiddlewareQueryException("Error!"));
 
-		this.germplasmListService.searchGermplasmLists("searchText");
+		this.germplasmListService.searchGermplasmLists("searchText", "maize");
 	}
 
 	@Test
@@ -151,7 +151,7 @@ public class GermplasmListServiceImplTest {
 		allGermplasmLists = null;
 
 		when(this.germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE)).thenReturn(allGermplasmLists);
-		List<GermplasmListSummary> actual = this.germplasmListService.list();
+		List<GermplasmListSummary> actual = this.germplasmListService.list("maize");
 
 		assertEquals(true, actual.isEmpty());
 	}
@@ -167,7 +167,7 @@ public class GermplasmListServiceImplTest {
 		germplasmList.setType("TEST_TYPE");
 
 		when(this.germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE)).thenReturn(allGermplasmLists);
-		List<GermplasmListSummary> actual = this.germplasmListService.list();
+		List<GermplasmListSummary> actual = this.germplasmListService.list("maize");
 
 		assertEquals(true, actual.isEmpty());
 	}
@@ -182,7 +182,7 @@ public class GermplasmListServiceImplTest {
 		allGermplasmLists.add(germplasmList);
 
 		when(this.germplasmListManager.getAllGermplasmLists(0, Integer.MAX_VALUE)).thenReturn(allGermplasmLists);
-		List<GermplasmListSummary> actual = this.germplasmListService.list();
+		List<GermplasmListSummary> actual = this.germplasmListService.list("maize");
 
 		assertEquals(true, actual.isEmpty());
 	}

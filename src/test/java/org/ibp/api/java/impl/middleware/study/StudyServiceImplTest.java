@@ -55,6 +55,8 @@ public class StudyServiceImplTest {
 
 	private static final int TEST_OBSERVATION_IDENTIIFER = 5;
 
+	private static final String TEST_CROP_NAME = "maize";
+
 	private StudyServiceImpl studyServiceImpl;
 
 	@Mock
@@ -108,7 +110,7 @@ public class StudyServiceImplTest {
 		this.studyServiceImpl.setValidationUtil(new ValidationUtil());
 		this.studyServiceImpl.setObservationValidator(this.observationValidator);
 		// Make all test data accessible
-		Mockito.when(this.securityService.isAccessible(Mockito.any(org.generationcp.middleware.service.api.study.StudySummary.class)))
+		Mockito.when(this.securityService.isAccessible(Mockito.any(org.generationcp.middleware.service.api.study.StudySummary.class), Mockito.anyString()))
 				.thenReturn(true);
 	}
 
@@ -131,7 +133,7 @@ public class StudyServiceImplTest {
 
 		Mockito.when(this.mockMiddlewareStudyService.search(Mockito.any(StudySearchParameters.class))).thenReturn(mockResult);
 
-		final List<StudySummary> studySummaries = this.studyServiceImpl.search(this.programUID, null, null, null);
+		final List<StudySummary> studySummaries = this.studyServiceImpl.search(this.programUID, TEST_CROP_NAME, null, null, null);
 		Assert.assertEquals(mockResult.size(), studySummaries.size());
 		Assert.assertEquals(studySummary.getId().toString(), studySummaries.get(0).getId());
 		Assert.assertEquals(studySummary.getName(), studySummaries.get(0).getName());
