@@ -17,7 +17,7 @@ import org.ibp.api.domain.study.StudySummary;
 
 public interface StudyService {
 
-	List<StudySummary> search(final String programUniqueId, String principalInvestigator, String location, String season);
+	List<StudySummary> search(final String programUniqueId, String cropname, String principalInvestigator, String location, String season);
 
 	int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
 

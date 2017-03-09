@@ -76,7 +76,7 @@ public class StudyResource {
 							+ "Matches against value of study level attribute identified by ontology term id 8370 (CROP_SEASON).")//
 			@RequestParam(value = "season", required = false) final String season) {
 
-		return new ResponseEntity<>(this.studyService.search(programUniqueId, principalInvestigator, location, season),
+		return new ResponseEntity<>(this.studyService.search(programUniqueId, cropname, principalInvestigator, location, season),
 				HttpStatus.OK);
 	}
 

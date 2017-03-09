@@ -101,9 +101,8 @@ public class StudyServiceImpl implements StudyService {
 	@Autowired
 	private CrossExpansionProperties crossExpansionProperties;
 
-
 	@Override
-	public List<StudySummary> search(final String programUniqueId, String principalInvestigator, String location, String season) {
+	public List<StudySummary> search(final String programUniqueId, String cropname, String principalInvestigator, String location, String season) {
 		final List<StudySummary> studySummaries = new ArrayList<StudySummary>();
 		try {
 			StudySearchParameters searchParameters = new StudySearchParameters();
@@ -115,7 +114,7 @@ public class StudyServiceImpl implements StudyService {
 					this.middlewareStudyService.search(searchParameters);
 
 			for (final org.generationcp.middleware.service.api.study.StudySummary mwStudySummary : mwStudySummaries) {
-				if (!this.securityService.isAccessible(mwStudySummary)) {
+				if (!this.securityService.isAccessible(mwStudySummary, cropname)) {
 					continue;
 				}
 
