@@ -55,12 +55,13 @@ public class ProgramValidatorTest {
 
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Program");
 		String programId = "uuid";
+		String cropname = "maize";
 
 		ProgramSummary program = new ProgramSummary();
-		program.setCrop("maize");
+		program.setCrop(cropname);
 		program.setUniqueID(programId);
 
-		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectByUuid(programId);
+		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectByUuidAndCrop(programId, cropname);
 
 		this.programValidator.validate(program, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -72,9 +73,10 @@ public class ProgramValidatorTest {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Program");
 
 		String programId = "uuid";
+		String cropname = "maize";
 
 		ProgramSummary program = new ProgramSummary();
-		program.setCrop("maize");
+		program.setCrop(cropname);
 		program.setUniqueID(programId);
 
 		Project project = new Project();
@@ -83,7 +85,7 @@ public class ProgramValidatorTest {
 		project.setProjectName("Crop_Program");
 		project.setCropType(new CropType("rice"));
 
-		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuid(programId);
+		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuidAndCrop(programId, cropname);
 
 		this.programValidator.validate(program, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
@@ -95,17 +97,19 @@ public class ProgramValidatorTest {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Program");
 
 		String programId = "uuid";
+		String cropname = "maize";
+
 		ProgramSummary program = new ProgramSummary();
-		program.setCrop("maize");
+		program.setCrop(cropname);
 		program.setUniqueID(programId);
 
 		Project project = new Project();
 		project.setUniqueID(programId);
 		project.setProjectId(1L);
 		project.setProjectName("Crop_Program");
-		project.setCropType(new CropType("maize"));
+		project.setCropType(new CropType(cropname));
 
-		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuid(programId);
+		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuidAndCrop(programId, cropname);
 
 		this.programValidator.validate(program, bindingResult);
 		Assert.assertFalse(bindingResult.hasErrors());

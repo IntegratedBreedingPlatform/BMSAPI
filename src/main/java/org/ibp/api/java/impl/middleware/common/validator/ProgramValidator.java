@@ -46,7 +46,7 @@ public class ProgramValidator extends BaseValidator implements Validator {
 
 	protected void checkIfProgramExist(String fieldName, ProgramSummary program, Errors errors) {
 		try {
-			Project project = this.workbenchDataManager.getProjectByUuid(program.getUniqueID());
+			Project project = this.workbenchDataManager.getProjectByUuidAndCrop(program.getUniqueID(), program.getCrop());
 			if (Objects.equals(project, null)) {
 				this.addCustomError(errors, fieldName, ProgramValidator.PROGRAM_DOES_NOT_EXIST, null);
 				return;
