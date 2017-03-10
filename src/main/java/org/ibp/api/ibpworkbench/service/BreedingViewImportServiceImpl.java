@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyDaoFactory;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
@@ -82,6 +83,9 @@ public class BreedingViewImportServiceImpl implements BreedingViewImportService 
 
 	@Autowired
 	private StandardVariableTransformer standardVariableTransformer;
+
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
 
 	private Map<String, String> localNameToAliasMap = null;
 
@@ -147,7 +151,7 @@ public class BreedingViewImportServiceImpl implements BreedingViewImportService 
 				}
 				// create or append the experiments to the means dataset
 				this.createOrAppendMeansExperiments(meansDataSet, traitsAndMeans, meansDataSetExists, plotDataSet.getId(),
-						trialDataSet.getId());
+						trialDataSet.getId(), this.workbenchDataManager.getProjectByUuid(programUUID).getCropType().getPlotCodePrefix());
 
 			}
 		} catch (final Exception e) {
@@ -158,15 +162,15 @@ public class BreedingViewImportServiceImpl implements BreedingViewImportService 
 	/**
 	 * This method creates or appends the experiments to the means dataset based on the map of traits and means from the output file and the
 	 * existing means dataset
-	 *
-	 * @param meansDataSet
+	 *  @param meansDataSet
 	 * @param traitsAndMeans
 	 * @param meansDataSetExists
 	 * @param plotDatasetId
 	 * @param trialDatasetId
+	 * @param cropPrefix
 	 */
-	private void createOrAppendMeansExperiments(final DataSet meansDataSet, final Map<String, ArrayList<String>> traitsAndMeans,
-			final boolean meansDataSetExists, final int plotDatasetId, final int trialDatasetId) {
+	private void createOrAppendMeansExperiments(final DataSet meansDataSet, final Map<String, ArrayList<String>> traitsAndMeans, final boolean meansDataSetExists, final int plotDatasetId, final int trialDatasetId,
+			final String cropPrefix) {
 		final List<ExperimentValues> experimentValuesList = new ArrayList<>();
 		final String[] csvHeader = traitsAndMeans.keySet().toArray(new String[0]);
 		final String envHeader = csvHeader[0];
@@ -214,7 +218,7 @@ public class BreedingViewImportServiceImpl implements BreedingViewImportService 
 		}
 
 		// save the experiment
-		this.studyDataManager.addOrUpdateExperiment(meansDataSet.getId(), ExperimentType.AVERAGE, experimentValuesList);
+		this.studyDataManager.addOrUpdateExperiment(meansDataSet.getId(), ExperimentType.AVERAGE, experimentValuesList, cropPrefix);
 	}
 
 	/**
@@ -753,7 +757,6 @@ public class BreedingViewImportServiceImpl implements BreedingViewImportService 
 	 * This method will add the variable types to the existing means and save it to the database
 	 *
 	 * @param csvHeader
-	 * @param inputDataSet
 	 * @param meansDataSet
 	 * @param programUUID
 	 * @param lsMean

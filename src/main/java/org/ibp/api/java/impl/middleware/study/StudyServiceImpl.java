@@ -422,7 +422,7 @@ public class StudyServiceImpl implements StudyService {
 
 	@Transactional
 	@Override
-	public Integer importStudy(final StudyImportDTO studyImportDTO, final String programUUID) {
+	public Integer importStudy(final StudyImportDTO studyImportDTO, final String programUUID, final String cropPrefix) {
 		try {
 
 			final Workbook workbook = this.conversionService.convert(studyImportDTO, Workbook.class);
@@ -430,7 +430,7 @@ public class StudyServiceImpl implements StudyService {
 					.setProgramUUID(programUUID);
 
 			// Save the study
-			final Integer studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID);
+			final Integer studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, cropPrefix);
 
 			// Create germplasm list
 			final GermplasmList germplasmList = this.conversionService.convert(studyImportDTO, GermplasmList.class);
