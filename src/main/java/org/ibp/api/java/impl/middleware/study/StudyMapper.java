@@ -68,6 +68,10 @@ public class StudyMapper {
 				this.map().setGermplasmDesignation(this.source.getDesignation());
 				this.map().setGermplasmId(this.source.getGid());
 				this.map().setPlotNumber(this.source.getPlotNumber());
+				this.map().setPlotId(this.source.getPlotId());
+				this.map().setRowNumber(this.source.getRowNumber());
+				this.map().setColumnNumber(this.source.getColumnNumber());
+				this.map().setAdditionalGermplasmDescriptors(this.source.getAdditionalGermplasmDescriptors());
 				this.map().setReplicationNumber(this.source.getRepitionNumber());
 				this.map().setEntryCode(this.source.getEntryCode());
 				this.using(new MeasurementDtoConverter()).map(this.source.getTraitMeasurements()).setMeasurements(null);

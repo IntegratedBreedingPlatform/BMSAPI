@@ -1,12 +1,14 @@
 
 package org.ibp.api.domain.study;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang3.tuple.Pair;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -24,6 +26,8 @@ public class Observation {
 
 	private String plotNumber;
 
+	private String plotId;
+
 	private String blockNumber;
 
 	private String replicationNumber;
@@ -33,6 +37,11 @@ public class Observation {
 	private String entryCode;
 
 	private List<Measurement> measurements;
+
+	private String rowNumber;
+	private String columnNumber;
+
+	private List<Pair<String, String>> additionalGermplasmDescriptors = new ArrayList<>();
 
 	@JsonIgnore
 	private final Map<MeasurementIdentifier, Measurement> measurementsMap = new HashMap<>();
@@ -134,6 +143,14 @@ public class Observation {
 		this.blockNumber = blockNumber;
 	}
 
+	public List<Pair<String, String>> getAdditionalGermplasmDescriptors() {
+		return this.additionalGermplasmDescriptors;
+	}
+
+	public void setAdditionalGermplasmDescriptors(final List<Pair<String, String>> additionalGermplasmDescriptors) {
+		this.additionalGermplasmDescriptors = additionalGermplasmDescriptors;
+	}
+
 	/**
 	 * @return the replicationNumber
 	 */
@@ -196,6 +213,34 @@ public class Observation {
 				this.measurementsMap.put(measurement.getMeasurementIdentifier(), measurement);
 			}
 		}
+	}
+
+	public String getRowNumber() {
+		return this.rowNumber;
+	}
+
+	public void setRowNumber(final String rowNumber) {
+		this.rowNumber = rowNumber;
+	}
+
+	public String getColumnNumber() {
+		return this.columnNumber;
+	}
+
+	public void setColumnNumber(final String columnNumber) {
+		this.columnNumber = columnNumber;
+	}
+
+	public Map<MeasurementIdentifier, Measurement> getMeasurementsMap() {
+		return this.measurementsMap;
+	}
+
+	public String getPlotId() {
+		return this.plotId;
+	}
+
+	public void setPlotId(final String plotId) {
+		this.plotId = plotId;
 	}
 
 	@Override
