@@ -21,6 +21,8 @@ public class PagedResult<T> {
 	private final int pageNumber;
 	private final int pageSize;
 	private final long totalResults;
+	private String sortBy;
+	private String sortOrder;
 
 	public static final int MAX_PAGE_SIZE = 200;
 	public static final int DEFAULT_PAGE_SIZE = 100;
@@ -60,6 +62,22 @@ public class PagedResult<T> {
 
 	public int getPageSize() {
 		return this.pageSize;
+	}
+
+	public String getSortBy() {
+		return this.sortBy;
+	}
+
+	public void setSortBy(final String sortBy) {
+		this.sortBy = sortBy;
+	}
+
+	public String getSortOrder() {
+		return this.sortOrder;
+	}
+
+	public void setSortOrder(final String sortOrder) {
+		this.sortOrder = sortOrder;
 	}
 
 	public long getTotalResults() {

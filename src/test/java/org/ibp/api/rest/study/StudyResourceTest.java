@@ -14,6 +14,7 @@ import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.TraitDto;
+import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.junit.Test;
@@ -76,35 +77,61 @@ public class StudyResourceTest extends ApiUnitTestBase {
 	public void testGetObservations() throws Exception {
 		MeasurementDto measurement = new MeasurementDto(new TraitDto(1, "Plant Height"), 1, "123");
 		ObservationDto obsDto =
-				new ObservationDto(1, "1", "Test", 1, "CML123", "1", "CIMMYT Seed Bank", "1", "1", Lists.newArrayList(measurement));
+				new ObservationDto(1, "1", "Test", 1, "CML123", "1", "CIMMYT Seed Bank", "1", "1", "2", Lists.newArrayList(measurement));
 
-		Mockito.when(this.studyServiceMW.getObservations(org.mockito.Matchers.anyInt())).thenReturn(Lists.newArrayList(obsDto));
+		obsDto.setColumnNumber("11");
+		obsDto.setRowNumber("22");
+		obsDto.setPlotId("CHMEPwuxU2Yr6");
+		obsDto.additionalGermplasmDescriptor("StockID", "Stck-123");
+
+		Mockito.when(this.studyServiceMW.countTotalObservationUnits(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt()))
+				.thenReturn(100);
+		Mockito.when(this.studyServiceMW.getObservations(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
+				org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyString(),
+				org.mockito.Matchers.anyString())).thenReturn(Lists.newArrayList(obsDto));
+
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.get("/study/{cropname}/{studyId}/observations", "maize", "1").contentType(this.contentType))
+				.perform(MockMvcRequestBuilders
+						.get("/study/{cropname}/{studyId}/observations?instanceId=1", "maize", "1")
+						.contentType(this.contentType))
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(1)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['uniqueIdentifier']", Matchers.is(obsDto.getMeasurementId())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['germplasmId']", Matchers.is(obsDto.getGid())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['germplasmDesignation']", Matchers.is(obsDto.getDesignation())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['entryNumber']", Matchers.is(obsDto.getEntryNo())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['entryType']", Matchers.is(obsDto.getEntryType())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['plotNumber']", Matchers.is(obsDto.getPlotNumber())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['replicationNumber']", Matchers.is(obsDto.getRepitionNumber())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['environmentNumber']", Matchers.is(obsDto.getTrialInstance())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['seedSource']", Matchers.is(obsDto.getSeedSource())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['measurements']", IsCollectionWithSize.hasSize(1)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber", Matchers.is(1)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageSize", Matchers.is(100)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.totalResults", Matchers.is(100)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.totalPages", Matchers.is(1)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.firstPage", Matchers.is(true)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.lastPage", Matchers.is(true)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.hasNextPage", Matchers.is(false)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.hasPreviousPage", Matchers.is(false)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults", IsCollectionWithSize.hasSize(1)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['uniqueIdentifier']", Matchers.is(obsDto.getMeasurementId())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['germplasmId']", Matchers.is(obsDto.getGid())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['germplasmDesignation']", Matchers.is(obsDto.getDesignation())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['entryNumber']", Matchers.is(obsDto.getEntryNo())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['entryType']", Matchers.is(obsDto.getEntryType())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['plotNumber']", Matchers.is(obsDto.getPlotNumber())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['blockNumber']", Matchers.is(obsDto.getBlockNumber())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['replicationNumber']", Matchers.is(obsDto.getRepitionNumber())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['environmentNumber']", Matchers.is(obsDto.getTrialInstance())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['entryCode']", Matchers.is(obsDto.getEntryCode())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['rowNumber']", Matchers.is(obsDto.getRowNumber())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['columnNumber']", Matchers.is(obsDto.getColumnNumber())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['plotId']", Matchers.is(obsDto.getPlotId())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['additionalGermplasmDescriptors'][0]['StockID']",
+						Matchers.is("Stck-123")))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['measurements']", IsCollectionWithSize.hasSize(1)))
 				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0]['measurements'][0].measurementIdentifier.measurementId",
+						MockMvcResultMatchers.jsonPath("$.pageResults[0]['measurements'][0].measurementIdentifier.measurementId",
 								Matchers.is(measurement.getPhenotypeId())))
 				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0]['measurements'][0].measurementIdentifier.trait.traitId",
+						MockMvcResultMatchers.jsonPath("$.pageResults[0]['measurements'][0].measurementIdentifier.trait.traitId",
 								Matchers.is(measurement.getTrait().getTraitId())))
 				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0]['measurements'][0].measurementIdentifier.trait.traitName",
+						MockMvcResultMatchers.jsonPath("$.pageResults[0]['measurements'][0].measurementIdentifier.trait.traitName",
 								Matchers.is(measurement.getTrait().getTraitName())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0]['measurements'][0].measurementValue", Matchers.is(measurement.getTriatValue())))
-				.andDo(MockMvcResultHandlers.print());
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['measurements'][0].measurementValue",
+						Matchers.is(measurement.getTriatValue())));
 	}
 
 	@Test
@@ -159,5 +186,25 @@ public class StudyResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is(folderRef.getName())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(folderRef.getDescription())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].parentFolderId", Matchers.is(folderRef.getParentFolderId())));
+	}
+
+	@Test
+	public void testListStudyInstances() throws Exception {
+
+		final StudyInstance studyInstance = new StudyInstance(1, "Gujarat, India", "GUJ", 1);
+		Mockito.when(this.studyServiceMW.getStudyInstances(Mockito.anyInt()))
+				.thenReturn(Lists.newArrayList(studyInstance));
+
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.get("/study/{cropname}/{studyId}/instances", "maize", "1")
+				.contentType(this.contentType))
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(1)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].instanceDbId", Matchers.is(studyInstance.getInstanceDbId())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].locationName", Matchers.is(studyInstance.getLocationName())))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$[0].locationAbbreviation", Matchers.is(studyInstance.getLocationAbbreviation())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].instanceNumber", Matchers.is(studyInstance.getInstanceNumber())));
 	}
 }

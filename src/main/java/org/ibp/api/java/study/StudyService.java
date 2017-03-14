@@ -12,13 +12,17 @@ import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
+import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
 
 public interface StudyService {
 
 	List<StudySummary> search(final String programUniqueId, String cropname, String principalInvestigator, String location, String season);
 
-	List<Observation> getObservations(Integer studyId);
+	int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
+
+	List<Observation> getObservations(final Integer studyId, final int instanceId, final int pageNumber, final int pageSize,
+			final String sortBy, final String sortOrder);
 
 	Observation getSingleObservation(Integer studyId, Integer obeservationId);
 
@@ -47,6 +51,8 @@ public interface StudyService {
 	List<StudyFolder> getAllStudyFolders();
 
 	String getProgramUUID(Integer studyIdentifier);
+
+	List<StudyInstance> getStudyInstances(int studyId);
 
 	StudyDetailsDto getStudyDetailsDto (final Integer studyId);
 

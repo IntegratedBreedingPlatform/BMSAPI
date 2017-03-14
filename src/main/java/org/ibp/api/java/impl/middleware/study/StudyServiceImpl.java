@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Experiment;
@@ -27,7 +25,13 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
-import org.generationcp.middleware.service.api.study.*;
+import org.generationcp.middleware.service.api.study.MeasurementDto;
+import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.service.api.study.StudyDetailsDto;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudySearchParameters;
+import org.generationcp.middleware.service.api.study.TraitDto;
+import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.domain.common.Command;
 import org.ibp.api.domain.common.ValidationUtil;
@@ -42,6 +46,7 @@ import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
+import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -56,6 +61,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 
 @Service
 @Transactional
@@ -128,8 +138,15 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<Observation> getObservations(final Integer studyId) {
-		final List<ObservationDto> studyMeasurements = this.middlewareStudyService.getObservations(studyId);
+	public int countTotalObservationUnits(int studyIdentifier, int instanceId) {
+		return this.middlewareStudyService.countTotalObservationUnits(studyIdentifier, instanceId);
+	}
+
+	@Override
+	public List<Observation> getObservations(final Integer studyId, final int instanceId, final int pageNumber, final int pageSize,
+			final String sortBy, final String sortOrder) {
+		final List<ObservationDto> studyMeasurements =
+				this.middlewareStudyService.getObservations(studyId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
 		final List<Observation> observations = new ArrayList<Observation>();
 		for (final ObservationDto measurement : studyMeasurements) {
 			observations.add(this.mapObservationDtoToObservation(measurement));
@@ -188,7 +205,8 @@ public class StudyServiceImpl implements StudyService {
 		final ObservationDto middlewareMeasurement =
 				new ObservationDto(observation.getUniqueIdentifier(), observation.getEnvironmentNumber(), observation.getEntryType(),
 						observation.getGermplasmId(), observation.getGermplasmDesignation(), observation.getEntryNumber(),
-						observation.getSeedSource(), observation.getReplicationNumber(), observation.getPlotNumber(), traits);
+						observation.getEntryCode(), observation.getReplicationNumber(), observation.getPlotNumber(),
+						observation.getBlockNumber(), traits);
 
 		return this.mapObservationDtoToObservation(this.middlewareStudyService.updataObservation(studyIdentifier, middlewareMeasurement));
 	}
@@ -528,6 +546,22 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
+	public List<StudyInstance> getStudyInstances(int studyId) {
+		final List<org.generationcp.middleware.service.impl.study.StudyInstance> studyInstancesMW =
+				this.middlewareStudyService.getStudyInstances(studyId);
+
+		final Function<org.generationcp.middleware.service.impl.study.StudyInstance, StudyInstance> transformer =
+				new Function<org.generationcp.middleware.service.impl.study.StudyInstance, StudyInstance>() {
+
+			@Override
+			public StudyInstance apply(org.generationcp.middleware.service.impl.study.StudyInstance input) {
+				return new StudyInstance(input.getInstanceDbId(), input.getLocationName(), input.getLocationAbbreviation(),
+						input.getInstanceNumber());
+			}
+		};
+		return Lists.transform(studyInstancesMW, transformer);
+	}
+
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
 		return middlewareStudyService.getTrialObservationTable(studyIdentifier);
 	}

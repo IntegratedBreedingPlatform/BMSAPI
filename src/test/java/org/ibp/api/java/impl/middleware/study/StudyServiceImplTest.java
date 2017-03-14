@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.validation.Errors;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
@@ -41,13 +40,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
-
-import uk.co.jemos.podam.api.PodamFactory;
-import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+
+import uk.co.jemos.podam.api.PodamFactory;
+import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 public class StudyServiceImplTest {
 
@@ -183,10 +183,12 @@ public class StudyServiceImplTest {
 	public void getObservations() {
 		final List<ObservationDto> observationDtoTestData =
 				Lists.newArrayList(this.factory.manufacturePojo(ObservationDto.class), this.factory.manufacturePojo(ObservationDto.class));
-		Mockito.when(this.mockMiddlewareStudyService.getObservations(StudyServiceImplTest.TEST_STUDY_IDENTIFIER)).thenReturn(
+		Mockito.when(this.mockMiddlewareStudyService.getObservations(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, 1, 1, 100, null, null))
+				.thenReturn(
 				observationDtoTestData);
 
-		final List<Observation> actualObservations = this.studyServiceImpl.getObservations(StudyServiceImplTest.TEST_STUDY_IDENTIFIER);
+		final List<Observation> actualObservations =
+				this.studyServiceImpl.getObservations(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, 1, 1, 100, null, null);
 
 		Assert.assertEquals(Lists.transform(observationDtoTestData, this.observationTransformFunction), actualObservations);
 
@@ -237,7 +239,8 @@ public class StudyServiceImplTest {
 	public void updateAnAlreadyInsertedMeasurement() {
 		final MeasurementDto databaseReturnedMeasurement = new MeasurementDto(new TraitDto(1, "Plant Height"), 1, "123");
 		final ObservationDto databaseReturnedObservationValue =
-				new ObservationDto(1, "1", "Test", 1, "CML123", "1", "CIMMYT Seed Bank", "1", "1", Lists.newArrayList(databaseReturnedMeasurement));
+				new ObservationDto(1, "1", "Test", 1, "CML123", "1", "CIMMYT Seed Bank", "1", "1", "2",
+						Lists.newArrayList(databaseReturnedMeasurement));
 		final List<ObservationDto> observationDtoTestData = Lists.newArrayList(databaseReturnedObservationValue);
 		Mockito.when(
 				this.mockMiddlewareStudyService.getSingleObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,
@@ -314,7 +317,7 @@ public class StudyServiceImplTest {
 			observation.setGermplasmId(measurement.getGid());
 			observation.setPlotNumber(measurement.getPlotNumber());
 			observation.setReplicationNumber(measurement.getRepitionNumber());
-			observation.setSeedSource(measurement.getSeedSource());
+			observation.setEntryCode(measurement.getEntryCode());
 
 			final List<MeasurementDto> traits = measurement.getTraitMeasurements();
 			final List<Measurement> measurements = new ArrayList<Measurement>();
