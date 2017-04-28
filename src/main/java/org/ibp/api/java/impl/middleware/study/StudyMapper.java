@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.service.api.study.MeasurementDto;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
-import org.generationcp.middleware.service.api.study.TraitDto;
 import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.MeasurementIdentifier;
 import org.ibp.api.domain.study.Observation;
@@ -48,9 +48,9 @@ public class StudyMapper {
 		public List<Measurement> convert(final MappingContext<List<MeasurementDto>, List<Measurement>> context) {
 			final List<Measurement> measurements = new ArrayList<Measurement>();
 			for (final MeasurementDto measurementDto : context.getSource()) {
-				final TraitDto trait = measurementDto.getTrait();
-				measurements.add(new Measurement(new MeasurementIdentifier(measurementDto.getPhenotypeId(), new Trait(trait.getTraitId(),
-						trait.getTraitName())), measurementDto.getTriatValue()));
+				final MeasurementVariableDto measurementVariable = measurementDto.getMeasurementVariable();
+				measurements.add(new Measurement(new MeasurementIdentifier(measurementDto.getPhenotypeId(), new Trait(measurementVariable.getId(),
+						measurementVariable.getName())), measurementDto.getVariableValue()));
 			}
 			return context.getMappingEngine().map(context.create(measurements, context.getDestinationType()));
 		}
@@ -74,7 +74,7 @@ public class StudyMapper {
 				this.map().setAdditionalGermplasmDescriptors(this.source.getAdditionalGermplasmDescriptors());
 				this.map().setReplicationNumber(this.source.getRepitionNumber());
 				this.map().setEntryCode(this.source.getEntryCode());
-				this.using(new MeasurementDtoConverter()).map(this.source.getTraitMeasurements()).setMeasurements(null);
+				this.using(new MeasurementDtoConverter()).map(this.source.getVariableMeasurements()).setMeasurements(null);
 			}
 		});
 	}

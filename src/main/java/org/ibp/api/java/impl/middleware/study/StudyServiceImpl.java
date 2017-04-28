@@ -26,11 +26,11 @@ import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
-import org.generationcp.middleware.service.api.study.TraitDto;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.domain.common.Command;
@@ -193,7 +193,7 @@ public class StudyServiceImpl implements StudyService {
 
 		final List<MeasurementDto> traits = new ArrayList<MeasurementDto>();
 		for (final Measurement measurement : measurements) {
-			traits.add(new MeasurementDto(new TraitDto(measurement.getMeasurementIdentifier()
+			traits.add(new MeasurementDto(new MeasurementVariableDto(measurement.getMeasurementIdentifier()
 					.getTrait()
 					.getTraitId(), measurement
 					.getMeasurementIdentifier()

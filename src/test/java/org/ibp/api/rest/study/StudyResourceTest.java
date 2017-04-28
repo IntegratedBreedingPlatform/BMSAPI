@@ -11,9 +11,9 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
-import org.generationcp.middleware.service.api.study.TraitDto;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
@@ -75,7 +75,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testGetObservations() throws Exception {
-		MeasurementDto measurement = new MeasurementDto(new TraitDto(1, "Plant Height"), 1, "123");
+		MeasurementDto measurement = new MeasurementDto(new MeasurementVariableDto(1, "Plant Height"), 1, "123");
 		ObservationDto obsDto =
 				new ObservationDto(1, "1", "Test", 1, "CML123", "1", "CIMMYT Seed Bank", "1", "1", "2", Lists.newArrayList(measurement));
 
@@ -126,12 +126,12 @@ public class StudyResourceTest extends ApiUnitTestBase {
 								Matchers.is(measurement.getPhenotypeId())))
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$.pageResults[0]['measurements'][0].measurementIdentifier.trait.traitId",
-								Matchers.is(measurement.getTrait().getTraitId())))
+								Matchers.is(measurement.getMeasurementVariable().getId())))
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$.pageResults[0]['measurements'][0].measurementIdentifier.trait.traitName",
-								Matchers.is(measurement.getTrait().getTraitName())))
+								Matchers.is(measurement.getMeasurementVariable().getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['measurements'][0].measurementValue",
-						Matchers.is(measurement.getTriatValue())));
+						Matchers.is(measurement.getVariableValue())));
 	}
 
 	@Test

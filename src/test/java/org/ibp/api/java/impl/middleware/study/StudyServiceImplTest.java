@@ -16,11 +16,11 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
-import org.generationcp.middleware.service.api.study.TraitDto;
 import org.ibp.api.domain.common.ValidationUtil;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 import org.ibp.api.domain.study.Measurement;
@@ -237,7 +237,7 @@ public class StudyServiceImplTest {
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void updateAnAlreadyInsertedMeasurement() {
-		final MeasurementDto databaseReturnedMeasurement = new MeasurementDto(new TraitDto(1, "Plant Height"), 1, "123");
+		final MeasurementDto databaseReturnedMeasurement = new MeasurementDto(new MeasurementVariableDto(1, "Plant Height"), 1, "123");
 		final ObservationDto databaseReturnedObservationValue =
 				new ObservationDto(1, "1", "Test", 1, "CML123", "1", "CIMMYT Seed Bank", "1", "1", "2",
 						Lists.newArrayList(databaseReturnedMeasurement));
@@ -319,11 +319,11 @@ public class StudyServiceImplTest {
 			observation.setReplicationNumber(measurement.getRepitionNumber());
 			observation.setEntryCode(measurement.getEntryCode());
 
-			final List<MeasurementDto> traits = measurement.getTraitMeasurements();
+			final List<MeasurementDto> measurementsDto = measurement.getVariableMeasurements();
 			final List<Measurement> measurements = new ArrayList<Measurement>();
-			for (final MeasurementDto trait : traits) {
-				measurements.add(new Measurement(new MeasurementIdentifier(trait.getPhenotypeId(), new Trait(trait.getTrait().getTraitId(),
-						trait.getTrait().getTraitName())), trait.getTriatValue()));
+			for (final MeasurementDto measurementDto : measurementsDto) {
+				measurements.add(new Measurement(new MeasurementIdentifier(measurementDto.getPhenotypeId(), new Trait(measurementDto.getMeasurementVariable().getId(),
+						measurementDto.getMeasurementVariable().getName())), measurementDto.getVariableValue()));
 			}
 
 			observation.setMeasurements(measurements);
