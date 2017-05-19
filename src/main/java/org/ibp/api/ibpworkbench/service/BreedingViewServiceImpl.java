@@ -11,7 +11,12 @@
 
 package org.ibp.api.ibpworkbench.service;
 
-import com.rits.cloning.Cloner;
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.generationcp.commons.service.BreedingViewImportService;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -25,10 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.rits.cloning.Cloner;
 
 @Component
 public class BreedingViewServiceImpl implements BreedingViewService {

@@ -4,6 +4,9 @@ package org.ibp.api.java.impl.middleware.common;
 import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
+import org.generationcp.commons.service.BreedingViewImportService;
+import org.generationcp.commons.service.impl.BreedingViewImportServiceImpl;
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.hibernate.DatasourceUtilities;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
@@ -52,7 +55,6 @@ import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hibernate.SessionFactory;
-import org.ibp.api.ibpworkbench.service.BreedingViewImportServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -261,7 +263,7 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public BreedingViewImportServiceImpl importService(){
+	public BreedingViewImportService getBreedingViewImportService(){
 		return new BreedingViewImportServiceImpl();
 	}
 
@@ -281,6 +283,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StandardVariableTransformer standardVariableTransformer() {
 		return new StandardVariableTransformer(this.getCropDatabaseSessionProvider());
+	}
+	
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public ContextUtil contextUtil() {
+		return new ContextUtil();
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {
