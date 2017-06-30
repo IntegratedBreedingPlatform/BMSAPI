@@ -37,29 +37,6 @@
 	</profiles>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.generationcp</groupId>
-			<artifactId>middleware</artifactId>
-			<version>${ibpcommons.version}</version>
-			<exclusions>
-	            <exclusion>
-	                <groupId>org.springframework</groupId>
-	                <artifactId>spring-core</artifactId>
-	            </exclusion>
-	            <exclusion>
-	                <groupId>org.springframework</groupId>
-	                <artifactId>spring-beans</artifactId>
-	            </exclusion>
-	            <exclusion>
-	                <groupId>org.springframework</groupId>
-	                <artifactId>spring-aop</artifactId>
-	            </exclusion>
-	            <exclusion>
-	                <groupId>org.springframework</groupId>
-	                <artifactId>spring-context</artifactId>
-	            </exclusion>
-        </exclusions>
-		</dependency>
 
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
@@ -222,26 +199,34 @@
 			<groupId>org.generationcp</groupId>
 			<artifactId>middleware</artifactId>
 			<version>${ibpcommons.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-beans</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-aop</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-context</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.itextpdf</groupId>
+					<artifactId>itext-pdfa</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.itextpdf</groupId>
+					<artifactId>itextpdf</artifactId>
+				</exclusion>
+			</exclusions>
 			<type>test-jar</type>
 			<scope>test</scope>
-			<exclusions>
-	            <exclusion>
-	                <groupId>org.springframework</groupId>
-	                <artifactId>spring-core</artifactId>
-	            </exclusion>
-	            <exclusion>
-	                <groupId>org.springframework</groupId>
-	                <artifactId>spring-beans</artifactId>
-	            </exclusion>
-	            <exclusion>
-	                <groupId>org.springframework</groupId>
-	                <artifactId>spring-aop</artifactId>
-	            </exclusion>
-	            <exclusion>
-	                <groupId>org.springframework</groupId>
-	                <artifactId>spring-context</artifactId>
-	            </exclusion>
-       	 	</exclusions>
 		</dependency>
 
 		<dependency>
@@ -269,8 +254,32 @@
 			<version>${ibpcommons.version}</version>
 			<exclusions>
 				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-beans</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-aop</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-context</artifactId>
+				</exclusion>
+				<exclusion>
 					<groupId>com.vaadin</groupId>
 					<artifactId>vaadin</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.itextpdf</groupId>
+					<artifactId>itext-pdfa</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.itextpdf</groupId>
+					<artifactId>itextpdf</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
