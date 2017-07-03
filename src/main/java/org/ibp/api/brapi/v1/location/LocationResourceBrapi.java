@@ -56,43 +56,35 @@ public class LocationResourceBrapi {
 					required = false) String locationType) {
 
 		final Map<LocationFilters, Object> filters = new HashMap<>();
-		
+		PagedResult<LocationDetailsDto> resultPage = null;
 		if (!StringUtils.isBlank(locationType)) {
-			final Integer locationTypeId = LocationResourceBrapi.this.locationDataManager
+			final Integer locationTypeId = this.locationDataManager
 					.getUserDefinedFieldIdOfName(org.generationcp.middleware.pojos.UDTableType.LOCATION_LTYPE, locationType);
 			if (locationTypeId != null) {
 				filters.put(LocationFilters.LOCATION_TYPE, locationTypeId.toString());
 
-			} else {
-				Map<String, String> status = new HashMap<String, String>();
-				status.put("message", "not found locations");
-				Metadata metadata = new Metadata(null, status);
-				Locations locationList = new Locations().withMetadata(metadata);
-				return new ResponseEntity<>(locationList, HttpStatus.NOT_FOUND);
-			}
-		}
-
-		PagedResult<LocationDetailsDto> resultPage =
-				new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<LocationDetailsDto>() {
+				resultPage = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<LocationDetailsDto>() {
 
 					@Override
 					public long getCount() {
-						return LocationResourceBrapi.this.locationDataManager.countLocationsByFilter(filters);
+						return locationDataManager.countLocationsByFilter(filters);
 					}
 
 					@Override
 					public List<LocationDetailsDto> getResults(PagedResult<LocationDetailsDto> pagedResult) {
-						return LocationResourceBrapi.this.locationDataManager.getLocationsByFilter(pagedResult.getPageNumber(),
+						return locationDataManager.getLocationsByFilter(pagedResult.getPageNumber(),
 								pagedResult.getPageSize(), filters);
 					}
 				});
+			}
+		}
 
-		if (resultPage.getTotalResults() > 0) {
+		if (resultPage!= null && resultPage.getTotalResults() > 0) {
 			
 			final ModelMapper mapper = LocationMapper.getInstance();
 			final List<Location> locations = new ArrayList<>();
 
-			for (org.generationcp.middleware.service.api.location.LocationDetailsDto locationDetailsDto : resultPage.getPageResults()) {
+			for (LocationDetailsDto locationDetailsDto : resultPage.getPageResults()) {
 				final Location location = mapper.map(locationDetailsDto, Location.class);
 				locations.add(location);
 			}
@@ -103,9 +95,10 @@ public class LocationResourceBrapi {
 
 			Metadata metadata = new Metadata().withPagination(pagination);
 			Locations locationList = new Locations().withMetadata(metadata).withResult(results);
-			return new ResponseEntity<Locations>(locationList, HttpStatus.OK);
+			return new ResponseEntity<>(locationList, HttpStatus.OK);
 			
 		} else {
+
 			Map<String, String> status = new HashMap<String, String>();
 			status.put("message", "not found locations");
 			Metadata metadata = new Metadata(null, status);
