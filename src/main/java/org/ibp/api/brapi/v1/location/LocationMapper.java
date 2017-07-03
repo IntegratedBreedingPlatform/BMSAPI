@@ -17,7 +17,7 @@ public class LocationMapper {
 	private static Converter<String, String> toUnknown = new AbstractConverter<String, String>() {
 
 		protected String convert(String source) {
-			return !StringUtils.isBlank(source) ? source : "Unknown";
+			return !StringUtils.isBlank(source) ? source : "";
 		}
 	};
 
@@ -25,7 +25,7 @@ public class LocationMapper {
 
 		protected String convert(String source) {
 			return !StringUtils.isBlank(source)
-				? WordUtils.capitalize(source.toLowerCase()) : "Unknown";
+				? WordUtils.capitalize(source.toLowerCase()) : "";
 		}
 	};
 
