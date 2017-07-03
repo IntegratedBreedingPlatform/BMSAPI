@@ -22,7 +22,7 @@ public class LocationMapperTest {
 		assertThat(location.getName(), equalTo(null));
 		assertThat(location.getAbbreviation(), equalTo(locationDetailsDto.getAbbreviation()));
 		assertThat(location.getCountryCode(), equalTo(locationDetailsDto.getCountryCode()));
-		assertThat(location.getCountryName(), equalTo("Unknown"));
+		assertThat(location.getCountryName(), equalTo(""));
 		assertThat(location.getLatitude(), equalTo(locationDetailsDto.getLatitude()));
 		assertThat(location.getLongitude(), equalTo(locationDetailsDto.getLongitude()));
 		assertThat(location.getAltitude(), equalTo(locationDetailsDto.getAltitude()));
