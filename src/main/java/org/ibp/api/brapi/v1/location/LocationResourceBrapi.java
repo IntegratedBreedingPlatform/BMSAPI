@@ -99,7 +99,7 @@ public class LocationResourceBrapi {
 			
 		} else {
 
-			Map<String, String> status = new HashMap<String, String>();
+			Map<String, String> status = new HashMap<>();
 			status.put("message", "not found locations");
 			Metadata metadata = new Metadata(null, status);
 			Locations locationList = new Locations().withMetadata(metadata);
