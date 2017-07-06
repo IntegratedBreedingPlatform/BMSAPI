@@ -22,4 +22,12 @@ public class CropDto {
 	public void setResult(final Result<String> result) {
 		this.result = result;
 	}
+
+	public Metadata getMetadata() {
+		return metadata;
+	}
+
+	public Result<String> getResult() {
+		return result;
+	}
 }
