@@ -84,27 +84,26 @@ public class LocationResourceBrapi {
 			final ModelMapper mapper = LocationMapper.getInstance();
 			final List<Location> locations = new ArrayList<>();
 
-			for (LocationDetailsDto locationDetailsDto : resultPage.getPageResults()) {
+			for (final LocationDetailsDto locationDetailsDto : resultPage.getPageResults()) {
 				final Location location = mapper.map(locationDetailsDto, Location.class);
 				locations.add(location);
 			}
 
-			Result<Location> results = new Result<Location>().withData(locations);
-			Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+			final Result<Location> results = new Result<Location>().withData(locations);
+			final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 					.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
-			Metadata metadata = new Metadata().withPagination(pagination);
-			Locations locationList = new Locations().withMetadata(metadata).withResult(results);
+			final Metadata metadata = new Metadata().withPagination(pagination);
+			final Locations locationList = new Locations().withMetadata(metadata).withResult(results);
 			return new ResponseEntity<>(locationList, HttpStatus.OK);
 			
 		} else {
 
-			Map<String, String> status = new HashMap<>();
+			final Map<String, String> status = new HashMap<>();
 			status.put("message", "not found locations");
-			Metadata metadata = new Metadata(null, status);
-			Locations locationList = new Locations().withMetadata(metadata);
+			final Metadata metadata = new Metadata(null, status);
+			final Locations locationList = new Locations().withMetadata(metadata);
 			return new ResponseEntity<>(locationList, HttpStatus.NOT_FOUND);
 		}
 	}
-
 }
