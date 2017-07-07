@@ -59,7 +59,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 		Mockito.when(this.workbenchDataManager.getInstalledCropDatabses()).thenReturn(getAllCrops());
 		Mockito.when(this.programService.countProgramsByFilter(Mockito.anyMapOf(ProgramFilters.class, Object.class))).thenReturn(2L);
 
-		final List<ProgramDetailsDto> programDetailsDtoList = getProgramdetails();
+		final List<ProgramDetailsDto> programDetailsDtoList = getProgramDetails();
 
 		Mockito.when(this.programService.getProgramsByFilter(Mockito.anyInt(), Mockito.anyInt(),
 			Mockito.anyMapOf(ProgramFilters.class, Object.class))).thenReturn(programDetailsDtoList);
@@ -76,7 +76,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testListProgramFilterByname() throws Exception {
+	public void testListProgramFilterByName() throws Exception {
 		Mockito.when(this.workbenchDataManager.getInstalledCropDatabses()).thenReturn(getAllCrops());
 		Mockito.when(this.programService.countProgramsByFilter(Mockito.anyMapOf(ProgramFilters.class, Object.class))).thenReturn(1L);
 
@@ -112,7 +112,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(jsonPath("$.metadata.status.message", Matchers.is("not found programs"))); //
 	}
 
-	private List<ProgramDetailsDto> getProgramdetails() {
+	private List<ProgramDetailsDto> getProgramDetails() {
 		final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
 		programDetailsDtoList.add(new ProgramDetailsDto(10, "Wheat", null, null, null));
 		programDetailsDtoList.add(new ProgramDetailsDto(11, "Rice", null, null, null));

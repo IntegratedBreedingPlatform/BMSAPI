@@ -64,7 +64,7 @@ public class ProgramResourceBrapi {
 
 		if(filters.get(ProgramFilters.CROP_TYPE) == null){
 			Map<String, String> status = new HashMap<>();
-			status.put("message", "the crop doesn't exist");
+			status.put("message", "crop doesn't exist");
 			Metadata metadata = new Metadata(null, status);
 			Programs programList = new Programs().withMetadata(metadata);
 			return new ResponseEntity<>(programList, HttpStatus.NOT_FOUND);
@@ -115,10 +115,10 @@ public class ProgramResourceBrapi {
 	}
 
 	private void setFilters(final Map<ProgramFilters, Object> filters, final String crop, final String programName) {
-		List<CropType> croptypeList;
-		croptypeList = this.workbenchDataManager.getInstalledCropDatabses();
+		List<CropType> cropTypeList;
+		cropTypeList = this.workbenchDataManager.getInstalledCropDatabses();
 
-		for (CropType cropType : croptypeList) {
+		for (final CropType cropType : cropTypeList) {
 			if (cropType.getCropName().equalsIgnoreCase(crop)) {
 				filters.put(ProgramFilters.CROP_TYPE, cropType);
 			}
