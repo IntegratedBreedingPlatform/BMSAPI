@@ -50,7 +50,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize2/brapi/v1/programs?pageNumber=1&pageSize=10&programName=&abbreviation=").contentType(this.contentType)) //
 			.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 			.andDo(MockMvcResultHandlers.print()) //
-			.andExpect(jsonPath("$.metadata.status.message", Matchers.is("the crop doesn't exist"))); //
+			.andExpect(jsonPath("$.metadata.status.message", Matchers.is("crop doesn't exist"))); //
 
 	}
 
