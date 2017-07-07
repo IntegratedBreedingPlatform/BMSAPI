@@ -51,52 +51,39 @@ public class TrialResourceBrapi {
 	public ResponseEntity<TrialSummaries> listTrialSummaries(@PathVariable final String crop,
 			@ApiParam(value = "Program filter to only return studies associated with given program id.", required = false) @RequestParam(value = "programDbId", required = false) final String programDbId,
 			@ApiParam(value = "Location filter to only return studies associated with given location id.", required = false) @RequestParam(value = "locationDbId", required = false) final String locationDbId,
-			@ApiParam(value = "Season or year filter to only return studies associated with given season or year.", required = false) @RequestParam(value = "seasonDbId", required = false) final String seasonDbId,
 			@ApiParam(value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.", required = false) @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
-			@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.", required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+			@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.", required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize,
+			@ApiParam(value = "Filter active status true/false", required = false) @RequestParam(value = "active", required = false) Boolean active,
+			@ApiParam(value = "Sort order. Name of the field to sorty by.", required = false) @RequestParam(value = "sortBy", required = false) Boolean sortBy,
+			@ApiParam(value = "Sort order direction. Ascending/Descending.", required = false) @RequestParam(value = "sortOrder", required = false) Boolean sortOrder) {
 
-		PagedResult<StudySummary> resultPage = new PaginatedSearch().execute(pageNumber, pageSize,
+		final PagedResult<StudySummary> resultPage = new PaginatedSearch().execute(pageNumber, pageSize,
 				new SearchSpec<StudySummary>() {
 
 					@Override
 					public long getCount() {
 						return TrialResourceBrapi.this.studyDataManager.countAllStudies(programDbId, locationDbId,
-								seasonDbId);
+								null);
 					}
 
 					@Override
 					public List<StudySummary> getResults(PagedResult<StudySummary> pagedResult) {
 						return TrialResourceBrapi.this.studyDataManager.findPagedProjects(programDbId, locationDbId,
-								seasonDbId, pagedResult.getPageSize(), pagedResult.getPageNumber());
+								null, pagedResult.getPageSize(), pagedResult.getPageNumber());
 					}
 				});
 
-		PropertyMap<StudySummary, TrialSummary> mappingSpec = new PropertyMap<StudySummary, TrialSummary>() {
-			@Override
-			protected void configure() {
-				map(source.getStudyDbid(), destination.getTrialDbId());
-				map(source.getName(), destination.getTrialName());
-				map(source.getProgramDbId(), destination.getProgramDbId());
-				map(source.getProgramName(), destination.getProgramName());
-				map(source.getStartDate(), destination.getStartDate());
-				map(source.getEndDate(), destination.getEndDate());
-				map(source.isActive(), destination.isActive());
-				map(source.getOptionalInfo(), destination.getAdditionalInfo());
-			}
-		};
+		final List<TrialSummary> trialSummaryList = new ArrayList<>();
+		final ModelMapper modelMapper = TrialMapper.getInstance();
 
-		List<TrialSummary> trialSummaryList = new ArrayList<>();
-		ModelMapper modelMapper = new ModelMapper();
-		modelMapper.addMappings(mappingSpec);
-
-		for (StudySummary mwStudy : resultPage.getPageResults()) {
-			TrialSummary trialSummaryDto = modelMapper.map(mwStudy, TrialSummary.class);
-			for (InstanceMetadata instance : mwStudy.getInstanceMetaData()) {
-				StudySummaryDto studyMetadata = new StudySummaryDto();
+		for (final StudySummary mwStudy : resultPage.getPageResults()) {
+			final TrialSummary trialSummaryDto = modelMapper.map(mwStudy, TrialSummary.class);
+			for (final InstanceMetadata instance : mwStudy.getInstanceMetaData()) {
+				final StudySummaryDto studyMetadata = new StudySummaryDto();
 				studyMetadata.setStudyDbId(instance.getInstanceDbId());
 				studyMetadata.setStudyName(instance.getTrialName() + " Environment Number " + instance.getInstanceNumber());
-				studyMetadata.setLocationName(
-						instance.getLocationName() != null ? instance.getLocationName() : instance.getLocationAbbreviation());
+				studyMetadata
+					.setLocationName(instance.getLocationName() != null ? instance.getLocationName() : instance.getLocationAbbreviation());
 				trialSummaryDto.addStudy(studyMetadata);
 			}
 			trialSummaryList.add(trialSummaryDto);
@@ -109,7 +96,7 @@ public class TrialResourceBrapi {
 		final Metadata metadata = new Metadata().withPagination(pagination);
 		final TrialSummaries trialSummaries = new TrialSummaries().withMetadata(metadata).withResult(results);
 
-		return new ResponseEntity<TrialSummaries>(trialSummaries, HttpStatus.OK);
+		return new ResponseEntity<>(trialSummaries, HttpStatus.OK);
 
 	}
 
