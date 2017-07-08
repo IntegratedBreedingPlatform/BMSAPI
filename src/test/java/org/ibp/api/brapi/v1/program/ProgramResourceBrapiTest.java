@@ -99,18 +99,17 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 
 	private List<CropType> getAllCrops() {
 		List<CropType> cropTypes = new ArrayList<>();
-		CropType cropTypeMaize = new CropType();
-		cropTypeMaize.setCropName("maize");
-		cropTypeMaize.setDbName("ibdbv2_maize_merged");
-		cropTypeMaize.setVersion("4.0.0");
-		cropTypes.add(cropTypeMaize);
-
-		CropType cropTypeRice = new CropType();
-		cropTypeRice.setCropName("rice");
-		cropTypeRice.setDbName("ibdbv2_rice_merged");
-		cropTypeRice.setVersion("4.0.0");
-		cropTypes.add(cropTypeRice);
+		cropTypes.add(getCropType("maize","ibdbv2_maize_merged","4.0.0"));
+		cropTypes.add(getCropType("rice","ibdbv2_rice_merged","4.0.0"));
 		return cropTypes;
+	}
+
+	private CropType getCropType(final String cropName, final String dbName, final String version) {
+		final CropType cropType = new CropType();
+		cropType.setCropName(cropName);
+		cropType.setDbName(dbName);
+		cropType.setVersion(version);
+		return cropType;
 	}
 
 	private List<Project> getProjectList() {
@@ -121,7 +120,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	private Project getProject(final Long id, final String projectName) {
-		Project project = new Project();
+		final Project project = new Project();
 		project.setProjectId(id);
 		project.setProjectName(projectName);
 		return project;
