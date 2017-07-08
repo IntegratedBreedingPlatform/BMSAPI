@@ -1,17 +1,14 @@
 package org.ibp.api.brapi.v1.program;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.java.program.ProgramService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -23,19 +20,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 
-	@Autowired
-	private ProgramService programService;
-
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
-
-
 	@Test
 	public void testListProgramsBadCrop() throws Exception {
 		Mockito.when(this.workbenchDataManager.getInstalledCropDatabses()).thenReturn(getAllCrops());
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize2/brapi/v1/programs?pageNumber=1&pageSize=10&programName=&abbreviation=").contentType(this.contentType)) //
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize2/brapi/v1/programs?pageNumber=1&pageSize=10&programName=&abbreviation=")
+			.contentType(this.contentType)) //
 			.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(jsonPath("$.metadata.status.message", Matchers.is("crop doesn't exist"))); //
@@ -43,17 +33,17 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	@Ignore
 	public void testListProgram() throws Exception {
-		Mockito.when(this.workbenchDataManager.getInstalledCropDatabses()).thenReturn(getAllCrops());
-		Mockito.when(this.programService.countProgramsByFilter(Mockito.anyMapOf(ProgramFilters.class, Object.class))).thenReturn(2L);
-
 		final List<ProgramDetailsDto> programDetailsDtoList = getProgramDetails();
+		Mockito.when(this.workbenchDataManager.getInstalledCropDatabses()).thenReturn(getAllCrops());
+		Mockito.when(this.workbenchDataManager.countProjectsByFilter(Mockito.anyMapOf(ProgramFilters.class, Object.class))).thenReturn(2L);
+		final List<Project> projectList = getProjectList();
+		Mockito.when(
+			this.workbenchDataManager.getProjects(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyMapOf(ProgramFilters.class, Object.class)))
+			.thenReturn(projectList);
 
-		Mockito.when(this.programService.getProgramsByFilter(Mockito.anyInt(), Mockito.anyInt(),
-			Mockito.anyMapOf(ProgramFilters.class, Object.class))).thenReturn(programDetailsDtoList);
-
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/programs?pageNumber=1&pageSize=10&programName=&abbreviation=").contentType(this.contentType)) //
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/programs?pageNumber=1&pageSize=10&programName=&abbreviation=")
+			.contentType(this.contentType)) //
 			.andExpect(MockMvcResultMatchers.status().isOk()) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(jsonPath("$.result.data", IsCollectionWithSize.hasSize(programDetailsDtoList.size()))) //
@@ -65,18 +55,21 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	@Ignore
 	public void testListProgramFilterByName() throws Exception {
 		Mockito.when(this.workbenchDataManager.getInstalledCropDatabses()).thenReturn(getAllCrops());
-		Mockito.when(this.programService.countProgramsByFilter(Mockito.anyMapOf(ProgramFilters.class, Object.class))).thenReturn(1L);
+		Mockito.when(this.workbenchDataManager.countProjectsByFilter(Mockito.anyMapOf(ProgramFilters.class, Object.class))).thenReturn(1L);
 
 		final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
 		programDetailsDtoList.add(new ProgramDetailsDto(11, "Rice", null, null, null));
+		final List<Project> projectList = new ArrayList<>();
+		projectList.add(getProject(11L, "Rice"));
 
-		Mockito.when(this.programService.getProgramsByFilter(Mockito.anyInt(), Mockito.anyInt(),
-			Mockito.anyMapOf(ProgramFilters.class, Object.class))).thenReturn(programDetailsDtoList);
+		Mockito.when(
+			this.workbenchDataManager.getProjects(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyMapOf(ProgramFilters.class, Object.class)))
+			.thenReturn(projectList);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/programs?pageNumber=1&pageSize=10&programName=Rice&abbreviation=").contentType(this.contentType)) //
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/programs?pageNumber=1&pageSize=10&programName=Rice&abbreviation=")
+			.contentType(this.contentType)) //
 			.andExpect(MockMvcResultMatchers.status().isOk()) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(jsonPath("$.result.data", IsCollectionWithSize.hasSize(programDetailsDtoList.size()))) //
@@ -88,15 +81,10 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 	@Test
 	public void testListProgramFilterByAbbreviation() throws Exception {
 		Mockito.when(this.workbenchDataManager.getInstalledCropDatabses()).thenReturn(getAllCrops());
-		Mockito.when(this.programService.countProgramsByFilter(Mockito.anyMapOf(ProgramFilters.class, Object.class))).thenReturn(1L);
+		Mockito.when(this.workbenchDataManager.countProjectsByFilter(Mockito.anyMapOf(ProgramFilters.class, Object.class))).thenReturn(1L);
 
-		final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
-		programDetailsDtoList.add(new ProgramDetailsDto(11, "Rice", null, null, null));
-
-		Mockito.when(this.programService.getProgramsByFilter(Mockito.anyInt(), Mockito.anyInt(),
-			Mockito.anyMapOf(ProgramFilters.class, Object.class))).thenReturn(programDetailsDtoList);
-
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/programs?pageNumber=1&pageSize=10&programName=&abbreviation=AAAB").contentType(this.contentType)) //
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/programs?pageNumber=1&pageSize=10&programName=&abbreviation=AAAB")
+			.contentType(this.contentType)) //
 			.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(jsonPath("$.metadata.status.message", Matchers.is("not found programs"))); //
@@ -125,4 +113,17 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 		return cropTypes;
 	}
 
+	private List<Project> getProjectList() {
+		final List<Project> projectList = new ArrayList<>();
+		projectList.add(getProject(10L, "Wheat"));
+		projectList.add(getProject(11L, "Rice"));
+		return projectList;
+	}
+
+	private Project getProject(final Long id, final String projectName) {
+		Project project = new Project();
+		project.setProjectId(id);
+		project.setProjectName(projectName);
+		return project;
+	}
 }
