@@ -108,7 +108,7 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public List<StudySummary> search(final String programUniqueId, String cropname, String principalInvestigator, String location, String season) {
-		final List<StudySummary> studySummaries = new ArrayList<StudySummary>();
+		final List<StudySummary> studySummaries = new ArrayList<>();
 		try {
 			StudySearchParameters searchParameters = new StudySearchParameters();
 			searchParameters.setProgramUniqueId(programUniqueId);
@@ -152,7 +152,7 @@ public class StudyServiceImpl implements StudyService {
 			final String sortBy, final String sortOrder) {
 		final List<ObservationDto> studyMeasurements =
 				this.middlewareStudyService.getObservations(studyId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
-		final List<Observation> observations = new ArrayList<Observation>();
+		final List<Observation> observations = new ArrayList<>();
 		for (final ObservationDto measurement : studyMeasurements) {
 			observations.add(this.mapObservationDtoToObservation(measurement));
 		}
@@ -196,7 +196,7 @@ public class StudyServiceImpl implements StudyService {
 
 		final List<Measurement> measurements = observation.getMeasurements();
 
-		final List<MeasurementDto> traits = new ArrayList<MeasurementDto>();
+		final List<MeasurementDto> traits = new ArrayList<>();
 		for (final Measurement measurement : measurements) {
 			traits.add(new MeasurementDto(new MeasurementVariableDto(measurement.getMeasurementIdentifier()
 					.getTrait()
@@ -244,7 +244,7 @@ public class StudyServiceImpl implements StudyService {
 	private void validateMeasurementSubmitted(final Integer studyIdentifier, final Observation observation) {
 		// If null do something
 		final Observation existingObservation = this.getSingleObservation(studyIdentifier, observation.getUniqueIdentifier());
-		final List<ObjectError> errors = new ArrayList<ObjectError>();
+		final List<ObjectError> errors = new ArrayList<>();
 		if (existingObservation == null || existingObservation.getUniqueIdentifier() == null) {
 			validateExistingObservation(studyIdentifier, observation, errors);
 		} else {
@@ -264,8 +264,8 @@ public class StudyServiceImpl implements StudyService {
 			// Relies on the hash coded generated in the MeasurementIdentifier object
 			final Measurement existingMeasurement = existingObservation.getMeasurement(measurement.getMeasurementIdentifier());
 			if (existingMeasurement == null) {
-				final String array[] = {"measurement.already.inserted"};
-				final List<String> object = new ArrayList<String>();
+				final String []array = {"measurement.already.inserted"};
+				final List<String> object = new ArrayList<>();
 				final ObjectMapper objectMapper = new ObjectMapper();
 				try {
 					object.add(objectMapper.writeValueAsString(measurement));
@@ -282,8 +282,8 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	private void validateExistingObservation(final Integer studyIdentifier, final Observation observation, final List<ObjectError> errors) {
-		final String errorKey[] = {"no.observation.found"};
-		final Object erroyKeyArguments[] = {studyIdentifier, observation.getUniqueIdentifier()};
+		final String []errorKey = {"no.observation.found"};
+		final Object []erroyKeyArguments = {studyIdentifier, observation.getUniqueIdentifier()};
 		final FieldError observationIdentifierError =
 				new FieldError("Observation", "uniqueIdentifier", null, false, errorKey, erroyKeyArguments,
 						"Error retrieving observation");
@@ -293,7 +293,7 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public List<StudyGermplasm> getStudyGermplasmList(final Integer studyIdentifer) {
 		final ModelMapper modelMapper = StudyMapper.getInstance();
-		final List<StudyGermplasm> destination = new ArrayList<StudyGermplasm>();
+		final List<StudyGermplasm> destination = new ArrayList<>();
 		final List<StudyGermplasmDto> studyGermplasmList = this.middlewareStudyService.getStudyGermplasmList(studyIdentifer);
 		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmList) {
 			final StudyGermplasm mappedValue = modelMapper.map(studyGermplasmDto, StudyGermplasm.class);
@@ -380,7 +380,7 @@ public class StudyServiceImpl implements StudyService {
 						// which is used to show dataset tables in the study browser UI.
 						final List<Experiment> experiments = this.studyDataManager.getExperiments(dsRef.getId(), 0, Integer.MAX_VALUE);
 						for (final Experiment experiment : experiments) {
-							final List<Variable> variables = new ArrayList<Variable>();
+							final List<Variable> variables = new ArrayList<>();
 							final VariableList fac = experiment.getFactors();
 							if (fac != null) {
 								variables.addAll(fac.getVariables());
