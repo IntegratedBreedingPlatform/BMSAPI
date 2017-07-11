@@ -1,10 +1,10 @@
 
 package org.ibp.api.java.impl.middleware.study;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Experiment;
@@ -20,15 +20,18 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
+import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
@@ -62,10 +65,9 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -76,6 +78,9 @@ public class StudyServiceImpl implements StudyService {
 
 	@Autowired
 	private StudyDataManager studyDataManager;
+
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
 	private FieldbookService fieldbookService;
@@ -576,5 +581,23 @@ public class StudyServiceImpl implements StudyService {
 		return middlewareStudyService.getStudyDetails(studyId);
 	}
 
+	@Override
+	public Long countStudies(final Map<StudyFilters, String> parameters) {
+		return this.studyDataManager.countAllStudies(parameters);
+	}
+
+	@Override
+	public List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final Map<StudyFilters, String> parameters,
+		final Integer pageSize, final Integer page) {
+		final List<org.generationcp.middleware.domain.dms.StudySummary> studySummaryList =
+			this.studyDataManager.findPagedProjects(parameters, pageSize, page);
+
+		for (final org.generationcp.middleware.domain.dms.StudySummary studySummary : studySummaryList) {
+			final Project project = this.workbenchDataManager.getProjectByUuid(studySummary.getProgramDbId());
+			studySummary.setProgramName(project.getProjectName());
+		}
+
+		return studySummaryList;
+	}
 
 }
