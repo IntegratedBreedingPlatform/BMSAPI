@@ -51,6 +51,10 @@ public abstract class ApiUnitTestBase {
 
 	@Autowired
 	protected WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	protected StudyDataManager studyDataManager;
+
 	@Autowired
 	protected UserDataManager userDataManager;
 
