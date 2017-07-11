@@ -68,7 +68,7 @@ public class TrialResourceBrapi {
 			return new ResponseEntity<>(trialSummaries, HttpStatus.NOT_FOUND);
 		}
 
-		final EnumMap<StudyFilters, String> parameters = setParameter(programDbId, locationDbId, sortBy, sortOrder);
+		final Map<StudyFilters, String> parameters = setParameters(programDbId, locationDbId, sortBy, sortOrder);
 		final PagedResult<StudySummary> resultPage = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<StudySummary>() {
 
 			@Override
@@ -113,10 +113,10 @@ public class TrialResourceBrapi {
 		return trialSummaryList;
 	}
 
-	private EnumMap<StudyFilters, String> setParameter(final String programDbId, final String locationDbId, final String sortByField,
+	private Map<StudyFilters, String> setParameters(final String programDbId, final String locationDbId, final String sortByField,
 		final String sortOrder) {
 
-		final EnumMap<StudyFilters, String> parametersMap = new EnumMap<>(StudyFilters.class);
+		final Map<StudyFilters, String> parametersMap = new EnumMap<>(StudyFilters.class);
 		if (!StringUtils.isBlank(programDbId)) {
 			parametersMap.put(StudyFilters.PROGRAM_ID, programDbId);
 		}
