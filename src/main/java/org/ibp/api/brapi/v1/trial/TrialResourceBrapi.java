@@ -151,7 +151,7 @@ public class TrialResourceBrapi {
 				nameField = "projectId";
 				break;
 			default:
-				nameField = "programName";
+				nameField = "";
 				break;
 		}
 		return nameField;
@@ -159,7 +159,7 @@ public class TrialResourceBrapi {
 
 	private String parameterValidation(final Boolean active, final String sortBy, final String sortOrder) {
 		final List<String> sortbyFields =
-			ImmutableList.<String>builder().add("trialDbId").add("trialName").add("programDbId").add("programName").build();
+			ImmutableList.<String>builder().add("trialDbId").add("trialName").add("programDbId").build();
 		final List<String> sortOrders = ImmutableList.<String>builder().add("Ascending").add("Descending").build();
 
 		if (active != null && !active) {
@@ -182,7 +182,7 @@ public class TrialResourceBrapi {
 				messageError = "not found inactive studies";
 				break;
 			case 2:
-				messageError = "sortBy bad filter, expect trialDbId/trialName/programDbId/programName";
+				messageError = "sortBy bad filter, expect trialDbId/trialName/programDbId";
 				break;
 			case 3:
 				messageError = "sortOrder bad filter, expect Ascending/Descending";
