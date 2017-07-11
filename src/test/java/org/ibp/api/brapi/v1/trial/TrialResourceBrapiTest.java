@@ -1,21 +1,15 @@
 package org.ibp.api.brapi.v1.trial;
 
-import static java.util.concurrent.ThreadLocalRandom.current;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasValue;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.anyString;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import java.util.List;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
-import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.ApiUnitTestBase;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -26,15 +20,17 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import java.util.List;
+
+import static java.util.concurrent.ThreadLocalRandom.current;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasValue;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 public class TrialResourceBrapiTest extends ApiUnitTestBase {
-
-	@Autowired
-	private StudyDataManager studyDataManager;
 
 	@Autowired
 	private StudyService studyServiceMW;
@@ -68,14 +64,18 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		instanceMetadata.setLocationName("INDIA");
 		studySummary.setInstanceMetaData(Lists.newArrayList(instanceMetadata));
 
-		List<StudySummary> mwStudySummary = Lists.newArrayList(studySummary);
-		Mockito.when(this.studyDataManager.findPagedProjects(programDbId, String.valueOf(locationId), season, 10, 1))
+		final List<StudySummary> mwStudySummary = Lists.newArrayList(studySummary);
+		Mockito.when(this.studyDataManager.findPagedProjects(Mockito.anyMapOf(StudyFilters.class, String.class), Mockito.anyInt(), Mockito.anyInt()))
 				.thenReturn(mwStudySummary);
-		Mockito.when(this.studyDataManager.countAllStudies(anyString(), anyString(), anyString())).thenReturn(200L);
+		Mockito.when(this.studyDataManager.countAllStudies(Mockito.anyMapOf(StudyFilters.class, String.class))).thenReturn(200L);
+
+		final Project project = new Project();
+		project.setProjectName("maize");
+		Mockito.when(this.workbenchDataManager.getProjectByUuid(Mockito.anyString())).thenReturn(project);
 
 		UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/trials")
-				.queryParam("programDbId", programDbId).queryParam("seasonDbId", season).queryParam("pageSize", 10)
-				.queryParam("pageNumber", 1).queryParam("locationDbId", String.valueOf(locationId)).build().encode();
+				.queryParam("programDbId", programDbId).queryParam("pageSize", 10)
+				.queryParam("pageNumber", 1).build().encode();
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isOk()) //
