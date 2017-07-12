@@ -6,6 +6,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.util.StringUtil;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.service.api.study.StudyFilters;
@@ -31,6 +32,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +48,9 @@ public class TrialResourceBrapi {
 
 	@Autowired
 	private StudyService studyService;
+
+	private static final String ASCENDING = "Ascending";
+	private static final String DESCENDING = "Descending";
 
 	@ApiOperation(value = "List of trial summaries", notes = "Get a list of trial summaries.")
 	@RequestMapping(value = "/{crop}/brapi/v1/trials", method = RequestMethod.GET)
@@ -81,7 +87,7 @@ public class TrialResourceBrapi {
 			}
 		});
 
-		final List<TrialSummary> trialSummaryList = translatedResults(resultPage);
+		final List<TrialSummary> trialSummaryList = translatedResults(resultPage, sortBy,sortOrder);
 		final Result<TrialSummary> results = new Result<TrialSummary>().withData(trialSummaryList);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
@@ -93,7 +99,7 @@ public class TrialResourceBrapi {
 
 	}
 
-	private List<TrialSummary> translatedResults(PagedResult<StudySummary> resultPage) {
+	private List<TrialSummary> translatedResults(PagedResult<StudySummary> resultPage,final String sortBy,final String sortOrder) {
 		final ModelMapper modelMapper = TrialMapper.getInstance();
 		final List<TrialSummary> trialSummaryList = new ArrayList<>();
 
@@ -109,9 +115,51 @@ public class TrialResourceBrapi {
 			}
 			trialSummaryList.add(trialSummaryDto);
 		}
+		if ("programName".equals(sortBy)) {
+			orderListByProgramName(trialSummaryList, sortOrder);
+		}else if("startDate".equals(sortBy)){
+			orderListByStartDate(trialSummaryList, sortOrder);
+		}
 		return trialSummaryList;
 	}
 
+	private void orderListByStartDate(List<TrialSummary> trialSummaryList, final String sortOrder) {
+		if (StringUtil.isEmpty(sortOrder) || TrialResourceBrapi.DESCENDING.equalsIgnoreCase(sortOrder)) {
+			Comparator desc = Collections.reverseOrder(getComparatorStartDate());
+			Collections.sort(trialSummaryList, desc);
+		}else {
+			Collections.sort(trialSummaryList, getComparatorStartDate());
+		}
+	}
+
+	private void orderListByProgramName(List<TrialSummary> trialSummaryList, final String sortOrder) {
+		if (StringUtil.isEmpty(sortOrder) || TrialResourceBrapi.DESCENDING.equalsIgnoreCase(sortOrder)) {
+			Comparator desc = Collections.reverseOrder(getComparatorProgramName());
+			Collections.sort(trialSummaryList, desc);
+		}else {
+			Collections.sort(trialSummaryList, getComparatorProgramName());
+		}
+	}
+
+	private Comparator<TrialSummary> getComparatorProgramName(){
+		return new Comparator<TrialSummary>() {
+
+			@Override
+			public int compare(final TrialSummary trialSummary1, final TrialSummary trialSummary2) {
+				return trialSummary1.getProgramName().compareTo(trialSummary2.getProgramName());
+			}
+		};
+	}
+
+	private Comparator<TrialSummary> getComparatorStartDate(){
+		return new Comparator<TrialSummary>() {
+
+			@Override
+			public int compare(final TrialSummary trialSummary1, final TrialSummary trialSummary2) {
+				return trialSummary1.getStartDate().compareTo(trialSummary2.getStartDate());
+			}
+		};
+	}
 	private Map<StudyFilters, String> setParameters(final String programDbId, final String locationDbId, final String sortByField,
 		final String sortOrder) {
 
@@ -129,34 +177,25 @@ public class TrialResourceBrapi {
 			parametersMap.put(StudyFilters.SORT_BY_FIELD, "projectId");
 
 		}
-		if (StringUtils.isBlank(sortOrder) || "Ascending".equalsIgnoreCase(sortOrder)) {
+		if (StringUtils.isBlank(sortOrder) || TrialResourceBrapi.ASCENDING.equalsIgnoreCase(sortOrder)) {
 			parametersMap.put(StudyFilters.ORDER, "asc");
-		} else if (!StringUtils.isBlank(sortOrder) && "Descending".equalsIgnoreCase(sortOrder)) {
+		} else if (!StringUtils.isBlank(sortOrder) && TrialResourceBrapi.DESCENDING.equalsIgnoreCase(sortOrder)) {
 			parametersMap.put(StudyFilters.ORDER, "desc");
 		}
 		return parametersMap;
 	}
 
 	private String translateNameField(final String sortByField) {
-		final String nameField;
-		switch (sortByField) {
-			case "programDbId":
-				nameField = "programUUID";
-				break;
-			case "trialName":
-				nameField = "name";
-				break;
-			default:
-				nameField = "projectId";
-				break;
+		if ("trialName".equals(sortByField)) {
+			return "name";
 		}
-		return nameField;
+		return "projectId";
 	}
 
 	private String parameterValidation(final Boolean active, final String sortBy, final String sortOrder) {
 		final List<String> sortbyFields =
-			ImmutableList.<String>builder().add("trialDbId").add("trialName").add("programDbId").build();
-		final List<String> sortOrders = ImmutableList.<String>builder().add("Ascending").add("Descending").build();
+			ImmutableList.<String>builder().add("trialDbId").add("trialName").add("programDbId").add("programName").add("startDate").add("endDate").add("active").build();
+		final List<String> sortOrders = ImmutableList.<String>builder().add(TrialResourceBrapi.ASCENDING).add(TrialResourceBrapi.DESCENDING).build();
 
 		if (active != null && !active) {
 			return gerMessageError(1);
@@ -178,7 +217,7 @@ public class TrialResourceBrapi {
 				messageError = "not found inactive studies";
 				break;
 			case 2:
-				messageError = "sortBy bad filter, expect trialDbId/trialName/programDbId";
+				messageError = "sortBy bad filter, expect trialDbId/trialName/programDbId/programName/startDate/endDate/active";
 				break;
 			case 3:
 				messageError = "sortOrder bad filter, expect Ascending/Descending";
