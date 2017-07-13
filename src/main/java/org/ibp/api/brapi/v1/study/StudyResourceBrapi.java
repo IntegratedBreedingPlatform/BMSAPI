@@ -5,10 +5,10 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.google.common.net.MediaType;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import liquibase.util.StringUtils;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -28,8 +28,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.web.DefaultRedirectStrategy;
-import org.springframework.security.web.RedirectStrategy;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,6 +43,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,7 +96,7 @@ public class StudyResourceBrapi {
 		 * For now, just returning an empty place holder message with status.
 		 */
 
-		Result<org.ibp.api.brapi.v1.study.StudySummaryDto> results = new Result<StudySummaryDto>();
+		Result<org.ibp.api.brapi.v1.study.StudySummaryDto> results = new Result<>();
 		Pagination pagination = new Pagination();
 		Metadata metadata =
 				new Metadata().withPagination(pagination)
@@ -114,23 +113,23 @@ public class StudyResourceBrapi {
 		@ApiParam(value = "The format parameter will cause the data to be dumped to a file in the specified format", required = false)
 		@RequestParam(value = "format", required = false) final String format) throws Exception {
 
-		if (CSV.equalsIgnoreCase(format.trim())) {
+		if (!StringUtils.isEmpty(format)) {
+			if (CSV.equalsIgnoreCase(format.trim())) {
+				response.sendRedirect("/bmsapi/" + crop + "/brapi/v1/" + studyDbId + "/table/csv");
+				return new ResponseEntity<>(HttpStatus.OK);
+			} else if (TSV.equalsIgnoreCase(format.trim())) {
 
-			response.sendRedirect("/bmsapi/" + crop + "/brapi/v1/" + studyDbId + "/table/csv");
-			return new ResponseEntity<>(HttpStatus.OK);
-		} else if (TSV.equalsIgnoreCase(format.trim())) {
-
-			response.sendRedirect("/bmsapi/" + crop + "/brapi/v1/" + studyDbId + "/table/tsv");
-			return new ResponseEntity<>(HttpStatus.OK);
+				response.sendRedirect("/bmsapi/" + crop + "/brapi/v1/" + studyDbId + "/table/tsv");
+				return new ResponseEntity<>(HttpStatus.OK);
+			}
 		}
-
 		return new ResponseEntity<>(this.getStudyObservations(studyDbId), HttpStatus.OK);
 	}
 
-	private StudyObservations getStudyObservations(int studyDbId) throws Exception {
+	private StudyObservations getStudyObservations(final int studyDbId) throws Exception {
 		StudyObservationTable studyObservationsTable = new StudyObservationTable();
 
-		Integer trialDbId = this.studyDataManager.getProjectIdByStudyDbId(studyDbId);
+		final Integer trialDbId = this.studyDataManager.getProjectIdByStudyDbId(studyDbId);
 
 		if (trialDbId == null) {
 			throw new Exception("studyDbId " + studyDbId + " does not exist");
@@ -141,7 +140,7 @@ public class StudyResourceBrapi {
 		int resultNumber = (trialObservationTable == null) ? 0 : 1;
 
 		if (resultNumber != 0) {
-			ModelMapper modelMapper = new ModelMapper();
+			final ModelMapper modelMapper = new ModelMapper();
 			studyObservationsTable = modelMapper.map(trialObservationTable, StudyObservationTable.class);
 		}
 
@@ -171,10 +170,10 @@ public class StudyResourceBrapi {
 			final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
 
 			if (mwStudyDetails.getMetadata().getLocationId() != null) {
-				Map<LocationFilters, Object> filters = new HashMap<>();
+				Map<LocationFilters, Object> filters = new EnumMap<>(LocationFilters.class);
 				filters.put(LocationFilters.LOCATION_ID, String.valueOf(mwStudyDetails.getMetadata().getLocationId()));
 				List<LocationDetailsDto> locations = locationDataManager.getLocationsByFilter(0, 1, filters);
-				if (locations.size() > 0) {
+				if (!locations.isEmpty()) {
 					final ModelMapper locationMapper = LocationMapper.getInstance();
 					Location location = locationMapper.map(locations.get(0), Location.class);
 					result.setLocation(location);
@@ -192,11 +191,11 @@ public class StudyResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/{studyDbId}/table/csv", method = RequestMethod.GET)
 	public ResponseEntity<FileSystemResource> streamCSV(@PathVariable final String crop, @PathVariable final Integer studyDbId) throws Exception {
 
-		File file = createDownloadFile(this.getStudyObservations(studyDbId).getResult(), ',', "studyObservations.csv");
+		final File file = createDownloadFile(this.getStudyObservations(studyDbId).getResult(), ',', "studyObservations.csv");
 		final String filename = file.getName();
 		final String absoluteLocation = file.getAbsolutePath();
 
-		return this.createResponseEntityForFileDownload(absoluteLocation, filename);
+		return StudyResourceBrapi.createResponseEntityForFileDownload(absoluteLocation, filename);
 	}
 
 
@@ -207,8 +206,8 @@ public class StudyResourceBrapi {
 	 * @param filename  - the filename that will be set in the http response header
 	 * @return
 	 */
-	public static ResponseEntity<FileSystemResource> createResponseEntityForFileDownload(String fileWithFullPath, String filename) throws
-		UnsupportedEncodingException {
+	public static ResponseEntity<FileSystemResource> createResponseEntityForFileDownload(final String fileWithFullPath,
+		final String filename) throws UnsupportedEncodingException {
 		final HttpHeaders respHeaders = new HttpHeaders();
 
 		final File resource = new File(fileWithFullPath);
@@ -224,36 +223,36 @@ public class StudyResourceBrapi {
 
 	}
 
-	private File createDownloadFile(StudyObservationTable table, char sep, String pathname) throws IOException {
+	private File createDownloadFile(final StudyObservationTable table, final char sep, final String pathname) throws IOException {
 		// create mapper and schema
-		CsvMapper mapper = new CsvMapper();
+		final CsvMapper mapper = new CsvMapper();
 		CsvSchema schema = mapper.schemaFor(List.class);
 		schema = schema.withColumnSeparator(sep);
 
 		// output writer
-		ObjectWriter myObjectWriter = mapper.writer(schema);
-		File resultFile = new File(pathname);
-		List<String> header = new ArrayList<>();
+		final ObjectWriter myObjectWriter = mapper.writer(schema);
+		final File resultFile = new File(pathname);
+		final List<String> header = new ArrayList<>();
 
-		for (String headerName : table.getHeaderRow()) {
+		for (final String headerName : table.getHeaderRow()) {
 			header.add(headerName);
 		}
 
-		Object[] variableIds = table.getObservationVariableDbIds().toArray();
-		Object[] variableNames = table.getObservationVariableNames().toArray();
+		final Object[] variableIds = table.getObservationVariableDbIds().toArray();
+		final Object[] variableNames = table.getObservationVariableNames().toArray();
 		for (int i = 0; i < variableIds.length; i++) {
 			header.add(variableNames[i] + "|" + variableIds[i]);
 		}
 
 
-		List<List<String>> data = table.getData();
+		final List<List<String>> data = table.getData();
 		data.add(0, header);
 
 		mapper.writeValue(resultFile, data);
 
-		FileOutputStream tempFileOutputStream = new FileOutputStream(resultFile);
-		BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(tempFileOutputStream, 1024);
-		OutputStreamWriter writerOutputStream = new OutputStreamWriter(bufferedOutputStream, "UTF-8");
+		final FileOutputStream tempFileOutputStream = new FileOutputStream(resultFile);
+		final BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(tempFileOutputStream, 1024);
+		final OutputStreamWriter writerOutputStream = new OutputStreamWriter(bufferedOutputStream, "UTF-8");
 
 		myObjectWriter.writeValue(writerOutputStream, data);
 		return resultFile;
@@ -261,10 +260,10 @@ public class StudyResourceBrapi {
 
 	@RequestMapping(value = "/{crop}/brapi/v1/{studyDbId}/table/tsv", method = RequestMethod.GET)
 	public ResponseEntity<FileSystemResource> streamTSV(@PathVariable final String crop, @PathVariable final Integer studyDbId) throws Exception {
-		File file = createDownloadFile(this.getStudyObservations(studyDbId).getResult(), '\t', "studyObservations.tsv");
+		final File file = createDownloadFile(this.getStudyObservations(studyDbId).getResult(), '\t', "studyObservations.tsv");
 		final String filename = file.getName();
 		final String absoluteLocation = file.getAbsolutePath();
 
-		return this.createResponseEntityForFileDownload(absoluteLocation, filename);
+		return StudyResourceBrapi.createResponseEntityForFileDownload(absoluteLocation, filename);
 	}
 }
