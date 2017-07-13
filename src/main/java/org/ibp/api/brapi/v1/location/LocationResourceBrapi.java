@@ -2,6 +2,7 @@
 package org.ibp.api.brapi.v1.location;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class LocationResourceBrapi {
 			@ApiParam(value = "name of location type", required = false) @RequestParam(value = "locationType",
 					required = false) String locationType) {
 
-		final Map<LocationFilters, Object> filters = new HashMap<>();
+		final Map<LocationFilters, Object> filters = new EnumMap<>(LocationFilters.class);
 		PagedResult<LocationDetailsDto> resultPage = null;
 		if (!StringUtils.isBlank(locationType)) {
 			final Integer locationTypeId = this.locationDataManager
