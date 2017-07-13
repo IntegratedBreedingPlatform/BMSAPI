@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class ProgramResourceBrapi {
 			String programName, @ApiParam(value = "Filter by program abbreviation. Exact match.", required = false)
 	@RequestParam(value = "abbreviation", required = false) String abbreviation) {
 
-		final Map<ProgramFilters, Object> filters = new HashMap<>();
+		final Map<ProgramFilters, Object> filters = new EnumMap<>(ProgramFilters.class);
 		PagedResult<ProgramDetailsDto> resultPage = null;
 		setFilters(filters, crop, programName);
 
@@ -108,7 +109,7 @@ public class ProgramResourceBrapi {
 			return new ResponseEntity<>(programList, HttpStatus.OK);
 		}
 		Map<String, String> status = new HashMap<>();
-		status.put("message", "not found programs");
+		status.put("message", "program not found.");
 		Metadata metadata = new Metadata(null, status);
 		Programs programList = new Programs().withMetadata(metadata);
 		return new ResponseEntity<>(programList, HttpStatus.NOT_FOUND);
