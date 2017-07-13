@@ -87,7 +87,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 			.contentType(this.contentType)) //
 			.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 			.andDo(MockMvcResultHandlers.print()) //
-			.andExpect(jsonPath("$.metadata.status.message", Matchers.is("not found programs"))); //
+			.andExpect(jsonPath("$.metadata.status.message", Matchers.is("program not found."))); //
 	}
 
 	private List<ProgramDetailsDto> getProgramDetails() {
