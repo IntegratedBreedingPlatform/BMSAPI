@@ -44,6 +44,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,11 +114,11 @@ public class StudyResourceBrapi {
 		@ApiParam(value = "The format parameter will cause the data to be dumped to a file in the specified format", required = false)
 		@RequestParam(value = "format", required = false) final String format) throws Exception {
 
-		if (CSV.equals(format)) {
+		if (CSV.equalsIgnoreCase(format.trim())) {
 
 			response.sendRedirect("/bmsapi/" + crop + "/brapi/v1/" + studyDbId + "/table/csv");
 			return new ResponseEntity<>(HttpStatus.OK);
-		} else if (TSV.equals(format)) {
+		} else if (TSV.equalsIgnoreCase(format.trim())) {
 
 			response.sendRedirect("/bmsapi/" + crop + "/brapi/v1/" + studyDbId + "/table/tsv");
 			return new ResponseEntity<>(HttpStatus.OK);
@@ -232,31 +233,38 @@ public class StudyResourceBrapi {
 		// output writer
 		ObjectWriter myObjectWriter = mapper.writer(schema);
 		File resultFile = new File(pathname);
-		String header = "";
+		List<String> header = new ArrayList<>();
 
 		for (String headerName : table.getHeaderRow()) {
-			header = header + headerName + sep;
+			header.add(headerName);
 		}
 
 		Object[] variableIds = table.getObservationVariableDbIds().toArray();
 		Object[] variableNames = table.getObservationVariableNames().toArray();
 		for (int i = 0; i < variableIds.length; i++) {
-			header = header + variableNames[i] + '|' + variableIds[i] + sep;
+			header.add(variableNames[i] + "|" + variableIds[i]);
 		}
 
-		header = header.substring(0, header.length() - 1);
-		mapper.writeValue(resultFile, header);
-		mapper.writeValue(resultFile, table.getData());
+
+		List<List<String>> data = table.getData();
+		data.add(0, header);
+
+		mapper.writeValue(resultFile, data);
 
 		FileOutputStream tempFileOutputStream = new FileOutputStream(resultFile);
 		BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(tempFileOutputStream, 1024);
 		OutputStreamWriter writerOutputStream = new OutputStreamWriter(bufferedOutputStream, "UTF-8");
-		myObjectWriter.writeValue(writerOutputStream, table.getData());
+
+		myObjectWriter.writeValue(writerOutputStream, data);
 		return resultFile;
 	}
 
 	@RequestMapping(value = "/{crop}/brapi/v1/{studyDbId}/table/tsv", method = RequestMethod.GET)
-	public void streamTSV(@PathVariable final String crop, @PathVariable final Integer studyDbId) throws Exception {
-		createDownloadFile(this.getStudyObservations(studyDbId).getResult(), '\t', "studyObservations.tsv");
+	public ResponseEntity<FileSystemResource> streamTSV(@PathVariable final String crop, @PathVariable final Integer studyDbId) throws Exception {
+		File file = createDownloadFile(this.getStudyObservations(studyDbId).getResult(), '\t', "studyObservations.tsv");
+		final String filename = file.getName();
+		final String absoluteLocation = file.getAbsolutePath();
+
+		return this.createResponseEntityForFileDownload(absoluteLocation, filename);
 	}
 }
