@@ -214,7 +214,7 @@ public class TrialResourceBrapi {
 		final String messageError;
 		switch (messageValue) {
 			case 1:
-				messageError = "not found inactive studies";
+				messageError = "No inactive studies found.";
 				break;
 			case 2:
 				messageError = "sortBy bad filter, expect trialDbId/trialName/programDbId/programName/startDate/endDate/active";
