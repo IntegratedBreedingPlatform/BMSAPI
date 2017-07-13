@@ -188,8 +188,9 @@ public class StudyResourceBrapi {
 
 	}
 
+	@ApiOperation(value = "", hidden = true)
 	@RequestMapping(value = "/{crop}/brapi/v1/{studyDbId}/table/csv", method = RequestMethod.GET)
-	public ResponseEntity<FileSystemResource> streamCSV(@PathVariable final String crop, @PathVariable final Integer studyDbId) throws Exception {
+	private ResponseEntity<FileSystemResource> streamCSV(@PathVariable final String crop, @PathVariable final Integer studyDbId) throws Exception {
 
 		final File file = createDownloadFile(this.getStudyObservations(studyDbId).getResult(), ',', "studyObservations.csv");
 		final String filename = file.getName();
@@ -206,7 +207,7 @@ public class StudyResourceBrapi {
 	 * @param filename  - the filename that will be set in the http response header
 	 * @return
 	 */
-	public static ResponseEntity<FileSystemResource> createResponseEntityForFileDownload(final String fileWithFullPath,
+	private static ResponseEntity<FileSystemResource> createResponseEntityForFileDownload(final String fileWithFullPath,
 		final String filename) throws UnsupportedEncodingException {
 		final HttpHeaders respHeaders = new HttpHeaders();
 
@@ -258,8 +259,9 @@ public class StudyResourceBrapi {
 		return resultFile;
 	}
 
+	@ApiOperation(value = "", hidden = true)
 	@RequestMapping(value = "/{crop}/brapi/v1/{studyDbId}/table/tsv", method = RequestMethod.GET)
-	public ResponseEntity<FileSystemResource> streamTSV(@PathVariable final String crop, @PathVariable final Integer studyDbId) throws Exception {
+	private ResponseEntity<FileSystemResource> streamTSV(@PathVariable final String crop, @PathVariable final Integer studyDbId) throws Exception {
 		final File file = createDownloadFile(this.getStudyObservations(studyDbId).getResult(), '\t', "studyObservations.tsv");
 		final String filename = file.getName();
 		final String absoluteLocation = file.getAbsolutePath();
