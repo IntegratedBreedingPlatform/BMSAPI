@@ -115,11 +115,12 @@ public class StudyResourceBrapi {
 
 		if (!StringUtils.isEmpty(format)) {
 			if (CSV.equalsIgnoreCase(format.trim())) {
-				response.sendRedirect("/bmsapi/" + crop + "/brapi/v1/" + studyDbId + "/table/csv");
+				response.sendRedirect("/bmsapi/" + crop + "/brapi/v1/studies/" + studyDbId + "/table/csv");
 				return new ResponseEntity<>(HttpStatus.OK);
 			} else if (TSV.equalsIgnoreCase(format.trim())) {
 
-				response.sendRedirect("/bmsapi/" + crop + "/brapi/v1/" + studyDbId + "/table/tsv");
+				response.sendRedirect("/bmsapi/" + crop + "/brapi/v1/studies/" + studyDbId + "/table/tsv");
+
 				return new ResponseEntity<>(HttpStatus.OK);
 			}
 		}
@@ -189,39 +190,21 @@ public class StudyResourceBrapi {
 	}
 
 	@ApiOperation(value = "", hidden = true)
-	@RequestMapping(value = "/{crop}/brapi/v1/{studyDbId}/table/csv", method = RequestMethod.GET)
-	private ResponseEntity<FileSystemResource> streamCSV(@PathVariable final String crop, @PathVariable final Integer studyDbId) throws Exception {
+	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/table/csv", method = RequestMethod.GET)
+	private ResponseEntity<FileSystemResource> streamCSV(@PathVariable final String crop, @PathVariable final Integer studyDbId)
+		throws Exception {
 
 		final File file = createDownloadFile(this.getStudyObservations(studyDbId).getResult(), ',', "studyObservations.csv");
-		final String filename = file.getName();
-		final String absoluteLocation = file.getAbsolutePath();
-
-		return StudyResourceBrapi.createResponseEntityForFileDownload(absoluteLocation, filename);
+		return StudyResourceBrapi.createResponseEntityForFileDownload(file);
 	}
 
+	@ApiOperation(value = "", hidden = true)
+	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/table/tsv", method = RequestMethod.GET)
+	private ResponseEntity<FileSystemResource> streamTSV(@PathVariable final String crop, @PathVariable final Integer studyDbId)
+		throws Exception {
+		final File file = createDownloadFile(this.getStudyObservations(studyDbId).getResult(), '\t', "studyObservations.tsv");
 
-	/**
-	 * Creates ResponseEntity to download a file from a controller.
-	 *
-	 * @param fileWithFullPath  - path of the file to be downloaded
-	 * @param filename  - the filename that will be set in the http response header
-	 * @return
-	 */
-	private static ResponseEntity<FileSystemResource> createResponseEntityForFileDownload(final String fileWithFullPath,
-		final String filename) throws UnsupportedEncodingException {
-		final HttpHeaders respHeaders = new HttpHeaders();
-
-		final File resource = new File(fileWithFullPath);
-		final FileSystemResource fileSystemResource = new FileSystemResource(resource);
-
-		final String mimeType = FileUtils.detectMimeType(filename);
-		final String sanitizedFilename = FileUtils.sanitizeFileName(filename);
-
-		respHeaders.set(CONTENT_TYPE,String.format("%s;charset=utf-8",mimeType));
-		respHeaders.set(CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"; filename*=utf-8\'\'%s", sanitizedFilename, FileUtils.encodeFilenameForDownload(sanitizedFilename)));
-
-		return new ResponseEntity<>(fileSystemResource, respHeaders, HttpStatus.OK);
-
+		return StudyResourceBrapi.createResponseEntityForFileDownload(file);
 	}
 
 	private File createDownloadFile(final StudyObservationTable table, final char sep, final String pathname) throws IOException {
@@ -245,7 +228,6 @@ public class StudyResourceBrapi {
 			header.add(variableNames[i] + "|" + variableIds[i]);
 		}
 
-
 		final List<List<String>> data = table.getData();
 		data.add(0, header);
 
@@ -259,13 +241,30 @@ public class StudyResourceBrapi {
 		return resultFile;
 	}
 
-	@ApiOperation(value = "", hidden = true)
-	@RequestMapping(value = "/{crop}/brapi/v1/{studyDbId}/table/tsv", method = RequestMethod.GET)
-	private ResponseEntity<FileSystemResource> streamTSV(@PathVariable final String crop, @PathVariable final Integer studyDbId) throws Exception {
-		final File file = createDownloadFile(this.getStudyObservations(studyDbId).getResult(), '\t', "studyObservations.tsv");
-		final String filename = file.getName();
-		final String absoluteLocation = file.getAbsolutePath();
+	/**
+	 * Creates ResponseEntity to download a file from a controller.
+	 *
+	 * @param file - file to be downloaded
+	 * @return
+	 */
+	private static ResponseEntity<FileSystemResource> createResponseEntityForFileDownload(final File file)
+		throws UnsupportedEncodingException {
 
-		return StudyResourceBrapi.createResponseEntityForFileDownload(absoluteLocation, filename);
+		final String filename = file.getName();
+		final String fileWithFullPath = file.getAbsolutePath();
+		final HttpHeaders respHeaders = new HttpHeaders();
+
+		final File resource = new File(fileWithFullPath);
+		final FileSystemResource fileSystemResource = new FileSystemResource(resource);
+
+		final String mimeType = FileUtils.detectMimeType(filename);
+		final String sanitizedFilename = FileUtils.sanitizeFileName(filename);
+
+		respHeaders.set(CONTENT_TYPE, String.format("%s;charset=utf-8", mimeType));
+		respHeaders.set(CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"; filename*=utf-8\'\'%s", sanitizedFilename,
+			FileUtils.encodeFilenameForDownload(sanitizedFilename)));
+
+		return new ResponseEntity<>(fileSystemResource, respHeaders, HttpStatus.OK);
+
 	}
 }
