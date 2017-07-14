@@ -168,4 +168,41 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(jsonPath("$.metadata.pagination.totalPages", is(1))) //
 		;
 	}
+
+
+	@Test
+	public void testGetListTrialSummariesBadOrderByFields() throws Exception {
+		UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/trials")
+			.queryParam("programDbId", 1).queryParam("pageSize", 10)
+			.queryParam("pageNumber", 1)
+			.queryParam("sortBy", "trialName1").build().encode();
+		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType)) //
+			.andExpect(MockMvcResultMatchers.status().isNotFound()) //
+			.andDo(MockMvcResultHandlers.print()).andExpect(jsonPath("$.metadata.status.message", is("sortBy bad filter, expect trialDbId/trialName/programDbId/programName/startDate/endDate/active"))) //
+		;
+	}
+
+	@Test
+	public void testGetListTrialSummariesFilterByInactiveStudies() throws Exception {
+		UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/trials")
+			.queryParam("programDbId", 1).queryParam("pageSize", 10)
+			.queryParam("pageNumber", 1)
+			.queryParam("active", Boolean.FALSE).build().encode();
+		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType)) //
+			.andExpect(MockMvcResultMatchers.status().isNotFound()) //
+			.andDo(MockMvcResultHandlers.print()).andExpect(jsonPath("$.metadata.status.message", is("No inactive studies found."))) //
+		;
+	}
+
+	@Test
+	public void testGetListTrialSummariesBadSorterOrder() throws Exception {
+		UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/trials")
+			.queryParam("programDbId", 1).queryParam("pageSize", 10)
+			.queryParam("pageNumber", 1)
+			.queryParam("sortOrder", "Ascendin").build().encode();
+		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType)) //
+			.andExpect(MockMvcResultMatchers.status().isNotFound()) //
+			.andDo(MockMvcResultHandlers.print()).andExpect(jsonPath("$.metadata.status.message", is("sortOrder bad filter, expect Ascending/Descending"))) //
+		;
+	}
 }
