@@ -13,14 +13,14 @@ public class TrialMapper {
 	}
 
 	static {
-		TrialMapper.addLocationDetailsDataMapping(TrialMapper.applicationWideModelMapper);
+		TrialMapper.addTrialSummaryMapper(TrialMapper.applicationWideModelMapper);
 	}
 
 	public static ModelMapper getInstance() {
 		return TrialMapper.applicationWideModelMapper;
 	}
 
-	private static void addLocationDetailsDataMapping(final ModelMapper mapper) {
+	private static void addTrialSummaryMapper(final ModelMapper mapper) {
 
 		mapper.addMappings(new PropertyMap<StudySummary, TrialSummary>() {
 

@@ -49,8 +49,8 @@ public class TrialResourceBrapi {
 	@Autowired
 	private StudyService studyService;
 
-	private static final String ASCENDING = "Ascending";
-	private static final String DESCENDING = "Descending";
+	private static final String ORDER_BY_ASCENDING = "asc";
+	private static final String ORDER_BY_DESCENDING = "desc";
 
 	@ApiOperation(value = "List of trial summaries", notes = "Get a list of trial summaries.")
 	@RequestMapping(value = "/{crop}/brapi/v1/trials", method = RequestMethod.GET)
@@ -62,7 +62,7 @@ public class TrialResourceBrapi {
 			@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.", required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize,
 			@ApiParam(value = "Filter active status true/false", required = false) @RequestParam(value = "active", required = false) final Boolean active,
 			@ApiParam(value = "Sort order. Name of the field to sorty by.", required = false) @RequestParam(value = "sortBy", required = false) final String sortBy,
-			@ApiParam(value = "Sort order direction. Ascending/Descending.", required = false) @RequestParam(value = "sortOrder", required = false) final String sortOrder) {
+			@ApiParam(value = "Sort order direction. asc/desc.", required = false) @RequestParam(value = "sortOrder", required = false) final String sortOrder) {
 
 		final String validationError = parameterValidation(active, sortBy, sortOrder);
 		if (!StringUtils.isBlank(validationError)) {
@@ -124,24 +124,24 @@ public class TrialResourceBrapi {
 	}
 
 	private void orderListByStartDate(List<TrialSummary> trialSummaryList, final String sortOrder) {
-		if (StringUtil.isEmpty(sortOrder) || TrialResourceBrapi.DESCENDING.equalsIgnoreCase(sortOrder)) {
-			Comparator desc = Collections.reverseOrder(getComparatorStartDate());
+		if (StringUtil.isEmpty(sortOrder) || TrialResourceBrapi.ORDER_BY_DESCENDING.equalsIgnoreCase(sortOrder)) {
+			Comparator desc = Collections.reverseOrder(TrialResourceBrapi.getComparatorStartDate());
 			Collections.sort(trialSummaryList, desc);
-		}else {
-			Collections.sort(trialSummaryList, getComparatorStartDate());
+		} else {
+			Collections.sort(trialSummaryList, TrialResourceBrapi.getComparatorStartDate());
 		}
 	}
 
 	private void orderListByProgramName(List<TrialSummary> trialSummaryList, final String sortOrder) {
-		if (StringUtil.isEmpty(sortOrder) || TrialResourceBrapi.DESCENDING.equalsIgnoreCase(sortOrder)) {
-			Comparator desc = Collections.reverseOrder(getComparatorProgramName());
+		if (StringUtil.isEmpty(sortOrder) || TrialResourceBrapi.ORDER_BY_DESCENDING.equalsIgnoreCase(sortOrder)) {
+			Comparator desc = Collections.reverseOrder(TrialResourceBrapi.getComparatorProgramName());
 			Collections.sort(trialSummaryList, desc);
-		}else {
-			Collections.sort(trialSummaryList, getComparatorProgramName());
+		} else {
+			Collections.sort(trialSummaryList, TrialResourceBrapi.getComparatorProgramName());
 		}
 	}
 
-	private Comparator<TrialSummary> getComparatorProgramName(){
+	private static Comparator<TrialSummary> getComparatorProgramName() {
 		return new Comparator<TrialSummary>() {
 
 			@Override
@@ -151,7 +151,7 @@ public class TrialResourceBrapi {
 		};
 	}
 
-	private Comparator<TrialSummary> getComparatorStartDate(){
+	private static Comparator<TrialSummary> getComparatorStartDate() {
 		return new Comparator<TrialSummary>() {
 
 			@Override
@@ -160,6 +160,7 @@ public class TrialResourceBrapi {
 			}
 		};
 	}
+
 	private Map<StudyFilters, String> setParameters(final String programDbId, final String locationDbId, final String sortByField,
 		final String sortOrder) {
 
@@ -171,62 +172,36 @@ public class TrialResourceBrapi {
 			parametersMap.put(StudyFilters.LOCATION_ID, locationDbId);
 		}
 
-		if (!StringUtils.isBlank(sortByField)) {
-			parametersMap.put(StudyFilters.SORT_BY_FIELD, translateNameField(sortByField));
+		if (!StringUtils.isBlank(sortByField) && "trialName".equals(sortByField)) {
+			parametersMap.put(StudyFilters.SORT_BY_FIELD, "name");
 		} else {
 			parametersMap.put(StudyFilters.SORT_BY_FIELD, "projectId");
 
 		}
-		if (StringUtils.isBlank(sortOrder) || TrialResourceBrapi.ASCENDING.equalsIgnoreCase(sortOrder)) {
+		if (StringUtils.isBlank(sortOrder) || TrialResourceBrapi.ORDER_BY_ASCENDING.equalsIgnoreCase(sortOrder)) {
 			parametersMap.put(StudyFilters.ORDER, "asc");
-		} else if (!StringUtils.isBlank(sortOrder) && TrialResourceBrapi.DESCENDING.equalsIgnoreCase(sortOrder)) {
+		} else if (!StringUtils.isBlank(sortOrder) && TrialResourceBrapi.ORDER_BY_DESCENDING.equalsIgnoreCase(sortOrder)) {
 			parametersMap.put(StudyFilters.ORDER, "desc");
 		}
 		return parametersMap;
 	}
 
-	private String translateNameField(final String sortByField) {
-		if ("trialName".equals(sortByField)) {
-			return "name";
-		}
-		return "projectId";
-	}
-
 	private String parameterValidation(final Boolean active, final String sortBy, final String sortOrder) {
 		final List<String> sortbyFields =
 			ImmutableList.<String>builder().add("trialDbId").add("trialName").add("programDbId").add("programName").add("startDate").add("endDate").add("active").build();
-		final List<String> sortOrders = ImmutableList.<String>builder().add(TrialResourceBrapi.ASCENDING).add(TrialResourceBrapi.DESCENDING).build();
+		final List<String> sortOrders = ImmutableList.<String>builder().add(TrialResourceBrapi.ORDER_BY_ASCENDING).add(TrialResourceBrapi.ORDER_BY_DESCENDING).build();
 
 		if (active != null && !active) {
-			return gerMessageError(1);
+			return "No inactive studies found.";
 		}
 		if (!StringUtils.isBlank(sortBy) && !sortbyFields.contains(sortBy)) {
-			return gerMessageError(2);
+			return "sortBy bad filter, expect trialDbId/trialName/programDbId/programName/startDate/endDate/active";
 
 		}
 		if (!StringUtils.isBlank(sortOrder) && !sortOrders.contains(sortOrder)) {
-			return gerMessageError(3);
+			return "sortOrder bad filter, expect asc/desc";
 		}
 		return "";
-	}
-
-	private String gerMessageError(final Integer messageValue) {
-		final String messageError;
-		switch (messageValue) {
-			case 1:
-				messageError = "No inactive studies found.";
-				break;
-			case 2:
-				messageError = "sortBy bad filter, expect trialDbId/trialName/programDbId/programName/startDate/endDate/active";
-				break;
-			case 3:
-				messageError = "sortOrder bad filter, expect Ascending/Descending";
-				break;
-			default:
-				messageError = "";
-				break;
-		}
-		return messageError;
 	}
 
 	@ApiOperation(value = "Get trial observation details as table", notes = "Get trial observation details as table")
