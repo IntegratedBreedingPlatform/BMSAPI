@@ -57,7 +57,7 @@ public interface StudyService {
 
 	StudyDetailsDto getStudyDetailsDto (final Integer studyId);
 
-	Long countStudies(final Map<StudyFilters, String> parameters);
+	Long countStudies(final Map<StudyFilters, String> filters);
 
-	List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final Map<StudyFilters, String> parameters, Integer pageSize, Integer page);
+	List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final Map<StudyFilters, String> filters, Integer pageSize, Integer pageNumber);
 }

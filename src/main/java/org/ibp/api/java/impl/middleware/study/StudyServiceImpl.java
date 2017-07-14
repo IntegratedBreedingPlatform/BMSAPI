@@ -264,7 +264,7 @@ public class StudyServiceImpl implements StudyService {
 			// Relies on the hash coded generated in the MeasurementIdentifier object
 			final Measurement existingMeasurement = existingObservation.getMeasurement(measurement.getMeasurementIdentifier());
 			if (existingMeasurement == null) {
-				final String []array = {"measurement.already.inserted"};
+				final String []errorMessage = {"measurement.already.inserted"};
 				final List<String> object = new ArrayList<>();
 				final ObjectMapper objectMapper = new ObjectMapper();
 				try {
@@ -273,7 +273,7 @@ public class StudyServiceImpl implements StudyService {
 					throw new ApiRuntimeException("Error mapping measurement to JSON", e);
 				}
 				final FieldError objectError =
-						new FieldError("Observation", "Measurements [" + counter + "]", null, false, array, object.toArray(),
+						new FieldError("Observation", "Measurements [" + counter + "]", null, false, errorMessage, object.toArray(),
 								"Error processing measurement");
 				errors.add(objectError);
 				counter++;
@@ -582,15 +582,15 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public Long countStudies(final Map<StudyFilters, String> parameters) {
-		return this.studyDataManager.countAllStudies(parameters);
+	public Long countStudies(final Map<StudyFilters, String> filters) {
+		return this.studyDataManager.countAllStudies(filters);
 	}
 
 	@Override
-	public List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final Map<StudyFilters, String> parameters,
-		final Integer pageSize, final Integer page) {
+	public List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final Map<StudyFilters, String> filters,
+		final Integer pageSize, final Integer pageNumber) {
 		final List<org.generationcp.middleware.domain.dms.StudySummary> studySummaryList =
-			this.studyDataManager.findPagedProjects(parameters, pageSize, page);
+			this.studyDataManager.findPagedProjects(filters, pageSize, pageNumber);
 
 		for (final org.generationcp.middleware.domain.dms.StudySummary studySummary : studySummaryList) {
 			final Project project = this.workbenchDataManager.getProjectByUuid(studySummary.getProgramDbId());
