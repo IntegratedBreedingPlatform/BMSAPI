@@ -40,7 +40,7 @@ public class Location {
 	private Double altitude;
 
 	@JsonInclude(Include.NON_EMPTY)
-	private List<Object> attributes = new ArrayList<Object>();
+	private List<Object> attributes = new ArrayList<>();
 
 	private Map<String, String> additionalInfo = new HashMap<>();
 
