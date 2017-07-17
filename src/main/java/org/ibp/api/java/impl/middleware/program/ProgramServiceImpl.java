@@ -46,7 +46,7 @@ public class ProgramServiceImpl implements ProgramService {
 					ProgramSummary programSummary = new ProgramSummary();
 					programSummary.setId(workbenchProgram.getProjectId().toString());
 					programSummary.setName(workbenchProgram.getProjectName());
-					if(workbenchProgram.getCropType() != null ) {
+					if (workbenchProgram.getCropType() != null) {
 						programSummary.setCrop(workbenchProgram.getCropType().getCropName());
 					}
 					User programUser = this.workbenchDataManager.getUserById(workbenchProgram.getUserId());
@@ -71,23 +71,24 @@ public class ProgramServiceImpl implements ProgramService {
 		return programSummaries;
 	}
 
-	public List<ProgramDetailsDto> getProgramsByFilter(final int pageNumber, final int pageSize, final Map<ProgramFilters, Object> filters){
+	public List<ProgramDetailsDto> getProgramsByFilter(final int pageNumber, final int pageSize,
+		final Map<ProgramFilters, Object> filters) {
 		List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
-			List<Project> projectList = this.workbenchDataManager.getProjects(pageNumber,pageSize,filters);
+		List<Project> projectList = this.workbenchDataManager.getProjects(pageNumber, pageSize, filters);
 
-			if(!projectList.isEmpty()){
-				for (Project project : projectList) {
-					ProgramDetailsDto programDetailsDto = new ProgramDetailsDto();
-					programDetailsDto.setProgramDbId(project.getProjectId().intValue());
-					programDetailsDto.setName(project.getProjectName());
-					programDetailsDtoList.add(programDetailsDto);
-				}
+		if (!projectList.isEmpty()) {
+			for (Project project : projectList) {
+				ProgramDetailsDto programDetailsDto = new ProgramDetailsDto();
+				programDetailsDto.setProgramDbId(project.getProjectId().intValue());
+				programDetailsDto.setName(project.getProjectName());
+				programDetailsDtoList.add(programDetailsDto);
 			}
+		}
 
 		return programDetailsDtoList;
 	}
 
-	public long countProgramsByFilter(final Map<ProgramFilters, Object> filter){
-		return  this.workbenchDataManager.countProjectsByFilter(filter);
+	public long countProgramsByFilter(final Map<ProgramFilters, Object> filter) {
+		return this.workbenchDataManager.countProjectsByFilter(filter);
 	}
 }
