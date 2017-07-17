@@ -21,6 +21,7 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.location.Location;
 import org.ibp.api.brapi.v1.location.LocationMapper;
+import org.ibp.api.brapi.v1.location.Locations;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,6 +123,13 @@ public class StudyResourceBrapi {
 				response.sendRedirect("/bmsapi/" + crop + "/brapi/v1/studies/" + studyDbId + "/table/tsv");
 
 				return new ResponseEntity<>(HttpStatus.OK);
+			}
+			else {
+				Map<String, String> status = new HashMap<String, String>();
+				status.put("message", "Incorrect format");
+				Metadata metadata = new Metadata(null, status);
+				StudyObservations observations = new StudyObservations().setMetadata(metadata);
+				return new ResponseEntity<>(observations, HttpStatus.NOT_FOUND);
 			}
 		}
 		return new ResponseEntity<>(this.getStudyObservations(studyDbId), HttpStatus.OK);
