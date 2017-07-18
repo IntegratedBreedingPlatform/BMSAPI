@@ -25,10 +25,6 @@ public class ProgramMapper {
 
 		mapper.addMappings(new PropertyMap<ProgramDetailsDto, Program>() {
 
-		/**
-		 * Only have ProgramDbId and Name,
-		 * we don't have Abbreviation, Objective and LeadPerson.
-		 **/
 			@Override
 			protected void configure() {
 				this.map().setProgramDbId(this.source.getProgramDbId());

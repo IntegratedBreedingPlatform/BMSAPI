@@ -65,7 +65,7 @@ public class ProgramResourceBrapi {
 
 		if(filters.get(ProgramFilters.CROP_TYPE) == null){
 			Map<String, String> status = new HashMap<>();
-			status.put("message", "crop doesn't exist");
+			status.put("message", "crop " + crop + " doesn't exist");
 			Metadata metadata = new Metadata(null, status);
 			Programs programList = new Programs().withMetadata(metadata);
 			return new ResponseEntity<>(programList, HttpStatus.NOT_FOUND);

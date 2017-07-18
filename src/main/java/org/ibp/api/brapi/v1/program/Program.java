@@ -8,7 +8,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"programDbId", "name", "name", "abbreviation", "objective", "leadPerson"})
+@JsonPropertyOrder({"programDbId", "name", "abbreviation", "objective", "leadPerson"})
 public class Program {
 
 	private Integer programDbId;
