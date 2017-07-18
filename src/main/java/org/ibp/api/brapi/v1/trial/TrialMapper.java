@@ -20,12 +20,14 @@ public class TrialMapper {
 		return TrialMapper.applicationWideModelMapper;
 	}
 
+
 	private static void addTrialSummaryMapper(final ModelMapper mapper) {
 
 		mapper.addMappings(new PropertyMap<StudySummary, TrialSummary>() {
 
 			@Override
 			protected void configure() {
+				map(source.getLocationId(), destination.getLocationDbId());
 				map(source.getStudyDbid(), destination.getTrialDbId());
 				map(source.getName(), destination.getTrialName());
 				map(source.getProgramDbId(), destination.getProgramDbId());
@@ -34,6 +36,7 @@ public class TrialMapper {
 				map(source.getEndDate(), destination.getEndDate());
 				map(source.isActive(), destination.isActive());
 				map(source.getOptionalInfo(), destination.getAdditionalInfo());
+
 			}
 
 		});

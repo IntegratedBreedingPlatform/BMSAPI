@@ -111,6 +111,7 @@ public class TrialResourceBrapi {
 				studyMetadata.setStudyName(instance.getTrialName() + " Environment Number " + instance.getInstanceNumber());
 				studyMetadata
 					.setLocationName(instance.getLocationName() != null ? instance.getLocationName() : instance.getLocationAbbreviation());
+				studyMetadata.setLocationDbId(String.valueOf(instance.getLocationDbId()));
 				trialSummaryDto.addStudy(studyMetadata);
 			}
 			trialSummaryList.add(trialSummaryDto);

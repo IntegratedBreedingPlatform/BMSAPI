@@ -29,6 +29,8 @@ public class TrialSummary {
 
 	private String endDate;
 
+	private String locationDbId;
+
 	private boolean active;
 
 	private List<StudySummaryDto> studies = new ArrayList<>();
@@ -117,6 +119,15 @@ public class TrialSummary {
 
 	public void addAdditionalInfo(final String name, final String value) {
 		this.additionalInfo.put(name, value);
+	}
+
+	public String getLocationDbId() {
+		return locationDbId;
+	}
+
+	public TrialSummary setLocationDbId(final String locationDbId) {
+		this.locationDbId = locationDbId;
+		return this;
 	}
 
 	@Override
