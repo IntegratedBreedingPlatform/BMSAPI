@@ -28,7 +28,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 			.contentType(this.contentType)) //
 			.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 			.andDo(MockMvcResultHandlers.print()) //
-			.andExpect(jsonPath("$.metadata.status.message", Matchers.is("crop doesn't exist"))); //
+			.andExpect(jsonPath("$.metadata.status.message", Matchers.is("crop maize2 doesn't exist"))); //
 
 	}
 
