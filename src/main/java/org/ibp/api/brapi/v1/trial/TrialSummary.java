@@ -29,6 +29,8 @@ public class TrialSummary {
 
 	private String endDate;
 
+	private String locationDbId;
+
 	private boolean active;
 
 	private List<StudySummaryDto> studies = new ArrayList<>();
@@ -119,18 +121,36 @@ public class TrialSummary {
 		this.additionalInfo.put(name, value);
 	}
 
+	public String getLocationDbId() {
+		return locationDbId;
+	}
+
+	public TrialSummary setLocationDbId(final String locationDbId) {
+		this.locationDbId = locationDbId;
+		return this;
+	}
+
 	@Override
 	public boolean equals(final Object other) {
 		if (!(other instanceof TrialSummary)) {
 			return false;
 		}
+		if (other == this) {
+			return true;
+		}
+
 		final TrialSummary castOther = (TrialSummary) other;
-		return new EqualsBuilder().append(this.trialDbId, castOther.trialDbId).isEquals();
+		return new EqualsBuilder().append(this.getTrialDbId(), castOther.getTrialDbId()) //
+			.append(this.getProgramDbId(),castOther.getProgramDbId()) //
+			.append(this.getProgramName(),castOther.getProgramName()) //
+			.append(this.getStartDate(),castOther.getStartDate()) //
+			.isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.trialDbId).hashCode();
+		return new HashCodeBuilder().append(this.trialDbId).append(this.programDbId).append(this.programName).append(this.startDate)
+			.hashCode();
 	}
 
 	@Override

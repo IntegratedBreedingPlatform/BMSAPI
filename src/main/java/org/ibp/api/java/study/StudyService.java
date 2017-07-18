@@ -1,10 +1,8 @@
 
 package org.ibp.api.java.study;
 
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
+import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
@@ -14,6 +12,9 @@ import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
+
+import java.util.List;
+import java.util.Map;
 
 public interface StudyService {
 
@@ -56,4 +57,7 @@ public interface StudyService {
 
 	StudyDetailsDto getStudyDetailsDto (final Integer studyId);
 
+	Long countStudies(final Map<StudyFilters, String> filters);
+
+	List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final Map<StudyFilters, String> filters, Integer pageSize, Integer pageNumber);
 }
