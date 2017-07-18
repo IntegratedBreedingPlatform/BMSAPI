@@ -14,18 +14,11 @@ public class LocationMapper {
 
 	private static ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
 
-	private static Converter<String, String> toUnknown = new AbstractConverter<String, String>() {
-
-		protected String convert(String source) {
-			return !StringUtils.isBlank(source) ? source : "Unknown";
-		}
-	};
-
 	private static Converter<String, String> toCapitalize = new AbstractConverter<String, String>() {
 
-		protected String convert(String source) {
+		protected String convert(final String source) {
 			return !StringUtils.isBlank(source)
-				? WordUtils.capitalize(source.toLowerCase()) : "Unknown";
+				? WordUtils.capitalize(source.toLowerCase()) : source;
 		}
 	};
 
@@ -54,9 +47,9 @@ public class LocationMapper {
 				this.map().setLongitude(this.source.getLongitude());
 				this.map().setAltitude(this.source.getAltitude());
 				this.map().setAdditionalInfo(this.source.getAdditionalInfo().getToMap());
-				using(toUnknown).map().setCountryName(source.getCountryName());
-				using(toUnknown).map().setCountryCode(source.getCountryCode());
-				using(toCapitalize).map().setLocationType(source.getLocationType());
+				this.map().setCountryName(this.source.getCountryName());
+				this.map().setCountryCode(this.source.getCountryCode());
+				using(toCapitalize).map().setLocationType(this.source.getLocationType());
 			}
 
 		});
