@@ -58,26 +58,21 @@ public class LocationResourceBrapi {
 
 		final Map<LocationFilters, Object> filters = new EnumMap<>(LocationFilters.class);
 		PagedResult<LocationDetailsDto> resultPage = null;
-		if (!StringUtils.isBlank(locationType)) {
-			final Integer locationTypeId = this.locationDataManager
-					.getUserDefinedFieldIdOfName(org.generationcp.middleware.pojos.UDTableType.LOCATION_LTYPE, locationType);
-			if (locationTypeId != null) {
-				filters.put(LocationFilters.LOCATION_TYPE, locationTypeId.toString());
+		final boolean validation = this.validateParameter(locationType, filters);
 
-				resultPage = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<LocationDetailsDto>() {
+		if (validation) {
+			resultPage = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<LocationDetailsDto>() {
 
-					@Override
-					public long getCount() {
-						return locationDataManager.countLocationsByFilter(filters);
-					}
+				@Override
+				public long getCount() {
+					return locationDataManager.countLocationsByFilter(filters);
+				}
 
-					@Override
-					public List<LocationDetailsDto> getResults(PagedResult<LocationDetailsDto> pagedResult) {
-						return locationDataManager.getLocationsByFilter(pagedResult.getPageNumber(),
-								pagedResult.getPageSize(), filters);
-					}
-				});
-			}
+				@Override
+				public List<LocationDetailsDto> getResults(PagedResult<LocationDetailsDto> pagedResult) {
+					return locationDataManager.getLocationsByFilter(pagedResult.getPageNumber(), pagedResult.getPageSize(), filters);
+				}
+			});
 		}
 
 		if (resultPage!= null && resultPage.getTotalResults() > 0) {
@@ -106,5 +101,18 @@ public class LocationResourceBrapi {
 			final Locations locationList = new Locations().withMetadata(metadata);
 			return new ResponseEntity<>(locationList, HttpStatus.NOT_FOUND);
 		}
+	}
+
+	private boolean validateParameter(final String locationType, final Map<LocationFilters, Object> filters) {
+		if (!StringUtils.isBlank(locationType)) {
+			final Integer locationTypeId = this.locationDataManager
+				.getUserDefinedFieldIdOfName(org.generationcp.middleware.pojos.UDTableType.LOCATION_LTYPE, locationType);
+			if (locationTypeId != null) {
+				filters.put(LocationFilters.LOCATION_TYPE, locationTypeId.toString());
+			} else {
+				return false;
+			}
+		}
+		return true;
 	}
 }
