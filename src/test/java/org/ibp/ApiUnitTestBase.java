@@ -41,6 +41,10 @@ public abstract class ApiUnitTestBase {
 	protected final MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(),
 			Charset.forName("utf8"));
 
+	protected final MediaType csvContentType = new MediaType(MediaType.TEXT_PLAIN.getType(), MediaType.TEXT_PLAIN.getSubtype(),
+		Charset.forName("utf8"));
+
+
 	protected final String cropName = "maize";
 	protected final String programUuid = UUID.randomUUID().toString();
 

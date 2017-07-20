@@ -1,23 +1,14 @@
 package org.ibp.api.brapi.v1.study;
 
-import static java.util.concurrent.ThreadLocalRandom.current;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasValue;
-import static org.hamcrest.CoreMatchers.is;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.ibp.ApiUnitTestBase;
 import org.junit.Test;
@@ -26,14 +17,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.concurrent.ThreadLocalRandom.current;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasValue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 public class StudyResourceBrapiTest extends ApiUnitTestBase {
 
@@ -106,6 +106,72 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	@Test
+	public void testGetStudyObservationsAsTableCSVRedirect() throws Exception {
+
+		final int trialDbId = current().nextInt();
+		final int studyDbId = current().nextInt();
+
+		final List<Integer> observationVariablesId = ImmutableList.<Integer>builder().add(current().nextInt()).build();
+
+		final List<String> observationVariableName = ImmutableList.<String>builder().add(randomAlphabetic(5)).build();
+
+		final List<List<String>> data = ImmutableList.<List<String>>builder().add(
+			ImmutableList.<String>builder().add(randomAlphabetic(5)).add(randomAlphabetic(5)).add(randomAlphabetic(5))
+				.add(randomAlphabetic(5)).build()).build();
+
+		TrialObservationTable trialObservationTable =
+			new TrialObservationTable().setStudyDbId(studyDbId).setObservationVariableDbIds(observationVariablesId)
+				.setObservationVariableNames(observationVariableName).setData(data);
+
+		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(trialObservationTable);
+
+		Mockito.when(this.studyDataManager.getProjectIdByStudyDbId(studyDbId)).thenReturn(trialDbId);
+
+		UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies/{studyDbId}/table?format=csv")
+			.buildAndExpand(ImmutableMap.<String, Object>builder().put("studyDbId", studyDbId).build());
+
+		UriComponents redirectedUriComponents = UriComponentsBuilder.newInstance().path("/bmsapi/maize/brapi/v1/studies/{studyDbId}/table/csv")
+			.buildAndExpand(ImmutableMap.<String, Object>builder().put("studyDbId", studyDbId).build());
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.csvContentType))
+			.andExpect(MockMvcResultMatchers.redirectedUrl(redirectedUriComponents.toUriString()))
+			;
+	}
+
+	@Test
+	public void testGetStudyObservationsAsTableTSVRedirect() throws Exception {
+
+		final int trialDbId = current().nextInt();
+		final int studyDbId = current().nextInt();
+
+		final List<Integer> observationVariablesId = ImmutableList.<Integer>builder().add(current().nextInt()).build();
+
+		final List<String> observationVariableName = ImmutableList.<String>builder().add(randomAlphabetic(5)).build();
+
+		final List<List<String>> data = ImmutableList.<List<String>>builder().add(
+			ImmutableList.<String>builder().add(randomAlphabetic(5)).add(randomAlphabetic(5)).add(randomAlphabetic(5))
+				.add(randomAlphabetic(5)).build()).build();
+
+		TrialObservationTable trialObservationTable =
+			new TrialObservationTable().setStudyDbId(studyDbId).setObservationVariableDbIds(observationVariablesId)
+				.setObservationVariableNames(observationVariableName).setData(data);
+
+		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(trialObservationTable);
+
+		Mockito.when(this.studyDataManager.getProjectIdByStudyDbId(studyDbId)).thenReturn(trialDbId);
+
+		UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies/{studyDbId}/table?format=tsv")
+			.buildAndExpand(ImmutableMap.<String, Object>builder().put("studyDbId", studyDbId).build());
+
+		UriComponents redirectedUriComponents = UriComponentsBuilder.newInstance().path("/bmsapi/maize/brapi/v1/studies/{studyDbId}/table/tsv")
+			.buildAndExpand(ImmutableMap.<String, Object>builder().put("studyDbId", studyDbId).build());
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.csvContentType))
+			.andExpect(MockMvcResultMatchers.redirectedUrl(redirectedUriComponents.toUriString()))
+		;
+	}
+
+	@Test
 	public void testGetStudyDetails() throws Exception {
 
 		final StudyDetailsDto studyDetailsDto = StudyTestDataProvider.getStudyDetailsDto();
@@ -157,4 +223,99 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 
 	}
 
+	@Test
+	public void testGetStudyObservationsAsTableCSV() throws Exception {
+
+		final int trialDbId = current().nextInt();
+		final int studyDbId = current().nextInt();
+
+		final List<Integer> observationVariablesId = ImmutableList.<Integer>builder().add(current().nextInt()).build();
+
+		final List<String> observationVariableName = ImmutableList.<String>builder().add(randomAlphabetic(5)).build();
+
+		final List<String> headerRow = ImmutableList.<String>builder().add(randomAlphabetic(5)).build();;
+
+		final List<List<String>> data = ImmutableList.<List<String>>builder().add(
+			ImmutableList.<String>builder().add(randomAlphabetic(5)).add(randomAlphabetic(5)).add(randomAlphabetic(5))
+				.add(randomAlphabetic(5)).build()).build();
+
+		TrialObservationTable trialObservationTable =
+			new TrialObservationTable().setStudyDbId(studyDbId).setObservationVariableDbIds(observationVariablesId)
+				.setObservationVariableNames(observationVariableName).setData(data);
+		trialObservationTable.setHeaderRow(headerRow);
+
+		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(trialObservationTable);
+
+		Mockito.when(this.studyDataManager.getProjectIdByStudyDbId(studyDbId)).thenReturn(trialDbId);
+
+		String stringResult =  headerRow.get(0) + "," + observationVariableName.get(0)
+			+ "|" + observationVariablesId.get(0) + "\n";
+
+		Object[] dataArray = data.get(0).toArray();
+
+		for (int i = 0; i < dataArray.length; i++) {
+			stringResult = stringResult + dataArray[i] + ",";
+		}
+
+		stringResult = stringResult.substring(0, stringResult.length()-1);
+		stringResult = stringResult +"\n";
+
+		UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies/{studyDbId}/table/csv")
+			.buildAndExpand(ImmutableMap.<String, Object>builder().put("studyDbId", studyDbId).build());
+
+		final MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.csvContentType))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().string(stringResult))
+			.andReturn()
+		;
+
+	}
+
+	@Test
+	public void testGetStudyObservationsAsTableTSV() throws Exception {
+
+		final int trialDbId = current().nextInt();
+		final int studyDbId = current().nextInt();
+
+		final List<Integer> observationVariablesId = ImmutableList.<Integer>builder().add(current().nextInt()).build();
+
+		final List<String> observationVariableName = ImmutableList.<String>builder().add(randomAlphabetic(5)).build();
+
+		final List<String> headerRow = ImmutableList.<String>builder().add(randomAlphabetic(5)).build();;
+
+		final List<List<String>> data = ImmutableList.<List<String>>builder().add(
+			ImmutableList.<String>builder().add(randomAlphabetic(5)).add(randomAlphabetic(5)).add(randomAlphabetic(5))
+				.add(randomAlphabetic(5)).build()).build();
+
+		TrialObservationTable trialObservationTable =
+			new TrialObservationTable().setStudyDbId(studyDbId).setObservationVariableDbIds(observationVariablesId)
+				.setObservationVariableNames(observationVariableName).setData(data);
+		trialObservationTable.setHeaderRow(headerRow);
+
+		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId, studyDbId)).thenReturn(trialObservationTable);
+
+		Mockito.when(this.studyDataManager.getProjectIdByStudyDbId(studyDbId)).thenReturn(trialDbId);
+
+		String stringResult =  headerRow.get(0) + "\t" + observationVariableName.get(0)
+			+ "|" + observationVariablesId.get(0) + "\n";
+
+		Object[] dataArray = data.get(0).toArray();
+
+		for (int i = 0; i < dataArray.length; i++) {
+			stringResult = stringResult + dataArray[i] + "\t";
+		}
+
+		stringResult = stringResult.substring(0, stringResult.length()-1);
+		stringResult = stringResult +"\n";
+
+		UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies/{studyDbId}/table/tsv")
+			.buildAndExpand(ImmutableMap.<String, Object>builder().put("studyDbId", studyDbId).build());
+
+		final MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.csvContentType))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().string(stringResult))
+			.andReturn()
+			;
+
+	}
 }
