@@ -29,7 +29,7 @@ public class TrialSummaryTestDataProvider {
 	}
 
 	public static StudySummary getTrialSummary() {
-		StudySummary studySummary = new StudySummary();
+		final StudySummary studySummary = new StudySummary();
 		studySummary.setLocationId("1");
 		studySummary.setActive(Boolean.TRUE);
 		studySummary.setEndDate("20170404");
