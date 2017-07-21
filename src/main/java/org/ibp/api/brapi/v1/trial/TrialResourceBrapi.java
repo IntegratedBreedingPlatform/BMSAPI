@@ -7,14 +7,12 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.StringUtil;
-import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
-import org.ibp.api.brapi.v1.study.StudySummaryDto;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -87,7 +85,7 @@ public class TrialResourceBrapi {
 			}
 		});
 
-		final List<TrialSummary> trialSummaryList = translatedResults(resultPage, sortBy,sortOrder);
+		final List<TrialSummary> trialSummaryList = translateResults(resultPage, sortBy, sortOrder);
 		final Result<TrialSummary> results = new Result<TrialSummary>().withData(trialSummaryList);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
@@ -99,21 +97,12 @@ public class TrialResourceBrapi {
 
 	}
 
-	private List<TrialSummary> translatedResults(PagedResult<StudySummary> resultPage,final String sortBy,final String sortOrder) {
-		final ModelMapper modelMapper = TrialMapper.getInstance();
+	private List<TrialSummary> translateResults(PagedResult<StudySummary> resultPage, final String sortBy, final String sortOrder) {
+		final ModelMapper modelMapper = TrialSummaryMapper.getInstance();
 		final List<TrialSummary> trialSummaryList = new ArrayList<>();
 
 		for (final StudySummary mwStudy : resultPage.getPageResults()) {
 			final TrialSummary trialSummaryDto = modelMapper.map(mwStudy, TrialSummary.class);
-			for (final InstanceMetadata instance : mwStudy.getInstanceMetaData()) {
-				final StudySummaryDto studyMetadata = new StudySummaryDto();
-				studyMetadata.setStudyDbId(instance.getInstanceDbId());
-				studyMetadata.setStudyName(instance.getTrialName() + " Environment Number " + instance.getInstanceNumber());
-				studyMetadata
-					.setLocationName(instance.getLocationName() != null ? instance.getLocationName() : instance.getLocationAbbreviation());
-				studyMetadata.setLocationDbId(String.valueOf(instance.getLocationDbId()));
-				trialSummaryDto.addStudy(studyMetadata);
-			}
 			trialSummaryList.add(trialSummaryDto);
 		}
 		if ("programName".equals(sortBy)) {
