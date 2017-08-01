@@ -39,13 +39,13 @@ public class SampleResourceBrapi {
 
 		final Sample sample = new Sample();
 
-		final org.generationcp.middleware.domain.sample.Sample mwSample = this.sampleService.getSample(sampleId);
+		/*final org.generationcp.middleware.pojos.Sample mwSample = this.sampleService.getSample(sampleId);
 		if (mwSample != null) {
 
 			sample.setLocationId(mwSample.getLocationId());
 			sample.setPlotId(mwSample.getPlotId());
 			sample.setPlotNumber(mwSample.getPlotNumber());
-			sample.setPlantId(mwSample.getPlantId());
+			sample.setPlantId(mwSample.getPlant());
 			sample.setSampleId(mwSample.getSampleId());
 			sample.setTakenBy(mwSample.getTakenBy());
 			sample.setSampleDate(mwSample.getSampleDate());
@@ -68,7 +68,7 @@ public class SampleResourceBrapi {
 			sample.setSeedSource(mwSample.getSeedSource());
 			sample.setPedigree(mwSample.getPedigree());
 
-		}
+		}*/
 
 		return new ResponseEntity<Sample>(sample, HttpStatus.OK);
 	}
@@ -80,11 +80,10 @@ public class SampleResourceBrapi {
 	@Transactional
 	public ResponseEntity<String> createSample(@PathVariable final String crop, @RequestBody Sample sample) {
 		
-		org.generationcp.middleware.domain.sample.Sample mwSample =
-				new org.generationcp.middleware.domain.sample.Sample(sample.getPlotId(),
-						sample.getPlantId(), null, sample.getTakenBy(), sample.getSampleDate(), sample.getNotes());
+		org.generationcp.middleware.pojos.Sample mwSample =
+				new org.generationcp.middleware.pojos.Sample();
 
-		final String sampleId = this.sampleService.createSample(mwSample);
+		final String sampleId = "";//this.sampleService.createSample(mwSample);
 		return new ResponseEntity<String>(sampleId, HttpStatus.CREATED);
 	}
 }
