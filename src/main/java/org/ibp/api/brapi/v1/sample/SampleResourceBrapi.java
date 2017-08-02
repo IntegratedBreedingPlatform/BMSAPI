@@ -45,7 +45,7 @@ public class SampleResourceBrapi {
 			sample.setLocationId(mwSample.getLocationId());
 			sample.setPlotId(mwSample.getPlotId());
 			sample.setPlotNumber(mwSample.getPlotNumber());
-			sample.setPlantId(mwSample.getPlant());
+			sample.setPlantId(mwSample.getSampleList());
 			sample.setSampleId(mwSample.getSampleId());
 			sample.setTakenBy(mwSample.getTakenBy());
 			sample.setSampleDate(mwSample.getSampleDate());
@@ -70,7 +70,7 @@ public class SampleResourceBrapi {
 
 		}*/
 
-		return new ResponseEntity<Sample>(sample, HttpStatus.OK);
+		return new ResponseEntity<>(sample, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Create (take) sample from a plant in a plot at a location within a study.",
@@ -83,7 +83,7 @@ public class SampleResourceBrapi {
 		org.generationcp.middleware.pojos.Sample mwSample =
 				new org.generationcp.middleware.pojos.Sample();
 
-		final String sampleId = "";//this.sampleService.createSample(mwSample);
-		return new ResponseEntity<String>(sampleId, HttpStatus.CREATED);
+		final String sampleId = "";//this.sampleService.createOrUpdateSample(mwSample);
+		return new ResponseEntity<>(sampleId, HttpStatus.CREATED);
 	}
 }

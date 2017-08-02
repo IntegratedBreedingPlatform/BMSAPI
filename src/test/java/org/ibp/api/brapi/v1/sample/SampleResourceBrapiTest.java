@@ -58,7 +58,7 @@ public class SampleResourceBrapiTest extends ApiUnitTestBase {
 		sample.setFieldId(7);
 		sample.setFieldName("CountrySideField");
 
-		Mockito.when(this.sampleService.getPlant(sampleId)).thenReturn(sample);
+		Mockito.when(this.sampleService.getSampleList(sampleId)).thenReturn(sample);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/sample/" + sampleId).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isOk()) //
@@ -92,7 +92,7 @@ public class SampleResourceBrapiTest extends ApiUnitTestBase {
 				+ "  \"sampleDate\": \"2016-07-19\",\n" + "  \"notes\": \"Flower petal\"\n" + "}");
 
 		final String sampleId = "SampleID-123";
-		Mockito.when(this.sampleService.createSample(Mockito.any(org.generationcp.middleware.pojos.Sample.class)))
+		Mockito.when(this.sampleService.createOrUpdateSample(Mockito.any(org.generationcp.middleware.pojos.Sample.class)))
 				.thenReturn(sampleId);
 
 		this.mockMvc
