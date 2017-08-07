@@ -1,10 +1,8 @@
 
-package org.ibp.api.brapi.v1.sample;
+package org.ibp.api.rest.sample;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 
-import java.util.Date;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -14,15 +12,9 @@ public class SampleListDto {
 
 	private String description;
 
-	private SampleListDTO hierarchy;
-
-	private String type;
-
 	private String notes;
 
 	private String createdBy;
-
-	private List<Integer> gids;
 
 	private Integer selectionVariableId;
 
@@ -30,7 +22,7 @@ public class SampleListDto {
 
 	private String takenBy;
 
-	private Date samplingDate;
+	private String samplingDate;
 
 	private Integer studyId;
 
@@ -62,22 +54,6 @@ public class SampleListDto {
 		this.description = description;
 	}
 
-	public SampleListDTO getHierarchy() {
-		return hierarchy;
-	}
-
-	public void setHierarchy(SampleListDTO hierarchy) {
-		this.hierarchy = hierarchy;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
 	public String getNotes() {
 		return notes;
 	}
@@ -92,14 +68,6 @@ public class SampleListDto {
 
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
-	}
-
-	public List<Integer> getGids() {
-		return gids;
-	}
-
-	public void setGids(List<Integer> gids) {
-		this.gids = gids;
 	}
 
 	public Integer getSelectionVariableId() {
@@ -126,11 +94,11 @@ public class SampleListDto {
 		this.takenBy = takenBy;
 	}
 
-	public Date getSamplingDate() {
+	public String getSamplingDate() {
 		return samplingDate;
 	}
 
-	public void setSamplingDate(Date samplingDate) {
+	public void setSamplingDate(String samplingDate) {
 		this.samplingDate = samplingDate;
 	}
 

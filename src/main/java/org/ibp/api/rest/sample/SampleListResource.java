@@ -1,4 +1,4 @@
-package org.ibp.api.brapi.v1.sample;
+package org.ibp.api.rest.sample;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -19,15 +19,16 @@ import java.util.Map;
  *
  * @author Naymesh Mistry
  */
-@Api(value = "BrAPI Sample Services")
+@Api(value = "Sample Services")
 @Controller
-public class SampleListResourceBrapi {
+@RequestMapping("/sample")
+public class SampleListResource {
 
 	@Autowired public SampleListService sampleListService;
 
 	@ApiOperation(value = "Create sample list", notes = "Create sample list. ")
-	@RequestMapping(value = "/{crop}/brapi/v1/sampleList", method = RequestMethod.POST) @ResponseBody
-	public ResponseEntity<Map<String, Object>> createUser(@PathVariable final String crop, @RequestBody SampleListDto dto) {
+	@RequestMapping(value = "/{crop}/sampleList", method = RequestMethod.POST) @ResponseBody
+	public ResponseEntity<Map<String, Object>> createSampleList(@PathVariable final String crop, @RequestBody SampleListDto dto) {
 		dto.setCropName(crop);
 		final Map<String, Object> map = this.sampleListService.createSampleList(dto);
 
