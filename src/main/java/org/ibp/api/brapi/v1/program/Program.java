@@ -11,7 +11,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 @JsonPropertyOrder({"programDbId", "name", "abbreviation", "objective", "leadPerson"})
 public class Program {
 
-	private Integer programDbId;
+	private String programDbId;
 	private String name;
 	private String abbreviation;
 	private String objective;
@@ -21,7 +21,7 @@ public class Program {
 
 	}
 
-	public Program(final Integer programDbId, final String name, final String abbreviation, final String objective,
+	public Program(final String programDbId, final String name, final String abbreviation, final String objective,
 		final String leadPerson) {
 
 		this.programDbId = programDbId;
@@ -31,11 +31,11 @@ public class Program {
 		this.leadPerson = leadPerson;
 	}
 
-	public Integer getProgramDbId() {
+	public String getProgramDbId() {
 		return programDbId;
 	}
 
-	public void setProgramDbId(Integer programDbId) {
+	public void setProgramDbId(String programDbId) {
 		this.programDbId = programDbId;
 	}
 
