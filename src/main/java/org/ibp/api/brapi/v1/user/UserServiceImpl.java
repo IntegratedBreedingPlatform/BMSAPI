@@ -135,6 +135,44 @@ public class UserServiceImpl implements UserService {
 		return mapResponse;
 	}
 
+	@Override
+	public List<UserDetailDto> getUsersByProjectUUID(final String projectUUID) {
+		final List<UserDetailDto> result = new ArrayList<>();
+		final List<UserDto> users = this.workbenchDataManager.getUsersByProjectUUID(projectUUID);
+		final PropertyMap<UserDto, UserDetailDto> userMapper = new PropertyMap<UserDto, UserDetailDto>() {
+
+			@Override
+			protected void configure() {
+				this.map(this.source.getFirstName(), this.destination.getFirstName());
+				this.map(this.source.getLastName(), this.destination.getLastName());
+				this.map(this.source.getUserId(), this.destination.getId());
+				this.map(this.source.getUsername(), this.destination.getUsername());
+				this.map(this.source.getRole(), this.destination.getRole());
+				this.map(this.source.getStatus() == 0 ? "true" : "false", this.destination.getStatus());
+				this.map(this.source.getEmail(), this.destination.getEmail());
+			}
+		};
+
+		final ModelMapper modelMapper = new ModelMapper();
+		modelMapper.addMappings(userMapper);
+
+		for (final Iterator<UserDto> iterator = users.iterator(); iterator.hasNext();) {
+			final UserDto userDto = iterator.next();
+			final UserDetailDto userInfo = modelMapper.map(userDto, UserDetailDto.class);
+
+			if (userDto.getStatus() == 0) {
+				userInfo.setStatus("true");
+			} else {
+				userInfo.setStatus("false");
+			}
+			userInfo.setRole(WordUtils.capitalize(userInfo.getRole().toLowerCase()));
+			result.add(userInfo);
+		}
+
+		return result;
+	}
+
+
 	private UserDto translateUserDetailsDtoToUserDto(final UserDetailDto user) {
 		final UserDto userdto = new UserDto();
 		userdto.setUserId(user.getId());
@@ -226,8 +264,7 @@ public class UserServiceImpl implements UserService {
 		if (UserValidator.SIGNUP_FIELD_INVALID_USER_ID.equals(codeError)) {
 			return "invalid";
 		}
-		
-		
+
 		return "";
 	}
 
