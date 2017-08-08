@@ -14,11 +14,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Map;
 
-/**
- * Prototype BrAPI call to support sample tracking and related analysis in systems such as GOBII and phenotype/genotype correlation tools.
- *
- * @author Naymesh Mistry
- */
 @Api(value = "Sample Services")
 @Controller
 @RequestMapping("/sample")
@@ -27,7 +22,8 @@ public class SampleListResource {
 	@Autowired public SampleListService sampleListService;
 
 	@ApiOperation(value = "Create sample list", notes = "Create sample list. ")
-	@RequestMapping(value = "/{crop}/sampleList", method = RequestMethod.POST) @ResponseBody
+	@RequestMapping(value = "/{crop}/sampleList", method = RequestMethod.POST)
+	@ResponseBody
 	public ResponseEntity<Map<String, Object>> createSampleList(@PathVariable final String crop, @RequestBody SampleListDto dto) {
 		dto.setCropName(crop);
 		final Map<String, Object> map = this.sampleListService.createSampleList(dto);

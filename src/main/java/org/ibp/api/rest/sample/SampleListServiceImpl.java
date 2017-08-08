@@ -29,7 +29,6 @@ public class SampleListServiceImpl implements SampleListService {
 
 	public Map<String, Object> createSampleList(final SampleListDto sampleListDto) {
 
-		{
 			LOG.debug(sampleListDto.toString());
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), SampleListServiceImpl.SAMPLE_LIST);
 			final HashMap<String, Object> mapResponse = new HashMap<String, Object>();
@@ -47,8 +46,6 @@ public class SampleListServiceImpl implements SampleListService {
 			}
 
 			return mapResponse;
-		}
-
 	}
 
 	private SampleListDTO translateUserDetailsDtoToUserDto(final SampleListDto dto) throws ParseException {
