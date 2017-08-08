@@ -10,13 +10,13 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class ProgramMapperTest {
 
+	final static String PROGRAM_UUID = "92c47f83-4427-44c9-982f-b611b8917a2d";
 
 	@Test
 	public void programDetailsMapperTest() {
 		final ModelMapper mapper = ProgramMapper.getInstance();
-		ProgramDetailsDto programDetailsDto = new ProgramDetailsDto(777, "Wheat", null, null, null);
+		ProgramDetailsDto programDetailsDto = new ProgramDetailsDto(PROGRAM_UUID, "Wheat", null, null, null);
 		Program program = mapper.map(programDetailsDto, Program.class);
-		System.out.println(program);
 
 		assertThat(program.getProgramDbId(), equalTo(programDetailsDto.getProgramDbId()));
 		assertThat(program.getName(), equalTo(programDetailsDto.getName()));

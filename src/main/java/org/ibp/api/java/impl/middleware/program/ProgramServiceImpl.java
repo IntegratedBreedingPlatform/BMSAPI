@@ -79,7 +79,7 @@ public class ProgramServiceImpl implements ProgramService {
 		if (!projectList.isEmpty()) {
 			for (Project project : projectList) {
 				ProgramDetailsDto programDetailsDto = new ProgramDetailsDto();
-				programDetailsDto.setProgramDbId(project.getProjectId().intValue());
+				programDetailsDto.setProgramDbId(project.getUniqueID());
 				programDetailsDto.setName(project.getProjectName());
 				programDetailsDtoList.add(programDetailsDto);
 			}
