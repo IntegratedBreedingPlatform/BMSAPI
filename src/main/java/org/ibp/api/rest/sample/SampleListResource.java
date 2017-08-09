@@ -19,6 +19,8 @@ import java.util.Map;
 @RequestMapping("/sample")
 public class SampleListResource {
 
+	public static final String NULL = "null";
+	public static final String ERROR = "ERROR";
 	@Autowired public SampleListService sampleListService;
 
 	@ApiOperation(value = "Create sample list", notes = "Create sample list. ")
@@ -28,9 +30,9 @@ public class SampleListResource {
 		dto.setCropName(crop);
 		final Map<String, Object> map = this.sampleListService.createSampleList(dto);
 
-		if (map.get("ERROR") != null) {
-			return new ResponseEntity<Map<String, Object>>(map, HttpStatus.CONFLICT);
+		if (map.get(ERROR) != null || NULL.equals(map.get("id"))) {
+			return new ResponseEntity<>(map, HttpStatus.CONFLICT);
 		}
-		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.CREATED);
+		return new ResponseEntity<>(map, HttpStatus.CREATED);
 	}
 }
