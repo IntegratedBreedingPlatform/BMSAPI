@@ -58,13 +58,13 @@ public class BreedingViewServiceImplTest {
 			final ArgumentCaptor<File> meansFileCaptor = ArgumentCaptor.forClass(File.class);
 			Mockito.verify(this.bvImportService).importMeansData(meansFileCaptor.capture(),
 					Matchers.eq(BreedingViewServiceImplTest.STUDY_ID));
-			Assert.assertEquals(this.getFileName(BreedingViewServiceImplTest.OUTPUT_FILEPATH), meansFileCaptor.getValue().getName());
+			Assert.assertEquals(this.getFileName(BreedingViewServiceImplTest.OUTPUT_FILEPATH), this.getFileName(meansFileCaptor.getValue().getName()));
 
 			// Verify the service method to import means data was called
 			final ArgumentCaptor<File> summaryFileCaptor = ArgumentCaptor.forClass(File.class);
 			Mockito.verify(this.bvImportService).importSummaryStatsData(summaryFileCaptor.capture(),
 					Matchers.eq(BreedingViewServiceImplTest.STUDY_ID));
-			Assert.assertEquals(this.getFileName(BreedingViewServiceImplTest.SUMMARY_FILEPATH), summaryFileCaptor.getValue().getName());
+			Assert.assertEquals(this.getFileName(BreedingViewServiceImplTest.SUMMARY_FILEPATH), this.getFileName(summaryFileCaptor.getValue().getName()));
 
 			// Verify the service method to import outlier was not called
 			Mockito.verify(this.bvImportService, Mockito.never()).importOutlierData(Matchers.any(File.class), Matchers.anyInt());
@@ -89,19 +89,19 @@ public class BreedingViewServiceImplTest {
 			final ArgumentCaptor<File> meansFileCaptor = ArgumentCaptor.forClass(File.class);
 			Mockito.verify(this.bvImportService).importMeansData(meansFileCaptor.capture(),
 					Matchers.eq(BreedingViewServiceImplTest.STUDY_ID));
-			Assert.assertEquals(this.getFileName(BreedingViewServiceImplTest.OUTPUT_FILEPATH), meansFileCaptor.getValue().getName());
+			Assert.assertEquals(this.getFileName(BreedingViewServiceImplTest.OUTPUT_FILEPATH), this.getFileName(meansFileCaptor.getValue().getName()));
 
 			// Verify the service method to import means data was called
 			final ArgumentCaptor<File> summaryFileCaptor = ArgumentCaptor.forClass(File.class);
 			Mockito.verify(this.bvImportService).importSummaryStatsData(summaryFileCaptor.capture(),
 					Matchers.eq(BreedingViewServiceImplTest.STUDY_ID));
-			Assert.assertEquals(this.getFileName(BreedingViewServiceImplTest.SUMMARY_FILEPATH), summaryFileCaptor.getValue().getName());
+			Assert.assertEquals(this.getFileName(BreedingViewServiceImplTest.SUMMARY_FILEPATH), this.getFileName(summaryFileCaptor.getValue().getName()));
 
 			// Verify the service method to import outlier was called
 			final ArgumentCaptor<File> outlierFileCaptor = ArgumentCaptor.forClass(File.class);
 			Mockito.verify(this.bvImportService).importOutlierData(outlierFileCaptor.capture(),
 					Matchers.eq(BreedingViewServiceImplTest.STUDY_ID));
-			Assert.assertEquals(this.getFileName(BreedingViewServiceImplTest.OUTLIER_FILEPATH), outlierFileCaptor.getValue().getName());
+			Assert.assertEquals(this.getFileName(BreedingViewServiceImplTest.OUTLIER_FILEPATH), this.getFileName(outlierFileCaptor.getValue().getName()));
 
 		} catch (IBPWebServiceException | BreedingViewImportException e) {
 			Assert.fail("Not expecting IBPWebServiceException to be thrown.");
