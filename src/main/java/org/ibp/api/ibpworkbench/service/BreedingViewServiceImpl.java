@@ -33,7 +33,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 	@Autowired
 	private BreedingViewImportService importService;
-	
+
 	@Autowired
 	private Cloner cloner;
 
@@ -46,26 +46,26 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 
 	@Override
 	@Transactional
-	public void execute(Map<String, String> params, List<String> errors) throws IBPWebServiceException {
+	public void execute(final Map<String, String> params, final List<String> errors) throws IBPWebServiceException {
 
 		try {
 
-			String mainOutputFilePath = params.get(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue());
-			String summaryOutputFilePath = params.get(WebAPIConstants.SUMMARY_OUTPUT_FILE_PATH.getParamValue());
-			String outlierOutputFilePath = params.get(WebAPIConstants.OUTLIER_OUTPUT_FILE_PATH.getParamValue());
-			int studyId = Integer.valueOf(params.get(WebAPIConstants.STUDY_ID.getParamValue()));
+			final String mainOutputFilePath = params.get(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue());
+			final String summaryOutputFilePath = params.get(WebAPIConstants.SUMMARY_OUTPUT_FILE_PATH.getParamValue());
+			final String outlierOutputFilePath = params.get(WebAPIConstants.OUTLIER_OUTPUT_FILE_PATH.getParamValue());
+			final int studyId = Integer.parseInt(params.get(WebAPIConstants.STUDY_ID.getParamValue()));
 
 			this.importService.importMeansData(new File(mainOutputFilePath), studyId);
 
-			if (outlierOutputFilePath != null && !outlierOutputFilePath.equals("")) {
+			if (outlierOutputFilePath != null && !"".equals(outlierOutputFilePath)) {
 				this.importService.importOutlierData(new File(outlierOutputFilePath), studyId);
 			}
 
-			if (summaryOutputFilePath != null && !summaryOutputFilePath.equals("")) {
+			if (summaryOutputFilePath != null && !"".equals(summaryOutputFilePath)) {
 				this.importService.importSummaryStatsData(new File(summaryOutputFilePath), studyId);
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			BreedingViewServiceImpl.LOG.error("ERROR:", e);
 			throw new IBPWebServiceException(e.getMessage());
 		}
@@ -76,7 +76,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 		return this.cloner;
 	}
 
-	protected void setCloner(Cloner cloner) {
+	protected void setCloner(final Cloner cloner) {
 		this.cloner = cloner;
 	}
 
@@ -96,8 +96,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 		return this.variableTypeListSummaryStats;
 	}
 
-	
-	public void setImportService(BreedingViewImportService importService) {
+	public void setImportService(final BreedingViewImportService importService) {
 		this.importService = importService;
 	}
 
