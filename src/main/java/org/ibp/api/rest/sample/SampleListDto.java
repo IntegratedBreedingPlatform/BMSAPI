@@ -8,8 +8,6 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SampleListDto {
 
-	private String listName;
-
 	private String description;
 
 	private String notes;
@@ -27,24 +25,6 @@ public class SampleListDto {
 	private Integer studyId;
 
 	private String cropName;
-
-	private String trialName;
-
-	public String getTrialName() {
-		return trialName;
-	}
-
-	public void setTrialName(String trialName) {
-		this.trialName = trialName;
-	}
-
-	public String getListName() {
-		return listName;
-	}
-
-	public void setListName(String listName) {
-		this.listName = listName;
-	}
 
 	public String getDescription() {
 		return description;
