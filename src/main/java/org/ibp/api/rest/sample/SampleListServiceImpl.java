@@ -26,10 +26,10 @@ public class SampleListServiceImpl implements SampleListService {
 	private SecurityService securityService;
 
 	public Map<String, Object> createSampleList(final SampleListDto sampleListDto) {
-		Preconditions.checkArgument(sampleListDto.getInstanceIds().isEmpty());
-		Preconditions.checkNotNull(sampleListDto.getSamplingDate());
-		Preconditions.checkNotNull(sampleListDto.getSelectionVariableId());
-		Preconditions.checkNotNull(sampleListDto.getStudyId());
+		Preconditions.checkArgument(sampleListDto.getInstanceIds() != null, "The Instance List must not be null");
+		Preconditions.checkArgument(!sampleListDto.getInstanceIds().isEmpty(), "The Instance List must not be empty");
+		Preconditions.checkNotNull(sampleListDto.getSelectionVariableId(), "The Selection Variable Id must not be empty");
+		Preconditions.checkNotNull(sampleListDto.getStudyId(), "The Study Id must not be empty");
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
 		mapResponse.put("id", String.valueOf(0));
