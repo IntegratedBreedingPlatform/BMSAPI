@@ -12,18 +12,14 @@
 package org.ibp.api.ibpworkbench.service;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.generationcp.commons.service.BreedingViewImportService;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.ibp.api.ibpworkbench.constants.WebAPIConstants;
 import org.ibp.api.ibpworkbench.exceptions.IBPWebServiceException;
-import org.ibp.api.ibpworkbench.util.ObjectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +35,7 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 	private BreedingViewImportService importService;
 	
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
-	
-	@Autowired
 	private Cloner cloner;
-
-	private Map<String, String> nameToAliasMapping;
 
 	private VariableTypeList variableTypeListSummaryStats;
 
@@ -64,16 +55,14 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			String outlierOutputFilePath = params.get(WebAPIConstants.OUTLIER_OUTPUT_FILE_PATH.getParamValue());
 			int studyId = Integer.valueOf(params.get(WebAPIConstants.STUDY_ID.getParamValue()));
 
-			this.nameToAliasMapping = this.getNameToAliasMapping();
-
-			this.importService.importMeansData(new File(mainOutputFilePath), studyId, this.nameToAliasMapping);
+			this.importService.importMeansData(new File(mainOutputFilePath), studyId);
 
 			if (outlierOutputFilePath != null && !outlierOutputFilePath.equals("")) {
-				this.importService.importOutlierData(new File(outlierOutputFilePath), studyId, this.nameToAliasMapping);
+				this.importService.importOutlierData(new File(outlierOutputFilePath), studyId);
 			}
 
 			if (summaryOutputFilePath != null && !summaryOutputFilePath.equals("")) {
-				this.importService.importSummaryStatsData(new File(summaryOutputFilePath), studyId, this.nameToAliasMapping);
+				this.importService.importSummaryStatsData(new File(summaryOutputFilePath), studyId);
 			}
 
 		} catch (Exception e) {
@@ -81,26 +70,6 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 			throw new IBPWebServiceException(e.getMessage());
 		}
 
-	}
-
-	protected Map<String, String> getNameToAliasMapping() throws MiddlewareQueryException {
-
-		Map<String, String> map = new HashMap<String, String>();
-
-		String fileName =
-				String.format("%s\\Temp\\%s", this.workbenchDataManager.getWorkbenchSetting().getInstallationDirectory(), "mapping.ser");
-
-		map = new ObjectUtil<HashMap<String, String>>().deserializeFromFile(fileName);
-
-		return map;
-	}
-
-	protected void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
-		this.workbenchDataManager = workbenchDataManager;
-	}
-
-	protected void setNameToAliasMapping(Map<String, String> mapping) {
-		this.nameToAliasMapping = mapping;
 	}
 
 	protected Cloner getCloner() {
