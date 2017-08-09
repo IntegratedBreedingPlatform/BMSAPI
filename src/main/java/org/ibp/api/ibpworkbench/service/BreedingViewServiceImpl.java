@@ -96,4 +96,9 @@ public class BreedingViewServiceImpl implements BreedingViewService {
 		return this.variableTypeListSummaryStats;
 	}
 
+	
+	public void setImportService(BreedingViewImportService importService) {
+		this.importService = importService;
+	}
+
 }
