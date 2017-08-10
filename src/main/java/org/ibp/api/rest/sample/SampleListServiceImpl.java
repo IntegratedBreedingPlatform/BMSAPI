@@ -34,7 +34,7 @@ public class SampleListServiceImpl implements SampleListService {
 		final HashMap<String, Object> mapResponse = new HashMap<>();
 		mapResponse.put("id", String.valueOf(0));
 		try {
-			final SampleListDTO sampleListdto = translateUserDetailsDtoToUserDto(sampleListDto);
+			final SampleListDTO sampleListdto = translateToSampleListDto(sampleListDto);
 
 			final Integer newSampleId = this.service.createOrUpdateSampleList(sampleListdto);
 			mapResponse.put("id", String.valueOf(newSampleId));
@@ -47,7 +47,7 @@ public class SampleListServiceImpl implements SampleListService {
 		return mapResponse;
 	}
 
-	private SampleListDTO translateUserDetailsDtoToUserDto(final SampleListDto dto) throws ParseException {
+	private SampleListDTO translateToSampleListDto(final SampleListDto dto) throws ParseException {
 		final SampleListDTO sampleListDTO = new SampleListDTO();
 
 		sampleListDTO.setCreatedBy(securityService.getCurrentlyLoggedInUser().getName());
@@ -55,7 +55,11 @@ public class SampleListServiceImpl implements SampleListService {
 		sampleListDTO.setDescription(dto.getDescription());
 		sampleListDTO.setInstanceIds(dto.getInstanceIds());
 		sampleListDTO.setNotes(dto.getNotes());
-		sampleListDTO.setSamplingDate(DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT).parse(dto.getSamplingDate()));
+
+		if (!dto.getSamplingDate().isEmpty()) {
+			sampleListDTO.setSamplingDate(DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT).parse(dto.getSamplingDate()));
+		}
+
 		sampleListDTO.setSelectionVariableId(dto.getSelectionVariableId());
 		sampleListDTO.setStudyId(dto.getStudyId());
 		sampleListDTO.setTakenBy(dto.getTakenBy());
