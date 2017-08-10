@@ -17,8 +17,6 @@ import java.util.Map;
 @Transactional
 public class SampleListServiceImpl implements SampleListService {
 
-	private static final String SAMPLE_LIST_TYPE = "SAMPLE LIST";
-
 	@Autowired
 	private org.generationcp.middleware.service.api.SampleListService service;
 
@@ -63,7 +61,6 @@ public class SampleListServiceImpl implements SampleListService {
 		sampleListDTO.setSelectionVariableId(dto.getSelectionVariableId());
 		sampleListDTO.setStudyId(dto.getStudyId());
 		sampleListDTO.setTakenBy(dto.getTakenBy());
-		sampleListDTO.setType(SAMPLE_LIST_TYPE);
 
 		return sampleListDTO;
 	}
