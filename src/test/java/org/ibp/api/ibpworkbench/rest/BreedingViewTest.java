@@ -1,20 +1,13 @@
 
-package org.ibp.api.ibpworkbench.service;
+package org.ibp.api.ibpworkbench.rest;
 
-import org.ibp.api.ibpworkbench.constants.WebAPIConstants;
-import org.ibp.api.ibpworkbench.exceptions.IBPWebServiceException;
 import org.ibp.api.ibpworkbench.model.DataResponse;
-import org.ibp.api.ibpworkbench.rest.BreedingView;
+import org.ibp.api.ibpworkbench.service.BreedingViewService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class BreedingViewTest {
 
@@ -34,12 +27,12 @@ public class BreedingViewTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		this.breedingView = Mockito.spy(new BreedingView());
+		this.breedingView = new BreedingView();
 		this.breedingView.setBreedingViewService(this.breedingViewService);
 	}
 
 	@Test
-	public void test_saveSsaResultSummary_nullRequiredParams() {
+	public void testSaveSsaResultSummaryWhenRequiredParamsAreNull() {
 		this.mainOutputFilePath = null;
 		this.summaryOutputFilePath = null;
 		this.workbenchProjectId = null;
@@ -48,7 +41,7 @@ public class BreedingViewTest {
 		this.outputDataSetId = null;
 		this.cropName = null;
 
-		DataResponse response =
+		final DataResponse response =
 				this.breedingView.saveSsaResultSummary(this.mainOutputFilePath, this.summaryOutputFilePath, this.outlierOutputFilePath,
 						this.workbenchProjectId, this.studyId, this.inputDataSetId, this.outputDataSetId, this.cropName);
 		Assert.assertFalse("Web service should fail", response.isSuccessful());
@@ -68,40 +61,20 @@ public class BreedingViewTest {
 	}
 
 	@Test
-	public void test_saveSsaResultSummary_ValidRequiredParams() {
-		this.mainOutputFilePath = "C:\\Breeding Management System\\workspace\\maize_test\\breeding_view\\output\\BMSOutput_1_6.csv";
-		this.summaryOutputFilePath = "C:\\Breeding Management System\\workspace\\maize_test\\breeding_view\\output\\BMSSummary_1_6.csv";
+	public void testSaveSsaResultSummaryWithValidRequiredParams() {
+		this.mainOutputFilePath = "C:\\BMS4\\workspace\\maize_test\\breeding_view\\output\\BMSOutput_1_6.csv";
+		this.summaryOutputFilePath = "C:\\BMS4\\workspace\\maize_test\\breeding_view\\output\\BMSSummary_1_6.csv";
 		this.outlierOutputFilePath = null;
 		this.workbenchProjectId = "1";
 		this.studyId = "1";
 		this.inputDataSetId = "3";
 		this.outputDataSetId = "0";
-		Map<String, String> params =
-				this.createBVParams(this.mainOutputFilePath, this.summaryOutputFilePath, this.outlierOutputFilePath,
-						this.workbenchProjectId, this.studyId, this.inputDataSetId, this.outputDataSetId);
-		try {
-			Mockito.doNothing().when(this.breedingViewService).execute(params, new ArrayList<String>());
-		} catch (IBPWebServiceException e) {
-			Assert.fail("BreedingViewService cannot be mocked");
-		}
-		DataResponse response =
+
+		final DataResponse response =
 				this.breedingView.saveSsaResultSummary(this.mainOutputFilePath, this.summaryOutputFilePath, this.outlierOutputFilePath,
 						this.workbenchProjectId, this.studyId, this.inputDataSetId, this.outputDataSetId, this.cropName);
 		Assert.assertTrue("Web service should succeed", response.isSuccessful());
 		Assert.assertTrue("Web service should return no errors", response.getMessage().indexOf("Successfully invoked service.") != -1);
-
 	}
-
-	private Map<String, String> createBVParams(String mainOutputFilePath2, String summaryOutputFilePath2, String outlierOutputFilePath2,
-			String workbenchProjectId2, String studyId2, String inputDataSetId2, String outputDataSetId2) {
-		Map<String, String> params = new HashMap<String, String>();
-		params.put(WebAPIConstants.MAIN_OUTPUT_FILE_PATH.getParamValue(), this.mainOutputFilePath);
-		params.put(WebAPIConstants.SUMMARY_OUTPUT_FILE_PATH.getParamValue(), this.summaryOutputFilePath);
-		params.put(WebAPIConstants.OUTLIER_OUTPUT_FILE_PATH.getParamValue(), this.outlierOutputFilePath);
-		params.put(WebAPIConstants.WORKBENCH_PROJECT_ID.getParamValue(), this.workbenchProjectId);
-		params.put(WebAPIConstants.STUDY_ID.getParamValue(), this.studyId);
-		params.put(WebAPIConstants.INPUT_DATASET_ID.getParamValue(), this.inputDataSetId);
-		params.put(WebAPIConstants.OUTPUT_DATASET_ID.getParamValue(), this.outputDataSetId);
-		return params;
-	}
+	
 }

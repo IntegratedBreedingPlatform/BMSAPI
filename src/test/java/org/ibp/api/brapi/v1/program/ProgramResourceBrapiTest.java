@@ -20,6 +20,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 
+	final static String PROGRAM_UUID_RICE = "92c47f83-4427-44c9-982f-b611b8917a2d";
+	final static String PROGRAM_UUID_WHEAT = "2ca55832-5c5d-404f-b05c-bc6e305c8b76";
+
 	@Test
 	public void testListProgramsBadCrop() throws Exception {
 		Mockito.when(this.workbenchDataManager.getInstalledCropDatabses()).thenReturn(getAllCrops());
@@ -47,9 +50,9 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk()) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(jsonPath("$.result.data", IsCollectionWithSize.hasSize(programDetailsDtoList.size()))) //
-			.andExpect(jsonPath("$.result.data[0].programDbId", Matchers.is(10))) //
+			.andExpect(jsonPath("$.result.data[0].programDbId", Matchers.is(PROGRAM_UUID_WHEAT))) //
 			.andExpect(jsonPath("$.result.data[0].name", Matchers.is("Wheat"))) //
-			.andExpect(jsonPath("$.result.data[1].programDbId", Matchers.is(11))) //
+			.andExpect(jsonPath("$.result.data[1].programDbId", Matchers.is(PROGRAM_UUID_RICE))) //
 			.andExpect(jsonPath("$.result.data[1].name", Matchers.is("Rice"))) //
 		;
 	}
@@ -60,9 +63,9 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 		Mockito.when(this.workbenchDataManager.countProjectsByFilter(Mockito.anyMapOf(ProgramFilters.class, Object.class))).thenReturn(1L);
 
 		final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
-		programDetailsDtoList.add(new ProgramDetailsDto(11, "Rice", null, null, null));
+		programDetailsDtoList.add(new ProgramDetailsDto(PROGRAM_UUID_RICE, "Rice", null, null, null));
 		final List<Project> projectList = new ArrayList<>();
-		projectList.add(getProject(11L, "Rice"));
+		projectList.add(getProject(11L, PROGRAM_UUID_RICE, "Rice"));
 
 		Mockito.when(
 			this.workbenchDataManager.getProjects(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyMapOf(ProgramFilters.class, Object.class)))
@@ -73,7 +76,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk()) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(jsonPath("$.result.data", IsCollectionWithSize.hasSize(programDetailsDtoList.size()))) //
-			.andExpect(jsonPath("$.result.data[0].programDbId", Matchers.is(11))) //
+			.andExpect(jsonPath("$.result.data[0].programDbId", Matchers.is(PROGRAM_UUID_RICE))) //
 			.andExpect(jsonPath("$.result.data[0].name", Matchers.is("Rice"))) //
 		;
 	}
@@ -92,8 +95,8 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 
 	private List<ProgramDetailsDto> getProgramDetails() {
 		final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
-		programDetailsDtoList.add(new ProgramDetailsDto(10, "Wheat", null, null, null));
-		programDetailsDtoList.add(new ProgramDetailsDto(11, "Rice", null, null, null));
+		programDetailsDtoList.add(new ProgramDetailsDto(PROGRAM_UUID_WHEAT, "Wheat", null, null, null));
+		programDetailsDtoList.add(new ProgramDetailsDto(PROGRAM_UUID_RICE, "Rice", null, null, null));
 		return programDetailsDtoList;
 	}
 
@@ -114,15 +117,16 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 
 	private List<Project> getProjectList() {
 		final List<Project> projectList = new ArrayList<>();
-		projectList.add(getProject(10L, "Wheat"));
-		projectList.add(getProject(11L, "Rice"));
+		projectList.add(getProject(10L, PROGRAM_UUID_WHEAT,  "Wheat"));
+		projectList.add(getProject(11L, PROGRAM_UUID_RICE, "Rice"));
 		return projectList;
 	}
 
-	private Project getProject(final Long id, final String projectName) {
+	private Project getProject(final Long id, String programUniqueID, final String projectName) {
 		final Project project = new Project();
 		project.setProjectId(id);
 		project.setProjectName(projectName);
+		project.setUniqueID(programUniqueID);
 		return project;
 	}
 }
