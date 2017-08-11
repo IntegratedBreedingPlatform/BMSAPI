@@ -2,15 +2,18 @@ package org.ibp.api.rest.sample;
 
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.service.api.SampleListService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -21,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-@Ignore
 public class SampleListResourceTest extends ApiUnitTestBase {
 
 	public static final String P = "P";
@@ -33,18 +35,33 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	private static final String CROP_PREFIX = "ABCD";
 	public static final String GID = "GID";
 	public static final String S = "S";
-	public static final Integer VALUE = new Integer(1);
+	public static final String VALUE = "1";
 
 	private SampleListDto dto;
 	private User user;
 
-	private SampleListServiceImpl sampleListService;
+	@Configuration
+	public static class TestConfiguration {
 
-	@Mock
+		@Bean
+		@Primary
+		public SecurityServiceImpl securityService() {
+			return Mockito.mock(SecurityServiceImpl.class);
+		}
+
+		@Bean
+		@Primary
+		public SampleListService service() {
+			return Mockito.mock(SampleListService.class);
+		}
+	}
+
+
+	@Autowired
 	private SecurityServiceImpl securityService;
 
-	@Mock
-	private org.generationcp.middleware.service.impl.study.SampleListServiceImpl service;
+	@Autowired
+	private org.generationcp.middleware.service.api.SampleListService service;
 
 	@Before
 	public void beforeEachTest() {
@@ -64,14 +81,6 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 		user = new User();
 		user.setName(ADMIN);
-
-		sampleListService = new SampleListServiceImpl();
-		service = Mockito.mock(org.generationcp.middleware.service.impl.study.SampleListServiceImpl.class);
-		securityService = Mockito.mock(SecurityServiceImpl.class);
-
-		sampleListService.setSecurityService(securityService);
-		sampleListService.setService(service);
-
 	}
 
 	@Test
@@ -81,7 +90,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sample/maize/sampleList").build().encode();
 
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
-		Mockito.when(this.service.createOrUpdateSampleList(Mockito.any(SampleListDTO.class))).thenReturn(VALUE);
+		Mockito.when(this.service.createOrUpdateSampleList(Mockito.any(SampleListDTO.class))).thenReturn(Integer.valueOf(VALUE));
 
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType)
