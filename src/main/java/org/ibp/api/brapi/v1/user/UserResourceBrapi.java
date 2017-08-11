@@ -28,7 +28,7 @@ public class UserResourceBrapi {
 	@RequestMapping(value = "/brapi/v1/users", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<UserDetailDto>> listUsers() {
-		return new ResponseEntity<List<UserDetailDto>>(this.userService.getAllUsersSortedByLastName(), HttpStatus.OK);
+		return new ResponseEntity<>(this.userService.getAllUsersSortedByLastName(), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Create user", notes = "Create user in this deployment instance of BMSAPI. ")
@@ -38,9 +38,9 @@ public class UserResourceBrapi {
 		final Map<String, Object> map = this.userService.createUser(user);
 
 		if (map.get("ERROR") != null) {
-			return new ResponseEntity<Map<String, Object>>(map, HttpStatus.CONFLICT);
+			return new ResponseEntity<>(map, HttpStatus.CONFLICT);
 		}
-		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.CREATED);
+		return new ResponseEntity<>(map, HttpStatus.CREATED);
 	}
 
 	@ApiOperation(value = "Update user", notes = "Update user in this deployment instance of BMSAPI. ")
@@ -49,8 +49,8 @@ public class UserResourceBrapi {
 	public ResponseEntity<Map<String, Object>> updateUser(final @PathVariable String id, @RequestBody UserDetailDto user) {
 		Map<String, Object> map = this.userService.updateUser(user);
 		if (map.get("ERROR") != null) {
-			return new ResponseEntity<Map<String, Object>>(map, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(map, HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
+		return new ResponseEntity<>(map, HttpStatus.OK);
 	}
 }
