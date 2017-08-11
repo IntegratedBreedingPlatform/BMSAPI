@@ -35,10 +35,14 @@ public class SampleListServiceImpl implements SampleListService {
 			final SampleListDTO sampleListdto = translateToSampleListDto(sampleListDto);
 
 			final Integer newSampleId = this.service.createOrUpdateSampleList(sampleListdto);
-			mapResponse.put("id", String.valueOf(newSampleId));
+
+			if (newSampleId != null) {
+				mapResponse.put("id", String.valueOf(newSampleId));
+			} else {
+				mapResponse.put("ERROR", "Error on SampleListService.createOrUpdateSampleList");
+			}
 
 		} catch (MiddlewareQueryException | ParseException e) {
-
 			mapResponse.put("ERROR", "Error on SampleListService.createOrUpdateSampleList " + e.getMessage());
 		}
 
