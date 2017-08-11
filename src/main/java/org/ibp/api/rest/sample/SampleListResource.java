@@ -33,6 +33,6 @@ public class SampleListResource {
 		if (map.get(ERROR) != null || NULL.equals(map.get("id"))) {
 			return new ResponseEntity<>(map, HttpStatus.CONFLICT);
 		}
-		return new ResponseEntity<>(map, HttpStatus.CREATED);
+		return new ResponseEntity<>(map, HttpStatus.OK);
 	}
 }
