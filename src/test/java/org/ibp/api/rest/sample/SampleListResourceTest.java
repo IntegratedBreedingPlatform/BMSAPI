@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -45,20 +47,10 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public SecurityServiceImpl securityService() {
-			return Mockito.mock(SecurityServiceImpl.class);
-		}
-
-		@Bean
-		@Primary
 		public SampleListService service() {
 			return Mockito.mock(SampleListService.class);
 		}
 	}
-
-
-	@Autowired
-	private SecurityServiceImpl securityService;
 
 	@Autowired
 	private org.generationcp.middleware.service.api.SampleListService service;
@@ -81,6 +73,14 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 		user = new User();
 		user.setName(ADMIN);
+		user.setUserid(1);
+		user.setPassword("password");
+		UsernamePasswordAuthenticationToken loggedInUser =
+			new UsernamePasswordAuthenticationToken(this.user.getName(), this.user.getPassword());
+		SecurityContextHolder.getContext().setAuthentication(loggedInUser);
+
+		Mockito.when(this.workbenchDataManager.getUserById(this.user.getUserid())).thenReturn(this.user);
+		Mockito.when(this.workbenchDataManager.getUserByUsername(this.user.getName())).thenReturn(this.user);
 	}
 
 	@Test
@@ -89,7 +89,6 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		result.put("id", VALUE);
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sample/maize/sampleList").build().encode();
 
-		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 		Mockito.when(this.service.createOrUpdateSampleList(Mockito.any(SampleListDTO.class))).thenReturn(Integer.valueOf(VALUE));
 
 
