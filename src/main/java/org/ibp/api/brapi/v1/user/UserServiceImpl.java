@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
 	public List<UserDetailDto> getUsersByProjectUUID(final String projectUUID) {
 		final List<UserDetailDto> result = new ArrayList<>();
 		final ModelMapper mapper = UserMapper.getInstance();
-		final List<UserDto> users = this.workbenchDataManager.getUsersByProjectUUID(projectUUID);
+		final List<UserDto> users = this.workbenchDataManager.getUsersByProjectUuid(projectUUID);
 
 		for (final UserDto userDto : users) {
 			final UserDetailDto userInfo = mapper.map(userDto, UserDetailDto.class);
