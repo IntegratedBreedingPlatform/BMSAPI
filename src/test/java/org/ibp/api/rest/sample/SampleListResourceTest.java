@@ -14,8 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -28,22 +26,23 @@ import java.util.List;
 
 public class SampleListResourceTest extends ApiUnitTestBase {
 
-	public static final String P = "P";
-	public static final String ADMIN = "admin";
-	public static final String DESCRIPTION = "description";
-	private static final String YYYY_M_MDD_HH = "yyyyMMddHH";
-	private static final String TRIAL_NAME = "trialName#";
-	public static final String NOTES = "Notes";
-	private static final String CROP_PREFIX = "ABCD";
-	public static final String GID = "GID";
-	public static final String S = "S";
-	public static final String VALUE = "1";
+	private static final String ADMIN = "admin";
+	private static final String DESCRIPTION = "description";
+	private static final String NOTES = "Notes";
+	private static final String VALUE = "1";
 
 	private SampleListDto dto;
 	private User user;
 
+
 	@Configuration
 	public static class TestConfiguration {
+
+		@Bean
+		@Primary
+		public SecurityServiceImpl securityService() {
+			return Mockito.mock(SecurityServiceImpl.class);
+		}
 
 		@Bean
 		@Primary
@@ -51,6 +50,10 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 			return Mockito.mock(SampleListService.class);
 		}
 	}
+
+
+	@Autowired
+	private SecurityServiceImpl securityService;
 
 	@Autowired
 	private org.generationcp.middleware.service.api.SampleListService service;
@@ -63,37 +66,29 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		dto.setNotes(NOTES);
 		dto.setCreatedBy(ADMIN);
 		dto.setSelectionVariableId(8263);
-		List<Integer> instanceIds = new ArrayList<>();
+		final List<Integer> instanceIds = new ArrayList<>();
 		instanceIds.add(1);
 		dto.setInstanceIds(instanceIds);
 		dto.setTakenBy(ADMIN);
 		dto.setSamplingDate("2017-08-01");
-		dto.setStudyId(new Integer(25025));
+		dto.setStudyId(25025);
 		dto.setCropName("maize");
 
 		user = new User();
 		user.setName(ADMIN);
-		user.setUserid(1);
-		user.setPassword("password");
-		UsernamePasswordAuthenticationToken loggedInUser =
-			new UsernamePasswordAuthenticationToken(this.user.getName(), this.user.getPassword());
-		SecurityContextHolder.getContext().setAuthentication(loggedInUser);
-
-		Mockito.when(this.workbenchDataManager.getUserById(this.user.getUserid())).thenReturn(this.user);
-		Mockito.when(this.workbenchDataManager.getUserByUsername(this.user.getName())).thenReturn(this.user);
 	}
 
 	@Test
 	public void createNewSampleList() throws Exception {
-		HashMap<String, Object> result = new HashMap<>();
+		final HashMap<String, Object> result = new HashMap<>();
 		result.put("id", VALUE);
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sample/maize/sampleList").build().encode();
 
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 		Mockito.when(this.service.createOrUpdateSampleList(Mockito.any(SampleListDTO.class))).thenReturn(Integer.valueOf(VALUE));
 
-
-		this.mockMvc.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType)
-			.content(this.convertObjectToByte(dto)))
+		this.mockMvc.perform(
+			MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType).content(this.convertObjectToByte(dto)))
 			.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))));
 	}
