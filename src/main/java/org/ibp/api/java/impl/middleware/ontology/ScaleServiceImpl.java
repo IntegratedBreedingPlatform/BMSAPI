@@ -9,12 +9,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
-import com.google.common.collect.Lists;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
+import javax.annotation.Nullable;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermRelationship;
@@ -43,9 +41,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Maps;
-
-import javax.annotation.Nullable;
+import com.google.common.collect.Lists;
 
 /**
  * Validate data of API Services and pass data to middleware services
@@ -94,12 +90,13 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 		final TermRequest term = new TermRequest(id, ScaleServiceImpl.SCALE, CvId.SCALES.getId());
 		this.termValidator.validate(term, errors);
 
-		// Note: If any error occurs then throws Exception with error messages
+		// If any error occurs then throws Exception with error messages
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		try {
-			final Scale scale = this.ontologyScaleDataManager.getScaleById(StringUtil.parseInt(id, null), true);
+			final Integer scaleId = StringUtil.parseInt(id, null);
+			final Scale scale = this.ontologyScaleDataManager.getScaleById(scaleId, true);
 			if (scale == null) {
 				return null;
 			}
@@ -109,9 +106,9 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 
 			final DataType dataType = DataType.getById(scale.getDataType().getId());
 
-			// Note : Get list of relationships related to scale Id
+			// Get list of variables using the scale
 			final List<TermRelationship> relationships =
-					this.termDataManager.getRelationshipsWithObjectAndType(StringUtil.parseInt(id, null), TermRelationshipId.HAS_SCALE);
+					this.termDataManager.getRelationshipsWithObjectAndType(scaleId, TermRelationshipId.HAS_SCALE);
 
 			Collections.sort(relationships, new Comparator<TermRelationship>() {
 
@@ -121,7 +118,7 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 				}
 			});
 
-			/* variables of scale */
+			// Add variables of scale in Scale's Metadata
 			for (final TermRelationship relationship : relationships) {
 				final org.ibp.api.domain.ontology.TermSummary termSummary =
 						mapper.map(relationship, org.ibp.api.domain.ontology.TermSummary.class);
@@ -131,34 +128,22 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 			Boolean deletable = Boolean.TRUE;
 			Boolean editable = Boolean.TRUE;
 
-			if (this.termDataManager.isTermReferred(StringUtil.parseInt(id, null))) {
-				// scale is not used in any variable
-				// Given the scale is used in one or more variables
+			if (this.termDataManager.isTermReferred(scaleId)) {
+				// Scale will only be deletable if it's not used by any variable
 				deletable = false;
 
 				final List<Integer> variablesIds = getVariablesIds(relationships);
 
 				editable = !this.ontologyVariableDataManager.areVariablesUsedInStudy(variablesIds);
 				
-				if (Objects.equals(scale.getDataType().getId(), CATEGORICAL_VARIABLE.getId())) {
-					// if scale is categorical
-		
-
-					if (!editable) {
-
-						final List<String> categories =
-								this.termDataManager.getCategoriesReferredInPhenotype(StringUtil.parseInt(id, null));
-						final Map<String, String> mappedCategories = Maps.uniqueIndex(categories, new Function<String, String>() {
-
-							@Override
-							public String apply(final String from) {
-								return from;
-							}
-						});
-						for (final Category category : scaleDetails.getValidValues().getCategories()) {
-							if (mappedCategories.containsKey(category.getName())) {
-								category.setEditable(Boolean.FALSE);
-							}
+				// If scale is categorical, determine which categories could be edited (ie. those not used in existing phenotypes)
+				if (Objects.equals(scale.getDataType().getId(), CATEGORICAL_VARIABLE.getId()) && !editable) {
+					final List<String> categories =
+							this.termDataManager.getCategoriesReferredInPhenotype(scaleId);
+					
+					for (final Category category : scaleDetails.getValidValues().getCategories()) {
+						if (categories.contains(category.getName())) {
+							category.setEditable(Boolean.FALSE);
 						}
 					}
 				}
