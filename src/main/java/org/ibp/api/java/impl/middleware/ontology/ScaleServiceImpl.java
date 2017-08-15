@@ -94,91 +94,86 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
-		try {
-			final Integer scaleId = StringUtil.parseInt(id, null);
-			final Scale scale = this.ontologyScaleDataManager.getScaleById(scaleId, true);
-			if (scale == null) {
-				return null;
+		final Integer scaleId = StringUtil.parseInt(id, null);
+		final Scale scale = this.ontologyScaleDataManager.getScaleById(scaleId, true);
+		if (scale == null) {
+			return null;
+		}
+
+		final ModelMapper mapper = OntologyMapper.getInstance();
+		final ScaleDetails scaleDetails = mapper.map(scale, ScaleDetails.class);
+
+		final DataType dataType = DataType.getById(scale.getDataType().getId());
+
+		// Get list of variables using the scale
+		final List<TermRelationship> relationships =
+				this.termDataManager.getRelationshipsWithObjectAndType(scaleId, TermRelationshipId.HAS_SCALE);
+
+		Collections.sort(relationships, new Comparator<TermRelationship>() {
+
+			@Override
+			public int compare(final TermRelationship l, final TermRelationship r) {
+				return l.getSubjectTerm().getName().compareToIgnoreCase(r.getSubjectTerm().getName());
 			}
+		});
 
-			final ModelMapper mapper = OntologyMapper.getInstance();
-			final ScaleDetails scaleDetails = mapper.map(scale, ScaleDetails.class);
+		// Add variables of scale in Scale's Metadata
+		for (final TermRelationship relationship : relationships) {
+			final org.ibp.api.domain.ontology.TermSummary termSummary =
+					mapper.map(relationship, org.ibp.api.domain.ontology.TermSummary.class);
+			scaleDetails.getMetadata().getUsage().addUsage(termSummary);
+		}
 
-			final DataType dataType = DataType.getById(scale.getDataType().getId());
+		Boolean deletable = Boolean.TRUE;
+		Boolean editable = Boolean.TRUE;
 
-			// Get list of variables using the scale
-			final List<TermRelationship> relationships =
-					this.termDataManager.getRelationshipsWithObjectAndType(scaleId, TermRelationshipId.HAS_SCALE);
+		if (this.termDataManager.isTermReferred(scaleId)) {
+			// Scale will only be deletable if it's not used by any variable
+			deletable = false;
 
-			Collections.sort(relationships, new Comparator<TermRelationship>() {
+			final List<Integer> variablesIds = getVariablesIds(relationships);
 
-				@Override
-				public int compare(final TermRelationship l, final TermRelationship r) {
-					return l.getSubjectTerm().getName().compareToIgnoreCase(r.getSubjectTerm().getName());
-				}
-			});
-
-			// Add variables of scale in Scale's Metadata
-			for (final TermRelationship relationship : relationships) {
-				final org.ibp.api.domain.ontology.TermSummary termSummary =
-						mapper.map(relationship, org.ibp.api.domain.ontology.TermSummary.class);
-				scaleDetails.getMetadata().getUsage().addUsage(termSummary);
-			}
-
-			Boolean deletable = Boolean.TRUE;
-			Boolean editable = Boolean.TRUE;
-
-			if (this.termDataManager.isTermReferred(scaleId)) {
-				// Scale will only be deletable if it's not used by any variable
-				deletable = false;
-
-				final List<Integer> variablesIds = getVariablesIds(relationships);
-
-				editable = !this.ontologyVariableDataManager.areVariablesUsedInStudy(variablesIds);
+			editable = !this.ontologyVariableDataManager.areVariablesUsedInStudy(variablesIds);
+			
+			// If scale is categorical, determine which categories could be edited (ie. those not used in existing phenotypes)
+			if (Objects.equals(scale.getDataType().getId(), CATEGORICAL_VARIABLE.getId()) && !editable) {
+				final List<String> categories =
+						this.termDataManager.getCategoriesReferredInPhenotype(scaleId);
 				
-				// If scale is categorical, determine which categories could be edited (ie. those not used in existing phenotypes)
-				if (Objects.equals(scale.getDataType().getId(), CATEGORICAL_VARIABLE.getId()) && !editable) {
-					final List<String> categories =
-							this.termDataManager.getCategoriesReferredInPhenotype(scaleId);
-					
-					for (final Category category : scaleDetails.getValidValues().getCategories()) {
-						if (categories.contains(category.getName())) {
-							category.setEditable(Boolean.FALSE);
-						}
+				for (final Category category : scaleDetails.getValidValues().getCategories()) {
+					if (categories.contains(category.getName())) {
+						category.setEditable(Boolean.FALSE);
 					}
 				}
-
 			}
 
-			if (!dataType.isSystemDataType()) {
-				if (!deletable) {
-					scaleDetails.getMetadata().addEditableField(ScaleServiceImpl.FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
-					
-				} else {
-					scaleDetails.getMetadata().addEditableField("name");
-					scaleDetails.getMetadata().addEditableField(ScaleServiceImpl.FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
-					scaleDetails.getMetadata().addEditableField("dataType");
-					
-				}
-				
-				if ((editable && Objects.equals(scale.getDataType().getId(), NUMERIC_VARIABLE.getId()))
-						|| Objects.equals(scale.getDataType().getId(), CATEGORICAL_VARIABLE.getId())) {
-					scaleDetails.getMetadata().addEditableField("validValues");
-				}
-				
-				scaleDetails.getMetadata().setDeletable(deletable);
-			} else {
-				scaleDetails.getMetadata().setDeletable(false);
-			}
-			scaleDetails.getMetadata().setEditable(editable);
-
-			return scaleDetails;
-		} catch (final MiddlewareException e) {
-			throw new ApiRuntimeException(ScaleServiceImpl.ERROR_MESSAGE, e);
 		}
+
+		if (!dataType.isSystemDataType()) {
+			if (!deletable) {
+				scaleDetails.getMetadata().addEditableField(ScaleServiceImpl.FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
+				
+			} else {
+				scaleDetails.getMetadata().addEditableField("name");
+				scaleDetails.getMetadata().addEditableField(ScaleServiceImpl.FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
+				scaleDetails.getMetadata().addEditableField("dataType");
+				
+			}
+			
+			if ((editable && Objects.equals(scale.getDataType().getId(), NUMERIC_VARIABLE.getId()))
+					|| Objects.equals(scale.getDataType().getId(), CATEGORICAL_VARIABLE.getId())) {
+				scaleDetails.getMetadata().addEditableField("validValues");
+			}
+			
+			scaleDetails.getMetadata().setDeletable(deletable);
+		} else {
+			scaleDetails.getMetadata().setDeletable(false);
+		}
+		scaleDetails.getMetadata().setEditable(editable);
+
+		return scaleDetails;
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<Integer> getVariablesIds(final List<TermRelationship> relationships) {
 		return Lists.transform(relationships, new Function<TermRelationship, Integer> () {
 			@Nullable @Override public Integer apply(final TermRelationship termRelationship) {
