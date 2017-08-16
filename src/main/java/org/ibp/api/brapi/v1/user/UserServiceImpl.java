@@ -1,6 +1,7 @@
 
 package org.ibp.api.brapi.v1.user;
 
+import com.google.common.base.Preconditions;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.service.api.user.UserDto;
@@ -70,7 +71,7 @@ public class UserServiceImpl implements UserService {
 				mapResponse.put("id", String.valueOf(newUserId));
 
 			} catch (MiddlewareQueryException e) {
-				LOG.info("Error on workbenchDataManager.createUser ",e.getMessage());
+				LOG.info("Error on workbenchDataManager.createUser ",e);
 				errors.rejectValue(UserValidator.USER_ID, UserValidator.DATABASE_ERROR);
 				translateErrorToMap(errors, mapResponse);
 			}
@@ -99,7 +100,7 @@ public class UserServiceImpl implements UserService {
 				final Integer updateUserId = this.workbenchDataManager.updateUser(userdto);
 				mapResponse.put("id", String.valueOf(updateUserId));
 			} catch (MiddlewareQueryException e) {
-				LOG.info("Error on workbenchDataManager.updateUser",e.getMessage());
+				LOG.info("Error on workbenchDataManager.updateUser", e);
 				errors.rejectValue(UserValidator.USER_ID, UserValidator.DATABASE_ERROR);
 				translateErrorToMap(errors, mapResponse);
 			}
@@ -112,13 +113,20 @@ public class UserServiceImpl implements UserService {
 	public List<UserDetailDto> getUsersByProjectUUID(final String projectUUID) {
 		final List<UserDetailDto> result = new ArrayList<>();
 		final ModelMapper mapper = UserMapper.getInstance();
-		final List<UserDto> users = this.workbenchDataManager.getUsersByProjectUuid(projectUUID);
 
-		for (final UserDto userDto : users) {
-			final UserDetailDto userInfo = mapper.map(userDto, UserDetailDto.class);
-			result.add(userInfo);
+		Preconditions.checkNotNull(projectUUID, "The projectUUID must not be empty");
+		try {
+			List<UserDto> users = this.workbenchDataManager.getUsersByProjectUuid(projectUUID);
+			Preconditions.checkArgument(!users.isEmpty(), "don't exists users for this projectUUID");
+
+			for (final UserDto userDto : users) {
+				final UserDetailDto userInfo = mapper.map(userDto, UserDetailDto.class);
+				result.add(userInfo);
+			}
+		} catch (MiddlewareQueryException e) {
+			LOG.info("Error on workbenchDataManager.getUsersByProjectUuid", e);
+			Preconditions.checkState(false, "An internal error occurred while trying to get the users");
 		}
-
 		return result;
 	}
 
