@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@ActiveProfiles("security-mocked")
 public class SampleListResourceTest extends ApiUnitTestBase {
 
 	private static final String ADMIN = "admin";
@@ -35,6 +38,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	private User user;
 
 
+	@Profile("security-mocked")
 	@Configuration
 	public static class TestConfiguration {
 
