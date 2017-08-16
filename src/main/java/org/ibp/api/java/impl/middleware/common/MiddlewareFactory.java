@@ -47,10 +47,14 @@ import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.service.api.PlantService;
+import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
-import org.generationcp.middleware.service.impl.SampleServiceImpl;
+import org.generationcp.middleware.service.impl.study.PlantServiceImpl;
+import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
+import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -86,7 +90,7 @@ public class MiddlewareFactory {
 	private ApplicationContext applicationContext;
 
 	public MiddlewareFactory() {
-
+		super();
 	}
 
 	private SessionFactory getSessionFactory() {
@@ -243,6 +247,18 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public SampleService getSampleService() {
 		return new SampleServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public PlantService getPlantService() {
+		return new PlantServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public SampleListService getSampleListService() {
+		return new SampleListServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean

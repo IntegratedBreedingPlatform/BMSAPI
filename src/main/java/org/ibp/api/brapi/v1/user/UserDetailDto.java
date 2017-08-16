@@ -7,7 +7,7 @@ import org.generationcp.middleware.service.api.user.UserDto;
 public class UserDetailDto implements Serializable, Comparable<UserDto> {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -1086700590088326865L;
 
@@ -97,8 +97,8 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 
 	@Override
 	public int compareTo(UserDto o) {
-		int comparId = o.getUserId();
-		return Integer.valueOf(this.getId()).compareTo(comparId);
+		int compareId = o.getUserId();
+		return Integer.valueOf(this.getId()).compareTo(compareId);
 	}
 
 	@Override

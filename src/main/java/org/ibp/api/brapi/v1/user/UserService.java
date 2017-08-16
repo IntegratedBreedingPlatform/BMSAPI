@@ -6,10 +6,11 @@ import java.util.Map;
 
 public interface UserService {
 
-	public List<UserDetailDto> getAllUsersSortedByLastName();
+	List<UserDetailDto> getAllUsersSortedByLastName();
 
-	public Map<String, Object> createUser(final UserDetailDto user);
+	Map<String, Object> createUser(final UserDetailDto user);
 
-	public Map<String, Object> updateUser(final UserDetailDto user);
+	Map<String, Object> updateUser(final UserDetailDto user);
 
+	List<UserDetailDto> getUsersByProjectUUID(final String projectUUID);
 }
