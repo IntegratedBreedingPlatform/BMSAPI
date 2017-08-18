@@ -47,6 +47,100 @@ public class SampleListServiceImpl implements SampleListService {
 		return mapResponse;
 	}
 
+	/**
+	 * Create a sample list folder
+	 * Sample List folder name must be unique across the elements in the parent folder
+	 *
+	 * @param folderName
+	 * @param parentId
+	 * @return Folder ID
+	 * @throws Exception
+	 */
+	@Override
+	public Map<String, Object> createSampleListFolder(final String folderName, final Integer parentId) {
+		Preconditions.checkArgument(folderName != null, "The folder name must not be null");
+		Preconditions.checkArgument(parentId != null, "The parent Id must not be null");
+
+		final HashMap<String, Object> mapResponse = new HashMap<>();
+		mapResponse.put("id", String.valueOf(0));
+		try {
+			Integer result = this.sampleListServiceMW.createSampleListFolder(folderName, parentId);
+			mapResponse.put("id", String.valueOf(result));
+		} catch (Exception e) {
+			mapResponse.put("ERROR", "Error on SampleListService.createSampleListFolder " + e.getMessage());
+		}
+		return mapResponse;
+	}
+
+	/**
+	 * Update sample list folder name
+	 * New folder name should be unique across the elements in the parent folder
+	 *
+	 * @param folderId
+	 * @param newFolderName
+	 * @throws Exception
+	 */
+	@Override
+	public Map<String, Object> updateSampleListFolderName(final Integer folderId, final String newFolderName) {
+		Preconditions.checkArgument(folderId != null, "The folder id must not be null");
+		Preconditions.checkArgument(newFolderName != null, "The new folder name must not be null");
+
+		final HashMap<String, Object> mapResponse = new HashMap<>();
+		mapResponse.put("id", String.valueOf(0));
+		try {
+			this.sampleListServiceMW.updateSampleListFolderName(folderId, newFolderName);
+		} catch (Exception e) {
+			mapResponse.put("ERROR", "Error on SampleListService.updateSampleListFolderName " + e.getMessage());
+		}
+		return mapResponse;
+	}
+
+	/**
+	 * Move a folder to another folder
+	 * FolderID must exist, newParentID must exist
+	 * newParentID folder must not contain another sample list with the name that the one that needs to be moved
+	 *
+	 * @param folderId
+	 * @param newParentId
+	 * @throws Exception
+	 */
+
+	@Override
+	public Map<String, Object> moveSampleListFolder(final Integer folderId, final Integer newParentId) {
+		Preconditions.checkArgument(folderId != null, "The folder id must not be null");
+		Preconditions.checkArgument(newParentId != null, "The new parent id must not be null");
+
+		final HashMap<String, Object> mapResponse = new HashMap<>();
+		mapResponse.put("id", String.valueOf(0));
+		try {
+			this.sampleListServiceMW.moveSampleListFolder(folderId, newParentId);
+		} catch (Exception e) {
+			mapResponse.put("ERROR", "Error on SampleListService.moveSampleListFolder " + e.getMessage());
+		}
+		return mapResponse;
+	}
+
+	/**
+	 * Delete a folder
+	 * Folder ID must exist and it can not contain any child
+	 *
+	 * @param folderId
+	 * @throws Exception
+	 */
+	@Override
+	public Map<String, Object> deleteSampleListFolder(final Integer folderId) {
+		Preconditions.checkArgument(folderId != null, "The folder id must not be null");
+
+		final HashMap<String, Object> mapResponse = new HashMap<>();
+		mapResponse.put("id", String.valueOf(0));
+		try {
+			this.sampleListServiceMW.deleteSampleListFolder(folderId);
+		} catch (Exception e) {
+			mapResponse.put("ERROR", "Error on SampleListService.deleteSampleListFolder " + e.getMessage());
+		}
+		return mapResponse;
+	}
+
 	private SampleListDTO translateToSampleListDto(final SampleListDto dto) throws ParseException {
 		final SampleListDTO sampleListDTO = new SampleListDTO();
 
