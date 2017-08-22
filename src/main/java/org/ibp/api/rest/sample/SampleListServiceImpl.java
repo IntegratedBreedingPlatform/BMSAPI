@@ -64,7 +64,9 @@ public class SampleListServiceImpl implements SampleListService {
 		final HashMap<String, Object> mapResponse = new HashMap<>();
 		mapResponse.put("id", String.valueOf(0));
 		try {
-			Integer result = this.sampleListServiceMW.createSampleListFolder(folderName, parentId);
+
+			final String createdBy = this.securityService.getCurrentlyLoggedInUser().getName();
+			Integer result = this.sampleListServiceMW.createSampleListFolder(folderName, parentId, createdBy);
 			mapResponse.put("id", String.valueOf(result));
 		} catch (Exception e) {
 			mapResponse.put("ERROR", "Error on SampleListService.createSampleListFolder " + e.getMessage());
