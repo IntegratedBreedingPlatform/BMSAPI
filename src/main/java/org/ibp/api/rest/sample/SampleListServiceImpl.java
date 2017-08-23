@@ -165,7 +165,7 @@ public class SampleListServiceImpl implements SampleListService {
 		return sampleListDTO;
 	}
 
-	public void setService(final org.generationcp.middleware.service.api.SampleListService service) {
+	public void setSampleListServiceMW(final org.generationcp.middleware.service.api.SampleListService service) {
 		this.sampleListServiceMW = service;
 	}
 

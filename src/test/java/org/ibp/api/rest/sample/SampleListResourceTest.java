@@ -1,6 +1,7 @@
 package org.ibp.api.rest.sample;
 
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
+import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.service.api.SampleListService;
@@ -26,6 +27,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 @ActiveProfiles("security-mocked")
 public class SampleListResourceTest extends ApiUnitTestBase {
@@ -122,19 +126,24 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void updateSampleListFolder() throws Exception {
-		final HashMap<String, Object> result = new HashMap<>();
-		result.put("id", VALUE);
-		SampleList sampleList = new SampleList();
-		sampleList.setId(folderId);
+		final Integer folderId = 2;
+		final Integer parentFolderId = 1;
+		final String newFolderName = "NEW_NAME";
+		final SampleList parentFolder = new SampleList();
+		parentFolder.setId(parentFolderId);
+		parentFolder.setType(SampleListType.FOLDER);
+		final SampleList folder = new SampleList();
+		folder.setId(folderId);
+		folder.setHierarchy(parentFolder);
+		folder.setType(SampleListType.FOLDER);
+
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sample/maize/sampleListFolder").build().encode();
 
-		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
-		Mockito.when(this.sampleListServiceMW.updateSampleListFolderName(folderId, folderName))
-			.thenReturn(sampleList);
+		Mockito.when(this.sampleListServiceMW.updateSampleListFolderName(Mockito.anyInt(), Mockito.anyString())).thenReturn(folder);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.put(uriComponents.toUriString()).contentType(this.contentType).content(this.convertObjectToByte(folderId))
-			.content(folderName)).andExpect(MockMvcResultMatchers.status().isOk())
-			//.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))))
+		this.mockMvc.perform(MockMvcRequestBuilders.put(uriComponents.toUriString()).contentType(this.contentType)
+			.content(this.convertObjectToByte(folderId)).content(newFolderName)).andExpect(MockMvcResultMatchers.status().isOk())
+		//.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))))
 		;
 	}
 }
