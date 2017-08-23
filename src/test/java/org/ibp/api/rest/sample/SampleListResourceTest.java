@@ -148,7 +148,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	public void moveSampleListFolder() throws Exception {
 		final Integer folderId = 2;
 		final Integer parentFolderId = 1;
-		final String newFolderName = "NEW_NAME";
+		final Integer newParentFolderId = 3;
 		final SampleList parentFolder = new SampleList();
 		parentFolder.setId(parentFolderId);
 		parentFolder.setType(SampleListType.FOLDER);
@@ -157,12 +157,18 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		folder.setHierarchy(parentFolder);
 		folder.setType(SampleListType.FOLDER);
 
+		final SampleList newParentFolder = new SampleList();
+		newParentFolder.setId(newParentFolderId);
+		newParentFolder.setType(SampleListType.FOLDER);
+
+
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sample/maize/sampleListFolder/move").build().encode();
 
 		Mockito.when(this.sampleListServiceMW.moveSampleList(Mockito.anyInt(), Mockito.anyInt())).thenReturn(folder);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.put(uriComponents.toUriString()).contentType(this.contentType).content(this.convertObjectToByte(folderId))
 			.content(this.convertObjectToByte(parentId))).andExpect(MockMvcResultMatchers.status().isOk())
-			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(folder.getId().toString())));
+			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.parentId", Matchers.is(newParentFolderId.toString())))
+		;
 	}
 }

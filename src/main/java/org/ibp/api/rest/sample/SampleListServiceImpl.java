@@ -118,7 +118,7 @@ public class SampleListServiceImpl implements SampleListService {
 		mapResponse.put("id", String.valueOf(0));
 		try {
 			SampleList result = this.sampleListServiceMW.moveSampleList(folderId, newParentId);
-			mapResponse.put("id", String.valueOf(result.getId()));
+			mapResponse.put("parentId", String.valueOf(result.getHierarchy().getId()));
 		} catch (Exception e) {
 			mapResponse.put("ERROR", "Error on SampleListService.moveSampleListFolder " + e.getMessage());
 		}
