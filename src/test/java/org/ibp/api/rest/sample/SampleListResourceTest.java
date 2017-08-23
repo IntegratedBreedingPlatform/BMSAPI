@@ -1,6 +1,7 @@
 package org.ibp.api.rest.sample;
 
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
+import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.hamcrest.Matchers;
@@ -36,6 +37,9 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 	private SampleListDto dto;
 	private User user;
+	private String folderName;
+	private Integer parentId;
+	private Integer folderId;
 
 
 	@Profile("security-mocked")
@@ -60,7 +64,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	private SecurityServiceImpl securityService;
 
 	@Autowired
-	private org.generationcp.middleware.service.api.SampleListService service;
+	private org.generationcp.middleware.service.api.SampleListService sampleListServiceMW;
 
 	@Before
 	public void beforeEachTest() {
@@ -80,6 +84,10 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 		user = new User();
 		user.setName(ADMIN);
+
+		folderName = "Folder Name";
+		parentId = 1;
+		folderId = 2;
 	}
 
 	@Test
@@ -89,11 +97,44 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sample/maize/sampleList").build().encode();
 
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
-		Mockito.when(this.service.createOrUpdateSampleList(Mockito.any(SampleListDTO.class))).thenReturn(Integer.valueOf(VALUE));
+		Mockito.when(this.sampleListServiceMW.createOrUpdateSampleList(Mockito.any(SampleListDTO.class))).thenReturn(Integer.valueOf(VALUE));
 
 		this.mockMvc.perform(
 			MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType).content(this.convertObjectToByte(dto)))
 			.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))));
+	}
+
+	@Test
+	public void createSampleListFolder() throws Exception {
+		final HashMap<String, Object> result = new HashMap<>();
+		result.put("id", VALUE);
+		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sample/maize/sampleListFolder").build().encode();
+
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+		Mockito.when(this.sampleListServiceMW.createSampleListFolder(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))
+			.thenReturn(Integer.valueOf(VALUE));
+
+		this.mockMvc.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType).content(folderName)
+			.content(this.convertObjectToByte(parentId))).andExpect(MockMvcResultMatchers.status().isOk())
+			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))));
+	}
+
+	@Test
+	public void updateSampleListFolder() throws Exception {
+		final HashMap<String, Object> result = new HashMap<>();
+		result.put("id", VALUE);
+		SampleList sampleList = new SampleList();
+		sampleList.setId(folderId);
+		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sample/maize/sampleListFolder").build().encode();
+
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+		Mockito.when(this.sampleListServiceMW.updateSampleListFolderName(folderId, folderName))
+			.thenReturn(sampleList);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.put(uriComponents.toUriString()).contentType(this.contentType).content(this.convertObjectToByte(folderId))
+			.content(folderName)).andExpect(MockMvcResultMatchers.status().isOk())
+			//.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))))
+		;
 	}
 }

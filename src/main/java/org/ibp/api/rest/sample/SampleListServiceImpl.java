@@ -8,6 +8,7 @@ import java.util.Map;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.SampleList;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -90,7 +91,8 @@ public class SampleListServiceImpl implements SampleListService {
 		final HashMap<String, Object> mapResponse = new HashMap<>();
 		mapResponse.put("id", String.valueOf(0));
 		try {
-			this.sampleListServiceMW.updateSampleListFolderName(folderId, newFolderName);
+			SampleList result = this.sampleListServiceMW.updateSampleListFolderName(folderId, newFolderName);
+			mapResponse.put("id", String.valueOf(result.getId()));
 		} catch (Exception e) {
 			mapResponse.put("ERROR", "Error on SampleListService.updateSampleListFolderName " + e.getMessage());
 		}
@@ -115,7 +117,7 @@ public class SampleListServiceImpl implements SampleListService {
 		final HashMap<String, Object> mapResponse = new HashMap<>();
 		mapResponse.put("id", String.valueOf(0));
 		try {
-			this.sampleListServiceMW.moveSampleListFolder(folderId, newParentId);
+			//this.sampleListServiceMW.moveSampleListFolder(folderId, newParentId);
 		} catch (Exception e) {
 			mapResponse.put("ERROR", "Error on SampleListService.moveSampleListFolder " + e.getMessage());
 		}
