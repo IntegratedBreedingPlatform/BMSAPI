@@ -117,7 +117,8 @@ public class SampleListServiceImpl implements SampleListService {
 		final HashMap<String, Object> mapResponse = new HashMap<>();
 		mapResponse.put("id", String.valueOf(0));
 		try {
-			//this.sampleListServiceMW.moveSampleListFolder(folderId, newParentId);
+			SampleList result = this.sampleListServiceMW.moveSampleList(folderId, newParentId);
+			mapResponse.put("id", String.valueOf(result.getId()));
 		} catch (Exception e) {
 			mapResponse.put("ERROR", "Error on SampleListService.moveSampleListFolder " + e.getMessage());
 		}

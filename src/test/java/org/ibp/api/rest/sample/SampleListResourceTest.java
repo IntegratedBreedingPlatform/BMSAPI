@@ -28,9 +28,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-
 @ActiveProfiles("security-mocked")
 public class SampleListResourceTest extends ApiUnitTestBase {
 
@@ -141,9 +138,31 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 		Mockito.when(this.sampleListServiceMW.updateSampleListFolderName(Mockito.anyInt(), Mockito.anyString())).thenReturn(folder);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.put(uriComponents.toUriString()).contentType(this.contentType)
-			.content(this.convertObjectToByte(folderId)).content(newFolderName)).andExpect(MockMvcResultMatchers.status().isOk())
-		//.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))))
-		;
+		this.mockMvc.perform(MockMvcRequestBuilders.put(uriComponents.toUriString()).contentType(this.contentType).content(newFolderName)
+			.content(this.convertObjectToByte(folderId))).andExpect(MockMvcResultMatchers.status().isOk())
+			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(folder.getId().toString())));
+	}
+
+
+	@Test
+	public void moveSampleListFolder() throws Exception {
+		final Integer folderId = 2;
+		final Integer parentFolderId = 1;
+		final String newFolderName = "NEW_NAME";
+		final SampleList parentFolder = new SampleList();
+		parentFolder.setId(parentFolderId);
+		parentFolder.setType(SampleListType.FOLDER);
+		final SampleList folder = new SampleList();
+		folder.setId(folderId);
+		folder.setHierarchy(parentFolder);
+		folder.setType(SampleListType.FOLDER);
+
+		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sample/maize/sampleListFolder/move").build().encode();
+
+		Mockito.when(this.sampleListServiceMW.moveSampleList(Mockito.anyInt(), Mockito.anyInt())).thenReturn(folder);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.put(uriComponents.toUriString()).contentType(this.contentType).content(this.convertObjectToByte(folderId))
+			.content(this.convertObjectToByte(parentId))).andExpect(MockMvcResultMatchers.status().isOk())
+			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(folder.getId().toString())));
 	}
 }

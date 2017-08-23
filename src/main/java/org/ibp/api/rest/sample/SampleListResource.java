@@ -54,8 +54,8 @@ public class SampleListResource {
 	@ApiOperation(value = "Update sample list folder", notes = "Update sample list folder. ")
 	@RequestMapping(value = "/{crop}/sampleListFolder", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<Map<String, Object>> updateSampleListFolderName(@RequestBody final Integer folderId,
-		@RequestBody final String newFolderName) {
+	public ResponseEntity<Map<String, Object>> updateSampleListFolderName(@RequestBody final String newFolderName,
+		@RequestBody final Integer folderId) {
 		Map<String, Object> map = this.sampleListService.updateSampleListFolderName(folderId, newFolderName);
 		if (map.get("ERROR") != null) {
 			return new ResponseEntity<>(map, HttpStatus.NOT_FOUND);
