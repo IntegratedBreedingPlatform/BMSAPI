@@ -23,12 +23,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -46,7 +44,6 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	private User user;
 	private String folderName;
 	private Integer parentId;
-	private Integer folderId;
 
 
 	@Profile("security-mocked")
@@ -94,7 +91,6 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 		folderName = "Folder Name";
 		parentId = 1;
-		folderId = 2;
 	}
 
 	@Test
