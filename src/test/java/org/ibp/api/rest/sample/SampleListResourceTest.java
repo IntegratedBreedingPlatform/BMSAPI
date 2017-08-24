@@ -147,27 +147,26 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	@Test
 	public void moveSampleListFolder() throws Exception {
 		final Integer folderId = 2;
-		final Integer parentFolderId = 1;
+
 		final Integer newParentFolderId = 3;
+
 		final SampleList parentFolder = new SampleList();
-		parentFolder.setId(parentFolderId);
+		parentFolder.setId(newParentFolderId);
 		parentFolder.setType(SampleListType.FOLDER);
+
 		final SampleList folder = new SampleList();
 		folder.setId(folderId);
 		folder.setHierarchy(parentFolder);
 		folder.setType(SampleListType.FOLDER);
 
-		final SampleList newParentFolder = new SampleList();
-		newParentFolder.setId(newParentFolderId);
-		newParentFolder.setType(SampleListType.FOLDER);
 
-		String url = String.format("/sample/maize/sampleListFolder/{folderId}/move?newParentId=%s", newParentFolderId);
-		Mockito.when(this.sampleListServiceMW.moveSampleList(Mockito.anyInt(), Mockito.anyInt())).thenReturn(folder);
+		final String url = String.format("/sample/maize/sampleListFolder/{folderId}/move?newParentId=%s", newParentFolderId);
+		Mockito.when(this.sampleListServiceMW.moveSampleList(folderId, newParentFolderId)).thenReturn(folder);
 
 
 		this.mockMvc.perform(MockMvcRequestBuilders.put(url, folderId))
 			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.parentId", Matchers.is(newParentFolderId.toString())))
+			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.parentId", Matchers.is(folder.getHierarchy().getId().toString())))
 		;
 	}
 
