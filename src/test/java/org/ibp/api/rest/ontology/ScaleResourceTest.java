@@ -3,10 +3,13 @@ package org.ibp.api.rest.ontology;
 
 import java.util.List;
 
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.util.StringUtil;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
@@ -34,6 +37,8 @@ import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
  * Tests to check Scale API Services Extended from {@link ApiUnitTestBase} for basic mock of services and common methods
  */
 public class ScaleResourceTest extends ApiUnitTestBase {
+
+	private static final String PROGRAM_UUID = "50a7e02e-db60-4240-bd64-417b34606e46";
 
 	@Configuration
 	public static class TestConfiguration {
@@ -66,11 +71,20 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 	@Autowired
 	private OntologyScaleDataManager ontologyScaleDataManager;
 
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
+
 	@Before
 	public void reset() {
 		Mockito.reset(this.modelService);
 		Mockito.reset(this.termDataManager);
 		Mockito.reset(this.ontologyScaleDataManager);
+
+		final Project project = new Project();
+		project.setUniqueID(PROGRAM_UUID);
+		project.setProjectId(1l);
+		Mockito.doReturn(project).when(workbenchDataManager).getLastOpenedProjectAnyUser();
+
 	}
 
 	/**
@@ -203,6 +217,8 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 
 		Assert.assertEquals(scale.getName(), captured.getName());
 		Assert.assertEquals(scale.getDefinition(), captured.getDefinition());
+		Assert.assertEquals(PROGRAM_UUID, ContextHolder.getCurrentProgram());
+
 	}
 
 	/**

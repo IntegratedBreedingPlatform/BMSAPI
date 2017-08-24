@@ -3,6 +3,8 @@ package org.ibp.api.rest.ontology;
 
 import java.util.List;
 
+import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.ContextHolder;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.java.ontology.ScaleService;
@@ -26,6 +28,9 @@ public class ScaleResource {
 
 	@Autowired
 	private ScaleService scaleService;
+
+	@Autowired
+	private ContextUtil contextUtil;
 
 	@ApiOperation(value = "All Scales", notes = "Get all scales")
 	@RequestMapping(value = "/{cropname}/scales", method = RequestMethod.GET)
@@ -54,7 +59,14 @@ public class ScaleResource {
 	@RequestMapping(value = "/{cropname}/scales/{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateScale(@PathVariable String cropname, @PathVariable String id, @RequestBody ScaleDetails scaleSummary) {
+
+		// Set the program in the ContextHolder for this request.
+		// This data is required in deleting Scales related variables from cache
+		// when updating the scale variable.
+		ContextHolder.setCurrentProgram(contextUtil.getCurrentProgramUUID());
+
 		this.scaleService.updateScale(id, scaleSummary);
+
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
