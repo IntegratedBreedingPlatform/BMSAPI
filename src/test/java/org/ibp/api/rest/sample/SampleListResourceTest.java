@@ -12,6 +12,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,8 +28,11 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
+import static org.mockito.Mockito.doAnswer;
 
 @ActiveProfiles("security-mocked")
 public class SampleListResourceTest extends ApiUnitTestBase {
@@ -166,16 +171,20 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc.perform(MockMvcRequestBuilders.put(url, folderId))
 			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.parentId", Matchers.is(folder.getHierarchy().getId().toString())))
+			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.parentId", Matchers.is(
+				folder.getHierarchy().getId().toString())))
 		;
 	}
 
 	@Test
 	public void deleteSampleListFolder() throws Exception {
-		final String folderId = "2";
-		final SampleList folder = new SampleList();
-		folder.setId(Integer.valueOf(folderId));
-		folder.setType(SampleListType.FOLDER);
+		final Integer folderId = 2;
+
+		doAnswer(new Answer<Void>() {
+			public Void answer(InvocationOnMock invocation) {
+				return null;
+			}
+		}).when(this.sampleListServiceMW).deleteSampleListFolder(folderId);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.delete("/sample/maize/sampleListFolder/{folderId}", folderId))
 			.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print())
