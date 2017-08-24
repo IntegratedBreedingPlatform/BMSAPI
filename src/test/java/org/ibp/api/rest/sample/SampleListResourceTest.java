@@ -21,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -110,14 +111,14 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	public void createSampleListFolder() throws Exception {
 		final HashMap<String, Object> result = new HashMap<>();
 		result.put("id", VALUE);
-		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sample/maize/sampleListFolder").build().encode();
 
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 		Mockito.when(this.sampleListServiceMW.createSampleListFolder(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))
 			.thenReturn(Integer.valueOf(VALUE));
 
-		this.mockMvc.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType).content(folderName)
-			.content(this.convertObjectToByte(parentId))).andExpect(MockMvcResultMatchers.status().isOk())
+		String url = String.format("/sample/maize/sampleListFolder?folderName=%s&parentId=%s", folderName, parentId);
+		this.mockMvc.perform(MockMvcRequestBuilders.post(url))
+			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))));
 	}
 
@@ -134,12 +135,11 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		folder.setHierarchy(parentFolder);
 		folder.setType(SampleListType.FOLDER);
 
-		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sample/maize/sampleListFolder").build().encode();
-
+		String url = String.format("/sample/maize/sampleListFolder/{folderId}?newFolderName=%s", newFolderName);
 		Mockito.when(this.sampleListServiceMW.updateSampleListFolderName(Mockito.anyInt(), Mockito.anyString())).thenReturn(folder);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.put(uriComponents.toUriString()).contentType(this.contentType).content(newFolderName)
-			.content(this.convertObjectToByte(folderId))).andExpect(MockMvcResultMatchers.status().isOk())
+		this.mockMvc.perform(MockMvcRequestBuilders.put(url, folderId)).
+			andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(folder.getId().toString())));
 	}
 
@@ -161,14 +161,26 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		newParentFolder.setId(newParentFolderId);
 		newParentFolder.setType(SampleListType.FOLDER);
 
-
-		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sample/maize/sampleListFolder/move").build().encode();
-
+		String url = String.format("/sample/maize/sampleListFolder/{folderId}/move?newParentId=%s", newParentFolderId);
 		Mockito.when(this.sampleListServiceMW.moveSampleList(Mockito.anyInt(), Mockito.anyInt())).thenReturn(folder);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.put(uriComponents.toUriString()).contentType(this.contentType).content(this.convertObjectToByte(folderId))
-			.content(this.convertObjectToByte(parentId))).andExpect(MockMvcResultMatchers.status().isOk())
+
+		this.mockMvc.perform(MockMvcRequestBuilders.put(url, folderId))
+			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.parentId", Matchers.is(newParentFolderId.toString())))
 		;
+	}
+
+	@Test
+	public void deleteSampleListFolder() throws Exception {
+		final String folderId = "2";
+		final SampleList folder = new SampleList();
+		folder.setId(Integer.valueOf(folderId));
+		folder.setType(SampleListType.FOLDER);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.delete("/sample/maize/sampleListFolder/{folderId}", folderId))
+			.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is("0")))
+			;
 	}
 }
