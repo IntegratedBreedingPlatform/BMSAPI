@@ -97,10 +97,12 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	public void createNewSampleList() throws Exception {
 		final HashMap<String, Object> result = new HashMap<>();
 		result.put("id", VALUE);
+		SampleList sampleList = new SampleList();
+		sampleList.setId(Integer.valueOf(VALUE));
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sample/maize/sampleList").build().encode();
 
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
-		Mockito.when(this.sampleListServiceMW.createOrUpdateSampleList(Mockito.any(SampleListDTO.class))).thenReturn(Integer.valueOf(VALUE));
+		Mockito.when(this.sampleListServiceMW.createOrUpdateSampleList(Mockito.any(SampleListDTO.class))).thenReturn(sampleList);
 
 		this.mockMvc.perform(
 			MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType).content(this.convertObjectToByte(dto)))
