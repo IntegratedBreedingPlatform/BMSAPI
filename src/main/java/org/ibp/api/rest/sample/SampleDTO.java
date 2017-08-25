@@ -1,13 +1,11 @@
 package org.ibp.api.rest.sample;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Date;
 
 @AutoProperty
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SampleDTO {
 
 	private String sampleName;
