@@ -27,7 +27,7 @@ public class SampleMapper {
 				this.map().setSampleName(this.source.getSampleName());
 				this.map().setSampleBusinessKey(this.source.getSampleBusinessKey());
 				this.map().setTakenBy(this.source.getTakenBy());
-				this.map().setCreatedDate(this.source.getCreatedDate());
+				this.map().setSamplingDate(this.source.getSamplingDate());
 				this.map().setSampleList(this.source.getSampleList());
 				this.map().setPlantNumber(this.source.getPlantNumber());
 				this.map().setPlantBusinessKey(this.source.getPlantBusinessKey());

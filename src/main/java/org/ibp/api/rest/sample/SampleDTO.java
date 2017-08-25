@@ -13,7 +13,7 @@ public class SampleDTO {
 	private String sampleName;
 	private String sampleBusinessKey;
 	private String takenBy;
-	private Date createdDate;
+	private Date samplingDate;
 	private String sampleList;
 	private Integer plantNumber;
 	private String plantBusinessKey;
@@ -42,12 +42,12 @@ public class SampleDTO {
 		this.takenBy = takenBy;
 	}
 
-	public Date getCreatedDate() {
-		return createdDate;
+	public Date getSamplingDate() {
+		return samplingDate;
 	}
 
-	public void setCreatedDate(Date createdDate) {
-		this.createdDate = createdDate;
+	public void setSamplingDate(Date samplingDate) {
+		this.samplingDate = samplingDate;
 	}
 
 	public String getSampleList() {
