@@ -3,6 +3,7 @@ package org.ibp.api.rest.sample;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,7 +50,8 @@ public class SampleListResource {
 	@ApiOperation(value = "Get samples for a plot", notes = "Get samples for a plot")
 	@RequestMapping(value = "/{crop}/samples", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<SampleDTO>> listSamples(@PathVariable final String crop, @RequestParam final String plotId) {
+	public ResponseEntity<List<SampleDTO>> listSamples(@PathVariable final String crop,
+		@RequestParam(required = true) @ApiParam(value = "The plotId to which the samples belong") final String plotId) {
 		List<SampleDTO> samples = new ArrayList<>();
 
 		List<org.generationcp.middleware.domain.sample.SampleDTO> dtos = this.sampleService.getSamples(plotId);
