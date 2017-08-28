@@ -20,7 +20,7 @@ public class SampleDTO {
 		return sampleName;
 	}
 
-	public void setSampleName(String sampleName) {
+	public void setSampleName(final String sampleName) {
 		this.sampleName = sampleName;
 	}
 
@@ -28,7 +28,7 @@ public class SampleDTO {
 		return sampleBusinessKey;
 	}
 
-	public void setSampleBusinessKey(String sampleBusinessKey) {
+	public void setSampleBusinessKey(final String sampleBusinessKey) {
 		this.sampleBusinessKey = sampleBusinessKey;
 	}
 
@@ -36,7 +36,7 @@ public class SampleDTO {
 		return takenBy;
 	}
 
-	public void setTakenBy(String takenBy) {
+	public void setTakenBy(final String takenBy) {
 		this.takenBy = takenBy;
 	}
 
@@ -44,7 +44,7 @@ public class SampleDTO {
 		return samplingDate;
 	}
 
-	public void setSamplingDate(Date samplingDate) {
+	public void setSamplingDate(final Date samplingDate) {
 		this.samplingDate = samplingDate;
 	}
 
@@ -52,7 +52,7 @@ public class SampleDTO {
 		return sampleList;
 	}
 
-	public void setSampleList(String sampleList) {
+	public void setSampleList(final String sampleList) {
 		this.sampleList = sampleList;
 	}
 
@@ -60,7 +60,7 @@ public class SampleDTO {
 		return plantNumber;
 	}
 
-	public void setPlantNumber(Integer plantNumber) {
+	public void setPlantNumber(final Integer plantNumber) {
 		this.plantNumber = plantNumber;
 	}
 
@@ -68,7 +68,7 @@ public class SampleDTO {
 		return plantBusinessKey;
 	}
 
-	public void setPlantBusinessKey(String plantBusinessKey) {
+	public void setPlantBusinessKey(final String plantBusinessKey) {
 		this.plantBusinessKey = plantBusinessKey;
 	}
 
