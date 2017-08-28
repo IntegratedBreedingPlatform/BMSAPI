@@ -38,11 +38,11 @@ public class SampleListServiceImpl implements SampleListService {
 		try {
 			final SampleListDTO sampleListDtoMW = this.translateToSampleListDto(sampleListDto);
 
-			final Integer newSampleId = this.sampleListServiceMW.createOrUpdateSampleList(sampleListDtoMW).getId();
+			final Integer newSampleId = this.sampleListServiceMW.createSampleList(sampleListDtoMW).getId();
 			mapResponse.put("id", String.valueOf(newSampleId));
 
 		} catch (MiddlewareQueryException | ParseException e) {
-			mapResponse.put("ERROR", "Error on SampleListService.createOrUpdateSampleList " + e.getMessage());
+			mapResponse.put("ERROR", "Error on SampleListService.createSampleList " + e.getMessage());
 		}
 
 		return mapResponse;

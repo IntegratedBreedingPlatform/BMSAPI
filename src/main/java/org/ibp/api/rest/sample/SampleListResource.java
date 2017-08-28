@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Api(value = "Sample Services")
 @Controller
-@RequestMapping("/sample")
+@RequestMapping("/sampleLists")
 public class SampleListResource {
 
 	public static final String NULL = "null";

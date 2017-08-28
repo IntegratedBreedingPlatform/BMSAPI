@@ -99,10 +99,10 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		result.put("id", VALUE);
 		SampleList sampleList = new SampleList();
 		sampleList.setId(Integer.valueOf(VALUE));
-		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sample/maize/sampleList").build().encode();
+		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sampleLists/maize/sampleList").build().encode();
 
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
-		Mockito.when(this.sampleListServiceMW.createOrUpdateSampleList(Mockito.any(SampleListDTO.class))).thenReturn(sampleList);
+		Mockito.when(this.sampleListServiceMW.createSampleList(Mockito.any(SampleListDTO.class))).thenReturn(sampleList);
 
 		this.mockMvc.perform(
 			MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType).content(this.convertObjectToByte(dto)))
@@ -119,7 +119,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		Mockito.when(this.sampleListServiceMW.createSampleListFolder(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))
 			.thenReturn(Integer.valueOf(VALUE));
 
-		String url = String.format("/sample/maize/sampleListFolder?folderName=%s&parentId=%s", folderName, parentId);
+		String url = String.format("/sampleLists/maize/sampleListFolder?folderName=%s&parentId=%s", folderName, parentId);
 		this.mockMvc.perform(MockMvcRequestBuilders.post(url))
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))));
@@ -138,7 +138,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		folder.setHierarchy(parentFolder);
 		folder.setType(SampleListType.FOLDER);
 
-		String url = String.format("/sample/maize/sampleListFolder/{folderId}?newFolderName=%s", newFolderName);
+		String url = String.format("/sampleLists/maize/sampleListFolder/{folderId}?newFolderName=%s", newFolderName);
 		Mockito.when(this.sampleListServiceMW.updateSampleListFolderName(Mockito.anyInt(), Mockito.anyString())).thenReturn(folder);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.put(url, folderId)).
@@ -163,7 +163,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		folder.setType(SampleListType.FOLDER);
 
 
-		final String url = String.format("/sample/maize/sampleListFolder/{folderId}/move?newParentId=%s", newParentFolderId);
+		final String url = String.format("/sampleLists/maize/sampleListFolder/{folderId}/move?newParentId=%s", newParentFolderId);
 		Mockito.when(this.sampleListServiceMW.moveSampleList(folderId, newParentFolderId)).thenReturn(folder);
 
 
@@ -184,7 +184,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 			}
 		}).when(this.sampleListServiceMW).deleteSampleListFolder(folderId);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.delete("/sample/maize/sampleListFolder/{folderId}", folderId))
+		this.mockMvc.perform(MockMvcRequestBuilders.delete("/sampleLists/maize/sampleListFolder/{folderId}", folderId))
 			.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is("0")))
 			;
