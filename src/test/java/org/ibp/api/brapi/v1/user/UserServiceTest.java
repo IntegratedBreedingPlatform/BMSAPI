@@ -1,12 +1,7 @@
 
 package org.ibp.api.brapi.v1.user;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -24,7 +19,11 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
@@ -36,6 +35,8 @@ public class UserServiceTest {
 
 	@InjectMocks
 	protected UserValidator userValidator;
+
+	private static final String projectUUID = "d8d59d89-f4ca-4b83-90e2-be2d82407146";
 
 	@Before
 	public void beforeEachTest() {
@@ -74,12 +75,12 @@ public class UserServiceTest {
 	 */
 	@Test
 	public void testCreateUser() throws Exception {
-		final UserDetailDto usrDtlsDto = initializeUserDetailDto(0);
+		final UserDetailDto usrDtlDto = initializeUserDetailDto(0);
 		final UserDto userDto = initializeUserDto(0);
 		
 		Mockito.when(this.workbenchDataManager.createUser(userDto)).thenReturn(new Integer(7));
 		
-		final Map<String, Object> mapResponse = this.userServiceImpl.createUser(usrDtlsDto);
+		final Map<String, Object> mapResponse = this.userServiceImpl.createUser(usrDtlDto);
 		assertThat((String) mapResponse.get("id"), equalTo("7"));
 	}
 
@@ -90,20 +91,20 @@ public class UserServiceTest {
 	 */
 	@Test
 	public void testCreateUserError() throws Exception {
-		final UserDetailDto usrDtlsDto = initializeUserDetailDto(0);
+		final UserDetailDto usrDtlDto = initializeUserDetailDto(0);
 		final UserDto userDto = initializeUserDto(0);
 
-		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlsDto.getUsername())).thenReturn(false);
-		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlsDto.getEmail())).thenReturn(false);
+		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlDto.getUsername())).thenReturn(false);
+		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlDto.getEmail())).thenReturn(false);
 		Mockito.when(this.workbenchDataManager.createUser(userDto)).thenThrow(new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + userDto.getUsername() + "): "));
 		
-		final Map<String, Object> mapResponse = this.userServiceImpl.createUser(usrDtlsDto);
+		final Map<String, Object> mapResponse = this.userServiceImpl.createUser(usrDtlDto);
 		final ErrorResponse error = (ErrorResponse)mapResponse.get("ERROR");
 		
 		assertThat((String) mapResponse.get("id"), equalTo("0"));
 		assertThat(error.getErrors().size(), equalTo(1));
 		assertThat(error.getErrors().get(0).getFieldNames()[0], equalTo("userId"));
-		assertThat((String) error.getErrors().get(0).getMessage(), 	equalTo("DB error"));			
+		assertThat(error.getErrors().get(0).getMessage(), 	equalTo("DB error"));
 	}
 	
 	/**
@@ -113,12 +114,12 @@ public class UserServiceTest {
 	 */
 	@Test
 	public void testCreateUserValidateError() throws Exception {
-		final UserDetailDto usrDtlsDto = initializeUserDetailDto(0);
+		final UserDetailDto usrDtlDto = initializeUserDetailDto(0);
 
-		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlsDto.getUsername())).thenReturn(true);
-		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlsDto.getEmail())).thenReturn(true);
+		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlDto.getUsername())).thenReturn(true);
+		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlDto.getEmail())).thenReturn(true);
 
-		final Map<String, Object> mapResponse = this.userServiceImpl.createUser(usrDtlsDto);
+		final Map<String, Object> mapResponse = this.userServiceImpl.createUser(usrDtlDto);
 		final ErrorResponse error = (ErrorResponse)mapResponse.get("ERROR");
 		
 		assertThat((String) mapResponse.get("id"), equalTo("0"));
@@ -132,14 +133,14 @@ public class UserServiceTest {
 	 */
 	@Test
 	public void testUpdateUser() throws Exception {
-		final UserDetailDto usrDtlsDto = initializeUserDetailDto(8);
+		final UserDetailDto usrDtlDto = initializeUserDetailDto(8);
 		final UserDto userDto = initializeUserDto(8);
 		final User user = initializeUser(8);
 		
 		Mockito.when(this.workbenchDataManager.updateUser(userDto)).thenReturn(new Integer(8));
 		Mockito.when(this.workbenchDataManager.getUserById(8)).thenReturn(user);
 		
-		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlsDto);
+		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlDto);
 		assertThat((String) mapResponse.get("id"), equalTo("8"));
 	}
 
@@ -150,14 +151,14 @@ public class UserServiceTest {
 	 */
 	@Test
 	public void testUpdateUserValidateError() throws Exception {
-		final UserDetailDto usrDtlsDto = initializeUserDetailDto(10);
+		final UserDetailDto usrDtlDto = initializeUserDetailDto(10);
 		final User usr = initializeUser(10);
 		usr.getPerson().setEmail("diego.nicolas.cuenya@leafnode.io");
-		Mockito.when(this.workbenchDataManager.getUserById(usrDtlsDto.getId())).thenReturn(usr);
-		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlsDto.getUsername())).thenReturn(false);
-		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlsDto.getEmail())).thenReturn(true);
+		Mockito.when(this.workbenchDataManager.getUserById(usrDtlDto.getId())).thenReturn(usr);
+		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlDto.getUsername())).thenReturn(false);
+		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlDto.getEmail())).thenReturn(true);
 		
-		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlsDto);
+		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlDto);
 		final ErrorResponse error = (ErrorResponse)mapResponse.get("ERROR");
 		
 		assertThat((String) mapResponse.get("id"), equalTo("0"));
@@ -171,24 +172,97 @@ public class UserServiceTest {
 	 */
 	@Test
 	public void testUpdateUserError() throws Exception {
-		final UserDetailDto usrDtlsDto = initializeUserDetailDto(10);
+		final UserDetailDto usrDtlDto = initializeUserDetailDto(10);
 		final User usr = initializeUser(10);
 		final UserDto userDto = initializeUserDto(10);
 		usr.getPerson().setEmail("diego.nicolas.cuenya@leafnode.io");
-		Mockito.when(this.workbenchDataManager.getUserById(usrDtlsDto.getId())).thenReturn(usr);
-		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlsDto.getUsername())).thenReturn(false);
-		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlsDto.getEmail())).thenReturn(false);
+		Mockito.when(this.workbenchDataManager.getUserById(usrDtlDto.getId())).thenReturn(usr);
+		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlDto.getUsername())).thenReturn(false);
+		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlDto.getEmail())).thenReturn(false);
 		Mockito.when(this.workbenchDataManager.updateUser(userDto)).thenThrow(new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + userDto.getUsername() + "): "));
 		
-		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlsDto);
+		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlDto);
 		final ErrorResponse error = (ErrorResponse)mapResponse.get("ERROR");
 		
 		assertThat((String) mapResponse.get("id"), equalTo("0"));
 		assertThat(error.getErrors().size(), equalTo(1));
 		assertThat(error.getErrors().get(0).getFieldNames()[0], equalTo("userId"));
-		assertThat((String) error.getErrors().get(0).getMessage(), 	equalTo("DB error"));			
+		assertThat(error.getErrors().get(0).getMessage(), 	equalTo("DB error"));
 	}
-	
+
+	/**
+	 * Should return a map with a List of UserDetailDto by the USER Key.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void getUsersByProjectUUID() throws Exception {
+		List<UserDto> usersDto = this.getAllListUser();
+
+		Mockito.when(this.workbenchDataManager.getUsersByProjectUuid(projectUUID)).thenReturn(usersDto);
+		final Map<String, Object> mapResults = this.userServiceImpl.getUsersByProjectUUID(projectUUID);
+		final List<UserDetailDto> userDetailDtoList = (List<UserDetailDto>) mapResults.get("USERS");
+		assertThat(usersDto.get(0).getFirstName(), equalTo(userDetailDtoList.get(0).getFirstName()));
+		assertThat(usersDto.get(0).getLastName(), equalTo(userDetailDtoList.get(0).getLastName()));
+		assertThat(usersDto.get(0).getUsername(), equalTo(userDetailDtoList.get(0).getUsername()));
+		assertThat(usersDto.get(0).getUserId(), equalTo(userDetailDtoList.get(0).getId()));
+		assertThat(usersDto.get(0).getEmail(), equalTo(userDetailDtoList.get(0).getEmail()));
+		assertThat("true", equalTo(userDetailDtoList.get(0).getStatus()));
+		assertThat(usersDto.get(0).getRole(), equalTo(userDetailDtoList.get(0).getRole()));
+	}
+
+	/**
+	 * Should return a map with a description by the ERROR Key.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void getUsersByProjectUUIDWithOutProjectUUID() throws Exception {
+		final Map<String, Object> mapResults = this.userServiceImpl.getUsersByProjectUUID("");
+		assertThat("The projectUUID must not be empty", equalTo(mapResults.get("ERROR")));
+
+	}
+
+	/**
+	 * Should return a map with a description by the ERROR Key.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void getUsersByProjectUUIDWithOutUsers() throws Exception {
+		final Map<String, Object> mapResults = this.userServiceImpl.getUsersByProjectUUID(projectUUID);
+		assertThat("don't exists users for this projectUUID", equalTo(mapResults.get("ERROR")));
+
+	}
+
+	/**
+	 * Should return a map with a description by the ERROR Key.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void getUsersByProjectUUIDErrorQuery() throws Exception {
+		Mockito.when(this.workbenchDataManager.getUsersByProjectUuid(projectUUID))
+			.thenThrow(new MiddlewareQueryException("Error in getUsersByProjectUUId()"));
+
+		final Map<String, Object> mapResults = this.userServiceImpl.getUsersByProjectUUID(projectUUID);
+		assertThat("An internal error occurred while trying to get the users", equalTo(mapResults.get("ERROR")));
+
+	}
+
+	/**
+	 * initialize List all user
+	 *
+	 * @return List<UserDetailDto>
+	 */
+	public List<UserDetailDto> createUserDetailDto() {
+		final UserDetailDto user = initializeUserDetailDto(10);
+		final List<UserDetailDto> users = Lists.newArrayList(user);
+
+		return users;
+	}
+
+
 	/**
 	 * initialize List all user
 	 * 
