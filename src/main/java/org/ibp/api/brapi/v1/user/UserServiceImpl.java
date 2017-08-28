@@ -1,7 +1,7 @@
 
 package org.ibp.api.brapi.v1.user;
 
-import com.google.common.base.Preconditions;
+import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.service.api.user.UserDto;
@@ -27,6 +27,7 @@ public class UserServiceImpl implements UserService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 	private static final String USER_NAME = "User";
+	private static final String ERROR = "ERROR";
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -110,24 +111,36 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<UserDetailDto> getUsersByProjectUUID(final String projectUUID) {
+	public Map<String, Object> getUsersByProjectUUID(final String projectUUID) {
 		final List<UserDetailDto> result = new ArrayList<>();
+		final Map<String, Object> mapResults = new HashMap<>();
 		final ModelMapper mapper = UserMapper.getInstance();
 
-		Preconditions.checkNotNull(projectUUID, "The projectUUID must not be empty");
+		if (StringUtils.isBlank(projectUUID)) {
+			mapResults.put(ERROR,"The projectUUID must not be empty");
+			return mapResults;
+		}
 		try {
 			List<UserDto> users = this.workbenchDataManager.getUsersByProjectUuid(projectUUID);
-			Preconditions.checkArgument(!users.isEmpty(), "don't exists users for this projectUUID");
+
+			if (users.isEmpty()) {
+				mapResults.put(ERROR,"don't exists users for this projectUUID");
+				return mapResults;
+
+			}
 
 			for (final UserDto userDto : users) {
 				final UserDetailDto userInfo = mapper.map(userDto, UserDetailDto.class);
 				result.add(userInfo);
 			}
+
+			mapResults.put("USERS", result);
 		} catch (MiddlewareQueryException e) {
 			LOG.info("Error on workbenchDataManager.getUsersByProjectUuid", e);
-			Preconditions.checkState(false, "An internal error occurred while trying to get the users");
+			mapResults.put(ERROR,"An internal error occurred while trying to get the users");
+
 		}
-		return result;
+		return mapResults;
 	}
 
 
@@ -193,7 +206,7 @@ public class UserServiceImpl implements UserService {
 			errResponse.addError(translateCodeErrorValidator(errorUserId), UserValidator.USER_ID);
 		}
 
-		mapErrors.put("ERROR", errResponse);
+		mapErrors.put(ERROR, errResponse);
 	}
 
 	private String translateCodeErrorValidator(final String codeError) {

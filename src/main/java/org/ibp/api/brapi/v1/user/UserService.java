@@ -12,5 +12,5 @@ public interface UserService {
 
 	Map<String, Object> updateUser(final UserDetailDto user);
 
-	List<UserDetailDto> getUsersByProjectUUID(final String projectUUID);
+	Map<String, Object> getUsersByProjectUUID(final String projectUUID);
 }
