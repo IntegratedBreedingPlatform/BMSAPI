@@ -3,15 +3,13 @@ package org.ibp.api.rest.sample;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-import java.util.Date;
-
 @AutoProperty
 public class SampleDTO {
 
 	private String sampleName;
 	private String sampleBusinessKey;
 	private String takenBy;
-	private Date samplingDate;
+	private String samplingDate;
 	private String sampleList;
 	private Integer plantNumber;
 	private String plantBusinessKey;
@@ -40,11 +38,11 @@ public class SampleDTO {
 		this.takenBy = takenBy;
 	}
 
-	public Date getSamplingDate() {
+	public String getSamplingDate() {
 		return samplingDate;
 	}
 
-	public void setSamplingDate(final Date samplingDate) {
+	public void setSamplingDate(final String samplingDate) {
 		this.samplingDate = samplingDate;
 	}
 
