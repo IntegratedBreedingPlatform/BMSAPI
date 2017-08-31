@@ -23,10 +23,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
-@ActiveProfiles("UserResource-mocked")
 public class UserResourceTest  extends ApiUnitTestBase {
 
-	@Profile("UserResource-mocked")
 	@Configuration
 	public static class TestConfiguration {
 
