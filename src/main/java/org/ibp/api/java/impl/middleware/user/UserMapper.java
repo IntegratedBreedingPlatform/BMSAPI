@@ -1,4 +1,4 @@
-package org.ibp.api.brapi.v1.user;
+package org.ibp.api.java.impl.middleware.user;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
