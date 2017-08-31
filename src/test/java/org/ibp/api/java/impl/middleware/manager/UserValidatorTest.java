@@ -1,16 +1,9 @@
-
 package org.ibp.api.java.impl.middleware.manager;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-
-import java.util.HashMap;
-
-import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
-import org.ibp.api.brapi.v1.user.UserDetailDto;
+import org.ibp.api.java.impl.middleware.user.UserDetailDto;
+import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,12 +15,17 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.HashMap;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 @RunWith(MockitoJUnitRunner.class)
 public class UserValidatorTest {
 
 	private UserValidator uservalidator;
 
-	@Mock
+	@Mock 
 	protected WorkbenchDataManager workbenchDataManager;
 
 	@Before
@@ -50,12 +48,12 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateFieldLength() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = new UserDetailDto();
+		final UserDetailDto userDto = new UserDetailDto();
 
-		userdto.setLastName("zxcvbnmaaskjhdfsgeeqwfsafsafg6tk6kglkugt8oljhhlly11");
-		userdto.setUsername("wertyuioiuytredsdfrtghjuklsl123");
-		
-		this.uservalidator.validate(userdto, bindingResult,true);
+		userDto.setLastName("zxcvbnmaaskjhdfsgeeqwfsafsafg6tk6kglkugt8oljhhlly11");
+		userDto.setUsername("wertyuioiuytredsdfrtghjuklsl123");
+
+		this.uservalidator.validate(userDto, bindingResult, true);
 
 		assertThat(6, equalTo(bindingResult.getAllErrors().size()));
 		assertThat(null, equalTo(bindingResult.getFieldError("firstName").getRejectedValue()));
@@ -75,13 +73,13 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateRole() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = initializeUserDetailDto(10);
-		final User user = initializeUser(10);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
+		final User user = UserTestDataGenerator.initializeUser(10);
 
-		userdto.setRole("Breeeder");
-		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
+		userDto.setRole("Breeeder");
+		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
 
-		this.uservalidator.validate(userdto, bindingResult,false);
+		this.uservalidator.validate(userDto, bindingResult, false);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.invalid.role", equalTo(bindingResult.getFieldError("role").getCode()));
@@ -95,13 +93,13 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateEmail() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = initializeUserDetailDto(10);
-		final User user = initializeUser(10);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
+		final User user = UserTestDataGenerator.initializeUser(10);
 
-		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
-		userdto.setEmail("cuenya.diego!@leafnode.io");
+		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		userDto.setEmail("cuenya.diego!@leafnode.io");
 
-		this.uservalidator.validate(userdto, bindingResult,false);
+		this.uservalidator.validate(userDto, bindingResult, false);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.email.invalid", equalTo(bindingResult.getFieldError("email").getCode()));
@@ -115,9 +113,9 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUserId() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = initializeUserDetailDto(777);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(777);
 
-		this.uservalidator.validate(userdto, bindingResult,false);
+		this.uservalidator.validate(userDto, bindingResult, false);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.invalid.userId", equalTo(bindingResult.getFieldError("userId").getCode()));
@@ -131,10 +129,10 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUserIdInexistent() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = initializeUserDetailDto(10);
-		final User user = initializeUser(5);
-		this.uservalidator.validate(userdto, bindingResult,false);
-		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
+		final User user = UserTestDataGenerator.initializeUser(5);
+		this.uservalidator.validate(userDto, bindingResult, false);
+		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.invalid.userId", equalTo(bindingResult.getFieldError("userId").getCode()));
 	}
@@ -147,11 +145,11 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateStatus() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = initializeUserDetailDto(20);
-		final User user = initializeUser(20);
-		userdto.setStatus("truee");
-		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
-		this.uservalidator.validate(userdto, bindingResult,false);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(20);
+		final User user = UserTestDataGenerator.initializeUser(20);
+		userDto.setStatus("truee");
+		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		this.uservalidator.validate(userDto, bindingResult, false);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.invalid.status", equalTo(bindingResult.getFieldError("status").getCode()));
@@ -165,11 +163,11 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUserAndPeronalEmailExists() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = initializeUserDetailDto(0);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(0);
 
-		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(true);
-		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(true);
-		this.uservalidator.validate(userdto, bindingResult,true);
+		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(true);
+		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userDto.getEmail())).thenReturn(true);
+		this.uservalidator.validate(userDto, bindingResult, true);
 
 		assertThat(2, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.username.exists", equalTo(bindingResult.getFieldError("username").getCode()));
@@ -184,13 +182,13 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUpdateUser() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = initializeUserDetailDto(10);
-		final User user = initializeUser(20);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
+		final User user = UserTestDataGenerator.initializeUser(20);
 
-		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
-		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(false);
-		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(false);
-		this.uservalidator.validate(userdto, bindingResult,false);
+		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(false);
+		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userDto.getEmail())).thenReturn(false);
+		this.uservalidator.validate(userDto, bindingResult, false);
 
 		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
 
@@ -204,13 +202,13 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUpdateUserEmailExists() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = initializeUserDetailDto(10);
-		final User user = initializeUser(10);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
+		final User user = UserTestDataGenerator.initializeUser(10);
 		user.getPerson().setEmail("user@leafnode.io");
-		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
-		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(false);
-		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(true);
-		this.uservalidator.validate(userdto, bindingResult,false);
+		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(false);
+		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userDto.getEmail())).thenReturn(true);
+		this.uservalidator.validate(userDto, bindingResult, false);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.email.exists", equalTo(bindingResult.getFieldError("email").getCode()));
@@ -225,13 +223,13 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUpdateUserUsernameExists() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = initializeUserDetailDto(10);
-		final User user = initializeUser(10);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
+		final User user = UserTestDataGenerator.initializeUser(10);
 		user.setName("Nahuel");
-		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
-		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(true);
-		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(false);
-		this.uservalidator.validate(userdto, bindingResult,false);
+		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(true);
+		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userDto.getEmail())).thenReturn(false);
+		this.uservalidator.validate(userDto, bindingResult, false);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.username.exists", equalTo(bindingResult.getFieldError("username").getCode()));
@@ -246,13 +244,13 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateInvalidUserUpdate() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = initializeUserDetailDto(10);
-		final User user = initializeUser(20);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
+		final User user = UserTestDataGenerator.initializeUser(20);
 
-		Mockito.when(this.workbenchDataManager.getUserById(userdto.getId())).thenReturn(user);
-		Mockito.when(this.workbenchDataManager.isUsernameExists(userdto.getUsername())).thenReturn(false);
-		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userdto.getEmail())).thenReturn(false);
-		this.uservalidator.validate(userdto, bindingResult,false);
+		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(false);
+		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userDto.getEmail())).thenReturn(false);
+		this.uservalidator.validate(userDto, bindingResult, false);
 
 		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
 
@@ -266,64 +264,11 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateCreateUser() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userdto = initializeUserDetailDto(0);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(0);
 
-		this.uservalidator.validate(userdto, bindingResult, true);
+		this.uservalidator.validate(userDto, bindingResult, true);
 
 		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
 
-	}
-
-	/**
-	 * Initialize UserDetailDto
-	 * 
-	 * @return UserDetailDto
-	 */
-	public UserDetailDto initializeUserDetailDto(final Integer userId) {
-		UserDetailDto user = new UserDetailDto();
-		final String firstName = RandomStringUtils.randomAlphanumeric(20);
-		user.setFirstName(firstName);
-		final String lastName = RandomStringUtils.randomAlphanumeric(50);
-		user.setLastName(lastName);
-		user.setStatus("true");
-		user.setRole("Breeder");
-		user.setId(userId);
-		final String username = RandomStringUtils.randomAlphanumeric(30);
-		user.setUsername(username);
-		final String email = RandomStringUtils.randomAlphanumeric(24);
-		user.setEmail("test" + email + "@leafnode.io");
-		return user;
-	}
-
-	public User initializeUser(final Integer userId) {
-		User user = new User();
-		Person person = new Person();
-		person.setId(2);
-		final String firstName = RandomStringUtils.randomAlphanumeric(20);
-		person.setFirstName(firstName);
-		person.setMiddleName("");
-		final String lastName = RandomStringUtils.randomAlphanumeric(50);
-		person.setLastName(lastName);
-		final String email = RandomStringUtils.randomAlphanumeric(24);
-		person.setEmail("test" + email + "@leafnode.io");
-		person.setTitle("-");
-		person.setContact("-");
-		person.setExtension("-");
-		person.setFax("-");
-		person.setInstituteId(0);
-		person.setLanguage(0);
-		person.setNotes("-");
-		person.setPositionName("-");
-		person.setPhone("-");
-		user.setPerson(person);
-
-		user.setPersonid(person.getId());
-		user.setPerson(person);
-		final String username = RandomStringUtils.randomAlphanumeric(30);
-		user.setName(username);
-		user.setAccess(0);
-		user.setInstalid(0);
-		user.setType(0);
-		return user;
 	}
 }
