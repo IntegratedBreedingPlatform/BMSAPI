@@ -1,6 +1,9 @@
 package org.ibp.api.brapi.v1.user;
 
 import org.generationcp.middleware.service.api.user.UserDto;
+import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
+import org.ibp.api.java.impl.middleware.user.UserDetailDto;
+import org.ibp.api.java.impl.middleware.user.UserMapper;
 import org.junit.Test;
 import org.modelmapper.ModelMapper;
 
@@ -12,8 +15,8 @@ public class UserMapperTest extends UserServiceTest {
 	@Test
 	public void userDetailsMapperTest() {
 		final ModelMapper mapper = UserMapper.getInstance();
-		UserDto userDto = initializeUserDto(1);
-		UserDetailDto userDetailDto = mapper.map(userDto, UserDetailDto.class);
+		final UserDto userDto = UserTestDataGenerator.initializeUserDto(1);
+		final UserDetailDto userDetailDto = mapper.map(userDto, UserDetailDto.class);
 		System.out.println(userDetailDto);
 
 		assertThat(userDto.getFirstName(), equalTo(userDetailDto.getFirstName()));
