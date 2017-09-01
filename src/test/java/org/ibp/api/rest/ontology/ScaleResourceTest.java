@@ -1,12 +1,14 @@
-
 package org.ibp.api.rest.ontology;
 
 import java.util.List;
 
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.util.StringUtil;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
@@ -35,6 +37,9 @@ import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
  */
 public class ScaleResourceTest extends ApiUnitTestBase {
 
+	private static final String PROGRAM_UUID = "50a7e02e-db60-4240-bd64-417b34606e46";
+
+
 	@Configuration
 	public static class TestConfiguration {
 
@@ -52,10 +57,11 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public ModelService modelService(){
+		public ModelService modelService() {
 			return Mockito.mock(ModelService.class);
 		}
 	}
+
 
 	@Autowired
 	protected ModelService modelService;
@@ -66,11 +72,20 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 	@Autowired
 	private OntologyScaleDataManager ontologyScaleDataManager;
 
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
+
 	@Before
 	public void reset() {
 		Mockito.reset(this.modelService);
 		Mockito.reset(this.termDataManager);
 		Mockito.reset(this.ontologyScaleDataManager);
+
+		final Project project = new Project();
+		project.setUniqueID(PROGRAM_UUID);
+		project.setProjectId(1l);
+		Mockito.doReturn(project).when(workbenchDataManager).getLastOpenedProjectAnyUser();
+
 	}
 
 	/**
@@ -81,20 +96,21 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllScales() throws Exception {
 
-		List<Scale> scaleList = TestDataProvider.getTestScales(3);
+		final List<Scale> scaleList = TestDataProvider.getTestScales(3);
 
 		Mockito.doReturn(scaleList).when(this.ontologyScaleDataManager).getAllScales();
 		Mockito.doReturn(true).when(this.modelService).isNumericDataType(String.valueOf(scaleList.get(0).getDataType().getId()));
 
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/scales", this.cropName).contentType(this.contentType))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/ontology/{cropname}/scales", this.cropName).contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(scaleList.size())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(String.valueOf(scaleList.get(0).getId()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.is(scaleList.get(0).getName())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(scaleList.get(0).getDefinition())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].validValues.min", Matchers.is(StringUtil.parseDouble(scaleList.get(0).getMinValue(), null))))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].validValues.max", Matchers.is(StringUtil.parseDouble(scaleList.get(0).getMaxValue(), null))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(scaleList.get(0).getDefinition()))).andExpect(
+				MockMvcResultMatchers
+						.jsonPath("$[0].validValues.min", Matchers.is(StringUtil.parseDouble(scaleList.get(0).getMinValue(), null))))
+				.andExpect(MockMvcResultMatchers
+						.jsonPath("$[0].validValues.max", Matchers.is(StringUtil.parseDouble(scaleList.get(0).getMaxValue(), null))))
 				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyScaleDataManager, Mockito.times(1)).getAllScales();
@@ -108,24 +124,23 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 	@Test
 	public void getScaleById() throws Exception {
 
-		Scale scale = TestDataProvider.getTestScale();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Scale scale = TestDataProvider.getTestScale();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scale.getId());
 		Mockito.doReturn(true).when(this.modelService).isNumericDataType(String.valueOf(scale.getDataType().getId()));
 
-		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders.get("/ontology/{cropname}/scales/{id}", this.cropName, scale.getId()).contentType(
-								this.contentType))
-		.andExpect(MockMvcResultMatchers.status().isOk())
-		.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(scale.getId()))))
-		.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(scale.getName())))
-		.andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.is(scale.getDefinition())))
-		.andExpect(MockMvcResultMatchers.jsonPath("$.validValues.min", Matchers.is(StringUtil.parseDouble(scale.getMinValue(), null))))
-		.andExpect(MockMvcResultMatchers.jsonPath("$.validValues.max", Matchers.is(StringUtil.parseDouble(scale.getMaxValue(), null))))
-		.andDo(MockMvcResultHandlers.print());
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.get("/ontology/{cropname}/scales/{id}", this.cropName, scale.getId()).contentType(this.contentType))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(scale.getId()))))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(scale.getName())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.is(scale.getDefinition()))).andExpect(
+				MockMvcResultMatchers.jsonPath("$.validValues.min", Matchers.is(StringUtil.parseDouble(scale.getMinValue(), null))))
+				.andExpect(
+						MockMvcResultMatchers.jsonPath("$.validValues.max", Matchers.is(StringUtil.parseDouble(scale.getMaxValue(), null))))
+				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyScaleDataManager, Mockito.times(1)).getScaleById(scale.getId(), true);
 	}
@@ -145,25 +160,23 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 		Mockito.doAnswer(new Answer<Void>() {
 
 			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				Object[] arguments = invocation.getArguments();
+			public Void answer(final InvocationOnMock invocation) throws Throwable {
+				final Object[] arguments = invocation.getArguments();
 				if (arguments != null && arguments.length > 0 && arguments[0] != null) {
-					Scale entity = (Scale) arguments[0];
+					final Scale entity = (Scale) arguments[0];
 					entity.setId(scale.getId());
 				}
 				return null;
 			}
 		}).when(this.ontologyScaleDataManager).addScale(org.mockito.Matchers.any(Scale.class));
 
-		ScaleDetails scaleDetails = TestDataProvider.getTestScaleDetails();
+		final ScaleDetails scaleDetails = TestDataProvider.getTestScaleDetails();
 		scaleDetails.setId(null);
 
 		Mockito.doReturn(true).when(this.modelService).isNumericDataType(String.valueOf(scaleDetails.getDataType().getId()));
 
-		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders.post("/ontology/{cropname}/scales", this.cropName).contentType(this.contentType)
-								.content(this.convertObjectToByte(scaleDetails))).andExpect(MockMvcResultMatchers.status().isCreated())
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/scales", this.cropName).contentType(this.contentType)
+				.content(this.convertObjectToByte(scaleDetails))).andExpect(MockMvcResultMatchers.status().isCreated())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(scale.getId()))))
 				.andDo(MockMvcResultHandlers.print());
 
@@ -178,31 +191,32 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 	@Test
 	public void updateScale() throws Exception {
 
-		Scale scale = TestDataProvider.getTestScale();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Scale scale = TestDataProvider.getTestScale();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		ArgumentCaptor<Scale> captor = ArgumentCaptor.forClass(Scale.class);
+		final ArgumentCaptor<Scale> captor = ArgumentCaptor.forClass(Scale.class);
 
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scale.getId());
 		Mockito.doNothing().when(this.ontologyScaleDataManager).updateScale(org.mockito.Matchers.any(Scale.class));
 
-		ScaleDetails scaleDetails = TestDataProvider.getTestScaleDetails();
+		final ScaleDetails scaleDetails = TestDataProvider.getTestScaleDetails();
 
 		Mockito.doReturn(true).when(this.modelService).isNumericDataType(String.valueOf(scaleDetails.getDataType().getId()));
 
-		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders.put("/ontology/{cropname}/scales/{id}", this.cropName, scale.getId())
-								.contentType(this.contentType).content(this.convertObjectToByte(scaleDetails)))
-				.andExpect(MockMvcResultMatchers.status().isNoContent()).andDo(MockMvcResultHandlers.print());
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.put("/ontology/{cropname}/scales/{id}", this.cropName, scale.getId()).contentType(this.contentType)
+						.content(this.convertObjectToByte(scaleDetails))).andExpect(MockMvcResultMatchers.status().isNoContent())
+				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyScaleDataManager).updateScale(captor.capture());
 
-		Scale captured = captor.getValue();
+		final Scale captured = captor.getValue();
 
 		Assert.assertEquals(scale.getName(), captured.getName());
 		Assert.assertEquals(scale.getDefinition(), captured.getDefinition());
+		Assert.assertEquals(PROGRAM_UUID, ContextHolder.getCurrentProgram());
+
 	}
 
 	/**
@@ -213,19 +227,17 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 	@Test
 	public void deleteScale() throws Exception {
 
-		Term scaleTerm = TestDataProvider.getScaleTerm();
-		Scale scale = TestDataProvider.getTestScale();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Scale scale = TestDataProvider.getTestScale();
 
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scale.getId());
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
 		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(scale.getId());
 		Mockito.doNothing().when(this.ontologyScaleDataManager).deleteScale(scale.getId());
 
-		this.mockMvc
-				.perform(
-						MockMvcRequestBuilders.delete("/ontology/{cropname}/scales/{id}", this.cropName, scale.getId()).contentType(
-								this.contentType)).andExpect(MockMvcResultMatchers.status().isNoContent())
-		.andDo(MockMvcResultHandlers.print());
+		this.mockMvc.perform(MockMvcRequestBuilders.delete("/ontology/{cropname}/scales/{id}", this.cropName, scale.getId())
+				.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isNoContent())
+				.andDo(MockMvcResultHandlers.print());
 
 		Mockito.verify(this.ontologyScaleDataManager, Mockito.times(1)).deleteScale(scale.getId());
 	}
