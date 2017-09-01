@@ -1,12 +1,13 @@
-
-package org.ibp.api.brapi.v1.user;
+package org.ibp.api.java.impl.middleware.user;
 
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.common.ErrorResponse;
+import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.manager.UserValidator;
+import org.ibp.api.java.user.UserService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ public class UserServiceImpl implements UserService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 	private static final String USER_NAME = "User";
+	private static final String ERROR = "ERROR";
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -60,7 +62,7 @@ public class UserServiceImpl implements UserService {
 		if (errors.hasErrors()) {
 			LOG.debug("UserValidator returns errors");
 			translateErrorToMap(errors, mapResponse);
-			
+
 		} else {
 
 			final UserDto userdto = translateUserDetailsDtoToUserDto(user);
@@ -71,12 +73,12 @@ public class UserServiceImpl implements UserService {
 				mapResponse.put("id", String.valueOf(newUserId));
 
 			} catch (MiddlewareQueryException e) {
-				LOG.info("Error on workbenchDataManager.createUser ",e);
+				LOG.info("Error on workbenchDataManager.createUser ", e);
 				errors.rejectValue(UserValidator.USER_ID, UserValidator.DATABASE_ERROR);
 				translateErrorToMap(errors, mapResponse);
 			}
 		}
-		
+
 		return mapResponse;
 	}
 
@@ -91,7 +93,7 @@ public class UserServiceImpl implements UserService {
 		if (errors.hasErrors()) {
 			LOG.debug("UserValidator returns errors");
 			translateErrorToMap(errors, mapResponse);
-			
+
 		} else {
 
 			final UserDto userdto = translateUserDetailsDtoToUserDto(user);
@@ -105,7 +107,7 @@ public class UserServiceImpl implements UserService {
 				translateErrorToMap(errors, mapResponse);
 			}
 		}
-		
+
 		return mapResponse;
 	}
 
@@ -115,21 +117,22 @@ public class UserServiceImpl implements UserService {
 		final ModelMapper mapper = UserMapper.getInstance();
 
 		Preconditions.checkNotNull(projectUUID, "The projectUUID must not be empty");
+
 		try {
 			List<UserDto> users = this.workbenchDataManager.getUsersByProjectUuid(projectUUID);
-			Preconditions.checkArgument(!users.isEmpty(), "don't exists users for this projectUUID");
+			Preconditions.checkArgument(!users.isEmpty(), "users don't exists for this projectUUID");
 
 			for (final UserDto userDto : users) {
 				final UserDetailDto userInfo = mapper.map(userDto, UserDetailDto.class);
 				result.add(userInfo);
 			}
+
 		} catch (MiddlewareQueryException e) {
 			LOG.info("Error on workbenchDataManager.getUsersByProjectUuid", e);
-			Preconditions.checkState(false, "An internal error occurred while trying to get the users");
+			throw new ApiRuntimeException("An internal error occurred while trying to get the users");
 		}
 		return result;
 	}
-
 
 	private UserDto translateUserDetailsDtoToUserDto(final UserDetailDto user) {
 		final UserDto userdto = new UserDto();
@@ -193,7 +196,7 @@ public class UserServiceImpl implements UserService {
 			errResponse.addError(translateCodeErrorValidator(errorUserId), UserValidator.USER_ID);
 		}
 
-		mapErrors.put("ERROR", errResponse);
+		mapErrors.put(ERROR, errResponse);
 	}
 
 	private String translateCodeErrorValidator(final String codeError) {

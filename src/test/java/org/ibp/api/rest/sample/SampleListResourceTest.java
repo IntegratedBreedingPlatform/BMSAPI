@@ -1,11 +1,14 @@
 package org.ibp.api.rest.sample;
 
+import org.generationcp.commons.util.DateUtil;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.hamcrest.Matchers;
+import org.hamcrest.collection.IsCollectionWithSize;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
 import org.junit.Before;
@@ -26,9 +29,14 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
+
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 
 import static org.mockito.Mockito.doAnswer;
 
@@ -45,6 +53,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	private String folderName;
 	private Integer parentId;
 
+	private static final SimpleDateFormat DATE_FORMAT = DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT_3);
 
 	@Profile("security-mocked")
 	@Configuration
@@ -61,6 +70,12 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		public SampleListService service() {
 			return Mockito.mock(SampleListService.class);
 		}
+
+		@Bean
+		@Primary
+		public SampleService sampleService() {
+			return  Mockito.mock(SampleService.class);
+		}
 	}
 
 
@@ -69,6 +84,9 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private org.generationcp.middleware.service.api.SampleListService sampleListServiceMW;
+
+	@Autowired
+	private SampleService sampleService;
 
 	@Before
 	public void beforeEachTest() {
@@ -187,6 +205,55 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.delete("/sampleLists/maize/sampleListFolder/{folderId}", folderId))
 			.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is("0")))
+			;
+	}
+
+	@Test
+	public void testListSamples() throws Exception {
+		String plotId = randomAlphanumeric(13);
+
+		List<SampleDTO> list = new ArrayList<>();
+		SampleDTO sample =
+			new SampleDTO(randomAlphanumeric(6), randomAlphanumeric(6), randomAlphanumeric(6), new Date(), randomAlphanumeric(6),
+				new Random().nextInt(), randomAlphanumeric(6));
+		list.add(sample);
+
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+		Mockito.when(this.sampleService.getSamples(plotId)).thenReturn(list);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/sample/maize/samples?plotId=" + plotId)
+			.contentType(this.contentType)
+			.content(this.convertObjectToByte(dto)))
+			.andExpect(MockMvcResultMatchers.status()
+				.isOk())
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(list.size())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].sampleName", Matchers.is(sample.getSampleName())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].sampleBusinessKey", Matchers.is(sample.getSampleBusinessKey())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].takenBy", Matchers.is(sample.getTakenBy())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].samplingDate", Matchers.is(DATE_FORMAT.format(sample.getSamplingDate()))))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].sampleList", Matchers.is(sample.getSampleList())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].plantNumber", Matchers.is(sample.getPlantNumber())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].plantBusinessKey", Matchers.is(sample.getPlantBusinessKey())))
+		;
+	}
+
+	@Test
+	public void testListSamplesNotFound() throws Exception {
+		String plotId = null;
+
+		List<SampleDTO> list = new ArrayList<>();
+
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+		Mockito.when(this.sampleService.getSamples(plotId)).thenReturn(list);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/sample/maize/samples?plotId=" + plotId)
+			.contentType(this.contentType)
+			.content(this.convertObjectToByte(dto)))
+			.andExpect(MockMvcResultMatchers.status()
+				.isOk())
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()))
 			;
 	}
 }

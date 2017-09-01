@@ -1,4 +1,4 @@
-package org.ibp.api.brapi.v1.user;
+package org.ibp.api.java.impl.middleware.user;
 
 import java.io.Serializable;
 
@@ -135,7 +135,7 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 	}
 	
 	public String toString(){
-		StringBuffer str= new StringBuffer();
+		StringBuilder str= new StringBuilder();
 		str.append("UserDetails ")
 		.append("[ id= ").append(id)
 		.append(" ,username= ").append(username)

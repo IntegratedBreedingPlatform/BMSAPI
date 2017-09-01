@@ -17,6 +17,7 @@ public class SampleListResource {
 
 	public static final String NULL = "null";
 	public static final String ERROR = "ERROR";
+
 	@Autowired
 	public SampleListService sampleListService;
 

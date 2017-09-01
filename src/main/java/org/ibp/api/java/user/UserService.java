@@ -1,5 +1,7 @@
 
-package org.ibp.api.brapi.v1.user;
+package org.ibp.api.java.user;
+
+import org.ibp.api.java.impl.middleware.user.UserDetailDto;
 
 import java.util.List;
 import java.util.Map;

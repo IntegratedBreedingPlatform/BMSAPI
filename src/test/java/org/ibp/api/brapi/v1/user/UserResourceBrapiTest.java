@@ -3,12 +3,13 @@ package org.ibp.api.brapi.v1.user;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.common.ErrorResponse;
+import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
+import org.ibp.api.java.impl.middleware.user.UserDetailDto;
+import org.ibp.api.java.user.UserService;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.google.common.collect.Lists;
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 
 public class UserResourceBrapiTest extends ApiUnitTestBase {
@@ -46,7 +46,7 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 	 */
 	@Test
 	public void testListUsers() throws Exception {
-		final List<UserDetailDto> users = responseListUser();
+		final List<UserDetailDto> users = UserTestDataGenerator.initializeListUserDetailDto();
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/brapi/v1/users").build().encode();
 
 		Mockito.when(this.userService.getAllUsersSortedByLastName()).thenReturn(users);
@@ -68,11 +68,11 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 	@Test
 	public void testCreateUser() throws Exception {
 		final String id = "10";
-		final UserDetailDto user = initializeUser();
+		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailDto();
 		final HashMap<String, Object> mapResponse = initializeResponse(id);
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/brapi/v1/users").build().encode();
 
-		Mockito.when(this.userService.createUser(Mockito.any(org.ibp.api.brapi.v1.user.UserDetailDto.class))).thenReturn(mapResponse);
+		Mockito.when(this.userService.createUser(Mockito.any(UserDetailDto.class))).thenReturn(mapResponse);
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType)
@@ -88,12 +88,12 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 	 */
 	@Test
 	public void testCreateUserError() throws Exception {
-		final UserDetailDto user = initializeUser();
+		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailDto();
 		final HashMap<String, Object> mapResponse = initializeResponseError("email", "exists");
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/brapi/v1/users").build().encode();
 
-		Mockito.when(this.userService.createUser(Mockito.any(org.ibp.api.brapi.v1.user.UserDetailDto.class))).thenReturn(mapResponse);
+		Mockito.when(this.userService.createUser(Mockito.any(UserDetailDto.class))).thenReturn(mapResponse);
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType)
@@ -112,10 +112,10 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 	@Test
 	public void testUpdateUser() throws Exception {
 		final String id = "7";
-		final UserDetailDto user = initializeUser();
+		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailDto();
 		final HashMap<String, Object> mapResponse = initializeResponse(id);
 
-		Mockito.when(this.userService.updateUser(Mockito.any(org.ibp.api.brapi.v1.user.UserDetailDto.class))).thenReturn(mapResponse);
+		Mockito.when(this.userService.updateUser(Mockito.any(UserDetailDto.class))).thenReturn(mapResponse);
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.put("/brapi/v1/users/{id}", id).contentType(this.contentType)
@@ -132,9 +132,9 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 	@Test
 	public void testUpdateUserError() throws Exception {
 		final String id = "7";
-		final UserDetailDto user = initializeUser();
+		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailDto();
 		final HashMap<String, Object> mapResponse = initializeResponseError("username", "exists");
-		Mockito.when(this.userService.updateUser(Mockito.any(org.ibp.api.brapi.v1.user.UserDetailDto.class))).thenReturn(mapResponse);
+		Mockito.when(this.userService.updateUser(Mockito.any(UserDetailDto.class))).thenReturn(mapResponse);
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.put("/brapi/v1/users/{id}", id).contentType(this.contentType)
@@ -143,50 +143,6 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$ERROR.errors.[0].fieldNames.[0]", Matchers.is("username")))
 				.andExpect(MockMvcResultMatchers.jsonPath("$ERROR.errors.[0].message", Matchers.is("exists")))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is("0")));
-	}
-
-	/**
-	 * initialize UserDetailDto
-	 * 
-	 * @return UserDetailDto
-	 */
-	public UserDetailDto initializeUser() {
-		final UserDetailDto user = new UserDetailDto();
-		final String firstName = RandomStringUtils.randomAlphabetic(5);
-		final String lastName = RandomStringUtils.randomAlphabetic(5);
-		final Integer userId = ThreadLocalRandom.current().nextInt();
-		final String username = RandomStringUtils.randomAlphabetic(5);
-
-		user.setFirstName(firstName);
-		user.setLastName(lastName);
-		user.setStatus("true");
-		user.setRole("Breeder");
-		user.setId(userId);
-		user.setUsername(username);
-		return user;
-	}
-
-	/**
-	 * initialize List UserDetailDto
-	 * 
-	 * @return List<UserDetailDto>
-	 */
-	public List<UserDetailDto> responseListUser() {
-		final UserDetailDto user = new UserDetailDto();
-		final String firstName = RandomStringUtils.randomAlphabetic(5);
-		final String lastName = RandomStringUtils.randomAlphabetic(5);
-		final Integer userId = ThreadLocalRandom.current().nextInt();
-		final String username = RandomStringUtils.randomAlphabetic(5);
-
-		user.setFirstName(firstName);
-		user.setLastName(lastName);
-		user.setStatus("true");
-		user.setRole("Breeder");
-		user.setId(userId);
-		user.setUsername(username);
-
-		final List<UserDetailDto> users = Lists.newArrayList(user);
-		return users;
 	}
 
 	/**
