@@ -22,11 +22,11 @@ public class SampleResourceBrapi {
 
 	@Autowired private SampleService sampleService;
 
-	@ApiOperation(value = "samples", notes = "Get a sample by sampleId")
+	@ApiOperation(value = "Get a sample by sampleId", notes = "Get a sample by sampleId")
 	@RequestMapping(value = "/{crop}/brapi/v1/samples/{sampleId}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SampleSummaryDto> sample(@PathVariable final String crop, final @PathVariable String sampleId) {
-		SampleObservationDto sampleObservationDto = sampleService.getSample(sampleId);
+		SampleObservationDto sampleObservationDto = sampleService.getSampleObservation(sampleId);
 
 		int resultNumber = (sampleObservationDto == null) ? 0 : 1;
 		Pagination pagination =
