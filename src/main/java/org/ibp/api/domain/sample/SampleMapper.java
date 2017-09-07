@@ -1,4 +1,4 @@
-package org.ibp.api.java.impl.middleware.sample;
+package org.ibp.api.domain.sample;
 
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.sample.SampleDTO;
@@ -28,7 +28,7 @@ public class SampleMapper {
 	}
 
 	private static void addSampleMapper(ModelMapper mapper) {
-		mapper.addMappings(new PropertyMap<SampleDTO, org.ibp.api.java.impl.middleware.sample.SampleDTO>() {
+		mapper.addMappings(new PropertyMap<SampleDTO, org.ibp.api.domain.sample.SampleDTO>() {
 
 			private Converter<Date, String> dateConverter = new AbstractConverter<Date, String>() {
 
