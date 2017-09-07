@@ -2,6 +2,7 @@ package org.ibp.api.rest.sample;
 
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.ibp.api.java.impl.middleware.sample.SampleMapper;
 import org.junit.Test;
 import org.modelmapper.ModelMapper;
 
@@ -23,7 +24,8 @@ public class SampleMapperTest {
 		SampleDTO sampleDTO =
 			new SampleDTO(randomAlphanumeric(6), randomAlphanumeric(6), randomAlphanumeric(6), new Date(), randomAlphanumeric(6),
 				new Random().nextInt(), randomAlphanumeric(6));
-		org.ibp.api.rest.sample.SampleDTO sampleDTOApi = mapper.map(sampleDTO, org.ibp.api.rest.sample.SampleDTO.class);
+		org.ibp.api.java.impl.middleware.sample.SampleDTO
+			sampleDTOApi = mapper.map(sampleDTO, org.ibp.api.java.impl.middleware.sample.SampleDTO.class);
 
 		assertThat(sampleDTOApi.getPlantBusinessKey(), equalTo(sampleDTO.getPlantBusinessKey()));
 		assertThat(sampleDTOApi.getPlantNumber(), equalTo(sampleDTO.getPlantNumber()));

@@ -1,4 +1,4 @@
-package org.ibp.api.rest.sample;
+package org.ibp.api.java.impl.middleware.sample;
 
 import org.generationcp.middleware.domain.sample.SampleDTO;
 
