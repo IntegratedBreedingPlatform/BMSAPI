@@ -2,14 +2,12 @@ package org.ibp.api.domain.sample;
 
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
+import org.ibp.api.java.impl.middleware.SampleTestDataGenerator;
 import org.junit.Test;
 import org.modelmapper.ModelMapper;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -20,7 +18,7 @@ public class SampleObservationMapperTest {
 	@Test
 	public void testSampleObservationMapper() {
 		final ModelMapper mapper = SampleObservationMapper.getInstance();
-		final SampleDetailsDTO sampleDetailsDTO = createRandomSampleDetails();
+		final SampleDetailsDTO sampleDetailsDTO = SampleTestDataGenerator.createRandomSampleDetails();
 		final SampleObservationDto sampleObservationDto = mapper.map(sampleDetailsDTO, SampleObservationDto.class);
 
 		assertThat(sampleObservationDto.getStudyDbId(), equalTo(sampleDetailsDTO.getStudyDbId()));
@@ -43,23 +41,4 @@ public class SampleObservationMapperTest {
 		assertThat(sampleObservationDto.getHarvestDate(), equalTo(sampleDetailsDTO.getHarvestDate()));
 	}
 
-	private static SampleDetailsDTO createRandomSampleDetails() {
-		final SampleDetailsDTO sampleDetailsDTO =
-			new SampleDetailsDTO(Integer.valueOf(randomNumeric(6)), randomAlphanumeric(6), randomAlphanumeric(6), randomAlphanumeric(6));
-		sampleDetailsDTO.setTakenBy(randomAlphanumeric(6));
-		sampleDetailsDTO.setSampleDate(new Date());
-		sampleDetailsDTO.setSampleType(randomAlphanumeric(6));
-		sampleDetailsDTO.setTissueType(randomAlphanumeric(6));
-		sampleDetailsDTO.setNotes(randomAlphanumeric(6));
-		sampleDetailsDTO.setStudyName(randomAlphanumeric(6));
-		sampleDetailsDTO.setSeason(randomAlphanumeric(6));
-		sampleDetailsDTO.setLocationName(randomAlphanumeric(6));
-		sampleDetailsDTO.setEntryNo(Integer.valueOf(randomNumeric(6)));
-		sampleDetailsDTO.setPlotNo(Integer.valueOf(randomNumeric(6)));
-
-		sampleDetailsDTO.setGid(Integer.valueOf(randomNumeric(6)));
-		sampleDetailsDTO.setSeedingDate(randomAlphanumeric(6));
-		sampleDetailsDTO.setHarvestDate(randomAlphanumeric(6));
-		return sampleDetailsDTO;
-	}
 }
