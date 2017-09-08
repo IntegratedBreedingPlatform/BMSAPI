@@ -1,4 +1,4 @@
-package org.ibp.api.java.impl.middleware.user;
+package org.ibp.api.domain.user;
 
 import java.io.Serializable;
 

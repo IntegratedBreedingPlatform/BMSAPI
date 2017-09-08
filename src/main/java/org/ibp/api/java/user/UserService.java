@@ -1,7 +1,7 @@
 
 package org.ibp.api.java.user;
 
-import org.ibp.api.java.impl.middleware.user.UserDetailDto;
+import org.ibp.api.domain.user.UserDetailDto;
 
 import java.util.List;
 import java.util.Map;

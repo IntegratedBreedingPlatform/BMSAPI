@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.manager;
 
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.User;
-import org.ibp.api.java.impl.middleware.user.UserDetailDto;
+import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
 import org.junit.After;
 import org.junit.Before;

@@ -2,8 +2,8 @@ package org.ibp.api.brapi.v1.user;
 
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
-import org.ibp.api.java.impl.middleware.user.UserDetailDto;
-import org.ibp.api.java.impl.middleware.user.UserMapper;
+import org.ibp.api.domain.user.UserDetailDto;
+import org.ibp.api.domain.user.UserMapper;
 import org.junit.Test;
 import org.modelmapper.ModelMapper;
 

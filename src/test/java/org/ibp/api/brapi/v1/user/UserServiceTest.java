@@ -9,7 +9,7 @@ import org.ibp.api.domain.common.ErrorResponse;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
 import org.ibp.api.java.impl.middleware.manager.UserValidator;
-import org.ibp.api.java.impl.middleware.user.UserDetailDto;
+import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.impl.middleware.user.UserServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
