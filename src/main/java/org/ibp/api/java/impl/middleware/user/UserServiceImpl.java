@@ -196,6 +196,11 @@ public class UserServiceImpl implements UserService {
 			errResponse.addError(translateCodeErrorValidator(errorUserId), UserValidator.USER_ID);
 		}
 
+		if (errors.getFieldErrorCount(UserValidator.LOGGED_USER) != 0) {
+			final String errorUserId = errors.getFieldError(UserValidator.LOGGED_USER).getCode();
+			errResponse.addError(translateCodeErrorValidator(errorUserId), UserValidator.LOGGED_USER);
+		}
+
 		mapErrors.put(ERROR, errResponse);
 	}
 
@@ -225,7 +230,9 @@ public class UserServiceImpl implements UserService {
 		if (UserValidator.SIGNUP_FIELD_INVALID_USER_ID.equals(codeError)) {
 			return "invalid";
 		}
-
+		if (UserValidator.SIGNUP_FIELD_SAME_USER_ID.equals(codeError)) {
+			return "Logged user can not be updated.";
+		}
 		return "";
 	}
 

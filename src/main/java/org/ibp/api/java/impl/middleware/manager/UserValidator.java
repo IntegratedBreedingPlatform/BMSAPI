@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.User;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.impl.middleware.user.UserDetailDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ public class UserValidator implements Validator {
 	public static final String SIGNUP_FIELD_INVALID_ROLE = "signup.field.invalid.role";
 	public static final String SIGNUP_FIELD_INVALID_STATUS = "signup.field.invalid.status";
 	public static final String SIGNUP_FIELD_INVALID_USER_ID = "signup.field.invalid.userId";
+	public static final String SIGNUP_FIELD_SAME_USER_ID = "signup.field.same.userId";
 
 	public static final String DATABASE_ERROR = "database.error";
 
@@ -44,12 +46,16 @@ public class UserValidator implements Validator {
 	public static final String ROLE = "role";
 	public static final String STATUS = "status";
 	public static final String USER_ID = "userId";
+	public static final String LOGGED_USER = "loggedUser";
 
 	private static final String EMAIL_PATTERN =
 			"^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
 	@Autowired
 	protected WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private SecurityService securityService;
 
 	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
@@ -104,6 +110,11 @@ public class UserValidator implements Validator {
 			}
 
 			if (userUpdate != null) {
+				User loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+				if(loggedInUser.equals(userUpdate)){
+					errors.rejectValue(LOGGED_USER, SIGNUP_FIELD_SAME_USER_ID);
+				}
+
 				if (!userUpdate.getName().equalsIgnoreCase(user.getUsername())) {
 					this.validateUsernameIfExists(errors, user.getUsername());
 				}
