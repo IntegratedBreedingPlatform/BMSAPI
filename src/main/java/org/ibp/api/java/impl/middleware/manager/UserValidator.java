@@ -28,7 +28,7 @@ public class UserValidator implements Validator {
 	public static final String SIGNUP_FIELD_INVALID_ROLE = "signup.field.invalid.role";
 	public static final String SIGNUP_FIELD_INVALID_STATUS = "signup.field.invalid.status";
 	public static final String SIGNUP_FIELD_INVALID_USER_ID = "signup.field.invalid.userId";
-	public static final String SIGNUP_FIELD_SAME_USER_ID = "signup.field.same.userId";
+	public static final String USER_AUTO_DEACTIVATION = "A user cannot be auto-deactivated";
 
 	public static final String DATABASE_ERROR = "database.error";
 
@@ -46,7 +46,6 @@ public class UserValidator implements Validator {
 	public static final String ROLE = "role";
 	public static final String STATUS = "status";
 	public static final String USER_ID = "userId";
-	public static final String LOGGED_USER = "loggedUser";
 
 	private static final String EMAIL_PATTERN =
 			"^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
@@ -111,8 +110,9 @@ public class UserValidator implements Validator {
 
 			if (userUpdate != null) {
 				User loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-				if(loggedInUser.equals(userUpdate)){
-					errors.rejectValue(LOGGED_USER, SIGNUP_FIELD_SAME_USER_ID);
+				// TODO change frontend status type to integer
+				if (loggedInUser.equals(userUpdate) && user.getStatus().equals("false")) {
+					errors.reject(USER_AUTO_DEACTIVATION);
 				}
 
 				if (!userUpdate.getName().equalsIgnoreCase(user.getUsername())) {
