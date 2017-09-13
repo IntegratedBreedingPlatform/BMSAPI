@@ -18,6 +18,7 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
 
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -294,5 +295,21 @@ public class UserValidatorTest {
 
 		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
 
+	}
+
+	@Test
+	public void testValidateUserCannotAutoDeactivate() {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
+		final User user = UserTestDataGenerator.initializeUser(20);
+
+		userDto.setStatus("false");
+		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
+		this.uservalidator.validate(userDto, bindingResult, false);
+
+		assertThat(0, not(equalTo(bindingResult.getGlobalErrorCount())));
+		assertThat(UserValidator.USER_AUTO_DEACTIVATION, equalTo(bindingResult.getGlobalErrors().get(0).getCode()));
 	}
 }
