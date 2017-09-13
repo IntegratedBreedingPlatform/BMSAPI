@@ -60,6 +60,10 @@ public class UserValidator implements Validator {
 		this.workbenchDataManager = workbenchDataManager;
 	}
 
+	public void setSecurityService(final SecurityService securityService) {
+		this.securityService = securityService;
+	}
+
 	@Override
 	public boolean supports(Class<?> aClass) {
 		return UserDetailDto.class.equals(aClass);
