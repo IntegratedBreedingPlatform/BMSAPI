@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
+import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -196,6 +197,13 @@ public class UserServiceImpl implements UserService {
 			errResponse.addError(translateCodeErrorValidator(errorUserId), UserValidator.USER_ID);
 		}
 
+		if (errors.getGlobalErrorCount() != 0) {
+			List<ObjectError> globalErrors = errors.getGlobalErrors();
+			for (ObjectError globalError : globalErrors) {
+				errResponse.addError(globalError.getCode());
+			}
+		}
+
 		mapErrors.put(ERROR, errResponse);
 	}
 
@@ -225,7 +233,6 @@ public class UserServiceImpl implements UserService {
 		if (UserValidator.SIGNUP_FIELD_INVALID_USER_ID.equals(codeError)) {
 			return "invalid";
 		}
-
 		return "";
 	}
 

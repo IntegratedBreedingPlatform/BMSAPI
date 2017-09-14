@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.User;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.impl.middleware.user.UserDetailDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ public class UserValidator implements Validator {
 	public static final String SIGNUP_FIELD_INVALID_ROLE = "signup.field.invalid.role";
 	public static final String SIGNUP_FIELD_INVALID_STATUS = "signup.field.invalid.status";
 	public static final String SIGNUP_FIELD_INVALID_USER_ID = "signup.field.invalid.userId";
+	public static final String USER_AUTO_DEACTIVATION = "A user cannot be auto-deactivated";
 
 	public static final String DATABASE_ERROR = "database.error";
 
@@ -51,8 +53,15 @@ public class UserValidator implements Validator {
 	@Autowired
 	protected WorkbenchDataManager workbenchDataManager;
 
+	@Autowired
+	private SecurityService securityService;
+
 	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
+	}
+
+	public void setSecurityService(final SecurityService securityService) {
+		this.securityService = securityService;
 	}
 
 	@Override
@@ -104,6 +113,12 @@ public class UserValidator implements Validator {
 			}
 
 			if (userUpdate != null) {
+				User loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+				// TODO change frontend status type to integer
+				if (loggedInUser.equals(userUpdate) && user.getStatus().equals("false")) {
+					errors.reject(USER_AUTO_DEACTIVATION);
+				}
+
 				if (!userUpdate.getName().equalsIgnoreCase(user.getUsername())) {
 					this.validateUsernameIfExists(errors, user.getUsername());
 				}
