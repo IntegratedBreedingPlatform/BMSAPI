@@ -45,7 +45,7 @@ public class SampleObservationDto implements Serializable {
 		return studyDbId;
 	}
 
-	public void setStudyDbId(Integer studyDbId) {
+	public void setStudyDbId(final Integer studyDbId) {
 		this.studyDbId = studyDbId;
 	}
 
@@ -53,7 +53,7 @@ public class SampleObservationDto implements Serializable {
 		return locationDbId;
 	}
 
-	public void setLocationDbId(Integer locationDbId) {
+	public void setLocationDbId(final Integer locationDbId) {
 		this.locationDbId = locationDbId;
 	}
 
@@ -61,7 +61,7 @@ public class SampleObservationDto implements Serializable {
 		return plotId;
 	}
 
-	public void setPlotId(String plotId) {
+	public void setPlotId(final String plotId) {
 		this.plotId = plotId;
 	}
 
@@ -69,7 +69,7 @@ public class SampleObservationDto implements Serializable {
 		return plantId;
 	}
 
-	public void setPlantId(String plantId) {
+	public void setPlantId(final String plantId) {
 		this.plantId = plantId;
 	}
 
@@ -85,7 +85,7 @@ public class SampleObservationDto implements Serializable {
 		return takenBy;
 	}
 
-	public void setTakenBy(String takenBy) {
+	public void setTakenBy(final String takenBy) {
 		this.takenBy = takenBy;
 	}
 
@@ -93,7 +93,7 @@ public class SampleObservationDto implements Serializable {
 		return sampleDate;
 	}
 
-	public void setSampleDate(String sampleDate) {
+	public void setSampleDate(final String sampleDate) {
 		this.sampleDate = sampleDate;
 	}
 
@@ -101,7 +101,7 @@ public class SampleObservationDto implements Serializable {
 		return sampleType;
 	}
 
-	public void setSampleType(String sampleType) {
+	public void setSampleType(final String sampleType) {
 		this.sampleType = sampleType;
 	}
 
@@ -109,7 +109,7 @@ public class SampleObservationDto implements Serializable {
 		return tissueType;
 	}
 
-	public void setTissueType(String tissueType) {
+	public void setTissueType(final String tissueType) {
 		this.tissueType = tissueType;
 	}
 
@@ -117,7 +117,7 @@ public class SampleObservationDto implements Serializable {
 		return notes;
 	}
 
-	public void setNotes(String notes) {
+	public void setNotes(final String notes) {
 		this.notes = notes;
 	}
 
@@ -125,7 +125,7 @@ public class SampleObservationDto implements Serializable {
 		return studyName;
 	}
 
-	public void setStudyName(String studyName) {
+	public void setStudyName(final String studyName) {
 		this.studyName = studyName;
 	}
 
@@ -133,7 +133,7 @@ public class SampleObservationDto implements Serializable {
 		return season;
 	}
 
-	public void setSeason(String season) {
+	public void setSeason(final String season) {
 		this.season = season;
 	}
 
@@ -141,7 +141,7 @@ public class SampleObservationDto implements Serializable {
 		return locationName;
 	}
 
-	public void setLocationName(String locationName) {
+	public void setLocationName(final String locationName) {
 		this.locationName = locationName;
 	}
 
@@ -149,7 +149,7 @@ public class SampleObservationDto implements Serializable {
 		return entryNumber;
 	}
 
-	public void setEntryNumber(Integer entryNumber) {
+	public void setEntryNumber(final Integer entryNumber) {
 		this.entryNumber = entryNumber;
 	}
 
@@ -157,7 +157,7 @@ public class SampleObservationDto implements Serializable {
 		return plotNumber;
 	}
 
-	public void setPlotNumber(Integer plotNumber) {
+	public void setPlotNumber(final Integer plotNumber) {
 		this.plotNumber = plotNumber;
 	}
 
@@ -165,7 +165,7 @@ public class SampleObservationDto implements Serializable {
 		return germplasmDbId;
 	}
 
-	public void setGermplasmDbId(Integer germplasmDbId) {
+	public void setGermplasmDbId(final Integer germplasmDbId) {
 		this.germplasmDbId = germplasmDbId;
 	}
 
@@ -173,7 +173,7 @@ public class SampleObservationDto implements Serializable {
 		return plantingDate;
 	}
 
-	public void setPlantingDate(String plantingDate) {
+	public void setPlantingDate(final String plantingDate) {
 		this.plantingDate = plantingDate;
 	}
 
@@ -181,7 +181,7 @@ public class SampleObservationDto implements Serializable {
 		return harvestDate;
 	}
 
-	public void setHarvestDate(String harvestDate) {
+	public void setHarvestDate(final String harvestDate) {
 		this.harvestDate = harvestDate;
 	}
 
