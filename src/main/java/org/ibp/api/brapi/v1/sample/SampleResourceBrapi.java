@@ -27,14 +27,14 @@ import java.util.Map;
 @Controller
 public class SampleResourceBrapi {
 
-	@Autowired private SampleService sampleService;
+	@Autowired
+	private SampleService sampleService;
 
 	@ApiOperation(value = "Get a sample by sampleId", notes = "Get a sample by sampleId")
 	@RequestMapping(value = "/{crop}/brapi/v1/samples/{sampleId}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<SampleSummaryDto> sample(@PathVariable final String crop, final @PathVariable String sampleId) {
+	public ResponseEntity<SampleSummaryDto> getSampleBySampleId(@PathVariable final String crop, final @PathVariable String sampleId) {
 		final SampleDetailsDTO sampleDetailsDTO = this.sampleService.getSampleObservation(sampleId);
-
 		if (StringUtils.isBlank(sampleDetailsDTO.getSampleBusinessKey())) {
 			final Map<String, String> status = new HashMap<>();
 			status.put("message", "not found sample");
