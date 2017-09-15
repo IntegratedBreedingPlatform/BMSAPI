@@ -4,6 +4,7 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.User;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
 
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -28,11 +30,15 @@ public class UserValidatorTest {
 	@Mock 
 	protected WorkbenchDataManager workbenchDataManager;
 
+	@Mock
+	private SecurityService securityService;
+
 	@Before
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
 		this.uservalidator = new UserValidator();
 		this.uservalidator.setWorkbenchDataManager(this.workbenchDataManager);
+		this.uservalidator.setSecurityService(this.securityService);
 	}
 
 	@After
@@ -78,6 +84,7 @@ public class UserValidatorTest {
 
 		userDto.setRole("Breeeder");
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		this.uservalidator.validate(userDto, bindingResult, false);
 
@@ -97,6 +104,8 @@ public class UserValidatorTest {
 		final User user = UserTestDataGenerator.initializeUser(10);
 
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
 		userDto.setEmail("cuenya.diego!@leafnode.io");
 
 		this.uservalidator.validate(userDto, bindingResult, false);
@@ -132,7 +141,10 @@ public class UserValidatorTest {
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final User user = UserTestDataGenerator.initializeUser(5);
 		this.uservalidator.validate(userDto, bindingResult, false);
+
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.invalid.userId", equalTo(bindingResult.getFieldError("userId").getCode()));
 	}
@@ -147,8 +159,11 @@ public class UserValidatorTest {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(20);
 		final User user = UserTestDataGenerator.initializeUser(20);
+
 		userDto.setStatus("truee");
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
 		this.uservalidator.validate(userDto, bindingResult, false);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
@@ -188,6 +203,8 @@ public class UserValidatorTest {
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(false);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userDto.getEmail())).thenReturn(false);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
 		this.uservalidator.validate(userDto, bindingResult, false);
 
 		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
@@ -204,10 +221,13 @@ public class UserValidatorTest {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final User user = UserTestDataGenerator.initializeUser(10);
+
 		user.getPerson().setEmail("user@leafnode.io");
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(false);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userDto.getEmail())).thenReturn(true);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
 		this.uservalidator.validate(userDto, bindingResult, false);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
@@ -226,9 +246,12 @@ public class UserValidatorTest {
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final User user = UserTestDataGenerator.initializeUser(10);
 		user.setName("Nahuel");
+
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(true);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userDto.getEmail())).thenReturn(false);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
 		this.uservalidator.validate(userDto, bindingResult, false);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
@@ -250,6 +273,8 @@ public class UserValidatorTest {
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(false);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userDto.getEmail())).thenReturn(false);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
 		this.uservalidator.validate(userDto, bindingResult, false);
 
 		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
@@ -270,5 +295,21 @@ public class UserValidatorTest {
 
 		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
 
+	}
+
+	@Test
+	public void testValidateUserCannotAutoDeactivate() {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
+		final User user = UserTestDataGenerator.initializeUser(20);
+
+		userDto.setStatus("false");
+		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
+		this.uservalidator.validate(userDto, bindingResult, false);
+
+		assertThat(0, not(equalTo(bindingResult.getGlobalErrorCount())));
+		assertThat(UserValidator.USER_AUTO_DEACTIVATION, equalTo(bindingResult.getGlobalErrors().get(0).getCode()));
 	}
 }

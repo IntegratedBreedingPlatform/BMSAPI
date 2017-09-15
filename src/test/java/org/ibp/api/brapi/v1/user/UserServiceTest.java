@@ -10,6 +10,7 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
 import org.ibp.api.java.impl.middleware.manager.UserValidator;
 import org.ibp.api.domain.user.UserDetailDto;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.impl.middleware.user.UserServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +34,9 @@ public class UserServiceTest {
 
 	@Mock
 	private WorkbenchDataManager workbenchDataManager;
+
+	@Mock
+	private SecurityService securityService;
 
 	@InjectMocks
 	protected UserValidator userValidator;
@@ -140,7 +144,8 @@ public class UserServiceTest {
 		
 		Mockito.when(this.workbenchDataManager.updateUser(userDto)).thenReturn(new Integer(8));
 		Mockito.when(this.workbenchDataManager.getUserById(8)).thenReturn(user);
-		
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
 		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlDto);
 		assertThat((String) mapResponse.get("id"), equalTo("8"));
 	}
@@ -154,11 +159,14 @@ public class UserServiceTest {
 	public void testUpdateUserValidateError() throws Exception {
 		final UserDetailDto usrDtlDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final User usr = UserTestDataGenerator.initializeUser(10);
+		final User user = UserTestDataGenerator.initializeUser(8);
+
 		usr.getPerson().setEmail("diego.nicolas.cuenya@leafnode.io");
 		Mockito.when(this.workbenchDataManager.getUserById(usrDtlDto.getId())).thenReturn(usr);
 		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlDto.getUsername())).thenReturn(false);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlDto.getEmail())).thenReturn(true);
-		
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
 		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlDto);
 		final ErrorResponse error = (ErrorResponse)mapResponse.get("ERROR");
 		
@@ -176,12 +184,15 @@ public class UserServiceTest {
 		final UserDetailDto usrDtlDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final User usr = UserTestDataGenerator.initializeUser(10);
 		final UserDto userDto = UserTestDataGenerator.initializeUserDto(10);
+		final User user = UserTestDataGenerator.initializeUser(8);
+
 		usr.getPerson().setEmail("diego.nicolas.cuenya@leafnode.io");
 		Mockito.when(this.workbenchDataManager.getUserById(usrDtlDto.getId())).thenReturn(usr);
 		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlDto.getUsername())).thenReturn(false);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlDto.getEmail())).thenReturn(false);
 		Mockito.when(this.workbenchDataManager.updateUser(userDto)).thenThrow(new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + userDto.getUsername() + "): "));
-		
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
 		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlDto);
 		final ErrorResponse error = (ErrorResponse)mapResponse.get("ERROR");
 		
