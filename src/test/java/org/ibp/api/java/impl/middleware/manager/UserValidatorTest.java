@@ -271,14 +271,12 @@ public class UserValidatorTest {
 		final User user = UserTestDataGenerator.initializeUser(20);
 
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
-		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(false);
+		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(true);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userDto.getEmail())).thenReturn(false);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		this.uservalidator.validate(userDto, bindingResult, false);
-
-		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
-
+		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 	}
 
 	/**
