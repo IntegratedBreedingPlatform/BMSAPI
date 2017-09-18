@@ -10,6 +10,7 @@ import org.generationcp.middleware.service.api.SampleListService;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.java.impl.middleware.sample.SampleService;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
 import org.junit.Before;
 import org.junit.Test;

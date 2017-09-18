@@ -1,4 +1,4 @@
-package org.ibp.api.rest.sample;
+package org.ibp.api.domain.sample;
 
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;

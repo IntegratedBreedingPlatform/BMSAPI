@@ -5,6 +5,8 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.common.ErrorResponse;
+import org.ibp.api.domain.user.UserDetailDto;
+import org.ibp.api.domain.user.UserMapper;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.manager.UserValidator;
 import org.ibp.api.java.user.UserService;

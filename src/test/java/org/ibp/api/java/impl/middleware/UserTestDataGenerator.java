@@ -5,7 +5,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.service.api.user.UserDto;
-import org.ibp.api.java.impl.middleware.user.UserDetailDto;
+import org.ibp.api.domain.user.UserDetailDto;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;

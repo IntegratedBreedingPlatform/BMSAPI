@@ -6,8 +6,8 @@ import java.util.regex.Pattern;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.User;
+import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
-import org.ibp.api.java.impl.middleware.user.UserDetailDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,7 +115,7 @@ public class UserValidator implements Validator {
 			if (userUpdate != null) {
 				User loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 				// TODO change frontend status type to integer
-				if (loggedInUser.equals(userUpdate) && user.getStatus().equals("false")) {
+				if (loggedInUser.equals(userUpdate) && "false".equals(user.getStatus())) {
 					errors.reject(USER_AUTO_DEACTIVATION);
 				}
 
@@ -180,16 +180,16 @@ public class UserValidator implements Validator {
 		}
 	}
 
-	protected void validateUserRole(final Errors errors, final String fieldvalue) {
-		if (null == errors.getFieldError(ROLE) && fieldvalue != null && !fieldvalue.equalsIgnoreCase("ADMIN")
-				&& !fieldvalue.equalsIgnoreCase("BREEDER") && !fieldvalue.equalsIgnoreCase("TECHNICIAN")) {
+	protected void validateUserRole(final Errors errors, final String fieldValue) {
+		if (null == errors.getFieldError(ROLE) && fieldValue != null && !"ADMIN".equalsIgnoreCase(fieldValue)
+				&& !"BREEDER".equalsIgnoreCase(fieldValue) && !"TECHNICIAN".equalsIgnoreCase(fieldValue)) {
 			errors.rejectValue(ROLE, SIGNUP_FIELD_INVALID_ROLE);
 		}
 	}
 
-	protected void validateUserStatus(final Errors errors, final String fieldvalue) {
-		if (null == errors.getFieldError(STATUS) && fieldvalue != null && !fieldvalue.equalsIgnoreCase("true")
-				&& !fieldvalue.equalsIgnoreCase("false")) {
+	protected void validateUserStatus(final Errors errors, final String fieldValue) {
+		if (null == errors.getFieldError(STATUS) && fieldValue != null && !"true".equalsIgnoreCase(fieldValue)
+				&& !"false".equalsIgnoreCase(fieldValue)) {
 			errors.rejectValue(STATUS, SIGNUP_FIELD_INVALID_STATUS);
 		}
 	}

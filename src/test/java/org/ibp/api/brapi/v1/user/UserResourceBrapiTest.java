@@ -8,7 +8,7 @@ import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
-import org.ibp.api.java.impl.middleware.user.UserDetailDto;
+import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.user.UserService;
 import org.junit.Test;
 import org.mockito.Mockito;

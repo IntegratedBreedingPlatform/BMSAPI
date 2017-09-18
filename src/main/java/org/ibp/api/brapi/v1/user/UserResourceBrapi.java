@@ -4,7 +4,7 @@ package org.ibp.api.brapi.v1.user;
 import java.util.List;
 import java.util.Map;
 
-import org.ibp.api.java.impl.middleware.user.UserDetailDto;
+import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

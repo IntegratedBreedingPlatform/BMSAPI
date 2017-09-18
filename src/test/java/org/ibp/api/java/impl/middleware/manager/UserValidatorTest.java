@@ -2,9 +2,9 @@ package org.ibp.api.java.impl.middleware.manager;
 
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.User;
+import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
-import org.ibp.api.java.impl.middleware.user.UserDetailDto;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -271,14 +271,12 @@ public class UserValidatorTest {
 		final User user = UserTestDataGenerator.initializeUser(20);
 
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
-		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(false);
+		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(true);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userDto.getEmail())).thenReturn(false);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		this.uservalidator.validate(userDto, bindingResult, false);
-
-		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
-
+		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 	}
 
 	/**
