@@ -104,7 +104,8 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		dto.setSamplingDate("2017-08-01");
 		dto.setStudyId(25025);
 		dto.setCropName("maize");
-
+		dto.setListName("SamplesTest");
+		dto.setCreatedDate("2017-10-12");
 		user = new User();
 		user.setName(ADMIN);
 
