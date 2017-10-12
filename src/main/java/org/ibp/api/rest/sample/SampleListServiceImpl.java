@@ -33,6 +33,10 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(!sampleListDto.getInstanceIds().isEmpty(), "The Instance List must not be empty");
 		Preconditions.checkNotNull(sampleListDto.getSelectionVariableId(), "The Selection Variable Id must not be empty");
 		Preconditions.checkNotNull(sampleListDto.getStudyId(), "The Study Id must not be empty");
+		Preconditions.checkNotNull(sampleListDto.getListName(), "The List Name must not be empty");
+		Preconditions.checkNotNull(sampleListDto.getCreatedDate(), "The Created Date must not be empty");
+
+
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
 		mapResponse.put("id", String.valueOf(0));
@@ -160,10 +164,15 @@ public class SampleListServiceImpl implements SampleListService {
 			sampleListDTO.setSamplingDate(DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT).parse(dto.getSamplingDate()));
 		}
 
+		if (!dto.getCreatedDate().isEmpty()) {
+			sampleListDTO.setCreatedDate(DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT).parse(dto.getCreatedDate()));
+		}
+
 		sampleListDTO.setSelectionVariableId(dto.getSelectionVariableId());
 		sampleListDTO.setStudyId(dto.getStudyId());
 		sampleListDTO.setTakenBy(dto.getTakenBy());
-
+		sampleListDTO.setParentId(dto.getParentId());
+		sampleListDTO.setListName(dto.getListName());
 		return sampleListDTO;
 	}
 
