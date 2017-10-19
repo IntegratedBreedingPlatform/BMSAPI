@@ -36,6 +36,8 @@ public class SampleListDto {
 
 	private String createdDate;
 
+	private String programUUID;
+
 
 	public String getDescription() {
 		return this.description;
@@ -146,5 +148,13 @@ public class SampleListDto {
 
 	public void setCreatedDate(String createdDate) {
 		this.createdDate = createdDate;
+	}
+
+	public String getProgramUUID() {
+		return programUUID;
+	}
+
+	public void setProgramUUID(String programUUID) {
+		this.programUUID = programUUID;
 	}
 }
