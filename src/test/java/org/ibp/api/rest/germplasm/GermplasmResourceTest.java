@@ -112,7 +112,7 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 		Mockito.when(this.germplasmDataManager.searchForGermplasm(Mockito.any(GermplasmSearchParameter.class)))
 				.thenReturn(matchingGermplasm);
 
-		Mockito.when(this.germplasmDataManager.countSearchForGermplasm(searchString, Operation.LIKE, false, false, false)).thenReturn(1);
+		Mockito.when(this.germplasmDataManager.countSearchForGermplasm(Mockito.any(GermplasmSearchParameter.class))).thenReturn(1);
 
 		this.mockMvc
 		.perform(MockMvcRequestBuilders.get("/germplasm/maize/search?q={searchString}", searchString).contentType(this.contentType))

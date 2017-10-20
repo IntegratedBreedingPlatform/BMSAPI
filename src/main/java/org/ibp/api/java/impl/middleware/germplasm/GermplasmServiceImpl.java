@@ -195,6 +195,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public int searchGermplasmCount(String searchText) {
-		return this.germplasmDataManager.countSearchForGermplasm(searchText, Operation.LIKE, false, false, false);
+
+		final GermplasmSearchParameter searchParameter = new GermplasmSearchParameter(searchText, Operation.LIKE, false, false, false);
+
+		return this.germplasmDataManager.countSearchForGermplasm(searchParameter);
 	}
 }
