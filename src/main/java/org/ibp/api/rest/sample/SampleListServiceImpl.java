@@ -36,6 +36,7 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkNotNull(sampleListDto.getStudyId(), "The Study Id must not be empty");
 		Preconditions.checkNotNull(sampleListDto.getListName(), "The List Name must not be empty");
 		Preconditions.checkNotNull(sampleListDto.getCreatedDate(), "The Created Date must not be empty");
+		Preconditions.checkArgument(sampleListDto.getListName().trim() != "", "The List Name must not be empty");
 
 
 
