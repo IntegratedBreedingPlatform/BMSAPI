@@ -130,7 +130,7 @@ public class SampleListDto {
 		return parentId;
 	}
 
-	public void setParentId(Integer parentId) {
+	public void setParentId(final Integer parentId) {
 		this.parentId = parentId;
 	}
 
@@ -138,7 +138,7 @@ public class SampleListDto {
 		return listName;
 	}
 
-	public void setListName(String listName) {
+	public void setListName(final String listName) {
 		this.listName = listName;
 	}
 
@@ -146,7 +146,7 @@ public class SampleListDto {
 		return createdDate;
 	}
 
-	public void setCreatedDate(String createdDate) {
+	public void setCreatedDate(final String createdDate) {
 		this.createdDate = createdDate;
 	}
 
@@ -154,7 +154,7 @@ public class SampleListDto {
 		return programUUID;
 	}
 
-	public void setProgramUUID(String programUUID) {
+	public void setProgramUUID(final String programUUID) {
 		this.programUUID = programUUID;
 	}
 }
