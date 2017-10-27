@@ -53,6 +53,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	private User user;
 	private String folderName;
 	private Integer parentId;
+	private String programUUID;
 
 	private static final SimpleDateFormat DATE_FORMAT = DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT_3);
 
@@ -104,12 +105,16 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		dto.setSamplingDate("2017-08-01");
 		dto.setStudyId(25025);
 		dto.setCropName("maize");
-
+		dto.setListName("SamplesTest");
+		dto.setCreatedDate("2017-10-12");
+		dto.setProgramUUID("c35c7769-bdad-4c70-a6c4-78c0dbf784e5");
 		user = new User();
 		user.setName(ADMIN);
 
 		folderName = "Folder Name";
 		parentId = 1;
+		programUUID = "c35c7769-bdad-4c70-a6c4-78c0dbf784e5";
+
 	}
 
 	@Test
@@ -135,10 +140,10 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		result.put("id", VALUE);
 
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
-		Mockito.when(this.sampleListServiceMW.createSampleListFolder(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))
+		Mockito.when(this.sampleListServiceMW.createSampleListFolder(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString()))
 			.thenReturn(Integer.valueOf(VALUE));
 
-		String url = String.format("/sampleLists/maize/sampleListFolder?folderName=%s&parentId=%s", folderName, parentId);
+		String url = String.format("/sampleLists/maize/sampleListFolder?folderName=%s&parentId=%s&programUUID=%s", folderName, parentId,programUUID);
 		this.mockMvc.perform(MockMvcRequestBuilders.post(url))
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))));

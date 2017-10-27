@@ -30,6 +30,15 @@ public class SampleListDto {
 
 	private String cropName;
 
+	private Integer parentId;
+
+	private String listName;
+
+	private String createdDate;
+
+	private String programUUID;
+
+
 	public String getDescription() {
 		return this.description;
 	}
@@ -115,5 +124,37 @@ public class SampleListDto {
 	@Override
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
+	}
+
+	public Integer getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(final Integer parentId) {
+		this.parentId = parentId;
+	}
+
+	public String getListName() {
+		return listName;
+	}
+
+	public void setListName(final String listName) {
+		this.listName = listName;
+	}
+
+	public String getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(final String createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public String getProgramUUID() {
+		return programUUID;
+	}
+
+	public void setProgramUUID(final String programUUID) {
+		this.programUUID = programUUID;
 	}
 }

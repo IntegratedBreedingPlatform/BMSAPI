@@ -31,8 +31,14 @@ public class SampleListServiceImpl implements SampleListService {
 	public Map<String, Object> createSampleList(final SampleListDto sampleListDto) {
 		Preconditions.checkArgument(sampleListDto.getInstanceIds() != null, "The Instance List must not be null");
 		Preconditions.checkArgument(!sampleListDto.getInstanceIds().isEmpty(), "The Instance List must not be empty");
+		Preconditions.checkArgument(sampleListDto.getProgramUUID() != null, "The programUUID must not be null");
 		Preconditions.checkNotNull(sampleListDto.getSelectionVariableId(), "The Selection Variable Id must not be empty");
 		Preconditions.checkNotNull(sampleListDto.getStudyId(), "The Study Id must not be empty");
+		Preconditions.checkNotNull(sampleListDto.getListName(), "The List Name must not be empty");
+		Preconditions.checkNotNull(sampleListDto.getCreatedDate(), "The Created Date must not be empty");
+		Preconditions.checkArgument(sampleListDto.getListName().trim() != "", "The List Name must not be empty");
+
+
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
 		mapResponse.put("id", String.valueOf(0));
@@ -43,7 +49,7 @@ public class SampleListServiceImpl implements SampleListService {
 			mapResponse.put("id", String.valueOf(newSampleId));
 
 		} catch (MiddlewareQueryException | ParseException e) {
-			mapResponse.put("ERROR", "Error on SampleListService.createSampleList " + e.getMessage());
+			mapResponse.put("ERROR", e.getMessage());
 		}
 
 		return mapResponse;
@@ -55,23 +61,25 @@ public class SampleListServiceImpl implements SampleListService {
 	 *
 	 * @param folderName
 	 * @param parentId
+	 * @param programUUID
 	 * @return Folder ID
 	 * @throws Exception
 	 */
 	@Override
-	public Map<String, Object> createSampleListFolder(final String folderName, final Integer parentId) {
+	public Map<String, Object> createSampleListFolder(final String folderName, final Integer parentId, final String programUUID) {
 		Preconditions.checkArgument(folderName != null, "The folder name must not be null");
 		Preconditions.checkArgument(parentId != null, "The parent Id must not be null");
+		Preconditions.checkArgument(programUUID != null, "The programUUID must not be null");
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
 		mapResponse.put("id", String.valueOf(0));
 		try {
 
 			final String createdBy = this.securityService.getCurrentlyLoggedInUser().getName();
-			Integer result = this.sampleListServiceMW.createSampleListFolder(folderName, parentId, createdBy);
+			Integer result = this.sampleListServiceMW.createSampleListFolder(folderName, parentId, createdBy, programUUID);
 			mapResponse.put("id", String.valueOf(result));
 		} catch (Exception e) {
-			mapResponse.put("ERROR", "Error on SampleListService.createSampleListFolder " + e.getMessage());
+			mapResponse.put("ERROR", e.getMessage());
 		}
 		return mapResponse;
 	}
@@ -95,7 +103,7 @@ public class SampleListServiceImpl implements SampleListService {
 			SampleList result = this.sampleListServiceMW.updateSampleListFolderName(folderId, newFolderName);
 			mapResponse.put("id", String.valueOf(result.getId()));
 		} catch (Exception e) {
-			mapResponse.put("ERROR", "Error on SampleListService.updateSampleListFolderName " + e.getMessage());
+			mapResponse.put("ERROR", e.getMessage());
 		}
 		return mapResponse;
 	}
@@ -121,7 +129,7 @@ public class SampleListServiceImpl implements SampleListService {
 			SampleList result = this.sampleListServiceMW.moveSampleList(folderId, newParentId);
 			mapResponse.put("parentId", String.valueOf(result.getHierarchy().getId()));
 		} catch (Exception e) {
-			mapResponse.put("ERROR", "Error on SampleListService.moveSampleListFolder " + e.getMessage());
+			mapResponse.put("ERROR", e.getMessage());
 		}
 		return mapResponse;
 	}
@@ -142,7 +150,7 @@ public class SampleListServiceImpl implements SampleListService {
 		try {
 			this.sampleListServiceMW.deleteSampleListFolder(folderId);
 		} catch (Exception e) {
-			mapResponse.put("ERROR", "Error on SampleListService.deleteSampleListFolder " + e.getMessage());
+			mapResponse.put("ERROR",e.getMessage());
 		}
 		return mapResponse;
 	}
@@ -152,6 +160,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 		sampleListDTO.setCreatedBy(this.securityService.getCurrentlyLoggedInUser().getName());
 		sampleListDTO.setCropName(dto.getCropName());
+		sampleListDTO.setProgramUUID(dto.getProgramUUID());
 		sampleListDTO.setDescription(dto.getDescription());
 		sampleListDTO.setInstanceIds(dto.getInstanceIds());
 		sampleListDTO.setNotes(dto.getNotes());
@@ -160,10 +169,15 @@ public class SampleListServiceImpl implements SampleListService {
 			sampleListDTO.setSamplingDate(DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT).parse(dto.getSamplingDate()));
 		}
 
+		if (!dto.getCreatedDate().isEmpty()) {
+			sampleListDTO.setCreatedDate(DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT).parse(dto.getCreatedDate()));
+		}
+
 		sampleListDTO.setSelectionVariableId(dto.getSelectionVariableId());
 		sampleListDTO.setStudyId(dto.getStudyId());
 		sampleListDTO.setTakenBy(dto.getTakenBy());
-
+		sampleListDTO.setParentId(dto.getParentId());
+		sampleListDTO.setListName(dto.getListName());
 		return sampleListDTO;
 	}
 

@@ -38,9 +38,9 @@ public class SampleListResource {
 	@RequestMapping(value = "/{crop}/sampleListFolder", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> createSampleListFolder(@PathVariable final String crop, @RequestParam final String folderName,
-		@RequestParam final Integer parentId) {
+		@RequestParam final Integer parentId, @RequestParam final String programUUID) {
 
-		final Map<String, Object> map = this.sampleListService.createSampleListFolder(folderName, parentId);
+		final Map<String, Object> map = this.sampleListService.createSampleListFolder(folderName, parentId, programUUID);
 
 		if (map.get(SampleListResource.ERROR) != null || SampleListResource.NULL.equals(map.get("id"))) {
 			return new ResponseEntity<>(map, HttpStatus.CONFLICT);

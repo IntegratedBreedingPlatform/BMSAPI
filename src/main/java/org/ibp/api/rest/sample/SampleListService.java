@@ -12,10 +12,11 @@ public interface SampleListService {
 	 *
 	 * @param folderName
 	 * @param parentId
+	 * @param programUUID
 	 * @return Folder ID
 	 * @throws Exception
 	 */
-	Map<String, Object> createSampleListFolder(final String folderName, final Integer parentId);
+	Map<String, Object> createSampleListFolder(final String folderName, final Integer parentId, final String programUUID);
 
 	/**
 	 * Update sample list folder name
