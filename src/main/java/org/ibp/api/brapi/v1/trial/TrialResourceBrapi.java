@@ -56,8 +56,8 @@ public class TrialResourceBrapi {
 	public ResponseEntity<TrialSummaries> listTrialSummaries(@PathVariable final String crop,
 			@ApiParam(value = "Program filter to only return studies associated with given program id.", required = false) @RequestParam(value = "programDbId", required = false) final String programDbId,
 			@ApiParam(value = "Location filter to only return studies associated with given location id.", required = false) @RequestParam(value = "locationDbId", required = false) final String locationDbId,
-			@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = Pagination.CURRENT_PAGE, required = false) Integer currentPage,
-			@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = Pagination.PAGE_SIZE, required = false) Integer pageSize,
+			@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page", required = false) Integer currentPage,
+			@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize,
 			@ApiParam(value = "Filter active status true/false", required = false) @RequestParam(value = "active", required = false) final Boolean active,
 			@ApiParam(value = "Sort order. Name of the field to sorty by.", required = false) @RequestParam(value = "sortBy", required = false) final String sortBy,
 			@ApiParam(value = "Sort order direction. asc/desc.", required = false) @RequestParam(value = "sortOrder", required = false) final String sortOrder) {

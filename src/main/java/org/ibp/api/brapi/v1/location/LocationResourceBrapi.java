@@ -50,9 +50,9 @@ public class LocationResourceBrapi {
 	@ResponseBody
 	public ResponseEntity<Locations> listLocations(@PathVariable final String crop,
 			@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION,
-					required = false) @RequestParam(value = Pagination.CURRENT_PAGE, required = false) Integer currentPage,
+					required = false) @RequestParam(value = "page", required = false) Integer currentPage,
 			@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION,
-					required = false) @RequestParam(value = Pagination.PAGE_SIZE, required = false) Integer pageSize,
+					required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize,
 			@ApiParam(value = "name of location type", required = false) @RequestParam(value = "locationType",
 					required = false) String locationType) {
 

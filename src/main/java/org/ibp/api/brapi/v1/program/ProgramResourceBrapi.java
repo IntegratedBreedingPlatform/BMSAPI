@@ -52,9 +52,9 @@ public class ProgramResourceBrapi {
 	@ResponseBody
 	public ResponseEntity<Programs> listPrograms(@PathVariable final String crop,
 		@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
-		@RequestParam(value = Pagination.CURRENT_PAGE, required = false) Integer currentPage,
+		@RequestParam(value = "page", required = false) Integer currentPage,
 		@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION, required = false)
-		@RequestParam(value = Pagination.PAGE_SIZE, required = false) Integer pageSize,
+		@RequestParam(value = "pageSize", required = false) Integer pageSize,
 		@ApiParam(value = "Filter by program name. Exact match.", required = false) @RequestParam(value = "programName", required = false)
 			String programName, @ApiParam(value = "Filter by program abbreviation. Exact match.", required = false)
 	@RequestParam(value = "abbreviation", required = false) String abbreviation) {

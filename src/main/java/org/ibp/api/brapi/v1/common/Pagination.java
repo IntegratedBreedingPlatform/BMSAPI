@@ -8,11 +8,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({"currentPage", "pageSize", "totalCount", "totalPages"})
 public class Pagination {
 	
-	public static final String CURRENT_PAGE = "currentPage";
-	public static final String PAGE_SIZE = "pageSize";
-	public static final String TOTAL_COUNT = "totalCount";
-	public static final String TOTAL_PAGES = "totalPages";
-
 	private Integer currentPage;
 
 	private Integer pageSize;
@@ -44,7 +39,7 @@ public class Pagination {
 
 	/**
 	 *
-	 * @return The pageNumber
+	 * @return The currentPage
 	 */
 	public Integer getCurrentPage() {
 		return this.currentPage;
@@ -52,7 +47,7 @@ public class Pagination {
 
 	/**
 	 *
-	 * @param currentPage The pageNumber
+	 * @param currentPage The currentPage
 	 */
 	public void setCurrentPage(final Integer currentPage) {
 		this.currentPage = currentPage;

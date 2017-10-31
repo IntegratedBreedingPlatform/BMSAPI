@@ -84,9 +84,9 @@ public class StudyResourceBrapi {
 							+ "Use <code>GET /{crop}/brapi/v1/trials</code> service to retrieve trial summaries first to obtain trialDbIds to supply here. ",
 					required = true) @RequestParam(value = "trialDbId", required = false) final String trialDbId,
 			@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION,
-					required = false) @RequestParam(value = Pagination.CURRENT_PAGE, required = false) Integer currentPage,
+					required = false) @RequestParam(value = "page", required = false) Integer currentPage,
 			@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION,
-					required = false) @RequestParam(value = Pagination.PAGE_SIZE, required = false) Integer pageSize) {
+					required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize) {
 
 		/***
 		 * Study in BrAPI land = Environment/Instance in BMS/Middleware land. We need to build services in Middleware to list all
