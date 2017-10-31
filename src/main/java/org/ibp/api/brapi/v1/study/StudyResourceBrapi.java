@@ -1,14 +1,19 @@
 package org.ibp.api.brapi.v1.study;
 
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import liquibase.util.StringUtils;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -21,7 +26,7 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.location.Location;
 import org.ibp.api.brapi.v1.location.LocationMapper;
-import org.ibp.api.brapi.v1.location.Locations;
+import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,18 +41,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+
+import liquibase.util.StringUtils;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a>
@@ -63,7 +66,6 @@ public class StudyResourceBrapi {
 	public static final String CONTENT_TYPE = "Content-Type";
 	public static final String CONTENT_DISPOSITION = "Content-Disposition";
 
-	@SuppressWarnings("unused") // temporary
 	@Autowired
 	private StudyDataManager studyDataManager;
 
@@ -81,10 +83,10 @@ public class StudyResourceBrapi {
 					value = "Studies are contained within a trial.  Provide the db id of the trial to list summary of studies within the trial. "
 							+ "Use <code>GET /{crop}/brapi/v1/trials</code> service to retrieve trial summaries first to obtain trialDbIds to supply here. ",
 					required = true) @RequestParam(value = "trialDbId", required = false) final String trialDbId,
-			@ApiParam(value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.",
-					required = false) @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
-			@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.",
-					required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+			@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION,
+					required = false) @RequestParam(value = Pagination.CURRENT_PAGE, required = false) Integer currentPage,
+			@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION,
+					required = false) @RequestParam(value = Pagination.PAGE_SIZE, required = false) Integer pageSize) {
 
 		/***
 		 * Study in BrAPI land = Environment/Instance in BMS/Middleware land. We need to build services in Middleware to list all

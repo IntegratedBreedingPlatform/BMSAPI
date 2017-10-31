@@ -5,10 +5,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"pageNumber", "pageSize", "totalCount", "totalPages"})
+@JsonPropertyOrder({"currentPage", "pageSize", "totalCount", "totalPages"})
 public class Pagination {
+	
+	public static final String CURRENT_PAGE = "currentPage";
+	public static final String PAGE_SIZE = "pageSize";
+	public static final String TOTAL_COUNT = "totalCount";
+	public static final String TOTAL_PAGES = "totalPages";
 
-	private Integer pageNumber;
+	private Integer currentPage;
 
 	private Integer pageSize;
 
@@ -27,11 +32,11 @@ public class Pagination {
 	 *
 	 * @param totalCount
 	 * @param pageSize
-	 * @param pageNumber
+	 * @param currentPage
 	 * @param totalPages
 	 */
-	public Pagination(final Integer pageNumber, final Integer pageSize, final Long totalCount, final Integer totalPages) {
-		this.pageNumber = pageNumber;
+	public Pagination(final Integer currentPage, final Integer pageSize, final Long totalCount, final Integer totalPages) {
+		this.currentPage = currentPage;
 		this.pageSize = pageSize;
 		this.totalCount = totalCount;
 		this.totalPages = totalPages;
@@ -41,20 +46,20 @@ public class Pagination {
 	 *
 	 * @return The pageNumber
 	 */
-	public Integer getPageNumber() {
-		return this.pageNumber;
+	public Integer getCurrentPage() {
+		return this.currentPage;
 	}
 
 	/**
 	 *
-	 * @param pageNumber The pageNumber
+	 * @param currentPage The pageNumber
 	 */
-	public void setPageNumber(final Integer pageNumber) {
-		this.pageNumber = pageNumber;
+	public void setCurrentPage(final Integer currentPage) {
+		this.currentPage = currentPage;
 	}
 
 	public Pagination withPageNumber(final Integer pageNumber) {
-		this.pageNumber = pageNumber;
+		this.currentPage = pageNumber;
 		return this;
 	}
 

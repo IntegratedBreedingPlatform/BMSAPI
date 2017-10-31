@@ -51,10 +51,10 @@ public class ProgramResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/programs", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<Programs> listPrograms(@PathVariable final String crop,
-		@ApiParam(value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.", required = false)
-		@RequestParam(value = "pageNumber", required = false) Integer pageNumber,
-		@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.", required = false)
-		@RequestParam(value = "pageSize", required = false) Integer pageSize,
+		@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
+		@RequestParam(value = Pagination.CURRENT_PAGE, required = false) Integer currentPage,
+		@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION, required = false)
+		@RequestParam(value = Pagination.PAGE_SIZE, required = false) Integer pageSize,
 		@ApiParam(value = "Filter by program name. Exact match.", required = false) @RequestParam(value = "programName", required = false)
 			String programName, @ApiParam(value = "Filter by program abbreviation. Exact match.", required = false)
 	@RequestParam(value = "abbreviation", required = false) String abbreviation) {
@@ -76,7 +76,7 @@ public class ProgramResourceBrapi {
 		 **/
 		if (StringUtils.isBlank(abbreviation)) {
 
-			resultPage = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<ProgramDetailsDto>() {
+			resultPage = new PaginatedSearch().execute(currentPage, pageSize, new SearchSpec<ProgramDetailsDto>() {
 
 				@Override
 				public long getCount() {
