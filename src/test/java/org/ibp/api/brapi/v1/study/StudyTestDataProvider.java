@@ -1,6 +1,7 @@
 package org.ibp.api.brapi.v1.study;
 
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
@@ -28,7 +29,8 @@ public class StudyTestDataProvider {
 		final List<String> seasons = Lists.newArrayList("WET");
 		final StudyMetadata metadata =
 				new StudyMetadata().setActive(Boolean.TRUE).setEndDate("20161010").setStartDate("20161010").setLocationId(2)
-						.setNurseryOrTrialId(5).setSeasons(seasons).setStudyType("T").setTrialName("TN").setTrialDbId(2).setStudyName("SN")
+						.setNurseryOrTrialId(5).setSeasons(seasons).setStudyType(StudyType.T.getName()).setTrialName("TN").setTrialDbId(2)
+					.setStudyName("SN")
 						.setStudyDbId(5);
 		return metadata;
 	}

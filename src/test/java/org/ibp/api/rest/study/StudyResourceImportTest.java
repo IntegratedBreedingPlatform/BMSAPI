@@ -1,6 +1,7 @@
 
 package org.ibp.api.rest.study;
 
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -61,7 +62,7 @@ public class StudyResourceImportTest extends ApiUnitTestBase {
 	public void testImportNursery() throws Exception {
 
 		final StudyImportDTO inputDTO = new StudyImportDTO();
-		inputDTO.setStudyType("N");
+		inputDTO.setStudyType(StudyType.N.getName());
 		inputDTO.setName("Maize Nursery");
 		inputDTO.setObjective("Grow more seeds");
 		inputDTO.setTitle("Maize Nursery title");
