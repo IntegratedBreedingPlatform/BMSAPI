@@ -4,8 +4,8 @@ import org.ibp.api.domain.common.PagedResult;
 
 public class BrapiPagedResult<T> extends PagedResult<T> {
 	
-	public static final int MAX_PAGE_SIZE = 200;
-	public static final int DEFAULT_PAGE_SIZE = 100;
+	public static final int MAX_PAGE_SIZE = 1000;
+	public static final int DEFAULT_PAGE_SIZE = 1000;
 	public static final int DEFAULT_PAGE_NUMBER = 0;
 	
 	public static final String CURRENT_PAGE_DESCRIPTION =
