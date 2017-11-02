@@ -21,12 +21,12 @@ import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.location.Location;
 import org.ibp.api.brapi.v1.location.LocationMapper;
-import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,9 +83,9 @@ public class StudyResourceBrapi {
 					value = "Studies are contained within a trial.  Provide the db id of the trial to list summary of studies within the trial. "
 							+ "Use <code>GET /{crop}/brapi/v1/trials</code> service to retrieve trial summaries first to obtain trialDbIds to supply here. ",
 					required = true) @RequestParam(value = "trialDbId", required = false) final String trialDbId,
-			@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION,
+			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION,
 					required = false) @RequestParam(value = "page", required = false) Integer currentPage,
-			@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION,
+			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION,
 					required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize) {
 
 		/***
@@ -97,6 +97,7 @@ public class StudyResourceBrapi {
 		 * studyDbId in BrAPI will map to nd_geolocation_id in Middleware.
 		 * 
 		 * For now, just returning an empty place holder message with status.
+		 * For posterity, keep in mind that BRAPI paging starts at index 0.
 		 */
 
 		Result<org.ibp.api.brapi.v1.study.StudySummaryDto> results = new Result<>();

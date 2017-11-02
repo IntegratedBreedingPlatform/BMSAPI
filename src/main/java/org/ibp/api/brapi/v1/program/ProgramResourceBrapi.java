@@ -8,6 +8,7 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
+import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
@@ -51,9 +52,9 @@ public class ProgramResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/programs", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<Programs> listPrograms(@PathVariable final String crop,
-		@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
 		@RequestParam(value = "page", required = false) Integer currentPage,
-		@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION, required = false)
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize", required = false) Integer pageSize,
 		@ApiParam(value = "Filter by program name. Exact match.", required = false) @RequestParam(value = "programName", required = false)
 			String programName, @ApiParam(value = "Filter by program abbreviation. Exact match.", required = false)
@@ -76,7 +77,7 @@ public class ProgramResourceBrapi {
 		 **/
 		if (StringUtils.isBlank(abbreviation)) {
 
-			resultPage = new PaginatedSearch().execute(currentPage, pageSize, new SearchSpec<ProgramDetailsDto>() {
+			resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<ProgramDetailsDto>() {
 
 				@Override
 				public long getCount() {
@@ -85,8 +86,10 @@ public class ProgramResourceBrapi {
 
 				@Override
 				public List<ProgramDetailsDto> getResults(PagedResult<ProgramDetailsDto> pagedResult) {
+					// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
+					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return ProgramResourceBrapi.this.programService
-						.getProgramsByFilter(pagedResult.getPageNumber(), pagedResult.getPageSize(), filters);
+						.getProgramsByFilter(pageNumber, pagedResult.getPageSize(), filters);
 				}
 			});
 		}

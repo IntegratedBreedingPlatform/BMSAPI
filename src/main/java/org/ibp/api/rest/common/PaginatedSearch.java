@@ -1,6 +1,7 @@
 
 package org.ibp.api.rest.common;
 
+import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.domain.common.PagedResult;
 
 /**
@@ -25,6 +26,27 @@ public class PaginatedSearch {
 
 		// Initialise page parameters/metadata and validate.
 		PagedResult<T> pagedResult = new PagedResult<T>(pageNumber, pageSize, totalResults);
+
+		// Add list/search result
+		pagedResult.addPageResults(searchSpec.getResults(pagedResult));
+		return pagedResult;
+	}
+	
+	public <T> BrapiPagedResult<T> executeBrapiSearch(Integer pageNumber, Integer pageSize, SearchSpec<T> searchSpec) {
+
+		// Default page parameters if not supplied.
+		if (pageNumber == null) {
+			pageNumber = new Integer(BrapiPagedResult.DEFAULT_PAGE_NUMBER);
+		}
+
+		if (pageSize == null) {
+			pageSize = new Integer(BrapiPagedResult.DEFAULT_PAGE_SIZE);
+		}
+
+		long totalResults = searchSpec.getCount();
+
+		// Initialise page parameters/metadata and validate.
+		BrapiPagedResult<T> pagedResult = new BrapiPagedResult<T>(pageNumber, pageSize, totalResults);
 
 		// Add list/search result
 		pagedResult.addPageResults(searchSpec.getResults(pagedResult));

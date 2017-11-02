@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
+import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
@@ -49,9 +50,9 @@ public class LocationResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/locations", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<Locations> listLocations(@PathVariable final String crop,
-			@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION,
+			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION,
 					required = false) @RequestParam(value = "page", required = false) Integer currentPage,
-			@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION,
+			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION,
 					required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize,
 			@ApiParam(value = "name of location type", required = false) @RequestParam(value = "locationType",
 					required = false) String locationType) {
@@ -61,7 +62,7 @@ public class LocationResourceBrapi {
 		final boolean validation = this.validateParameter(locationType, filters);
 
 		if (validation) {
-			resultPage = new PaginatedSearch().execute(currentPage, pageSize, new SearchSpec<LocationDetailsDto>() {
+			resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<LocationDetailsDto>() {
 
 				@Override
 				public long getCount() {
@@ -70,7 +71,9 @@ public class LocationResourceBrapi {
 
 				@Override
 				public List<LocationDetailsDto> getResults(PagedResult<LocationDetailsDto> pagedResult) {
-					return locationDataManager.getLocationsByFilter(pagedResult.getPageNumber(), pagedResult.getPageSize(), filters);
+					// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
+					final int pageNumber = pagedResult.getPageNumber() + 1;
+					return locationDataManager.getLocationsByFilter(pageNumber, pagedResult.getPageSize(), filters);
 				}
 			});
 		}

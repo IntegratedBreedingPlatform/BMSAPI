@@ -1,15 +1,20 @@
 
 package org.ibp.api.brapi.v1.trial;
 
-import com.google.common.collect.ImmutableList;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.StringUtil;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
@@ -29,13 +34,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.ImmutableList;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/#reference/trials">BrAPI Trial services</a>.
@@ -56,8 +58,8 @@ public class TrialResourceBrapi {
 	public ResponseEntity<TrialSummaries> listTrialSummaries(@PathVariable final String crop,
 			@ApiParam(value = "Program filter to only return studies associated with given program id.", required = false) @RequestParam(value = "programDbId", required = false) final String programDbId,
 			@ApiParam(value = "Location filter to only return studies associated with given location id.", required = false) @RequestParam(value = "locationDbId", required = false) final String locationDbId,
-			@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page", required = false) Integer currentPage,
-			@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize,
+			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page", required = false) Integer currentPage,
+			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize,
 			@ApiParam(value = "Filter active status true/false", required = false) @RequestParam(value = "active", required = false) final Boolean active,
 			@ApiParam(value = "Sort order. Name of the field to sorty by.", required = false) @RequestParam(value = "sortBy", required = false) final String sortBy,
 			@ApiParam(value = "Sort order direction. asc/desc.", required = false) @RequestParam(value = "sortOrder", required = false) final String sortOrder) {
@@ -72,7 +74,7 @@ public class TrialResourceBrapi {
 		}
 
 		final Map<StudyFilters, String> parameters = setParameters(programDbId, locationDbId, sortBy, sortOrder);
-		final PagedResult<StudySummary> resultPage = new PaginatedSearch().execute(currentPage, pageSize, new SearchSpec<StudySummary>() {
+		final PagedResult<StudySummary> resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<StudySummary>() {
 
 			@Override
 			public long getCount() {
@@ -81,7 +83,9 @@ public class TrialResourceBrapi {
 
 			@Override
 			public List<StudySummary> getResults(PagedResult<StudySummary> pagedResult) {
-				return TrialResourceBrapi.this.studyService.getStudies(parameters, pagedResult.getPageSize(), pagedResult.getPageNumber());
+				// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
+				final int pageNumber = pagedResult.getPageNumber() + 1;
+				return TrialResourceBrapi.this.studyService.getStudies(parameters, pagedResult.getPageSize(), pageNumber);
 			}
 		});
 
