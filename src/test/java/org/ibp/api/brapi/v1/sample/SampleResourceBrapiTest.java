@@ -76,7 +76,7 @@ public class SampleResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(jsonPath("$.result.plantingDate", Matchers.is(sampleDetailsDTO.getSeedingDate()))) //
 			.andExpect(jsonPath("$.result.harvestDate", Matchers.is(sampleDetailsDTO.getHarvestDate()))) //
 
-			.andExpect(jsonPath("$.metadata.pagination.pageNumber", Matchers.is(1))) //
+			.andExpect(jsonPath("$.metadata.pagination.currentPage", Matchers.is(1))) //
 			.andExpect(jsonPath("$.metadata.pagination.pageSize", Matchers.is(1))) //
 			.andExpect(jsonPath("$.metadata.pagination.totalCount", Matchers.is(1))) //
 			.andExpect(jsonPath("$.metadata.pagination.totalPages", Matchers.is(1))) //

@@ -98,7 +98,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(jsonPath("$.result.data[0][1]", is(data.get(0).get(1))))
 				.andExpect(jsonPath("$.result.data[0][2]", is(data.get(0).get(2))))
 				.andExpect(jsonPath("$.result.data[0][3]", is(data.get(0).get(3))))
-				.andExpect(jsonPath("$.metadata.pagination.pageNumber", is(1)))
+				.andExpect(jsonPath("$.metadata.pagination.currentPage", is(1)))
 				.andExpect(jsonPath("$.metadata.pagination.pageSize", is(1)))
 				.andExpect(jsonPath("$.metadata.pagination.totalCount", is(1)))
 				.andExpect(jsonPath("$.metadata.pagination.totalPages", is(1)))
@@ -216,7 +216,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(jsonPath("$.result.contacts[0].orcid", is("")))
 				.andExpect(jsonPath("$.result.additionalInfo", hasKey("prop1")))
 				.andExpect(jsonPath("$.result.additionalInfo", hasValue("val1")))
-				.andExpect(jsonPath("$.metadata.pagination.pageNumber", is(1)))
+				.andExpect(jsonPath("$.metadata.pagination.currentPage", is(1)))
 				.andExpect(jsonPath("$.metadata.pagination.pageSize", is(1)))
 				.andExpect(jsonPath("$.metadata.pagination.totalCount", is(1)))
 				.andExpect(jsonPath("$.metadata.pagination.totalPages", is(1)));
