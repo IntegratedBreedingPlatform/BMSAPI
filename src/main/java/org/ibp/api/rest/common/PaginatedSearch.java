@@ -11,42 +11,46 @@ import org.ibp.api.domain.common.PagedResult;
  */
 public class PaginatedSearch {
 
-	public <T> PagedResult<T> execute(Integer pageNumber, Integer pageSize, SearchSpec<T> searchSpec) {
+	public <T> PagedResult<T> execute(final Integer pageNumber, final Integer pageSize, final SearchSpec<T> searchSpec) {
 
+		int pgeNum = pageNumber;
 		// Default page parameters if not supplied.
 		if (pageNumber == null) {
-			pageNumber = new Integer(PagedResult.DEFAULT_PAGE_NUMBER);
+			pgeNum = new Integer(PagedResult.DEFAULT_PAGE_NUMBER);
 		}
 
+		int pgeSize = pageSize;
 		if (pageSize == null) {
-			pageSize = new Integer(PagedResult.DEFAULT_PAGE_SIZE);
+			pgeSize = new Integer(PagedResult.DEFAULT_PAGE_SIZE);
 		}
 
-		long totalResults = searchSpec.getCount();
+		final long totalResults = searchSpec.getCount();
 
 		// Initialise page parameters/metadata and validate.
-		PagedResult<T> pagedResult = new PagedResult<T>(pageNumber, pageSize, totalResults);
+		final PagedResult<T> pagedResult = new PagedResult<T>(pgeNum, pgeSize, totalResults);
 
 		// Add list/search result
 		pagedResult.addPageResults(searchSpec.getResults(pagedResult));
 		return pagedResult;
 	}
-	
-	public <T> BrapiPagedResult<T> executeBrapiSearch(Integer pageNumber, Integer pageSize, SearchSpec<T> searchSpec) {
 
+	public <T> BrapiPagedResult<T> executeBrapiSearch(final Integer pageNumber, final Integer pageSize, final SearchSpec<T> searchSpec) {
+
+		int pgeNum = pageNumber;
 		// Default page parameters if not supplied.
 		if (pageNumber == null) {
-			pageNumber = new Integer(BrapiPagedResult.DEFAULT_PAGE_NUMBER);
+			pgeNum = new Integer(BrapiPagedResult.DEFAULT_PAGE_NUMBER);
 		}
 
+		int pgeSize = pageSize;
 		if (pageSize == null) {
-			pageSize = new Integer(BrapiPagedResult.DEFAULT_PAGE_SIZE);
+			pgeSize = new Integer(BrapiPagedResult.DEFAULT_PAGE_SIZE);
 		}
 
-		long totalResults = searchSpec.getCount();
+		final long totalResults = searchSpec.getCount();
 
 		// Initialise page parameters/metadata and validate.
-		BrapiPagedResult<T> pagedResult = new BrapiPagedResult<T>(pageNumber, pageSize, totalResults);
+		final BrapiPagedResult<T> pagedResult = new BrapiPagedResult<T>(pgeNum, pgeSize, totalResults);
 
 		// Add list/search result
 		pagedResult.addPageResults(searchSpec.getResults(pagedResult));

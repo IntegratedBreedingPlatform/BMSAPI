@@ -50,12 +50,12 @@ public class LocationResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/locations", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<Locations> listLocations(@PathVariable final String crop,
-			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION,
-					required = false) @RequestParam(value = "page", required = false) Integer currentPage,
-			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION,
-					required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize,
+			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
+					required = false) final Integer currentPage,
+			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
+					required = false) final Integer pageSize,
 			@ApiParam(value = "name of location type", required = false) @RequestParam(value = "locationType",
-					required = false) String locationType) {
+					required = false) final String locationType) {
 
 		final Map<LocationFilters, Object> filters = new EnumMap<>(LocationFilters.class);
 		PagedResult<LocationDetailsDto> resultPage = null;
@@ -66,20 +66,21 @@ public class LocationResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return locationDataManager.countLocationsByFilter(filters);
+					return LocationResourceBrapi.this.locationDataManager.countLocationsByFilter(filters);
 				}
 
 				@Override
-				public List<LocationDetailsDto> getResults(PagedResult<LocationDetailsDto> pagedResult) {
+				public List<LocationDetailsDto> getResults(final PagedResult<LocationDetailsDto> pagedResult) {
 					// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
 					final int pageNumber = pagedResult.getPageNumber() + 1;
-					return locationDataManager.getLocationsByFilter(pageNumber, pagedResult.getPageSize(), filters);
+					return LocationResourceBrapi.this.locationDataManager.getLocationsByFilter(pageNumber, pagedResult.getPageSize(),
+							filters);
 				}
 			});
 		}
 
-		if (resultPage!= null && resultPage.getTotalResults() > 0) {
-			
+		if (resultPage != null && resultPage.getTotalResults() > 0) {
+
 			final ModelMapper mapper = LocationMapper.getInstance();
 			final List<Location> locations = new ArrayList<>();
 
@@ -95,7 +96,7 @@ public class LocationResourceBrapi {
 			final Metadata metadata = new Metadata().withPagination(pagination);
 			final Locations locationList = new Locations().withMetadata(metadata).withResult(results);
 			return new ResponseEntity<>(locationList, HttpStatus.OK);
-			
+
 		} else {
 
 			final Map<String, String> status = new HashMap<>();
@@ -109,7 +110,7 @@ public class LocationResourceBrapi {
 	private boolean validateParameter(final String locationType, final Map<LocationFilters, Object> filters) {
 		if (!StringUtils.isBlank(locationType)) {
 			final Integer locationTypeId = this.locationDataManager
-				.getUserDefinedFieldIdOfName(org.generationcp.middleware.pojos.UDTableType.LOCATION_LTYPE, locationType);
+					.getUserDefinedFieldIdOfName(org.generationcp.middleware.pojos.UDTableType.LOCATION_LTYPE, locationType);
 			if (locationTypeId != null) {
 				filters.put(LocationFilters.LOCATION_TYPE, locationTypeId.toString());
 			} else {

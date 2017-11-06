@@ -27,17 +27,16 @@ public class PagedResult<T> {
 	public static final int MAX_PAGE_SIZE = 200;
 	public static final int DEFAULT_PAGE_SIZE = 100;
 	public static final int DEFAULT_PAGE_NUMBER = 1;
-	
-	public static final String CURRENT_PAGE_DESCRIPTION =
-			"Page number to retrieve in case of multi paged results. Defaults to " + DEFAULT_PAGE_NUMBER + " (first page) if not supplied.";
-	public static final String PAGE_SIZE_DESCRIPTION =
-			"Number of results to retrieve per page. Defaults to " + DEFAULT_PAGE_SIZE + " if not supplied. Max page size allowed is "
-					+ MAX_PAGE_SIZE + ".";
 
-	public PagedResult(){
+	public static final String CURRENT_PAGE_DESCRIPTION = "Page number to retrieve in case of multi paged results. Defaults to "
+			+ PagedResult.DEFAULT_PAGE_NUMBER + " (first page) if not supplied.";
+	public static final String PAGE_SIZE_DESCRIPTION = "Number of results to retrieve per page. Defaults to "
+			+ PagedResult.DEFAULT_PAGE_SIZE + " if not supplied. Max page size allowed is " + PagedResult.MAX_PAGE_SIZE + ".";
+
+	public PagedResult() {
 		// Empty constructor needed for subclass constructor
 	}
-	
+
 	public PagedResult(final int pageNumber, final int pageSize, final long totalResults) {
 		this.totalResults = totalResults;
 
@@ -46,7 +45,7 @@ public class PagedResult<T> {
 		}
 		this.pageSize = pageSize;
 
-		if ((totalResults != 0) && (pageNumber < PagedResult.DEFAULT_PAGE_NUMBER || pageNumber > this.getTotalPages())) {
+		if (totalResults != 0 && (pageNumber < PagedResult.DEFAULT_PAGE_NUMBER || pageNumber > this.getTotalPages())) {
 			throw new IllegalArgumentException(
 					"A total of " + this.getTotalPages() + " pages are available, so the page number must between "
 							+ PagedResult.DEFAULT_PAGE_NUMBER + " and " + this.getTotalPages() + ".");
@@ -59,7 +58,7 @@ public class PagedResult<T> {
 		return this.pageResults;
 	}
 
-	public void addPageResults(List<T> pageResults) {
+	public void addPageResults(final List<T> pageResults) {
 		if (pageResults == null) {
 			throw new IllegalArgumentException("Page results must not be null.");
 		}

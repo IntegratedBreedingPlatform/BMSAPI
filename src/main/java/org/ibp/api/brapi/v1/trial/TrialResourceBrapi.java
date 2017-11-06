@@ -56,43 +56,51 @@ public class TrialResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/trials", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<TrialSummaries> listTrialSummaries(@PathVariable final String crop,
-			@ApiParam(value = "Program filter to only return studies associated with given program id.", required = false) @RequestParam(value = "programDbId", required = false) final String programDbId,
-			@ApiParam(value = "Location filter to only return studies associated with given location id.", required = false) @RequestParam(value = "locationDbId", required = false) final String locationDbId,
-			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page", required = false) Integer currentPage,
-			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize,
-			@ApiParam(value = "Filter active status true/false", required = false) @RequestParam(value = "active", required = false) final Boolean active,
-			@ApiParam(value = "Sort order. Name of the field to sorty by.", required = false) @RequestParam(value = "sortBy", required = false) final String sortBy,
-			@ApiParam(value = "Sort order direction. asc/desc.", required = false) @RequestParam(value = "sortOrder", required = false) final String sortOrder) {
+			@ApiParam(value = "Program filter to only return studies associated with given program id.",
+					required = false) @RequestParam(value = "programDbId", required = false) final String programDbId,
+			@ApiParam(value = "Location filter to only return studies associated with given location id.",
+					required = false) @RequestParam(value = "locationDbId", required = false) final String locationDbId,
+			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
+					required = false) final Integer currentPage,
+			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
+					required = false) final Integer pageSize,
+			@ApiParam(value = "Filter active status true/false", required = false) @RequestParam(value = "active",
+					required = false) final Boolean active,
+			@ApiParam(value = "Sort order. Name of the field to sorty by.", required = false) @RequestParam(value = "sortBy",
+					required = false) final String sortBy,
+			@ApiParam(value = "Sort order direction. asc/desc.", required = false) @RequestParam(value = "sortOrder",
+					required = false) final String sortOrder) {
 
-		final String validationError = parameterValidation(active, sortBy, sortOrder);
+		final String validationError = this.parameterValidation(active, sortBy, sortOrder);
 		if (!StringUtils.isBlank(validationError)) {
-			Map<String, String> status = new HashMap<>();
+			final Map<String, String> status = new HashMap<>();
 			status.put("message", validationError);
-			Metadata metadata = new Metadata(null, status);
-			TrialSummaries trialSummaries = new TrialSummaries().withMetadata(metadata).withResult(new Result<TrialSummary>());
+			final Metadata metadata = new Metadata(null, status);
+			final TrialSummaries trialSummaries = new TrialSummaries().withMetadata(metadata).withResult(new Result<TrialSummary>());
 			return new ResponseEntity<>(trialSummaries, HttpStatus.NOT_FOUND);
 		}
 
-		final Map<StudyFilters, String> parameters = setParameters(programDbId, locationDbId, sortBy, sortOrder);
-		final PagedResult<StudySummary> resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<StudySummary>() {
+		final Map<StudyFilters, String> parameters = this.setParameters(programDbId, locationDbId, sortBy, sortOrder);
+		final PagedResult<StudySummary> resultPage =
+				new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<StudySummary>() {
 
-			@Override
-			public long getCount() {
-				return TrialResourceBrapi.this.studyService.countStudies(parameters);
-			}
+					@Override
+					public long getCount() {
+						return TrialResourceBrapi.this.studyService.countStudies(parameters);
+					}
 
-			@Override
-			public List<StudySummary> getResults(PagedResult<StudySummary> pagedResult) {
-				// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
-				final int pageNumber = pagedResult.getPageNumber() + 1;
-				return TrialResourceBrapi.this.studyService.getStudies(parameters, pagedResult.getPageSize(), pageNumber);
-			}
-		});
+					@Override
+					public List<StudySummary> getResults(final PagedResult<StudySummary> pagedResult) {
+						// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
+						final int pageNumber = pagedResult.getPageNumber() + 1;
+						return TrialResourceBrapi.this.studyService.getStudies(parameters, pagedResult.getPageSize(), pageNumber);
+					}
+				});
 
-		final List<TrialSummary> trialSummaryList = translateResults(resultPage, sortBy, sortOrder);
+		final List<TrialSummary> trialSummaryList = this.translateResults(resultPage, sortBy, sortOrder);
 		final Result<TrialSummary> results = new Result<TrialSummary>().withData(trialSummaryList);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
-			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
 		final TrialSummaries trialSummaries = new TrialSummaries().withMetadata(metadata).withResult(results);
@@ -101,7 +109,7 @@ public class TrialResourceBrapi {
 
 	}
 
-	private List<TrialSummary> translateResults(PagedResult<StudySummary> resultPage, final String sortBy, final String sortOrder) {
+	private List<TrialSummary> translateResults(final PagedResult<StudySummary> resultPage, final String sortBy, final String sortOrder) {
 		final ModelMapper modelMapper = TrialSummaryMapper.getInstance();
 		final List<TrialSummary> trialSummaryList = new ArrayList<>();
 
@@ -110,25 +118,25 @@ public class TrialResourceBrapi {
 			trialSummaryList.add(trialSummaryDto);
 		}
 		if ("programName".equals(sortBy)) {
-			orderListByProgramName(trialSummaryList, sortOrder);
-		}else if("startDate".equals(sortBy)){
-			orderListByStartDate(trialSummaryList, sortOrder);
+			this.orderListByProgramName(trialSummaryList, sortOrder);
+		} else if ("startDate".equals(sortBy)) {
+			this.orderListByStartDate(trialSummaryList, sortOrder);
 		}
 		return trialSummaryList;
 	}
 
-	private void orderListByStartDate(List<TrialSummary> trialSummaryList, final String sortOrder) {
+	private void orderListByStartDate(final List<TrialSummary> trialSummaryList, final String sortOrder) {
 		if (StringUtil.isEmpty(sortOrder) || TrialResourceBrapi.ORDER_BY_DESCENDING.equalsIgnoreCase(sortOrder)) {
-			Comparator desc = Collections.reverseOrder(TrialResourceBrapi.getComparatorStartDate());
+			final Comparator desc = Collections.reverseOrder(TrialResourceBrapi.getComparatorStartDate());
 			Collections.sort(trialSummaryList, desc);
 		} else {
 			Collections.sort(trialSummaryList, TrialResourceBrapi.getComparatorStartDate());
 		}
 	}
 
-	private void orderListByProgramName(List<TrialSummary> trialSummaryList, final String sortOrder) {
+	private void orderListByProgramName(final List<TrialSummary> trialSummaryList, final String sortOrder) {
 		if (StringUtil.isEmpty(sortOrder) || TrialResourceBrapi.ORDER_BY_DESCENDING.equalsIgnoreCase(sortOrder)) {
-			Comparator desc = Collections.reverseOrder(TrialResourceBrapi.getComparatorProgramName());
+			final Comparator desc = Collections.reverseOrder(TrialResourceBrapi.getComparatorProgramName());
 			Collections.sort(trialSummaryList, desc);
 		} else {
 			Collections.sort(trialSummaryList, TrialResourceBrapi.getComparatorProgramName());
@@ -156,7 +164,7 @@ public class TrialResourceBrapi {
 	}
 
 	private Map<StudyFilters, String> setParameters(final String programDbId, final String locationDbId, final String sortByField,
-		final String sortOrder) {
+			final String sortOrder) {
 
 		final Map<StudyFilters, String> parametersMap = new EnumMap<>(StudyFilters.class);
 		if (!StringUtils.isBlank(programDbId)) {
@@ -181,9 +189,10 @@ public class TrialResourceBrapi {
 	}
 
 	private String parameterValidation(final Boolean active, final String sortBy, final String sortOrder) {
-		final List<String> sortbyFields =
-			ImmutableList.<String>builder().add("trialDbId").add("trialName").add("programDbId").add("programName").add("startDate").add("endDate").add("active").build();
-		final List<String> sortOrders = ImmutableList.<String>builder().add(TrialResourceBrapi.ORDER_BY_ASCENDING).add(TrialResourceBrapi.ORDER_BY_DESCENDING).build();
+		final List<String> sortbyFields = ImmutableList.<String>builder().add("trialDbId").add("trialName").add("programDbId")
+				.add("programName").add("startDate").add("endDate").add("active").build();
+		final List<String> sortOrders = ImmutableList.<String>builder().add(TrialResourceBrapi.ORDER_BY_ASCENDING)
+				.add(TrialResourceBrapi.ORDER_BY_DESCENDING).build();
 
 		if (active != null && !active) {
 			return "No inactive studies found.";
@@ -206,28 +215,29 @@ public class TrialResourceBrapi {
 
 		org.ibp.api.brapi.v1.trial.TrialObservationTable trialObservationsTable = new org.ibp.api.brapi.v1.trial.TrialObservationTable();
 
-		TrialObservationTable mwTrialObservationTable = this.studyService.getTrialObservationTable(trialDbId);
+		final TrialObservationTable mwTrialObservationTable = this.studyService.getTrialObservationTable(trialDbId);
 
-		int resultNumber = (mwTrialObservationTable == null) ? 0 : 1;
+		final int resultNumber = mwTrialObservationTable == null ? 0 : 1;
 
 		if (resultNumber != 0) {
-			PropertyMap<TrialObservationTable, org.ibp.api.brapi.v1.trial.TrialObservationTable> mappingSpec = new PropertyMap<TrialObservationTable, org.ibp.api.brapi.v1.trial.TrialObservationTable>() {
+			final PropertyMap<TrialObservationTable, org.ibp.api.brapi.v1.trial.TrialObservationTable> mappingSpec =
+					new PropertyMap<TrialObservationTable, org.ibp.api.brapi.v1.trial.TrialObservationTable>() {
 
-				@Override
-				protected void configure() {
-					map(source.getStudyDbId(), destination.getTrialDbId());
-				}
-			};
-			ModelMapper modelMapper = new ModelMapper();
+						@Override
+						protected void configure() {
+							this.map(this.source.getStudyDbId(), this.destination.getTrialDbId());
+						}
+					};
+			final ModelMapper modelMapper = new ModelMapper();
 			modelMapper.addMappings(mappingSpec);
 			trialObservationsTable = modelMapper.map(mwTrialObservationTable, org.ibp.api.brapi.v1.trial.TrialObservationTable.class);
 		}
 
-		Pagination pagination =
+		final Pagination pagination =
 				new Pagination().withPageNumber(1).withPageSize(resultNumber).withTotalCount((long) resultNumber).withTotalPages(1);
 
-		Metadata metadata = new Metadata().withPagination(pagination);
-		TrialObservations trialObservations = new TrialObservations().setMetadata(metadata).setResult(trialObservationsTable);
+		final Metadata metadata = new Metadata().withPagination(pagination);
+		final TrialObservations trialObservations = new TrialObservations().setMetadata(metadata).setResult(trialObservationsTable);
 		return new ResponseEntity<>(trialObservations, HttpStatus.OK);
 	}
 }

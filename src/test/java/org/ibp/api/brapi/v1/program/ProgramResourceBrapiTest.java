@@ -136,10 +136,8 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 				org.mockito.Matchers.anyMapOf(ProgramFilters.class, Object.class))).thenReturn(projectList);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(ProgramResourceBrapiTest.MAIZE_BRAPI_V1_PROGRAMS)
-				.queryParam("programName", RICE).build().encode();
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.get(uriComponents.toString())
-						.contentType(this.contentType)) //
+				.queryParam("programName", ProgramResourceBrapiTest.RICE).build().encode();
+		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isOk()) //
 				.andDo(MockMvcResultHandlers.print()) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(programDetailsDtoList.size()))) //
@@ -156,9 +154,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(ProgramResourceBrapiTest.MAIZE_BRAPI_V1_PROGRAMS)
 				.queryParam("abbreviation", "AAAB").build().encode();
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.get(uriComponents.toString())
-						.contentType(this.contentType)) //
+		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 				.andDo(MockMvcResultHandlers.print()) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status.message", Matchers.is("program not found.")));

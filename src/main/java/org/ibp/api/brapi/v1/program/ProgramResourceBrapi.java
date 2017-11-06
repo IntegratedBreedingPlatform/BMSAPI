@@ -1,8 +1,12 @@
+
 package org.ibp.api.brapi.v1.program;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -27,11 +31,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a> Location services.
@@ -52,28 +54,29 @@ public class ProgramResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/programs", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<Programs> listPrograms(@PathVariable final String crop,
-		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
-		@RequestParam(value = "page", required = false) Integer currentPage,
-		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
-		@RequestParam(value = "pageSize", required = false) Integer pageSize,
-		@ApiParam(value = "Filter by program name. Exact match.", required = false) @RequestParam(value = "programName", required = false)
-			String programName, @ApiParam(value = "Filter by program abbreviation. Exact match.", required = false)
-	@RequestParam(value = "abbreviation", required = false) String abbreviation) {
+			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
+					required = false) final Integer currentPage,
+			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
+					required = false) final Integer pageSize,
+			@ApiParam(value = "Filter by program name. Exact match.", required = false) @RequestParam(value = "programName",
+					required = false) final String programName,
+			@ApiParam(value = "Filter by program abbreviation. Exact match.", required = false) @RequestParam(value = "abbreviation",
+					required = false) final String abbreviation) {
 
 		final Map<ProgramFilters, Object> filters = new EnumMap<>(ProgramFilters.class);
 		PagedResult<ProgramDetailsDto> resultPage = null;
-		setFilters(filters, crop, programName);
+		this.setFilters(filters, crop, programName);
 
-		if(filters.get(ProgramFilters.CROP_TYPE) == null){
-			Map<String, String> status = new HashMap<>();
+		if (filters.get(ProgramFilters.CROP_TYPE) == null) {
+			final Map<String, String> status = new HashMap<>();
 			status.put("message", "crop " + crop + " doesn't exist");
-			Metadata metadata = new Metadata(null, status);
-			Programs programList = new Programs().withMetadata(metadata);
+			final Metadata metadata = new Metadata(null, status);
+			final Programs programList = new Programs().withMetadata(metadata);
 			return new ResponseEntity<>(programList, HttpStatus.NOT_FOUND);
 		}
 
-		/** At the moment we don't have the abbreviation field.
-		 * When this filter is used will be returned "not found programs".
+		/**
+		 * At the moment we don't have the abbreviation field. When this filter is used will be returned "not found programs".
 		 **/
 		if (StringUtils.isBlank(abbreviation)) {
 
@@ -85,11 +88,10 @@ public class ProgramResourceBrapi {
 				}
 
 				@Override
-				public List<ProgramDetailsDto> getResults(PagedResult<ProgramDetailsDto> pagedResult) {
+				public List<ProgramDetailsDto> getResults(final PagedResult<ProgramDetailsDto> pagedResult) {
 					// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
 					final int pageNumber = pagedResult.getPageNumber() + 1;
-					return ProgramResourceBrapi.this.programService
-						.getProgramsByFilter(pageNumber, pagedResult.getPageSize(), filters);
+					return ProgramResourceBrapi.this.programService.getProgramsByFilter(pageNumber, pagedResult.getPageSize(), filters);
 				}
 			});
 		}
@@ -98,23 +100,23 @@ public class ProgramResourceBrapi {
 			final ModelMapper mapper = ProgramMapper.getInstance();
 			final List<Program> programs = new ArrayList<>();
 
-			for (ProgramDetailsDto programDetailsDto : resultPage.getPageResults()) {
+			for (final ProgramDetailsDto programDetailsDto : resultPage.getPageResults()) {
 				final Program program = mapper.map(programDetailsDto, Program.class);
 				programs.add(program);
 			}
 
-			Result<Program> results = new Result<Program>().withData(programs);
-			Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
-				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+			final Result<Program> results = new Result<Program>().withData(programs);
+			final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+					.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
-			Metadata metadata = new Metadata().withPagination(pagination);
-			Programs programList = new Programs().withMetadata(metadata).withResult(results);
+			final Metadata metadata = new Metadata().withPagination(pagination);
+			final Programs programList = new Programs().withMetadata(metadata).withResult(results);
 			return new ResponseEntity<>(programList, HttpStatus.OK);
 		}
-		Map<String, String> status = new HashMap<>();
+		final Map<String, String> status = new HashMap<>();
 		status.put("message", "program not found.");
-		Metadata metadata = new Metadata(null, status);
-		Programs programList = new Programs().withMetadata(metadata);
+		final Metadata metadata = new Metadata(null, status);
+		final Programs programList = new Programs().withMetadata(metadata);
 		return new ResponseEntity<>(programList, HttpStatus.NOT_FOUND);
 	}
 
