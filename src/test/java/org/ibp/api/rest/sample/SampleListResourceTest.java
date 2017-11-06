@@ -221,7 +221,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		List<SampleDTO> list = new ArrayList<>();
 		SampleDTO sample =
 			new SampleDTO(randomAlphanumeric(6), randomAlphanumeric(6), randomAlphanumeric(6), new Date(), randomAlphanumeric(6),
-				new Random().nextInt(), randomAlphanumeric(6));
+				new Random().nextInt(), randomAlphanumeric(6), new Random().nextInt() );
 		list.add(sample);
 
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
