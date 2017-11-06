@@ -13,14 +13,14 @@ public class PaginatedSearch {
 
 	public <T> PagedResult<T> execute(final Integer pageNumber, final Integer pageSize, final SearchSpec<T> searchSpec) {
 
-		int pgeNum = pageNumber;
+		Integer pgeNum = pageNumber;
 		// Default page parameters if not supplied.
-		if (pageNumber == null) {
+		if (pgeNum == null) {
 			pgeNum = new Integer(PagedResult.DEFAULT_PAGE_NUMBER);
 		}
 
-		int pgeSize = pageSize;
-		if (pageSize == null) {
+		Integer pgeSize = pageSize;
+		if (pgeSize == null) {
 			pgeSize = new Integer(PagedResult.DEFAULT_PAGE_SIZE);
 		}
 
@@ -36,14 +36,14 @@ public class PaginatedSearch {
 
 	public <T> BrapiPagedResult<T> executeBrapiSearch(final Integer pageNumber, final Integer pageSize, final SearchSpec<T> searchSpec) {
 
-		int pgeNum = pageNumber;
+		Integer pgeNum = pageNumber;
 		// Default page parameters if not supplied.
-		if (pageNumber == null) {
+		if (pgeNum == null) {
 			pgeNum = new Integer(BrapiPagedResult.DEFAULT_PAGE_NUMBER);
 		}
 
-		int pgeSize = pageSize;
-		if (pageSize == null) {
+		Integer pgeSize = pageSize;
+		if (pgeSize == null) {
 			pgeSize = new Integer(BrapiPagedResult.DEFAULT_PAGE_SIZE);
 		}
 
