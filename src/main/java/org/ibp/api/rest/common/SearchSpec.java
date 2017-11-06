@@ -10,7 +10,7 @@ import org.ibp.api.domain.common.PagedResult;
  *
  * @author Naymesh Mistry
  *
- * @param <T> the entity being searhced/listed.
+ * @param <T> the entity being searched/listed.
  */
 public interface SearchSpec<T> {
 

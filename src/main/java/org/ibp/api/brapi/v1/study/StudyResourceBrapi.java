@@ -1,14 +1,20 @@
+
 package org.ibp.api.brapi.v1.study;
 
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import liquibase.util.StringUtils;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -16,12 +22,12 @@ import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.location.Location;
 import org.ibp.api.brapi.v1.location.LocationMapper;
-import org.ibp.api.brapi.v1.location.Locations;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,22 +42,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+
+import liquibase.util.StringUtils;
 
 /**
- * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a>
- * Study services.
+ * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a> Study services.
  */
 @Api(value = "BrAPI Study Services")
 @Controller
@@ -63,7 +66,6 @@ public class StudyResourceBrapi {
 	public static final String CONTENT_TYPE = "Content-Type";
 	public static final String CONTENT_DISPOSITION = "Content-Disposition";
 
-	@SuppressWarnings("unused") // temporary
 	@Autowired
 	private StudyDataManager studyDataManager;
 
@@ -81,54 +83,55 @@ public class StudyResourceBrapi {
 					value = "Studies are contained within a trial.  Provide the db id of the trial to list summary of studies within the trial. "
 							+ "Use <code>GET /{crop}/brapi/v1/trials</code> service to retrieve trial summaries first to obtain trialDbIds to supply here. ",
 					required = true) @RequestParam(value = "trialDbId", required = false) final String trialDbId,
-			@ApiParam(value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.",
-					required = false) @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
-			@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.",
-					required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
+					required = false) final Integer currentPage,
+			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
+					required = false) final Integer pageSize) {
 
 		/***
 		 * Study in BrAPI land = Environment/Instance in BMS/Middleware land. We need to build services in Middleware to list all
 		 * Environment/Instance metadata for a given trialDbId (required parameter). BrAPI does not yet have the trialDbId parameters but we
 		 * need it here so we are going to add it and implement anyway. In future we may support taking array of trial Ids to list studies
 		 * for. There is no point listing all instance/environment summaries across all trials.
-		 * 
+		 *
 		 * studyDbId in BrAPI will map to nd_geolocation_id in Middleware.
-		 * 
-		 * For now, just returning an empty place holder message with status.
+		 *
+		 * For now, just returning an empty place holder message with status. For posterity, keep in mind that BRAPI paging starts at index
+		 * 0.
 		 */
 
-		Result<org.ibp.api.brapi.v1.study.StudySummaryDto> results = new Result<>();
-		Pagination pagination = new Pagination();
-		Metadata metadata =
-				new Metadata().withPagination(pagination)
-						.withStatus(Maps.newHashMap(ImmutableMap.of("message", "This call is not yet implemented.")));
-		StudySummariesDto studiesList = new StudySummariesDto().setMetadata(metadata).setResult(results);
+		final Result<org.ibp.api.brapi.v1.study.StudySummaryDto> results = new Result<>();
+		final Pagination pagination = new Pagination();
+		final Metadata metadata = new Metadata().withPagination(pagination)
+				.withStatus(Maps.newHashMap(ImmutableMap.of("message", "This call is not yet implemented.")));
+		final StudySummariesDto studiesList = new StudySummariesDto().setMetadata(metadata).setResult(results);
 
 		return new ResponseEntity<>(studiesList, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get study observation details as table", notes = "Get study observation details as table")
-	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/table", method = RequestMethod.GET) @ResponseBody
-	public ResponseEntity<StudyObservations> getStudyObservationsAsTable(HttpServletResponse response, @PathVariable final String crop,
-		@PathVariable final int studyDbId,
-		@ApiParam(value = "The format parameter will cause the data to be dumped to a file in the specified format", required = false)
-		@RequestParam(value = "format", required = false) final String format) throws Exception {
+	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/table", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<StudyObservations> getStudyObservationsAsTable(final HttpServletResponse response,
+			@PathVariable final String crop, @PathVariable final int studyDbId,
+			@ApiParam(value = "The format parameter will cause the data to be dumped to a file in the specified format",
+					required = false) @RequestParam(value = "format", required = false) final String format)
+			throws Exception {
 
 		if (!StringUtils.isEmpty(format)) {
-			if (CSV.equalsIgnoreCase(format.trim())) {
+			if (StudyResourceBrapi.CSV.equalsIgnoreCase(format.trim())) {
 				response.sendRedirect("/bmsapi/" + crop + "/brapi/v1/studies/" + studyDbId + "/table/csv");
 				return new ResponseEntity<>(HttpStatus.OK);
-			} else if (TSV.equalsIgnoreCase(format.trim())) {
+			} else if (StudyResourceBrapi.TSV.equalsIgnoreCase(format.trim())) {
 
 				response.sendRedirect("/bmsapi/" + crop + "/brapi/v1/studies/" + studyDbId + "/table/tsv");
 
 				return new ResponseEntity<>(HttpStatus.OK);
-			}
-			else {
-				Map<String, String> status = new HashMap<String, String>();
+			} else {
+				final Map<String, String> status = new HashMap<String, String>();
 				status.put("message", "Incorrect format");
-				Metadata metadata = new Metadata(null, status);
-				StudyObservations observations = new StudyObservations().setMetadata(metadata);
+				final Metadata metadata = new Metadata(null, status);
+				final StudyObservations observations = new StudyObservations().setMetadata(metadata);
 				return new ResponseEntity<>(observations, HttpStatus.NOT_FOUND);
 			}
 		}
@@ -144,20 +147,20 @@ public class StudyResourceBrapi {
 			throw new Exception("studyDbId " + studyDbId + " does not exist");
 		}
 
-		TrialObservationTable trialObservationTable = this.studyService.getTrialObservationTable(trialDbId, studyDbId);
+		final TrialObservationTable trialObservationTable = this.studyService.getTrialObservationTable(trialDbId, studyDbId);
 
-		int resultNumber = (trialObservationTable == null) ? 0 : 1;
+		final int resultNumber = trialObservationTable == null ? 0 : 1;
 
 		if (resultNumber != 0) {
 			final ModelMapper modelMapper = new ModelMapper();
 			studyObservationsTable = modelMapper.map(trialObservationTable, StudyObservationTable.class);
 		}
 
-		Pagination pagination =
-			new Pagination().withPageNumber(1).withPageSize(resultNumber).withTotalCount((long) resultNumber).withTotalPages(1);
+		final Pagination pagination =
+				new Pagination().withPageNumber(1).withPageSize(resultNumber).withTotalCount((long) resultNumber).withTotalPages(1);
 
-		Metadata metadata = new Metadata().withPagination(pagination);
-		StudyObservations studyObservations = new StudyObservations().setMetadata(metadata).setResult(studyObservationsTable);
+		final Metadata metadata = new Metadata().withPagination(pagination);
+		final StudyObservations studyObservations = new StudyObservations().setMetadata(metadata).setResult(studyObservationsTable);
 
 		return studyObservations;
 	}
@@ -169,9 +172,9 @@ public class StudyResourceBrapi {
 		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsDto(studyDbId);
 
 		if (mwStudyDetails != null) {
-			StudyDetails studyDetails = new StudyDetails();
-			Metadata metadata = new Metadata();
-			Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
+			final StudyDetails studyDetails = new StudyDetails();
+			final Metadata metadata = new Metadata();
+			final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
 			metadata.setPagination(pagination);
 			metadata.setStatus(new HashMap<String, String>());
 			studyDetails.setMetadata(metadata);
@@ -179,12 +182,12 @@ public class StudyResourceBrapi {
 			final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
 
 			if (mwStudyDetails.getMetadata().getLocationId() != null) {
-				Map<LocationFilters, Object> filters = new EnumMap<>(LocationFilters.class);
+				final Map<LocationFilters, Object> filters = new EnumMap<>(LocationFilters.class);
 				filters.put(LocationFilters.LOCATION_ID, String.valueOf(mwStudyDetails.getMetadata().getLocationId()));
-				List<LocationDetailsDto> locations = locationDataManager.getLocationsByFilter(0, 1, filters);
+				final List<LocationDetailsDto> locations = this.locationDataManager.getLocationsByFilter(0, 1, filters);
 				if (!locations.isEmpty()) {
 					final ModelMapper locationMapper = LocationMapper.getInstance();
-					Location location = locationMapper.map(locations.get(0), Location.class);
+					final Location location = locationMapper.map(locations.get(0), Location.class);
 					result.setLocation(location);
 				}
 			}
@@ -200,17 +203,17 @@ public class StudyResourceBrapi {
 	@ApiOperation(value = "", hidden = true)
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/table/csv", method = RequestMethod.GET)
 	private ResponseEntity<FileSystemResource> streamCSV(@PathVariable final String crop, @PathVariable final Integer studyDbId)
-		throws Exception {
+			throws Exception {
 
-		final File file = createDownloadFile(this.getStudyObservations(studyDbId).getResult(), ',', "studyObservations.csv");
+		final File file = this.createDownloadFile(this.getStudyObservations(studyDbId).getResult(), ',', "studyObservations.csv");
 		return StudyResourceBrapi.createResponseEntityForFileDownload(file);
 	}
 
 	@ApiOperation(value = "", hidden = true)
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/table/tsv", method = RequestMethod.GET)
 	private ResponseEntity<FileSystemResource> streamTSV(@PathVariable final String crop, @PathVariable final Integer studyDbId)
-		throws Exception {
-		final File file = createDownloadFile(this.getStudyObservations(studyDbId).getResult(), '\t', "studyObservations.tsv");
+			throws Exception {
+		final File file = this.createDownloadFile(this.getStudyObservations(studyDbId).getResult(), '\t', "studyObservations.tsv");
 
 		return StudyResourceBrapi.createResponseEntityForFileDownload(file);
 	}
@@ -256,7 +259,7 @@ public class StudyResourceBrapi {
 	 * @return
 	 */
 	private static ResponseEntity<FileSystemResource> createResponseEntityForFileDownload(final File file)
-		throws UnsupportedEncodingException {
+			throws UnsupportedEncodingException {
 
 		final String filename = file.getName();
 		final String fileWithFullPath = file.getAbsolutePath();
@@ -268,9 +271,9 @@ public class StudyResourceBrapi {
 		final String mimeType = FileUtils.detectMimeType(filename);
 		final String sanitizedFilename = FileUtils.sanitizeFileName(filename);
 
-		respHeaders.set(CONTENT_TYPE, String.format("%s;charset=utf-8", mimeType));
-		respHeaders.set(CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"; filename*=utf-8\'\'%s", sanitizedFilename,
-			FileUtils.encodeFilenameForDownload(sanitizedFilename)));
+		respHeaders.set(StudyResourceBrapi.CONTENT_TYPE, String.format("%s;charset=utf-8", mimeType));
+		respHeaders.set(StudyResourceBrapi.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"; filename*=utf-8\'\'%s",
+				sanitizedFilename, FileUtils.encodeFilenameForDownload(sanitizedFilename)));
 
 		return new ResponseEntity<>(fileSystemResource, respHeaders, HttpStatus.OK);
 
