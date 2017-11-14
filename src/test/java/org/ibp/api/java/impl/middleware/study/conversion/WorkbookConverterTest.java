@@ -23,7 +23,7 @@ public class WorkbookConverterTest {
 	public void testConvertNursery() {
 
 		final StudyImportDTO inputDTO = new StudyImportDTO();
-		inputDTO.setStudyType("N");
+		inputDTO.setStudyType(StudyType.N.getName());
 		inputDTO.setName("Maize Nursery");
 		inputDTO.setObjective("Grow more seeds.");
 		inputDTO.setTitle("Maize Nursery title.");

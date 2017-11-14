@@ -62,7 +62,7 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 	private void buildStudyDetails(final StudyImportDTO source) {
 
 		final StudyDetails studyDetails = new StudyDetails();
-		final StudyType stype = StudyType.getStudyType(source.getStudyType());
+		final StudyType stype = StudyType.getStudyTypeByName(source.getStudyType());
 		studyDetails.setStudyType(stype);
 		studyDetails.setStudyName(source.getName());
 		studyDetails.setObjective(source.getObjective());
@@ -90,7 +90,7 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 		conditions.add(StudyConditions.OBJECTIVE.asMeasurementVariable(source.getObjective()));
 		conditions.add(StudyConditions.STUDY_INSTITUTE.asMeasurementVariable(source.getStudyInstitute()));
 
-		if (source.getStudyType().equals("T")) {
+		if (StudyType.T.getName().equals(source.getStudyType())) {
 			final MeasurementVariable exptDesign = StudyBaseFactors.EXPT_DESIGN.asMeasurementVariable();
 			exptDesign.setValue(source.getEnvironmentDetails().getDesignType() != null ? source.getEnvironmentDetails().getDesignType()
 					.getId().toString() : null);
@@ -113,7 +113,7 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 		factors.add(StudyBaseFactors.GID.asMeasurementVariable());
 		factors.add(StudyBaseFactors.PLOT_NUMBER.asMeasurementVariable());
 
-		if (source.getStudyType().equals("T")) {
+		if (StudyType.T.getName().equals(source.getStudyType())) {
 			factors.add(StudyBaseFactors.REPLICATION_NO.asMeasurementVariable());
 
 			factors.add(StudyBaseFactors.TRIAL_INSTANCE.asMeasurementVariable());
@@ -224,7 +224,7 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 
 			final StudyGermplasm studyGermplasm = source.findStudyGermplasm(observationUnit.getGid());
 
-			if (source.getStudyType().equals("T")) {
+			if (StudyType.T.getName().equals(source.getStudyType())) {
 				final MeasurementData instanceData =
 						new MeasurementData(StudyBaseFactors.TRIAL_INSTANCE.name(), String.valueOf(observationUnit.getEnvironmentNumber()));
 				instanceData.setMeasurementVariable(StudyBaseFactors.TRIAL_INSTANCE.asMeasurementVariable());
