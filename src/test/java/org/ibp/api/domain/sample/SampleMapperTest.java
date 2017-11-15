@@ -22,7 +22,7 @@ public class SampleMapperTest {
 		ModelMapper mapper = SampleMapper.getInstance();
 		SampleDTO sampleDTO =
 			new SampleDTO(randomAlphanumeric(6), randomAlphanumeric(6), randomAlphanumeric(6), new Date(), randomAlphanumeric(6),
-				new Random().nextInt(), randomAlphanumeric(6));
+				new Random().nextInt(), randomAlphanumeric(6), new Random().nextInt());
 		org.ibp.api.domain.sample.SampleDTO
 			sampleDTOApi = mapper.map(sampleDTO, org.ibp.api.domain.sample.SampleDTO.class);
 
