@@ -51,40 +51,33 @@ public enum StudyConditions {
 				measureVariable =
 						this.createMeasurementVariable(TermId.BREEDING_METHOD_CODE.getId(), "STUDY_BM_CODE",
 								"Breeding method applied to all plots in a study (CODE)", this.toString(), APPLIED, "BMETH_CODE", CHAR,
-								null, TEXT_STUDY, TermId.STUDY_INFORMATION.getId(), true);
+								null,  true);
 				break;
 			case STUDY_INSTITUTE:
 				measureVariable =
 						this.createMeasurementVariable(TermId.STUDY_INSTITUTE.getId(), "STUDY_INSTITUTE",
-								"Study institute - conducted (DBCV)", this.toString(), CONDUCTED, DBCV, CHAR, initialValue, TEXT_STUDY,
-								TermId.STUDY_INFORMATION.getId(), true);
+								"Study institute - conducted (DBCV)", this.toString(), CONDUCTED, DBCV, CHAR, initialValue, true);
 				break;
 			case STUDY_NAME:
 				measureVariable =
 						this.createMeasurementVariable(TermId.STUDY_NAME.getId(), "STUDY_NAME", "Study - assigned (DBCV)", this.toString(),
-								ASSIGNED, DBCV, CHAR, initialValue, TEXT_STUDY, TermId.STUDY_NAME_STORAGE.getId(), true);
+								ASSIGNED, DBCV, CHAR, initialValue, true);
 				break;
-			case STUDY_TITLE:
-				measureVariable =
-						this.createMeasurementVariable(TermId.STUDY_TITLE.getId(), "STUDY_TITLE", "Study title - assigned (text)",
-								this.toString(), ASSIGNED, SCALE_TEXT, CHAR, initialValue, TEXT_STUDY, TermId.STUDY_TITLE_STORAGE.getId(),
-								true);
-				break;
+
 			case START_DATE:
 				measureVariable =
 						this.createMeasurementVariable(TermId.START_DATE.getId(), "START_DATE", "Start date - assigned (date)",
-						this.toString(), ASSIGNED, DATE, CHAR, initialValue, TEXT_STUDY, TermId.STUDY_INFORMATION.getId(), true);
+						this.toString(), ASSIGNED, DATE, CHAR, initialValue, true);
 				break;
 			case END_DATE:
 				measureVariable =
 						this.createMeasurementVariable(TermId.END_DATE.getId(), "END_DATE", "End date - assigned (date)", this.toString(),
-								ASSIGNED, DATE, CHAR, initialValue, TEXT_STUDY, TermId.STUDY_INFORMATION.getId(), true);
+								ASSIGNED, DATE, CHAR, initialValue, true);
 				break;
 			case OBJECTIVE:
 				measureVariable =
 						this.createMeasurementVariable(TermId.STUDY_OBJECTIVE.getId(), "STUDY_OBJECTIVE", "Objective - described (text)",
-								this.toString(), DESCRIBED, SCALE_TEXT, CHAR, initialValue, TEXT_STUDY, TermId.STUDY_INFORMATION.getId(),
-								true);
+								this.toString(), DESCRIBED, SCALE_TEXT, CHAR, initialValue, true);
 				break;
 			default:
 				//Adding default block empty as SonarQube report that default block is required in switch: Add a default case to this switch.
@@ -94,8 +87,7 @@ public enum StudyConditions {
 	}
 
 	private MeasurementVariable createMeasurementVariable(final int termId, final String name, final String description,
-			final String property, final String method, final String scale, final String dataType, final String value, final String label,
-			final int storedIn, final boolean isFactor) {
+			final String property, final String method, final String scale, final String dataType, final String value, final boolean isFactor) {
 
 		final MeasurementVariable variable = new MeasurementVariable();
 

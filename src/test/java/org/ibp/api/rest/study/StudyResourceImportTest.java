@@ -65,7 +65,7 @@ public class StudyResourceImportTest extends ApiUnitTestBase {
 		inputDTO.setStudyType(StudyType.N.getName());
 		inputDTO.setName("Maize Nursery");
 		inputDTO.setObjective("Grow more seeds");
-		inputDTO.setTitle("Maize Nursery title");
+		inputDTO.setDescription("Maize Nursery title");
 		inputDTO.setStartDate("20150101");
 		inputDTO.setEndDate("20151201");
 		inputDTO.setUserId(1);

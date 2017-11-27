@@ -144,7 +144,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		Study study = Mockito.mock(Study.class);
 		Mockito.when(study.getId()).thenReturn(studyId);
 		Mockito.when(study.getName()).thenReturn("Maizing Trial");
-		Mockito.when(study.getTitle()).thenReturn("Title");
+		Mockito.when(study.getDescription()).thenReturn("Title");
 		Mockito.when(study.getObjective()).thenReturn("Objective");
 		Mockito.when(study.getType()).thenReturn(StudyType.T);
 		Mockito.when(study.getStartDate()).thenReturn(20150101);
@@ -160,7 +160,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(String.valueOf(study.getId()))))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.is(study.getName())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.title", Matchers.is(study.getTitle())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.title", Matchers.is(study.getDescription())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.objective", Matchers.is(study.getObjective())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.type", Matchers.is(study.getType().getName())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.startDate", Matchers.is(String.valueOf(study.getStartDate()))))
