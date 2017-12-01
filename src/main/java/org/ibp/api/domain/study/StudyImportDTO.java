@@ -27,7 +27,7 @@ public class StudyImportDTO {
 	private String objective;
 
 	@NotBlank
-	private String title;
+	private String description;
 
 	@ApiModelProperty(value = "Study start date in YYYYMMDD format.")
 	@Pattern(regexp = "[0-9]{8}")
@@ -126,12 +126,12 @@ public class StudyImportDTO {
 		this.endDate = endDate;
 	}
 
-	public String getTitle() {
-		return this.title;
+	public String getDescription() {
+		return this.description;
 	}
 
-	public void setTitle(final String title) {
-		this.title = title;
+	public void setDescription(final String description) {
+		this.description = description;
 	}
 
 	public String getStudyType() {

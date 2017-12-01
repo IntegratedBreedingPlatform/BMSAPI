@@ -26,13 +26,13 @@ public class WorkbookConverterTest {
 		inputDTO.setStudyType(StudyType.N.getName());
 		inputDTO.setName("Maize Nursery");
 		inputDTO.setObjective("Grow more seeds.");
-		inputDTO.setTitle("Maize Nursery title.");
 		inputDTO.setStartDate("20150101");
 		inputDTO.setEndDate("20151201");
 		inputDTO.setUserId(1);
 		inputDTO.setFolderId(1L);
 		inputDTO.setSiteName("Mexico");
 		inputDTO.setStudyInstitute("CIMMYT");
+		inputDTO.setDescription("Maize Nursery title.");
 
 		final Trait trait1 = new Trait(1, "Plant Height");
 		final Trait trait2 = new Trait(2, "Grain Yield");
@@ -98,7 +98,7 @@ public class WorkbookConverterTest {
 		Assert.assertEquals(StudyType.N, outputWorkbook.getStudyDetails().getStudyType());
 		Assert.assertEquals(inputDTO.getName(), outputWorkbook.getStudyDetails().getStudyName());
 		Assert.assertEquals(inputDTO.getObjective(), outputWorkbook.getStudyDetails().getObjective());
-		Assert.assertEquals(inputDTO.getTitle(), outputWorkbook.getStudyDetails().getTitle());
+		Assert.assertEquals(inputDTO.getDescription(), outputWorkbook.getStudyDetails().getDescription());
 		Assert.assertEquals(inputDTO.getStartDate(), outputWorkbook.getStudyDetails().getStartDate());
 		Assert.assertEquals(inputDTO.getEndDate(), outputWorkbook.getStudyDetails().getEndDate());
 		Assert.assertEquals(inputDTO.getSiteName(), outputWorkbook.getStudyDetails().getSiteName());
@@ -112,12 +112,6 @@ public class WorkbookConverterTest {
 		Assert.assertEquals(PhenotypicType.STUDY, mvName.getRole());
 		Assert.assertTrue(mvName.isFactor());
 		Assert.assertEquals(TermId.STUDY_NAME.getId(), mvName.getTermId());
-
-		final MeasurementVariable mvTitle = outputWorkbook.getConditions().get(1);
-		Assert.assertEquals(inputDTO.getTitle(), mvTitle.getValue());
-		Assert.assertEquals(PhenotypicType.STUDY, mvTitle.getRole());
-		Assert.assertTrue(mvTitle.isFactor());
-		Assert.assertEquals(TermId.STUDY_TITLE.getId(), mvTitle.getTermId());
 
 		final MeasurementVariable mvStartDate = outputWorkbook.getConditions().get(2);
 		Assert.assertEquals(inputDTO.getStartDate(), mvStartDate.getValue());

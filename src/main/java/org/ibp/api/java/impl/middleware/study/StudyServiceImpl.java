@@ -66,6 +66,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -315,7 +316,7 @@ public class StudyServiceImpl implements StudyService {
 			final StudyDetails studyDetails = new StudyDetails();
 			studyDetails.setId(String.valueOf(study.getId()));
 			studyDetails.setName(study.getName());
-			studyDetails.setTitle(study.getTitle());
+			studyDetails.setTitle(study.getDescription());
 			studyDetails.setObjective(study.getObjective());
 			studyDetails.setType(study.getType()
 					.getName());
@@ -485,7 +486,7 @@ public class StudyServiceImpl implements StudyService {
 
 	private final <T, S> List<T> convert(final List<S> beanList, final Class<T> clazz) {
 		if (null == beanList) {
-			return null;
+			return Collections.emptyList();
 		}
 
 		final List<T> convertedList = new ArrayList<>();

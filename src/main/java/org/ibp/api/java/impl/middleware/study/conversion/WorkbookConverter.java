@@ -66,11 +66,11 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 		studyDetails.setStudyType(stype);
 		studyDetails.setStudyName(source.getName());
 		studyDetails.setObjective(source.getObjective());
-		studyDetails.setTitle(source.getTitle());
 		studyDetails.setStartDate(source.getStartDate());
 		studyDetails.setEndDate(source.getEndDate());
 		studyDetails.setSiteName(source.getSiteName());
 		studyDetails.setParentFolderId(source.getFolderId());
+		studyDetails.setDescription(source.getDescription());
 
 		this.workbook.setStudyDetails(studyDetails);
 	}
@@ -84,7 +84,7 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 
 		final List<MeasurementVariable> conditions = new ArrayList<>();
 		conditions.add(StudyConditions.STUDY_NAME.asMeasurementVariable(source.getName()));
-		conditions.add(StudyConditions.STUDY_TITLE.asMeasurementVariable(source.getTitle()));
+		conditions.add(StudyConditions.STUDY_TITLE.asMeasurementVariable(source.getDescription()));
 		conditions.add(StudyConditions.START_DATE.asMeasurementVariable(source.getStartDate()));
 		conditions.add(StudyConditions.END_DATE.asMeasurementVariable(source.getEndDate()));
 		conditions.add(StudyConditions.OBJECTIVE.asMeasurementVariable(source.getObjective()));
@@ -106,7 +106,7 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 
 	private void buildFactors(final StudyImportDTO source) {
 
-		final List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> factors = new ArrayList<>();
 		factors.add(StudyBaseFactors.ENTRY_NUMBER.asMeasurementVariable());
 		factors.add(StudyBaseFactors.DESIGNATION.asMeasurementVariable());
 		factors.add(StudyBaseFactors.CROSS.asMeasurementVariable());
@@ -147,7 +147,7 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 	 * These are the environment level observations (such as Soil PH): <code>Workbook.trialObservations</code>.
 	 */
 	private void buildEnvironmentObservations(final StudyImportDTO source) {
-		final List<MeasurementRow> environmentObservations = new ArrayList<MeasurementRow>();
+		final List<MeasurementRow> environmentObservations = new ArrayList<>();
 
 		final Map<Integer, MeasurementVariable> environmentVariablesMap = new HashMap<>();
 		for (final EnvironmentLevelVariable envVar : source.getEnvironmentDetails().getEnvironmentLevelVariables()) {
@@ -178,7 +178,7 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 
 		for (final EnvironmentLevelObservation envObs : source.getEnvironmentDetails().getEnvironmentLevelObservations()) {
 			final MeasurementRow row = new MeasurementRow();
-			final List<MeasurementData> dataList = new ArrayList<MeasurementData>();
+			final List<MeasurementData> dataList = new ArrayList<>();
 
 			final MeasurementData instanceData =
 					new MeasurementData(StudyBaseFactors.TRIAL_INSTANCE.name(), String.valueOf(envObs.getEnvironmentNumber()));
@@ -215,12 +215,12 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 	 * These are the plot level observations (such as Plant Height): <code>Workbook.observations</code>
 	 */
 	private void buildPlotObservations(final StudyImportDTO source) {
-		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
+		final List<MeasurementRow> observations = new ArrayList<>();
 
 		for (final ObservationImportDTO observationUnit : source.getObservations()) {
 
 			final MeasurementRow row = new MeasurementRow();
-			final List<MeasurementData> dataList = new ArrayList<MeasurementData>();
+			final List<MeasurementData> dataList = new ArrayList<>();
 
 			final StudyGermplasm studyGermplasm = source.findStudyGermplasm(observationUnit.getGid());
 
