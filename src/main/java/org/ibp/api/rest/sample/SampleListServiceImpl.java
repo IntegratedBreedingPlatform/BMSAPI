@@ -1,21 +1,20 @@
 
 package org.ibp.api.rest.sample;
 
-import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.SampleList;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.google.common.base.Preconditions;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @Transactional (propagation = Propagation.NEVER)
@@ -35,22 +34,20 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkNotNull(sampleListDto.getSelectionVariableId(), "The Selection Variable Id must not be empty");
 		Preconditions.checkNotNull(sampleListDto.getStudyId(), "The Study Id must not be empty");
 		Preconditions.checkNotNull(sampleListDto.getListName(), "The List Name must not be empty");
-		Preconditions.checkNotNull(sampleListDto.getCreatedDate(), "The Created Date must not be empty");
 		Preconditions.checkArgument(sampleListDto.getListName().trim() != "", "The List Name must not be empty");
+		Preconditions.checkArgument(sampleListDto.getListName().length()<100,"List Name must not exceed 100 characters");
+		Preconditions.checkNotNull(sampleListDto.getCreatedDate(), "The Created Date must not be empty");
 
-
+		if(StringUtils.isNotBlank(sampleListDto.getDescription())){
+			Preconditions.checkArgument(sampleListDto.getDescription().length()<255,"List Description must not exceed 255 characters");
+		}
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
 		mapResponse.put("id", String.valueOf(0));
-		try {
-			final SampleListDTO sampleListDtoMW = this.translateToSampleListDto(sampleListDto);
+		final SampleListDTO sampleListDtoMW = this.translateToSampleListDto(sampleListDto);
 
-			final Integer newSampleId = this.sampleListServiceMW.createSampleList(sampleListDtoMW).getId();
-			mapResponse.put("id", String.valueOf(newSampleId));
-
-		} catch (MiddlewareQueryException | ParseException e) {
-			mapResponse.put("ERROR", e.getMessage());
-		}
+		final Integer newSampleId = this.sampleListServiceMW.createSampleList(sampleListDtoMW).getId();
+		mapResponse.put("id", String.valueOf(newSampleId));
 
 		return mapResponse;
 	}
@@ -155,7 +152,7 @@ public class SampleListServiceImpl implements SampleListService {
 		return mapResponse;
 	}
 
-	private SampleListDTO translateToSampleListDto(final SampleListDto dto) throws ParseException {
+	private SampleListDTO translateToSampleListDto(final SampleListDto dto) {
 		final SampleListDTO sampleListDTO = new SampleListDTO();
 
 		sampleListDTO.setCreatedBy(this.securityService.getCurrentlyLoggedInUser().getName());
@@ -165,12 +162,18 @@ public class SampleListServiceImpl implements SampleListService {
 		sampleListDTO.setInstanceIds(dto.getInstanceIds());
 		sampleListDTO.setNotes(dto.getNotes());
 
-		if (!dto.getSamplingDate().isEmpty()) {
-			sampleListDTO.setSamplingDate(DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT).parse(dto.getSamplingDate()));
-		}
+		try {
 
-		if (!dto.getCreatedDate().isEmpty()) {
-			sampleListDTO.setCreatedDate(DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT).parse(dto.getCreatedDate()));
+			if (!dto.getSamplingDate().isEmpty()) {
+				sampleListDTO.setSamplingDate(DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT).parse(dto.getSamplingDate()));
+			}
+
+			if (!dto.getCreatedDate().isEmpty()) {
+				sampleListDTO.setCreatedDate(DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT).parse(dto.getCreatedDate()));
+			}
+
+		} catch (ParseException e) {
+			throw new IllegalArgumentException("The List Date should be in yyyy-MM-dd format");
 		}
 
 		sampleListDTO.setSelectionVariableId(dto.getSelectionVariableId());
