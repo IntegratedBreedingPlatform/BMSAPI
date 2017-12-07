@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.SampleList;
+import org.generationcp.middleware.pojos.User;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -68,15 +69,9 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(programUUID != null, "The programUUID must not be null");
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
-		mapResponse.put("id", String.valueOf(0));
-		try {
-
-			final String createdBy = this.securityService.getCurrentlyLoggedInUser().getName();
-			Integer result = this.sampleListServiceMW.createSampleListFolder(folderName, parentId, createdBy, programUUID);
-			mapResponse.put("id", String.valueOf(result));
-		} catch (Exception e) {
-			mapResponse.put("ERROR", e.getMessage());
-		}
+		final User createdBy = this.securityService.getCurrentlyLoggedInUser();
+		Integer result = this.sampleListServiceMW.createSampleListFolder(folderName, parentId, createdBy, programUUID);
+		mapResponse.put("id", String.valueOf(result));
 		return mapResponse;
 	}
 
@@ -94,13 +89,8 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(newFolderName != null, "The new folder name must not be null");
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
-		mapResponse.put("id", String.valueOf(0));
-		try {
-			SampleList result = this.sampleListServiceMW.updateSampleListFolderName(folderId, newFolderName);
-			mapResponse.put("id", String.valueOf(result.getId()));
-		} catch (Exception e) {
-			mapResponse.put("ERROR", e.getMessage());
-		}
+		SampleList result = this.sampleListServiceMW.updateSampleListFolderName(folderId, newFolderName);
+		mapResponse.put("id", String.valueOf(result.getId()));
 		return mapResponse;
 	}
 
@@ -120,13 +110,8 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(newParentId != null, "The new parent id must not be null");
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
-		mapResponse.put("id", String.valueOf(0));
-		try {
-			SampleList result = this.sampleListServiceMW.moveSampleList(folderId, newParentId);
-			mapResponse.put("parentId", String.valueOf(result.getHierarchy().getId()));
-		} catch (Exception e) {
-			mapResponse.put("ERROR", e.getMessage());
-		}
+		SampleList result = this.sampleListServiceMW.moveSampleList(folderId, newParentId);
+		mapResponse.put("parentId", String.valueOf(result.getHierarchy().getId()));
 		return mapResponse;
 	}
 
@@ -138,17 +123,9 @@ public class SampleListServiceImpl implements SampleListService {
 	 * @throws Exception
 	 */
 	@Override
-	public Map<String, Object> deleteSampleListFolder(final Integer folderId) {
+	public void deleteSampleListFolder(final Integer folderId) {
 		Preconditions.checkArgument(folderId != null, "The folder id must not be null");
-
-		final HashMap<String, Object> mapResponse = new HashMap<>();
-		mapResponse.put("id", String.valueOf(0));
-		try {
 			this.sampleListServiceMW.deleteSampleListFolder(folderId);
-		} catch (Exception e) {
-			mapResponse.put("ERROR",e.getMessage());
-		}
-		return mapResponse;
 	}
 
 	private SampleListDTO translateToSampleListDto(final SampleListDto dto) {
