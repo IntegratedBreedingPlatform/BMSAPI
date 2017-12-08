@@ -29,9 +29,6 @@ public class SampleListResource {
 	@Autowired
 	public SampleListService sampleListService;
 
-	@Autowired
-	private ContextUtil contextUtil;
-
 	@ApiOperation(value = "Create sample list", notes = "Create sample list. ")
 	@RequestMapping(value = "/{crop}/sampleList", method = RequestMethod.POST)
 	@ResponseBody
@@ -57,10 +54,10 @@ public class SampleListResource {
 	@RequestMapping(value = "/{crop}/sampleListFolder", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity createSampleListFolder(@PathVariable final String crop, @RequestParam final String folderName,
-		@RequestParam final Integer parentId) {
+		@RequestParam final Integer parentId, @RequestParam final String programUUID) {
 		Map<String, Object> map;
 		try {
-			map = this.sampleListService.createSampleListFolder(folderName, parentId, contextUtil.getCurrentProgramUUID());
+			map = this.sampleListService.createSampleListFolder(folderName, parentId, programUUID);
 		} catch (final MiddlewareException e) {
 			final ErrorResponse response = new ErrorResponse();
 			response.addError("Something went wrong, please try again");
