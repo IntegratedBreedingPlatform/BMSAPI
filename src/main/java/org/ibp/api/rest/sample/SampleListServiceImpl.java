@@ -41,7 +41,12 @@ public class SampleListServiceImpl implements SampleListService {
 
 		if (StringUtils.isNotBlank(sampleListDto.getDescription())) {
 			Preconditions
-				.checkArgument(sampleListDto.getDescription().length() <= 255, "List Description must not exceed 255 " + "characters");
+				.checkArgument(sampleListDto.getDescription().length() <= 255, "List Description must not exceed 255 characters");
+		}
+
+		if (StringUtils.isNotBlank(sampleListDto.getNotes())) {
+			Preconditions
+				.checkArgument(sampleListDto.getNotes().length() <= 65535 , "Notes must not exceed 65535 characters");
 		}
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
