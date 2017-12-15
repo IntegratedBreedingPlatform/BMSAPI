@@ -1,7 +1,10 @@
 
 package org.ibp.api.rest.sample;
 
-import com.google.common.base.Preconditions;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
@@ -13,12 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.base.Preconditions;
 
 @Service
-@Transactional (propagation = Propagation.NEVER)
+@Transactional(propagation = Propagation.NEVER)
 public class SampleListServiceImpl implements SampleListService {
 
 	@Autowired
@@ -38,16 +39,11 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(sampleListDto.getListName().trim() != "", "The List Name must not be empty");
 		Preconditions.checkArgument(sampleListDto.getListName().length() <= 100, "List Name must not exceed 100 characters");
 		Preconditions.checkNotNull(sampleListDto.getCreatedDate(), "The Created Date must not be empty");
-
-		if (StringUtils.isNotBlank(sampleListDto.getDescription())) {
-			Preconditions
-				.checkArgument(sampleListDto.getDescription().length() <= 255, "List Description must not exceed 255 characters");
-		}
-
-		if (StringUtils.isNotBlank(sampleListDto.getNotes())) {
-			Preconditions
-				.checkArgument(sampleListDto.getNotes().length() <= 65535 , "Notes must not exceed 65535 characters");
-		}
+		Preconditions.checkArgument(
+				StringUtils.isNotBlank(sampleListDto.getDescription()) && sampleListDto.getDescription().length() <= 255,
+				"List Description must not exceed 255 characters");
+		Preconditions.checkArgument(StringUtils.isNotBlank(sampleListDto.getNotes()) && sampleListDto.getNotes().length() <= 65535,
+				"Notes must not exceed 65535 characters");
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
 		final SampleListDTO sampleListDtoMW = this.translateToSampleListDto(sampleListDto);
@@ -59,8 +55,7 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	/**
-	 * Create a sample list folder
-	 * Sample List folder name must be unique across the elements in the parent folder
+	 * Create a sample list folder Sample List folder name must be unique across the elements in the parent folder
 	 *
 	 * @param folderName
 	 * @param parentId
@@ -76,14 +71,13 @@ public class SampleListServiceImpl implements SampleListService {
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
 		final User createdBy = this.securityService.getCurrentlyLoggedInUser();
-		Integer result = this.sampleListServiceMW.createSampleListFolder(folderName, parentId, createdBy, programUUID);
+		final Integer result = this.sampleListServiceMW.createSampleListFolder(folderName, parentId, createdBy, programUUID);
 		mapResponse.put("id", String.valueOf(result));
 		return mapResponse;
 	}
 
 	/**
-	 * Update sample list folder name
-	 * New folder name should be unique across the elements in the parent folder
+	 * Update sample list folder name New folder name should be unique across the elements in the parent folder
 	 *
 	 * @param folderId
 	 * @param newFolderName
@@ -95,15 +89,14 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(newFolderName != null, "The new folder name must not be null");
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
-		SampleList result = this.sampleListServiceMW.updateSampleListFolderName(folderId, newFolderName);
+		final SampleList result = this.sampleListServiceMW.updateSampleListFolderName(folderId, newFolderName);
 		mapResponse.put("id", String.valueOf(result.getId()));
 		return mapResponse;
 	}
 
 	/**
-	 * Move a folder to another folder
-	 * FolderID must exist, newParentID must exist
-	 * newParentID folder must not contain another sample list with the name that the one that needs to be moved
+	 * Move a folder to another folder FolderID must exist, newParentID must exist newParentID folder must not contain another sample list
+	 * with the name that the one that needs to be moved
 	 *
 	 * @param folderId
 	 * @param newParentId
@@ -116,14 +109,13 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(newParentId != null, "The new parent id must not be null");
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
-		SampleList result = this.sampleListServiceMW.moveSampleList(folderId, newParentId);
+		final SampleList result = this.sampleListServiceMW.moveSampleList(folderId, newParentId);
 		mapResponse.put("parentId", String.valueOf(result.getHierarchy().getId()));
 		return mapResponse;
 	}
 
 	/**
-	 * Delete a folder
-	 * Folder ID must exist and it can not contain any child
+	 * Delete a folder Folder ID must exist and it can not contain any child
 	 *
 	 * @param folderId
 	 * @throws Exception
@@ -131,7 +123,7 @@ public class SampleListServiceImpl implements SampleListService {
 	@Override
 	public void deleteSampleListFolder(final Integer folderId) {
 		Preconditions.checkArgument(folderId != null, "The folder id must not be null");
-			this.sampleListServiceMW.deleteSampleListFolder(folderId);
+		this.sampleListServiceMW.deleteSampleListFolder(folderId);
 	}
 
 	private SampleListDTO translateToSampleListDto(final SampleListDto dto) {
@@ -154,7 +146,7 @@ public class SampleListServiceImpl implements SampleListService {
 				sampleListDTO.setCreatedDate(DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT).parse(dto.getCreatedDate()));
 			}
 
-		} catch (ParseException e) {
+		} catch (final ParseException e) {
 			throw new IllegalArgumentException("The List Date should be in yyyy-MM-dd format");
 		}
 
