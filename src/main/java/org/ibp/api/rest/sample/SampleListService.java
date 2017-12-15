@@ -46,5 +46,5 @@ public interface SampleListService {
 	 * @param folderId
 	 * @throws Exception
 	 */
-	Map<String, Object> deleteSampleListFolder(final Integer folderId);
+	void deleteSampleListFolder(final Integer folderId);
 }
