@@ -36,13 +36,13 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkNotNull(sampleListDto.getSelectionVariableId(), "The Selection Variable Id must not be empty");
 		Preconditions.checkNotNull(sampleListDto.getStudyId(), "The Study Id must not be empty");
 		Preconditions.checkNotNull(sampleListDto.getListName(), "The List Name must not be empty");
-		Preconditions.checkArgument(sampleListDto.getListName().trim() != "", "The List Name must not be empty");
+		Preconditions.checkArgument(StringUtils.isNotBlank(sampleListDto.getListName()), "The List Name must not be empty");
 		Preconditions.checkArgument(sampleListDto.getListName().length() <= 100, "List Name must not exceed 100 characters");
 		Preconditions.checkNotNull(sampleListDto.getCreatedDate(), "The Created Date must not be empty");
 		Preconditions.checkArgument(
-				StringUtils.isNotBlank(sampleListDto.getDescription()) && sampleListDto.getDescription().length() <= 255,
+				StringUtils.isBlank(sampleListDto.getDescription()) || sampleListDto.getDescription().length() <= 255,
 				"List Description must not exceed 255 characters");
-		Preconditions.checkArgument(StringUtils.isNotBlank(sampleListDto.getNotes()) && sampleListDto.getNotes().length() <= 65535,
+		Preconditions.checkArgument(StringUtils.isBlank(sampleListDto.getNotes()) || sampleListDto.getNotes().length() <= 65535,
 				"Notes must not exceed 65535 characters");
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
