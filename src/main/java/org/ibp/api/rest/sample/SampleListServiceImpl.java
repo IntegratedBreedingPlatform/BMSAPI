@@ -32,7 +32,6 @@ public class SampleListServiceImpl implements SampleListService {
 	public Map<String, Object> createSampleList(final SampleListDto sampleListDto) {
 		Preconditions.checkArgument(sampleListDto.getInstanceIds() != null, "The Instance List must not be null");
 		Preconditions.checkArgument(!sampleListDto.getInstanceIds().isEmpty(), "The Instance List must not be empty");
-		Preconditions.checkArgument(sampleListDto.getProgramUUID() != null, "The programUUID must not be null");
 		Preconditions.checkNotNull(sampleListDto.getSelectionVariableId(), "The Selection Variable Id must not be empty");
 		Preconditions.checkNotNull(sampleListDto.getStudyId(), "The Study Id must not be empty");
 		Preconditions.checkNotNull(sampleListDto.getListName(), "The List Name must not be empty");
