@@ -59,6 +59,8 @@ import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
@@ -76,6 +78,9 @@ public class StudyServiceImpl implements StudyService {
 
 	@Autowired
 	private org.generationcp.middleware.service.api.study.StudyService middlewareStudyService;
+
+	@Autowired
+	org.generationcp.middleware.service.api.SampleService sampleService;
 
 	@Autowired
 	private StudyDataManager studyDataManager;
@@ -601,4 +606,12 @@ public class StudyServiceImpl implements StudyService {
 		return studySummaryList;
 	}
 
+	@Override
+	public Boolean isSampled(final Integer studyId) {
+		try {
+			return this.sampleService.studyHasSamples(studyId);
+		} catch (MiddlewareException e) {
+			throw new ApiRuntimeException("an error happened when trying to check if a study is sampled", e);
+		}
+	}
 }
