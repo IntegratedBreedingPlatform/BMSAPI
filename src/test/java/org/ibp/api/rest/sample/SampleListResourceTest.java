@@ -187,7 +187,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		folder.setType(SampleListType.FOLDER);
 
 		final String url = String.format("/sampleLists/maize/sampleListFolder/{folderId}/move?newParentId=%s", newParentFolderId);
-		Mockito.when(this.sampleListServiceMW.moveSampleList(folderId, newParentFolderId)).thenReturn(folder);
+		Mockito.when(this.sampleListServiceMW.moveSampleList(folderId, newParentFolderId, false)).thenReturn(folder);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.put(url, folderId)).andExpect(MockMvcResultMatchers.status().isOk())
 				.andDo(MockMvcResultHandlers.print())

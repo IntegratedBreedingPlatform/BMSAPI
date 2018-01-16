@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.SampleList;
@@ -27,6 +28,9 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Autowired
 	private SecurityService securityService;
+
+	@Autowired
+	private ContextUtil contextUtil;
 
 	@Override
 	public Map<String, Object> createSampleList(final SampleListDto sampleListDto) {
@@ -99,16 +103,17 @@ public class SampleListServiceImpl implements SampleListService {
 	 *
 	 * @param folderId
 	 * @param newParentId
+	 * @param isCropList
 	 * @throws Exception
 	 */
 
 	@Override
-	public Map<String, Object> moveSampleListFolder(final Integer folderId, final Integer newParentId) {
+	public Map<String, Object> moveSampleListFolder(final Integer folderId, final Integer newParentId, final boolean isCropList) {
 		Preconditions.checkArgument(folderId != null, "The folder id must not be null");
 		Preconditions.checkArgument(newParentId != null, "The new parent id must not be null");
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
-		final SampleList result = this.sampleListServiceMW.moveSampleList(folderId, newParentId);
+		final SampleList result = this.sampleListServiceMW.moveSampleList(folderId, newParentId, isCropList);
 		mapResponse.put("parentId", String.valueOf(result.getHierarchy().getId()));
 		return mapResponse;
 	}
