@@ -1,8 +1,7 @@
-
 package org.ibp.api.rest.sample;
 
-import java.util.Map;
-
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.Map;
 
 @Api(value = "Sample Services")
 @Controller
@@ -26,6 +24,7 @@ public class SampleListResource {
 
 	public static final String NULL = "null";
 	public static final String ERROR = "ERROR";
+	public static final String SOMETHING_WENT_WRONG_PLEASE_TRY_AGAIN = "Something went wrong, please try again";
 
 	@Autowired
 	public SampleListService sampleListService;
@@ -41,10 +40,10 @@ public class SampleListResource {
 
 		} catch (final MiddlewareException e) {
 			final ErrorResponse response = new ErrorResponse();
-			if (e.getMessage().equalsIgnoreCase("List name should be unique within the same directory")) {
+			if ("List name should be unique within the same directory".equalsIgnoreCase(e.getMessage())) {
 				response.addError(e.getMessage(), "ListName");
 			} else {
-				response.addError("Something went wrong, please try again");
+				response.addError(SOMETHING_WENT_WRONG_PLEASE_TRY_AGAIN);
 			}
 			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
 		}

@@ -1,12 +1,7 @@
-
 package org.ibp.api.rest.sample;
 
-import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.SampleList;
@@ -17,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Preconditions;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @Transactional(propagation = Propagation.NEVER)
@@ -29,9 +26,6 @@ public class SampleListServiceImpl implements SampleListService {
 	@Autowired
 	private SecurityService securityService;
 
-	@Autowired
-	private ContextUtil contextUtil;
-
 	@Override
 	public Map<String, Object> createSampleList(final SampleListDto sampleListDto) {
 		Preconditions.checkArgument(sampleListDto.getInstanceIds() != null, "The Instance List must not be null");
@@ -42,8 +36,7 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(StringUtils.isNotBlank(sampleListDto.getListName()), "The List Name must not be empty");
 		Preconditions.checkArgument(sampleListDto.getListName().length() <= 100, "List Name must not exceed 100 characters");
 		Preconditions.checkNotNull(sampleListDto.getCreatedDate(), "The Created Date must not be empty");
-		Preconditions.checkArgument(
-				StringUtils.isBlank(sampleListDto.getDescription()) || sampleListDto.getDescription().length() <= 255,
+		Preconditions.checkArgument(StringUtils.isBlank(sampleListDto.getDescription()) || sampleListDto.getDescription().length() <= 255,
 				"List Description must not exceed 255 characters");
 		Preconditions.checkArgument(StringUtils.isBlank(sampleListDto.getNotes()) || sampleListDto.getNotes().length() <= 65535,
 				"Notes must not exceed 65535 characters");
