@@ -186,8 +186,8 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		folder.setHierarchy(parentFolder);
 		folder.setType(SampleListType.FOLDER);
 
-		final String url = String.format("/sampleLists/maize/sampleListFolder/{folderId}/move?newParentId=%s&isCropList=false", newParentFolderId);
-		Mockito.when(this.sampleListServiceMW.moveSampleList(folderId, newParentFolderId, false)).thenReturn(folder);
+		final String url = String.format("/sampleLists/maize/sampleListFolder/{folderId}/move?newParentId=%s&isCropList=false&programUUID=%s", newParentFolderId, programUUID);
+		Mockito.when(this.sampleListServiceMW.moveSampleList(folderId, newParentFolderId, false, programUUID)).thenReturn(folder);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.put(url, folderId)).andExpect(MockMvcResultMatchers.status().isOk())
 				.andDo(MockMvcResultHandlers.print())

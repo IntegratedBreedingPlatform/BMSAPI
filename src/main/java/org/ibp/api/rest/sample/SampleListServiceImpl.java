@@ -97,16 +97,18 @@ public class SampleListServiceImpl implements SampleListService {
 	 * @param folderId
 	 * @param newParentId
 	 * @param isCropList
+	 * @param programUUID
 	 * @throws Exception
 	 */
 
 	@Override
-	public Map<String, Object> moveSampleListFolder(final Integer folderId, final Integer newParentId, final boolean isCropList) {
+	public Map<String, Object> moveSampleListFolder(final Integer folderId, final Integer newParentId, final boolean isCropList,
+			final String programUUID) {
 		Preconditions.checkArgument(folderId != null, "The folder id must not be null");
 		Preconditions.checkArgument(newParentId != null, "The new parent id must not be null");
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
-		final SampleList result = this.sampleListServiceMW.moveSampleList(folderId, newParentId, isCropList);
+		final SampleList result = this.sampleListServiceMW.moveSampleList(folderId, newParentId, isCropList, programUUID);
 		mapResponse.put("parentId", String.valueOf(result.getHierarchy().getId()));
 		return mapResponse;
 	}

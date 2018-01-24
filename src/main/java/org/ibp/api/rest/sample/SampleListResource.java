@@ -87,10 +87,10 @@ public class SampleListResource {
 	@RequestMapping(value = "/{crop}/sampleListFolder/{folderId}/move", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity moveSampleListFolder(@PathVariable final String crop, @PathVariable final Integer folderId,
-			@RequestParam final Integer newParentId, @RequestParam final boolean isCropList) {
+			@RequestParam final Integer newParentId, @RequestParam final boolean isCropList, @RequestParam final String programUUID) {
 		final Map<String, Object> map;
 		try {
-			map = this.sampleListService.moveSampleListFolder(folderId, newParentId, isCropList);
+			map = this.sampleListService.moveSampleListFolder(folderId, newParentId, isCropList, programUUID);
 		} catch (final MiddlewareException e) {
 			final ErrorResponse response = new ErrorResponse();
 			response.addError("Something went wrong, please try again");
