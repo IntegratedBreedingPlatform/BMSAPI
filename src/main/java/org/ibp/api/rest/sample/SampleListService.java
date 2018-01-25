@@ -35,9 +35,12 @@ public interface SampleListService {
 	 *
 	 * @param folderId
 	 * @param newParentId
+	 * @param isCropList
+	 * @param programUUID
 	 * @throws Exception
 	 */
-	Map<String, Object> moveSampleListFolder(final Integer folderId, final Integer newParentId);
+	Map<String, Object> moveSampleListFolder(final Integer folderId, final Integer newParentId, final boolean isCropList,
+			final String programUUID);
 
 	/**
 	 * Delete a folder

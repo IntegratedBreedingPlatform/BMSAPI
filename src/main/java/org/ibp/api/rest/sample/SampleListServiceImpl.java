@@ -1,10 +1,6 @@
-
 package org.ibp.api.rest.sample;
 
-import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
@@ -16,11 +12,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Preconditions;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @Transactional(propagation = Propagation.NEVER)
 public class SampleListServiceImpl implements SampleListService {
+
+	protected static final String PARENT_ID = "parentId";
 
 	@Autowired
 	private org.generationcp.middleware.service.api.SampleListService sampleListServiceMW;
@@ -32,15 +32,13 @@ public class SampleListServiceImpl implements SampleListService {
 	public Map<String, Object> createSampleList(final SampleListDto sampleListDto) {
 		Preconditions.checkArgument(sampleListDto.getInstanceIds() != null, "The Instance List must not be null");
 		Preconditions.checkArgument(!sampleListDto.getInstanceIds().isEmpty(), "The Instance List must not be empty");
-		Preconditions.checkArgument(sampleListDto.getProgramUUID() != null, "The programUUID must not be null");
 		Preconditions.checkNotNull(sampleListDto.getSelectionVariableId(), "The Selection Variable Id must not be empty");
 		Preconditions.checkNotNull(sampleListDto.getStudyId(), "The Study Id must not be empty");
 		Preconditions.checkNotNull(sampleListDto.getListName(), "The List Name must not be empty");
 		Preconditions.checkArgument(StringUtils.isNotBlank(sampleListDto.getListName()), "The List Name must not be empty");
 		Preconditions.checkArgument(sampleListDto.getListName().length() <= 100, "List Name must not exceed 100 characters");
 		Preconditions.checkNotNull(sampleListDto.getCreatedDate(), "The Created Date must not be empty");
-		Preconditions.checkArgument(
-				StringUtils.isBlank(sampleListDto.getDescription()) || sampleListDto.getDescription().length() <= 255,
+		Preconditions.checkArgument(StringUtils.isBlank(sampleListDto.getDescription()) || sampleListDto.getDescription().length() <= 255,
 				"List Description must not exceed 255 characters");
 		Preconditions.checkArgument(StringUtils.isBlank(sampleListDto.getNotes()) || sampleListDto.getNotes().length() <= 65535,
 				"Notes must not exceed 65535 characters");
@@ -100,17 +98,20 @@ public class SampleListServiceImpl implements SampleListService {
 	 *
 	 * @param folderId
 	 * @param newParentId
+	 * @param isCropList
+	 * @param programUUID
 	 * @throws Exception
 	 */
 
 	@Override
-	public Map<String, Object> moveSampleListFolder(final Integer folderId, final Integer newParentId) {
+	public Map<String, Object> moveSampleListFolder(final Integer folderId, final Integer newParentId, final boolean isCropList,
+			final String programUUID) {
 		Preconditions.checkArgument(folderId != null, "The folder id must not be null");
 		Preconditions.checkArgument(newParentId != null, "The new parent id must not be null");
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
-		final SampleList result = this.sampleListServiceMW.moveSampleList(folderId, newParentId);
-		mapResponse.put("parentId", String.valueOf(result.getHierarchy().getId()));
+		final SampleList result = this.sampleListServiceMW.moveSampleList(folderId, newParentId, isCropList, programUUID);
+		mapResponse.put(PARENT_ID, String.valueOf(result.getHierarchy().getId()));
 		return mapResponse;
 	}
 
