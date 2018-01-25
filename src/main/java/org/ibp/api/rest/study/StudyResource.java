@@ -7,6 +7,8 @@ import java.util.Map;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 
+import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.service.api.SampleService;
 import org.ibp.api.domain.common.PagedResult;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.ibp.api.domain.study.FieldMap;
@@ -17,6 +19,7 @@ import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
+import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -47,6 +50,9 @@ public class StudyResource {
 
 	@Autowired
 	private StudyService studyService;
+
+	@Autowired
+	private SampleService sampleService;
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -209,5 +215,15 @@ public class StudyResource {
 	public ResponseEntity<List<StudyInstance>> listStudyInstances(final @PathVariable String cropname,
 			@PathVariable final Integer studyId) {
 		return new ResponseEntity<List<StudyInstance>>(this.studyService.getStudyInstances(studyId), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Check if a study is sampled.",
+			notes = "Returns boolean indicating if there are samples associated to the study.")
+	@RequestMapping(value = "/{cropName}/{studyId}/sampled", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Boolean> hasSamples(final @PathVariable String cropName,
+			@PathVariable final Integer studyId) {
+		final Boolean hasSamples = this.studyService.isSampled(studyId);
+		return new ResponseEntity<>(hasSamples, HttpStatus.OK);
 	}
 }

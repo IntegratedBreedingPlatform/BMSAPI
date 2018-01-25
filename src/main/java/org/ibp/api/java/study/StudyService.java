@@ -60,4 +60,6 @@ public interface StudyService {
 	Long countStudies(final Map<StudyFilters, String> filters);
 
 	List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final Map<StudyFilters, String> filters, Integer pageSize, Integer pageNumber);
+
+	Boolean isSampled (final Integer studyId);
 }
