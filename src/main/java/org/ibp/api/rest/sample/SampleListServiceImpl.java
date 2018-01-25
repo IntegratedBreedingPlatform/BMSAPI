@@ -20,6 +20,8 @@ import java.util.Map;
 @Transactional(propagation = Propagation.NEVER)
 public class SampleListServiceImpl implements SampleListService {
 
+	protected static final String PARENT_ID = "parentId";
+
 	@Autowired
 	private org.generationcp.middleware.service.api.SampleListService sampleListServiceMW;
 
@@ -109,7 +111,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
 		final SampleList result = this.sampleListServiceMW.moveSampleList(folderId, newParentId, isCropList, programUUID);
-		mapResponse.put("parentId", String.valueOf(result.getHierarchy().getId()));
+		mapResponse.put(PARENT_ID, String.valueOf(result.getHierarchy().getId()));
 		return mapResponse;
 	}
 
