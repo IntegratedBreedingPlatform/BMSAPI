@@ -27,6 +27,8 @@ import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
@@ -590,6 +592,16 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public Long countStudies(final Map<StudyFilters, String> filters) {
 		return this.studyDataManager.countAllStudies(filters);
+	}
+
+	@Override
+	public List<PhenotypeSearchDTO> searchPhenotypes(Integer pageSize, Integer pageNumber, PhenotypeSearchRequestDTO requestDTO) {
+		return this.middlewareStudyService.searchPhenotypes(pageSize, pageNumber, requestDTO);
+	}
+
+	@Override
+	public long countPhenotypes(PhenotypeSearchRequestDTO requestDTO) {
+		return this.middlewareStudyService.countPhenotypes(requestDTO);
 	}
 
 	@Override
