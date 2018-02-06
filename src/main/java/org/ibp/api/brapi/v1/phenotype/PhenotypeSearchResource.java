@@ -37,15 +37,11 @@ public class PhenotypeSearchResource {
 	@RequestMapping(value = "/{crop}/brapi/v1/phenotypes-search", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<PhenotypeSearchSummariesDto> searchPhenotypes(@PathVariable final String crop,
-		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION) @RequestParam(value = "page", required = false) //
-		final Integer currentPage, //
-		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION) @RequestParam(value = "pageSize", required = false) //
-		final Integer pageSize, //
 		@RequestBody final PhenotypeSearchRequestDTO requestDTO) {
 
 
 		final PagedResult<PhenotypeSearchDTO> resultPage =
-			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<PhenotypeSearchDTO>() {
+			new PaginatedSearch().executeBrapiSearch(requestDTO.getPage(), requestDTO.getPageSize(), new SearchSpec<PhenotypeSearchDTO>() {
 
 				@Override
 				public long getCount() {
