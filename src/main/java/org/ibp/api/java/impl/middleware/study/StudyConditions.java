@@ -64,16 +64,6 @@ public enum StudyConditions {
 								ASSIGNED, DBCV, CHAR, initialValue, true);
 				break;
 
-			case START_DATE:
-				measureVariable =
-						this.createMeasurementVariable(TermId.START_DATE.getId(), "START_DATE", "Start date - assigned (date)",
-						this.toString(), ASSIGNED, DATE, CHAR, initialValue, true);
-				break;
-			case END_DATE:
-				measureVariable =
-						this.createMeasurementVariable(TermId.END_DATE.getId(), "END_DATE", "End date - assigned (date)", this.toString(),
-								ASSIGNED, DATE, CHAR, initialValue, true);
-				break;
 			case OBJECTIVE:
 				measureVariable =
 						this.createMeasurementVariable(TermId.STUDY_OBJECTIVE.getId(), "STUDY_OBJECTIVE", "Objective - described (text)",

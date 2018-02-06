@@ -113,18 +113,6 @@ public class WorkbookConverterTest {
 		Assert.assertTrue(mvName.isFactor());
 		Assert.assertEquals(TermId.STUDY_NAME.getId(), mvName.getTermId());
 
-		final MeasurementVariable mvStartDate = outputWorkbook.getConditions().get(2);
-		Assert.assertEquals(inputDTO.getStartDate(), mvStartDate.getValue());
-		Assert.assertEquals(PhenotypicType.STUDY, mvStartDate.getRole());
-		Assert.assertTrue(mvStartDate.isFactor());
-		Assert.assertEquals(TermId.START_DATE.getId(), mvStartDate.getTermId());
-
-		final MeasurementVariable mvEndDate = outputWorkbook.getConditions().get(3);
-		Assert.assertEquals(inputDTO.getEndDate(), mvEndDate.getValue());
-		Assert.assertEquals(PhenotypicType.STUDY, mvEndDate.getRole());
-		Assert.assertTrue(mvEndDate.isFactor());
-		Assert.assertEquals(TermId.END_DATE.getId(), mvEndDate.getTermId());
-
 		final MeasurementVariable mvObjective = outputWorkbook.getConditions().get(4);
 		Assert.assertEquals(inputDTO.getObjective(), mvObjective.getValue());
 		Assert.assertEquals(PhenotypicType.STUDY, mvObjective.getRole());

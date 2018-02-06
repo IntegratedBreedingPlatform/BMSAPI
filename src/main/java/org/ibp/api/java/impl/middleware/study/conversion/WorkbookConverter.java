@@ -71,6 +71,9 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 		studyDetails.setSiteName(source.getSiteName());
 		studyDetails.setParentFolderId(source.getFolderId());
 		studyDetails.setDescription(source.getDescription());
+		studyDetails.setStartDate(source.getStartDate());
+		studyDetails.setEndDate(source.getEndDate());
+		studyDetails.setStudyUpdate(source.getStudyUpdate());
 
 		this.workbook.setStudyDetails(studyDetails);
 	}
