@@ -29,7 +29,6 @@ public class StudyImportDTO {
 	@NotBlank
 	private String description;
 
-	@NotBlank
 	private String studyUpdate;
 
 	@ApiModelProperty(value = "Study start date in YYYYMMDD format.")
