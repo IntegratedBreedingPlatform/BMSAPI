@@ -68,7 +68,7 @@ public class PhenotypeSearchSummariesDto {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
 
