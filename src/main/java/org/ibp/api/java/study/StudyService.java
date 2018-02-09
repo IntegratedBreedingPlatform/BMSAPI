@@ -61,9 +61,9 @@ public interface StudyService {
 
 	Long countStudies(final Map<StudyFilters, String> filters);
 
-	List<PhenotypeSearchDTO> searchPhenotypes(Integer pageSize, Integer pageNumber, PhenotypeSearchRequestDTO requestDTO);
+	List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO);
 
-	long countPhenotypes(PhenotypeSearchRequestDTO requestDTO);
+	long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO);
 
 	List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final Map<StudyFilters, String> filters, Integer pageSize, Integer pageNumber);
 
