@@ -12,46 +12,24 @@ import org.pojomatic.Pojomatic;
 public class PhenotypeSearchSummariesDto {
 
 	private Metadata metadata;
-
 	private Result<PhenotypeSearchDTO> result;
 
 	public PhenotypeSearchSummariesDto() {
 	}
 
-	/**
-	 *
-	 * @return Metadata
-	 */
 	public Metadata getMetadata() {
 		return metadata;
 	}
 
-	/**
-	 *
-	 * @param metadata
-	 *            The metadata
-	 * @return this
-	 */
 	public PhenotypeSearchSummariesDto setMetadata(final Metadata metadata) {
 		this.metadata = metadata;
 		return this;
 	}
 
-
-	/**
-	 *
-	 * @return The result
-	 */
 	public Result<PhenotypeSearchDTO> getResult() {
 		return result;
 	}
 
-	/**
-	 *
-	 * @param result
-	 *            The result
-	 * @return this
-	 */
 	public PhenotypeSearchSummariesDto setResult(final Result<PhenotypeSearchDTO> result) {
 		this.result = result;
 		return this;
