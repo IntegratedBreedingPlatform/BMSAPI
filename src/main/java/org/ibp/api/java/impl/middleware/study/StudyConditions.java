@@ -58,11 +58,6 @@ public enum StudyConditions {
 						this.createMeasurementVariable(TermId.STUDY_INSTITUTE.getId(), "STUDY_INSTITUTE",
 								"Study institute - conducted (DBCV)", this.toString(), CONDUCTED, DBCV, CHAR, initialValue, true);
 				break;
-			case STUDY_NAME:
-				measureVariable =
-						this.createMeasurementVariable(TermId.STUDY_NAME.getId(), "STUDY_NAME", "Study - assigned (DBCV)", this.toString(),
-								ASSIGNED, DBCV, CHAR, initialValue, true);
-				break;
 			default:
 				//Adding default block empty as SonarQube report that default block is required in switch: Add a default case to this switch.
 		}

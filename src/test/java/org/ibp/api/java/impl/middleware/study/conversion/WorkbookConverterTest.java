@@ -111,7 +111,6 @@ public class WorkbookConverterTest {
 		Assert.assertEquals(inputDTO.getName(), mvName.getValue());
 		Assert.assertEquals(PhenotypicType.STUDY, mvName.getRole());
 		Assert.assertTrue(mvName.isFactor());
-		Assert.assertEquals(TermId.STUDY_NAME.getId(), mvName.getTermId());
 
 		final MeasurementVariable mvStudyInstitute = outputWorkbook.getConditions().get(5);
 		Assert.assertEquals(inputDTO.getStudyInstitute(), mvStudyInstitute.getValue());
