@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.study;
 
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
@@ -62,4 +63,6 @@ public interface StudyService {
 	List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final Map<StudyFilters, String> filters, Integer pageSize, Integer pageNumber);
 
 	Boolean isSampled (final Integer studyId);
+
+	List<StudyTypeDto> getStudyTypes();
 }

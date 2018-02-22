@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -614,4 +615,31 @@ public class StudyServiceImpl implements StudyService {
 			throw new ApiRuntimeException("an error happened when trying to check if a study is sampled", e);
 		}
 	}
+
+	@Override
+	public List<StudyTypeDto> getStudyTypes(){
+		try{
+			List<StudyTypeDto> lists = new ArrayList<>();
+			lists.add(new StudyTypeDto(10000,"Nursery","N"));
+
+			lists.add(new StudyTypeDto(10001,"Hybridization Nursery","HB"));
+			lists.add(new StudyTypeDto(10002,"Pedigree Nursery","PN"));
+
+			lists.add(new StudyTypeDto(10003,"Characterization Nursery","CN"));
+
+			lists.add(new StudyTypeDto(10010,"Trial","T"));
+			lists.add(new StudyTypeDto(10005,"Observational Yield Trial","OYT"));
+			lists.add(new StudyTypeDto(10015,"Replication Yield Trial","RYT"));
+			lists.add(new StudyTypeDto(10017,"On Form Trial","OFT"));
+			lists.add(new StudyTypeDto(10020,"Survey","S"));
+			lists.add(new StudyTypeDto(10030,"Experiment","E"));
+
+
+			return lists;
+			//return this.studyDataManager.getAllStudyTypes();
+		} catch (MiddlewareException e) {
+			throw new ApiRuntimeException("an error happened when trying to check if a study is sampled", e);
+		}
+	}
+
 }
