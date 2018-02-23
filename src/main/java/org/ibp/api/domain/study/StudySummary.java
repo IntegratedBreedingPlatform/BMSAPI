@@ -21,6 +21,7 @@ public class StudySummary {
 	private String principalInvestigator;
 	private String location;
 	private String season;
+	private String createdBy;
 
 	public StudySummary() {
 
@@ -127,5 +128,9 @@ public class StudySummary {
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(this.id).toHashCode();
+	}
+
+	public void setCreatedBy(final String createdBy) {
+		this.createdBy = createdBy;
 	}
 }

@@ -33,6 +33,7 @@ public class WorkbookConverterTest {
 		inputDTO.setSiteName("Mexico");
 		inputDTO.setStudyInstitute("CIMMYT");
 		inputDTO.setDescription("Maize Nursery title.");
+		inputDTO.setCreatedBy("1");
 
 		final Trait trait1 = new Trait(1, "Plant Height");
 		final Trait trait2 = new Trait(2, "Grain Yield");

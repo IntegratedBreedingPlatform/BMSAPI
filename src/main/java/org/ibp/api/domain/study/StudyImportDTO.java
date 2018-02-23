@@ -31,6 +31,8 @@ public class StudyImportDTO {
 
 	private String studyUpdate;
 
+	private String createdBy;
+
 	@ApiModelProperty(value = "Study start date in YYYYMMDD format.")
 	@Pattern(regexp = "[0-9]{8}")
 	private String startDate;
@@ -207,5 +209,14 @@ public class StudyImportDTO {
 
 	public void setStudyUpdate(final String studyUpdate) {
 		this.studyUpdate = studyUpdate;
+	}
+
+	public void setCreatedBy(final String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+
 	}
 }

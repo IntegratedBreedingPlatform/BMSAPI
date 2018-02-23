@@ -71,6 +71,7 @@ public class StudyResourceImportTest extends ApiUnitTestBase {
 		inputDTO.setUserId(1);
 		inputDTO.setFolderId(1L);
 		inputDTO.setSiteName("CIMMYT");
+		inputDTO.setCreatedBy("1");
 
 		final Trait trait1 = new Trait(1, "Plant Height");
 		final Trait trait2 = new Trait(2, "Grain Yield");
