@@ -1,6 +1,8 @@
 
 package org.ibp.api.java.study;
 
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
@@ -58,6 +60,10 @@ public interface StudyService {
 	StudyDetailsDto getStudyDetailsDto (final Integer studyId);
 
 	Long countStudies(final Map<StudyFilters, String> filters);
+
+	List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO);
+
+	long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO);
 
 	List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final Map<StudyFilters, String> filters, Integer pageSize, Integer pageNumber);
 
