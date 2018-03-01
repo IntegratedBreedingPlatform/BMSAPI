@@ -456,8 +456,7 @@ public class StudyServiceImpl implements StudyService {
 
 			// Create the study's snapshot of the Germplasm list (ListDataProject)
 			final List<ListDataProject> listDataProjects = this.convert(studyImportDTO.getGermplasm(), ListDataProject.class);
-			final GermplasmListType listType = this.extractGermListType(studyImportDTO);
-			this.fieldbookService.saveOrUpdateListDataProject(studyId, listType, listId, listDataProjects, studyImportDTO.getUserId());
+			this.fieldbookService.saveOrUpdateListDataProject(studyId, GermplasmListType.STUDY, listId, listDataProjects, studyImportDTO.getUserId());
 
 			return studyId;
 
