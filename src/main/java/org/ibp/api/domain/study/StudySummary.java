@@ -27,7 +27,7 @@ public class StudySummary {
 
 	}
 
-	public StudySummary(String studyId) {
+	public StudySummary(final String studyId) {
 		this.id = studyId;
 	}
 
@@ -35,7 +35,7 @@ public class StudySummary {
 		return this.id;
 	}
 
-	public void setId(String id) {
+	public void setId(final String id) {
 		this.id = id;
 	}
 
@@ -43,7 +43,7 @@ public class StudySummary {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -51,7 +51,7 @@ public class StudySummary {
 		return this.title;
 	}
 
-	public void setTitle(String title) {
+	public void setTitle(final String title) {
 		this.title = title;
 	}
 
@@ -59,7 +59,7 @@ public class StudySummary {
 		return this.objective;
 	}
 
-	public void setObjective(String objective) {
+	public void setObjective(final String objective) {
 		this.objective = objective;
 	}
 
@@ -67,7 +67,7 @@ public class StudySummary {
 		return this.type;
 	}
 
-	public void setType(String type) {
+	public void setType(final String type) {
 		this.type = type;
 	}
 
@@ -75,7 +75,7 @@ public class StudySummary {
 		return this.startDate;
 	}
 
-	public void setStartDate(String startDate) {
+	public void setStartDate(final String startDate) {
 		this.startDate = startDate;
 	}
 
@@ -83,7 +83,7 @@ public class StudySummary {
 		return this.endDate;
 	}
 
-	public void setEndDate(String endDate) {
+	public void setEndDate(final String endDate) {
 		this.endDate = endDate;
 	}
 
@@ -91,7 +91,7 @@ public class StudySummary {
 		return this.principalInvestigator;
 	}
 
-	public void setPrincipalInvestigator(String principalInvestigator) {
+	public void setPrincipalInvestigator(final String principalInvestigator) {
 		this.principalInvestigator = principalInvestigator;
 	}
 
@@ -99,7 +99,7 @@ public class StudySummary {
 		return this.location;
 	}
 
-	public void setLocation(String location) {
+	public void setLocation(final String location) {
 		this.location = location;
 	}
 
@@ -107,7 +107,7 @@ public class StudySummary {
 		return this.season;
 	}
 
-	public void setSeason(String season) {
+	public void setSeason(final String season) {
 		this.season = season;
 	}
 
@@ -121,7 +121,7 @@ public class StudySummary {
 		if (!(other instanceof StudySummary)) {
 			return false;
 		}
-		StudySummary castOther = (StudySummary) other;
+		final StudySummary castOther = (StudySummary) other;
 		return new EqualsBuilder().append(this.id, castOther.id).isEquals();
 	}
 

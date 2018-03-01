@@ -36,25 +36,25 @@ public class ProgramServiceImpl implements ProgramService {
 
 	@Override
 	public List<ProgramSummary> listAllPrograms() {
-		List<Project> workbenchProgramList;
-		List<ProgramSummary> programSummaries = new ArrayList<>();
+		final List<Project> workbenchProgramList;
+		final List<ProgramSummary> programSummaries = new ArrayList<>();
 		try {
-			User loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+			final User loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 			workbenchProgramList = this.workbenchDataManager.getProjectsByUser(loggedInUser);
 			if (!workbenchProgramList.isEmpty()) {
-				for (Project workbenchProgram : workbenchProgramList) {
-					ProgramSummary programSummary = new ProgramSummary();
+				for (final Project workbenchProgram : workbenchProgramList) {
+					final ProgramSummary programSummary = new ProgramSummary();
 					programSummary.setId(workbenchProgram.getProjectId().toString());
 					programSummary.setName(workbenchProgram.getProjectName());
 					if (workbenchProgram.getCropType() != null) {
 						programSummary.setCrop(workbenchProgram.getCropType().getCropName());
 					}
-					User programUser = this.workbenchDataManager.getUserById(workbenchProgram.getUserId());
+					final User programUser = this.workbenchDataManager.getUserById(workbenchProgram.getUserId());
 					programSummary.setCreatedBy(programUser.getName());
 
-					List<User> allProgramMembers = this.workbenchDataManager.getUsersByProjectId(workbenchProgram.getProjectId());
-					Set<String> members = new HashSet<>();
-					for (User member : allProgramMembers) {
+					final List<User> allProgramMembers = this.workbenchDataManager.getUsersByProjectId(workbenchProgram.getProjectId());
+					final Set<String> members = new HashSet<>();
+					for (final User member : allProgramMembers) {
 						members.add(member.getName());
 					}
 					programSummary.setMembers(members);
@@ -65,7 +65,7 @@ public class ProgramServiceImpl implements ProgramService {
 					programSummaries.add(programSummary);
 				}
 			}
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
 		return programSummaries;
@@ -73,12 +73,12 @@ public class ProgramServiceImpl implements ProgramService {
 
 	public List<ProgramDetailsDto> getProgramsByFilter(final int pageNumber, final int pageSize,
 		final Map<ProgramFilters, Object> filters) {
-		List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
-		List<Project> projectList = this.workbenchDataManager.getProjects(pageNumber, pageSize, filters);
+		final List<ProgramDetailsDto> programDetailsDtoList = new ArrayList<>();
+		final List<Project> projectList = this.workbenchDataManager.getProjects(pageNumber, pageSize, filters);
 
 		if (!projectList.isEmpty()) {
-			for (Project project : projectList) {
-				ProgramDetailsDto programDetailsDto = new ProgramDetailsDto();
+			for (final Project project : projectList) {
+				final ProgramDetailsDto programDetailsDto = new ProgramDetailsDto();
 				programDetailsDto.setProgramDbId(project.getUniqueID());
 				programDetailsDto.setName(project.getProjectName());
 				programDetailsDtoList.add(programDetailsDto);

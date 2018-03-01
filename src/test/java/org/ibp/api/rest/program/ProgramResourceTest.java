@@ -61,11 +61,11 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAllMethods() throws Exception {
 
-		CropType cropType = new CropType();
+		final CropType cropType = new CropType();
 		cropType.setCropName("MAIZE");
 
-		List<Project> programList = new ArrayList<>();
-		Project program1 = new Project();
+		final List<Project> programList = new ArrayList<>();
+		final Project program1 = new Project();
 		program1.setProjectId(1L);
 		program1.setProjectName("Program I Created");
 		program1.setCropType(cropType);
@@ -76,7 +76,7 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 
 		programList.add(program1);
 
-		Project program2 = new Project();
+		final Project program2 = new Project();
 		program2.setProjectId(2L);
 		program2.setProjectName("Program I am member of");
 		program2.setCropType(cropType);
