@@ -25,7 +25,7 @@ public class ProgramSummary {
 		return this.id;
 	}
 
-	public void setId(String id) {
+	public void setId(final String id) {
 		this.id = id;
 	}
 
@@ -33,7 +33,7 @@ public class ProgramSummary {
 		return this.uniqueID;
 	}
 
-	public void setUniqueID(String uniqueID) {
+	public void setUniqueID(final String uniqueID) {
 		this.uniqueID = uniqueID;
 	}
 
@@ -41,7 +41,7 @@ public class ProgramSummary {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -49,7 +49,7 @@ public class ProgramSummary {
 		return this.createdBy;
 	}
 
-	public void setCreatedBy(String createdBy) {
+	public void setCreatedBy(final String createdBy) {
 		this.createdBy = createdBy;
 	}
 
@@ -57,7 +57,7 @@ public class ProgramSummary {
 		return this.members;
 	}
 
-	public void setMembers(Set<String> members) {
+	public void setMembers(final Set<String> members) {
 		this.members = members;
 	}
 
@@ -65,7 +65,7 @@ public class ProgramSummary {
 		return this.crop;
 	}
 
-	public void setCrop(String crop) {
+	public void setCrop(final String crop) {
 		this.crop = crop;
 	}
 
@@ -73,7 +73,7 @@ public class ProgramSummary {
 		return this.startDate;
 	}
 
-	public void setStartDate(String startDate) {
+	public void setStartDate(final String startDate) {
 		this.startDate = startDate;
 	}
 

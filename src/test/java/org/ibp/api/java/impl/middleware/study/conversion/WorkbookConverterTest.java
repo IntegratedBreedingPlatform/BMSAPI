@@ -33,6 +33,7 @@ public class WorkbookConverterTest {
 		inputDTO.setSiteName("Mexico");
 		inputDTO.setStudyInstitute("CIMMYT");
 		inputDTO.setDescription("Maize Nursery title.");
+		inputDTO.setCreatedBy("1");
 
 		final Trait trait1 = new Trait(1, "Plant Height");
 		final Trait trait2 = new Trait(2, "Grain Yield");
@@ -106,30 +107,7 @@ public class WorkbookConverterTest {
 
 		// Basic details as MeasurementVariables
 		Assert.assertEquals(6, outputWorkbook.getConditions().size());
-
-		final MeasurementVariable mvName = outputWorkbook.getConditions().get(0);
-		Assert.assertEquals(inputDTO.getName(), mvName.getValue());
-		Assert.assertEquals(PhenotypicType.STUDY, mvName.getRole());
-		Assert.assertTrue(mvName.isFactor());
-		Assert.assertEquals(TermId.STUDY_NAME.getId(), mvName.getTermId());
-
-		final MeasurementVariable mvStartDate = outputWorkbook.getConditions().get(2);
-		Assert.assertEquals(inputDTO.getStartDate(), mvStartDate.getValue());
-		Assert.assertEquals(PhenotypicType.STUDY, mvStartDate.getRole());
-		Assert.assertTrue(mvStartDate.isFactor());
-		Assert.assertEquals(TermId.START_DATE.getId(), mvStartDate.getTermId());
-
-		final MeasurementVariable mvEndDate = outputWorkbook.getConditions().get(3);
-		Assert.assertEquals(inputDTO.getEndDate(), mvEndDate.getValue());
-		Assert.assertEquals(PhenotypicType.STUDY, mvEndDate.getRole());
-		Assert.assertTrue(mvEndDate.isFactor());
-		Assert.assertEquals(TermId.END_DATE.getId(), mvEndDate.getTermId());
-
-		final MeasurementVariable mvObjective = outputWorkbook.getConditions().get(4);
-		Assert.assertEquals(inputDTO.getObjective(), mvObjective.getValue());
-		Assert.assertEquals(PhenotypicType.STUDY, mvObjective.getRole());
-		Assert.assertTrue(mvObjective.isFactor());
-		Assert.assertEquals(TermId.STUDY_OBJECTIVE.getId(), mvObjective.getTermId());
+		Assert.assertEquals(inputDTO.getName(), outputWorkbook.getStudyName());
 
 		final MeasurementVariable mvStudyInstitute = outputWorkbook.getConditions().get(5);
 		Assert.assertEquals(inputDTO.getStudyInstitute(), mvStudyInstitute.getValue());
