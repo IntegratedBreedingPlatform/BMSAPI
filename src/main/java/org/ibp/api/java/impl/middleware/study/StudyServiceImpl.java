@@ -465,30 +465,6 @@ public class StudyServiceImpl implements StudyService {
 		}
 	}
 
-	/**
-	 * Infers the List type for a list, based on the study type of a given {@link StudyImportDTO}
-	 *
-	 * @param studyImportDTO
-	 * @return the corresponding germplasm list type for a study workbook, or null if no valid type is found.
-	 */
-	private final GermplasmListType extractGermListType(final StudyImportDTO studyImportDTO) {
-		final StudyType studyType = StudyType.valueOf(studyImportDTO.getStudyType());
-		GermplasmListType listType;
-
-		switch (studyType) {
-			case N:
-				listType = GermplasmListType.NURSERY;
-				break;
-			case T:
-				listType = GermplasmListType.TRIAL;
-				break;
-			default:
-				listType = null;
-		}
-
-		return listType;
-	}
-
 	private final <T, S> List<T> convert(final List<S> beanList, final Class<T> clazz) {
 		if (null == beanList) {
 			return Collections.emptyList();
