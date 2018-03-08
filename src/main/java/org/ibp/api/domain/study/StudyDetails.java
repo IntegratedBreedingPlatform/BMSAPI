@@ -59,4 +59,5 @@ public class StudyDetails extends StudySummary {
 	public List<StudyGermplasm> getGermplasm() {
 		return this.germplasm;
 	}
+
 }

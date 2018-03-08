@@ -213,7 +213,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testListSamples() throws Exception {
 		final String plotId = RandomStringUtils.randomAlphanumeric(13);
-		final Date samplingDate = SampleListResourceTest.DATE_FORMAT.parse("01/01/2018");
+		final Date samplingDate = new Date();
 		final List<SampleDTO> list = new ArrayList<>();
 		final SampleDTO sample = new SampleDTO(RandomStringUtils.randomAlphanumeric(6), RandomStringUtils.randomAlphanumeric(6),
 				RandomStringUtils.randomAlphanumeric(6), samplingDate, RandomStringUtils.randomAlphanumeric(6), new Random().nextInt(),
