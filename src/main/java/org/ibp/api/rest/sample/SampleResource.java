@@ -25,13 +25,14 @@ public class SampleResource {
 	@Autowired
 	public SampleService sampleService;
 
-	@ApiOperation(value = "Get samples for a plot", notes = "Get samples for a plot")
+	@ApiOperation(value = "Get samples", notes = "Get samples")
 	@RequestMapping(value = "/{crop}/samples", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<SampleDTO>> listSamples(@PathVariable final String crop,
-		@RequestParam(required = true) @ApiParam(value = "The plotId to which the samples belong") final String plotId) {
+	public ResponseEntity<List<SampleDTO>> filter(@PathVariable final String crop,
+        @RequestParam(required = false) @ApiParam(value = "The plot to which the samples belong") final String plotId,
+        @RequestParam(required = false) @ApiParam(value = "The list to which the samples belong") final Integer listId) {
 
-		List<SampleDTO> samples = this.sampleService.getSamples(plotId);
+		List<SampleDTO> samples = this.sampleService.filter(plotId, listId);
 
 		return new ResponseEntity<>(samples, HttpStatus.OK);
 	}

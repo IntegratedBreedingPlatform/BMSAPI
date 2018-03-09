@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
@@ -213,6 +214,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testListSamples() throws Exception {
 		final String plotId = RandomStringUtils.randomAlphanumeric(13);
+		final Integer listId = null;
 		final Date samplingDate = new Date();
 		final List<SampleDTO> list = new ArrayList<>();
 		final SampleDTO sample = new SampleDTO(RandomStringUtils.randomAlphanumeric(6), RandomStringUtils.randomAlphanumeric(6),
@@ -221,7 +223,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		list.add(sample);
 
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
-		Mockito.when(this.sampleService.getSamples(plotId)).thenReturn(list);
+		Mockito.when(this.sampleService.filter(plotId, listId)).thenReturn(list);
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.get("/sample/maize/samples?plotId=" + plotId).contentType(this.contentType)
@@ -241,11 +243,12 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testListSamplesNotFound() throws Exception {
 		final String plotId = null;
+		final Integer listId = null;
 
 		final List<SampleDTO> list = new ArrayList<>();
 
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
-		Mockito.when(this.sampleService.getSamples(plotId)).thenReturn(list);
+		Mockito.when(this.sampleService.filter(plotId, listId)).thenReturn(list);
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.get("/sample/maize/samples?plotId=" + plotId).contentType(this.contentType)

@@ -18,8 +18,8 @@ public class SampleServiceImpl implements SampleService {
 	org.generationcp.middleware.service.api.SampleService sampleService;
 
 	@Override
-	public List<SampleDTO> getSamples(final String plotId) {
-		return this.sampleService.getSamples(plotId);
+	public List<SampleDTO> filter(final String plotId, Integer listId) {
+		return this.sampleService.filter(plotId, listId);
 	}
 
 	@Override

@@ -6,7 +6,7 @@ import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import java.util.List;
 
 public interface SampleService {
-	List<SampleDTO> getSamples(final String plotId);
+	List<SampleDTO> filter(final String plotId, Integer listId);
 
 	SampleDetailsDTO getSampleObservation(final String sampleId);
 }
