@@ -1,11 +1,6 @@
 
 package org.ibp.api.java.impl.middleware.study.conversion;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -13,6 +8,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.ibp.api.domain.study.EnvironmentLevelMeasurement;
 import org.ibp.api.domain.study.EnvironmentLevelObservation;
 import org.ibp.api.domain.study.EnvironmentLevelVariable;
@@ -26,6 +22,11 @@ import org.ibp.api.java.impl.middleware.study.StudyConditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Converts from a front-end rest-domain {@link StudyImportDTO} to a back-end middleware-domain Workbook
@@ -62,7 +63,7 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 	private void buildStudyDetails(final StudyImportDTO source) {
 
 		final StudyDetails studyDetails = new StudyDetails();
-		final StudyType stype = StudyType.getStudyTypeByName(source.getStudyType());
+		final StudyTypeDto stype = new StudyTypeDto(source.getStudyType());
 		studyDetails.setStudyType(stype);
 		studyDetails.setStudyName(source.getName());
 		studyDetails.setObjective(source.getObjective());
@@ -228,17 +229,16 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 
 			final StudyGermplasm studyGermplasm = source.findStudyGermplasm(observationUnit.getGid());
 
-			if (StudyType.T.getName().equals(source.getStudyType())) {
-				final MeasurementData instanceData =
-						new MeasurementData(StudyBaseFactors.TRIAL_INSTANCE.name(), String.valueOf(observationUnit.getEnvironmentNumber()));
-				instanceData.setMeasurementVariable(StudyBaseFactors.TRIAL_INSTANCE.asMeasurementVariable());
-				dataList.add(instanceData);
+			final MeasurementData instanceData =
+				new MeasurementData(StudyBaseFactors.TRIAL_INSTANCE.name(), String.valueOf(observationUnit.getEnvironmentNumber()));
+			instanceData.setMeasurementVariable(StudyBaseFactors.TRIAL_INSTANCE.asMeasurementVariable());
+			dataList.add(instanceData);
 
-				final MeasurementData replicationData =
-						new MeasurementData(StudyBaseFactors.REPLICATION_NO.name(), String.valueOf(observationUnit.getReplicationNumber()));
-				replicationData.setMeasurementVariable(StudyBaseFactors.REPLICATION_NO.asMeasurementVariable());
-				dataList.add(replicationData);
-			}
+			final MeasurementData replicationData =
+				new MeasurementData(StudyBaseFactors.REPLICATION_NO.name(), String.valueOf(observationUnit.getReplicationNumber()));
+			replicationData.setMeasurementVariable(StudyBaseFactors.REPLICATION_NO.asMeasurementVariable());
+			dataList.add(replicationData);
+
 
 			final MeasurementData entryData =
 					new MeasurementData(StudyBaseFactors.ENTRY_NUMBER.name(), String.valueOf(studyGermplasm.getEntryNumber()));

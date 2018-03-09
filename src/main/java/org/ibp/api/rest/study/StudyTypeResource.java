@@ -17,13 +17,14 @@ import java.util.List;
 
 @Api(value = "StudyType Services")
 @Controller
+@RequestMapping("/studytype")
 public class StudyTypeResource {
 
 	@Autowired
 	private StudyService studyService;
 
 	@ApiOperation(value = "List all study type", notes = "Returns a list of all study types.")
-	@RequestMapping(value = "/{cropname}/studytypes", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropname}/allVisible", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<StudyTypeDto>> listStudyTypes(final @PathVariable String cropname) {
 		return new ResponseEntity<>(this.studyService.getStudyTypes(), HttpStatus.OK);

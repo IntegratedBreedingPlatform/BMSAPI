@@ -1,18 +1,11 @@
 
 package org.ibp.api.java.impl.middleware.study;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
-
-import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
-import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.domain.study.FieldMap;
@@ -23,9 +16,15 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
-import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import java.net.URISyntaxException;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * The class <code>FieldMapServiceTest</code> contains tests for the class <code>{@link FieldMapService}</code>.
@@ -37,13 +36,13 @@ public class FieldMapServiceTest {
 
 	@Before
 	public void setup() throws Exception {
-		StudyDataManager studyDataManager = Mockito.mock(StudyDataManager.class);
-		List<FieldMapInfo> testFieldMapInfo = getSimpleMiddlewareFieldMapInfoObjectForTest();
-		when(studyDataManager.getStudyType(123)).thenReturn(StudyType.T);
+		final StudyDataManager studyDataManager = Mockito.mock(StudyDataManager.class);
+		final List<FieldMapInfo> testFieldMapInfo = getSimpleMiddlewareFieldMapInfoObjectForTest();
+		when(studyDataManager.getStudyType(123)).thenReturn(new StudyTypeDto("T"));
 		when(
-				studyDataManager.getFieldMapInfoOfStudy(Matchers.<List<Integer>>any(), any(StudyType.class),
+				studyDataManager.getFieldMapInfoOfStudy(Matchers.<List<Integer>>any(),
 						any(CrossExpansionProperties.class))).thenReturn(testFieldMapInfo);
-		FieldMapService fieldMapService = new FieldMapService(studyDataManager, Mockito.mock(CrossExpansionProperties.class));
+		final FieldMapService fieldMapService = new FieldMapService(studyDataManager, Mockito.mock(CrossExpansionProperties.class));
 		simpleFieldMap = fieldMapService.getFieldMap("123");
 	}
 
@@ -62,7 +61,7 @@ public class FieldMapServiceTest {
 		checkplotValues(expectedPlotValues, resultingPlotsPlots, new AssertFileMapValues() {
 
 			@Override
-			public void checkValues(int column, int range) {
+			public void checkValues(final int column, final int range) {
 				Assert.assertEquals(String.format("Plot values for coordinate %d, %d must be the same", column, range),
 						expectedPlotValues[column][range], resultingPlotsPlots[column][range].getPlotNumber());
 
@@ -73,7 +72,7 @@ public class FieldMapServiceTest {
 		checkplotValues(expectedDeletedValues, resultingPlotsPlots, new AssertFileMapValues() {
 
 			@Override
-			public void checkValues(int column, int range) {
+			public void checkValues(final int column, final int range) {
 				Assert.assertEquals(String.format("Deleted values for coordinate %d, %d must be the same", column, range),
 						expectedDeletedValues[column][range], resultingPlotsPlots[column][range].isPlotDeleted());
 
@@ -84,7 +83,7 @@ public class FieldMapServiceTest {
 		checkplotValues(expectedEntryNumber, resultingPlotsPlots, new AssertFileMapValues() {
 
 			@Override
-			public void checkValues(int column, int range) {
+			public void checkValues(final int column, final int range) {
 				Assert.assertEquals(String.format("Entry number for coordinate %d, %d must be the same", column, range),
 						expectedEntryNumber[column][range], resultingPlotsPlots[column][range].getEntryNumber());
 
@@ -105,21 +104,21 @@ public class FieldMapServiceTest {
 
 		Assert.assertEquals("For the test data provided there should be 9 plots", 9, getNumberOfPlots(actualRangeResults));
 
-		ImmutableMap<Integer, List<Integer>> expectedRangeResults =
+		final ImmutableMap<Integer, List<Integer>> expectedRangeResults =
 				new ImmutableMap.Builder<Integer, List<Integer>>().put(1, Lists.newArrayList(1, 2, 3)).put(2, Lists.newArrayList(0, 0, 0))
 						.put(3, Lists.newArrayList(4, 5, 6)).build();
 
 		checkplotValues(expectedRangeResults, actualRangeResults, new AssertFileMapValuesTwo() {
 
 			@Override
-			public void checkValues(Integer expectedPlotValue, FieldPlot actualFieldPlot) {
+			public void checkValues(final Integer expectedPlotValue, final FieldPlot actualFieldPlot) {
 				Assert.assertEquals(expectedPlotValue,
 						(Integer) (actualFieldPlot.getPlotNumber() == null ? 0 : actualFieldPlot.getPlotNumber()));
 
 			}
 		});
 
-		ImmutableMap<Integer, List<Integer>> expectedColumnResults =
+		final ImmutableMap<Integer, List<Integer>> expectedColumnResults =
 				new ImmutableMap.Builder<Integer, List<Integer>>().put(1, Lists.newArrayList(1, 0, 4)).put(2, Lists.newArrayList(2, 0, 5))
 						.put(3, Lists.newArrayList(3, 0, 6)).build();
 		final Map<Integer, List<FieldPlot>> actualColumnResults = simpleFieldMap.get(600000078).getColumns();
@@ -127,7 +126,7 @@ public class FieldMapServiceTest {
 		checkplotValues(expectedColumnResults, actualColumnResults, new AssertFileMapValuesTwo() {
 
 			@Override
-			public void checkValues(Integer expectedPlotValue, FieldPlot actualFieldPlot) {
+			public void checkValues(final Integer expectedPlotValue, final FieldPlot actualFieldPlot) {
 				Assert.assertEquals(expectedPlotValue,
 						(Integer) (actualFieldPlot.getPlotNumber() == null ? 0 : actualFieldPlot.getPlotNumber()));
 
@@ -135,20 +134,20 @@ public class FieldMapServiceTest {
 		});
 	}
 
-	private void checkplotValues(ImmutableMap<Integer, List<Integer>> expectedResults, Map<Integer, List<FieldPlot>> actualResults,
-			AssertFileMapValuesTwo assertFileMapValuesTwo) {
+	private void checkplotValues(final ImmutableMap<Integer, List<Integer>> expectedResults, final Map<Integer, List<FieldPlot>> actualResults,
+			final AssertFileMapValuesTwo assertFileMapValuesTwo) {
 
 		final ImmutableCollection<Entry<Integer, List<Integer>>> expectedPlotValues = expectedResults.entrySet();
 
 		for (final Entry<Integer, List<Integer>> expectedPlotValuesEntry : expectedPlotValues) {
-			Integer key = expectedPlotValuesEntry.getKey();
-			List<Integer> expectedValues = expectedPlotValuesEntry.getValue();
-			Iterator<Integer> expectedValueIterator = expectedValues.iterator();
-			List<FieldPlot> actualValues = actualResults.get(key);
-			Iterator<FieldPlot> actualValueIterator = actualValues.iterator();
+			final Integer key = expectedPlotValuesEntry.getKey();
+			final List<Integer> expectedValues = expectedPlotValuesEntry.getValue();
+			final Iterator<Integer> expectedValueIterator = expectedValues.iterator();
+			final List<FieldPlot> actualValues = actualResults.get(key);
+			final Iterator<FieldPlot> actualValueIterator = actualValues.iterator();
 			while (expectedValueIterator.hasNext()) {
-				Integer plotValues = (Integer) expectedValueIterator.next();
-				FieldPlot fieldPlot = (FieldPlot) actualValueIterator.next();
+				final Integer plotValues = (Integer) expectedValueIterator.next();
+				final FieldPlot fieldPlot = (FieldPlot) actualValueIterator.next();
 				assertFileMapValuesTwo.checkValues(plotValues, fieldPlot);
 			}
 
@@ -156,11 +155,11 @@ public class FieldMapServiceTest {
 
 	}
 
-	private int getNumberOfPlots(Map<Integer, List<FieldPlot>> resultingPlotsInRange) {
+	private int getNumberOfPlots(final Map<Integer, List<FieldPlot>> resultingPlotsInRange) {
 		int counter = 0;
-		Collection<List<FieldPlot>> values = resultingPlotsInRange.values();
-		for (List<FieldPlot> list : values) {
-			for (FieldPlot fieldPlot : list) {
+		final Collection<List<FieldPlot>> values = resultingPlotsInRange.values();
+		for (final List<FieldPlot> list : values) {
+			for (final FieldPlot fieldPlot : list) {
 				counter++;
 			}
 		}
@@ -178,7 +177,7 @@ public class FieldMapServiceTest {
 		void checkValues(Integer expectedPlotValue, FieldPlot actualFieldPlot);
 	}
 
-	private void checkplotValues(Object[][] expectedPlotValues, FieldPlot[][] resultingPlotsPlots, AssertFileMapValues assertFileMapValues) {
+	private void checkplotValues(final Object[][] expectedPlotValues, final FieldPlot[][] resultingPlotsPlots, final AssertFileMapValues assertFileMapValues) {
 
 		for (int i = 0; i < resultingPlotsPlots.length; i++) {
 			for (int j = 0; j < resultingPlotsPlots[i].length; j++) {
@@ -191,8 +190,8 @@ public class FieldMapServiceTest {
 	private int getNumberOfPlots(final FieldPlot[][] fieldPlots) {
 
 		int counter = 0;
-		for (FieldPlot[] fieldPlot : fieldPlots) {
-			for (FieldPlot plot : fieldPlot) {
+		for (final FieldPlot[] fieldPlot : fieldPlots) {
+			for (final FieldPlot plot : fieldPlot) {
 				counter++;
 			}
 		}

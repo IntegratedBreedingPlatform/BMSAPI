@@ -15,7 +15,6 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -62,8 +61,6 @@ import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
@@ -116,10 +113,10 @@ public class StudyServiceImpl implements StudyService {
 	private CrossExpansionProperties crossExpansionProperties;
 
 	@Override
-	public List<StudySummary> search(final String programUniqueId, String cropname, String principalInvestigator, String location, String season) {
+	public List<StudySummary> search(final String programUniqueId, final String cropname, final String principalInvestigator, final String location, final String season) {
 		final List<StudySummary> studySummaries = new ArrayList<>();
 		try {
-			StudySearchParameters searchParameters = new StudySearchParameters();
+			final StudySearchParameters searchParameters = new StudySearchParameters();
 			searchParameters.setProgramUniqueId(programUniqueId);
 			searchParameters.setPrincipalInvestigator(principalInvestigator);
 			searchParameters.setLocation(location);
@@ -152,7 +149,7 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public int countTotalObservationUnits(int studyIdentifier, int instanceId) {
+	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId) {
 		return this.middlewareStudyService.countTotalObservationUnits(studyIdentifier, instanceId);
 	}
 
@@ -231,7 +228,7 @@ public class StudyServiceImpl implements StudyService {
 
 		validationUtil.invokeValidation("StudyServiceImpl", new Command() {
 			@Override
-			public void execute(Errors errors) {
+			public void execute(final Errors errors) {
 				int counter = 0;
 				for (final Observation observation : observations) {
 					errors.pushNestedPath("Observation[" + counter++ + "]");
@@ -503,7 +500,7 @@ public class StudyServiceImpl implements StudyService {
 		this.dataImportService = dataImportService;
 	}
 
-	void setSecurityService(SecurityService securityService) {
+	void setSecurityService(final SecurityService securityService) {
 		this.securityService = securityService;
 	}
 
@@ -535,7 +532,7 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<StudyInstance> getStudyInstances(int studyId) {
+	public List<StudyInstance> getStudyInstances(final int studyId) {
 		final List<org.generationcp.middleware.service.impl.study.StudyInstance> studyInstancesMW =
 				this.middlewareStudyService.getStudyInstances(studyId);
 
@@ -543,7 +540,7 @@ public class StudyServiceImpl implements StudyService {
 				new Function<org.generationcp.middleware.service.impl.study.StudyInstance, StudyInstance>() {
 
 			@Override
-			public StudyInstance apply(org.generationcp.middleware.service.impl.study.StudyInstance input) {
+			public StudyInstance apply(final org.generationcp.middleware.service.impl.study.StudyInstance input) {
 				return new StudyInstance(input.getInstanceDbId(), input.getLocationName(), input.getLocationAbbreviation(),
 						input.getInstanceNumber());
 			}
@@ -598,7 +595,7 @@ public class StudyServiceImpl implements StudyService {
 	public Boolean isSampled(final Integer studyId) {
 		try {
 			return this.sampleService.studyHasSamples(studyId);
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 			throw new ApiRuntimeException("an error happened when trying to check if a study is sampled", e);
 		}
 	}
@@ -606,25 +603,8 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public List<StudyTypeDto> getStudyTypes(){
 		try{
-			List<StudyTypeDto> lists = new ArrayList<>();
-			lists.add(new StudyTypeDto(10000,"Nursery","N"));
-
-			lists.add(new StudyTypeDto(10001,"Hybridization Nursery","HB"));
-			lists.add(new StudyTypeDto(10002,"Pedigree Nursery","PN"));
-
-			lists.add(new StudyTypeDto(10003,"Characterization Nursery","CN"));
-
-			lists.add(new StudyTypeDto(10010,"Trial","T"));
-			lists.add(new StudyTypeDto(10005,"Observational Yield Trial","OYT"));
-			lists.add(new StudyTypeDto(10015,"Replication Yield Trial","RYT"));
-			lists.add(new StudyTypeDto(10017,"On Form Trial","OFT"));
-			lists.add(new StudyTypeDto(10020,"Survey","S"));
-			lists.add(new StudyTypeDto(10030,"Experiment","E"));
-
-
-			return lists;
-			//return this.studyDataManager.getAllStudyTypes();
-		} catch (MiddlewareException e) {
+			return this.studyDataManager.getAllVisibleStudyTypes();
+		} catch (final MiddlewareException e) {
 			throw new ApiRuntimeException("an error happened when trying to check if a study is sampled", e);
 		}
 	}
