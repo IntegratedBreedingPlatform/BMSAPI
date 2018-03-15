@@ -7,7 +7,6 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.ibp.api.domain.study.EnvironmentLevelMeasurement;
 import org.ibp.api.domain.study.EnvironmentLevelObservation;
@@ -95,16 +94,16 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 		conditions.add(StudyConditions.OBJECTIVE.asMeasurementVariable(source.getObjective()));
 		conditions.add(StudyConditions.STUDY_INSTITUTE.asMeasurementVariable(source.getStudyInstitute()));
 
-		if (StudyType.T.getName().equals(source.getStudyType())) {
-			final MeasurementVariable exptDesign = StudyBaseFactors.EXPT_DESIGN.asMeasurementVariable();
-			exptDesign.setValue(source.getEnvironmentDetails().getDesignType() != null ? source.getEnvironmentDetails().getDesignType()
-					.getId().toString() : null);
-			conditions.add(exptDesign);
+		final MeasurementVariable exptDesign = StudyBaseFactors.EXPT_DESIGN.asMeasurementVariable();
+		exptDesign.setValue(source.getEnvironmentDetails().getDesignType() != null ?
+			source.getEnvironmentDetails().getDesignType().getId().toString() :
+			null);
+		conditions.add(exptDesign);
 
-			final MeasurementVariable numReps = StudyBaseFactors.NREP.asMeasurementVariable();
-			numReps.setValue(String.valueOf(source.getEnvironmentDetails().getNumberOfReplications()));
-			conditions.add(numReps);
-		}
+		final MeasurementVariable numReps = StudyBaseFactors.NREP.asMeasurementVariable();
+		numReps.setValue(String.valueOf(source.getEnvironmentDetails().getNumberOfReplications()));
+		conditions.add(numReps);
+
 
 		this.workbook.setConditions(conditions);
 	}
@@ -118,20 +117,19 @@ public class WorkbookConverter implements Converter<StudyImportDTO, Workbook> {
 		factors.add(StudyBaseFactors.GID.asMeasurementVariable());
 		factors.add(StudyBaseFactors.PLOT_NUMBER.asMeasurementVariable());
 
-		if (StudyType.T.getName().equals(source.getStudyType())) {
-			factors.add(StudyBaseFactors.REPLICATION_NO.asMeasurementVariable());
+		factors.add(StudyBaseFactors.REPLICATION_NO.asMeasurementVariable());
 
-			factors.add(StudyBaseFactors.TRIAL_INSTANCE.asMeasurementVariable());
+		factors.add(StudyBaseFactors.TRIAL_INSTANCE.asMeasurementVariable());
 
-			final MeasurementVariable exptDesign = StudyBaseFactors.EXPT_DESIGN.asMeasurementVariable();
-			exptDesign.setValue(source.getEnvironmentDetails().getDesignType() != null ? source.getEnvironmentDetails().getDesignType()
-					.getId().toString() : null);
-			factors.add(exptDesign);
+		final MeasurementVariable exptDesign = StudyBaseFactors.EXPT_DESIGN.asMeasurementVariable();
+		exptDesign.setValue(source.getEnvironmentDetails().getDesignType() != null ?
+			source.getEnvironmentDetails().getDesignType().getId().toString() :
+			null);
+		factors.add(exptDesign);
 
-			final MeasurementVariable numReps = StudyBaseFactors.NREP.asMeasurementVariable();
-			numReps.setValue(String.valueOf(source.getEnvironmentDetails().getNumberOfReplications()));
-			factors.add(numReps);
-		}
+		final MeasurementVariable numReps = StudyBaseFactors.NREP.asMeasurementVariable();
+		numReps.setValue(String.valueOf(source.getEnvironmentDetails().getNumberOfReplications()));
+		factors.add(numReps);
 
 		this.workbook.setFactors(factors);
 	}
