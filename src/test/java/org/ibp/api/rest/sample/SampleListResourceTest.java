@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
@@ -33,6 +32,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -223,7 +223,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		list.add(sample);
 
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
-		Mockito.when(this.sampleService.filter(plotId, listId)).thenReturn(list);
+		Mockito.when(this.sampleService.filter(null, null, null)).thenReturn(list);
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.get("/sample/maize/samples?plotId=" + plotId).contentType(this.contentType)
@@ -248,7 +248,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		final List<SampleDTO> list = new ArrayList<>();
 
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
-		Mockito.when(this.sampleService.filter(plotId, listId)).thenReturn(list);
+		Mockito.when(this.sampleService.filter(null, null, null)).thenReturn(list);
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.get("/sample/maize/samples?plotId=" + plotId).contentType(this.contentType)
