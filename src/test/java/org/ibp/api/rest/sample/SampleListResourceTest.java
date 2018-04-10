@@ -223,7 +223,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		list.add(sample);
 
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
-		Mockito.when(this.sampleService.filter(null, null, null)).thenReturn(list);
+		Mockito.when(this.sampleService.filter(org.mockito.Matchers.anyString(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.any(Pageable.class))).thenReturn(list);
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.get("/sample/maize/samples?plotId=" + plotId).contentType(this.contentType)
