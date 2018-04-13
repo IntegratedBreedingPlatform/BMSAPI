@@ -32,6 +32,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -213,6 +214,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testListSamples() throws Exception {
 		final String plotId = RandomStringUtils.randomAlphanumeric(13);
+		final Integer listId = null;
 		final Date samplingDate = new Date();
 		final List<SampleDTO> list = new ArrayList<>();
 		final SampleDTO sample = new SampleDTO(RandomStringUtils.randomAlphanumeric(6), RandomStringUtils.randomAlphanumeric(6),
@@ -221,7 +223,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		list.add(sample);
 
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
-		Mockito.when(this.sampleService.getSamples(plotId)).thenReturn(list);
+		Mockito.when(this.sampleService.filter(org.mockito.Matchers.anyString(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.any(Pageable.class))).thenReturn(list);
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.get("/sample/maize/samples?plotId=" + plotId).contentType(this.contentType)
@@ -241,11 +243,12 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testListSamplesNotFound() throws Exception {
 		final String plotId = null;
+		final Integer listId = null;
 
 		final List<SampleDTO> list = new ArrayList<>();
 
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
-		Mockito.when(this.sampleService.getSamples(plotId)).thenReturn(list);
+		Mockito.when(this.sampleService.filter(null, null, null)).thenReturn(list);
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.get("/sample/maize/samples?plotId=" + plotId).contentType(this.contentType)
