@@ -23,6 +23,7 @@ import java.util.Map;
 public class SampleListResource {
 
 	public static final String NULL = "null";
+	// FIXME externalize
 	public static final String ERROR = "ERROR";
 	public static final String SOMETHING_WENT_WRONG_PLEASE_TRY_AGAIN = "Something went wrong, please try again";
 

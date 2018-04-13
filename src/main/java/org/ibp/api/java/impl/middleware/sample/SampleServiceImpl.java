@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,8 +19,8 @@ public class SampleServiceImpl implements SampleService {
 	org.generationcp.middleware.service.api.SampleService sampleService;
 
 	@Override
-	public List<SampleDTO> getSamples(final String plotId) {
-		return this.sampleService.getSamples(plotId);
+	public List<SampleDTO> filter(final String plotId, final Integer listId, final Pageable pageable) {
+		return this.sampleService.filter(plotId, listId, pageable);
 	}
 
 	@Override
