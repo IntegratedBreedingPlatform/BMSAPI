@@ -4,6 +4,8 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.common.ErrorResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,8 @@ import java.util.Map;
 @Controller
 @RequestMapping("/sampleLists")
 public class SampleListResource {
+
+	private static final Logger LOG = LoggerFactory.getLogger(SampleListResource.class);
 
 	public static final String NULL = "null";
 	// FIXME externalize
@@ -40,6 +44,7 @@ public class SampleListResource {
 			map = this.sampleListService.createSampleList(dto);
 
 		} catch (final MiddlewareException e) {
+			LOG.error("Error creating sample list", e);
 			final ErrorResponse response = new ErrorResponse();
 			if ("List name should be unique within the same directory".equalsIgnoreCase(e.getMessage())) {
 				response.addError(e.getMessage(), "ListName");
@@ -60,6 +65,7 @@ public class SampleListResource {
 		try {
 			map = this.sampleListService.createSampleListFolder(folderName, parentId, programUUID);
 		} catch (final MiddlewareException e) {
+			LOG.error("Error creating sample list folder", e);
 			final ErrorResponse response = new ErrorResponse();
 			response.addError("Something went wrong, please try again");
 			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
@@ -77,6 +83,7 @@ public class SampleListResource {
 		try {
 			map = this.sampleListService.updateSampleListFolderName(folderId, newFolderName);
 		} catch (final MiddlewareException e) {
+			LOG.error("Error updating sample list folder", e);
 			final ErrorResponse response = new ErrorResponse();
 			response.addError("Something went wrong, please try again");
 			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
@@ -93,6 +100,7 @@ public class SampleListResource {
 		try {
 			map = this.sampleListService.moveSampleListFolder(folderId, newParentId, isCropList, programUUID);
 		} catch (final MiddlewareException e) {
+			LOG.error("Error moving sample list folder", e);
 			final ErrorResponse response = new ErrorResponse();
 			response.addError("Something went wrong, please try again");
 			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
@@ -107,6 +115,7 @@ public class SampleListResource {
 		try {
 			this.sampleListService.deleteSampleListFolder(Integer.valueOf(folderId));
 		} catch (final MiddlewareException e) {
+			LOG.error("Error deleting sample list folder", e);
 			final ErrorResponse response = new ErrorResponse();
 			response.addError("Something went wrong, please try again");
 			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
