@@ -67,8 +67,8 @@ public class TestDataProvider {
     public static final org.ibp.api.domain.ontology.VariableType ANALYSIS_VARIABLE = new org.ibp.api.domain.ontology.VariableType(VariableType.ANALYSIS.getId().toString(),
             VariableType.ANALYSIS.getName(), VariableType.ANALYSIS.getDescription());
 
-    public static final org.ibp.api.domain.ontology.VariableType NURSERY_CONDITION_VARIABLE = new org.ibp.api.domain.ontology.VariableType(VariableType.NURSERY_CONDITION.getId().toString(),
-            VariableType.NURSERY_CONDITION.getName(), VariableType.NURSERY_CONDITION.getDescription());
+    public static final org.ibp.api.domain.ontology.VariableType STUDY_CONDITION_VARIABLE = new org.ibp.api.domain.ontology.VariableType(VariableType.STUDY_CONDITION.getId().toString(),
+            VariableType.STUDY_CONDITION.getName(), VariableType.STUDY_CONDITION.getDescription());
 
 	public static Term getMethodTerm() {
 		return new Term(TestDataProvider.METHOD_ID, TestDataProvider.METHOD_NAME, TestDataProvider.METHOD_DESCRIPTION, CvId.METHODS.getId(),null);
@@ -87,19 +87,19 @@ public class TestDataProvider {
 	}
 
 	public static Date getDateCreated() {
-		Calendar dateCreated = Calendar.getInstance();
+		final Calendar dateCreated = Calendar.getInstance();
 		dateCreated.set(2015, Calendar.JANUARY, 1);
 		return dateCreated.getTime();
 	}
 
 	public static Date getDateModified() {
-		Calendar dateLastModified = Calendar.getInstance();
+		final Calendar dateLastModified = Calendar.getInstance();
 		dateLastModified.set(2015, Calendar.JANUARY, 2);
 		return dateLastModified.getTime();
 	}
 
 	public static Method getTestMethod() {
-		Method method = new Method();
+		final Method method = new Method();
 		method.setId(TestDataProvider.METHOD_ID);
 		method.setName(TestDataProvider.METHOD_NAME);
 		method.setDefinition(TestDataProvider.METHOD_DESCRIPTION);
@@ -108,11 +108,11 @@ public class TestDataProvider {
 		return method;
 	}
 
-	public static List<Method> getTestMethodList(Integer elements) {
-		List<Method> methods = new ArrayList<>();
+	public static List<Method> getTestMethodList(final Integer elements) {
+		final List<Method> methods = new ArrayList<>();
 		for (Integer count = 0; count < elements; count++) {
-			Integer methodId = 100 + count;
-			Method method = new Method();
+			final Integer methodId = 100 + count;
+			final Method method = new Method();
 			method.setId(methodId);
 			method.setName(TestDataProvider.METHOD_NAME + methodId);
 			method.setDefinition(TestDataProvider.METHOD_DESCRIPTION);
@@ -124,7 +124,7 @@ public class TestDataProvider {
 	}
 
 	public static Property getTestProperty() {
-		Property property = new Property();
+		final Property property = new Property();
 		property.setId(TestDataProvider.PROPERTY_ID);
 		property.setName(TestDataProvider.PROPERTY_NAME);
 		property.setDefinition(TestDataProvider.PROPERTY_DESCRIPTION);
@@ -135,11 +135,11 @@ public class TestDataProvider {
 		return property;
 	}
 
-	public static List<Property> getTestProperties(Integer elements) {
-		List<Property> properties = new ArrayList<>();
+	public static List<Property> getTestProperties(final Integer elements) {
+		final List<Property> properties = new ArrayList<>();
 
 		for (Integer count = 0; count < elements; count++) {
-			Property property = new Property();
+			final Property property = new Property();
 			property.setId(TestDataProvider.PROPERTY_ID);
 			property.setName(TestDataProvider.PROPERTY_NAME);
 			property.setDefinition(TestDataProvider.PROPERTY_DESCRIPTION);
@@ -153,7 +153,7 @@ public class TestDataProvider {
 	}
 
 	public static Scale getTestScale() {
-		Scale scale = new Scale();
+		final Scale scale = new Scale();
 		scale.setId(TestDataProvider.SCALE_ID);
 		scale.setName(TestDataProvider.SCALE_NAME);
 		scale.setVocabularyId(TestDataProvider.SCALE_VOCABULARY_ID);
@@ -167,11 +167,11 @@ public class TestDataProvider {
 		return scale;
 	}
 
-	public static List<Scale> getTestScales(Integer elements) {
-		List<Scale> scaleList = new ArrayList<>();
+	public static List<Scale> getTestScales(final Integer elements) {
+		final List<Scale> scaleList = new ArrayList<>();
 
 		for (Integer count = 0; count < elements; count++) {
-			Scale scale = new Scale();
+			final Scale scale = new Scale();
 			scale.setId(TestDataProvider.SCALE_ID);
 			scale.setName(TestDataProvider.SCALE_NAME);
 			scale.setDefinition(TestDataProvider.SCALE_DESCRIPTION);
@@ -187,7 +187,7 @@ public class TestDataProvider {
 	}
 
 	public static Variable getTestVariable() {
-		Variable variable = new Variable();
+		final Variable variable = new Variable();
 		variable.setId(TestDataProvider.VARIABLE_ID);
 		variable.setName(TestDataProvider.VARIABLE_NAME);
 		variable.setDefinition(TestDataProvider.VARIABLE_DESCRIPTION);
@@ -209,11 +209,11 @@ public class TestDataProvider {
 		return variable;
 	}
 
-	public static List<Variable> getTestVariables(Integer elements) {
-		List<Variable> variableList = new ArrayList<>();
+	public static List<Variable> getTestVariables(final Integer elements) {
+		final List<Variable> variableList = new ArrayList<>();
 
 		for (Integer count = 0; count < elements; count++) {
-			Variable variable = new Variable(new Term(TestDataProvider.VARIABLE_ID + count, TestDataProvider.VARIABLE_NAME + count, TestDataProvider.VARIABLE_DESCRIPTION + count));
+			final Variable variable = new Variable(new Term(TestDataProvider.VARIABLE_ID + count, TestDataProvider.VARIABLE_NAME + count, TestDataProvider.VARIABLE_DESCRIPTION + count));
 			variable.setMinValue(TestDataProvider.VARIABLE_EXPECTED_MIN);
 			variable.setMaxValue(TestDataProvider.VARIABLE_EXPECTED_MAX);
 			variable.setAlias(TestDataProvider.VARIABLE_ALIAS + "_" + String.valueOf(count));
@@ -231,14 +231,14 @@ public class TestDataProvider {
 	}
 
 	public static MetadataDetails getTestMetadataDetails() {
-		MetadataDetails metadataDetails = new MetadataDetails();
+		final MetadataDetails metadataDetails = new MetadataDetails();
 		metadataDetails.setDateCreated(TestDataProvider.getDateCreated());
 		metadataDetails.setDateLastModified(TestDataProvider.getDateModified());
 		return metadataDetails;
 	}
 
 	public static MethodDetails getTestMethodDetails() {
-		MethodDetails method = new MethodDetails();
+		final MethodDetails method = new MethodDetails();
 		method.setId(String.valueOf(TestDataProvider.METHOD_ID));
 		method.setName(TestDataProvider.METHOD_NAME);
 		method.setDescription(TestDataProvider.METHOD_DESCRIPTION);
@@ -247,7 +247,7 @@ public class TestDataProvider {
 	}
 
 	public static PropertyDetails getTestPropertyDetails() {
-		PropertyDetails propertyDetails = new PropertyDetails();
+		final PropertyDetails propertyDetails = new PropertyDetails();
 		propertyDetails.setId(String.valueOf(TestDataProvider.PROPERTY_ID));
 		propertyDetails.setName(TestDataProvider.PROPERTY_NAME);
 		propertyDetails.setDescription(TestDataProvider.PROPERTY_DESCRIPTION);
@@ -258,7 +258,7 @@ public class TestDataProvider {
 	}
 
 	public static ScaleDetails getTestScaleDetails() {
-		ScaleDetails scaleDetails = new ScaleDetails();
+		final ScaleDetails scaleDetails = new ScaleDetails();
 		scaleDetails.setId(String.valueOf(TestDataProvider.SCALE_ID));
 		scaleDetails.setName(TestDataProvider.SCALE_NAME);
 		scaleDetails.setDescription(TestDataProvider.SCALE_DESCRIPTION);
@@ -270,7 +270,7 @@ public class TestDataProvider {
 	}
 
 	public static VariableDetails getTestVariableDetails() {
-		VariableDetails variableDetails = new VariableDetails();
+		final VariableDetails variableDetails = new VariableDetails();
 		variableDetails.setProgramUuid(TestDataProvider.PROGRAM_UUID);
 		variableDetails.setId(String.valueOf(TestDataProvider.VARIABLE_ID));
 		variableDetails.setName(TestDataProvider.VARIABLE_NAME);
@@ -287,7 +287,7 @@ public class TestDataProvider {
 	}
 
 	public static VariableFilter getVariableFilterForVariableValidator(){
-		VariableFilter variableFilter = new VariableFilter();
+		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addMethodId(METHOD_ID);
 		variableFilter.addPropertyId(PROPERTY_ID);
 		variableFilter.addScaleId(SCALE_ID);
@@ -295,7 +295,7 @@ public class TestDataProvider {
 	}
 
 	public static List<org.ibp.api.domain.ontology.VariableType> getVariableTypes(){
-		List<org.ibp.api.domain.ontology.VariableType> variableTypes = new ArrayList<>();
+		final List<org.ibp.api.domain.ontology.VariableType> variableTypes = new ArrayList<>();
 
 		org.ibp.api.domain.ontology.VariableType variableType = new org.ibp.api.domain.ontology.VariableType("1", "Variable Type 1", "Variable Type Description 1");
 		variableTypes.add(variableType);
