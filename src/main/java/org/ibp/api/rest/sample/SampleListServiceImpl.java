@@ -13,7 +13,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -125,6 +127,11 @@ public class SampleListServiceImpl implements SampleListService {
 	public void deleteSampleListFolder(final Integer folderId) {
 		Preconditions.checkArgument(folderId != null, "The folder id must not be null");
 		this.sampleListServiceMW.deleteSampleListFolder(folderId);
+	}
+
+	@Override
+	public List<SampleList> search(final String searchString, final boolean exactMatch, final String programUUID) {
+		return this.sampleListServiceMW.searchSampleLists(searchString, exactMatch, programUUID);
 	}
 
 	private SampleListDTO translateToSampleListDto(final SampleListDto dto) {

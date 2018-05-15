@@ -1,5 +1,8 @@
 package org.ibp.api.rest.sample;
 
+import org.generationcp.middleware.pojos.SampleList;
+
+import java.util.List;
 import java.util.Map;
 
 public interface SampleListService {
@@ -50,4 +53,12 @@ public interface SampleListService {
 	 * @throws Exception
 	 */
 	void deleteSampleListFolder(final Integer folderId);
+
+	/**
+	 * Search for SampleLists with names that contain the search term
+	 * @param searchString
+	 * @param exactMatch
+	 * @return
+	 */
+	List<SampleList> search(final String searchString, final boolean exactMatch, final String programUUID);
 }
