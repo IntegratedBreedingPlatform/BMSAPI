@@ -9,6 +9,7 @@ import org.ibp.api.domain.common.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -134,9 +135,9 @@ public class SampleListResource {
 	@ResponseBody
 	public ResponseEntity<List<org.generationcp.middleware.pojos.SampleList>> search(
 			@ApiParam("Only return the exact match of the search text") @RequestParam final boolean exactMatch,
-			@ApiParam("The name of the list to be searched") @RequestParam final String searchString) {
+			@ApiParam("The name of the list to be searched") @RequestParam final String searchString, final Pageable pageable) {
 		final List<org.generationcp.middleware.pojos.SampleList> sampleLists =
-				sampleListService.search(searchString, exactMatch, contextUtil.getCurrentProgramUUID());
+				sampleListService.search(searchString, exactMatch, contextUtil.getCurrentProgramUUID(), pageable);
 		return new ResponseEntity<>(sampleLists, HttpStatus.OK);
 	}
 }

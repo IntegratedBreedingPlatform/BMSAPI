@@ -1,6 +1,7 @@
 package org.ibp.api.rest.sample;
 
 import org.generationcp.middleware.pojos.SampleList;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -60,5 +61,5 @@ public interface SampleListService {
 	 * @param exactMatch
 	 * @return
 	 */
-	List<SampleList> search(final String searchString, final boolean exactMatch, final String programUUID);
+	List<SampleList> search(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable);
 }

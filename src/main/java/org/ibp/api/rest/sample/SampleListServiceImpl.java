@@ -8,6 +8,7 @@ import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -130,8 +131,8 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
-	public List<SampleList> search(final String searchString, final boolean exactMatch, final String programUUID) {
-		return this.sampleListServiceMW.searchSampleLists(searchString, exactMatch, programUUID);
+	public List<SampleList> search(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable) {
+		return this.sampleListServiceMW.searchSampleLists(searchString, exactMatch, programUUID, pageable);
 	}
 
 	private SampleListDTO translateToSampleListDto(final SampleListDto dto) {
