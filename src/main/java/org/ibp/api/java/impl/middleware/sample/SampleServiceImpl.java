@@ -24,6 +24,11 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
+	public long countFilter(final String plotId, final Integer listId) {
+		return this.sampleService.countFilter(plotId, listId);
+	}
+
+	@Override
 	public SampleDetailsDTO getSampleObservation(final String sampleId){
 		final SampleDetailsDTO sampleDetailsDTO;
 		try {

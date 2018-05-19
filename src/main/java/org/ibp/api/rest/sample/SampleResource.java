@@ -44,8 +44,7 @@ public class SampleResource {
 
 				@Override
 				public long getCount() {
-					// TODO
-					return 21;
+					return sampleService.countFilter(plotId, listId);
 				}
 
 				@Override
