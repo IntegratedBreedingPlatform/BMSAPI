@@ -585,7 +585,9 @@ public class StudyServiceImpl implements StudyService {
 
 		for (final org.generationcp.middleware.domain.dms.StudySummary studySummary : studySummaryList) {
 			final Project project = this.workbenchDataManager.getProjectByUuid(studySummary.getProgramDbId());
-			studySummary.setProgramName(project.getProjectName());
+			if (project != null) {
+				studySummary.setProgramName(project.getProjectName());
+			}
 		}
 
 		return studySummaryList;
