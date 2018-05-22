@@ -2,11 +2,14 @@ package org.ibp.api.rest.sample;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.List;
 import java.util.Map;
 
 @Api(value = "Sample Services")
@@ -33,6 +37,9 @@ public class SampleListResource {
 
 	@Autowired
 	public SampleListService sampleListService;
+
+	@Autowired
+	public ContextUtil contextUtil;
 
 	@ApiOperation(value = "Create sample list", notes = "Create sample list. ")
 	@RequestMapping(value = "/{crop}/sampleList", method = RequestMethod.POST)
@@ -121,5 +128,16 @@ public class SampleListResource {
 			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Search Sample List", notes = "Search Sample List")
+	@RequestMapping(value = "/{crop}/search", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<org.generationcp.middleware.pojos.SampleList>> search(
+			@ApiParam("Only return the exact match of the search text") @RequestParam final boolean exactMatch,
+			@ApiParam("The name of the list to be searched") @RequestParam final String searchString, final Pageable pageable) {
+		final List<org.generationcp.middleware.pojos.SampleList> sampleLists =
+				sampleListService.search(searchString, exactMatch, contextUtil.getCurrentProgramUUID(), pageable);
+		return new ResponseEntity<>(sampleLists, HttpStatus.OK);
 	}
 }
