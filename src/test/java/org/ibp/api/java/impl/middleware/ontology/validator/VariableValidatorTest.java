@@ -847,7 +847,7 @@ public class VariableValidatorTest {
 
         final List<VariableType> variableTypes = new ArrayList<>();
 
-        // changing variable types so that nursery condition is the only type
+        // changing variable types so that study condition is the only type
         variableTypes.add(TestDataProvider.STUDY_CONDITION_VARIABLE);
         variable.setVariableTypes(new HashSet<>(variableTypes));
 
