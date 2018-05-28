@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
@@ -77,6 +78,12 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		public SampleService sampleService() {
 			return Mockito.mock(SampleService.class);
 		}
+
+		@Bean
+		@Primary
+		public ContextUtil getContextUtil() {
+			return Mockito.mock(ContextUtil.class);
+		}
 	}
 
 	@Autowired
@@ -87,6 +94,9 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private SampleService sampleService;
+
+	@Autowired
+	private ContextUtil contextUtil;
 
 	@Before
 	public void beforeEachTest() {
@@ -238,6 +248,36 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].sampleList", Matchers.is(sample.getSampleList())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].plantNumber", Matchers.is(sample.getPlantNumber())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].plantBusinessKey", Matchers.is(sample.getPlantBusinessKey())));
+	}
+
+	@Test
+	public void testSearch() throws Exception {
+
+		final String searchString = "ListName1";
+
+		final List<SampleList> list = new ArrayList<>();
+		final SampleList sampleList = new SampleList();
+		sampleList.setId(1);
+		sampleList.setListName(searchString);
+		sampleList.setDescription("Description");
+		list.add(sampleList);
+
+		Mockito.when(this.contextUtil.getCurrentProgramUUID()).thenReturn(this.programUUID);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
+		Mockito.when(this.sampleListServiceMW.searchSampleLists(Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(), Mockito.any(Pageable.class))).thenReturn(list);
+
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.get("/sampleLists/maize/search")
+						.param("searchString", searchString)
+						.param("exactMatch", "false")
+						.contentType(this.contentType)
+						.content(this.convertObjectToByte(this.dto)))
+				.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(list.size())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].listName", Matchers.is(sampleList.getListName())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(sampleList.getDescription())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(sampleList.getId())));
+
 	}
 
 	@Test
