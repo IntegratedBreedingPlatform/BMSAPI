@@ -1,11 +1,12 @@
 
 package org.ibp.api.java.impl.middleware.study.conversion;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 import org.ibp.api.domain.study.MeasurementImportDTO;
 import org.ibp.api.domain.study.ObservationImportDTO;
@@ -15,15 +16,13 @@ import org.ibp.api.domain.study.Trait;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-
 public class WorkbookConverterTest {
 
 	@Test
 	public void testConvertNursery() {
 
 		final StudyImportDTO inputDTO = new StudyImportDTO();
-		inputDTO.setStudyType(StudyType.N.getName());
+		inputDTO.setStudyType(StudyTypeDto.NURSERY_NAME);
 		inputDTO.setName("Maize Nursery");
 		inputDTO.setObjective("Grow more seeds.");
 		inputDTO.setStartDate("20150101");
@@ -96,7 +95,7 @@ public class WorkbookConverterTest {
 		final Workbook outputWorkbook = converter.convert(inputDTO);
 
 		// StudyDetail mapping
-		Assert.assertEquals(StudyType.N, outputWorkbook.getStudyDetails().getStudyType());
+		Assert.assertEquals(new StudyTypeDto(StudyTypeDto.NURSERY_NAME), outputWorkbook.getStudyDetails().getStudyType());
 		Assert.assertEquals(inputDTO.getName(), outputWorkbook.getStudyDetails().getStudyName());
 		Assert.assertEquals(inputDTO.getObjective(), outputWorkbook.getStudyDetails().getObjective());
 		Assert.assertEquals(inputDTO.getDescription(), outputWorkbook.getStudyDetails().getDescription());
