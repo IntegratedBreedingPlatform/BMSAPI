@@ -105,7 +105,7 @@ public class WorkbookConverterTest {
 		Assert.assertEquals(inputDTO.getFolderId(), new Long(outputWorkbook.getStudyDetails().getParentFolderId()));
 
 		// Basic details as MeasurementVariables
-		Assert.assertEquals(6, outputWorkbook.getConditions().size());
+		Assert.assertEquals(8, outputWorkbook.getConditions().size());
 		Assert.assertEquals(inputDTO.getName(), outputWorkbook.getStudyName());
 
 		final MeasurementVariable mvStudyInstitute = outputWorkbook.getConditions().get(5);
@@ -119,7 +119,7 @@ public class WorkbookConverterTest {
 		Assert.assertEquals(0, outputWorkbook.getConstants().size());
 
 		// Factors
-		Assert.assertEquals(5, outputWorkbook.getFactors().size());
+		Assert.assertEquals(9, outputWorkbook.getFactors().size());
 		final MeasurementVariable mvEntryNumber = outputWorkbook.getFactors().get(0);
 		Assert.assertEquals(PhenotypicType.GERMPLASM, mvEntryNumber.getRole());
 		Assert.assertTrue(mvEntryNumber.isFactor());
