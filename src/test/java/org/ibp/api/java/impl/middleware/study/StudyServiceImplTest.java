@@ -6,7 +6,6 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -121,7 +120,7 @@ public class StudyServiceImplTest {
 
 	@Test
 	public void listAllStudies() throws MiddlewareQueryException {
-
+		final StudyTypeDto studyTypeDto= new StudyTypeDto(StudyTypeDto.TRIAL_NAME);
 		final List<org.generationcp.middleware.service.api.study.StudySummary> mockResult = new ArrayList<>();
 		final org.generationcp.middleware.service.api.study.StudySummary studySummary =
 				new org.generationcp.middleware.service.api.study.StudySummary();
@@ -132,7 +131,7 @@ public class StudyServiceImplTest {
 		studySummary.setProgramUUID(this.programUID);
 		studySummary.setStartDate("2015-01-01");
 		studySummary.setEndDate("2015-12-31");
-		studySummary.setType(new StudyTypeDto("T"));
+		studySummary.setType(studyTypeDto);
 
 		mockResult.add(studySummary);
 
@@ -146,7 +145,7 @@ public class StudyServiceImplTest {
 		Assert.assertEquals(studySummary.getObjective(), studySummaries.get(0).getObjective());
 		Assert.assertEquals(studySummary.getStartDate(), studySummaries.get(0).getStartDate());
 		Assert.assertEquals(studySummary.getEndDate(), studySummaries.get(0).getEndDate());
-		Assert.assertEquals(studySummary.getType().toString(), studySummaries.get(0).getType());
+		Assert.assertEquals(studySummary.getType().getName(), studySummaries.get(0).getType());
 
 	}
 
@@ -338,7 +337,7 @@ public class StudyServiceImplTest {
 
 		// Minimal setup
 		final StudyImportDTO studyImportDTO = new StudyImportDTO();
-		studyImportDTO.setStudyType(StudyType.N.getName());
+		studyImportDTO.setStudyType("N");
 		studyImportDTO.setUserId(1);
 
 		final Workbook workbook = new Workbook();

@@ -44,7 +44,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		summaryMW.setName("A Maizing Trial");
 		summaryMW.setTitle("A Maizing Trial Title");
 		summaryMW.setObjective("A Maize the world with new Maize variety.");
-		summaryMW.setType(new StudyTypeDto("T"));
+		summaryMW.setType(new StudyTypeDto(StudyTypeDto.TRIAL_NAME));
 		summaryMW.setStartDate("01012015");
 		summaryMW.setEndDate("01012015");
 		summaryMW.setPrincipalInvestigator("Mr. Breeder");
@@ -145,7 +145,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		Mockito.when(study.getName()).thenReturn("Maizing Trial");
 		Mockito.when(study.getDescription()).thenReturn("Title");
 		Mockito.when(study.getObjective()).thenReturn("Objective");
-		Mockito.when(study.getType()).thenReturn(new StudyTypeDto("T"));
+		Mockito.when(study.getType()).thenReturn(new StudyTypeDto(StudyTypeDto.TRIAL_NAME));
 		Mockito.when(study.getStartDate()).thenReturn(20150101);
 		Mockito.when(study.getEndDate()).thenReturn(20151231);
 
