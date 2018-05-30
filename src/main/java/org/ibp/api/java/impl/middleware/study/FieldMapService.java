@@ -228,7 +228,7 @@ public class FieldMapService {
 	private StudyFieldMap getRawDataFromMiddleware(final String studyId) {
 		final Integer studyIdentifier = Integer.valueOf(studyId);
 		try {
-			final StudyTypeDto studyType = this.studyDataManager.getStudyType(studyIdentifier);
+			final StudyTypeDto studyType = this.studyDataManager.getStudyTypeByStudyId(studyIdentifier);
 
 			final List<FieldMapInfo> fieldMapInfoOfStudy =
 					this.studyDataManager.getFieldMapInfoOfStudy(Lists.newArrayList(studyIdentifier),

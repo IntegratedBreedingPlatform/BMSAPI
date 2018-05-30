@@ -31,7 +31,7 @@ public class ComplexFieldMapServiceTest {
 	public void setup() throws Exception {
 		final StudyDataManager studyDataManager = Mockito.mock(StudyDataManager.class);
 		final List<FieldMapInfo> testFieldMapInfo = getComplexMiddlewareFieldMapInfoObjectForTest();
-		when(studyDataManager.getStudyType(123)).thenReturn(new StudyTypeDto(StudyTypeDto.TRIAL_NAME));
+		when(studyDataManager.getStudyTypeByStudyId(123)).thenReturn(new StudyTypeDto(StudyTypeDto.TRIAL_NAME));
 		when(
 				studyDataManager.getFieldMapInfoOfStudy(Matchers.<List<Integer>>any(),
 						any(CrossExpansionProperties.class))).thenReturn(testFieldMapInfo);
