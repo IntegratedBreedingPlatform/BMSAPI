@@ -19,11 +19,11 @@ import org.junit.Test;
 public class WorkbookConverterTest {
 
 	@Test
-	public void testConvertNursery() {
+	public void testConvertStudy() {
 
 		final StudyImportDTO inputDTO = new StudyImportDTO();
 		inputDTO.setStudyType(StudyTypeDto.NURSERY_NAME);
-		inputDTO.setName("Maize Nursery");
+		inputDTO.setName("Maize Study");
 		inputDTO.setObjective("Grow more seeds.");
 		inputDTO.setStartDate("20150101");
 		inputDTO.setEndDate("20151201");
@@ -31,7 +31,7 @@ public class WorkbookConverterTest {
 		inputDTO.setFolderId(1L);
 		inputDTO.setSiteName("Mexico");
 		inputDTO.setStudyInstitute("CIMMYT");
-		inputDTO.setDescription("Maize Nursery title.");
+		inputDTO.setDescription("Maize Study title.");
 		inputDTO.setCreatedBy("1");
 
 		final Trait trait1 = new Trait(1, "Plant Height");
@@ -95,7 +95,7 @@ public class WorkbookConverterTest {
 		final Workbook outputWorkbook = converter.convert(inputDTO);
 
 		// StudyDetail mapping
-		Assert.assertEquals(StudyTypeDto.getNurseryDto(), outputWorkbook.getStudyDetails().getStudyType());
+		Assert.assertEquals(StudyTypeDto.getNurseryDto().getName(), outputWorkbook.getStudyDetails().getStudyType().getName());
 		Assert.assertEquals(inputDTO.getName(), outputWorkbook.getStudyDetails().getStudyName());
 		Assert.assertEquals(inputDTO.getObjective(), outputWorkbook.getStudyDetails().getObjective());
 		Assert.assertEquals(inputDTO.getDescription(), outputWorkbook.getStudyDetails().getDescription());
