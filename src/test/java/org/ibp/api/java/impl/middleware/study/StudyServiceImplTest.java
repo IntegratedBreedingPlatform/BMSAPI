@@ -337,7 +337,7 @@ public class StudyServiceImplTest {
 
 		// Minimal setup
 		final StudyImportDTO studyImportDTO = new StudyImportDTO();
-		studyImportDTO.setStudyType("N");
+		studyImportDTO.setStudyType(StudyTypeDto.NURSERY_NAME);
 		studyImportDTO.setUserId(1);
 
 		final Workbook workbook = new Workbook();
