@@ -120,7 +120,7 @@ public class StudyServiceImplTest {
 
 	@Test
 	public void listAllStudies() throws MiddlewareQueryException {
-		final StudyTypeDto studyTypeDto= new StudyTypeDto(StudyTypeDto.TRIAL_NAME);
+		final StudyTypeDto studyTypeDto= StudyTypeDto.getTrialDto();
 		final List<org.generationcp.middleware.service.api.study.StudySummary> mockResult = new ArrayList<>();
 		final org.generationcp.middleware.service.api.study.StudySummary studySummary =
 				new org.generationcp.middleware.service.api.study.StudySummary();

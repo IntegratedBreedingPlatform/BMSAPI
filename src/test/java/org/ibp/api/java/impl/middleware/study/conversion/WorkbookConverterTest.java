@@ -95,7 +95,7 @@ public class WorkbookConverterTest {
 		final Workbook outputWorkbook = converter.convert(inputDTO);
 
 		// StudyDetail mapping
-		Assert.assertEquals(new StudyTypeDto(StudyTypeDto.NURSERY_NAME), outputWorkbook.getStudyDetails().getStudyType());
+		Assert.assertEquals(StudyTypeDto.getNurseryDto(), outputWorkbook.getStudyDetails().getStudyType());
 		Assert.assertEquals(inputDTO.getName(), outputWorkbook.getStudyDetails().getStudyName());
 		Assert.assertEquals(inputDTO.getObjective(), outputWorkbook.getStudyDetails().getObjective());
 		Assert.assertEquals(inputDTO.getDescription(), outputWorkbook.getStudyDetails().getDescription());
