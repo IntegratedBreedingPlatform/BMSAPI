@@ -1,17 +1,18 @@
 package org.ibp.api.brapi.v1.study;
 
-import com.google.common.collect.Lists;
-import org.generationcp.middleware.domain.oms.StudyType;
-import org.generationcp.middleware.service.api.location.LocationDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyMetadata;
-import org.generationcp.middleware.service.api.user.UserDto;
-import org.ibp.api.brapi.v1.location.Location;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.service.api.study.StudyDetailsDto;
+import org.generationcp.middleware.service.api.study.StudyMetadata;
+import org.generationcp.middleware.service.api.user.UserDto;
+
+import com.google.common.collect.Lists;
 
 public class StudyTestDataProvider {
 
@@ -21,7 +22,7 @@ public class StudyTestDataProvider {
 		user.setEmail("a@a.com");
 		user.setFirstName("admin");
 		user.setLastName("admin");
-		user.setRole("ADMIN");
+		user.setRole(new Role(1,"ADMIN"));
 		return user;
 	}
 

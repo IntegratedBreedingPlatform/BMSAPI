@@ -10,6 +10,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,7 +41,7 @@ public class WorkbenchUserDetailsServiceTest {
 			User testUserWorkbench = new User();
 			testUserWorkbench.setName(WorkbenchUserDetailsServiceTest.TEST_USER);
 			testUserWorkbench.setPassword("password");
-			UserRole testUserRole = new UserRole(testUserWorkbench, "ADMIN");
+			UserRole testUserRole = new UserRole(testUserWorkbench, new Role(1, "ADMIN"));
 			testUserWorkbench.setRoles(Arrays.asList(testUserRole));
 			matchingUsers.add(testUserWorkbench);
 
@@ -51,7 +52,7 @@ public class WorkbenchUserDetailsServiceTest {
 			Assert.assertEquals(testUserWorkbench.getName(), userDetails.getUsername());
 			Assert.assertEquals(testUserWorkbench.getPassword(), userDetails.getPassword());
 			Assert.assertEquals(1, userDetails.getAuthorities().size());
-			Assert.assertTrue(userDetails.getAuthorities().contains(new SimpleGrantedAuthority(testUserRole.getRole())));
+			Assert.assertTrue(userDetails.getAuthorities().contains(new SimpleGrantedAuthority(testUserRole.getRole().getCapitalizedName())));
 		} catch (MiddlewareQueryException e) {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
@@ -66,7 +67,7 @@ public class WorkbenchUserDetailsServiceTest {
 		User testUserWorkbench = new User();
 		testUserWorkbench.setName(rawUTF8Username);
 		testUserWorkbench.setPassword("password");
-		UserRole testUserRole = new UserRole(testUserWorkbench, "ADMIN");
+		UserRole testUserRole = new UserRole(testUserWorkbench, new Role(1, "ADMIN"));
 		testUserWorkbench.setRoles(Arrays.asList(testUserRole));
 		matchingUsers.add(testUserWorkbench);
 

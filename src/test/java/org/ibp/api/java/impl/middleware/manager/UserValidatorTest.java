@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.manager;
 
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -82,7 +83,7 @@ public class UserValidatorTest {
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final User user = UserTestDataGenerator.initializeUser(10);
 
-		userDto.setRole("Breeeder");
+		userDto.setRole(new Role(2,"Breeeder"));
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
