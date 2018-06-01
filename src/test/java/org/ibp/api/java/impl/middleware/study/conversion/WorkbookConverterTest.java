@@ -22,7 +22,7 @@ public class WorkbookConverterTest {
 	public void testConvertStudy() {
 
 		final StudyImportDTO inputDTO = new StudyImportDTO();
-		inputDTO.setStudyType(StudyTypeDto.NURSERY_NAME);
+		inputDTO.setStudyType(StudyTypeDto.TRIAL_NAME);
 		inputDTO.setName("Maize Study");
 		inputDTO.setObjective("Grow more seeds.");
 		inputDTO.setStartDate("20150101");
@@ -95,7 +95,7 @@ public class WorkbookConverterTest {
 		final Workbook outputWorkbook = converter.convert(inputDTO);
 
 		// StudyDetail mapping
-		Assert.assertEquals(StudyTypeDto.getNurseryDto().getName(), outputWorkbook.getStudyDetails().getStudyType().getName());
+		Assert.assertEquals(StudyTypeDto.getTrialDto().getName(), outputWorkbook.getStudyDetails().getStudyType().getName());
 		Assert.assertEquals(inputDTO.getName(), outputWorkbook.getStudyDetails().getStudyName());
 		Assert.assertEquals(inputDTO.getObjective(), outputWorkbook.getStudyDetails().getObjective());
 		Assert.assertEquals(inputDTO.getDescription(), outputWorkbook.getStudyDetails().getDescription());

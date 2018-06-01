@@ -13,7 +13,7 @@ public class GermplasmListConverterTest {
 	public void testConvert() {
 
 		final StudyImportDTO input = new StudyImportDTO();
-		input.setName("Test Nursery");
+		input.setName("Test Study");
 		input.setStartDate("20150101");
 		input.setUserId(1);
 
