@@ -37,7 +37,7 @@ public class TrialSummaryTestDataProvider {
 		studySummary.setProgramName("PROGRAM1");
 		studySummary.setStartDate("20160404");
 		studySummary.setStudyDbid(2);
-		studySummary.setName("TRIAL1");
+		studySummary.setName("STUDY1");
 		studySummary.setOptionalInfo(getOptionalInfo());
 		studySummary.setInstanceMetaData(getInstanceMatadatas());
 		return studySummary;

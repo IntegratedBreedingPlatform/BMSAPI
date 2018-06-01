@@ -41,8 +41,8 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		final org.generationcp.middleware.service.api.study.StudySummary summaryMW =
 				new org.generationcp.middleware.service.api.study.StudySummary();
 		summaryMW.setId(1);
-		summaryMW.setName("A Maizing Trial");
-		summaryMW.setTitle("A Maizing Trial Title");
+		summaryMW.setName("A Maizing Study");
+		summaryMW.setTitle("A Maizing Study Title");
 		summaryMW.setObjective("A Maize the world with new Maize variety.");
 		summaryMW.setType(StudyTypeDto.getTrialDto());
 		summaryMW.setStartDate("01012015");
@@ -142,7 +142,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		// so that test does not need too much structural knowledge of Middleware data objects.
 		final Study study = Mockito.mock(Study.class);
 		Mockito.when(study.getId()).thenReturn(studyId);
-		Mockito.when(study.getName()).thenReturn("Maizing Trial");
+		Mockito.when(study.getName()).thenReturn("Maizing Study");
 		Mockito.when(study.getDescription()).thenReturn("Title");
 		Mockito.when(study.getObjective()).thenReturn("Objective");
 		Mockito.when(study.getType()).thenReturn(StudyTypeDto.getTrialDto());

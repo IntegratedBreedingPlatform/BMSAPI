@@ -10,22 +10,22 @@ import static org.hamcrest.Matchers.equalTo;
 public class TrialSummaryMapperTest {
 
 	@Test
-	public void trialSummaryMapperTest() {
+	public void studySummaryMapperTest() {
 
 		final ModelMapper mapper = TrialSummaryMapper.getInstance();
 		final StudySummary studySummary = TrialSummaryTestDataProvider.getTrialSummary();
-		final TrialSummary trialSummaryDto = mapper.map(studySummary, TrialSummary.class);
+		final TrialSummary studySummaryDto = mapper.map(studySummary, TrialSummary.class);
 
-		assertThat(studySummary.getLocationId(), equalTo(trialSummaryDto.getLocationDbId()));
-		assertThat(studySummary.isActive(), equalTo(trialSummaryDto.isActive()));
-		assertThat(studySummary.getEndDate(), equalTo(trialSummaryDto.getEndDate()));
-		assertThat(studySummary.getProgramDbId(), equalTo(trialSummaryDto.getProgramDbId()));
-		assertThat(studySummary.getProgramName(), equalTo(trialSummaryDto.getProgramName()));
-		assertThat(studySummary.getStartDate(), equalTo(trialSummaryDto.getStartDate()));
-		assertThat(studySummary.getStudyDbid(), equalTo(trialSummaryDto.getTrialDbId()));
-		assertThat(studySummary.getName(), equalTo(trialSummaryDto.getTrialName()));
-		assertThat(studySummary.getOptionalInfo().size(), equalTo(trialSummaryDto.getAdditionalInfo().size()));
-		assertThat(studySummary.getInstanceMetaData().size(), equalTo(trialSummaryDto.getStudies().size()));
+		assertThat(studySummary.getLocationId(), equalTo(studySummaryDto.getLocationDbId()));
+		assertThat(studySummary.isActive(), equalTo(studySummaryDto.isActive()));
+		assertThat(studySummary.getEndDate(), equalTo(studySummaryDto.getEndDate()));
+		assertThat(studySummary.getProgramDbId(), equalTo(studySummaryDto.getProgramDbId()));
+		assertThat(studySummary.getProgramName(), equalTo(studySummaryDto.getProgramName()));
+		assertThat(studySummary.getStartDate(), equalTo(studySummaryDto.getStartDate()));
+		assertThat(studySummary.getStudyDbid(), equalTo(studySummaryDto.getTrialDbId()));
+		assertThat(studySummary.getName(), equalTo(studySummaryDto.getTrialName()));
+		assertThat(studySummary.getOptionalInfo().size(), equalTo(studySummaryDto.getAdditionalInfo().size()));
+		assertThat(studySummary.getInstanceMetaData().size(), equalTo(studySummaryDto.getStudies().size()));
 	}
 
 }
