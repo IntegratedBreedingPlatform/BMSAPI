@@ -9,6 +9,7 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -44,8 +45,8 @@ public class SecurityServiceImpl implements SecurityService {
 		// User reference on the gerplasmList is a reference to the User record in crop DB which is created by copying the User record in
 		// Workbench db. The record ids might not be same but the user name must be the same.
 		User cropDBListOwner = this.userDataManager.getUserById(germplasmList.getUserId());
-		User workbenchListOwner = this.workbenchDataManager.getUserByUsername(cropDBListOwner.getName());
-		User loggedInUser = this.getCurrentlyLoggedInUser();
+		WorkbenchUser workbenchListOwner = this.workbenchDataManager.getUserByUsername(cropDBListOwner.getName());
+		WorkbenchUser loggedInUser = this.getCurrentlyLoggedInUser();
 
 		if (loggedInUser.equals(workbenchListOwner)) {
 			return true;
@@ -56,16 +57,16 @@ public class SecurityServiceImpl implements SecurityService {
 
 	private boolean loggedInUserIsMemberOf(String programUniqueId, String cropname) {
 		if (!StringUtils.isBlank(programUniqueId)) {
-			User loggedInUser = this.getCurrentlyLoggedInUser();
+			WorkbenchUser loggedInUser = this.getCurrentlyLoggedInUser();
 			Project program = this.workbenchDataManager.getProjectByUuidAndCrop(programUniqueId, cropname);
-			List<User> allProgramMembers = this.workbenchDataManager.getUsersByProjectId(program.getProjectId());
+			List<WorkbenchUser> allProgramMembers = this.workbenchDataManager.getUsersByProjectId(program.getProjectId());
 			return allProgramMembers.contains(loggedInUser);
 		}
 		return false;
 	}
 
 	@Override
-	public User getCurrentlyLoggedInUser() {
+	public WorkbenchUser getCurrentlyLoggedInUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null) {
 			throw new IllegalStateException("No authenticated user was found in security context.");

@@ -15,7 +15,7 @@ import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
@@ -50,7 +50,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	private static final String VALUE = "1";
 
 	private SampleListDto dto;
-	private User user;
+	private WorkbenchUser user;
 	private String folderName;
 	private Integer parentId;
 	private String programUUID;
@@ -116,7 +116,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		this.dto.setListName("SamplesTest");
 		this.dto.setCreatedDate("2017-10-12");
 		this.dto.setProgramUUID("c35c7769-bdad-4c70-a6c4-78c0dbf784e5");
-		this.user = new User();
+		this.user = new WorkbenchUser();
 		this.user.setName(SampleListResourceTest.ADMIN);
 
 		this.folderName = "Folder Name";
@@ -148,10 +148,10 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	public void createSampleListFolder() throws Exception {
 		final HashMap<String, Object> result = new HashMap<>();
 		result.put("id", SampleListResourceTest.VALUE);
-		final User creatingBy = new User();
+		final WorkbenchUser creatingBy = new WorkbenchUser();
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(creatingBy);
 		Mockito.when(this.sampleListServiceMW.createSampleListFolder(org.mockito.Matchers.anyString(), org.mockito.Matchers.anyInt(),
-				org.mockito.Matchers.any(User.class), org.mockito.Matchers.anyString()))
+				org.mockito.Matchers.any(String.class), org.mockito.Matchers.anyString()))
 				.thenReturn(Integer.valueOf(SampleListResourceTest.VALUE));
 
 		final String url = String.format("/sampleLists/maize/sampleListFolder?folderName=%s&parentId=%s&programUUID=%s", this.folderName,

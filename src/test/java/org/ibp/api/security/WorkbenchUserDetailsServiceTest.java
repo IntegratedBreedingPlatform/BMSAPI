@@ -12,6 +12,7 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,8 +38,8 @@ public class WorkbenchUserDetailsServiceTest {
 	@Test
 	public void testLoadUserByUserName() {
 		try {
-			List<User> matchingUsers = new ArrayList<User>();
-			User testUserWorkbench = new User();
+			List<WorkbenchUser> matchingUsers = new ArrayList<WorkbenchUser>();
+			WorkbenchUser testUserWorkbench = new WorkbenchUser();
 			testUserWorkbench.setName(WorkbenchUserDetailsServiceTest.TEST_USER);
 			testUserWorkbench.setPassword("password");
 			UserRole testUserRole = new UserRole(testUserWorkbench, new Role(1, "ADMIN"));
@@ -63,8 +64,8 @@ public class WorkbenchUserDetailsServiceTest {
 		String htmlEscaptedUTF8Username = "&#28900;&#29482;";
 		String rawUTF8Username = "烤猪";
 
-		List<User> matchingUsers = new ArrayList<User>();
-		User testUserWorkbench = new User();
+		List<WorkbenchUser> matchingUsers = new ArrayList<WorkbenchUser>();
+		WorkbenchUser testUserWorkbench = new WorkbenchUser();
 		testUserWorkbench.setName(rawUTF8Username);
 		testUserWorkbench.setPassword("password");
 		UserRole testUserRole = new UserRole(testUserWorkbench, new Role(1, "ADMIN"));
@@ -80,7 +81,7 @@ public class WorkbenchUserDetailsServiceTest {
 	@Test(expected = UsernameNotFoundException.class)
 	public void testLoadUserByNonExistantUserName() throws MiddlewareQueryException {
 		Mockito.when(this.workbenchDataManager.getUserByName(WorkbenchUserDetailsServiceTest.TEST_USER, 0, 1, Operation.EQUAL)).thenReturn(
-				Collections.<User>emptyList());
+				Collections.<WorkbenchUser>emptyList());
 		this.service.loadUserByUsername(WorkbenchUserDetailsServiceTest.TEST_USER);
 	}
 

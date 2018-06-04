@@ -9,8 +9,8 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.UserRole;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
@@ -43,9 +43,9 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 			// username must be converted from html-encode to utf-8 string to support chinese/utf-8 languages
 			username = StringEscapeUtils.unescapeHtml(username);
 
-			final List<User> matchingUsers = this.workbenchDataManager.getUserByName(username, 0, 1, Operation.EQUAL);
+			final List<WorkbenchUser> matchingUsers = this.workbenchDataManager.getUserByName(username, 0, 1, Operation.EQUAL);
 			if (matchingUsers != null && !matchingUsers.isEmpty()) {
-				final User workbenchUser = matchingUsers.get(0);
+				final WorkbenchUser workbenchUser = matchingUsers.get(0);
 				// FIXME Populate flags for accountNonExpired, credentialsNonExpired, accountNonLocked properly, all true for now.
 				return new org.springframework.security.core.userdetails.User(workbenchUser.getName(), workbenchUser.getPassword(),
 						this.getRolesAsAuthorities(workbenchUser));
@@ -56,13 +56,13 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 		}
 	}
 
-	private Collection<? extends GrantedAuthority> getRolesAsAuthorities(final User workbenchUser) {
+	private Collection<? extends GrantedAuthority> getRolesAsAuthorities(final WorkbenchUser workbenchUser) {
 		final List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 		if (workbenchUser != null) {
 			final List<UserRole> userRoles = workbenchUser.getRoles();
 			if (userRoles != null && !userRoles.isEmpty()) {
 				for (final UserRole role : userRoles) {
-					authorities.add(new SimpleGrantedAuthority(role.getRole()));
+					authorities.add(new SimpleGrantedAuthority(role.getRole().getCapitalizedName()));
 				}
 			}
 		}

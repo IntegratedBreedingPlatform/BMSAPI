@@ -1,15 +1,21 @@
 
 package org.ibp.api.brapi.v1.user;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
+import java.util.List;
+import java.util.Map;
+
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.common.ErrorResponse;
+import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
 import org.ibp.api.java.impl.middleware.manager.UserValidator;
-import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.impl.middleware.user.UserServiceImpl;
 import org.junit.Before;
@@ -20,12 +26,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
@@ -140,7 +140,7 @@ public class UserServiceTest {
 	public void testUpdateUser() throws Exception {
 		final UserDetailDto usrDtlDto = UserTestDataGenerator.initializeUserDetailDto(8);
 		final UserDto userDto = UserTestDataGenerator.initializeUserDto(8);
-		final User user = UserTestDataGenerator.initializeUser(8);
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(8);
 		
 		Mockito.when(this.workbenchDataManager.updateUser(userDto)).thenReturn(new Integer(8));
 		Mockito.when(this.workbenchDataManager.getUserById(8)).thenReturn(user);
@@ -158,8 +158,8 @@ public class UserServiceTest {
 	@Test
 	public void testUpdateUserValidateError() throws Exception {
 		final UserDetailDto usrDtlDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final User usr = UserTestDataGenerator.initializeUser(10);
-		final User user = UserTestDataGenerator.initializeUser(8);
+		final WorkbenchUser usr = UserTestDataGenerator.initializeWorkbenchUser(10);
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(8);
 
 		usr.getPerson().setEmail("diego.nicolas.cuenya@leafnode.io");
 		Mockito.when(this.workbenchDataManager.getUserById(usrDtlDto.getId())).thenReturn(usr);
@@ -182,9 +182,9 @@ public class UserServiceTest {
 	@Test
 	public void testUpdateUserError() throws Exception {
 		final UserDetailDto usrDtlDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final User usr = UserTestDataGenerator.initializeUser(10);
+		final WorkbenchUser usr = UserTestDataGenerator.initializeWorkbenchUser(10);
 		final UserDto userDto = UserTestDataGenerator.initializeUserDto(10);
-		final User user = UserTestDataGenerator.initializeUser(8);
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(8);
 
 		usr.getPerson().setEmail("diego.nicolas.cuenya@leafnode.io");
 		Mockito.when(this.workbenchDataManager.getUserById(usrDtlDto.getId())).thenReturn(usr);

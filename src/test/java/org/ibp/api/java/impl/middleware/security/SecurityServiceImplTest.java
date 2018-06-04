@@ -5,6 +5,7 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.junit.After;
 import org.junit.Assert;
@@ -30,8 +31,8 @@ public class SecurityServiceImplTest {
 	@InjectMocks
 	private SecurityServiceImpl securityServiceImpl = new SecurityServiceImpl();
 
-	private User me;
-	private User otherBreeder;
+	private WorkbenchUser me;
+	private WorkbenchUser otherBreeder;
 	private UsernamePasswordAuthenticationToken loggedInUser;
 
 	private final String programUUID = "fb0783d2-dc82-4db6-a36e-7554d3740092";
@@ -41,11 +42,11 @@ public class SecurityServiceImplTest {
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
 
-		this.me = new User();
+		this.me = new WorkbenchUser();
 		this.me.setName("Mr. Breeder");
 		this.me.setUserid(1);
 
-		this.otherBreeder = new User();
+		this.otherBreeder = new WorkbenchUser();
 		this.otherBreeder.setName("Other Breeder");
 		this.otherBreeder.setUserid(2);
 
@@ -146,7 +147,7 @@ public class SecurityServiceImplTest {
 	public void testGermplasmListIsAccessibleToOwner() {
 		GermplasmList list = new GermplasmList();
 		list.setUserId(this.me.getUserid());
-		Mockito.when(this.userDataManager.getUserById(this.me.getUserid())).thenReturn(this.me);
+		Mockito.when(this.userDataManager.getUserById(this.me.getUserid())).thenReturn(this.me.copyToUser());
 		Assert.assertTrue("Lists owned by logged in user should be accessible.", this.securityServiceImpl.isAccessible(list, this.cropname));
 	}
 
@@ -167,7 +168,7 @@ public class SecurityServiceImplTest {
 		Mockito.when(this.workbenchDataManager.getUsersByProjectId(listProgram.getProjectId())).thenReturn(
 				Lists.newArrayList(this.otherBreeder));
 
-		Mockito.when(this.userDataManager.getUserById(this.otherBreeder.getUserid())).thenReturn(this.otherBreeder);
+		Mockito.when(this.userDataManager.getUserById(this.otherBreeder.getUserid())).thenReturn(this.otherBreeder.copyToUser());
 		Assert.assertFalse("Lists not owned by logged in user should not be accessible.", this.securityServiceImpl.isAccessible(list, this.cropname));
 	}
 
@@ -180,7 +181,7 @@ public class SecurityServiceImplTest {
 		list.setUserId(this.otherBreeder.getUserid());
 		list.setProgramUUID(this.programUUID);
 
-		Mockito.when(this.userDataManager.getUserById(this.otherBreeder.getUserid())).thenReturn(this.otherBreeder);
+		Mockito.when(this.userDataManager.getUserById(this.otherBreeder.getUserid())).thenReturn(this.otherBreeder.copyToUser());
 
 		final Project listProgram = new Project();
 		listProgram.setProjectId(2L);

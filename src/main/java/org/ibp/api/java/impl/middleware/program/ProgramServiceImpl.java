@@ -12,6 +12,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
 import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.ibp.api.domain.program.ProgramSummary;
@@ -39,7 +40,7 @@ public class ProgramServiceImpl implements ProgramService {
 		final List<Project> workbenchProgramList;
 		final List<ProgramSummary> programSummaries = new ArrayList<>();
 		try {
-			final User loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+			final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 			workbenchProgramList = this.workbenchDataManager.getProjectsByUser(loggedInUser);
 			if (!workbenchProgramList.isEmpty()) {
 				for (final Project workbenchProgram : workbenchProgramList) {
@@ -49,12 +50,12 @@ public class ProgramServiceImpl implements ProgramService {
 					if (workbenchProgram.getCropType() != null) {
 						programSummary.setCrop(workbenchProgram.getCropType().getCropName());
 					}
-					final User programUser = this.workbenchDataManager.getUserById(workbenchProgram.getUserId());
+					final WorkbenchUser programUser = this.workbenchDataManager.getUserById(workbenchProgram.getUserId());
 					programSummary.setCreatedBy(programUser.getName());
 
-					final List<User> allProgramMembers = this.workbenchDataManager.getUsersByProjectId(workbenchProgram.getProjectId());
+					final List<WorkbenchUser> allProgramMembers = this.workbenchDataManager.getUsersByProjectId(workbenchProgram.getProjectId());
 					final Set<String> members = new HashSet<>();
-					for (final User member : allProgramMembers) {
+					for (final WorkbenchUser member : allProgramMembers) {
 						members.add(member.getName());
 					}
 					programSummary.setMembers(members);

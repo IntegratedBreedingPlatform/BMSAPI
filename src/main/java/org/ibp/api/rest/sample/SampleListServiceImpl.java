@@ -1,11 +1,15 @@
 package org.ibp.api.rest.sample;
 
-import com.google.common.base.Preconditions;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -13,11 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.common.base.Preconditions;
 
 @Service
 @Transactional(propagation = Propagation.NEVER)
@@ -71,8 +71,8 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(programUUID != null, "The programUUID must not be null");
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
-		final User createdBy = this.securityService.getCurrentlyLoggedInUser();
-		final Integer result = this.sampleListServiceMW.createSampleListFolder(folderName, parentId, createdBy, programUUID);
+		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
+		final Integer result = this.sampleListServiceMW.createSampleListFolder(folderName, parentId, createdBy.getName(), programUUID);
 		mapResponse.put("id", String.valueOf(result));
 		return mapResponse;
 	}

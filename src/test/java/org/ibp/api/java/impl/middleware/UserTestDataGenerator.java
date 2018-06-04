@@ -4,6 +4,8 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.user.UserDetailDto;
 
@@ -13,13 +15,13 @@ import java.util.concurrent.ThreadLocalRandom;
 public abstract class UserTestDataGenerator {
 
 	/**
-	 * initialize User
+	 * initialize Workbench User
 	 *
 	 * @param userId Integer
-	 * @return user User
+	 * @return user WorkbenchUser
 	 */
-	public static User initializeUser(final Integer userId) {
-		final User user = new User();
+	public static WorkbenchUser initializeWorkbenchUser(final Integer userId) {
+		final WorkbenchUser user = new WorkbenchUser();
 		final Person person = new Person();
 
 		person.setId(2);
@@ -57,6 +59,20 @@ public abstract class UserTestDataGenerator {
 
 		return user;
 	}
+	
+	/**
+	 * initialize Workbench User
+	 *
+	 * @param userId Integer
+	 * @return user User
+	 */
+	public static User initializeUser(final Integer userId) {
+		final WorkbenchUser workbenchUser = UserTestDataGenerator.initializeWorkbenchUser(userId);
+		final User user = workbenchUser.copyToUser();
+		user.setUserid(userId);
+		
+		return user;
+	}
 
 	/**
 	 * initialize UserDto
@@ -73,7 +89,7 @@ public abstract class UserTestDataGenerator {
 		user.setLastName(lastName);
 
 		user.setStatus(0);
-		user.setRole("Breeder");
+		user.setRole(new Role(2, "Breeder"));
 		user.setUserId(userId);
 
 		final String username = RandomStringUtils.randomAlphanumeric(30);
@@ -137,7 +153,7 @@ public abstract class UserTestDataGenerator {
 		user.setFirstName(firstName);
 		user.setLastName(lastName);
 		user.setStatus("true");
-		user.setRole("Breeder");
+		user.setRole(new Role(2, "Breeder"));
 		user.setId(userId);
 		user.setUsername(username);
 		return user;
