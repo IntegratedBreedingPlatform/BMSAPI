@@ -4,40 +4,42 @@ package org.ibp.api.brapi.v1.role;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hamcrest.Matchers;
-import org.hamcrest.collection.IsCollectionWithSize;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.ibp.ApiUnitTestBase;
+import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 public class RoleServiceImplTest extends ApiUnitTestBase {
+	
+	
+	@Mock
+	private WorkbenchDataManager workbenchManager;
 
+	@InjectMocks
+	private RoleServiceImpl roleServiceImpl;
+	
 	@Test
 	public void testGetAllUsers() throws Exception {
-		List<RoleDto> roles = new ArrayList<RoleDto>();
-
-		RoleDto admin = new RoleDto(1, "ADMIN");
-		RoleDto breeder = new RoleDto(2, "BREEDER");
-		RoleDto technician = new RoleDto(3, "TECHNICIAN");
-
+		
+		List<Role> roles = new ArrayList<>();
+		Role admin = new Role(1, "ADMIN");
+		Role breeder = new Role(2, "BREEDER");
+		Role technician = new Role(3, "TECHNICIAN");
 		roles.add(admin);
 		roles.add(breeder);
 		roles.add(technician);
+		Mockito.doReturn(roles).when(this.workbenchDataManager).getAssignableRoles();
 
-		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/brapi/v1/roles").build().encode();
-
-		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
-				.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(roles.size())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(admin.getId())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(admin.getDescription())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(breeder.getId())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[1].description", Matchers.is(breeder.getDescription())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[2].id", Matchers.is(technician.getId())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[2].description", Matchers.is(technician.getDescription())));
+		final List<RoleDto> allRoles = this.roleServiceImpl.getAllRoles();
+		Mockito.verify(this.workbenchDataManager).getAssignableRoles();
+		Assert.assertEquals(roles.size(), allRoles.size());
+		for (int i = 0; i < allRoles.size(); i++) {
+			final RoleDto roleDto = allRoles.get(i);
+			final Role expectedRole = roles.get(i);
+		}
 	}
 }

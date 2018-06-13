@@ -134,6 +134,8 @@ public abstract class UserTestDataGenerator {
 
 		final String email = RandomStringUtils.randomAlphanumeric(24);
 		user.setEmail("test" + email + "@leafnode.io");
+		
+		user.setRole(new Role(2, "Breeder"));
 
 		return user;
 	}

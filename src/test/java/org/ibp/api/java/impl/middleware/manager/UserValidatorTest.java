@@ -78,19 +78,35 @@ public class UserValidatorTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void testValidateRole() throws Exception {
+	public void testValidateRoleWhenNull() throws Exception {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
 
-		userDto.setRole(new Role(2,"Breeeder"));
+		userDto.setRole(null);
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		this.uservalidator.validate(userDto, bindingResult, false);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
-		assertThat("signup.field.invalid.role", equalTo(bindingResult.getFieldError("role").getCode()));
+		assertThat(UserValidator.SIGNUP_FIELD_INVALID_ROLE, equalTo(bindingResult.getFieldError("role").getCode()));
+	}
+	
+	@Test
+	public void testValidateRole() throws Exception {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
+
+		userDto.getRole().setDescription("Breeder qwertyuioiuytredsdfrtghjuklsl123");
+		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
+		this.uservalidator.validate(userDto, bindingResult, false);
+
+		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
+		assertThat("signup.field.length.exceed", equalTo(bindingResult.getFieldError("role").getCode()));
 	}
 
 	/**
@@ -160,7 +176,7 @@ public class UserValidatorTest {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(20);
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20);
-
+		
 		userDto.setStatus("truee");
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);

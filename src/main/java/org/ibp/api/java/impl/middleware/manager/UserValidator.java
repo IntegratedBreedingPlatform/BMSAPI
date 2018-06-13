@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -81,9 +82,9 @@ public class UserValidator implements Validator {
 		this.validateFieldLength(errors, user.getLastName(), LAST_NAME, LAST_NAME_STR, 50);
 		this.validateFieldLength(errors, user.getUsername(), USERNAME, USERNAME_STR, 30);
 		this.validateFieldLength(errors, user.getEmail(), EMAIL, EMAIL_STR, 40);
-		this.validateFieldLength(errors, user.getRole().getDescription(), ROLE, ROLE_STR, 30);
 		this.validateFieldLength(errors, user.getStatus(), STATUS, STATUS_STR, 11);
 
+		this.validateUserRole(errors, user.getRole());
 		this.validateEmailFormat(errors, user.getEmail());
 
 		this.validateUserStatus(errors, user.getStatus());
@@ -178,6 +179,15 @@ public class UserValidator implements Validator {
 		}
 	}
 
+    protected void validateUserRole(final Errors errors, final Role role) {
+		if (null == role) {
+            errors.rejectValue(ROLE, SIGNUP_FIELD_INVALID_ROLE);
+		} else {
+	        this.validateFieldLength(errors, role.getDescription(), ROLE, ROLE_STR, 30);
+		}
+
+    }
+    
 	protected void validateUserStatus(final Errors errors, final String fieldValue) {
 		if (null == errors.getFieldError(STATUS) && fieldValue != null && !"true".equalsIgnoreCase(fieldValue)
 				&& !"false".equalsIgnoreCase(fieldValue)) {
