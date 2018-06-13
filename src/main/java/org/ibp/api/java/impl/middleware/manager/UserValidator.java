@@ -81,7 +81,7 @@ public class UserValidator implements Validator {
 		this.validateFieldLength(errors, user.getLastName(), LAST_NAME, LAST_NAME_STR, 50);
 		this.validateFieldLength(errors, user.getUsername(), USERNAME, USERNAME_STR, 30);
 		this.validateFieldLength(errors, user.getEmail(), EMAIL, EMAIL_STR, 40);
-		this.validateFieldLength(errors, user.getRole().getName(), ROLE, ROLE_STR, 30);
+		this.validateFieldLength(errors, user.getRole().getDescription(), ROLE, ROLE_STR, 30);
 		this.validateFieldLength(errors, user.getStatus(), STATUS, STATUS_STR, 11);
 
 		this.validateEmailFormat(errors, user.getEmail());

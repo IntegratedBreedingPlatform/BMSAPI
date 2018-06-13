@@ -62,7 +62,7 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 			final List<UserRole> userRoles = workbenchUser.getRoles();
 			if (userRoles != null && !userRoles.isEmpty()) {
 				for (final UserRole role : userRoles) {
-					authorities.add(new SimpleGrantedAuthority(role.getRole().getCapitalizedName()));
+					authorities.add(new SimpleGrantedAuthority(role.getRole().getCapitalizedRole()));
 				}
 			}
 		}

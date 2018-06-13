@@ -53,7 +53,7 @@ public class WorkbenchUserDetailsServiceTest {
 			Assert.assertEquals(testUserWorkbench.getName(), userDetails.getUsername());
 			Assert.assertEquals(testUserWorkbench.getPassword(), userDetails.getPassword());
 			Assert.assertEquals(1, userDetails.getAuthorities().size());
-			Assert.assertTrue(userDetails.getAuthorities().contains(new SimpleGrantedAuthority(testUserRole.getRole().getCapitalizedName())));
+			Assert.assertTrue(userDetails.getAuthorities().contains(new SimpleGrantedAuthority(testUserRole.getRole().getCapitalizedRole())));
 		} catch (MiddlewareQueryException e) {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}

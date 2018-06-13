@@ -7,8 +7,6 @@ import java.util.List;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.brapi.v1.role.RoleDto;
-import org.ibp.api.brapi.v1.role.RoleServiceImpl;
 import org.junit.Test;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -22,9 +20,9 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 	public void testGetAllUsers() throws Exception {
 		List<RoleDto> roles = new ArrayList<RoleDto>();
 
-		RoleDto admin = new RoleDto(1, RoleServiceImpl.ADMIN);
-		RoleDto breeder = new RoleDto(2, RoleServiceImpl.BREEDER);
-		RoleDto technician = new RoleDto(3, RoleServiceImpl.TECHNICIAN);
+		RoleDto admin = new RoleDto(1, "ADMIN");
+		RoleDto breeder = new RoleDto(2, "BREEDER");
+		RoleDto technician = new RoleDto(3, "TECHNICIAN");
 
 		roles.add(admin);
 		roles.add(breeder);

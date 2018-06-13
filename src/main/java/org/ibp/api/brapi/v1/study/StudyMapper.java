@@ -32,7 +32,7 @@ public class StudyMapper {
 			final List<Contact> contacts = new ArrayList<>();
 			for (final UserDto userDto : context.getSource()) {
 				contacts.add(new Contact(userDto.getUserId(), userDto.getEmail(), userDto.getFirstName() + " " + userDto.getLastName(),
-						userDto.getRole().getName(), ""));
+						userDto.getRole().getDescription(), ""));
 			}
 			return context.getMappingEngine().map(context.create(contacts, context.getDestinationType()));
 		}
