@@ -1,14 +1,13 @@
 
 package org.ibp.api.rest.study;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.common.collect.Lists;
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
@@ -24,8 +23,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.google.common.collect.Lists;
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StudyResourceTest extends ApiUnitTestBase {
 
@@ -38,14 +37,14 @@ public class StudyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testListAllStudies() throws Exception {
 
-		List<org.generationcp.middleware.service.api.study.StudySummary> summariesMW = new ArrayList<>();
-		org.generationcp.middleware.service.api.study.StudySummary summaryMW =
+		final List<org.generationcp.middleware.service.api.study.StudySummary> summariesMW = new ArrayList<>();
+		final org.generationcp.middleware.service.api.study.StudySummary summaryMW =
 				new org.generationcp.middleware.service.api.study.StudySummary();
 		summaryMW.setId(1);
-		summaryMW.setName("A Maizing Trial");
-		summaryMW.setTitle("A Maizing Trial Title");
+		summaryMW.setName("A Maizing Study");
+		summaryMW.setTitle("A Maizing Study Title");
 		summaryMW.setObjective("A Maize the world with new Maize variety.");
-		summaryMW.setType(StudyType.T);
+		summaryMW.setType(StudyTypeDto.getTrialDto());
 		summaryMW.setStartDate("01012015");
 		summaryMW.setEndDate("01012015");
 		summaryMW.setPrincipalInvestigator("Mr. Breeder");
@@ -75,8 +74,8 @@ public class StudyResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testGetObservations() throws Exception {
-		MeasurementDto measurement = new MeasurementDto(new MeasurementVariableDto(1, "Plant Height"), 1, "123");
-		ObservationDto obsDto =
+		final MeasurementDto measurement = new MeasurementDto(new MeasurementVariableDto(1, "Plant Height"), 1, "123");
+		final ObservationDto obsDto =
 				new ObservationDto(1, "1", "Test", 1, "CML123", "1", "CIMMYT Seed Bank", "1", "1", "2", Lists.newArrayList(measurement));
 
 		obsDto.setColumnNumber("11");
@@ -137,16 +136,16 @@ public class StudyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testGetStudyDetailsBasic() throws Exception {
 
-		int studyId = 123;
+		final int studyId = 123;
 
 		// Study object is Middleware is quite complex to setup so chosing to just mock it instead
 		// so that test does not need too much structural knowledge of Middleware data objects.
-		Study study = Mockito.mock(Study.class);
+		final Study study = Mockito.mock(Study.class);
 		Mockito.when(study.getId()).thenReturn(studyId);
-		Mockito.when(study.getName()).thenReturn("Maizing Trial");
+		Mockito.when(study.getName()).thenReturn("Maizing Study");
 		Mockito.when(study.getDescription()).thenReturn("Title");
 		Mockito.when(study.getObjective()).thenReturn("Objective");
-		Mockito.when(study.getType()).thenReturn(StudyType.T);
+		Mockito.when(study.getType()).thenReturn(StudyTypeDto.getTrialDto());
 		Mockito.when(study.getStartDate()).thenReturn(20150101);
 		Mockito.when(study.getEndDate()).thenReturn(20151231);
 
@@ -175,7 +174,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testListAllFolders() throws Exception {
 		
-		FolderReference folderRef = new FolderReference(1, 2, "My Folder", "My Folder Description");
+		final FolderReference folderRef = new FolderReference(1, 2, "My Folder", "My Folder Description");
 		Mockito.when(this.studyDataManager.getAllFolders()).thenReturn(Lists.newArrayList(folderRef));
 		
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/study/{cropname}/folders", "maize").contentType(this.contentType))
@@ -192,7 +191,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 	public void testListStudyInstances() throws Exception {
 
 		final StudyInstance studyInstance = new StudyInstance(1, "Gujarat, India", "GUJ", 1);
-		Mockito.when(this.studyServiceMW.getStudyInstances(Mockito.anyInt()))
+		Mockito.when(this.studyServiceMW.getStudyInstances(org.mockito.Matchers.anyInt()))
 				.thenReturn(Lists.newArrayList(studyInstance));
 
 		this.mockMvc

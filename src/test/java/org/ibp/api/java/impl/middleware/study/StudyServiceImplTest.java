@@ -1,14 +1,12 @@
 
 package org.ibp.api.java.impl.middleware.study;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
-import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -36,18 +34,19 @@ import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class StudyServiceImplTest {
 
@@ -114,13 +113,14 @@ public class StudyServiceImplTest {
 		this.studyServiceImpl.setValidationUtil(new ValidationUtil());
 		this.studyServiceImpl.setObservationValidator(this.observationValidator);
 		// Make all test data accessible
-		Mockito.when(this.securityService.isAccessible(Mockito.any(org.generationcp.middleware.service.api.study.StudySummary.class), Mockito.anyString()))
+		Mockito.when(this.securityService.isAccessible(Matchers.any(org.generationcp.middleware.service.api.study.StudySummary.class),
+			Matchers.anyString()))
 				.thenReturn(true);
 	}
 
 	@Test
 	public void listAllStudies() throws MiddlewareQueryException {
-
+		final StudyTypeDto studyTypeDto= StudyTypeDto.getTrialDto();
 		final List<org.generationcp.middleware.service.api.study.StudySummary> mockResult = new ArrayList<>();
 		final org.generationcp.middleware.service.api.study.StudySummary studySummary =
 				new org.generationcp.middleware.service.api.study.StudySummary();
@@ -131,11 +131,11 @@ public class StudyServiceImplTest {
 		studySummary.setProgramUUID(this.programUID);
 		studySummary.setStartDate("2015-01-01");
 		studySummary.setEndDate("2015-12-31");
-		studySummary.setType(StudyType.T);
+		studySummary.setType(studyTypeDto);
 
 		mockResult.add(studySummary);
 
-		Mockito.when(this.mockMiddlewareStudyService.search(Mockito.any(StudySearchParameters.class))).thenReturn(mockResult);
+		Mockito.when(this.mockMiddlewareStudyService.search(Matchers.any(StudySearchParameters.class))).thenReturn(mockResult);
 
 		final List<StudySummary> studySummaries = this.studyServiceImpl.search(this.programUID, TEST_CROP_NAME, null, null, null);
 		Assert.assertEquals(mockResult.size(), studySummaries.size());
@@ -145,7 +145,7 @@ public class StudyServiceImplTest {
 		Assert.assertEquals(studySummary.getObjective(), studySummaries.get(0).getObjective());
 		Assert.assertEquals(studySummary.getStartDate(), studySummaries.get(0).getStartDate());
 		Assert.assertEquals(studySummary.getEndDate(), studySummaries.get(0).getEndDate());
-		Assert.assertEquals(studySummary.getType().toString(), studySummaries.get(0).getType());
+		Assert.assertEquals(studySummary.getType().getName(), studySummaries.get(0).getType());
 
 	}
 
@@ -197,12 +197,12 @@ public class StudyServiceImplTest {
 	@Test(expected = ApiRequestValidationException.class)
 	public void updateObservationWhichDoesNotExist() {
 		final Integer studyIdentifier = new Integer(5);
-		Observation manufacturePojo = this.factory.manufacturePojo(Observation.class);
+		final Observation manufacturePojo = this.factory.manufacturePojo(Observation.class);
 
 		try {
 			this.studyServiceImpl.updateObservation(studyIdentifier, manufacturePojo);
 		} catch (final ApiRequestValidationException apiRequestValidationException) {
-			List<ObjectError> errors = apiRequestValidationException.getErrors();
+			final List<ObjectError> errors = apiRequestValidationException.getErrors();
 			Assert.assertEquals("We should only have one error", 1, errors.size());
 			Assert.assertEquals("The error should have the code", "no.observation.found", errors.get(0).getCode());
 			Assert.assertEquals("The error have the study identifier as its first parameter", studyIdentifier,
@@ -216,14 +216,14 @@ public class StudyServiceImplTest {
 	@Test(expected = ApiRequestValidationException.class)
 	public void updateObservationsWhichDoesNotExist() {
 		final Integer studyIdentifier = new Integer(5);
-		Observation manufacturePojo = this.factory.manufacturePojo(Observation.class);
-		Observation manufacturePojo1 = this.factory.manufacturePojo(Observation.class);
-		Observation manufacturePojo2 = this.factory.manufacturePojo(Observation.class);
+		final Observation manufacturePojo = this.factory.manufacturePojo(Observation.class);
+		final Observation manufacturePojo1 = this.factory.manufacturePojo(Observation.class);
+		final Observation manufacturePojo2 = this.factory.manufacturePojo(Observation.class);
 		try {
 			this.studyServiceImpl.updateObservations(studyIdentifier,
 					Lists.newArrayList(manufacturePojo, manufacturePojo1, manufacturePojo2));
 		} catch (final ApiRequestValidationException apiRequestValidationException) {
-			List<ObjectError> errors = apiRequestValidationException.getErrors();
+			final List<ObjectError> errors = apiRequestValidationException.getErrors();
 			// This is because we are just stopping at the first error
 			Assert.assertEquals("We should only have one error", 1, errors.size());
 			Assert.assertEquals("The error should have the code", "no.observation.found", errors.get(0).getCode());
@@ -250,7 +250,7 @@ public class StudyServiceImplTest {
 			observation.getMeasurements().get(0).getMeasurementIdentifier().setMeasurementId(null);
 			this.studyServiceImpl.updateObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,observation);
 		} catch (final ApiRequestValidationException apiRequestValidationException) {
-			List<ObjectError> errors = apiRequestValidationException.getErrors();
+			final List<ObjectError> errors = apiRequestValidationException.getErrors();
 			// This is because we are just stopping at the first error
 			Assert.assertEquals("We should only have one error", 1, errors.size());
 			Assert.assertEquals("The error should have the code", "measurement.already.inserted", errors.get(0).getCode());
@@ -270,7 +270,7 @@ public class StudyServiceImplTest {
 
 		final Observation observation = Lists.transform(observationDtoTestData, this.observationTransformFunction).get(0);
 		this.studyServiceImpl.updateObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, observation);
-		Mockito.verify(observationValidator, Mockito.times(1)).validate(Mockito.eq(observation), Mockito.any(Errors.class));
+		Mockito.verify(observationValidator, Mockito.times(1)).validate(Matchers.eq(observation), Matchers.any(Errors.class));
 	}
 
 	@Test
@@ -287,7 +287,7 @@ public class StudyServiceImplTest {
 		this.studyServiceImpl.updateObservations(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, observations);
 
 		observations.get(0).equals(observations.get(1));
-		Mockito.verify(observationValidator, Mockito.times(2)).validate(Mockito.eq(observations.get(0)), Mockito.any(Errors.class));
+		Mockito.verify(observationValidator, Mockito.times(2)).validate(Matchers.eq(observations.get(0)), Matchers.any(Errors.class));
 
 	}
 
@@ -337,7 +337,7 @@ public class StudyServiceImplTest {
 
 		// Minimal setup
 		final StudyImportDTO studyImportDTO = new StudyImportDTO();
-		studyImportDTO.setStudyType(StudyType.N.getName());
+		studyImportDTO.setStudyType(StudyTypeDto.TRIAL_NAME);
 		studyImportDTO.setUserId(1);
 
 		final Workbook workbook = new Workbook();
@@ -351,9 +351,9 @@ public class StudyServiceImplTest {
 		Mockito.verify(this.conversionService).convert(studyImportDTO, Workbook.class);
 		Mockito.verify(this.dataImportService).saveDataset(workbook, true, false, this.programUID, cropPrefix);
 		Mockito.verify(this.conversionService).convert(studyImportDTO, GermplasmList.class);
-		Mockito.verify(this.germplasmListManager).addGermplasmList(Mockito.any(GermplasmList.class));
-		Mockito.verify(this.germplasmListManager).addGermplasmListData(Mockito.anyList());
-		Mockito.verify(this.fieldbookService).saveOrUpdateListDataProject(Mockito.anyInt(), Mockito.any(GermplasmListType.class),
-				Mockito.anyInt(), Mockito.anyList(), Mockito.anyInt());
+		Mockito.verify(this.germplasmListManager).addGermplasmList(Matchers.any(GermplasmList.class));
+		Mockito.verify(this.germplasmListManager).addGermplasmListData(Matchers.anyList());
+		Mockito.verify(this.fieldbookService).saveOrUpdateListDataProject(Matchers.anyInt(), Matchers.any(GermplasmListType.class),
+			Matchers.anyInt(), Matchers.anyList(), Matchers.anyInt());
 	}
 }

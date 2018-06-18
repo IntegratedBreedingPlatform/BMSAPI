@@ -35,7 +35,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 	private StudyService studyServiceMW;
 
 	@Test
-	public void testListTrialSummaries() throws Exception {
+	public void testListStudySummaries() throws Exception {
 
 		final int studyDbId = ThreadLocalRandom.current().nextInt();
 		final String locationId = RandomStringUtils.randomAlphabetic(5);
@@ -108,7 +108,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testListTrialSummariesWithPageParameters() throws Exception {
+	public void testListStudySummariesWithPageParameters() throws Exception {
 
 		final int studyDbId = ThreadLocalRandom.current().nextInt();
 		final String locationId = RandomStringUtils.randomAlphabetic(5);
@@ -179,7 +179,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testGetTrialObservationsAsTableNotNullResults() throws Exception {
+	public void testGetStudyObservationsAsTableNotNullResults() throws Exception {
 
 		final int trialDbId = ThreadLocalRandom.current().nextInt();
 
@@ -194,10 +194,10 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 								.add(RandomStringUtils.randomAlphabetic(5)).build())
 						.build();
 
-		final TrialObservationTable mwTrialObservationTable = new TrialObservationTable().setStudyDbId(trialDbId)
+		final TrialObservationTable mwStudyObservationTable = new TrialObservationTable().setStudyDbId(trialDbId)
 				.setObservationVariableDbIds(observationVariablesId).setObservationVariableNames(observationVariableName).setData(data);
 
-		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId)).thenReturn(mwTrialObservationTable);
+		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId)).thenReturn(mwStudyObservationTable);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/trials/{trialDbId}/table")
 				.buildAndExpand(ImmutableMap.<String, Object>builder().put("trialDbId", trialDbId).build()).encode();
@@ -205,7 +205,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isOk()) //
 				.andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.trialDbId", Matchers.is(mwTrialObservationTable.getStudyDbId()))) //
+				.andExpect(MockMvcResultMatchers.jsonPath("$.result.trialDbId", Matchers.is(mwStudyObservationTable.getStudyDbId()))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.observationVariableDbIds",
 						IsCollectionWithSize.hasSize(observationVariablesId.size()))) //
 				.andExpect(
@@ -227,15 +227,15 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testGetTrialObservationsAsTableNullResults() throws Exception {
+	public void testGetStudyObservationsAsTableNullResults() throws Exception {
 
 		final int trialDbId = ThreadLocalRandom.current().nextInt();
 
-		final TrialObservationTable mwTrialObservationTable =
+		final TrialObservationTable mwStudyObservationTable =
 				new TrialObservationTable().setStudyDbId(trialDbId).setObservationVariableDbIds(Lists.<Integer>newArrayList())
 						.setObservationVariableNames(Lists.<String>newArrayList()).setData(Lists.<List<String>>newArrayList());
 
-		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId)).thenReturn(mwTrialObservationTable);
+		Mockito.when(this.studyServiceMW.getTrialObservationTable(trialDbId)).thenReturn(mwStudyObservationTable);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/trials/{trialDbId}/table")
 				.buildAndExpand(ImmutableMap.<String, Object>builder().put("trialDbId", trialDbId).build()).encode();
@@ -243,7 +243,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isOk()) //
 				.andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.trialDbId", Matchers.is(mwTrialObservationTable.getStudyDbId()))) //
+				.andExpect(MockMvcResultMatchers.jsonPath("$.result.trialDbId", Matchers.is(mwStudyObservationTable.getStudyDbId()))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.observationVariableDbIds", IsCollectionWithSize.hasSize(0))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.observationVariableNames", IsCollectionWithSize.hasSize(0))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(0))) //
@@ -255,7 +255,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testGetListTrialSummariesBadOrderByFields() throws Exception {
+	public void testGetListStudySummariesBadOrderByFields() throws Exception {
 		final UriComponents uriComponents =
 				UriComponentsBuilder.newInstance().path(TrialResourceBrapiTest.MAIZE_BRAPI_V1_TRIALS).queryParam("programDbId", 1)
 						.queryParam("pageSize", 10).queryParam("page", 1).queryParam("sortBy", "invalid_sort_By").build().encode();
@@ -267,7 +267,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testGetListTrialSummariesFilterByInactiveStudies() throws Exception {
+	public void testGetListStudySummariesFilterByInactiveStudies() throws Exception {
 		final UriComponents uriComponents =
 				UriComponentsBuilder.newInstance().path(TrialResourceBrapiTest.MAIZE_BRAPI_V1_TRIALS).queryParam("programDbId", 1)
 						.queryParam("pageSize", 10).queryParam("pageNumber", 1).queryParam("active", Boolean.FALSE).build().encode();
@@ -279,7 +279,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testGetListTrialSummariesBadSorterOrder() throws Exception {
+	public void testGetListStudySummariesBadSorterOrder() throws Exception {
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(TrialResourceBrapiTest.MAIZE_BRAPI_V1_TRIALS)
 				.queryParam("programDbId", 1).queryParam("pageSize", 10).queryParam("pageNumber", 1)
 				.queryParam("sortOrder", "invalid_sort_order").build().encode();

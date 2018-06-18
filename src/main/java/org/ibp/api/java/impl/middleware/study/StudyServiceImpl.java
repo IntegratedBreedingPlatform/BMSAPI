@@ -15,7 +15,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
-import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -61,8 +61,6 @@ import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
@@ -115,10 +113,10 @@ public class StudyServiceImpl implements StudyService {
 	private CrossExpansionProperties crossExpansionProperties;
 
 	@Override
-	public List<StudySummary> search(final String programUniqueId, String cropname, String principalInvestigator, String location, String season) {
+	public List<StudySummary> search(final String programUniqueId, final String cropname, final String principalInvestigator, final String location, final String season) {
 		final List<StudySummary> studySummaries = new ArrayList<>();
 		try {
-			StudySearchParameters searchParameters = new StudySearchParameters();
+			final StudySearchParameters searchParameters = new StudySearchParameters();
 			searchParameters.setProgramUniqueId(programUniqueId);
 			searchParameters.setPrincipalInvestigator(principalInvestigator);
 			searchParameters.setLocation(location);
@@ -151,7 +149,7 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public int countTotalObservationUnits(int studyIdentifier, int instanceId) {
+	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId) {
 		return this.middlewareStudyService.countTotalObservationUnits(studyIdentifier, instanceId);
 	}
 
@@ -230,7 +228,7 @@ public class StudyServiceImpl implements StudyService {
 
 		validationUtil.invokeValidation("StudyServiceImpl", new Command() {
 			@Override
-			public void execute(Errors errors) {
+			public void execute(final Errors errors) {
 				int counter = 0;
 				for (final Observation observation : observations) {
 					errors.pushNestedPath("Observation[" + counter++ + "]");
@@ -457,38 +455,13 @@ public class StudyServiceImpl implements StudyService {
 
 			// Create the study's snapshot of the Germplasm list (ListDataProject)
 			final List<ListDataProject> listDataProjects = this.convert(studyImportDTO.getGermplasm(), ListDataProject.class);
-			final GermplasmListType listType = this.extractGermListType(studyImportDTO);
-			this.fieldbookService.saveOrUpdateListDataProject(studyId, listType, listId, listDataProjects, studyImportDTO.getUserId());
+			this.fieldbookService.saveOrUpdateListDataProject(studyId, GermplasmListType.STUDY, listId, listDataProjects, studyImportDTO.getUserId());
 
 			return studyId;
 
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error caused by: " + e.getMessage(), e);
 		}
-	}
-
-	/**
-	 * Infers the List type for a list, based on the study type of a given {@link StudyImportDTO}
-	 *
-	 * @param studyImportDTO
-	 * @return the corresponding germplasm list type for a study workbook, or null if no valid type is found.
-	 */
-	private final GermplasmListType extractGermListType(final StudyImportDTO studyImportDTO) {
-		final StudyType studyType = StudyType.valueOf(studyImportDTO.getStudyType());
-		GermplasmListType listType;
-
-		switch (studyType) {
-			case N:
-				listType = GermplasmListType.NURSERY;
-				break;
-			case T:
-				listType = GermplasmListType.TRIAL;
-				break;
-			default:
-				listType = null;
-		}
-
-		return listType;
 	}
 
 	private final <T, S> List<T> convert(final List<S> beanList, final Class<T> clazz) {
@@ -527,7 +500,7 @@ public class StudyServiceImpl implements StudyService {
 		this.dataImportService = dataImportService;
 	}
 
-	void setSecurityService(SecurityService securityService) {
+	void setSecurityService(final SecurityService securityService) {
 		this.securityService = securityService;
 	}
 
@@ -559,7 +532,7 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<StudyInstance> getStudyInstances(int studyId) {
+	public List<StudyInstance> getStudyInstances(final int studyId) {
 		final List<org.generationcp.middleware.service.impl.study.StudyInstance> studyInstancesMW =
 				this.middlewareStudyService.getStudyInstances(studyId);
 
@@ -567,7 +540,7 @@ public class StudyServiceImpl implements StudyService {
 				new Function<org.generationcp.middleware.service.impl.study.StudyInstance, StudyInstance>() {
 
 			@Override
-			public StudyInstance apply(org.generationcp.middleware.service.impl.study.StudyInstance input) {
+			public StudyInstance apply(final org.generationcp.middleware.service.impl.study.StudyInstance input) {
 				return new StudyInstance(input.getInstanceDbId(), input.getLocationName(), input.getLocationAbbreviation(),
 						input.getInstanceNumber());
 			}
@@ -612,7 +585,9 @@ public class StudyServiceImpl implements StudyService {
 
 		for (final org.generationcp.middleware.domain.dms.StudySummary studySummary : studySummaryList) {
 			final Project project = this.workbenchDataManager.getProjectByUuid(studySummary.getProgramDbId());
-			studySummary.setProgramName(project.getProjectName());
+			if (project != null) {
+				studySummary.setProgramName(project.getProjectName());
+			}
 		}
 
 		return studySummaryList;
@@ -622,8 +597,18 @@ public class StudyServiceImpl implements StudyService {
 	public Boolean isSampled(final Integer studyId) {
 		try {
 			return this.sampleService.studyHasSamples(studyId);
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 			throw new ApiRuntimeException("an error happened when trying to check if a study is sampled", e);
 		}
 	}
+
+	@Override
+	public List<StudyTypeDto> getStudyTypes(){
+		try{
+			return this.studyDataManager.getAllVisibleStudyTypes();
+		} catch (final MiddlewareException e) {
+			throw new ApiRuntimeException("an error happened when trying to check if a study is sampled", e);
+		}
+	}
+
 }
