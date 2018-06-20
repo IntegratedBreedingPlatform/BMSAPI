@@ -29,7 +29,7 @@ public class SecurityServiceImplTest {
 	private UserDataManager userDataManager;
 
 	@InjectMocks
-	private SecurityServiceImpl securityServiceImpl = new SecurityServiceImpl();
+	private final SecurityServiceImpl securityServiceImpl = new SecurityServiceImpl();
 
 	private WorkbenchUser me;
 	private WorkbenchUser otherBreeder;
@@ -71,7 +71,7 @@ public class SecurityServiceImplTest {
 	@Test
 	public void testIsAccessibleStudySummaryMine() {
 
-		StudySummary summaryStudy = new StudySummary();
+		final StudySummary summaryStudy = new StudySummary();
 		summaryStudy.setProgramUUID(this.programUUID);
 
 		final Project summaryStudyProgram = new Project();
@@ -95,7 +95,7 @@ public class SecurityServiceImplTest {
 	@Test
 	public void testIsAccessibleStudySummaryOthers() {
 
-		StudySummary summaryStudy = new StudySummary();
+		final StudySummary summaryStudy = new StudySummary();
 		summaryStudy.setProgramUUID(this.programUUID);
 
 		final Project summaryStudyProgram = new Project();
@@ -114,11 +114,11 @@ public class SecurityServiceImplTest {
 	}
 
 	/**
-	 * Case 3 Nursery/Trial templates case where there is no program uuid
+	 * Case 3 Study templates case where there is no program uuid
 	 */
 	@Test
 	public void testIsAccessibleStudySummaryTemplates() {
-		StudySummary summary = new StudySummary();
+		final StudySummary summary = new StudySummary();
 		summary.setProgramUUID(null);
 
 		// Accessible to all
@@ -145,7 +145,7 @@ public class SecurityServiceImplTest {
 	 */
 	@Test
 	public void testGermplasmListIsAccessibleToOwner() {
-		GermplasmList list = new GermplasmList();
+		final GermplasmList list = new GermplasmList();
 		list.setUserId(this.me.getUserid());
 		Mockito.when(this.userDataManager.getUserById(this.me.getUserid())).thenReturn(this.me.copyToUser());
 		Assert.assertTrue("Lists owned by logged in user should be accessible.", this.securityServiceImpl.isAccessible(list, this.cropname));
@@ -156,7 +156,7 @@ public class SecurityServiceImplTest {
 	 */
 	@Test
 	public void testGermplasmListIsNotAccessibleIfNotOwner() {
-		GermplasmList list = new GermplasmList();
+		final GermplasmList list = new GermplasmList();
 		list.setUserId(this.otherBreeder.getUserid());
 		list.setProgramUUID(this.programUUID);
 
@@ -177,7 +177,7 @@ public class SecurityServiceImplTest {
 	 */
 	@Test
 	public void testGermplasmListIsAccessibleToProgramMembers() {
-		GermplasmList list = new GermplasmList();
+		final GermplasmList list = new GermplasmList();
 		list.setUserId(this.otherBreeder.getUserid());
 		list.setProgramUUID(this.programUUID);
 
@@ -202,7 +202,7 @@ public class SecurityServiceImplTest {
 	 */
 	@Test
 	public void testGermplasmListIsAccessibleIfNoProgramReference() {
-		GermplasmList list = new GermplasmList();
+		final GermplasmList list = new GermplasmList();
 		list.setProgramUUID(null);
 		Assert.assertTrue("Lists with no program reference should be accessible to all.", this.securityServiceImpl.isAccessible(list, this.cropname));
 	}
