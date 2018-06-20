@@ -1,12 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.study;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.Lists;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.collections4.map.DefaultedMap;
 import org.apache.commons.lang.StringUtils;
@@ -15,7 +10,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
-import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -27,20 +22,24 @@ import org.ibp.api.domain.study.FieldPlot;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Transactional
 public class FieldMapService {
 
-	private StudyDataManager studyDataManager;
-	private CrossExpansionProperties crossExpansionProperties;
+	private final StudyDataManager studyDataManager;
+	private final CrossExpansionProperties crossExpansionProperties;
 
 	public FieldMapService(final StudyDataManager studyDataManager, final CrossExpansionProperties crossExpansionProperties) {
 		this.studyDataManager = studyDataManager;
 		this.crossExpansionProperties = crossExpansionProperties;
 	}
 
-	public Map<Integer, FieldMap> getFieldMap(String studyId) {
+	public Map<Integer, FieldMap> getFieldMap(final String studyId) {
 
 		final Map<Integer, FieldMap> fieldMaps = this.getDefaultFieldMap();
 		final StudyFieldMap rawDataFromMiddleware = this.getRawDataFromMiddleware(studyId);
@@ -58,14 +57,14 @@ public class FieldMapService {
 		return fieldMaps;
 	}
 
-	private void extractRangesFromPlotData(Map<Integer, FieldMap> fieldMaps) {
-		Collection<FieldMap> createdFieldMaps = fieldMaps.values();
-		for (FieldMap fieldMap : createdFieldMaps) {
+	private void extractRangesFromPlotData(final Map<Integer, FieldMap> fieldMaps) {
+		final Collection<FieldMap> createdFieldMaps = fieldMaps.values();
+		for (final FieldMap fieldMap : createdFieldMaps) {
 			final FieldPlot[][] fieldPlots = fieldMap.getPlots();
 
 			for (int column = 0; column < fieldPlots.length; column++) {
 				for (int range = 0; range < fieldPlots[column].length; range++) {
-					FieldPlot fieldPlot = fieldPlots[column][range];
+					final FieldPlot fieldPlot = fieldPlots[column][range];
 
 					this.addToList(this.getDefaultList(fieldMap.getRange()), range + 1, fieldPlot);
 
@@ -76,8 +75,8 @@ public class FieldMapService {
 		}
 	}
 
-	private void addToList(final Map<Integer, List<FieldPlot>> mapToAddTo, int range, FieldPlot fieldPlot) {
-		List<FieldPlot> rangeList = mapToAddTo.get(range);
+	private void addToList(final Map<Integer, List<FieldPlot>> mapToAddTo, final int range, final FieldPlot fieldPlot) {
+		final List<FieldPlot> rangeList = mapToAddTo.get(range);
 		rangeList.add(fieldPlot);
 	}
 
@@ -85,7 +84,7 @@ public class FieldMapService {
 		return DefaultedMap.defaultedMap(rangeMap, new Transformer<Integer, List<FieldPlot>>() {
 
 			@Override
-			public List<FieldPlot> transform(Integer number) {
+			public List<FieldPlot> transform(final Integer number) {
 				final List<FieldPlot> plotList = new ArrayList<>();
 				rangeMap.put(number, plotList);
 				return plotList;
@@ -93,7 +92,7 @@ public class FieldMapService {
 		});
 	}
 
-	private void populateStudyInformation(final Map<Integer, FieldMap> filedMaps, StudyFieldMap rawDataFromMiddleware) {
+	private void populateStudyInformation(final Map<Integer, FieldMap> filedMaps, final StudyFieldMap rawDataFromMiddleware) {
 		for (final FieldMapTrialInstanceInfo middlewareFieldMapTrialInstanceInfo : rawDataFromMiddleware.getMiddlewareTiralInstances()) {
 			if (middlewareFieldMapTrialInstanceInfo.getBlockId() == null) {
 				// No field map generated
@@ -115,15 +114,15 @@ public class FieldMapService {
 		}
 	}
 
-	private void updatePlotsDeleted(FieldMap fieldMap, final FieldMapTrialInstanceInfo middlewareFieldMapTrialInstanceInfo) {
+	private void updatePlotsDeleted(final FieldMap fieldMap, final FieldMapTrialInstanceInfo middlewareFieldMapTrialInstanceInfo) {
 
 		final List<String> deletedPlots = middlewareFieldMapTrialInstanceInfo.getDeletedPlots();
 		final FieldPlot[][] fieldPlots = fieldMap.getPlots();
-		for (String deletedPlot : deletedPlots) {
-			String[] plots = deletedPlot.split(",");
-			int column = Integer.parseInt(plots[0]);
-			int range = Integer.parseInt(plots[1]);
-			FieldPlot fieldPlot = fieldPlots[column][range];
+		for (final String deletedPlot : deletedPlots) {
+			final String[] plots = deletedPlot.split(",");
+			final int column = Integer.parseInt(plots[0]);
+			final int range = Integer.parseInt(plots[1]);
+			final FieldPlot fieldPlot = fieldPlots[column][range];
 			fieldPlot.setPlotDeleted(true);
 		}
 
@@ -133,8 +132,8 @@ public class FieldMapService {
 			final StudyFieldMap rawDataFromMiddleware) {
 
 		this.initFieldPlots(fieldMap, middlewareFieldMapTrialInstanceInfo);
-		FieldPlot[][] fieldPlots = fieldMap.getPlots();
-		for (FieldMapLabel fieldMapLabel : middlewareFieldMapTrialInstanceInfo.getFieldMapLabels()) {
+		final FieldPlot[][] fieldPlots = fieldMap.getPlots();
+		for (final FieldMapLabel fieldMapLabel : middlewareFieldMapTrialInstanceInfo.getFieldMapLabels()) {
 			fieldPlots[fieldMapLabel.getRange() - 1][fieldMapLabel.getColumn() - 1] =
 					this.mapMiddlewareFieldLableToFieldPlot(fieldMapLabel, middlewareFieldMapTrialInstanceInfo, rawDataFromMiddleware);
 		}
@@ -142,7 +141,7 @@ public class FieldMapService {
 	}
 
 	private FieldPlot mapMiddlewareFieldLableToFieldPlot(final FieldMapLabel fieldMapLabel,
-			FieldMapTrialInstanceInfo middlewareFieldMapTrialInstanceInfo, StudyFieldMap rawDataFromMiddleware) {
+			final FieldMapTrialInstanceInfo middlewareFieldMapTrialInstanceInfo, final StudyFieldMap rawDataFromMiddleware) {
 		final FieldPlot fieldPlot = new FieldPlot();
 		fieldPlot.setEntryNumber(fieldMapLabel.getEntryNumber());
 		fieldPlot.setObservationUniqueIdentifier(fieldMapLabel.getExperimentId());
@@ -155,7 +154,7 @@ public class FieldMapService {
 
 	private void initFieldPlots(final FieldMap fieldMap, final FieldMapTrialInstanceInfo middlewareFieldMapTrialInstanceInfo) {
 		if (fieldMap.getPlots() == null) {
-			FieldPlot[][] fieldPlots = StudyFieldMapUtility.getDefaultPlots(middlewareFieldMapTrialInstanceInfo);
+			final FieldPlot[][] fieldPlots = StudyFieldMapUtility.getDefaultPlots(middlewareFieldMapTrialInstanceInfo);
 			fieldMap.setPlots(fieldPlots);
 		}
 	}
@@ -170,7 +169,7 @@ public class FieldMapService {
 		}
 	}
 
-	private FieldMapStudySummary mapPlantingSummary(StudyFieldMap rawDataFromMiddleware,
+	private FieldMapStudySummary mapPlantingSummary(final StudyFieldMap rawDataFromMiddleware,
 			final FieldMapTrialInstanceInfo fieldMapTrialInstanceInfo) {
 		final FieldMapStudySummary plantingSummary = new FieldMapStudySummary();
 		plantingSummary.setDataset(rawDataFromMiddleware.getFieldmapDataset().getDatasetName());
@@ -186,7 +185,7 @@ public class FieldMapService {
 
 	private void mapPlantingDetails(final FieldMapTrialInstanceInfo fieldMapTrialInstanceInfo, final FieldMapMetaData fieldMapMetaData) {
 		if (fieldMapMetaData.getFieldPlantingDetails() == null && fieldMapTrialInstanceInfo.getBlockId() != null) {
-			FieldMapPlantingDetails plantingDetails = new FieldMapPlantingDetails();
+			final FieldMapPlantingDetails plantingDetails = new FieldMapPlantingDetails();
 			plantingDetails.setBlockCapacity(fieldMapTrialInstanceInfo.getRowsInBlock() + " Rows ,"
 					+ fieldMapTrialInstanceInfo.getRangesInBlock() + " Ranges");
 			plantingDetails.setRowsPerPlot(fieldMapTrialInstanceInfo.getRowsPerPlot());
@@ -201,7 +200,7 @@ public class FieldMapService {
 
 	}
 
-	private String getPlanningOrderString(Integer plantingOrder) {
+	private String getPlanningOrderString(final Integer plantingOrder) {
 		switch (plantingOrder) {
 			case 1:
 				return "Row/Column";
@@ -217,7 +216,7 @@ public class FieldMapService {
 		return DefaultedMap.defaultedMap(fieldMaps, new Transformer<Integer, FieldMap>() {
 
 			@Override
-			public FieldMap transform(Integer blockId) {
+			public FieldMap transform(final Integer blockId) {
 				final FieldMap fieldMap = new FieldMap();
 				fieldMap.setBlockId(blockId);
 				fieldMaps.put(blockId, fieldMap);
@@ -227,39 +226,40 @@ public class FieldMapService {
 	}
 
 	private StudyFieldMap getRawDataFromMiddleware(final String studyId) {
-		Integer studyIdentifier = Integer.valueOf(studyId);
+		final Integer studyIdentifier = Integer.valueOf(studyId);
 		try {
-			final StudyType studyType = this.studyDataManager.getStudyType(studyIdentifier);
+			final StudyTypeDto studyType = this.studyDataManager.getStudyTypeByStudyId(studyIdentifier);
 
 			final List<FieldMapInfo> fieldMapInfoOfStudy =
-					this.studyDataManager.getFieldMapInfoOfStudy(Lists.newArrayList(studyIdentifier), studyType,
+					this.studyDataManager.getFieldMapInfoOfStudy(Lists.newArrayList(studyIdentifier),
 							crossExpansionProperties);
 			return new StudyFieldMap(studyType, fieldMapInfoOfStudy);
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException(String.format("There was an error retriving infomration for studyId %s was found.", studyId), e);
 		}
 	}
 
 	private static class StudyFieldMap {
 
-		private StudyType studyType;
+		private final StudyTypeDto studyType;
 
-		private List<FieldMapInfo> middlewareFieldMapInfo;
+		private final List<FieldMapInfo> middlewareFieldMapInfo;
 
 		/**
 		 * @param studyType
 		 * @param middlewareFieldMapInfo
 		 */
-		public StudyFieldMap(StudyType studyType, List<FieldMapInfo> middlewareFieldMapInfo) {
+		public StudyFieldMap(final StudyTypeDto studyType, final List<FieldMapInfo> middlewareFieldMapInfo) {
 			super();
 			this.studyType = studyType;
 			this.middlewareFieldMapInfo = middlewareFieldMapInfo;
 		}
 
+
 		/**
 		 * @return the studyType
 		 */
-		public StudyType getStudyType() {
+		public StudyTypeDto getStudyType() {
 			return this.studyType;
 		}
 

@@ -64,19 +64,19 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithNullNameRequest() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setName(null);
 		variable.setId(null);
 
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -97,19 +97,19 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithNameLengthExceedMaxLimit() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setName(RandomStringUtils.randomAlphanumeric(201));
 
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -124,18 +124,18 @@ public class VariableValidatorTest {
 
     @Test
     public void testEmptyStringAgainstNullDBValue() throws MiddlewareException {
-        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-        VariableDetails variable = TestDataProvider.getTestVariableDetails();
+        final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+        final VariableDetails variable = TestDataProvider.getTestVariableDetails();
         variable.setAlias("");
 
-        Variable dbVariable = TestDataProvider.getTestVariable();
+        final Variable dbVariable = TestDataProvider.getTestVariable();
         dbVariable.setAlias(null);
         dbVariable.setObservations(5);
 
-    		Term methodTerm = TestDataProvider.getMethodTerm();
-    		Term propertyTerm = TestDataProvider.getPropertyTerm();
-    		Term scaleTerm = TestDataProvider.getScaleTerm();
-    		Scale scale = TestDataProvider.getTestScale();
+    		final Term methodTerm = TestDataProvider.getMethodTerm();
+    		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+    		final Term scaleTerm = TestDataProvider.getScaleTerm();
+    		final Scale scale = TestDataProvider.getTestScale();
 
     		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
     		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -150,19 +150,19 @@ public class VariableValidatorTest {
 
     @Test
     public void testVariableShouldBeEditableNewValue() throws MiddlewareException {
-        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
-        VariableDetails variable = TestDataProvider.getTestVariableDetails();
+        final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+        final VariableDetails variable = TestDataProvider.getTestVariableDetails();
         variable.setAlias("");
 
-        Variable dbVariable = TestDataProvider.getTestVariable();
+        final Variable dbVariable = TestDataProvider.getTestVariable();
         dbVariable.setHasUsage(true);
 
         dbVariable.setAlias("TEST");
         
-    		Term methodTerm = TestDataProvider.getMethodTerm();
-    		Term propertyTerm = TestDataProvider.getPropertyTerm();
-    		Term scaleTerm = TestDataProvider.getScaleTerm();
-    		Scale scale = TestDataProvider.getTestScale();
+    		final Term methodTerm = TestDataProvider.getMethodTerm();
+    		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+    		final Term scaleTerm = TestDataProvider.getScaleTerm();
+    		final Scale scale = TestDataProvider.getTestScale();
 
 
     		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
@@ -185,19 +185,19 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithDescriptionLengthExceedMaxLimit() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setDescription(RandomStringUtils.randomAlphanumeric(1025));
 
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -218,21 +218,21 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithUniqueNonNullVariableName() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
-		Term variableTerm = TestDataProvider.getVariableTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term variableTerm = TestDataProvider.getVariableTerm();
 		variableTerm.setId(variableTerm.getId() + 100);
 
-		Scale scale = TestDataProvider.getTestScale();
-		Variable variable = TestDataProvider.getTestVariable();
+		final Scale scale = TestDataProvider.getTestScale();
+		final Variable variable = TestDataProvider.getTestVariable();
 		variable.setHasUsage(true);
-		VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
 		variableDetails.setName("ChangedName");
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(variableTerm).when(this.termDataManager).getTermById(variableTerm.getId());
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
@@ -254,19 +254,19 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithSpecialCharacterAnsStartWithDigitVariableName() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setName("V@riable");
 
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -285,27 +285,27 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithSpecialCharacterAnsStartWithDigitVariableAlias() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
 		variableDetails.setId("11");
 		variableDetails.setProgramUuid("uuid");
 		variableDetails.setName("Variable_Name");
 		variableDetails.setAlias("2lia");
 
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		Variable variable = TestDataProvider.getTestVariable();
+		final Variable variable = TestDataProvider.getTestVariable();
 		variable.setMethod(new Method(methodTerm));
 		variable.setProperty(new Property(propertyTerm));
 		variable.setScale(scale);
 	  	variable.setHasUsage(true);
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -326,18 +326,18 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithPropertyIdRequiredRequest() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setProperty(new PropertyDetails());
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -358,19 +358,19 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithPropertyIdExistOrNotRequest() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.getProperty().setId("0");
 
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -389,18 +389,18 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithMethodIdRequiredRequest() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setMethod(new MethodDetails());
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -421,18 +421,18 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithMethodIdExistOrNotRequest() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.getMethod().setId("0");
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -453,19 +453,19 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithScaleIdRequiredRequest() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
-		ScaleDetails scaleSummary = new ScaleDetails();
+		final ScaleDetails scaleSummary = new ScaleDetails();
 		variable.setScale(scaleSummary);
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -486,18 +486,18 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithScaleIdExistOrNotRequest() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.getScale().setId("0");
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -518,19 +518,19 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithScaleDataTypeNumericAndExpectedRangeOutOfScaleValidValues() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setExpectedMin("9");
 		variable.setExpectedMax("21");
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -552,19 +552,19 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithEqualExpectedMinAndMaxValues() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setExpectedMin("15");
 		variable.setExpectedMax("15");
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -584,19 +584,19 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithEqualExpectedMinAndScaleMinValue() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setExpectedMin("10.01");
 		variable.setExpectedMax("15");
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -616,19 +616,19 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithEqualExpectedMaxAndScaleMaxValue() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setExpectedMin("15");
 		variable.setExpectedMax("20.02");
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -648,19 +648,19 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithExpectedRangeMinGreaterThanMax() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setExpectedMin("32");
 		variable.setExpectedMax("18");
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -681,19 +681,19 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithMethodPropertyScaleCombinationExist() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
-		Variable variableDetail = TestDataProvider.getTestVariable();
+		final Variable variableDetail = TestDataProvider.getTestVariable();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -713,18 +713,18 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithVariableTypeShouldNotBeNull() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setVariableTypes(null);
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -745,22 +745,22 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithVariableTypeIsNotValid() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
 		variable.setVariableTypes(null);
 
-		VariableType variableType = new VariableType("0", "Variable Type 1", "Variable Type Description 1");
+		final VariableType variableType = new VariableType("0", "Variable Type 1", "Variable Type Description 1");
 
 		variable.getVariableTypes().add(variableType);
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -781,21 +781,21 @@ public class VariableValidatorTest {
     @Test
     public void testAnalysisVariableShouldNotContainOtherVariableType() throws MiddlewareException {
 
-        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+        final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-        VariableDetails variable = TestDataProvider.getTestVariableDetails();
+        final VariableDetails variable = TestDataProvider.getTestVariableDetails();
         variable.setId(null);
-        List<VariableType> variableTypes = variable.getVariableTypes();
+        final List<VariableType> variableTypes = variable.getVariableTypes();
         variableTypes.add(TestDataProvider.ANALYSIS_VARIABLE);
         variable.setVariableTypes(new HashSet<>(variableTypes));
 
-        Term methodTerm = TestDataProvider.getMethodTerm();
-        Term propertyTerm = TestDataProvider.getPropertyTerm();
-        Term scaleTerm = TestDataProvider.getScaleTerm();
+        final Term methodTerm = TestDataProvider.getMethodTerm();
+        final Term propertyTerm = TestDataProvider.getPropertyTerm();
+        final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-        Scale scale = TestDataProvider.getTestScale();
+        final Scale scale = TestDataProvider.getTestScale();
 
-        VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+        final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
         Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
         Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -810,21 +810,21 @@ public class VariableValidatorTest {
 
     @Test
     public void testPreviousVariableTypesShouldBePresentPositive() {
-        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+        final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-        VariableDetails variable = TestDataProvider.getTestVariableDetails();
-        List<VariableType> variableTypes = variable.getVariableTypes();
+        final VariableDetails variable = TestDataProvider.getTestVariableDetails();
+        final List<VariableType> variableTypes = variable.getVariableTypes();
         // adding a new variable type
-        variableTypes.add(TestDataProvider.NURSERY_CONDITION_VARIABLE);
+        variableTypes.add(TestDataProvider.STUDY_CONDITION_VARIABLE);
         variable.setVariableTypes(new HashSet<>(variableTypes));
 
-        Term methodTerm = TestDataProvider.getMethodTerm();
-        Term propertyTerm = TestDataProvider.getPropertyTerm();
-        Term scaleTerm = TestDataProvider.getScaleTerm();
+        final Term methodTerm = TestDataProvider.getMethodTerm();
+        final Term propertyTerm = TestDataProvider.getPropertyTerm();
+        final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-        Scale scale = TestDataProvider.getTestScale();
-        VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
-        Variable originalVariable = TestDataProvider.getTestVariable();
+        final Scale scale = TestDataProvider.getTestScale();
+        final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+        final Variable originalVariable = TestDataProvider.getTestVariable();
 
         originalVariable.setHasUsage(true);
 
@@ -841,23 +841,23 @@ public class VariableValidatorTest {
 
     @Test
     public void testPreviousVariableTypesShouldBePresentNegative() {
-        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+        final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-        VariableDetails variable = TestDataProvider.getTestVariableDetails();
+        final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 
-        List<VariableType> variableTypes = new ArrayList<>();
+        final List<VariableType> variableTypes = new ArrayList<>();
 
-        // changing variable types so that nursery condition is the only type
-        variableTypes.add(TestDataProvider.NURSERY_CONDITION_VARIABLE);
+        // changing variable types so that study condition is the only type
+        variableTypes.add(TestDataProvider.STUDY_CONDITION_VARIABLE);
         variable.setVariableTypes(new HashSet<>(variableTypes));
 
-        Term methodTerm = TestDataProvider.getMethodTerm();
-        Term propertyTerm = TestDataProvider.getPropertyTerm();
-        Term scaleTerm = TestDataProvider.getScaleTerm();
+        final Term methodTerm = TestDataProvider.getMethodTerm();
+        final Term propertyTerm = TestDataProvider.getPropertyTerm();
+        final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-        Scale scale = TestDataProvider.getTestScale();
-        VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
-        Variable originalVariable = TestDataProvider.getTestVariable();
+        final Scale scale = TestDataProvider.getTestScale();
+        final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+        final Variable originalVariable = TestDataProvider.getTestVariable();
 
         originalVariable.setHasUsage(true);
 
@@ -881,17 +881,17 @@ public class VariableValidatorTest {
 	@Test
 	public void testWithValidRequest() throws MiddlewareException {
 
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-		VariableDetails variable = TestDataProvider.getTestVariableDetails();
+		final VariableDetails variable = TestDataProvider.getTestVariableDetails();
 		variable.setId(null);
-		Term methodTerm = TestDataProvider.getMethodTerm();
-		Term propertyTerm = TestDataProvider.getPropertyTerm();
-		Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-		Scale scale = TestDataProvider.getTestScale();
+		final Scale scale = TestDataProvider.getTestScale();
 
-		VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+		final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
@@ -911,17 +911,17 @@ public class VariableValidatorTest {
     @Test
     public void testVariableShouldNotSaveOrUpdateWithWithValidRequest() throws MiddlewareException {
 
-        BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
+        final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Variable");
 
-        VariableDetails variable = TestDataProvider.getTestVariableDetails();
+        final VariableDetails variable = TestDataProvider.getTestVariableDetails();
         variable.setId(null);
-        Term methodTerm = TestDataProvider.getMethodTerm();
-        Term propertyTerm = TestDataProvider.getPropertyTerm();
-        Term scaleTerm = TestDataProvider.getScaleTerm();
+        final Term methodTerm = TestDataProvider.getMethodTerm();
+        final Term propertyTerm = TestDataProvider.getPropertyTerm();
+        final Term scaleTerm = TestDataProvider.getScaleTerm();
 
-        Scale scale = TestDataProvider.getTestScale();
+        final Scale scale = TestDataProvider.getTestScale();
 
-        VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
+        final VariableFilter variableFilter = TestDataProvider.getVariableFilterForVariableValidator();
 
         Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
         Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());

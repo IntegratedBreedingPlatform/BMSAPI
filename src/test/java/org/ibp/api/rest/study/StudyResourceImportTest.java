@@ -1,7 +1,9 @@
 
 package org.ibp.api.rest.study;
 
-import org.generationcp.middleware.domain.oms.StudyType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -21,9 +23,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 
 public class StudyResourceImportTest extends ApiUnitTestBase {
 
@@ -62,7 +61,7 @@ public class StudyResourceImportTest extends ApiUnitTestBase {
 	public void testImportNursery() throws Exception {
 
 		final StudyImportDTO inputDTO = new StudyImportDTO();
-		inputDTO.setStudyType(StudyType.N.getName());
+		inputDTO.setStudyType(StudyTypeDto.NURSERY_NAME);
 		inputDTO.setName("Maize Nursery");
 		inputDTO.setObjective("Grow more seeds");
 		inputDTO.setDescription("Maize Nursery title");
@@ -138,8 +137,8 @@ public class StudyResourceImportTest extends ApiUnitTestBase {
 		final String inptJSON = new ObjectMapper().writeValueAsString(inputDTO);
 
 		this.mockMvc.perform(
-				MockMvcRequestBuilders.post("/study/{cropName}/import?programUUID={programUUID}", this.cropName, this.programUuid) //
+			MockMvcRequestBuilders.post("/study/{cropName}/import?programUUID={programUUID}", this.cropName, this.programUuid) //
 				.contentType(this.contentType).content(inptJSON)) //
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED.value()));
+			.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED.value()));
 	}
 }

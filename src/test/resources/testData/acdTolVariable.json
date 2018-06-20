@@ -63,14 +63,9 @@
         "description": "Characteristics of a germplasm to be recorded during a study."
       },
       {
-        "id": "1803",
-        "name": "Nursery Condition",
-        "description": "Observations made of conditions in a nursery."
-      },
-      {
         "id": "1802",
-        "name": "Trial Condition",
-        "description": "Observations made of conditions in an individual environment involved in a trial."
+        "name": "Study Condition",
+        "description": "Observations made of conditions in a study."
       }
     ],
     "favourite": false,

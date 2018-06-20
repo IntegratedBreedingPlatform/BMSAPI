@@ -1,11 +1,12 @@
 
 package org.ibp.api.java.impl.middleware.study.conversion;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 import org.ibp.api.domain.study.MeasurementImportDTO;
 import org.ibp.api.domain.study.ObservationImportDTO;
@@ -15,16 +16,14 @@ import org.ibp.api.domain.study.Trait;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-
 public class WorkbookConverterTest {
 
 	@Test
-	public void testConvertNursery() {
+	public void testConvertStudy() {
 
 		final StudyImportDTO inputDTO = new StudyImportDTO();
-		inputDTO.setStudyType(StudyType.N.getName());
-		inputDTO.setName("Maize Nursery");
+		inputDTO.setStudyType(StudyTypeDto.TRIAL_NAME);
+		inputDTO.setName("Maize Study");
 		inputDTO.setObjective("Grow more seeds.");
 		inputDTO.setStartDate("20150101");
 		inputDTO.setEndDate("20151201");
@@ -32,7 +31,7 @@ public class WorkbookConverterTest {
 		inputDTO.setFolderId(1L);
 		inputDTO.setSiteName("Mexico");
 		inputDTO.setStudyInstitute("CIMMYT");
-		inputDTO.setDescription("Maize Nursery title.");
+		inputDTO.setDescription("Maize Study title.");
 		inputDTO.setCreatedBy("1");
 
 		final Trait trait1 = new Trait(1, "Plant Height");
@@ -96,7 +95,7 @@ public class WorkbookConverterTest {
 		final Workbook outputWorkbook = converter.convert(inputDTO);
 
 		// StudyDetail mapping
-		Assert.assertEquals(StudyType.N, outputWorkbook.getStudyDetails().getStudyType());
+		Assert.assertEquals(StudyTypeDto.getTrialDto().getName(), outputWorkbook.getStudyDetails().getStudyType().getName());
 		Assert.assertEquals(inputDTO.getName(), outputWorkbook.getStudyDetails().getStudyName());
 		Assert.assertEquals(inputDTO.getObjective(), outputWorkbook.getStudyDetails().getObjective());
 		Assert.assertEquals(inputDTO.getDescription(), outputWorkbook.getStudyDetails().getDescription());
@@ -106,7 +105,7 @@ public class WorkbookConverterTest {
 		Assert.assertEquals(inputDTO.getFolderId(), new Long(outputWorkbook.getStudyDetails().getParentFolderId()));
 
 		// Basic details as MeasurementVariables
-		Assert.assertEquals(6, outputWorkbook.getConditions().size());
+		Assert.assertEquals(8, outputWorkbook.getConditions().size());
 		Assert.assertEquals(inputDTO.getName(), outputWorkbook.getStudyName());
 
 		final MeasurementVariable mvStudyInstitute = outputWorkbook.getConditions().get(5);
@@ -120,7 +119,7 @@ public class WorkbookConverterTest {
 		Assert.assertEquals(0, outputWorkbook.getConstants().size());
 
 		// Factors
-		Assert.assertEquals(5, outputWorkbook.getFactors().size());
+		Assert.assertEquals(9, outputWorkbook.getFactors().size());
 		final MeasurementVariable mvEntryNumber = outputWorkbook.getFactors().get(0);
 		Assert.assertEquals(PhenotypicType.GERMPLASM, mvEntryNumber.getRole());
 		Assert.assertTrue(mvEntryNumber.isFactor());
