@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.pojos.workbench.Role;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
