@@ -2,13 +2,11 @@ package org.ibp.api.domain.user;
 
 import java.io.Serializable;
 
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.service.api.user.UserDto;
 
 public class UserDetailDto implements Serializable, Comparable<UserDto> {
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = -1086700590088326865L;
 
 	private Integer id;
@@ -19,7 +17,7 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 
 	private String lastName;
 
-	private String role;
+	private Role role;
 
 	private String status;
 	
@@ -66,12 +64,12 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 	}
 
 	
-	public String getRole() {
+	public Role getRole() {
 		return role;
 	}
 
 	
-	public void setRole(String role) {
+	public void setRole(final Role role) {
 		this.role = role;
 	}
 

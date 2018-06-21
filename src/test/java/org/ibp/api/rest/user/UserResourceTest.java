@@ -102,7 +102,8 @@ public class UserResourceTest  extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(users.get(0).getId())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].username", Matchers.is(users.get(0).getUsername())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].lastName", Matchers.is(users.get(0).getLastName())))
-			.andExpect(MockMvcResultMatchers.jsonPath("$[0].role", Matchers.is(users.get(0).getRole())));
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].role.id", Matchers.is(users.get(0).getRole().getId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].role.description", Matchers.is(users.get(0).getRole().getDescription())));
 	}
 
 

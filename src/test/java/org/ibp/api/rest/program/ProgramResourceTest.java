@@ -10,6 +10,7 @@ import java.util.List;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.impl.middleware.program.ProgramServiceImpl;
@@ -27,18 +28,18 @@ import com.google.common.collect.Lists;
 public class ProgramResourceTest extends ApiUnitTestBase {
 
 	private UsernamePasswordAuthenticationToken loggedInUser;
-	private User me;
-	private User myBreedingBuddy;
+	private WorkbenchUser me;
+	private WorkbenchUser myBreedingBuddy;
 
 	@Before
 	public void beforeEachTest() {
 
-		this.me = new User();
+		this.me = new WorkbenchUser();
 		this.me.setName("Mr. Breeder");
 		this.me.setUserid(1);
 		this.me.setPassword("password");
 
-		this.myBreedingBuddy = new User();
+		this.myBreedingBuddy = new WorkbenchUser();
 		this.myBreedingBuddy.setName("My Breeding Buddy");
 		this.myBreedingBuddy.setUserid(2);
 		this.myBreedingBuddy.setPassword("password");

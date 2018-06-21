@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.user;
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.ibp.api.domain.user.UserDetailDto;
@@ -143,7 +144,7 @@ public class UserServiceImpl implements UserService {
 		userdto.setUsername(user.getUsername());
 		userdto.setFirstName(user.getFirstName());
 		userdto.setLastName(user.getLastName());
-		userdto.setRole(user.getRole());
+		userdto.setRole(new Role(user.getRole().getId(), user.getRole().getDescription()));
 		userdto.setEmail(user.getEmail());
 		userdto.setStatus("true".equals(user.getStatus()) ? 0 : 1);
 		return userdto;

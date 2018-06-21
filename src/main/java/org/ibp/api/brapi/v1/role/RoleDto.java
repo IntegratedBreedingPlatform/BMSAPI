@@ -30,7 +30,7 @@ public class RoleDto {
 
 	public String toString(){
 		StringBuffer str= new StringBuffer();
-		str.append("UserDetails ")
+		str.append("RoleDto ")
 		.append("[ id= ").append(id)
 		.append(" ,description= ").append(description)		
 		.append(" ]");
