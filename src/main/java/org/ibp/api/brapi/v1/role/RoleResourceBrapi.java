@@ -27,5 +27,12 @@ public class RoleResourceBrapi {
 	public ResponseEntity<List<RoleDto>> listRoles() {
 		return new ResponseEntity<List<RoleDto>>(this.roleService.getAllRoles(), HttpStatus.OK);
 	}
+	
+	@ApiOperation(value = "List all assignable roles", notes = "List all assignable roles in this deployment instance of BMSAPI. ")
+	@RequestMapping(value = "brapi/v1/roles/assignable", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<RoleDto>> listAssignableRoles() {
+		return new ResponseEntity<List<RoleDto>>(this.roleService.getAssignableRoles(), HttpStatus.OK);
+	}
 
 }
