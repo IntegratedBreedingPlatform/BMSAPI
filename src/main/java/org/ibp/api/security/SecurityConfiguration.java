@@ -1,6 +1,12 @@
 
 package org.ibp.api.security;
 
+import java.util.List;
+
+import javax.annotation.Nullable;
+
+import org.ibp.api.brapi.v1.role.RoleDto;
+import org.ibp.api.brapi.v1.role.RoleService;
 import org.ibp.api.security.xauth.TokenProvider;
 import org.ibp.api.security.xauth.XAuthTokenConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +24,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+
 // **Important note for developers** : This class is central to the authentication framework of BMSAPI. Please do not alter it without a
 // good understanding of Spring Security in general and BMS X-Auth-Token based authentication workflow in particular, otherwise there will
 // be MAJOR breakages in the functioning of BMS components. Consult your friendly senior developer first if you are unsure.
@@ -31,6 +40,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private UserDetailsService userDetailsService;
+	
+	@Autowired
+	private RoleService roleService;
 
 	@Autowired
 	private TokenProvider tokenProvider;
@@ -55,6 +67,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		final List<RoleDto> allRoles = this.roleService.getAllRoles();
+		final List<String> roleNames = Lists.transform(allRoles, new Function<RoleDto, String>() {
+
+			@Nullable
+			@Override
+			public String apply(final RoleDto role) {
+				return role.getDescription().toUpperCase();
+			}
+		});
+		
 		http
 		.exceptionHandling()
 		.authenticationEntryPoint(this.authenticationEntryPoint)
@@ -68,7 +90,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		.authorizeRequests()
 				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 				.antMatchers("/", "/api-docs/**", "/authenticate", "/brapi/**/token", "/cooltools/**", "/breeding_view/**").permitAll()
-		.anyRequest().hasAnyAuthority("ADMIN", "TECHNICIAN", "BREEDER")
+		.anyRequest().hasAnyAuthority(roleNames.toArray(new String[]{}))
 		.and()
 		.apply(this.securityConfigurerAdapter());
 	}
