@@ -5,10 +5,12 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.user.UserDetailDto;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -56,6 +58,8 @@ public abstract class UserTestDataGenerator {
 		user.setAccess(0);
 		user.setInstalid(0);
 		user.setType(0);
+		
+		user.setRoles(Arrays.asList(new UserRole(user, new Role(2, "Breeder"))));
 
 		return user;
 	}

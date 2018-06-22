@@ -30,6 +30,8 @@ public class UserValidator implements Validator {
 	public static final String SIGNUP_FIELD_INVALID_STATUS = "signup.field.invalid.status";
 	public static final String SIGNUP_FIELD_INVALID_USER_ID = "signup.field.invalid.userId";
 	public static final String USER_AUTO_DEACTIVATION = "A user cannot be auto-deactivated";
+	public static final String CANNOT_UPDATE_SUPERADMIN = "Updating this user is not allowed";
+	public static final String CANNOT_ASSIGN_SUPERADMIN_ROLE = "SuperAdmin role cannot be assigned to a user";
 
 	public static final String DATABASE_ERROR = "database.error";
 
@@ -112,7 +114,12 @@ public class UserValidator implements Validator {
 			}
 
 			if (userUpdate != null) {
-				WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+				final Role userRole = userUpdate.getRoles().get(0).getRole();
+				if (this.isSuperAdminRole(userRole)){
+					errors.reject(CANNOT_UPDATE_SUPERADMIN);
+				}
+				
+				final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 				// TODO change frontend status type to integer
 				if (loggedInUser.equals(userUpdate) && "false".equals(user.getStatus())) {
 					errors.reject(USER_AUTO_DEACTIVATION);
@@ -129,6 +136,10 @@ public class UserValidator implements Validator {
 				errors.rejectValue(USER_ID, SIGNUP_FIELD_INVALID_USER_ID);
 			}
 		}
+	}
+
+	private boolean isSuperAdminRole(final Role userRole) {
+		return Role.SUPERADMIN.equals(userRole.getCapitalizedRole());
 	}
 
 	private void validateUserId(final Errors errors, final Integer userId) {
@@ -182,9 +193,11 @@ public class UserValidator implements Validator {
     protected void validateUserRole(final Errors errors, final Role role) {
 		if (null == role) {
             errors.rejectValue(ROLE, SIGNUP_FIELD_INVALID_ROLE);
+		} else if (this.isSuperAdminRole(role)) {
+			errors.reject(CANNOT_ASSIGN_SUPERADMIN_ROLE);
 		} else {
 	        this.validateFieldLength(errors, role.getDescription(), ROLE, ROLE_STR, 30);
-		}
+		} 
 
     }
     
