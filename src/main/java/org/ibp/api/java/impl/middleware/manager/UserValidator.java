@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.manager;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -58,6 +59,8 @@ public class UserValidator implements Validator {
 
 	@Autowired
 	private SecurityService securityService;
+	
+	private Role superAdminRole;
 
 	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
@@ -79,6 +82,7 @@ public class UserValidator implements Validator {
 
 	public void validate(final Object o, final Errors errors, final boolean createUser) {
 		UserDetailDto user = (UserDetailDto) o;
+		this.retrieveSuperAdminRole();
 
 		this.validateFieldLength(errors, user.getFirstName(), FIRST_NAME, FIRST_NAME_STR, 20);
 		this.validateFieldLength(errors, user.getLastName(), LAST_NAME, LAST_NAME_STR, 50);
@@ -101,6 +105,15 @@ public class UserValidator implements Validator {
 			this.validateUserUpdate(errors, user);
 		}
 
+	}
+
+	private void retrieveSuperAdminRole() {
+		final List<Role> allRoles = this.workbenchDataManager.getAllRoles();
+		for (final Role role : allRoles) {
+			if (this.isSuperAdminRole(role)){
+				this.superAdminRole = role;
+			} 
+		}
 	}
 
 	private void validateUserUpdate(Errors errors, UserDetailDto user) {
@@ -138,8 +151,10 @@ public class UserValidator implements Validator {
 		}
 	}
 
-	private boolean isSuperAdminRole(final Role userRole) {
-		return Role.SUPERADMIN.equals(userRole.getCapitalizedRole());
+	// Match by either "SUPERADMIN" description or by id of superadmin role from database
+	private boolean isSuperAdminRole(final Role role) {
+		return Role.SUPERADMIN.equals(role.getCapitalizedRole())
+				|| (this.superAdminRole != null && this.superAdminRole.getId().equals(role.getId()));
 	}
 
 	private void validateUserId(final Errors errors, final Integer userId) {
