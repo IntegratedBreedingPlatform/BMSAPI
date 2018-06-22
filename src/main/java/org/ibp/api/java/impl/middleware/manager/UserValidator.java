@@ -152,7 +152,7 @@ public class UserValidator implements Validator {
 	}
 
 	// Match by either "SUPERADMIN" description or by id of superadmin role from database
-	private boolean isSuperAdminRole(final Role role) {
+	boolean isSuperAdminRole(final Role role) {
 		return Role.SUPERADMIN.equals(role.getCapitalizedRole())
 				|| (this.superAdminRole != null && this.superAdminRole.getId().equals(role.getId()));
 	}
@@ -221,5 +221,10 @@ public class UserValidator implements Validator {
 				&& !"false".equalsIgnoreCase(fieldValue)) {
 			errors.rejectValue(STATUS, SIGNUP_FIELD_INVALID_STATUS);
 		}
+	}
+
+	
+	public void setSuperAdminRole(Role superAdminRole) {
+		this.superAdminRole = superAdminRole;
 	}
 }
