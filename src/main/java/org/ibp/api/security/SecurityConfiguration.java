@@ -1,6 +1,7 @@
 
 package org.ibp.api.security;
 
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.ibp.api.security.xauth.TokenProvider;
 import org.ibp.api.security.xauth.XAuthTokenConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private UserDetailsService userDetailsService;
-
+	
 	@Autowired
 	private TokenProvider tokenProvider;
 
@@ -68,7 +69,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		.authorizeRequests()
 				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 				.antMatchers("/", "/api-docs/**", "/authenticate", "/brapi/**/token", "/cooltools/**", "/breeding_view/**").permitAll()
-		.anyRequest().hasAnyAuthority("ADMIN", "TECHNICIAN", "BREEDER")
+		//  TODO Retrieve roles from DB		
+		.anyRequest().hasAnyAuthority(Role.ADMIN, "BREEDER", "TECHNICIAN", Role.SUPERADMIN)
 		.and()
 		.apply(this.securityConfigurerAdapter());
 	}

@@ -18,6 +18,18 @@ public class RoleServiceImpl implements RoleService {
 	public List<RoleDto> getAllRoles() {
 		List<RoleDto> roles = new ArrayList<RoleDto>();
 		
+		final List<Role> assignableRoles = this.workbenchDataManager.getAllRoles();
+		for (final Role role : assignableRoles) {
+			roles.add(new RoleDto(role.getId(), role.getDescription()));
+		}
+
+		return roles;
+	}
+
+	@Override
+	public List<RoleDto> getAssignableRoles() {
+		List<RoleDto> roles = new ArrayList<RoleDto>();
+		
 		final List<Role> assignableRoles = this.workbenchDataManager.getAssignableRoles();
 		for (final Role role : assignableRoles) {
 			roles.add(new RoleDto(role.getId(), role.getDescription()));
