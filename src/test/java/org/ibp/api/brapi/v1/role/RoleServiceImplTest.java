@@ -31,14 +31,13 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 		this.createTestRoles();
 		final List<Role> assignableRoles = new ArrayList<>(this.allRoles);
 		assignableRoles.remove(this.restrictedRole);
-		Mockito.doReturn(this.allRoles).when(this.workbenchDataManager).getAllRoles();
 		Mockito.doReturn(assignableRoles).when(this.workbenchDataManager).getAssignableRoles();
+		Mockito.doReturn(this.allRoles).when(this.workbenchDataManager).getAllRoles();
 	}
 	
 	@Test
 	public void testGetAllRoles() throws Exception {
 		final List<RoleDto> allRoles = this.roleServiceImpl.getAllRoles();
-		Mockito.verify(this.workbenchDataManager).getAllRoles();
 		Assert.assertEquals(this.allRoles.size(), allRoles.size());
 	}
 	
