@@ -20,28 +20,28 @@ public class CallServiceImpl implements CallService {
 
 	@Override
 	public List<org.ibp.api.brapi.v1.calls.BrapiCall> getAllCalls(final String dataType, final Integer pageSize, final Integer pageNumber) {
-		List<BrapiCall> brapiCalls = this.workbenchDataManager.getBrapiCalls(dataType, pageSize, pageNumber);
+		final List<BrapiCall> brapiCalls = this.workbenchDataManager.getBrapiCalls(dataType, pageSize, pageNumber);
 
 		return this.map(brapiCalls);
 	}
 
-	void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
+	void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}
 
-	private List<org.ibp.api.brapi.v1.calls.BrapiCall> map(List<BrapiCall> brapiCalls) throws MiddlewareQueryException {
-		List<org.ibp.api.brapi.v1.calls.BrapiCall> calls = new ArrayList<>();
+	private List<org.ibp.api.brapi.v1.calls.BrapiCall> map(final List<BrapiCall> brapiCalls) throws MiddlewareQueryException {
+		final List<org.ibp.api.brapi.v1.calls.BrapiCall> calls = new ArrayList<>();
 
 		if (brapiCalls == null) {
 			return calls;
 		}
 
-		for (BrapiCall brapiCall : brapiCalls) {
-			org.ibp.api.brapi.v1.calls.BrapiCall call = new org.ibp.api.brapi.v1.calls.BrapiCall();
+		for (final BrapiCall brapiCall : brapiCalls) {
+			final org.ibp.api.brapi.v1.calls.BrapiCall call = new org.ibp.api.brapi.v1.calls.BrapiCall();
 			call.setCall(brapiCall.getCall());
 			call.setDatatypes(Arrays.asList(brapiCall.getDatatypes().split(",")));
 			call.setVersions(Arrays.asList(brapiCall.getVersions().split(",")));
-			List<String> methods = Arrays.asList(brapiCall.getMethods().split(","));
+			final List<String> methods = Arrays.asList(brapiCall.getMethods().split(","));
 			for (int i = 0; i < methods.size() ; i++) {
 				call.addMethods(RequestMethod.valueOf(methods.get(i).trim()));
 			}

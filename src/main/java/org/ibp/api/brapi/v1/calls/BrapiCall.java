@@ -90,10 +90,10 @@ public class BrapiCall {
 	@Override
 	public String toString() {
 		return "BrapiCall{" +
-			"call='" + call + '\'' +
-			", datatypes='" + datatypes + '\'' +
-			", methods='" + methods + '\'' +
-			", versions='" + versions + '\'' +
+			"call='" + this.call + '\'' +
+			", datatypes='" + this.datatypes + '\'' +
+			", methods='" + this.methods + '\'' +
+			", versions='" + this.versions + '\'' +
 			'}';
 	}
 
