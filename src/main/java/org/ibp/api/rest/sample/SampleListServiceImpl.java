@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.generationcp.commons.util.DateUtil;
+import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -133,6 +135,11 @@ public class SampleListServiceImpl implements SampleListService {
 	@Override
 	public List<SampleList> search(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable) {
 		return this.sampleListServiceMW.searchSampleLists(searchString, exactMatch, programUUID, pageable);
+	}
+
+	@Override
+	public List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer listId) {
+		return sampleListServiceMW.getSampleDetailsDTOs(listId);
 	}
 
 	private SampleListDTO translateToSampleListDto(final SampleListDto dto) {
