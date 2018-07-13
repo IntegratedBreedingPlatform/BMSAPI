@@ -13,7 +13,7 @@
 		<spring-security-version>4.0.2.RELEASE</spring-security-version>
 		<tomcat.version>7.0.50</tomcat.version>
 		<ibpcommons.version>${project.version}</ibpcommons.version>
-		<jsonpath.version>0.8.1</jsonpath.version>
+		<jsonpath.version>2.4.0</jsonpath.version>
 		<modelmapper.version>0.7.3</modelmapper.version>
 		<envConfig>${user.name}</envConfig>
 	</properties>
@@ -299,9 +299,9 @@
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
-			<version>2.3.0</version>
+			<version>${jsonpath.version}</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/net.minidev/json-smart -->
+
 		<dependency>
 			<groupId>net.minidev</groupId>
 			<artifactId>json-smart</artifactId>
