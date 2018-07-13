@@ -8,13 +8,15 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Result;
 
+import java.util.Map;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"metadata", "result"})
 public class BrapiCalls {
 
 	private Metadata metadata;
 
-	private Result<BrapiCall> result;
+	private Result<Map<String, Object>> result;
 
 	/**
 	 * No args constructor required by serialization libraries.
@@ -26,7 +28,7 @@ public class BrapiCalls {
 	 * @param result
 	 * @param metadata
 	 */
-	public BrapiCalls(final Metadata metadata, final Result<BrapiCall> result) {
+	public BrapiCalls(final Metadata metadata, final Result<Map<String, Object>> result) {
 		this.metadata = metadata;
 		this.result = result;
 	}
@@ -53,18 +55,18 @@ public class BrapiCalls {
 	/**
 	 * @return The result
 	 */
-	public Result<BrapiCall> getResult() {
+	public Result<Map<String, Object>> getResult() {
 		return this.result;
 	}
 
 	/**
 	 * @param result The result
 	 */
-	public void setResult(final Result<BrapiCall> result) {
+	public void setResult(final Result<Map<String, Object>> result) {
 		this.result = result;
 	}
 
-	public BrapiCalls withResult(final Result<BrapiCall> result) {
+	public BrapiCalls withResult(final Result<Map<String, Object>> result) {
 		this.result = result;
 		return this;
 	}

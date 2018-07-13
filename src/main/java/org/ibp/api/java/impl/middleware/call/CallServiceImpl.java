@@ -1,16 +1,16 @@
 package org.ibp.api.java.impl.middleware.call;
 
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import com.jayway.jsonpath.JsonPath;
+import org.apache.commons.io.IOUtils;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.workbench.BrapiCall;
-import org.ibp.api.java.call.CallService;
+import org.ibp.api.java.calls.CallService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CallServiceImpl implements CallService {
@@ -19,36 +19,39 @@ public class CallServiceImpl implements CallService {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Override
-	public List<org.ibp.api.brapi.v1.calls.BrapiCall> getAllCalls(final String dataType, final Integer pageSize, final Integer pageNumber) {
-		List<BrapiCall> brapiCalls = this.workbenchDataManager.getBrapiCalls(dataType, pageSize, pageNumber);
-
-		return this.map(brapiCalls);
-	}
-
-	void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
-		this.workbenchDataManager = workbenchDataManager;
-	}
-
-	private List<org.ibp.api.brapi.v1.calls.BrapiCall> map(List<BrapiCall> brapiCalls) throws MiddlewareQueryException {
-		List<org.ibp.api.brapi.v1.calls.BrapiCall> calls = new ArrayList<>();
-
-		if (brapiCalls == null) {
-			return calls;
-		}
-
-		for (BrapiCall brapiCall : brapiCalls) {
-			org.ibp.api.brapi.v1.calls.BrapiCall call = new org.ibp.api.brapi.v1.calls.BrapiCall();
-			call.setCall(brapiCall.getCall());
-			call.setDatatypes(Arrays.asList(brapiCall.getDatatypes().split(",")));
-			call.setVersions(Arrays.asList(brapiCall.getVersions().split(",")));
-			List<String> methods = Arrays.asList(brapiCall.getMethods().split(","));
-			for (int i = 0; i < methods.size() ; i++) {
-				call.addMethods(RequestMethod.valueOf(methods.get(i).trim()));
+	public List<Map<String, Object>> getAllCalls(final String dataType, final Integer pageSize, final Integer pageNumber) {
+		try {
+			List<Map<String, Object>> brapiCalls;
+			final String jsonPath;
+			if (dataType != null) {
+				jsonPath = "$.data[?('" + dataType + "' in @['datatypes'])]";
+			} else {
+				jsonPath = "$.data.*";
 			}
 
-			calls.add(call);
-		}
-		return calls;
-	}
+			final InputStream is = CallServiceImpl.class.getClassLoader().getResourceAsStream("brapi/calls.json");
+			final String jsonTxt = IOUtils.toString( is );
+			brapiCalls = JsonPath.parse(jsonTxt).read(jsonPath);
 
+			if (pageNumber != null && pageSize != null) {
+
+				int maxLenght = pageSize * (pageNumber) + pageSize;
+				if (maxLenght > brapiCalls.size()) {
+					maxLenght = brapiCalls.size();
+				}
+
+				int minLenght = (pageNumber - 1) * pageSize;
+				if (minLenght < 0) {
+					minLenght = 0;
+				}
+
+				brapiCalls = brapiCalls.subList(minLenght, maxLenght);
+			}
+
+			return brapiCalls;
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

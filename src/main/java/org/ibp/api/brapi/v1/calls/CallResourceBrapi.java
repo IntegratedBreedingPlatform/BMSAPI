@@ -9,7 +9,7 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.java.call.CallService;
+import org.ibp.api.java.calls.CallService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ import java.util.Map;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a>
- * Crop services.
+ * Call services.
  */
 @Api(value = "BrAPI Call Services")
 @Controller
@@ -40,7 +40,7 @@ public class CallResourceBrapi {
 	@ApiOperation(value = "List of available calls", notes = "Get a list of available calls.")
 	@RequestMapping(value = "/brapi/v1/calls", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<BrapiCalls> listAvailableCrops(
+	public ResponseEntity<BrapiCalls> listAvailableCalls(
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
 			required = false) final Integer currentPage,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
@@ -49,17 +49,17 @@ public class CallResourceBrapi {
 			required = false) final String datatype) {
 
 		final Map<LocationFilters, Object> filters = new EnumMap<>(LocationFilters.class);
-		PagedResult<BrapiCall> resultPage = null;
+		PagedResult<Map<String, Object>> resultPage = null;
 
-		resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<BrapiCall>() {
+		resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<Map<String, Object>>() {
 
 			@Override
 			public long getCount() {
-				return CallResourceBrapi.this.callService.getAllCalls(datatype, pageSize, currentPage).size();
+				return CallResourceBrapi.this.callService.getAllCalls(datatype, null, null).size();
 			}
 
 			@Override
-			public List<BrapiCall> getResults(final PagedResult<BrapiCall> pagedResult) {
+			public List<Map<String, Object>> getResults(final PagedResult<Map<String, Object>> pagedResult) {
 				// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
 				final int pageNumber = pagedResult.getPageNumber() + 1;
 				return CallResourceBrapi.this.callService.getAllCalls(datatype, pageSize, currentPage);
@@ -68,7 +68,7 @@ public class CallResourceBrapi {
 
 		if (resultPage != null && resultPage.getTotalResults() > 0) {
 
-			final Result<BrapiCall> results = new Result<BrapiCall>().withData(resultPage.getPageResults());
+			final Result<Map<String, Object>> results = new Result<Map<String, Object>>().withData(resultPage.getPageResults());
 			final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
