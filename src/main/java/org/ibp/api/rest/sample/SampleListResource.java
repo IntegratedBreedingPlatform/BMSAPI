@@ -13,12 +13,10 @@ import org.ibp.api.domain.common.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,9 +28,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -160,7 +155,7 @@ public class SampleListResource {
 
 	@ApiOperation(value = "Download Sample List as CSV file", notes = "Download Sample List as CSV file")
 	@RequestMapping(value = "/{crop}/download", method = RequestMethod.GET)
-	public ResponseEntity<Resource> download(@PathVariable final String crop, @RequestParam final Integer listId,
+	public ResponseEntity<FileSystemResource> download(@PathVariable final String crop, @RequestParam final Integer listId,
 			@RequestParam final String listName) throws IOException {
 
 		final List<SampleDetailsDTO> sampleDetailsDTOs = this.sampleListService.getSampleDetailsDTOs(listId);
@@ -173,15 +168,12 @@ public class SampleListResource {
 
 		final FileExportInfo exportInfo = this.csvExportSampleListService.export(sampleDetailsDTOs, listName, visibleColumns);
 
-		final File file = new File(exportInfo.getFilePath());
-
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", exportInfo.getDownloadFileName()));
 
-		final Path path = Paths.get(file.getAbsolutePath());
-		final Resource resource = new ByteArrayResource(Files.readAllBytes(path));
+		final File file = new File(exportInfo.getFilePath());
+		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 
-		return ResponseEntity.ok().headers(headers).contentLength(file.length())
-				.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
 }
