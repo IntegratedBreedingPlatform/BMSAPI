@@ -60,30 +60,6 @@
         ]
       },
       {
-        "call": "roles",
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.0"
-        ]
-      },
-      {
-        "call": "roles/assignable",
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET"
-        ],
-        "versions": [
-          "1.0"
-        ]
-      },
-      {
         "call": "samples/{sampleId}",
         "datatypes": [
           "json"
@@ -157,32 +133,7 @@
           "1.0"
         ]
       },
-      {
-        "call": "users",
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "GET",
-          "POST"
-        ],
-        "versions": [
-          "1.0"
-        ]
-      },
-      {
-        "call": "users/{id}",
-        "datatypes": [
-          "json"
-        ],
-        "methods": [
-          "PUT"
-         ],
-        "versions": [
-          "1.0"
-        ]
-      },
-      {
+     {
         "call": "calls",
         "datatypes": [
           "json"
