@@ -100,8 +100,8 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 				.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType)
 						.content(this.convertObjectToByte(user)))
 				.andExpect(MockMvcResultMatchers.status().isConflict()).andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$ERROR.errors.[0].fieldNames.[0]", Matchers.is("email")))
-				.andExpect(MockMvcResultMatchers.jsonPath("$ERROR.errors.[0].message", Matchers.is("exists")))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.ERROR.errors.[0].fieldNames.[0]", Matchers.is("email")))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.ERROR.errors.[0].message", Matchers.is("exists")))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is((String) mapResponse.get("id"))));
 	}
 
@@ -141,8 +141,8 @@ public class UserResourceBrapiTest extends ApiUnitTestBase {
 				.perform(MockMvcRequestBuilders.put("/brapi/v1/users/{id}", id).contentType(this.contentType)
 						.content(this.convertObjectToByte(user)))
 				.andExpect(MockMvcResultMatchers.status().isNotFound()).andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$ERROR.errors.[0].fieldNames.[0]", Matchers.is("username")))
-				.andExpect(MockMvcResultMatchers.jsonPath("$ERROR.errors.[0].message", Matchers.is("exists")))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.ERROR.errors.[0].fieldNames.[0]", Matchers.is("username")))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.ERROR.errors.[0].message", Matchers.is("exists")))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is("0")));
 	}
 
