@@ -45,7 +45,7 @@ public class CallResourceBrapi {
 			required = false) final Integer currentPage,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
 			required = false) final Integer pageSize,
-		@ApiParam(value = "name of datatype", required = false) @RequestParam(value = "datatype",
+		@ApiParam(value = "name of datatype", required = false, allowableValues = "csv,tsv,json") @RequestParam(value = "datatype",
 			required = false) final String datatype) {
 
 		final Map<LocationFilters, Object> filters = new EnumMap<>(LocationFilters.class);

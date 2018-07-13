@@ -15,9 +15,6 @@ import java.util.Map;
 @Service
 public class CallServiceImpl implements CallService {
 
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
-
 	@Override
 	public List<Map<String, Object>> getAllCalls(final String dataType, final Integer pageSize, final Integer pageNumber) {
 		try {
@@ -51,7 +48,7 @@ public class CallServiceImpl implements CallService {
 			return brapiCalls;
 		} catch (final IOException e) {
 			e.printStackTrace();
+			return null;
 		}
-		return null;
 	}
 }
