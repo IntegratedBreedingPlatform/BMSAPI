@@ -3,7 +3,6 @@ package org.ibp.api.brapi.v1.calls;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +46,6 @@ public class CallResourceBrapi {
 		@ApiParam(value = "name of datatype", required = false, allowableValues = "csv,tsv,json") @RequestParam(value = "datatype",
 			required = false) final String datatype) {
 
-		final Map<LocationFilters, Object> filters = new EnumMap<>(LocationFilters.class);
 		PagedResult<Map<String, Object>> resultPage = null;
 
 		resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<Map<String, Object>>() {
