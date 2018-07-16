@@ -5,7 +5,9 @@ import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
 import org.generationcp.commons.service.BreedingViewImportService;
+import org.generationcp.commons.service.CsvExportSampleListService;
 import org.generationcp.commons.service.impl.BreedingViewImportServiceImpl;
+import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.hibernate.DatasourceUtilities;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
@@ -255,6 +257,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public PlantService getPlantService() {
 		return new PlantServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public CsvExportSampleListService getCsvExportSampleListService() {
+		return new CsvExportSampleListServiceImpl();
 	}
 
 	@Bean
