@@ -1,5 +1,6 @@
 package org.ibp.api.rest.sample;
 
+import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.pojos.SampleList;
 import org.springframework.data.domain.Pageable;
 
@@ -62,4 +63,7 @@ public interface SampleListService {
 	 * @return
 	 */
 	List<SampleList> search(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable);
+
+	List<SampleDetailsDTO> getSampleDetailsDTOs(Integer listId);
+
 }

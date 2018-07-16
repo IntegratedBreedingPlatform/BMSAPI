@@ -5,7 +5,9 @@ import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
 import org.generationcp.commons.service.BreedingViewImportService;
+import org.generationcp.commons.service.CsvExportSampleListService;
 import org.generationcp.commons.service.impl.BreedingViewImportServiceImpl;
+import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.hibernate.DatasourceUtilities;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
@@ -50,8 +52,10 @@ import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
+import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
 import org.generationcp.middleware.service.impl.study.PlantServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
@@ -176,7 +180,7 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public OntologyVariableDataManager getOntologyVariableDataManager() {
 		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
-				this.getOntologyScaleDataManager(), this.getCropDatabaseSessionProvider());
+				this.getOntologyScaleDataManager(), this.getFormulaService(), this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
@@ -253,6 +257,18 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public PlantService getPlantService() {
 		return new PlantServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public CsvExportSampleListService getCsvExportSampleListService() {
+		return new CsvExportSampleListServiceImpl();
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public FormulaService getFormulaService() {
+		return new FormulaServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
