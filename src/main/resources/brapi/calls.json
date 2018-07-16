@@ -1,0 +1,151 @@
+{"data": [
+      {
+        "call": "token",
+        "datatypes": [
+          "json"
+        ],
+        "methods": [
+          "POST"
+        ],
+        "versions": [
+          "1.0"
+        ]
+      },
+      {
+        "call": "crops",
+        "datatypes": [
+          "json"
+        ],
+        "methods": [
+          "GET"
+        ],
+        "versions": [
+          "1.0"
+        ]
+      },
+      {
+        "call": "locations",
+        "datatypes": [
+          "json"
+        ],
+        "methods": [
+          "GET"
+        ],
+        "versions": [
+          "1.0"
+        ]
+      },
+      {
+        "call": "phenotypes-search",
+        "datatypes": [
+          "json"
+        ],
+        "methods": [
+          "POST"
+        ],
+        "versions": [
+          "1.0"
+        ]
+      },
+      {
+        "call": "programs",
+        "datatypes": [
+          "json"
+        ],
+        "methods": [
+          "GET"
+        ],
+        "versions": [
+          "1.0"
+        ]
+      },
+      {
+        "call": "samples/{sampleId}",
+        "datatypes": [
+          "json"
+        ],
+        "methods": [
+          "GET"
+        ],
+        "versions": [
+          "1.0"
+        ]
+      },
+      {
+        "call": "studies",
+        "datatypes": [
+          "json"
+        ],
+        "methods": [
+          "GET"
+        ],
+        "versions": [
+          "1.0"
+        ]
+      },
+      {
+        "call": "studies/{studyDbId}",
+        "datatypes": [
+          "json"
+        ],
+        "methods": [
+          "GET"
+        ],
+        "versions": [
+          "1.0"
+        ]
+      },
+      {
+        "call": "studies/{studyDbId}/table",
+        "datatypes": [
+          "json", 
+          "tsv", 
+          "csv"
+        ],
+        "methods": [
+          "GET"
+        ],
+        "versions": [
+          "1.0"
+        ]
+      },
+      {
+        "call": "trials",
+        "datatypes": [
+          "json"
+        ],
+        "methods": [
+          "GET"
+        ],
+        "versions": [
+          "1.0"
+        ]
+      },
+      {
+        "call": "trials/{trialDbId}/table",
+        "datatypes": [
+          "json"
+        ],
+        "methods": [
+          "GET"
+        ],
+        "versions": [
+          "1.0"
+        ]
+      },
+     {
+        "call": "calls",
+        "datatypes": [
+          "json"
+        ],
+        "methods": [
+          "GET"
+         ],
+        "versions": [
+          "1.0",
+          "1.1",
+          "1.2"
+        ]
+      }
+    ]
+}

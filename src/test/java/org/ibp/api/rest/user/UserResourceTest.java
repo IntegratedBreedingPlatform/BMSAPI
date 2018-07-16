@@ -48,7 +48,7 @@ public class UserResourceTest  extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isInternalServerError())
-			.andExpect(MockMvcResultMatchers.jsonPath("errors.$[0].message", Matchers.is("Required String parameter 'projectUUID' is not present")));
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", Matchers.is("Required String parameter 'projectUUID' is not present")));
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class UserResourceTest  extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isInternalServerError())
-			.andExpect(MockMvcResultMatchers.jsonPath("errors.$[0].message", Matchers.is("don't exists users for this projectUUID")));
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", Matchers.is("don't exists users for this projectUUID")));
 	}
 
 	/**
@@ -80,7 +80,7 @@ public class UserResourceTest  extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isInternalServerError())
-			.andExpect(MockMvcResultMatchers.jsonPath("errors.$[0].message", Matchers.is("An internal error occurred while trying to get the users")));
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", Matchers.is("An internal error occurred while trying to get the users")));
 	}
 
 	/**
