@@ -1,5 +1,7 @@
 package org.ibp.api.rest.ontology;
 
+import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.lang.math.RandomUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
@@ -20,16 +22,23 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.annotation.Resource;
 import java.util.Locale;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
 
 public class FormulaResourceTest extends ApiUnitTestBase {
 
 	private static final String ERROR_FORMULA_REQUIRED = "Formula required";
 	private static final String ERROR_FORMULA_TARGET_REQUIRED = "Target required";
 	private static final String ERROR_FORMULA_DEFINITION_REQUIRED = "Target required";
+	private static final String ERROR_JEXL_EXCEPTION = "Some jexl exception";
+	private static final String JEXL_EXCEPTION_PREFIX = "?: ";
+
 	private static Locale locale = Locale.getDefault();
 
 
@@ -93,6 +102,27 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(this.getMessage("variable.formula.targetid.required")))) //
+		;
+
+		Mockito.verify(this.service, Mockito.times(0)).save(formulaDto);
+	}
+
+	@Test
+	public void testSave_InvalidFormula() throws Exception {
+		final FormulaDto formulaDto = new FormulaDto();
+		formulaDto.setTargetTermId(RandomUtils.nextInt());
+		formulaDto.setDefinition("{{1}}");
+
+		when(this.processor.evaluateFormula(anyString(), anyMap())).thenThrow(new JexlException(null, ERROR_JEXL_EXCEPTION));
+
+		this.mockMvc //
+			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
+				.contentType(this.contentType) //
+				.locale(locale)
+				.content(this.convertObjectToByte(formulaDto))) //
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(JEXL_EXCEPTION_PREFIX + ERROR_JEXL_EXCEPTION))) //
 		;
 
 		Mockito.verify(this.service, Mockito.times(0)).save(formulaDto);

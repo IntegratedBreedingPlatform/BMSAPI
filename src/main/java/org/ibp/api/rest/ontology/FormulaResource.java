@@ -5,6 +5,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
+import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.Map;
 
 @Api(value = "Ontology Formula Services")
 @Controller
@@ -50,6 +53,16 @@ public class FormulaResource {
 		Preconditions
 			.checkArgument(!StringUtils.isBlank(formulaDto.getDefinition()), this.getMessage("variable.formula.definition.required"));
 
+		String formula = formulaDto.getDefinition();
+		final Map<String, Object> terms = DerivedVariableUtils.extractTerms(formula);
+		for (final Map.Entry<String, Object> termEntry : terms.entrySet()) {
+			termEntry.setValue(BigDecimal.ONE);
+		}
+
+		formula = DerivedVariableUtils.replaceDelimiters(formula);
+		// Inform the ontology manager admin full details of the exception by throwing it
+		// Mapping engine errors to UI errors would be impractical
+		processor.evaluateFormula(formula, terms);
 	}
 
 	private String getMessage(final String code) {
