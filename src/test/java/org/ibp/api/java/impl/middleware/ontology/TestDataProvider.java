@@ -9,10 +9,13 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.commons.lang.math.RandomUtils;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.ontology.FormulaDto;
+import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
@@ -204,9 +207,27 @@ public class TestDataProvider {
 		variable.addVariableType(VariableType.TRAIT);
 		variable.setDateCreated(TestDataProvider.getDateCreated());
 		variable.setDateLastModified(TestDataProvider.getDateModified());
+		variable.setFormula(getTestFormula());
 	  	variable.setHasUsage(false);
 
 		return variable;
+	}
+
+	public static FormulaDto getTestFormula() {
+		final FormulaDto formulaDto = new FormulaDto();
+		formulaDto.setFormulaId(RandomUtils.nextInt());
+		formulaDto.setTargetTermId(RandomUtils.nextInt());
+		formulaDto.setDefinition("{{" + RandomUtils.nextInt() + "}}");
+
+		final List<FormulaVariable> inputs = new ArrayList<>();
+		final FormulaVariable input = new FormulaVariable();
+		input.setTargetTermId(RandomUtils.nextInt());
+		input.setName("input name");
+		input.setId(RandomUtils.nextInt());
+		inputs.add(input);
+		formulaDto.setInputs(inputs);
+
+		return formulaDto;
 	}
 
 	public static List<Variable> getTestVariables(final Integer elements) {
