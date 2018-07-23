@@ -3,6 +3,7 @@ package org.ibp.api.rest.ontology;
 import com.google.common.base.Preconditions;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
@@ -41,7 +42,11 @@ public class FormulaResource {
 	@ApiOperation(value = "Create Formula", notes = "Create a formula to calculate a Variable")
 	@RequestMapping(value = "/{cropname}/formula", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<FormulaDto> createFormula(@PathVariable final String cropname, @RequestBody final FormulaDto formulaDto) {
+	public ResponseEntity<FormulaDto> createFormula(
+		@PathVariable final String cropname,
+		@ApiParam("Formula object to create. Inputs will be extracted from the formula definition."
+			+ " All other info about inputs will be discarded")
+		@RequestBody final FormulaDto formulaDto) {
 		this.validate(formulaDto);
 
 		return new ResponseEntity<>(this.service.save(formulaDto), HttpStatus.CREATED);
@@ -62,7 +67,12 @@ public class FormulaResource {
 		formula = DerivedVariableUtils.replaceDelimiters(formula);
 		// Inform the ontology manager admin full details of the exception by throwing it
 		// Mapping engine errors to UI errors would be impractical
-		processor.evaluateFormula(formula, terms);
+		try {
+			processor.evaluateFormula(formula, terms);
+		} catch (Exception e) {
+			throw new IllegalArgumentException(
+				getMessage("variable.formula.invalid") + e.getMessage() + " - " + e.getCause());
+		}
 	}
 
 	private String getMessage(final String code) {

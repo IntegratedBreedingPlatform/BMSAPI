@@ -1,13 +1,11 @@
 package org.ibp.api.rest.ontology;
 
 import org.apache.commons.jexl3.JexlException;
-import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.lang.math.RandomUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.ibp.ApiUnitTestBase;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +20,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.annotation.Resource;
 import java.util.Locale;
-import java.util.Map;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
@@ -37,7 +35,6 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 	private static final String ERROR_FORMULA_TARGET_REQUIRED = "Target required";
 	private static final String ERROR_FORMULA_DEFINITION_REQUIRED = "Target required";
 	private static final String ERROR_JEXL_EXCEPTION = "Some jexl exception";
-	private static final String JEXL_EXCEPTION_PREFIX = "?: ";
 
 	private static Locale locale = Locale.getDefault();
 
@@ -122,7 +119,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 				.content(this.convertObjectToByte(formulaDto))) //
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(JEXL_EXCEPTION_PREFIX + ERROR_JEXL_EXCEPTION))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", containsString(ERROR_JEXL_EXCEPTION))) //
 		;
 
 		Mockito.verify(this.service, Mockito.times(0)).save(formulaDto);
