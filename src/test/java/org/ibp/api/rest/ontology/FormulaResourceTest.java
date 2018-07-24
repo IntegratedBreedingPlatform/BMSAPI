@@ -6,6 +6,7 @@ import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
+import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.ibp.ApiUnitTestBase;
@@ -20,6 +21,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import static org.hamcrest.Matchers.empty;
@@ -58,6 +61,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		final Term term = new Term();
 		term.setVocabularyId(CvId.VARIABLES.getId());
 		doReturn(term).when(this.termDataManager).getTermById(anyInt());
+		doReturn(term).when(this.termDataManager).getTermByName(anyString());
 	}
 
 	@Test
@@ -119,6 +123,33 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 				.jsonPath(
 					"$.errors[0].message",
 					is(this.getMessage("id.does.not.exist", new Object[] {"target variable", String.valueOf(targetTermId)}))))
+		;
+
+		Mockito.verify(this.service, Mockito.times(0)).save(formulaDto);
+	}
+
+	@Test
+	public void testSave_InputNotExist() throws Exception {
+		final FormulaDto formulaDto = new FormulaDto();
+		final int targetTermId = RandomUtils.nextInt();
+		formulaDto.setTargetTermId(targetTermId);
+		final String inputName = "SomeInvalidInputName";
+		formulaDto.setDefinition("{{" + inputName + "}}");
+
+
+		doReturn(null).when(this.termDataManager).getTermByName(inputName);
+
+		this.mockMvc //
+			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
+				.contentType(this.contentType) //
+				.locale(locale) //
+				.content(this.convertObjectToByte(formulaDto))) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
+			.andExpect(MockMvcResultMatchers
+				.jsonPath(
+					"$.errors[0].message",
+					is(this.getMessage("variable.input.not.exists", new Object[] {inputName}))))
 		;
 
 		Mockito.verify(this.service, Mockito.times(0)).save(formulaDto);

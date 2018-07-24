@@ -4,9 +4,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
+import org.generationcp.middleware.domain.ontology.FormulaVariable;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.java.impl.middleware.ontology.TermRequest;
-import org.ibp.api.java.impl.middleware.ontology.VariableServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -30,6 +32,9 @@ public class FormulaValidator implements Validator {
 	@Autowired
 	protected TermValidator termValidator;
 
+	@Autowired
+	protected TermDataManager termDataManager;
+
 	@Override
 	public boolean supports(final Class<?> aClass) {
 		return FormulaDto.class.equals(aClass);
@@ -45,6 +50,8 @@ public class FormulaValidator implements Validator {
 			return;
 		}
 
+		// Validate target variable
+
 		if (formulaDto.getTargetTermId() == null) {
 			errors.reject("variable.formula.targetid.required", "");
 			return;
@@ -52,6 +59,17 @@ public class FormulaValidator implements Validator {
 
 		final TermRequest term = new TermRequest(String.valueOf(formulaDto.getTargetTermId()), "target variable", CvId.VARIABLES.getId());
 		this.termValidator.validate(term, errors);
+
+		// Validate inputs
+
+		for (final FormulaVariable formulaVariable : formulaDto.getInputs()) {
+			final Term termByName = this.termDataManager.getTermByName(formulaVariable.getName());
+			if (termByName == null) {
+				errors.reject("variable.input.not.exists", new Object[] {formulaVariable.getName()}, "");
+			} else {
+				formulaVariable.setId(termByName.getId());
+			}
+		}
 
 		// Validate formula definition
 

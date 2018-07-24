@@ -30,21 +30,24 @@ public class FormulaServiceImpl implements FormulaService {
 	@Override
 	public FormulaDto save(final FormulaDto formulaDto) {
 
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), FormulaDto.class.getName());
+		this.extractInputs(formulaDto);
 
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), FormulaDto.class.getName());
 		this.formulaValidator.validate(formulaDto, bindingResult);
 
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 
-		this.extractInputs(formulaDto);
-
 		return this.formulaService.save(formulaDto);
 	}
 
 	private void extractInputs(final FormulaDto formulaDto) {
-		final List<String> inputs = DerivedVariableUtils.extractInputs(formulaDto.getDefinition());
+		final String definition = formulaDto.getDefinition();
+		if (definition == null) {
+			return;
+		}
+		final List<String> inputs = DerivedVariableUtils.extractInputs(definition);
 		final List<FormulaVariable> formulaInputs = new ArrayList<>();
 		for (final String input : inputs) {
 			final FormulaVariable formulaVariable = new FormulaVariable();
