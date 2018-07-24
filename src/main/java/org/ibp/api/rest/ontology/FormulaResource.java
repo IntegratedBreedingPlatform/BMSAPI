@@ -59,16 +59,16 @@ public class FormulaResource {
 			.checkArgument(!StringUtils.isBlank(formulaDto.getDefinition()), this.getMessage("variable.formula.definition.required"));
 
 		String formula = formulaDto.getDefinition();
-		final Map<String, Object> terms = DerivedVariableUtils.extractTerms(formula);
-		for (final Map.Entry<String, Object> termEntry : terms.entrySet()) {
+		final Map<String, Object> parameters = DerivedVariableUtils.extractParameters(formula);
+		for (final Map.Entry<String, Object> termEntry : parameters.entrySet()) {
 			termEntry.setValue(BigDecimal.ONE);
 		}
 
 		formula = DerivedVariableUtils.replaceDelimiters(formula);
-		// Inform the ontology manager admin full details of the exception by throwing it
+		// Inform the ontology manager admin about the exception
 		// Mapping engine errors to UI errors would be impractical
 		try {
-			processor.evaluateFormula(formula, terms);
+			processor.evaluateFormula(formula, parameters);
 		} catch (Exception e) {
 			throw new IllegalArgumentException(
 				getMessage("variable.formula.invalid") + e.getMessage() + " - " + e.getCause());
