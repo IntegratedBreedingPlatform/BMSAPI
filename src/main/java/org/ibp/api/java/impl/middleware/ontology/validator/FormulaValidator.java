@@ -3,7 +3,10 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
+import org.ibp.api.java.impl.middleware.ontology.TermRequest;
+import org.ibp.api.java.impl.middleware.ontology.VariableServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -16,13 +19,16 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 @Component
-public class FormulaValidator extends OntologyValidator implements Validator {
+public class FormulaValidator implements Validator {
 
 	@Autowired
 	private DerivedVariableProcessor processor;
 
 	@Resource
 	private ResourceBundleMessageSource resourceBundleMessageSource;
+
+	@Autowired
+	protected TermValidator termValidator;
 
 	@Override
 	public boolean supports(final Class<?> aClass) {
@@ -35,20 +41,27 @@ public class FormulaValidator extends OntologyValidator implements Validator {
 		final FormulaDto formulaDto = (FormulaDto) target;
 
 		if (formulaDto == null) {
-			this.addCustomError(errors, "variable.formula.required", null);
+			errors.rejectValue("variable.formula.required", "");
 			return;
 		}
 
 		if (formulaDto.getTargetTermId() == null) {
-			this.addCustomError(errors, "variable.formula.targetid.required", null);
+			errors.reject("variable.formula.targetid.required", "");
+			return;
 		}
 
+		final TermRequest term = new TermRequest(String.valueOf(formulaDto.getTargetTermId()), "target variable", CvId.VARIABLES.getId());
+		this.termValidator.validate(term, errors);
+
+		// Validate formula definition
+
 		if (StringUtils.isBlank(formulaDto.getDefinition())) {
-			this.addCustomError(errors, "variable.formula.definition.required", null);
+			errors.reject("variable.formula.definition.required", "");
 			return;
 		}
 
 		// Validate syntax
+
 		try {
 			String formula = formulaDto.getDefinition();
 			final Map<String, Object> parameters = DerivedVariableUtils.extractParameters(formula);
