@@ -6,6 +6,7 @@ import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.ibp.ApiUnitTestBase;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +28,11 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 
 public class FormulaResourceTest extends ApiUnitTestBase {
 
-	private static final String ERROR_FORMULA_REQUIRED = "Formula required";
-	private static final String ERROR_FORMULA_TARGET_REQUIRED = "Target required";
-	private static final String ERROR_FORMULA_DEFINITION_REQUIRED = "Target required";
 	private static final String ERROR_JEXL_EXCEPTION = "Some jexl exception";
 
 	private static Locale locale = Locale.getDefault();
@@ -64,6 +63,13 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 
 	@Resource
 	private ResourceBundleMessageSource resourceBundleMessageSource;
+
+	@Before
+	public void setup() throws Exception {
+		super.setUp();
+
+		doReturn("").when(this.processor).evaluateFormula(anyString(), anyMap());
+	}
 
 	@Test
 	public void testCreateFormula_NoDefinition() throws Exception {
@@ -110,7 +116,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		formulaDto.setTargetTermId(RandomUtils.nextInt());
 		formulaDto.setDefinition("{{1}}");
 
-		when(this.processor.evaluateFormula(anyString(), anyMap())).thenThrow(new JexlException(null, ERROR_JEXL_EXCEPTION));
+		doThrow(new JexlException(null, ERROR_JEXL_EXCEPTION)).when(this.processor).evaluateFormula(anyString(), anyMap());
 
 		this.mockMvc //
 			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
