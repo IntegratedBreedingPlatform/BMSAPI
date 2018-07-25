@@ -1,12 +1,13 @@
 package org.ibp.api.rest.ontology;
 
+import com.google.common.base.Optional;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.lang.math.RandomUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
-import org.generationcp.middleware.domain.ontology.FormulaVariable;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.ibp.ApiUnitTestBase;
@@ -21,8 +22,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import static org.hamcrest.Matchers.empty;
@@ -52,6 +51,9 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	protected TermDataManager termDataManager;
+
+	@Autowired
+	protected OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Before
 	public void setup() throws Exception {
@@ -174,6 +176,43 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		;
 
 		Mockito.verify(this.service, Mockito.times(0)).save(formulaDto);
+	}
+
+	@Test
+	public void testDelete() throws Exception {
+		final Integer formulaId = RandomUtils.nextInt();
+		final FormulaDto formulaDto = new FormulaDto();
+		final Optional<FormulaDto> formula = Optional.of(formulaDto);
+		formulaDto.setFormulaId(formulaId);
+		formulaDto.setTargetTermId(RandomUtils.nextInt());
+
+		doReturn(formula).when(this.service).getById(formulaId);
+		doReturn(false).when(this.ontologyVariableDataManager).isVariableUsedInStudy(formulaDto.getTargetTermId());
+
+		this.mockMvc //
+			.perform(MockMvcRequestBuilders.delete("/ontology/{cropname}/formula/{formulaId}", this.cropName, formulaId)) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.status().isNoContent()) //
+		;
+	}
+
+	@Test
+	public void testDelete_VariableUsedInStudy() throws Exception {
+		final Integer formulaId = RandomUtils.nextInt();
+		final FormulaDto formulaDto = new FormulaDto();
+		final Optional<FormulaDto> formula = Optional.of(formulaDto);
+		formulaDto.setFormulaId(formulaId);
+		formulaDto.setTargetTermId(RandomUtils.nextInt());
+
+		doReturn(formula).when(this.service).getById(formulaId);
+		doReturn(true).when(this.ontologyVariableDataManager).isVariableUsedInStudy(formulaDto.getTargetTermId());
+
+		this.mockMvc //
+			.perform(MockMvcRequestBuilders.delete("/ontology/{cropname}/formula/{formulaId}", this.cropName, formulaId)) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(getMessage("variable.formula.invalid.is.not.deletable"))))
+		;
 	}
 
 	private String getMessage(final String code) {

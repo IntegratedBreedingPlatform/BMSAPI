@@ -8,6 +8,7 @@ import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
@@ -110,6 +111,12 @@ public abstract class ApiUnitTestBase {
 		@Primary
 		public TermDataManager termDataManager() {
 			return Mockito.mock(TermDataManager.class);
+		}
+
+		@Bean
+		@Primary
+		public OntologyVariableDataManager ontologyVariableDataManager() {
+			return Mockito.mock(OntologyVariableDataManager.class);
 		}
 	}
 
