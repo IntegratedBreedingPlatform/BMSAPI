@@ -7,7 +7,9 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.ontology.TermRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -34,6 +36,9 @@ public class FormulaValidator implements Validator {
 
 	@Autowired
 	protected TermDataManager termDataManager;
+
+	@Autowired
+	protected OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Override
 	public boolean supports(final Class<?> aClass) {
@@ -93,6 +98,17 @@ public class FormulaValidator implements Validator {
 			// Mapping engine errors to UI errors would be impractical
 			throw new IllegalArgumentException(
 				getMessage("variable.formula.invalid") + e.getMessage() + " - " + e.getCause());
+		}
+	}
+
+	public void validateDelete(final FormulaDto formula, final Errors errors) {
+		final TermRequest term = new TermRequest(String.valueOf(formula.getTargetTermId()), "formula", CvId.VARIABLES.getId());
+
+		final boolean isVariableUsedInStudy =
+			this.ontologyVariableDataManager.isVariableUsedInStudy(Integer.valueOf(formula.getTargetTermId()));
+
+		if (isVariableUsedInStudy) {
+			errors.reject("variable.formula.invalid.is.not.deletable", "");
 		}
 	}
 
