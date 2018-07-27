@@ -208,6 +208,7 @@ public class TestDataProvider {
 		variable.setDateCreated(TestDataProvider.getDateCreated());
 		variable.setDateLastModified(TestDataProvider.getDateModified());
 		variable.setFormula(getTestFormula());
+		variable.setAllowsFormula(true);
 	  	variable.setHasUsage(false);
 
 		return variable;

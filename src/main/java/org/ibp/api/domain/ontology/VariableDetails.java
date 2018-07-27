@@ -27,6 +27,7 @@ public class VariableDetails extends TermSummary {
 	private boolean favourite;
 	private final ExpectedRange expectedRange = new ExpectedRange();
 	private FormulaDto formula;
+	private boolean allowsFormula = false;
 
 	public MetadataDetails getMetadata() {
 		return this.metadata;
@@ -134,6 +135,14 @@ public class VariableDetails extends TermSummary {
 
 	public void setFormula(final FormulaDto formula) {
 		this.formula = formula;
+	}
+
+	public boolean isAllowsFormula() {
+		return allowsFormula;
+	}
+
+	public void setAllowsFormula(final boolean allowsFormula) {
+		this.allowsFormula = allowsFormula;
 	}
 
 }

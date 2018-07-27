@@ -138,6 +138,7 @@ public class OntologyMapper {
 				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
 				this.map().getMetadata().setDeletable(false);
 				this.map().setFormula(this.source.getFormula());
+				this.map().setAllowsFormula(this.source.isAllowsFormula());
 			}
 		});
 	}

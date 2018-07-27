@@ -179,6 +179,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.formula.formulaId", is(ontologyVariable.getFormula().getFormulaId())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.formula.targetTermId", is(ontologyVariable.getFormula().getTargetTermId())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.formula.definition", is(ontologyVariable.getFormula().getDefinition())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.allowsFormula", is(ontologyVariable.isAllowsFormula())))
 		;
 
 		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).getVariable(this.programUuid, ontologyVariable.getId(), true, true);

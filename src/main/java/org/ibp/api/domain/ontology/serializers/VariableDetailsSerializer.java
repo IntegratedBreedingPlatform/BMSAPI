@@ -279,6 +279,7 @@ public class VariableDetailsSerializer extends JsonSerializer<VariableDetails>{
 		jsonGenerator.writeEndObject();
 
 		jsonGenerator.writeObjectField("formula", variableDetails.getFormula());
+		jsonGenerator.writeBooleanField("allowsFormula", variableDetails.isAllowsFormula());
 
 		jsonGenerator.writeEndObject();
 	}
