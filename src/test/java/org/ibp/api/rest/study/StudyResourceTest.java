@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
@@ -74,7 +75,8 @@ public class StudyResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testGetObservations() throws Exception {
-		final MeasurementDto measurement = new MeasurementDto(new MeasurementVariableDto(1, "Plant Height"), 1, "123");
+		final MeasurementDto measurement =
+			new MeasurementDto(new MeasurementVariableDto(1, "Plant Height"), 1, "123", Phenotype.ValueStatus.OUT_OF_SYNC);
 		final ObservationDto obsDto =
 				new ObservationDto(1, "1", "Test", 1, "CML123", "1", "CIMMYT Seed Bank", "1", "1", "2", Lists.newArrayList(measurement));
 

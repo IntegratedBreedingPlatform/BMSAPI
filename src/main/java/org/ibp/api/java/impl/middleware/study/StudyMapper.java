@@ -21,7 +21,7 @@ import org.modelmapper.spi.MappingContext;
 
 public class StudyMapper {
 
-	private static ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
+	private static final ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
 
 	/**
 	 * We do not want public constructor of this class as all methods are static
@@ -49,8 +49,9 @@ public class StudyMapper {
 			final List<Measurement> measurements = new ArrayList<Measurement>();
 			for (final MeasurementDto measurementDto : context.getSource()) {
 				final MeasurementVariableDto measurementVariable = measurementDto.getMeasurementVariable();
-				measurements.add(new Measurement(new MeasurementIdentifier(measurementDto.getPhenotypeId(), new Trait(measurementVariable.getId(),
-						measurementVariable.getName())), measurementDto.getVariableValue()));
+				measurements.add(new Measurement(new MeasurementIdentifier(measurementDto.getPhenotypeId(), new Trait(
+					measurementVariable.getId(),
+					measurementVariable.getName())), measurementDto.getVariableValue(), measurementDto.getValueStatus()));
 			}
 			return context.getMappingEngine().map(context.create(measurements, context.getDestinationType()));
 		}
