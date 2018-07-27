@@ -220,11 +220,7 @@ public class SampleListServiceImpl implements SampleListService {
 		return map;
 	}
 
-	public void setSampleListServiceMW(final org.generationcp.middleware.service.api.SampleListService service) {
-		this.sampleListServiceMW = service;
-	}
-
-	public void setSecurityService(final SecurityService securityService) {
-		this.securityService = securityService;
+	public void setMessageSource(final ResourceBundleMessageSource messageSource) {
+		this.messageSource = messageSource;
 	}
 }

@@ -1,5 +1,6 @@
 package org.ibp.api.rest.sample;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.pojo.FileExportInfo;
@@ -79,6 +80,12 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
+		public org.ibp.api.rest.sample.SampleListService sampleListService() {
+			return Mockito.mock(org.ibp.api.rest.sample.SampleListService.class);
+		}
+
+		@Bean
+		@Primary
 		public SampleService sampleService() {
 			return Mockito.mock(SampleService.class);
 		}
@@ -105,6 +112,9 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private SampleService sampleService;
+
+	@Autowired
+	private org.ibp.api.rest.sample.SampleListService sampleListService;
 
 	@Autowired
 	private ContextUtil contextUtil;
@@ -333,6 +343,18 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		} finally {
 			temporaryFile.delete();
 		}
+
+	}
+
+	@Test
+	public void testImportPlateInformation() throws Exception {
+
+		final PlateInformationDto dto = new PlateInformationDto();
+
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize//plate-information/import").content(this.convertObjectToByte(dto))
+				.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+		Mockito.verify(this.sampleListService).importSamplePlateInformation(Mockito.any(PlateInformationDto.class));
 
 	}
 
