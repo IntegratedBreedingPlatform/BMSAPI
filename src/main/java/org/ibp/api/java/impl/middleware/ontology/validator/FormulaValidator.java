@@ -1,5 +1,8 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
@@ -7,9 +10,9 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
-import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.ontology.TermRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -18,9 +21,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 @Component
 public class FormulaValidator implements Validator {
@@ -57,23 +63,46 @@ public class FormulaValidator implements Validator {
 
 		// Validate target variable
 
-		if (formulaDto.getTargetTermId() == null) {
+		final Integer targetTermId = formulaDto.getTargetTermId();
+		if (targetTermId == null) {
 			errors.reject("variable.formula.targetid.required", "");
 			return;
 		}
 
-		final TermRequest term = new TermRequest(String.valueOf(formulaDto.getTargetTermId()), "target variable", CvId.VARIABLES.getId());
-		this.termValidator.validate(term, errors);
+		final TermRequest targetTerm = new TermRequest(String.valueOf(targetTermId), "target variable", CvId.VARIABLES.getId());
+		this.termValidator.validate(targetTerm, errors);
+
+		if (!this.isTrait(targetTermId)) {
+			errors.reject("variable.formula.target.not.trait", new String[] {String.valueOf(targetTermId)}, "");
+		}
 
 		// Validate inputs
 
-		for (final FormulaVariable formulaVariable : formulaDto.getInputs()) {
-			final Term termByName = this.termDataManager.getTermByName(formulaVariable.getName());
-			if (termByName == null) {
-				errors.reject("variable.input.not.exists", new Object[] {formulaVariable.getName()}, "");
+		final Set<Term> nonTraitInputs = new LinkedHashSet<>();
+
+		for (final FormulaVariable input : formulaDto.getInputs()) {
+			final Term inputTerm = this.termDataManager.getTermByName(input.getName());
+			if (inputTerm == null) {
+				errors.reject("variable.input.not.exists", new Object[] {input.getName()}, "");
 			} else {
-				formulaVariable.setId(termByName.getId());
+				final int id = inputTerm.getId();
+				input.setId(id); // it will be used to save the input
+				if (!this.isTrait(id)) {
+					nonTraitInputs.add(inputTerm);
+				}
 			}
+		}
+
+		if (!nonTraitInputs.isEmpty()) {
+			errors.reject("variable.formula.inputs.not.trait", new String[] {StringUtils.join(Iterables.transform(
+				nonTraitInputs, new Function<Term, String>() {
+
+					@Nullable
+					@Override
+					public String apply(@Nullable final Term term) {
+						return term.getName() + "(" + term.getId() + ")";
+					}
+				}), ", ")}, "");
 		}
 
 		// Validate formula definition
@@ -99,6 +128,16 @@ public class FormulaValidator implements Validator {
 			throw new IllegalArgumentException(
 				getMessage("variable.formula.invalid") + e.getMessage() + " - " + e.getCause());
 		}
+	}
+
+	private boolean isTrait(final int id) {
+		return Iterables.any(this.ontologyVariableDataManager.getVariableTypes(id), new Predicate<VariableType>() {
+
+			@Override
+			public boolean apply(@Nullable final VariableType variableType) {
+				return variableType.equals(VariableType.TRAIT);
+			}
+		});
 	}
 
 	public void validateDelete(final FormulaDto formula, final Errors errors) {

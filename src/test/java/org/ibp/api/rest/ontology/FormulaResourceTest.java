@@ -1,12 +1,14 @@
 package org.ibp.api.rest.ontology;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.lang.math.RandomUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
@@ -64,6 +66,9 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		term.setVocabularyId(CvId.VARIABLES.getId());
 		doReturn(term).when(this.termDataManager).getTermById(anyInt());
 		doReturn(term).when(this.termDataManager).getTermByName(anyString());
+
+		doReturn(Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL, VariableType.TRAIT))
+			.when(this.ontologyVariableDataManager).getVariableTypes(anyInt());
 	}
 
 	@Test
@@ -71,6 +76,8 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		final FormulaDto formulaDto = new FormulaDto();
 		formulaDto.setTargetTermId(RandomUtils.nextInt());
 		formulaDto.setDefinition(null);
+
+		doReturn(new Term()).when(this.termDataManager).getTermByName(anyString());
 
 		this.mockMvc //
 			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
@@ -152,6 +159,34 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 				.jsonPath(
 					"$.errors[0].message",
 					is(this.getMessage("variable.input.not.exists", new Object[] {inputName}))))
+		;
+
+		Mockito.verify(this.service, Mockito.times(0)).save(formulaDto);
+	}
+
+	@Test
+	public void testSave_TargetNotATrait() throws Exception {
+		final FormulaDto formulaDto = new FormulaDto();
+		final int targetTermId = RandomUtils.nextInt();
+		formulaDto.setTargetTermId(targetTermId);
+		final String inputName = "SomeInvalidInputName";
+		formulaDto.setDefinition("{{" + inputName + "}}");
+
+		doReturn(new Term()).when(this.termDataManager).getTermByName(inputName);
+		doReturn(Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL, VariableType.GERMPLASM_DESCRIPTOR))
+			.when(this.ontologyVariableDataManager).getVariableTypes(anyInt());
+
+		this.mockMvc //
+			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
+				.contentType(this.contentType) //
+				.locale(locale) //
+				.content(this.convertObjectToByte(formulaDto))) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
+			.andExpect(MockMvcResultMatchers
+				.jsonPath(
+					"$.errors[0].message",
+					is(this.getMessage("variable.formula.target.not.trait", new Object[] {String.valueOf(targetTermId)}))))
 		;
 
 		Mockito.verify(this.service, Mockito.times(0)).save(formulaDto);
