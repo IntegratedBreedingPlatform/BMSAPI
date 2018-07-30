@@ -216,15 +216,16 @@ public class TestDataProvider {
 
 	public static FormulaDto getTestFormula() {
 		final FormulaDto formulaDto = new FormulaDto();
+		final int inputId = RandomUtils.nextInt();
 		formulaDto.setFormulaId(RandomUtils.nextInt());
 		formulaDto.setTargetTermId(RandomUtils.nextInt());
-		formulaDto.setDefinition("{{" + RandomUtils.nextInt() + "}}");
+		formulaDto.setDefinition("{{" + inputId + "}}");
 
 		final List<FormulaVariable> inputs = new ArrayList<>();
 		final FormulaVariable input = new FormulaVariable();
 		input.setTargetTermId(RandomUtils.nextInt());
 		input.setName("input name");
-		input.setId(RandomUtils.nextInt());
+		input.setId(inputId);
 		inputs.add(input);
 		formulaDto.setInputs(inputs);
 
