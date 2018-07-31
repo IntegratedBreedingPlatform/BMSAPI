@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -335,16 +336,31 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		// 18. Variable type IDs must be an array of integer values that correspond to the IDs of variable types and contain at least one
 		// item
+		// If not trait then it should not have formulas asociated
+		boolean isTrait = false;
 
 		for (final VariableType variableType : variable.getVariableTypes()) {
-			if (org.generationcp.middleware.domain.ontology.VariableType.getById(this.parseVariableTypeAsInteger(variableType)) == null) {
+			final org.generationcp.middleware.domain.ontology.VariableType type =
+				org.generationcp.middleware.domain.ontology.VariableType.getById(this.parseVariableTypeAsInteger(variableType));
+			if (type == null) {
 				this.addCustomError(errors, "variableTypes", BaseValidator.INVALID_TYPE_ID, new Object[] {"Variable Type"});
+			} else if (type.equals(org.generationcp.middleware.domain.ontology.VariableType.TRAIT)) {
+				isTrait = true;
+			}
+		}
+
+		if (!isTrait && !StringUtils.isBlank(variable.getId())) {
+			final Integer requestId = Integer.valueOf(variable.getId());
+			final Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId, true, true);
+			if (oldVariable.getFormula() != null) {
+				this.addCustomError(errors, "variableTypes", "variable.type.formula", new Object[] {});
 			}
 		}
 
         if(this.isAnalysisVariable(variable) && variable.getVariableTypes().size() > 1) {
 				this.addCustomError(errors, "variableTypes", VariableValidator.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE, new Object[]{"Variable Type"});
 		}
+
 
 		return errors.getErrorCount() == initialCount;
 	}
