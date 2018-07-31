@@ -72,6 +72,10 @@ public class FormulaValidator implements Validator {
 		final TermRequest targetTerm = new TermRequest(String.valueOf(targetTermId), "target variable", CvId.VARIABLES.getId());
 		this.termValidator.validate(targetTerm, errors);
 
+		if (errors.hasErrors()) {
+			return;
+		}
+
 		if (!this.isTrait(targetTermId)) {
 			errors.reject("variable.formula.target.not.trait", new String[] {String.valueOf(targetTermId)}, "");
 		}
