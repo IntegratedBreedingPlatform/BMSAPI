@@ -1,6 +1,5 @@
 package org.ibp.api.rest.sample;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.pojo.FileExportInfo;
