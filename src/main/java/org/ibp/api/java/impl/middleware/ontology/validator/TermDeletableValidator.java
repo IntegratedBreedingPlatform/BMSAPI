@@ -68,7 +68,8 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
 					@Nullable
 					@Override
 					public String apply(@Nullable final FormulaDto formulaDto) {
-						return formulaDto.getTarget().getName();
+						return formulaDto.getTarget().getName() + (formulaDto.getActive() != null && !formulaDto.getActive() ?
+							"(deleted formula)" : "");
 					}
 				});
 				this.addCustomError(
