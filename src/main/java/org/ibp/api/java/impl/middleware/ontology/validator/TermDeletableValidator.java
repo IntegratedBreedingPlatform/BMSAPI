@@ -34,19 +34,18 @@ public class TermDeletableValidator extends OntologyValidator implements org.spr
 				return;
 			}
 
+			boolean hasUsage = false,
+					isReferred = false;
 			if (Objects.equals(request.getCvId(), CvId.VARIABLES.getId())) {
-				boolean hasUsage = this.ontologyVariableDataManager.isVariableUsedInStudy(Integer.valueOf(request.getId()));
-				if (!hasUsage) {
-					return;
-				}
+				hasUsage = this.ontologyVariableDataManager.isVariableUsedInStudy(Integer.valueOf(request.getId()));
 			} else {
-				boolean isReferred = this.termDataManager.isTermReferred(StringUtil.parseInt(request.getId(), null));
-				if (!isReferred) {
-					return;
-				}
+				isReferred = this.termDataManager.isTermReferred(StringUtil.parseInt(request.getId(), null));
 			}
 
-			this.addCustomError(errors, BaseValidator.RECORD_IS_NOT_DELETABLE, new Object[] {request.getTermName(), request.getId()});
+			if (hasUsage || isReferred) {
+				this.addCustomError(errors, BaseValidator.RECORD_IS_NOT_DELETABLE, new Object[] {request.getTermName(), request.getId()});
+			}
+
 
 		} catch (MiddlewareException e) {
 			TermDeletableValidator.LOGGER.error("Error while validating object", e);
