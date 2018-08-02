@@ -2,6 +2,7 @@ package org.ibp.api.rest.sample;
 
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.pojos.SampleList;
+import org.ibp.api.exception.InvalidValuesException;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -65,5 +66,7 @@ public interface SampleListService {
 	List<SampleList> search(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable);
 
 	List<SampleDetailsDTO> getSampleDetailsDTOs(Integer listId);
+
+	void importSamplePlateInformation(PlateInformationDto plateInformationDto) throws InvalidValuesException;
 
 }

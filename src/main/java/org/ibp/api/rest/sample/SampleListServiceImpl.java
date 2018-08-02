@@ -2,18 +2,24 @@ package org.ibp.api.rest.sample;
 
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
+import org.ibp.api.exception.InvalidValuesException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -32,6 +38,9 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Autowired
 	private SecurityService securityService;
+
+	@Autowired
+	private ResourceBundleMessageSource messageSource;
 
 	@Override
 	public Map<String, Object> createSampleList(final SampleListDto sampleListDto) {
@@ -142,6 +151,23 @@ public class SampleListServiceImpl implements SampleListService {
 		return sampleListServiceMW.getSampleDetailsDTOs(listId);
 	}
 
+	@Override
+	public void importSamplePlateInformation(final PlateInformationDto plateInformationDto) throws InvalidValuesException {
+
+		final Map<String, SamplePlateInfo> samplePlateInfoMap = convertToSamplePlateInfoMap(plateInformationDto);
+		final Set<String> sampleBusinessKeys = samplePlateInfoMap.keySet();
+
+		final long count = this.sampleListServiceMW.countSamplesByUIDs(sampleBusinessKeys, plateInformationDto.getListId());
+
+		if (sampleBusinessKeys.size() == count) {
+			this.sampleListServiceMW.updateSamplePlateInfo(plateInformationDto.getListId(), samplePlateInfoMap);
+		} else {
+			throw new InvalidValuesException(this.messageSource.getMessage("sample.sample.ids.not.present.in.file", null, LocaleContextHolder
+					.getLocale()));
+		}
+
+	}
+
 	private SampleListDTO translateToSampleListDto(final SampleListDto dto) {
 		final SampleListDTO sampleListDTO = new SampleListDTO();
 
@@ -174,11 +200,27 @@ public class SampleListServiceImpl implements SampleListService {
 		return sampleListDTO;
 	}
 
-	public void setSampleListServiceMW(final org.generationcp.middleware.service.api.SampleListService service) {
-		this.sampleListServiceMW = service;
+	protected Map<String, SamplePlateInfo> convertToSamplePlateInfoMap(final PlateInformationDto plateInformationDto) {
+		final Map<String, SamplePlateInfo> map = new HashMap<>();
+
+		final int sampleIdHeaderIndex = plateInformationDto.getImportData().get(0).indexOf(plateInformationDto.getSampleIdHeader());
+		final int plateIdHeaderIndex = plateInformationDto.getImportData().get(0).indexOf(plateInformationDto.getPlateIdHeader());
+		final int wellHeaderIndex = plateInformationDto.getImportData().get(0).indexOf(plateInformationDto.getWellHeader());
+		final Iterator<List<String>> iterator = plateInformationDto.getImportData().iterator();
+		// Ignore the first row which is the header.
+		iterator.next();
+		// Convert the rows to SamplePlateInfo map.
+		while(iterator.hasNext()) {
+			final List<String> rowData = iterator.next();
+			final SamplePlateInfo samplePlateInfo = new SamplePlateInfo();
+			samplePlateInfo.setPlateId(rowData.get(plateIdHeaderIndex));
+			samplePlateInfo.setWell(rowData.get(wellHeaderIndex));
+			map.put(rowData.get(sampleIdHeaderIndex), samplePlateInfo);
+		}
+		return map;
 	}
 
-	public void setSecurityService(final SecurityService securityService) {
-		this.securityService = securityService;
+	public void setMessageSource(final ResourceBundleMessageSource messageSource) {
+		this.messageSource = messageSource;
 	}
 }
