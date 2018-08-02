@@ -63,11 +63,12 @@ public class FormulaValidator implements Validator {
 
 		// Validate target variable
 
-		final Integer targetTermId = formulaDto.getTargetTermId();
-		if (targetTermId == null) {
+		if (formulaDto.getTarget() == null) {
 			errors.reject("variable.formula.targetid.required", "");
 			return;
 		}
+
+		final Integer targetTermId = formulaDto.getTarget().getId();
 
 		final TermRequest targetTerm = new TermRequest(String.valueOf(targetTermId), "target variable", CvId.VARIABLES.getId());
 		this.termValidator.validate(targetTerm, errors);
@@ -145,10 +146,10 @@ public class FormulaValidator implements Validator {
 	}
 
 	public void validateDelete(final FormulaDto formula, final Errors errors) {
-		final TermRequest term = new TermRequest(String.valueOf(formula.getTargetTermId()), "formula", CvId.VARIABLES.getId());
+		final TermRequest term = new TermRequest(String.valueOf(formula.getTarget().getId()), "formula", CvId.VARIABLES.getId());
 
 		final boolean isVariableUsedInStudy =
-			this.ontologyVariableDataManager.isVariableUsedInStudy(Integer.valueOf(formula.getTargetTermId()));
+			this.ontologyVariableDataManager.isVariableUsedInStudy(Integer.valueOf(formula.getTarget().getId()));
 
 		if (isVariableUsedInStudy) {
 			errors.reject("variable.formula.invalid.is.not.deletable", "");

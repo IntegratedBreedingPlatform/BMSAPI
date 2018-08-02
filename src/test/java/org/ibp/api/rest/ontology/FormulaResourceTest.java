@@ -8,6 +8,7 @@ import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
+import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
@@ -74,7 +75,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testCreateFormula_NoDefinition() throws Exception {
 		final FormulaDto formulaDto = new FormulaDto();
-		formulaDto.setTargetTermId(RandomUtils.nextInt());
+		formulaDto.setTarget(new FormulaVariable(RandomUtils.nextInt(), "", null));
 		formulaDto.setDefinition(null);
 
 		doReturn(new Term()).when(this.termDataManager).getTermByName(anyString());
@@ -96,7 +97,6 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testSave_NoTarget() throws Exception {
 		final FormulaDto formulaDto = new FormulaDto();
-		formulaDto.setTargetTermId(null);
 		formulaDto.setDefinition("{{1}}");
 
 		this.mockMvc //
@@ -116,7 +116,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 	public void testSave_TargetNotExist() throws Exception {
 		final FormulaDto formulaDto = new FormulaDto();
 		final int targetTermId = RandomUtils.nextInt();
-		formulaDto.setTargetTermId(targetTermId);
+		formulaDto.setTarget(new FormulaVariable(targetTermId, "", null));
 		formulaDto.setDefinition("{{1}}");
 
 		doReturn(null).when(this.termDataManager).getTermById(anyInt());
@@ -141,7 +141,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 	public void testSave_InputNotExist() throws Exception {
 		final FormulaDto formulaDto = new FormulaDto();
 		final int targetTermId = RandomUtils.nextInt();
-		formulaDto.setTargetTermId(targetTermId);
+		formulaDto.setTarget(new FormulaVariable(targetTermId, "", null));
 		final String inputName = "SomeInvalidInputName";
 		formulaDto.setDefinition("{{" + inputName + "}}");
 
@@ -168,7 +168,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 	public void testSave_TargetNotATrait() throws Exception {
 		final FormulaDto formulaDto = new FormulaDto();
 		final int targetTermId = RandomUtils.nextInt();
-		formulaDto.setTargetTermId(targetTermId);
+		formulaDto.setTarget(new FormulaVariable(targetTermId, "", null));
 		final String inputName = "SomeInvalidInputName";
 		formulaDto.setDefinition("{{" + inputName + "}}");
 
@@ -195,7 +195,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testSave_InvalidFormula() throws Exception {
 		final FormulaDto formulaDto = new FormulaDto();
-		formulaDto.setTargetTermId(RandomUtils.nextInt());
+		formulaDto.setTarget(new FormulaVariable(RandomUtils.nextInt(), "", null));
 		formulaDto.setDefinition("{{1}}");
 
 		doThrow(new JexlException(null, ERROR_JEXL_EXCEPTION)).when(this.processor).evaluateFormula(anyString(), anyMap());
@@ -219,10 +219,10 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		final FormulaDto formulaDto = new FormulaDto();
 		final Optional<FormulaDto> formula = Optional.of(formulaDto);
 		formulaDto.setFormulaId(formulaId);
-		formulaDto.setTargetTermId(RandomUtils.nextInt());
+		formulaDto.setTarget(new FormulaVariable(RandomUtils.nextInt(), "", null));
 
 		doReturn(formula).when(this.service).getById(formulaId);
-		doReturn(false).when(this.ontologyVariableDataManager).isVariableUsedInStudy(formulaDto.getTargetTermId());
+		doReturn(false).when(this.ontologyVariableDataManager).isVariableUsedInStudy(formulaDto.getTarget().getId());
 
 		this.mockMvc //
 			.perform(MockMvcRequestBuilders.delete("/ontology/{cropname}/formula/{formulaId}", this.cropName, formulaId)) //
@@ -237,10 +237,10 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		final FormulaDto formulaDto = new FormulaDto();
 		final Optional<FormulaDto> formula = Optional.of(formulaDto);
 		formulaDto.setFormulaId(formulaId);
-		formulaDto.setTargetTermId(RandomUtils.nextInt());
+		formulaDto.setTarget(new FormulaVariable(RandomUtils.nextInt(), "", null));
 
 		doReturn(formula).when(this.service).getById(formulaId);
-		doReturn(true).when(this.ontologyVariableDataManager).isVariableUsedInStudy(formulaDto.getTargetTermId());
+		doReturn(true).when(this.ontologyVariableDataManager).isVariableUsedInStudy(formulaDto.getTarget().getId());
 
 		this.mockMvc //
 			.perform(MockMvcRequestBuilders.delete("/ontology/{cropname}/formula/{formulaId}", this.cropName, formulaId)) //

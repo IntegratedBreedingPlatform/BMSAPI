@@ -218,7 +218,9 @@ public class TestDataProvider {
 		final FormulaDto formulaDto = new FormulaDto();
 		final int inputId = RandomUtils.nextInt();
 		formulaDto.setFormulaId(RandomUtils.nextInt());
-		formulaDto.setTargetTermId(RandomUtils.nextInt());
+		final FormulaVariable target = new FormulaVariable();
+		target.setId(RandomUtils.nextInt());
+		formulaDto.setTarget(target);
 		formulaDto.setDefinition("{{" + inputId + "}}");
 
 		final List<FormulaVariable> inputs = new ArrayList<>();

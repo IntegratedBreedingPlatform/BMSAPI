@@ -177,7 +177,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers
 				.jsonPath("$.variableTypes", IsCollectionWithSize.hasSize(ontologyVariable.getVariableTypes().size())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.formula.formulaId", is(ontologyVariable.getFormula().getFormulaId())))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.formula.targetTermId", is(ontologyVariable.getFormula().getTargetTermId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.formula.target.id", is(ontologyVariable.getFormula().getTarget().getId())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.formula.definition", is(ontologyVariable.getFormula().getDefinition())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.allowsFormula", is(ontologyVariable.isAllowsFormula())))
 		;
