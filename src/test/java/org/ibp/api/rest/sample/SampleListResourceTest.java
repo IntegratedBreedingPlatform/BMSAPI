@@ -39,6 +39,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -333,6 +334,28 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		} finally {
 			temporaryFile.delete();
 		}
+
+	}
+
+	@Test
+	public void testImportPlateInformation() throws Exception {
+
+		final PlateInformationDto dto = new PlateInformationDto();
+		dto.setSampleIdHeader("SampleId");
+		dto.setPlateIdHeader("PlateId");
+		dto.setWellHeader("Well");
+		final List<List<String>> importData = new ArrayList<>();
+		importData.add(Arrays.asList("SampleId", "PlateId", "Well"));
+		importData.add(Arrays.asList("jhdksl", "dfgfdh", "dfgfdg"));
+		importData.add(Arrays.asList("asdsa", "sfwd", "asdasf"));
+		dto.setImportData(importData);
+
+		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySet(), Mockito.anyInt())).thenReturn(2l);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import").content(this.convertObjectToByte(dto))
+				.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+		Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(Mockito.anyInt(), Mockito.anyMap());
 
 	}
 

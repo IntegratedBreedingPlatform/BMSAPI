@@ -10,6 +10,7 @@ import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.common.ErrorResponse;
+import org.ibp.api.exception.InvalidValuesException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -176,4 +179,22 @@ public class SampleListResource {
 
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Import Plate Information", notes = "Import Plate Information")
+	@RequestMapping(value = "/{crop}/plate-information/import", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity saveSamplePlateInformation(@PathVariable final String crop, @RequestBody final PlateInformationDto plateInformationDto) {
+		try {
+			sampleListService.importSamplePlateInformation(plateInformationDto);
+		} catch (InvalidValuesException e) {
+			LOG.error("Error saving plate information", e);
+			final ErrorResponse response = new ErrorResponse();
+			response.addError(e.getMessage());
+			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+		}
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+
+
 }
