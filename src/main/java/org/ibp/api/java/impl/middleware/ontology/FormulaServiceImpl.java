@@ -1,8 +1,9 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
-import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -18,6 +19,7 @@ import org.springframework.validation.MapBindingResult;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -37,11 +39,14 @@ public class FormulaServiceImpl implements FormulaService {
 		this.extractInputs(formulaDto);
 
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), FormulaDto.class.getName());
+		// This validation will also fill the the inputs ids if exists
 		this.formulaValidator.validate(formulaDto, bindingResult);
 
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
+
+		this.setStorageFormat(formulaDto);
 
 		return this.formulaService.save(formulaDto);
 	}
@@ -78,5 +83,16 @@ public class FormulaServiceImpl implements FormulaService {
 			formulaInputs.add(formulaVariable);
 		}
 		formulaDto.setInputs(formulaInputs);
+	}
+
+	private void setStorageFormat(final FormulaDto formulaDto) {
+		final Map<String, FormulaVariable> formulaVariableMap =
+			Maps.uniqueIndex(formulaDto.getInputs(), new Function<FormulaVariable, String>() {
+
+				public String apply(FormulaVariable from) {
+					return String.valueOf(from.getName());
+				}
+			});
+		formulaDto.setDefinition(DerivedVariableUtils.getStorageFormat(formulaDto.getDefinition(), formulaVariableMap));
 	}
 }

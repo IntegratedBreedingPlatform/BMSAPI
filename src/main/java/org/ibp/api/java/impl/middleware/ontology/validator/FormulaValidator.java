@@ -81,7 +81,7 @@ public class FormulaValidator implements Validator {
 			errors.reject("variable.formula.target.not.trait", new String[] {String.valueOf(targetTermId)}, "");
 		}
 
-		// Validate inputs
+		// Validate inputs and set ids
 
 		final Set<Term> nonTraitInputs = new LinkedHashSet<>();
 
