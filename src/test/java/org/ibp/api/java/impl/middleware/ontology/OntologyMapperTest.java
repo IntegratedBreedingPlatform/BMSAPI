@@ -115,6 +115,8 @@ public class OntologyMapperTest {
 		Assert.assertTrue(variableDetails.getMetadata().getEditableFields().isEmpty());
 		Assert.assertFalse(variableDetails.getMetadata().isDeletable());
 		Assert.assertTrue(variableDetails.getMetadata().getUsage().getVariables().isEmpty());
+		Assert.assertEquals(variable.getFormula(), variableDetails.getFormula());
+		Assert.assertEquals(variable.isAllowsFormula(), variableDetails.isAllowsFormula());
 	}
 
 	@Test
