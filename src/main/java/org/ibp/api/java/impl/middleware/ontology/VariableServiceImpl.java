@@ -1,15 +1,15 @@
 
 package org.ibp.api.java.impl.middleware.ontology;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-
+import com.google.common.base.Function;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.FormulaDto;
+import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -36,7 +36,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import com.google.common.base.Strings;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Validate data of API Services and pass data to middleware services
@@ -176,6 +181,19 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			Integer id = StringUtil.parseInt(variableId, null);
 
 			Variable ontologyVariable = this.ontologyVariableDataManager.getVariable(programId, id, true, true);
+
+			final FormulaDto formula = ontologyVariable.getFormula();
+			if (formula != null) {
+				final Map<String, FormulaVariable> formulaVariableMap =
+					Maps.uniqueIndex(formula.getInputs(), new Function<FormulaVariable, String>() {
+
+						public String apply(FormulaVariable from) {
+							return String.valueOf(from.getId());
+						}
+					});
+				formula.setDefinition(DerivedVariableUtils.getEditableFormat(formula.getDefinition(), formulaVariableMap));
+
+			}
 
 			if (ontologyVariable == null) {
 				return null;

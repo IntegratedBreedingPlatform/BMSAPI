@@ -1,13 +1,13 @@
 
 package org.ibp.api.domain.ontology;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.generationcp.middleware.domain.ontology.FormulaDto;
+import org.ibp.api.domain.ontology.serializers.VariableDetailsSerializer;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import org.ibp.api.domain.ontology.serializers.VariableDetailsSerializer;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Holds all Variable details. Extended from {@link TermSummary} for basic term details.
@@ -26,6 +26,8 @@ public class VariableDetails extends TermSummary {
 	private final List<VariableType> variableTypes = new ArrayList<>();
 	private boolean favourite;
 	private final ExpectedRange expectedRange = new ExpectedRange();
+	private FormulaDto formula;
+	private boolean allowsFormula = false;
 
 	public MetadataDetails getMetadata() {
 		return this.metadata;
@@ -126,4 +128,21 @@ public class VariableDetails extends TermSummary {
 			this.metadata.setStudies(studies);
 		}
 	}
+
+	public FormulaDto getFormula() {
+		return formula;
+	}
+
+	public void setFormula(final FormulaDto formula) {
+		this.formula = formula;
+	}
+
+	public boolean isAllowsFormula() {
+		return allowsFormula;
+	}
+
+	public void setAllowsFormula(final boolean allowsFormula) {
+		this.allowsFormula = allowsFormula;
+	}
+
 }

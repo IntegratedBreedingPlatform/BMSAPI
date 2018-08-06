@@ -4,6 +4,7 @@ package org.ibp.api.java.impl.middleware.common;
 import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
+import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.service.BreedingViewImportService;
 import org.generationcp.commons.service.CsvExportSampleListService;
 import org.generationcp.commons.service.impl.BreedingViewImportServiceImpl;
@@ -269,6 +270,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public FormulaService getFormulaService() {
 		return new FormulaServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public DerivedVariableProcessor getDerivedVariableProcessor() {
+		return new DerivedVariableProcessor();
 	}
 
 	@Bean
