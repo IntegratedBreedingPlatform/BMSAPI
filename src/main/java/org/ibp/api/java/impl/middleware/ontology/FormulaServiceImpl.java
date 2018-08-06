@@ -86,13 +86,10 @@ public class FormulaServiceImpl implements FormulaService {
 	}
 
 	private void setStorageFormat(final FormulaDto formulaDto) {
-		final Map<String, FormulaVariable> formulaVariableMap =
-			Maps.uniqueIndex(formulaDto.getInputs(), new Function<FormulaVariable, String>() {
-
-				public String apply(FormulaVariable from) {
-					return String.valueOf(from.getName());
-				}
-			});
+		final Map<String, FormulaVariable> formulaVariableMap = new HashMap<>();
+		for (final FormulaVariable input : formulaDto.getInputs()) {
+			formulaVariableMap.put(input.getName(), input);
+		}
 		formulaDto.setDefinition(DerivedVariableUtils.getStorageFormat(formulaDto.getDefinition(), formulaVariableMap));
 	}
 }

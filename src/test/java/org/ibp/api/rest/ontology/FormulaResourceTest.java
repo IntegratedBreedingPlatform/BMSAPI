@@ -88,11 +88,12 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		final int inputId = nextInt();
 		formulaDto.setTarget(new FormulaVariable(targetTermId, "", null));
 		final String inputName = "SomeInvalidInputName";
-		formulaDto.setDefinition("{{" + inputName + "}}");
+		formulaDto.setDefinition("{{" + inputName + "}} + {{" + inputName + "}}");
 		final List<FormulaVariable> inputs = new ArrayList<>();
 		final FormulaVariable input = new FormulaVariable();
 		input.setName(inputName);
 		input.setId(inputId);
+		inputs.add(input);
 		inputs.add(input);
 		formulaDto.setInputs(inputs);
 
@@ -110,7 +111,8 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 
 		final ArgumentCaptor<FormulaDto> captor = ArgumentCaptor.forClass(FormulaDto.class);
 		Mockito.verify(this.service, atLeastOnce()).save(captor.capture());
-		Assert.assertThat("Should store formula definition with termid", captor.getValue().getDefinition(), is("{{" + inputId + "}}"));
+		Assert.assertThat("Should store formula definition with termid", captor.getValue().getDefinition(),
+			is("{{" + inputId + "}} + {{" + inputId + "}}"));
 	}
 
 	@Test
