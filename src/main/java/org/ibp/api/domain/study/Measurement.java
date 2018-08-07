@@ -1,9 +1,9 @@
 
 package org.ibp.api.domain.study;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.generationcp.middleware.pojos.dms.Phenotype;
+
+import java.util.Objects;
 
 /**
  *
@@ -17,13 +17,16 @@ public class Measurement {
 
 	private String measurementValue;
 
+	private Phenotype.ValueStatus valueStatus;
+
 	public Measurement() {
 
 	}
 
-	public Measurement(MeasurementIdentifier measurementIdentifier, final String value) {
+	public Measurement(final MeasurementIdentifier measurementIdentifier, final String value, final Phenotype.ValueStatus valueStatus) {
 		this.measurementIdentifier = measurementIdentifier;
 		this.measurementValue = value;
+		this.valueStatus = valueStatus;
 	}
 
 	/**
@@ -36,7 +39,7 @@ public class Measurement {
 	/**
 	 * @param measurementIdentifier the measurementIdentifier to set
 	 */
-	public void setMeasurementIdentifier(MeasurementIdentifier measurementIdentifier) {
+	public void setMeasurementIdentifier(final MeasurementIdentifier measurementIdentifier) {
 		this.measurementIdentifier = measurementIdentifier;
 	}
 
@@ -50,29 +53,41 @@ public class Measurement {
 	/**
 	 * @param measurementValue the measurementValue to set
 	 */
-	public void setMeasurementValue(String measurementValue) {
+	public void setMeasurementValue(final String measurementValue) {
 		this.measurementValue = measurementValue;
 	}
 
+	public Phenotype.ValueStatus getValueStatus() {
+		return this.valueStatus;
+	}
+
+	public void setValueStatus(final Phenotype.ValueStatus valueStatus) {
+		this.valueStatus = valueStatus;
+	}
+
 	@Override
-	public boolean equals(final Object other) {
-		if (!(other instanceof Measurement)) {
+	public boolean equals(final Object o) {
+		if (this == o)
+			return true;
+		if (o == null || this.getClass() != o.getClass())
 			return false;
-		}
-		Measurement castOther = (Measurement) other;
-		return new EqualsBuilder().append(this.measurementIdentifier, castOther.measurementIdentifier)
-				.append(this.measurementValue, castOther.measurementValue).isEquals();
+		final Measurement that = (Measurement) o;
+		return Objects.equals(this.measurementIdentifier, that.measurementIdentifier) &&
+			Objects.equals(this.measurementValue, that.measurementValue) &&
+			this.valueStatus == that.valueStatus;
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.measurementIdentifier).append(this.measurementValue).toHashCode();
+		return Objects.hash(this.measurementIdentifier, this.measurementValue, this.valueStatus);
 	}
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this).append("measurementIdentifier", this.measurementIdentifier)
-				.append("measurementValue", this.measurementValue).toString();
+		return "Measurement{" +
+			"measurementIdentifier=" + this.measurementIdentifier +
+			", measurementValue='" + this.measurementValue + '\'' +
+			", valueStatus=" + this.valueStatus +
+			'}';
 	}
-
 }

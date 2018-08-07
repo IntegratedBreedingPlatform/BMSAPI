@@ -181,13 +181,13 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public Observation updateObservation(final Integer studyIdentifier, final Observation observation) {
-		validationUtil.invokeValidation("StudyServiceImpl", new Command() {
+		this.validationUtil.invokeValidation("StudyServiceImpl", new Command() {
 			@Override
 			public void execute(final Errors errors) {
-				observationValidator.validate(observation, errors);
+				StudyServiceImpl.this.observationValidator.validate(observation, errors);
 			}
 		});
-		return mapAndUpdateObservation(studyIdentifier, observation);
+		return this.mapAndUpdateObservation(studyIdentifier, observation);
 	}
 
 	/**
@@ -205,13 +205,13 @@ public class StudyServiceImpl implements StudyService {
 		final List<MeasurementDto> traits = new ArrayList<>();
 		for (final Measurement measurement : measurements) {
 			traits.add(new MeasurementDto(new MeasurementVariableDto(measurement.getMeasurementIdentifier()
-					.getTrait()
-					.getTraitId(), measurement
-					.getMeasurementIdentifier()
-					.getTrait()
-					.getTraitName()), measurement.getMeasurementIdentifier()
-					.getMeasurementId(),
-					measurement.getMeasurementValue()));
+				.getTrait()
+				.getTraitId(), measurement
+				.getMeasurementIdentifier()
+				.getTrait()
+				.getTraitName()), measurement.getMeasurementIdentifier()
+				.getMeasurementId(),
+				measurement.getMeasurementValue(), measurement.getValueStatus()));
 		}
 		final ObservationDto middlewareMeasurement =
 				new ObservationDto(observation.getUniqueIdentifier(), observation.getEnvironmentNumber(), observation.getEntryType(),
@@ -226,13 +226,13 @@ public class StudyServiceImpl implements StudyService {
 	public List<Observation> updateObservations(final Integer studyIdentifier, final List<Observation> observations) {
 		final List<Observation> returnList = new ArrayList<>();
 
-		validationUtil.invokeValidation("StudyServiceImpl", new Command() {
+		this.validationUtil.invokeValidation("StudyServiceImpl", new Command() {
 			@Override
 			public void execute(final Errors errors) {
 				int counter = 0;
 				for (final Observation observation : observations) {
 					errors.pushNestedPath("Observation[" + counter++ + "]");
-					observationValidator.validate(observation, errors);
+					StudyServiceImpl.this.observationValidator.validate(observation, errors);
 					returnList.add(StudyServiceImpl.this.mapAndUpdateObservation(studyIdentifier, observation));
 					errors.popNestedPath();
 				}
@@ -252,9 +252,9 @@ public class StudyServiceImpl implements StudyService {
 		final Observation existingObservation = this.getSingleObservation(studyIdentifier, observation.getUniqueIdentifier());
 		final List<ObjectError> errors = new ArrayList<>();
 		if (existingObservation == null || existingObservation.getUniqueIdentifier() == null) {
-			validateExistingObservation(studyIdentifier, observation, errors);
+			this.validateExistingObservation(studyIdentifier, observation, errors);
 		} else {
-			validateMeasurementHasNotBeenCreated(observation, existingObservation, errors);
+			this.validateMeasurementHasNotBeenCreated(observation, existingObservation, errors);
 		}
 		if (!errors.isEmpty()) {
 			throw new ApiRequestValidationException(errors);
@@ -427,7 +427,7 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public Map<Integer, FieldMap> getFieldMap(final String studyId) {
-		final FieldMapService fieldMapService = new FieldMapService(this.studyDataManager, crossExpansionProperties);
+		final FieldMapService fieldMapService = new FieldMapService(this.studyDataManager, this.crossExpansionProperties);
 		return fieldMapService.getFieldMap(studyId);
 	}
 
@@ -441,7 +441,7 @@ public class StudyServiceImpl implements StudyService {
 					.setProgramUUID(programUUID);
 
 			// Save the study
-			final Integer studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, cropPrefix);
+			final int studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, cropPrefix);
 
 			// Create germplasm list
 			final GermplasmList germplasmList = this.conversionService.convert(studyImportDTO, GermplasmList.class);
@@ -528,7 +528,7 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public String getProgramUUID(final Integer studyIdentifier) {
-		return middlewareStudyService.getProgramUUID(studyIdentifier);
+		return this.middlewareStudyService.getProgramUUID(studyIdentifier);
 	}
 
 	@Override
@@ -549,17 +549,17 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
-		return middlewareStudyService.getTrialObservationTable(studyIdentifier);
+		return this.middlewareStudyService.getTrialObservationTable(studyIdentifier);
 	}
 
 	@Override
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier, final Integer studyDbId) {
-		return middlewareStudyService.getTrialObservationTable(studyIdentifier, studyDbId);
+		return this.middlewareStudyService.getTrialObservationTable(studyIdentifier, studyDbId);
 	}
 
 	@Override
 	public StudyDetailsDto getStudyDetailsDto(final Integer studyId) {
-		return middlewareStudyService.getStudyDetails(studyId);
+		return this.middlewareStudyService.getStudyDetails(studyId);
 	}
 
 	@Override

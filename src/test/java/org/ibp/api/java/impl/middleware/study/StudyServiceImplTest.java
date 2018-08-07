@@ -11,6 +11,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
@@ -237,7 +238,8 @@ public class StudyServiceImplTest {
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void updateAnAlreadyInsertedMeasurement() {
-		final MeasurementDto databaseReturnedMeasurement = new MeasurementDto(new MeasurementVariableDto(1, "Plant Height"), 1, "123");
+		final MeasurementDto databaseReturnedMeasurement =
+			new MeasurementDto(new MeasurementVariableDto(1, "Plant Height"), 1, "123", Phenotype.ValueStatus.OUT_OF_SYNC);
 		final ObservationDto databaseReturnedObservationValue =
 				new ObservationDto(1, "1", "Test", 1, "CML123", "1", "CIMMYT Seed Bank", "1", "1", "2",
 						Lists.newArrayList(databaseReturnedMeasurement));
@@ -270,7 +272,7 @@ public class StudyServiceImplTest {
 
 		final Observation observation = Lists.transform(observationDtoTestData, this.observationTransformFunction).get(0);
 		this.studyServiceImpl.updateObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, observation);
-		Mockito.verify(observationValidator, Mockito.times(1)).validate(Matchers.eq(observation), Matchers.any(Errors.class));
+		Mockito.verify(this.observationValidator, Mockito.times(1)).validate(Matchers.eq(observation), Matchers.any(Errors.class));
 	}
 
 	@Test
@@ -287,7 +289,7 @@ public class StudyServiceImplTest {
 		this.studyServiceImpl.updateObservations(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, observations);
 
 		observations.get(0).equals(observations.get(1));
-		Mockito.verify(observationValidator, Mockito.times(2)).validate(Matchers.eq(observations.get(0)), Matchers.any(Errors.class));
+		Mockito.verify(this.observationValidator, Mockito.times(2)).validate(Matchers.eq(observations.get(0)), Matchers.any(Errors.class));
 
 	}
 
@@ -322,8 +324,12 @@ public class StudyServiceImplTest {
 			final List<MeasurementDto> measurementsDto = measurement.getVariableMeasurements();
 			final List<Measurement> measurements = new ArrayList<Measurement>();
 			for (final MeasurementDto measurementDto : measurementsDto) {
-				measurements.add(new Measurement(new MeasurementIdentifier(measurementDto.getPhenotypeId(), new Trait(measurementDto.getMeasurementVariable().getId(),
-						measurementDto.getMeasurementVariable().getName())), measurementDto.getVariableValue()));
+				measurements.add(new Measurement(
+					new MeasurementIdentifier(measurementDto.getPhenotypeId(), new Trait(
+						measurementDto.getMeasurementVariable().getId(),
+						measurementDto.getMeasurementVariable().getName())),
+					measurementDto.getVariableValue(),
+					measurementDto.getValueStatus()));
 			}
 
 			observation.setMeasurements(measurements);
@@ -345,11 +351,11 @@ public class StudyServiceImplTest {
 		workbook.setStudyDetails(studyDetails);
 
 		Mockito.when(this.conversionService.convert(studyImportDTO, Workbook.class)).thenReturn(workbook);
-		this.studyServiceImpl.importStudy(studyImportDTO, this.programUID, cropPrefix);
+		this.studyServiceImpl.importStudy(studyImportDTO, this.programUID, this.cropPrefix);
 
 		// Only asserting interactions with key collaborators
 		Mockito.verify(this.conversionService).convert(studyImportDTO, Workbook.class);
-		Mockito.verify(this.dataImportService).saveDataset(workbook, true, false, this.programUID, cropPrefix);
+		Mockito.verify(this.dataImportService).saveDataset(workbook, true, false, this.programUID, this.cropPrefix);
 		Mockito.verify(this.conversionService).convert(studyImportDTO, GermplasmList.class);
 		Mockito.verify(this.germplasmListManager).addGermplasmList(Matchers.any(GermplasmList.class));
 		Mockito.verify(this.germplasmListManager).addGermplasmListData(Matchers.anyList());
