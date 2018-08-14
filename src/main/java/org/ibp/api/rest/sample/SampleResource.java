@@ -37,10 +37,18 @@ public class SampleResource {
         @RequestParam(required = false) @ApiParam(value = "The plot to which the samples belong") final String plotId,
         @RequestParam(required = false) @ApiParam(value = "The list to which the samples belong") final Integer listId,
 		// TODO use in swagger
-		final Pageable pageable) {
+		@RequestParam(required = false) final Pageable pageable) {
+
+		Integer pageNumber = null;
+		Integer pageSize = null;
+
+		if (pageable != null) {
+			pageNumber = pageable.getPageNumber();
+			pageSize = pageable.getPageSize();
+		}
 
 		final PagedResult<SampleDTO> resultPage =
-			new PaginatedSearch().executeBrapiSearch(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<SampleDTO>() {
+			new PaginatedSearch().executeBrapiSearch(pageNumber, pageSize, new SearchSpec<SampleDTO>() {
 
 				@Override
 				public long getCount() {
