@@ -200,7 +200,8 @@ public class SampleListServiceImpl implements SampleListService {
 		return sampleListDTO;
 	}
 
-	protected Map<String, SamplePlateInfo> convertToSamplePlateInfoMap(final PlateInformationDto plateInformationDto) {
+	protected Map<String, SamplePlateInfo> convertToSamplePlateInfoMap(final PlateInformationDto plateInformationDto)
+		throws InvalidValuesException {
 		final Map<String, SamplePlateInfo> map = new HashMap<>();
 
 		final int sampleIdHeaderIndex = plateInformationDto.getImportData().get(0).indexOf(plateInformationDto.getSampleIdHeader());
@@ -210,12 +211,39 @@ public class SampleListServiceImpl implements SampleListService {
 		// Ignore the first row which is the header.
 		iterator.next();
 		// Convert the rows to SamplePlateInfo map.
-		while(iterator.hasNext()) {
+		while (iterator.hasNext()) {
 			final List<String> rowData = iterator.next();
 			final SamplePlateInfo samplePlateInfo = new SamplePlateInfo();
-			samplePlateInfo.setPlateId(rowData.get(plateIdHeaderIndex));
-			samplePlateInfo.setWell(rowData.get(wellHeaderIndex));
-			map.put(rowData.get(sampleIdHeaderIndex), samplePlateInfo);
+			final int numElements = rowData.size() - 1;
+
+			if (numElements >= plateIdHeaderIndex) {
+				final String plateId = rowData.get(plateIdHeaderIndex);
+				if (plateId.length() > 255) {
+					throw new InvalidValuesException(this.messageSource.getMessage("sample.plate.id.exceed.length", null, LocaleContextHolder
+						.getLocale()));
+				}
+				samplePlateInfo.setPlateId(plateId);
+
+			}
+
+			if (numElements >= wellHeaderIndex) {
+				final String well = rowData.get(wellHeaderIndex);
+				if (well.length() > 255) {
+					throw new InvalidValuesException(this.messageSource.getMessage("sample.well.exceed.length", null, LocaleContextHolder
+						.getLocale()));
+				}
+				samplePlateInfo.setWell(well);
+
+			}
+
+			if (numElements >= sampleIdHeaderIndex) {
+				final String sampleId = rowData.get(sampleIdHeaderIndex);
+				if(StringUtils.isBlank(sampleId)){
+					throw new InvalidValuesException(this.messageSource.getMessage("sample.record.not.include.sample.id.in.file", null, LocaleContextHolder
+						.getLocale()));
+				}
+				map.put(sampleId, samplePlateInfo);
+			}
 		}
 		return map;
 	}
