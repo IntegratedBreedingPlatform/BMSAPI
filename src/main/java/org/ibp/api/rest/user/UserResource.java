@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,8 +25,8 @@ public class UserResource {
 	private UserService userService;
 
 	@ApiOperation(value = "List all users of one projectUUID", notes = "List all users")
-	@RequestMapping(value = "/user/list", method = RequestMethod.GET)
-	public ResponseEntity<List<UserDetailDto>> list(@RequestParam(value = "projectUUID") final String projectUUID) {
+	@RequestMapping(value = "/projects/{projectUUID}/users", method = RequestMethod.GET)
+	public ResponseEntity<List<UserDetailDto>> list(@PathVariable final String projectUUID) {
 		return new ResponseEntity<>(this.userService.getUsersByProjectUUID(projectUUID), HttpStatus.OK);
 	}
 
