@@ -80,12 +80,6 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public SampleService sampleService() {
-			return Mockito.mock(SampleService.class);
-		}
-
-		@Bean
-		@Primary
 		public ContextUtil getContextUtil() {
 			return Mockito.mock(ContextUtil.class);
 		}
@@ -103,9 +97,6 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private org.generationcp.middleware.service.api.SampleListService sampleListServiceMW;
-
-	@Autowired
-	private SampleService sampleService;
 
 	@Autowired
 	private ContextUtil contextUtil;
@@ -237,40 +228,6 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testListSamples() throws Exception {
-		final String plotId = RandomStringUtils.randomAlphanumeric(13);
-		final Integer listId = null;
-		final Date samplingDate = new Date();
-		final List<SampleDTO> list = new ArrayList<>();
-		final SampleDTO sample = new SampleDTO(RandomStringUtils.randomAlphanumeric(6), RandomStringUtils.randomAlphanumeric(6),
-				RandomStringUtils.randomAlphanumeric(6), samplingDate, RandomStringUtils.randomAlphanumeric(6), new Random().nextInt(),
-				RandomStringUtils.randomAlphanumeric(6), new Random().nextInt());
-		list.add(sample);
-
-		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
-		Mockito.when(this.sampleService
-				.filter(org.mockito.Matchers.anyString(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.any(Pageable.class)))
-				.thenReturn(list);
-
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/sample/maize/samples?plotId=" + plotId).contentType(this.contentType)
-				.content(this.convertObjectToByte(this.dto))).andExpect(MockMvcResultMatchers.status().isOk())
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(list.size())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].sampleName", Matchers.is(sample.getSampleName())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].sampleBusinessKey", Matchers.is(sample.getSampleBusinessKey())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].takenBy", Matchers.is(sample.getTakenBy())))
-				// FIXME Jackson use UTC as default timezone
-				// .andExpect(MockMvcResultMatchers
-				// 	.jsonPath("$[0].samplingDate", Matchers.is(SampleListResourceTest.DATE_FORMAT.format(sample.getSamplingDate()))))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].sampleList", Matchers.is(sample.getSampleList())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].plantNumber", Matchers.is(sample.getPlantNumber())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].plantBusinessKey", Matchers.is(sample.getPlantBusinessKey())));
-
-		Mockito.verify(this.sampleService, Mockito.atLeastOnce())
-			.filter(org.mockito.Matchers.anyString(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.isNull(Pageable.class));
-	}
-
-	@Test
 	public void testSearch() throws Exception {
 
 		final String searchString = "ListName1";
@@ -297,21 +254,6 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(sampleList.getDescription())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(sampleList.getId())));
 
-	}
-
-	@Test
-	public void testListSamplesNotFound() throws Exception {
-		final String plotId = null;
-		final Integer listId = null;
-
-		final List<SampleDTO> list = new ArrayList<>();
-
-		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
-		Mockito.when(this.sampleService.filter(null, null, null)).thenReturn(list);
-
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/sample/maize/samples?plotId=" + plotId).contentType(this.contentType)
-				.content(this.convertObjectToByte(this.dto))).andExpect(MockMvcResultMatchers.status().isOk())
-				.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
 	}
 
 	@Test
