@@ -90,7 +90,7 @@ public class SampleListServiceImplTest {
 	}
 
 	@Test
-	public void testConvertToSamplePlateInfoMap() {
+	public void testConvertToSamplePlateInfoMap() throws InvalidValuesException {
 
 		final PlateInformationDto plateInformationDto = this.createPlateInformationDto();
 		final Map<String, SamplePlateInfo> map = this.sampleListService.convertToSamplePlateInfoMap(plateInformationDto);
