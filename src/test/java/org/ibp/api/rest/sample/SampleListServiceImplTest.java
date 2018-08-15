@@ -3,8 +3,7 @@ package org.ibp.api.rest.sample;
 import junit.framework.Assert;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
-import org.ibp.api.exception.InvalidValuesException;
-import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,11 +11,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,9 +38,6 @@ public class SampleListServiceImplTest {
 	@Before
 	public void init() {
 
-		this.messageSource = new ResourceBundleMessageSource();
-		this.messageSource.setUseCodeAsDefaultMessage(true);
-		this.sampleListService.setMessageSource(this.messageSource);
 	}
 
 
@@ -67,7 +66,7 @@ public class SampleListServiceImplTest {
 		try {
 			this.sampleListService.importSamplePlateInformation(plateInformationDto);
 			Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(Mockito.eq(plateInformationDto.getListId()), Mockito.anyMap());
-		} catch (InvalidValuesException e) {
+		} catch (ApiRequestValidationException e) {
 			Assert.fail("InvalidValuesException should not be thrown.");
 		}
 
@@ -83,17 +82,18 @@ public class SampleListServiceImplTest {
 		try {
 			this.sampleListService.importSamplePlateInformation(plateInformationDto);
 			Assert.fail("InvalidValuesException should be thrown.");
-		} catch (InvalidValuesException e) {
-			Assert.assertEquals("sample.sample.ids.not.present.in.file", e.getMessage());
+		} catch (ApiRequestValidationException e) {
+			Assert.assertEquals("sample.sample.ids.not.present.in.file",  ((FieldError)e.getErrors().get(0)).getField());
 		}
 
 	}
 
 	@Test
-	public void testConvertToSamplePlateInfoMap() throws InvalidValuesException {
+	public void testConvertToSamplePlateInfoMap() {
 
 		final PlateInformationDto plateInformationDto = this.createPlateInformationDto();
-		final Map<String, SamplePlateInfo> map = this.sampleListService.convertToSamplePlateInfoMap(plateInformationDto);
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), PlateInformationDto.class.getName());
+		final Map<String, SamplePlateInfo> map = this.sampleListService.convertToSamplePlateInfoMap(plateInformationDto, bindingResult);
 		Assert.assertEquals(2, map.size());
 		Assert.assertEquals("TestValue-1", map.get("SampleId-1").getPlateId());
 		Assert.assertEquals("TestValue-2", map.get("SampleId-1").getWell());
