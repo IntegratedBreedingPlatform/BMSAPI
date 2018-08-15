@@ -233,6 +233,9 @@ public class SampleListServiceImpl implements SampleListService {
 				if (StringUtils.isBlank(sampleId)) {
 					throwApiRequestValidationError(bindingResult, "sample.record.not.include.sample.id.in.file");
 				}
+				if (map.get(sampleId) != null) {
+					throwApiRequestValidationError(bindingResult, "sample.id.repeat.in.file");
+				}
 				map.put(sampleId, samplePlateInfo);
 			} else {
 				throwApiRequestValidationError(bindingResult, "sample.record.not.include.sample.id.in.file");
