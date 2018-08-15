@@ -67,6 +67,6 @@ public interface SampleListService {
 
 	List<SampleDetailsDTO> getSampleDetailsDTOs(Integer listId);
 
-	void importSamplePlateInformation(PlateInformationDto plateInformationDto) throws InvalidValuesException;
+	void importSamplePlateInformation(PlateInformationDto plateInformationDto);
 
 }
