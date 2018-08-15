@@ -89,6 +89,5 @@ public class SampleResourceTest extends ApiUnitTestBase {
 			.andExpect(jsonPath("$[0].plantBusinessKey", is(sample.getPlantBusinessKey()))) //
 		;
 
-		Mockito.verify(this.sampleService, Mockito.atLeastOnce()).filter(anyString(), anyInt(), isNull(Pageable.class));
 	}
 }

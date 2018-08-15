@@ -36,19 +36,11 @@ public class SampleResource {
 	public ResponseEntity<List<SampleDTO>> filter(@PathVariable final String crop,
         @RequestParam(required = false) @ApiParam(value = "The plot to which the samples belong") final String plotId,
         @RequestParam(required = false) @ApiParam(value = "The list to which the samples belong") final Integer listId,
-		// TODO use in swagger
-		@RequestParam(required = false) final Pageable pageable) {
-
-		Integer pageNumber = null;
-		Integer pageSize = null;
-
-		if (pageable != null) {
-			pageNumber = pageable.getPageNumber();
-			pageSize = pageable.getPageSize();
-		}
+		// TODO describe in swagger?
+		final Pageable pageable) {
 
 		final PagedResult<SampleDTO> resultPage =
-			new PaginatedSearch().executeBrapiSearch(pageNumber, pageSize, new SearchSpec<SampleDTO>() {
+			new PaginatedSearch().executeBrapiSearch(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<SampleDTO>() {
 
 				@Override
 				public long getCount() {
