@@ -36,7 +36,7 @@ public class SampleResource {
 	public ResponseEntity<List<SampleDTO>> filter(@PathVariable final String crop,
         @RequestParam(required = false) @ApiParam(value = "The plot to which the samples belong") final String plotId,
         @RequestParam(required = false) @ApiParam(value = "The list to which the samples belong") final Integer listId,
-		// TODO use in swagger
+		// TODO describe in swagger?
 		final Pageable pageable) {
 
 		final PagedResult<SampleDTO> resultPage =
