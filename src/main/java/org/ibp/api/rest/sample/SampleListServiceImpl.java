@@ -199,12 +199,38 @@ public class SampleListServiceImpl implements SampleListService {
 		final BindingResult bindingResult) {
 
 		final Map<String, SamplePlateInfo> map = new HashMap<>();
+
+		if (StringUtils.isBlank(plateInformationDto.getSampleIdHeader())) {
+			throwApiRequestValidationError(bindingResult, "sample.header.not.mapped", new Object[] {"Sample Id"});
+
+		}
+		if (StringUtils.isBlank(plateInformationDto.getPlateIdHeader())) {
+			throwApiRequestValidationError(bindingResult, "sample.header.not.mapped", new Object[] {"Plate Id"});
+
+		}
+		if (StringUtils.isBlank(plateInformationDto.getWellHeader())) {
+			throwApiRequestValidationError(bindingResult, "sample.header.not.mapped", new Object[] {"Well"});
+
+		}
 		final int sampleIdHeaderIndex = plateInformationDto.getImportData().get(0).indexOf(plateInformationDto.getSampleIdHeader());
 		final int plateIdHeaderIndex = plateInformationDto.getImportData().get(0).indexOf(plateInformationDto.getPlateIdHeader());
 		final int wellHeaderIndex = plateInformationDto.getImportData().get(0).indexOf(plateInformationDto.getWellHeader());
 		final Iterator<List<String>> iterator = plateInformationDto.getImportData().iterator();
 		// Ignore the first row which is the header.
 		iterator.next();
+
+		if (sampleIdHeaderIndex == -1) {
+			throwApiRequestValidationError(bindingResult, "sample.header.not.matched", new Object[] {"Sample Id"});
+		}
+
+		if (plateIdHeaderIndex == -1) {
+			throwApiRequestValidationError(bindingResult, "sample.header.not.matched", new Object[] {"Plate Id"});
+		}
+
+		if (wellHeaderIndex == -1) {
+			throwApiRequestValidationError(bindingResult, "sample.header.not.matched", new Object[] {"Well"});
+		}
+
 		// Convert the rows to SamplePlateInfo map.
 		while (iterator.hasNext()) {
 			final List<String> rowData = iterator.next();
@@ -213,7 +239,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 			if (numElements >= plateIdHeaderIndex) {
 				final String plateId = rowData.get(plateIdHeaderIndex);
-				if (plateId.length() > 255) {
+				if (StringUtils.isNotBlank(plateId) && plateId.length() > 255) {
 					throwApiRequestValidationError(bindingResult, "sample.plate.id.exceed.length");
 				}
 				samplePlateInfo.setPlateId(plateId);
@@ -221,7 +247,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 			if (numElements >= wellHeaderIndex) {
 				final String well = rowData.get(wellHeaderIndex);
-				if (well.length() > 255) {
+				if (StringUtils.isNotBlank(well) && well.length() > 255) {
 					throwApiRequestValidationError(bindingResult, "sample.well.exceed.length");
 				}
 				samplePlateInfo.setWell(well);
@@ -248,5 +274,11 @@ public class SampleListServiceImpl implements SampleListService {
 		bindingResult.reject(errorDescription, "");
 		throw new ApiRequestValidationException(bindingResult.getAllErrors());
 
+	}
+
+	private void throwApiRequestValidationError(final BindingResult bindingResult, final String errorDescription,
+		final Object[] arguments) {
+		bindingResult.reject(errorDescription, arguments, null);
+		throw new ApiRequestValidationException(bindingResult.getAllErrors());
 	}
 }
