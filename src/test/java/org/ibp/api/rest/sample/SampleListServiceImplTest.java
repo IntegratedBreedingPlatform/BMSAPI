@@ -83,7 +83,7 @@ public class SampleListServiceImplTest {
 			this.sampleListService.importSamplePlateInformation(plateInformationDto);
 			Assert.fail("InvalidValuesException should be thrown.");
 		} catch (ApiRequestValidationException e) {
-			Assert.assertEquals("sample.sample.ids.not.present.in.file",  ((FieldError)e.getErrors().get(0)).getField());
+			Assert.assertEquals("sample.sample.ids.not.present.in.file",  e.getErrors().get(0).getCodes()[1]);
 		}
 
 	}
