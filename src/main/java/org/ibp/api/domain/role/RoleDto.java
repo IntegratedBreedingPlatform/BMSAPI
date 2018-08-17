@@ -1,4 +1,4 @@
-package org.ibp.api.brapi.v1.role;
+package org.ibp.api.domain.role;
 
 public class RoleDto {
 
