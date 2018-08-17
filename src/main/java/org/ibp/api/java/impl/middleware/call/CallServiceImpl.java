@@ -2,18 +2,21 @@ package org.ibp.api.java.impl.middleware.call;
 
 import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.io.IOUtils;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.ibp.api.java.calls.CallService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class CallServiceImpl implements CallService {
+
+	private static final Logger LOG = LoggerFactory.getLogger(CallServiceImpl.class);
 
 	@Override
 	public List<Map<String, Object>> getAllCalls(final String dataType, final Integer pageSize, final Integer pageNumber) {
@@ -32,23 +35,23 @@ public class CallServiceImpl implements CallService {
 
 			if (pageNumber != null && pageSize != null) {
 
-				int maxLenght = pageSize * (pageNumber) + pageSize;
-				if (maxLenght > brapiCalls.size()) {
-					maxLenght = brapiCalls.size();
+				int toIndex = pageSize * (pageNumber) + pageSize;
+				if (toIndex > brapiCalls.size()) {
+					toIndex = brapiCalls.size();
 				}
 
-				int minLenght = (pageNumber - 1) * pageSize;
-				if (minLenght < 0) {
-					minLenght = 0;
+				int fromIndex = pageNumber * pageSize;
+				if (fromIndex < 0) {
+					fromIndex = 0;
 				}
 
-				brapiCalls = brapiCalls.subList(minLenght, maxLenght);
+				brapiCalls = brapiCalls.subList(fromIndex, toIndex);
 			}
 
 			return brapiCalls;
 		} catch (final IOException e) {
-			e.printStackTrace();
-			return null;
+			LOG.error(e.getMessage(), e);
+			return new ArrayList<>();
 		}
 	}
 }
