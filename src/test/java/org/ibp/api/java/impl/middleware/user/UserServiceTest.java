@@ -1,5 +1,5 @@
 
-package org.ibp.api.brapi.v1.user;
+package org.ibp.api.java.impl.middleware.user;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
