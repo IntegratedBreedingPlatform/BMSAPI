@@ -30,6 +30,9 @@ import java.util.Set;
 public class SampleListServiceImpl implements SampleListService {
 
 	protected static final String PARENT_ID = "parentId";
+	protected static final String SAMPLE_ID = "Sample Id";
+	protected static final String PLATE_ID = "Plate Id";
+	protected static final String WELL = "Well";
 
 	@Autowired
 	private org.generationcp.middleware.service.api.SampleListService sampleListServiceMW;
@@ -201,15 +204,15 @@ public class SampleListServiceImpl implements SampleListService {
 		final Map<String, SamplePlateInfo> map = new HashMap<>();
 
 		if (StringUtils.isBlank(plateInformationDto.getSampleIdHeader())) {
-			throwApiRequestValidationError(bindingResult, "sample.header.not.mapped", new Object[] {"Sample Id"});
+			throwApiRequestValidationError(bindingResult, "sample.header.not.mapped", new Object[] {SampleListServiceImpl.SAMPLE_ID});
 
 		}
 		if (StringUtils.isBlank(plateInformationDto.getPlateIdHeader())) {
-			throwApiRequestValidationError(bindingResult, "sample.header.not.mapped", new Object[] {"Plate Id"});
+			throwApiRequestValidationError(bindingResult, "sample.header.not.mapped", new Object[] {SampleListServiceImpl.PLATE_ID});
 
 		}
 		if (StringUtils.isBlank(plateInformationDto.getWellHeader())) {
-			throwApiRequestValidationError(bindingResult, "sample.header.not.mapped", new Object[] {"Well"});
+			throwApiRequestValidationError(bindingResult, "sample.header.not.mapped", new Object[] {SampleListServiceImpl.WELL});
 
 		}
 		final int sampleIdHeaderIndex = plateInformationDto.getImportData().get(0).indexOf(plateInformationDto.getSampleIdHeader());
