@@ -223,15 +223,15 @@ public class SampleListServiceImpl implements SampleListService {
 		iterator.next();
 
 		if (sampleIdHeaderIndex == -1) {
-			throwApiRequestValidationError(bindingResult, "sample.header.not.matched", new Object[] {"Sample Id"});
+			throwApiRequestValidationError(bindingResult, "sample.header.not.matched", new Object[] {SampleListServiceImpl.SAMPLE_ID});
 		}
 
 		if (plateIdHeaderIndex == -1) {
-			throwApiRequestValidationError(bindingResult, "sample.header.not.matched", new Object[] {"Plate Id"});
+			throwApiRequestValidationError(bindingResult, "sample.header.not.matched", new Object[] {SampleListServiceImpl.PLATE_ID});
 		}
 
 		if (wellHeaderIndex == -1) {
-			throwApiRequestValidationError(bindingResult, "sample.header.not.matched", new Object[] {"Well"});
+			throwApiRequestValidationError(bindingResult, "sample.header.not.matched", new Object[] {SampleListServiceImpl.WELL});
 		}
 
 		// Convert the rows to SamplePlateInfo map.
