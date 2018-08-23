@@ -57,7 +57,7 @@ public class FormulaValidator implements Validator {
 		final FormulaDto formulaDto = (FormulaDto) target;
 
 		if (formulaDto == null) {
-			errors.rejectValue("variable.formula.required", "");
+			errors.reject("variable.formula.required", "");
 			return;
 		}
 
@@ -130,7 +130,8 @@ public class FormulaValidator implements Validator {
 		} catch (final Exception e) {
 			// Inform the ontology manager admin about the exception
 			// Mapping engine errors to UI errors would be impractical
-			errors.reject("variable.formula.invalid", new Object[] {e.getMessage(), e.getCause()}, "");
+			throw new IllegalArgumentException(
+				getMessage("variable.formula.invalid") + e.getMessage() + " - " + e.getCause());
 		}
 	}
 
