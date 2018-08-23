@@ -160,11 +160,11 @@ public class SampleListResource {
 
 		final List<SampleDetailsDTO> sampleDetailsDTOs = this.sampleListService.getSampleDetailsDTOs(listId);
 
-		final List<String> visibleColumns =
-				Arrays.asList(CsvExportSampleListServiceImpl.SAMPLE_ENTRY, CsvExportSampleListServiceImpl.DESIGNATION,
-						CsvExportSampleListServiceImpl.GID, CsvExportSampleListServiceImpl.SAMPLE_NAME,
-						CsvExportSampleListServiceImpl.TAKEN_BY, CsvExportSampleListServiceImpl.SAMPLING_DATE,
-						CsvExportSampleListServiceImpl.SAMPLE_UID);
+		final List<String> visibleColumns = Arrays
+			.asList(CsvExportSampleListServiceImpl.SAMPLE_ENTRY, CsvExportSampleListServiceImpl.DESIGNATION,
+				CsvExportSampleListServiceImpl.GID, CsvExportSampleListServiceImpl.SAMPLE_NAME, CsvExportSampleListServiceImpl.TAKEN_BY,
+				CsvExportSampleListServiceImpl.SAMPLING_DATE, CsvExportSampleListServiceImpl.SAMPLE_UID,
+				CsvExportSampleListServiceImpl.PLATE_ID, CsvExportSampleListServiceImpl.WELL);
 
 		final FileExportInfo exportInfo = this.csvExportSampleListService.export(sampleDetailsDTOs, listName, visibleColumns);
 
