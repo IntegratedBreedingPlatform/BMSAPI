@@ -130,8 +130,7 @@ public class FormulaValidator implements Validator {
 		} catch (final Exception e) {
 			// Inform the ontology manager admin about the exception
 			// Mapping engine errors to UI errors would be impractical
-			throw new IllegalArgumentException(
-				getMessage("variable.formula.invalid") + e.getMessage() + " - " + e.getCause());
+			errors.reject("variable.formula.invalid", new Object[] {e.getMessage(), e.getCause()}, "");
 		}
 	}
 
