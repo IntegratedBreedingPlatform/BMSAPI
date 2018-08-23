@@ -28,6 +28,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -36,6 +38,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,7 +46,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
+
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
 
 @ActiveProfiles("security-mocked")
 public class SampleListResourceTest extends ApiUnitTestBase {
@@ -52,6 +60,8 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	private static final String DESCRIPTION = "description";
 	private static final String NOTES = "Notes";
 	private static final String VALUE = "1";
+	private static Locale locale = Locale.getDefault();
+
 
 	private SampleListDto dto;
 	private WorkbenchUser user;
@@ -80,12 +90,6 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public SampleService sampleService() {
-			return Mockito.mock(SampleService.class);
-		}
-
-		@Bean
-		@Primary
 		public ContextUtil getContextUtil() {
 			return Mockito.mock(ContextUtil.class);
 		}
@@ -105,13 +109,13 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	private org.generationcp.middleware.service.api.SampleListService sampleListServiceMW;
 
 	@Autowired
-	private SampleService sampleService;
-
-	@Autowired
 	private ContextUtil contextUtil;
 
 	@Autowired
 	private CsvExportSampleListService csvExportSampleListService;
+
+	@Resource
+	private ResourceBundleMessageSource resourceBundleMessageSource;
 
 	@Before
 	public void beforeEachTest() {
@@ -237,37 +241,6 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testListSamples() throws Exception {
-		final String plotId = RandomStringUtils.randomAlphanumeric(13);
-		final Integer listId = null;
-		final Date samplingDate = new Date();
-		final List<SampleDTO> list = new ArrayList<>();
-		final SampleDTO sample = new SampleDTO(RandomStringUtils.randomAlphanumeric(6), RandomStringUtils.randomAlphanumeric(6),
-				RandomStringUtils.randomAlphanumeric(6), samplingDate, RandomStringUtils.randomAlphanumeric(6), new Random().nextInt(),
-				RandomStringUtils.randomAlphanumeric(6), new Random().nextInt());
-		list.add(sample);
-
-		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
-		Mockito.when(this.sampleService
-				.filter(org.mockito.Matchers.anyString(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.any(Pageable.class)))
-				.thenReturn(list);
-
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/sample/maize/samples?plotId=" + plotId).contentType(this.contentType)
-				.content(this.convertObjectToByte(this.dto))).andExpect(MockMvcResultMatchers.status().isOk())
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(list.size())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].sampleName", Matchers.is(sample.getSampleName())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].sampleBusinessKey", Matchers.is(sample.getSampleBusinessKey())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].takenBy", Matchers.is(sample.getTakenBy())))
-				// FIXME Jackson use UTC as default timezone
-				// .andExpect(MockMvcResultMatchers
-				// 	.jsonPath("$[0].samplingDate", Matchers.is(SampleListResourceTest.DATE_FORMAT.format(sample.getSamplingDate()))))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].sampleList", Matchers.is(sample.getSampleList())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].plantNumber", Matchers.is(sample.getPlantNumber())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].plantBusinessKey", Matchers.is(sample.getPlantBusinessKey())));
-	}
-
-	@Test
 	public void testSearch() throws Exception {
 
 		final String searchString = "ListName1";
@@ -294,21 +267,6 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(sampleList.getDescription())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(sampleList.getId())));
 
-	}
-
-	@Test
-	public void testListSamplesNotFound() throws Exception {
-		final String plotId = null;
-		final Integer listId = null;
-
-		final List<SampleDTO> list = new ArrayList<>();
-
-		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
-		Mockito.when(this.sampleService.filter(null, null, null)).thenReturn(list);
-
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/sample/maize/samples?plotId=" + plotId).contentType(this.contentType)
-				.content(this.convertObjectToByte(this.dto))).andExpect(MockMvcResultMatchers.status().isOk())
-				.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
 	}
 
 	@Test
@@ -342,23 +300,169 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testImportPlateInformation() throws Exception {
 
-		final PlateInformationDto dto = new PlateInformationDto();
-		dto.setSampleIdHeader("SampleId");
-		dto.setPlateIdHeader("PlateId");
-		dto.setWellHeader("Well");
-		final List<List<String>> importData = new ArrayList<>();
-		importData.add(Arrays.asList("SampleId", "PlateId", "Well"));
-		importData.add(Arrays.asList("jhdksl", "dfgfdh", "dfgfdg"));
-		importData.add(Arrays.asList("asdsa", "sfwd", "asdasf"));
-		dto.setImportData(importData);
+		final PlateInformationDto plateInformationDto = createPlateInformationDto();
 
 		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySet(), Mockito.anyInt())).thenReturn(2l);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import").content(this.convertObjectToByte(dto))
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import").content(this.convertObjectToByte(plateInformationDto))
 				.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
 		Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(Mockito.anyInt(), Mockito.anyMap());
 
+	}
+
+	@Test
+	public void testImportPlateInformation_NoSampleId() throws Exception {
+
+		final PlateInformationDto plateInformationDto = createPlateInformationDto();
+		final List<List<String>> importData = new ArrayList<>();
+		importData.add(Arrays.asList("SampleId", "PlateId", "well"));
+		importData.add(Arrays.asList("jhdksl", "dfgfdh", "dfgfdg"));
+		importData.add(Arrays.asList("", "sfwd", "asdasf"));
+		plateInformationDto.setImportData(importData);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import") //
+			.contentType(this.contentType) //
+			.locale(locale) //
+			.content(this.convertObjectToByte(plateInformationDto))) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
+			.andExpect(MockMvcResultMatchers
+				.jsonPath("$.errors[0].message", is(this.getMessage("sample.record.not.include.sample.id.in.file")))) //
+		;
+	}
+
+	@Test
+	public void testImportPlateInformation_plate_id_exceeded_max_length() throws Exception {
+
+		final PlateInformationDto plateInformationDto = createPlateInformationDto();
+		final List<List<String>> importData = new ArrayList<>();
+		importData.add(Arrays.asList("SampleId", "PlateId", "well"));
+		importData.add(Arrays.asList("jhdksl", RandomStringUtils.random(256), "aasdd"));
+		importData.add(Arrays.asList("jhdksl", "sfwd", "asdasf"));
+		plateInformationDto.setImportData(importData);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import") //
+			.contentType(this.contentType) //
+			.locale(locale) //
+			.content(this.convertObjectToByte(plateInformationDto))) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(this.getMessage("sample.plate.id.exceed.length")))) //
+		;
+	}
+
+	@Test
+	public void testImportPlateInformation_Well_exceeded_max_length() throws Exception {
+
+		final PlateInformationDto plateInformationDto = createPlateInformationDto();
+		final List<List<String>> importData = new ArrayList<>();
+		importData.add(Arrays.asList("SampleId", "PlateId", "well"));
+		importData.add(Arrays.asList("jhdksl", "aasdd", RandomStringUtils.random(256)));
+		importData.add(Arrays.asList("jhdksl", "sfwd", "asdasf"));
+		plateInformationDto.setImportData(importData);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import") //
+			.contentType(this.contentType) //
+			.locale(locale) //
+			.content(this.convertObjectToByte(plateInformationDto))) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(this.getMessage("sample.well.exceed.length")))) //
+		;
+	}
+
+	@Test
+	public void testImportPlateInformation_SampleId_is_repeated_in_the_SampleList() throws Exception {
+
+		final PlateInformationDto plateInformationDto = createPlateInformationDto();
+		final List<List<String>> importData = new ArrayList<>();
+		importData.add(Arrays.asList("SampleId", "PlateId", "well"));
+		importData.add(Arrays.asList("qwe12asd", "aasdd", "asfqf"));
+		importData.add(Arrays.asList("qwe12asd", "sfwd", "asdasf23ds"));
+		plateInformationDto.setImportData(importData);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import") //
+			.contentType(this.contentType) //
+			.locale(locale) //
+			.content(this.convertObjectToByte(plateInformationDto))) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(this.getMessage("sample.id.repeat.in.file")))) //
+		;
+	}
+
+	@Test
+	public void testImportPlateInformation_SampleId_header_is_not_present() throws Exception {
+
+		final PlateInformationDto plateInformationDto = createPlateInformationDto();
+		plateInformationDto.setSampleIdHeader(null);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import") //
+			.contentType(this.contentType) //
+			.locale(locale) //
+			.content(this.convertObjectToByte(plateInformationDto))) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
+			.andExpect(MockMvcResultMatchers
+				.jsonPath("$.errors[0].message", is(this.getMessage("sample.header.not.mapped", new Object[] {"Sample Id"})))) //
+		;
+	}
+
+	@Test
+	public void testImportPlateInformation_PlateId_header_is_not_present() throws Exception {
+
+		final PlateInformationDto plateInformationDto = createPlateInformationDto();
+		plateInformationDto.setPlateIdHeader(null);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import") //
+			.contentType(this.contentType) //
+			.locale(locale) //
+			.content(this.convertObjectToByte(plateInformationDto))) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
+			.andExpect(MockMvcResultMatchers
+				.jsonPath("$.errors[0].message", is(this.getMessage("sample.header.not.mapped", new Object[] {"Plate Id"})))) //
+		;
+	}
+
+	@Test
+	public void testImportPlateInformation_well_header_is_not_present() throws Exception {
+
+		final PlateInformationDto plateInformationDto = createPlateInformationDto();
+		plateInformationDto.setWellHeader(null);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import") //
+			.contentType(this.contentType) //
+			.locale(locale) //
+			.content(this.convertObjectToByte(plateInformationDto))) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
+			.andExpect(MockMvcResultMatchers
+				.jsonPath("$.errors[0].message", is(this.getMessage("sample.header.not.mapped", new Object[] {"Well"})))) //
+		;
+	}
+
+	private String getMessage(final String code) {
+		return this.resourceBundleMessageSource.getMessage(code, null, LocaleContextHolder.getLocale());
+	}
+
+	private String getMessage(final String code,final Object[] arguments) {
+		return this.resourceBundleMessageSource.getMessage(code, arguments, LocaleContextHolder.getLocale());
+	}
+
+	private PlateInformationDto createPlateInformationDto() {
+		final PlateInformationDto plateInformationDto = new PlateInformationDto();
+		plateInformationDto.setSampleIdHeader("SampleId");
+		plateInformationDto.setPlateIdHeader("PlateId");
+		plateInformationDto.setWellHeader("well");
+		final List<List<String>> importData = new ArrayList<>();
+		importData.add(Arrays.asList("SampleId", "PlateId", "well"));
+		importData.add(Arrays.asList("qwe12asd", "aasdd", "asfqf"));
+		importData.add(Arrays.asList("qsdesd", "sfwd", "asdasf23ds"));
+		plateInformationDto.setImportData(importData);
+
+		return plateInformationDto;
 	}
 
 }
