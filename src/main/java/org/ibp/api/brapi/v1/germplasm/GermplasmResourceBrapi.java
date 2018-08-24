@@ -3,16 +3,19 @@ package org.ibp.api.brapi.v1.germplasm;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.gms.GermplasmDTO;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
-import org.ibp.api.brapi.v1.location.Locations;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -85,5 +88,26 @@ public class GermplasmResourceBrapi {
 			final SingleGermplasmResponse germplasmResponse = new SingleGermplasmResponse().withMetadata(metadata);
 			return new ResponseEntity<>(germplasmResponse, HttpStatus.NOT_FOUND);
 		}
+	}
+
+	@ApiOperation(value = "Germplasm pedigree by id", notes = "")
+	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}/pedigree", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<PedigreeDTO> getPedigree(
+		@PathVariable
+		final String crop,
+		@ApiParam(value = "the internal id of the germplasm")
+		@PathVariable(value = "germplasmDbId")
+		final String germplasmDbId
+		// TODO
+		// @ApiParam(value = "text representation of the pedigree", required = false)
+		// @RequestParam(value = "notation", required = false)
+		// final String notation,
+		// @ApiParam(value = "include array of siblings in response", required = false)
+		// @RequestParam(required = false, required = false)
+		// final Boolean includeSiblings
+		) {
+
+		return new ResponseEntity<>(this.germplasmService.getPedigree(germplasmDbId, null), HttpStatus.OK);
 	}
 }
