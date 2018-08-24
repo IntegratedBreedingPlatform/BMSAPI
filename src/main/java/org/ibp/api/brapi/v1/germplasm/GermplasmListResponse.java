@@ -8,16 +8,16 @@ import org.pojomatic.Pojomatic;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"metadata", "result"})
-public class Germplasms {
+public class GermplasmListResponse {
 
 	private Metadata metadata;
 
 	private Result<Germplasm> result;
 
-	public Germplasms() {
+	public GermplasmListResponse() {
 	}
 
-	public Germplasms(final Metadata metadata, final Result<Germplasm> result) {
+	public GermplasmListResponse(final Metadata metadata, final Result<Germplasm> result) {
 		this.metadata = metadata;
 		this.result = result;
 	}

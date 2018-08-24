@@ -3,7 +3,14 @@ package org.ibp.api.brapi.v1.germplasm;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.generationcp.middleware.domain.gms.GermplasmDTO;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+import org.ibp.api.brapi.v1.common.Metadata;
+import org.ibp.api.brapi.v1.common.Pagination;
+import org.ibp.api.brapi.v1.location.Locations;
+import org.ibp.api.java.germplasm.GermplasmService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,14 +19,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Api(value = "BrAPI Germplasm Services")
 @Controller
 public class GermplasmResourceBrapi {
 
+	@Autowired
+	private GermplasmService germplasmService;
+
 	@ApiOperation(value = "Search germplasms", notes = "Search germplasms")
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm-search", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Germplasms> searchGermplasms(
+	public ResponseEntity<GermplasmListResponse> searchGermplasms(
 			@PathVariable
 			final String crop,
 			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
@@ -47,5 +60,30 @@ public class GermplasmResourceBrapi {
 					required = false)
 			final String commonCropName) {
 		return null;
+	}
+
+	@ApiOperation(value = "Germplasm search by germplasmDbId", notes = "Germplasm search by germplasmDbId")
+	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<SingleGermplasmResponse> searchGermplasm(
+			@PathVariable
+			final String crop,
+			@PathVariable
+			final String germplasmDbId) {
+		try {
+			Integer gid = Integer.parseInt(germplasmDbId);
+			final GermplasmDTO germplasmDTO = germplasmService.getGermplasmDTObyGID(gid);
+			//convert to Germplasm
+			final Germplasm germplasm = null;
+			final Metadata metadata = new Metadata().withPagination(new Pagination());
+			final SingleGermplasmResponse singleGermplasmResponse = new SingleGermplasmResponse(metadata, germplasm);
+			return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
+		} catch (final NumberFormatException e) {
+			final Map<String, String> status = new HashMap<>();
+			status.put("message", "no germplasm found");
+			final Metadata metadata = new Metadata(null, status);
+			final SingleGermplasmResponse germplasmResponse = new SingleGermplasmResponse().withMetadata(metadata);
+			return new ResponseEntity<>(germplasmResponse, HttpStatus.NOT_FOUND);
+		}
 	}
 }

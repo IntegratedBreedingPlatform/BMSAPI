@@ -39,12 +39,14 @@ public class Germplasm {
 
 	private String countryOfOriginCode;
 
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private List<String> typeOfGermplasmStorageCode;
 
 	private String genus;
 
 	private String species;
 
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private List<Taxon> taxonIds;
 
 	private String speciesAuthority;
@@ -53,6 +55,7 @@ public class Germplasm {
 
 	private String subtaxaAuthority;
 
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private List<Donor> donors;
 
 	private String acquisitionDate;

@@ -4,6 +4,7 @@ package org.ibp.api.java.impl.middleware.germplasm;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.gms.GermplasmDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
@@ -200,4 +201,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		return this.germplasmDataManager.countSearchForGermplasm(searchParameter);
 	}
+
+	@Override
+	public GermplasmDTO getGermplasmDTObyGID (final Integer germplasmId) {
+		return germplasmDataManager.getGermplasmDTOByGID(germplasmId);
+	}
+
 }
