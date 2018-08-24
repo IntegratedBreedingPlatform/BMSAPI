@@ -10,7 +10,6 @@ import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.common.ErrorResponse;
-import org.ibp.api.exception.InvalidValuesException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -163,11 +160,11 @@ public class SampleListResource {
 
 		final List<SampleDetailsDTO> sampleDetailsDTOs = this.sampleListService.getSampleDetailsDTOs(listId);
 
-		final List<String> visibleColumns =
-				Arrays.asList(CsvExportSampleListServiceImpl.SAMPLE_ENTRY, CsvExportSampleListServiceImpl.DESIGNATION,
-						CsvExportSampleListServiceImpl.GID, CsvExportSampleListServiceImpl.SAMPLE_NAME,
-						CsvExportSampleListServiceImpl.TAKEN_BY, CsvExportSampleListServiceImpl.SAMPLING_DATE,
-						CsvExportSampleListServiceImpl.SAMPLE_UID);
+		final List<String> visibleColumns = Arrays
+			.asList(CsvExportSampleListServiceImpl.SAMPLE_ENTRY, CsvExportSampleListServiceImpl.DESIGNATION,
+				CsvExportSampleListServiceImpl.GID, CsvExportSampleListServiceImpl.SAMPLE_NAME, CsvExportSampleListServiceImpl.TAKEN_BY,
+				CsvExportSampleListServiceImpl.SAMPLING_DATE, CsvExportSampleListServiceImpl.SAMPLE_UID,
+				CsvExportSampleListServiceImpl.PLATE_ID, CsvExportSampleListServiceImpl.WELL);
 
 		final FileExportInfo exportInfo = this.csvExportSampleListService.export(sampleDetailsDTOs, listName, visibleColumns);
 
@@ -184,17 +181,8 @@ public class SampleListResource {
 	@RequestMapping(value = "/{crop}/plate-information/import", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity saveSamplePlateInformation(@PathVariable final String crop, @RequestBody final PlateInformationDto plateInformationDto) {
-		try {
-			sampleListService.importSamplePlateInformation(plateInformationDto);
-		} catch (InvalidValuesException e) {
-			LOG.error("Error saving plate information", e);
-			final ErrorResponse response = new ErrorResponse();
-			response.addError(e.getMessage());
-			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-		}
+		sampleListService.importSamplePlateInformation(plateInformationDto);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-
-
 
 }
