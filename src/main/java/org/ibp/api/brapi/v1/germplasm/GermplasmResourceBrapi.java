@@ -6,6 +6,7 @@ import com.wordnik.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.gms.GermplasmDTO;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
@@ -35,7 +36,7 @@ public class GermplasmResourceBrapi {
 	@ApiOperation(value = "Search germplasms", notes = "Search germplasms")
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm-search", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<GermplasmListResponse> searchGermplasms(
+	public ResponseEntity<EntityListResponse<Germplasm>> searchGermplasms(
 			@PathVariable
 			final String crop,
 			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
