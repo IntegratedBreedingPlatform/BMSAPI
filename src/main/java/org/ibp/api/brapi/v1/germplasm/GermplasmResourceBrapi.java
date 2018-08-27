@@ -7,8 +7,8 @@ import org.generationcp.middleware.domain.gms.GermplasmDTO;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
-import org.ibp.api.brapi.v1.location.Locations;
 import org.ibp.api.java.germplasm.GermplasmService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,19 +72,33 @@ public class GermplasmResourceBrapi {
 			@PathVariable
 			final String germplasmDbId) {
 		try {
-			Integer gid = Integer.parseInt(germplasmDbId);
+			final Integer gid = Integer.parseInt(germplasmDbId);
 			final GermplasmDTO germplasmDTO = germplasmService.getGermplasmDTObyGID(gid);
-			//convert to Germplasm
-			final Germplasm germplasm = null;
-			final Metadata metadata = new Metadata().withPagination(new Pagination());
-			final SingleGermplasmResponse singleGermplasmResponse = new SingleGermplasmResponse(metadata, germplasm);
-			return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
+
+			if (germplasmDTO != null) {
+				final ModelMapper mapper = new ModelMapper();
+				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
+
+				final SingleGermplasmResponse singleGermplasmResponse =
+						new SingleGermplasmResponse(new Metadata(new Pagination(0, 0, 0L, 0), new HashMap<String, String>(), new URL[] {}),
+								germplasm);
+
+				return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
+			} else {
+				return buildNotFoundSimpleGermplasmResponse();
+			}
 		} catch (final NumberFormatException e) {
-			final Map<String, String> status = new HashMap<>();
-			status.put("message", "no germplasm found");
-			final Metadata metadata = new Metadata(null, status);
-			final SingleGermplasmResponse germplasmResponse = new SingleGermplasmResponse().withMetadata(metadata);
-			return new ResponseEntity<>(germplasmResponse, HttpStatus.NOT_FOUND);
+			return buildNotFoundSimpleGermplasmResponse();
 		}
+
 	}
+
+	private ResponseEntity<SingleGermplasmResponse> buildNotFoundSimpleGermplasmResponse() {
+		final Map<String, String> status = new HashMap<>();
+		status.put("message", "no germplasm found");
+		final Metadata metadata = new Metadata(null, status);
+		final SingleGermplasmResponse germplasmResponse = new SingleGermplasmResponse().withMetadata(metadata);
+		return new ResponseEntity<>(germplasmResponse, HttpStatus.NOT_FOUND);
+	}
+
 }

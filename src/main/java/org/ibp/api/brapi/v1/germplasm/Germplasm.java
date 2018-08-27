@@ -1,11 +1,15 @@
 package org.ibp.api.brapi.v1.germplasm;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.pojomatic.Pojomatic;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonPropertyOrder({"germplasmDbId", "defaultDisplayName", "accessionNumber", "germplasmName", "germplasmPUI", "pedigree",
 		"germplasmSeedSource", "synonyms", "commonCropName", "instituteCode", "instituteName", "biologicalStatusOfAccessionCode",
 		"countryOfOriginCode", "typeOfGermplasmStorageCode", "genus", "species", "taxonIds", "speciesAuthority", "subtaxa",
@@ -26,8 +30,7 @@ public class Germplasm {
 
 	private String germplasmSeedSource;
 
-	@JsonInclude(JsonInclude.Include.NON_EMPTY)
-	private List<String> synonyms;
+	private List<String> synonyms = new ArrayList<>();
 
 	private String commonCropName;
 
@@ -39,15 +42,13 @@ public class Germplasm {
 
 	private String countryOfOriginCode;
 
-	@JsonInclude(JsonInclude.Include.NON_EMPTY)
-	private List<String> typeOfGermplasmStorageCode;
+	private List<String> typeOfGermplasmStorageCode = new ArrayList<>();
 
 	private String genus;
 
 	private String species;
 
-	@JsonInclude(JsonInclude.Include.NON_EMPTY)
-	private List<Taxon> taxonIds;
+	private List<Taxon> taxonIds = new ArrayList<>();
 
 	private String speciesAuthority;
 
@@ -55,10 +56,10 @@ public class Germplasm {
 
 	private String subtaxaAuthority;
 
-	@JsonInclude(JsonInclude.Include.NON_EMPTY)
-	private List<Donor> donors;
+	private List<Donor> donors = new ArrayList<>();
 
-	private String acquisitionDate;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Date acquisitionDate;
 
 	public Germplasm() {
 	}
@@ -231,11 +232,11 @@ public class Germplasm {
 		this.donors = donors;
 	}
 
-	public String getAcquisitionDate() {
+	public Date getAcquisitionDate() {
 		return acquisitionDate;
 	}
 
-	public void setAcquisitionDate(final String acquisitionDate) {
+	public void setAcquisitionDate(final Date acquisitionDate) {
 		this.acquisitionDate = acquisitionDate;
 	}
 

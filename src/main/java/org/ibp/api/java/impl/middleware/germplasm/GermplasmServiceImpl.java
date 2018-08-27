@@ -204,7 +204,16 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public GermplasmDTO getGermplasmDTObyGID (final Integer germplasmId) {
-		return germplasmDataManager.getGermplasmDTOByGID(germplasmId);
+		final GermplasmDTO germplasmDTO;
+		try {
+			germplasmDTO = germplasmDataManager.getGermplasmDTOByGID(germplasmId);
+			if (germplasmDTO != null) {
+				germplasmDTO.setPedigree(pedigreeService.getCrossExpansion(germplasmId, crossExpansionProperties));
+			}
+		} catch (final MiddlewareQueryException e) {
+			throw new ApiRuntimeException("An error has occurred when trying to search a germplasm", e);
+		}
+		return germplasmDTO;
 	}
 
 }
