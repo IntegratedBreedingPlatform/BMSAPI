@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.gms.GermplasmDTO;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +68,7 @@ public class GermplasmResourceBrapi {
 	@ApiOperation(value = "Germplasm search by germplasmDbId", notes = "Germplasm search by germplasmDbId")
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<SingleGermplasmResponse> searchGermplasm(
+	public ResponseEntity<SingleEntityResponse<Germplasm>> searchGermplasm(
 			@PathVariable
 			final String crop,
 			@PathVariable
@@ -80,8 +81,8 @@ public class GermplasmResourceBrapi {
 				final ModelMapper mapper = new ModelMapper();
 				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
 
-				final SingleGermplasmResponse singleGermplasmResponse =
-						new SingleGermplasmResponse(new Metadata(new Pagination(0, 0, 0L, 0), new HashMap<String, String>(), new URL[] {}),
+				final SingleEntityResponse<Germplasm> singleGermplasmResponse =
+						new SingleEntityResponse<>(new Metadata(new Pagination(0, 0, 0L, 0), new HashMap<String, String>(), new URL[] {}),
 								germplasm);
 
 				return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
@@ -115,11 +116,11 @@ public class GermplasmResourceBrapi {
 		return new ResponseEntity<>(this.germplasmService.getPedigree(germplasmDbId, null), HttpStatus.OK);
 	}
 
-	private ResponseEntity<SingleGermplasmResponse> buildNotFoundSimpleGermplasmResponse() {
+	private ResponseEntity<SingleEntityResponse<Germplasm>> buildNotFoundSimpleGermplasmResponse() {
 		final Map<String, String> status = new HashMap<>();
 		status.put("message", "no germplasm found");
 		final Metadata metadata = new Metadata(null, status);
-		final SingleGermplasmResponse germplasmResponse = new SingleGermplasmResponse().withMetadata(metadata);
+		final SingleEntityResponse<Germplasm> germplasmResponse = new SingleEntityResponse<>().withMetadata(metadata);
 		return new ResponseEntity<>(germplasmResponse, HttpStatus.NOT_FOUND);
 	}
 

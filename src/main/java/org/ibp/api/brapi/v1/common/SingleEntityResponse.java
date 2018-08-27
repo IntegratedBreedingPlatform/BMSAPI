@@ -1,27 +1,26 @@
-package org.ibp.api.brapi.v1.germplasm;
+package org.ibp.api.brapi.v1.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import org.ibp.api.brapi.v1.common.Metadata;
 import org.pojomatic.Pojomatic;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"metadata", "result"})
-public class SingleGermplasmResponse {
+public class SingleEntityResponse<T> {
 
 	private Metadata metadata;
 
-	private Germplasm result;
+	private T result;
 
-	public SingleGermplasmResponse() {
+	public SingleEntityResponse() {
 	}
 
-	public SingleGermplasmResponse(final Metadata metadata, final Germplasm result) {
+	public SingleEntityResponse(final Metadata metadata, final T result) {
 		this.metadata = metadata;
 		this.result = result;
 	}
 
-	public SingleGermplasmResponse withMetadata(final Metadata metadata) {
+	public SingleEntityResponse withMetadata(final Metadata metadata) {
 		this.metadata = metadata;
 		return this;
 	}
@@ -34,11 +33,11 @@ public class SingleGermplasmResponse {
 		this.metadata = metadata;
 	}
 
-	public Germplasm getResult() {
+	public T getResult() {
 		return result;
 	}
 
-	public void setResult(final Germplasm result) {
+	public void setResult(final T result) {
 		this.result = result;
 	}
 
@@ -56,5 +55,4 @@ public class SingleGermplasmResponse {
 	public boolean equals(Object o) {
 		return Pojomatic.equals(this, o);
 	}
-
 }
