@@ -3,6 +3,7 @@ package org.ibp.api.brapi.v1.germplasm;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.gms.GermplasmDTO;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -91,6 +92,27 @@ public class GermplasmResourceBrapi {
 			return buildNotFoundSimpleGermplasmResponse();
 		}
 
+	}
+
+	@ApiOperation(value = "Germplasm pedigree by id", notes = "")
+	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}/pedigree", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<PedigreeDTO> getPedigree(
+		@PathVariable
+		final String crop,
+		@ApiParam(value = "the internal id of the germplasm")
+		@PathVariable(value = "germplasmDbId")
+		final String germplasmDbId
+		// TODO
+		// @ApiParam(value = "text representation of the pedigree", required = false)
+		// @RequestParam(value = "notation", required = false)
+		// final String notation,
+		// @ApiParam(value = "include array of siblings in response", required = false)
+		// @RequestParam(required = false, required = false)
+		// final Boolean includeSiblings
+		) {
+
+		return new ResponseEntity<>(this.germplasmService.getPedigree(germplasmDbId, null), HttpStatus.OK);
 	}
 
 	private ResponseEntity<SingleGermplasmResponse> buildNotFoundSimpleGermplasmResponse() {

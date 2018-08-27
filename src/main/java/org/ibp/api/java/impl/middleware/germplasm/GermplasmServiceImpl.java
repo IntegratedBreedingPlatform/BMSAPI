@@ -1,9 +1,8 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.gms.GermplasmDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -27,11 +26,18 @@ import org.ibp.api.domain.germplasm.GermplasmName;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.domain.germplasm.PedigreeTree;
 import org.ibp.api.domain.germplasm.PedigreeTreeNode;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 @Service
 @Transactional
@@ -136,6 +142,25 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
+	public PedigreeDTO getPedigree(final String germplasmDbId, final String notation) {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), GermplasmServiceImpl.class.getName());
+
+		if (!NumberUtils.isNumber(germplasmDbId)) {
+			bindingResult.reject("germplasm.germplasmDbId.not.found");
+		}
+
+		if (bindingResult.hasErrors()) {
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
+		final Integer gid = Integer.valueOf(germplasmDbId);
+
+		final PedigreeDTO pedigreeDTO = this.germplasmDataManager.getPedigree(gid, notation);
+		pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(gid, crossExpansionProperties));
+		return pedigreeDTO;
+	}
+
+	@Override
 	public PedigreeTree getPedigreeTree(String germplasmId, Integer levels) {
 
 		if (levels == null) {
@@ -211,7 +236,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				germplasmDTO.setPedigree(pedigreeService.getCrossExpansion(germplasmId, crossExpansionProperties));
 			}
 		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to search a germplasm", e);
+			throw new ApiRuntimeException("An error has occurred when trying to get a germplasm", e);
 		}
 		return germplasmDTO;
 	}
