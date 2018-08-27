@@ -2,8 +2,9 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
-import org.generationcp.middleware.domain.gms.GermplasmDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
@@ -241,4 +242,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return germplasmDTO;
 	}
 
+	@Override
+	public List<GermplasmDTO> searchGermplasmDTO(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
+		return germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO);
+	}
 }

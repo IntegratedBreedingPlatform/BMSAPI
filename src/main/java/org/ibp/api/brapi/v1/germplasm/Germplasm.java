@@ -8,12 +8,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonPropertyOrder({"germplasmDbId", "defaultDisplayName", "accessionNumber", "germplasmName", "germplasmPUI", "pedigree",
 		"germplasmSeedSource", "synonyms", "commonCropName", "instituteCode", "instituteName", "biologicalStatusOfAccessionCode",
 		"countryOfOriginCode", "typeOfGermplasmStorageCode", "genus", "species", "taxonIds", "speciesAuthority", "subtaxa",
 		"subtaxaAuthority", "donors", "acquisitionDate"})
+@AutoProperty
 public class Germplasm {
 
 	private String germplasmDbId;

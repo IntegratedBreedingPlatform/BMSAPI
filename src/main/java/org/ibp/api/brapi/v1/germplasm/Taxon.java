@@ -3,7 +3,9 @@ package org.ibp.api.brapi.v1.germplasm;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
+@AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"sourceName", "taxonId",})
 class Taxon {

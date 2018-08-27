@@ -1,14 +1,18 @@
 package org.ibp.api.brapi.v1.germplasm;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
-import org.generationcp.middleware.domain.gms.GermplasmDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
+import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.modelmapper.ModelMapper;
@@ -63,7 +67,18 @@ public class GermplasmResourceBrapi {
 			@RequestParam(value = "commonCropName",
 					required = false)
 			final String commonCropName) {
-		return null;
+		final Integer gid = Integer.parseInt(germplasmDbId);
+		final GermplasmSearchRequestDTO germplasmSearchRequestDTO =
+				new GermplasmSearchRequestDTO(gid, germplasmName, germplasmPUI, currentPage, pageSize);
+		List<GermplasmDTO> germplasmDTOList = this.germplasmService.searchGermplasmDTO(germplasmSearchRequestDTO);
+		List<Germplasm> germplasmList = new ArrayList<>();
+		final ModelMapper mapper = new ModelMapper();
+		for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
+			germplasmList.add(mapper.map(germplasmDTO, Germplasm.class));
+		}
+		final EntityListResponse<Germplasm> entityListResponse = new EntityListResponse<>(new Metadata(), new Result<Germplasm>(germplasmList));
+		return new ResponseEntity<>(entityListResponse , HttpStatus.OK);
+
 	}
 
 	@ApiOperation(value = "Germplasm search by germplasmDbId", notes = "Germplasm search by germplasmDbId")

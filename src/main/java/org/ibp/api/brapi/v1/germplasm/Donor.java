@@ -3,9 +3,11 @@ package org.ibp.api.brapi.v1.germplasm;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"donorAccessionNumber", "donorInstituteCode", "germplasmPUI"})
+@AutoProperty
 public class Donor {
 
 	private String donorAccessionNumber;
