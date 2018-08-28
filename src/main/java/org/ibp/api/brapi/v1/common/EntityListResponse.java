@@ -20,6 +20,11 @@ public class EntityListResponse<T> {
 		this.result = result;
 	}
 
+	public EntityListResponse withMetadata(final Metadata metadata) {
+		this.metadata = metadata;
+		return this;
+	}
+
 	public Metadata getMetadata() {
 		return metadata;
 	}

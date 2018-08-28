@@ -140,4 +140,11 @@ public class GermplasmResourceBrapi {
 		return new ResponseEntity<>(germplasmResponse, HttpStatus.NOT_FOUND);
 	}
 
+	private ResponseEntity<EntityListResponse<Germplasm>> buildNotFoundGermplasmListResponse() {
+		final Map<String, String> status = new HashMap<>();
+		status.put("message", "no germplasm found");
+		final Metadata metadata = new Metadata(null, status);
+		final EntityListResponse<Germplasm> germplasmListResponse = new EntityListResponse<>().withMetadata(metadata);
+		return new ResponseEntity<>(germplasmListResponse, HttpStatus.NOT_FOUND);
+	}
 }
