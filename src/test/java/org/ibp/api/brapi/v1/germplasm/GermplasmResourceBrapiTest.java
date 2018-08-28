@@ -1,6 +1,8 @@
 package org.ibp.api.brapi.v1.germplasm;
 
+import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.junit.Test;
@@ -60,6 +62,32 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(jsonPath("$.result.germplasmDbId", is(pedigreeDTO.getGermplasmDbId()))) //
 			.andExpect(jsonPath("$.result.pedigree", is(pedigreeDTO.getPedigree()))) //
+		;
+	}
+
+	@Test
+	public void testGetProgeny() throws Exception {
+		final int gid = nextInt();
+		final String germplasmDbId = String.valueOf(gid);
+
+		final ProgenyDTO progenyDTO= new ProgenyDTO();
+		progenyDTO.setGermplasmDbId(gid);
+		final List<ProgenyDTO.Progeny> progenies = new ArrayList<>();
+		final ProgenyDTO.Progeny progeny = new ProgenyDTO.Progeny();
+		progeny.setGermplasmDbId(nextInt());
+		progeny.setParentType(ParentType.MALE.name());
+		progenies.add(progeny);
+		progenyDTO.setProgeny(progenies);
+
+		when(this.germplasmService.getProgeny(gid)).thenReturn(progenyDTO);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm/" + germplasmDbId + "/progeny") //
+			.contentType(this.contentType) //
+			.locale(locale)) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(jsonPath("$.result.germplasmDbId", is(gid))) //
+			.andExpect(jsonPath("$.result.progeny[0].germplasmDbId", is(progenyDTO.getProgeny().get(0).getGermplasmDbId()))) //
+			.andExpect(jsonPath("$.result.progeny[0].parentType", is(progenyDTO.getProgeny().get(0).getParentType()))) //
 		;
 	}
 }
