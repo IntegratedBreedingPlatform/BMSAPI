@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.pojomatic.Pojomatic;
 
+import java.net.URL;
+import java.util.HashMap;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"metadata", "result"})
 public class SingleEntityResponse<T> {
@@ -13,10 +16,11 @@ public class SingleEntityResponse<T> {
 	private T result;
 
 	public SingleEntityResponse() {
+		this.metadata = new Metadata();
 	}
 
-	public SingleEntityResponse(final Metadata metadata, final T result) {
-		this.metadata = metadata;
+	public SingleEntityResponse(final T result) {
+		this();
 		this.result = result;
 	}
 
@@ -39,6 +43,11 @@ public class SingleEntityResponse<T> {
 
 	public void setResult(final T result) {
 		this.result = result;
+	}
+
+	public SingleEntityResponse<T> withMessage(final String message) {
+		this.metadata.getStatus().put("message", message);
+		return this;
 	}
 
 	@Override

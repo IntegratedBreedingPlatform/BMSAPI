@@ -3,6 +3,7 @@ package org.ibp.api.java.germplasm;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -20,7 +21,9 @@ public interface GermplasmService {
 
 	GermplasmSummary getGermplasm(String germplasmId);
 
-	PedigreeDTO getPedigree(String germplasmId, String notation);
+	PedigreeDTO getPedigree(Integer germplasmDbId, String notation);
+
+	ProgenyDTO getProgeny(Integer germplasmDbId);
 
 	PedigreeTree getPedigreeTree(String germplasmId, Integer levels);
 

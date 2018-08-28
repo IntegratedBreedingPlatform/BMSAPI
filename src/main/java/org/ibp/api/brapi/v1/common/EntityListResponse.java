@@ -13,16 +13,22 @@ public class EntityListResponse<T> {
 	private Result<T> result;
 
 	public EntityListResponse() {
+		this.metadata = new Metadata();
 	}
 
-	public EntityListResponse(final Metadata metadata, final Result<T> result) {
-		this.metadata = metadata;
+	public EntityListResponse(final Result<T> result) {
+		this();
 		this.result = result;
 	}
 
 	public EntityListResponse withMetadata(final Metadata metadata) {
 		this.metadata = metadata;
 		return this;
+	}
+
+	public EntityListResponse(final Metadata metadata, final Result<T> result) {
+		this.metadata = metadata;
+		this.result = result;
 	}
 
 	public Metadata getMetadata() {
@@ -39,6 +45,11 @@ public class EntityListResponse<T> {
 
 	public void setResult(final Result<T> result) {
 		this.result = result;
+	}
+
+	public EntityListResponse<T> withMessage(final String message) {
+		this.metadata.getStatus().put("message", message);
+		return this;
 	}
 
 	@Override
