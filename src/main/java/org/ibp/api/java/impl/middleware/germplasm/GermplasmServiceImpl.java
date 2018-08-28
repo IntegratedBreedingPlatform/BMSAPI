@@ -246,4 +246,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public List<GermplasmDTO> searchGermplasmDTO(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
 		return germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO);
 	}
+
+	@Override
+	public long countGermplasmDTOs(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
+		return germplasmDataManager.countGermplasmDTOs(germplasmSearchRequestDTO);
+	}
+
 }

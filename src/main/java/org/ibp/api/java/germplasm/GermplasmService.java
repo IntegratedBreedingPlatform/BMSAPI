@@ -12,13 +12,13 @@ import org.ibp.api.domain.germplasm.PedigreeTree;
 
 public interface GermplasmService {
 
+	Integer DEFAULT_PEDIGREE_LEVELS = 20;
+
 	int searchGermplasmCount(String searchText);
 
 	List<GermplasmSummary> searchGermplasm(String searchText, int pageNumber, int pageSize);
 
 	GermplasmSummary getGermplasm(String germplasmId);
-
-	Integer DEFAULT_PEDIGREE_LEVELS = 20;
 
 	PedigreeDTO getPedigree(String germplasmId, String notation);
 
@@ -28,5 +28,8 @@ public interface GermplasmService {
 
 	GermplasmDTO getGermplasmDTObyGID (Integer germplasmId);
 
-	List<GermplasmDTO> searchGermplasmDTO (final GermplasmSearchRequestDTO germplasmSearchRequestDTO);
+	List<GermplasmDTO> searchGermplasmDTO (GermplasmSearchRequestDTO germplasmSearchRequestDTO);
+
+	long countGermplasmDTOs(GermplasmSearchRequestDTO germplasmSearchRequestDTO);
+
 }
