@@ -4,6 +4,7 @@ package org.ibp.api.java.impl.middleware.germplasm;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -143,22 +144,16 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public PedigreeDTO getPedigree(final String germplasmDbId, final String notation) {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), GermplasmServiceImpl.class.getName());
-
-		if (!NumberUtils.isNumber(germplasmDbId)) {
-			bindingResult.reject("germplasm.germplasmDbId.not.found");
-		}
-
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-
-		final Integer gid = Integer.valueOf(germplasmDbId);
-
-		final PedigreeDTO pedigreeDTO = this.germplasmDataManager.getPedigree(gid, notation);
-		pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(gid, crossExpansionProperties));
+	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation) {
+		final PedigreeDTO pedigreeDTO = this.germplasmDataManager.getPedigree(germplasmDbId, notation);
+		pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(germplasmDbId, crossExpansionProperties));
 		return pedigreeDTO;
+	}
+
+	@Override
+	public ProgenyDTO getProgeny(final Integer germplasmDbId) {
+		final ProgenyDTO progenyDTO = this.germplasmDataManager.getProgeny(germplasmDbId);
+		return progenyDTO;
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
@@ -145,7 +146,7 @@ public class GermplasmResourceBrapi {
 	@ApiOperation(value = "Germplasm pedigree by id", notes = "")
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}/pedigree", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<PedigreeDTO> getPedigree(
+	public ResponseEntity<SingleEntityResponse<PedigreeDTO>> getPedigree(
 		@PathVariable
 		final String crop,
 		@ApiParam(value = "the internal id of the germplasm")
@@ -160,8 +161,45 @@ public class GermplasmResourceBrapi {
 		// final Boolean includeSiblings
 		) {
 
-		return new ResponseEntity<>(this.germplasmService.getPedigree(germplasmDbId, null), HttpStatus.OK);
+		Integer gid = null;
+		try {
+			gid = Integer.valueOf(germplasmDbId);
+		} catch (final NumberFormatException e) {
+			final SingleEntityResponse<PedigreeDTO> response = new SingleEntityResponse<PedigreeDTO>()
+				.withMessage("no germplasm found");
+			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+		}
+
+		final SingleEntityResponse<PedigreeDTO> response = new SingleEntityResponse<>(this.germplasmService.getPedigree(gid, null));
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Germplasm progeny by id", notes = "")
+	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}/progeny", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<SingleEntityResponse<ProgenyDTO>> getProgeny(
+		@PathVariable
+		final String crop,
+		@ApiParam(value = "the internal id of the germplasm")
+		@PathVariable(value = "germplasmDbId")
+		final String germplasmDbId
+	) {
+
+		Integer gid = null;
+		try {
+			gid = Integer.valueOf(germplasmDbId);
+		} catch (final NumberFormatException e) {
+			final SingleEntityResponse<ProgenyDTO> response = new SingleEntityResponse<ProgenyDTO>()
+				.withMessage("no germplasm found");
+			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+		}
+
+		final SingleEntityResponse<ProgenyDTO> response = new SingleEntityResponse<>(this.germplasmService.getProgeny(gid));
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
 
 	private ResponseEntity<SingleEntityResponse<Germplasm>> buildNotFoundSimpleGermplasmResponse() {
 		final Map<String, String> status = new HashMap<>();
