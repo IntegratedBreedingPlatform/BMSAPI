@@ -106,11 +106,16 @@ public class GermplasmResourceBrapi {
 			}
 		}
 
+		final Result<Germplasm> results = new Result<Germplasm>().withData(germplasmList);
+		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+
+		final Metadata metadata = new Metadata().withPagination(pagination);
+
 		final EntityListResponse<Germplasm> entityListResponse =
-				new EntityListResponse<>(new Metadata(), new Result<>(germplasmList));
+				new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
-
 
 	}
 
