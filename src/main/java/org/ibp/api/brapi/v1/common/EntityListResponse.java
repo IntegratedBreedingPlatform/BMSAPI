@@ -42,6 +42,11 @@ public class EntityListResponse<T> {
 		this.result = result;
 	}
 
+	public EntityListResponse<T> withMessage(final String message) {
+		this.metadata.getStatus().put("message", message);
+		return this;
+	}
+
 	@Override
 	public int hashCode() {
 		return Pojomatic.hashCode(this);
