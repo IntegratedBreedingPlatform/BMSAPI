@@ -14,7 +14,10 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
+import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.germplasm.GermplasmService;
+import org.ibp.api.rest.common.PaginatedSearch;
+import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -67,17 +70,47 @@ public class GermplasmResourceBrapi {
 			@RequestParam(value = "commonCropName",
 					required = false)
 			final String commonCropName) {
-		final Integer gid = Integer.parseInt(germplasmDbId);
+
+		Integer gid;
+
+		try {
+			gid = Integer.parseInt(germplasmDbId);
+		} catch (final NumberFormatException e) {
+			gid = null;
+		}
+
 		final GermplasmSearchRequestDTO germplasmSearchRequestDTO =
 				new GermplasmSearchRequestDTO(gid, germplasmName, germplasmPUI, currentPage, pageSize);
-		List<GermplasmDTO> germplasmDTOList = this.germplasmService.searchGermplasmDTO(germplasmSearchRequestDTO);
+
+		final PagedResult<GermplasmDTO> resultPage = new PaginatedSearch()
+				.executeBrapiSearch(germplasmSearchRequestDTO.getPage(), germplasmSearchRequestDTO.getPageSize(),
+						new SearchSpec<GermplasmDTO>() {
+
+							@Override
+							public long getCount() {
+								return GermplasmResourceBrapi.this.germplasmService.countGermplasmDTOs(germplasmSearchRequestDTO);
+							}
+
+							@Override
+							public List<GermplasmDTO> getResults(final PagedResult<GermplasmDTO> pagedResult) {
+								return GermplasmResourceBrapi.this.germplasmService.searchGermplasmDTO(germplasmSearchRequestDTO);
+							}
+						});
+
 		List<Germplasm> germplasmList = new ArrayList<>();
-		final ModelMapper mapper = new ModelMapper();
-		for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
-			germplasmList.add(mapper.map(germplasmDTO, Germplasm.class));
+
+		if (resultPage.getPageResults() != null) {
+			final ModelMapper mapper = new ModelMapper();
+			for (final GermplasmDTO germplasmDTO : resultPage.getPageResults()) {
+				germplasmList.add(mapper.map(germplasmDTO, Germplasm.class));
+			}
 		}
-		final EntityListResponse<Germplasm> entityListResponse = new EntityListResponse<>(new Metadata(), new Result<Germplasm>(germplasmList));
-		return new ResponseEntity<>(entityListResponse , HttpStatus.OK);
+
+		final EntityListResponse<Germplasm> entityListResponse =
+				new EntityListResponse<>(new Metadata(), new Result<>(germplasmList));
+
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+
 
 	}
 
@@ -140,11 +173,4 @@ public class GermplasmResourceBrapi {
 		return new ResponseEntity<>(germplasmResponse, HttpStatus.NOT_FOUND);
 	}
 
-	private ResponseEntity<EntityListResponse<Germplasm>> buildNotFoundGermplasmListResponse() {
-		final Map<String, String> status = new HashMap<>();
-		status.put("message", "no germplasm found");
-		final Metadata metadata = new Metadata(null, status);
-		final EntityListResponse<Germplasm> germplasmListResponse = new EntityListResponse<>().withMetadata(metadata);
-		return new ResponseEntity<>(germplasmListResponse, HttpStatus.NOT_FOUND);
-	}
 }

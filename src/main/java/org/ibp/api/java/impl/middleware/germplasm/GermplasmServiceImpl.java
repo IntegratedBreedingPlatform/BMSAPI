@@ -254,13 +254,17 @@ public class GermplasmServiceImpl implements GermplasmService {
 			}
 			return germplasmDTOList;
 		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to get a germplasm", e);
+			throw new ApiRuntimeException("An error has occurred when trying to serach germplasms", e);
 		}
 	}
 
 	@Override
 	public long countGermplasmDTOs(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
-		return germplasmDataManager.countGermplasmDTOs(germplasmSearchRequestDTO);
+		try {
+			return germplasmDataManager.countGermplasmDTOs(germplasmSearchRequestDTO);
+		} catch (final MiddlewareQueryException e) {
+			throw new ApiRuntimeException("An error has occurred when trying to count germplasms", e);
+		}
 	}
 
 }
