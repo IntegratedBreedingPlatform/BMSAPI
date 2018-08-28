@@ -12,12 +12,13 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import static org.apache.commons.lang.math.RandomUtils.nextInt;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -26,8 +27,10 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
 	private static Locale locale = Locale.getDefault();
 
+
 	@Configuration
 	public static class TestConfiguration {
+
 		@Bean
 		@Primary
 		public GermplasmService germplasmService() {
@@ -36,12 +39,12 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
 	}
 
+
 	@Autowired
 	private GermplasmService germplasmService;
 
 	@Test
 	public void testGetPedigree() throws Exception {
-
 		final int gid = nextInt();
 		final String germplasmDbId = String.valueOf(gid);
 
@@ -52,12 +55,11 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		when(this.germplasmService.getPedigree(gid, null)).thenReturn(pedigreeDTO);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm/" + germplasmDbId + "/pedigree") //
-				.contentType(this.contentType) //
-				.locale(locale)) //
+			.contentType(this.contentType) //
+			.locale(locale)) //
 			.andDo(MockMvcResultHandlers.print()) //
-			.andExpect(jsonPath("$", is(not(empty())))) //
-			.andExpect(jsonPath("$.germplasmDbId", is(pedigreeDTO.getGermplasmDbId()))) //
-			.andExpect(jsonPath("$.pedigree", is(pedigreeDTO.getPedigree()))) //
+			.andExpect(jsonPath("$.result.germplasmDbId", is(pedigreeDTO.getGermplasmDbId()))) //
+			.andExpect(jsonPath("$.result.pedigree", is(pedigreeDTO.getPedigree()))) //
 		;
 	}
 }
