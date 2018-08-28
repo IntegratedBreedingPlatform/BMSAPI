@@ -68,12 +68,16 @@ public class GermplasmResourceBrapi {
 					required = false)
 			final String commonCropName) {
 
-		Integer gid;
+		Integer gid  = null;
 
 		try {
-			gid = Integer.parseInt(germplasmDbId);
+			if (germplasmDbId != null) {
+				gid = Integer.parseInt(germplasmDbId);
+			}
 		} catch (final NumberFormatException e) {
-			gid = null;
+			if (germplasmName == null && germplasmPUI == null) {
+				return new ResponseEntity<>(new EntityListResponse<>(new Result<>(new ArrayList<Germplasm>())), HttpStatus.OK);
+			}
 		}
 
 		final GermplasmSearchRequestDTO germplasmSearchRequestDTO =
@@ -123,22 +127,26 @@ public class GermplasmResourceBrapi {
 			final String crop,
 			@PathVariable
 			final String germplasmDbId) {
+
+		final Integer gid;
 		try {
-			final Integer gid = Integer.parseInt(germplasmDbId);
-			final GermplasmDTO germplasmDTO = germplasmService.getGermplasmDTObyGID(gid);
-
-			if (germplasmDTO != null) {
-				final ModelMapper mapper = new ModelMapper();
-				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
-
-				final SingleEntityResponse<Germplasm> singleGermplasmResponse = new SingleEntityResponse<>(germplasm);
-
-				return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
-			} else {
-				return buildNotFoundSimpleGermplasmResponse();
-			}
+			gid = Integer.parseInt(germplasmDbId);
 		} catch (final NumberFormatException e) {
-			return buildNotFoundSimpleGermplasmResponse();
+			return new ResponseEntity<>(new SingleEntityResponse<Germplasm>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
+
+		}
+
+		final GermplasmDTO germplasmDTO = germplasmService.getGermplasmDTObyGID(gid);
+
+		if (germplasmDTO != null) {
+			final ModelMapper mapper = new ModelMapper();
+			final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
+
+			final SingleEntityResponse<Germplasm> singleGermplasmResponse = new SingleEntityResponse<>(germplasm);
+
+			return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(new SingleEntityResponse<Germplasm>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
 		}
 
 	}
@@ -198,11 +206,6 @@ public class GermplasmResourceBrapi {
 		final SingleEntityResponse<ProgenyDTO> response = new SingleEntityResponse<>(this.germplasmService.getProgeny(gid));
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
-	}
-
-	private ResponseEntity<SingleEntityResponse<Germplasm>> buildNotFoundSimpleGermplasmResponse() {
-		final SingleEntityResponse<Germplasm> germplasmResponse = new SingleEntityResponse<Germplasm>().withMessage("no germplasm found");
-		return new ResponseEntity<>(germplasmResponse, HttpStatus.NOT_FOUND);
 	}
 
 }
