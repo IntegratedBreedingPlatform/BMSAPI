@@ -173,14 +173,15 @@ public class GermplasmResourceBrapi {
 		try {
 			gid = Integer.valueOf(germplasmDbId);
 		} catch (final NumberFormatException e) {
-			final SingleEntityResponse<PedigreeDTO> response = new SingleEntityResponse<PedigreeDTO>()
-				.withMessage("no germplasm found");
-			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new SingleEntityResponse<PedigreeDTO>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
 		}
 
-		final SingleEntityResponse<PedigreeDTO> response = new SingleEntityResponse<>(this.germplasmService.getPedigree(gid, null));
+		final PedigreeDTO pedigreeDTO = this.germplasmService.getPedigree(gid, null);
+		if (pedigreeDTO == null) {
+			return new ResponseEntity<>(new SingleEntityResponse<PedigreeDTO>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
+		}
 
-		return new ResponseEntity<>(response, HttpStatus.OK);
+		return new ResponseEntity<>(new SingleEntityResponse<>(pedigreeDTO), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Germplasm progeny by id", notes = "")
@@ -198,14 +199,15 @@ public class GermplasmResourceBrapi {
 		try {
 			gid = Integer.valueOf(germplasmDbId);
 		} catch (final NumberFormatException e) {
-			final SingleEntityResponse<ProgenyDTO> response = new SingleEntityResponse<ProgenyDTO>()
-				.withMessage("no germplasm found");
-			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new SingleEntityResponse<ProgenyDTO>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
 		}
 
-		final SingleEntityResponse<ProgenyDTO> response = new SingleEntityResponse<>(this.germplasmService.getProgeny(gid));
+		final ProgenyDTO progenyDTO = this.germplasmService.getProgeny(gid);
+		if (progenyDTO == null) {
+			return new ResponseEntity<>(new SingleEntityResponse<ProgenyDTO>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
+		}
 
-		return new ResponseEntity<>(response, HttpStatus.OK);
+		return new ResponseEntity<>(new SingleEntityResponse<>(progenyDTO), HttpStatus.OK);
 	}
 
 }

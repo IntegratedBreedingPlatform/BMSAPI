@@ -145,14 +145,26 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation) {
-		final PedigreeDTO pedigreeDTO = this.germplasmDataManager.getPedigree(germplasmDbId, notation);
-		pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(germplasmDbId, crossExpansionProperties));
+		PedigreeDTO pedigreeDTO = null;
+		try {
+			pedigreeDTO = this.germplasmDataManager.getPedigree(germplasmDbId, notation);
+			if (pedigreeDTO != null) {
+				pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(germplasmDbId, crossExpansionProperties));
+			}
+		} catch (final MiddlewareQueryException e) {
+			throw new ApiRuntimeException("An error has occurred when trying to get the pedigree", e);
+		}
 		return pedigreeDTO;
 	}
 
 	@Override
 	public ProgenyDTO getProgeny(final Integer germplasmDbId) {
-		final ProgenyDTO progenyDTO = this.germplasmDataManager.getProgeny(germplasmDbId);
+		ProgenyDTO progenyDTO = null;
+		try {
+			progenyDTO = this.germplasmDataManager.getProgeny(germplasmDbId);
+		} catch (final MiddlewareQueryException e) {
+			throw new ApiRuntimeException("An error has occurred when trying to get the progeny", e);
+		}
 		return progenyDTO;
 	}
 
@@ -249,7 +261,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			}
 			return germplasmDTOList;
 		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("An error has occurred when trying to serach germplasms", e);
+			throw new ApiRuntimeException("An error has occurred when trying to search germplasms", e);
 		}
 	}
 
