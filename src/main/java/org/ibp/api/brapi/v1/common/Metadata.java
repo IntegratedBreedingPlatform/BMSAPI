@@ -2,6 +2,7 @@
 package org.ibp.api.brapi.v1.common;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -20,6 +21,9 @@ public class Metadata {
 	 *
 	 */
 	public Metadata() {
+		this.pagination = new Pagination(0, 0, 0L, 0);
+		this.status = new HashMap<>();
+		this.datafiles = new URL[] {};
 	}
 
 	/**

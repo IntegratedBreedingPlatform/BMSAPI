@@ -13,10 +13,11 @@ public class EntityListResponse<T> {
 	private Result<T> result;
 
 	public EntityListResponse() {
+		this.metadata = new Metadata();
 	}
 
-	public EntityListResponse(final Metadata metadata, final Result<T> result) {
-		this.metadata = metadata;
+	public EntityListResponse(final Result<T> result) {
+		this();
 		this.result = result;
 	}
 

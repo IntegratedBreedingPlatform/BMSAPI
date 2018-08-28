@@ -107,7 +107,7 @@ public class GermplasmResourceBrapi {
 		}
 
 		final EntityListResponse<Germplasm> entityListResponse =
-				new EntityListResponse<>(new Metadata(), new Result<>(germplasmList));
+				new EntityListResponse<>(new Result<>(germplasmList));
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 
@@ -130,9 +130,7 @@ public class GermplasmResourceBrapi {
 				final ModelMapper mapper = new ModelMapper();
 				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
 
-				final SingleEntityResponse<Germplasm> singleGermplasmResponse =
-						new SingleEntityResponse<>(new Metadata(new Pagination(0, 0, 0L, 0), new HashMap<String, String>(), new URL[] {}),
-								germplasm);
+				final SingleEntityResponse<Germplasm> singleGermplasmResponse = new SingleEntityResponse<>(germplasm);
 
 				return new ResponseEntity<>(singleGermplasmResponse, HttpStatus.OK);
 			} else {
