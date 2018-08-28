@@ -244,7 +244,18 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public List<GermplasmDTO> searchGermplasmDTO(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
-		return germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO);
+		try {
+			final List<GermplasmDTO> germplasmDTOList = germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO);
+			if (germplasmDTOList != null) {
+				for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
+					germplasmDTO.setPedigree(
+							pedigreeService.getCrossExpansion(Integer.parseInt(germplasmDTO.getGermplasmDbId()), crossExpansionProperties));
+				}
+			}
+			return germplasmDTOList;
+		} catch (final MiddlewareQueryException e) {
+			throw new ApiRuntimeException("An error has occurred when trying to get a germplasm", e);
+		}
 	}
 
 	@Override
