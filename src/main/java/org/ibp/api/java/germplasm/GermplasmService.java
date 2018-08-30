@@ -21,7 +21,7 @@ public interface GermplasmService {
 
 	GermplasmSummary getGermplasm(String germplasmId);
 
-	PedigreeDTO getPedigree(Integer germplasmDbId, String notation);
+	PedigreeDTO getPedigree(Integer germplasmDbId, String notation, final Boolean includeSiblings);
 
 	ProgenyDTO getProgeny(Integer germplasmDbId);
 

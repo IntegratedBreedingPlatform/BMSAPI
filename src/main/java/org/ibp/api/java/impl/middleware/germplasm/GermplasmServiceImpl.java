@@ -1,7 +1,6 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -28,17 +27,13 @@ import org.ibp.api.domain.germplasm.GermplasmName;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.domain.germplasm.PedigreeTree;
 import org.ibp.api.domain.germplasm.PedigreeTreeNode;
-import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -144,10 +139,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation) {
+	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
 		PedigreeDTO pedigreeDTO = null;
 		try {
-			pedigreeDTO = this.germplasmDataManager.getPedigree(germplasmDbId, notation);
+			pedigreeDTO = this.germplasmDataManager.getPedigree(germplasmDbId, notation, includeSiblings);
 			if (pedigreeDTO != null) {
 				pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(germplasmDbId, crossExpansionProperties));
 			}

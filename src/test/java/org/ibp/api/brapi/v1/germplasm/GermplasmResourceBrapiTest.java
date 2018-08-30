@@ -54,7 +54,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		pedigreeDTO.setGermplasmDbId(gid);
 		pedigreeDTO.setPedigree(randomAlphanumeric(255));
 
-		when(this.germplasmService.getPedigree(gid, null)).thenReturn(pedigreeDTO);
+		when(this.germplasmService.getPedigree(gid, null, true)).thenReturn(pedigreeDTO);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm/" + germplasmDbId + "/pedigree") //
 			.contentType(this.contentType) //

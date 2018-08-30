@@ -159,15 +159,20 @@ public class GermplasmResourceBrapi {
 		final String crop,
 		@ApiParam(value = "the internal id of the germplasm")
 		@PathVariable(value = "germplasmDbId")
-		final String germplasmDbId
-		// TODO
-		// @ApiParam(value = "text representation of the pedigree", required = false)
-		// @RequestParam(value = "notation", required = false)
-		// final String notation,
-		// @ApiParam(value = "include array of siblings in response", required = false)
-		// @RequestParam(required = false, required = false)
-		// final Boolean includeSiblings
+		final String germplasmDbId,
+		@ApiParam(value = "text representation of the pedigree <strong style='color: red'>(Not Implemented)</strong>", required = false)
+		@RequestParam(value = "notation", required = false)
+		final String notation,
+		@ApiParam(value = "include array of siblings in response", required = false)
+		@RequestParam(value = "includeSiblings", required = false)
+		final Boolean includeSiblings
 		) {
+
+		// TODO
+		if (notation != null) {
+			return new ResponseEntity<>(
+				new SingleEntityResponse<PedigreeDTO>().withMessage("Search by pedigree not implemented"), HttpStatus.NOT_IMPLEMENTED);
+		}
 
 		Integer gid = null;
 		try {
@@ -176,7 +181,7 @@ public class GermplasmResourceBrapi {
 			return new ResponseEntity<>(new SingleEntityResponse<PedigreeDTO>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
 		}
 
-		final PedigreeDTO pedigreeDTO = this.germplasmService.getPedigree(gid, null);
+		final PedigreeDTO pedigreeDTO = this.germplasmService.getPedigree(gid, null, includeSiblings);
 		if (pedigreeDTO == null) {
 			return new ResponseEntity<>(new SingleEntityResponse<PedigreeDTO>().withMessage("no germplasm found"), HttpStatus.NOT_FOUND);
 		}
