@@ -3,14 +3,10 @@ package org.ibp.api.brapi.v1.germplasm;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.java.germplasm.GermplasmService;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
@@ -20,7 +16,6 @@ import java.util.Locale;
 
 import static org.apache.commons.lang.math.RandomUtils.nextInt;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -29,21 +24,8 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
 	private static Locale locale = Locale.getDefault();
 
-
-	@Configuration
-	public static class TestConfiguration {
-
-		@Bean
-		@Primary
-		public GermplasmService germplasmService() {
-			return Mockito.mock(GermplasmService.class);
-		}
-
-	}
-
-
 	@Autowired
-	private GermplasmService germplasmService;
+	private GermplasmDataManager germplasmDataManager;
 
 	@Test
 	public void testGetPedigree() throws Exception {
@@ -54,7 +36,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		pedigreeDTO.setGermplasmDbId(gid);
 		pedigreeDTO.setPedigree(randomAlphanumeric(255));
 
-		when(this.germplasmService.getPedigree(gid, null, null)).thenReturn(pedigreeDTO);
+		when(this.germplasmDataManager.getPedigree(gid, null, null)).thenReturn(pedigreeDTO);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm/" + germplasmDbId + "/pedigree") //
 			.contentType(this.contentType) //
@@ -79,7 +61,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		progenies.add(progeny);
 		progenyDTO.setProgeny(progenies);
 
-		when(this.germplasmService.getProgeny(gid)).thenReturn(progenyDTO);
+		when(this.germplasmDataManager.getProgeny(gid)).thenReturn(progenyDTO);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm/" + germplasmDbId + "/progeny") //
 			.contentType(this.contentType) //
