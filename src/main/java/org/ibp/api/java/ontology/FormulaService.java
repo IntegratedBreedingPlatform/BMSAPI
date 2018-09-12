@@ -6,5 +6,6 @@ public interface FormulaService {
 
 	FormulaDto save(FormulaDto formulaDto);
 
-	void delete(Integer formulaId);
+	FormulaDto update(final FormulaDto formulaDto);
+
 }
