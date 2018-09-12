@@ -3,6 +3,7 @@ package org.ibp.api.rest.samplesubmission.domain.common;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,9 +15,9 @@ public abstract class GOBiiGenericPayload {
 	@AutoProperty
 	class LinkCollection {
 
-		private List linksPerDataItem;
+		private List linksPerDataItem = new ArrayList();
 
-		private List exploreLinksPerDataItem;
+		private List exploreLinksPerDataItem = new ArrayList();
 
 		public List getLinksPerDataItem() {
 			return linksPerDataItem;
@@ -51,7 +52,7 @@ public abstract class GOBiiGenericPayload {
 
 	}
 
-	private LinkCollection linkCollection;
+	private LinkCollection linkCollection = new LinkCollection();
 
 	public LinkCollection getLinkCollection() {
 		return linkCollection;

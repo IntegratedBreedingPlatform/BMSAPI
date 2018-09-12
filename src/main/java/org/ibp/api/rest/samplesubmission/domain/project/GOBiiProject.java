@@ -1,11 +1,8 @@
 package org.ibp.api.rest.samplesubmission.domain.project;
 
-import org.ibp.api.rest.samplesubmission.domain.common.GOBiiGenericData;
 import org.ibp.api.rest.samplesubmission.domain.common.GOBiiHeader;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
-
-import java.util.List;
 
 
 /**

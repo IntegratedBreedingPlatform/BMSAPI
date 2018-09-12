@@ -1,5 +1,6 @@
 package org.ibp.api.rest.samplesubmission.domain.common;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import java.util.List;
  */
 public abstract class GOBiiGenericData {
 
-	private List<String> allowedProcessTypes;
+	private List<String> allowedProcessTypes = new ArrayList<>();
 
 	private Integer createdBy;
 

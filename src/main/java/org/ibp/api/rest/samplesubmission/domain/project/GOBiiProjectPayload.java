@@ -5,6 +5,7 @@ import org.ibp.api.rest.samplesubmission.domain.common.GOBiiGenericPayload;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -88,7 +89,7 @@ public class GOBiiProjectPayload extends GOBiiGenericPayload {
 
 		private List principleInvestigators;
 
-		private List<Property> properties;
+		private List<Property> properties = new ArrayList<>();
 
 		public String getEntityNameType() {
 			return entityNameType;

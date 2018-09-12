@@ -1,6 +1,8 @@
 package org.ibp.api.rest.samplesubmission;
 
 import java.util.List;
+
+import org.ibp.api.rest.samplesubmission.domain.common.GOBiiHeader;
 import org.ibp.api.rest.samplesubmission.domain.common.GOBiiToken;
 import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProject;
 import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProjectPayload;
@@ -44,7 +46,11 @@ public class GOBiiProjectResourceTest {
 		GOBiiProjectPayload goBiiProjectPayload = new GOBiiProjectPayload();
 		goBiiProjectPayload.setData(dataList);
 
+		GOBiiHeader goBiiHeader = new GOBiiHeader();
+		goBiiHeader.setGobiiProcessType("CREATE");
+
 		goBiiProject.setPayload(goBiiProjectPayload);
+		goBiiProject.setHeader(goBiiHeader);
 
 		goBiiProjectResource.postGOBiiProject(goBiiToken, goBiiProject);
 	}
