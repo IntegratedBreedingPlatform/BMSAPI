@@ -1,8 +1,6 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.collect.Maps;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
@@ -68,6 +66,29 @@ public class FormulaServiceImpl implements FormulaService {
 		}
 
 		this.formulaService.delete(formulaId);
+	}
+
+	@Override
+	public FormulaDto update(final FormulaDto formulaDto) {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), FormulaDto.class.getName());
+		final Optional<FormulaDto> formula = this.formulaService.getById(formulaDto.getFormulaId());
+
+		if (!formula.isPresent()) {
+			bindingResult.reject("variable.formula.not.exist", new Integer[] {formulaDto.getFormulaId()}, "");
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
+		this.extractInputs(formulaDto);
+		// This validation will also fill the the inputs ids if exists
+		this.formulaValidator.validate(formulaDto, bindingResult);
+
+		if (bindingResult.hasErrors()) {
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
+		this.setStorageFormat(formulaDto);
+
+		return this.formulaService.update(formulaDto);
 	}
 
 	private void extractInputs(final FormulaDto formulaDto) {
