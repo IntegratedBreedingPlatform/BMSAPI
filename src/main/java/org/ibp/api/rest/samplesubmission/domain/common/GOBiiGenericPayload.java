@@ -1,4 +1,4 @@
-package org.ibp.api.rest.samplesubmission.domain;
+package org.ibp.api.rest.samplesubmission.domain.common;
 
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -9,7 +9,7 @@ import java.util.List;
  * Created by clarysabel on 9/12/18.
  */
 @AutoProperty
-public class Payload<T extends GOBiiGenericData> {
+public abstract class GOBiiGenericPayload {
 
 	@AutoProperty
 	class LinkCollection {
@@ -53,32 +53,12 @@ public class Payload<T extends GOBiiGenericData> {
 
 	private LinkCollection linkCollection;
 
-	private T data;
-
-	private Header header;
-
-	public T getData() {
-		return data;
-	}
-
 	public LinkCollection getLinkCollection() {
 		return linkCollection;
 	}
 
 	public void setLinkCollection(final LinkCollection linkCollection) {
 		this.linkCollection = linkCollection;
-	}
-
-	public void setData(final T data) {
-		this.data = data;
-	}
-
-	public Header getHeader() {
-		return header;
-	}
-
-	public void setHeader(final Header header) {
-		this.header = header;
 	}
 
 	@Override

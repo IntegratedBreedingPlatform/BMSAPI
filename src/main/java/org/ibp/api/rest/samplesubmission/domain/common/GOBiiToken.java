@@ -1,4 +1,4 @@
-package org.ibp.api.rest.samplesubmission.domain;
+package org.ibp.api.rest.samplesubmission.domain.common;
 
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;

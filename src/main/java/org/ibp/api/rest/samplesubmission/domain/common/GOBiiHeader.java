@@ -1,12 +1,12 @@
-package org.ibp.api.rest.samplesubmission.domain;
+package org.ibp.api.rest.samplesubmission.domain.common;
 
-import com.sun.tools.javac.util.List;
+import java.util.List;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 
 @AutoProperty
-public class Header {
+public class GOBiiHeader {
 
 	@AutoProperty
 	class Status {

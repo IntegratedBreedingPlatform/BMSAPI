@@ -1,6 +1,6 @@
 package org.ibp.api.rest.samplesubmission;
 
-import org.ibp.api.rest.samplesubmission.domain.GOBiiToken;
+import org.ibp.api.rest.samplesubmission.domain.common.GOBiiToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
