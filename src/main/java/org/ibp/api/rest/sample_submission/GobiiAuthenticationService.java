@@ -40,17 +40,15 @@ public class GobiiAuthenticationService {
 
 			HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
 
-			RestTemplate template = new RestTemplate();
-
 			ResponseEntity<GobiiToken> apiAuthToken =
-					template.exchange("http://192.168.9.145:8282/gobii-dev/gobii/v1/auth", HttpMethod.POST, entity, GobiiToken.class);
+					restTemplate.exchange("http://192.168.9.145:8282/gobii-dev/gobii/v1/auth", HttpMethod.POST, entity, GobiiToken.class);
 
 			if (apiAuthToken != null && apiAuthToken.getBody() != null) {
 				LOG.debug("Successfully authenticated and obtained a token from Gobii for user {}.", username);
 			}
 			return apiAuthToken.getBody();
 		} catch (RestClientException e) {
-			LOG.debug("Error encountered while trying authenticate user {} with BMSAPI to obtain a token: {}", username, e.getMessage());
+			LOG.debug("Error encountered while trying authenticate user {} with Gobii to obtain a token: {}", username, e.getMessage());
 			throw e;
 		}
 	}
