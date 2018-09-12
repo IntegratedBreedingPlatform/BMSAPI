@@ -1,7 +1,7 @@
-package org.ibp.api.rest.sample_submission;
+package org.ibp.api.rest.samplesubmission;
 
-import org.ibp.api.rest.sample_submission.domain.GOBiiProject;
-import org.ibp.api.rest.sample_submission.domain.GOBiiToken;
+import org.ibp.api.rest.samplesubmission.domain.GOBiiProject;
+import org.ibp.api.rest.samplesubmission.domain.GOBiiToken;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 

@@ -1,4 +1,4 @@
-package org.ibp.api.rest.sample_submission;
+package org.ibp.api.rest.samplesubmission;
 
 import org.junit.Before;
 import org.junit.Ignore;

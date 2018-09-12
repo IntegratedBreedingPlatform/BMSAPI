@@ -1,4 +1,4 @@
-package org.ibp.api.rest.sample_submission.domain;
+package org.ibp.api.rest.samplesubmission.domain;
 
 import com.sun.tools.javac.util.List;
 import org.pojomatic.Pojomatic;

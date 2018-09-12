@@ -1,7 +1,4 @@
-package org.ibp.api.rest.sample_submission.domain;
-
-import org.pojomatic.Pojomatic;
-import org.pojomatic.annotations.AutoProperty;
+package org.ibp.api.rest.samplesubmission.domain;
 
 import java.util.Date;
 import java.util.List;
