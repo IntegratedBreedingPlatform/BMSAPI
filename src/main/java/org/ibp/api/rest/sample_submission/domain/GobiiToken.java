@@ -7,7 +7,7 @@ import org.pojomatic.annotations.AutoProperty;
  * Created by clarysabel on 9/12/18.
  */
 @AutoProperty
-public class GobiiToken {
+public class GOBiiToken {
 
 	private String userName;
 
