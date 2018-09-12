@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Api(value = "Ontology Formula Services")
@@ -45,5 +44,15 @@ public class FormulaResource {
 
 		this.formulaService.delete(formulaId);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@ApiOperation(value = "Update Formula", notes = "Update a formula in a Variable")
+	@RequestMapping(value = "/{cropname}/formula/{formulaId}", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity<FormulaDto> updateFormula(
+		@PathVariable final String cropname,
+		@PathVariable final Integer formulaId,
+		@RequestBody final FormulaDto formulaDto) {
+		return new ResponseEntity<>(this.formulaService.update(formulaDto),HttpStatus.OK);
 	}
 }
