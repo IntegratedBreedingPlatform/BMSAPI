@@ -10,11 +10,11 @@ import org.junit.Test;
 @Ignore
 public class GobiiAuthenticationResourceTest {
 
-	private GOBiiAuthenticationResource gobiiAuthenticationService;
+	private GOBiiAuthenticationService gobiiAuthenticationService;
 
 	@Before
 	public void before() {
-		gobiiAuthenticationService = new GOBiiAuthenticationResource();
+		gobiiAuthenticationService = new GOBiiAuthenticationService();
 	}
 
 	@Test

@@ -17,13 +17,13 @@ import java.util.Arrays;
 /**
  * Created by clarysabel on 9/12/18.
  */
-public class GOBiiAuthenticationResource {
+public class GOBiiAuthenticationService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(GOBiiAuthenticationResource.class);
+	private static final Logger LOG = LoggerFactory.getLogger(GOBiiAuthenticationService.class);
 
 	private final RestOperations restTemplate;
 
-	GOBiiAuthenticationResource() {
+	GOBiiAuthenticationService() {
 		// It can be replaced by RestTemplateBuilder when Spring Boot is upgraded
 		restTemplate = new RestTemplate();
 	}

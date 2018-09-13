@@ -18,11 +18,11 @@ import java.util.ArrayList;
 @Ignore
 public class GOBiiProjectResourceTest {
 
-	private GOBiiProjectResource goBiiProjectResource;
+	private GOBiiProjectService goBiiProjectResource;
 
 	@Before
 	public void before() {
-		goBiiProjectResource = new GOBiiProjectResource();
+		goBiiProjectResource = new GOBiiProjectService();
 	}
 
 	@Test

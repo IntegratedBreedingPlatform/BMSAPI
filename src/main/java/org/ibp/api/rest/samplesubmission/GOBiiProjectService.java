@@ -18,13 +18,13 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Created by clarysabel on 9/12/18.
  */
-public class GOBiiProjectResource {
+public class GOBiiProjectService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(GOBiiProjectResource.class);
+	private static final Logger LOG = LoggerFactory.getLogger(GOBiiProjectService.class);
 
 	private final RestTemplate restTemplate;
 
-	GOBiiProjectResource() {
+	GOBiiProjectService() {
 		// It can be replaced by RestTemplateBuilder when Spring Boot is upgraded
 		restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
