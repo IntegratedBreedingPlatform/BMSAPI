@@ -9,7 +9,7 @@ import org.junit.Test;
  * Created by clarysabel on 9/12/18.
  */
 @Ignore
-public class GobiiAuthenticationResourceTest {
+public class GobiiAuthenticationServiceTest {
 
 	private GOBiiAuthenticationService gobiiAuthenticationService;
 

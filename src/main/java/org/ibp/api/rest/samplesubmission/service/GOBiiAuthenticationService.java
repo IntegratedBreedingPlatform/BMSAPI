@@ -23,7 +23,7 @@ public class GOBiiAuthenticationService {
 
 	private final RestOperations restTemplate;
 
-	GOBiiAuthenticationService() {
+	public GOBiiAuthenticationService() {
 		// It can be replaced by RestTemplateBuilder when Spring Boot is upgraded
 		restTemplate = new RestTemplate();
 	}

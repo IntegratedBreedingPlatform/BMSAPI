@@ -91,6 +91,10 @@ public class GOBiiProjectPayload extends GOBiiGenericPayload {
 
 		private List<Property> properties = new ArrayList<>();
 
+		public ProjectData() {
+			entityNameType = "PROJECT";
+		}
+
 		public String getEntityNameType() {
 			return entityNameType;
 		}

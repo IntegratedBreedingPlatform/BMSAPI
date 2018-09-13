@@ -17,7 +17,7 @@ import java.util.ArrayList;
  * Created by clarysabel on 9/12/18.
  */
 @Ignore
-public class GOBiiProjectResourceTest {
+public class GOBiiProjectServiceTest {
 
 	private GOBiiProjectService goBiiProjectResource;
 

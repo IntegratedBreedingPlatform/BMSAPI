@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class GOBiiGenericPayload {
 
 	@AutoProperty
-	class LinkCollection {
+	public static class LinkCollection {
 
 		private List linksPerDataItem = new ArrayList();
 

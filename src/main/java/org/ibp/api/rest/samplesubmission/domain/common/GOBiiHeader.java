@@ -9,7 +9,7 @@ import org.pojomatic.annotations.AutoProperty;
 public class GOBiiHeader {
 
 	@AutoProperty
-	class Status {
+	public static class Status {
 
 		private Boolean succeded;
 
