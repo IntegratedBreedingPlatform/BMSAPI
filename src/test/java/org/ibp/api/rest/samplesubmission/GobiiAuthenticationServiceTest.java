@@ -4,6 +4,7 @@ import org.ibp.api.rest.samplesubmission.service.impl.GOBiiAuthenticationService
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Created by clarysabel on 9/12/18.
@@ -11,11 +12,13 @@ import org.junit.Test;
 @Ignore
 public class GobiiAuthenticationServiceTest {
 
+	@Autowired
 	private GOBiiAuthenticationServiceImpl gobiiAuthenticationService;
 
 	@Before
 	public void before() {
 		gobiiAuthenticationService = new GOBiiAuthenticationServiceImpl();
+		gobiiAuthenticationService.resolveGobiiURL();
 	}
 
 	@Test

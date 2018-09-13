@@ -5,6 +5,8 @@ import org.ibp.api.rest.samplesubmission.service.GOBiiAuthenticationService;
 import org.ibp.api.rest.samplesubmission.service.GOBiiExperimentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -15,6 +17,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.util.Arrays;
 
 /**
@@ -27,9 +30,19 @@ public class GOBiiAuthenticationServiceImpl implements GOBiiAuthenticationServic
 
 	private final RestOperations restTemplate;
 
+	@Autowired
+	private Environment environment;
+
+	private String gobiiURL;
+
 	public GOBiiAuthenticationServiceImpl() {
 		// It can be replaced by RestTemplateBuilder when Spring Boot is upgraded
 		restTemplate = new RestTemplate();
+	}
+
+	@PostConstruct
+	public void resolveGobiiURL () {
+		gobiiURL = environment.getProperty("gobii.url");
 	}
 
 	public GOBiiToken authenticate(final String username, final String password) {
@@ -44,8 +57,11 @@ public class GOBiiAuthenticationServiceImpl implements GOBiiAuthenticationServic
 
 			HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
 
+			String urlFormat = "%s/gobii-dev/gobii/v1/auth";
+			String url = String.format(urlFormat, gobiiURL);
+
 			ResponseEntity<GOBiiToken> apiAuthToken =
-					restTemplate.exchange("http://192.168.9.145:8282/gobii-dev/gobii/v1/auth", HttpMethod.POST, entity, GOBiiToken.class);
+					restTemplate.exchange(url, HttpMethod.POST, entity, GOBiiToken.class);
 
 			if (apiAuthToken != null && apiAuthToken.getBody() != null) {
 				LOG.debug("Successfully authenticated and obtained a token from Gobii for user {}.", username);
