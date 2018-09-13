@@ -1,6 +1,6 @@
 package org.ibp.api.rest.samplesubmission;
 
-import org.ibp.api.rest.samplesubmission.service.GOBiiAuthenticationService;
+import org.ibp.api.rest.samplesubmission.service.impl.GOBiiAuthenticationServiceImpl;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -11,11 +11,11 @@ import org.junit.Test;
 @Ignore
 public class GobiiAuthenticationServiceTest {
 
-	private GOBiiAuthenticationService gobiiAuthenticationService;
+	private GOBiiAuthenticationServiceImpl gobiiAuthenticationService;
 
 	@Before
 	public void before() {
-		gobiiAuthenticationService = new GOBiiAuthenticationService();
+		gobiiAuthenticationService = new GOBiiAuthenticationServiceImpl();
 	}
 
 	@Test
