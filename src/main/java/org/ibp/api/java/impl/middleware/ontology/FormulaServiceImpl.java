@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
+import org.generationcp.middleware.manager.ontology.VariableCache;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.ontology.validator.FormulaValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
@@ -45,7 +46,7 @@ public class FormulaServiceImpl implements FormulaService {
 		}
 
 		this.setStorageFormat(formulaDto);
-
+		VariableCache.removeFromCache(formulaDto.getTarget().getId());
 		return this.formulaService.save(formulaDto);
 	}
 
@@ -64,7 +65,7 @@ public class FormulaServiceImpl implements FormulaService {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-
+		VariableCache.removeFromCache(formula.get().getTarget().getTargetTermId());
 		this.formulaService.delete(formulaId);
 	}
 
@@ -87,7 +88,7 @@ public class FormulaServiceImpl implements FormulaService {
 		}
 
 		this.setStorageFormat(formulaDto);
-
+		VariableCache.removeFromCache(formula.get().getTarget().getTargetTermId());
 		return this.formulaService.update(formulaDto);
 	}
 
