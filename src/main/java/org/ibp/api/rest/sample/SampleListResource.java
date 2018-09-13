@@ -185,4 +185,13 @@ public class SampleListResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Submit sample data to GOBii", notes = "Submit sample data to GOBii")
+	@RequestMapping(value = "/{crop}/{sampleListId}/submitToGOBii", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Integer> submitToGOBii(@PathVariable final String crop, @PathVariable final Integer sampleListId) {
+
+		return new ResponseEntity<>(sampleListId, HttpStatus.OK);
+	}
+
+
 }
