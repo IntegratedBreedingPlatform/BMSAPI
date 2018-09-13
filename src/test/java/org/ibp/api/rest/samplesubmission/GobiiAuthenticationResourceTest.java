@@ -1,5 +1,6 @@
 package org.ibp.api.rest.samplesubmission;
 
+import org.ibp.api.rest.samplesubmission.service.GOBiiAuthenticationService;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;

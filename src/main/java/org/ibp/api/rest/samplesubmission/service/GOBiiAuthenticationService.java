@@ -1,4 +1,4 @@
-package org.ibp.api.rest.samplesubmission;
+package org.ibp.api.rest.samplesubmission.service;
 
 import org.ibp.api.rest.samplesubmission.domain.common.GOBiiToken;
 import org.slf4j.Logger;

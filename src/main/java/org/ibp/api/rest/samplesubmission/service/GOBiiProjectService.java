@@ -1,4 +1,4 @@
-package org.ibp.api.rest.samplesubmission;
+package org.ibp.api.rest.samplesubmission.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProject;

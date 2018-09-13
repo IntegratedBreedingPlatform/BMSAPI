@@ -6,6 +6,7 @@ import org.ibp.api.rest.samplesubmission.domain.common.GOBiiHeader;
 import org.ibp.api.rest.samplesubmission.domain.common.GOBiiToken;
 import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProject;
 import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProjectPayload;
+import org.ibp.api.rest.samplesubmission.service.GOBiiProjectService;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
