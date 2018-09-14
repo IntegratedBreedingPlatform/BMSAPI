@@ -193,6 +193,13 @@ public class SampleListResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Get sample list", notes = "Get sample list")
+	@RequestMapping(value = "/{crop}/{sampleListId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<SampleListDto> getSampleList(@PathVariable final String crop, @PathVariable final Integer sampleListId) {
+		return new ResponseEntity<>(sampleListService.getSampleListDTO(sampleListId), HttpStatus.OK);
+	}
+
 	@ApiOperation(value = "Submit sample data to GOBii", notes = "Submit sample data to GOBii")
 	@RequestMapping(value = "/{crop}/{sampleListId}/submitToGOBii", method = RequestMethod.POST)
 	@ResponseBody

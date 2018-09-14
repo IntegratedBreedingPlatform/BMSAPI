@@ -67,6 +67,8 @@ public interface SampleListService {
 
 	List<SampleDetailsDTO> getSampleDetailsDTOs(Integer listId);
 
+	SampleListDto getSampleListDTO(Integer listId);
+
 	void importSamplePlateInformation(PlateInformationDto plateInformationDto);
 
 	SampleList getSampleListById (Integer sampleListId);

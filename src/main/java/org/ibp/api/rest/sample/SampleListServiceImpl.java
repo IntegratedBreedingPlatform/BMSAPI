@@ -17,6 +17,8 @@ import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProject;
 import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProjectPayload;
 import org.ibp.api.rest.samplesubmission.service.GOBiiAuthenticationService;
 import org.ibp.api.rest.samplesubmission.service.GOBiiProjectService;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -164,6 +166,12 @@ public class SampleListServiceImpl implements SampleListService {
 	@Override
 	public List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer listId) {
 		return sampleListServiceMW.getSampleDetailsDTOs(listId);
+	}
+
+	@Override
+	public SampleListDto getSampleListDTO(final Integer listId) {
+		final SampleList sampleList = sampleListServiceMW.getSampleList(listId);
+		return SampleListMapper.getInstance().map(sampleList, SampleListDto.class);
 	}
 
 	@Override
