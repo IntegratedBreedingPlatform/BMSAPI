@@ -1,5 +1,6 @@
 package org.ibp.api.rest.samplesubmission.service.impl;
 
+import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.rest.samplesubmission.domain.common.GOBiiToken;
 import org.ibp.api.rest.samplesubmission.service.GOBiiAuthenticationService;
 import org.ibp.api.rest.samplesubmission.service.GOBiiExperimentService;
@@ -10,6 +11,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,10 @@ public class GOBiiAuthenticationServiceImpl implements GOBiiAuthenticationServic
 
 	private String gobiiURL;
 
+	private String username;
+
+	private String password;
+
 	public GOBiiAuthenticationServiceImpl() {
 		// It can be replaced by RestTemplateBuilder when Spring Boot is upgraded
 		restTemplate = new RestTemplate();
@@ -43,10 +49,12 @@ public class GOBiiAuthenticationServiceImpl implements GOBiiAuthenticationServic
 	@PostConstruct
 	public void resolveGobiiURL () {
 		gobiiURL = environment.getProperty("gobii.url");
+		username = environment.getProperty("gobii.test.username");
+		password = environment.getProperty("gobii.test.password");
 	}
 
-	public GOBiiToken authenticate(final String username, final String password) {
-		LOG.debug("Trying to authenticate user {} with Gobii to obtain a token.", username);
+	public GOBiiToken authenticate() throws Exception {
+		LOG.debug("Trying to authenticate user {} with Gobii to obtain a token.");
 		try {
 
 			HttpHeaders headers = new HttpHeaders();
@@ -63,8 +71,10 @@ public class GOBiiAuthenticationServiceImpl implements GOBiiAuthenticationServic
 			ResponseEntity<GOBiiToken> apiAuthToken =
 					restTemplate.exchange(url, HttpMethod.POST, entity, GOBiiToken.class);
 
-			if (apiAuthToken != null && apiAuthToken.getBody() != null) {
+			if (apiAuthToken.getStatusCode().equals(HttpStatus.OK)) {
 				LOG.debug("Successfully authenticated and obtained a token from Gobii for user {}.", username);
+			} else {
+				throw new ApiRuntimeException("Could not connect to GOBii");
 			}
 			return apiAuthToken.getBody();
 		} catch (RestClientException e) {

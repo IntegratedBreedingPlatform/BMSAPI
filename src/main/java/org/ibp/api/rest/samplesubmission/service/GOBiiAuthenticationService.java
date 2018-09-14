@@ -7,6 +7,6 @@ import org.ibp.api.rest.samplesubmission.domain.common.GOBiiToken;
  */
 public interface GOBiiAuthenticationService {
 
-	GOBiiToken authenticate(String username, String password);
+	GOBiiToken authenticate() throws Exception;
 
 }

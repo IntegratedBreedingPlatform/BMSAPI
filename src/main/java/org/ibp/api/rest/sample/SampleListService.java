@@ -69,4 +69,11 @@ public interface SampleListService {
 
 	void importSamplePlateInformation(PlateInformationDto plateInformationDto);
 
+	SampleList getSampleListById (Integer sampleListId);
+
+	SampleList saveOrUpdate (SampleList sampleList);
+
+	Integer submitToGOBii (final Integer sampleListId);
+
+
 }

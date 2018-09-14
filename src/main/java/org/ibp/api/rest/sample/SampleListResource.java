@@ -9,7 +9,14 @@ import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.pojos.SampleList;
 import org.ibp.api.domain.common.ErrorResponse;
+import org.ibp.api.rest.samplesubmission.domain.common.GOBiiHeader;
+import org.ibp.api.rest.samplesubmission.domain.common.GOBiiToken;
+import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProject;
+import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProjectPayload;
+import org.ibp.api.rest.samplesubmission.service.GOBiiAuthenticationService;
+import org.ibp.api.rest.samplesubmission.service.GOBiiProjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +35,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -189,9 +197,8 @@ public class SampleListResource {
 	@RequestMapping(value = "/{crop}/{sampleListId}/submitToGOBii", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Integer> submitToGOBii(@PathVariable final String crop, @PathVariable final Integer sampleListId) {
-
-		return new ResponseEntity<>(sampleListId, HttpStatus.OK);
+		final Integer projectId = sampleListService.submitToGOBii(sampleListId);
+		return new ResponseEntity<>(projectId, HttpStatus.OK);
 	}
-
 
 }

@@ -22,8 +22,8 @@ public class GobiiAuthenticationServiceTest {
 	}
 
 	@Test
-	public void authenticateTest() {
-		gobiiAuthenticationService.authenticate("USER_READER", "reader");
+	public void authenticateTest() throws Exception{
+		gobiiAuthenticationService.authenticate();
 	}
 
 }

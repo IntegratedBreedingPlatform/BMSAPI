@@ -9,9 +9,18 @@ import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.rest.samplesubmission.domain.common.GOBiiHeader;
+import org.ibp.api.rest.samplesubmission.domain.common.GOBiiToken;
+import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProject;
+import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProjectPayload;
+import org.ibp.api.rest.samplesubmission.service.GOBiiAuthenticationService;
+import org.ibp.api.rest.samplesubmission.service.GOBiiProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +28,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -39,6 +49,12 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Autowired
 	private SecurityService securityService;
+
+	@Autowired
+	private GOBiiAuthenticationService goBiiAuthenticationService;
+
+	@Autowired
+	private GOBiiProjectService goBiiProjectService;
 
 
 	@Override
@@ -166,6 +182,39 @@ public class SampleListServiceImpl implements SampleListService {
 		}
 	}
 
+	@Override
+	public SampleList getSampleListById(final Integer sampleListId) {
+		return this.sampleListServiceMW.getSampleListById(sampleListId);
+	}
+
+	@Override
+	public SampleList saveOrUpdate(final SampleList sampleList) {
+		return this.sampleListServiceMW.saveOrUpdate(sampleList);
+	}
+
+	@Override
+	public Integer submitToGOBii (final Integer sampleListId) {
+		final GOBiiToken token;
+		try {
+			token = goBiiAuthenticationService.authenticate();
+		} catch (Exception e) {
+			throw new ApiRuntimeException("Could not connect to GOBii. Try later");
+		}
+		final SampleList sampleList = this.getSampleListById(sampleListId);
+		if (sampleList != null && sampleList.getGobiiProjectId() == null) {
+			final GOBiiProject goBiiProject = this.buildGOBiiProject(sampleList);
+			final Integer projectId = goBiiProjectService.postGOBiiProject(token, goBiiProject);
+			if (projectId != null) {
+				sampleList.setGobiiProjectId(projectId);
+				this.saveOrUpdate(sampleList);
+				return projectId;
+			} else {
+				throw new ApiRuntimeException("An error has occurred when trying to send data to GOBii ");
+			}
+		}
+		throw new ApiRuntimeException("List was previously sent to GOBii");
+	}
+
 	private SampleListDTO translateToSampleListDto(final SampleListDto dto) {
 		final SampleListDTO sampleListDTO = new SampleListDTO();
 
@@ -284,4 +333,31 @@ public class SampleListServiceImpl implements SampleListService {
 		bindingResult.reject(errorDescription, arguments, null);
 		throw new ApiRequestValidationException(bindingResult.getAllErrors());
 	}
+
+
+	private GOBiiProject buildGOBiiProject(final SampleList sampleListDto) {
+		GOBiiProjectPayload.ProjectData data = new GOBiiProjectPayload.ProjectData();
+		data.setPiContact(1);
+		data.setProjectName(sampleListDto.getListName());
+		data.setProjectStatus(1);
+		data.setProjectCode(sampleListDto.getListName());
+		data.setCreatedBy(1);
+		data.setModifiedBy(1);
+
+		List<GOBiiProjectPayload.ProjectData> dataList = new ArrayList<>();
+		dataList.add(data);
+
+		GOBiiProject goBiiProject = new GOBiiProject();
+		GOBiiProjectPayload goBiiProjectPayload = new GOBiiProjectPayload();
+		goBiiProjectPayload.setData(dataList);
+
+		GOBiiHeader goBiiHeader = new GOBiiHeader();
+		goBiiHeader.setGobiiProcessType("CREATE");
+
+		goBiiProject.setPayload(goBiiProjectPayload);
+		goBiiProject.setHeader(goBiiHeader);
+
+		return goBiiProject;
+	}
+
 }
