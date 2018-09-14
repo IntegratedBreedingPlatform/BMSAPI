@@ -38,6 +38,7 @@ public class SampleListDto {
 
 	private String programUUID;
 
+	private Integer gobiiProjectId;
 
 	public String getDescription() {
 		return this.description;
@@ -111,21 +112,6 @@ public class SampleListDto {
 		this.cropName = cropName;
 	}
 
-	@Override
-	public int hashCode() {
-		return Pojomatic.hashCode(this);
-	}
-
-	@Override
-	public String toString() {
-		return Pojomatic.toString(this);
-	}
-
-	@Override
-	public boolean equals(final Object o) {
-		return Pojomatic.equals(this, o);
-	}
-
 	public Integer getParentId() {
 		return parentId;
 	}
@@ -156,5 +142,28 @@ public class SampleListDto {
 
 	public void setProgramUUID(final String programUUID) {
 		this.programUUID = programUUID;
+	}
+
+	public Integer getGobiiProjectId() {
+		return gobiiProjectId;
+	}
+
+	public void setGobiiProjectId(final Integer gobiiProjectId) {
+		this.gobiiProjectId = gobiiProjectId;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
 	}
 }
