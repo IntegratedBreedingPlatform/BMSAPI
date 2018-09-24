@@ -295,11 +295,84 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		;
 	}
 
+	@Test
+	public void testUpdate() throws Exception {
+		final Integer formulaId = nextInt();
+		final FormulaDto formulaDto = buildFormulaDto(formulaId);
+		final FormulaVariable input = formulaDto.getInputs().get(0);
+		final Term term = new Term();
+		term.setId(input.getId());
+
+		final Optional<FormulaDto> formula = Optional.of(formulaDto);
+
+		when(this.termDataManager.getTermByName(input.getName())).thenReturn(term);
+
+		doReturn(formula).when(this.service).getById(formulaId);
+
+		this.mockMvc //
+			.perform(MockMvcRequestBuilders.put("/ontology/{cropname}/formula/{formulaId}", this.cropName, formulaId) //
+				.contentType(this.contentType) //
+				.locale(locale) //
+				.content(this.convertObjectToByte(formulaDto))) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.status().isOk()) //
+		;
+	}
+
+	@Test
+	public void testUpdate_formulaIdNotExists() throws Exception {
+		final Integer formulaId = nextInt();
+		final FormulaDto formulaDto = buildFormulaDto(formulaId);
+		final FormulaVariable input = formulaDto.getInputs().get(0);
+		final Term term = new Term();
+		term.setId(input.getId());
+
+		final Optional<FormulaDto> formula = Optional.of(formulaDto);
+
+		when(this.termDataManager.getTermByName(input.getName())).thenReturn(term);
+
+		doReturn(Optional.absent()).when(this.service).getById(formulaId);
+
+		this.mockMvc //
+			.perform(MockMvcRequestBuilders.put("/ontology/{cropname}/formula/{formulaId}", this.cropName, formulaId) //
+				.contentType(this.contentType) //
+				.locale(locale) //
+				.content(this.convertObjectToByte(formulaDto))) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(getMessage("variable.formula.not.exist", new Integer[] {formulaDto.getFormulaId()})))) //
+		;
+	}
+
 	private String getMessage(final String code) {
 		return this.resourceBundleMessageSource.getMessage(code, null, LocaleContextHolder.getLocale());
 	}
 
 	private String getMessage(final String code, final Object[] args) {
 		return this.resourceBundleMessageSource.getMessage(code, args, LocaleContextHolder.getLocale());
+	}
+
+	private FormulaDto buildFormulaDto(final Integer formulaId) {
+		final FormulaDto formulaDto = new FormulaDto();
+		formulaDto.setFormulaId(formulaId);
+		final int targetTermId = nextInt();
+		final int inputId = nextInt();
+		formulaDto.setTarget(new FormulaVariable(targetTermId, "", null));
+		final String inputName = "SomeInvalidInputName";
+		formulaDto.setDefinition("{{" + inputName + "}} + {{" + inputName + "}}");
+		final List<FormulaVariable> inputs = new ArrayList<>();
+		final FormulaVariable input = buildInput(inputName, inputId);
+		inputs.add(input);
+		inputs.add(input);
+		formulaDto.setInputs(inputs);
+
+		return formulaDto;
+	}
+
+	private FormulaVariable buildInput(final String inputName, final int inputId) {
+		final FormulaVariable input = new FormulaVariable();
+		input.setName(inputName);
+		input.setId(inputId);
+		return input;
 	}
 }
