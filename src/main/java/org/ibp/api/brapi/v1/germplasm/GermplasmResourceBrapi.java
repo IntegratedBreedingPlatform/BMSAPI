@@ -141,6 +141,7 @@ public class GermplasmResourceBrapi {
 		if (germplasmDTO != null) {
 			final ModelMapper mapper = new ModelMapper();
 			final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
+			germplasm.setCommonCropName(crop);
 
 			final SingleEntityResponse<Germplasm> singleGermplasmResponse = new SingleEntityResponse<>(germplasm);
 
