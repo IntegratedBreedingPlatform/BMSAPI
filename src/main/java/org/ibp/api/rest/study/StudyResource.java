@@ -214,7 +214,13 @@ public class StudyResource {
 	@ResponseBody
 	public ResponseEntity<List<StudyInstance>> listStudyInstances(final @PathVariable String cropname,
 			@PathVariable final Integer studyId) {
-		return new ResponseEntity<List<StudyInstance>>(this.studyService.getStudyInstances(studyId), HttpStatus.OK);
+		final List<StudyInstance> studyInstances = this.studyService.getStudyInstances(studyId);
+
+		if (studyInstances.isEmpty()) {
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		}
+
+		return new ResponseEntity<List<StudyInstance>>(studyInstances, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Check if a study is sampled.",
