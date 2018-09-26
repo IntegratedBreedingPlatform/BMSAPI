@@ -103,7 +103,9 @@ public class GermplasmResourceBrapi {
 		if (resultPage.getPageResults() != null) {
 			final ModelMapper mapper = new ModelMapper();
 			for (final GermplasmDTO germplasmDTO : resultPage.getPageResults()) {
-				germplasmList.add(mapper.map(germplasmDTO, Germplasm.class));
+				final Germplasm germplasm = mapper.map(germplasmDTO, Germplasm.class);
+				germplasm.setCommonCropName(commonCropName);
+				germplasmList.add(germplasm);
 			}
 		}
 
