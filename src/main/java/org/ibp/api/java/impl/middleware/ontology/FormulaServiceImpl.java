@@ -65,7 +65,7 @@ public class FormulaServiceImpl implements FormulaService {
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
-		VariableCache.removeFromCache(formula.get().getTarget().getTargetTermId());
+		VariableCache.removeFromCache(formula.get().getTarget().getId());
 		this.formulaService.delete(formulaId);
 	}
 
@@ -88,7 +88,7 @@ public class FormulaServiceImpl implements FormulaService {
 		}
 
 		this.setStorageFormat(formulaDto);
-		VariableCache.removeFromCache(formula.get().getTarget().getTargetTermId());
+		VariableCache.removeFromCache(formula.get().getTarget().getId());
 		return this.formulaService.update(formulaDto);
 	}
 
