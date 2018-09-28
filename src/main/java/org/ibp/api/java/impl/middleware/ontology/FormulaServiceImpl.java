@@ -81,7 +81,7 @@ public class FormulaServiceImpl implements FormulaService {
 
 		this.extractInputs(formulaDto);
 		// This validation will also fill the the inputs ids if exists
-		this.formulaValidator.validate(formulaDto, bindingResult);
+		this.formulaValidator.validateUpdate(formulaDto, bindingResult);
 
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
