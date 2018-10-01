@@ -542,7 +542,7 @@ public class StudyServiceImpl implements StudyService {
 			@Override
 			public StudyInstance apply(final org.generationcp.middleware.service.impl.study.StudyInstance input) {
 				return new StudyInstance(input.getInstanceDbId(), input.getLocationName(), input.getLocationAbbreviation(),
-						input.getInstanceNumber());
+						input.getInstanceNumber(),input.getCustomLocationAbbreviation());
 			}
 		};
 		return Lists.transform(studyInstancesMW, transformer);
