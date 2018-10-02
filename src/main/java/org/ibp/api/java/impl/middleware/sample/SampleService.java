@@ -8,12 +8,12 @@ import java.util.List;
 
 public interface SampleService {
 
-	List<SampleDTO> filter(final String plotId, final Integer listId, final Pageable pageable);
+	List<SampleDTO> filter(final String obsUnitId, final Integer listId, final Pageable pageable);
 
 	/**
 	 * count results from {@link #filter}
 	 */
-	long countFilter(final String plotId, final Integer listId);
+	long countFilter(final String obsUnitId, final Integer listId);
 
 	SampleDetailsDTO getSampleObservation(final String sampleId);
 }

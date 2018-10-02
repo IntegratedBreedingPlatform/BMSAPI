@@ -82,7 +82,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 
 		obsDto.setColumnNumber("11");
 		obsDto.setRowNumber("22");
-		obsDto.setPlotId("CHMEPwuxU2Yr6");
+		obsDto.setObsUnitId("CHMEPwuxU2Yr6");
 		obsDto.additionalGermplasmDescriptor("StockID", "Stck-123");
 
 		Mockito.when(this.studyServiceMW.countTotalObservationUnits(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt()))
@@ -118,7 +118,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['entryCode']", Matchers.is(obsDto.getEntryCode())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['rowNumber']", Matchers.is(obsDto.getRowNumber())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['columnNumber']", Matchers.is(obsDto.getColumnNumber())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['plotId']", Matchers.is(obsDto.getPlotId())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['obsUnitId']", Matchers.is(obsDto.getObsUnitId())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['additionalGermplasmDescriptors'][0]['StockID']",
 						Matchers.is("Stck-123")))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults[0]['measurements']", IsCollectionWithSize.hasSize(1)))
