@@ -3,6 +3,8 @@ package org.ibp.api.rest.ontology;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.ibp.api.java.ontology.FormulaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Api(value = "Ontology Formula Services")
@@ -24,6 +25,10 @@ public class FormulaResource {
 	@Autowired
 	private FormulaService formulaService;
 
+
+	@Autowired
+	private ContextUtil contextUtil;
+
 	@ApiOperation(value = "Create Formula", notes = "Create a formula to calculate a Variable")
 	@RequestMapping(value = "/{cropname}/formula", method = RequestMethod.POST)
 	@ResponseBody
@@ -32,7 +37,10 @@ public class FormulaResource {
 		@ApiParam("Formula object to create. Inputs will be extracted from the formula definition."
 			+ " All other info about inputs will be discarded")
 		@RequestBody final FormulaDto formulaDto) {
-
+		// Set the program in the ContextHolder for this request.
+		// This data is required in deleting variables from cache
+		// when creating the formula.
+		ContextHolder.setCurrentProgram(contextUtil.getCurrentProgramUUID());
 		return new ResponseEntity<>(this.formulaService.save(formulaDto), HttpStatus.CREATED);
 	}
 
@@ -42,8 +50,27 @@ public class FormulaResource {
 	public ResponseEntity<Void> deleteFormula(
 		@PathVariable final String cropname,
 		@PathVariable final Integer formulaId) {
+		// Set the program in the ContextHolder for this request.
+		// This data is required in deleting variables from cache
+		// when deleting the formula.
+		ContextHolder.setCurrentProgram(contextUtil.getCurrentProgramUUID());
 
 		this.formulaService.delete(formulaId);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@ApiOperation(value = "Update Formula", notes = "Update a formula in a Variable")
+	@RequestMapping(value = "/{cropname}/formula/{formulaId}", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity<FormulaDto> updateFormula(
+		@PathVariable final String cropname,
+		@PathVariable final Integer formulaId,
+		@RequestBody final FormulaDto formulaDto) {
+		// Set the program in the ContextHolder for this request.
+		// This data is required in deleting variables from cache
+		// when updating the formula.
+		ContextHolder.setCurrentProgram(contextUtil.getCurrentProgramUUID());
+
+		return new ResponseEntity<>(this.formulaService.update(formulaDto),HttpStatus.OK);
 	}
 }

@@ -4,7 +4,10 @@ import org.generationcp.middleware.domain.ontology.FormulaDto;
 
 public interface FormulaService {
 
-	FormulaDto save(FormulaDto formulaDto);
+	FormulaDto save(final FormulaDto formulaDto);
 
-	void delete(Integer formulaId);
+	void delete(final Integer formulaId);
+
+	FormulaDto update(final FormulaDto formulaDto);
+
 }

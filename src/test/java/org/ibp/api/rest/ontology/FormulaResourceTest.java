@@ -3,8 +3,8 @@ package org.ibp.api.rest.ontology;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import org.apache.commons.jexl3.JexlException;
-import org.apache.commons.lang.math.RandomUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
@@ -12,11 +12,11 @@ import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.ibp.ApiUnitTestBase;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -37,7 +37,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
@@ -49,6 +48,9 @@ import static org.mockito.Mockito.when;
 public class FormulaResourceTest extends ApiUnitTestBase {
 
 	private static final String ERROR_JEXL_EXCEPTION = "Some jexl exception";
+
+	private static final String PROGRAM_UUID = "50a7e02e-db60-4240-bd64-417b34606e46";
+
 
 	private static Locale locale = Locale.getDefault();
 
@@ -79,6 +81,12 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 
 		doReturn(Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL, VariableType.TRAIT))
 			.when(this.ontologyVariableDataManager).getVariableTypes(anyInt());
+
+		final Project project = new Project();
+		project.setUniqueID(FormulaResourceTest.PROGRAM_UUID);
+		project.setProjectId(1l);
+		ContextHolder.setCurrentCrop( this.cropName);
+		Mockito.doReturn(project).when(workbenchDataManager).getLastOpenedProjectAnyUser();
 	}
 
 	@Test
@@ -287,11 +295,84 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		;
 	}
 
+	@Test
+	public void testUpdate() throws Exception {
+		final Integer formulaId = nextInt();
+		final FormulaDto formulaDto = buildFormulaDto(formulaId);
+		final FormulaVariable input = formulaDto.getInputs().get(0);
+		final Term term = new Term();
+		term.setId(input.getId());
+
+		final Optional<FormulaDto> formula = Optional.of(formulaDto);
+
+		when(this.termDataManager.getTermByName(input.getName())).thenReturn(term);
+
+		doReturn(formula).when(this.service).getById(formulaId);
+
+		this.mockMvc //
+			.perform(MockMvcRequestBuilders.put("/ontology/{cropname}/formula/{formulaId}", this.cropName, formulaId) //
+				.contentType(this.contentType) //
+				.locale(locale) //
+				.content(this.convertObjectToByte(formulaDto))) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.status().isOk()) //
+		;
+	}
+
+	@Test
+	public void testUpdate_formulaIdNotExists() throws Exception {
+		final Integer formulaId = nextInt();
+		final FormulaDto formulaDto = buildFormulaDto(formulaId);
+		final FormulaVariable input = formulaDto.getInputs().get(0);
+		final Term term = new Term();
+		term.setId(input.getId());
+
+		final Optional<FormulaDto> formula = Optional.of(formulaDto);
+
+		when(this.termDataManager.getTermByName(input.getName())).thenReturn(term);
+
+		doReturn(Optional.absent()).when(this.service).getById(formulaId);
+
+		this.mockMvc //
+			.perform(MockMvcRequestBuilders.put("/ontology/{cropname}/formula/{formulaId}", this.cropName, formulaId) //
+				.contentType(this.contentType) //
+				.locale(locale) //
+				.content(this.convertObjectToByte(formulaDto))) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(getMessage("variable.formula.not.exist", new Integer[] {formulaDto.getFormulaId()})))) //
+		;
+	}
+
 	private String getMessage(final String code) {
 		return this.resourceBundleMessageSource.getMessage(code, null, LocaleContextHolder.getLocale());
 	}
 
 	private String getMessage(final String code, final Object[] args) {
 		return this.resourceBundleMessageSource.getMessage(code, args, LocaleContextHolder.getLocale());
+	}
+
+	private FormulaDto buildFormulaDto(final Integer formulaId) {
+		final FormulaDto formulaDto = new FormulaDto();
+		formulaDto.setFormulaId(formulaId);
+		final int targetTermId = nextInt();
+		final int inputId = nextInt();
+		formulaDto.setTarget(new FormulaVariable(targetTermId, "", null));
+		final String inputName = "SomeInvalidInputName";
+		formulaDto.setDefinition("{{" + inputName + "}} + {{" + inputName + "}}");
+		final List<FormulaVariable> inputs = new ArrayList<>();
+		final FormulaVariable input = buildInput(inputName, inputId);
+		inputs.add(input);
+		inputs.add(input);
+		formulaDto.setInputs(inputs);
+
+		return formulaDto;
+	}
+
+	private FormulaVariable buildInput(final String inputName, final int inputId) {
+		final FormulaVariable input = new FormulaVariable();
+		input.setName(inputName);
+		input.setId(inputId);
+		return input;
 	}
 }
