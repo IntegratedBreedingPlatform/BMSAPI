@@ -45,14 +45,14 @@ public class SampleResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testListSamplesNotFound() throws Exception {
-		final String plotId = null;
+		final String obsUnitId = null;
 		final Integer listId = null;
 
 		final List<SampleDTO> list = new ArrayList<>();
 
 		Mockito.when(this.sampleService.filter(null, null, null)).thenReturn(list);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/sample/maize/samples?plotId=" + plotId).contentType(this.contentType)) //
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/sample/maize/samples?obsUnitId=" + obsUnitId).contentType(this.contentType)) //
 			.andExpect(MockMvcResultMatchers.status().isOk()) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(jsonPath("$", Matchers.empty())) //
@@ -61,7 +61,7 @@ public class SampleResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testListSamples() throws Exception {
-		final String plotId = randomAlphanumeric(13);
+		final String obsUnitId = randomAlphanumeric(13);
 		final Integer listId = null;
 		final Date samplingDate = new Date();
 		final List<SampleDTO> list = new ArrayList<>();
@@ -74,7 +74,7 @@ public class SampleResourceTest extends ApiUnitTestBase {
 			.filter(anyString(), anyInt(), org.mockito.Matchers.any(Pageable.class)))
 			.thenReturn(list);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/sample/maize/samples?plotId=" + plotId).contentType(this.contentType))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/sample/maize/samples?obsUnitId=" + obsUnitId).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.status().isOk()) //
 			.andExpect(jsonPath("$", IsCollectionWithSize.hasSize(list.size()))) //

@@ -23,7 +23,7 @@ public class SampleObservationMapperTest {
 
 		assertThat(sampleObservationDto.getStudyDbId(), equalTo(sampleDetailsDTO.getStudyDbId()));
 		assertThat(sampleObservationDto.getLocationDbId(), equalTo(sampleDetailsDTO.getLocationDbId()));
-		assertThat(sampleObservationDto.getPlotId(), equalTo(sampleDetailsDTO.getPlotId()));
+		assertThat(sampleObservationDto.getObsUnitId(), equalTo(sampleDetailsDTO.getObsUnitId()));
 		assertThat(sampleObservationDto.getPlantId(), equalTo(sampleDetailsDTO.getPlantBusinessKey()));
 		assertThat(sampleObservationDto.getSampleId(), equalTo(sampleDetailsDTO.getSampleBusinessKey()));
 		assertThat(sampleObservationDto.getTakenBy(), equalTo(sampleDetailsDTO.getTakenBy()));
