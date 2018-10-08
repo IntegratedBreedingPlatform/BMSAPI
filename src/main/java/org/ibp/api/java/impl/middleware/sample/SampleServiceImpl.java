@@ -19,13 +19,13 @@ public class SampleServiceImpl implements SampleService {
 	org.generationcp.middleware.service.api.SampleService sampleService;
 
 	@Override
-	public List<SampleDTO> filter(final String plotId, final Integer listId, final Pageable pageable) {
-		return this.sampleService.filter(plotId, listId, pageable);
+	public List<SampleDTO> filter(final String obsUnitId, final Integer listId, final Pageable pageable) {
+		return this.sampleService.filter(obsUnitId, listId, pageable);
 	}
 
 	@Override
-	public long countFilter(final String plotId, final Integer listId) {
-		return this.sampleService.countFilter(plotId, listId);
+	public long countFilter(final String obsUnitId, final Integer listId) {
+		return this.sampleService.countFilter(obsUnitId, listId);
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public class SampleServiceImpl implements SampleService {
 		final SampleDetailsDTO sampleDetailsDTO;
 		try {
 			sampleDetailsDTO = this.sampleService.getSampleObservation(sampleId);
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 			throw new ApiRuntimeException("an error happened when try to get the sample", e);
 		}
 		return sampleDetailsDTO;
