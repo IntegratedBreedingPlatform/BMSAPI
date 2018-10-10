@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
@@ -609,6 +610,11 @@ public class StudyServiceImpl implements StudyService {
 		} catch (final MiddlewareException e) {
 			throw new ApiRuntimeException("an error happened when trying to check if a study is sampled", e);
 		}
+	}
+
+	@Override
+	public StudyReference getStudyReference(Integer studyId) {
+		return this.studyDataManager.getStudyReference(studyId);
 	}
 
 }

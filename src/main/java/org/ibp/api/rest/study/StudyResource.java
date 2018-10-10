@@ -4,13 +4,13 @@ package org.ibp.api.rest.study;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.service.api.SampleService;
-import org.ibp.api.domain.common.PagedResult;
+import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyDetails;
@@ -19,13 +19,14 @@ import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
-import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -47,17 +48,19 @@ import com.wordnik.swagger.annotations.ApiParam;
 @Controller
 public class StudyResource {
 
+	private static final String NO_PERMISSION_FOR_LOCKED_STUDY = "no.permission.for.locked.study";
+
 	@Autowired
 	private StudyService studyService;
 
 	@Autowired
-	private SampleService sampleService;
-
-	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
+	@Resource
+	private ResourceBundleMessageSource resourceBundleMessageSource;
+	
 	private static final Logger LOG = LoggerFactory.getLogger(StudyResource.class);
-
+	
 	@ApiOperation(value = "Search studies",
 			notes = "Search studies (Nurseries and Trials) by various criteria (see parameter documentation).")
 	@RequestMapping(value = "/study/{cropname}/search", method = RequestMethod.GET)
@@ -135,9 +138,16 @@ public class StudyResource {
 	public ResponseEntity<Observation> updateObservation(@PathVariable final String cropname, @PathVariable final Integer studyId,
 			@PathVariable final Integer observationId, @RequestBody final Observation observation) {
 		if (observationId == null || observation.getUniqueIdentifier() == null || !observationId.equals(observation.getUniqueIdentifier())) {
+			// TODO: Give back some better error messages.
 			throw new IllegalArgumentException(
 					"The observation identifier must be populated and have the same value in the object and the url");
-			// TODO: Give back some better error messages.
+			
+		} else {
+			final StudyReference study = this.studyService.getStudyReference(studyId);
+			if (study.getIsLocked()) {				
+				throw new IllegalArgumentException(
+						this.resourceBundleMessageSource.getMessage(NO_PERMISSION_FOR_LOCKED_STUDY,  new String[] {study.getOwnerName()}, LocaleContextHolder.getLocale()));
+			}
 		}
 		return new ResponseEntity<>(this.studyService.updateObservation(studyId, observation), HttpStatus.OK);
 	}
@@ -147,6 +157,11 @@ public class StudyResource {
 	@ResponseBody
 	public ResponseEntity<List<Observation>> addOrUpdateMultipleObservations(@PathVariable final String cropname,
 			@PathVariable final Integer studyId, @RequestBody final List<Observation> observation) {
+		final StudyReference study = this.studyService.getStudyReference(studyId);
+		if (study.getIsLocked()) {				
+			throw new IllegalArgumentException(
+					this.resourceBundleMessageSource.getMessage(NO_PERMISSION_FOR_LOCKED_STUDY, new String[] {study.getOwnerName()}, LocaleContextHolder.getLocale()));
+		}
 		return new ResponseEntity<>(this.studyService.updateObservations(studyId, observation), HttpStatus.OK);
 	}
 
