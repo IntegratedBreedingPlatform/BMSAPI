@@ -1,13 +1,14 @@
 
 package org.ibp.api.java.impl.middleware.study;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -42,12 +43,12 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public class StudyServiceImplTest {
 
@@ -120,7 +121,7 @@ public class StudyServiceImplTest {
 	}
 
 	@Test
-	public void listAllStudies() throws MiddlewareQueryException {
+	public void testListAllStudies() {
 		final StudyTypeDto studyTypeDto= StudyTypeDto.getTrialDto();
 		final List<org.generationcp.middleware.service.api.study.StudySummary> mockResult = new ArrayList<>();
 		final org.generationcp.middleware.service.api.study.StudySummary studySummary =
@@ -151,7 +152,7 @@ public class StudyServiceImplTest {
 	}
 
 	@Test
-	public void getStudyGermplasmList() throws MiddlewareQueryException {
+	public void testGetStudyGermplasmList() {
 
 		final List<StudyGermplasmDto> studyGermplasmTestData =
 				Lists.newArrayList(this.factory.manufacturePojo(StudyGermplasmDto.class),
@@ -181,7 +182,7 @@ public class StudyServiceImplTest {
 	}
 
 	@Test
-	public void getObservations() {
+	public void testGetObservations() {
 		final List<ObservationDto> observationDtoTestData =
 				Lists.newArrayList(this.factory.manufacturePojo(ObservationDto.class), this.factory.manufacturePojo(ObservationDto.class));
 		Mockito.when(this.mockMiddlewareStudyService.getObservations(StudyServiceImplTest.TEST_STUDY_IDENTIFIER, 1, 1, 100, null, null))
@@ -196,7 +197,7 @@ public class StudyServiceImplTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void updateObservationWhichDoesNotExist() {
+	public void testUpdateObservationWhichDoesNotExist() {
 		final Integer studyIdentifier = new Integer(5);
 		final Observation manufacturePojo = this.factory.manufacturePojo(Observation.class);
 
@@ -215,7 +216,7 @@ public class StudyServiceImplTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void updateObservationsWhichDoesNotExist() {
+	public void testUpdateObservationsWhichDoesNotExist() {
 		final Integer studyIdentifier = new Integer(5);
 		final Observation manufacturePojo = this.factory.manufacturePojo(Observation.class);
 		final Observation manufacturePojo1 = this.factory.manufacturePojo(Observation.class);
@@ -237,7 +238,7 @@ public class StudyServiceImplTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void updateAnAlreadyInsertedMeasurement() {
+	public void testUpdateAnAlreadyInsertedMeasurement() {
 		final MeasurementDto databaseReturnedMeasurement =
 			new MeasurementDto(new MeasurementVariableDto(1, "Plant Height"), 1, "123", Phenotype.ValueStatus.OUT_OF_SYNC);
 		final ObservationDto databaseReturnedObservationValue =
@@ -261,7 +262,7 @@ public class StudyServiceImplTest {
 	}
 
 	@Test
-	public void ensureValidationInvokedOnUpdateObservation() {
+	public void testEnsureValidationInvokedOnUpdateObservation() {
 		final ObservationDto manufacturePojo = this.factory.manufacturePojo(ObservationDto.class);
 		final List<ObservationDto> observationDtoTestData = Lists.newArrayList(manufacturePojo);
 		Mockito.when(
@@ -276,7 +277,7 @@ public class StudyServiceImplTest {
 	}
 
 	@Test
-	public void ensureValidationInvokedOnUpdateObservations() {
+	public void testEnsureValidationInvokedOnUpdateObservations() {
 
 		final ObservationDto manufacturePojo = this.factory.manufacturePojo(ObservationDto.class);
 		Mockito.when(
@@ -294,7 +295,7 @@ public class StudyServiceImplTest {
 	}
 
 	@Test
-	public void getSingleObservations() {
+	public void testGetSingleObservations() {
 		final List<ObservationDto> observationDtoTestData = Lists.newArrayList(this.factory.manufacturePojo(ObservationDto.class));
 		Mockito.when(
 				this.mockMiddlewareStudyService.getSingleObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,
@@ -339,7 +340,7 @@ public class StudyServiceImplTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void importStudy() {
+	public void testImportStudy() {
 
 		// Minimal setup
 		final StudyImportDTO studyImportDTO = new StudyImportDTO();
@@ -361,5 +362,12 @@ public class StudyServiceImplTest {
 		Mockito.verify(this.germplasmListManager).addGermplasmListData(Matchers.anyList());
 		Mockito.verify(this.fieldbookService).saveOrUpdateListDataProject(Matchers.anyInt(), Matchers.any(GermplasmListType.class),
 			Matchers.anyInt(), Matchers.anyList(), Matchers.anyInt());
+	}
+	
+	@Test
+	public void testGetStudyReference() {
+		int studyId = 101;
+		this.studyServiceImpl.getStudyReference(studyId);
+		Mockito.verify(this.studyDataManager).getStudyReference(studyId);
 	}
 }

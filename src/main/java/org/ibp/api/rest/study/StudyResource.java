@@ -144,7 +144,7 @@ public class StudyResource {
 			
 		} else {
 			final StudyReference study = this.studyService.getStudyReference(studyId);
-			if (study.getIsLocked()) {				
+			if (study!= null & study.getIsLocked()) {				
 				throw new IllegalArgumentException(
 						this.resourceBundleMessageSource.getMessage(NO_PERMISSION_FOR_LOCKED_STUDY,  new String[] {study.getOwnerName()}, LocaleContextHolder.getLocale()));
 			}
