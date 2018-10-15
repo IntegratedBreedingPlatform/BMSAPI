@@ -1,10 +1,16 @@
 
 package org.ibp.api.rest.study;
 
-import com.google.common.collect.Lists;
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
@@ -17,6 +23,8 @@ import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.domain.study.Observation;
+import org.ibp.api.java.study.StudyService;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,16 +32,19 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.collect.Lists;
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 
 public class StudyResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private org.generationcp.middleware.service.api.study.StudyService studyServiceMW;
-
+	
 	@Autowired
 	private StudyDataManager studyDataManager;
+	
+	@Autowired
+	private StudyService studyService;
 
 	@Test
 	public void testListAllStudies() throws Exception {
@@ -207,5 +218,29 @@ public class StudyResourceTest extends ApiUnitTestBase {
 				.andExpect(
 						MockMvcResultMatchers.jsonPath("$[0].locationAbbreviation", Matchers.is(studyInstance.getLocationAbbreviation())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].instanceNumber", Matchers.is(studyInstance.getInstanceNumber())));
+	}
+	
+	@Test
+	public void testUpdateObservationForLockedStudy() throws Exception {
+		int observationId = 503;
+		final Observation observation = new Observation();
+		observation.setUniqueIdentifier(observationId);
+
+		int studyId = 111;
+		final StudyReference study = new StudyReference(studyId, "Study 111");
+		study.setIsLocked(true);
+		final String owner = "Top Breeder";
+		study.setOwnerName(owner);
+		Mockito.when(this.studyService.getStudyReference(studyId)).thenReturn(study);
+		
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.put("/study/{cropname}/{studyId}/observations/{observationId}", "maize", "111", "503")
+						.contentType(this.contentType)
+						.content(this.convertObjectToByte(observation)))
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.status().is5xxServerError())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
+				.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is("Study is locked by " + owner + " and can't be modified.")));
+			
 	}
 }

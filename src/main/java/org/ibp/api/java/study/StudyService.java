@@ -3,6 +3,7 @@ package org.ibp.api.java.study;
 
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
+import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
@@ -71,4 +72,8 @@ public interface StudyService {
 	Boolean isSampled (final Integer studyId);
 
 	List<StudyTypeDto> getStudyTypes();
+	
+	StudyReference getStudyReference(final Integer studyId);
+	
+	
 }
