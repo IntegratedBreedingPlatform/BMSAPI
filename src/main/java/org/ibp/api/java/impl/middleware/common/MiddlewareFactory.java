@@ -12,7 +12,6 @@ import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.hibernate.DatasourceUtilities;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
-import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmListManagerImpl;
@@ -53,6 +52,8 @@ import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.DatasetServiceImpl;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
@@ -314,14 +315,14 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public DaoFactory daoFactory() {
-		return new DaoFactory(this.getCropDatabaseSessionProvider());
+	public StandardVariableTransformer standardVariableTransformer() {
+		return new StandardVariableTransformer(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public StandardVariableTransformer standardVariableTransformer() {
-		return new StandardVariableTransformer(this.getCropDatabaseSessionProvider());
+	public DatasetService getDatasetService() {
+		return new DatasetServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 	
 	@Bean
