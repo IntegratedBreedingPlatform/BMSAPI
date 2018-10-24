@@ -1,4 +1,4 @@
-package org.ibp.api.rest.dataset;
+package org.ibp.api.rest.study.dataset;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;

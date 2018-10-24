@@ -1,6 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import org.ibp.api.rest.dataset.DatasetGeneratorInput;
+import org.ibp.api.rest.study.dataset.DatasetGeneratorInput;
 
 /**
  * Created by clarysabel on 10/24/18.

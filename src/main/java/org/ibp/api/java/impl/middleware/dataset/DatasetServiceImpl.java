@@ -1,6 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import org.ibp.api.rest.dataset.DatasetGeneratorInput;
+import org.ibp.api.rest.study.dataset.DatasetGeneratorInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
