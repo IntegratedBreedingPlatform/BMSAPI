@@ -1,4 +1,4 @@
-package org.ibp.api.rest.study.dataset;
+package org.ibp.api.rest.dataset;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang.builder.EqualsBuilder;
