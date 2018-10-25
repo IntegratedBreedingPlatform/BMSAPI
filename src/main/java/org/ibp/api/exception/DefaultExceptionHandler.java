@@ -3,6 +3,8 @@ package org.ibp.api.exception;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 import org.ibp.api.domain.common.ErrorResponse;
 import org.slf4j.Logger;
@@ -95,6 +97,34 @@ public class DefaultExceptionHandler {
 				response.addError(message);
 			}
 		}
+		return response;
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(ResourceNotFoundException.class)
+	@ResponseStatus(value = NOT_FOUND)
+	@ResponseBody
+	public ErrorResponse handleNotFoundException(ResourceNotFoundException ex) {
+
+		ErrorResponse response = new ErrorResponse();
+
+		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
+		response.addError(message);
+
+		return response;
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(ForbiddenException.class)
+	@ResponseStatus(value = FORBIDDEN)
+	@ResponseBody
+	public ErrorResponse handleForbiddenException(ForbiddenException ex) {
+
+		ErrorResponse response = new ErrorResponse();
+
+		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
+		response.addError(message);
+
 		return response;
 	}
 }
