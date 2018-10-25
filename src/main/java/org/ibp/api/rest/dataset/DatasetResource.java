@@ -20,20 +20,21 @@ import com.wordnik.swagger.annotations.ApiOperation;
 
 @Api(value = "Dataset Services")
 @Controller
+@RequestMapping("/crops")
 public class DatasetResource {
 
 	@Autowired
-	private StudyDatasetService datasetService;
+	private StudyDatasetService studyDatasetService;
 
 	@ApiOperation(value = "Count Phenotypes", notes = "Returns count of phenotypes for variables")
-	@RequestMapping(value = "crops/{crop}/{studyId}/datasets/{datasetId}/variables/observations", method = RequestMethod.HEAD)
+	@RequestMapping(value = "/{crop}/{studyId}/datasets/{datasetId}/variables/observations", method = RequestMethod.HEAD)
 	@Transactional
 	public ResponseEntity<String> countPhenotypes(@PathVariable final String crop, @PathVariable final Integer studyId,
 			@PathVariable final Integer datasetId,  @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
-		if (!this.datasetService.datasetExists(studyId, datasetId)) {
+		if (!this.studyDatasetService.datasetExists(studyId, datasetId)) {
 			return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
 		}
-		final long count = this.datasetService.countPhenotypesForDataset(datasetId, Arrays.asList(variableIds));
+		final long count = this.studyDatasetService.countPhenotypesForDataset(datasetId, Arrays.asList(variableIds));
 		final HttpHeaders respHeaders = new HttpHeaders();
 		respHeaders.add("X-Total-Count", String.valueOf(count));
 
