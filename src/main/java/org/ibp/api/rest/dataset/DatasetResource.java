@@ -3,7 +3,7 @@ package org.ibp.api.rest.dataset;
 
 import java.util.Arrays;
 
-import org.generationcp.middleware.service.api.study.StudyDatasetService;
+import org.ibp.api.java.study.StudyDatasetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
