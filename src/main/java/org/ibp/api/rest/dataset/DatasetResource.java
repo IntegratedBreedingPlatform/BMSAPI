@@ -26,7 +26,7 @@ public class DatasetResource {
 	private StudyDatasetService datasetService;
 
 	@ApiOperation(value = "Count Phenotypes", notes = "Returns count of phenotypes for variables")
-	@RequestMapping(value = "studies/{crop}/{studyId}/datasets/{datasetId}/variables/observations", method = RequestMethod.HEAD)
+	@RequestMapping(value = "crops/{crop}/{studyId}/datasets/{datasetId}/variables/observations", method = RequestMethod.HEAD)
 	@Transactional
 	public ResponseEntity<String> countPhenotypes(@PathVariable final String crop, @PathVariable final Integer studyId,
 			@PathVariable final Integer datasetId,  @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
