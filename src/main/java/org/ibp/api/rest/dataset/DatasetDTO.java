@@ -8,28 +8,21 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DatasetDTO {
 
-	private Integer projectId;
-
-	private Integer parent;
+	private Integer datasetId;
 
 	private Integer datasetTypeId;
 
 	private String name;
 
-	public Integer getProjectId() {
-		return projectId;
+	private Integer parentDatasetId;
+
+
+	public Integer getDatasetId() {
+		return datasetId;
 	}
 
-	public void setProjectId(Integer projectId) {
-		this.projectId = projectId;
-	}
-
-	public Integer getParent() {
-		return parent;
-	}
-
-	public void setParent(Integer parent) {
-		this.parent = parent;
+	public void setDatasetId(final Integer datasetId) {
+		this.datasetId = datasetId;
 	}
 
 	public Integer getDatasetTypeId() {
@@ -44,10 +37,17 @@ public class DatasetDTO {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
+	public Integer getParentDatasetId() {
+		return parentDatasetId;
+	}
+
+	public void setParentDatasetId(final Integer parentDatasetId) {
+		this.parentDatasetId = parentDatasetId;
+	}
 
 	@Override
 	public String toString() {
@@ -60,8 +60,8 @@ public class DatasetDTO {
 			return false;
 		}
 		final DatasetDTO castOther = (DatasetDTO) other;
-		return new EqualsBuilder().append(this.projectId, castOther.projectId)
-			.append(this.parent,castOther.parent)
+		return new EqualsBuilder().append(this.datasetId, castOther.datasetId)
+			.append(this.parentDatasetId,castOther.parentDatasetId)
 			.append(this.datasetTypeId,castOther.datasetTypeId)
 			.append(this.name,castOther.name)
 			.isEquals();
@@ -69,6 +69,6 @@ public class DatasetDTO {
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.projectId).append(this.parent).append(this.datasetTypeId).append(this.name).toHashCode();
+		return new HashCodeBuilder().append(this.datasetId).append(this.parentDatasetId).append(this.datasetTypeId).append(this.name).toHashCode();
 	}
 }
