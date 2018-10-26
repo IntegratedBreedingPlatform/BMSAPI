@@ -3,7 +3,7 @@ package org.ibp.api.rest.dataset;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.ibp.api.domain.study.Observation;
-import org.ibp.api.java.impl.middleware.dataset.DatasetService;
+import org.ibp.api.java.dataset.DatasetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

@@ -53,10 +53,10 @@ import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
-import org.generationcp.middleware.service.api.dataset.DatasetServiceImpl;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
+import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
 import org.generationcp.middleware.service.impl.study.PlantServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
@@ -146,6 +146,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StudyService getStudyService() {
 		return new StudyServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+	
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public DatasetService getStudyDatasetService() {
+		return new DatasetServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
