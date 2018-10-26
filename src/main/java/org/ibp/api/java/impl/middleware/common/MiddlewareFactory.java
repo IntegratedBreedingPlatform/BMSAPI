@@ -327,12 +327,6 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public DatasetService getDatasetService() {
-		return new DatasetServiceImpl(this.getCropDatabaseSessionProvider());
-	}
-	
-	@Bean
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public ContextUtil contextUtil() {
 		return new ContextUtil();
 	}
