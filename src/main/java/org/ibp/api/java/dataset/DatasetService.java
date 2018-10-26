@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface DatasetService {
 	
-	long countPhenotypesForDataset(Integer datasetId, List<Integer> traitIds);
+	long countPhenotypes(Integer studyId, Integer datasetId, List<Integer> traitIds);
 	
 }

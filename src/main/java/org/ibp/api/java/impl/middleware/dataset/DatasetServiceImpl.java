@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.dataset;
 import java.util.List;
 
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,8 +15,12 @@ public class DatasetServiceImpl implements DatasetService {
 	@Autowired
 	private org.generationcp.middleware.service.api.dataset.DatasetService middlewareDatasetService;
 
+	@Autowired
+	private StudyValidator studyValidator;
+	
 	@Override
-	public long countPhenotypesForDataset(final Integer datasetId, final List<Integer> traitIds) {
+	public long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> traitIds) {
+		this.studyValidator.validate(studyId, false);
 		return this.middlewareDatasetService.countPhenotypes(datasetId, traitIds);
 	}
 
