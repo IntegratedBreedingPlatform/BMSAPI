@@ -30,15 +30,16 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.middlewareDatasetService.countPhenotypes(datasetId, traitIds);
 	}
 
+	@Override
 	public int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId) {
-		return this.datasetService.countTotalObservationUnitsForDataset(datasetId, instanceId);
+		return this.middlewareDatasetService.countTotalObservationUnitsForDataset(datasetId, instanceId);
 	}
 
 	@Override
 	public List<ObservationUnitRow> getObservationUnitRows(final int studyId, final int datasetId, final int instanceId,
 		final int pageNumber, final int pageSize, final String sortBy, final String sortOrder) {
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
-			this.datasetService.getObservationUnitRows(studyId, datasetId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
+			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
 		final ModelMapper mapper = new ModelMapper();
 		final List<ObservationUnitRow> list = new ArrayList<>();
 		for (final org.generationcp.middleware.service.api.dataset.ObservationUnitRow dto : observationUnitRows) {

@@ -1,18 +1,12 @@
 package org.ibp.api.rest.dataset;
 
-import java.util.Arrays;
-
-import org.ibp.api.java.dataset.DatasetService;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.domain.study.Observation;
-import org.ibp.api.java.impl.middleware.dataset.DatasetService;
+import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,9 +17,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.Arrays;
+import java.util.List;
 
 @Api(value = "Dataset Services")
 @Controller
@@ -48,18 +43,18 @@ public class DatasetResource {
 		return new ResponseEntity<>("", respHeaders, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "It will retrieve a list of datasets", notes = "Retrieves the list of datasets for the specified study.")
+	/*@ApiOperation(value = "It will retrieve a list of datasets", notes = "Retrieves the list of datasets for the specified study.")
 	@RequestMapping(value = "/{cropname}/studies/{studyId}/datasets/list", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<DatasetDTO>> getDatasets(
 		@PathVariable final String cropname,
 		@PathVariable final Integer studyId,
 		@RequestParam(value = "filterByTypeIds", required = false) final Set<Integer> filterByTypeIds) {
-		return new ResponseEntity<>(this.datasetService.getDatasetByStudyId(studyId, filterByTypeIds), HttpStatus.OK);
-	}
+		return new ResponseEntity<>(this.studyDatasetService.getDatasetByStudyId(studyId, filterByTypeIds), HttpStatus.OK);
+	}*/
 
 	@ApiOperation(value = "It will retrieve all the observation units including observations and props values in a format that will be used by the Observations table.")
-	@RequestMapping(value = "/crops/{cropname}/studies/{studyId}/datasets/{datasetId}/instances/{instanceId}/observationUnits/table", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropname}/studies/{studyId}/datasets/{datasetId}/instances/{instanceId}/observationUnits/table", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<ObservationUnitTable> getObservationUnitTable(@PathVariable final String cropname,
 		@PathVariable final Integer studyId, @PathVariable final Integer datasetId,
@@ -72,14 +67,14 @@ public class DatasetResource {
 
 				@Override
 				public long getCount() {
-					return DatasetResource.this.datasetService.countTotalObservationUnitsForDataset(datasetId, instanceId);
+					return DatasetResource.this.studyDatasetService.countTotalObservationUnitsForDataset (datasetId, instanceId);
 				}
 
 				@Override
 				public List<ObservationUnitRow> getResults(final PagedResult<ObservationUnitRow> pagedResult) {
 					// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
 					final int pageNumber = pagedResult.getPageNumber() + 1;
-					return DatasetResource.this.datasetService.getObservationUnitRows(
+					return DatasetResource.this.studyDatasetService.getObservationUnitRows(
 						studyId,
 						datasetId,
 						instanceId,
