@@ -21,6 +21,7 @@ import java.util.Arrays;
 
 @Api(value = "Dataset Services")
 @Controller
+@RequestMapping("/crops")
 public class DatasetResource {
 
 	@Autowired
@@ -40,7 +41,7 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "Generate and save a dataset", notes = "Returns the basic information for the generated dataset")
-	@RequestMapping(value = "/crops/{cropName}/studies/{studyId}/datasets/generation", method = RequestMethod.POST)
+	@RequestMapping(value = "/{cropName}/studies/{studyId}/datasets/generation", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Observation> generateDataset(@PathVariable
 	final String cropName, @PathVariable final Integer studyId, @RequestBody final DatasetGeneratorInput datasetGeneratorInput) {
