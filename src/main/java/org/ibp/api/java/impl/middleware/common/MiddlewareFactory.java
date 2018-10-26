@@ -53,7 +53,7 @@ import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
-import org.generationcp.middleware.service.api.dataset.DatasetServiceImpl;
+import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
