@@ -30,7 +30,7 @@ public class DatasetResource {
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables/observations", method = RequestMethod.HEAD)
 	@Transactional
 	public ResponseEntity<String> countPhenotypes(@PathVariable final String crop, @PathVariable final Integer studyId,
-			@PathVariable final Integer datasetId,  @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
+		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
 
 		final long count = this.studyDatasetService.countPhenotypes(studyId, datasetId, Arrays.asList(variableIds));
 		final HttpHeaders respHeaders = new HttpHeaders();
@@ -40,11 +40,9 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "It will retrieve a list of datasets", notes = "Retrieves the list of datasets for the specified study.")
-	@RequestMapping(value = "/crops/{cropname}/studies/{studyId}/datasets/list", method = RequestMethod.GET)
-	public ResponseEntity<List<DatasetDTO>> getDatasets(
-		@PathVariable final String cropname,
-		@PathVariable final Integer studyId,
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/list", method = RequestMethod.GET)
+	public ResponseEntity<List<DatasetDTO>> getDatasets(@PathVariable final String crop, @PathVariable final Integer studyId,
 		@RequestParam(value = "filterByTypeIds", required = false) final Set<Integer> filterByTypeIds) {
-		return new ResponseEntity<>(this.datasetService.getDatasetByStudyId(studyId, filterByTypeIds), HttpStatus.OK);
+		return new ResponseEntity<>(this.studyDatasetService.getDatasetByStudyId(studyId, filterByTypeIds), HttpStatus.OK);
 	}
 }
