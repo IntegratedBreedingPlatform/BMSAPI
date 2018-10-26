@@ -26,10 +26,10 @@ public class DatasetServiceImpl implements DatasetService {
 
 		this.studyValidator.validate(studyId, true);
 
-				return middlewareDatasetService
-						.generateSubObservationDataset(studyId, datasetGeneratorInput.getDatasetName(), datasetGeneratorInput.getDatasetTypeId(),
-								Arrays.asList(datasetGeneratorInput.getInstanceIds()), datasetGeneratorInput.getSequenceVariableId(),
-								datasetGeneratorInput.getNumberOfSubObservationUnits());
+		return middlewareDatasetService
+				.generateSubObservationDataset(studyId, datasetGeneratorInput.getDatasetName(), datasetGeneratorInput.getDatasetTypeId(),
+						Arrays.asList(datasetGeneratorInput.getInstanceIds()), datasetGeneratorInput.getSequenceVariableId(),
+						datasetGeneratorInput.getNumberOfSubObservationUnits());
 	}
 
 	@Override
