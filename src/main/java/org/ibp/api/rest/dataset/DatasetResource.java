@@ -3,7 +3,7 @@ package org.ibp.api.rest.dataset;
 
 import java.util.Arrays;
 
-import org.ibp.api.java.study.StudyDatasetService;
+import org.ibp.api.java.dataset.DatasetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,16 +24,14 @@ import com.wordnik.swagger.annotations.ApiOperation;
 public class DatasetResource {
 
 	@Autowired
-	private StudyDatasetService studyDatasetService;
+	private DatasetService studyDatasetService;
 
 	@ApiOperation(value = "Count Phenotypes", notes = "Returns count of phenotypes for variables")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables/observations", method = RequestMethod.HEAD)
 	@Transactional
 	public ResponseEntity<String> countPhenotypes(@PathVariable final String crop, @PathVariable final Integer studyId,
 			@PathVariable final Integer datasetId,  @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
-		if (!this.studyDatasetService.datasetExists(studyId, datasetId)) {
-			return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
-		}
+		
 		final long count = this.studyDatasetService.countPhenotypesForDataset(datasetId, Arrays.asList(variableIds));
 		final HttpHeaders respHeaders = new HttpHeaders();
 		respHeaders.add("X-Total-Count", String.valueOf(count));
