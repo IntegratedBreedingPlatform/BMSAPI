@@ -43,7 +43,7 @@ public class DatasetResource {
 	@ResponseBody
 	public ResponseEntity<Observation> generateDataset(@PathVariable
 	final String cropName, @PathVariable final Integer studyId, @RequestBody final DatasetGeneratorInput datasetGeneratorInput) {
-		studyDatasetService.generateSubObservationDataset(studyId, datasetGeneratorInput);
+		studyDatasetService.generateSubObservationDataset(cropName, studyId, datasetGeneratorInput);
 		return null;
 	}
 }
