@@ -4,9 +4,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.pojomatic.annotations.AutoProperty;
 
+import java.io.Serializable;
+@AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DatasetDTO {
+public class DatasetDTO implements Serializable {
 
 	private Integer datasetId;
 
