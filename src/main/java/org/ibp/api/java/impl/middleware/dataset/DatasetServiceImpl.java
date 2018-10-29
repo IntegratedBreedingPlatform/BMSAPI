@@ -7,6 +7,7 @@ import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.rest.dataset.DatasetDTO;
+import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -53,7 +55,7 @@ public class DatasetServiceImpl implements DatasetService {
 			for (Integer dataSetTypeId : filterByTypeIds) {
 				final DataSetType dataSetType = DataSetType.findById(dataSetTypeId);
 				if (dataSetType == null) {
-					errors.reject("dataset.type.id.not.exist", new Object[]{dataSetTypeId},"");
+					errors.reject("dataset.type.id.not.exist", new Object[] {dataSetTypeId}, "");
 					throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 				}
 			}
@@ -63,7 +65,12 @@ public class DatasetServiceImpl implements DatasetService {
 			this.middlewareDatasetService.getDatasetByStudyId(studyId, filterByTypeIds);
 
 		final ModelMapper mapper = new ModelMapper();
-		final List<DatasetDTO> DatasetDTOs = mapper.map(datasetDTOS, List.class);
+		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+		final List<DatasetDTO> DatasetDTOs = new ArrayList();
+		for (org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO : datasetDTOS) {
+			final DatasetDTO datasetDto = mapper.map(datasetDTO, DatasetDTO.class);
+			DatasetDTOs.add(datasetDto);
+		}
 		return DatasetDTOs;
 	}
 }
