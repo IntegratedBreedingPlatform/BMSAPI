@@ -1,17 +1,19 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import java.util.List;
-
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
+import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
+import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -40,10 +42,18 @@ public class DatasetServiceImpl implements DatasetService {
 		final int pageNumber, final int pageSize, final String sortBy, final String sortOrder) {
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
 			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
-		final ModelMapper mapper = new ModelMapper();
+		final ModelMapper observationUnitRowMapper = new ModelMapper();
+		final ModelMapper observationUnitDataMapper = new ModelMapper();
+		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+		observationUnitDataMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final List<ObservationUnitRow> list = new ArrayList<>();
 		for (final org.generationcp.middleware.service.api.dataset.ObservationUnitRow dto : observationUnitRows) {
-			final ObservationUnitRow observationUnitRow = mapper.map(dto, ObservationUnitRow.class);
+			final Map<String, ObservationUnitData> datas = new HashMap<>();
+			for (final String data : dto.getVariables().keySet()) {
+				datas.put(data, observationUnitDataMapper.map(dto.getVariables().get(data), ObservationUnitData.class));
+			}
+			final ObservationUnitRow observationUnitRow = observationUnitRowMapper.map(dto, ObservationUnitRow.class);
+			observationUnitRow.setVariables(datas);
 			list.add(observationUnitRow);
 		}
 		return list;

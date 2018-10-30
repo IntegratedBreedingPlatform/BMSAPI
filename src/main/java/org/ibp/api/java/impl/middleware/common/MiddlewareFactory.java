@@ -60,6 +60,8 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
+import org.generationcp.middleware.service.impl.study.DesignFactors;
+import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
 import org.generationcp.middleware.service.impl.study.MeasurementVariableServiceImpl;
 import org.generationcp.middleware.service.impl.study.PlantServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
@@ -339,7 +341,19 @@ public class MiddlewareFactory {
 	public MeasurementVariableService getMeasurementVariableService() {
 		return new MeasurementVariableServiceImpl(this.getCropDatabaseSessionProvider().getSession());
 	}
-	
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public GermplasmDescriptors getGermplasmDescriptors() {
+		return new GermplasmDescriptors(this.getCropDatabaseSessionProvider().getSession());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public DesignFactors getDesignFactors() {
+		return new DesignFactors(this.getCropDatabaseSessionProvider().getSession());
+	}
+
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public ContextUtil contextUtil() {
