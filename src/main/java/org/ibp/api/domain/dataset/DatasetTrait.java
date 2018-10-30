@@ -12,6 +12,12 @@ public class DatasetTrait {
 	@NotBlank
 	private String studyAlias;
 	
+	public DatasetTrait(Integer traitId, String studyAlias) {
+		super();
+		this.traitId = traitId;
+		this.studyAlias = studyAlias;
+	}
+
 	public Integer getTraitId() {
 		return traitId;
 	}
