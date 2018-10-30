@@ -40,9 +40,9 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "It will retrieve a list of datasets", notes = "Retrieves the list of datasets for the specified study.")
-	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/list", method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets", method = RequestMethod.GET)
 	public ResponseEntity<List<DatasetDTO>> getDatasets(@PathVariable final String crop, @PathVariable final Integer studyId,
 		@RequestParam(value = "filterByTypeIds", required = false) final Set<Integer> filterByTypeIds) {
-		return new ResponseEntity<>(this.studyDatasetService.getDatasetByStudyId(studyId, filterByTypeIds), HttpStatus.OK);
+		return new ResponseEntity<>(this.studyDatasetService.getDatasets(studyId, filterByTypeIds), HttpStatus.OK);
 	}
 }
