@@ -9,6 +9,6 @@ public interface DatasetService {
 
 	long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> traitIds);
 
-	List<DatasetDTO> getDatasetByStudyId(final Integer studyId, final Set<Integer> filterByTypeIds);
+	List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds);
 
 }
