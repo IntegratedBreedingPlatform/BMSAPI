@@ -72,6 +72,7 @@ public class DatasetServiceImplTest {
 		this.studyDatasetService.addDatasetTrait(studyId, datasetId, new DatasetTrait(traitId, alias));
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator).validateDatasetTrait(studyId, datasetId, true, traitId, false);
+		Mockito.verify(this.middlewareDatasetService).addTrait(datasetId, traitId, alias);
 		Mockito.verify(this.measurementVariableTransformer).transform(this.standardVariable, false);
 		Mockito.verify(this.variable).setName(alias);
 		Mockito.verify(this.variable).setVariableType(VariableType.TRAIT);
