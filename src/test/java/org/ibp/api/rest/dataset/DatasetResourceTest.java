@@ -117,7 +117,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", Matchers.is("100 is not a valid dataset type")));
 	}
 
-	private List<DatasetDTO> createDatasets(final List<Integer> datasetTypes) {
+	private static List<DatasetDTO> createDatasets(final List<Integer> datasetTypes) {
 		final List<DatasetDTO> datasets = new ArrayList<>();
 		int num = datasetTypes.size();
 		for (final Integer datasetType : datasetTypes) {
