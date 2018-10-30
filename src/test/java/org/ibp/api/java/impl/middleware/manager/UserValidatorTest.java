@@ -59,7 +59,7 @@ public class UserValidatorTest {
 	}
 
 	/**
-	 * Should validate all fields empty and with length exceed.* *
+	 * Should validateBasicData all fields empty and with length exceed.* *
 	 *
 	 * @throws Exception
 	 */
@@ -84,7 +84,7 @@ public class UserValidatorTest {
 	}
 
 	/**
-	 * Should validate the Role allow.* *
+	 * Should validateBasicData the Role allow.* *
 	 *
 	 * @throws Exception
 	 */
@@ -142,7 +142,7 @@ public class UserValidatorTest {
 	}
 
 	/**
-	 * Should validate the Email Format.* *
+	 * Should validateBasicData the Email Format.* *
 	 *
 	 * @throws Exception
 	 */
@@ -164,7 +164,7 @@ public class UserValidatorTest {
 	}
 
 	/**
-	 * Should validate the UserId.* *
+	 * Should validateBasicData the UserId.* *
 	 *
 	 * @throws Exception
 	 */
@@ -180,7 +180,7 @@ public class UserValidatorTest {
 	}
 
 	/**
-	 * Should validate the userId inexistent.* *
+	 * Should validateBasicData the userId inexistent.* *
 	 *
 	 * @throws Exception
 	 */
@@ -199,7 +199,7 @@ public class UserValidatorTest {
 	}
 
 	/**
-	 * Should validate the status allow.* *
+	 * Should validateBasicData the status allow.* *
 	 *
 	 * @throws Exception
 	 */
@@ -220,7 +220,7 @@ public class UserValidatorTest {
 	}
 
 	/**
-	 * Should validate if username and email exists.* *
+	 * Should validateBasicData if username and email exists.* *
 	 *
 	 * @throws Exception
 	 */
@@ -239,7 +239,7 @@ public class UserValidatorTest {
 	}
 
 	/**
-	 * Should validate update user.* *
+	 * Should validateBasicData update user.* *
 	 *
 	 * @throws Exception
 	 */
@@ -261,7 +261,7 @@ public class UserValidatorTest {
 	}
 
 	/**
-	 * Should validate update user with diferent Email* *
+	 * Should validateBasicData update user with diferent Email* *
 	 *
 	 * @throws Exception
 	 */
@@ -285,7 +285,7 @@ public class UserValidatorTest {
 	}
 
 	/**
-	 * Should validate update user with diferent username* *
+	 * Should validateBasicData update user with diferent username* *
 	 *
 	 * @throws Exception
 	 */
@@ -309,7 +309,7 @@ public class UserValidatorTest {
 	}
 
 	/**
-	 * Should validate update user.* *
+	 * Should validateBasicData update user.* *
 	 *
 	 * @throws Exception
 	 */
@@ -332,7 +332,7 @@ public class UserValidatorTest {
 	}
 
 	/**
-	 * Should validate create user.* *
+	 * Should validateBasicData create user.* *
 	 *
 	 * @throws Exception
 	 */
@@ -367,10 +367,10 @@ public class UserValidatorTest {
 	public void testIsSuperAdminRole(){
 		this.uservalidator.setSuperAdminRole(this.superAdminRole);
 		
-		// Should validate "SUPERADMIN" description
+		// Should validateBasicData "SUPERADMIN" description
 		Assert.assertTrue(this.uservalidator.isSuperAdminRole(new Role(100, Role.SUPERADMIN)));
 		
-		// Should validate by superadmin ID from DB
+		// Should validateBasicData by superadmin ID from DB
 		Assert.assertTrue(this.uservalidator.isSuperAdminRole(new Role(SUPERADMIN_ID, "")));
 		
 		// Should not flag as superamin user if ID and description do not match

@@ -74,7 +74,7 @@ public class MethodValidatorTest {
 
 		Term methodTerm = TestDataProvider.getMethodTerm();
 
-		// Changing method term with another id to validate uniqueness by validator
+		// Changing method term with another id to validateBasicData uniqueness by validator
 		methodTerm.setId(methodTerm.getId() + 100);
 
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermByNameAndCvId(methodTerm.getName(), CvId.METHODS.getId());

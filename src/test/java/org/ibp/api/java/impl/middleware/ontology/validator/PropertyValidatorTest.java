@@ -77,7 +77,7 @@ public class PropertyValidatorTest {
 
 		Term propertyTerm = TestDataProvider.getPropertyTerm();
 
-		// Changing term with another id to validate uniqueness by validator
+		// Changing term with another id to validateBasicData uniqueness by validator
 		propertyTerm.setId(propertyTerm.getId() + 100);
 
 		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermByNameAndCvId(propertyTerm.getName(), CvId.PROPERTIES.getId());

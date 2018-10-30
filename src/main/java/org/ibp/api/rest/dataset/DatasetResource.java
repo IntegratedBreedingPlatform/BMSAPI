@@ -38,12 +38,12 @@ public class DatasetResource {
 		return new ResponseEntity<>("", respHeaders, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Generate and save a dataset", notes = "Returns the basic information for the generated dataset")
-	@RequestMapping(value = "/{cropName}/studies/{studyId}/datasets/generation", method = RequestMethod.POST)
+	@ApiOperation(value = "Generate and save a sub-observation dataset", notes = "Returns the basic information for the generated dataset")
+	@RequestMapping(value = "/{cropName}/studies/{studyId}/datasets/{parentId}/generation", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Observation> generateDataset(@PathVariable
-	final String cropName, @PathVariable final Integer studyId, @RequestBody final DatasetGeneratorInput datasetGeneratorInput) {
-		studyDatasetService.generateSubObservationDataset(cropName, studyId, datasetGeneratorInput);
+	final String cropName, @PathVariable final Integer studyId, @PathVariable final Integer parentId, @RequestBody final DatasetGeneratorInput datasetGeneratorInput) {
+		studyDatasetService.generateSubObservationDataset(cropName, studyId, parentId, datasetGeneratorInput);
 		return null;
 	}
 }

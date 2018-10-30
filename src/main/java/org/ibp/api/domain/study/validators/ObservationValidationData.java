@@ -4,7 +4,7 @@ package org.ibp.api.domain.study.validators;
 import java.util.Map;
 
 /**
- * Data structure that holds all data needed to validate a observation.
+ * Data structure that holds all data needed to validateBasicData a observation.
  */
 public class ObservationValidationData {
 

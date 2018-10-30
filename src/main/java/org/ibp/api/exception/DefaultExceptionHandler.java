@@ -2,9 +2,11 @@
 package org.ibp.api.exception;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.NOT_IMPLEMENTED;
 
 import org.ibp.api.domain.common.ErrorResponse;
 import org.slf4j.Logger;
@@ -119,6 +121,40 @@ public class DefaultExceptionHandler {
 	@ResponseStatus(value = FORBIDDEN)
 	@ResponseBody
 	public ErrorResponse handleForbiddenException(ForbiddenException ex) {
+
+		ErrorResponse response = new ErrorResponse();
+
+		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
+		response.addError(message);
+
+		return response;
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(ConflictException.class)
+	@ResponseStatus(value = CONFLICT)
+	@ResponseBody
+	public ErrorResponse handleConflictException(ConflictException ex) {
+
+		ErrorResponse response = new ErrorResponse();
+
+		for (ObjectError error : ex.getErrors()) {
+			String message = this.messageSource.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale());
+			if (error instanceof FieldError) {
+				FieldError fieldError = (FieldError) error;
+				response.addError(message, fieldError.getField());
+			} else {
+				response.addError(message);
+			}
+		}
+		return response;
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(NotImplementedException.class)
+	@ResponseStatus(value = NOT_IMPLEMENTED)
+	@ResponseBody
+	public ErrorResponse handleNotImplementedException(NotImplementedException ex) {
 
 		ErrorResponse response = new ErrorResponse();
 

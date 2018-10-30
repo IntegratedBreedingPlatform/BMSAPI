@@ -1,6 +1,8 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ConflictException;
+import org.ibp.api.exception.NotImplementedException;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetGeneratorInputValidator;
 import org.springframework.stereotype.Service;
 
@@ -31,23 +33,33 @@ public class DatasetServiceImpl implements DatasetService {
 	private DatasetGeneratorInputValidator datasetGeneratorInputValidator;
 
 	@Override
-	public Integer generateSubObservationDataset(final String cropName, final Integer studyId, final DatasetGeneratorInput datasetGeneratorInput) {
+	public Integer generateSubObservationDataset(final String cropName, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetGeneratorInput) {
 
 		// checks that study exists and it is not locked
 		this.studyValidator.validate(studyId, true);
 
+		// check that parentId belongs to the study
+
 		// checks input matches validation rules
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
 
-		this.datasetGeneratorInputValidator.validate(cropName, studyId, datasetGeneratorInput, bindingResult);
+		this.datasetGeneratorInputValidator.validateBasicData(cropName, studyId, parentId, datasetGeneratorInput, bindingResult);
 
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 
 		// not implemented yet
+		this.datasetGeneratorInputValidator.validateDatasetTypeIsImplemented(datasetGeneratorInput.getDatasetTypeId(), bindingResult);
+		if (bindingResult.hasErrors()) {
+			throw new NotImplementedException(bindingResult.getAllErrors().get(0));
+		}
 
 		// conflict
+		this.datasetGeneratorInputValidator.validateDataConflicts(studyId, datasetGeneratorInput, bindingResult);
+		if (bindingResult.hasErrors()) {
+			throw new ConflictException(bindingResult.getAllErrors());
+		}
 
 		return middlewareDatasetService
 				.generateSubObservationDataset(studyId, datasetGeneratorInput.getDatasetName(), datasetGeneratorInput.getDatasetTypeId(),

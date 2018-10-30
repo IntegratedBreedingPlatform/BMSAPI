@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableType;
 import org.ibp.api.domain.study.StudyInstance;
@@ -34,9 +35,14 @@ public class DatasetGeneratorInputValidator {
 	private StudyDataManager studyDataManager;
 
 	@Autowired
+	private DatasetService studyDatasetService;
+
+	@Autowired
 	private Environment environment;
 
 	private Integer maxAllowedSubobservationUnits;
+
+	private Integer maxAllowedDatasetsPerParent;
 
 	private VariableType observationUnitVariableType;
 
@@ -50,9 +56,14 @@ public class DatasetGeneratorInputValidator {
 	@PostConstruct
 	public void init() {
 		maxAllowedSubobservationUnits = Integer.parseInt(environment.getProperty("maximum.number.of.sub.observation.parent.unit"));
+		maxAllowedDatasetsPerParent = Integer.parseInt(environment.getProperty("maximum.number.of.sub.observation.sets"));
 	}
 
-	public void validate(final String crop, final Integer studyId, final DatasetGeneratorInput o, final Errors errors) {
+	public void validateBasicData(final String crop, final Integer studyId, final Integer parentId, final DatasetGeneratorInput o, final Errors errors) {
+
+		//FIXME check that parentId has types PLOT, CUSTOM, PLANT, QUADRAT, TIMESERIE
+
+		// Validate that the parent dataset does not have more than X children
 
 		if (DataSetType.findById(o.getDatasetTypeId()) == null) {
 			errors.reject("dataset.type.invalid", new String[] {String.valueOf(o.getDatasetTypeId())}, "");
@@ -62,6 +73,7 @@ public class DatasetGeneratorInputValidator {
 			errors.reject("dataset.name.exceed.length");
 		}
 
+		//FIXME needs to be replaced by getInstances of the parentId
 		final List<StudyInstance> studyInstances = this.studyService.getStudyInstances(studyId);
 
 		Function<StudyInstance, Integer> studyInstancesToIds = new Function<StudyInstance, Integer>() {
@@ -94,4 +106,18 @@ public class DatasetGeneratorInputValidator {
 		}
 	}
 
+	public void validateDataConflicts(final Integer studyId, final DatasetGeneratorInput o, final Errors errors) {
+		final Study study = studyDataManager.getStudy(studyId);
+		if (!studyDatasetService.isDatasetNameAvailable(o.getDatasetName(), study.getProgramUUID())) {
+			errors.reject("dataset.name.not.available", new String[] {o.getDatasetName()} , "");
+		}
+	}
+
+	public void validateDatasetTypeIsImplemented(final Integer datasetTypeId, final Errors errors) {
+		final DataSetType type = DataSetType.findById(datasetTypeId);
+		if (!DataSetType.CUSTOM_SUBOBSERVATIONS.equals(type) && !DataSetType.PLANT_SUBOBSERVATIONS.equals(type)
+				&& !DataSetType.QUADRAT_SUBOBSERVATIONS.equals(type) && !DataSetType.TIME_SERIES_SUBOBSERVATIONS.equals(type)) {
+			errors.reject("dataset.operation.not.implemented", new String[] {String.valueOf(datasetTypeId)}, "");
+		}
+	}
 }
