@@ -64,7 +64,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testGetDatasets() throws Exception {
 		final List<DatasetDTO> datasets= createDatasets(Arrays.asList(10090, 10094, 10095));
-		doReturn(datasets).when(this.studyDatasetService).getDatasetByStudyId(100, null);
+		doReturn(datasets).when(this.studyDatasetService).getDatasets(100, null);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets/list", this.cropName, 100, null)
@@ -77,7 +77,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testGetDatasetsWithFilter() throws Exception {
 		final List<DatasetDTO> datasets= createDatasets(Arrays.asList(10090));
-		doReturn(datasets).when(this.studyDatasetService).getDatasetByStudyId(100, null);
+		doReturn(datasets).when(this.studyDatasetService).getDatasets(100, null);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets/list", this.cropName, 100, null)
@@ -92,7 +92,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	public void testGetDatasetsErrorStudyIsNotFound() throws Exception {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		errors.reject("study.not.exist", "");
-		Mockito.when(studyDatasetService.getDatasetByStudyId(100, null)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
+		Mockito.when(studyDatasetService.getDatasets(100, null)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets/list", this.cropName, 100, null)
 			.contentType(this.contentType))
@@ -108,7 +108,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final Set<Integer> filterByTypeIds = new TreeSet<>();
 		filterByTypeIds.add(100);
 		errors.reject("dataset.type.id.not.exist", new Object[]{100},"");
-		Mockito.when(studyDatasetService.getDatasetByStudyId(100,filterByTypeIds)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
+		Mockito.when(studyDatasetService.getDatasets(100,filterByTypeIds)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets/list", this.cropName, 100, null)
 			.param("filterByTypeIds", "100").contentType(this.contentType))
