@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 @Service
 @Transactional
@@ -41,9 +42,9 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<DatasetDTO> getDatasetByStudyId(final Integer studyId, final Set<Integer> filterByTypeIds) {
+	public List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-
+		final Set<Integer> datasetTypeIdList = new TreeSet<>();
 		final Study study = studyDataManager.getStudy(studyId);
 
 		if (study == null) {
@@ -51,26 +52,28 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
-		if (filterByTypeIds != null) {
-			for (Integer dataSetTypeId : filterByTypeIds) {
+		if (datasetTypeIds != null) {
+			for (Integer dataSetTypeId : datasetTypeIds) {
 				final DataSetType dataSetType = DataSetType.findById(dataSetTypeId);
 				if (dataSetType == null) {
 					errors.reject("dataset.type.id.not.exist", new Object[] {dataSetTypeId}, "");
 					throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+				} else {
+					datasetTypeIdList.add(dataSetTypeId);
 				}
 			}
 		}
 
 		final List<org.generationcp.middleware.domain.dms.DatasetDTO> datasetDTOS =
-			this.middlewareDatasetService.getDatasetByStudyId(studyId, filterByTypeIds);
+			this.middlewareDatasetService.getDatasets(studyId, datasetTypeIdList);
 
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-		final List<DatasetDTO> DatasetDTOs = new ArrayList();
+		final List<DatasetDTO> datasetDTOs = new ArrayList();
 		for (org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO : datasetDTOS) {
 			final DatasetDTO datasetDto = mapper.map(datasetDTO, DatasetDTO.class);
-			DatasetDTOs.add(datasetDto);
+			datasetDTOs.add(datasetDto);
 		}
-		return DatasetDTOs;
+		return datasetDTOs;
 	}
 }
