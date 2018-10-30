@@ -67,7 +67,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		doReturn(datasets).when(this.studyDatasetService).getDatasets(100, null);
 
 		this.mockMvc
-			.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets/list", this.cropName, 100, null)
+			.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets", this.cropName, 100, null)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -80,7 +80,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		doReturn(datasets).when(this.studyDatasetService).getDatasets(100, null);
 
 		this.mockMvc
-			.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets/list", this.cropName, 100, null)
+			.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets", this.cropName, 100, null)
 				.param("filterByTypeIds", "10090").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -94,7 +94,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		errors.reject("study.not.exist", "");
 		Mockito.when(studyDatasetService.getDatasets(100, null)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets/list", this.cropName, 100, null)
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets", this.cropName, 100, null)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isNotFound())
@@ -110,7 +110,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		errors.reject("dataset.type.id.not.exist", new Object[]{100},"");
 		Mockito.when(studyDatasetService.getDatasets(100,filterByTypeIds)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets/list", this.cropName, 100, null)
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets", this.cropName, 100, null)
 			.param("filterByTypeIds", "100").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isNotFound())
