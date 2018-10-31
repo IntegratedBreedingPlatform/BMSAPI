@@ -1,7 +1,7 @@
 package org.ibp.api.rest.dataset;
 
-import java.util.Arrays;
-
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.ibp.api.java.dataset.DatasetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -14,8 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 @Api(value = "Dataset Services")
 @Controller
@@ -29,8 +30,8 @@ public class DatasetResource {
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables/observations", method = RequestMethod.HEAD)
 	@Transactional
 	public ResponseEntity<String> countPhenotypes(@PathVariable final String crop, @PathVariable final Integer studyId,
-			@PathVariable final Integer datasetId,  @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
-		
+		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
+
 		final long count = this.studyDatasetService.countPhenotypes(studyId, datasetId, Arrays.asList(variableIds));
 		final HttpHeaders respHeaders = new HttpHeaders();
 		respHeaders.add("X-Total-Count", String.valueOf(count));
@@ -38,4 +39,10 @@ public class DatasetResource {
 		return new ResponseEntity<>("", respHeaders, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "It will retrieve a list of datasets", notes = "Retrieves the list of datasets for the specified study.")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets", method = RequestMethod.GET)
+	public ResponseEntity<List<DatasetDTO>> getDatasets(@PathVariable final String crop, @PathVariable final Integer studyId,
+		@RequestParam(value = "filterByTypeIds", required = false) final Set<Integer> filterByTypeIds) {
+		return new ResponseEntity<>(this.studyDatasetService.getDatasets(studyId, filterByTypeIds), HttpStatus.OK);
+	}
 }

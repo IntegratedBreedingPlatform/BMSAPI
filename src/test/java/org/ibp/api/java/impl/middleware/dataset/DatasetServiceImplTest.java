@@ -1,10 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.generationcp.middleware.service.api.dataset.DatasetService;
-import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,9 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.springframework.validation.ObjectError;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class DatasetServiceImplTest {
 	
