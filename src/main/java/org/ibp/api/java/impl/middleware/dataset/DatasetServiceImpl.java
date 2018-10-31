@@ -158,10 +158,13 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	//FIXME replace Integer parentId by DatasetDTO parent
 	public DatasetDTO generateSubObservationDataset(final String cropName, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetGeneratorInput) {
 
 		// checks that study exists and it is not locked
 		this.studyValidator.validate(studyId, true);
+
+
 
 		//FIXME Add validation
 		// check that parentId exists
