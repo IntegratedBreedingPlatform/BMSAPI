@@ -4,13 +4,18 @@ import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.dataset.ObservationUnitTable;
 
 import java.util.List;
+import org.ibp.api.rest.dataset.DatasetDTO;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by clarysabel on 10/24/18.
  */
 public interface DatasetService {
 
-		//Integer generateSubObservationDataset(DatasetGeneratorInput datasetGeneratorInput);
+
+	List<DatasetDTO> getDatasetByStudyId(final Integer studyId, final Set<Integer> filterByTypeIds);
 
 	int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId);
 
