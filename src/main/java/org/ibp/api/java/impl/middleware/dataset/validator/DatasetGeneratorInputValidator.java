@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -20,6 +21,7 @@ import org.springframework.validation.Errors;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 @Component
@@ -61,9 +63,30 @@ public class DatasetGeneratorInputValidator {
 
 	public void validateBasicData(final String crop, final Integer studyId, final Integer parentId, final DatasetGeneratorInput o, final Errors errors) {
 
-		//FIXME check that parentId has types PLOT, CUSTOM, PLANT, QUADRAT, TIMESERIE
+		final List<DatasetDTO> allChildren = studyDatasetService.getDatasets(studyId, new HashSet<Integer>());
+		boolean found = false;
+		for (final DatasetDTO datasetDTO: allChildren) {
+			if (datasetDTO.getDatasetId().equals(parentId)) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			errors.reject("dataset.do.not.belong.to.study", new String[] {String.valueOf(parentId), String.valueOf(studyId)}, "");
+			return;
+		}
 
-		// Validate that the parent dataset does not have more than X children
+		//FIXME check that parentId has types PLOT, CUSTOM, PLANT, QUADRAT, TIMESERIE
+		// Check using DataSetType.isObservationDatasetType(type)
+		if (false) {
+			errors.reject("dataset.parent.not.allowed");
+			return;
+		}
+
+		if (studyDatasetService.getNumberOfChildren(parentId).equals(maxAllowedDatasetsPerParent)) {
+			errors.reject("dataset.creation.not.allowed", new String[] {String.valueOf(maxAllowedDatasetsPerParent)}, "");
+			return;
+		}
 
 		if (DataSetType.findById(o.getDatasetTypeId()) == null) {
 			errors.reject("dataset.type.id.not.exist", new String[] {String.valueOf(o.getDatasetTypeId())}, "");
@@ -115,8 +138,7 @@ public class DatasetGeneratorInputValidator {
 
 	public void validateDatasetTypeIsImplemented(final Integer datasetTypeId, final Errors errors) {
 		final DataSetType type = DataSetType.findById(datasetTypeId);
-		if (!DataSetType.CUSTOM_SUBOBSERVATIONS.equals(type) && !DataSetType.PLANT_SUBOBSERVATIONS.equals(type)
-				&& !DataSetType.QUADRAT_SUBOBSERVATIONS.equals(type) && !DataSetType.TIME_SERIES_SUBOBSERVATIONS.equals(type)) {
+		if (!DataSetType.isSubObservationDatasetType(type)){
 			errors.reject("dataset.operation.not.implemented", new String[] {String.valueOf(datasetTypeId)}, "");
 		}
 	}

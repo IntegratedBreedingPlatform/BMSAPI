@@ -118,12 +118,15 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Integer generateSubObservationDataset(final String cropName, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetGeneratorInput) {
+	public DatasetDTO generateSubObservationDataset(final String cropName, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetGeneratorInput) {
 
 		// checks that study exists and it is not locked
 		this.studyValidator.validate(studyId, true);
 
-		// check that parentId belongs to the study
+		//FIXME Add validation
+		// check that parentId exists
+		// ResourceNotFoundException
+		// getDataset
 
 		// checks input matches validation rules
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
@@ -146,10 +149,13 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new ConflictException(bindingResult.getAllErrors());
 		}
 
-		return middlewareDatasetService
-				.generateSubObservationDataset(studyId, datasetGeneratorInput.getDatasetName(), datasetGeneratorInput.getDatasetTypeId(),
-						Arrays.asList(datasetGeneratorInput.getInstanceIds()), datasetGeneratorInput.getSequenceVariableId(),
-						datasetGeneratorInput.getNumberOfSubObservationUnits());
+		org.generationcp.middleware.domain.dms.DatasetDTO mwDatasetDTO = middlewareDatasetService
+				.generateSubObservationDataset(studyId, parentId, datasetGeneratorInput.getDatasetName(), datasetGeneratorInput.getDatasetTypeId(),
+				Arrays.asList(datasetGeneratorInput.getInstanceIds()), datasetGeneratorInput.getSequenceVariableId(),
+				datasetGeneratorInput.getNumberOfSubObservationUnits());
+
+		//FIXME map middleware DTO to BMSAPI DTO
+		return null;
 	}
 	
 }

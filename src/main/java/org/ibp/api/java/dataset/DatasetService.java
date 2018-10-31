@@ -18,6 +18,6 @@ public interface DatasetService {
 	
 	List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds);
 	
-	Integer generateSubObservationDataset(String cropName, Integer studyId, Integer parentId, DatasetGeneratorInput datasetGeneratorInput);
+	DatasetDTO generateSubObservationDataset(String cropName, Integer studyId, Integer parentId, DatasetGeneratorInput datasetGeneratorInput);
 
 }
