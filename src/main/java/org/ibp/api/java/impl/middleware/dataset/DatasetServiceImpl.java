@@ -50,7 +50,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.middlewareDatasetService.addVariable(datasetId, variableId, type, alias);
 		final MeasurementVariable measurementVariable = this.measurementVariableTransformer.transform(traitVariable, false);
 		measurementVariable.setName(alias);
-		measurementVariable.setVariableType(VariableType.TRAIT);
+		measurementVariable.setVariableType(type);
 		measurementVariable.setRequired(false);
 		return measurementVariable;
 	}

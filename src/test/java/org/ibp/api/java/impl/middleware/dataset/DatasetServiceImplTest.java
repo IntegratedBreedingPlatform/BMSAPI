@@ -64,7 +64,8 @@ public class DatasetServiceImplTest {
 		final Random random = new Random();
 		final int studyId = random.nextInt();
 		final int datasetId = random.nextInt();
-		final int variableTypeId = VariableType.SELECTION_METHOD.getId();
+		final VariableType variableType = VariableType.SELECTION_METHOD;
+		final int variableTypeId = variableType.getId();
 		final int variableId = random.nextInt();
 		final String alias = RandomStringUtils.randomAlphabetic(20);
 		final DatasetVariable datasetVariable = new DatasetVariable(variableTypeId, variableId, alias);
@@ -74,10 +75,10 @@ public class DatasetServiceImplTest {
 		this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator).validateDatasetVariable(studyId, datasetId, true, datasetVariable, false);
-		Mockito.verify(this.middlewareDatasetService).addVariable(datasetId, variableId, VariableType.SELECTION_METHOD, alias);
+		Mockito.verify(this.middlewareDatasetService).addVariable(datasetId, variableId, variableType, alias);
 		Mockito.verify(this.measurementVariableTransformer).transform(this.standardVariable, false);
 		Mockito.verify(this.variable).setName(alias);
-		Mockito.verify(this.variable).setVariableType(VariableType.TRAIT);
+		Mockito.verify(this.variable).setVariableType(variableType);
 		Mockito.verify(this.variable).setRequired(false);
 	}
 	
