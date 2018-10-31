@@ -14,7 +14,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 
 /**
- * Data structure to extract and hold details needed to validateBasicData a measurement value.
+ * Data structure to extract and hold details needed to validate a measurement value.
  *
  */
 public class MeasurementDetails {
