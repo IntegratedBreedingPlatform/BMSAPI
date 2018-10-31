@@ -10,7 +10,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
-import org.ibp.api.domain.dataset.DatasetTrait;
+import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.junit.Before;
@@ -60,19 +60,21 @@ public class DatasetServiceImplTest {
 	}
 	
 	@Test
-	public void testAddDatasetTrait() {
+	public void testAddDatasetVariable() {
 		final Random random = new Random();
 		final int studyId = random.nextInt();
 		final int datasetId = random.nextInt();
-		final int traitId = random.nextInt();
+		final int variableTypeId = VariableType.SELECTION_METHOD.getId();
+		final int variableId = random.nextInt();
 		final String alias = RandomStringUtils.randomAlphabetic(20);
-		Mockito.doReturn(this.standardVariable).when(this.datasetValidator).validateDatasetTrait(studyId, datasetId, true, traitId, false);
+		final DatasetVariable datasetVariable = new DatasetVariable(variableTypeId, variableId, alias);
+		Mockito.doReturn(this.standardVariable).when(this.datasetValidator).validateDatasetVariable(studyId, datasetId, true, datasetVariable, false);
 		Mockito.doReturn(this.variable).when(this.measurementVariableTransformer).transform(this.standardVariable, false);
 		
-		this.studyDatasetService.addDatasetTrait(studyId, datasetId, new DatasetTrait(traitId, alias));
+		this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.datasetValidator).validateDatasetTrait(studyId, datasetId, true, traitId, false);
-		Mockito.verify(this.middlewareDatasetService).addTrait(datasetId, traitId, alias);
+		Mockito.verify(this.datasetValidator).validateDatasetVariable(studyId, datasetId, true, datasetVariable, false);
+		Mockito.verify(this.middlewareDatasetService).addVariable(datasetId, variableId, VariableType.SELECTION_METHOD, alias);
 		Mockito.verify(this.measurementVariableTransformer).transform(this.standardVariable, false);
 		Mockito.verify(this.variable).setName(alias);
 		Mockito.verify(this.variable).setVariableType(VariableType.TRAIT);

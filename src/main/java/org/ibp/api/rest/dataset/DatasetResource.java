@@ -4,7 +4,7 @@ package org.ibp.api.rest.dataset;
 import java.util.Arrays;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.ibp.api.domain.dataset.DatasetTrait;
+import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.java.dataset.DatasetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -42,13 +42,13 @@ public class DatasetResource {
 		return new ResponseEntity<>("", respHeaders, HttpStatus.OK);
 	}
 	
-	@ApiOperation(value = "Add Dataset Trait", notes = "Add trait as dataset variable")
+	@ApiOperation(value = "Add Dataset Variable", notes = "Add Dataset Variable")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables", method = RequestMethod.PUT)
 	@Transactional
 	public ResponseEntity<MeasurementVariable> addTrait(@PathVariable final String crop, @PathVariable final Integer studyId,
-			@PathVariable final Integer datasetId, @RequestBody final DatasetTrait datasetTrait) {
+			@PathVariable final Integer datasetId, @RequestBody final DatasetVariable datasetTrait) {
 		
-		final MeasurementVariable variable = this.studyDatasetService.addDatasetTrait(studyId, datasetId, datasetTrait);
+		final MeasurementVariable variable = this.studyDatasetService.addDatasetVariable(  studyId, datasetId, datasetTrait);
 		return new ResponseEntity<>(variable, HttpStatus.OK);
 	}
 

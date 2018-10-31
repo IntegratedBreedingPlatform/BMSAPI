@@ -6,7 +6,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
-import org.ibp.api.domain.dataset.DatasetTrait;
+import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
@@ -40,13 +40,14 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public MeasurementVariable addDatasetTrait(final Integer studyId, final Integer datasetId, final DatasetTrait datasetTrait) {
+	public MeasurementVariable addDatasetVariable(final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable) {
 		this.studyValidator.validate(studyId, true);
-		final Integer traitId = datasetTrait.getTraitId();
-		final StandardVariable traitVariable = this.datasetValidator.validateDatasetTrait(studyId, datasetId, true, traitId, false);
+		final Integer variableId = datasetVariable.getVariableId();
+		final StandardVariable traitVariable = this.datasetValidator.validateDatasetVariable(studyId, datasetId, true, datasetVariable, false);
 
-		final String alias = datasetTrait.getStudyAlias();
-		this.middlewareDatasetService.addTrait(datasetId, traitId, alias);
+		final String alias = datasetVariable.getStudyAlias();
+		final VariableType type = VariableType.getById(datasetVariable.getVariableTypeId());
+		this.middlewareDatasetService.addVariable(datasetId, variableId, type, alias);
 		final MeasurementVariable measurementVariable = this.measurementVariableTransformer.transform(traitVariable, false);
 		measurementVariable.setName(alias);
 		measurementVariable.setVariableType(VariableType.TRAIT);
