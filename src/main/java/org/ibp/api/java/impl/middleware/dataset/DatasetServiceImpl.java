@@ -10,10 +10,12 @@ import org.ibp.api.domain.dataset.DatasetVariable;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
+import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
@@ -48,6 +50,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private StudyDataManager studyDataManager;
+
+	@Autowired
+	private StudyService studyService;
 
 	@Override
 	public long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> traitIds) {
@@ -107,5 +112,23 @@ public class DatasetServiceImpl implements DatasetService {
 			datasetDTOs.add(datasetDto);
 		}
 		return datasetDTOs;
+	}
+
+	@Override
+	public DatasetDTO getDataset(final String crop, final Integer studyId, final Integer datasetId) {
+		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(datasetId);
+		final ModelMapper mapper = new ModelMapper();
+		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+		final DatasetDTO datasetDto = mapper.map(datasetDTO, DatasetDTO.class);
+		final List<StudyInstance> instances = new ArrayList();
+		for (org.generationcp.middleware.service.impl.study.StudyInstance instance : datasetDTO.getInstances()) {
+			final StudyInstance datasetInstance = mapper.map(instance, StudyInstance.class);
+			instances.add(datasetInstance);
+		}
+		datasetDto.setInstances(instances);
+		datasetDto.setStudyId(studyId);
+		datasetDto.setCropName(crop);
+
+		return datasetDto;
 	}
 }

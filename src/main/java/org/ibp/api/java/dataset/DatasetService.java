@@ -16,4 +16,6 @@ public interface DatasetService {
 	
 	List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds);
 
+	DatasetDTO getDataset(final String crop, final Integer studyId, final Integer datasetId);
+
 }
