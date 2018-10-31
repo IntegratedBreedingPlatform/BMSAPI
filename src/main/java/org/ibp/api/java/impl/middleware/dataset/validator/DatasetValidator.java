@@ -3,9 +3,7 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -68,10 +66,10 @@ public class DatasetValidator {
 		this.validateDataset(dataSet, shouldBeSubobservationDataset);
 
 		// Validate if variable exists and of supported variable type
-		this.validateVariableType(datasetVariable.getVariableTypeId());
+		final VariableType variableType = this.validateVariableType(datasetVariable.getVariableTypeId());
 		final Integer variableId = datasetVariable.getVariableId();
 		final StandardVariable standardVariable = this.ontologyDataManager.getStandardVariable(variableId, dataSet.getProgramUUID());
-		this.validateVariable(standardVariable);
+		this.validateVariable(standardVariable, variableType);
 
 		this.validateIfAlreadyDatasetVariable(variableId, shouldAlreadyBeDatasetVariable, dataSet);
 
@@ -105,7 +103,7 @@ public class DatasetValidator {
 		}
 	}
 
-	void validateVariableType(final Integer variableTypeId) {
+	VariableType validateVariableType(final Integer variableTypeId) {
 		final VariableType variableType = VariableType.getById(variableTypeId);
 		if (variableType == null) {
 			this.errors.reject("variable.type.does.not.exist", "");
@@ -116,19 +114,19 @@ public class DatasetValidator {
 			this.errors.reject("variable.type.not.supported", "");
 			throw new NotSupportedException(this.errors.getAllErrors().get(0));
 		}
+		
+		return variableType;
+		
 	}
 	
-	void validateVariable(final StandardVariable variable) {
+	void validateVariable(final StandardVariable variable, final VariableType variableType) {
 		if (variable == null) {
 			this.errors.reject("variable.does.not.exist", "");
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
 		
 		// Check if variable is configured to be given variable type
-		final Set<VariableType> supportedTypes = new HashSet<>();
-		supportedTypes.addAll(variable.getVariableTypes());
-		supportedTypes.retainAll(VALID_VARIABLE_TYPES);
-		if (supportedTypes.isEmpty()) {
+		if (!variable.getVariableTypes().contains(variableType)) {
 			this.errors.reject("variable.not.of.given.variable.type", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
