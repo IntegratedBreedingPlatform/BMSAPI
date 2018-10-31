@@ -131,6 +131,21 @@ public class DefaultExceptionHandler {
 	}
 
 	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(NotSupportedException.class)
+	@ResponseStatus(value = NOT_IMPLEMENTED)
+	@ResponseBody
+	public ErrorResponse handleNotSupportedException(NotSupportedException ex) {
+
+		ErrorResponse response = new ErrorResponse();
+
+		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
+		response.addError(message);
+
+		return response;
+	}
+
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
 	@ExceptionHandler(ConflictException.class)
 	@ResponseStatus(value = CONFLICT)
 	@ResponseBody
@@ -149,18 +164,5 @@ public class DefaultExceptionHandler {
 		}
 		return response;
 	}
-
-	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
-	@ExceptionHandler(NotImplementedException.class)
-	@ResponseStatus(value = NOT_IMPLEMENTED)
-	@ResponseBody
-	public ErrorResponse handleNotImplementedException(NotImplementedException ex) {
-
-		ErrorResponse response = new ErrorResponse();
-
-		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
-		response.addError(message);
-
-		return response;
-	}
+	
 }

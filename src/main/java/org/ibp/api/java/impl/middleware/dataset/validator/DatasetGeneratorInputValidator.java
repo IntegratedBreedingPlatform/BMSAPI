@@ -66,7 +66,7 @@ public class DatasetGeneratorInputValidator {
 		// Validate that the parent dataset does not have more than X children
 
 		if (DataSetType.findById(o.getDatasetTypeId()) == null) {
-			errors.reject("dataset.type.invalid", new String[] {String.valueOf(o.getDatasetTypeId())}, "");
+			errors.reject("dataset.type.id.not.exist", new String[] {String.valueOf(o.getDatasetTypeId())}, "");
 		}
 
 		if (o.getDatasetName() != null && o.getDatasetName().length() > 100) {
