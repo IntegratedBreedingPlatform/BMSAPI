@@ -1,16 +1,15 @@
 package org.ibp.api.java.dataset;
 
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.rest.dataset.DatasetDTO;
 
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.ibp.api.domain.dataset.DatasetVariable;
-
 public interface DatasetService {
 
-	List<MeasurementVariable> getSubObservationSetColumns(Integer subObservationSetId);
+	List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, Integer subObservationSetId);
 
 	long countPhenotypes(Integer studyId, Integer datasetId, List<Integer> traitIds);
 	

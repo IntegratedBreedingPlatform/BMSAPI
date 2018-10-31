@@ -47,7 +47,12 @@ public class DatasetServiceImpl implements DatasetService {
 	private StudyDataManager studyDataManager;
 
 	@Override
-	public List<MeasurementVariable> getSubObservationSetColumns(final Integer subObservationSetId) {
+	public List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId) {
+		this.studyValidator.validate(studyId, false);
+
+		// TODO generalize to any obs dataset (plot/subobs), make 3rd param false
+		this.datasetValidator.validateDataset(studyId, subObservationSetId, true);
+
 		return this.middlewareDatasetService.getSubObservationSetColumns(subObservationSetId);
 	}
 

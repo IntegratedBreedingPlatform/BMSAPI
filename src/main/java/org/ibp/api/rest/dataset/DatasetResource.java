@@ -37,7 +37,7 @@ public class DatasetResource {
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
 
-		final List<MeasurementVariable> subObservationSetColumns = this.studyDatasetService.getSubObservationSetColumns(datasetId);
+		final List<MeasurementVariable> subObservationSetColumns = this.studyDatasetService.getSubObservationSetColumns(studyId, datasetId);
 
 		return new ResponseEntity<>(subObservationSetColumns, HttpStatus.OK);
 	}
