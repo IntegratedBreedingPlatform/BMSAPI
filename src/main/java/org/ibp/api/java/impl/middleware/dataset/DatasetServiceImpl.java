@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
+import org.generationcp.middleware.domain.dms.DataSetType;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ConflictException;
 import org.ibp.api.exception.NotSupportedException;
@@ -7,18 +8,19 @@ import org.ibp.api.java.impl.middleware.dataset.validator.DatasetGeneratorInputV
 import org.springframework.stereotype.Service;
 
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.generationcp.middleware.domain.dms.DataSetType;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.rest.dataset.DatasetDTO;
+import org.ibp.api.rest.dataset.ObservationUnitData;
+import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
@@ -32,6 +34,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -44,10 +47,10 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private StudyValidator studyValidator;
-	
+
 	@Autowired
 	private DatasetValidator datasetValidator;
-	
+
 	@Autowired
 	private MeasurementVariableTransformer measurementVariableTransformer;
 
@@ -58,10 +61,20 @@ public class DatasetServiceImpl implements DatasetService {
 	private StudyDataManager studyDataManager;
 
 	@Override
+	public List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId) {
+		this.studyValidator.validate(studyId, false);
+
+		// TODO generalize to any obs dataset (plot/subobs), make 3rd param false
+		this.datasetValidator.validateDataset(studyId, subObservationSetId, true);
+
+		return this.middlewareDatasetService.getSubObservationSetColumns(subObservationSetId);
+	}
+
+	@Override
 	public long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> traitIds) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
-		
+
 		return this.middlewareDatasetService.countPhenotypes(datasetId, traitIds);
 	}
 
@@ -85,7 +98,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		final Set<Integer> datasetTypeIdList = new TreeSet<>();
-		final Study study = studyDataManager.getStudy(studyId);
+		final Study study = this.studyDataManager.getStudy(studyId);
 
 		if (study == null) {
 			errors.reject("study.not.exist", "");
@@ -93,7 +106,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		if (datasetTypeIds != null) {
-			for (Integer dataSetTypeId : datasetTypeIds) {
+			for (final Integer dataSetTypeId : datasetTypeIds) {
 				final DataSetType dataSetType = DataSetType.findById(dataSetTypeId);
 				if (dataSetType == null) {
 					errors.reject("dataset.type.id.not.exist", new Object[] {dataSetTypeId}, "");
@@ -110,11 +123,38 @@ public class DatasetServiceImpl implements DatasetService {
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final List<DatasetDTO> datasetDTOs = new ArrayList();
-		for (org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO : datasetDTOS) {
+		for (final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO : datasetDTOS) {
 			final DatasetDTO datasetDto = mapper.map(datasetDTO, DatasetDTO.class);
 			datasetDTOs.add(datasetDto);
 		}
 		return datasetDTOs;
+	}
+	@Override
+	public int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId) {
+		return this.middlewareDatasetService.countTotalObservationUnitsForDataset(datasetId, instanceId);
+	}
+
+	@Override
+	public List<ObservationUnitRow> getObservationUnitRows(final int studyId, final int datasetId, final int instanceId,
+		final int pageNumber, final int pageSize, final String sortBy, final String sortOrder) {
+		this.studyValidator.validate(studyId, false);
+		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
+			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
+		final ModelMapper observationUnitRowMapper = new ModelMapper();
+		final ModelMapper observationUnitDataMapper = new ModelMapper();
+		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+		observationUnitDataMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+		final List<ObservationUnitRow> list = new ArrayList<>();
+		for (final org.generationcp.middleware.service.api.dataset.ObservationUnitRow dto : observationUnitRows) {
+			final Map<String, ObservationUnitData> datas = new HashMap<>();
+			for (final String data : dto.getVariables().keySet()) {
+				datas.put(data, observationUnitDataMapper.map(dto.getVariables().get(data), ObservationUnitData.class));
+			}
+			final ObservationUnitRow observationUnitRow = observationUnitRowMapper.map(dto, ObservationUnitRow.class);
+			observationUnitRow.setVariables(datas);
+			list.add(observationUnitRow);
+		}
+		return list;
 	}
 
 	@Override
