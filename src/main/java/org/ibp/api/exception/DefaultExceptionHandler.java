@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -119,6 +120,20 @@ public class DefaultExceptionHandler {
 	@ResponseStatus(value = FORBIDDEN)
 	@ResponseBody
 	public ErrorResponse handleForbiddenException(ForbiddenException ex) {
+
+		ErrorResponse response = new ErrorResponse();
+
+		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
+		response.addError(message);
+
+		return response;
+	}
+	
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(NotSupportedException.class)
+	@ResponseStatus(value = HttpStatus.NOT_IMPLEMENTED)
+	@ResponseBody
+	public ErrorResponse handleNotSupportedException(NotSupportedException ex) {
 
 		ErrorResponse response = new ErrorResponse();
 
