@@ -74,10 +74,9 @@ public class DatasetResource {
 	@ApiOperation(value = "Generate and save a sub-observation dataset", notes = "Returns the basic information for the generated dataset")
 	@RequestMapping(value = "/{cropName}/studies/{studyId}/datasets/{parentId}/generation", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Observation> generateDataset(@PathVariable
+	public ResponseEntity<DatasetDTO> generateDataset(@PathVariable
 	final String cropName, @PathVariable final Integer studyId, @PathVariable final Integer parentId, @RequestBody final DatasetGeneratorInput datasetGeneratorInput) {
-		studyDatasetService.generateSubObservationDataset(cropName, studyId, parentId, datasetGeneratorInput);
-		return null;
+		return new ResponseEntity<>(this.studyDatasetService.generateSubObservationDataset(cropName, studyId, parentId, datasetGeneratorInput), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "It will retrieve all the observation units", notes = "It will retrieve all the observation units including observations and props values in a format that will be used by the Observations table.")

@@ -35,7 +35,6 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -134,15 +133,16 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Integer generateSubObservationDataset(final String cropName, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetGeneratorInput) {
+	public DatasetDTO generateSubObservationDataset(final String cropName, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetGeneratorInput) {
 
 		// checks that study exists and it is not locked
 		this.studyValidator.validate(studyId, true);
 
-		// check that parentId belongs to the study
-
 		// checks input matches validation rules
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
+
+		// check that parentId belongs to the study
+		this.datasetGeneratorInputValidator.validateParentBelongsToStudy(studyId, parentId, bindingResult);
 
 		this.datasetGeneratorInputValidator.validateBasicData(cropName, studyId, parentId, datasetGeneratorInput, bindingResult);
 
@@ -162,10 +162,13 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new ConflictException(bindingResult.getAllErrors());
 		}
 
-		return middlewareDatasetService
-				.generateSubObservationDataset(studyId, datasetGeneratorInput.getDatasetName(), datasetGeneratorInput.getDatasetTypeId(),
-						Arrays.asList(datasetGeneratorInput.getInstanceIds()), datasetGeneratorInput.getSequenceVariableId(),
-						datasetGeneratorInput.getNumberOfSubObservationUnits());
+		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService
+			.generateSubObservationDataset(studyId, datasetGeneratorInput.getDatasetName(), datasetGeneratorInput.getDatasetTypeId(),
+				Arrays.asList(datasetGeneratorInput.getInstanceIds()), datasetGeneratorInput.getSequenceVariableId(),
+				datasetGeneratorInput.getNumberOfSubObservationUnits(), parentId);
+		final ModelMapper mapper = new ModelMapper();
+		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+		return mapper.map(datasetDTO, DatasetDTO.class);
 	}
 
 
@@ -176,7 +179,7 @@ public class DatasetServiceImpl implements DatasetService {
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final DatasetDTO datasetDto = mapper.map(datasetDTO, DatasetDTO.class);
 		final List<StudyInstance> instances = new ArrayList();
-		for (org.generationcp.middleware.service.impl.study.StudyInstance instance : datasetDTO.getInstances()) {
+		for (final org.generationcp.middleware.service.impl.study.StudyInstance instance : datasetDTO.getInstances()) {
 			final StudyInstance datasetInstance = mapper.map(instance, StudyInstance.class);
 			instances.add(datasetInstance);
 		}
