@@ -1,6 +1,7 @@
 package org.ibp.api.rest.dataset;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.ibp.api.domain.study.StudyInstance;
 import org.pojomatic.Pojomatic;
@@ -11,6 +12,8 @@ import java.util.List;
 
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({"datasetId", "name", "description", "datasetTypeId", "studyId", "parentDatasetId", "cropName", "variables",
+	"instances"})
 public class DatasetDTO implements Serializable {
 
 	private Integer datasetId;
