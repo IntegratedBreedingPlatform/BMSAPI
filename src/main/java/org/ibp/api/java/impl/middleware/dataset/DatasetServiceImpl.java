@@ -1,13 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import org.generationcp.middleware.domain.dms.DataSetType;
-import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.exception.ConflictException;
-import org.ibp.api.exception.NotSupportedException;
-import org.ibp.api.java.impl.middleware.dataset.validator.DatasetGeneratorInputValidator;
-import org.springframework.stereotype.Service;
-
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -16,24 +9,28 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
+import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ConflictException;
+import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.java.impl.middleware.dataset.validator.DatasetGeneratorInputValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.rest.dataset.DatasetDTO;
+import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
-import org.ibp.api.rest.dataset.DatasetGeneratorInput;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,46 +131,6 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public DatasetDTO generateSubObservationDataset(final String cropName, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetGeneratorInput) {
-
-		// checks that study exists and it is not locked
-		this.studyValidator.validate(studyId, true);
-
-		// checks input matches validation rules
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
-
-		// check that parentId belongs to the study
-		this.datasetGeneratorInputValidator.validateParentBelongsToStudy(studyId, parentId, bindingResult);
-
-		this.datasetGeneratorInputValidator.validateBasicData(cropName, studyId, parentId, datasetGeneratorInput, bindingResult);
-
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
-
-		// not implemented yet
-		this.datasetGeneratorInputValidator.validateDatasetTypeIsImplemented(datasetGeneratorInput.getDatasetTypeId(), bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new NotSupportedException(bindingResult.getAllErrors().get(0));
-		}
-
-		// conflict
-		this.datasetGeneratorInputValidator.validateDataConflicts(studyId, datasetGeneratorInput, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ConflictException(bindingResult.getAllErrors());
-		}
-
-		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService
-			.generateSubObservationDataset(studyId, datasetGeneratorInput.getDatasetName(), datasetGeneratorInput.getDatasetTypeId(),
-				Arrays.asList(datasetGeneratorInput.getInstanceIds()), datasetGeneratorInput.getSequenceVariableId(),
-				datasetGeneratorInput.getNumberOfSubObservationUnits(), parentId);
-		final ModelMapper mapper = new ModelMapper();
-		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-		return mapper.map(datasetDTO, DatasetDTO.class);
-	}
-
-
-	@Override
 	public DatasetDTO getDataset(final String crop, final Integer studyId, final Integer datasetId) {
 		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(datasetId);
 		final ModelMapper mapper = new ModelMapper();
@@ -219,22 +176,18 @@ public class DatasetServiceImpl implements DatasetService {
 		return list;
 	}
 
+
 	@Override
-	//FIXME replace Integer parentId by DatasetDTO parent
 	public DatasetDTO generateSubObservationDataset(final String cropName, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetGeneratorInput) {
 
 		// checks that study exists and it is not locked
 		this.studyValidator.validate(studyId, true);
 
-
-
-		//FIXME Add validation
-		// check that parentId exists
-		// ResourceNotFoundException
-		// getDataset
-
 		// checks input matches validation rules
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
+
+		// check that parentId belongs to the study
+		this.datasetGeneratorInputValidator.validateParentBelongsToStudy(studyId, parentId, bindingResult);
 
 		this.datasetGeneratorInputValidator.validateBasicData(cropName, studyId, parentId, datasetGeneratorInput, bindingResult);
 
@@ -254,13 +207,12 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new ConflictException(bindingResult.getAllErrors());
 		}
 
-		org.generationcp.middleware.domain.dms.DatasetDTO mwDatasetDTO = middlewareDatasetService
-				.generateSubObservationDataset(studyId, parentId, datasetGeneratorInput.getDatasetName(), datasetGeneratorInput.getDatasetTypeId(),
+		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService
+			.generateSubObservationDataset(studyId, datasetGeneratorInput.getDatasetName(), datasetGeneratorInput.getDatasetTypeId(),
 				Arrays.asList(datasetGeneratorInput.getInstanceIds()), datasetGeneratorInput.getSequenceVariableId(),
-				datasetGeneratorInput.getNumberOfSubObservationUnits());
-
-		//FIXME map middleware DTO to BMSAPI DTO
-		return null;
+				datasetGeneratorInput.getNumberOfSubObservationUnits(), parentId);
+		final ModelMapper mapper = new ModelMapper();
+		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+		return mapper.map(datasetDTO, DatasetDTO.class);
 	}
-
 }

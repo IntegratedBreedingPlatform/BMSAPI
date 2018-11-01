@@ -66,9 +66,8 @@ public class DatasetGeneratorInputValidator {
 
 	public void validateBasicData(final String crop, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetInputGenerator, final Errors errors) {
 		final DatasetDTO dataset = this.studyDatasetService.getDataset(parentId);
-	public void validateBasicData(final String crop, final Integer studyId, final Integer parentId, final DatasetGeneratorInput o, final Errors errors) {
 
-		final List<DatasetDTO> allChildren = studyDatasetService.getDatasets(studyId, new HashSet<Integer>());
+		final List<DatasetDTO> allChildren = this.studyDatasetService.getDatasets(studyId, new HashSet<Integer>());
 		boolean found = false;
 		for (final DatasetDTO datasetDTO: allChildren) {
 			if (datasetDTO.getDatasetId().equals(parentId)) {
@@ -95,8 +94,8 @@ public class DatasetGeneratorInputValidator {
 			errors.reject("dataset.parent.type.id.not.exist");
 		}
 		// Validate that the parent dataset does not have more than X children
-		if (studyDatasetService.getNumberOfChildren(parentId).equals(maxAllowedDatasetsPerParent)) {
-			errors.reject("dataset.creation.not.allowed", new String[] {String.valueOf(maxAllowedDatasetsPerParent)}, "");
+		if (this.studyDatasetService.getNumberOfChildren(parentId).equals(this.maxAllowedDatasetsPerParent)) {
+			errors.reject("dataset.creation.not.allowed", new String[] {String.valueOf(this.maxAllowedDatasetsPerParent)}, "");
 			return;
 		}
 
