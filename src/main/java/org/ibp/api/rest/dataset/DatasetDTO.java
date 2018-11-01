@@ -1,6 +1,7 @@
 package org.ibp.api.rest.dataset;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.ibp.api.domain.study.StudyInstance;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -27,6 +28,8 @@ public class DatasetDTO implements Serializable {
 	private String cropName;
 
 	private List<StudyInstance> instances;
+
+	private List<MeasurementVariable> variables;
 
 
 	public Integer getDatasetId() {
@@ -93,6 +96,14 @@ public class DatasetDTO implements Serializable {
 		this.instances = instances;
 	}
 
+	public List<MeasurementVariable> getVariables() {
+		return variables;
+	}
+
+	public void setVariables(final List<MeasurementVariable> variables) {
+		this.variables = variables;
+	}
+
 	@Override
 	public int hashCode() {
 		return Pojomatic.hashCode(this);
@@ -107,4 +118,5 @@ public class DatasetDTO implements Serializable {
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
+
 }
