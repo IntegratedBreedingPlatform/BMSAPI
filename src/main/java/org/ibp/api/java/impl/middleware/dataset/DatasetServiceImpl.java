@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
+import org.generationcp.middleware.domain.dms.DataSetType;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ConflictException;
 import org.ibp.api.exception.NotSupportedException;
@@ -217,4 +218,49 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 		return list;
 	}
+
+	@Override
+	//FIXME replace Integer parentId by DatasetDTO parent
+	public DatasetDTO generateSubObservationDataset(final String cropName, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetGeneratorInput) {
+
+		// checks that study exists and it is not locked
+		this.studyValidator.validate(studyId, true);
+
+
+
+		//FIXME Add validation
+		// check that parentId exists
+		// ResourceNotFoundException
+		// getDataset
+
+		// checks input matches validation rules
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
+
+		this.datasetGeneratorInputValidator.validateBasicData(cropName, studyId, parentId, datasetGeneratorInput, bindingResult);
+
+		if (bindingResult.hasErrors()) {
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
+		// not implemented yet
+		this.datasetGeneratorInputValidator.validateDatasetTypeIsImplemented(datasetGeneratorInput.getDatasetTypeId(), bindingResult);
+		if (bindingResult.hasErrors()) {
+			throw new NotSupportedException(bindingResult.getAllErrors().get(0));
+		}
+
+		// conflict
+		this.datasetGeneratorInputValidator.validateDataConflicts(studyId, datasetGeneratorInput, bindingResult);
+		if (bindingResult.hasErrors()) {
+			throw new ConflictException(bindingResult.getAllErrors());
+		}
+
+		org.generationcp.middleware.domain.dms.DatasetDTO mwDatasetDTO = middlewareDatasetService
+				.generateSubObservationDataset(studyId, parentId, datasetGeneratorInput.getDatasetName(), datasetGeneratorInput.getDatasetTypeId(),
+				Arrays.asList(datasetGeneratorInput.getInstanceIds()), datasetGeneratorInput.getSequenceVariableId(),
+				datasetGeneratorInput.getNumberOfSubObservationUnits());
+
+		//FIXME map middleware DTO to BMSAPI DTO
+		return null;
+	}
+
 }

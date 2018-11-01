@@ -1,14 +1,16 @@
 package org.ibp.api.rest.dataset;
 
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.ibp.api.domain.dataset.DatasetVariable;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.ibp.api.domain.study.Observation;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
+import org.ibp.api.domain.study.Observation;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -53,7 +55,8 @@ public class DatasetResource {
 	@ApiOperation(value = "Count Phenotypes", notes = "Returns count of phenotypes for variables")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables/observations", method = RequestMethod.HEAD)
 	public ResponseEntity<String> countPhenotypes(@PathVariable final String crop, @PathVariable final Integer studyId,
-			@PathVariable final Integer datasetId,  @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
+		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
+
 		final long count = this.studyDatasetService.countPhenotypes(studyId, datasetId, Arrays.asList(variableIds));
 		final HttpHeaders respHeaders = new HttpHeaders();
 		respHeaders.add("X-Total-Count", String.valueOf(count));
@@ -117,6 +120,15 @@ public class DatasetResource {
 		observationUnitTable.setRecordsTotal((int) pageResult.getTotalResults());
 		observationUnitTable.setRecordsFiltered((int) pageResult.getTotalResults());
 		return new ResponseEntity<>(observationUnitTable, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Generate and save a sub-observation dataset", notes = "Returns the basic information for the generated dataset")
+	@RequestMapping(value = "/{cropName}/studies/{studyId}/datasets/{parentId}/generation", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Observation> generateDataset(@PathVariable
+	final String cropName, @PathVariable final Integer studyId, @PathVariable final Integer parentId, @RequestBody final DatasetGeneratorInput datasetGeneratorInput) {
+		studyDatasetService.generateSubObservationDataset(cropName, studyId, parentId, datasetGeneratorInput);
+		return null;
 	}
 
 	@ApiOperation(value = "It will retrieve a list of datasets", notes = "Retrieves the list of datasets for the specified study.")

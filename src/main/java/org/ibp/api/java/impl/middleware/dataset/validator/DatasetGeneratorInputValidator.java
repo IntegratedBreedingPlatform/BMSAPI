@@ -66,6 +66,27 @@ public class DatasetGeneratorInputValidator {
 
 	public void validateBasicData(final String crop, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetInputGenerator, final Errors errors) {
 		final DatasetDTO dataset = this.studyDatasetService.getDataset(parentId);
+	public void validateBasicData(final String crop, final Integer studyId, final Integer parentId, final DatasetGeneratorInput o, final Errors errors) {
+
+		final List<DatasetDTO> allChildren = studyDatasetService.getDatasets(studyId, new HashSet<Integer>());
+		boolean found = false;
+		for (final DatasetDTO datasetDTO: allChildren) {
+			if (datasetDTO.getDatasetId().equals(parentId)) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			errors.reject("dataset.do.not.belong.to.study", new String[] {String.valueOf(parentId), String.valueOf(studyId)}, "");
+			return;
+		}
+
+		//FIXME check that parentId has types PLOT, CUSTOM, PLANT, QUADRAT, TIMESERIE
+		// Check using DataSetType.isObservationDatasetType(type)
+		if (false) {
+			errors.reject("dataset.parent.not.allowed");
+			return;
+		}
 
 		if (!(dataset.getDatasetTypeId().equals(DataSetType.PLOT_DATA.getId()) || dataset.getDatasetTypeId()
 			.equals(DataSetType.CUSTOM_SUBOBSERVATIONS.getId())
@@ -74,6 +95,10 @@ public class DatasetGeneratorInputValidator {
 			errors.reject("dataset.parent.type.id.not.exist");
 		}
 		// Validate that the parent dataset does not have more than X children
+		if (studyDatasetService.getNumberOfChildren(parentId).equals(maxAllowedDatasetsPerParent)) {
+			errors.reject("dataset.creation.not.allowed", new String[] {String.valueOf(maxAllowedDatasetsPerParent)}, "");
+			return;
+		}
 
 		if (DataSetType.findById(datasetInputGenerator.getDatasetTypeId()) == null) {
 			errors.reject("dataset.type.id.not.exist", new String[] {String.valueOf(datasetInputGenerator.getDatasetTypeId())}, "");
@@ -124,8 +149,7 @@ public class DatasetGeneratorInputValidator {
 
 	public void validateDatasetTypeIsImplemented(final Integer datasetTypeId, final Errors errors) {
 		final DataSetType type = DataSetType.findById(datasetTypeId);
-		if (!DataSetType.CUSTOM_SUBOBSERVATIONS.equals(type) && !DataSetType.PLANT_SUBOBSERVATIONS.equals(type)
-				&& !DataSetType.QUADRAT_SUBOBSERVATIONS.equals(type) && !DataSetType.TIME_SERIES_SUBOBSERVATIONS.equals(type)) {
+		if (!DataSetType.isSubObservationDatasetType(type)){
 			errors.reject("dataset.operation.not.implemented", new String[] {String.valueOf(datasetTypeId)}, "");
 		}
 	}
