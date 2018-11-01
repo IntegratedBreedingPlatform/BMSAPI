@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.ibp.api.domain.dataset.DatasetVariable;
+import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
@@ -40,17 +41,24 @@ public class DatasetServiceImpl implements DatasetService {
 	@Autowired
 	private StudyValidator studyValidator;
 
-
 	@Autowired
 	private DatasetValidator datasetValidator;
 
 	@Autowired
 	private MeasurementVariableTransformer measurementVariableTransformer;
 
-
-
 	@Autowired
 	private StudyDataManager studyDataManager;
+
+	@Override
+	public List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId) {
+		this.studyValidator.validate(studyId, false);
+
+		// TODO generalize to any obs dataset (plot/subobs), make 3rd param false
+		this.datasetValidator.validateDataset(studyId, subObservationSetId, true);
+
+		return this.middlewareDatasetService.getSubObservationSetColumns(subObservationSetId);
+	}
 
 	@Override
 	public long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> traitIds) {
@@ -111,6 +119,25 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 		return datasetDTOs;
 	}
+
+	@Override
+	public DatasetDTO getDataset(final String crop, final Integer studyId, final Integer datasetId) {
+		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(datasetId);
+		final ModelMapper mapper = new ModelMapper();
+		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+		final DatasetDTO datasetDto = mapper.map(datasetDTO, DatasetDTO.class);
+		final List<StudyInstance> instances = new ArrayList();
+		for (org.generationcp.middleware.service.impl.study.StudyInstance instance : datasetDTO.getInstances()) {
+			final StudyInstance datasetInstance = mapper.map(instance, StudyInstance.class);
+			instances.add(datasetInstance);
+		}
+		datasetDto.setInstances(instances);
+		datasetDto.setStudyId(studyId);
+		datasetDto.setCropName(crop);
+
+		return datasetDto;
+	}
+
 	@Override
 	public int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId) {
 		return this.middlewareDatasetService.countTotalObservationUnitsForDataset(datasetId, instanceId);
