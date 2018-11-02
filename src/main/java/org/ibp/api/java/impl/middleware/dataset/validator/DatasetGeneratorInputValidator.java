@@ -2,9 +2,6 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.collections.Transformer;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
@@ -23,7 +20,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -67,9 +63,6 @@ public class DatasetGeneratorInputValidator {
 
 	public void validateBasicData(final String crop, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetInputGenerator, final Errors errors) {
 		final DatasetDTO dataset = this.studyDatasetService.getDataset(studyId, parentId);
-
-		if (this.validateDatasetBelongsToStudy(studyId, parentId, errors))
-			return;
 
 		final DataSetType dataSetType = DataSetType.findById(datasetInputGenerator.getDatasetTypeId());
 		if (dataSetType == null) {
@@ -122,22 +115,6 @@ public class DatasetGeneratorInputValidator {
 		if (datasetInputGenerator.getNumberOfSubObservationUnits() > this.maxAllowedSubobservationUnits) {
 			errors.reject("dataset.invalid.number.subobs.units", new String[] {String.valueOf(this.maxAllowedSubobservationUnits)}, "");
 		}
-	}
-
-	public boolean validateDatasetBelongsToStudy(final Integer studyId, final Integer parentId, final Errors errors) {
-		final List<DatasetDTO> allChildren = this.studyDatasetService.getDatasets(studyId, new HashSet<Integer>());
-		boolean found = false;
-		for (final DatasetDTO datasetDTO: allChildren) {
-			if (datasetDTO.getDatasetId().equals(parentId)) {
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
-			errors.reject("dataset.do.not.belong.to.study", new String[] {String.valueOf(parentId), String.valueOf(studyId)}, "");
-			return true;
-		}
-		return false;
 	}
 
 	public void validateDataConflicts(final Integer studyId, final DatasetGeneratorInput o, final Errors errors) {
