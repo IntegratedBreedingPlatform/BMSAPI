@@ -132,7 +132,22 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public DatasetDTO getDataset(final String crop, final Integer studyId, final Integer datasetId) {
-		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(datasetId);
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
+		final Study study = this.studyDataManager.getStudy(studyId);
+
+		if (study == null) {
+			errors.reject("study.not.exist", "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
+
+		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(studyId, datasetId);
+
+		if (datasetDTO == null) {
+			errors.reject("dataset.does.not.exist", "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
+
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final DatasetDTO datasetDto = mapper.map(datasetDTO, DatasetDTO.class);

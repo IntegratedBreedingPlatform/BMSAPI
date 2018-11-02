@@ -131,7 +131,7 @@ public class DatasetResource {
 
 	@ApiOperation(value = "It will retrieve a dataset given the id", notes = "Retrieves a dataset given the id")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}", method = RequestMethod.GET)
-	public ResponseEntity<DatasetDTO> getDatasets(@PathVariable final String crop,
+	public ResponseEntity<DatasetDTO> getDataset(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
 		return new ResponseEntity<>(this.studyDatasetService.getDataset(crop, studyId, datasetId), HttpStatus.OK);
