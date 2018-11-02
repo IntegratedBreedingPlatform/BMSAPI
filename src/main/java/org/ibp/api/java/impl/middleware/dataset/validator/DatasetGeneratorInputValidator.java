@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -67,40 +68,24 @@ public class DatasetGeneratorInputValidator {
 	public void validateBasicData(final String crop, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetInputGenerator, final Errors errors) {
 		final DatasetDTO dataset = this.studyDatasetService.getDataset(parentId);
 
-		final List<DatasetDTO> allChildren = this.studyDatasetService.getDatasets(studyId, new HashSet<Integer>());
-		boolean found = false;
-		for (final DatasetDTO datasetDTO: allChildren) {
-			if (datasetDTO.getDatasetId().equals(parentId)) {
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
-			errors.reject("dataset.do.not.belong.to.study", new String[] {String.valueOf(parentId), String.valueOf(studyId)}, "");
+		if (validateDatasetBelongsToStudy(studyId, parentId, errors))
+			return;
+
+		final DataSetType dataSetType = DataSetType.findById(datasetInputGenerator.getDatasetTypeId());
+		if (dataSetType == null) {
+			errors.reject("dataset.type.id.not.exist", new String[] {String.valueOf(datasetInputGenerator.getDatasetTypeId())}, "");
 			return;
 		}
 
-		//FIXME check that parentId has types PLOT, CUSTOM, PLANT, QUADRAT, TIMESERIE
-		// Check using DataSetType.isObservationDatasetType(type)
-		if (false) {
+		if (!DataSetType.isObservationDatasetType(dataSetType)) {
 			errors.reject("dataset.parent.not.allowed");
 			return;
 		}
 
-		if (!(dataset.getDatasetTypeId().equals(DataSetType.PLOT_DATA.getId()) || dataset.getDatasetTypeId()
-			.equals(DataSetType.CUSTOM_SUBOBSERVATIONS.getId())
-			|| dataset.getDatasetTypeId().equals(DataSetType.QUADRAT_SUBOBSERVATIONS.getId()) || dataset.getDatasetTypeId()
-			.equals(DataSetType.TIME_SERIES_SUBOBSERVATIONS.getId()))) {
-			errors.reject("dataset.parent.type.id.not.exist");
-		}
 		// Validate that the parent dataset does not have more than X children
 		if (this.studyDatasetService.getNumberOfChildren(parentId).equals(this.maxAllowedDatasetsPerParent)) {
 			errors.reject("dataset.creation.not.allowed", new String[] {String.valueOf(this.maxAllowedDatasetsPerParent)}, "");
 			return;
-		}
-
-		if (DataSetType.findById(datasetInputGenerator.getDatasetTypeId()) == null) {
-			errors.reject("dataset.type.id.not.exist", new String[] {String.valueOf(datasetInputGenerator.getDatasetTypeId())}, "");
 		}
 
 		if (datasetInputGenerator.getDatasetName() != null && datasetInputGenerator.getDatasetName().length() > 100) {
@@ -139,6 +124,22 @@ public class DatasetGeneratorInputValidator {
 		}
 	}
 
+	public boolean validateDatasetBelongsToStudy(final Integer studyId, final Integer parentId, final Errors errors) {
+		final List<DatasetDTO> allChildren = this.studyDatasetService.getDatasets(studyId, new HashSet<Integer>());
+		boolean found = false;
+		for (final DatasetDTO datasetDTO: allChildren) {
+			if (datasetDTO.getDatasetId().equals(parentId)) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			errors.reject("dataset.do.not.belong.to.study", new String[] {String.valueOf(parentId), String.valueOf(studyId)}, "");
+			return true;
+		}
+		return false;
+	}
+
 	public void validateDataConflicts(final Integer studyId, final DatasetGeneratorInput o, final Errors errors) {
 		final Study study = this.studyDataManager.getStudy(studyId);
 		if (!this.studyDatasetService.isDatasetNameAvailable(o.getDatasetName(), study.getProgramUUID())) {
@@ -150,22 +151,6 @@ public class DatasetGeneratorInputValidator {
 		final DataSetType type = DataSetType.findById(datasetTypeId);
 		if (!DataSetType.isSubObservationDatasetType(type)){
 			errors.reject("dataset.operation.not.implemented", new String[] {String.valueOf(datasetTypeId)}, "");
-		}
-	}
-
-	public void validateParentBelongsToStudy(final Integer studyId, final Integer parentId, final Errors errors) {
-		final List<DatasetDTO> datasets = this.studyDatasetService.getDatasets(studyId, new HashSet<Integer>());
-
-		final List<Integer> parentDatasetIds = (List<Integer>) CollectionUtils.collect(datasets, new Transformer() {
-			@Override
-			public Integer transform(final Object input) {
-				final DatasetDTO variable = (DatasetDTO) input;
-				return variable.getParentDatasetId();
-			}
-		});
-
-		if (!parentDatasetIds.contains(parentId)) {
-			errors.reject("dataset.parent.does.not.belong.to.study");
 		}
 	}
 }
