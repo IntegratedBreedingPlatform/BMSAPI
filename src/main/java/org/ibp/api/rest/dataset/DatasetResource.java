@@ -1,16 +1,11 @@
 package org.ibp.api.rest.dataset;
 
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.ibp.api.domain.dataset.DatasetVariable;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import org.ibp.api.domain.study.Observation;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.study.Observation;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -125,8 +120,8 @@ public class DatasetResource {
 	@ApiOperation(value = "It will retrieve a list of datasets", notes = "Retrieves the list of datasets for the specified study.")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets", method = RequestMethod.GET)
 	public ResponseEntity<List<DatasetDTO>> getDatasets(@PathVariable final String crop, @PathVariable final Integer studyId,
-		@RequestParam(value = "filterByTypeIds", required = false) final Set<Integer> filterByTypeIds) {
-		return new ResponseEntity<>(this.studyDatasetService.getDatasets(studyId, filterByTypeIds), HttpStatus.OK);
+		@RequestParam(value = "datasetTypeIds", required = false) final Set<Integer> datasetTypeIds) {
+		return new ResponseEntity<>(this.studyDatasetService.getDatasets(studyId, datasetTypeIds), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "It will retrieve a dataset given the id", notes = "Retrieves a dataset given the id")
