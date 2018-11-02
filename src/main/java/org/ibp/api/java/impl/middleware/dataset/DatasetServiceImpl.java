@@ -201,7 +201,9 @@ public class DatasetServiceImpl implements DatasetService {
 		// checks input matches validation rules
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
 
+
 		this.datasetValidator.validateDatasetBelongsToStudy(studyId, parentId);
+
 		this.datasetGeneratorInputValidator.validateBasicData(cropName, studyId, parentId, datasetGeneratorInput, bindingResult);
 
 		if (bindingResult.hasErrors()) {
