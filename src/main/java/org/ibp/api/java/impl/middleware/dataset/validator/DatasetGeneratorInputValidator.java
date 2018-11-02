@@ -66,9 +66,9 @@ public class DatasetGeneratorInputValidator {
 	}
 
 	public void validateBasicData(final String crop, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetInputGenerator, final Errors errors) {
-		final DatasetDTO dataset = this.studyDatasetService.getDataset(parentId);
+		final DatasetDTO dataset = this.studyDatasetService.getDataset(studyId, parentId);
 
-		if (validateDatasetBelongsToStudy(studyId, parentId, errors))
+		if (this.validateDatasetBelongsToStudy(studyId, parentId, errors))
 			return;
 
 		final DataSetType dataSetType = DataSetType.findById(datasetInputGenerator.getDatasetTypeId());
