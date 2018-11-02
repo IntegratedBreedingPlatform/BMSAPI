@@ -3,16 +3,19 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.NotSupportedException;
@@ -20,6 +23,7 @@ import org.ibp.api.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.validation.MapBindingResult;
 
 @Component
@@ -34,16 +38,20 @@ public class DatasetValidator {
 	@Autowired
 	private OntologyDataManager ontologyDataManager;
 
+	@Autowired
+	private DatasetService studyDatasetService;
+
 	private BindingResult errors;
 
 	public void validateDataset(final Integer studyId, final Integer datasetId, final Boolean shouldBeSubobservationDataset) {
 
 		final DataSet dataSet = this.studyDataManager.getDataSet(datasetId);
 		this.validateDataset(dataSet, shouldBeSubobservationDataset);
+		this.validateDatasetBelongsToStudy(studyId, datasetId);
 	}
 
 	private void validateDataset(final DataSet dataSet, final Boolean shouldBeSubobservationDataset) {
-		errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		
 		if (dataSet == null) {
 			this.errors.reject("dataset.does.not.exist", "");
@@ -60,7 +68,7 @@ public class DatasetValidator {
 
 	public StandardVariable validateDatasetVariable(final Integer studyId, final Integer datasetId,
 			final Boolean shouldBeSubobservationDataset, final DatasetVariable datasetVariable, final Boolean shouldAlreadyBeDatasetVariable) {
-		errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		
 		final DataSet dataSet = this.studyDataManager.getDataSet(datasetId);
 		this.validateDataset(dataSet, shouldBeSubobservationDataset);
@@ -132,4 +140,19 @@ public class DatasetValidator {
 		}
 	}
 
+	public boolean validateDatasetBelongsToStudy(final Integer studyId, final Integer datasetId) {
+		final List<DatasetDTO> allChildren = this.studyDatasetService.getDatasets(studyId, new HashSet<Integer>());
+		boolean found = false;
+		for (final DatasetDTO datasetDTO: allChildren) {
+			if (datasetDTO.getDatasetId().equals(datasetId)) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			this.errors.reject("dataset.do.not.belong.to.study", new String[] {String.valueOf(datasetId), String.valueOf(studyId)}, "");
+			return true;
+		}
+		return false;
+	}
 }

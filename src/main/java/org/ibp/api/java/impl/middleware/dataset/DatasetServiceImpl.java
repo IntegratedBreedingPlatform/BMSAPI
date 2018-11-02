@@ -9,11 +9,16 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
+import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ConflictException;
+import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.java.impl.middleware.dataset.validator.DatasetGeneratorInputValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.rest.dataset.DatasetDTO;
+import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.modelmapper.Conditions;
@@ -25,6 +30,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +52,10 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private MeasurementVariableTransformer measurementVariableTransformer;
+
+	@Autowired
+	private DatasetGeneratorInputValidator datasetGeneratorInputValidator;
+
 
 	@Autowired
 	private StudyDataManager studyDataManager;
@@ -142,7 +152,7 @@ public class DatasetServiceImpl implements DatasetService {
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final DatasetDTO datasetDto = mapper.map(datasetDTO, DatasetDTO.class);
 		final List<StudyInstance> instances = new ArrayList();
-		for (org.generationcp.middleware.service.impl.study.StudyInstance instance : datasetDTO.getInstances()) {
+		for (final org.generationcp.middleware.service.impl.study.StudyInstance instance : datasetDTO.getInstances()) {
 			final StudyInstance datasetInstance = mapper.map(instance, StudyInstance.class);
 			instances.add(datasetInstance);
 		}
@@ -179,5 +189,43 @@ public class DatasetServiceImpl implements DatasetService {
 			list.add(observationUnitRow);
 		}
 		return list;
+	}
+
+
+	@Override
+	public DatasetDTO generateSubObservationDataset(final String cropName, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetGeneratorInput) {
+
+		// checks that study exists and it is not locked
+		this.studyValidator.validate(studyId, true);
+
+		// checks input matches validation rules
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
+
+		this.datasetValidator.validateDatasetBelongsToStudy(studyId, parentId);
+		this.datasetGeneratorInputValidator.validateBasicData(cropName, studyId, parentId, datasetGeneratorInput, bindingResult);
+
+		if (bindingResult.hasErrors()) {
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
+		// not implemented yet
+		this.datasetGeneratorInputValidator.validateDatasetTypeIsImplemented(datasetGeneratorInput.getDatasetTypeId(), bindingResult);
+		if (bindingResult.hasErrors()) {
+			throw new NotSupportedException(bindingResult.getAllErrors().get(0));
+		}
+
+		// conflict
+		this.datasetGeneratorInputValidator.validateDataConflicts(studyId, datasetGeneratorInput, bindingResult);
+		if (bindingResult.hasErrors()) {
+			throw new ConflictException(bindingResult.getAllErrors());
+		}
+
+		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService
+			.generateSubObservationDataset(studyId, datasetGeneratorInput.getDatasetName(), datasetGeneratorInput.getDatasetTypeId(),
+				Arrays.asList(datasetGeneratorInput.getInstanceIds()), datasetGeneratorInput.getSequenceVariableId(),
+				datasetGeneratorInput.getNumberOfSubObservationUnits(), parentId);
+		final ModelMapper mapper = new ModelMapper();
+		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+		return mapper.map(datasetDTO, DatasetDTO.class);
 	}
 }

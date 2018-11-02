@@ -5,6 +5,8 @@ import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 
+import org.ibp.api.rest.dataset.DatasetGeneratorInput;
+
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +19,8 @@ public interface DatasetService {
 	MeasurementVariable addDatasetVariable(final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable);
 
 	List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds);
+	
+	DatasetDTO generateSubObservationDataset(String cropName, Integer studyId, Integer parentId, DatasetGeneratorInput datasetGeneratorInput);
 
 	DatasetDTO getDataset(final String crop, final Integer studyId, final Integer datasetId);
 
