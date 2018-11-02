@@ -2,9 +2,11 @@
 package org.ibp.api.exception;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.NOT_IMPLEMENTED;
 
 import org.ibp.api.domain.common.ErrorResponse;
 import org.slf4j.Logger;
@@ -12,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -128,10 +129,10 @@ public class DefaultExceptionHandler {
 
 		return response;
 	}
-	
+
 	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
 	@ExceptionHandler(NotSupportedException.class)
-	@ResponseStatus(value = HttpStatus.NOT_IMPLEMENTED)
+	@ResponseStatus(value = NOT_IMPLEMENTED)
 	@ResponseBody
 	public ErrorResponse handleNotSupportedException(NotSupportedException ex) {
 
@@ -142,4 +143,26 @@ public class DefaultExceptionHandler {
 
 		return response;
 	}
+
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(ConflictException.class)
+	@ResponseStatus(value = CONFLICT)
+	@ResponseBody
+	public ErrorResponse handleConflictException(ConflictException ex) {
+
+		ErrorResponse response = new ErrorResponse();
+
+		for (ObjectError error : ex.getErrors()) {
+			String message = this.messageSource.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale());
+			if (error instanceof FieldError) {
+				FieldError fieldError = (FieldError) error;
+				response.addError(message, fieldError.getField());
+			} else {
+				response.addError(message);
+			}
+		}
+		return response;
+	}
+	
 }

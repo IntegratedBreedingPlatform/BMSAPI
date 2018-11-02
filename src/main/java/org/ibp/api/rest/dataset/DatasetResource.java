@@ -49,7 +49,6 @@ public class DatasetResource {
 
 	@ApiOperation(value = "Count Phenotypes", notes = "Returns count of phenotypes for variables")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables/observations", method = RequestMethod.HEAD)
-	@Transactional
 	public ResponseEntity<String> countPhenotypes(@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
 
@@ -68,6 +67,14 @@ public class DatasetResource {
 
 		final MeasurementVariable variable = this.studyDatasetService.addDatasetVariable(  studyId, datasetId, datasetTrait);
 		return new ResponseEntity<>(variable, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Generate and save a sub-observation dataset", notes = "Returns the basic information for the generated dataset")
+	@RequestMapping(value = "/{cropName}/studies/{studyId}/datasets/{parentId}/generation", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<DatasetDTO> generateDataset(@PathVariable
+	final String cropName, @PathVariable final Integer studyId, @PathVariable final Integer parentId, @RequestBody final DatasetGeneratorInput datasetGeneratorInput) {
+		return new ResponseEntity<>(this.studyDatasetService.generateSubObservationDataset(cropName, studyId, parentId, datasetGeneratorInput), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "It will retrieve all the observation units", notes = "It will retrieve all the observation units including observations and props values in a format that will be used by the Observations table.")
@@ -113,13 +120,13 @@ public class DatasetResource {
 	@ApiOperation(value = "It will retrieve a list of datasets", notes = "Retrieves the list of datasets for the specified study.")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets", method = RequestMethod.GET)
 	public ResponseEntity<List<DatasetDTO>> getDatasets(@PathVariable final String crop, @PathVariable final Integer studyId,
-		@RequestParam(value = "filterByTypeIds", required = false) final Set<Integer> filterByTypeIds) {
-		return new ResponseEntity<>(this.studyDatasetService.getDatasets(studyId, filterByTypeIds), HttpStatus.OK);
+		@RequestParam(value = "datasetTypeIds", required = false) final Set<Integer> datasetTypeIds) {
+		return new ResponseEntity<>(this.studyDatasetService.getDatasets(studyId, datasetTypeIds), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "It will retrieve a dataset given the id", notes = "Retrieves a dataset given the id")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}", method = RequestMethod.GET)
-	public ResponseEntity<DatasetDTO> getDatasets(@PathVariable final String crop,
+	public ResponseEntity<DatasetDTO> getDataset(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
 		return new ResponseEntity<>(this.studyDatasetService.getDataset(crop, studyId, datasetId), HttpStatus.OK);
