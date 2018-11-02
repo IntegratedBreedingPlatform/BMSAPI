@@ -151,8 +151,8 @@ public class DatasetValidator {
 		}
 		if (!found) {
 			this.errors.reject("dataset.do.not.belong.to.study", new String[] {String.valueOf(datasetId), String.valueOf(studyId)}, "");
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	}
 }
