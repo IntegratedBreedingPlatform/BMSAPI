@@ -147,6 +147,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public List<ObservationUnitRow> getObservationUnitRows(final int studyId, final int datasetId, final int instanceId,
 		final int pageNumber, final int pageSize, final String sortBy, final String sortOrder) {
 		this.studyValidator.validate(studyId, false);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
 			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
