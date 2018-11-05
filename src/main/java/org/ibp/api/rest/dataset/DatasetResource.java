@@ -4,6 +4,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.java.dataset.DatasetService;
@@ -81,10 +82,15 @@ public class DatasetResource {
 	@ResponseBody
 	public ResponseEntity<ObservationUnitTable> getObservationUnitTable(@PathVariable final String cropname,
 		@PathVariable final Integer studyId, @PathVariable final Integer datasetId,
-		@PathVariable final Integer instanceId, @RequestParam(value = "pageNumber", required = false) final Integer pageNumber, //
-		@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.", required = false)
-		//
-		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
+		@PathVariable final Integer instanceId,
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "pageNumber",
+			required = false) final Integer pageNumber,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
+			required = false) final Integer pageSize,
+		@ApiParam(value = "Sort order. Name of the field to sorty by.", required = false) @RequestParam(value = "sortBy",
+			required = false) final String sortBy,
+		@ApiParam(value = "Sort order direction. asc/desc.", required = false) @RequestParam(value = "sortOrder",
+			required = false) final String sortOrder) {
 		final PagedResult<ObservationUnitRow> pageResult =
 			new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<ObservationUnitRow>() {
 

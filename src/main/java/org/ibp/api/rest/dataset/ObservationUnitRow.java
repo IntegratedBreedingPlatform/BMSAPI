@@ -3,11 +3,13 @@ package org.ibp.api.rest.dataset;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Map;
 import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@AutoProperty
 public class ObservationUnitRow {
 
 	private Integer observationUnitId;
