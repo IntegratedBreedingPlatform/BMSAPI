@@ -2,10 +2,13 @@ package org.ibp.api.rest.dataset;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@AutoProperty
 public class ObservationUnitData {
 
 	private Integer observationId;
@@ -61,29 +64,16 @@ public class ObservationUnitData {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (this == o)
-			return true;
-		if (!(o instanceof ObservationUnitData))
-			return false;
-		final ObservationUnitData that = (ObservationUnitData) o;
-		return Objects.equals(this.getObservationId(), that.getObservationId()) &&
-			Objects.equals(this.getCategoricalValueId(), that.getCategoricalValueId()) &&
-			Objects.equals(this.getValue(), that.getValue()) &&
-			this.getStatus() == that.getStatus();
+		return Pojomatic.equals(this, o);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.getObservationId(), this.getCategoricalValueId(), this.getValue(), this.getStatus());
+		return Pojomatic.hashCode(this);
 	}
 
 	@Override
 	public String toString() {
-		return "ObservationUnitData{" +
-			"observationId=" + this.observationId +
-			", categoricalValueId=" + this.categoricalValueId +
-			", value='" + this.value + '\'' +
-			", status=" + this.status +
-			'}';
+		return Pojomatic.toString(this);
 	}
 }

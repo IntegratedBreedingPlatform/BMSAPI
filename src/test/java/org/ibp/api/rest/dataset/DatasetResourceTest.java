@@ -1,20 +1,16 @@
 package org.ibp.api.rest.dataset;
 
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-
+import com.google.common.collect.Lists;
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.apache.commons.lang.RandomStringUtils;
+import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
-import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.junit.Before;
@@ -34,9 +30,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import org.ibp.api.domain.study.StudyInstance;
 
 public class DatasetResourceTest extends ApiUnitTestBase {
 	
@@ -121,7 +124,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	public void testGetDatasetsErrorStudyIsNotFound() throws Exception {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		errors.reject("study.not.exist", "");
-		Mockito.when(studyDatasetService.getDatasets(100, null)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
+		Mockito.when(this.studyDatasetService.getDatasets(100, null)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets", this.cropName, 100)
 			.contentType(this.contentType))
@@ -137,7 +140,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final Set<Integer> datasetTypeIds = new TreeSet<>();
 		datasetTypeIds.add(100);
 		errors.reject("dataset.type.id.not.exist", new Object[] {100}, "");
-		Mockito.when(studyDatasetService.getDatasets(100, datasetTypeIds)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
+		Mockito.when(this.studyDatasetService.getDatasets(100, datasetTypeIds)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/studies/{studyId}/datasets", this.cropName, 100)
 			.param("datasetTypeIds", "100").contentType(this.contentType))
@@ -211,6 +214,62 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		verify(this.studyDatasetService, times(1)).getDataset(this.cropName, 1011,1012);
 	}
 
+	@Test
+	public void testGetObservations() throws Exception {
+		final ObservationUnitData measurement =
+			new ObservationUnitData(12, 1, "123", Phenotype.ValueStatus.OUT_OF_SYNC);
+		final ObservationUnitRow obsDto = new ObservationUnitRow();
+
+		obsDto.setObservationUnitId(11);
+		obsDto.setGid(22);
+		obsDto.setDesignation("CHMEPwuxU2Yr6");
+		obsDto.setAction("11");
+		final Map<String, ObservationUnitData> map = new HashMap<>();
+		map.put("TEST1", measurement);
+		obsDto.setVariables(map);
+
+		Mockito.when(this.studyDatasetService.countTotalObservationUnitsForDataset(
+			org.mockito.Matchers.anyInt(),
+			org.mockito.Matchers.anyInt()))
+			.thenReturn(100);
+		Mockito.when(this.studyDatasetService.getObservationUnitRows(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
+			org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyString(),
+			org.mockito.Matchers.anyString())).thenReturn(Lists.newArrayList(obsDto));
+		final Random random = new Random();
+		final int studyId = random.nextInt(10000);
+		final int datasetId = random.nextInt(10000);
+		final int instanceId = random.nextInt(10000);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders.get(
+				"/crops/{cropname}/studies/{studyId}/datasets/{datasetId}/instances/{instanceId}/observationUnits/table",
+				this.cropName,
+				studyId,
+				datasetId,
+				instanceId).param("pageNumber", "1")
+				.param("pageSize", "100").contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.recordsFiltered", Matchers.is(100)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.recordsTotal", Matchers.is(100)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.draw", Matchers.is("1")))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].observationUnitId", Matchers.is(obsDto.getObservationUnitId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].gid", Matchers.is(obsDto.getGid())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].designation", Matchers.is(obsDto.getDesignation())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].action", Matchers.is(obsDto.getAction())))
+			.andExpect(
+				MockMvcResultMatchers.jsonPath("$.data[0].variables[\"TEST1\"].observationId",
+					Matchers.is(measurement.getObservationId())))
+			.andExpect(
+				MockMvcResultMatchers.jsonPath("$.data[0].variables[\"TEST1\"].categoricalValueId",
+					Matchers.is(measurement.getCategoricalValueId())))
+			.andExpect(
+				MockMvcResultMatchers.jsonPath("$.data[0].variables[\"TEST1\"].value",
+					Matchers.is(measurement.getValue())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].variables[\"TEST1\"].status",
+				Matchers.is(measurement.getStatus().getName())))
+		;
+	}
 
 	private DatasetDTO createDataset(final int datasetType, final Integer datasetId,final String name, final String crop, final Integer studyId) {
 		final DataSetType dataSetType = DataSetType.findById(datasetType);
@@ -263,4 +322,5 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		}
 		return datasets;
 	}
+
 }
