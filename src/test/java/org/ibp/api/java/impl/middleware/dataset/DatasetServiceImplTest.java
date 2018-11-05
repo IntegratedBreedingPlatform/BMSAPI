@@ -71,6 +71,7 @@ public class DatasetServiceImplTest {
 		final int instanceId = random.nextInt();
 		this.studyDatasetService.countPhenotypesByInstance(studyId, datasetId, instanceId);
 		Mockito.verify(this.studyValidator).validate(studyId, false);
+		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, false);
 		Mockito.verify(this.middlewareDatasetService).countPhenotypesByInstance(datasetId, instanceId);
 	}
 

@@ -42,7 +42,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public long countPhenotypesByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId) {
 		this.studyValidator.validate(studyId, false);
-		//FIXME - add validation if dataset is valid dataset of study (waiting on Middleware service to be available)
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		return this.middlewareDatasetService.countPhenotypesByInstance(datasetId, instanceId);
 	}
 
