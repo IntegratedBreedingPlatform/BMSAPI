@@ -13,5 +13,5 @@ public interface DatasetService {
 
 	MeasurementVariable addDatasetVariable(Integer studyId, Integer datasetId, DatasetVariable datasetVariable);
 
-	Observation updatePhenotype(Integer observationId, ObservationValue observationValue);
+	Observation updatePhenotype(Integer observationUnitId, Integer observationId, ObservationValue observationValue);
 }

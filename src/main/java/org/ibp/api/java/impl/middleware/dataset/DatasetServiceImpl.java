@@ -60,20 +60,22 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Observation updatePhenotype(final Integer observationId, final ObservationValue observationValue) {
+	public Observation updatePhenotype(final Integer observationUnitId, final Integer observationId, final ObservationValue observationValue) {
 
 		final Phenotype phenotype = this.middlewareDatasetService
 			.updatePhenotype(
-				observationId, observationValue.getCategoricalValueId(), observationValue.getValue(), observationValue.getStatus());
+				observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue(), observationValue.getStatus());
 
 		final SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMDD HH:MM:SS");
 		final Observation observation = new Observation();
 		observation.setObservationId(phenotype.getPhenotypeId());
 		observation.setCategoricalValueId(phenotype.getcValueId());
-		observation.setStatus(phenotype.getValueStatus().getName());
+		observation.setStatus(phenotype.getValueStatus() != null ? phenotype.getValueStatus().getName() : null);
 		observation.setUpdatedDate(dateFormat.format(phenotype.getUpdatedDate()));
 		observation.setCreatedDate(dateFormat.format(phenotype.getCreatedDate()));
 		observation.setValue(phenotype.getValue());
+		observation.setObservationUnitId(phenotype.getExperiment().getNdExperimentId());
+		observation.setVariableId(phenotype.getObservableId());
 
 		return observation;
 	}

@@ -61,9 +61,10 @@ public class DatasetResource {
 	@Transactional
 	public ResponseEntity<Observation> updateObservation(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
-		@PathVariable final Integer datasetId, @PathVariable final Integer obsevationUnitId, @PathVariable final Integer observationId,
+		@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId, @PathVariable final Integer observationId,
 		@RequestBody final ObservationValue observationValue) {
-		final Observation observation = this.studyDatasetService.updatePhenotype(observationId, observationValue);
+
+		final Observation observation = this.studyDatasetService.updatePhenotype(observationUnitId, observationId, observationValue);
 		return new ResponseEntity<>(observation, HttpStatus.OK);
 	}
 

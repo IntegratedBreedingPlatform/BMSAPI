@@ -16,7 +16,7 @@ public class Observation {
 
 	private String updatedDate;
 
-	private String observationUnitId;
+	private Integer observationUnitId;
 
 	public Integer getObservationId() {
 		return observationId;
@@ -74,11 +74,11 @@ public class Observation {
 		this.createdDate = createdDate;
 	}
 
-	public String getObservationUnitId() {
+	public Integer getObservationUnitId() {
 		return observationUnitId;
 	}
 
-	public void setObservationUnitId(final String observationUnitId) {
+	public void setObservationUnitId(final Integer observationUnitId) {
 		this.observationUnitId = observationUnitId;
 	}
 
