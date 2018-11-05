@@ -12,5 +12,7 @@ public interface DatasetService {
 	long countPhenotypesByInstance(Integer studyId, Integer datasetId, Integer instanceId);
 
 	MeasurementVariable addDatasetVariable(Integer studyId, Integer datasetId, DatasetVariable datasetVariable);
+	
+	void removeVariables(Integer studyId, Integer datasetId, List<Integer> variableIds);
 
 }
