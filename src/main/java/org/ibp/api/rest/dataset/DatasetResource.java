@@ -51,5 +51,14 @@ public class DatasetResource {
 		final MeasurementVariable variable = this.studyDatasetService.addDatasetVariable(  studyId, datasetId, datasetTrait);
 		return new ResponseEntity<>(variable, HttpStatus.OK);
 	}
+	
+	@ApiOperation(value ="Remove dataset variables", notes = "Remove a set of variables from dataset")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables", method = RequestMethod.DELETE)
+	@Transactional
+	public ResponseEntity<Void> removeVariables(@PathVariable final String crop, @PathVariable final Integer studyId,
+			@PathVariable final Integer datasetId,  @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
+		this.studyDatasetService.removeVariables(studyId, datasetId, Arrays.asList(variableIds));
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 
 }

@@ -69,19 +69,34 @@ public class DatasetValidator {
 		final VariableType variableType = this.validateVariableType(datasetVariable.getVariableTypeId());
 		final Integer variableId = datasetVariable.getVariableId();
 		final StandardVariable standardVariable = this.ontologyDataManager.getStandardVariable(variableId, dataSet.getProgramUUID());
-		this.validateVariable(standardVariable, variableType);
+		this.validateVariable(standardVariable, variableType, variableId);
 
 		this.validateIfAlreadyDatasetVariable(variableId, shouldAlreadyBeDatasetVariable, dataSet);
 
 		return standardVariable;
 	}
+	
+	public void validateExistingDatasetVariables(final Integer studyId, final Integer datasetId,
+			final Boolean shouldBeSubobservationDataset, final List<Integer> variableIds) {
+		errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		
+		final DataSet dataSet = this.studyDataManager.getDataSet(datasetId);
+		this.validateDataset(dataSet, shouldBeSubobservationDataset);
 
-	private void validateIfAlreadyDatasetVariable(final Integer variableId, final Boolean shouldAlreadyBeDatasetVariable,
+		for (final Integer variableId : variableIds) {			
+			final StandardVariable standardVariable = this.ontologyDataManager.getStandardVariable(variableId, dataSet.getProgramUUID());
+			this.validateVariableExists(standardVariable, variableId);
+			this.validateIfAlreadyDatasetVariable(variableId, true, dataSet);
+		}
+
+	}
+
+	void validateIfAlreadyDatasetVariable(final Integer variableId, final Boolean shouldAlreadyBeDatasetVariable,
 			final DataSet dataSet) {
 		final VariableTypeList variableList = dataSet.getVariableTypes();
 		final VariableTypeList variates = variableList.getVariates();
 		if (variates == null && shouldAlreadyBeDatasetVariable) {
-			this.errors.reject("variable.not.dataset.variable", "");
+			this.errors.reject("variable.not.dataset.variable", new Integer[] {variableId}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
@@ -89,16 +104,19 @@ public class DatasetValidator {
 		for (final DMSVariableType datasetVariable : variates.getVariableTypes()) {
 			if (variableId.equals(datasetVariable.getId())) {
 				isDatasetVariable = true;
+				final VariableType variableType = datasetVariable.getVariableType();
+				if (!shouldAlreadyBeDatasetVariable) {
+					this.errors.reject("variable.already.dataset.variable", new Object[] {String.valueOf(variableId)}, "");
+					throw new ApiRequestValidationException(this.errors.getAllErrors());
+				} else if (!VALID_VARIABLE_TYPES.contains(variableType)) {
+					this.errors.reject("dataset.variable.cannot.be.deleted", new Object[] {String.valueOf(variableId), variableType.getName()}, "");
+					throw new NotSupportedException(this.errors.getAllErrors().get(0));
+				}
 			}
 		}
 
-		if (isDatasetVariable && !shouldAlreadyBeDatasetVariable) {
-			this.errors.reject("variable.already.dataset.variable", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
 		if (!isDatasetVariable && shouldAlreadyBeDatasetVariable) {
-			this.errors.reject("variable.not.dataset.variable", "");
+			this.errors.reject("variable.not.dataset.variable", new Object[] {String.valueOf(variableId)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
@@ -119,11 +137,8 @@ public class DatasetValidator {
 		
 	}
 	
-	void validateVariable(final StandardVariable variable, final VariableType variableType) {
-		if (variable == null) {
-			this.errors.reject("variable.does.not.exist", "");
-			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
-		}
+	void validateVariable(final StandardVariable variable, final VariableType variableType, final Integer variableId) {
+		validateVariableExists(variable, variableId);
 		
 		// Check if variable is configured to be given variable type
 		if (!variable.getVariableTypes().contains(variableType)) {
@@ -131,5 +146,14 @@ public class DatasetValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
+
+	// TODO remove this, unreachable code as MiddlewareQueryException is thrown for invalid variable ID
+	private void validateVariableExists(final StandardVariable variable, final Integer variableId) {
+		if (variable == null) {
+			this.errors.reject("variable.does.not.exist", new Integer[] {variableId}, "");
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		}
+	}
+	
 
 }

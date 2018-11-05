@@ -11,4 +11,6 @@ public interface DatasetService {
 	
 	MeasurementVariable addDatasetVariable(Integer studyId, Integer datasetId, DatasetVariable datasetVariable);
 	
+	void removeVariables(Integer studyId, Integer datasetId, List<Integer> variableIds);
+	
 }
