@@ -64,7 +64,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final Phenotype phenotype = this.middlewareDatasetService
 			.updatePhenotype(
-				observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue(), observationValue.getStatus());
+				observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue(),
+				observationValue.getStatus());
 
 		final SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMDD HH:MM:SS");
 		final Observation observation = new Observation();
@@ -78,6 +79,13 @@ public class DatasetServiceImpl implements DatasetService {
 		observation.setVariableId(phenotype.getObservableId());
 
 		return observation;
+	}
+
+	@Override
+	public void removeVariables(Integer studyId, Integer datasetId, List<Integer> variableIds) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, variableIds);
+		this.middlewareDatasetService.removeVariables(datasetId, variableIds);
 	}
 
 }

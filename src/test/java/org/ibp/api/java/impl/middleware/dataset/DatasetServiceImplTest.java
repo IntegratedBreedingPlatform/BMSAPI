@@ -53,7 +53,7 @@ public class DatasetServiceImplTest {
 		final Random random = new Random();
 		final int studyId = random.nextInt();
 		final int datasetId = random.nextInt();
-		final List<Integer> traitIds = Arrays.asList(1,2,3);
+		final List<Integer> traitIds = Arrays.asList(random.nextInt(), random.nextInt(), random.nextInt());
 		this.studyDatasetService.countPhenotypes(studyId, datasetId, traitIds);
 		Mockito.verify(this.studyValidator).validate(studyId, false);
 		Mockito.verify(this.middlewareDatasetService).countPhenotypes(datasetId, traitIds);
@@ -80,6 +80,18 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.variable).setName(alias);
 		Mockito.verify(this.variable).setVariableType(variableType);
 		Mockito.verify(this.variable).setRequired(false);
+	}
+	
+	@Test
+	public void testRemoveVariables() {
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int datasetId = random.nextInt();
+		final List<Integer> variableIds = Arrays.asList(random.nextInt(), random.nextInt(), random.nextInt());
+		this.studyDatasetService.removeVariables(studyId, datasetId, variableIds);
+		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.datasetValidator).validateExistingDatasetVariables(studyId, datasetId, true, variableIds);
+		Mockito.verify(this.middlewareDatasetService).removeVariables(datasetId, variableIds);
 	}
 	
 }

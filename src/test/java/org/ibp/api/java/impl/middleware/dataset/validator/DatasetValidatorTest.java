@@ -139,11 +139,9 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 		final Integer variableId = ran.nextInt();
 		final String programUUID = RandomStringUtils.randomAlphabetic(20);
 		final StandardVariable standardVariable = createStandardVariable(variableId);
-		createDataset(datasetId, programUUID, standardVariable);
-		Mockito.when(ontologyDataManager.getStandardVariable(variableId, programUUID)).thenReturn(standardVariable);
+		final DataSet dataset = createDataset(datasetId, programUUID, standardVariable);
 		
-		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.SELECTION_METHOD.getId(), variableId, "");
-		this.datasetValidator.validateDatasetVariable(ran.nextInt(), datasetId, ran.nextBoolean(), datasetVariable, false);
+		this.datasetValidator.validateIfAlreadyDatasetVariable(variableId, false, dataset);
 	}
 
 	@Test (expected = ApiRequestValidationException.class)
@@ -152,12 +150,22 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 		final Integer datasetId = ran.nextInt();
 		final Integer variableId = ran.nextInt();
 		final String programUUID = RandomStringUtils.randomAlphabetic(20);
-		createDataset(datasetId, programUUID, null);
-		final StandardVariable standardVariable = createStandardVariable(variableId);
-		Mockito.when(ontologyDataManager.getStandardVariable(variableId, programUUID)).thenReturn(standardVariable);
+		final DataSet dataset = createDataset(datasetId, programUUID, null);
 		
-		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.SELECTION_METHOD.getId(), variableId, "");
-		this.datasetValidator.validateDatasetVariable(ran.nextInt(), datasetId, ran.nextBoolean(), datasetVariable, true);
+		this.datasetValidator.validateIfAlreadyDatasetVariable(variableId, true, dataset);;
+	}
+	
+	@Test (expected = NotSupportedException.class)
+	public void testShouldBeDatasetVariableButVariableTypeNotSupported() {
+		final Random ran = new Random();
+		final Integer datasetId = ran.nextInt();
+		final Integer variableId = ran.nextInt();
+		final String programUUID = RandomStringUtils.randomAlphabetic(20);
+		final StandardVariable standardVariable = createStandardVariable(variableId);
+		final DataSet dataset = createDataset(datasetId, programUUID, standardVariable);
+		dataset.getVariableTypes().getVariableTypes().get(0).setVariableType(VariableType.ANALYSIS_SUMMARY);
+		
+		this.datasetValidator.validateIfAlreadyDatasetVariable(variableId, true, dataset);
 	}
 	
 
@@ -190,6 +198,37 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 		this.datasetValidator.validateDatasetVariable(ran.nextInt(), datasetId, ran.nextBoolean(), datasetVariable, true);
 	}
 	
+	@Test (expected = ResourceNotFoundException.class)
+	public void testValidateExistingVariablesWhenOneVariableDoesNotExist() {
+		final Random ran = new Random();
+		final Integer datasetId = ran.nextInt();
+		final Integer variableId = ran.nextInt();
+		final Integer nonExistingVariableId = ran.nextInt();
+		final String programUUID = RandomStringUtils.randomAlphabetic(20);
+		final StandardVariable standardVariable = createStandardVariable(variableId);
+		createDataset(datasetId, programUUID, standardVariable);
+		Mockito.when(ontologyDataManager.getStandardVariable(variableId, programUUID)).thenReturn(standardVariable);
+		Mockito.when(ontologyDataManager.getStandardVariable(nonExistingVariableId, programUUID)).thenReturn(null);
+		
+		this.datasetValidator.validateExistingDatasetVariables(ran.nextInt(), datasetId, true, Arrays.asList(variableId, nonExistingVariableId));
+	}
+	
+	@Test (expected = ApiRequestValidationException.class)
+	public void testValidateExistingVariablesWhenOneVariableNotDatasetVariable() {
+		final Random ran = new Random();
+		final Integer datasetId = ran.nextInt();
+		final Integer variableId = ran.nextInt();
+		final String programUUID = RandomStringUtils.randomAlphabetic(20);
+		final StandardVariable standardVariable = createStandardVariable(variableId);
+		Mockito.when(ontologyDataManager.getStandardVariable(variableId, programUUID)).thenReturn(standardVariable);
+		createDataset(datasetId, programUUID, standardVariable);
+		final Integer nonDatasetVariableId = ran.nextInt();
+		final StandardVariable nonDatasetVariable = createStandardVariable(nonDatasetVariableId);
+		Mockito.when(ontologyDataManager.getStandardVariable(nonDatasetVariableId, programUUID)).thenReturn(nonDatasetVariable);
+		
+		this.datasetValidator.validateExistingDatasetVariables(ran.nextInt(), datasetId, true, Arrays.asList(variableId, nonDatasetVariableId));
+	}
+	
 	private StandardVariable createStandardVariable(final Integer traitId) {
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(traitId);
@@ -197,7 +236,7 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 		return standardVariable;
 	}
 
-	private void createDataset(final Integer datasetId, final String programUUID, final StandardVariable stdVariable) {
+	private DataSet createDataset(final Integer datasetId, final String programUUID, final StandardVariable stdVariable) {
 		final DataSet dataset = new DataSet();
 		dataset.setId(datasetId);
 		dataset.setProgramUUID(programUUID);
@@ -213,6 +252,8 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 		}
 		dataset.setVariableTypes(datasetVariables);
 		Mockito.when(studyDataManager.getDataSet(datasetId)).thenReturn(dataset);
+		
+		return dataset;
 	}
 			
 
