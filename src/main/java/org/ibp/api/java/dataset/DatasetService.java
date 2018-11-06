@@ -20,6 +20,8 @@ public interface DatasetService {
 
 	List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds);
 	
+	void removeVariables(Integer studyId, Integer datasetId, List<Integer> variableIds);
+
 	DatasetDTO generateSubObservationDataset(String cropName, Integer studyId, Integer parentId, DatasetGeneratorInput datasetGeneratorInput);
 
 	DatasetDTO getDataset(final String crop, final Integer studyId, final Integer datasetId);

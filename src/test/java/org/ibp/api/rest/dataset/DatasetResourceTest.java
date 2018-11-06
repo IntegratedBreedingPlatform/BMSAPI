@@ -94,6 +94,18 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
+	public void testRemoveVariables() throws Exception {
+		final int studyId = 100;
+		final int datasetId = 102;
+		this.mockMvc
+			.perform(MockMvcRequestBuilders.delete("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/variables", this.cropName, studyId, datasetId)
+					.param("variableIds", "1,2,3").contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+		Mockito.verify(this.studyDatasetService).removeVariables(studyId, datasetId, Arrays.asList(1, 2, 3));
+	}
+
+	@Test
 	public void testGetDatasets() throws Exception {
 		final List<DatasetDTO> datasets= createDatasets(Arrays.asList(10090, 10094, 10095));
 		doReturn(datasets).when(this.studyDatasetService).getDatasets(100, null);

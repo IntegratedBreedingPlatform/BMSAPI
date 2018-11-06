@@ -95,6 +95,13 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public void removeVariables(Integer studyId, Integer datasetId, List<Integer> variableIds) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, variableIds);
+		this.middlewareDatasetService.removeVariables(datasetId, variableIds);
+	}
+
+	@Override
 	public List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		final Set<Integer> datasetTypeIdList = new TreeSet<>();
