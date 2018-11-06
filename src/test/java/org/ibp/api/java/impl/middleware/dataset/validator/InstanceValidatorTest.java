@@ -5,6 +5,7 @@ import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	}
 
-	@Test(expected = ApiRequestValidationException.class)
+	@Test(expected = ResourceNotFoundException.class)
 	public void testValidateRejected() {
 		final Random ran = new Random();
 		final int studyId = ran.nextInt();

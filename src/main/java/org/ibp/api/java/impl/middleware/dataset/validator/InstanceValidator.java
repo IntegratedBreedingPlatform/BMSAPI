@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -27,7 +28,7 @@ public class InstanceValidator {
 
 		if (!instanceMetadataOptional.isPresent()) {
 			errors.reject("instance.does.not.exist", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
 	}
 
