@@ -9,6 +9,7 @@ import org.generationcp.middleware.operation.transformer.etl.MeasurementVariable
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,9 @@ public class DatasetServiceImpl implements DatasetService {
 	
 	@Autowired
 	private DatasetValidator datasetValidator;
+
+	@Autowired
+	private InstanceValidator instanceValidator;
 	
 	@Autowired
 	private MeasurementVariableTransformer measurementVariableTransformer;
@@ -43,6 +47,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public long countPhenotypesByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
+		this.instanceValidator.validate(studyId, instanceId);
 		return this.middlewareDatasetService.countPhenotypesByInstance(datasetId, instanceId);
 	}
 
