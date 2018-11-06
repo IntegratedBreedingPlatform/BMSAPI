@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -90,7 +91,9 @@ public class DatasetResource {
 		@ApiParam(value = "Sort order. Name of the field to sorty by.", required = false) @RequestParam(value = "sortBy",
 			required = false) final String sortBy,
 		@ApiParam(value = "Sort order direction. asc/desc.", required = false) @RequestParam(value = "sortOrder",
-			required = false) final String sortOrder) {
+			required = false) final String sortOrder,
+		final HttpServletRequest req) {
+
 		final PagedResult<ObservationUnitRow> pageResult =
 			new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<ObservationUnitRow>() {
 
@@ -116,7 +119,7 @@ public class DatasetResource {
 
 		final ObservationUnitTable observationUnitTable = new ObservationUnitTable();
 		observationUnitTable.setData(pageResult.getPageResults());
-		observationUnitTable.setDraw("1");
+		observationUnitTable.setDraw(req.getParameter("draw"));
 		observationUnitTable.setRecordsTotal((int) pageResult.getTotalResults());
 		observationUnitTable.setRecordsFiltered((int) pageResult.getTotalResults());
 		return new ResponseEntity<>(observationUnitTable, HttpStatus.OK);
