@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 import com.google.common.base.Optional;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

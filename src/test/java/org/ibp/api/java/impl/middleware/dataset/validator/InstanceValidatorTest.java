@@ -4,7 +4,6 @@ import com.google.common.base.Optional;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.junit.Test;
 import org.mockito.Mockito;
