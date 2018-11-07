@@ -121,8 +121,8 @@ public class DatasetResource {
 						instanceId,
 						pagedResult.getPageNumber(),
 						pagedResult.getPageSize(),
-						pagedResult.getSortBy(),
-						pagedResult.getSortOrder());
+						sortBy,
+						sortOrder);
 				}
 			});
 
