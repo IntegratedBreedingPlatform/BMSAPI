@@ -131,7 +131,7 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.observationValidator).validateObservation(datasetId, observationUnitId);
 		Mockito.verify(this.middlewareDatasetService)
-			.updatePhenotype(observationId, observationUnitId, observationValue.getCategoricalValueId(), observationValue.getValue());
+			.updatePhenotype(observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue());
 	}
 
 }
