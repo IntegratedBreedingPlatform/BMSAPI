@@ -3,6 +3,7 @@ package org.ibp.api.rest.dataset;
 
 import java.util.Arrays;
 
+import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.Observation;
@@ -55,24 +56,38 @@ public class DatasetResource {
 		final MeasurementVariable variable = this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetTrait);
 		return new ResponseEntity<>(variable, HttpStatus.OK);
 	}
-	
-	@ApiOperation(value ="Remove dataset variables", notes = "Remove a set of variables from dataset")
+
+	@ApiOperation(value = "Remove dataset variables", notes = "Remove a set of variables from dataset")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables", method = RequestMethod.DELETE)
 	@Transactional
-	public ResponseEntity<Void> removeVariables(@PathVariable final String crop, @PathVariable final Integer studyId,
-			@PathVariable final Integer datasetId,  @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
+	public ResponseEntity<Void> removeVariables(
+		@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
 		this.studyDatasetService.removeVariables(studyId, datasetId, Arrays.asList(variableIds));
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Add Observation", notes = "Add Observation")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}", method = RequestMethod.POST)
+	@Transactional
+	public ResponseEntity<ObservationDto> addObservation(
+		@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId, @PathVariable final Integer obsevationUnitId, @PathVariable final Integer observationId,
+		@RequestBody final ObservationDto observation) {
+
+		return new ResponseEntity<>(
+			this.studyDatasetService.addObservation(studyId, datasetId, obsevationUnitId, observation), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update Observation", notes = "Update Observation")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}", method = RequestMethod.PATCH)
 	@Transactional
-	public ResponseEntity<Observation> updateObservation(
+	public ResponseEntity<ObservationDto> updateObservation(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer obsevationUnitId, @PathVariable final Integer observationId,
 		@RequestBody final ObservationValue observationValue) {
-		final Observation observation = this.studyDatasetService.updatePhenotype(observationId, observationValue);
+		final ObservationDto observation =
+			this.studyDatasetService.updateObservation(studyId, datasetId, observationId, obsevationUnitId, observationValue);
 		return new ResponseEntity<>(observation, HttpStatus.OK);
 	}
 

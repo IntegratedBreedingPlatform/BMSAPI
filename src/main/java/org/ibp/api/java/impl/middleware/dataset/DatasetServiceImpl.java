@@ -1,17 +1,11 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import java.text.SimpleDateFormat;
-import java.util.List;
-
 import org.generationcp.middleware.domain.dataset.ObservationDto;
-import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
-import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.dataset.Observation;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
@@ -20,6 +14,9 @@ import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 @Transactional
@@ -36,7 +33,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private MeasurementVariableTransformer measurementVariableTransformer;
-	
+
 	@Autowired
 	private ObservationValidator observationValidator;
 
@@ -66,7 +63,6 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-
 	public void removeVariables(Integer studyId, Integer datasetId, List<Integer> variableIds) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, variableIds);
@@ -75,32 +71,23 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public ObservationDto addObservation(Integer studyId, Integer datasetId, Integer observationUnitId, ObservationDto observation) {
+
 		this.studyValidator.validate(studyId, true);
-		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, observation.getVariableId());
-		this.observationValidator.validateObservation(datasetId, dataset.getProgramUUID(), observation);
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, Arrays.asList(observation.getVariableId()));
+		this.observationValidator.validateObservation(datasetId, observationUnitId);
 		return this.middlewareDatasetService.addPhenotype(observation);
 
 	}
 
 	@Override
-	public ObservationDto updateObservation(final Integer observationId, final Integer observationUnitId, final ObservationValue observationValue) {
-
-		final Phenotype phenotype = this.middlewareDatasetService
+	public ObservationDto updateObservation(
+		final Integer studyId, final Integer datasetId, final Integer observationId, final Integer observationUnitId,
+		final ObservationValue observationValue) {
+		this.studyValidator.validate(studyId, true);
+		this.observationValidator.validateObservation(datasetId, observationUnitId);
+		return this.middlewareDatasetService
 			.updatePhenotype(
 				observationId, observationUnitId, observationValue.getCategoricalValueId(), observationValue.getValue());
-
-		final SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMDD HH:MM:SS");
-		final ObservationDto observation = new ObservationDto();
-		observation.setObservationId(phenotype.getPhenotypeId());
-		observation.setCategoricalValueId(phenotype.getcValueId());
-		observation.setStatus(phenotype.getValueStatus() != null ? phenotype.getValueStatus().getName() : null);
-		observation.setUpdatedDate(dateFormat.format(phenotype.getUpdatedDate()));
-		observation.setCreatedDate(dateFormat.format(phenotype.getCreatedDate()));
-		observation.setValue(phenotype.getValue());
-		observation.setObservationUnitId(phenotype.getExperiment().getNdExperimentId());
-		observation.setVariableId(phenotype.getObservableId());
-		
-		return observation;
 
 	}
 

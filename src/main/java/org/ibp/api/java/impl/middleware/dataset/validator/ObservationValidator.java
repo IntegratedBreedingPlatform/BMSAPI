@@ -18,10 +18,10 @@ public class ObservationValidator {
 	
 	private BindingResult errors;
 	
-	public void validateObservation(final Integer datasetId, final ObservationDto observation) {
+	public void validateObservation(final Integer datasetId, final Integer observationUnitId) {
 		errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		
-		final boolean isValid = this.datasetService.isValidObservationUnit(datasetId, observation.getObservationUnitId());
+		final boolean isValid = this.datasetService.isValidObservationUnit(datasetId, observationUnitId);
 		if (!isValid) {
 			errors.reject("invalid.observation.unit.id", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
