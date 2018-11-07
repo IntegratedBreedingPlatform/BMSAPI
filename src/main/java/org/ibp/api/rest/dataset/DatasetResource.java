@@ -6,7 +6,6 @@ import java.util.Arrays;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.dataset.Observation;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.java.dataset.DatasetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,11 +71,11 @@ public class DatasetResource {
 	@Transactional
 	public ResponseEntity<ObservationDto> addObservation(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
-		@PathVariable final Integer datasetId, @PathVariable final Integer obsevationUnitId, @PathVariable final Integer observationId,
+		@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId,
 		@RequestBody final ObservationDto observation) {
 
 		return new ResponseEntity<>(
-			this.studyDatasetService.addObservation(studyId, datasetId, obsevationUnitId, observation), HttpStatus.OK);
+			this.studyDatasetService.addObservation(studyId, datasetId, observationUnitId, observation), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update Observation", notes = "Update Observation")
@@ -84,10 +83,10 @@ public class DatasetResource {
 	@Transactional
 	public ResponseEntity<ObservationDto> updateObservation(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
-		@PathVariable final Integer datasetId, @PathVariable final Integer obsevationUnitId, @PathVariable final Integer observationId,
+		@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId, @PathVariable final Integer observationId,
 		@RequestBody final ObservationValue observationValue) {
 		final ObservationDto observation =
-			this.studyDatasetService.updateObservation(studyId, datasetId, observationId, obsevationUnitId, observationValue);
+			this.studyDatasetService.updateObservation(studyId, datasetId, observationId, observationUnitId, observationValue);
 		return new ResponseEntity<>(observation, HttpStatus.OK);
 	}
 

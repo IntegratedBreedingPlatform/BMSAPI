@@ -1,8 +1,5 @@
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
-import java.util.HashMap;
-
-import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +7,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-@Component
+import java.util.HashMap;
+
+@Component("datasetObservationValidator")
 public class ObservationValidator {
 	
 	@Autowired
