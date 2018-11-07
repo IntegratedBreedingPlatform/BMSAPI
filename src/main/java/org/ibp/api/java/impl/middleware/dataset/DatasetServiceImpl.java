@@ -2,6 +2,8 @@ package org.ibp.api.java.impl.middleware.dataset;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.dataset.ObservationDto;
+import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -9,6 +11,7 @@ import org.generationcp.middleware.operation.transformer.etl.MeasurementVariable
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,9 @@ public class DatasetServiceImpl implements DatasetService {
 	
 	@Autowired
 	private MeasurementVariableTransformer measurementVariableTransformer;
+	
+	@Autowired
+	private ObservationValidator observationValidator;
 	
 	
 	@Override
@@ -60,6 +66,14 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, variableIds);
 		this.middlewareDatasetService.removeVariables(datasetId, variableIds);
+	}
+
+	@Override
+	public ObservationDto addObservation(Integer studyId, Integer datasetId, Integer observationUnitId, ObservationDto observation) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, observation.getVariableId());
+		this.observationValidator.validateObservation(datasetId, dataset.getProgramUUID(), observation);
+		return this.middlewareDatasetService.addPhenotype(observation);
 	}
 
 }

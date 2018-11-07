@@ -2,6 +2,7 @@ package org.ibp.api.java.dataset;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.ibp.api.domain.dataset.DatasetVariable;
 
@@ -13,4 +14,6 @@ public interface DatasetService {
 	
 	void removeVariables(Integer studyId, Integer datasetId, List<Integer> variableIds);
 	
+	ObservationDto addObservation(Integer studyId, Integer datasetId, Integer observationUnitId, final ObservationDto observation);
+
 }
