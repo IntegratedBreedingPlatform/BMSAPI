@@ -264,7 +264,6 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.recordsFiltered", Matchers.is(100)))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.recordsTotal", Matchers.is(100)))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.draw", Matchers.is("1")))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].observationUnitId", Matchers.is(obsDto.getObservationUnitId())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].gid", Matchers.is(obsDto.getGid())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].designation", Matchers.is(obsDto.getDesignation())))
