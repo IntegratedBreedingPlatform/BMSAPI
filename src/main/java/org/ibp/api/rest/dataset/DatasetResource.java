@@ -3,9 +3,9 @@ package org.ibp.api.rest.dataset;
 
 import java.util.Arrays;
 
+import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.dataset.Observation;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.java.dataset.DatasetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,12 +68,12 @@ public class DatasetResource {
 	@ApiOperation(value = "Update Observation", notes = "Update Observation")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}", method = RequestMethod.PATCH)
 	@Transactional
-	public ResponseEntity<Observation> updateObservation(
+	public ResponseEntity<ObservationDto> updateObservation(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId, @PathVariable final Integer observationId,
 		@RequestBody final ObservationValue observationValue) {
 
-		final Observation observation = this.studyDatasetService.updatePhenotype(observationUnitId, observationId, observationValue);
+		final ObservationDto observation = this.studyDatasetService.updatePhenotype(observationUnitId, observationId, observationValue);
 		return new ResponseEntity<>(observation, HttpStatus.OK);
 	}
 

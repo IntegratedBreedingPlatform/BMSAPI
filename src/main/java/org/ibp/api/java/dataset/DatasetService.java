@@ -2,9 +2,9 @@ package org.ibp.api.java.dataset;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.dataset.Observation;
 import org.ibp.api.domain.dataset.ObservationValue;
 
 public interface DatasetService {
@@ -13,7 +13,7 @@ public interface DatasetService {
 
 	MeasurementVariable addDatasetVariable(Integer studyId, Integer datasetId, DatasetVariable datasetVariable);
 
-	Observation updatePhenotype(Integer observationUnitId, Integer observationId, ObservationValue observationValue);
+	ObservationDto updatePhenotype(Integer observationUnitId, Integer observationId, ObservationValue observationValue);
 
 	void removeVariables(Integer studyId, Integer datasetId, List<Integer> variableIds);
 

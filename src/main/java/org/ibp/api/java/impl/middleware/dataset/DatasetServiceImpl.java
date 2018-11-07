@@ -3,13 +3,13 @@ package org.ibp.api.java.impl.middleware.dataset;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.dataset.Observation;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
@@ -60,15 +60,14 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Observation updatePhenotype(final Integer observationUnitId, final Integer observationId, final ObservationValue observationValue) {
+	public ObservationDto updatePhenotype(final Integer observationUnitId, final Integer observationId, final ObservationValue observationValue) {
 
 		final Phenotype phenotype = this.middlewareDatasetService
 			.updatePhenotype(
-				observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue(),
-				observationValue.getStatus());
+				observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue());
 
 		final SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMDD HH:MM:SS");
-		final Observation observation = new Observation();
+		final ObservationDto observation = new ObservationDto();
 		observation.setObservationId(phenotype.getPhenotypeId());
 		observation.setCategoricalValueId(phenotype.getcValueId());
 		observation.setStatus(phenotype.getValueStatus() != null ? phenotype.getValueStatus().getName() : null);
