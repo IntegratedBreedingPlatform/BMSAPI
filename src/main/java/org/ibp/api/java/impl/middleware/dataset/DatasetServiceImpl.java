@@ -84,6 +84,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Integer studyId, final Integer datasetId, final Integer observationId, final Integer observationUnitId,
 		final ObservationValue observationValue) {
 		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		this.observationValidator.validateObservation(datasetId, observationUnitId);
 		return this.middlewareDatasetService
 			.updatePhenotype(

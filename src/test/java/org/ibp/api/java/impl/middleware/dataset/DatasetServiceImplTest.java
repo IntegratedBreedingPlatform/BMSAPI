@@ -129,6 +129,7 @@ public class DatasetServiceImplTest {
 		observationValue.setValue(random.toString());
 		this.studyDatasetService.updateObservation(studyId, datasetId, observationId, observationUnitId, observationValue);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, true);
 		Mockito.verify(this.observationValidator).validateObservation(datasetId, observationUnitId);
 		Mockito.verify(this.middlewareDatasetService)
 			.updatePhenotype(observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue());
