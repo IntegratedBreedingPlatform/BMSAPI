@@ -12,6 +12,7 @@ import org.generationcp.middleware.operation.transformer.etl.MeasurementVariable
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,44 +22,64 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class DatasetServiceImplTest {
-	
+
 	@Mock
 	private DatasetService middlewareDatasetService;
-	
+
 	@Mock
 	private StudyValidator studyValidator;
-	
+
 	@Mock
 	private DatasetValidator datasetValidator;
-	
+
+	@Mock
+	private InstanceValidator instanceValidator;
+
 	@Mock
 	private MeasurementVariable variable;
-	
+
 	@Mock
 	private StandardVariable standardVariable;
-	
+
 	@Mock
 	private MeasurementVariableTransformer measurementVariableTransformer;
-	
+
 	@InjectMocks
 	private DatasetServiceImpl studyDatasetService;
-	
+
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 	}
-	
+
 	@Test
 	public void testCountPhenotypes() {
+
 		final Random random = new Random();
 		final int studyId = random.nextInt();
 		final int datasetId = random.nextInt();
+
 		final List<Integer> traitIds = Arrays.asList(random.nextInt(), random.nextInt(), random.nextInt());
+
 		this.studyDatasetService.countPhenotypes(studyId, datasetId, traitIds);
 		Mockito.verify(this.studyValidator).validate(studyId, false);
 		Mockito.verify(this.middlewareDatasetService).countPhenotypes(datasetId, traitIds);
 	}
-	
+
+	@Test
+	public void testCountPhenotypesByInstance() {
+
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int datasetId = random.nextInt();
+		final int instanceId = random.nextInt();
+		this.studyDatasetService.countPhenotypesByInstance(studyId, datasetId, instanceId);
+		Mockito.verify(this.studyValidator).validate(studyId, false);
+		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, false);
+		Mockito.verify(this.instanceValidator).validate(datasetId, instanceId);
+		Mockito.verify(this.middlewareDatasetService).countPhenotypesByInstance(datasetId, instanceId);
+	}
+
 	@Test
 	public void testAddDatasetVariable() {
 		final Random random = new Random();
@@ -69,9 +90,10 @@ public class DatasetServiceImplTest {
 		final int variableId = random.nextInt();
 		final String alias = RandomStringUtils.randomAlphabetic(20);
 		final DatasetVariable datasetVariable = new DatasetVariable(variableTypeId, variableId, alias);
-		Mockito.doReturn(this.standardVariable).when(this.datasetValidator).validateDatasetVariable(studyId, datasetId, true, datasetVariable, false);
+		Mockito.doReturn(this.standardVariable).when(this.datasetValidator)
+			.validateDatasetVariable(studyId, datasetId, true, datasetVariable, false);
 		Mockito.doReturn(this.variable).when(this.measurementVariableTransformer).transform(this.standardVariable, false);
-		
+
 		this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator).validateDatasetVariable(studyId, datasetId, true, datasetVariable, false);
@@ -81,6 +103,7 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.variable).setVariableType(variableType);
 		Mockito.verify(this.variable).setRequired(false);
 	}
+
 	
 	@Test
 	public void testRemoveVariables() {
@@ -93,5 +116,5 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.datasetValidator).validateExistingDatasetVariables(studyId, datasetId, true, variableIds);
 		Mockito.verify(this.middlewareDatasetService).removeVariables(datasetId, variableIds);
 	}
-	
+
 }

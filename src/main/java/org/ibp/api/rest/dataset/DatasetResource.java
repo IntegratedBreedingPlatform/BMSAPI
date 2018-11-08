@@ -32,9 +32,10 @@ public class DatasetResource {
 	@ApiOperation(value = "Count Phenotypes", notes = "Returns count of phenotypes for variables")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables/observations", method = RequestMethod.HEAD)
 	@Transactional
-	public ResponseEntity<String> countPhenotypes(@PathVariable final String crop, @PathVariable final Integer studyId,
-			@PathVariable final Integer datasetId,  @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
-		
+	public ResponseEntity<String> countPhenotypes(
+		@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
+
 		final long count = this.studyDatasetService.countPhenotypes(studyId, datasetId, Arrays.asList(variableIds));
 		final HttpHeaders respHeaders = new HttpHeaders();
 		respHeaders.add("X-Total-Count", String.valueOf(count));
@@ -59,6 +60,20 @@ public class DatasetResource {
 			@PathVariable final Integer datasetId,  @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
 		this.studyDatasetService.removeVariables(studyId, datasetId, Arrays.asList(variableIds));
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Count Phenotypes for specific instance (environment)", notes = "Returns count of phenotypes for specific instance (environment)")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{instanceId}", method = RequestMethod.HEAD)
+	@Transactional
+	public ResponseEntity<String> countPhenotypesByInstance(
+		@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId, @PathVariable final Integer instanceId) {
+
+		final long count = this.studyDatasetService.countPhenotypesByInstance(studyId, datasetId, instanceId);
+		final HttpHeaders respHeaders = new HttpHeaders();
+		respHeaders.add("X-Total-Count", String.valueOf(count));
+
+		return new ResponseEntity<>("", respHeaders, HttpStatus.OK);
 	}
 
 }

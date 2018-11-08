@@ -1,7 +1,5 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -9,41 +7,55 @@ import org.generationcp.middleware.operation.transformer.etl.MeasurementVariable
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class DatasetServiceImpl implements DatasetService {
-	
+
 	@Autowired
 	private org.generationcp.middleware.service.api.dataset.DatasetService middlewareDatasetService;
 
 	@Autowired
 	private StudyValidator studyValidator;
-	
+
 	@Autowired
 	private DatasetValidator datasetValidator;
-	
+
+	@Autowired
+	private InstanceValidator instanceValidator;
+
 	@Autowired
 	private MeasurementVariableTransformer measurementVariableTransformer;
-	
-	
+
 	@Override
 	public long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> traitIds) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
-		
+
 		return this.middlewareDatasetService.countPhenotypes(datasetId, traitIds);
+	}
+
+	@Override
+	public long countPhenotypesByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId) {
+		this.studyValidator.validate(studyId, false);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
+		this.instanceValidator.validate(datasetId, instanceId);
+		return this.middlewareDatasetService.countPhenotypesByInstance(datasetId, instanceId);
 	}
 
 	@Override
 	public MeasurementVariable addDatasetVariable(final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable) {
 		this.studyValidator.validate(studyId, true);
 		final Integer variableId = datasetVariable.getVariableId();
-		final StandardVariable traitVariable = this.datasetValidator.validateDatasetVariable(studyId, datasetId, true, datasetVariable, false);
+		final StandardVariable traitVariable =
+			this.datasetValidator.validateDatasetVariable(studyId, datasetId, true, datasetVariable, false);
 
 		final String alias = datasetVariable.getStudyAlias();
 		final VariableType type = VariableType.getById(datasetVariable.getVariableTypeId());
@@ -53,6 +65,7 @@ public class DatasetServiceImpl implements DatasetService {
 		measurementVariable.setVariableType(type);
 		measurementVariable.setRequired(false);
 		return measurementVariable;
+
 	}
 
 	@Override
