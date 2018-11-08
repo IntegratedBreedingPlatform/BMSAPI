@@ -1,13 +1,13 @@
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
+import java.util.HashMap;
+
 import org.generationcp.middleware.service.api.dataset.DatasetService;
-import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-
-import java.util.HashMap;
 
 @Component("datasetObservationValidator")
 public class ObservationValidator {
@@ -23,7 +23,7 @@ public class ObservationValidator {
 		final boolean isValid = this.datasetService.isValidObservationUnit(datasetId, observationUnitId);
 		if (!isValid) {
 			errors.reject("invalid.observation.unit.id", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 		
 	}
