@@ -62,6 +62,7 @@ public class DatasetGeneratorInputValidator {
 	}
 
 	public void validateBasicData(final String crop, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetInputGenerator, final Errors errors) {
+
 		final DatasetDTO dataset = this.studyDatasetService.getDataset(studyId, parentId);
 
 		final DataSetType dataSetType = DataSetType.findById(datasetInputGenerator.getDatasetTypeId());
@@ -83,6 +84,10 @@ public class DatasetGeneratorInputValidator {
 
 		if (datasetInputGenerator.getDatasetName() != null && datasetInputGenerator.getDatasetName().length() > 100) {
 			errors.reject("dataset.name.exceed.length");
+		}
+
+		if (datasetInputGenerator.getDatasetName() != null && datasetInputGenerator.getDatasetName().isEmpty()) {
+			errors.reject("dataset.name.empty.name");
 		}
 
 		final List<StudyInstance> studyInstances = dataset.getInstances();
@@ -112,7 +117,8 @@ public class DatasetGeneratorInputValidator {
 			errors.reject("dataset.invalid.obs.unit.variable", new String[] {String.valueOf(datasetInputGenerator.getSequenceVariableId())}, "");
 		}
 
-		if (datasetInputGenerator.getNumberOfSubObservationUnits() > this.maxAllowedSubobservationUnits) {
+		if (datasetInputGenerator.getNumberOfSubObservationUnits() > this.maxAllowedSubobservationUnits
+			|| datasetInputGenerator.getNumberOfSubObservationUnits() <= 0) {
 			errors.reject("dataset.invalid.number.subobs.units", new String[] {String.valueOf(this.maxAllowedSubobservationUnits)}, "");
 		}
 	}
