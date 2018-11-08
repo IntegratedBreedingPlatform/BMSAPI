@@ -61,6 +61,20 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
+	public void testCountPhenotypesByObservation() throws Exception {
+		final long count = 11;
+		doReturn(count).when(this.studyDatasetService).countPhenotypesByInstance(100, 102, 103);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.head("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{instanceId}", this.cropName, 100, 102, 103)
+				.param("variableIds", "1,2,3").contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.header().string("X-Total-Count", String.valueOf(count)));
+	}
+
+	@Test
 	public void testAddDatasetVariable() throws Exception {
 		final Random random = new Random();
 		final int studyId = random.nextInt(10000);
