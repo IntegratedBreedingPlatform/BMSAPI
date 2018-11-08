@@ -17,7 +17,7 @@ public class ObservationValidator {
 	
 	private BindingResult errors;
 	
-	public void validateObservation(final Integer datasetId, final Integer observationUnitId) {
+	public void validateObservationUnit(final Integer datasetId, final Integer observationUnitId) {
 		errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		
 		final boolean isValid = this.datasetService.isValidObservationUnit(datasetId, observationUnitId);
@@ -25,6 +25,18 @@ public class ObservationValidator {
 			errors.reject("invalid.observation.unit.id", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
+		
+	}
+	
+	public void validateObservation(final Integer datasetId, final Integer observationUnitId, final Integer observationId) {
+		this.validateObservationUnit(datasetId, observationUnitId);
+		
+		final boolean isValid = this.datasetService.isValidObservation(observationUnitId, observationId);
+		if (!isValid) {
+			errors.reject("invalid.observation.id", "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
+		
 		
 	}
 

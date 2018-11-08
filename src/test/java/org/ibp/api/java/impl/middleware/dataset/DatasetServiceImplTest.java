@@ -113,7 +113,7 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator)
 			.validateExistingDatasetVariables(studyId, datasetId, true, Arrays.asList(observationDto.getVariableId()));
-		Mockito.verify(this.observationValidator).validateObservation(datasetId, observationUnitId);
+		Mockito.verify(this.observationValidator).validateObservationUnit(datasetId, observationUnitId);
 		Mockito.verify(this.middlewareDatasetService).addPhenotype(observationDto);
 	}
 
@@ -130,7 +130,7 @@ public class DatasetServiceImplTest {
 		this.studyDatasetService.updateObservation(studyId, datasetId, observationId, observationUnitId, observationValue);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, true);
-		Mockito.verify(this.observationValidator).validateObservation(datasetId, observationUnitId);
+		Mockito.verify(this.observationValidator).validateObservation(datasetId, observationUnitId, observationId);
 		Mockito.verify(this.middlewareDatasetService)
 			.updatePhenotype(observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue());
 	}

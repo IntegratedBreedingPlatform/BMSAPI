@@ -33,7 +33,7 @@ public class ObservationValidatorTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testValidateObservationSuccess() {
+	public void testValidateObservationUnitSuccess() {
 
 		final Random random = new Random();
 		final int datasetId = random.nextInt();
@@ -41,11 +41,11 @@ public class ObservationValidatorTest extends ApiUnitTestBase {
 
 		when(datasetService.isValidObservationUnit(datasetId, observationUnitId)).thenReturn(true);
 
-		this.observationValidator.validateObservation(datasetId, observationUnitId);
+		this.observationValidator.validateObservationUnit(datasetId, observationUnitId);
 	}
 
 	@Test (expected = ResourceNotFoundException.class)
-	public void testValidateObservationReject() {
+	public void testValidateObservationUnitReject() {
 
 		final Random random = new Random();
 		final int datasetId = random.nextInt();
@@ -53,7 +53,48 @@ public class ObservationValidatorTest extends ApiUnitTestBase {
 
 		when(datasetService.isValidObservationUnit(datasetId, observationUnitId)).thenReturn(false);
 
-		this.observationValidator.validateObservation(datasetId, observationUnitId);
+		this.observationValidator.validateObservationUnit(datasetId, observationUnitId);
+	}
+	
+	@Test
+	public void testValidateObservationSuccess() {
+
+		final Random random = new Random();
+		final int datasetId = random.nextInt();
+		final int observationUnitId = random.nextInt();
+		final int observationId = random.nextInt();
+		
+		when(datasetService.isValidObservationUnit(datasetId, observationUnitId)).thenReturn(true);
+		when(datasetService.isValidObservation(observationUnitId, observationId)).thenReturn(true);
+
+		this.observationValidator.validateObservation(datasetId, observationUnitId, observationId);
+	}
+
+	@Test (expected = ResourceNotFoundException.class)
+	public void testValidateObservationWithInvalidObservationUnit() {
+
+		final Random random = new Random();
+		final int datasetId = random.nextInt();
+		final int observationUnitId = random.nextInt();
+		final int observationId = random.nextInt();
+		
+		when(datasetService.isValidObservationUnit(datasetId, observationUnitId)).thenReturn(false);
+
+		this.observationValidator.validateObservation(datasetId, observationUnitId, observationId);
+	}
+	
+	@Test (expected = ResourceNotFoundException.class)
+	public void testValidateObservationWithInvalidObservation() {
+
+		final Random random = new Random();
+		final int datasetId = random.nextInt();
+		final int observationUnitId = random.nextInt();
+		final int observationId = random.nextInt();
+
+		when(datasetService.isValidObservationUnit(datasetId, observationUnitId)).thenReturn(true);
+		when(datasetService.isValidObservation(observationUnitId, observationId)).thenReturn(false);
+
+		this.observationValidator.validateObservation(datasetId, observationUnitId, observationId);
 	}
 
 }
