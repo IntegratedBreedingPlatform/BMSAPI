@@ -46,7 +46,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public long countPhenotypesByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
-		this.instanceValidator.validate(studyId, instanceId);
+		this.instanceValidator.validate(datasetId, instanceId);
 		return this.middlewareDatasetService.countPhenotypesByInstance(datasetId, instanceId);
 	}
 
