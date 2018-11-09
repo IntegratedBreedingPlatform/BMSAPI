@@ -5,31 +5,24 @@ import static org.mockito.Mockito.when;
 import java.util.Random;
 
 import org.generationcp.middleware.service.api.dataset.DatasetService;
-import org.ibp.ApiUnitTestBase;
 import org.ibp.api.exception.ResourceNotFoundException;
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-public class ObservationValidatorTest extends ApiUnitTestBase {
+public class ObservationValidatorTest {
 
-	@Autowired
+	@InjectMocks
 	private ObservationValidator observationValidator;
 
-	@Autowired
+	@Mock
 	private DatasetService datasetService;
-
-	@Configuration
-	public static class TestConfiguration {
-
-		@Bean
-		@Primary
-		public DatasetService datasetService() {
-			return Mockito.mock(DatasetService.class);
-		}
+	
+	@Before
+	public void setup() {
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
