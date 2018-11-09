@@ -2,6 +2,7 @@ package org.ibp.api.domain.dataset;
 
 import javax.validation.constraints.NotNull;
 
+// TODO Assess if this is redundant with ObservationUnitData
 public class ObservationValue {
 
 	@NotNull
