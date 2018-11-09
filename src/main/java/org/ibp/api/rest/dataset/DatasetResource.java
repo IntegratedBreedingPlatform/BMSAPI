@@ -113,7 +113,7 @@ public class DatasetResource {
 			required = false) final Integer pageNumber,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
 			required = false) final Integer pageSize,
-		@ApiParam(value = "Sort order. Name of the field to sorty by.", required = false) @RequestParam(value = "sortBy",
+		@ApiParam(value = "Sort order. Name of the field to sorty by. Should be termId of the field", required = false) @RequestParam(value = "sortBy",
 			required = false) final String sortBy,
 		@ApiParam(value = "Sort order direction. asc/desc.", required = false) @RequestParam(value = "sortOrder",
 			required = false) final String sortOrder,
