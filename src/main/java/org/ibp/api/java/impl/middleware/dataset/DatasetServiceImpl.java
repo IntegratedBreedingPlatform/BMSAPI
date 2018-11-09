@@ -108,7 +108,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void removeVariables(Integer studyId, Integer datasetId, List<Integer> variableIds) {
+	public void removeVariables(final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, variableIds);
 		this.middlewareDatasetService.removeVariables(datasetId, variableIds);
@@ -193,6 +193,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final int pageNumber, final int pageSize, final String sortBy, final String sortOrder) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.instanceValidator.validate(datasetId, instanceId);
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
 			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
