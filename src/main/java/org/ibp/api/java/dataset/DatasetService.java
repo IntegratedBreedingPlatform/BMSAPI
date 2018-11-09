@@ -16,12 +16,14 @@ public interface DatasetService {
 
 	long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> traitIds);
 
+	long countPhenotypesByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId);
+
 	MeasurementVariable addDatasetVariable(final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable);
+
+	void removeVariables(final Integer studyId, final Integer datasetId, final List<Integer> variableIds);
 
 	List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds);
 	
-	void removeVariables(Integer studyId, Integer datasetId, List<Integer> variableIds);
-
 	DatasetDTO generateSubObservationDataset(String cropName, Integer studyId, Integer parentId, DatasetGeneratorInput datasetGeneratorInput);
 
 	DatasetDTO getDataset(final String crop, final Integer studyId, final Integer datasetId);
@@ -30,6 +32,5 @@ public interface DatasetService {
 		final int pageSize, final String sortBy, final String sortOrder);
 
 	int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId);
-
 
 }

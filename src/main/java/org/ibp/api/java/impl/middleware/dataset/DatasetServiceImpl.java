@@ -16,6 +16,7 @@ import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetGeneratorInputValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
@@ -51,6 +52,8 @@ public class DatasetServiceImpl implements DatasetService {
 	private DatasetValidator datasetValidator;
 
 	@Autowired
+	private InstanceValidator instanceValidator;
+	@Autowired
 	private MeasurementVariableTransformer measurementVariableTransformer;
 
 	@Autowired
@@ -79,10 +82,19 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public long countPhenotypesByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId) {
+		this.studyValidator.validate(studyId, false);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
+		this.instanceValidator.validate(datasetId, instanceId);
+		return this.middlewareDatasetService.countPhenotypesByInstance(datasetId, instanceId);
+	}
+
+	@Override
 	public MeasurementVariable addDatasetVariable(final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable) {
 		this.studyValidator.validate(studyId, true);
 		final Integer variableId = datasetVariable.getVariableId();
-		final StandardVariable traitVariable = this.datasetValidator.validateDatasetVariable(studyId, datasetId, true, datasetVariable, false);
+		final StandardVariable traitVariable =
+			this.datasetValidator.validateDatasetVariable(studyId, datasetId, true, datasetVariable, false);
 
 		final String alias = datasetVariable.getStudyAlias();
 		final VariableType type = VariableType.getById(datasetVariable.getVariableTypeId());
@@ -92,6 +104,7 @@ public class DatasetServiceImpl implements DatasetService {
 		measurementVariable.setVariableType(type);
 		measurementVariable.setRequired(false);
 		return measurementVariable;
+
 	}
 
 	@Override

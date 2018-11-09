@@ -42,10 +42,11 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import org.ibp.api.domain.study.StudyInstance;
 
 public class DatasetResourceTest extends ApiUnitTestBase {
-	
+
 	@Autowired
 	private DatasetService studyDatasetService;
-	
+
+
 	@Configuration
 	public static class TestConfiguration {
 
@@ -60,15 +61,30 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	public void setup() throws Exception {
 		super.setUp();
 	}
-	
+
 	@Test
 	public void testCountPhenotypes() throws Exception {
 		final long count = 10;
 		doReturn(count).when(this.studyDatasetService).countPhenotypes(100, 102, Arrays.asList(1, 2, 3));
-		
+
 		this.mockMvc
-			.perform(MockMvcRequestBuilders.head("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/variables/observations", this.cropName, 100, 102)
-					.param("variableIds", "1,2,3").contentType(this.contentType))
+			.perform(MockMvcRequestBuilders
+				.head("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/variables/observations", this.cropName, 100, 102)
+				.param("variableIds", "1,2,3").contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.header().string("X-Total-Count", String.valueOf(count)));
+	}
+
+	@Test
+	public void testCountPhenotypesByObservation() throws Exception {
+		final long count = 11;
+		doReturn(count).when(this.studyDatasetService).countPhenotypesByInstance(100, 102, 103);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.head("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{instanceId}", this.cropName, 100, 102, 103)
+				.param("variableIds", "1,2,3").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.header().string("X-Total-Count", String.valueOf(count)));
