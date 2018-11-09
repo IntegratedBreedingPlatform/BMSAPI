@@ -47,7 +47,7 @@ public class DatasetValidator {
 	}
 
 	public void validateDataset(final Integer studyId, final Integer datasetId, final Boolean shouldBeSubobservationDataset) {
-
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		final DataSet dataSet = this.studyDataManager.getDataSet(datasetId);
 		this.validateDataset(studyId, dataSet, shouldBeSubobservationDataset);
 	}
@@ -70,7 +70,7 @@ public class DatasetValidator {
 	public StandardVariable validateDatasetVariable(final Integer studyId, final Integer datasetId,
 			final Boolean shouldBeSubobservationDataset, final DatasetVariable datasetVariable, final Boolean shouldAlreadyBeDatasetVariable) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		
+
 		final DataSet dataSet = this.studyDataManager.getDataSet(datasetId);
 		this.validateDataset(studyId, dataSet, shouldBeSubobservationDataset);
 
@@ -87,7 +87,7 @@ public class DatasetValidator {
 
 	public void validateExistingDatasetVariables(final Integer studyId, final Integer datasetId,
 			final Boolean shouldBeSubobservationDataset, final List<Integer> variableIds) {
-		errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		final DataSet dataSet = this.studyDataManager.getDataSet(datasetId);
 		this.validateDataset(studyId, dataSet, shouldBeSubobservationDataset);
@@ -100,8 +100,9 @@ public class DatasetValidator {
 
 	}
 
-	void validateIfAlreadyDatasetVariable(final Integer variableId, final Boolean shouldAlreadyBeDatasetVariable,
+	public void validateIfAlreadyDatasetVariable(final Integer variableId, final Boolean shouldAlreadyBeDatasetVariable,
 			final DataSet dataSet) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		final VariableTypeList variableList = dataSet.getVariableTypes();
 		final VariableTypeList variates = variableList.getVariates();
 		if (variates == null && shouldAlreadyBeDatasetVariable) {
@@ -130,25 +131,25 @@ public class DatasetValidator {
 		}
 	}
 
-	VariableType validateVariableType(final Integer variableTypeId) {
+	private VariableType validateVariableType(final Integer variableTypeId) {
 		final VariableType variableType = VariableType.getById(variableTypeId);
 		if (variableType == null) {
 			this.errors.reject("variable.type.does.not.exist", "");
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
-		
+
 		if (!VALID_VARIABLE_TYPES.contains(variableType)) {
 			this.errors.reject("variable.type.not.supported", "");
 			throw new NotSupportedException(this.errors.getAllErrors().get(0));
 		}
-		
+
 		return variableType;
-		
+
 	}
-	
+
 	void validateVariable(final StandardVariable variable, final VariableType variableType, final Integer variableId) {
 		validateVariableExists(variable, variableId);
-		
+
 		// Check if variable is configured to be given variable type
 		if (!variable.getVariableTypes().contains(variableType)) {
 			this.errors.reject("variable.not.of.given.variable.type", "");
@@ -166,6 +167,7 @@ public class DatasetValidator {
 
 
 	public void validateDatasetBelongsToStudy(final Integer studyId, final Integer datasetId) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		final List<DatasetDTO> allChildren = this.studyDatasetService.getDatasets(studyId, new HashSet<Integer>());
 		boolean found = false;
 		for (final DatasetDTO datasetDTO: allChildren) {
