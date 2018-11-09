@@ -1,20 +1,31 @@
 package org.ibp.api.rest.dataset.validator;
 
+import java.util.Random;
+
 import org.generationcp.middleware.domain.dms.Study;
-import org.ibp.ApiUnitTestBase;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.MockitoAnnotations;
 
-import java.util.Random;
+public class StudyValidatorTest {
+	
+	@Mock
+	private StudyDataManager studyDataManager;
 
-public class StudyValidatorTest extends ApiUnitTestBase {
-
-	@Autowired
+	@InjectMocks
 	private StudyValidator studyValidator;
+	
+	@Before
+	public void setup() {
+		MockitoAnnotations.initMocks(this);
+	}
 
 	@Test (expected = ResourceNotFoundException.class)
 	public void testStudyDoesNotExist() throws Exception {
