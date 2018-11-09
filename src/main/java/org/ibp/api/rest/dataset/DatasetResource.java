@@ -13,7 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +32,6 @@ public class DatasetResource {
 
 	@ApiOperation(value = "Count Phenotypes", notes = "Returns count of phenotypes for variables")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables/observations", method = RequestMethod.HEAD)
-	@Transactional
 	public ResponseEntity<String> countPhenotypes(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
@@ -47,7 +45,6 @@ public class DatasetResource {
 
 	@ApiOperation(value = "Add Dataset Variable", notes = "Add Dataset Variable")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables", method = RequestMethod.PUT)
-	@Transactional
 	public ResponseEntity<MeasurementVariable> addTrait(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestBody final DatasetVariable datasetTrait) {
@@ -58,7 +55,6 @@ public class DatasetResource {
 
 	@ApiOperation(value = "Remove dataset variables", notes = "Remove a set of variables from dataset")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables", method = RequestMethod.DELETE)
-	@Transactional
 	public ResponseEntity<Void> removeVariables(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
@@ -68,7 +64,6 @@ public class DatasetResource {
 
 	@ApiOperation(value = "Add Observation", notes = "Add Observation")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}", method = RequestMethod.POST)
-	@Transactional
 	public ResponseEntity<ObservationDto> addObservation(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId,
@@ -80,7 +75,6 @@ public class DatasetResource {
 
 	@ApiOperation(value = "Update Observation", notes = "Update Observation")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}", method = RequestMethod.PATCH)
-	@Transactional
 	public ResponseEntity<ObservationDto> updateObservation(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId, @PathVariable final Integer observationId,
@@ -92,7 +86,6 @@ public class DatasetResource {
 	
 	@ApiOperation(value = "Count Phenotypes for specific instance (environment)", notes = "Returns count of phenotypes for specific instance (environment)")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{instanceId}", method = RequestMethod.HEAD)
-	@Transactional
 	public ResponseEntity<String> countPhenotypesByInstance(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer instanceId) {
