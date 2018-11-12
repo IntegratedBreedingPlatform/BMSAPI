@@ -200,7 +200,12 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			}
 
 			boolean deletable = true;
-			if (ontologyVariable.getHasUsage()) {
+
+			// FIXME stop-gap solution for nullPointer
+			// in org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator#validateDataset
+			// getVariable for dataset variables is called with calculateVariableUsage=false
+			// and then the variable is inserted into the VariableCache
+			if (Boolean.TRUE.equals(ontologyVariable.getHasUsage())) {
 				deletable = false;
 			}
 

@@ -5,49 +5,57 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Random;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.ibp.ApiUnitTestBase;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.exception.ResourceNotFoundException;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.mockito.MockitoAnnotations;
 
-public class DatasetValidatorTest extends ApiUnitTestBase {
-	
-	@Autowired
-	private DatasetValidator datasetValidator;
-	
-	@Autowired
+public class DatasetValidatorTest  {
+
+	@Mock
+	protected StudyDataManager studyDataManager;
+
+	@Mock
 	private OntologyDataManager ontologyDataManager;
-	
-	@Configuration
-	public static class TestConfiguration {
 
-		@Bean
-		@Primary
-		public OntologyDataManager ontologyDataManager() {
-			return Mockito.mock(OntologyDataManager.class);
-		}
+	@Mock
+	private DatasetService studyDatasetService;
+
+	@InjectMocks
+	private DatasetValidator datasetValidator;
+
+	@Before
+	public void beforeEachTest() {
+		MockitoAnnotations.initMocks(this);
 	}
-	
+
 	@Test (expected = ResourceNotFoundException.class)
 	public void testDatasetDoesNotExist() {
 		final Random ran = new Random();
 		final Integer datasetId = ran.nextInt();
+		Mockito.doReturn(Lists.newArrayList(datasetId))
+			.when(this.studyDatasetService)
+			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		Mockito.when(studyDataManager.getDataSet(datasetId)).thenReturn(null);
 		this.datasetValidator.validateDataset(ran.nextInt(), datasetId, ran.nextBoolean());
 	}
@@ -56,6 +64,9 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 	public void testDatasetShouldBeSubobservationDatasetButWasNot() {
 		final Random ran = new Random();
 		final Integer datasetId = ran.nextInt();
+		Mockito.doReturn(Lists.newArrayList(new DatasetDTO(datasetId)))
+			.when(this.studyDatasetService)
+			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final DataSet dataset = new DataSet();
 		dataset.setId(datasetId);
 		dataset.setDataSetType(DataSetType.PLOT_DATA);
@@ -68,6 +79,9 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 	public void testDatasetShouldBeSubobservationDataset() {
 		final Random ran = new Random();
 		final Integer datasetId = ran.nextInt();
+		Mockito.doReturn(Lists.newArrayList(new DatasetDTO(datasetId)))
+			.when(this.studyDatasetService)
+			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final DataSet dataset = new DataSet();
 		dataset.setId(datasetId);
 		dataset.setDataSetType(DataSetType.QUADRAT_SUBOBSERVATIONS);
@@ -80,6 +94,9 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 	public void testVariableDoesNotExist() {
 		final Random ran = new Random();
 		final Integer datasetId = ran.nextInt();
+		Mockito.doReturn(Lists.newArrayList(new DatasetDTO(datasetId)))
+			.when(this.studyDatasetService)
+			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer variableId = ran.nextInt();
 		final String programUUID = RandomStringUtils.randomAlphabetic(20);
 		createDataset(datasetId, programUUID, null);
@@ -93,6 +110,9 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 	public void testVariableTypeDoesNotExist() {
 		final Random ran = new Random();
 		final Integer datasetId = ran.nextInt();
+		Mockito.doReturn(Lists.newArrayList(new DatasetDTO(datasetId)))
+			.when(this.studyDatasetService)
+			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer variableId = ran.nextInt();
 		final String programUUID = RandomStringUtils.randomAlphabetic(20);
 		createDataset(datasetId, programUUID, null);
@@ -105,6 +125,9 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 	public void testVariableTypeIsNotSupported() {
 		final Random ran = new Random();
 		final Integer datasetId = ran.nextInt();
+		Mockito.doReturn(Lists.newArrayList(new DatasetDTO(datasetId)))
+			.when(this.studyDatasetService)
+			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer variableId = ran.nextInt();
 		final String programUUID = RandomStringUtils.randomAlphabetic(20);
 		createDataset(datasetId, programUUID, null);
@@ -117,6 +140,9 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 	public void testVariableIsNotGivenVariableType() {
 		final Random ran = new Random();
 		final Integer datasetId = ran.nextInt();
+		Mockito.doReturn(Lists.newArrayList(new DatasetDTO(datasetId)))
+			.when(this.studyDatasetService)
+			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer variableId = ran.nextInt();
 		final String programUUID = RandomStringUtils.randomAlphabetic(20);
 		final StandardVariable standardVariable = new StandardVariable();
@@ -136,6 +162,9 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 	public void testShouldNotBeDatasetVariableButItAlreadyIs() {
 		final Random ran = new Random();
 		final Integer datasetId = ran.nextInt();
+		Mockito.doReturn(Lists.newArrayList(new DatasetDTO(datasetId)))
+			.when(this.studyDatasetService)
+			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer variableId = ran.nextInt();
 		final String programUUID = RandomStringUtils.randomAlphabetic(20);
 		final StandardVariable standardVariable = createStandardVariable(variableId);
@@ -148,6 +177,9 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 	public void testShouldBeDatasetVariableButItIsNot() {
 		final Random ran = new Random();
 		final Integer datasetId = ran.nextInt();
+		Mockito.doReturn(Lists.newArrayList(new DatasetDTO(datasetId)))
+			.when(this.studyDatasetService)
+			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer variableId = ran.nextInt();
 		final String programUUID = RandomStringUtils.randomAlphabetic(20);
 		final DataSet dataset = createDataset(datasetId, programUUID, null);
@@ -159,6 +191,9 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 	public void testShouldBeDatasetVariableButVariableTypeNotSupported() {
 		final Random ran = new Random();
 		final Integer datasetId = ran.nextInt();
+		Mockito.doReturn(Lists.newArrayList(new DatasetDTO(datasetId)))
+			.when(this.studyDatasetService)
+			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer variableId = ran.nextInt();
 		final String programUUID = RandomStringUtils.randomAlphabetic(20);
 		final StandardVariable standardVariable = createStandardVariable(variableId);
@@ -173,6 +208,9 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 	public void testShouldNotBeDatasetVariable() {
 		final Random ran = new Random();
 		final Integer datasetId = ran.nextInt();
+		Mockito.doReturn(Lists.newArrayList(new DatasetDTO(datasetId)))
+			.when(this.studyDatasetService)
+			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer existingTraitId = ran.nextInt();
 		final Integer variableId = ran.nextInt();
 		final String programUUID = RandomStringUtils.randomAlphabetic(20);
@@ -188,6 +226,9 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 	public void testShouldBeDatasetVariable() {
 		final Random ran = new Random();
 		final Integer datasetId = ran.nextInt();
+		Mockito.doReturn(Lists.newArrayList(new DatasetDTO(datasetId)))
+			.when(this.studyDatasetService)
+			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer variableId = ran.nextInt();
 		final String programUUID = RandomStringUtils.randomAlphabetic(20);
 		final StandardVariable standardVariable = createStandardVariable(variableId);
@@ -202,6 +243,9 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 	public void testValidateExistingVariablesWhenOneVariableDoesNotExist() {
 		final Random ran = new Random();
 		final Integer datasetId = ran.nextInt();
+		Mockito.doReturn(Lists.newArrayList(new DatasetDTO(datasetId)))
+			.when(this.studyDatasetService)
+			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer variableId = ran.nextInt();
 		final Integer nonExistingVariableId = ran.nextInt();
 		final String programUUID = RandomStringUtils.randomAlphabetic(20);
@@ -217,6 +261,9 @@ public class DatasetValidatorTest extends ApiUnitTestBase {
 	public void testValidateExistingVariablesWhenOneVariableNotDatasetVariable() {
 		final Random ran = new Random();
 		final Integer datasetId = ran.nextInt();
+		Mockito.doReturn(Lists.newArrayList(new DatasetDTO(datasetId)))
+			.when(this.studyDatasetService)
+			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer variableId = ran.nextInt();
 		final String programUUID = RandomStringUtils.randomAlphabetic(20);
 		final StandardVariable standardVariable = createStandardVariable(variableId);
