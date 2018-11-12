@@ -43,7 +43,7 @@ public class DatasetValidator {
 	private BindingResult errors;
 
 	public DatasetValidator() {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
 	}
 
 	public void validateDataset(final Integer studyId, final Integer datasetId, final Boolean shouldBeSubobservationDataset) {
@@ -148,7 +148,7 @@ public class DatasetValidator {
 	}
 
 	void validateVariable(final StandardVariable variable, final VariableType variableType, final Integer variableId) {
-		validateVariableExists(variable, variableId);
+		this.validateVariableExists(variable, variableId);
 
 		// Check if variable is configured to be given variable type
 		if (!variable.getVariableTypes().contains(variableType)) {
