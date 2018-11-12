@@ -153,12 +153,6 @@ public class MiddlewareFactory {
 	public StudyService getStudyService() {
 		return new StudyServiceImpl(this.getCropDatabaseSessionProvider());
 	}
-	
-	/*@Bean
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public DatasetService getStudyDatasetService() {
-		return new DatasetServiceImpl(this.getCropDatabaseSessionProvider());
-	}*/
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
