@@ -130,9 +130,9 @@ public class DatasetResource {
 	public ResponseEntity<ObservationUnitTable> getObservationUnitTable(@PathVariable final String cropname,
 		@PathVariable final Integer studyId, @PathVariable final Integer datasetId,
 		@PathVariable final Integer instanceId,
-		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "pageNumber",
+		@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "pageNumber",
 			required = false) final Integer pageNumber,
-		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
+		@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
 			required = false) final Integer pageSize,
 		@ApiParam(value = "Sort order. Name of the field to sorty by. Should be termId of the field", required = false) @RequestParam(value = "sortBy",
 			required = false) final String sortBy,
@@ -150,8 +150,6 @@ public class DatasetResource {
 
 				@Override
 				public List<ObservationUnitRow> getResults(final PagedResult<ObservationUnitRow> pagedResult) {
-					// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
-					final int pageNumber = pagedResult.getPageNumber() + 1;
 					return DatasetResource.this.studyDatasetService.getObservationUnitRows(
 						studyId,
 						datasetId,
