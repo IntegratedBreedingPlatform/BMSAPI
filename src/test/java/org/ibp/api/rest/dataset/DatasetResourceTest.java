@@ -41,7 +41,6 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 public class DatasetResourceTest extends ApiUnitTestBase {
 
@@ -278,7 +277,6 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isNotFound())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is("Study does not exist")));
 		verify(this.studyDatasetService, times(1)).getDataset(this.cropName, 1000,1001);
-		verifyNoMoreInteractions(this.studyDatasetService);
 	}
 
 	@Test
