@@ -45,6 +45,9 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 public class DatasetResourceTest extends ApiUnitTestBase {
 
+	public static final String DATASET_NAME = "TEST1234";
+	public static final int STUDY_ID = 12345;
+	public static final int PARENT_ID = 200;
 	@Autowired
 	private DatasetService studyDatasetService;
 
@@ -402,4 +405,311 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		return datasets;
 	}
 
+	@Test
+	public void testGenerateDataset() throws Exception {
+		final int datasetTypeId = DataSetType.QUADRAT_SUBOBSERVATIONS.getId();
+		final DatasetDTO dataset = this.createDataset(datasetTypeId, 1234, DATASET_NAME, this.cropName, STUDY_ID);
+		final DatasetGeneratorInput datasetGeneratorInput = new DatasetGeneratorInput();
+		final Integer[] instanceIds = new Integer[1];
+
+		datasetGeneratorInput.setDatasetName(DATASET_NAME);
+		datasetGeneratorInput.setDatasetTypeId(datasetTypeId);
+		datasetGeneratorInput.setInstanceIds(instanceIds);
+		datasetGeneratorInput.setNumberOfSubObservationUnits(5);
+		datasetGeneratorInput.setSequenceVariableId(8206);
+
+		doReturn(dataset).when(this.studyDatasetService)
+			.generateSubObservationDataset(this.cropName, STUDY_ID, PARENT_ID, datasetGeneratorInput);
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post(
+					"/crops/{cropName}/studies/{studyId}/datasets/{parentId}/generation", this.cropName, STUDY_ID, PARENT_ID,
+					datasetGeneratorInput)
+				.contentType(this.contentType)
+				.content(this.convertObjectToByte(datasetGeneratorInput)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.name", is(dataset.getName())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.datasetId", is(dataset.getDatasetId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.datasetTypeId", is(dataset.getDatasetTypeId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.studyId", is(dataset.getStudyId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.cropName", is(dataset.getCropName())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].termId", is(dataset.getVariables().get(0).getTermId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].name", is(dataset.getVariables().get(0).getName())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].description", is(dataset.getVariables().get(0).getDescription())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].scale", is(dataset.getVariables().get(0).getScale())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].method", is(dataset.getVariables().get(0).getMethod())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].property", is(dataset.getVariables().get(0).getProperty())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].dataType", is(dataset.getVariables().get(0).getDataType())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].dataTypeId", is(dataset.getVariables().get(0).getDataTypeId())))
+
+			.andExpect(MockMvcResultMatchers.jsonPath("$.instances[0].instanceDbId", is(dataset.getInstances().get(0).getInstanceDbId())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.instances[0].locationName", is(dataset.getInstances().get(0).getLocationName())))
+			.andExpect(MockMvcResultMatchers
+				.jsonPath("$.instances[0].locationAbbreviation", is(dataset.getInstances().get(0).getLocationAbbreviation())))
+			.andExpect(MockMvcResultMatchers
+				.jsonPath("$.instances[0].customLocationAbbreviation", is(dataset.getInstances().get(0).getCustomLocationAbbreviation())))
+			.andExpect(
+				MockMvcResultMatchers.jsonPath("$.instances[0].instanceNumber", is(dataset.getInstances().get(0).getInstanceNumber())));
+	}
+
+	@Test
+	public void testGenerateDatasetsErrorDuplicatedName() throws Exception {
+		final DatasetGeneratorInput datasetGeneratorInput = new DatasetGeneratorInput();
+		final Integer[] instanceIds = new Integer[1];
+		final int datasetTypeId = DataSetType.QUADRAT_SUBOBSERVATIONS.getId();
+		datasetGeneratorInput.setDatasetName(DATASET_NAME);
+		datasetGeneratorInput.setDatasetTypeId(datasetTypeId);
+		datasetGeneratorInput.setInstanceIds(instanceIds);
+		datasetGeneratorInput.setNumberOfSubObservationUnits(5);
+		datasetGeneratorInput.setSequenceVariableId(8206);
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		errors.reject("dataset.name.not.available", "");
+		Mockito.when(this.studyDatasetService.generateSubObservationDataset(this.cropName, STUDY_ID, PARENT_ID, datasetGeneratorInput)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post(
+					"/crops/{cropName}/studies/{studyId}/datasets/{parentId}/generation", this.cropName, STUDY_ID, PARENT_ID,
+					datasetGeneratorInput)
+				.contentType(this.contentType)
+				.content(this.convertObjectToByte(datasetGeneratorInput)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isNotFound())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is("{0} is already in use.")));
+	}
+
+	@Test
+	public void testGenerateDatasetsErrorDatasetTypeNotExists() throws Exception {
+		final DatasetGeneratorInput datasetGeneratorInput = new DatasetGeneratorInput();
+		final Integer[] instanceIds = new Integer[1];
+		final int datasetTypeId = DataSetType.QUADRAT_SUBOBSERVATIONS.getId();
+		datasetGeneratorInput.setDatasetName(DATASET_NAME);
+		datasetGeneratorInput.setDatasetTypeId(datasetTypeId);
+		datasetGeneratorInput.setInstanceIds(instanceIds);
+		datasetGeneratorInput.setNumberOfSubObservationUnits(5);
+		datasetGeneratorInput.setSequenceVariableId(8206);
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		errors.reject("dataset.type.id.not.exist", "");
+		Mockito.when(this.studyDatasetService.generateSubObservationDataset(this.cropName, STUDY_ID, PARENT_ID, datasetGeneratorInput)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post(
+					"/crops/{cropName}/studies/{studyId}/datasets/{parentId}/generation", this.cropName, STUDY_ID, PARENT_ID,
+					datasetGeneratorInput)
+				.contentType(this.contentType)
+				.content(this.convertObjectToByte(datasetGeneratorInput)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isNotFound())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is("{0} is not a valid dataset type")));
+	}
+
+	@Test
+	public void testGenerateDatasetsErrorParentNotAllowed() throws Exception {
+		final DatasetGeneratorInput datasetGeneratorInput = new DatasetGeneratorInput();
+		final Integer[] instanceIds = new Integer[1];
+		final int datasetTypeId = DataSetType.QUADRAT_SUBOBSERVATIONS.getId();
+		datasetGeneratorInput.setDatasetName(DATASET_NAME);
+		datasetGeneratorInput.setDatasetTypeId(datasetTypeId);
+		datasetGeneratorInput.setInstanceIds(instanceIds);
+		datasetGeneratorInput.setNumberOfSubObservationUnits(5);
+		datasetGeneratorInput.setSequenceVariableId(8206);
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		errors.reject("dataset.parent.not.allowed", "");
+		Mockito.when(this.studyDatasetService.generateSubObservationDataset(this.cropName, STUDY_ID, PARENT_ID, datasetGeneratorInput)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post(
+					"/crops/{cropName}/studies/{studyId}/datasets/{parentId}/generation", this.cropName, STUDY_ID, PARENT_ID,
+					datasetGeneratorInput)
+				.contentType(this.contentType)
+				.content(this.convertObjectToByte(datasetGeneratorInput)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isNotFound())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is("Specified parentId does not have type PLOT or SubObservation type")));
+	}
+
+	@Test
+	public void testGenerateDatasetsErrorMaxChildren() throws Exception {
+		final DatasetGeneratorInput datasetGeneratorInput = new DatasetGeneratorInput();
+		final Integer[] instanceIds = new Integer[1];
+		final int datasetTypeId = DataSetType.QUADRAT_SUBOBSERVATIONS.getId();
+		datasetGeneratorInput.setDatasetName(DATASET_NAME);
+		datasetGeneratorInput.setDatasetTypeId(datasetTypeId);
+		datasetGeneratorInput.setInstanceIds(instanceIds);
+		datasetGeneratorInput.setNumberOfSubObservationUnits(5);
+		datasetGeneratorInput.setSequenceVariableId(8206);
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		errors.reject("dataset.creation.not.allowed", "");
+		Mockito.when(this.studyDatasetService.generateSubObservationDataset(this.cropName, STUDY_ID, PARENT_ID, datasetGeneratorInput)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post(
+					"/crops/{cropName}/studies/{studyId}/datasets/{parentId}/generation", this.cropName, STUDY_ID, PARENT_ID,
+					datasetGeneratorInput)
+				.contentType(this.contentType)
+				.content(this.convertObjectToByte(datasetGeneratorInput)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isNotFound())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is("The parent dataset already has {0} children datasets")));
+	}
+
+	@Test
+	public void testGenerateDatasetsErrorExceedLength() throws Exception {
+		final DatasetGeneratorInput datasetGeneratorInput = new DatasetGeneratorInput();
+		final Integer[] instanceIds = new Integer[1];
+		final int datasetTypeId = DataSetType.QUADRAT_SUBOBSERVATIONS.getId();
+		datasetGeneratorInput.setDatasetName(DATASET_NAME);
+		datasetGeneratorInput.setDatasetTypeId(datasetTypeId);
+		datasetGeneratorInput.setInstanceIds(instanceIds);
+		datasetGeneratorInput.setNumberOfSubObservationUnits(5);
+		datasetGeneratorInput.setSequenceVariableId(8206);
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		errors.reject("dataset.name.exceed.length", "");
+		Mockito.when(this.studyDatasetService.generateSubObservationDataset(this.cropName, STUDY_ID, PARENT_ID, datasetGeneratorInput)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post(
+					"/crops/{cropName}/studies/{studyId}/datasets/{parentId}/generation", this.cropName, STUDY_ID, PARENT_ID,
+					datasetGeneratorInput)
+				.contentType(this.contentType)
+				.content(this.convertObjectToByte(datasetGeneratorInput)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isNotFound())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is("Dataset name must not exceed 100 characters.")));
+	}
+
+	@Test
+	public void testGenerateDatasetsErrorEmptyName() throws Exception {
+		final DatasetGeneratorInput datasetGeneratorInput = new DatasetGeneratorInput();
+		final Integer[] instanceIds = new Integer[1];
+		final int datasetTypeId = DataSetType.QUADRAT_SUBOBSERVATIONS.getId();
+		datasetGeneratorInput.setDatasetName(DATASET_NAME);
+		datasetGeneratorInput.setDatasetTypeId(datasetTypeId);
+		datasetGeneratorInput.setInstanceIds(instanceIds);
+		datasetGeneratorInput.setNumberOfSubObservationUnits(5);
+		datasetGeneratorInput.setSequenceVariableId(8206);
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		errors.reject("dataset.name.empty.name", "");
+		Mockito.when(this.studyDatasetService.generateSubObservationDataset(this.cropName, STUDY_ID, PARENT_ID, datasetGeneratorInput)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post(
+					"/crops/{cropName}/studies/{studyId}/datasets/{parentId}/generation", this.cropName, STUDY_ID, PARENT_ID,
+					datasetGeneratorInput)
+				.contentType(this.contentType)
+				.content(this.convertObjectToByte(datasetGeneratorInput)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isNotFound())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is("Dataset name should not be empty.")));
+	}
+
+	@Test
+	public void testGenerateDatasetsErrorInvalidInstances() throws Exception {
+		final DatasetGeneratorInput datasetGeneratorInput = new DatasetGeneratorInput();
+		final Integer[] instanceIds = new Integer[1];
+		final int datasetTypeId = DataSetType.QUADRAT_SUBOBSERVATIONS.getId();
+		datasetGeneratorInput.setDatasetName(DATASET_NAME);
+		datasetGeneratorInput.setDatasetTypeId(datasetTypeId);
+		datasetGeneratorInput.setInstanceIds(instanceIds);
+		datasetGeneratorInput.setNumberOfSubObservationUnits(5);
+		datasetGeneratorInput.setSequenceVariableId(8206);
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		errors.reject("dataset.invalid.instances", "");
+		Mockito.when(this.studyDatasetService.generateSubObservationDataset(this.cropName, STUDY_ID, PARENT_ID, datasetGeneratorInput)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post(
+					"/crops/{cropName}/studies/{studyId}/datasets/{parentId}/generation", this.cropName, STUDY_ID, PARENT_ID,
+					datasetGeneratorInput)
+				.contentType(this.contentType)
+				.content(this.convertObjectToByte(datasetGeneratorInput)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isNotFound())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is("Some of the specified instances does not belong to the study or array is empty")));
+	}
+
+	@Test
+	public void testGenerateDatasetsErrorInvalidSubObservationUnitVariable() throws Exception {
+		final DatasetGeneratorInput datasetGeneratorInput = new DatasetGeneratorInput();
+		final Integer[] instanceIds = new Integer[1];
+		final int datasetTypeId = DataSetType.QUADRAT_SUBOBSERVATIONS.getId();
+		datasetGeneratorInput.setDatasetName(DATASET_NAME);
+		datasetGeneratorInput.setDatasetTypeId(datasetTypeId);
+		datasetGeneratorInput.setInstanceIds(instanceIds);
+		datasetGeneratorInput.setNumberOfSubObservationUnits(5);
+		datasetGeneratorInput.setSequenceVariableId(8206);
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		errors.reject("dataset.invalid.obs.unit.variable", "");
+		Mockito.when(this.studyDatasetService.generateSubObservationDataset(this.cropName, STUDY_ID, PARENT_ID, datasetGeneratorInput)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post(
+					"/crops/{cropName}/studies/{studyId}/datasets/{parentId}/generation", this.cropName, STUDY_ID, PARENT_ID,
+					datasetGeneratorInput)
+				.contentType(this.contentType)
+				.content(this.convertObjectToByte(datasetGeneratorInput)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isNotFound())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is("Invalid SubObservation Unit VariableId: {0}.")));
+	}
+
+	@Test
+	public void testGenerateDatasetsErrorInvalidSubObservationUnitNumber() throws Exception {
+		final DatasetGeneratorInput datasetGeneratorInput = new DatasetGeneratorInput();
+		final Integer[] instanceIds = new Integer[1];
+		final int datasetTypeId = DataSetType.QUADRAT_SUBOBSERVATIONS.getId();
+		datasetGeneratorInput.setDatasetName(DATASET_NAME);
+		datasetGeneratorInput.setDatasetTypeId(datasetTypeId);
+		datasetGeneratorInput.setInstanceIds(instanceIds);
+		datasetGeneratorInput.setNumberOfSubObservationUnits(5);
+		datasetGeneratorInput.setSequenceVariableId(8206);
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		errors.reject("dataset.invalid.number.subobs.units", "");
+		Mockito.when(this.studyDatasetService.generateSubObservationDataset(this.cropName, STUDY_ID, PARENT_ID, datasetGeneratorInput)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post(
+					"/crops/{cropName}/studies/{studyId}/datasets/{parentId}/generation", this.cropName, STUDY_ID, PARENT_ID,
+					datasetGeneratorInput)
+				.contentType(this.contentType)
+				.content(this.convertObjectToByte(datasetGeneratorInput)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isNotFound())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is("Number of subobservations units should not be lower than 1 or higher than {0}.")));
+	}
+
+	@Test
+	public void testGenerateDatasetsErrorNotImplementedForDataset() throws Exception {
+		final DatasetGeneratorInput datasetGeneratorInput = new DatasetGeneratorInput();
+		final Integer[] instanceIds = new Integer[1];
+		final int datasetTypeId = DataSetType.QUADRAT_SUBOBSERVATIONS.getId();
+		datasetGeneratorInput.setDatasetName(DATASET_NAME);
+		datasetGeneratorInput.setDatasetTypeId(datasetTypeId);
+		datasetGeneratorInput.setInstanceIds(instanceIds);
+		datasetGeneratorInput.setNumberOfSubObservationUnits(5);
+		datasetGeneratorInput.setSequenceVariableId(8206);
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		errors.reject("dataset.operation.not.implemented", "");
+		Mockito.when(this.studyDatasetService.generateSubObservationDataset(this.cropName, STUDY_ID, PARENT_ID, datasetGeneratorInput)).thenThrow(new ResourceNotFoundException(errors.getAllErrors().get(0)));
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post(
+					"/crops/{cropName}/studies/{studyId}/datasets/{parentId}/generation", this.cropName, STUDY_ID, PARENT_ID,
+					datasetGeneratorInput)
+				.contentType(this.contentType)
+				.content(this.convertObjectToByte(datasetGeneratorInput)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isNotFound())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is("This operation is not implemented for the dataset type id: {0}")));
+	}
 }
