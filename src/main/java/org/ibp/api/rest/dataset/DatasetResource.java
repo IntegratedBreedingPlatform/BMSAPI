@@ -9,6 +9,7 @@ import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
+import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -182,6 +183,14 @@ public class DatasetResource {
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
 		return new ResponseEntity<>(this.studyDatasetService.getDataset(crop, studyId, datasetId), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Retrieves all instances associated to the dataset", notes = "Retrieves all instances associated to the dataset")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/instances", method = RequestMethod.GET)
+	public ResponseEntity<List<StudyInstance>> getDatasetInstances(@PathVariable final String crop,
+		@PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId) {
+		return new ResponseEntity<>(this.studyDatasetService.getDatasetInstances(studyId, datasetId), HttpStatus.OK);
 	}
 
 }

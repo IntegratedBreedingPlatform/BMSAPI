@@ -4,6 +4,7 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
+import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -39,4 +40,5 @@ public interface DatasetService {
 
 	int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId);
 
+	List<StudyInstance> getDatasetInstances(final Integer studyId, final Integer datasetId);
 }
