@@ -95,8 +95,8 @@ public class DatasetValidator {
 		this.validateDataset(studyId, dataSet, shouldBeSubobservationDataset);
 
 		for (final Integer variableId : variableIds) {
-			final StandardVariable standardVariable = this.ontologyDataManager.getStandardVariable(variableId, dataSet.getProgramUUID());
-			this.validateVariableExists(standardVariable, variableId);
+			// If the variable does not exist, MiddlewareQueryException will be thrown
+			this.ontologyDataManager.getStandardVariable(variableId, this.contextUtil.getCurrentProgramUUID());
 			this.validateIfAlreadyDatasetVariable(variableId, true, dataSet);
 		}
 
@@ -151,23 +151,12 @@ public class DatasetValidator {
 	}
 
 	void validateVariable(final StandardVariable variable, final VariableType variableType, final Integer variableId) {
-		this.validateVariableExists(variable, variableId);
-
 		// Check if variable is configured to be given variable type
 		if (!variable.getVariableTypes().contains(variableType)) {
 			this.errors.reject("variable.not.of.given.variable.type", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
-
-	// TODO remove this, unreachable code as MiddlewareQueryException is thrown for invalid variable ID
-	private void validateVariableExists(final StandardVariable variable, final Integer variableId) {
-		if (variable == null) {
-			this.errors.reject("variable.does.not.exist", new Integer[] {variableId}, "");
-			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
-		}
-	}
-
 
 	public void validateDatasetBelongsToStudy(final Integer studyId, final Integer datasetId) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
