@@ -363,6 +363,28 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				is(measurement.getStatus().getName())))
 		;
 	}
+	
+	@Test
+	public void testDeleteObservation() throws Exception {
+
+		final Random random = new Random();
+		final int studyId = random.nextInt(10000);
+		final int datasetId = random.nextInt(10000);
+		final int observationUnitId = random.nextInt(10000);
+		final int observationId = random.nextInt(10000);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.delete(
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}",
+					this.cropName, studyId, datasetId, observationUnitId, observationId)
+				.contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+
+		Mockito.verify(this.studyDatasetService)
+			.deleteObservation(Matchers.eq(studyId), Matchers.eq(datasetId), Matchers.eq(observationUnitId), Matchers.eq(observationId));
+	}
 
 	@Test
 	public void testGenerateDataset() throws Exception {

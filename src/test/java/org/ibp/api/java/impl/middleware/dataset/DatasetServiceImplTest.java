@@ -40,7 +40,6 @@ import java.util.Random;
 public class DatasetServiceImplTest {
 
 	private static final int TEST_STUDY_IDENTIFIER = 2013;
-	private static final String ND_EXPERIMENT_ID = "ndExperimentId";
 	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
 	public static final String ENTRY_CODE = "ENTRY_CODE";
 	public static final String ENTRY_NO = "ENTRY_NO";
@@ -191,6 +190,20 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.observationValidator).validateObservation(datasetId, observationUnitId, observationId);
 		Mockito.verify(this.middlewareDatasetService)
 			.updatePhenotype(observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue());
+	}
+	
+	@Test
+	public void testDeleteObservation() {
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int datasetId = random.nextInt();
+		final int observationUnitId = random.nextInt();
+		final int observationId = random.nextInt();
+		this.studyDatasetService.deleteObservation(studyId, datasetId, observationUnitId, observationId);
+		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.verify(this.observationValidator).validateObservation(datasetId, observationUnitId, observationId);
+		Mockito.verify(this.middlewareDatasetService).deletePhenotype(observationId);
 	}
 
 
