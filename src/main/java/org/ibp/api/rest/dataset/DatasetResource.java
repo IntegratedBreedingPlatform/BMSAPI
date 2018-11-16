@@ -5,7 +5,6 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
@@ -183,6 +182,17 @@ public class DatasetResource {
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
 		return new ResponseEntity<>(this.studyDatasetService.getDataset(crop, studyId, datasetId), HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "Delete Observation", notes = "Delete Observation")
+	@RequestMapping(
+			value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}",
+			method = RequestMethod.DELETE)
+	public ResponseEntity<Void> deleteObservation(@PathVariable final String crop, @PathVariable final Integer studyId,
+			@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId,
+			@PathVariable final Integer observationId) {
+		this.studyDatasetService.deleteObservation(studyId, datasetId, observationUnitId, observationId);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Retrieves all instances associated to the dataset", notes = "Retrieves all instances associated to the dataset")

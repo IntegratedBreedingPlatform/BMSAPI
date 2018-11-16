@@ -284,7 +284,16 @@ public class DatasetServiceImpl implements DatasetService {
 		return mapper.map(datasetDTO, DatasetDTO.class);
 	}
 
-	List<StudyInstance> convertToStudyInstances(final ModelMapper mapper, List<org.generationcp.middleware.service.impl.study.StudyInstance> middlewareStudyInstances) {
+	@Override
+	public void deleteObservation(final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.observationValidator.validateObservation(datasetId, observationUnitId, observationId);
+		this.middlewareDatasetService.deletePhenotype(observationId);
+
+	}
+
+	List<StudyInstance> convertToStudyInstances(final ModelMapper mapper, final List<org.generationcp.middleware.service.impl.study.StudyInstance> middlewareStudyInstances) {
 
 		final List<StudyInstance> instances = new ArrayList();
 		for (final org.generationcp.middleware.service.impl.study.StudyInstance instance : middlewareStudyInstances) {
@@ -294,4 +303,5 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 		return instances;
 	}
+
 }
