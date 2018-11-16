@@ -3,16 +3,19 @@ package org.ibp.api.rest.dataset;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
+import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +41,9 @@ public class DatasetResource {
 
 	@Autowired
 	private DatasetService studyDatasetService;
+
+	@Autowired
+	private DatasetExportService datasetExportService;
 
 	@ApiOperation(value = "Get Dataset Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the dataset, "
 		+ "that will be shown in the Observation Table")
@@ -183,7 +191,7 @@ public class DatasetResource {
 		@PathVariable final Integer datasetId) {
 		return new ResponseEntity<>(this.studyDatasetService.getDataset(crop, studyId, datasetId), HttpStatus.OK);
 	}
-	
+
 	@ApiOperation(value = "Delete Observation", notes = "Delete Observation")
 	@RequestMapping(
 			value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}",
@@ -201,6 +209,25 @@ public class DatasetResource {
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
 		return new ResponseEntity<>(this.studyDatasetService.getDatasetInstances(studyId, datasetId), HttpStatus.OK);
+	}
+
+
+	@ApiOperation(value = "Retrieves all instances associated to the dataset", notes = "Retrieves all instances associated to the dataset")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/{fileType}", method = RequestMethod.GET)
+	public ResponseEntity<FileSystemResource> getObservationUnitAsCSV(@PathVariable final String crop,
+		@PathVariable final Integer studyId, @PathVariable final Integer datasetId, @PathVariable final String fileType,
+		@RequestParam(value = "instanceIds") final Set<Integer> instanceIds) {
+
+			if ("csv".equals(fileType)) {
+				final File file = this.datasetExportService.exportAsCSV(studyId, datasetId, instanceIds);
+				final HttpHeaders headers = new HttpHeaders();
+				headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
+				final FileSystemResource fileSystemResource = new FileSystemResource(file);
+				return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+			}
+
 	}
 
 }
