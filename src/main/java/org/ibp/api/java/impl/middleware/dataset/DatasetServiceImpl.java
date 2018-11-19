@@ -280,4 +280,12 @@ public class DatasetServiceImpl implements DatasetService {
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		return mapper.map(datasetDTO, DatasetDTO.class);
 	}
+
+	@Override
+	public void deleteObservation(final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.observationValidator.validateObservation(datasetId, observationUnitId, observationId);
+		this.middlewareDatasetService.deletePhenotype(observationId);
+	}
 }
