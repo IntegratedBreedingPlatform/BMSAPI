@@ -39,6 +39,7 @@ import java.util.Set;
 @RequestMapping("/crops")
 public class DatasetResource {
 
+	public static final String CSV = "csv";
 	@Autowired
 	private DatasetService studyDatasetService;
 
@@ -216,10 +217,10 @@ public class DatasetResource {
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/{fileType}", method = RequestMethod.GET)
 	public ResponseEntity<FileSystemResource> getObservationUnitAsCSV(@PathVariable final String crop,
 		@PathVariable final Integer studyId, @PathVariable final Integer datasetId, @PathVariable final String fileType,
-		@RequestParam(value = "instanceIds") final Set<Integer> instanceIds) {
+		@RequestParam(value = "instanceIds") final Set<Integer> instanceIds, @RequestParam(value = "collectionOrderId") final Integer collectionOrderId) {
 
-			if ("csv".equals(fileType)) {
-				final File file = this.datasetExportService.exportAsCSV(studyId, datasetId, instanceIds);
+			if (CSV.equals(fileType)) {
+				final File file = this.datasetExportService.exportAsCSV(studyId, datasetId, instanceIds, collectionOrderId);
 				final HttpHeaders headers = new HttpHeaders();
 				headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
 				final FileSystemResource fileSystemResource = new FileSystemResource(file);

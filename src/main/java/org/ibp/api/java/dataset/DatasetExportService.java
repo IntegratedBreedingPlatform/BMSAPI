@@ -5,6 +5,6 @@ import java.util.Set;
 
 public interface DatasetExportService {
 
-	File exportAsCSV(final int studyId, final int datasetId, final Set<Integer> instanceIds);
-
+	File exportAsCSV(int studyId, int datasetId, Set<Integer> instanceIds, int collectionOrderId);
+	
 }
