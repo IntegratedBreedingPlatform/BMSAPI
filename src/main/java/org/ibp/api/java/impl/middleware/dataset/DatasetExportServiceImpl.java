@@ -1,8 +1,13 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import com.google.common.io.Files;
+import org.generationcp.commons.util.FileUtils;
 import org.generationcp.commons.util.ZipUtil;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.ibp.api.domain.study.StudyInstance;
@@ -31,13 +36,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 @Service
 @Transactional
 public class DatasetExportServiceImpl implements DatasetExportService {
-
-	private static final String TEMP_FILE_DIR = new File(System.getProperty("java.io.tmpdir")).getPath();
 
 	@Autowired
 	private StudyValidator studyValidator;
@@ -62,10 +64,12 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 
+		final Study study = this.studyDataManager.getStudy(studyId);
+		final DataSet dataSet = this.studyDataManager.getDataSet(datasetId);
 		final List<StudyInstance> selectedDatasetInstances = getSelectedDatasetInstances(studyId, datasetId, instanceIds);
 
 		try {
-			return this.generateCSVFiles(studyId, datasetId, selectedDatasetInstances, collectionOrderId);
+			return this.generateCSVFiles(study, dataSet, selectedDatasetInstances, collectionOrderId);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("cannot.exportAsCSV.dataset", "");
@@ -74,16 +78,25 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 	}
 
 	protected File generateCSVFiles(
-		final int studyId, final int datasetId, final List<StudyInstance> studyInstances, final int collectionOrderId) throws IOException {
+		final Study study, final DataSet dataSet, final List<StudyInstance> studyInstances, final int collectionOrderId)
+		throws IOException {
 		final List<File> csvFiles = new ArrayList<>();
 
-		final List<String> headerNames = getHeaderNames(this.studyDatasetService.getSubObservationSetColumns(studyId, datasetId));
-		final int trialDatasetId = this.studyDataManager.getDataSetsByType(studyId, DataSetType.SUMMARY_DATA).get(0).getId();
+		// Get the visible variables in SubObservation table
+		final List<String> headerNames =
+			getHeaderNames(this.studyDatasetService.getSubObservationSetColumns(study.getId(), dataSet.getId()));
+		// Then manually add PLOT_NO to the exported csv file. This is the only design variable required in the exported file.
+		// PLOT_NO data is readily available in ObservationUnitRow.
+		headerNames.add(ExperimentDao.PLOT_NO);
+
+		final int trialDatasetId = this.studyDataManager.getDataSetsByType(study.getId(), DataSetType.SUMMARY_DATA).get(0).getId();
+		final File temporaryFolder = Files.createTempDir();
 
 		for (final StudyInstance studyInstance : studyInstances) {
 			final List<ObservationUnitRow> observationUnitRows =
 				this.studyDatasetService
-					.getObservationUnitRows(studyId, datasetId, studyInstance.getInstanceDbId(), Integer.MAX_VALUE, Integer.MAX_VALUE, null,
+					.getObservationUnitRows(study.getId(), dataSet.getId(), studyInstance.getInstanceDbId(), Integer.MAX_VALUE,
+						Integer.MAX_VALUE, null,
 						"");
 
 			final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder =
@@ -91,14 +104,23 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 			final List<ObservationUnitRow> reorderedObservationUnitRows = datasetCollectionOrderService
 				.reorder(collectionOrder, trialDatasetId, String.valueOf(studyInstance.getInstanceNumber()), observationUnitRows);
 
-			final String csvFileName = TEMP_FILE_DIR + "Export-" + UUID.randomUUID() + ".csv";
-			csvFiles.add(generateCSVFile(headerNames, reorderedObservationUnitRows, csvFileName));
+			// Build the filename with the following format:
+			// study_name + location_number + location_name +  dataset_type + dataset_name
+			final String sanitizedFileName = FileUtils.sanitizeFileName(String
+				.format(
+					"%s_%s_%s_%s_%s.csv", study.getName(), studyInstance.getInstanceNumber(), studyInstance.getLocationName(),
+					dataSet.getDataSetType().name(), dataSet.getName()));
+
+			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
+
+			csvFiles.add(
+				this.generateCSVFile(headerNames, reorderedObservationUnitRows, fileNameFullPath));
 		}
 
 		if (csvFiles.size() == 1) {
 			return csvFiles.get(0);
 		} else {
-			return this.zipUtil.zipFiles(csvFiles);
+			return this.zipUtil.zipFiles(study.getName(), csvFiles);
 		}
 	}
 
