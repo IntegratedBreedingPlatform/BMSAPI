@@ -41,9 +41,9 @@ public class DefaultExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(value = INTERNAL_SERVER_ERROR)
 	@ResponseBody
-	public ErrorResponse handleUncaughtException(Exception ex) {
+	public ErrorResponse handleUncaughtException(final Exception ex) {
 		LOG.error("Error executing the API call.", ex);
-		ErrorResponse response = new ErrorResponse();
+		final ErrorResponse response = new ErrorResponse();
 		if (ex.getCause() != null) {
 			response.addError(ex.getCause().getMessage());
 		} else {
@@ -56,11 +56,11 @@ public class DefaultExceptionHandler {
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	@ResponseStatus(value = BAD_REQUEST)
 	@ResponseBody
-	public ErrorResponse httpMessageNotReadableException(HttpMessageNotReadableException ex) {
-		ErrorResponse response = new ErrorResponse();
-		Throwable rootCause = ex.getRootCause();
+	public ErrorResponse httpMessageNotReadableException(final HttpMessageNotReadableException ex) {
+		final ErrorResponse response = new ErrorResponse();
+		final Throwable rootCause = ex.getRootCause();
 		if (rootCause instanceof UnrecognizedPropertyException) {
-			UnrecognizedPropertyException unrecognizedPropertyException = (UnrecognizedPropertyException) ex.getCause();
+			final UnrecognizedPropertyException unrecognizedPropertyException = (UnrecognizedPropertyException) ex.getCause();
 			response.addError(this.messageSource.getMessage("not.recognised.field",
 					new Object[] {unrecognizedPropertyException.getPropertyName()}, LocaleContextHolder.getLocale()));
 		} else if (rootCause instanceof JsonParseException) {
@@ -75,8 +75,8 @@ public class DefaultExceptionHandler {
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
 	@ResponseStatus(value = BAD_REQUEST)
 	@ResponseBody
-	public ErrorResponse httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
-		ErrorResponse response = new ErrorResponse();
+	public ErrorResponse httpRequestMethodNotSupportedException(final HttpRequestMethodNotSupportedException ex) {
+		final ErrorResponse response = new ErrorResponse();
 		DefaultExceptionHandler.LOG.error("Request not supported with given input", ex);
 		response.addError(this.messageSource.getMessage("request.method.not.supported", null, LocaleContextHolder.getLocale()));
 		return response;
@@ -86,14 +86,14 @@ public class DefaultExceptionHandler {
 	@ExceptionHandler(ApiRequestValidationException.class)
 	@ResponseStatus(value = BAD_REQUEST)
 	@ResponseBody
-	public ErrorResponse handleValidationException(ApiRequestValidationException ex) {
+	public ErrorResponse handleValidationException(final ApiRequestValidationException ex) {
 
-		ErrorResponse response = new ErrorResponse();
+		final ErrorResponse response = new ErrorResponse();
 
-		for (ObjectError error : ex.getErrors()) {
-			String message = this.messageSource.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale());
+		for (final ObjectError error : ex.getErrors()) {
+			final String message = this.messageSource.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale());
 			if (error instanceof FieldError) {
-				FieldError fieldError = (FieldError) error;
+				final FieldError fieldError = (FieldError) error;
 				response.addError(message, fieldError.getField());
 			} else {
 				response.addError(message);
@@ -106,11 +106,11 @@ public class DefaultExceptionHandler {
 	@ExceptionHandler(ResourceNotFoundException.class)
 	@ResponseStatus(value = NOT_FOUND)
 	@ResponseBody
-	public ErrorResponse handleNotFoundException(ResourceNotFoundException ex) {
+	public ErrorResponse handleNotFoundException(final ResourceNotFoundException ex) {
 
-		ErrorResponse response = new ErrorResponse();
+		final ErrorResponse response = new ErrorResponse();
 
-		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
+		final String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
 		response.addError(message);
 
 		return response;
@@ -120,11 +120,11 @@ public class DefaultExceptionHandler {
 	@ExceptionHandler(ForbiddenException.class)
 	@ResponseStatus(value = FORBIDDEN)
 	@ResponseBody
-	public ErrorResponse handleForbiddenException(ForbiddenException ex) {
+	public ErrorResponse handleForbiddenException(final ForbiddenException ex) {
 
-		ErrorResponse response = new ErrorResponse();
+		final ErrorResponse response = new ErrorResponse();
 
-		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
+		final String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
 		response.addError(message);
 
 		return response;
@@ -134,11 +134,11 @@ public class DefaultExceptionHandler {
 	@ExceptionHandler(NotSupportedException.class)
 	@ResponseStatus(value = NOT_IMPLEMENTED)
 	@ResponseBody
-	public ErrorResponse handleNotSupportedException(NotSupportedException ex) {
+	public ErrorResponse handleNotSupportedException(final NotSupportedException ex) {
 
-		ErrorResponse response = new ErrorResponse();
+		final ErrorResponse response = new ErrorResponse();
 
-		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
+		final String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
 		response.addError(message);
 
 		return response;
@@ -149,19 +149,32 @@ public class DefaultExceptionHandler {
 	@ExceptionHandler(ConflictException.class)
 	@ResponseStatus(value = CONFLICT)
 	@ResponseBody
-	public ErrorResponse handleConflictException(ConflictException ex) {
+	public ErrorResponse handleConflictException(final ConflictException ex) {
 
-		ErrorResponse response = new ErrorResponse();
+		final ErrorResponse response = new ErrorResponse();
 
-		for (ObjectError error : ex.getErrors()) {
-			String message = this.messageSource.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale());
+		for (final ObjectError error : ex.getErrors()) {
+			final String message = this.messageSource.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale());
 			if (error instanceof FieldError) {
-				FieldError fieldError = (FieldError) error;
+				final FieldError fieldError = (FieldError) error;
 				response.addError(message, fieldError.getField());
 			} else {
 				response.addError(message);
 			}
 		}
+		return response;
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(MiddlewareRequestException.class)
+	@ResponseStatus(value = BAD_REQUEST)
+	@ResponseBody
+	public ErrorResponse handleUncaughtException(final MiddlewareRequestException ex) {
+		final ErrorResponse response = new ErrorResponse();
+
+		final String message = this.messageSource.getMessage(ex.getErrorCode(), ex.getParams(), LocaleContextHolder.getLocale());
+		response.addError(message);
+
 		return response;
 	}
 	
