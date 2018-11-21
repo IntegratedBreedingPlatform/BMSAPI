@@ -93,7 +93,7 @@ public class Main extends WebMvcConfigurerAdapter {
 	@Bean
 	public ResourceBundleMessageSource getResourceBundleMessageSource() {
 		final ResourceBundleMessageSource resourceBundleMessageSource = new ResourceBundleMessageSource();
-		resourceBundleMessageSource.setBasenames("CommonMessages", "messages_en");
+		resourceBundleMessageSource.setBasenames("CommonMessages", "mw_messages", "messages_en");
 		return resourceBundleMessageSource;
 	}
 
