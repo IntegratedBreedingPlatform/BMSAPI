@@ -5,6 +5,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitImportResult;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
@@ -191,6 +192,16 @@ public class DatasetResource {
 			@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId,
 			@PathVariable final Integer observationId) {
 		this.studyDatasetService.deleteObservation(studyId, datasetId, observationUnitId, observationId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Put Observations Dataset", notes = "Put Observations Dataset")
+	@RequestMapping(
+			value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations",
+			method = RequestMethod.PUT)
+	public ResponseEntity<List<ObservationUnitImportResult>> deleteObservation(@PathVariable final String crop, @PathVariable final Integer studyId,
+			@PathVariable final Integer datasetId, @RequestBody List<List<String>> data) {
+		this.studyDatasetService.importObservations(studyId, datasetId, data);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

@@ -2,6 +2,7 @@ package org.ibp.api.java.dataset;
 
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitImportResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.rest.dataset.DatasetDTO;
@@ -40,5 +41,7 @@ public interface DatasetService {
 	int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId);
 	
 	void deleteObservation(final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId);
+
+	ObservationUnitImportResult importObservations(Integer studyId, Integer datasetId, List<List<String>> data);
 
 }

@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
+import com.google.common.collect.Table;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -8,6 +9,9 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitImportResult;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
+import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
@@ -25,6 +29,7 @@ import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
+import org.ibp.api.rest.dataset.ObservationUnitsTableBuilder;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,15 +65,18 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private InstanceValidator instanceValidator;
+
 	@Autowired
 	private MeasurementVariableTransformer measurementVariableTransformer;
 
 	@Autowired
 	private DatasetGeneratorInputValidator datasetGeneratorInputValidator;
 
-
 	@Autowired
 	private StudyDataManager studyDataManager;
+
+	@Autowired
+	private MeasurementVariableService measurementVariableService;
 
 	@Override
 	public List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId) {
@@ -139,8 +147,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		this.observationValidator.validateObservation(datasetId, observationUnitId, observationId);
 		return this.middlewareDatasetService
-			.updatePhenotype(
-				observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue());
+			.updatePhenotype(observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue());
 
 	}
 
@@ -288,4 +295,22 @@ public class DatasetServiceImpl implements DatasetService {
 		this.observationValidator.validateObservation(datasetId, observationUnitId, observationId);
 		this.middlewareDatasetService.deletePhenotype(observationId);
 	}
+
+	@Override
+	public ObservationUnitImportResult importObservations(final Integer studyId, final Integer datasetId, final List<List<String>> data) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+
+		// get dataset variables that can be measured
+		final List<MeasurementVariableDto> measurementVariables = this.measurementVariableService.getVariablesForDataset(datasetId,
+				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
+
+		// try to build a Table object with given input data
+		final List<String> warnings = new ArrayList<>();
+
+		final Table table = ObservationUnitsTableBuilder.buildObservationUnitsTable(data, measurementVariables, warnings);
+
+		return null;
+	}
+
 }
