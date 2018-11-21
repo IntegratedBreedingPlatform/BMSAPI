@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -77,6 +78,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private MeasurementVariableService measurementVariableService;
+
+	@Resource
+	private ObservationUnitsTableBuilder observationUnitsTableBuilder;
 
 	@Override
 	public List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId) {
@@ -305,10 +309,11 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<MeasurementVariableDto> measurementVariables = this.measurementVariableService.getVariablesForDataset(datasetId,
 				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 
-		// try to build a Table object with given input data
 		final List<String> warnings = new ArrayList<>();
 
-		final Table table = ObservationUnitsTableBuilder.buildObservationUnitsTable(data, measurementVariables, warnings);
+		final Table table = observationUnitsTableBuilder.buildObservationUnitsTable(data, measurementVariables, warnings);
+
+
 
 		return null;
 	}
