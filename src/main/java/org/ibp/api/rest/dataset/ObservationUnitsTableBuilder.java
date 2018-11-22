@@ -9,26 +9,21 @@ import java.util.List;
 
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
-
-import javax.annotation.Resource;
 
 /**
  * Created by clarysabel on 11/21/18.
  */
-@Component
 public class ObservationUnitsTableBuilder {
 
 	public static String OBS_UNIT_ID = "OBS_UNIT_ID";
 
-	@Resource
-	private ResourceBundleMessageSource resourceBundleMessageSource;
+	private int duplicatedRowsFoundDuringBuilding = 0;
 
-	public Table buildObservationUnitsTable (final List<List<String>> data, List<MeasurementVariableDto> datasetMeasurementVariables, List<String> warnings) {
+	public Table build(final List<List<String>> data, final List<MeasurementVariableDto> datasetMeasurementVariables) {
+
+		this.duplicatedRowsFoundDuringBuilding = 0;
 
 		final BindingResult
 				errors = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
@@ -76,10 +71,18 @@ public class ObservationUnitsTableBuilder {
 					table.put(observationUnitId, headers.get(index), row.get(index));
 				}
 			} else {
-				warnings.add(resourceBundleMessageSource.getMessage("duplicated.obs.unit.id", null, LocaleContextHolder.getLocale()));
+				this.duplicatedRowsFoundDuringBuilding++;
 			}
 		}
-
 		return table;
 	}
+
+	public int getDuplicatedRowsFoundDuringBuilding() {
+		return duplicatedRowsFoundDuringBuilding;
+	}
+
+	public boolean areDuplicatedValues() {
+		return (duplicatedRowsFoundDuringBuilding > 0);
+	}
+
 }

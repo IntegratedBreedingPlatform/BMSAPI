@@ -33,6 +33,8 @@ import org.ibp.api.rest.dataset.ObservationUnitsTableBuilder;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -80,7 +82,7 @@ public class DatasetServiceImpl implements DatasetService {
 	private MeasurementVariableService measurementVariableService;
 
 	@Resource
-	private ObservationUnitsTableBuilder observationUnitsTableBuilder;
+	private ResourceBundleMessageSource resourceBundleMessageSource;
 
 	@Override
 	public List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId) {
@@ -309,10 +311,16 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<MeasurementVariableDto> measurementVariables = this.measurementVariableService.getVariablesForDataset(datasetId,
 				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 
+		final ObservationUnitsTableBuilder observationUnitsTableBuilder = new ObservationUnitsTableBuilder();
+
+		final Table table = observationUnitsTableBuilder.build(data, measurementVariables);
+
+		//build warnings
 		final List<String> warnings = new ArrayList<>();
+		if (observationUnitsTableBuilder.areDuplicatedValues()) {
+			warnings.add(resourceBundleMessageSource.getMessage("duplicated.obs.unit.id", null, LocaleContextHolder.getLocale()));
 
-		final Table table = observationUnitsTableBuilder.buildObservationUnitsTable(data, measurementVariables, warnings);
-
+		}
 
 
 		return null;
