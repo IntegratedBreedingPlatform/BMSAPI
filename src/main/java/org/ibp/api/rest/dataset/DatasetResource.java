@@ -199,7 +199,7 @@ public class DatasetResource {
 	@RequestMapping(
 			value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations",
 			method = RequestMethod.PUT)
-	public ResponseEntity<List<ObservationUnitImportResult>> deleteObservation(@PathVariable final String crop, @PathVariable final Integer studyId,
+	public ResponseEntity<List<ObservationUnitImportResult>> postObservationUnits(@PathVariable final String crop, @PathVariable final Integer studyId,
 			@PathVariable final Integer datasetId, @RequestBody List<List<String>> data) {
 		this.studyDatasetService.importObservations(studyId, datasetId, data);
 		return new ResponseEntity<>(HttpStatus.OK);

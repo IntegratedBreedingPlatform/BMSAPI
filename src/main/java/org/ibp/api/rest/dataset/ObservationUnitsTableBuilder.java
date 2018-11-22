@@ -21,12 +21,12 @@ public class ObservationUnitsTableBuilder {
 
 	private int duplicatedRowsFoundDuringBuilding = 0;
 
-	public Table build(final List<List<String>> data, final List<MeasurementVariableDto> datasetMeasurementVariables) {
+	public Table<String, String, String> build(final List<List<String>> data, final List<MeasurementVariableDto> datasetMeasurementVariables) {
 
 		this.duplicatedRowsFoundDuringBuilding = 0;
 
 		final BindingResult
-				errors = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
+				errors = new MapBindingResult(new HashMap<String, String>(), data.getClass().getName());
 
 		final List<String> headers = data.get(0);
 		final List<List<String>> values = data.subList(1, data.size());
@@ -52,6 +52,11 @@ public class ObservationUnitsTableBuilder {
 					}
 				}
 			}
+		}
+
+		if (importMeasurementVariablesIndex.isEmpty()) {
+			errors.reject("no.measurement.variables.input", null, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
 		final Integer obsUnitIdIndex = headers.indexOf(OBS_UNIT_ID);

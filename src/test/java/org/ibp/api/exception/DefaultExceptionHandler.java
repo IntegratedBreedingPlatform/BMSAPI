@@ -8,7 +8,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_IMPLEMENTED;
 
-import org.generationcp.middleware.exceptions.MiddlewareRequestException;
+//import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,18 +165,18 @@ public class DefaultExceptionHandler {
 		}
 		return response;
 	}
-
-	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
-	@ExceptionHandler(MiddlewareRequestException.class)
-	@ResponseStatus(value = BAD_REQUEST)
-	@ResponseBody
-	public ErrorResponse handleUncaughtException(final MiddlewareRequestException ex) {
-		final ErrorResponse response = new ErrorResponse();
-
-		final String message = this.messageSource.getMessage(ex.getErrorCode(), ex.getParams(), LocaleContextHolder.getLocale());
-		response.addError(message);
-
-		return response;
-	}
+//
+//	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+//	@ExceptionHandler(MiddlewareRequestException.class)
+//	@ResponseStatus(value = BAD_REQUEST)
+//	@ResponseBody
+//	public ErrorResponse handleUncaughtException(final MiddlewareRequestException ex) {
+//		final ErrorResponse response = new ErrorResponse();
+//
+//		final String message = this.messageSource.getMessage(ex.getErrorCode(), ex.getParams(), LocaleContextHolder.getLocale());
+//		response.addError(message);
+//
+//		return response;
+//	}
 
 }
