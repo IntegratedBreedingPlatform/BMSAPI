@@ -33,6 +33,7 @@ public class ObservationsTableValidator {
 
 	private static final String DATA_TYPE_NUMERIC = "Numeric";
 
+	//FIXME query variables before
 	public void validate(final String programUUID, final Table<String, String, String> inputData,
 			final Map<String, ObservationUnitRow> storedData) throws ApiRequestValidationException {
 

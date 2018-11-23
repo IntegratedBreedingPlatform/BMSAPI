@@ -325,6 +325,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final ObservationUnitsTableBuilder observationUnitsTableBuilder = new ObservationUnitsTableBuilder();
 		final Table<String, String, String> table = observationUnitsTableBuilder.build(input.getData(), datasetMeasurementVariables);
 
+		// Get Map<OBS_UNIT_ID, Observations>
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData =
 				middlewareDatasetService.getObservationUnitsAsMap(datasetId, datasetMeasurementVariables, new ArrayList<>(table.rowKeySet()));
 
@@ -335,8 +336,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final int rowsNotBelongingToDataset = table.rowKeySet().size() - storedData.size();
 
+		// remove elements that does not belong to the dataset
 		if (rowsNotBelongingToDataset != 0) {
-			// remove elements that does not belong to the dataset
 			final List<String> obsUnitIdsList = new ArrayList<>(table.rowKeySet());
 			obsUnitIdsList.removeAll(storedData.keySet());
 			for (final String obsUnitId: obsUnitIdsList) {
