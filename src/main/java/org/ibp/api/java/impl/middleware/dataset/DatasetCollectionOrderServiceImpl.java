@@ -26,8 +26,11 @@ public class DatasetCollectionOrderServiceImpl implements DatasetCollectionOrder
 
 		final String blockId =
 			this.fieldbookMiddlewareService.getBlockId(trialDatasetId, instanceNumber);
-		final FieldmapBlockInfo fieldmapBlockInfo =
-			this.fieldbookMiddlewareService.getBlockInformation(Integer.valueOf((blockId == null) ? "0" : blockId));
+
+		FieldmapBlockInfo fieldmapBlockInfo = null;
+		if (blockId != null) {
+			fieldmapBlockInfo = this.fieldbookMiddlewareService.getBlockInformation(Integer.valueOf(blockId));
+		}
 
 		if (collectionOrder == CollectionOrder.PLOT_ORDER || fieldmapBlockInfo == null) {
 			// meaning no fieldmap
