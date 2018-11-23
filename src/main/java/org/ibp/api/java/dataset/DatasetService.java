@@ -8,6 +8,7 @@ import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
+import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 
 import java.util.List;
 import java.util.Set;
@@ -42,6 +43,6 @@ public interface DatasetService {
 	
 	void deleteObservation(final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId);
 
-	ObservationUnitImportResult importObservations(Integer studyId, Integer datasetId, List<List<String>> data);
+	ObservationUnitImportResult importObservations(Integer studyId, Integer datasetId, ObservationsPutRequestInput input);
 
 }

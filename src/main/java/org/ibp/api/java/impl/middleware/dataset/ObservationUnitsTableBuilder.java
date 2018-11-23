@@ -1,4 +1,4 @@
-package org.ibp.api.rest.dataset;
+package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -9,24 +9,23 @@ import java.util.List;
 
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-/**
- * Created by clarysabel on 11/21/18.
- */
+
 public class ObservationUnitsTableBuilder {
 
 	public static String OBS_UNIT_ID = "OBS_UNIT_ID";
 
-	private int duplicatedRowsFoundDuringBuilding = 0;
+	private Integer duplicatedFoundNumber;
 
-	public Table<String, String, String> build(final List<List<String>> data, final List<MeasurementVariableDto> datasetMeasurementVariables) {
+	public Table<String, String, String> build(final List<List<String>> data, final List<MeasurementVariableDto> datasetMeasurementVariables) throws ApiRequestValidationException {
 
-		this.duplicatedRowsFoundDuringBuilding = 0;
+		duplicatedFoundNumber = 0;
 
 		final BindingResult
-				errors = new MapBindingResult(new HashMap<String, String>(), data.getClass().getName());
+				errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
 
 		final List<String> headers = data.get(0);
 		final List<List<String>> values = data.subList(1, data.size());
@@ -76,18 +75,14 @@ public class ObservationUnitsTableBuilder {
 					table.put(observationUnitId, headers.get(index), row.get(index));
 				}
 			} else {
-				this.duplicatedRowsFoundDuringBuilding++;
+				duplicatedFoundNumber++;
 			}
 		}
 		return table;
 	}
 
-	public int getDuplicatedRowsFoundDuringBuilding() {
-		return duplicatedRowsFoundDuringBuilding;
-	}
-
-	public boolean areDuplicatedValues() {
-		return (duplicatedRowsFoundDuringBuilding > 0);
+	public Integer getDuplicatedFoundNumber() {
+		return duplicatedFoundNumber;
 	}
 
 }

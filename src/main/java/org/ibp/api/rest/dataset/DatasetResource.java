@@ -200,8 +200,8 @@ public class DatasetResource {
 			value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations",
 			method = RequestMethod.PUT)
 	public ResponseEntity<List<ObservationUnitImportResult>> postObservationUnits(@PathVariable final String crop, @PathVariable final Integer studyId,
-			@PathVariable final Integer datasetId, @RequestBody List<List<String>> data) {
-		this.studyDatasetService.importObservations(studyId, datasetId, data);
+			@PathVariable final Integer datasetId, @RequestBody ObservationsPutRequestInput input) {
+		this.studyDatasetService.importObservations(studyId, datasetId, input);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

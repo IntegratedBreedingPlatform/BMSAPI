@@ -1,23 +1,17 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.collect.Table;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitImportResult;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
-import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
@@ -30,12 +24,13 @@ import org.ibp.api.java.impl.middleware.dataset.validator.DatasetGeneratorInputV
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.dataset.ObservationUnitsTableBuilder;
+import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,10 +84,8 @@ public class DatasetServiceImpl implements DatasetService {
 	@Resource
 	private ResourceBundleMessageSource resourceBundleMessageSource;
 
-	@Resource
-	private OntologyDataManager ontologyDataManager;
-
-	private static final String DATA_TYPE_NUMERIC = "Numeric";
+	@Autowired
+	private ObservationsTableValidator observationsTableValidator;
 
 	@Override
 	public List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId) {
@@ -313,74 +306,65 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public ObservationUnitImportResult importObservations(final Integer studyId, final Integer datasetId, final List<List<String>> data) {
+	public ObservationUnitImportResult importObservations(final Integer studyId, final Integer datasetId,
+			final ObservationsPutRequestInput input) {
 
-		final BindingResult
-				errors = new MapBindingResult(new HashMap<String, String>(), data.getClass().getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
 
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 
-		final String programUUID = studyDataManager.getStudy(studyId).getProgramUUID();
+		final List<MeasurementVariableDto> datasetMeasurementVariables = this.measurementVariableService
+				.getVariablesForDataset(datasetId, VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 
-		// get dataset variables that can be measured
-		final List<MeasurementVariableDto> measurementVariables = this.measurementVariableService.getVariablesForDataset(datasetId,
-				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
-
-		if (measurementVariables.isEmpty()) {
+		if (datasetMeasurementVariables.isEmpty()) {
 			errors.reject("no.variables.dataset", null, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
 		final ObservationUnitsTableBuilder observationUnitsTableBuilder = new ObservationUnitsTableBuilder();
+		final Table<String, String, String> table = observationUnitsTableBuilder.build(input.getData(), datasetMeasurementVariables);
 
-		final Table<String, String, String> table = observationUnitsTableBuilder.build(data, measurementVariables);
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData =
+				middlewareDatasetService.getObservationUnitsAsMap(datasetId, datasetMeasurementVariables, new ArrayList<>(table.rowKeySet()));
 
-		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> currentData =
-				middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, new ArrayList<String>(table.rowKeySet()));
-
-		if (currentData.isEmpty()) {
+		if (storedData.isEmpty()) {
 			errors.reject("none.obs.unit.id.matches", null, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		final int rowsNotBelongingToDataset = table.rowKeySet().size() - currentData.size();
+		final int rowsNotBelongingToDataset = table.rowKeySet().size() - storedData.size();
 
 		if (rowsNotBelongingToDataset != 0) {
 			// remove elements that does not belong to the dataset
 			final List<String> obsUnitIdsList = new ArrayList<>(table.rowKeySet());
-
-			obsUnitIdsList.removeAll(currentData.keySet());
-
+			obsUnitIdsList.removeAll(storedData.keySet());
 			for (final String obsUnitId: obsUnitIdsList) {
 				table.row(obsUnitId).clear();
 			}
 		}
 
 		// Check for data issues
-		for (final String observationUnitId : table.rowKeySet()) {
-			final org.generationcp.middleware.service.api.dataset.ObservationUnitRow storedObservations =
-					currentData.get(observationUnitId);
-
-			for (final String variableName : table.columnKeySet()) {
-
-				final org.generationcp.middleware.service.api.dataset.ObservationUnitData observation =
-						storedObservations.getVariables().get(variableName);
-
-				final StandardVariable
-						standardVariable = this.ontologyDataManager.getStandardVariable(observation.getVariableId(), programUUID);
-				final MeasurementVariable measurementVariable = this.measurementVariableTransformer.transform(standardVariable, false);
-				if (!this.isValidValue(measurementVariable, table.get(observationUnitId, variableName))) {
-					//The numeric variableName {0} contains an invalid value {1} containing characters. Please check the data file and try again.
-					errors.reject("warning.import.save.invalidCellValue", new String[] {variableName, table.get(observationUnitId, variableName)}, null);
-					throw new ApiRequestValidationException(errors.getAllErrors());
-				}
-			}
-		}
+		final String programUUID = studyDataManager.getStudy(studyId).getProgramUUID();
+		observationsTableValidator.validate(programUUID, table, storedData);
 
 		// Building warnings
+		if (input.isDryTest()) {
+			final List<String> warnings = processObservationsDataWarnings(table, storedData, rowsNotBelongingToDataset,
+					observationUnitsTableBuilder.getDuplicatedFoundNumber());
+			System.out.println(warnings);
+		} else {
+
+		}
+
+		return null;
+	}
+
+	private List<String> processObservationsDataWarnings(final Table<String, String, String> table,
+			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData,
+			final Integer rowsNotBelongingToDataset, final Integer duplicatedFoundNumber) {
 		final List<String> warnings = new ArrayList<>();
-		if (observationUnitsTableBuilder.areDuplicatedValues()) {
+		if (duplicatedFoundNumber > 0) {
 			warnings.add(resourceBundleMessageSource.getMessage("duplicated.obs.unit.id", null, LocaleContextHolder.getLocale()));
 		}
 
@@ -390,13 +374,22 @@ public class DatasetServiceImpl implements DatasetService {
 							LocaleContextHolder.getLocale()));
 		}
 
-		boolean overwrittingData = false;
+		if (isInputOverwritingData(table, storedData)) {
+			warnings.add(
+					this.resourceBundleMessageSource.getMessage("warning.import.overwrite.data", null, LocaleContextHolder.getLocale()));
+		}
+
+		return warnings;
+	}
+
+	private Boolean isInputOverwritingData(final Table<String, String, String> table, final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData) {
+		boolean overwritingData = false;
 
 		externalLoop:
 		for (final String observationUnitId : table.rowKeySet()) {
 
 			final org.generationcp.middleware.service.api.dataset.ObservationUnitRow storedObservations =
-					currentData.get(observationUnitId);
+					storedData.get(observationUnitId);
 
 			for (final String variableName : table.columnKeySet()) {
 
@@ -405,43 +398,15 @@ public class DatasetServiceImpl implements DatasetService {
 
 				if (observation != null && observation.getValue() != null && !observation.getValue()
 						.equalsIgnoreCase(table.get(observationUnitId, variableName))) {
-					overwrittingData = true;
+					overwritingData = true;
 
 					break externalLoop;
 				}
 			}
 
 		}
-
-		if (overwrittingData) {
-			warnings.add(this.resourceBundleMessageSource.getMessage("warning.import.overwrite.data", null, LocaleContextHolder.getLocale()));
-		}
-
-
-		return null;
+		return overwritingData;
 	}
 
-
-	private boolean isValidValue(
-			final MeasurementVariable var, final String value) {
-		if (StringUtils.isBlank(value)) {
-			return true;
-		}
-		if (var.getMinRange() != null && var.getMaxRange() != null) {
-			return this.validateIfValueIsMissingOrNumber(value.trim());
-		} else if (var != null && var.getDataTypeId() != null && var.getDataTypeId() == TermId.DATE_VARIABLE.getId()) {
-			return Util.isValidDate(value);
-		} else if (StringUtils.isNotBlank(var.getDataType()) && var.getDataType().equalsIgnoreCase(DATA_TYPE_NUMERIC)) {
-			return this.validateIfValueIsMissingOrNumber(value.trim());
-		}
-		return true;
-	}
-
-	private boolean validateIfValueIsMissingOrNumber(final String value) {
-		if (MeasurementData.MISSING_VALUE.equals(value.trim())) {
-			return true;
-		}
-		return NumberUtils.isNumber(value);
-	}
 
 }

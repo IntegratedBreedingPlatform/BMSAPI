@@ -8,6 +8,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_IMPLEMENTED;
 
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,6 +163,16 @@ public class DefaultExceptionHandler {
 				response.addError(message);
 			}
 		}
+		return response;
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(MiddlewareRequestException.class)
+	@ResponseStatus(value = BAD_REQUEST)
+	@ResponseBody
+	public ErrorResponse handleUncaughtException(MiddlewareRequestException ex) {
+		ErrorResponse response = new ErrorResponse();
+		response.addError(ex.getMessage());
 		return response;
 	}
 
