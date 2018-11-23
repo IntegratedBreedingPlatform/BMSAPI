@@ -178,7 +178,7 @@ public class DatasetResource {
 		return new ResponseEntity<>(observationUnitTable, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "It will retrieve a list of datasets", notes = "Retrieves the list of datasets for the specified study.")
+	@ApiOperation(value = "It will retrieve a list f datasets", notes = "Retrieves the list of datasets for the specified study.")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets", method = RequestMethod.GET)
 	public ResponseEntity<List<DatasetDTO>> getDatasets(@PathVariable final String crop, @PathVariable final Integer studyId,
 		@RequestParam(value = "datasetTypeIds", required = false) final Set<Integer> datasetTypeIds) {

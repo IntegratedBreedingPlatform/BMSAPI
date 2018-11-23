@@ -3,12 +3,14 @@ package org.ibp.api.java.impl.middleware.dataset;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class DataCollectionSorter {
 
 	public List<ObservationUnitRow> orderByRange(

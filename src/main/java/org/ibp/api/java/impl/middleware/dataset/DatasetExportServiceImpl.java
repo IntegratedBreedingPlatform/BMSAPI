@@ -8,7 +8,6 @@ import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -33,7 +32,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -56,7 +54,10 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 	@Resource
 	private StudyDataManager studyDataManager;
 
-	private final ZipUtil zipUtil = new ZipUtil();
+	@Resource
+	private DatasetCSVGenerator datasetCSVGenerator;
+
+	private ZipUtil zipUtil = new ZipUtil();
 
 	@Override
 	public File exportAsCSV(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId) {
@@ -84,7 +85,7 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 
 		// Get the visible variables in SubObservation table
 		final List<String> headerNames =
-			getHeaderNames(this.studyDatasetService.getSubObservationSetColumns(study.getId(), dataSet.getId()));
+			this.datasetCSVGenerator.getHeaderNames(this.studyDatasetService.getSubObservationSetColumns(study.getId(), dataSet.getId()));
 		// Then manually add PLOT_NO to the exported csv file. This is the only design variable required in the exported file.
 		// PLOT_NO data is readily available in ObservationUnitRow.
 		headerNames.add(ExperimentDao.PLOT_NO);
@@ -113,8 +114,9 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 
 			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 
-			csvFiles.add(
-				this.generateCSVFile(headerNames, reorderedObservationUnitRows, fileNameFullPath));
+			final CSVWriter csvWriter =
+				new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',');
+			csvFiles.add(this.datasetCSVGenerator.generateCSVFile(headerNames, reorderedObservationUnitRows, fileNameFullPath, csvWriter));
 		}
 
 		if (csvFiles.size() == 1) {
@@ -122,43 +124,6 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 		} else {
 			return this.zipUtil.zipFiles(study.getName(), csvFiles);
 		}
-	}
-
-	protected File generateCSVFile(
-		final List<String> headerNames, final List<ObservationUnitRow> observationUnitRows,
-		final String fileNameFullPath) throws IOException {
-		final File newFile = new File(fileNameFullPath);
-
-		final CSVWriter writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',');
-
-		// feed in your array (or convert your data to an array)
-		final List<String[]> rowValues = new ArrayList<>();
-
-		rowValues.add(headerNames.toArray(new String[] {}));
-
-		for (final ObservationUnitRow row : observationUnitRows) {
-			rowValues.add(this.getColumnValues(row, headerNames));
-		}
-
-		writer.writeAll(rowValues);
-		writer.close();
-		return newFile;
-	}
-
-	protected String[] getColumnValues(final ObservationUnitRow row, final List<String> headerNames) {
-		final List<String> values = new LinkedList<>();
-		for (final String headerName : headerNames) {
-			values.add(row.getVariables().get(headerName).getValue());
-		}
-		return values.toArray(new String[] {});
-	}
-
-	protected List<String> getHeaderNames(final List<MeasurementVariable> subObservationSetColumns) {
-		final List<String> headerNames = new LinkedList<>();
-		for (final MeasurementVariable measurementVariable : subObservationSetColumns) {
-			headerNames.add(measurementVariable.getName());
-		}
-		return headerNames;
 	}
 
 	protected List<StudyInstance> getSelectedDatasetInstances(final int studyId, final int datasetId, final Set<Integer> instanceIds) {
@@ -171,5 +136,9 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 			}
 		}
 		return studyInstances;
+	}
+
+	protected void setZipUtil(final ZipUtil zipUtil) {
+		this.zipUtil = zipUtil;
 	}
 }

@@ -17,7 +17,8 @@ public class DatasetCollectionOrderServiceImpl implements DatasetCollectionOrder
 	@Resource
 	private FieldbookService fieldbookMiddlewareService;
 
-	private final DataCollectionSorter dataCollectionSorter = new DataCollectionSorter();
+	@Resource
+	private DataCollectionSorter dataCollectionSorter;
 
 	@Override
 	public List<ObservationUnitRow> reorder(

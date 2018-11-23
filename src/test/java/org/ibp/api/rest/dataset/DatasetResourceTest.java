@@ -13,7 +13,9 @@ import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
+import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.java.impl.middleware.dataset.DatasetCollectionOrderServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -28,9 +30,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -48,6 +52,9 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	@Autowired
 	private DatasetService studyDatasetService;
 
+	@Autowired
+	private DatasetExportService datasetExportService;
+
 
 	@Configuration
 	public static class TestConfiguration {
@@ -56,6 +63,12 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		@Primary
 		public DatasetService studyDatasetService() {
 			return Mockito.mock(DatasetService.class);
+		}
+
+		@Bean
+		@Primary
+		public DatasetExportService datasetExportService() {
+			return Mockito.mock(DatasetExportService.class);
 		}
 	}
 
@@ -349,7 +362,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				is(measurement.getStatus().getName())))
 		;
 	}
-	
+
 	@Test
 	public void testDeleteObservation() throws Exception {
 
@@ -370,6 +383,34 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		Mockito.verify(this.studyDatasetService)
 			.deleteObservation(Matchers.eq(studyId), Matchers.eq(datasetId), Matchers.eq(observationUnitId), Matchers.eq(observationId));
+	}
+
+	@Test
+	public void testGetObservationUnitAsCSV() throws Exception {
+
+		final Random random = new Random();
+		final int studyId = random.nextInt(10000);
+		final int datasetId = random.nextInt(10000);
+		final Set<Integer> instanceIds = new HashSet<>();
+		instanceIds.add(1);
+		instanceIds.add(2);
+		instanceIds.add(3);
+		final int collectionOrderId = DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId();
+
+		final File file = File.createTempFile("test", ".csv");
+		Mockito.when(this.datasetExportService.exportAsCSV(studyId, datasetId, instanceIds, collectionOrderId)).thenReturn(file);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.get(
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/{fileType}",
+					this.cropName, studyId, datasetId, DatasetResource.CSV)
+				.param("instanceIds", "1,2,3")
+				.param("collectionOrderId", String.valueOf(collectionOrderId))
+				.contentType(this.csvContentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+
 	}
 
 	private DatasetDTO createDataset(final int datasetType, final Integer datasetId,final String name, final String crop, final Integer studyId) {
