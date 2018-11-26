@@ -73,7 +73,7 @@ public class DatasetResource {
 
 	@ApiOperation(value = "Add Dataset Variable", notes = "Add Dataset Variable")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables", method = RequestMethod.PUT)
-	public ResponseEntity<MeasurementVariable> addTrait(
+	public ResponseEntity<MeasurementVariable> addVariable(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestBody final DatasetVariable datasetTrait) {
 
