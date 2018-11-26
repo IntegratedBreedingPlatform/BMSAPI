@@ -134,7 +134,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public ObservationDto addObservation(Integer studyId, Integer datasetId, Integer observationUnitId, ObservationDto observation) {
+	public ObservationDto addObservation(
+		final Integer studyId, final Integer datasetId, final Integer observationUnitId, final ObservationDto observation) {
 
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, Arrays.asList(observation.getVariableId()));
@@ -309,7 +310,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 
-		observationsTableValidator.validateList(input.getData());
+		this.observationsTableValidator.validateList(input.getData());
 
 		final List<MeasurementVariable> datasetMeasurementVariables = this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId);
 
@@ -323,7 +324,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		// Get Map<OBS_UNIT_ID, Observations>
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData =
-				middlewareDatasetService.getObservationUnitsAsMap(datasetId, datasetMeasurementVariables, new ArrayList<>(table.rowKeySet()));
+			this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, datasetMeasurementVariables, new ArrayList<>(table.rowKeySet()));
 
 		if (storedData.isEmpty()) {
 			errors.reject("none.obs.unit.id.matches", null, "");
@@ -342,17 +343,17 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		// Check for data issues
-		observationsTableValidator.validateObservationsValuesDataTypes(table, datasetMeasurementVariables);
+		this.observationsTableValidator.validateObservationsValuesDataTypes(table, datasetMeasurementVariables);
 
 		// Building warnings
 		if (input.isDryTest()) {
-			final List<String> warnings = processObservationsDataWarnings(table, storedData, rowsNotBelongingToDataset,
+			final List<String> warnings = this.processObservationsDataWarnings(table, storedData, rowsNotBelongingToDataset,
 					observationUnitsTableBuilder.getDuplicatedFoundNumber());
-			//TODO build table in review mode
 			System.out.println(warnings);
-		} else {
-			//TODO call save, no need to build table in review mode
 		}
+
+		this.middlewareDatasetService.importDataset(datasetId, table, input.isDryTest());
+
 
 		return null;
 	}
@@ -362,16 +363,16 @@ public class DatasetServiceImpl implements DatasetService {
 			final Integer rowsNotBelongingToDataset, final Integer duplicatedFoundNumber) {
 		final List<String> warnings = new ArrayList<>();
 		if (duplicatedFoundNumber > 0) {
-			warnings.add(resourceBundleMessageSource.getMessage("duplicated.obs.unit.id", null, LocaleContextHolder.getLocale()));
+			warnings.add(this.resourceBundleMessageSource.getMessage("duplicated.obs.unit.id", null, LocaleContextHolder.getLocale()));
 		}
 
 		if (rowsNotBelongingToDataset != 0) {
-			warnings.add(resourceBundleMessageSource
+			warnings.add(this.resourceBundleMessageSource
 					.getMessage("some.obs.unit.id.matches", new String[] {String.valueOf(rowsNotBelongingToDataset)},
 							LocaleContextHolder.getLocale()));
 		}
 
-		if (isInputOverwritingData(table, storedData)) {
+		if (this.isInputOverwritingData(table, storedData)) {
 			warnings.add(
 					this.resourceBundleMessageSource.getMessage("warning.import.overwrite.data", null, LocaleContextHolder.getLocale()));
 		}
