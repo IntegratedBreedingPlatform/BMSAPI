@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 import org.springframework.validation.BindingResult;
@@ -20,7 +20,7 @@ public class ObservationUnitsTableBuilder {
 
 	private Integer duplicatedFoundNumber;
 
-	public Table<String, String, String> build(final List<List<String>> data, final List<MeasurementVariableDto> datasetMeasurementVariables) throws ApiRequestValidationException {
+	public Table<String, String, String> build(final List<List<String>> data, final List<MeasurementVariable> datasetMeasurementVariables) throws ApiRequestValidationException {
 
 		duplicatedFoundNumber = 0;
 
@@ -40,7 +40,7 @@ public class ObservationUnitsTableBuilder {
 		List<Integer> importMeasurementVariablesIndex = new ArrayList<>();
 
 		for (final String header: headers) {
-			for (final MeasurementVariableDto measurementVariableDto: datasetMeasurementVariables) {
+			for (final MeasurementVariable measurementVariableDto: datasetMeasurementVariables) {
 				if (measurementVariableDto.getName().equals(header)) {
 					if (importMeasurementVariablesIndex.contains(headers.indexOf(header))) {
 						errors.reject("duplicated.measurement.variables.not.allowed", null , "");

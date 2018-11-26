@@ -10,8 +10,6 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitImportResult;
-import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
@@ -77,9 +75,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private StudyDataManager studyDataManager;
-
-	@Autowired
-	private MeasurementVariableService measurementVariableService;
 
 	@Resource
 	private ResourceBundleMessageSource resourceBundleMessageSource;
@@ -314,8 +309,9 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 
-		final List<MeasurementVariableDto> datasetMeasurementVariables = this.measurementVariableService
-				.getVariablesForDataset(datasetId, VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
+		observationsTableValidator.validateList(input.getData());
+
+		final List<MeasurementVariable> datasetMeasurementVariables = this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId);
 
 		if (datasetMeasurementVariables.isEmpty()) {
 			errors.reject("no.variables.dataset", null, "");
@@ -346,16 +342,16 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		// Check for data issues
-		final String programUUID = studyDataManager.getStudy(studyId).getProgramUUID();
-		observationsTableValidator.validate(programUUID, table, storedData);
+		observationsTableValidator.validateObservationsValuesDataTypes(table, datasetMeasurementVariables);
 
 		// Building warnings
 		if (input.isDryTest()) {
 			final List<String> warnings = processObservationsDataWarnings(table, storedData, rowsNotBelongingToDataset,
 					observationUnitsTableBuilder.getDuplicatedFoundNumber());
+			//TODO build table in review mode
 			System.out.println(warnings);
 		} else {
-
+			//TODO call save, no need to build table in review mode
 		}
 
 		return null;

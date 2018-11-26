@@ -1,63 +1,78 @@
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
+
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
 @Component
 public class ObservationsTableValidator {
 
-	@Resource
-	private OntologyDataManager ontologyDataManager;
-
-	@Autowired
-	private MeasurementVariableTransformer measurementVariableTransformer;
-
 	private static final String DATA_TYPE_NUMERIC = "Numeric";
 
-	//FIXME query variables before
-	public void validate(final String programUUID, final Table<String, String, String> inputData,
-			final Map<String, ObservationUnitRow> storedData) throws ApiRequestValidationException {
+	public void validateList(final List<List<String>> inputData) throws ApiRequestValidationException {
+
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
+
+		if (inputData.size() < 2) {
+			errors.reject("table.should.have.at.least.two.rows", null, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		final int rowLength = inputData.get(0).size();
+		boolean formatErrorFound = false;
+		for (final List<String> row : inputData) {
+			if (row.size() != rowLength) {
+				formatErrorFound = true;
+				break;
+			}
+		}
+		if (rowLength == 0 || formatErrorFound) {
+			errors.reject("table.format.inconsistency", null, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+	}
+
+	public void validateObservationsValuesDataTypes(final Table<String, String, String> inputData,
+			final List<MeasurementVariable> measurementVariables) throws ApiRequestValidationException {
+
+		Map<String, MeasurementVariable> mappedVariables =
+				Maps.uniqueIndex(measurementVariables, new Function<MeasurementVariable, String>() {
+
+					public String apply(MeasurementVariable from) {
+						return from.getName();
+					}
+				});
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
 
 		for (final String observationUnitId : inputData.rowKeySet()) {
-			final org.generationcp.middleware.service.api.dataset.ObservationUnitRow storedObservations = storedData.get(observationUnitId);
 
 			for (final String variableName : inputData.columnKeySet()) {
 
-				final org.generationcp.middleware.service.api.dataset.ObservationUnitData observation =
-						storedObservations.getVariables().get(variableName);
-
-				final StandardVariable standardVariable =
-						this.ontologyDataManager.getStandardVariable(observation.getVariableId(), programUUID);
-				final MeasurementVariable measurementVariable = this.measurementVariableTransformer.transform(standardVariable, false);
-				if (!this.isValidValue(measurementVariable, inputData.get(observationUnitId, variableName))) {
+				if (!this.isValidValue(mappedVariables.get(variableName), inputData.get(observationUnitId, variableName))) {
 					errors.reject("warning.import.save.invalidCellValue",
 							new String[] {variableName, inputData.get(observationUnitId, variableName)}, "");
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				}
 			}
 		}
-
 	}
 
 	private boolean isValidValue(final MeasurementVariable var, final String value) {
