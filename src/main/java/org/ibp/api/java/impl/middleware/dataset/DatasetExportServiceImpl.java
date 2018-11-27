@@ -5,11 +5,11 @@ import com.google.common.io.Files;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.ibp.api.domain.study.StudyInstance;
+import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
 import org.ibp.api.java.dataset.DatasetExportService;
@@ -57,6 +57,9 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 	@Resource
 	private DatasetCSVGenerator datasetCSVGenerator;
 
+	@Resource
+	private org.generationcp.middleware.service.api.dataset.DatasetService datasetService;
+
 	private ZipUtil zipUtil = new ZipUtil();
 
 	@Override
@@ -66,8 +69,8 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 
 		final Study study = this.studyDataManager.getStudy(studyId);
-		final DataSet dataSet = this.studyDataManager.getDataSet(datasetId);
-		final List<StudyInstance> selectedDatasetInstances = getSelectedDatasetInstances(studyId, datasetId, instanceIds);
+		final DatasetDTO dataSet = this.datasetService.getDataset(studyId, datasetId);
+		final List<StudyInstance> selectedDatasetInstances = getSelectedDatasetInstances(dataSet.getInstances(), instanceIds);
 
 		try {
 			return this.generateCSVFiles(study, dataSet, selectedDatasetInstances, collectionOrderId);
@@ -79,13 +82,13 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 	}
 
 	protected File generateCSVFiles(
-		final Study study, final DataSet dataSet, final List<StudyInstance> studyInstances, final int collectionOrderId)
+		final Study study, final DatasetDTO dataSetDto, final List<StudyInstance> studyInstances, final int collectionOrderId)
 		throws IOException {
 		final List<File> csvFiles = new ArrayList<>();
 
 		// Get the visible variables in SubObservation table
 		final List<String> headerNames =
-			this.datasetCSVGenerator.getHeaderNames(this.studyDatasetService.getSubObservationSetColumns(study.getId(), dataSet.getId()));
+			this.datasetCSVGenerator.getHeaderNames(this.studyDatasetService.getSubObservationSetColumns(study.getId(), dataSetDto.getDatasetId()));
 		// Then manually add PLOT_NO to the exported csv file. This is the only design variable required in the exported file.
 		// PLOT_NO data is readily available in ObservationUnitRow.
 		headerNames.add(ExperimentDao.PLOT_NO);
@@ -96,7 +99,7 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 		for (final StudyInstance studyInstance : studyInstances) {
 			final List<ObservationUnitRow> observationUnitRows =
 				this.studyDatasetService
-					.getObservationUnitRows(study.getId(), dataSet.getId(), studyInstance.getInstanceDbId(), Integer.MAX_VALUE,
+					.getObservationUnitRows(study.getId(), dataSetDto.getDatasetId(), studyInstance.getInstanceDbId(), Integer.MAX_VALUE,
 						Integer.MAX_VALUE, null,
 						"");
 
@@ -110,7 +113,7 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 			final String sanitizedFileName = FileUtils.sanitizeFileName(String
 				.format(
 					"%s_%s_%s_%s_%s.csv", study.getName(), studyInstance.getInstanceNumber(), studyInstance.getLocationName(),
-					dataSet.getDataSetType().name(), dataSet.getName()));
+					DataSetType.findById(dataSetDto.getDatasetTypeId()).name(), dataSetDto.getName()));
 
 			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 
@@ -126,8 +129,7 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 		}
 	}
 
-	protected List<StudyInstance> getSelectedDatasetInstances(final int studyId, final int datasetId, final Set<Integer> instanceIds) {
-		final List<StudyInstance> studyInstances = this.studyDatasetService.getDatasetInstances(studyId, datasetId);
+	protected List<StudyInstance> getSelectedDatasetInstances(final List<StudyInstance> studyInstances, final Set<Integer> instanceIds) {
 		final Iterator<StudyInstance> iterator = studyInstances.iterator();
 		while (iterator.hasNext()) {
 			final StudyInstance studyInstance = iterator.next();

@@ -1,8 +1,8 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
-import org.generationcp.middleware.service.api.FieldbookService;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
+import org.ibp.api.java.impl.middleware.study.FieldMapService;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +15,7 @@ import java.util.List;
 public class DatasetCollectionOrderServiceImpl implements DatasetCollectionOrderService {
 
 	@Resource
-	private FieldbookService fieldbookMiddlewareService;
+	private FieldMapService fieldMapService;
 
 	@Resource
 	private DataCollectionSorter dataCollectionSorter;
@@ -26,11 +26,11 @@ public class DatasetCollectionOrderServiceImpl implements DatasetCollectionOrder
 		final int trialDatasetId, final String instanceNumber, final List<ObservationUnitRow> observationUnitRows) {
 
 		final String blockId =
-			this.fieldbookMiddlewareService.getBlockId(trialDatasetId, instanceNumber);
+			this.fieldMapService.getBlockId(trialDatasetId, instanceNumber);
 
 		FieldmapBlockInfo fieldmapBlockInfo = null;
 		if (blockId != null) {
-			fieldmapBlockInfo = this.fieldbookMiddlewareService.getBlockInformation(Integer.valueOf(blockId));
+			fieldmapBlockInfo = this.fieldMapService.getBlockInformation(Integer.valueOf(blockId));
 		}
 
 		if (collectionOrder == CollectionOrder.PLOT_ORDER || fieldmapBlockInfo == null) {

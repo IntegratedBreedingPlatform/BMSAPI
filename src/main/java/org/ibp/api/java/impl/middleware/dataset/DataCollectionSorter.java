@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.stereotype.Component;
@@ -12,6 +11,9 @@ import java.util.Map;
 
 @Component
 public class DataCollectionSorter {
+
+	public static final String FIELDMAP_RANGE = "FIELDMAP RANGE";
+	public static final String FIELDMAP_COLUMN = "FIELDMAP COLUMN";
 
 	public List<ObservationUnitRow> orderByRange(
 		final FieldmapBlockInfo blockInfo, final List<ObservationUnitRow> observationUnitRows) {
@@ -90,8 +92,8 @@ public class DataCollectionSorter {
 
 		final Map<String, List<ObservationUnitRow>> fieldmapExperiments = new HashMap();
 		for (final ObservationUnitRow observationUnitRow : observationUnitRows) {
-			final String range = observationUnitRow.getVariables().get(ExperimentDao.FIELD_MAP_RANGE).getValue();
-			final String column = observationUnitRow.getVariables().get(ExperimentDao.FIELD_MAP_COLUMN).getValue();
+			final String range = observationUnitRow.getVariables().get(FIELDMAP_RANGE).getValue();
+			final String column = observationUnitRow.getVariables().get(FIELDMAP_COLUMN).getValue();
 			if (range != null && column != null) {
 				// Group the ObservationUnitRow by column and range combination key
 				final String key = coordinateKey(Integer.valueOf(column), Integer.valueOf(range));

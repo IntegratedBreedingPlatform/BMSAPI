@@ -298,7 +298,6 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<StudyInstance> instances = new ArrayList();
 		for (final org.generationcp.middleware.service.impl.study.StudyInstance instance : middlewareStudyInstances) {
 			final StudyInstance datasetInstance = mapper.map(instance, StudyInstance.class);
-			datasetInstance.setCustomLocationAbbreviation("");
 			instances.add(datasetInstance);
 		}
 		return instances;

@@ -178,7 +178,7 @@ public class DatasetResource {
 		return new ResponseEntity<>(observationUnitTable, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "It will retrieve a list f datasets", notes = "Retrieves the list of datasets for the specified study.")
+	@ApiOperation(value = "It will retrieve a list of datasets", notes = "Retrieves the list of datasets for the specified study.")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets", method = RequestMethod.GET)
 	public ResponseEntity<List<DatasetDTO>> getDatasets(@PathVariable final String crop, @PathVariable final Integer studyId,
 		@RequestParam(value = "datasetTypeIds", required = false) final Set<Integer> datasetTypeIds) {
@@ -213,9 +213,9 @@ public class DatasetResource {
 	}
 
 
-	@ApiOperation(value = "Retrieves all instances associated to the dataset", notes = "Retrieves all instances associated to the dataset")
+	@ApiOperation(value = "Exports the dataset to a specified file type", notes = "Exports the dataset to a specified file type")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/{fileType}", method = RequestMethod.GET)
-	public ResponseEntity<FileSystemResource> getObservationUnitAsCSV(@PathVariable final String crop,
+	public ResponseEntity<FileSystemResource> exportDataset(@PathVariable final String crop,
 		@PathVariable final Integer studyId, @PathVariable final Integer datasetId, @PathVariable final String fileType,
 		@RequestParam(value = "instanceIds") final Set<Integer> instanceIds, @RequestParam(value = "collectionOrderId") final Integer collectionOrderId) {
 

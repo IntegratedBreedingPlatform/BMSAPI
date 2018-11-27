@@ -113,6 +113,9 @@ public class StudyServiceImpl implements StudyService {
 	@Autowired
 	private CrossExpansionProperties crossExpansionProperties;
 
+	@Autowired
+	private FieldMapService fieldMapService;
+
 	@Override
 	public List<StudySummary> search(final String programUniqueId, final String cropname, final String principalInvestigator, final String location, final String season) {
 		final List<StudySummary> studySummaries = new ArrayList<>();
@@ -428,7 +431,6 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public Map<Integer, FieldMap> getFieldMap(final String studyId) {
-		final FieldMapService fieldMapService = new FieldMapService(this.studyDataManager, this.crossExpansionProperties);
 		return fieldMapService.getFieldMap(studyId);
 	}
 
