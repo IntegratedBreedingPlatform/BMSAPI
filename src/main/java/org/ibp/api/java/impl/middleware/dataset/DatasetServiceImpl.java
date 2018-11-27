@@ -348,11 +348,14 @@ public class DatasetServiceImpl implements DatasetService {
 		// Building warnings
 		if (input.isDryTest()) {
 			final List<String> warnings = this.processObservationsDataWarnings(table, storedData, rowsNotBelongingToDataset,
-					observationUnitsTableBuilder.getDuplicatedFoundNumber());
+				observationUnitsTableBuilder.getDuplicatedFoundNumber());
+			//TODO build table in review mode
 			System.out.println(warnings);
+			this.middlewareDatasetService.previewImportDataset(datasetId, table);
+		} else {
+			//TODO call save, no need to build table in review mode
+			this.middlewareDatasetService.importDataset(datasetId, table);
 		}
-
-		this.middlewareDatasetService.importDataset(datasetId, table, input.isDryTest());
 
 
 		return null;
