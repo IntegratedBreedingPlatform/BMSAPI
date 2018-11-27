@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -103,8 +102,8 @@ public class DataCollectionSorterTest {
 
 			final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 			final Map<String, ObservationUnitData> variables = new HashMap<>();
-			variables.put(ExperimentDao.FIELD_MAP_RANGE, fieldMapRangeObservationData);
-			variables.put(ExperimentDao.FIELD_MAP_COLUMN, fieldMapColumnObservationData);
+			variables.put(DataCollectionSorter.FIELDMAP_RANGE, fieldMapRangeObservationData);
+			variables.put(DataCollectionSorter.FIELDMAP_COLUMN, fieldMapColumnObservationData);
 			observationUnitRow.setVariables(variables);
 			observationUnitRows.add(observationUnitRow);
 		}

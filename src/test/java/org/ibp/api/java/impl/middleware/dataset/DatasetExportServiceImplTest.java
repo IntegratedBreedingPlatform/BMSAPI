@@ -123,7 +123,7 @@ public class DatasetExportServiceImplTest {
 	@Test(expected = ResourceNotFoundException.class)
 	public void testExportAsCSVException() throws IOException {
 
-		when(this.datasetCSVGenerator.getHeaderNames(anyList())).thenReturn(new ArrayList<>());
+		when(this.datasetCSVGenerator.getHeaderNames(anyList())).thenReturn(new ArrayList<String>());
 		when(this.datasetCSVGenerator.generateCSVFile(anyList(), anyList(), anyString(), any(CSVWriter.class)))
 			.thenThrow(IOException.class);
 		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(instanceId1, instanceId2));
