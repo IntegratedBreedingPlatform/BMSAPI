@@ -36,6 +36,7 @@ import org.springframework.validation.MapBindingResult;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -91,7 +92,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public long countPhenotypesByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
-		this.instanceValidator.validate(datasetId, instanceId);
+		this.instanceValidator.validate(datasetId, new HashSet<Integer>(Arrays.asList(instanceId)));
 		return this.middlewareDatasetService.countPhenotypesByInstance(datasetId, instanceId);
 	}
 
@@ -227,7 +228,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final int pageNumber, final int pageSize, final String sortBy, final String sortOrder) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
-		this.instanceValidator.validate(datasetId, instanceId);
+		this.instanceValidator.validate(datasetId, new HashSet<Integer>(Arrays.asList(instanceId)));
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
 			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
 		final ModelMapper observationUnitRowMapper = new ModelMapper();

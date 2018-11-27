@@ -15,6 +15,7 @@ import org.ibp.api.java.dataset.DatasetCollectionOrderService;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,9 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 	private DatasetValidator datasetValidator;
 
 	@Autowired
+	private InstanceValidator instanceValidator;
+
+	@Autowired
 	private DatasetService studyDatasetService;
 
 	@Autowired
@@ -67,6 +71,7 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
+		this.instanceValidator.validate(datasetId, instanceIds);
 
 		final Study study = this.studyDataManager.getStudy(studyId);
 		final DatasetDTO dataSet = this.datasetService.getDataset(studyId, datasetId);

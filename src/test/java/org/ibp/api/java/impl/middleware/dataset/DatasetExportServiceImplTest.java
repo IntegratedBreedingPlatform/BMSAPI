@@ -13,6 +13,7 @@ import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,6 +62,9 @@ public class DatasetExportServiceImplTest {
 
 	@Mock
 	private DatasetCSVGenerator datasetCSVGenerator;
+
+	@Mock
+	private InstanceValidator instanceValidator;
 
 	@Mock
 	private org.generationcp.middleware.service.api.dataset.DatasetService datasetService;
