@@ -302,8 +302,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void importObservations(final Integer studyId, final Integer datasetId,
-			final ObservationsPutRequestInput input) {
+	public void importObservations(final Integer studyId, final Integer datasetId, final ObservationsPutRequestInput input) {
 
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
 
@@ -312,7 +311,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 		this.observationsTableValidator.validateList(input.getData());
 
-		final List<MeasurementVariable> datasetMeasurementVariables = this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId);
+		final List<MeasurementVariable> datasetMeasurementVariables =
+				this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId);
 
 		if (datasetMeasurementVariables.isEmpty()) {
 			errors.reject("no.variables.dataset", null, "");
@@ -323,8 +323,8 @@ public class DatasetServiceImpl implements DatasetService {
 		final Table<String, String, String> table = observationUnitsTableBuilder.build(input.getData(), datasetMeasurementVariables);
 
 		// Get Map<OBS_UNIT_ID, Observations>
-		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData =
-			this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, datasetMeasurementVariables, new ArrayList<>(table.rowKeySet()));
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = this.middlewareDatasetService
+				.getObservationUnitsAsMap(datasetId, datasetMeasurementVariables, new ArrayList<>(table.rowKeySet()));
 
 		if (storedData.isEmpty()) {
 			errors.reject("none.obs.unit.id.matches", null, "");
@@ -337,7 +337,7 @@ public class DatasetServiceImpl implements DatasetService {
 		if (rowsNotBelongingToDataset != 0) {
 			final List<String> obsUnitIdsList = new ArrayList<>(table.rowKeySet());
 			obsUnitIdsList.removeAll(storedData.keySet());
-			for (final String obsUnitId: obsUnitIdsList) {
+			for (final String obsUnitId : obsUnitIdsList) {
 				table.row(obsUnitId).clear();
 			}
 		}
@@ -400,14 +400,14 @@ public class DatasetServiceImpl implements DatasetService {
 		return warnings;
 	}
 
-	private Boolean isInputOverwritingData(final Table<String, String, String> table, final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData) {
+	private Boolean isInputOverwritingData(final Table<String, String, String> table,
+			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData) {
 		boolean overwritingData = false;
 
 		externalLoop:
 		for (final String observationUnitId : table.rowKeySet()) {
 
-			final org.generationcp.middleware.service.api.dataset.ObservationUnitRow storedObservations =
-					storedData.get(observationUnitId);
+			final org.generationcp.middleware.service.api.dataset.ObservationUnitRow storedObservations = storedData.get(observationUnitId);
 
 			for (final String variableName : table.columnKeySet()) {
 
