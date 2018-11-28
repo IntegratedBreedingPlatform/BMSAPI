@@ -214,15 +214,6 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<StudyInstance> getDatasetInstances(final Integer studyId, final Integer datasetId) {
-		this.studyValidator.validate(studyId, false);
-		this.datasetValidator.validateDataset(studyId, datasetId, true);
-		final ModelMapper mapper = new ModelMapper();
-		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-		return convertToStudyInstances(mapper, middlewareDatasetService.getDatasetInstances(datasetId));
-	}
-
-	@Override
 	public List<ObservationUnitRow> getObservationUnitRows(
 		final int studyId, final int datasetId, final int instanceId,
 		final int pageNumber, final int pageSize, final String sortBy, final String sortOrder) {

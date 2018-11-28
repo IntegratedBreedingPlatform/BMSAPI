@@ -42,5 +42,4 @@ public interface DatasetService {
 	
 	void deleteObservation(final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId);
 
-	List<StudyInstance> getDatasetInstances(final Integer studyId, final Integer datasetId);
 }
