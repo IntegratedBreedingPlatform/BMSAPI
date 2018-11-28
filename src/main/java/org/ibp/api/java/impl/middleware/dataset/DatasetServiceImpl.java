@@ -9,13 +9,13 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitImportResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ConflictException;
 import org.ibp.api.exception.NotSupportedException;
+import org.ibp.api.exception.PreconditionFailedException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetGeneratorInputValidator;
@@ -302,10 +302,10 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public ObservationUnitImportResult importObservations(final Integer studyId, final Integer datasetId,
+	public void importObservations(final Integer studyId, final Integer datasetId,
 			final ObservationsPutRequestInput input) {
 
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
 
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
@@ -345,23 +345,40 @@ public class DatasetServiceImpl implements DatasetService {
 		// Check for data issues
 		this.observationsTableValidator.validateObservationsValuesDataTypes(table, datasetMeasurementVariables);
 
-		// Building warnings
-		if (input.isDryTest()) {
-			final List<String> warnings = this.processObservationsDataWarnings(table, storedData, rowsNotBelongingToDataset,
-				observationUnitsTableBuilder.getDuplicatedFoundNumber());
-			//TODO build table in review mode
-			System.out.println(warnings);
-			this.middlewareDatasetService.previewImportDataset(datasetId, table);
-		} else {
-			//TODO call save, no need to build table in review mode
+		// Processing warnings
+		if (input.isProcessWarnings()) {
+			errors = this.processObservationsDataWarningsAsErrors(table, storedData, rowsNotBelongingToDataset,
+					observationUnitsTableBuilder.getDuplicatedFoundNumber());
+		}
+		if (!errors.hasErrors()) {
 			this.middlewareDatasetService.importDataset(datasetId, table);
+		} else {
+			throw new PreconditionFailedException(errors.getAllErrors());
 		}
 
-
-		return null;
 	}
 
-	private List<String> processObservationsDataWarnings(final Table<String, String, String> table,
+	private BindingResult processObservationsDataWarningsAsErrors(final Table<String, String, String> table,
+			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData,
+			final Integer rowsNotBelongingToDataset, final Integer duplicatedFoundNumber) {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
+		if (duplicatedFoundNumber > 0) {
+			errors.reject("duplicated.obs.unit.id", null, "");
+		}
+
+		if (rowsNotBelongingToDataset != 0) {
+			errors.reject("some.obs.unit.id.matches", new String[] {String.valueOf(rowsNotBelongingToDataset)}, "");
+		}
+
+		if (this.isInputOverwritingData(table, storedData)) {
+			errors.reject("warning.import.overwrite.data", null, "");
+		}
+
+		return errors;
+	}
+
+	// DO NOT REMOVE THIS FUNCTION EVEN WHEN IT IS UNUSED, IT WILL BE USED WHEN WE IMPLEMENT THE PREVIEW PROCESS
+	private List<String> processObservationsDataWarningsAsStrings(final Table<String, String, String> table,
 			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData,
 			final Integer rowsNotBelongingToDataset, final Integer duplicatedFoundNumber) {
 		final List<String> warnings = new ArrayList<>();

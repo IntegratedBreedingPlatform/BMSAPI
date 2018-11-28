@@ -11,16 +11,16 @@ import java.util.List;
 @AutoProperty
 public class ObservationsPutRequestInput {
 
-	private boolean dryTest;
+	private boolean processWarnings;
 
 	private List<List<String>> data;
 
-	public boolean isDryTest() {
-		return dryTest;
+	public boolean isProcessWarnings() {
+		return processWarnings;
 	}
 
-	public void setDryTest(final boolean dryTest) {
-		this.dryTest = dryTest;
+	public void setProcessWarnings(final boolean processWarnings) {
+		this.processWarnings = processWarnings;
 	}
 
 	public List<List<String>> getData() {

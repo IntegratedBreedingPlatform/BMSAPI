@@ -7,6 +7,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_IMPLEMENTED;
+import static org.springframework.http.HttpStatus.PRECONDITION_FAILED;
 
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.ibp.api.domain.common.ErrorResponse;
@@ -173,6 +174,26 @@ public class DefaultExceptionHandler {
 	public ErrorResponse handleUncaughtException(MiddlewareRequestException ex) {
 		ErrorResponse response = new ErrorResponse();
 		response.addError(ex.getMessage());
+		return response;
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(PreconditionFailedException.class)
+	@ResponseStatus(value = PRECONDITION_FAILED)
+	@ResponseBody
+	public ErrorResponse handleConflictException(PreconditionFailedException ex) {
+
+		ErrorResponse response = new ErrorResponse();
+
+		for (ObjectError error : ex.getErrors()) {
+			String message = this.messageSource.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale());
+			if (error instanceof FieldError) {
+				FieldError fieldError = (FieldError) error;
+				response.addError(message, fieldError.getField());
+			} else {
+				response.addError(message);
+			}
+		}
 		return response;
 	}
 
