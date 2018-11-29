@@ -11,11 +11,15 @@ import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
+import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.PreconditionFailedException;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.rest.dataset.ObservationUnitData;
+import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +27,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 
@@ -32,6 +37,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyListOf;
 
 public class DatasetServiceImplTest {
 
@@ -67,6 +77,9 @@ public class DatasetServiceImplTest {
 
 	@Mock
 	private ObservationValidator observationValidator;
+
+	@Spy
+	private ObservationsTableValidator observationsTableValidator;
 
 	@Mock
 	private InstanceValidator instanceValidator;
@@ -237,6 +250,216 @@ public class DatasetServiceImplTest {
 
 	}
 
+	@Test(expected = ApiRequestValidationException.class)
+	public void testImportDatasetFails_DatasetWithNoVariables() throws Exception {
+		final Integer studyId = 1;
+		final Integer datasetId = 3;
+		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
+		final List<List<String>> data = new ArrayList<>();
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A");
+		final List<String> row = Arrays.asList("1", "1");
+		data.add(header);
+		data.add(row);
+		observationsPutRequestInput.setData(data);
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		Mockito.when(middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
+		Mockito.doNothing().when(studyValidator).validate(studyId, true);
+		Mockito.doNothing().when(datasetValidator).validateDataset(studyId, datasetId, true);
+		try {
+			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
+		} catch (ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("no.variables.dataset"));
+			throw e;
+		}
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testImportDatasetFails_NoObsUnitIdMatches() throws Exception {
+		final Integer studyId = 1;
+		final Integer datasetId = 3;
+		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
+		final List<List<String>> data = new ArrayList<>();
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A");
+		final List<String> row = Arrays.asList("1", "1");
+		data.add(header);
+		data.add(row);
+		observationsPutRequestInput.setData(data);
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setName("A");
+		measurementVariables.add(measurementVariable);
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
+		Mockito.doNothing().when(studyValidator).validate(studyId, true);
+		Mockito.doNothing().when(datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.when(middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
+		Mockito.when(middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
+				.thenReturn(storedData);
+		try {
+			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
+		} catch (ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("none.obs.unit.id.matches"));
+			throw e;
+		}
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testImportDatasetFails_DataTypeInconsistency() throws Exception {
+		final Integer studyId = 1;
+		final Integer datasetId = 3;
+		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
+		final List<List<String>> data = new ArrayList<>();
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A");
+		final List<String> row = Arrays.asList("1", "A");
+		data.add(header);
+		data.add(row);
+		observationsPutRequestInput.setData(data);
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setName("A");
+		measurementVariable.setDataType("Numeric");
+		measurementVariables.add(measurementVariable);
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> observationUnitDataMap = new HashMap<>();
+		observationUnitDataMap.put("A", new org.generationcp.middleware.service.api.dataset.ObservationUnitData("1"));
+		final org.generationcp.middleware.service.api.dataset.ObservationUnitRow observationUnitRow = new ObservationUnitRow();
+		observationUnitRow.setObservationUnitId(1);
+		observationUnitRow.setVariables(observationUnitDataMap);
+		storedData.put("A", observationUnitRow);
+		Mockito.doNothing().when(studyValidator).validate(studyId, true);
+		Mockito.doNothing().when(datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.when(middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
+		Mockito.when(middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
+				.thenReturn(storedData);
+		try {
+			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
+		} catch (ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalidCellValue"));
+			throw e;
+		}
+	}
+
+	@Test(expected = PreconditionFailedException.class)
+	public void testImportDatasetFails_WarningsOverwrittingDataFound() throws Exception {
+		final Integer studyId = 1;
+		final Integer datasetId = 3;
+		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
+		final List<List<String>> data = new ArrayList<>();
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A");
+		final List<String> row1 = Arrays.asList("1", "1");
+
+		data.add(header);
+		data.add(row1);
+
+		observationsPutRequestInput.setData(data);
+		observationsPutRequestInput.setProcessWarnings(true);
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setName("A");
+		measurementVariable.setDataType("Numeric");
+		measurementVariables.add(measurementVariable);
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> observationUnitDataMap = new HashMap<>();
+		observationUnitDataMap.put("A", new org.generationcp.middleware.service.api.dataset.ObservationUnitData("2"));
+		final org.generationcp.middleware.service.api.dataset.ObservationUnitRow observationUnitRow = new ObservationUnitRow();
+		observationUnitRow.setObservationUnitId(1);
+		observationUnitRow.setVariables(observationUnitDataMap);
+		storedData.put("1", observationUnitRow);
+		Mockito.doNothing().when(studyValidator).validate(studyId, true);
+		Mockito.doNothing().when(datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.when(middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
+		Mockito.when(middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
+				.thenReturn(storedData);
+		try {
+			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
+		} catch (PreconditionFailedException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.overwrite.data"));
+			throw e;
+		}
+	}
+
+	@Test(expected = PreconditionFailedException.class)
+	public void testImportDatasetFails_WarningsDuplicatedObsUnitId() throws Exception {
+		final Integer studyId = 1;
+		final Integer datasetId = 3;
+		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
+		final List<List<String>> data = new ArrayList<>();
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A");
+		final List<String> row1 = Arrays.asList("1", "1");
+		final List<String> row2 = Arrays.asList("1", "1");
+
+		data.add(header);
+		data.add(row1);
+		data.add(row2);
+
+		observationsPutRequestInput.setData(data);
+		observationsPutRequestInput.setProcessWarnings(true);
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setName("A");
+		measurementVariable.setDataType("Numeric");
+		measurementVariables.add(measurementVariable);
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> observationUnitDataMap = new HashMap<>();
+		observationUnitDataMap.put("A", new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
+		final org.generationcp.middleware.service.api.dataset.ObservationUnitRow observationUnitRow = new ObservationUnitRow();
+		observationUnitRow.setObservationUnitId(1);
+		observationUnitRow.setVariables(observationUnitDataMap);
+		storedData.put("1", observationUnitRow);
+		Mockito.doNothing().when(studyValidator).validate(studyId, true);
+		Mockito.doNothing().when(datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.when(middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
+		Mockito.when(middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
+				.thenReturn(storedData);
+		try {
+			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
+		} catch (PreconditionFailedException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("duplicated.obs.unit.id"));
+			throw e;
+		}
+	}
+
+	@Test(expected = PreconditionFailedException.class)
+	public void testImportDatasetFails_WarningsObsUnitIdNotBelongToDataset() throws Exception {
+		final Integer studyId = 1;
+		final Integer datasetId = 3;
+		final ObservationsPutRequestInput observationsPutRequestInput = new ObservationsPutRequestInput();
+		final List<List<String>> data = new ArrayList<>();
+		final List<String> header = Arrays.asList("OBS_UNIT_ID", "A");
+		final List<String> row1 = Arrays.asList("1", "1");
+		final List<String> row2 = Arrays.asList("2", "1");
+
+		data.add(header);
+		data.add(row1);
+		data.add(row2);
+
+		observationsPutRequestInput.setData(data);
+		observationsPutRequestInput.setProcessWarnings(true);
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setName("A");
+		measurementVariable.setDataType("Numeric");
+		measurementVariables.add(measurementVariable);
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> observationUnitDataMap = new HashMap<>();
+		observationUnitDataMap.put("A", new org.generationcp.middleware.service.api.dataset.ObservationUnitData(""));
+		final org.generationcp.middleware.service.api.dataset.ObservationUnitRow observationUnitRow = new ObservationUnitRow();
+		observationUnitRow.setObservationUnitId(1);
+		observationUnitRow.setVariables(observationUnitDataMap);
+		storedData.put("1", observationUnitRow);
+		Mockito.doNothing().when(studyValidator).validate(studyId, true);
+		Mockito.doNothing().when(datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.when(middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
+		Mockito.when(
+				middlewareDatasetService.getObservationUnitsAsMap(anyInt(), anyListOf(MeasurementVariable.class), anyListOf(String.class)))
+				.thenReturn(storedData);
+		try {
+			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
+		} catch (PreconditionFailedException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("some.obs.unit.id.matches"));
+			throw e;
+		}
+	}
+
 	private List<org.ibp.api.rest.dataset.ObservationUnitRow> mapObservationUnitRows(final List<ObservationUnitRow> observationDtoTestData) {
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
@@ -253,4 +476,5 @@ public class DatasetServiceImplTest {
 		}
 		return list;
 	}
+
 }
