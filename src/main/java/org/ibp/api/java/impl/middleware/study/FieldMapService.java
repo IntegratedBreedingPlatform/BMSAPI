@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -20,6 +21,8 @@ import org.ibp.api.domain.study.FieldMapPlantingDetails;
 import org.ibp.api.domain.study.FieldMapStudySummary;
 import org.ibp.api.domain.study.FieldPlot;
 import org.ibp.api.exception.ApiRuntimeException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -28,16 +31,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Service
 @Transactional
 public class FieldMapService {
 
-	private final StudyDataManager studyDataManager;
-	private final CrossExpansionProperties crossExpansionProperties;
+	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
 
-	public FieldMapService(final StudyDataManager studyDataManager, final CrossExpansionProperties crossExpansionProperties) {
-		this.studyDataManager = studyDataManager;
-		this.crossExpansionProperties = crossExpansionProperties;
-	}
+	@Autowired
+	private StudyDataManager studyDataManager;
 
 	public Map<Integer, FieldMap> getFieldMap(final String studyId) {
 
@@ -55,6 +57,14 @@ public class FieldMapService {
 		this.extractRangesFromPlotData(fieldMaps);
 
 		return fieldMaps;
+	}
+
+	public String getBlockId(final int datasetId, final String trialInstance) {
+		return studyDataManager.getBlockId(datasetId, trialInstance);
+	}
+
+	public FieldmapBlockInfo getBlockInformation(int blockId) {
+		return studyDataManager.getBlockInformation(blockId);
 	}
 
 	private void extractRangesFromPlotData(final Map<Integer, FieldMap> fieldMaps) {

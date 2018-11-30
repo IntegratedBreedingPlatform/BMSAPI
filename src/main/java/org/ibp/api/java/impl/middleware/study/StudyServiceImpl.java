@@ -1,10 +1,11 @@
 
 package org.ibp.api.java.impl.middleware.study;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Experiment;
@@ -38,7 +39,6 @@ import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
-import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.domain.common.Command;
 import org.ibp.api.domain.common.ValidationUtil;
 import org.ibp.api.domain.ontology.TermSummary;
@@ -68,10 +68,10 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 
 @Service
 @Transactional
@@ -111,7 +111,7 @@ public class StudyServiceImpl implements StudyService {
 	private ValidationUtil validationUtil;
 
 	@Autowired
-	private CrossExpansionProperties crossExpansionProperties;
+	private FieldMapService fieldMapService;
 
 	@Override
 	public List<StudySummary> search(final String programUniqueId, final String cropname, final String principalInvestigator, final String location, final String season) {
@@ -428,7 +428,6 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public Map<Integer, FieldMap> getFieldMap(final String studyId) {
-		final FieldMapService fieldMapService = new FieldMapService(this.studyDataManager, this.crossExpansionProperties);
 		return fieldMapService.getFieldMap(studyId);
 	}
 
@@ -543,7 +542,7 @@ public class StudyServiceImpl implements StudyService {
 			@Override
 			public StudyInstance apply(final org.generationcp.middleware.service.impl.study.StudyInstance input) {
 				return new StudyInstance(input.getInstanceDbId(), input.getLocationName(), input.getLocationAbbreviation(),
-						input.getInstanceNumber(),input.getCustomLocationAbbreviation());
+						input.getInstanceNumber(),input.getCustomLocationAbbreviation(), input.isHasFieldmap());
 			}
 		};
 		return Lists.transform(studyInstancesMW, transformer);

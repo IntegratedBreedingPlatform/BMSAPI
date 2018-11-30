@@ -43,6 +43,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -104,7 +105,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public long countPhenotypesByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
-		this.instanceValidator.validate(datasetId, instanceId);
+		this.instanceValidator.validate(datasetId, new HashSet<>(Arrays.asList(instanceId)));
 		return this.middlewareDatasetService.countPhenotypesByInstance(datasetId, instanceId);
 	}
 
@@ -213,12 +214,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final DatasetDTO datasetDto = mapper.map(datasetDTO, DatasetDTO.class);
-		final List<StudyInstance> instances = new ArrayList();
-		for (final org.generationcp.middleware.service.impl.study.StudyInstance instance : datasetDTO.getInstances()) {
-			final StudyInstance datasetInstance = mapper.map(instance, StudyInstance.class);
-			instances.add(datasetInstance);
-		}
-		datasetDto.setInstances(instances);
+		datasetDto.setInstances(convertToStudyInstances(mapper, datasetDTO.getInstances()));
 		datasetDto.setStudyId(studyId);
 		datasetDto.setCropName(crop);
 
@@ -231,11 +227,21 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<ObservationUnitRow> getObservationUnitRows(final int studyId, final int datasetId, final int instanceId,
+	public List<StudyInstance> getDatasetInstances(final Integer studyId, final Integer datasetId) {
+		this.studyValidator.validate(studyId, false);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		final ModelMapper mapper = new ModelMapper();
+		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+		return convertToStudyInstances(mapper, middlewareDatasetService.getDatasetInstances(datasetId));
+	}
+
+	@Override
+	public List<ObservationUnitRow> getObservationUnitRows(
+		final int studyId, final int datasetId, final int instanceId,
 		final int pageNumber, final int pageSize, final String sortBy, final String sortOrder) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
-		this.instanceValidator.validate(datasetId, instanceId);
+		this.instanceValidator.validate(datasetId, new HashSet<>(Arrays.asList(instanceId)));
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
 			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
@@ -253,16 +259,15 @@ public class DatasetServiceImpl implements DatasetService {
 		return list;
 	}
 
-
 	@Override
-	public DatasetDTO generateSubObservationDataset(final String cropName, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetGeneratorInput) {
+	public DatasetDTO generateSubObservationDataset(
+		final String cropName, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetGeneratorInput) {
 
 		// checks that study exists and it is not locked
 		this.studyValidator.validate(studyId, true);
 
 		// checks input matches validation rules
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
-
 
 		this.datasetValidator.validateDatasetBelongsToStudy(studyId, parentId);
 
@@ -299,7 +304,19 @@ public class DatasetServiceImpl implements DatasetService {
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		this.observationValidator.validateObservation(datasetId, observationUnitId, observationId);
 		this.middlewareDatasetService.deletePhenotype(observationId);
+
 	}
+
+	List<StudyInstance> convertToStudyInstances(final ModelMapper mapper, final List<org.generationcp.middleware.service.impl.study.StudyInstance> middlewareStudyInstances) {
+
+		final List<StudyInstance> instances = new ArrayList();
+		for (final org.generationcp.middleware.service.impl.study.StudyInstance instance : middlewareStudyInstances) {
+			final StudyInstance datasetInstance = mapper.map(instance, StudyInstance.class);
+			instances.add(datasetInstance);
+		}
+		return instances;
+	}
+
 
 	@Override
 	public void importObservations(final Integer studyId, final Integer datasetId, final ObservationsPutRequestInput input) {

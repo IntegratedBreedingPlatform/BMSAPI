@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -34,6 +35,7 @@ import org.modelmapper.ModelMapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -125,7 +127,7 @@ public class DatasetServiceImplTest {
 		this.studyDatasetService.countPhenotypesByInstance(studyId, datasetId, instanceId);
 		Mockito.verify(this.studyValidator).validate(studyId, false);
 		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, false);
-		Mockito.verify(this.instanceValidator).validate(datasetId, instanceId);
+		Mockito.verify(this.instanceValidator).validate(datasetId, Sets.newHashSet(instanceId));
 		Mockito.verify(this.middlewareDatasetService).countPhenotypesByInstance(datasetId, instanceId);
 	}
 
