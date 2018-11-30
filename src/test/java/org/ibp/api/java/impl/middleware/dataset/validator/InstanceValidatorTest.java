@@ -1,8 +1,9 @@
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
+import com.google.common.collect.Sets;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.exception.ResourceNotFoundException;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,19 +24,19 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 		final int datasetId = ran.nextInt();
 		final int instanceId = ran.nextInt();
 
-		Mockito.when(studyDataManager.isInstanceExistsInDataset(datasetId, instanceId)).thenReturn(true);
-		instanceValidator.validate(datasetId, instanceId);
+		Mockito.when(studyDataManager.areAllInstancesExistInDataset(datasetId, Sets.newHashSet(instanceId))).thenReturn(true);
+		instanceValidator.validate(datasetId, Sets.newHashSet(instanceId));
 
 	}
 
-	@Test(expected = ResourceNotFoundException.class)
+	@Test(expected = ApiRequestValidationException.class)
 	public void testValidateRejected() {
 		final Random ran = new Random();
 		final int datasetId = ran.nextInt();
 		final int instanceId = ran.nextInt();
 
-		Mockito.when(studyDataManager.isInstanceExistsInDataset(datasetId, instanceId)).thenReturn(false);
-		instanceValidator.validate(datasetId, instanceId);
+		Mockito.when(studyDataManager.areAllInstancesExistInDataset(datasetId, Sets.newHashSet(instanceId))).thenReturn(false);
+		instanceValidator.validate(datasetId, Sets.newHashSet(instanceId));
 
 	}
 
