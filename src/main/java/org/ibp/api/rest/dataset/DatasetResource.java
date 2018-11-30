@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
+import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -202,6 +203,15 @@ public class DatasetResource {
 		this.studyDatasetService.deleteObservation(studyId, datasetId, observationUnitId, observationId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Retrieves all instances associated to the dataset", notes = "Retrieves all instances associated to the dataset")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/instances", method = RequestMethod.GET)
+	public ResponseEntity<List<StudyInstance>> getDatasetInstances(@PathVariable final String crop,
+		@PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId) {
+		return new ResponseEntity<>(this.studyDatasetService.getDatasetInstances(studyId, datasetId), HttpStatus.OK);
+	}
+
 
 	@ApiOperation(value = "Exports the dataset to a specified file type", notes = "Exports the dataset to a specified file type")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/{fileType}", method = RequestMethod.GET)
