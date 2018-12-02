@@ -80,7 +80,7 @@ public class TestExceptionHandler {
 	@ExceptionHandler(PreconditionFailedException.class)
 	@ResponseStatus(value = PRECONDITION_FAILED)
 	@ResponseBody
-	public ErrorResponse handleConflictException(PreconditionFailedException ex) {
+	public ErrorResponse handlePreconditionFailedException(PreconditionFailedException ex) {
 
 		return this.defaultExceptionHandler.handlePreconditionFailedException(ex);
 	}
