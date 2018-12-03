@@ -28,9 +28,6 @@ import java.util.List;
 public class DatasetGeneratorInputValidator {
 
 	@Autowired
-	private StudyService studyService;
-
-	@Autowired
 	private VariableService variableService;
 
 	@Autowired
