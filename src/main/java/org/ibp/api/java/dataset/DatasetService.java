@@ -4,6 +4,7 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
+import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -27,9 +28,9 @@ public interface DatasetService {
 
 	DatasetDTO generateSubObservationDataset(String cropName, Integer studyId, Integer parentId, DatasetGeneratorInput datasetGeneratorInput);
 
-	DatasetDTO getDataset(final String crop, final Integer studyId, final Integer datasetId);
+	DatasetDTO      getDataset(final String crop, final Integer studyId, final Integer datasetId);
 
-	List<ObservationUnitRow> getObservationUnitRows(final int studyId, final int datasetId, final int instanceId, final int pageNumber,
+	List<ObservationUnitRow>  getObservationUnitRows(final int studyId, final int datasetId, final int instanceId, final int pageNumber,
 		final int pageSize, final String sortBy, final String sortOrder);
 
 	ObservationDto addObservation(Integer studyId, Integer datasetId, Integer observationUnitId, final ObservationDto observation);
@@ -41,4 +42,5 @@ public interface DatasetService {
 	
 	void deleteObservation(final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId);
 
+	List<StudyInstance> getDatasetInstances(final Integer studyId, final Integer datasetId);
 }

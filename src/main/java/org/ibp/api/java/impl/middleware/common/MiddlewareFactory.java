@@ -1,16 +1,15 @@
 
 package org.ibp.api.java.impl.middleware.common;
 
-import javax.transaction.TransactionManager;
-import javax.transaction.UserTransaction;
-
+import com.atomikos.icatch.jta.UserTransactionImp;
+import com.atomikos.icatch.jta.UserTransactionManager;
+import com.rits.cloning.Cloner;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.service.BreedingViewImportService;
 import org.generationcp.commons.service.CsvExportSampleListService;
 import org.generationcp.commons.service.impl.BreedingViewImportServiceImpl;
 import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.hibernate.DatasourceUtilities;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.manager.GenotypicDataManagerImpl;
@@ -83,9 +82,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
-import com.atomikos.icatch.jta.UserTransactionImp;
-import com.atomikos.icatch.jta.UserTransactionManager;
-import com.rits.cloning.Cloner;
+import javax.transaction.TransactionManager;
+import javax.transaction.UserTransaction;
 
 @Configuration
 @EnableTransactionManagement
