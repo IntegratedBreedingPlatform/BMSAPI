@@ -4,7 +4,6 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.io.Files;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.commons.util.ZipUtil;
-import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
@@ -94,9 +93,6 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 		// Get the visible variables in SubObservation table
 		final List<String> headerNames =
 			this.datasetCSVGenerator.getHeaderNames(this.studyDatasetService.getSubObservationSetColumns(study.getId(), dataSetDto.getDatasetId()));
-		// Then manually add PLOT_NO to the exported csv file. This is the only design variable required in the exported file.
-		// PLOT_NO data is readily available in ObservationUnitRow.
-		headerNames.add(ExperimentDao.PLOT_NO);
 
 		final int trialDatasetId = this.studyDataManager.getDataSetsByType(study.getId(), DataSetType.SUMMARY_DATA).get(0).getId();
 		final File temporaryFolder = Files.createTempDir();

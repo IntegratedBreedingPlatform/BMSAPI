@@ -1,23 +1,27 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
+import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.PreconditionFailedException;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
-import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
@@ -35,7 +39,6 @@ import org.modelmapper.ModelMapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -67,6 +70,8 @@ public class DatasetServiceImplTest {
 	public static final String REP_NO = "REP_NO";
 	private static final String STOCK_ID = "STOCK_ID";
 	private static final String FACT1 = "FACT1";
+	public static final String DATASET_NAME = "ABC";
+	public static final int PARENT_ID = 123;
 
 	@Mock
 	private DatasetService middlewareDatasetService;
@@ -198,7 +203,7 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, true);
 		Mockito.verify(this.observationValidator).validateObservation(datasetId, observationUnitId, observationId);
 		Mockito.verify(this.middlewareDatasetService)
-			.updatePhenotype(observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue());
+				.updatePhenotype(observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue());
 	}
 	
 	@Test
@@ -477,6 +482,43 @@ public class DatasetServiceImplTest {
 			list.add(observationUnitRow);
 		}
 		return list;
+	}
+
+	@Test
+	public void testGenerateDataset() {
+
+		final DatasetDTO datasetDTO = new DatasetDTO();
+		datasetDTO.setName(DATASET_NAME);
+		datasetDTO.setParentDatasetId(PARENT_ID);
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setTermId(8206);
+		datasetDTO.setVariables(Lists.newArrayList(measurementVariable));
+
+		final StudyInstance studyInstance1 = new StudyInstance();
+		studyInstance1.setInstanceDbId(1);
+
+		final StudyInstance studyInstance2 = new StudyInstance();
+		studyInstance2.setInstanceDbId(2);
+
+		final StudyInstance studyInstance3 = new StudyInstance();
+		studyInstance3.setInstanceDbId(3);
+
+		datasetDTO.setInstances(Lists.newArrayList(studyInstance1, studyInstance2, studyInstance3));
+		Mockito.doReturn(datasetDTO).when(this.middlewareDatasetService).generateSubObservationDataset(TEST_STUDY_IDENTIFIER, DATASET_NAME,
+			DataSetType.QUADRAT_SUBOBSERVATIONS.getId(), Lists.newArrayList(1, 2, 3), 8206, 3, PARENT_ID);
+
+		final DatasetDTO dto =
+			this.middlewareDatasetService.generateSubObservationDataset(TEST_STUDY_IDENTIFIER, DATASET_NAME,
+				DataSetType.QUADRAT_SUBOBSERVATIONS.getId(), Lists.newArrayList(1, 2, 3), 8206, 3, PARENT_ID);
+
+		Assert.assertNotNull(dto);
+		Assert.assertTrue(dto.getName().equalsIgnoreCase(datasetDTO.getName()));
+		Assert.assertTrue(dto.getParentDatasetId().equals(datasetDTO.getParentDatasetId()));
+		Assert.assertTrue(dto.getInstances().size() == 3);
+		Assert.assertTrue(dto.getVariables().size() == 1);
+		Assert.assertTrue(CollectionUtils.isEqualCollection(dto.getInstances(), datasetDTO.getInstances()));
+		Assert.assertTrue(CollectionUtils.isEqualCollection(dto.getVariables(), datasetDTO.getVariables()));
 	}
 
 }
