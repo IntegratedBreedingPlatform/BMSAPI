@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import org.apache.commons.lang3.StringUtils;
@@ -8,6 +9,7 @@ import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -15,15 +17,14 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.java.impl.middleware.ontology.TermRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 import javax.annotation.Nullable;
-import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -33,9 +34,6 @@ public class FormulaValidator implements Validator {
 
 	@Autowired
 	private DerivedVariableProcessor processor;
-
-	@Resource
-	private ResourceBundleMessageSource resourceBundleMessageSource;
 
 	@Autowired
 	protected TermValidator termValidator;
@@ -84,13 +82,22 @@ public class FormulaValidator implements Validator {
 		// Validate inputs and set ids
 
 		final Set<Term> nonTraitInputs = new LinkedHashSet<>();
+		final Map<String, DataType> inputVariablesDataTypeMap = new HashMap<>();
 
 		for (final FormulaVariable input : formulaDto.getInputs()) {
 			final Term inputTerm = this.termDataManager.getTermByName(input.getName());
 			if (inputTerm == null) {
 				errors.reject("variable.input.not.exists", new Object[] {input.getName()}, "");
 			} else {
+
 				final int id = inputTerm.getId();
+
+				// We need the datatype info of each variable so that we can properly create mock data later.
+				final Optional<DataType> dataTypeOptional = this.ontologyVariableDataManager.getDataType(id);
+				if (dataTypeOptional.isPresent()) {
+					inputVariablesDataTypeMap.put(DerivedVariableUtils.wrapTerm(inputTerm.getName()), dataTypeOptional.get());
+				}
+
 				input.setId(id); // it will be used to save the input
 				if (!this.isTrait(id)) {
 					nonTraitInputs.add(inputTerm);
@@ -99,15 +106,16 @@ public class FormulaValidator implements Validator {
 		}
 
 		if (!nonTraitInputs.isEmpty()) {
-			errors.reject("variable.formula.inputs.not.trait", new String[] {StringUtils.join(Iterables.transform(
-				nonTraitInputs, new Function<Term, String>() {
+			errors.reject("variable.formula.inputs.not.trait", new String[] {
+				StringUtils.join(Iterables.transform(
+					nonTraitInputs, new Function<Term, String>() {
 
-					@Nullable
-					@Override
-					public String apply(@Nullable final Term term) {
-						return term.getName() + "(" + term.getId() + ")";
-					}
-				}), ", ")}, "");
+						@Nullable
+						@Override
+						public String apply(@Nullable final Term term) {
+							return term.getName() + "(" + term.getId() + ")";
+						}
+					}), ", ")}, "");
 		}
 
 		// Validate formula definition
@@ -122,8 +130,14 @@ public class FormulaValidator implements Validator {
 		try {
 			String formula = formulaDto.getDefinition();
 			final Map<String, Object> parameters = DerivedVariableUtils.extractParameters(formula);
+
+			// Create mock data for each variable.
 			for (final Map.Entry<String, Object> termEntry : parameters.entrySet()) {
-				termEntry.setValue(BigDecimal.ONE);
+				if (inputVariablesDataTypeMap.get(termEntry.getKey()) == DataType.DATE_TIME_VARIABLE) {
+					termEntry.setValue(new Date());
+				} else {
+					termEntry.setValue(BigDecimal.ONE);
+				}
 			}
 			formula = DerivedVariableUtils.replaceDelimiters(formula);
 			processor.evaluateFormula(formula, parameters);
@@ -155,7 +169,7 @@ public class FormulaValidator implements Validator {
 	}
 
 	public void validateUpdate(final FormulaDto formula, final Errors errors) {
-		this.validate(formula,errors);
+		this.validate(formula, errors);
 
 		final boolean isVariableUsedInStudy =
 			this.ontologyVariableDataManager.isVariableUsedInStudy(Integer.valueOf(formula.getTarget().getId()));
@@ -165,7 +179,4 @@ public class FormulaValidator implements Validator {
 		}
 	}
 
-	private String getMessage(final String code) {
-		return this.resourceBundleMessageSource.getMessage(code, null, LocaleContextHolder.getLocale());
-	}
 }
