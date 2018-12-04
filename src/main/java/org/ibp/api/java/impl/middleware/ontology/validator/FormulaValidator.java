@@ -17,14 +17,11 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.java.impl.middleware.ontology.TermRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 import javax.annotation.Nullable;
-import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,9 +34,6 @@ public class FormulaValidator implements Validator {
 
 	@Autowired
 	private DerivedVariableProcessor processor;
-
-	@Resource
-	private ResourceBundleMessageSource resourceBundleMessageSource;
 
 	@Autowired
 	protected TermValidator termValidator;
@@ -112,15 +106,16 @@ public class FormulaValidator implements Validator {
 		}
 
 		if (!nonTraitInputs.isEmpty()) {
-			errors.reject("variable.formula.inputs.not.trait", new String[] {StringUtils.join(Iterables.transform(
-				nonTraitInputs, new Function<Term, String>() {
+			errors.reject("variable.formula.inputs.not.trait", new String[] {
+				StringUtils.join(Iterables.transform(
+					nonTraitInputs, new Function<Term, String>() {
 
-					@Nullable
-					@Override
-					public String apply(@Nullable final Term term) {
-						return term.getName() + "(" + term.getId() + ")";
-					}
-				}), ", ")}, "");
+						@Nullable
+						@Override
+						public String apply(@Nullable final Term term) {
+							return term.getName() + "(" + term.getId() + ")";
+						}
+					}), ", ")}, "");
 		}
 
 		// Validate formula definition
@@ -174,7 +169,7 @@ public class FormulaValidator implements Validator {
 	}
 
 	public void validateUpdate(final FormulaDto formula, final Errors errors) {
-		this.validate(formula,errors);
+		this.validate(formula, errors);
 
 		final boolean isVariableUsedInStudy =
 			this.ontologyVariableDataManager.isVariableUsedInStudy(Integer.valueOf(formula.getTarget().getId()));
@@ -184,7 +179,4 @@ public class FormulaValidator implements Validator {
 		}
 	}
 
-	private String getMessage(final String code) {
-		return this.resourceBundleMessageSource.getMessage(code, null, LocaleContextHolder.getLocale());
-	}
 }
