@@ -7,6 +7,7 @@ import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -81,6 +82,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 
 		doReturn(Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL, VariableType.TRAIT))
 			.when(this.ontologyVariableDataManager).getVariableTypes(anyInt());
+		doReturn(Optional.of(DataType.NUMERIC_VARIABLE)).when(this.ontologyVariableDataManager).getDataType(anyInt());
 
 		final Project project = new Project();
 		project.setUniqueID(FormulaResourceTest.PROGRAM_UUID);
