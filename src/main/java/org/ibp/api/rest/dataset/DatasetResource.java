@@ -204,6 +204,16 @@ public class DatasetResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Put Observations Dataset", notes = "Put Observations Dataset")
+	@RequestMapping(
+			value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations",
+			method = RequestMethod.PUT)
+	public ResponseEntity<Void> postObservationUnits(@PathVariable final String crop, @PathVariable final Integer studyId,
+			@PathVariable final Integer datasetId, @RequestBody ObservationsPutRequestInput input) {
+		this.studyDatasetService.importObservations(studyId, datasetId, input);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 	@ApiOperation(value = "Retrieves all instances associated to the dataset", notes = "Retrieves all instances associated to the dataset")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/instances", method = RequestMethod.GET)
 	public ResponseEntity<List<StudyInstance>> getDatasetInstances(@PathVariable final String crop,

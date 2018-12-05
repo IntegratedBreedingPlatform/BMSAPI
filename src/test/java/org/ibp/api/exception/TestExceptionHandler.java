@@ -16,6 +16,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.PRECONDITION_FAILED;
 
 @ControllerAdvice
 public class TestExceptionHandler {
@@ -73,5 +74,14 @@ public class TestExceptionHandler {
 	@ResponseBody
 	public ErrorResponse handleForbiddenException(ForbiddenException ex) {
 		return this.defaultExceptionHandler.handleForbiddenException(ex);
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(PreconditionFailedException.class)
+	@ResponseStatus(value = PRECONDITION_FAILED)
+	@ResponseBody
+	public ErrorResponse handlePreconditionFailedException(PreconditionFailedException ex) {
+
+		return this.defaultExceptionHandler.handlePreconditionFailedException(ex);
 	}
 }

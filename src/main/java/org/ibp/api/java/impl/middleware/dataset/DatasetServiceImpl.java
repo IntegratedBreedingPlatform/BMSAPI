@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
+import com.google.common.collect.Table;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -14,25 +15,31 @@ import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ConflictException;
 import org.ibp.api.exception.NotSupportedException;
+import org.ibp.api.exception.PreconditionFailedException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetGeneratorInputValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
+import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -70,6 +77,12 @@ public class DatasetServiceImpl implements DatasetService {
 	@Autowired
 	private StudyDataManager studyDataManager;
 
+	@Resource
+	private ResourceBundleMessageSource resourceBundleMessageSource;
+
+	@Autowired
+	private ObservationsTableValidator observationsTableValidator;
+
 	@Override
 	public List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId) {
 		this.studyValidator.validate(studyId, false);
@@ -92,7 +105,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public long countPhenotypesByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
-		this.instanceValidator.validate(datasetId, new HashSet<Integer>(Arrays.asList(instanceId)));
+		this.instanceValidator.validate(datasetId, new HashSet<>(Arrays.asList(instanceId)));
 		return this.middlewareDatasetService.countPhenotypesByInstance(datasetId, instanceId);
 	}
 
@@ -122,7 +135,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public ObservationDto addObservation(Integer studyId, Integer datasetId, Integer observationUnitId, ObservationDto observation) {
+	public ObservationDto addObservation(
+		final Integer studyId, final Integer datasetId, final Integer observationUnitId, final ObservationDto observation) {
 
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, Arrays.asList(observation.getVariableId()));
@@ -139,8 +153,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		this.observationValidator.validateObservation(datasetId, observationUnitId, observationId);
 		return this.middlewareDatasetService
-			.updatePhenotype(
-				observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue());
+			.updatePhenotype(observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue());
 
 	}
 
@@ -228,7 +241,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final int pageNumber, final int pageSize, final String sortBy, final String sortOrder) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
-		this.instanceValidator.validate(datasetId, new HashSet<Integer>(Arrays.asList(instanceId)));
+		this.instanceValidator.validate(datasetId, new HashSet<>(Arrays.asList(instanceId)));
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
 			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
@@ -303,5 +316,132 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 		return instances;
 	}
+
+
+	@Override
+	public void importObservations(final Integer studyId, final Integer datasetId, final ObservationsPutRequestInput input) {
+
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
+
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+
+		this.observationsTableValidator.validateList(input.getData());
+
+		final List<MeasurementVariable> datasetMeasurementVariables =
+				this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId);
+
+		if (datasetMeasurementVariables.isEmpty()) {
+			errors.reject("no.variables.dataset", null, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		final ObservationUnitsTableBuilder observationUnitsTableBuilder = new ObservationUnitsTableBuilder();
+		final Table<String, String, String> table = observationUnitsTableBuilder.build(input.getData(), datasetMeasurementVariables);
+
+		// Get Map<OBS_UNIT_ID, Observations>
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = this.middlewareDatasetService
+				.getObservationUnitsAsMap(datasetId, datasetMeasurementVariables, new ArrayList<>(table.rowKeySet()));
+
+		if (storedData.isEmpty()) {
+			errors.reject("none.obs.unit.id.matches", null, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		final int rowsNotBelongingToDataset = table.rowKeySet().size() - storedData.size();
+
+		// remove elements that does not belong to the dataset
+		if (rowsNotBelongingToDataset != 0) {
+			final List<String> obsUnitIdsList = new ArrayList<>(table.rowKeySet());
+			obsUnitIdsList.removeAll(storedData.keySet());
+			for (final String obsUnitId : obsUnitIdsList) {
+				table.row(obsUnitId).clear();
+			}
+		}
+
+		// Check for data issues
+		this.observationsTableValidator.validateObservationsValuesDataTypes(table, datasetMeasurementVariables);
+
+		// Processing warnings
+		if (input.isProcessWarnings()) {
+			errors = this.processObservationsDataWarningsAsErrors(table, storedData, rowsNotBelongingToDataset,
+					observationUnitsTableBuilder.getDuplicatedFoundNumber());
+		}
+		if (!errors.hasErrors()) {
+			this.middlewareDatasetService.importDataset(datasetId, table);
+		} else {
+			throw new PreconditionFailedException(errors.getAllErrors());
+		}
+
+	}
+
+	private BindingResult processObservationsDataWarningsAsErrors(final Table<String, String, String> table,
+			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData,
+			final Integer rowsNotBelongingToDataset, final Integer duplicatedFoundNumber) {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
+		if (duplicatedFoundNumber > 0) {
+			errors.reject("duplicated.obs.unit.id", null, "");
+		}
+
+		if (rowsNotBelongingToDataset != 0) {
+			errors.reject("some.obs.unit.id.matches", new String[] {String.valueOf(rowsNotBelongingToDataset)}, "");
+		}
+
+		if (this.isInputOverwritingData(table, storedData)) {
+			errors.reject("warning.import.overwrite.data", null, "");
+		}
+
+		return errors;
+	}
+
+	// DO NOT REMOVE THIS FUNCTION EVEN WHEN IT IS UNUSED, IT WILL BE USED WHEN WE IMPLEMENT THE PREVIEW PROCESS
+	private List<String> processObservationsDataWarningsAsStrings(final Table<String, String, String> table,
+			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData,
+			final Integer rowsNotBelongingToDataset, final Integer duplicatedFoundNumber) {
+		final List<String> warnings = new ArrayList<>();
+		if (duplicatedFoundNumber > 0) {
+			warnings.add(this.resourceBundleMessageSource.getMessage("duplicated.obs.unit.id", null, LocaleContextHolder.getLocale()));
+		}
+
+		if (rowsNotBelongingToDataset != 0) {
+			warnings.add(this.resourceBundleMessageSource
+					.getMessage("some.obs.unit.id.matches", new String[] {String.valueOf(rowsNotBelongingToDataset)},
+							LocaleContextHolder.getLocale()));
+		}
+
+		if (this.isInputOverwritingData(table, storedData)) {
+			warnings.add(
+					this.resourceBundleMessageSource.getMessage("warning.import.overwrite.data", null, LocaleContextHolder.getLocale()));
+		}
+
+		return warnings;
+	}
+
+	private Boolean isInputOverwritingData(final Table<String, String, String> table,
+			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData) {
+		boolean overwritingData = false;
+
+		externalLoop:
+		for (final String observationUnitId : table.rowKeySet()) {
+
+			final org.generationcp.middleware.service.api.dataset.ObservationUnitRow storedObservations = storedData.get(observationUnitId);
+
+			for (final String variableName : table.columnKeySet()) {
+
+				final org.generationcp.middleware.service.api.dataset.ObservationUnitData observation =
+						storedObservations.getVariables().get(variableName);
+
+				if (observation != null && observation.getValue() != null && !observation.getValue()
+						.equalsIgnoreCase(table.get(observationUnitId, variableName))) {
+					overwritingData = true;
+
+					break externalLoop;
+				}
+			}
+
+		}
+		return overwritingData;
+	}
+
 
 }
