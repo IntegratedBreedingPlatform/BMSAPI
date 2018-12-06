@@ -132,11 +132,11 @@ public class DatasetGeneratorInputValidator {
 		}
 	}
 
-	public void setMaxAllowedSubobservationUnits(final Integer maxAllowedSubobservationUnits) {
-		this.maxAllowedSubobservationUnits = maxAllowedSubobservationUnits;
+	public Environment getEnvironment() {
+		return this.environment;
 	}
 
-	public void setMaxAllowedDatasetsPerParent(final Integer maxAllowedDatasetsPerParent) {
-		this.maxAllowedDatasetsPerParent = maxAllowedDatasetsPerParent;
+	public void setEnvironment(final Environment environment) {
+		this.environment = environment;
 	}
 }
