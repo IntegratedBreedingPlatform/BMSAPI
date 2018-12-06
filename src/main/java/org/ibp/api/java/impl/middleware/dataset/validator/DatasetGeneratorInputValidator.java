@@ -12,7 +12,6 @@ import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableType;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.ontology.VariableService;
-import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -21,7 +20,6 @@ import org.springframework.validation.Errors;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 @Component
@@ -132,5 +130,13 @@ public class DatasetGeneratorInputValidator {
 		if (!DataSetType.isSubObservationDatasetType(type)){
 			errors.reject("dataset.operation.not.implemented", new String[] {String.valueOf(datasetTypeId)}, "");
 		}
+	}
+
+	public Environment getEnvironment() {
+		return this.environment;
+	}
+
+	public void setEnvironment(final Environment environment) {
+		this.environment = environment;
 	}
 }
