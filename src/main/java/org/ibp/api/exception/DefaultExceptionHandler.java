@@ -151,7 +151,7 @@ public class DefaultExceptionHandler {
 	@ExceptionHandler(ConflictException.class)
 	@ResponseStatus(value = CONFLICT)
 	@ResponseBody
-	public ErrorResponse handlePreconditionFailedException(ConflictException ex) {
+	public ErrorResponse handleConflictException(ConflictException ex) {
 
 		ErrorResponse response = new ErrorResponse();
 
