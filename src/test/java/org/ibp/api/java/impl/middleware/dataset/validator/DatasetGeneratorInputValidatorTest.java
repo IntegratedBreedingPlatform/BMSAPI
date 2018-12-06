@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
+import org.hamcrest.CoreMatchers;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableType;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
@@ -24,12 +25,14 @@ import org.springframework.validation.MapBindingResult;
 import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
 
 public class DatasetGeneratorInputValidatorTest {
@@ -104,7 +107,7 @@ public class DatasetGeneratorInputValidatorTest {
 
 		Assert.assertTrue(errors.getAllErrors().size() == 1);
 		final ObjectError objectError = errors.getAllErrors().get(0);
-		Assert.assertTrue(objectError.getCodes()[1].contains("dataset.name.not.available"));
+		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.name.not.available"));
 	}
 
 	@Test
@@ -127,8 +130,7 @@ public class DatasetGeneratorInputValidatorTest {
 		this.datasetGeneratorInputValidator.validateDatasetTypeIsImplemented(datasetTypeId, errors);
 		Assert.assertTrue(errors.getAllErrors().size() == 1);
 		final ObjectError objectError = errors.getAllErrors().get(0);
-		Assert.assertTrue(objectError.getCodes()[1].contains("dataset.operation.not.implemented"));
-
+		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.operation.not.implemented"));
 	}
 
 	@Test
@@ -226,7 +228,7 @@ public class DatasetGeneratorInputValidatorTest {
 
 		Assert.assertTrue(errors.getAllErrors().size() == 1);
 		final ObjectError objectError = errors.getAllErrors().get(0);
-		Assert.assertTrue(objectError.getCodes()[1].contains("dataset.type.id.not.exist"));
+		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.type.id.not.exist"));
 	}
 
 	@Test
@@ -276,7 +278,7 @@ public class DatasetGeneratorInputValidatorTest {
 
 		Assert.assertTrue(errors.getAllErrors().size() == 1);
 		final ObjectError objectError = errors.getAllErrors().get(0);
-		Assert.assertTrue(objectError.getCodes()[1].contains("dataset.parent.not.allowed"));
+		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.parent.not.allowed"));
 	}
 
 	@Test
@@ -327,7 +329,7 @@ public class DatasetGeneratorInputValidatorTest {
 
 		Assert.assertTrue(errors.getAllErrors().size() == 1);
 		final ObjectError objectError = errors.getAllErrors().get(0);
-		Assert.assertTrue(objectError.getCodes()[1].contains("dataset.creation.not.allowed"));
+		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.creation.not.allowed"));
 	}
 
 	@Test
@@ -379,7 +381,7 @@ public class DatasetGeneratorInputValidatorTest {
 
 		Assert.assertTrue(errors.getAllErrors().size() == 1);
 		final ObjectError objectError = errors.getAllErrors().get(0);
-		Assert.assertTrue(objectError.getCodes()[1].contains("dataset.name.exceed.length"));
+		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.name.exceed.length"));
 	}
 
 	@Test
@@ -430,7 +432,7 @@ public class DatasetGeneratorInputValidatorTest {
 
 		Assert.assertTrue(errors.getAllErrors().size() == 1);
 		final ObjectError objectError = errors.getAllErrors().get(0);
-		Assert.assertTrue(objectError.getCodes()[1].contains("dataset.name.empty.name"));
+		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.name.empty.name"));
 	}
 
 	@Test
@@ -482,7 +484,7 @@ public class DatasetGeneratorInputValidatorTest {
 		Assert.assertTrue(errors.getAllErrors().size() == 1);
 
 		final ObjectError objectError = errors.getAllErrors().get(0);
-		Assert.assertTrue(objectError.getCodes()[1].contains("dataset.invalid.instances"));
+		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.invalid.instances"));
 	}
 
 	@Test
@@ -536,8 +538,7 @@ public class DatasetGeneratorInputValidatorTest {
 		Assert.assertTrue(errors.getAllErrors().size() == 1);
 
 		final ObjectError objectError = errors.getAllErrors().get(0);
-		Assert.assertTrue(objectError.getCodes()[1].contains("dataset.invalid.number.subobs.units"));
-
+		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.invalid.number.subobs.units"));
 	}
 
 	@Test
@@ -587,7 +588,6 @@ public class DatasetGeneratorInputValidatorTest {
 		Assert.assertTrue(errors.getAllErrors().size() == 1);
 
 		final ObjectError objectError = errors.getAllErrors().get(0);
-		Assert.assertTrue(objectError.getCodes()[1].contains("dataset.invalid.obs.unit.variable"));
-
+		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.invalid.obs.unit.variable"));
 	}
 }
