@@ -129,6 +129,14 @@ public class VariableDetails extends TermSummary {
 		}
 	}
 
+	public void setDataSets(Integer dataSets) {
+		if (dataSets == null) {
+			this.metadata.setDataSets(0);
+		} else {
+			this.metadata.setDataSets(dataSets);
+		}
+	}
+
 	public FormulaDto getFormula() {
 		return formula;
 	}

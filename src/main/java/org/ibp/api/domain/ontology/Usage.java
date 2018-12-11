@@ -21,6 +21,9 @@ public class Usage {
 	// studies of variable
 	private Integer studies;
 
+	// datasets of variable
+	private Integer dataSets;
+
 	public void addUsage(TermSummary variable) {
 		// Note: Do not add null value of variable
 		if (variable != null) {
@@ -48,4 +51,11 @@ public class Usage {
 		this.studies = studies;
 	}
 
+	public Integer getDataSets() {
+		return this.dataSets;
+	}
+
+	public void setDataSets(Integer dataSets) {
+		this.dataSets = dataSets;
+	}
 }

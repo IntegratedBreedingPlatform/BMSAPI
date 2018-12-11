@@ -131,7 +131,7 @@ public class OntologyMapper {
 				this.map().setFavourite(this.source.getIsFavorite());
 				this.map().setAlias(this.source.getAlias());
 				this.map().setObservations(this.source.getObservations());
-				this.map().setStudies(this.source.getStudies());
+				this.map().setStudies(this.source.getDatasets());
 				this.map().setExpectedMin(this.source.getMinValue());
 				this.map().setExpectedMax(this.source.getMaxValue());
 				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
@@ -139,6 +139,7 @@ public class OntologyMapper {
 				this.map().getMetadata().setDeletable(false);
 				this.map().setFormula(this.source.getFormula());
 				this.map().setAllowsFormula(this.source.isAllowsFormula());
+				this.map().getMetadata().setDataSets(this.source.getDatasets());
 			}
 		});
 	}
