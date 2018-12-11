@@ -1,4 +1,3 @@
-
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import java.util.ArrayList;
@@ -866,7 +865,7 @@ public class VariableValidatorTest {
         Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
         Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
         Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
-        Mockito.doReturn(originalVariable).when(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), originalVariable.getId(), true, true);
+        Mockito.doReturn(originalVariable).when(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), originalVariable.getId(), true, false);
 
         this.variableValidator.validate(variable, bindingResult);
         Assert.assertTrue("Validation should fail if previous type is no longer present", bindingResult.hasErrors());

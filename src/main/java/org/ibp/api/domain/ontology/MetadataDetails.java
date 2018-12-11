@@ -57,11 +57,11 @@ public class MetadataDetails extends MetadataSummary {
 		return this;
 	}
 
-	public Integer getDataSets() {
-		return this.usage.getDataSets();
+	public Integer getDatasets() {
+		return this.usage.getDatasets();
 	}
 
-	public void setDataSets(final Integer datasets) {
-		this.usage.setDataSets(datasets);
+	public void setDatasets(final Integer datasets) {
+		this.usage.setDatasets(datasets);
 	}
 }

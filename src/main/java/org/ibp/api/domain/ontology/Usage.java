@@ -22,7 +22,7 @@ public class Usage {
 	private Integer studies;
 
 	// datasets of variable
-	private Integer dataSets;
+	private Integer datasets;
 
 	public void addUsage(TermSummary variable) {
 		// Note: Do not add null value of variable
@@ -51,11 +51,11 @@ public class Usage {
 		this.studies = studies;
 	}
 
-	public Integer getDataSets() {
-		return this.dataSets;
+	public Integer getDatasets() {
+		return this.datasets;
 	}
 
-	public void setDataSets(Integer dataSets) {
-		this.dataSets = dataSets;
+	public void setDatasets(Integer datasets) {
+		this.datasets = datasets;
 	}
 }
