@@ -140,7 +140,7 @@ public class VariableValidatorTest {
     		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
     		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());    		
     		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleTerm.getId(), true);
-    		Mockito.doReturn(dbVariable).when(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), dbVariable.getId(), true, true);
+			Mockito.doReturn(dbVariable).when(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), dbVariable.getId(), true);
 
         this.variableValidator.validate(variable, bindingResult);
 
@@ -157,22 +157,22 @@ public class VariableValidatorTest {
         dbVariable.setHasUsage(true);
 
         dbVariable.setAlias("TEST");
-        
-    		final Term methodTerm = TestDataProvider.getMethodTerm();
-    		final Term propertyTerm = TestDataProvider.getPropertyTerm();
-    		final Term scaleTerm = TestDataProvider.getScaleTerm();
-    		final Scale scale = TestDataProvider.getTestScale();
 
+		final Term methodTerm = TestDataProvider.getMethodTerm();
+		final Term propertyTerm = TestDataProvider.getPropertyTerm();
+		final Term scaleTerm = TestDataProvider.getScaleTerm();
+		final Scale scale = TestDataProvider.getTestScale();
 
-    		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
-    		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
-    		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());    		
-    		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleTerm.getId(), true);
-    		Mockito.doReturn(dbVariable).when(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), dbVariable.getId(), true, true);
+		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
+		Mockito.doReturn(propertyTerm).when(this.termDataManager).getTermById(propertyTerm.getId());
+		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
+		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scaleTerm.getId(), true);
+		Mockito.doReturn(dbVariable).when(this.ontologyVariableDataManager)
+				.getVariable(variable.getProgramUuid(), dbVariable.getId(), true);
 
-        this.variableValidator.validate(variable, bindingResult);
-        
-        Assert.assertEquals(1, bindingResult.getErrorCount());
+		this.variableValidator.validate(variable, bindingResult);
+
+		Assert.assertEquals(1, bindingResult.getErrorCount());
         Assert.assertNotNull("Validator unable to catch change in alias value between user input and current db state", bindingResult.getFieldError("alias"));
     }
 
@@ -240,8 +240,7 @@ public class VariableValidatorTest {
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
 		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
 		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(variableDetails.getProgramUuid(), variable.getId(),
-				true, true);
-
+				true);
 		this.variableValidator.validate(variableDetails, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("name"));
@@ -312,8 +311,7 @@ public class VariableValidatorTest {
 		Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
 		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
 		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(variableDetails.getProgramUuid(),
-				StringUtil.parseInt(variableDetails.getId(), null), true, true);
-
+				StringUtil.parseInt(variableDetails.getId(), null), true);
 		this.variableValidator.validate(variableDetails, bindingResult);
 		Assert.assertTrue(bindingResult.hasErrors());
 		Assert.assertNotNull(bindingResult.getFieldError("alias"));
@@ -832,7 +830,7 @@ public class VariableValidatorTest {
         Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
         Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
         Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
-        Mockito.doReturn(originalVariable).when(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), originalVariable.getId(), true, true);
+		Mockito.doReturn(originalVariable).when(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), originalVariable.getId(), true);
 
         this.variableValidator.validate(variable, bindingResult);
         Assert.assertFalse("Validation should still pass even with new variable types as previous types are retained", bindingResult.hasErrors());
@@ -865,7 +863,7 @@ public class VariableValidatorTest {
         Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleTerm.getId());
         Mockito.doReturn(scale).when(this.ontologyScaleDataManager).getScaleById(scale.getId(), true);
         Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
-        Mockito.doReturn(originalVariable).when(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), originalVariable.getId(), true, false);
+		Mockito.doReturn(originalVariable).when(this.ontologyVariableDataManager).getVariable(variable.getProgramUuid(), originalVariable.getId(), true);
 
         this.variableValidator.validate(variable, bindingResult);
         Assert.assertTrue("Validation should fail if previous type is no longer present", bindingResult.hasErrors());
