@@ -141,6 +141,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, Arrays.asList(observation.getVariableId()));
 		this.observationValidator.validateObservationUnit(datasetId, observationUnitId);
+		this.observationValidator.validateObservationValue(studyId, observation.getVariableId(), observation.getValue());
 		return this.middlewareDatasetService.addPhenotype(observation);
 
 	}
@@ -151,7 +152,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final ObservationValue observationValue) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
-		this.observationValidator.validateObservation(datasetId, observationUnitId, observationId);
+		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, observationValue.getValue());
 		return this.middlewareDatasetService
 			.updatePhenotype(observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue());
 
@@ -302,7 +303,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public void deleteObservation(final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
-		this.observationValidator.validateObservation(datasetId, observationUnitId, observationId);
+		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, null);
 		this.middlewareDatasetService.deletePhenotype(observationId);
 
 	}
