@@ -67,7 +67,7 @@ public class ObservationValidator {
 
 		if (!isValidValue(var, value)) {
 			errors.reject("invalid.observation.value");
-            throw new ApiRequestValidationException(errors.getAllErrors());
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 
