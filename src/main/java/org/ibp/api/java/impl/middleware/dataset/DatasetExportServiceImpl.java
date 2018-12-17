@@ -7,6 +7,7 @@ import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -91,8 +92,8 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 		final List<File> csvFiles = new ArrayList<>();
 
 		// Get the visible variables in SubObservation table
-		final List<String> headerNames =
-			this.datasetCSVGenerator.getHeaderNames(this.studyDatasetService.getSubObservationSetColumns(study.getId(), dataSetDto.getDatasetId()));
+		final List<MeasurementVariable> columns =
+			this.studyDatasetService.getSubObservationSetColumns(study.getId(), dataSetDto.getDatasetId());
 
 		final int trialDatasetId = this.studyDataManager.getDataSetsByType(study.getId(), DataSetType.SUMMARY_DATA).get(0).getId();
 		final File temporaryFolder = Files.createTempDir();
@@ -120,7 +121,7 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 
 			final CSVWriter csvWriter =
 				new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',');
-			csvFiles.add(this.datasetCSVGenerator.generateCSVFile(headerNames, reorderedObservationUnitRows, fileNameFullPath, csvWriter));
+			csvFiles.add(this.datasetCSVGenerator.generateCSVFile(columns, reorderedObservationUnitRows, fileNameFullPath, csvWriter));
 		}
 
 		if (csvFiles.size() == 1) {

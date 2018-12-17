@@ -294,7 +294,7 @@ public class DatasetServiceImplTest {
 		observationsPutRequestInput.setData(data);
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setName("A");
+		measurementVariable.setAlias("A");
 		measurementVariables.add(measurementVariable);
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
 		Mockito.doNothing().when(studyValidator).validate(studyId, true);
@@ -323,7 +323,7 @@ public class DatasetServiceImplTest {
 		observationsPutRequestInput.setData(data);
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setName("A");
+		measurementVariable.setAlias("A");
 		measurementVariable.setDataType("Numeric");
 		measurementVariables.add(measurementVariable);
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
@@ -362,7 +362,7 @@ public class DatasetServiceImplTest {
 		observationsPutRequestInput.setProcessWarnings(true);
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setName("A");
+		measurementVariable.setAlias("A");
 		measurementVariable.setDataType("Numeric");
 		measurementVariables.add(measurementVariable);
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
@@ -403,7 +403,7 @@ public class DatasetServiceImplTest {
 		observationsPutRequestInput.setProcessWarnings(true);
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setName("A");
+		measurementVariable.setAlias("A");
 		measurementVariable.setDataType("Numeric");
 		measurementVariables.add(measurementVariable);
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
@@ -444,7 +444,7 @@ public class DatasetServiceImplTest {
 		observationsPutRequestInput.setProcessWarnings(true);
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setName("A");
+		measurementVariable.setAlias("A");
 		measurementVariable.setDataType("Numeric");
 		measurementVariables.add(measurementVariable);
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();

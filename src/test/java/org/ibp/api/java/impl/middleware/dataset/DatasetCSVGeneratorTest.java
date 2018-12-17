@@ -32,6 +32,7 @@ public class DatasetCSVGeneratorTest {
 	private final String variableValue1 = RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH);
 	private final String variableValue2 = RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH);
 	private final List<String> headerNames = Arrays.asList(variableName1, variableName2);
+	private List<MeasurementVariable> measurementVariables;
 
 	@InjectMocks
 	private DatasetCSVGenerator datasetCSVGenerator;
@@ -50,6 +51,16 @@ public class DatasetCSVGeneratorTest {
 		observationUnitRow.setVariables(variables);
 		this.observationUnitRows = Arrays.asList(observationUnitRow);
 
+		final MeasurementVariable measurementVariable1 = new MeasurementVariable();
+		measurementVariable1.setAlias(variableName1);
+		measurementVariable1.setName(variableName1);
+
+		final MeasurementVariable measurementVariable2 = new MeasurementVariable();
+		measurementVariable2.setAlias(variableName2);
+		measurementVariable2.setName(variableName2);
+
+		measurementVariables = Arrays.asList(measurementVariable1, measurementVariable2);
+
 	}
 
 	@Test
@@ -58,7 +69,7 @@ public class DatasetCSVGeneratorTest {
 		final CSVWriter csvWriter = Mockito.mock(CSVWriter.class);
 		final String fileNameFullPath = RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH);
 
-		datasetCSVGenerator.generateCSVFile(headerNames, observationUnitRows, fileNameFullPath, csvWriter);
+		datasetCSVGenerator.generateCSVFile(measurementVariables, observationUnitRows, fileNameFullPath, csvWriter);
 
 		Mockito.verify(csvWriter).writeAll(Mockito.anyList());
 		Mockito.verify(csvWriter).close();
@@ -68,7 +79,7 @@ public class DatasetCSVGeneratorTest {
 	@Test
 	public void testGetColumnValues() {
 
-		final String[] result = datasetCSVGenerator.getColumnValues(observationUnitRows.get(0), headerNames);
+		final String[] result = datasetCSVGenerator.getColumnValues(observationUnitRows.get(0), measurementVariables);
 		assertEquals(result.length, headerNames.size());
 		assertEquals(variableValue1, result[0]);
 		assertEquals(variableValue2, result[1]);
@@ -76,18 +87,9 @@ public class DatasetCSVGeneratorTest {
 
 	@Test
 	public void testGetHeaderNames() {
-
-		final MeasurementVariable measurementVariable1 = new MeasurementVariable();
-		measurementVariable1.setName(variableName1);
-		final MeasurementVariable measurementVariable2 = new MeasurementVariable();
-		measurementVariable2.setName(variableName2);
-
-		final List<MeasurementVariable> measurementVariables = Arrays.asList(measurementVariable1, measurementVariable2);
-
 		final List<String> result = datasetCSVGenerator.getHeaderNames(measurementVariables);
 		assertEquals(measurementVariables.size(), result.size());
 		assertTrue(result.contains(variableName1));
 		assertTrue(result.contains(variableName2));
-
 	}
 }

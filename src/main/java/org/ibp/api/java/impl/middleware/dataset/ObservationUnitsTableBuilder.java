@@ -41,7 +41,7 @@ public class ObservationUnitsTableBuilder {
 
 		for (final String header: headers) {
 			for (final MeasurementVariable measurementVariableDto: datasetMeasurementVariables) {
-				if (measurementVariableDto.getName().equals(header)) {
+				if (measurementVariableDto.getAlias().equals(header)) {
 					if (importMeasurementVariablesIndex.contains(headers.indexOf(header))) {
 						errors.reject("duplicated.measurement.variables.not.allowed", null , "");
 						throw new ApiRequestValidationException (errors.getAllErrors());
