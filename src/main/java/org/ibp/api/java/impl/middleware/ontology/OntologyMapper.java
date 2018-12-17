@@ -139,6 +139,9 @@ public class OntologyMapper {
 				this.map().getMetadata().setDeletable(false);
 				this.map().setFormula(this.source.getFormula());
 				this.map().setAllowsFormula(this.source.isAllowsFormula());
+				// Mapping datasets this through metadata instead of creating a new set as it is in studies and observations
+				// since it was failing in some environments
+				this.map().getMetadata().setDatasets(this.source.getDatasets());
 			}
 		});
 	}

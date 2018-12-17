@@ -180,7 +180,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		try {
 			Integer id = StringUtil.parseInt(variableId, null);
 
-			Variable ontologyVariable = this.ontologyVariableDataManager.getVariable(programId, id, true, true);
+			Variable ontologyVariable = this.ontologyVariableDataManager.getVariable(programId, id, true);
+			ontologyVariableDataManager.fillVariableUsage(ontologyVariable);
 
 			final FormulaDto formula = ontologyVariable.getFormula();
 			if (formula != null) {
@@ -201,10 +202,6 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 			boolean deletable = true;
 
-			// FIXME stop-gap solution for nullPointer
-			// There could be places where getVariable is called with calculateVariableUsage=false
-			// and then the variable is inserted into the VariableCache
-			// We need to refactor getVariable and remove the FlagArgument
 			if (Boolean.TRUE.equals(ontologyVariable.getHasUsage())) {
 				deletable = false;
 			}

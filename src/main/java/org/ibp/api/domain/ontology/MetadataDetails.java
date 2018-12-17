@@ -56,4 +56,12 @@ public class MetadataDetails extends MetadataSummary {
 		this.editable = editable;
 		return this;
 	}
+
+	public Integer getDatasets() {
+		return this.usage.getDatasets();
+	}
+
+	public void setDatasets(final Integer datasets) {
+		this.usage.setDatasets(datasets);
+	}
 }

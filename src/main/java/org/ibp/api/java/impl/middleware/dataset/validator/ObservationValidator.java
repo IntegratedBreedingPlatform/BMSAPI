@@ -63,7 +63,7 @@ public class ObservationValidator {
 	public void validateObservationValue(final Integer studyId, final Integer variableId, final String value) {
 
 		final String programUuid = this.studyDataManager.getStudy(studyId).getProgramUUID();
-		final Variable var = this.ontologyVariableDataManager.getVariable(programUuid, variableId, true, false);
+		final Variable var = this.ontologyVariableDataManager.getVariable(programUuid, variableId, true);
 
 		if (!isValidValue(var, value)) {
 			errors.reject("invalid.observation.value");
