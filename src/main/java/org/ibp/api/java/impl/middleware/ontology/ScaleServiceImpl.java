@@ -135,10 +135,10 @@ public class ScaleServiceImpl extends ServiceBaseImpl implements ScaleService {
 
 			editable = !this.ontologyVariableDataManager.areVariablesUsedInStudy(variablesIds);
 
-			// If scale is categorical, determine which categories could be edited (ie. those not used in existing phenotypes)
+			// If scale is categorical, determine which categories could be edited (ie. those not used in existing studies)
 			if (Objects.equals(scale.getDataType().getId(), CATEGORICAL_VARIABLE.getId()) && !editable) {
-				final List<String> categories = this.termDataManager.getCategoriesReferredInPhenotype(scaleId);
-
+				final List<String> categories = this.termDataManager.getCategoriesUsedInStudies(scaleId);
+				
 				for (final Category category : scaleDetails.getValidValues().getCategories()) {
 					if (categories.contains(category.getName())) {
 						category.setEditable(Boolean.FALSE);
