@@ -61,7 +61,7 @@ public class ObservationsTableValidatorTest {
 		final Table<String, String, String> data = HashBasedTable.create();
 		data.put("Obs1", "A", "A");
 		MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setName("A");
+		measurementVariable.setAlias("A");
 		measurementVariable.setMinRange(1D);
 		measurementVariable.setMaxRange(2D);
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
@@ -79,7 +79,7 @@ public class ObservationsTableValidatorTest {
 		final Table<String, String, String> data = HashBasedTable.create();
 		data.put("Obs1", "A", "A");
 		MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setName("A");
+		measurementVariable.setAlias("A");
 		measurementVariable.setDataType("Numeric");
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(measurementVariable);
@@ -96,7 +96,7 @@ public class ObservationsTableValidatorTest {
 		final Table<String, String, String> data = HashBasedTable.create();
 		data.put("Obs1", "A", "1");
 		MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setName("A");
+		measurementVariable.setAlias("A");
 		measurementVariable.setDataType("Numeric");
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(measurementVariable);
@@ -108,7 +108,7 @@ public class ObservationsTableValidatorTest {
 		final Table<String, String, String> data = HashBasedTable.create();
 		data.put("Obs1", "A", "missing");
 		MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setName("A");
+		measurementVariable.setAlias("A");
 		measurementVariable.setDataType("Numeric");
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(measurementVariable);
@@ -120,7 +120,7 @@ public class ObservationsTableValidatorTest {
 		final Table<String, String, String> data = HashBasedTable.create();
 		data.put("Obs1", "A", "A");
 		MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setName("A");
+		measurementVariable.setAlias("A");
 		measurementVariable.setDataTypeId(TermId.DATE_VARIABLE.getId());
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(measurementVariable);
@@ -137,7 +137,7 @@ public class ObservationsTableValidatorTest {
 		final Table<String, String, String> data = HashBasedTable.create();
 		data.put("Obs1", "A", "20181010");
 		MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setName("A");
+		measurementVariable.setAlias("A");
 		measurementVariable.setDataTypeId(TermId.DATE_VARIABLE.getId());
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(measurementVariable);

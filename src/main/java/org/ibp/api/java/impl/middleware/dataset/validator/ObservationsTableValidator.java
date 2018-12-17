@@ -56,7 +56,7 @@ public class ObservationsTableValidator {
 				Maps.uniqueIndex(measurementVariables, new Function<MeasurementVariable, String>() {
 
 					public String apply(MeasurementVariable from) {
-						return from.getName();
+						return from.getAlias();
 					}
 				});
 

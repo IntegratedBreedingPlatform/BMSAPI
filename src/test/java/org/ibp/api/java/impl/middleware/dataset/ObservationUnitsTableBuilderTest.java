@@ -45,7 +45,7 @@ public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
 		data.add(row);
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setName("A");
+		measurementVariable.setAlias("A");
 		measurementVariables.add(measurementVariable);
 		try {
 			observationUnitsTableBuilder.build(data, measurementVariables);
@@ -64,7 +64,7 @@ public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
 		data.add(row);
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setName("B");
+		measurementVariable.setAlias("B");
 		measurementVariables.add(measurementVariable);
 		try {
 			observationUnitsTableBuilder.build(data, measurementVariables);
@@ -83,7 +83,7 @@ public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
 		data.add(row);
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setName("A");
+		measurementVariable.setAlias("A");
 		measurementVariables.add(measurementVariable);
 		try {
 			observationUnitsTableBuilder.build(data, measurementVariables);
@@ -106,7 +106,7 @@ public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
 		data.add(row3);
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setName("A");
+		measurementVariable.setAlias("A");
 		measurementVariables.add(measurementVariable);
 		final Table<String, String, String> table = observationUnitsTableBuilder.build(data, measurementVariables);
 		assertThat(table.columnKeySet(), hasSize(1));
