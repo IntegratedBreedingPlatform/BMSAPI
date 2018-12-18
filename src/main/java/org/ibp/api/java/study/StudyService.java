@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.study;
 
+import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.domain.dms.StudyReference;
@@ -74,6 +75,7 @@ public interface StudyService {
 	List<StudyTypeDto> getStudyTypes();
 	
 	StudyReference getStudyReference(final Integer studyId);
-	
-	
+
+	void updateStudy (final Study study);
+
 }

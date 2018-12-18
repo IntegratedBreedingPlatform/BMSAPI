@@ -616,4 +616,8 @@ public class StudyServiceImpl implements StudyService {
 		return this.studyDataManager.getStudyReference(studyId);
 	}
 
+	@Override
+	public void updateStudy(final Study study) {
+		this.studyDataManager.updateStudyLockedStatus(study.getId(), study.isLocked());
+	}
 }
