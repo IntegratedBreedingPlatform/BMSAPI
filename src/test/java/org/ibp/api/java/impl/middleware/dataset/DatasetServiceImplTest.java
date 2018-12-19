@@ -509,6 +509,7 @@ public class DatasetServiceImplTest {
 		Mockito.doReturn(datasetDTO).when(this.middlewareDatasetService).generateSubObservationDataset(TEST_STUDY_IDENTIFIER, DATASET_NAME,
 			DataSetType.QUADRAT_SUBOBSERVATIONS.getId(), Lists.newArrayList(1, 2, 3), 8206, 3, PARENT_ID);
 
+		// FIXME test the real method, not the mock IBP-2231
 		final DatasetDTO dto =
 			this.middlewareDatasetService.generateSubObservationDataset(TEST_STUDY_IDENTIFIER, DATASET_NAME,
 				DataSetType.QUADRAT_SUBOBSERVATIONS.getId(), Lists.newArrayList(1, 2, 3), 8206, 3, PARENT_ID);
