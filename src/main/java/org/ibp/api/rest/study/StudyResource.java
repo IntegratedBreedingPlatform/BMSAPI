@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 
+import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.ibp.api.domain.common.PagedResult;
@@ -246,5 +247,17 @@ public class StudyResource {
 			@PathVariable final Integer studyId) {
 		final Boolean hasSamples = this.studyService.isSampled(studyId);
 		return new ResponseEntity<>(hasSamples, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Partially modifies a study",
+			notes = "As of now, it only allows to update the status")
+	@RequestMapping(value = "/study/{cropName}/{studyId}", method = RequestMethod.PATCH)
+	@ResponseBody
+	public ResponseEntity<Void> patchStudy (final @PathVariable String cropName,
+			@PathVariable final Integer studyId, @RequestBody Study study) {
+		// TODO Properly define study entity, Identify which attributes of the Study entity can be updated, Implement patch accordingly
+		study.setId(studyId);
+		this.studyService.updateStudy(study);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
