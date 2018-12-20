@@ -255,6 +255,7 @@ public class StudyResource {
 	@ResponseBody
 	public ResponseEntity<Void> patchStudy (final @PathVariable String cropName,
 			@PathVariable final Integer studyId, @RequestBody Study study) {
+		// TODO Properly define study entity, Identify which attributes of the Study entity can be updated, Implement patch accordingly
 		study.setId(studyId);
 		this.studyService.updateStudy(study);
 		return new ResponseEntity<>(HttpStatus.OK);
