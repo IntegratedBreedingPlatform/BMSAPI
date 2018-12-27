@@ -171,7 +171,7 @@ public class DatasetGeneratorInputValidatorTest {
 		variableDetails.setName("ChangedName");
 		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
 
-		when(this.studyDatasetService.getDataset(studyId, parentId)).thenReturn(dataset);
+		when(this.studyDatasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		when(this.variableService
 			.getVariableById("maize", study.getProgramUUID(), String.valueOf(datasetInputGenerator.getSequenceVariableId())))
@@ -219,7 +219,7 @@ public class DatasetGeneratorInputValidatorTest {
 		variableDetails.setName("ChangedName");
 		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
 
-		when(this.studyDatasetService.getDataset(studyId, parentId)).thenReturn(dataset);
+		when(this.studyDatasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		when(this.variableService
 			.getVariableById("maize", study.getProgramUUID(), String.valueOf(datasetInputGenerator.getSequenceVariableId())))
@@ -269,7 +269,7 @@ public class DatasetGeneratorInputValidatorTest {
 		variableDetails.setName("ChangedName");
 		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
 
-		when(this.studyDatasetService.getDataset(studyId, parentId)).thenReturn(dataset);
+		when(this.studyDatasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		when(this.variableService
 			.getVariableById("maize", study.getProgramUUID(), String.valueOf(datasetInputGenerator.getSequenceVariableId())))
@@ -319,7 +319,7 @@ public class DatasetGeneratorInputValidatorTest {
 		variableDetails.setName("ChangedName");
 		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
 
-		when(this.studyDatasetService.getDataset(studyId, parentId)).thenReturn(dataset);
+		when(this.studyDatasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		when(this.variableService
 			.getVariableById("maize", study.getProgramUUID(), String.valueOf(datasetInputGenerator.getSequenceVariableId())))
@@ -371,7 +371,7 @@ public class DatasetGeneratorInputValidatorTest {
 		variableDetails.setName("ChangedName");
 		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
 
-		when(this.studyDatasetService.getDataset(studyId, parentId)).thenReturn(dataset);
+		when(this.studyDatasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		when(this.variableService
 			.getVariableById("maize", study.getProgramUUID(), String.valueOf(datasetInputGenerator.getSequenceVariableId())))
@@ -422,7 +422,7 @@ public class DatasetGeneratorInputValidatorTest {
 		variableDetails.setName("ChangedName");
 		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
 
-		when(this.studyDatasetService.getDataset(studyId, parentId)).thenReturn(dataset);
+		when(this.studyDatasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		when(this.variableService
 			.getVariableById("maize", study.getProgramUUID(), String.valueOf(datasetInputGenerator.getSequenceVariableId())))
@@ -473,7 +473,7 @@ public class DatasetGeneratorInputValidatorTest {
 		variableDetails.setName("ChangedName");
 		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
 
-		when(this.studyDatasetService.getDataset(studyId, parentId)).thenReturn(dataset);
+		when(this.studyDatasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		when(this.variableService
 			.getVariableById("maize", study.getProgramUUID(), String.valueOf(datasetInputGenerator.getSequenceVariableId())))
@@ -522,7 +522,7 @@ public class DatasetGeneratorInputValidatorTest {
 		variableDetails.setName("ChangedName");
 		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
 
-		when(this.studyDatasetService.getDataset(studyId, parentId)).thenReturn(dataset);
+		when(this.studyDatasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		when(this.variableService
 			.getVariableById("maize", study.getProgramUUID(), String.valueOf(datasetInputGenerator.getSequenceVariableId())))
@@ -579,7 +579,7 @@ public class DatasetGeneratorInputValidatorTest {
 		variableDetails.setName("ChangedName");
 		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
 
-		when(this.studyDatasetService.getDataset(studyId, parentId)).thenReturn(dataset);
+		when(this.studyDatasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 
 		when(this.studyDatasetService.getNumberOfChildren(parentId)).thenReturn(2);

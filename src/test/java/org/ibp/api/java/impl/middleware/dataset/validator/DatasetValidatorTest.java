@@ -1,12 +1,7 @@
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.dms.DataSetType;
@@ -28,8 +23,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
 
 public class DatasetValidatorTest  {
 
@@ -62,7 +61,7 @@ public class DatasetValidatorTest  {
 		Mockito.doReturn(Lists.newArrayList(datasetId))
 			.when(this.studyDatasetService)
 			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
-		Mockito.when(this.studyDatasetService.getDataset(studyId, datasetId)).thenReturn(null);
+		Mockito.when(this.studyDatasetService.getDataset(datasetId)).thenReturn(null);
 		this.datasetValidator.validateDataset(studyId, datasetId, ran.nextBoolean());
 	}
 	
@@ -77,7 +76,7 @@ public class DatasetValidatorTest  {
 		final DatasetDTO dataset = new DatasetDTO();
 		dataset.setDatasetId(datasetId);
 		dataset.setDatasetTypeId(DataSetType.PLOT_DATA.getId());
-		Mockito.when(this.studyDatasetService.getDataset(studyId, datasetId)).thenReturn(dataset);
+		Mockito.when(this.studyDatasetService.getDataset(datasetId)).thenReturn(dataset);
 		
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 	}
@@ -93,7 +92,7 @@ public class DatasetValidatorTest  {
 		final DatasetDTO dataset = new DatasetDTO();
 		dataset.setDatasetId(datasetId);
 		dataset.setDatasetTypeId(DataSetType.QUADRAT_SUBOBSERVATIONS.getId());
-		Mockito.when(this.studyDatasetService.getDataset(studyId, datasetId)).thenReturn(dataset);
+		Mockito.when(this.studyDatasetService.getDataset(datasetId)).thenReturn(dataset);
 		
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 	}
@@ -268,7 +267,7 @@ public class DatasetValidatorTest  {
 			variables.add(variable);
 		}
 		dataset.setVariables(variables);
-		Mockito.when(this.studyDatasetService.getDataset(studyId, datasetId)).thenReturn(dataset);
+		Mockito.when(this.studyDatasetService.getDataset(datasetId)).thenReturn(dataset);
 		
 		return dataset;
 	}
