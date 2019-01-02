@@ -178,7 +178,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Import Plate Information", notes = "Import Plate Information")
-	@RequestMapping(value = "/{crop}/plate-information/import", method = RequestMethod.POST)
+	@RequestMapping(value = "/{crop}/sampleList/{listId}/samples", method = RequestMethod.PATCH)
 	@ResponseBody
 	public ResponseEntity saveSamplePlateInformation(@PathVariable final String crop, @RequestBody final PlateInformationDto plateInformationDto) {
 		sampleListService.importSamplePlateInformation(plateInformationDto);
