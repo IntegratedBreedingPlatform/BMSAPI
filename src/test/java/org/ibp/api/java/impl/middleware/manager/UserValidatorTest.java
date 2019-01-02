@@ -191,9 +191,6 @@ public class UserValidatorTest {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(5);
 		this.uservalidator.validate(userDto, bindingResult, false);
 
-		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
-		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
-
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.invalid.userId", equalTo(bindingResult.getFieldError("userId").getCode()));
 	}

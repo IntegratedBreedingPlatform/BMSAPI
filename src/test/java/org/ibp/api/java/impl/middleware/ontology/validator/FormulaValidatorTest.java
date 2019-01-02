@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
@@ -209,7 +209,7 @@ public class FormulaValidatorTest {
 		this.formulaValidator.validate(formulaDto, errors);
 
 		verify(termValidator).validate(any(TermRequest.class), any(Errors.class));
-		verify(processor).evaluateFormula(anyString(), anyMap());
+		verify(processor).evaluateFormula(anyString(), anyMapOf(String.class, Object.class));
 
 	}
 
@@ -228,12 +228,12 @@ public class FormulaValidatorTest {
 		when(ontologyVariableDataManager.getVariableTypes(formulaDto.getTarget().getId())).thenReturn(Arrays.asList(VariableType.TRAIT));
 		when(termDataManager.getTermByName(inputVariableName)).thenReturn(inputVariableTerm);
 		when(ontologyVariableDataManager.getDataType(inputVariableTermId)).thenReturn(Optional.of(DataType.NUMERIC_VARIABLE));
-		when(processor.evaluateFormula(anyString(), anyMap())).thenThrow(Exception.class);
+		when(processor.evaluateFormula(anyString(), anyMapOf(String.class, Object.class))).thenThrow(Exception.class);
 
 		this.formulaValidator.validate(formulaDto, errors);
 
 		verify(termValidator).validate(any(TermRequest.class), any(Errors.class));
-		verify(processor).evaluateFormula(anyString(), anyMap());
+		verify(processor).evaluateFormula(anyString(), anyMapOf(String.class, Object.class));
 		verify(errors).reject(eq("variable.formula.invalid"), any(new Object[0].getClass()), anyString());
 
 	}

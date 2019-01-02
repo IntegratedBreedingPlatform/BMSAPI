@@ -71,7 +71,7 @@ public class DatasetCSVGeneratorTest {
 
 		datasetCSVGenerator.generateCSVFile(measurementVariables, observationUnitRows, fileNameFullPath, csvWriter);
 
-		Mockito.verify(csvWriter).writeAll(Mockito.anyList());
+		Mockito.verify(csvWriter).writeAll(Mockito.anyListOf(String[].class));
 		Mockito.verify(csvWriter).close();
 
 	}

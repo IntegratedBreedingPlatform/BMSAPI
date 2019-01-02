@@ -62,10 +62,11 @@ public class SampleListServiceImplTest {
 	public void testImportSamplePlateInformationSuccess() {
 
 		final PlateInformationDto plateInformationDto = this.createPlateInformationDto();
-		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySet(), Mockito.anyInt())).thenReturn(2l);
+		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySetOf(String.class), Mockito.anyInt())).thenReturn(2l);
 		try {
 			this.sampleListService.importSamplePlateInformation(plateInformationDto);
-			Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(Mockito.eq(plateInformationDto.getListId()), Mockito.anyMap());
+			Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(Mockito.eq(plateInformationDto.getListId()), Mockito.anyMapOf(
+					String.class, SamplePlateInfo.class));
 		} catch (ApiRequestValidationException e) {
 			Assert.fail("InvalidValuesException should not be thrown.");
 		}
@@ -77,7 +78,7 @@ public class SampleListServiceImplTest {
 
 		final PlateInformationDto plateInformationDto = this.createPlateInformationDto();
 
-		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySet(), Mockito.anyInt())).thenReturn(1l);
+		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySetOf(String.class), Mockito.anyInt())).thenReturn(1l);
 
 		try {
 			this.sampleListService.importSamplePlateInformation(plateInformationDto);
