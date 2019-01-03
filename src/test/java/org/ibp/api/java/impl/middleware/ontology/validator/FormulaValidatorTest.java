@@ -228,7 +228,7 @@ public class FormulaValidatorTest {
 		when(ontologyVariableDataManager.getVariableTypes(formulaDto.getTarget().getId())).thenReturn(Arrays.asList(VariableType.TRAIT));
 		when(termDataManager.getTermByName(inputVariableName)).thenReturn(inputVariableTerm);
 		when(ontologyVariableDataManager.getDataType(inputVariableTermId)).thenReturn(Optional.of(DataType.NUMERIC_VARIABLE));
-		when(processor.evaluateFormula(anyString(), anyMapOf(String.class, Object.class))).thenThrow(Exception.class);
+		when(processor.evaluateFormula(anyString(), anyMapOf(String.class, Object.class))).thenThrow(RuntimeException.class);
 
 		this.formulaValidator.validate(formulaDto, errors);
 
