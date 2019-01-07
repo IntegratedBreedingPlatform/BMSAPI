@@ -89,24 +89,29 @@ public class SampleListServiceImplTest {
 
 	@Test
 	public void testConvertToSamplePlateInfoMap() {
-
 		final List<SampleDTO> sampleDTOs = this.createSampleDto();
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), SampleDTO.class.getName());
 		final Map<String, SamplePlateInfo> map = this.sampleListService.convertToSamplePlateInfoMap(sampleDTOs, bindingResult);
 		Assert.assertEquals(2, map.size());
 		Assert.assertEquals("TestValue-1", map.get("SampleId-1").getPlateId());
-		Assert.assertEquals("TestValue-2", map.get("SampleId-1").getWell());
-		Assert.assertEquals("TestValue-3", map.get("SampleId-2").getPlateId());
-		Assert.assertEquals("TestValue-4", map.get("SampleId-2").getWell());
+		Assert.assertEquals("TestValue-4", map.get("SampleId-1").getWell());
+		Assert.assertEquals("TestValue-2", map.get("SampleId-2").getPlateId());
+		Assert.assertEquals("TestValue-5", map.get("SampleId-2").getWell());
 
 	}
 
 	private List<SampleDTO> createSampleDto() {
 		final List<SampleDTO> sampleDTOs = new ArrayList<>();
-		SampleDTO sampleDTO =new SampleDTO();
+		SampleDTO sampleDTO = new SampleDTO();
 		sampleDTO.setSampleBusinessKey("SampleId-1");
 		sampleDTO.setPlateId("TestValue-1");
 		sampleDTO.setWell("TestValue-4");
+		sampleDTOs.add(sampleDTO);
+		sampleDTO = new SampleDTO();
+		sampleDTO.setSampleBusinessKey("SampleId-2");
+		sampleDTO.setPlateId("TestValue-2");
+		sampleDTO.setWell("TestValue-5");
+		sampleDTOs.add(sampleDTO);
 		return sampleDTOs;
 
 	}
