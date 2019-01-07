@@ -25,7 +25,6 @@ public class FormulaResource {
 	@Autowired
 	private FormulaService formulaService;
 
-
 	@Autowired
 	private ContextUtil contextUtil;
 

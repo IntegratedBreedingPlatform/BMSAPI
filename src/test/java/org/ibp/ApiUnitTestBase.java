@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -13,6 +14,7 @@ import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.util.Debug;
+import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -30,6 +32,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
@@ -117,6 +120,24 @@ public abstract class ApiUnitTestBase {
 		@Primary
 		public OntologyVariableDataManager ontologyVariableDataManager() {
 			return Mockito.mock(OntologyVariableDataManager.class);
+		}
+
+		@Bean
+		@Primary
+		public SecurityServiceImpl securityService() {
+			return Mockito.mock(SecurityServiceImpl.class);
+		}
+
+		@Bean
+		@Primary
+		public HttpServletRequest httpServletRequest() {
+            return Mockito.mock(HttpServletRequest.class);
+		}
+
+		@Bean
+		@Primary
+		public ContextUtil getContextUtil() {
+			return Mockito.mock(ContextUtil.class);
 		}
 	}
 

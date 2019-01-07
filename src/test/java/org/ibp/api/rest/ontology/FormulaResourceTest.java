@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import org.apache.commons.jexl3.JexlException;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -70,6 +71,9 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 	@Autowired
 	protected OntologyVariableDataManager ontologyVariableDataManager;
 
+	@Autowired
+	private ContextUtil contextUtil;
+
 	@Before
 	public void setup() throws Exception {
 		super.setUp();
@@ -87,7 +91,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		final Project project = new Project();
 		project.setUniqueID(FormulaResourceTest.PROGRAM_UUID);
 		project.setProjectId(1l);
-		ContextHolder.setCurrentCrop( this.cropName);
+		doReturn(this.programUuid).when(this.contextUtil).getCurrentProgramUUID();
 		Mockito.doReturn(project).when(workbenchDataManager).getLastOpenedProjectAnyUser();
 	}
 

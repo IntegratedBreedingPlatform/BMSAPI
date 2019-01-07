@@ -2,6 +2,7 @@ package org.ibp.api.rest.ontology;
 
 import java.util.List;
 
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -75,6 +76,9 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
+	@Autowired
+	private ContextUtil contextUtil;
+
 	@Before
 	public void reset() {
 		Mockito.reset(this.modelService);
@@ -85,6 +89,7 @@ public class ScaleResourceTest extends ApiUnitTestBase {
 		project.setUniqueID(PROGRAM_UUID);
 		project.setProjectId(1l);
 		Mockito.doReturn(project).when(workbenchDataManager).getLastOpenedProjectAnyUser();
+		Mockito.doReturn(PROGRAM_UUID).when(this.contextUtil).getCurrentProgramUUID();
 
 	}
 
