@@ -4,6 +4,9 @@ package org.ibp.api.rest.study;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,15 +19,19 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
+import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.study.Observation;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +44,8 @@ import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 
 public class StudyResourceTest extends ApiUnitTestBase {
 
+	private static final int USER_ID = 1;
+
 	@Autowired
 	private org.generationcp.middleware.service.api.study.StudyService studyServiceMW;
 	
@@ -45,6 +54,18 @@ public class StudyResourceTest extends ApiUnitTestBase {
 	
 	@Autowired
 	private StudyService studyService;
+
+	@Autowired
+	private SecurityService securityService;
+
+	@Before
+	public void init() {
+		Mockito.reset(this.securityService);
+		doReturn(true).when(this.securityService).isAccessible(any(StudySummary.class), anyString());
+		final WorkbenchUser user = new WorkbenchUser();
+		user.setUserid(USER_ID);
+		doReturn(user).when(this.securityService).getCurrentlyLoggedInUser();
+	}
 
 	@Test
 	public void testListAllStudies() throws Exception {
@@ -64,7 +85,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		summaryMW.setSeason("Summer");
 		summariesMW.add(summaryMW);
 
-		Mockito.when(this.studyServiceMW.search(org.mockito.Matchers.any(StudySearchParameters.class))).thenReturn(summariesMW);
+		Mockito.when(this.studyServiceMW.search(any(StudySearchParameters.class))).thenReturn(summariesMW);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/study/{cropname}/search", "maize").contentType(this.contentType))
 				.andExpect(MockMvcResultMatchers.status().isOk())
@@ -81,7 +102,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0]['season']", Matchers.is(summaryMW.getSeason())))
 				.andDo(MockMvcResultHandlers.print());
 
-		Mockito.verify(this.studyServiceMW).search(org.mockito.Matchers.any(StudySearchParameters.class));
+		Mockito.verify(this.studyServiceMW).search(any(StudySearchParameters.class));
 	}
 
 	@Test
@@ -99,8 +120,8 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		Mockito.when(this.studyServiceMW.countTotalObservationUnits(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt()))
 				.thenReturn(100);
 		Mockito.when(this.studyServiceMW.getObservations(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
-				org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyString(),
-				org.mockito.Matchers.anyString())).thenReturn(Lists.newArrayList(obsDto));
+				org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), anyString(),
+				anyString())).thenReturn(Lists.newArrayList(obsDto));
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders
@@ -232,6 +253,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		study.setIsLocked(true);
 		final String owner = "Top Breeder";
 		study.setOwnerName(owner);
+		study.setOwnerId(2);
 		Mockito.when(this.studyService.getStudyReference(studyId)).thenReturn(study);
 		
 		this.mockMvc

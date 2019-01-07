@@ -158,7 +158,7 @@ public class StudyResource {
 			final StudyReference study = this.studyService.getStudyReference(studyId);
 			final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 
-			if (study != null & study.getIsLocked()
+			if (study != null && study.getIsLocked()
 				&& !ObjectUtils.equals(study.getOwnerId(), loggedInUser.getUserid())
 				&& !request.isUserInRole(Role.SUPERADMIN)) {
 				throw new IllegalArgumentException(
