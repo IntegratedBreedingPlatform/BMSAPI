@@ -22,6 +22,11 @@ public class InstanceValidator {
 
 		errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
+        if (!studyDataManager.existInstances(instanceIds)) {
+            errors.reject("dataset.non.existent.instances", "");
+            throw new ApiRequestValidationException(this.errors.getAllErrors());
+        }
+
 		if (!studyDataManager.areAllInstancesExistInDataset(datasetId, instanceIds)) {
 			errors.reject("dataset.invalid.instances", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
