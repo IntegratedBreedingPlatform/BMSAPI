@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 import org.apache.commons.lang3.ObjectUtils;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -45,7 +46,7 @@ public class StudyValidator {
 		if (shouldBeUnlocked
 			&& study.isLocked()
 			&& !ObjectUtils.equals(study.getCreatedBy(), String.valueOf(loggedInUser.getUserid()))
-			&& !request.isUserInRole("SUPERADMIN")) {
+			&& !request.isUserInRole(Role.SUPERADMIN)) {
 			errors.reject("study.is.locked", "");
 			throw new ForbiddenException(errors.getAllErrors().get(0));
 		}

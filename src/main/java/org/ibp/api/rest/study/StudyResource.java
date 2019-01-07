@@ -5,12 +5,16 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.study.FieldMap;
 import org.ibp.api.domain.study.Observation;
@@ -20,6 +24,7 @@ import org.ibp.api.domain.study.StudyGermplasm;
 import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -59,7 +64,13 @@ public class StudyResource {
 
 	@Resource
 	private ResourceBundleMessageSource resourceBundleMessageSource;
-	
+
+	@Autowired
+	private HttpServletRequest request;
+
+	@Autowired
+	private SecurityService securityService;
+
 	private static final Logger LOG = LoggerFactory.getLogger(StudyResource.class);
 	
 	@ApiOperation(value = "Search studies",
@@ -145,7 +156,11 @@ public class StudyResource {
 			
 		} else {
 			final StudyReference study = this.studyService.getStudyReference(studyId);
-			if (study!= null & study.getIsLocked()) {				
+			final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+
+			if (study != null & study.getIsLocked()
+				&& !ObjectUtils.equals(study.getOwnerId(), loggedInUser.getUserid())
+				&& !request.isUserInRole(Role.SUPERADMIN)) {
 				throw new IllegalArgumentException(
 						this.resourceBundleMessageSource.getMessage(NO_PERMISSION_FOR_LOCKED_STUDY,  new String[] {study.getOwnerName()}, LocaleContextHolder.getLocale()));
 			}
@@ -159,7 +174,12 @@ public class StudyResource {
 	public ResponseEntity<List<Observation>> addOrUpdateMultipleObservations(@PathVariable final String cropname,
 			@PathVariable final Integer studyId, @RequestBody final List<Observation> observation) {
 		final StudyReference study = this.studyService.getStudyReference(studyId);
-		if (study.getIsLocked()) {				
+
+		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+
+		if (study.getIsLocked()
+			&& !ObjectUtils.equals(study.getOwnerId(), loggedInUser.getUserid())
+			&& !request.isUserInRole(Role.SUPERADMIN)) {
 			throw new IllegalArgumentException(
 					this.resourceBundleMessageSource.getMessage(NO_PERMISSION_FOR_LOCKED_STUDY, new String[] {study.getOwnerName()}, LocaleContextHolder.getLocale()));
 		}
