@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -21,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 
 public class StudyValidatorTest {
 
+	public static final int USER_ID = 10;
+
 	@Mock
 	private HttpServletRequest request;
 
@@ -37,7 +40,7 @@ public class StudyValidatorTest {
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(USER_ID);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 	}
 
@@ -58,6 +61,32 @@ public class StudyValidatorTest {
 		study.setLocked(true);
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
 		studyValidator.validate(studyId, true);
+	}
+
+	@Test
+	public void testStudyIsLockedButUserIsOwner() {
+		final Random ran = new Random();
+		final int studyId = ran.nextInt();
+		final Study study = new Study();
+		study.setId(studyId);
+		study.setLocked(true);
+		study.setCreatedBy(String.valueOf(USER_ID));
+		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
+		studyValidator.validate(studyId, true);
+		// no exceptions thrown
+	}
+
+	@Test
+	public void testStudyIsLockedButUserIsSuperAdmin() {
+		final Random ran = new Random();
+		final int studyId = ran.nextInt();
+		final Study study = new Study();
+		study.setId(studyId);
+		study.setLocked(true);
+		Mockito.doReturn(true).when(this.request).isUserInRole(Role.SUPERADMIN);
+		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
+		studyValidator.validate(studyId, true);
+		// no exceptions thrown
 	}
 
 }
