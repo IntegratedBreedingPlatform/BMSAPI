@@ -178,6 +178,7 @@ public class SampleListResource {
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
 
+	//TODO: Is necessary make a refactor in the future with this service for do it more generic to import samples not only Plate Id and well.
 	@ApiOperation(value = "Import Plate Information", notes = "Import Plate Information")
 	@RequestMapping(value = "/{crop}/sampleList/{listId}/samples", method = RequestMethod.PATCH)
 	@ResponseBody
