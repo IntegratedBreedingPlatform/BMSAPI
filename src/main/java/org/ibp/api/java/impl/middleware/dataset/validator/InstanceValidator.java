@@ -27,7 +27,7 @@ public class InstanceValidator {
             throw new ApiRequestValidationException(this.errors.getAllErrors());
         }
 
-		if (!this.studyDataManager.areAllInstancesExistInDataset(datasetId, instanceIds)) {
+		if (datasetId != null && !this.studyDataManager.areAllInstancesExistInDataset(datasetId, instanceIds)) {
 			this.errors.reject("dataset.invalid.instances", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
