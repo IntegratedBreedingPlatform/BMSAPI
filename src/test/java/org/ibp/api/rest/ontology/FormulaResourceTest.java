@@ -91,6 +91,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		final Project project = new Project();
 		project.setUniqueID(FormulaResourceTest.PROGRAM_UUID);
 		project.setProjectId(1l);
+		ContextHolder.setCurrentCrop(this.cropName);
 		doReturn(this.programUuid).when(this.contextUtil).getCurrentProgramUUID();
 		Mockito.doReturn(project).when(workbenchDataManager).getLastOpenedProjectAnyUser();
 	}
