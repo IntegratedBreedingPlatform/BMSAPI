@@ -40,7 +40,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
@@ -78,7 +78,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 	public void setup() throws Exception {
 		super.setUp();
 
-		doReturn("").when(this.processor).evaluateFormula(anyString(), anyMap());
+		doReturn("").when(this.processor).evaluateFormula(anyString(), anyMapOf(String.class, Object.class));
 		final Term term = new Term();
 		term.setVocabularyId(CvId.VARIABLES.getId());
 		doReturn(term).when(this.termDataManager).getTermById(anyInt());
@@ -251,7 +251,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		formulaDto.setTarget(new FormulaVariable(nextInt(), "", null));
 		formulaDto.setDefinition("{{1}}");
 
-		doThrow(new JexlException(null, ERROR_JEXL_EXCEPTION)).when(this.processor).evaluateFormula(anyString(), anyMap());
+		doThrow(new JexlException(null, ERROR_JEXL_EXCEPTION)).when(this.processor).evaluateFormula(anyString(), anyMapOf(String.class, Object.class));
 
 		this.mockMvc //
 			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //

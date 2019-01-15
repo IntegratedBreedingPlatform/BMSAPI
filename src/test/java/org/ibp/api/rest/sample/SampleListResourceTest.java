@@ -6,11 +6,13 @@ import org.generationcp.commons.pojo.FileExportInfo;
 import org.generationcp.commons.service.CsvExportSampleListService;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.commons.util.DateUtil;
+import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.SampleListService;
+import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.ibp.ApiUnitTestBase;
@@ -46,6 +48,8 @@ import java.util.Locale;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
+
+import static org.mockito.ArgumentMatchers.isNull;
 
 public class SampleListResourceTest extends ApiUnitTestBase {
 
@@ -141,15 +145,14 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	// @Ignore
 	public void createSampleListFolder() throws Exception {
 		final HashMap<String, Object> result = new HashMap<>();
 		result.put("id", SampleListResourceTest.VALUE);
 		final WorkbenchUser creatingBy = new WorkbenchUser();
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(creatingBy);
-		Mockito.when(this.sampleListServiceMW.createSampleListFolder(org.mockito.Matchers.anyString(), org.mockito.Matchers.anyInt(),
-				org.mockito.Matchers.any(String.class), org.mockito.Matchers.anyString()))
-				.thenReturn(Integer.valueOf(SampleListResourceTest.VALUE));
+		Mockito.doReturn(Integer.valueOf(SampleListResourceTest.VALUE)).when(this.sampleListServiceMW)
+				.createSampleListFolder(org.mockito.Matchers.anyString(), org.mockito.Matchers.anyInt(),
+						org.mockito.ArgumentMatchers.isNull(String.class), org.mockito.Matchers.anyString());
 
 		final String url = String.format("/sampleLists/maize/sampleListFolder?folderName=%s&parentId=%s&programUUID=%s", this.folderName,
 				this.parentId, this.programUUID);
@@ -234,9 +237,8 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 		Mockito.when(this.contextUtil.getCurrentProgramUUID()).thenReturn(this.programUUID);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
-		Mockito.when(this.sampleListServiceMW
-				.searchSampleLists(Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(), Mockito.any(Pageable.class)))
-				.thenReturn(list);
+		Mockito.doReturn(list).when(sampleListServiceMW).searchSampleLists(Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(),
+				Mockito.any(Pageable.class));
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.get("/sampleLists/maize/search").param("searchString", searchString).param("exactMatch", "false")
@@ -265,7 +267,8 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 			fileExportInfo.setFilePath(temporaryFile.getAbsolutePath());
 			fileExportInfo.setDownloadFileName(fileName);
 
-			Mockito.when(this.csvExportSampleListService.export(Mockito.anyList(), Mockito.anyString(), Mockito.anyList()))
+			Mockito.when(this.csvExportSampleListService.export(Mockito.anyListOf(SampleDetailsDTO.class), Mockito.anyString(), Mockito.anyListOf(
+					String.class)))
 					.thenReturn(fileExportInfo);
 
 			this.mockMvc.perform(MockMvcRequestBuilders.get("/sampleLists/maize/download?listId=" + listId + "&listName=" + listName)
@@ -282,12 +285,12 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 		final PlateInformationDto plateInformationDto = createPlateInformationDto();
 
-		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySet(), Mockito.anyInt())).thenReturn(2l);
+		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySetOf(String.class),isNull(Integer.class))).thenReturn(2l);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import").content(this.convertObjectToByte(plateInformationDto))
 				.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
-		Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(Mockito.anyInt(), Mockito.anyMap());
+		Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(isNull(Integer.class), Mockito.anyMapOf(String.class, SamplePlateInfo.class));
 
 	}
 

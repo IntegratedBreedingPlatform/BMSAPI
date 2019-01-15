@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -190,9 +190,6 @@ public class UserValidatorTest {
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(5);
 		this.uservalidator.validate(userDto, bindingResult, false);
-
-		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
-		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.invalid.userId", equalTo(bindingResult.getFieldError("userId").getCode()));
