@@ -3,6 +3,7 @@ package org.ibp.api.rest.sample;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.SampleList;
@@ -132,7 +133,6 @@ public class SampleListServiceImpl implements SampleListService {
 	 * Delete a folder Folder ID must exist and it can not contain any child
 	 *
 	 * @param folderId
-	 * @throws Exception
 	 */
 	@Override
 	public void deleteSampleListFolder(final Integer folderId) {
@@ -151,16 +151,15 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
-	public void importSamplePlateInformation(final PlateInformationDto plateInformationDto){
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), PlateInformationDto.class.getName());
-		final Map<String, SamplePlateInfo> samplePlateInfoMap = convertToSamplePlateInfoMap(plateInformationDto, bindingResult);
+	public void importSamplePlateInformation(final List<SampleDTO> sampleDTOs, final Integer listId){
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), SampleDTO.class.getName());
+		final Map<String, SamplePlateInfo> samplePlateInfoMap = convertToSamplePlateInfoMap(sampleDTOs, bindingResult);
 
 		final Set<String> sampleBusinessKeys = samplePlateInfoMap.keySet();
-
-		final long count = this.sampleListServiceMW.countSamplesByUIDs(sampleBusinessKeys, plateInformationDto.getListId());
+		final long count = this.sampleListServiceMW.countSamplesByUIDs(sampleBusinessKeys, listId);
 
 		if (sampleBusinessKeys.size() == count) {
-			this.sampleListServiceMW.updateSamplePlateInfo(plateInformationDto.getListId(), samplePlateInfoMap);
+			this.sampleListServiceMW.updateSamplePlateInfo(listId, samplePlateInfoMap);
 		} else {
 			throwApiRequestValidationError(bindingResult, "sample.sample.ids.not.present.in.file");
 		}
@@ -198,77 +197,36 @@ public class SampleListServiceImpl implements SampleListService {
 		return sampleListDTO;
 	}
 
-	protected Map<String, SamplePlateInfo> convertToSamplePlateInfoMap(final PlateInformationDto plateInformationDto,
+	protected Map<String, SamplePlateInfo> convertToSamplePlateInfoMap(final List<SampleDTO> sampleDTOs,
 		final BindingResult bindingResult) {
 
 		final Map<String, SamplePlateInfo> map = new HashMap<>();
 
-		if (StringUtils.isBlank(plateInformationDto.getSampleIdHeader())) {
-			throwApiRequestValidationError(bindingResult, "sample.header.not.mapped", new Object[] {SampleListServiceImpl.SAMPLE_ID});
-
-		}
-		if (StringUtils.isBlank(plateInformationDto.getPlateIdHeader())) {
-			throwApiRequestValidationError(bindingResult, "sample.header.not.mapped", new Object[] {SampleListServiceImpl.PLATE_ID});
-
-		}
-		if (StringUtils.isBlank(plateInformationDto.getWellHeader())) {
-			throwApiRequestValidationError(bindingResult, "sample.header.not.mapped", new Object[] {SampleListServiceImpl.WELL});
-
-		}
-		final int sampleIdHeaderIndex = plateInformationDto.getImportData().get(0).indexOf(plateInformationDto.getSampleIdHeader());
-		final int plateIdHeaderIndex = plateInformationDto.getImportData().get(0).indexOf(plateInformationDto.getPlateIdHeader());
-		final int wellHeaderIndex = plateInformationDto.getImportData().get(0).indexOf(plateInformationDto.getWellHeader());
-		final Iterator<List<String>> iterator = plateInformationDto.getImportData().iterator();
-		// Ignore the first row which is the header.
-		iterator.next();
-
-		if (sampleIdHeaderIndex == -1) {
-			throwApiRequestValidationError(bindingResult, "sample.header.not.matched", new Object[] {SampleListServiceImpl.SAMPLE_ID});
-		}
-
-		if (plateIdHeaderIndex == -1) {
-			throwApiRequestValidationError(bindingResult, "sample.header.not.matched", new Object[] {SampleListServiceImpl.PLATE_ID});
-		}
-
-		if (wellHeaderIndex == -1) {
-			throwApiRequestValidationError(bindingResult, "sample.header.not.matched", new Object[] {SampleListServiceImpl.WELL});
-		}
-
 		// Convert the rows to SamplePlateInfo map.
-		while (iterator.hasNext()) {
-			final List<String> rowData = iterator.next();
+		for (final SampleDTO sampleDTO : sampleDTOs) {
 			final SamplePlateInfo samplePlateInfo = new SamplePlateInfo();
-			final int numElements = rowData.size() - 1;
 
-			if (numElements >= plateIdHeaderIndex) {
-				final String plateId = rowData.get(plateIdHeaderIndex);
-				if (StringUtils.isNotBlank(plateId) && plateId.length() > 255) {
-					throwApiRequestValidationError(bindingResult, "sample.plate.id.exceed.length");
-				}
-				samplePlateInfo.setPlateId(plateId);
-			}
-
-			if (numElements >= wellHeaderIndex) {
-				final String well = rowData.get(wellHeaderIndex);
-				if (StringUtils.isNotBlank(well) && well.length() > 255) {
-					throwApiRequestValidationError(bindingResult, "sample.well.exceed.length");
-				}
-				samplePlateInfo.setWell(well);
-			}
-
-			if (numElements >= sampleIdHeaderIndex) {
-				final String sampleId = rowData.get(sampleIdHeaderIndex);
-
-				if (StringUtils.isBlank(sampleId)) {
-					throwApiRequestValidationError(bindingResult, "sample.record.not.include.sample.id.in.file");
-				}
-				if (map.get(sampleId) != null) {
-					throwApiRequestValidationError(bindingResult, "sample.id.repeat.in.file");
-				}
-				map.put(sampleId, samplePlateInfo);
-			} else {
+			final String sampleId = sampleDTO.getSampleBusinessKey();
+			if (StringUtils.isBlank(sampleId)) {
 				throwApiRequestValidationError(bindingResult, "sample.record.not.include.sample.id.in.file");
 			}
+			if (map.get(sampleId) != null) {
+				throwApiRequestValidationError(bindingResult, "sample.id.repeat.in.file");
+			}
+
+			final String plateId = sampleDTO.getPlateId();
+			if (StringUtils.isNotBlank(plateId) && plateId.length() > 255) {
+				throwApiRequestValidationError(bindingResult, "sample.plate.id.exceed.length");
+			}
+
+			final String well = sampleDTO.getWell();
+			if (StringUtils.isNotBlank(well) && well.length() > 255) {
+				throwApiRequestValidationError(bindingResult, "sample.well.exceed.length");
+			}
+
+			samplePlateInfo.setPlateId(plateId);
+			samplePlateInfo.setWell(well);
+			map.put(sampleId, samplePlateInfo);
 		}
 		return map;
 	}

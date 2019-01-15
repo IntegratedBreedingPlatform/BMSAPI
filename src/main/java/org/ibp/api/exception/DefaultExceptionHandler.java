@@ -31,6 +31,8 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
+import java.util.List;
+
 @ControllerAdvice
 public class DefaultExceptionHandler {
 
@@ -59,6 +61,7 @@ public class DefaultExceptionHandler {
 	@ResponseStatus(value = BAD_REQUEST)
 	@ResponseBody
 	public ErrorResponse httpMessageNotReadableException(HttpMessageNotReadableException ex) {
+		LOG.error("Error executing the API call.", ex);
 		ErrorResponse response = new ErrorResponse();
 		Throwable rootCause = ex.getRootCause();
 		if (rootCause instanceof UnrecognizedPropertyException) {
@@ -78,7 +81,8 @@ public class DefaultExceptionHandler {
 	@ResponseStatus(value = BAD_REQUEST)
 	@ResponseBody
 	public ErrorResponse httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
-		ErrorResponse response = new ErrorResponse();
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = new ErrorResponse();
 		DefaultExceptionHandler.LOG.error("Request not supported with given input", ex);
 		response.addError(this.messageSource.getMessage("request.method.not.supported", null, LocaleContextHolder.getLocale()));
 		return response;
@@ -89,18 +93,8 @@ public class DefaultExceptionHandler {
 	@ResponseStatus(value = BAD_REQUEST)
 	@ResponseBody
 	public ErrorResponse handleValidationException(ApiRequestValidationException ex) {
-
-		ErrorResponse response = new ErrorResponse();
-
-		for (ObjectError error : ex.getErrors()) {
-			String message = this.messageSource.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale());
-			if (error instanceof FieldError) {
-				FieldError fieldError = (FieldError) error;
-				response.addError(message, fieldError.getField());
-			} else {
-				response.addError(message);
-			}
-		}
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = buildErrorResponse(ex.getErrors());
 		return response;
 	}
 
@@ -109,8 +103,8 @@ public class DefaultExceptionHandler {
 	@ResponseStatus(value = NOT_FOUND)
 	@ResponseBody
 	public ErrorResponse handleNotFoundException(ResourceNotFoundException ex) {
-
-		ErrorResponse response = new ErrorResponse();
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = new ErrorResponse();
 
 		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
 		response.addError(message);
@@ -123,8 +117,8 @@ public class DefaultExceptionHandler {
 	@ResponseStatus(value = FORBIDDEN)
 	@ResponseBody
 	public ErrorResponse handleForbiddenException(ForbiddenException ex) {
-
-		ErrorResponse response = new ErrorResponse();
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = new ErrorResponse();
 
 		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
 		response.addError(message);
@@ -137,8 +131,8 @@ public class DefaultExceptionHandler {
 	@ResponseStatus(value = NOT_IMPLEMENTED)
 	@ResponseBody
 	public ErrorResponse handleNotSupportedException(NotSupportedException ex) {
-
-		ErrorResponse response = new ErrorResponse();
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = new ErrorResponse();
 
 		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
 		response.addError(message);
@@ -152,18 +146,8 @@ public class DefaultExceptionHandler {
 	@ResponseStatus(value = CONFLICT)
 	@ResponseBody
 	public ErrorResponse handleConflictException(ConflictException ex) {
-
-		ErrorResponse response = new ErrorResponse();
-
-		for (ObjectError error : ex.getErrors()) {
-			String message = this.messageSource.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale());
-			if (error instanceof FieldError) {
-				FieldError fieldError = (FieldError) error;
-				response.addError(message, fieldError.getField());
-			} else {
-				response.addError(message);
-			}
-		}
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = buildErrorResponse(ex.getErrors());
 		return response;
 	}
 
@@ -172,7 +156,8 @@ public class DefaultExceptionHandler {
 	@ResponseStatus(value = BAD_REQUEST)
 	@ResponseBody
 	public ErrorResponse handleUncaughtException(MiddlewareRequestException ex) {
-		ErrorResponse response = new ErrorResponse();
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = new ErrorResponse();
 		response.addError(ex.getMessage());
 		return response;
 	}
@@ -182,10 +167,14 @@ public class DefaultExceptionHandler {
 	@ResponseStatus(value = PRECONDITION_FAILED)
 	@ResponseBody
 	public ErrorResponse handlePreconditionFailedException(PreconditionFailedException ex) {
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = buildErrorResponse(ex.getErrors());
+		return response;
+	}
 
-		ErrorResponse response = new ErrorResponse();
-
-		for (ObjectError error : ex.getErrors()) {
+	private ErrorResponse buildErrorResponse(final List<ObjectError> objectErrors){
+		final ErrorResponse response = new ErrorResponse();
+		for (ObjectError error : objectErrors) {
 			String message = this.messageSource.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale());
 			if (error instanceof FieldError) {
 				FieldError fieldError = (FieldError) error;
@@ -196,5 +185,4 @@ public class DefaultExceptionHandler {
 		}
 		return response;
 	}
-
 }

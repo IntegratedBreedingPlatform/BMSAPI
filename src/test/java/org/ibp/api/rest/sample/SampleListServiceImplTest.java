@@ -1,6 +1,7 @@
 package org.ibp.api.rest.sample;
 
 import junit.framework.Assert;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -13,11 +14,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,12 +59,12 @@ public class SampleListServiceImplTest {
 
 	@Test
 	public void testImportSamplePlateInformationSuccess() {
-
-		final PlateInformationDto plateInformationDto = this.createPlateInformationDto();
+		final int listId = 1;
+		final List<SampleDTO> sampleDTOs = this.createSampleDto();
 		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySetOf(String.class), Mockito.anyInt())).thenReturn(2l);
 		try {
-			this.sampleListService.importSamplePlateInformation(plateInformationDto);
-			Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(Mockito.eq(plateInformationDto.getListId()), Mockito.anyMapOf(
+			this.sampleListService.importSamplePlateInformation(sampleDTOs, listId);
+			Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(Mockito.eq(listId), Mockito.anyMapOf(
 					String.class, SamplePlateInfo.class));
 		} catch (ApiRequestValidationException e) {
 			Assert.fail("InvalidValuesException should not be thrown.");
@@ -75,13 +74,13 @@ public class SampleListServiceImplTest {
 
 	@Test
 	public void testImportSamplePlateInformationError() {
-
-		final PlateInformationDto plateInformationDto = this.createPlateInformationDto();
+		final int listId = 1;
+		final List<SampleDTO> sampleDTOs = this.createSampleDto();
 
 		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySetOf(String.class), Mockito.anyInt())).thenReturn(1l);
 
 		try {
-			this.sampleListService.importSamplePlateInformation(plateInformationDto);
+			this.sampleListService.importSamplePlateInformation(sampleDTOs, listId);
 			Assert.fail("InvalidValuesException should be thrown.");
 		} catch (ApiRequestValidationException e) {
 			Assert.assertEquals("sample.sample.ids.not.present.in.file",  e.getErrors().get(0).getCodes()[1]);
@@ -91,38 +90,30 @@ public class SampleListServiceImplTest {
 
 	@Test
 	public void testConvertToSamplePlateInfoMap() {
-
-		final PlateInformationDto plateInformationDto = this.createPlateInformationDto();
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), PlateInformationDto.class.getName());
-		final Map<String, SamplePlateInfo> map = this.sampleListService.convertToSamplePlateInfoMap(plateInformationDto, bindingResult);
+		final List<SampleDTO> sampleDTOs = this.createSampleDto();
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), SampleDTO.class.getName());
+		final Map<String, SamplePlateInfo> map = this.sampleListService.convertToSamplePlateInfoMap(sampleDTOs, bindingResult);
 		Assert.assertEquals(2, map.size());
 		Assert.assertEquals("TestValue-1", map.get("SampleId-1").getPlateId());
-		Assert.assertEquals("TestValue-2", map.get("SampleId-1").getWell());
-		Assert.assertEquals("TestValue-3", map.get("SampleId-2").getPlateId());
-		Assert.assertEquals("TestValue-4", map.get("SampleId-2").getWell());
+		Assert.assertEquals("TestValue-4", map.get("SampleId-1").getWell());
+		Assert.assertEquals("TestValue-2", map.get("SampleId-2").getPlateId());
+		Assert.assertEquals("TestValue-5", map.get("SampleId-2").getWell());
 
 	}
 
-	private PlateInformationDto createPlateInformationDto() {
-
-		final PlateInformationDto plateInformationDto = new PlateInformationDto();
-
-		final String sampleIdColumnName = "SAMPLE_ID";
-		final String plateIdColumnName = "PLATE_ID";
-		final String wellColumnName = "WELL";
-
-		final int listId = 1;
-		final List<List<String>> importData = new ArrayList<>();
-		importData.add(Arrays.asList(sampleIdColumnName, plateIdColumnName, wellColumnName));
-		importData.add(Arrays.asList("SampleId-1","TestValue-1", "TestValue-2"));
-		importData.add(Arrays.asList("SampleId-2","TestValue-3", "TestValue-4"));
-		plateInformationDto.setListId(listId);
-		plateInformationDto.setPlateIdHeader(plateIdColumnName);
-		plateInformationDto.setSampleIdHeader(sampleIdColumnName);
-		plateInformationDto.setWellHeader(wellColumnName);
-		plateInformationDto.setImportData(importData);
-
-		return plateInformationDto;
+	private List<SampleDTO> createSampleDto() {
+		final List<SampleDTO> sampleDTOs = new ArrayList<>();
+		SampleDTO sampleDTO = new SampleDTO();
+		sampleDTO.setSampleBusinessKey("SampleId-1");
+		sampleDTO.setPlateId("TestValue-1");
+		sampleDTO.setWell("TestValue-4");
+		sampleDTOs.add(sampleDTO);
+		sampleDTO = new SampleDTO();
+		sampleDTO.setSampleBusinessKey("SampleId-2");
+		sampleDTO.setPlateId("TestValue-2");
+		sampleDTO.setWell("TestValue-5");
+		sampleDTOs.add(sampleDTO);
+		return sampleDTOs;
 
 	}
 
