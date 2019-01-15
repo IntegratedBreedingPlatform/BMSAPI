@@ -96,7 +96,7 @@ public class DatasetExportServiceImplTest {
 		this.dataSetDTO.setInstances(this.createStudyInstances());
 
 		when(this.studyDataManager.getStudy(this.study.getId())).thenReturn(this.study);
-		when(this.datasetService.getDataset(this.study.getId(), this.dataSetDTO.getDatasetId())).thenReturn(this.dataSetDTO);
+		when(this.datasetService.getDataset(this.dataSetDTO.getDatasetId())).thenReturn(this.dataSetDTO);
 		when(this.studyDataManager.getDataSetsByType(this.study.getId(), DataSetType.SUMMARY_DATA))
 			.thenReturn(Arrays.asList(this.trialDataSet));
 
