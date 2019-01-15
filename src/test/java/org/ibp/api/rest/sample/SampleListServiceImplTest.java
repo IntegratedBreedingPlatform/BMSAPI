@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -61,10 +61,11 @@ public class SampleListServiceImplTest {
 	public void testImportSamplePlateInformationSuccess() {
 		final int listId = 1;
 		final List<SampleDTO> sampleDTOs = this.createSampleDto();
-		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySet(), Mockito.anyInt())).thenReturn(2l);
+		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySetOf(String.class), Mockito.anyInt())).thenReturn(2l);
 		try {
 			this.sampleListService.importSamplePlateInformation(sampleDTOs, listId);
-			Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(Mockito.eq(listId), Mockito.anyMap());
+			Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(Mockito.eq(listId), Mockito.anyMapOf(
+					String.class, SamplePlateInfo.class));
 		} catch (ApiRequestValidationException e) {
 			Assert.fail("InvalidValuesException should not be thrown.");
 		}
@@ -76,7 +77,7 @@ public class SampleListServiceImplTest {
 		final int listId = 1;
 		final List<SampleDTO> sampleDTOs = this.createSampleDto();
 
-		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySet(), Mockito.anyInt())).thenReturn(1l);
+		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySetOf(String.class), Mockito.anyInt())).thenReturn(1l);
 
 		try {
 			this.sampleListService.importSamplePlateInformation(sampleDTOs, listId);

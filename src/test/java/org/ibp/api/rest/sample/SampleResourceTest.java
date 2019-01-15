@@ -62,7 +62,6 @@ public class SampleResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testListSamples() throws Exception {
 		final String obsUnitId = randomAlphanumeric(13);
-		final Integer listId = null;
 		final Date samplingDate = new Date();
 		final List<SampleDTO> list = new ArrayList<>();
 		final SampleDTO sample =
@@ -70,9 +69,7 @@ public class SampleResourceTest extends ApiUnitTestBase {
 				nextInt(), randomAlphanumeric(6), nextInt());
 		list.add(sample);
 
-		Mockito.when(this.sampleService
-			.filter(anyString(), anyInt(), org.mockito.Matchers.any(Pageable.class)))
-			.thenReturn(list);
+		Mockito.doReturn(list).when(sampleService).filter(anyString(), Mockito.isNull(Integer.class), org.mockito.Matchers.any(Pageable.class));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/sample/maize/samples?obsUnitId=" + obsUnitId).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print()) //

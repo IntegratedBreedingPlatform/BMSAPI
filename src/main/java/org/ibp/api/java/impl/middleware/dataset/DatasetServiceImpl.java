@@ -205,12 +205,8 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
-		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(studyId, datasetId);
-
-		if (datasetDTO == null) {
-			errors.reject("dataset.does.not.exist", "");
-			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
-		}
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
+		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(datasetId);
 
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());

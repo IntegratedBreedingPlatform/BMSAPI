@@ -35,6 +35,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import com.google.common.collect.Lists;
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 
+import static org.mockito.ArgumentMatchers.isNull;
+
 public class StudyResourceTest extends ApiUnitTestBase {
 
 	@Autowired
@@ -99,8 +101,8 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		Mockito.when(this.studyServiceMW.countTotalObservationUnits(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt()))
 				.thenReturn(100);
 		Mockito.when(this.studyServiceMW.getObservations(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
-				org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyString(),
-				org.mockito.Matchers.anyString())).thenReturn(Lists.newArrayList(obsDto));
+				org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), isNull(String.class),
+				isNull(String.class))).thenReturn(Lists.newArrayList(obsDto));
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders
