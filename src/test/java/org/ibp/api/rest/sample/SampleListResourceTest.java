@@ -305,13 +305,13 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		final Integer listId = random.nextInt(10000);
 		final String crop = "MAIZE";
 		final List<SampleDTO> sampleDTOs = createSampleDto(2);
-		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySetOf(String.class),isNull(Integer.class))).thenReturn(2l);
+		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(ArgumentMatchers.<Set<String>>any(),ArgumentMatchers.any(Integer.class))).thenReturn(2l);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.patch("/sampleLists/{crop}/sampleList/{listId}/samples", crop, listId)
 			.content(this.convertObjectToByte(sampleDTOs))
 			.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
-		Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(isNull(Integer.class), Mockito.anyMapOf(String.class, SamplePlateInfo.class));
+		Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(ArgumentMatchers.any(Integer.class), ArgumentMatchers.<String, SamplePlateInfo>anyMap());
 
 	}
 
