@@ -11,7 +11,8 @@ import java.util.HashMap;
 import java.util.Set;
 
 @Component
-public class InstanceValidator {
+public class
+InstanceValidator {
 
 	@Autowired
 	private StudyDataManager studyDataManager;
@@ -20,10 +21,10 @@ public class InstanceValidator {
 
 	public void validate(final Integer datasetId, final Set<Integer> instanceIds) {
 
-		errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		if (!studyDataManager.areAllInstancesExistInDataset(datasetId, instanceIds)) {
-			errors.reject("dataset.invalid.instances", "");
+		if (!this.studyDataManager.areAllInstancesExistInDataset(datasetId, instanceIds)) {
+			this.errors.reject("dataset.invalid.instances", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
