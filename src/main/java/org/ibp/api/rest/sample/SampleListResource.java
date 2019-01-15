@@ -179,7 +179,7 @@ public class SampleListResource {
 	}
 
 	//TODO: Is necessary make a refactor in the future with this service for do it more generic to import samples not only Plate Id and well.
-	@ApiOperation(value = "Import Plate Information", notes = "Import Plate Information")
+	@ApiOperation(value = "Import Plate Information", notes = "Current implementation only supports patch on plateId and well attributes")
 	@RequestMapping(value = "/{crop}/sampleList/{listId}/samples", method = RequestMethod.PATCH)
 	@ResponseBody
 	public ResponseEntity saveSamplePlateInformation(

@@ -151,9 +151,9 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
-	public void importSamplePlateInformation(final List<SampleDTO> sampleDTO, final Integer listId){
+	public void importSamplePlateInformation(final List<SampleDTO> sampleDTOs, final Integer listId){
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), SampleDTO.class.getName());
-		final Map<String, SamplePlateInfo> samplePlateInfoMap = convertToSamplePlateInfoMap(sampleDTO, bindingResult);
+		final Map<String, SamplePlateInfo> samplePlateInfoMap = convertToSamplePlateInfoMap(sampleDTOs, bindingResult);
 
 		final Set<String> sampleBusinessKeys = samplePlateInfoMap.keySet();
 		final long count = this.sampleListServiceMW.countSamplesByUIDs(sampleBusinessKeys, listId);
