@@ -50,7 +50,6 @@ import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
-import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -63,7 +62,6 @@ import org.generationcp.middleware.service.impl.derived_variables.FormulaService
 import org.generationcp.middleware.service.impl.study.DesignFactors;
 import org.generationcp.middleware.service.impl.study.GermplasmDescriptors;
 import org.generationcp.middleware.service.impl.study.MeasurementVariableServiceImpl;
-import org.generationcp.middleware.service.impl.study.PlantServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
@@ -263,12 +261,6 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public SampleService getSampleService() {
 		return new SampleServiceImpl(this.getCropDatabaseSessionProvider());
-	}
-
-	@Bean
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public PlantService getPlantService() {
-		return new PlantServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean

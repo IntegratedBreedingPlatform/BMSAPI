@@ -43,7 +43,6 @@ public class SampleObservationMapper {
 				this.map().setStudyDbId(this.source.getStudyDbId());
 				this.map().setLocationDbId(this.source.getLocationDbId());
 				this.map().setObsUnitId(this.source.getObsUnitId());
-				this.map().setPlantId(this.source.getPlantBusinessKey());
 				this.map().setSampleId(this.source.getSampleBusinessKey());
 				this.map().setTakenBy(this.source.getTakenBy());
 				this.using(this.toDateConverter).map(this.source.getSampleDate()).setSampleDate(null);
