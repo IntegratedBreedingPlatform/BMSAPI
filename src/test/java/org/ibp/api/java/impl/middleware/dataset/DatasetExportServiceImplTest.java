@@ -114,7 +114,7 @@ public class DatasetExportServiceImplTest {
 		when(this.zipUtil.zipFiles(eq(this.study.getName()), anyList())).thenReturn(zipFile);
 
 		final File result = datasetExportService.exportAsCSV(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
-			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId());
+			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
 
 		verify(this.studyValidator).validate(study.getId(), false);
 		verify(this.datasetValidator).validateDataset(study.getId(), dataSetDTO.getDatasetId(), false);
@@ -130,7 +130,7 @@ public class DatasetExportServiceImplTest {
 		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(instanceId1, instanceId2));
 
 		datasetExportService.exportAsCSV(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
-			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId());
+			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
 
 	}
 
@@ -150,7 +150,7 @@ public class DatasetExportServiceImplTest {
 
 		final File result = datasetExportService
 			.generateCSVFiles(
-				this.study, this.dataSetDTO, studyInstances, DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId());
+				this.study, this.dataSetDTO, studyInstances, DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
 
 		for (final StudyInstance studyInstance : studyInstances) {
 			verify(this.studyDatasetService)
@@ -186,7 +186,7 @@ public class DatasetExportServiceImplTest {
 		final File result = datasetExportService
 			.generateCSVFiles(
 				this.study, this.dataSetDTO, Arrays.asList(studyInstance),
-				DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId());
+				DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
 
 		verify(this.studyDatasetService)
 			.getObservationUnitRows(this.study.getId(), this.dataSetDTO.getDatasetId(), studyInstance.getInstanceDbId(), Integer.MAX_VALUE,

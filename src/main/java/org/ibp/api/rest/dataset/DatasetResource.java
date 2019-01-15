@@ -227,10 +227,10 @@ public class DatasetResource {
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/{fileType}", method = RequestMethod.GET)
 	public ResponseEntity<FileSystemResource> exportDataset(@PathVariable final String crop,
 		@PathVariable final Integer studyId, @PathVariable final Integer datasetId, @PathVariable final String fileType,
-		@RequestParam(value = "instanceIds") final Set<Integer> instanceIds, @RequestParam(value = "collectionOrderId") final Integer collectionOrderId) {
+		@RequestParam(value = "instanceIds") final Set<Integer> instanceIds, @RequestParam(value = "collectionOrderId") final Integer collectionOrderId, @RequestParam(value = "isExportInSingleFile") final boolean isExportInSingleFile) {
 
 			if (CSV.equals(fileType)) {
-				final File file = this.datasetExportService.exportAsCSV(studyId, datasetId, instanceIds, collectionOrderId);
+				final File file = this.datasetExportService.exportAsCSV(studyId, datasetId, instanceIds, collectionOrderId, isExportInSingleFile);
 				final HttpHeaders headers = new HttpHeaders();
 				headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
 				final FileSystemResource fileSystemResource = new FileSystemResource(file);

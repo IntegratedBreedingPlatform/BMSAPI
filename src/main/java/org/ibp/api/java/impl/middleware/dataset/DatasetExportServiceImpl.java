@@ -65,10 +65,9 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 	private org.generationcp.middleware.service.api.dataset.DatasetService datasetService;
 
 	private ZipUtil zipUtil = new ZipUtil();
-
+	
 	@Override
-	public File exportAsCSV(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId) {
-
+	public File exportAsCSV(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId, final boolean isExportInSingleFile) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		this.instanceValidator.validate(datasetId, instanceIds);
@@ -78,7 +77,7 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 		final List<StudyInstance> selectedDatasetInstances = getSelectedDatasetInstances(dataSet.getInstances(), instanceIds);
 
 		try {
-			return this.generateCSVFiles(study, dataSet, selectedDatasetInstances, collectionOrderId);
+			return this.generateCSVFiles(study, dataSet, selectedDatasetInstances, collectionOrderId, isExportInSingleFile);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("cannot.exportAsCSV.dataset", "");
@@ -87,7 +86,7 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 	}
 
 	protected File generateCSVFiles(
-		final Study study, final DatasetDTO dataSetDto, final List<StudyInstance> studyInstances, final int collectionOrderId)
+		final Study study, final DatasetDTO dataSetDto, final List<StudyInstance> studyInstances, final int collectionOrderId, final boolean isExportInSingleFile)
 		throws IOException {
 		final List<File> csvFiles = new ArrayList<>();
 
@@ -97,6 +96,7 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 
 		final int trialDatasetId = this.studyDataManager.getDataSetsByType(study.getId(), DataSetType.SUMMARY_DATA).get(0).getId();
 		final File temporaryFolder = Files.createTempDir();
+		final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder = DatasetCollectionOrderServiceImpl.CollectionOrder.findById(collectionOrderId);
 
 		for (final StudyInstance studyInstance : studyInstances) {
 			final List<ObservationUnitRow> observationUnitRows =
@@ -105,8 +105,6 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 						Integer.MAX_VALUE, null,
 						"");
 
-			final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder =
-				DatasetCollectionOrderServiceImpl.CollectionOrder.findById(collectionOrderId);
 			final List<ObservationUnitRow> reorderedObservationUnitRows = datasetCollectionOrderService
 				.reorder(collectionOrder, trialDatasetId, String.valueOf(studyInstance.getInstanceNumber()), observationUnitRows);
 

@@ -579,7 +579,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int collectionOrderId = DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId();
 
 		final File file = File.createTempFile("test", ".csv");
-		Mockito.when(this.datasetExportService.exportAsCSV(studyId, datasetId, instanceIds, collectionOrderId)).thenReturn(file);
+		Mockito.when(this.datasetExportService.exportAsCSV(studyId, datasetId, instanceIds, collectionOrderId, false)).thenReturn(file);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
