@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -28,6 +29,9 @@ public class StudyValidator {
 	@Autowired
 	private StudyDataManager studyDataManager;
 
+	@Autowired
+	private ContextUtil contextUtil;
+
 	private BindingResult errors;
 
 	public void validate(final Integer studyId, final Boolean shouldBeUnlocked) {
@@ -45,7 +49,7 @@ public class StudyValidator {
 
 		if (shouldBeUnlocked
 			&& study.isLocked()
-			&& !ObjectUtils.equals(study.getCreatedBy(), String.valueOf(loggedInUser.getUserid()))
+			&& !ObjectUtils.equals(study.getCreatedBy(), String.valueOf(contextUtil.getIbdbUserId(loggedInUser.getUserid())))
 			&& !request.isUserInRole(Role.SUPERADMIN)) {
 			errors.reject("study.is.locked", "");
 			throw new ForbiddenException(errors.getAllErrors().get(0));

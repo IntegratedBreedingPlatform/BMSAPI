@@ -2,6 +2,7 @@ package org.ibp.api.rest.dataset.validator;
 
 import java.util.Random;
 
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -13,13 +14,19 @@ import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static org.mockito.Mockito.doReturn;
+
+@RunWith(MockitoJUnitRunner.class)
 public class StudyValidatorTest {
 
 	public static final int USER_ID = 10;
@@ -33,15 +40,17 @@ public class StudyValidatorTest {
 	@Mock
 	private StudyDataManager studyDataManager;
 
+	@Mock
+	private ContextUtil contextUtil;
+
 	@InjectMocks
 	private StudyValidator studyValidator;
 	
 	@Before
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
-
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(USER_ID);
-		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+		doReturn(user).when(this.securityService).getCurrentlyLoggedInUser();
+		doReturn(USER_ID).when(this.contextUtil).getIbdbUserId(ArgumentMatchers.anyInt());
 	}
 
 	@Test (expected = ResourceNotFoundException.class)
@@ -83,7 +92,7 @@ public class StudyValidatorTest {
 		final Study study = new Study();
 		study.setId(studyId);
 		study.setLocked(true);
-		Mockito.doReturn(true).when(this.request).isUserInRole(Role.SUPERADMIN);
+		doReturn(true).when(this.request).isUserInRole(Role.SUPERADMIN);
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
 		studyValidator.validate(studyId, true);
 		// no exceptions thrown
