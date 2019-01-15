@@ -6,6 +6,7 @@ import org.generationcp.commons.pojo.FileExportInfo;
 import org.generationcp.commons.service.CsvExportSampleListService;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.commons.util.DateUtil;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
@@ -19,6 +20,7 @@ import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
@@ -46,6 +48,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
@@ -320,7 +324,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		final List<SampleDTO> sampleDTOs = createSampleDto(1);
 		sampleDTOs.get(0).setSampleBusinessKey(null);
 
-		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySet(), Mockito.anyInt())).thenReturn(2l);
+		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(ArgumentMatchers.<Set<String>>any(), Mockito.anyInt())).thenReturn(2l);
 		this.mockMvc.perform(MockMvcRequestBuilders.patch("/sampleLists/{crop}/sampleList/{listId}/samples", crop, listId)
 			.content(this.convertObjectToByte(sampleDTOs))
 			//
@@ -343,7 +347,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		SampleDTO sampleDTO = sampleDTOs.get(0);
 		sampleDTO.setPlateId(RandomStringUtils.random(256));
 
-		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySet(), Mockito.anyInt())).thenReturn(2l);
+		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(ArgumentMatchers.<Set<String>>any(), Mockito.anyInt())).thenReturn(2l);
 		this.mockMvc.perform(MockMvcRequestBuilders.patch("/sampleLists/{crop}/sampleList/{listId}/samples", crop, listId)
 			.content(this.convertObjectToByte(sampleDTOs)) //
 			.contentType(this.contentType) //
