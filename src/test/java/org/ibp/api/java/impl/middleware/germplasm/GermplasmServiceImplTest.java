@@ -18,6 +18,7 @@ import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -58,26 +59,25 @@ public class GermplasmServiceImplTest {
 		gp.setLocationId(1);
 
 		List<Germplasm> middlewareSearchResults = Lists.newArrayList(gp);
-		Mockito.when(this.germplasmDataManager.searchForGermplasm(Mockito.any(GermplasmSearchParameter.class)))
-				.thenReturn(middlewareSearchResults);
+		Mockito.doReturn(middlewareSearchResults).when(germplasmDataManager).searchForGermplasm(Mockito.any(GermplasmSearchParameter.class));
+
 		String gpPedigree = "CML1/CML2";
-		Mockito.when(this.pedigreeService.getCrossExpansion(Matchers.anyInt(), Matchers.any(CrossExpansionProperties.class))).thenReturn(
-				gpPedigree);
+		Mockito.doReturn(gpPedigree).when(pedigreeService).getCrossExpansion(Matchers.anyInt(), ArgumentMatchers.isNull(CrossExpansionProperties.class));
 
 		Name gpName = new Name();
 		gpName.setGermplasmId(gp.getGid());
 		gpName.setNval("CML1");
 		List<Name> gpNames = Lists.newArrayList(gpName);
-		Mockito.when(this.germplasmDataManager.getNamesByGID(Matchers.anyInt(), Matchers.anyInt(), Matchers.any(GermplasmNameType.class)))
-				.thenReturn(gpNames);
+		Mockito.doReturn(gpNames).when(germplasmDataManager).getNamesByGID(Matchers.anyInt(),ArgumentMatchers.isNull(Integer.class),
+				ArgumentMatchers.isNull(GermplasmNameType.class));
 
 		Method gpMethod = new Method();
 		gpMethod.setMname("Backcross");
-		Mockito.when(this.germplasmDataManager.getMethodByID(Matchers.anyInt())).thenReturn(gpMethod);
+		Mockito.doReturn(gpMethod).when(germplasmDataManager).getMethodByID(Matchers.anyInt());
 
 		Location gpLocation = new Location();
 		gpLocation.setLname("Mexico");
-		Mockito.when(this.locationDataManger.getLocationByID(Matchers.anyInt())).thenReturn(gpLocation);
+		Mockito.doReturn(gpLocation).when(locationDataManger).getLocationByID(Matchers.anyInt());
 
 		List<GermplasmSummary> germplasmSummaries = this.germplasmServiceImpl.searchGermplasm("CML", 1, 20);
 		Assert.assertTrue(!germplasmSummaries.isEmpty());

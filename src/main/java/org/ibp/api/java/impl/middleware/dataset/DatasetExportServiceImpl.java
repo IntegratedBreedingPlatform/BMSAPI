@@ -73,7 +73,7 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 		this.instanceValidator.validate(datasetId, instanceIds);
 
 		final Study study = this.studyDataManager.getStudy(studyId);
-		final DatasetDTO dataSet = this.datasetService.getDataset(studyId, datasetId);
+		final DatasetDTO dataSet = this.datasetService.getDataset(datasetId);
 		final List<StudyInstance> selectedDatasetInstances = getSelectedDatasetInstances(dataSet.getInstances(), instanceIds);
 
 		try {

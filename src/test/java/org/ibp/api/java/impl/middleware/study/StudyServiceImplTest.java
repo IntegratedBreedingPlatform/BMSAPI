@@ -12,6 +12,8 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -49,6 +51,8 @@ import com.google.common.collect.Lists;
 
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
+
+import static org.mockito.ArgumentMatchers.isNull;
 
 public class StudyServiceImplTest {
 
@@ -358,10 +362,10 @@ public class StudyServiceImplTest {
 		Mockito.verify(this.conversionService).convert(studyImportDTO, Workbook.class);
 		Mockito.verify(this.dataImportService).saveDataset(workbook, true, false, this.programUID, this.cropPrefix);
 		Mockito.verify(this.conversionService).convert(studyImportDTO, GermplasmList.class);
-		Mockito.verify(this.germplasmListManager).addGermplasmList(Matchers.any(GermplasmList.class));
-		Mockito.verify(this.germplasmListManager).addGermplasmListData(Matchers.anyList());
+		Mockito.verify(this.germplasmListManager).addGermplasmList(isNull(GermplasmList.class));
+		Mockito.verify(this.germplasmListManager).addGermplasmListData(Matchers.anyListOf(GermplasmListData.class));
 		Mockito.verify(this.fieldbookService).saveOrUpdateListDataProject(Matchers.anyInt(), Matchers.any(GermplasmListType.class),
-			Matchers.anyInt(), Matchers.anyList(), Matchers.anyInt());
+			Matchers.anyInt(), Matchers.anyListOf(ListDataProject.class), Matchers.anyInt());
 	}
 	
 	@Test

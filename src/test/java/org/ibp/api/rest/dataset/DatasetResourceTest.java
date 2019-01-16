@@ -51,6 +51,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import static org.mockito.ArgumentMatchers.isNull;
+
 public class DatasetResourceTest extends ApiUnitTestBase {
 
 	public static final String DATASET_NAME = "TEST1234";
@@ -339,8 +341,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			org.mockito.Matchers.anyInt()))
 			.thenReturn(100);
 		Mockito.when(this.studyDatasetService.getObservationUnitRows(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
-			org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyString(),
-			org.mockito.Matchers.anyString())).thenReturn(Lists.newArrayList(obsDto));
+			org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), isNull(String.class),
+			isNull(String.class))).thenReturn(Lists.newArrayList(obsDto));
 		final Random random = new Random();
 		final int studyId = random.nextInt(10000);
 		final int datasetId = random.nextInt(10000);

@@ -7,18 +7,20 @@ import org.generationcp.commons.service.CsvExportSampleListService;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.SampleListService;
+import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.java.impl.middleware.sample.SampleService;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
@@ -43,15 +45,17 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
+
+import static org.mockito.ArgumentMatchers.isNull;
 
 @ActiveProfiles("security-mocked")
 public class SampleListResourceTest extends ApiUnitTestBase {
@@ -61,7 +65,6 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	private static final String NOTES = "Notes";
 	private static final String VALUE = "1";
 	private static Locale locale = Locale.getDefault();
-
 
 	private SampleListDto dto;
 	private WorkbenchUser user;
@@ -156,25 +159,23 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		Mockito.when(this.sampleListServiceMW.createSampleList(org.mockito.Matchers.any(SampleListDTO.class))).thenReturn(sampleList);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType)
-				.content(this.convertObjectToByte(this.dto))).andExpect(MockMvcResultMatchers.status().isOk())
-				.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))));
+			.content(this.convertObjectToByte(this.dto))).andExpect(MockMvcResultMatchers.status().isOk())
+			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))));
 	}
 
 	@Test
-	// @Ignore
 	public void createSampleListFolder() throws Exception {
 		final HashMap<String, Object> result = new HashMap<>();
 		result.put("id", SampleListResourceTest.VALUE);
 		final WorkbenchUser creatingBy = new WorkbenchUser();
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(creatingBy);
-		Mockito.when(this.sampleListServiceMW.createSampleListFolder(org.mockito.Matchers.anyString(), org.mockito.Matchers.anyInt(),
-				org.mockito.Matchers.any(String.class), org.mockito.Matchers.anyString()))
-				.thenReturn(Integer.valueOf(SampleListResourceTest.VALUE));
+		Mockito.doReturn(Integer.valueOf(SampleListResourceTest.VALUE)).when(this.sampleListServiceMW).createSampleListFolder(org.mockito.Matchers.anyString(), org.mockito.Matchers.anyInt(),
+			org.mockito.ArgumentMatchers.isNull(String.class), org.mockito.Matchers.anyString());
 
 		final String url = String.format("/sampleLists/maize/sampleListFolder?folderName=%s&parentId=%s&programUUID=%s", this.folderName,
-				this.parentId, this.programUUID);
+			this.parentId, this.programUUID);
 		this.mockMvc.perform(MockMvcRequestBuilders.post(url)).andExpect(MockMvcResultMatchers.status().isOk())
-				.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))));
+			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))));
 	}
 
 	@Test
@@ -192,11 +193,11 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 		final String url = String.format("/sampleLists/maize/sampleListFolder/{folderId}?newFolderName=%s", newFolderName);
 		Mockito.when(this.sampleListServiceMW.updateSampleListFolderName(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyString()))
-				.thenReturn(folder);
+			.thenReturn(folder);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.put(url, folderId)).andExpect(MockMvcResultMatchers.status().isOk())
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(folder.getId().toString())));
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(folder.getId().toString())));
 	}
 
 	@Test
@@ -215,13 +216,13 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		folder.setType(SampleListType.FOLDER);
 
 		final String url =
-				String.format("/sampleLists/maize/sampleListFolder/{folderId}/move?newParentId=%s&isCropList=false&programUUID=%s",
-						newParentFolderId, programUUID);
+			String.format("/sampleLists/maize/sampleListFolder/{folderId}/move?newParentId=%s&isCropList=false&programUUID=%s",
+				newParentFolderId, programUUID);
 		Mockito.when(this.sampleListServiceMW.moveSampleList(folderId, newParentFolderId, false, programUUID)).thenReturn(folder);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.put(url, folderId)).andExpect(MockMvcResultMatchers.status().isOk())
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.parentId", Matchers.is(folder.getHierarchy().getId().toString())));
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.parentId", Matchers.is(folder.getHierarchy().getId().toString())));
 	}
 
 	@Test
@@ -237,7 +238,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		}).when(this.sampleListServiceMW).deleteSampleListFolder(folderId);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.delete("/sampleLists/maize/sampleListFolder/{folderId}", folderId))
-				.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print());
+			.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print());
 	}
 
 	@Test
@@ -254,18 +255,18 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 		Mockito.when(this.contextUtil.getCurrentProgramUUID()).thenReturn(this.programUUID);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
-		Mockito.when(this.sampleListServiceMW
-				.searchSampleLists(Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(), Mockito.any(Pageable.class)))
-				.thenReturn(list);
+		Mockito.doReturn(list).when(sampleListServiceMW
+			).searchSampleLists(Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(),
+				Mockito.any(Pageable.class));
 
 		this.mockMvc.perform(
-				MockMvcRequestBuilders.get("/sampleLists/maize/search").param("searchString", searchString).param("exactMatch", "false")
-						.contentType(this.contentType).content(this.convertObjectToByte(this.dto)))
-				.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(list.size())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].listName", Matchers.is(sampleList.getListName())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(sampleList.getDescription())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(sampleList.getId())));
+			MockMvcRequestBuilders.get("/sampleLists/maize/search").param("searchString", searchString).param("exactMatch", "false")
+				.contentType(this.contentType).content(this.convertObjectToByte(this.dto)))
+			.andExpect(MockMvcResultMatchers.status().isOk()).andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(list.size())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].listName", Matchers.is(sampleList.getListName())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].description", Matchers.is(sampleList.getDescription())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(sampleList.getId())));
 
 	}
 
@@ -285,11 +286,12 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 			fileExportInfo.setFilePath(temporaryFile.getAbsolutePath());
 			fileExportInfo.setDownloadFileName(fileName);
 
-			Mockito.when(this.csvExportSampleListService.export(Mockito.anyList(), Mockito.anyString(), Mockito.anyList()))
-					.thenReturn(fileExportInfo);
+			Mockito.when(this.csvExportSampleListService.export(Mockito.anyListOf(SampleDetailsDTO.class), Mockito.anyString(), Mockito.anyListOf(
+					String.class)))
+				.thenReturn(fileExportInfo);
 
 			this.mockMvc.perform(MockMvcRequestBuilders.get("/sampleLists/maize/download?listId=" + listId + "&listName=" + listName)
-					.contentType(this.csvContentType)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+				.contentType(this.csvContentType)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
 		} finally {
 			temporaryFile.delete();
@@ -299,32 +301,36 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testImportPlateInformation() throws Exception {
+		final Random random = new Random();
+		final Integer listId = random.nextInt(10000);
+		final String crop = "MAIZE";
+		final List<SampleDTO> sampleDTOs = createSampleDto(2);
+		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(ArgumentMatchers.<Set<String>>any(),ArgumentMatchers.any(Integer.class))).thenReturn(2l);
 
-		final PlateInformationDto plateInformationDto = createPlateInformationDto();
+		this.mockMvc.perform(MockMvcRequestBuilders.patch("/sampleLists/{crop}/sampleList/{listId}/samples", crop, listId)
+			.content(this.convertObjectToByte(sampleDTOs))
+			.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
-		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySet(), Mockito.anyInt())).thenReturn(2l);
-
-		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import").content(this.convertObjectToByte(plateInformationDto))
-				.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-
-		Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(Mockito.anyInt(), Mockito.anyMap());
+		Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(ArgumentMatchers.any(Integer.class), ArgumentMatchers.<String, SamplePlateInfo>anyMap());
 
 	}
 
 	@Test
+
 	public void testImportPlateInformation_NoSampleId() throws Exception {
+		final Random random = new Random();
+		final Integer listId = random.nextInt(10000);
+		final String crop = "MAIZE";
+		final List<SampleDTO> sampleDTOs = createSampleDto(1);
+		sampleDTOs.get(0).setSampleBusinessKey(null);
 
-		final PlateInformationDto plateInformationDto = createPlateInformationDto();
-		final List<List<String>> importData = new ArrayList<>();
-		importData.add(Arrays.asList("SampleId", "PlateId", "well"));
-		importData.add(Arrays.asList("jhdksl", "dfgfdh", "dfgfdg"));
-		importData.add(Arrays.asList("", "sfwd", "asdasf"));
-		plateInformationDto.setImportData(importData);
-
-		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import") //
+		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(ArgumentMatchers.<Set<String>>any(), Mockito.anyInt())).thenReturn(2l);
+		this.mockMvc.perform(MockMvcRequestBuilders.patch("/sampleLists/{crop}/sampleList/{listId}/samples", crop, listId)
+			.content(this.convertObjectToByte(sampleDTOs))
+			//
 			.contentType(this.contentType) //
 			.locale(locale) //
-			.content(this.convertObjectToByte(plateInformationDto))) //
+			.content(this.convertObjectToByte(sampleDTOs))) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
 			.andExpect(MockMvcResultMatchers
@@ -334,18 +340,19 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testImportPlateInformation_plate_id_exceeded_max_length() throws Exception {
+		final Random random = new Random();
+		final Integer listId = random.nextInt(10000);
+		final String crop = "MAIZE";
+		final List<SampleDTO> sampleDTOs = createSampleDto(1);
+		SampleDTO sampleDTO = sampleDTOs.get(0);
+		sampleDTO.setPlateId(RandomStringUtils.random(256));
 
-		final PlateInformationDto plateInformationDto = createPlateInformationDto();
-		final List<List<String>> importData = new ArrayList<>();
-		importData.add(Arrays.asList("SampleId", "PlateId", "well"));
-		importData.add(Arrays.asList("jhdksl", RandomStringUtils.random(256), "aasdd"));
-		importData.add(Arrays.asList("jhdksl", "sfwd", "asdasf"));
-		plateInformationDto.setImportData(importData);
-
-		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import") //
+		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(ArgumentMatchers.<Set<String>>any(), Mockito.anyInt())).thenReturn(2l);
+		this.mockMvc.perform(MockMvcRequestBuilders.patch("/sampleLists/{crop}/sampleList/{listId}/samples", crop, listId)
+			.content(this.convertObjectToByte(sampleDTOs)) //
 			.contentType(this.contentType) //
 			.locale(locale) //
-			.content(this.convertObjectToByte(plateInformationDto))) //
+			.content(this.convertObjectToByte(sampleDTOs))) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(this.getMessage("sample.plate.id.exceed.length")))) //
@@ -354,18 +361,18 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testImportPlateInformation_Well_exceeded_max_length() throws Exception {
+		final Random random = new Random();
+		final Integer listId = random.nextInt(10000);
+		final String crop = "MAIZE";
+		final List<SampleDTO> sampleDTOs = createSampleDto(1);
+		SampleDTO sampleDTO = sampleDTOs.get(0);
+		sampleDTO.setWell(RandomStringUtils.random(256));
 
-		final PlateInformationDto plateInformationDto = createPlateInformationDto();
-		final List<List<String>> importData = new ArrayList<>();
-		importData.add(Arrays.asList("SampleId", "PlateId", "well"));
-		importData.add(Arrays.asList("jhdksl", "aasdd", RandomStringUtils.random(256)));
-		importData.add(Arrays.asList("jhdksl", "sfwd", "asdasf"));
-		plateInformationDto.setImportData(importData);
-
-		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import") //
+		this.mockMvc.perform(MockMvcRequestBuilders.patch("/sampleLists/{crop}/sampleList/{listId}/samples", crop, listId)
+			.content(this.convertObjectToByte(sampleDTOs)) //
 			.contentType(this.contentType) //
 			.locale(locale) //
-			.content(this.convertObjectToByte(plateInformationDto))) //
+			.content(this.convertObjectToByte(sampleDTOs))) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(this.getMessage("sample.well.exceed.length")))) //
@@ -374,72 +381,19 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testImportPlateInformation_SampleId_is_repeated_in_the_SampleList() throws Exception {
-
-		final PlateInformationDto plateInformationDto = createPlateInformationDto();
-		final List<List<String>> importData = new ArrayList<>();
-		importData.add(Arrays.asList("SampleId", "PlateId", "well"));
-		importData.add(Arrays.asList("qwe12asd", "aasdd", "asfqf"));
-		importData.add(Arrays.asList("qwe12asd", "sfwd", "asdasf23ds"));
-		plateInformationDto.setImportData(importData);
-
-		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import") //
+		final Random random = new Random();
+		final Integer listId = random.nextInt(10000);
+		final String crop = "MAIZE";
+		final List<SampleDTO> sampleDTOs = createSampleDto(2);
+		SampleDTO sampleDTO = sampleDTOs.get(1);
+		sampleDTO.setSampleBusinessKey(sampleDTOs.get(0).getSampleBusinessKey());
+		this.mockMvc.perform(MockMvcRequestBuilders.patch("/sampleLists/{crop}/sampleList/{listId}/samples", crop, listId)
+			.content(this.convertObjectToByte(sampleDTOs)) //
 			.contentType(this.contentType) //
-			.locale(locale) //
-			.content(this.convertObjectToByte(plateInformationDto))) //
+			.locale(locale)) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(this.getMessage("sample.id.repeat.in.file")))) //
-		;
-	}
-
-	@Test
-	public void testImportPlateInformation_SampleId_header_is_not_present() throws Exception {
-
-		final PlateInformationDto plateInformationDto = createPlateInformationDto();
-		plateInformationDto.setSampleIdHeader(null);
-
-		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import") //
-			.contentType(this.contentType) //
-			.locale(locale) //
-			.content(this.convertObjectToByte(plateInformationDto))) //
-			.andDo(MockMvcResultHandlers.print()) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
-			.andExpect(MockMvcResultMatchers
-				.jsonPath("$.errors[0].message", is(this.getMessage("sample.header.not.mapped", new Object[] {"Sample Id"})))) //
-		;
-	}
-
-	@Test
-	public void testImportPlateInformation_PlateId_header_is_not_present() throws Exception {
-
-		final PlateInformationDto plateInformationDto = createPlateInformationDto();
-		plateInformationDto.setPlateIdHeader(null);
-
-		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import") //
-			.contentType(this.contentType) //
-			.locale(locale) //
-			.content(this.convertObjectToByte(plateInformationDto))) //
-			.andDo(MockMvcResultHandlers.print()) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
-			.andExpect(MockMvcResultMatchers
-				.jsonPath("$.errors[0].message", is(this.getMessage("sample.header.not.mapped", new Object[] {"Plate Id"})))) //
-		;
-	}
-
-	@Test
-	public void testImportPlateInformation_well_header_is_not_present() throws Exception {
-
-		final PlateInformationDto plateInformationDto = createPlateInformationDto();
-		plateInformationDto.setWellHeader(null);
-
-		this.mockMvc.perform(MockMvcRequestBuilders.post("/sampleLists/maize/plate-information/import") //
-			.contentType(this.contentType) //
-			.locale(locale) //
-			.content(this.convertObjectToByte(plateInformationDto))) //
-			.andDo(MockMvcResultHandlers.print()) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
-			.andExpect(MockMvcResultMatchers
-				.jsonPath("$.errors[0].message", is(this.getMessage("sample.header.not.mapped", new Object[] {"Well"})))) //
 		;
 	}
 
@@ -447,22 +401,22 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		return this.resourceBundleMessageSource.getMessage(code, null, LocaleContextHolder.getLocale());
 	}
 
-	private String getMessage(final String code,final Object[] arguments) {
+	private String getMessage(final String code, final Object[] arguments) {
 		return this.resourceBundleMessageSource.getMessage(code, arguments, LocaleContextHolder.getLocale());
 	}
 
-	private PlateInformationDto createPlateInformationDto() {
-		final PlateInformationDto plateInformationDto = new PlateInformationDto();
-		plateInformationDto.setSampleIdHeader("SampleId");
-		plateInformationDto.setPlateIdHeader("PlateId");
-		plateInformationDto.setWellHeader("well");
-		final List<List<String>> importData = new ArrayList<>();
-		importData.add(Arrays.asList("SampleId", "PlateId", "well"));
-		importData.add(Arrays.asList("qwe12asd", "aasdd", "asfqf"));
-		importData.add(Arrays.asList("qsdesd", "sfwd", "asdasf23ds"));
-		plateInformationDto.setImportData(importData);
+	private List<SampleDTO> createSampleDto(final int numeberOfSamples) {
+		final List<SampleDTO> sampleDTOs = new ArrayList<>();
 
-		return plateInformationDto;
+		for (int i = 0; i < numeberOfSamples; i++) {
+			SampleDTO sampleDTO = new SampleDTO();
+			sampleDTO.setSampleBusinessKey("SampleId-" + i);
+			sampleDTO.setPlateId("TestValue-" + i);
+			sampleDTO.setWell("TestValue-" + i);
+			sampleDTOs.add(sampleDTO);
+		}
+		return sampleDTOs;
+
 	}
 
 }
