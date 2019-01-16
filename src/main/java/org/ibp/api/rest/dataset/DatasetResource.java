@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -40,6 +39,8 @@ import java.util.Set;
 public class DatasetResource {
 
 	public static final String CSV = "csv";
+	public static final String XLS = "xls";
+
 	@Autowired
 	private DatasetService studyDatasetService;
 
@@ -209,7 +210,7 @@ public class DatasetResource {
 			value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations",
 			method = RequestMethod.PUT)
 	public ResponseEntity<Void> postObservationUnits(@PathVariable final String crop, @PathVariable final Integer studyId,
-			@PathVariable final Integer datasetId, @RequestBody ObservationsPutRequestInput input) {
+			@PathVariable final Integer datasetId, @RequestBody final ObservationsPutRequestInput input) {
 		this.studyDatasetService.importObservations(studyId, datasetId, input);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -225,20 +226,30 @@ public class DatasetResource {
 
 	@ApiOperation(value = "Exports the dataset to a specified file type", notes = "Exports the dataset to a specified file type")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/{fileType}", method = RequestMethod.GET)
-	public ResponseEntity<FileSystemResource> exportDataset(@PathVariable final String crop,
+	public ResponseEntity<FileSystemResource> exportDataset(
+		@PathVariable final String crop,
 		@PathVariable final Integer studyId, @PathVariable final Integer datasetId, @PathVariable final String fileType,
-		@RequestParam(value = "instanceIds") final Set<Integer> instanceIds, @RequestParam(value = "collectionOrderId") final Integer collectionOrderId) {
+		@RequestParam(value = "instanceIds") final Set<Integer> instanceIds,
+		@RequestParam(value = "collectionOrderId") final Integer collectionOrderId) {
 
-			if (CSV.equals(fileType)) {
-				final File file = this.datasetExportService.exportAsCSV(studyId, datasetId, instanceIds, collectionOrderId);
-				final HttpHeaders headers = new HttpHeaders();
-				headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
-				final FileSystemResource fileSystemResource = new FileSystemResource(file);
-				return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-			}
+		if (CSV.equals(fileType)) {
+			final File file = this.datasetExportService.exportAsCSV(studyId, datasetId, instanceIds, collectionOrderId);
+			return this.getFileSystemResourceResponseEntity(file);
+		} else if (XLS.equals(fileType)) {
+			final File file = this.datasetExportService.exportAsExcel(studyId, datasetId, instanceIds, collectionOrderId);
+			return this.getFileSystemResourceResponseEntity(file);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+		}
 
+	}
+
+	private ResponseEntity<FileSystemResource> getFileSystemResourceResponseEntity(final File file) {
+		final HttpHeaders headers = new HttpHeaders();
+		headers
+			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
+		final FileSystemResource fileSystemResource = new FileSystemResource(file);
+		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
 
 }
