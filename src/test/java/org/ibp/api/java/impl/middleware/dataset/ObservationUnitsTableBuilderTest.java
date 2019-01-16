@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.collection.IsCollectionContaining.hasItems;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 
 
 public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
@@ -111,8 +111,8 @@ public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
 		final Table<String, String, String> table = observationUnitsTableBuilder.build(data, measurementVariables);
 		assertThat(table.columnKeySet(), hasSize(1));
 		assertThat(table.rowKeySet(), hasSize(2));
-		assertThat(table.columnKeySet(), hasItems("A"));
-		assertThat(table.rowKeySet(), hasItems("Obs1", "Obs2"));
+		assertThat(table.columnKeySet(), contains("A"));
+		assertThat(table.rowKeySet(), contains("Obs1", "Obs2"));
 		assertThat(observationUnitsTableBuilder.getDuplicatedFoundNumber(), is(1));
 		assertThat(table.get("Obs2", "A"), is("A2"));
 	}

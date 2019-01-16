@@ -1,11 +1,6 @@
 
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -24,6 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 @Component
 public class DatasetValidator {
@@ -50,7 +50,7 @@ public class DatasetValidator {
 
 	public void validateDataset(final Integer studyId, final Integer datasetId, final Boolean shouldBeSubobservationDataset) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(studyId, datasetId);
+		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
 		this.validateDataset(studyId, dataSet, shouldBeSubobservationDataset);
 	}
 
@@ -73,7 +73,7 @@ public class DatasetValidator {
 			final Boolean shouldBeSubobservationDataset, final DatasetVariable datasetVariable, final Boolean shouldAlreadyBeDatasetVariable) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(studyId, datasetId);
+		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
 		this.validateDataset(studyId, dataSet, shouldBeSubobservationDataset);
 
 		// Validate if variable exists and of supported variable type
@@ -91,7 +91,7 @@ public class DatasetValidator {
 			final Boolean shouldBeSubobservationDataset, final List<Integer> variableIds) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(studyId, datasetId);
+		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
 		this.validateDataset(studyId, dataSet, shouldBeSubobservationDataset);
 
 		for (final Integer variableId : variableIds) {
