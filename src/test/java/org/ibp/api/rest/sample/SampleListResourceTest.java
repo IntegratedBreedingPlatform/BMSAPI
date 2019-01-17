@@ -29,11 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -57,7 +55,6 @@ import static org.hamcrest.core.IsNot.not;
 
 import static org.mockito.ArgumentMatchers.isNull;
 
-@ActiveProfiles("security-mocked")
 public class SampleListResourceTest extends ApiUnitTestBase {
 
 	private static final String ADMIN = "admin";
@@ -75,26 +72,13 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 	private static final SimpleDateFormat DATE_FORMAT = DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT_3);
 
 
-	@Profile("security-mocked")
 	@Configuration
 	public static class TestConfiguration {
 
 		@Bean
 		@Primary
-		public SecurityServiceImpl securityService() {
-			return Mockito.mock(SecurityServiceImpl.class);
-		}
-
-		@Bean
-		@Primary
 		public SampleListService service() {
 			return Mockito.mock(SampleListService.class);
-		}
-
-		@Bean
-		@Primary
-		public ContextUtil getContextUtil() {
-			return Mockito.mock(ContextUtil.class);
 		}
 
 		@Bean
