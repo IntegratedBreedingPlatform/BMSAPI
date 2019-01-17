@@ -72,7 +72,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		//  TODO Retrieve roles from DB		
 		.anyRequest().hasAnyAuthority(Role.ADMIN, "BREEDER", "TECHNICIAN", Role.SUPERADMIN)
 		.and()
-		.apply(this.securityConfigurerAdapter());
+		.apply(this.securityConfigurerAdapter())
+		.and()
+		.servletApi().rolePrefix("");
 	}
 
 	private XAuthTokenConfigurer securityConfigurerAdapter() {

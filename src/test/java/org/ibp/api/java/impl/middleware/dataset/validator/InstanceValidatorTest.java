@@ -25,6 +25,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 		final int instanceId = ran.nextInt();
 
 		Mockito.when(studyDataManager.areAllInstancesExistInDataset(datasetId, Sets.newHashSet(instanceId))).thenReturn(true);
+		Mockito.when(studyDataManager.existInstances(Sets.newHashSet(instanceId))).thenReturn(true);
 		instanceValidator.validate(datasetId, Sets.newHashSet(instanceId));
 
 	}
