@@ -2,19 +2,27 @@ package org.ibp.api.rest.labelprinting;
 
 public enum LabelPrintingType {
 
-	DATASET (1);
+	DATASET(1);
 
-	private Integer value;
+	private Integer code;
 
-	LabelPrintingType (final Integer value) {
-		this.value = value;
+	LabelPrintingType(final Integer code) {
+		this.code = code;
 	}
 
-	public Integer getValue() {
-		return value;
+	public Integer getCode() {
+		return code;
 	}
 
-	public void setValue(final Integer value) {
-		this.value = value;
+	public void setCode(final Integer value) {
+		this.code = code;
+	}
+
+	public static LabelPrintingType getEnumByCode(final Integer code) {
+		for (LabelPrintingType e : LabelPrintingType.values()) {
+			if (code == e.getCode())
+				return e;
+		}
+		return null;
 	}
 }
