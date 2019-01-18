@@ -13,6 +13,8 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FillPatternType;
+import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -55,6 +57,8 @@ public class DatasetXLSGenerator {
 	private static final String NO_RANGE = "All values allowed";
 	public static final String POSSIBLE_VALUES_AS_STRING_DELIMITER = "/";
 	private static final String STUDY = "STUDY";
+	private static final String ENVIRONMENT = "ENVIRONMENT";
+	private static final String PLOT = "PLOT";
 
 	@Autowired
 	ResourceBundleMessageSource messageSource;
@@ -62,14 +66,16 @@ public class DatasetXLSGenerator {
 	@Resource
 	private StudyDataManager studyDataManager;
 
-	protected File generateXLSFile(final Integer studyId,
-		final List<MeasurementVariable> columns, final List<ObservationUnitRow> reorderedObservationUnitRows,
+	protected File generateXLSFile(
+		final Integer studyId,
+		final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
+		final List<ObservationUnitRow> reorderedObservationUnitRows,
 		final String fileNamePath) throws IOException {
 		final File newFile = new File(fileNamePath);
 		FileOutputStream fos = null;
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
-		this.writeDescriptionSheet(xlsBook, studyId);
+		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto);
 		this.writeObservationSheet(columns, reorderedObservationUnitRows, xlsBook);
 
 		try {
@@ -85,7 +91,8 @@ public class DatasetXLSGenerator {
 		return newFile;
 	}
 
-	private void writeObservationSheet(final List<MeasurementVariable> columns, final List<ObservationUnitRow> reorderedObservationUnitRows,
+	private void writeObservationSheet(
+		final List<MeasurementVariable> columns, final List<ObservationUnitRow> reorderedObservationUnitRows,
 		final HSSFWorkbook xlsBook) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFSheet xlsSheet = xlsBook.createSheet(this.messageSource.getMessage("export.study.sheet.observation", null, locale));
@@ -141,18 +148,14 @@ public class DatasetXLSGenerator {
 	protected CellStyle getObservationHeaderStyle(final boolean isFactor, final HSSFWorkbook xlsBook) {
 		final CellStyle style;
 		if (isFactor) {
-			style = this.getHeaderStyle(xlsBook, 51, 153, 102);
+			style = this.getHeaderStyle(xlsBook, this.getColorIndex(xlsBook, 51, 153, 102));
 		} else {
-			style = this.getHeaderStyle(xlsBook, 51, 51, 153);
+			style = this.getHeaderStyle(xlsBook, this.getColorIndex(xlsBook, 51, 51, 153));
 		}
 		return style;
 	}
 
-	private CellStyle getHeaderStyle(final HSSFWorkbook xlsBook, final int c1, final int c2, final int c3) {
-		final HSSFPalette palette = xlsBook.getCustomPalette();
-		final HSSFColor color = palette.findSimilarColor(c1, c2, c3);
-		final short colorIndex = color.getIndex();
-
+	private CellStyle getHeaderStyle(final HSSFWorkbook xlsBook, final short colorIndex) {
 		final HSSFFont whiteFont = xlsBook.createFont();
 		whiteFont.setColor(HSSFColor.HSSFColorPredefined.WHITE.getIndex());
 
@@ -164,27 +167,143 @@ public class DatasetXLSGenerator {
 		return cellStyle;
 	}
 
-	private void writeDescriptionSheet(final HSSFWorkbook xlsBook, final Integer studyId) {
+	private void writeDescriptionSheet(
+		final HSSFWorkbook xlsBook, final Integer studyId, final DatasetDTO dataSetDto) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFSheet xlsSheet = xlsBook.createSheet(this.messageSource.getMessage("export.study.sheet.description", null, locale));
 		int currentRowNum = 0;
 
 		final StudyDetails studyDetails = this.studyDataManager.getStudyDetails(studyId);
-		currentRowNum = this.writeStudyDetails(currentRowNum, xlsBook, xlsSheet, studyDetails);
-		xlsSheet.createRow(currentRowNum++);
-
 		final List<MeasurementVariable> studyDetailsVariables =
 			this.studyDataManager.getMeasurementVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
-		this.writeSection(
+		final int environmentDatasetId = this.studyDataManager.getDataSetsByType(studyId, DataSetType.SUMMARY_DATA).get(0).getId();
+		final int plotDatasetId = dataSetDto.getParentDatasetId();
+
+		final List<MeasurementVariable> environmentDetailsVariables =
+			this.studyDataManager
+				.getMeasurementVariables(environmentDatasetId, Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId()));
+
+		final List<MeasurementVariable> experimentalDesignVariablesForEnvironment =
+			this.studyDataManager
+				.getMeasurementVariables(environmentDatasetId, Lists.newArrayList(VariableType.EXPERIMENTAL_DESIGN.getId()));
+
+		final List<MeasurementVariable> experimentalDesignVariablesForPlot =
+			this.studyDataManager.getMeasurementVariables(plotDatasetId, Lists.newArrayList(VariableType.EXPERIMENTAL_DESIGN.getId()));
+
+		final List<MeasurementVariable> environmentalConditionsVariables =
+			this.studyDataManager
+				.getMeasurementVariables(environmentDatasetId, Lists.newArrayList(VariableType.STUDY_CONDITION.getId()));
+
+		final List<MeasurementVariable> treatmentFactorsVariables =
+			this.studyDataManager
+				.getMeasurementVariables(plotDatasetId, Lists.newArrayList(VariableType.TREATMENT_FACTOR.getId()));
+
+		final List<MeasurementVariable> germplasmDescriptorsVariables =
+			this.studyDataManager
+				.getMeasurementVariables(plotDatasetId, Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
+
+		final List<MeasurementVariable> observationUnitVariables = this.studyDataManager
+			.getMeasurementVariables(dataSetDto.getDatasetId(), Lists.newArrayList(VariableType.OBSERVATION_UNIT.getId()));
+
+		final List<MeasurementVariable> traitsVariables = this.studyDataManager
+			.getMeasurementVariables(dataSetDto.getDatasetId(), Lists.newArrayList(VariableType.TRAIT.getId()));
+
+		final List<MeasurementVariable> selectionsVariables = this.studyDataManager
+			.getMeasurementVariables(dataSetDto.getDatasetId(), Lists.newArrayList(VariableType.SELECTION_METHOD.getId()));
+
+		currentRowNum = this.writeStudyDetails(currentRowNum, xlsBook, xlsSheet, studyDetails);
+		xlsSheet.createRow(currentRowNum++);
+
+		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
 			studyDetailsVariables,
 			"export.study.description.column.study.details",
-			153,
-			51,
-			0, STUDY);
+			this.getColorIndex(xlsBook, 153, 51, 0), STUDY, true);
+		xlsSheet.createRow(currentRowNum++);
+
+		currentRowNum = this.writeSection(
+			currentRowNum,
+			xlsBook,
+			xlsSheet,
+			experimentalDesignVariablesForEnvironment,
+			"export.study.description.column.experimental.design",
+			this.getColorIndex(xlsBook, 124, 124, 124), ENVIRONMENT, true);
+		xlsSheet.createRow(currentRowNum++);
+
+		currentRowNum = this.writeSection(
+			currentRowNum,
+			xlsBook,
+			xlsSheet,
+			experimentalDesignVariablesForPlot,
+			"export.study.description.column.experimental.design",
+			this.getColorIndex(xlsBook, 124, 124, 124), PLOT, false);
+		xlsSheet.createRow(currentRowNum++);
+
+		currentRowNum = this.writeSection(
+			currentRowNum,
+			xlsBook,
+			xlsSheet,
+			environmentDetailsVariables,
+			"export.study.description.column.environment.details",
+			this.getColorIndex(xlsBook, 124, 124, 124), ENVIRONMENT, true);
+		xlsSheet.createRow(currentRowNum++);
+
+		currentRowNum = this.writeSection(
+			currentRowNum,
+			xlsBook,
+			xlsSheet,
+			environmentalConditionsVariables,
+			"export.study.description.column.environmental.conditions",
+			this.getColorIndex(xlsBook, 124, 124, 124), ENVIRONMENT, true);
+		xlsSheet.createRow(currentRowNum++);
+
+		currentRowNum = this.writeSection(
+			currentRowNum,
+			xlsBook,
+			xlsSheet,
+			treatmentFactorsVariables,
+			"export.study.description.column.treatment.factors",
+			this.getColorIndex(xlsBook, 124, 124, 124), STUDY, true);
+		xlsSheet.createRow(currentRowNum++);
+
+		currentRowNum = this.writeSection(
+			currentRowNum,
+			xlsBook,
+			xlsSheet,
+			germplasmDescriptorsVariables,
+			"export.study.description.column.germplasm.descriptors",
+			this.getColorIndex(xlsBook, 51, 153, 102), PLOT, true);
+		xlsSheet.createRow(currentRowNum++);
+
+		currentRowNum = this.writeSection(
+			currentRowNum,
+			xlsBook,
+			xlsSheet,
+			observationUnitVariables,
+			"export.study.description.column.observation.unit",
+			this.getColorIndex(xlsBook, 51, 153, 102), DataSetType.findById(dataSetDto.getDatasetTypeId()).name(), true);
+		xlsSheet.createRow(currentRowNum++);
+
+		currentRowNum = this.writeSection(
+			currentRowNum,
+			xlsBook,
+			xlsSheet,
+			traitsVariables,
+			"export.study.description.column.traits",
+			this.getColorIndex(xlsBook, 51, 51, 153), DataSetType.findById(dataSetDto.getDatasetTypeId()).name(), true);
+		xlsSheet.createRow(currentRowNum++);
+
+		this.writeSection(
+			currentRowNum,
+			xlsBook,
+			xlsSheet,
+			selectionsVariables,
+			"export.study.description.column.selections",
+			this.getColorIndex(xlsBook, 51, 51, 153), DataSetType.findById(dataSetDto.getDatasetTypeId()).name(), true);
+
 		xlsSheet.setColumnWidth(0, 20 * PIXEL_SIZE);
 		xlsSheet.setColumnWidth(1, 24 * PIXEL_SIZE);
 		xlsSheet.setColumnWidth(2, 30 * PIXEL_SIZE);
@@ -193,9 +312,11 @@ public class DatasetXLSGenerator {
 		xlsSheet.setColumnWidth(5, 15 * PIXEL_SIZE);
 		xlsSheet.setColumnWidth(6, 20 * PIXEL_SIZE);
 		xlsSheet.setColumnWidth(7, 20 * PIXEL_SIZE);
+		xlsSheet.setColumnWidth(8, 20 * PIXEL_SIZE);
 	}
 
-	private int writeStudyDetails(final int currentRowNum, final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet,
+	private int writeStudyDetails(
+		final int currentRowNum, final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet,
 		final StudyDetails studyDetails) {
 		int rowNumIndex = currentRowNum;
 		this.writeStudyDetailRow(xlsBook, xlsSheet, rowNumIndex++, "export.study.description.details.study",
@@ -224,93 +345,116 @@ public class DatasetXLSGenerator {
 		return rowNumIndex;
 	}
 
-	private void writeSectionHeader(final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final int currentRowNum, final String typeLabel,
-		final int c1, final int c2, final int c3) {
+	private void writeSectionHeader(
+		final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final int currentRowNum, final String typeLabel, final short color) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFRow row = xlsSheet.createRow(currentRowNum);
 
 		HSSFCell cell = row.createCell(VARIABLE_NAME_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.getHeaderStyle(xlsBook, c1, c2, c3));
+		cell.setCellStyle(this.getHeaderStyle(xlsBook, color));
 		cell.setCellValue(this.messageSource.getMessage(typeLabel, null, locale));
 
 		cell = row.createCell(DESCRIPTION_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.getHeaderStyle(xlsBook, c1, c2, c3));
+		cell.setCellStyle(this.getHeaderStyle(xlsBook, color));
 		cell.setCellValue(this.messageSource.getMessage("export.study.description.column.description", null, locale));
 
 		cell = row.createCell(ONTOLOGY_ID_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.getHeaderStyle(xlsBook, c1, c2, c3));
+		cell.setCellStyle(this.getHeaderStyle(xlsBook, color));
 		cell.setCellValue(this.messageSource.getMessage("export.study.description.column.ontology.id", null, locale));
 
 		cell = row.createCell(PROPERTY_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.getHeaderStyle(xlsBook, c1, c2, c3));
+		cell.setCellStyle(this.getHeaderStyle(xlsBook, color));
 		cell.setCellValue(this.messageSource.getMessage("export.study.description.column.property", null, locale));
 
 		cell = row.createCell(SCALE_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.getHeaderStyle(xlsBook, c1, c2, c3));
+		cell.setCellStyle(this.getHeaderStyle(xlsBook, color));
 		cell.setCellValue(this.messageSource.getMessage("export.study.description.column.scale", null, locale));
 
 		cell = row.createCell(METHOD_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.getHeaderStyle(xlsBook, c1, c2, c3));
+		cell.setCellStyle(this.getHeaderStyle(xlsBook, color));
 		cell.setCellValue(this.messageSource.getMessage("export.study.description.column.method", null, locale));
 
 		cell = row.createCell(DATATYPE_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.getHeaderStyle(xlsBook, c1, c2, c3));
+		cell.setCellStyle(this.getHeaderStyle(xlsBook, color));
 		cell.setCellValue(this.messageSource.getMessage("export.study.description.column.datatype", null, locale));
 
 		cell = row.createCell(VARIABLE_VALUE_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.getHeaderStyle(xlsBook, c1, c2, c3));
+		cell.setCellStyle(this.getHeaderStyle(xlsBook, color));
 		cell.setCellValue(this.messageSource.getMessage("export.study.description.column.value", null, locale));
 
 		cell = row.createCell(DATASET_COLUMN_INDEX, CellType.STRING);
-		cell.setCellStyle(this.getHeaderStyle(xlsBook, c1, c2, c3));
+		cell.setCellStyle(this.getHeaderStyle(xlsBook, color));
 		cell.setCellValue(this.messageSource.getMessage("export.study.description.column.dataset", null, locale));
 	}
 
-	private int writeSection(final int currentRowNum, final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet,
-		final List<MeasurementVariable> variables, final String sectionLabel, final int c1, final int c2, final int c3,
-		final String datasetColumn) {
+	private int writeSection(
+		final int currentRowNum, final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet,
+		final List<MeasurementVariable> variables, final String sectionLabel, final short headerColor,
+		final String datasetColumn, final boolean withHeader) {
+		final CellStyle backgroundStyle = xlsBook.createCellStyle();
+		final HSSFFont blackFont = xlsBook.createFont();
+		backgroundStyle.setFillBackgroundColor(this.getColorIndex(xlsBook, 231, 230, 230));
+		blackFont.setColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
+		backgroundStyle.setFont(blackFont);
+
 		int rowNumIndex = currentRowNum;
-		this.writeSectionHeader(xlsBook, xlsSheet, rowNumIndex++, sectionLabel, c1, c2, c3);
+		if (withHeader) {
+			this.writeSectionHeader(xlsBook, xlsSheet, rowNumIndex++, sectionLabel, headerColor);
+		}
+
 		if (variables != null && !variables.isEmpty()) {
 			for (final MeasurementVariable variable : variables) {
-				this.writeSectionRow(rowNumIndex++, xlsSheet, variable, datasetColumn);
+				final String cropOntologyId = variable.getCropOntology();
+
+				this.writeSectionRow(
+					rowNumIndex++, xlsSheet, variable, datasetColumn,
+					cropOntologyId, backgroundStyle);
 			}
 		}
 		return rowNumIndex;
-
 	}
 
-	private void writeSectionRow(final int currentRowNum, final HSSFSheet xlsSheet, final MeasurementVariable measurementVariable,
-		final String datasetColumn) {
+	private void writeSectionRow(
+		final int currentRowNum, final HSSFSheet xlsSheet, final MeasurementVariable measurementVariable,
+		final String datasetColumn, final String ontologyId, final CellStyle backgroundStyle) {
 		{
 			final HSSFRow row = xlsSheet.createRow(currentRowNum);
 
 			HSSFCell cell = row.createCell(VARIABLE_NAME_COLUMN_INDEX, CellType.STRING);
 			cell.setCellValue(measurementVariable.getName());
+			cell.setCellStyle(backgroundStyle);
 
 			cell = row.createCell(DESCRIPTION_COLUMN_INDEX, CellType.STRING);
 			cell.setCellValue(measurementVariable.getDescription());
+			cell.setCellStyle(backgroundStyle);
 
 			cell = row.createCell(ONTOLOGY_ID_COLUMN_INDEX, CellType.STRING);
-			cell.setCellValue(measurementVariable.getTermId());
+			cell.setCellValue(ontologyId);
+			cell.setCellStyle(backgroundStyle);
 
 			cell = row.createCell(PROPERTY_COLUMN_INDEX, CellType.STRING);
 			cell.setCellValue(measurementVariable.getProperty());
+			cell.setCellStyle(backgroundStyle);
 
 			cell = row.createCell(SCALE_COLUMN_INDEX, CellType.STRING);
 			cell.setCellValue(measurementVariable.getScale());
+			cell.setCellStyle(backgroundStyle);
 
 			cell = row.createCell(METHOD_COLUMN_INDEX, CellType.STRING);
 			cell.setCellValue(measurementVariable.getMethod());
+			cell.setCellStyle(backgroundStyle);
 
 			cell = row.createCell(DATATYPE_COLUMN_INDEX, CellType.STRING);
 			cell.setCellValue(measurementVariable.getDataTypeCode());
+			cell.setCellStyle(backgroundStyle);
 
 			cell = row.createCell(VARIABLE_VALUE_COLUMN_INDEX, CellType.STRING);
 			this.setContentOfVariableValueColumn(cell, measurementVariable);
+			cell.setCellStyle(backgroundStyle);
 
 			cell = row.createCell(DATASET_COLUMN_INDEX, CellType.STRING);
 			cell.setCellValue(datasetColumn);
+			cell.setCellStyle(backgroundStyle);
 		}
 	}
 
@@ -406,15 +550,21 @@ public class DatasetXLSGenerator {
 		}
 	}
 
-	private void writeStudyDetailRow(final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final int currentRowNum, final String label,
+	private void writeStudyDetailRow(
+		final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final int currentRowNum, final String label,
 		final String value) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFRow row = xlsSheet.createRow(currentRowNum);
 		HSSFCell cell = row.createCell(0, CellType.STRING);
-		cell.setCellStyle(this.getHeaderStyle(xlsBook, 153, 51, 0));
+		cell.setCellStyle(this.getHeaderStyle(xlsBook, this.getColorIndex(xlsBook, 153, 51, 0)));
 		cell.setCellValue(this.messageSource.getMessage(label, null, locale));
 		cell = row.createCell(1, CellType.STRING);
 		cell.setCellValue(value);
 	}
 
+	private short getColorIndex(final HSSFWorkbook xlsBook, final int c1, final int c2, final int c3) {
+		final HSSFPalette palette = xlsBook.getCustomPalette();
+		final HSSFColor color = palette.findSimilarColor(c1, c2, c3);
+		return color.getIndex();
+	}
 }

@@ -184,7 +184,7 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 
 			final String fileNamePath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 
-			files.add(this.datasetXLSGenerator.generateXLSFile(study.getId(), columns, reorderedObservationUnitRows, fileNamePath));
+			files.add(this.datasetXLSGenerator.generateXLSFile(study.getId(), dataSetDto, columns, reorderedObservationUnitRows, fileNamePath));
 		}
 
 		if (files.size() == 1) {
