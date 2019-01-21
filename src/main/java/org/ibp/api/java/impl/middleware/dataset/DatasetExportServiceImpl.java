@@ -88,9 +88,10 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 	}
 
 	protected File generateCSVFiles(
-		final Study study, final DatasetDTO dataSetDto, final Set<Integer> studyInstances, final int collectionOrderId)
+		final Study study, final DatasetDTO dataSetDto, final Set<Integer> studyInstanceIds, final int collectionOrderId)
 		throws IOException {
-		final Map<Integer, StudyInstance>  selectedDatasetInstancesMap = getSelectedDatasetInstancesMap(dataSetDto.getInstances(), studyInstances);
+		final Map<Integer, StudyInstance>  selectedDatasetInstancesMap = getSelectedDatasetInstancesMap(dataSetDto.getInstances(),
+			studyInstanceIds);
 
 		final List<File> csvFiles = new ArrayList<>();
 
@@ -101,13 +102,13 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 		final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder = DatasetCollectionOrderServiceImpl.CollectionOrder.findById(collectionOrderId);
 
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
-			this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataSetDto.getDatasetId(), new ArrayList<>(studyInstances));
-
-		for(Integer instanceNumber: studyInstances) {
-			final List<ObservationUnitRow> observationUnitRows = observationUnitRowMap.get(instanceNumber);
+			this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataSetDto.getDatasetId(), new ArrayList<>(
+				studyInstanceIds));
+		for(Integer instanceDBID: studyInstanceIds) {
+			final List<ObservationUnitRow> observationUnitRows = observationUnitRowMap.get(instanceDBID);
 
 			final List<ObservationUnitRow> reorderedObservationUnitRows = datasetCollectionOrderService
-				.reorder(collectionOrder, trialDatasetId, String.valueOf(instanceNumber), observationUnitRows);
+				.reorder(collectionOrder, trialDatasetId, String.valueOf(selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber()), observationUnitRows);
 			// Build the filename with the following format:
 			// study_name + TRIAL_INSTANCE number + location_abbr +  dataset_type + dataset_name
 			final String sanitizedFileName = FileUtils.sanitizeFileName(String
@@ -131,8 +132,10 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 	}
 
 	protected File generateCSVFileInSingleFile(
-		final Study study, final DatasetDTO dataSetDto, final Set<Integer> studyInstances, final int collectionOrderId)
+		final Study study, final DatasetDTO dataSetDto, final Set<Integer> studyInstanceIds, final int collectionOrderId)
 		throws IOException {
+		final Map<Integer, StudyInstance>  selectedDatasetInstancesMap = getSelectedDatasetInstancesMap(dataSetDto.getInstances(),
+			studyInstanceIds);
 		// Get all variables for the dataset
 		final List<MeasurementVariable> columns = this.reorderColumns(this.studyDatasetService.getAllDatasetVariables(study.getId(), dataSetDto.getDatasetId()));
 
@@ -140,7 +143,8 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 		final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder = DatasetCollectionOrderServiceImpl.CollectionOrder.findById(collectionOrderId);
 
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
-			this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataSetDto.getDatasetId(), new ArrayList<>(studyInstances));
+			this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataSetDto.getDatasetId(), new ArrayList<>(
+				studyInstanceIds));
 		//final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = this.mockObservationUnitRowMap();
 
 		final File temporaryFolder = Files.createTempDir();
@@ -150,11 +154,11 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 		final CSVWriter csvWriter =
 			new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',');
 		final File csvFile = this.datasetCSVGenerator.generateCSVFileWithHeaders(columns, fileNameFullPath, csvWriter);
-		for(Integer instanceNumber: studyInstances) {
-			final List<ObservationUnitRow> observationUnitRows = observationUnitRowMap.get(instanceNumber);
+		for(Integer instanceDBID: studyInstanceIds) {
+			final List<ObservationUnitRow> observationUnitRows = observationUnitRowMap.get(instanceDBID);
 
 			final List<ObservationUnitRow> reorderedObservationUnitRows = datasetCollectionOrderService
-				.reorder(collectionOrder, trialDatasetId, String.valueOf(instanceNumber), observationUnitRows);
+				.reorder(collectionOrder, trialDatasetId, String.valueOf(selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber()), observationUnitRows);
 
 			this.datasetCSVGenerator.writeInstanceObservationUnitRowsToCSVFile(columns, reorderedObservationUnitRows, csvWriter);
 		}
