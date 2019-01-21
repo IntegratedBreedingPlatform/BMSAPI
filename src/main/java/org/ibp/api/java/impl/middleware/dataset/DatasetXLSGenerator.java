@@ -1,6 +1,8 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -34,6 +36,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -180,129 +183,115 @@ public class DatasetXLSGenerator {
 		final int environmentDatasetId = this.studyDataManager.getDataSetsByType(studyId, DataSetType.SUMMARY_DATA).get(0).getId();
 		final int plotDatasetId = dataSetDto.getParentDatasetId();
 
-		final List<MeasurementVariable> environmentDetailsVariables =
+		final List<MeasurementVariable> environmentVariables =
 			this.studyDataManager
-				.getMeasurementVariables(environmentDatasetId, Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId()));
+				.getMeasurementVariables(
+					environmentDatasetId, Lists
+						.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
+							VariableType.STUDY_CONDITION.getId()));
 
-		final List<MeasurementVariable> experimentalDesignVariablesForEnvironment =
-			this.studyDataManager
-				.getMeasurementVariables(environmentDatasetId, Lists.newArrayList(VariableType.EXPERIMENTAL_DESIGN.getId()));
+		final List<MeasurementVariable> plotVariables =
+			this.studyDataManager.getMeasurementVariables(plotDatasetId, Lists
+				.newArrayList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId(),
+					VariableType.GERMPLASM_DESCRIPTOR.getId()));
 
-		final List<MeasurementVariable> experimentalDesignVariablesForPlot =
-			this.studyDataManager.getMeasurementVariables(plotDatasetId, Lists.newArrayList(VariableType.EXPERIMENTAL_DESIGN.getId()));
-
-		final List<MeasurementVariable> environmentalConditionsVariables =
-			this.studyDataManager
-				.getMeasurementVariables(environmentDatasetId, Lists.newArrayList(VariableType.STUDY_CONDITION.getId()));
-
-		final List<MeasurementVariable> treatmentFactorsVariables =
-			this.studyDataManager
-				.getMeasurementVariables(plotDatasetId, Lists.newArrayList(VariableType.TREATMENT_FACTOR.getId()));
-
-		final List<MeasurementVariable> germplasmDescriptorsVariables =
-			this.studyDataManager
-				.getMeasurementVariables(plotDatasetId, Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
-
-		final List<MeasurementVariable> observationUnitVariables = this.studyDataManager
-			.getMeasurementVariables(dataSetDto.getDatasetId(), Lists.newArrayList(VariableType.OBSERVATION_UNIT.getId()));
-
-		final List<MeasurementVariable> traitsVariables = this.studyDataManager
-			.getMeasurementVariables(dataSetDto.getDatasetId(), Lists.newArrayList(VariableType.TRAIT.getId()));
-
-		final List<MeasurementVariable> selectionsVariables = this.studyDataManager
-			.getMeasurementVariables(dataSetDto.getDatasetId(), Lists.newArrayList(VariableType.SELECTION_METHOD.getId()));
+		final List<MeasurementVariable> datasetVariables = this.studyDataManager
+			.getMeasurementVariables(dataSetDto.getDatasetId(), Lists
+				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 
 		currentRowNum = this.writeStudyDetails(currentRowNum, xlsBook, xlsSheet, studyDetails);
 		xlsSheet.createRow(currentRowNum++);
 
+		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.study.details",
+			this.getColorIndex(xlsBook, 153, 51, 0));
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			studyDetailsVariables,
-			"export.study.description.column.study.details",
-			this.getColorIndex(xlsBook, 153, 51, 0), STUDY, true);
+			studyDetailsVariables, STUDY);
 		xlsSheet.createRow(currentRowNum++);
+
+		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.experimental.design",
+			this.getColorIndex(xlsBook, 124, 124, 124));
+		currentRowNum = this.writeSection(
+			currentRowNum,
+			xlsBook,
+			xlsSheet,
+			this.filter(environmentVariables, VariableType.EXPERIMENTAL_DESIGN),
+			ENVIRONMENT);
 
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			experimentalDesignVariablesForEnvironment,
-			"export.study.description.column.experimental.design",
-			this.getColorIndex(xlsBook, 124, 124, 124), ENVIRONMENT, true);
+			this.filter(plotVariables, VariableType.EXPERIMENTAL_DESIGN), PLOT);
 		xlsSheet.createRow(currentRowNum++);
 
+		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environment.details",
+			this.getColorIndex(xlsBook, 124, 124, 124));
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			experimentalDesignVariablesForPlot,
-			"export.study.description.column.experimental.design",
-			this.getColorIndex(xlsBook, 124, 124, 124), PLOT, false);
+			this.filter(environmentVariables, VariableType.ENVIRONMENT_DETAIL), ENVIRONMENT);
 		xlsSheet.createRow(currentRowNum++);
 
+		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environmental.conditions",
+			this.getColorIndex(xlsBook, 124, 124, 124));
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			environmentDetailsVariables,
-			"export.study.description.column.environment.details",
-			this.getColorIndex(xlsBook, 124, 124, 124), ENVIRONMENT, true);
+			this.filter(environmentVariables, VariableType.STUDY_CONDITION), ENVIRONMENT);
 		xlsSheet.createRow(currentRowNum++);
 
+		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.treatment.factors",
+			this.getColorIndex(xlsBook, 124, 124, 124));
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			environmentalConditionsVariables,
-			"export.study.description.column.environmental.conditions",
-			this.getColorIndex(xlsBook, 124, 124, 124), ENVIRONMENT, true);
+			this.filter(plotVariables, VariableType.TREATMENT_FACTOR), STUDY);
 		xlsSheet.createRow(currentRowNum++);
 
+		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.germplasm.descriptors",
+			this.getColorIndex(xlsBook, 51, 153, 102));
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			treatmentFactorsVariables,
-			"export.study.description.column.treatment.factors",
-			this.getColorIndex(xlsBook, 124, 124, 124), STUDY, true);
+			this.filter(plotVariables, VariableType.GERMPLASM_DESCRIPTOR), PLOT);
 		xlsSheet.createRow(currentRowNum++);
 
+		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.observation.unit",
+			this.getColorIndex(xlsBook, 51, 153, 102));
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			germplasmDescriptorsVariables,
-			"export.study.description.column.germplasm.descriptors",
-			this.getColorIndex(xlsBook, 51, 153, 102), PLOT, true);
+			this.filter(datasetVariables, VariableType.OBSERVATION_UNIT),
+			DataSetType.findById(dataSetDto.getDatasetTypeId()).name());
 		xlsSheet.createRow(currentRowNum++);
 
+		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.traits",
+			this.getColorIndex(xlsBook, 51, 51, 153));
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			observationUnitVariables,
-			"export.study.description.column.observation.unit",
-			this.getColorIndex(xlsBook, 51, 153, 102), DataSetType.findById(dataSetDto.getDatasetTypeId()).name(), true);
+			this.filter(datasetVariables, VariableType.TRAIT),
+			DataSetType.findById(dataSetDto.getDatasetTypeId()).name());
 		xlsSheet.createRow(currentRowNum++);
 
-		currentRowNum = this.writeSection(
-			currentRowNum,
-			xlsBook,
-			xlsSheet,
-			traitsVariables,
-			"export.study.description.column.traits",
-			this.getColorIndex(xlsBook, 51, 51, 153), DataSetType.findById(dataSetDto.getDatasetTypeId()).name(), true);
-		xlsSheet.createRow(currentRowNum++);
 
+		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.selections",
+			this.getColorIndex(xlsBook, 51, 51, 153));
 		this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			selectionsVariables,
-			"export.study.description.column.selections",
-			this.getColorIndex(xlsBook, 51, 51, 153), DataSetType.findById(dataSetDto.getDatasetTypeId()).name(), true);
+			this.filter(datasetVariables, VariableType.SELECTION_METHOD),
+			DataSetType.findById(dataSetDto.getDatasetTypeId()).name());
 
 		xlsSheet.setColumnWidth(0, 20 * PIXEL_SIZE);
 		xlsSheet.setColumnWidth(1, 24 * PIXEL_SIZE);
@@ -389,19 +378,14 @@ public class DatasetXLSGenerator {
 
 	private int writeSection(
 		final int currentRowNum, final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet,
-		final List<MeasurementVariable> variables, final String sectionLabel, final short headerColor,
-		final String datasetColumn, final boolean withHeader) {
+		final List<MeasurementVariable> variables, final String datasetColumn) {
+
 		final CellStyle backgroundStyle = xlsBook.createCellStyle();
 		final HSSFFont blackFont = xlsBook.createFont();
 		backgroundStyle.setFillBackgroundColor(this.getColorIndex(xlsBook, 231, 230, 230));
 		blackFont.setColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
 		backgroundStyle.setFont(blackFont);
-
 		int rowNumIndex = currentRowNum;
-		if (withHeader) {
-			this.writeSectionHeader(xlsBook, xlsSheet, rowNumIndex++, sectionLabel, headerColor);
-		}
-
 		if (variables != null && !variables.isEmpty()) {
 			for (final MeasurementVariable variable : variables) {
 				final String cropOntologyId = variable.getCropOntology();
@@ -411,6 +395,14 @@ public class DatasetXLSGenerator {
 					cropOntologyId, backgroundStyle);
 			}
 		}
+		return rowNumIndex;
+	}
+
+	private int createHeader(
+		final int currentRowNum, final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final String sectionLabel, final short headerColor) {
+
+		int rowNumIndex = currentRowNum;
+		this.writeSectionHeader(xlsBook, xlsSheet, rowNumIndex++, sectionLabel, headerColor);
 		return rowNumIndex;
 	}
 
@@ -566,5 +558,17 @@ public class DatasetXLSGenerator {
 		final HSSFPalette palette = xlsBook.getCustomPalette();
 		final HSSFColor color = palette.findSimilarColor(c1, c2, c3);
 		return color.getIndex();
+	}
+
+	private static List<MeasurementVariable> filter(final List<MeasurementVariable> measurementVariables, final VariableType variableType) {
+		final Collection<MeasurementVariable> variablesByType = CollectionUtils.select(measurementVariables, new Predicate() {
+
+			@Override
+			public boolean evaluate(final Object o) {
+				final MeasurementVariable measurementVariable = (MeasurementVariable) o;
+				return measurementVariable.getVariableType().equals(variableType);
+			}
+		});
+		return Lists.newArrayList(variablesByType);
 	}
 }

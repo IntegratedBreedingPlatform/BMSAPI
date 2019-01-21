@@ -3,6 +3,7 @@ package org.ibp.api.rest.dataset;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import liquibase.util.StringUtils;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -232,16 +233,16 @@ public class DatasetResource {
 		@RequestParam(value = "instanceIds") final Set<Integer> instanceIds,
 		@RequestParam(value = "collectionOrderId") final Integer collectionOrderId) {
 
-		if (CSV.equals(fileType)) {
-			final File file = this.datasetExportService.exportAsCSV(studyId, datasetId, instanceIds, collectionOrderId);
-			return this.getFileSystemResourceResponseEntity(file);
-		} else if (XLS.equals(fileType)) {
-			final File file = this.datasetExportService.exportAsExcel(studyId, datasetId, instanceIds, collectionOrderId);
-			return this.getFileSystemResourceResponseEntity(file);
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+		if (!StringUtils.isEmpty(fileType)) {
+			if (CSV.equalsIgnoreCase(fileType.trim())) {
+				final File file = this.datasetExportService.exportAsCSV(studyId, datasetId, instanceIds, collectionOrderId);
+				return this.getFileSystemResourceResponseEntity(file);
+			} else if (XLS.equalsIgnoreCase(fileType.trim())) {
+				final File file = this.datasetExportService.exportAsExcel(studyId, datasetId, instanceIds, collectionOrderId);
+				return this.getFileSystemResourceResponseEntity(file);
+			}
 		}
-
+		return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 	}
 
 	private ResponseEntity<FileSystemResource> getFileSystemResourceResponseEntity(final File file) {
