@@ -31,9 +31,6 @@ import java.util.Set;
 public class SampleListServiceImpl implements SampleListService {
 
 	protected static final String PARENT_ID = "parentId";
-	protected static final String SAMPLE_ID = "Sample Id";
-	protected static final String PLATE_ID = "Plate Id";
-	protected static final String WELL = "Well";
 
 	@Autowired
 	private org.generationcp.middleware.service.api.SampleListService sampleListServiceMW;
@@ -47,7 +44,6 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkArgument(sampleListDto.getInstanceIds() != null, "The Instance List must not be null");
 		Preconditions.checkArgument(!sampleListDto.getInstanceIds().isEmpty(), "The Instance List must not be empty");
 		Preconditions.checkNotNull(sampleListDto.getSelectionVariableId(), "The Selection Variable Id must not be empty");
-		Preconditions.checkNotNull(sampleListDto.getStudyId(), "The Study Id must not be empty");
 		Preconditions.checkNotNull(sampleListDto.getListName(), "The List Name must not be empty");
 		Preconditions.checkArgument(StringUtils.isNotBlank(sampleListDto.getListName()), "The List Name must not be empty");
 		Preconditions.checkArgument(sampleListDto.getListName().length() <= 100, "List Name must not exceed 100 characters");
@@ -190,7 +186,7 @@ public class SampleListServiceImpl implements SampleListService {
 		}
 
 		sampleListDTO.setSelectionVariableId(dto.getSelectionVariableId());
-		sampleListDTO.setStudyId(dto.getStudyId());
+		sampleListDTO.setDatasetId(dto.getDatasetId());
 		sampleListDTO.setTakenBy(dto.getTakenBy());
 		sampleListDTO.setParentId(dto.getParentId());
 		sampleListDTO.setListName(dto.getListName());

@@ -117,7 +117,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		this.dto.setInstanceIds(instanceIds);
 		this.dto.setTakenBy(SampleListResourceTest.ADMIN);
 		this.dto.setSamplingDate("2017-08-01");
-		this.dto.setStudyId(25025);
+		this.dto.setDatasetId(25025);
 		this.dto.setCropName("maize");
 		this.dto.setListName("SamplesTest");
 		this.dto.setCreatedDate("2017-10-12");

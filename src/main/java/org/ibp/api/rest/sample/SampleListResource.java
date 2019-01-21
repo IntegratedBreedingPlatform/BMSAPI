@@ -55,7 +55,7 @@ public class SampleListResource {
 	public CsvExportSampleListService csvExportSampleListService;
 
 	@ApiOperation(value = "Create sample list", notes = "Create sample list. ")
-	@RequestMapping(value = "/{crop}/sampleList", method = RequestMethod.POST)
+	@RequestMapping(value = "/{crop}/sampleLists", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity createSampleList(@PathVariable final String crop, @RequestBody final SampleListDto dto) {
 		dto.setCropName(crop);
