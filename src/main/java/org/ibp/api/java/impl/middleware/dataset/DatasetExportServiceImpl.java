@@ -185,14 +185,12 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 		int trialInstanceIndex = 0;
 		for(MeasurementVariable column: columns) {
 			if(TermId.TRIAL_INSTANCE_FACTOR.getId() == column.getTermId()) {
+				final MeasurementVariable trialInstanceMeasurementVariable = columns.remove(trialInstanceIndex);
+				columns.add(0, trialInstanceMeasurementVariable);
 				break;
 			}
 			trialInstanceIndex++;
 		}
-
-		final MeasurementVariable trialInstanceMeasurementVariable = columns.remove(trialInstanceIndex);
-		columns.add(0, trialInstanceMeasurementVariable);
-
 		return columns;
 
 	}
