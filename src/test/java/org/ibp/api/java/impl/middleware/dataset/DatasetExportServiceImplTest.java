@@ -3,11 +3,13 @@ package org.ibp.api.java.impl.middleware.dataset;
 import au.com.bytecode.opencsv.CSVWriter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.util.ZipUtil;
+import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -17,6 +19,7 @@ import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -156,7 +159,7 @@ public class DatasetExportServiceImplTest {
 
 		final File result = datasetExportService
 			.generateCSVFiles(
-				this.study, this.dataSetDTO, new HashSet<>(Arrays.asList(instanceId1, instanceId1)), DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId());
+				this.study, this.dataSetDTO, new HashSet<>(Arrays.asList(instanceId1, instanceId2)), DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId());
 		verify(this.studyDatasetService)
 			.getInstanceObservationUnitRowsMap(eq(this.study.getId()), eq(this.dataSetDTO.getDatasetId()), any(ArrayList.class));
 
@@ -207,7 +210,18 @@ public class DatasetExportServiceImplTest {
 
 	@Test
 	public void testGetSelectedDatasetInstancesMap() {
-		//
+		final List<StudyInstance> studyInstances = this.createStudyInstances();
+		Map<Integer, StudyInstance> selectedDatasetInstanceMap = this.datasetExportService.getSelectedDatasetInstancesMap(studyInstances, new HashSet<Integer>(Arrays.asList(this.instanceId2)));
+		Assert.assertEquals(1, selectedDatasetInstanceMap.size());
+
+		selectedDatasetInstanceMap = this.datasetExportService.getSelectedDatasetInstancesMap(studyInstances, new HashSet<Integer>(Arrays.asList(this.instanceId1, this.instanceId2)));
+		Assert.assertEquals(2, selectedDatasetInstanceMap.size());
+	}
+
+	@Test
+	public void testReorderColumns() {
+		final List<MeasurementVariable> reorderedColumns = this.datasetExportService.reorderColumns(this.createColumnHeaders());
+		Assert.assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), reorderedColumns.get(0).getTermId());
 	}
 
 	private List<StudyInstance> createStudyInstances() {
@@ -222,6 +236,22 @@ public class DatasetExportServiceImplTest {
 		studyInstance.setInstanceNumber(random.nextInt());
 		studyInstance.setLocationName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
 		return studyInstance;
+	}
+
+	private List<MeasurementVariable> createColumnHeaders() {
+		List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		MeasurementVariable mvar1 = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.GID.getId(), TermId.GID.name());
+		mvar1.setAlias("DIG");
+		measurementVariables.add(mvar1);
+
+		MeasurementVariable mvar2 = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.DESIG.getId(), TermId.DESIG.name());
+		mvar2.setAlias("DESIGNATION");
+		measurementVariables.add(mvar2);
+
+		MeasurementVariable mvar3 = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.name());
+		mvar3.setAlias("TRIAL_INSTANCE");
+		measurementVariables.add(mvar3);
+		return  measurementVariables;
 	}
 
 }
