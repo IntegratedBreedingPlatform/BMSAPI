@@ -113,7 +113,7 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 			// study_name + TRIAL_INSTANCE number + location_abbr +  dataset_type + dataset_name
 			final String sanitizedFileName = FileUtils.sanitizeFileName(String
 				.format(
-					"%s_%s_%s_%s_%s.csv", study.getName(), instanceNumber, selectedDatasetInstancesMap.get(instanceNumber).getLocationAbbreviation(),
+					"%s_%s_%s_%s_%s.csv", study.getName(), selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber(), selectedDatasetInstancesMap.get(instanceDBID).getLocationAbbreviation(),
 					DataSetType.findById(dataSetDto.getDatasetTypeId()).name(), dataSetDto.getName()));
 
 			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
