@@ -21,20 +21,25 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyListOf;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -145,22 +150,22 @@ public class DatasetExportServiceImplTest {
 			.thenReturn(new File(""));
 		when(this.zipUtil.zipFiles(eq(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
 
+		Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = Mockito.mock(HashMap.class);
+		Mockito.when(instanceObservationUnitRowsMap.get(anyInt())).thenReturn(new ArrayList<ObservationUnitRow>());
+		when(this.studyDatasetService.getInstanceObservationUnitRowsMap(eq(this.study.getId()), eq(this.dataSetDTO.getDatasetId()), any(ArrayList.class))).thenReturn(instanceObservationUnitRowsMap);
+
 		final File result = datasetExportService
 			.generateCSVFiles(
-				this.study, this.dataSetDTO, studyInstances, DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
+				this.study, this.dataSetDTO, new HashSet<>(Arrays.asList(instanceId1, instanceId1)), DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId());
+		verify(this.studyDatasetService)
+			.getInstanceObservationUnitRowsMap(eq(this.study.getId()), eq(this.dataSetDTO.getDatasetId()), any(ArrayList.class));
 
-		for (final StudyInstance studyInstance : studyInstances) {
-			verify(this.studyDatasetService)
-				.getObservationUnitRows(this.study.getId(), this.dataSetDTO.getDatasetId(), studyInstance.getInstanceDbId(), Integer.MAX_VALUE,
-					Integer.MAX_VALUE, null, "");
-
-			verify(this.datasetCollectionOrderService)
+		verify(this.datasetCollectionOrderService, times(studyInstances.size()))
 				.reorder(eq(DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER), eq(this.trialDataSet.getId()),
-					eq(String.valueOf(studyInstance.getInstanceNumber())), anyListOf(ObservationUnitRow.class));
+					anyString(), eq(new ArrayList<ObservationUnitRow>()));
 
-			verify(this.datasetCSVGenerator, times(studyInstances.size()))
-				.generateCSVFile(eq(measurementVariables), anyListOf(ObservationUnitRow.class), anyString(), any(CSVWriter.class));
-		}
+		verify(this.datasetCSVGenerator, times(studyInstances.size()))
+			.generateCSVFile(eq(measurementVariables), anyListOf(ObservationUnitRow.class), anyString(), any(CSVWriter.class));
 
 		verify(zipUtil).zipFiles(eq(this.study.getName()), anyListOf(File.class));
 		assertSame(result, zipFile);
@@ -169,9 +174,6 @@ public class DatasetExportServiceImplTest {
 
 	@Test
 	public void testGenerateCSVFilesOnlyOneInstance() throws IOException {
-
-		final StudyInstance studyInstance = this.createStudyInstance(instanceId1);
-		final List<String> headerNames = new ArrayList<>();
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 
 		final File csvFile = new File("");
@@ -179,18 +181,21 @@ public class DatasetExportServiceImplTest {
 		when(this.datasetCSVGenerator.generateCSVFile(eq(measurementVariables), anyListOf(ObservationUnitRow.class), anyString(), any(CSVWriter.class)))
 			.thenReturn(csvFile);
 
+		Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = Mockito.mock(HashMap.class);
+		Mockito.when(instanceObservationUnitRowsMap.get(anyInt())).thenReturn(new ArrayList<ObservationUnitRow>());
+		when(this.studyDatasetService.getInstanceObservationUnitRowsMap(eq(this.study.getId()), eq(this.dataSetDTO.getDatasetId()), any(ArrayList.class))).thenReturn(instanceObservationUnitRowsMap);
+
 		final File result = datasetExportService
 			.generateCSVFiles(
-				this.study, this.dataSetDTO, Arrays.asList(studyInstance),
-				DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
+				this.study, this.dataSetDTO, new HashSet<>(Arrays.asList(instanceId1)),
+				DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId());
 
 		verify(this.studyDatasetService)
-			.getObservationUnitRows(this.study.getId(), this.dataSetDTO.getDatasetId(), studyInstance.getInstanceDbId(), Integer.MAX_VALUE,
-				Integer.MAX_VALUE, null, "");
+			.getInstanceObservationUnitRowsMap(eq(this.study.getId()), eq(this.dataSetDTO.getDatasetId()), any(ArrayList.class));
 
 		verify(this.datasetCollectionOrderService)
 			.reorder(eq(DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER), eq(this.trialDataSet.getId()),
-				eq(String.valueOf(studyInstance.getInstanceNumber())), anyListOf(ObservationUnitRow.class));
+				anyString(), eq(new ArrayList<ObservationUnitRow>()));
 
 		verify(this.datasetCSVGenerator)
 			.generateCSVFile(eq(measurementVariables), anyListOf(ObservationUnitRow.class), anyString(), any(CSVWriter.class));
@@ -201,19 +206,8 @@ public class DatasetExportServiceImplTest {
 	}
 
 	@Test
-	public void testGetSelectedDatasetInstances() {
-
-		final List<StudyInstance> result1 =
-			datasetExportService
-				.getSelectedDatasetInstances(dataSetDTO.getInstances(), new HashSet<>(Arrays.asList(instanceId1, instanceId2)));
-
-		assertEquals(2, result1.size());
-
-		final List<StudyInstance> result2 =
-			datasetExportService.getSelectedDatasetInstances(dataSetDTO.getInstances(), new HashSet<>(Arrays.asList(instanceId1)));
-
-		assertEquals(1, result2.size());
-
+	public void testGetSelectedDatasetInstancesMap() {
+		//
 	}
 
 	private List<StudyInstance> createStudyInstances() {

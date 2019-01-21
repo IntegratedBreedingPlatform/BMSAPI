@@ -32,6 +32,24 @@ public class DatasetCSVGenerator {
 		return newFile;
 	}
 
+	protected File generateCSVFileWithHeaders(
+		final List<MeasurementVariable> columns, final String fileNameFullPath, final CSVWriter csvWriter) {
+		final File newFile = new File(fileNameFullPath);
+		csvWriter.writeNext(this.getHeaderNames(columns).toArray(new String[] {}));
+		return newFile;
+	}
+
+	protected void writeInstanceObservationUnitRowsToCSVFile(
+		final List<MeasurementVariable> columns, final List<ObservationUnitRow> observationUnitRows,
+		final CSVWriter csvWriter) {
+		// feed in your array (or convert your data to an array)
+		final List<String[]> rowValues = new ArrayList<>();
+		for (final ObservationUnitRow row : observationUnitRows) {
+			rowValues.add(this.getColumnValues(row, columns));
+		}
+		csvWriter.writeAll(rowValues);
+	}
+
 	protected String[] getColumnValues(final ObservationUnitRow row, List<MeasurementVariable> subObservationSetColumns) {
 		final List<String> values = new LinkedList<>();
 		for (final MeasurementVariable column : subObservationSetColumns) {
