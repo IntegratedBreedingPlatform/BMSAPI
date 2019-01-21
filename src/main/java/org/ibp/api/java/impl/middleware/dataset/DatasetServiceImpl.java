@@ -93,6 +93,17 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.middlewareDatasetService.getSubObservationSetColumns(subObservationSetId);
 	}
 
+
+	@Override
+	public List<MeasurementVariable> getAllDatasetVariables(final Integer studyId, final Integer subObservationSetId) {
+		this.studyValidator.validate(studyId, false);
+
+		// TODO generalize to any obs dataset (plot/subobs), make 3rd param false
+		this.datasetValidator.validateDataset(studyId, subObservationSetId, true);
+
+		return this.middlewareDatasetService.getAllDatasetVariables(subObservationSetId);
+	}
+
 	@Override
 	public long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> traitIds) {
 		this.studyValidator.validate(studyId, false);
@@ -233,6 +244,26 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(
+		final int studyId, final int datasetId, final List<Integer> instanceId) {
+		this.studyValidator.validate(studyId, false);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.instanceValidator.validate(datasetId, new HashSet<>(instanceId));
+		final Map<Integer, List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow>> observationUnitRowsMap =
+			this.middlewareDatasetService.getInstanceObservationUnitRowsMap(studyId, datasetId, instanceId);
+		final ModelMapper observationUnitRowMapper = new ModelMapper();
+		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+		final Map<Integer, List<ObservationUnitRow>> map = new HashMap<>();
+		for(Integer instanceNumber: observationUnitRowsMap.keySet()) {
+			final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows = observationUnitRowsMap.get(instanceNumber);
+			final  List<ObservationUnitRow> list = new ArrayList<>();
+			this.mapObservationUnitRows(observationUnitRowMapper, observationUnitRows, list);
+			map.put(instanceNumber, list);
+		}
+		return map;
+	}
+
+	@Override
 	public List<ObservationUnitRow> getObservationUnitRows(
 		final int studyId, final int datasetId, final int instanceId,
 		final int pageNumber, final int pageSize, final String sortBy, final String sortOrder) {
@@ -244,15 +275,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final List<ObservationUnitRow> list = new ArrayList<>();
-		for (final org.generationcp.middleware.service.api.dataset.ObservationUnitRow dto : observationUnitRows) {
-			final Map<String, ObservationUnitData> datas = new HashMap<>();
-			for (final String data : dto.getVariables().keySet()) {
-				datas.put(data, observationUnitRowMapper.map(dto.getVariables().get(data), ObservationUnitData.class));
-			}
-			final ObservationUnitRow observationUnitRow = observationUnitRowMapper.map(dto, ObservationUnitRow.class);
-			observationUnitRow.setVariables(datas);
-			list.add(observationUnitRow);
-		}
+		this.mapObservationUnitRows(observationUnitRowMapper, observationUnitRows, list);
 		return list;
 	}
 
@@ -438,6 +461,21 @@ public class DatasetServiceImpl implements DatasetService {
 
 		}
 		return overwritingData;
+	}
+
+	private void mapObservationUnitRows(
+		final ModelMapper observationUnitRowMapper,
+		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows,
+		final List<ObservationUnitRow> list) {
+		for (final org.generationcp.middleware.service.api.dataset.ObservationUnitRow dto : observationUnitRows) {
+			final Map<String, ObservationUnitData> datas = new HashMap<>();
+			for (final String data : dto.getVariables().keySet()) {
+				datas.put(data, observationUnitRowMapper.map(dto.getVariables().get(data), ObservationUnitData.class));
+			}
+			final ObservationUnitRow observationUnitRow = observationUnitRowMapper.map(dto, ObservationUnitRow.class);
+			observationUnitRow.setVariables(datas);
+			list.add(observationUnitRow);
+		}
 	}
 
 
