@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
+import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DataSetType;
@@ -105,11 +106,11 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> traitIds) {
+	public long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 
-		return this.middlewareDatasetService.countPhenotypes(datasetId, traitIds);
+		return this.middlewareDatasetService.countPhenotypes(datasetId, variableIds);
 	}
 
 	@Override
@@ -222,7 +223,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final DatasetDTO datasetDto = mapper.map(datasetDTO, DatasetDTO.class);
-		datasetDto.setInstances(convertToStudyInstances(mapper, datasetDTO.getInstances()));
+		datasetDto.setInstances(this.convertToStudyInstances(mapper, datasetDTO.getInstances()));
 		datasetDto.setStudyId(studyId);
 		datasetDto.setCropName(crop);
 
@@ -240,7 +241,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-		return convertToStudyInstances(mapper, middlewareDatasetService.getDatasetInstances(datasetId));
+		return this.convertToStudyInstances(mapper, this.middlewareDatasetService.getDatasetInstances(datasetId));
 	}
 
 	@Override
@@ -290,7 +291,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
 
 		this.datasetValidator.validateDatasetBelongsToStudy(studyId, parentId);
-
+		this.instanceValidator.validate(null, Sets.newHashSet(datasetGeneratorInput.getInstanceIds()));
 		this.datasetGeneratorInputValidator.validateBasicData(cropName, studyId, parentId, datasetGeneratorInput, bindingResult);
 
 		if (bindingResult.hasErrors()) {

@@ -510,7 +510,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final DatasetGeneratorInput datasetGeneratorInput = this.setupDatasetGeneratorInput("dataset.invalid.instances");
 
 		this.generateAndValidateDataset(
-			datasetGeneratorInput, "Some of the specified instances does not belong to the study or array is empty");
+			datasetGeneratorInput, "Specified instance(s) does not belong to the study or array is empty");
 	}
 
 	@Test
