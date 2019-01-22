@@ -39,7 +39,7 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 	@Override
 	public void validateInputData(final LabelsNeededSummaryInput labelsNeededSummaryInput) {
 		studyValidator.validate(labelsNeededSummaryInput.getStudyId(), false);
-		datasetValidator.validateDataset(labelsNeededSummaryInput.getStudyId(), labelsNeededSummaryInput.getDatasetId(), false);
+		datasetValidator.validateDataset(labelsNeededSummaryInput.getStudyId(), labelsNeededSummaryInput.getDatasetId(), true);
 	}
 
 	@Override
