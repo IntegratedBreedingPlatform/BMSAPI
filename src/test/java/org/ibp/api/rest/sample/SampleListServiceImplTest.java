@@ -34,12 +34,6 @@ public class SampleListServiceImplTest {
 	@InjectMocks
 	private SampleListServiceImpl sampleListService;
 
-	@Before
-	public void init() {
-
-	}
-
-
 	@Test
 	public void testMoveSampleListFolder() {
 
@@ -91,8 +85,7 @@ public class SampleListServiceImplTest {
 	@Test
 	public void testConvertToSamplePlateInfoMap() {
 		final List<SampleDTO> sampleDTOs = this.createSampleDto();
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), SampleDTO.class.getName());
-		final Map<String, SamplePlateInfo> map = this.sampleListService.convertToSamplePlateInfoMap(sampleDTOs, bindingResult);
+		final Map<String, SamplePlateInfo> map = this.sampleListService.convertToSamplePlateInfoMap(sampleDTOs);
 		Assert.assertEquals(2, map.size());
 		Assert.assertEquals("TestValue-1", map.get("SampleId-1").getPlateId());
 		Assert.assertEquals("TestValue-4", map.get("SampleId-1").getWell());
