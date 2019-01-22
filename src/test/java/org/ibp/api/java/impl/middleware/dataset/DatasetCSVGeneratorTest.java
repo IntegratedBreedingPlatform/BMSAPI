@@ -92,4 +92,21 @@ public class DatasetCSVGeneratorTest {
 		assertTrue(result.contains(variableName1));
 		assertTrue(result.contains(variableName2));
 	}
+
+	@Test
+	public void testGenerateCSVFileWithHeaders() throws IOException {
+		final CSVWriter csvWriter = Mockito.mock(CSVWriter.class);
+		final String fileNameFullPath = RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH);
+
+		datasetCSVGenerator.generateCSVFileWithHeaders(measurementVariables, fileNameFullPath, csvWriter);
+
+		Mockito.verify(csvWriter).writeNext(Mockito.any(String[].class));
+	}
+
+	@Test
+	public void testWriteInstanceObservationUnitRowsToCSVFile() {
+		final CSVWriter csvWriter = Mockito.mock(CSVWriter.class);
+		datasetCSVGenerator.writeInstanceObservationUnitRowsToCSVFile(measurementVariables, observationUnitRows, csvWriter);
+		Mockito.verify(csvWriter).writeAll(Mockito.anyListOf(String[].class));
+	}
 }
