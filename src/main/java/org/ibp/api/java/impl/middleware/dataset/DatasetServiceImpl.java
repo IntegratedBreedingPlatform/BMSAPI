@@ -129,6 +129,13 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public List<MeasurementVariable> getVariables(final Integer studyId, final Integer datasetId, final VariableType variableType) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
+		return this.middlewareDatasetService.getVariables(datasetId, variableType);
+	}
+
+	@Override
 	public void removeVariables(final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, variableIds);

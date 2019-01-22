@@ -17,10 +17,10 @@ public class SampleListValidator {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		if (sampleListDto.getInstanceIds() != null) {
+		if (sampleListDto.getInstanceIds() == null) {
 			this.errors.reject("The Instance List must not be null");
 		}
-		if (!sampleListDto.getInstanceIds().isEmpty()) {
+		if (sampleListDto.getInstanceIds().isEmpty()) {
 			this.errors.reject("The Instance List must not be empty");
 		}
 		if (sampleListDto.getSelectionVariableId() == null) {
@@ -29,19 +29,19 @@ public class SampleListValidator {
 		if (StringUtils.isEmpty(sampleListDto.getListName())) {
 			this.errors.reject("The List Name must not be empty");
 		}
-		if (StringUtils.isNotBlank(sampleListDto.getListName())) {
+		if (StringUtils.isBlank(sampleListDto.getListName())) {
 			this.errors.reject("The List Name must not be empty");
 		}
-		if (sampleListDto.getListName().length() <= 100) {
+		if (sampleListDto.getListName().length() > 100) {
 			this.errors.reject("List Name must not exceed 100 characters");
 		}
 		if (StringUtils.isEmpty(sampleListDto.getCreatedDate())) {
 			this.errors.reject("The Created Date must not be empty");
 		}
-		if (StringUtils.isBlank(sampleListDto.getDescription()) || sampleListDto.getDescription().length() <= 255) {
+		if (StringUtils.isNotBlank(sampleListDto.getDescription()) && sampleListDto.getDescription().length() > 255) {
 			this.errors.reject("List Description must not exceed 255 characters");
 		}
-		if (StringUtils.isBlank(sampleListDto.getNotes()) || sampleListDto.getNotes().length() <= 65535) {
+		if (StringUtils.isNotBlank(sampleListDto.getNotes()) && sampleListDto.getNotes().length() > 65535) {
 			this.errors.reject("Notes must not exceed 65535 characters");
 		}
 
