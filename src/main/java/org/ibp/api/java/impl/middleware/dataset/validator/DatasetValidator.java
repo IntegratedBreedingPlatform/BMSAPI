@@ -50,6 +50,10 @@ public class DatasetValidator {
 
 	public void validateDataset(final Integer studyId, final Integer datasetId, final Boolean shouldBeSubobservationDataset) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		if (datasetId == null) {
+			this.errors.reject("dataset.required", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
 		this.validateDataset(studyId, dataSet, shouldBeSubobservationDataset);
 	}

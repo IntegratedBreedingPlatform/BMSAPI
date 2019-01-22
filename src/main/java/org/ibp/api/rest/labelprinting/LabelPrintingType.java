@@ -2,7 +2,7 @@ package org.ibp.api.rest.labelprinting;
 
 public enum LabelPrintingType {
 
-	DATASET(1);
+	SUBOBSERVATION_DATASET(1);
 
 	private Integer code;
 

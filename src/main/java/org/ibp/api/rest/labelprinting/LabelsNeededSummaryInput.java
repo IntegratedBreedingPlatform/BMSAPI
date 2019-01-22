@@ -6,7 +6,17 @@ import org.pojomatic.annotations.AutoProperty;
 @AutoProperty
 public class LabelsNeededSummaryInput {
 
+	private Integer studyId;
+
 	private Integer datasetId;
+
+	public Integer getStudyId() {
+		return studyId;
+	}
+
+	public void setStudyId(final Integer studyId) {
+		this.studyId = studyId;
+	}
 
 	public Integer getDatasetId() {
 		return datasetId;
