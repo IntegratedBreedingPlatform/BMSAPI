@@ -24,6 +24,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,9 @@ public class DatasetXLSGenerator {
 
 	@Resource
 	private StudyDataManager studyDataManager;
+
+	@Resource
+	private DatasetService datasetService ;
 
 	protected File generateXLSFile(
 		final Integer studyId,
@@ -178,24 +182,24 @@ public class DatasetXLSGenerator {
 
 		final StudyDetails studyDetails = this.studyDataManager.getStudyDetails(studyId);
 		final List<MeasurementVariable> studyDetailsVariables =
-			this.studyDataManager.getMeasurementVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
+			this.datasetService.getMeasurementVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
 		final int environmentDatasetId = this.studyDataManager.getDataSetsByType(studyId, DataSetType.SUMMARY_DATA).get(0).getId();
 		final int plotDatasetId = dataSetDto.getParentDatasetId();
 
 		final List<MeasurementVariable> environmentVariables =
-			this.studyDataManager
+			this.datasetService
 				.getMeasurementVariables(
 					environmentDatasetId, Lists
 						.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 							VariableType.STUDY_CONDITION.getId()));
 
 		final List<MeasurementVariable> plotVariables =
-			this.studyDataManager.getMeasurementVariables(plotDatasetId, Lists
+			this.datasetService.getMeasurementVariables(plotDatasetId, Lists
 				.newArrayList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId(),
 					VariableType.GERMPLASM_DESCRIPTOR.getId()));
 
-		final List<MeasurementVariable> datasetVariables = this.studyDataManager
+		final List<MeasurementVariable> datasetVariables = this.datasetService
 			.getMeasurementVariables(dataSetDto.getDatasetId(), Lists
 				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 

@@ -373,6 +373,11 @@ public class DatasetServiceImpl implements DatasetService {
 
 	}
 
+	@Override
+	public List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes) {
+		return this.middlewareDatasetService.getMeasurementVariables(projectId, variableTypes);
+	}
+
 	private BindingResult processObservationsDataWarningsAsErrors(final Table<String, String, String> table,
 			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData,
 			final Integer rowsNotBelongingToDataset, final Integer duplicatedFoundNumber) {

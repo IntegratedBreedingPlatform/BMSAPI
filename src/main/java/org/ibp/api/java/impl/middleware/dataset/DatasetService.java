@@ -1,9 +1,7 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.dataset.ObservationUnitTable;
 
-import java.util.List;
 import org.ibp.api.rest.dataset.DatasetDTO;
 
 import java.util.List;

@@ -13,6 +13,8 @@ import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.java.impl.middleware.dataset.DatasetCSVExportServiceImpl;
+import org.ibp.api.java.impl.middleware.dataset.DatasetExcelExportServiceImpl;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +48,10 @@ public class DatasetResource {
 	private DatasetService studyDatasetService;
 
 	@Autowired
-	private DatasetExportService datasetExportService;
+	private DatasetCSVExportServiceImpl datasetCSVExportService;
+
+	@Autowired
+	private DatasetExcelExportServiceImpl datasetExcelExportService;
 
 	@ApiOperation(value = "Get Dataset Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the dataset, "
 		+ "that will be shown in the Observation Table")
@@ -224,7 +229,6 @@ public class DatasetResource {
 		return new ResponseEntity<>(this.studyDatasetService.getDatasetInstances(studyId, datasetId), HttpStatus.OK);
 	}
 
-
 	@ApiOperation(value = "Exports the dataset to a specified file type", notes = "Exports the dataset to a specified file type")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/{fileType}", method = RequestMethod.GET)
 	public ResponseEntity<FileSystemResource> exportDataset(
@@ -234,15 +238,22 @@ public class DatasetResource {
 		@RequestParam(value = "collectionOrderId") final Integer collectionOrderId) {
 
 		if (!StringUtils.isEmpty(fileType)) {
-			if (CSV.equalsIgnoreCase(fileType.trim())) {
-				final File file = this.datasetExportService.exportAsCSV(studyId, datasetId, instanceIds, collectionOrderId);
-				return this.getFileSystemResourceResponseEntity(file);
-			} else if (XLS.equalsIgnoreCase(fileType.trim())) {
-				final File file = this.datasetExportService.exportAsExcel(studyId, datasetId, instanceIds, collectionOrderId);
+			final DatasetExportService exportMethod = this.getExportFileStrategy(fileType);
+			if (exportMethod != null) {
+				final File file = exportMethod.export(studyId, datasetId, instanceIds, collectionOrderId);
 				return this.getFileSystemResourceResponseEntity(file);
 			}
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+	}
+
+	private DatasetExportService getExportFileStrategy(final String fileType) {
+		if (CSV.equalsIgnoreCase(fileType.trim())) {
+			return this.datasetCSVExportService;
+		} else if (XLS.equalsIgnoreCase(fileType.trim())) {
+			return this.datasetExcelExportService;
+		}
+		return null;
 	}
 
 	private ResponseEntity<FileSystemResource> getFileSystemResourceResponseEntity(final File file) {
@@ -252,5 +263,4 @@ public class DatasetResource {
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
-
 }

@@ -11,8 +11,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 @Component
-public class
-InstanceValidator {
+public class InstanceValidator {
 
 	@Autowired
 	private StudyDataManager studyDataManager;

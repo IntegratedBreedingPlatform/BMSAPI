@@ -38,7 +38,7 @@ import java.util.Set;
 
 @Service
 @Transactional
-public class DatasetExportServiceImpl implements DatasetExportService {
+public class DatasetCSVExportServiceImpl implements DatasetExportService {
 
 	@Autowired
 	private StudyValidator studyValidator;
@@ -62,15 +62,12 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 	private DatasetCSVGenerator datasetCSVGenerator;
 
 	@Resource
-	private DatasetXLSGenerator datasetXLSGenerator;
-
-	@Resource
 	private org.generationcp.middleware.service.api.dataset.DatasetService datasetService;
 
 	private ZipUtil zipUtil = new ZipUtil();
 
 	@Override
-	public File exportAsCSV(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId) {
+	public File export(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId) {
 
 		this.validate(studyId, datasetId, instanceIds);
 
@@ -139,59 +136,6 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 			}
 		}
 		return studyInstances;
-	}
-
-	@Override
-	public File exportAsExcel(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId) {
-
-		this.validate(studyId, datasetId, instanceIds);
-
-		final Study study = this.studyDataManager.getStudy(studyId);
-		final DatasetDTO dataSet = this.datasetService.getDataset(datasetId);
-		final List<StudyInstance> selectedDatasetInstances = this.getSelectedDatasetInstances(dataSet.getInstances(), instanceIds);
-
-		try {
-			return this.generateExcelFiles(study, dataSet, selectedDatasetInstances, collectionOrderId);
-		} catch (final IOException e) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-			errors.reject("cannot.exportAsXLS.dataset", "");
-			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
-		}
-	}
-
-	protected File generateExcelFiles(
-		final Study study, final DatasetDTO dataSetDto, final List<StudyInstance> studyInstances, final int collectionOrderId)
-		throws IOException {
-		final List<File> files = new ArrayList<>();
-
-		// Get the visible variables in SubObservation table
-		final List<MeasurementVariable> columns =
-			this.studyDatasetService.getSubObservationSetColumns(study.getId(), dataSetDto.getDatasetId());
-
-		final int trialDatasetId = this.studyDataManager.getDataSetsByType(study.getId(), DataSetType.SUMMARY_DATA).get(0).getId();
-		final File temporaryFolder = Files.createTempDir();
-
-		for (final StudyInstance studyInstance : studyInstances) {
-			final List<ObservationUnitRow> reorderedObservationUnitRows =
-				this.getObservationUnitRows(study, dataSetDto, collectionOrderId, trialDatasetId, studyInstance);
-
-			// Build the filename with the following format:
-			// 'study_name'-'location_abbr'-'dataset_type'-'dataset_name'
-			final String sanitizedFileName = FileUtils.sanitizeFileName(String
-				.format(
-					"%s_%s_%s_%s.xls", study.getName(), studyInstance.getLocationAbbreviation(),
-					DataSetType.findById(dataSetDto.getDatasetTypeId()).name(), dataSetDto.getName()));
-
-			final String fileNamePath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
-
-			files.add(this.datasetXLSGenerator.generateXLSFile(study.getId(), dataSetDto, columns, reorderedObservationUnitRows, fileNamePath));
-		}
-
-		if (files.size() == 1) {
-			return files.get(0);
-		} else {
-			return this.zipUtil.zipFiles(study.getName(), files);
-		}
 	}
 
 	private List<ObservationUnitRow> getObservationUnitRows(
