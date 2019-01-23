@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Api(value = "Label Printing Services")
@@ -73,6 +74,28 @@ public class LabelPrintingResource {
 		final Map<String, String> metadata = labelPrintingStrategy.getOriginResourceMetadata(labelsNeededSummaryInput);
 
 		return new ResponseEntity<>(metadata, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/crops/{cropname}/labelPrinting/{printingLabelType}/labelTypes", method = RequestMethod.POST)
+	@ApiOperation(value = "Get the list of available label fields according to the specified printing label type and the input in the request body",
+		notes = "Returns list of available label fields grouped by type according to the printing label type and input in the request body.")
+	@ResponseBody
+	public ResponseEntity<List<LabelType>> getAvailableLabelFields(
+		@PathVariable
+			String cropname,
+		@PathVariable
+			Integer printingLabelType,
+		@RequestBody
+			LabelsNeededSummaryInput labelsNeededSummaryInput) {
+
+		final LabelPrintingType labelPrintingType = LabelPrintingType.getEnumByCode(printingLabelType);
+		this.validateLabelPrintingType(labelPrintingType);
+
+		final LabelPrintingStrategy labelPrintingStrategy = this.locateLabelPrintingImpl(labelPrintingType);
+		labelPrintingStrategy.validateInputData(labelsNeededSummaryInput);
+		final List<LabelType> labelTypes = labelPrintingStrategy.getAvailableLabelFields(labelsNeededSummaryInput);
+
+		return new ResponseEntity<>(labelTypes, HttpStatus.OK);
 	}
 
 	private LabelPrintingStrategy locateLabelPrintingImpl(final LabelPrintingType labelPrintingType) {

@@ -1,5 +1,6 @@
 package org.ibp.api.rest.labelprinting;
 
+import java.util.List;
 import java.util.Map;
 
 public interface LabelPrintingStrategy {
@@ -11,5 +12,7 @@ public interface LabelPrintingStrategy {
 	LabelsNeededSummaryResponse transformLabelsNeededSummary(final LabelsNeededSummary labelsNeededSummary);
 
 	Map<String, String> getOriginResourceMetadata (final LabelsNeededSummaryInput labelsNeededSummaryInput);
+
+	List<LabelType> getAvailableLabelFields(final LabelsNeededSummaryInput labelsNeededSummaryInput);
 
 }
