@@ -55,15 +55,12 @@ public class DatasetExcelExportServiceImpl implements DatasetExportService {
 	private StudyDataManager studyDataManager;
 
 	@Resource
-	private DatasetCSVGenerator datasetCSVGenerator;
-
-	@Resource
 	private DatasetXLSGenerator datasetXLSGenerator;
 
 	@Resource
 	private org.generationcp.middleware.service.api.dataset.DatasetService datasetService;
 
-	private ZipUtil zipUtil = new ZipUtil();
+	private final ZipUtil zipUtil = new ZipUtil();
 
 	private void validate(final int studyId, final int datasetId, final Set<Integer> instanceIds) {
 		this.studyValidator.validate(studyId, false);
@@ -149,9 +146,5 @@ public class DatasetExcelExportServiceImpl implements DatasetExportService {
 			DatasetCollectionOrderServiceImpl.CollectionOrder.findById(collectionOrderId);
 		return this.datasetCollectionOrderService
 			.reorder(collectionOrder, trialDatasetId, String.valueOf(studyInstance.getInstanceNumber()), observationUnitRows);
-	}
-
-	protected void setZipUtil(final ZipUtil zipUtil) {
-		this.zipUtil = zipUtil;
 	}
 }
