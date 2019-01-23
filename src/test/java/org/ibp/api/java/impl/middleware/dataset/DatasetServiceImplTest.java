@@ -4,11 +4,13 @@ import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.RandomStringUtils;
+import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -39,6 +41,7 @@ import org.modelmapper.ModelMapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -221,10 +224,53 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.middlewareDatasetService).deletePhenotype(observationId);
 	}
 
+	@Test
+	public void testGetAllDatasetVariables() {
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		measurementVariables.add(MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.name(), "1"));
+		Mockito.doReturn(measurementVariables).when(this.middlewareDatasetService).getAllDatasetVariables(1, 1);
+		final List<MeasurementVariable> result = this.studyDatasetService.getAllDatasetVariables(1, 1);
 
+		Mockito.verify(this.studyValidator).validate(1, false);
+		Mockito.verify(this.datasetValidator).validateDataset(1, 1, true);
+		Assert.assertEquals(1, result.size());
+		Assert.assertEquals(measurementVariables.get(0).getTermId(), result.get(0).getTermId());
+		Assert.assertEquals(measurementVariables.get(0).getName(), result.get(0).getName());
+	}
+
+	@Test
+	public void testGetInstanceObservationUnitRowsMap() {
+		final Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = new HashMap<>();
+		instanceObservationUnitRowsMap.put(1, this.mockObservationUnitRowList());
+		Mockito.doReturn(instanceObservationUnitRowsMap).when(this.middlewareDatasetService).getInstanceObservationUnitRowsMap(1, 1, Arrays.asList(1));
+		final Map<Integer, List<org.ibp.api.rest.dataset.ObservationUnitRow>> results = this.studyDatasetService.getInstanceObservationUnitRowsMap(1,1 ,Arrays.asList(1));
+		Assert.assertNotNull(results);
+		Assert.assertEquals(1, results.size());
+		Assert.assertEquals(1, results.get(1).size());
+		Assert.assertEquals(this.mapObservationUnitRows(instanceObservationUnitRowsMap.get(1)), results.get(1));
+	}
+
+	@Test
+	public void testValidateStudyDatasetAndInstances() {
+		this.studyDatasetService.validateStudyDatasetAndInstances(1, 1, Arrays.asList(1), true);
+		Mockito.verify(this.studyValidator).validate(1, false);
+		Mockito.verify(this.datasetValidator).validateDataset(1, 1, true);
+		Mockito.verify(this.instanceValidator).validate(1, new HashSet<>(Arrays.asList(1)));
+	}
 
 	@Test
 	public void testGetObservations() {
+		final List<ObservationUnitRow> observationDtoTestData = mockObservationUnitRowList();
+
+		Mockito.doReturn(observationDtoTestData).when(this.middlewareDatasetService).getObservationUnitRows(TEST_STUDY_IDENTIFIER, 1, 1, 1, 100, null, null);
+		final List<org.ibp.api.rest.dataset.ObservationUnitRow> actualObservations =
+			this.studyDatasetService.getObservationUnitRows(TEST_STUDY_IDENTIFIER, 1, 1, 1, 100, null, null);
+
+		Assert.assertEquals(this.mapObservationUnitRows(observationDtoTestData), actualObservations);
+
+	}
+
+	private List<ObservationUnitRow> mockObservationUnitRowList() {
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setObservationUnitId(1);
 		observationUnitRow.setAction("1");
@@ -247,15 +293,7 @@ public class DatasetServiceImplTest {
 		variables.put(FACT1, new org.generationcp.middleware.service.api.dataset.ObservationUnitData());
 		observationUnitRow.setVariables(variables);
 
-		final List<ObservationUnitRow> observationDtoTestData =
-			Lists.newArrayList(observationUnitRow);
-
-		Mockito.doReturn(observationDtoTestData).when(this.middlewareDatasetService).getObservationUnitRows(TEST_STUDY_IDENTIFIER, 1, 1, 1, 100, null, null);
-		final List<org.ibp.api.rest.dataset.ObservationUnitRow> actualObservations =
-			this.studyDatasetService.getObservationUnitRows(TEST_STUDY_IDENTIFIER, 1, 1, 1, 100, null, null);
-
-		Assert.assertEquals(this.mapObservationUnitRows(observationDtoTestData), actualObservations);
-
+		return Lists.newArrayList(observationUnitRow);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)

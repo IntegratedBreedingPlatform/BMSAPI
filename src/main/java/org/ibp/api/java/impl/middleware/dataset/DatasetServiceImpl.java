@@ -115,9 +115,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public long countPhenotypesByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId) {
-		this.studyValidator.validate(studyId, false);
-		this.datasetValidator.validateDataset(studyId, datasetId, false);
-		this.instanceValidator.validate(datasetId, new HashSet<>(Arrays.asList(instanceId)));
+		validateStudyDatasetAndInstances(studyId, datasetId, Arrays.asList(instanceId), false);
 		return this.middlewareDatasetService.countPhenotypesByInstance(datasetId, instanceId);
 	}
 
@@ -247,9 +245,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(
 		final int studyId, final int datasetId, final List<Integer> instanceId) {
-		this.studyValidator.validate(studyId, false);
-		this.datasetValidator.validateDataset(studyId, datasetId, true);
-		this.instanceValidator.validate(datasetId, new HashSet<>(instanceId));
+		validateStudyDatasetAndInstances(studyId, datasetId, instanceId, true);
 		final Map<Integer, List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow>> observationUnitRowsMap =
 			this.middlewareDatasetService.getInstanceObservationUnitRowsMap(studyId, datasetId, instanceId);
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
@@ -264,13 +260,17 @@ public class DatasetServiceImpl implements DatasetService {
 		return map;
 	}
 
+	void validateStudyDatasetAndInstances(final int studyId, final int datasetId, final List<Integer> instanceId, final boolean shouldBeSubObservation) {
+		this.studyValidator.validate(studyId, false);
+		this.datasetValidator.validateDataset(studyId, datasetId, shouldBeSubObservation);
+		this.instanceValidator.validate(datasetId, new HashSet<>(instanceId));
+	}
+
 	@Override
 	public List<ObservationUnitRow> getObservationUnitRows(
 		final int studyId, final int datasetId, final int instanceId,
 		final int pageNumber, final int pageSize, final String sortBy, final String sortOrder) {
-		this.studyValidator.validate(studyId, false);
-		this.datasetValidator.validateDataset(studyId, datasetId, true);
-		this.instanceValidator.validate(datasetId, new HashSet<>(Arrays.asList(instanceId)));
+		validateStudyDatasetAndInstances(studyId, datasetId, Arrays.asList(instanceId), true);
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
 			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
