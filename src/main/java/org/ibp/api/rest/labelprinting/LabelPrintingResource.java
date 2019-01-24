@@ -3,7 +3,7 @@ package org.ibp.api.rest.labelprinting;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.ibp.api.exception.NotSupportedException;
-import org.ibp.api.rest.labelprinting.domain.LabelPrintingType;
+import org.generationcp.middleware.domain.labelprinting.LabelPrintingType;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryInput;
