@@ -165,7 +165,7 @@ public class DatasetExportServiceImplTest {
 		final File result = this.datasetExportService
 			.generateFiles(
 				this.study, this.dataSetDTO, studyInstances, DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), this.datasetCSVGenerator,
-				fileExtension);
+				DatasetExportServiceImpl.CSV);
 
 		for (final StudyInstance studyInstance : studyInstances) {
 			verify(this.studyDatasetService)
@@ -202,7 +202,7 @@ public class DatasetExportServiceImplTest {
 		final File result = this.datasetExportService
 			.generateFiles(
 				this.study, this.dataSetDTO, Arrays.asList(studyInstance),
-				DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), this.datasetCSVGenerator, fileExtension);
+				DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), this.datasetCSVGenerator, DatasetExportServiceImpl.CSV);
 
 
 		verify(this.studyDatasetService)
