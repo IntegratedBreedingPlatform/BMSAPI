@@ -17,7 +17,6 @@ import org.ibp.api.exception.PreconditionFailedException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
-import org.ibp.api.java.impl.middleware.dataset.DatasetCSVExportServiceImpl;
 import org.ibp.api.java.impl.middleware.dataset.DatasetCollectionOrderServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,11 +47,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
-import static org.mockito.ArgumentMatchers.isNull;
 
 public class DatasetResourceTest extends ApiUnitTestBase {
 
@@ -65,7 +63,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	private DatasetService studyDatasetService;
 
 	@Autowired
-	private DatasetCSVExportServiceImpl datasetCSVExportService;
+	private DatasetExportService datasetCSVExportService;
 
 
 	@Configuration
@@ -590,6 +588,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/{fileType}",
 					this.cropName, studyId, datasetId, DatasetResource.CSV)
 				.param("instanceIds", "1,2,3")
+				.param("singleFile", String.valueOf(Boolean.FALSE))
 				.param("collectionOrderId", String.valueOf(collectionOrderId))
 				.contentType(this.csvContentType))
 			.andDo(MockMvcResultHandlers.print())
