@@ -46,16 +46,14 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 	@Autowired
 	private StudyValidator studyValidator;
 
-	private static List<Field> staticStudyDetailsFields;
-	private static Field studyNameField;
+	private static Field STUDY_NAME_FIELD;
 	private static String PLOT = "PLOT";
 	private static String OBS_UNIT_ID = "OBS_UNIT_ID";
 
 	@PostConstruct
 	void initStaticFields() {
 		final String studyNamePropValue = messageSource.getMessage("label.printing.field.study.name", null, LocaleContextHolder.getLocale());
-		studyNameField = new Field(studyNamePropValue, studyNamePropValue);
-		staticStudyDetailsFields = Arrays.asList(studyNameField);
+		STUDY_NAME_FIELD = new Field(studyNamePropValue, studyNamePropValue);
 	}
 
 	@Override
@@ -153,7 +151,7 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 		final LabelType studyDetailsLabelType = new LabelType(studyDetailsPropValue, studyDetailsPropValue);
 		final List<Field> studyDetailsFields = new LinkedList<>();
 		//Requirement to add Study Name as an available label when in fact it is not a variable.
-		studyDetailsFields.addAll(staticStudyDetailsFields);
+		studyDetailsFields.add(STUDY_NAME_FIELD);
 		studyDetailsFields.addAll(this.transform(studyDetailsVariables));
 		studyDetailsFields.addAll(this.transform(environmentVariables));
 		studyDetailsFields.addAll(this.transform(treatmentFactors));
