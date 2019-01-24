@@ -41,7 +41,7 @@ public class DatasetCSVExportServiceImpl extends DatasetExportServiceImpl implem
 		final List<StudyInstance> selectedDatasetInstances = this.getSelectedDatasetInstances(dataSet.getInstances(), instanceIds);
 
 		try {
-			return this.generateFiles(study, dataSet, selectedDatasetInstances, collectionOrderId, this.datasetCSVGenerator, XLS);
+			return this.generateFiles(study, dataSet, selectedDatasetInstances, collectionOrderId, this.datasetCSVGenerator, CSV);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("cannot.exportAsCSV.dataset", "");
