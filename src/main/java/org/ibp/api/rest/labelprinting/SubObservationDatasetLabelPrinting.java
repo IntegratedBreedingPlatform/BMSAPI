@@ -161,8 +161,8 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 		final List<Field> datasetDetailsFields = new LinkedList<>();
 		datasetDetailsFields.addAll(transform(plotVariables));
 		// Requirement to add SubObs dataset type plus OBS_UNIT_ID when it is not a variable associated to the subObs dataset
-		final Field subObsUnitIdfield = new Field(DataSetType.findById(dataSetDTO.getDatasetTypeId()).name().concat(" ").concat(OBS_UNIT_ID),
-				DataSetType.findById(dataSetDTO.getDatasetTypeId()).name().concat(" ").concat(OBS_UNIT_ID));
+		final Field subObsUnitIdfield = new Field(DataSetType.findById(dataSetDTO.getDatasetTypeId()).getReadableName().concat(" ").concat(OBS_UNIT_ID),
+				DataSetType.findById(dataSetDTO.getDatasetTypeId()).getReadableName().concat(" ").concat(OBS_UNIT_ID));
 		datasetDetailsFields.add(subObsUnitIdfield);
 		datasetDetailsFields.addAll(transform(datasetVariables));
 		datasetDetailsLabelType.setFields(datasetDetailsFields);
