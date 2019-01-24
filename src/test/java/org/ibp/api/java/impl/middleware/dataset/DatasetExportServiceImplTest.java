@@ -34,6 +34,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyListOf;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -178,7 +179,7 @@ public class DatasetExportServiceImplTest {
 					eq(String.valueOf(studyInstance.getInstanceNumber())), anyListOf(ObservationUnitRow.class));
 
 			verify(this.datasetCSVGenerator, times(studyInstances.size()))
-				.generateFile(this.study.getId(), this.dataSetDTO, eq(measurementVariables), anyListOf(ObservationUnitRow.class), anyString());
+				.generateFile(anyInt(), any(DatasetDTO.class), eq(measurementVariables), anyListOf(ObservationUnitRow.class), anyString());
 		}
 
 		verify(this.zipUtil).zipFiles(eq(this.study.getName()), anyListOf(File.class));
@@ -190,13 +191,12 @@ public class DatasetExportServiceImplTest {
 	public void testGenerateCSVFilesOnlyOneInstance() throws IOException {
 
 		final StudyInstance studyInstance = this.createStudyInstance(this.instanceId1);
-		final List<String> headerNames = new ArrayList<>();
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 
 		final File csvFile = new File("");
 
 		when(this.datasetCSVGenerator
-			.generateFile(this.study.getId(), this.dataSetDTO, eq(measurementVariables), anyListOf(ObservationUnitRow.class), anyString()))
+			.generateFile(anyInt(), any(DatasetDTO.class), eq(measurementVariables), anyListOf(ObservationUnitRow.class), anyString()))
 			.thenReturn(csvFile);
 
 		final File result = this.datasetExportService
@@ -214,7 +214,7 @@ public class DatasetExportServiceImplTest {
 				eq(String.valueOf(studyInstance.getInstanceNumber())), anyListOf(ObservationUnitRow.class));
 
 		verify(this.datasetCSVGenerator)
-			.generateFile(this.study.getId(), this.dataSetDTO, eq(measurementVariables), anyListOf(ObservationUnitRow.class), anyString());
+			.generateFile(anyInt(), any(DatasetDTO.class), eq(measurementVariables), anyListOf(ObservationUnitRow.class), anyString());
 
 		verify(this.zipUtil, times(0)).zipFiles(anyString(), anyListOf(File.class));
 		assertSame(result, csvFile);
