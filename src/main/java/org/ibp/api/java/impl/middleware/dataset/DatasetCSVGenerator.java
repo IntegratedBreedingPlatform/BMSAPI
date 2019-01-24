@@ -8,6 +8,7 @@ import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -19,13 +20,15 @@ import java.util.List;
 @Component
 public class DatasetCSVGenerator implements DatasetFileGenerator {
 
+	private CSVWriter csvWriter;
+
 	@Override
 	public File generateFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> observationUnitRows,
 		final String fileNameFullPath) throws IOException {
 
-		final CSVWriter csvWriter =
-			new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',');
+		this.createCSVWriter(fileNameFullPath);
+
 		final File newFile = new File(fileNameFullPath);
 		// feed in your array (or convert your data to an array)
 		final List<String[]> rowValues = new ArrayList<>();
@@ -36,9 +39,16 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 			rowValues.add(this.getColumnValues(row, columns));
 		}
 
-		csvWriter.writeAll(rowValues);
-		csvWriter.close();
+		this.csvWriter.writeAll(rowValues);
+		this.csvWriter.close();
 		return newFile;
+	}
+
+	public void createCSVWriter(final String fileNameFullPath) throws FileNotFoundException {
+		if (this.csvWriter == null) {
+			this.setCSVWriter(
+				new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ','));
+		}
 	}
 
 	protected String[] getColumnValues(final ObservationUnitRow row, final List<MeasurementVariable> subObservationSetColumns) {
@@ -57,4 +67,7 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 		return headerNames;
 	}
 
+	public void setCSVWriter(final CSVWriter csvWriter) {
+		this.csvWriter = csvWriter;
+	}
 }

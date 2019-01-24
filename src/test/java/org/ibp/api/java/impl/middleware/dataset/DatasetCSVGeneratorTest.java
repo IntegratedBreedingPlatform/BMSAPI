@@ -71,7 +71,7 @@ public class DatasetCSVGeneratorTest {
 
 		final CSVWriter csvWriter = Mockito.mock(CSVWriter.class);
 		final String fileNameFullPath = RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH);
-
+		this.datasetCSVGenerator.setCSVWriter(csvWriter);
 		this.datasetCSVGenerator.generateFile(this.studyId, this.datasetDTO,
 			this.measurementVariables, this.observationUnitRows, fileNameFullPath);
 
