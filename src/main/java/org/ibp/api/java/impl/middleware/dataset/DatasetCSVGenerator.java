@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.dataset;
 import au.com.bytecode.opencsv.CSVWriter;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.stereotype.Component;
 
@@ -16,8 +17,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Component
-public class DatasetCSVGenerator extends DatasetFileGenerator {
+public class DatasetCSVGenerator implements DatasetFileGenerator {
 
+	@Override
 	public File generateFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> observationUnitRows,
 		final String fileNameFullPath) throws IOException {

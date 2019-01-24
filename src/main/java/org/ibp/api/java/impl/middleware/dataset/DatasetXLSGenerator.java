@@ -24,6 +24,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -43,7 +44,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Component
-public class DatasetXLSGenerator extends DatasetFileGenerator {
+public class DatasetXLSGenerator implements DatasetFileGenerator {
 
 	private static final String NUMERIC_DATA_TYPE = "NUMERIC_DATA_TYPE ";
 	private static final int PIXEL_SIZE = 250;
@@ -73,6 +74,7 @@ public class DatasetXLSGenerator extends DatasetFileGenerator {
 	@Resource
 	private DatasetService datasetService;
 
+	@Override
 	public File generateFile(
 		final Integer studyId,
 		final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,

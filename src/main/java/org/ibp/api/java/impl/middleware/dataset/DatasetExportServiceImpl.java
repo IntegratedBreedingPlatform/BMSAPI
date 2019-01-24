@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
+import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
@@ -29,7 +30,7 @@ import java.util.Set;
 
 @Service
 @Transactional
-public class DatasetExportServiceImpl {
+public abstract class DatasetExportServiceImpl {
 
 	public static final String XLS = "xls";
 	public static final String CSV = "csv";

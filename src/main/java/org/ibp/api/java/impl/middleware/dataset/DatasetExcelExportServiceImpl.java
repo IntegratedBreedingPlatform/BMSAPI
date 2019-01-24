@@ -37,7 +37,7 @@ public class DatasetExcelExportServiceImpl extends DatasetExportServiceImpl impl
 		final List<StudyInstance> selectedDatasetInstances = this.getSelectedDatasetInstances(dataSet.getInstances(), instanceIds);
 
 		try {
-			return this.generateFiles(study, dataSet, selectedDatasetInstances, collectionOrderId, this.datasetXLSGenerator, CSV);
+			return this.generateFiles(study, dataSet, selectedDatasetInstances, collectionOrderId, this.datasetXLSGenerator, XLS);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("cannot.exportAsXLS.dataset", "");
