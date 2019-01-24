@@ -1,35 +1,38 @@
 
 package org.ibp.api.rest.program;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.generationcp.middleware.pojos.User;
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.impl.middleware.program.ProgramServiceImpl;
+import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class ProgramResourceTest extends ApiUnitTestBase {
 
 	private UsernamePasswordAuthenticationToken loggedInUser;
 	private WorkbenchUser me;
 	private WorkbenchUser myBreedingBuddy;
+
+	@Autowired
+	private SecurityServiceImpl securityService;
 
 	@Before
 	public void beforeEachTest() {
@@ -52,6 +55,7 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 
 		Mockito.when(this.workbenchDataManager.getUserByUsername(this.me.getName())).thenReturn(this.me);
 		Mockito.when(this.workbenchDataManager.getUserByUsername(this.myBreedingBuddy.getName())).thenReturn(this.myBreedingBuddy);
+		Mockito.when(securityService.getCurrentlyLoggedInUser()).thenCallRealMethod();
 	}
 
 	@After
