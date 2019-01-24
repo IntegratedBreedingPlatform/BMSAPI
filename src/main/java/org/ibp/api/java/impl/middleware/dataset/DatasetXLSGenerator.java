@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Component
-public class DatasetXLSGenerator {
+public class DatasetXLSGenerator extends DatasetFileGenerator {
 
 	private static final String NUMERIC_DATA_TYPE = "NUMERIC_DATA_TYPE ";
 	private static final int PIXEL_SIZE = 250;
@@ -71,9 +71,9 @@ public class DatasetXLSGenerator {
 	private StudyDataManager studyDataManager;
 
 	@Resource
-	private DatasetService datasetService ;
+	private DatasetService datasetService;
 
-	protected File generateXLSFile(
+	public File generateFile(
 		final Integer studyId,
 		final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> reorderedObservationUnitRows,
@@ -286,7 +286,6 @@ public class DatasetXLSGenerator {
 			this.filter(datasetVariables, VariableType.TRAIT),
 			DataSetType.findById(dataSetDto.getDatasetTypeId()).name());
 		xlsSheet.createRow(currentRowNum++);
-
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.selections",
 			this.getColorIndex(xlsBook, 51, 51, 153));
