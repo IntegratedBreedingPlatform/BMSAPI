@@ -1,4 +1,4 @@
-package org.ibp.api.rest.labelprinting;
+package org.ibp.api.rest.labelprinting.domain;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.pojomatic.Pojomatic;

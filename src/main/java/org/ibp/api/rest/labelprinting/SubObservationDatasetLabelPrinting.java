@@ -1,23 +1,27 @@
 package org.ibp.api.rest.labelprinting;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
+import org.ibp.api.rest.labelprinting.domain.Field;
+import org.ibp.api.rest.labelprinting.domain.LabelType;
+import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
+import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryInput;
+import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -43,16 +47,15 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 	private StudyValidator studyValidator;
 
 	private static List<Field> staticStudyDetailsFields;
-
-	private static List<Field> staticDatasetDetailsFields;
-
 	private static Field studyNameField;
+	private static String PLOT = "PLOT";
+	private static String OBS_UNIT_ID = "OBS_UNIT_ID";
 
 	@PostConstruct
 	void initStaticFields() {
-		studyNameField = new Field(messageSource.getMessage("label.printing.field.study.name", null, LocaleContextHolder.getLocale()), messageSource.getMessage("label.printing.field.study.name", null, LocaleContextHolder.getLocale()));
+		final String studyNamePropValue = messageSource.getMessage("label.printing.field.study.name", null, LocaleContextHolder.getLocale());
+		studyNameField = new Field(studyNamePropValue, studyNamePropValue);
 		staticStudyDetailsFields = Arrays.asList(studyNameField);
-		staticDatasetDetailsFields = new ArrayList<>();
 	}
 
 	@Override
@@ -64,16 +67,16 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 	@Override
 	public LabelsNeededSummary getSummaryOfLabelsNeeded(final LabelsNeededSummaryInput labelsNeededSummaryInput) {
 		final LabelsNeededSummary labelsNeededSummary = new LabelsNeededSummary();
-		final List<Pair<String, Long>> observationsByInstance =
+		final Map<String, Long> observationsByInstance =
 				middlewareDatasetService.countObservationsGroupedByInstance(labelsNeededSummaryInput.getDatasetId());
 		long totalNumberOfLabelsNeeded = 0;
-		for (Pair<String, Long> pair : observationsByInstance) {
+		for (final String key : observationsByInstance.keySet()) {
 			final LabelsNeededSummary.Row row = new LabelsNeededSummary.Row();
-			row.setInstanceNumber(pair.getLeft());
-			row.setLabelsNeeded(pair.getRight());
-			row.setSubObservationNumber(pair.getRight());
+			row.setInstanceNumber(key);
+			row.setLabelsNeeded(observationsByInstance.get(key));
+			row.setSubObservationNumber(observationsByInstance.get(key));
 			labelsNeededSummary.addRow(row);
-			totalNumberOfLabelsNeeded += pair.getRight();
+			totalNumberOfLabelsNeeded += observationsByInstance.get(key);
 		}
 		labelsNeededSummary.setTotalNumberOfLabelsNeeded(totalNumberOfLabelsNeeded);
 		return labelsNeededSummary;
@@ -127,64 +130,61 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 	public List<LabelType> getAvailableLabelFields(final LabelsNeededSummaryInput labelsNeededSummaryInput) {
 		final List<LabelType> labelTypes = new LinkedList<>();
 
-		final LabelType studyDetailsLabelType = new LabelType(messageSource.getMessage("label.printing.study.details", null, LocaleContextHolder.getLocale()), messageSource.getMessage("label.printing.study.details", null, LocaleContextHolder.getLocale()));
-		final List<Field> studyDetailsFields = new LinkedList<>();
-		studyDetailsFields.addAll(staticStudyDetailsFields);
+		final String studyDetailsPropValue = messageSource.getMessage("label.printing.study.details", null, LocaleContextHolder.getLocale());
+		final String datasetDetailsPropValue = messageSource.getMessage("label.printing.dataset.details", null, LocaleContextHolder.getLocale());
 
 		final DatasetDTO dataSetDTO = middlewareDatasetService.getDataset(labelsNeededSummaryInput.getDatasetId());
-
-		final List<MeasurementVariable> studyDetailsVariables =
-			this.middlewareDatasetService.getMeasurementVariables(labelsNeededSummaryInput.getStudyId(), Arrays.asList(VariableType.STUDY_DETAIL.getId()));
-
-		studyDetailsFields.addAll(this.transform(studyDetailsVariables));
-
-		final int environmentDatasetId = this.studyDataManager.getDataSetsByType(labelsNeededSummaryInput.getStudyId(), DataSetType.SUMMARY_DATA).get(0).getId();
+		final int environmentDatasetId =
+				this.studyDataManager.getDataSetsByType(labelsNeededSummaryInput.getStudyId(), DataSetType.SUMMARY_DATA).get(0).getId();
 		final int plotDatasetId = dataSetDTO.getParentDatasetId();
 
-		final List<MeasurementVariable> environmentVariables =
-			this.middlewareDatasetService
-				.getMeasurementVariables(
-					environmentDatasetId, Arrays
-						.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-							VariableType.STUDY_CONDITION.getId(), VariableType.TRAIT.getId()));
+		final List<MeasurementVariable> studyDetailsVariables = this.middlewareDatasetService
+				.getMeasurementVariables(labelsNeededSummaryInput.getStudyId(), Arrays.asList(VariableType.STUDY_DETAIL.getId()));
+		final List<MeasurementVariable> environmentVariables = this.middlewareDatasetService.getMeasurementVariables(environmentDatasetId,
+				Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
+						VariableType.STUDY_CONDITION.getId(), VariableType.TRAIT.getId()));
+		final List<MeasurementVariable> treatmentFactors =
+				this.middlewareDatasetService.getMeasurementVariables(plotDatasetId, Arrays.asList(VariableType.TREATMENT_FACTOR.getId()));
+		final List<MeasurementVariable> plotVariables = this.middlewareDatasetService.getMeasurementVariables(plotDatasetId,
+				Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()));
+		final List<MeasurementVariable> datasetVariables = this.middlewareDatasetService
+				.getMeasurementVariables(labelsNeededSummaryInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId()));
 
+		final LabelType studyDetailsLabelType = new LabelType(studyDetailsPropValue, studyDetailsPropValue);
+		final List<Field> studyDetailsFields = new LinkedList<>();
+		//Requirement to add Study Name as an available label when in fact it is not a variable.
+		studyDetailsFields.addAll(staticStudyDetailsFields);
+		studyDetailsFields.addAll(this.transform(studyDetailsVariables));
 		studyDetailsFields.addAll(this.transform(environmentVariables));
-
-		final List<MeasurementVariable> treatmentFactors=
-			this.middlewareDatasetService.getMeasurementVariables(plotDatasetId, Arrays
-				.asList(VariableType.TREATMENT_FACTOR.getId()
-					));
-
 		studyDetailsFields.addAll(this.transform(treatmentFactors));
-
 		studyDetailsLabelType.setFields(studyDetailsFields);
 
-		final List<MeasurementVariable> plotVariables =
-			this.middlewareDatasetService.getMeasurementVariables(plotDatasetId, Arrays
-				.asList(VariableType.EXPERIMENTAL_DESIGN.getId(),
-					VariableType.GERMPLASM_DESCRIPTOR.getId()));
-
+		final LabelType datasetDetailsLabelType = new LabelType(datasetDetailsPropValue, datasetDetailsPropValue);
 		final List<Field> datasetDetailsFields = new LinkedList<>();
 		datasetDetailsFields.addAll(transform(plotVariables));
-
-		final List<MeasurementVariable> datasetVariables = this.middlewareDatasetService
-			.getMeasurementVariables(labelsNeededSummaryInput.getDatasetId(), Arrays
-				.asList(VariableType.OBSERVATION_UNIT.getId()));
+		// Requirement to add SubObs dataset type plus OBS_UNIT_ID when it is not a variable associated to the subObs dataset
+		final Field subObsUnitIdfield = new Field(DataSetType.findById(dataSetDTO.getDatasetTypeId()).name().concat(" ").concat(OBS_UNIT_ID),
+				DataSetType.findById(dataSetDTO.getDatasetTypeId()).name().concat(" ").concat(OBS_UNIT_ID));
+		datasetDetailsFields.add(subObsUnitIdfield);
 		datasetDetailsFields.addAll(transform(datasetVariables));
-
-		final LabelType datasetDetailsLabelType = new LabelType(messageSource.getMessage("label.printing.dataset.details", null, LocaleContextHolder.getLocale()), messageSource.getMessage("label.printing.dataset.details", null, LocaleContextHolder.getLocale()));
 		datasetDetailsLabelType.setFields(datasetDetailsFields);
+
 		labelTypes.add(studyDetailsLabelType);
 		labelTypes.add(datasetDetailsLabelType);
 
 		return labelTypes;
 	}
 
-	// it can be moved to a common place
 	private List<Field> transform (final List<MeasurementVariable> measurementVariables) {
 		final List<Field> fields = new LinkedList<>();
 		for (final MeasurementVariable measurementVariable: measurementVariables) {
-			fields.add(new Field(measurementVariable));
+			final Field field = new Field(measurementVariable);
+			//Requirement to show PLOT OBS_UNIT_ID label when variable = OBS_UNIT_ID in Plot Dataset
+			//Which is in fact the only dataset that cointains this variable.
+			if (field.getId().equals(String.valueOf(TermId.OBS_UNIT_ID.getId()))){
+				field.setName(PLOT.concat(" ").concat(field.getName()));
+			}
+			fields.add(field);
 		}
 		return fields;
 	}
