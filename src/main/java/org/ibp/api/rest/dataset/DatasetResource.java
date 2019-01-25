@@ -45,10 +45,10 @@ public class DatasetResource {
 	private DatasetService studyDatasetService;
 
 	@Autowired
-	private DatasetExportService datasetCSVExportServiceImpl;
+	private DatasetCSVExportService datasetCSVExportService;
 
 	@Autowired
-	private DatasetExportService datasetExcelExportServiceImpl;
+	private DatasetExcelExportService datasetExcelExportService;
 
 	@ApiOperation(value = "Get Dataset Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the dataset, "
 		+ "that will be shown in the Observation Table")
@@ -245,10 +245,10 @@ public class DatasetResource {
 	}
 
 	private DatasetExportService getExportFileStrategy(final String fileType) {
-		if (CSV.equalsIgnoreCase(fileType.trim())) {
-			return this.datasetCSVExportServiceImpl;
-		} else if (XLS.equalsIgnoreCase(fileType.trim())) {
-			return this.datasetExcelExportServiceImpl;
+		if (DatasetResource.CSV.equalsIgnoreCase(fileType.trim())) {
+			return this.datasetCSVExportService;
+		} else if (DatasetResource.XLS.equalsIgnoreCase(fileType.trim())) {
+			return this.datasetExcelExportService;
 		}
 		return null;
 	}

@@ -5,7 +5,7 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
-import org.ibp.api.java.dataset.DatasetExportService;
+import org.ibp.api.java.dataset.DatasetCSVExportService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -20,7 +20,7 @@ import java.util.Set;
 
 @Service
 @Transactional
-public class DatasetCSVExportServiceImpl extends DatasetExportServiceImpl implements DatasetExportService {
+public class DatasetCSVExportServiceImpl extends DatasetExportServiceImpl implements DatasetCSVExportService {
 
 	@Resource
 	private StudyDataManager studyDataManager;
