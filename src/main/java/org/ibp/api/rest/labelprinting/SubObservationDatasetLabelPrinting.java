@@ -49,6 +49,7 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 	private static Field STUDY_NAME_FIELD;
 	private static Field YEAR_FIELD;
 	private static Field SEASON_FIELD;
+	private static Field PARENTAGE_FIELD;
 	private static List<Field> DEFAULT_STUDY_DETAILS_FIELDS;
 
 	private static String PLOT = "PLOT";
@@ -59,10 +60,12 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 		final String studyNamePropValue = messageSource.getMessage("label.printing.field.study.name", null, LocaleContextHolder.getLocale());
 		final String yearPropValue = messageSource.getMessage("label.printing.field.year", null, LocaleContextHolder.getLocale());
 		final String seasonNamePropValue = messageSource.getMessage("label.printing.field.season", null, LocaleContextHolder.getLocale());
+		final String parentagePropValue = messageSource.getMessage("label.printing.field.parentage", null, LocaleContextHolder.getLocale());
 
 		STUDY_NAME_FIELD = new Field(studyNamePropValue, studyNamePropValue);
 		YEAR_FIELD = new Field(yearPropValue, yearPropValue);
 		SEASON_FIELD = new Field(seasonNamePropValue, seasonNamePropValue);
+		PARENTAGE_FIELD = new Field(parentagePropValue, parentagePropValue);
 
 		DEFAULT_STUDY_DETAILS_FIELDS = Arrays.asList(STUDY_NAME_FIELD, YEAR_FIELD, SEASON_FIELD);
 	}
@@ -176,6 +179,7 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 				DataSetType.findById(dataSetDTO.getDatasetTypeId()).getReadableName().concat(" ").concat(OBS_UNIT_ID));
 		datasetDetailsFields.add(subObsUnitIdfield);
 		datasetDetailsFields.addAll(transform(datasetVariables));
+		datasetDetailsFields.add(PARENTAGE_FIELD);
 		datasetDetailsLabelType.setFields(datasetDetailsFields);
 
 		labelTypes.add(studyDetailsLabelType);
