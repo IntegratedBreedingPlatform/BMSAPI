@@ -3,7 +3,6 @@ package org.ibp.api.rest.dataset;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-import liquibase.util.StringUtils;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -236,13 +235,12 @@ public class DatasetResource {
 		@RequestParam(value = "collectionOrderId") final Integer collectionOrderId,
 		@RequestParam(value = "singleFile") final boolean singleFile) {
 
-		if (!StringUtils.isEmpty(fileType)) {
-			final DatasetExportService exportMethod = this.getExportFileStrategy(fileType);
-			if (exportMethod != null) {
-				final File file = exportMethod.export(studyId, datasetId, instanceIds, collectionOrderId);
-				return this.getFileSystemResourceResponseEntity(file);
-			}
+		final DatasetExportService exportMethod = this.getExportFileStrategy(fileType);
+		if (exportMethod != null) {
+			final File file = exportMethod.export(studyId, datasetId, instanceIds, collectionOrderId);
+			return this.getFileSystemResourceResponseEntity(file);
 		}
+
 		return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 	}
 
