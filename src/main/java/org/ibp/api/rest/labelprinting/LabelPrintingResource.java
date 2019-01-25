@@ -97,7 +97,7 @@ public class LabelPrintingResource {
 	private LabelPrintingStrategy getLabelPrintingStrategy(final String labelPrintingType) {
 		final LabelPrintingType labelPrintingTypeEnum = LabelPrintingType.getEnumByCode(labelPrintingType);
 
-		if (labelPrintingType == null) {
+		if (labelPrintingTypeEnum == null) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("label.printing.type.not.supported", "");
 			throw new NotSupportedException(errors.getAllErrors().get(0));

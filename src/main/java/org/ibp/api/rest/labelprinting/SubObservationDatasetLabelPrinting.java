@@ -47,13 +47,24 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 	private StudyValidator studyValidator;
 
 	private static Field STUDY_NAME_FIELD;
+	private static Field YEAR_FIELD;
+	private static Field SEASON_FIELD;
+	private static List<Field> DEFAULT_STUDY_DETAILS_FIELDS;
+
 	private static String PLOT = "PLOT";
 	private static String OBS_UNIT_ID = "OBS_UNIT_ID";
 
 	@PostConstruct
 	void initStaticFields() {
 		final String studyNamePropValue = messageSource.getMessage("label.printing.field.study.name", null, LocaleContextHolder.getLocale());
+		final String yearPropValue = messageSource.getMessage("label.printing.field.year", null, LocaleContextHolder.getLocale());
+		final String seasonNamePropValue = messageSource.getMessage("label.printing.field.season", null, LocaleContextHolder.getLocale());
+
 		STUDY_NAME_FIELD = new Field(studyNamePropValue, studyNamePropValue);
+		YEAR_FIELD = new Field(yearPropValue, yearPropValue);
+		SEASON_FIELD = new Field(seasonNamePropValue, seasonNamePropValue);
+
+		DEFAULT_STUDY_DETAILS_FIELDS = Arrays.asList(STUDY_NAME_FIELD, YEAR_FIELD, SEASON_FIELD);
 	}
 
 	@Override
@@ -151,7 +162,7 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 		final LabelType studyDetailsLabelType = new LabelType(studyDetailsPropValue, studyDetailsPropValue);
 		final List<Field> studyDetailsFields = new LinkedList<>();
 		//Requirement to add Study Name as an available label when in fact it is not a variable.
-		studyDetailsFields.add(STUDY_NAME_FIELD);
+		studyDetailsFields.addAll(DEFAULT_STUDY_DETAILS_FIELDS);
 		studyDetailsFields.addAll(this.transform(studyDetailsVariables));
 		studyDetailsFields.addAll(this.transform(environmentVariables));
 		studyDetailsFields.addAll(this.transform(treatmentFactors));
