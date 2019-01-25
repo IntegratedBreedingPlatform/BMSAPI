@@ -10,6 +10,8 @@ import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
+import org.ibp.api.java.dataset.DatasetCSVExportService;
+import org.ibp.api.java.dataset.DatasetExcelExportService;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.common.PaginatedSearch;
