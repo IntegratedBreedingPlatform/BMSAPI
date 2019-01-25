@@ -15,7 +15,7 @@ import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.PreconditionFailedException;
 import org.ibp.api.exception.ResourceNotFoundException;
-import org.ibp.api.java.dataset.DatasetExportService;
+import org.ibp.api.java.dataset.DatasetCSVExportService;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.DatasetCollectionOrderServiceImpl;
 import org.junit.Before;
@@ -63,8 +63,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	private DatasetService studyDatasetService;
 
 	@Autowired
-	private DatasetExportService datasetCSVExportService;
-
+	private DatasetCSVExportService datasetCSVExportService;
 
 	@Configuration
 	public static class TestConfiguration {
@@ -77,8 +76,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public DatasetExportService datasetExportService() {
-			return Mockito.mock(DatasetExportService.class);
+		public DatasetCSVExportService datasetCSVExportService() {
+			return Mockito.mock(DatasetCSVExportService.class);
 		}
 	}
 
