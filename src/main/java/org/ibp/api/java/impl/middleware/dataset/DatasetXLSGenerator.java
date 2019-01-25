@@ -42,6 +42,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 @Component
 public class DatasetXLSGenerator implements DatasetFileGenerator {
@@ -194,7 +195,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 				.getMeasurementVariables(
 					environmentDatasetId, Lists
 						.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-							VariableType.STUDY_CONDITION.getId()));
+							VariableType.STUDY_CONDITION.getId(), VariableType.TRAIT.getId()));
 
 		final List<MeasurementVariable> plotVariables =
 			this.datasetService.getMeasurementVariables(plotDatasetId, Lists
@@ -223,23 +224,26 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filter(environmentVariables, VariableType.EXPERIMENTAL_DESIGN),
+			this.filterByVariableType(environmentVariables, VariableType.EXPERIMENTAL_DESIGN),
 			ENVIRONMENT);
 
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filter(plotVariables, VariableType.EXPERIMENTAL_DESIGN), PLOT);
+			this.filterByVariableType(plotVariables, VariableType.EXPERIMENTAL_DESIGN), PLOT);
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environment.details",
 			this.getColorIndex(xlsBook, 124, 124, 124));
+
+		final List<MeasurementVariable> environmentDetails = this.fixEnvironmentalDetailsValues(environmentDatasetId, environmentVariables);
+
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filter(environmentVariables, VariableType.ENVIRONMENT_DETAIL), ENVIRONMENT);
+			environmentDetails, ENVIRONMENT);
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environmental.conditions",
@@ -248,7 +252,12 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filter(environmentVariables, VariableType.STUDY_CONDITION), ENVIRONMENT);
+			this.filterByVariableType(environmentVariables, VariableType.STUDY_CONDITION), ENVIRONMENT);
+		currentRowNum = this.writeSection(
+			currentRowNum,
+			xlsBook,
+			xlsSheet,
+			this.filterByVariableType(environmentVariables, VariableType.TRAIT), ENVIRONMENT);
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.treatment.factors",
@@ -257,7 +266,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filter(plotVariables, VariableType.TREATMENT_FACTOR), STUDY);
+			this.filterByVariableType(plotVariables, VariableType.TREATMENT_FACTOR), STUDY);
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.germplasm.descriptors",
@@ -266,7 +275,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filter(plotVariables, VariableType.GERMPLASM_DESCRIPTOR), PLOT);
+			this.filterByVariableType(plotVariables, VariableType.GERMPLASM_DESCRIPTOR), PLOT);
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.observation.unit",
@@ -275,8 +284,8 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filter(datasetVariables, VariableType.OBSERVATION_UNIT),
-			DataSetType.findById(dataSetDto.getDatasetTypeId()).name());
+			this.filterByVariableType(datasetVariables, VariableType.OBSERVATION_UNIT),
+			DataSetType.findById(dataSetDto.getDatasetTypeId()).getReadableName());
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.traits",
@@ -285,8 +294,8 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filter(datasetVariables, VariableType.TRAIT),
-			DataSetType.findById(dataSetDto.getDatasetTypeId()).name());
+			this.filterByVariableType(datasetVariables, VariableType.TRAIT),
+			DataSetType.findById(dataSetDto.getDatasetTypeId()).getReadableName());
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.selections",
@@ -295,8 +304,8 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filter(datasetVariables, VariableType.SELECTION_METHOD),
-			DataSetType.findById(dataSetDto.getDatasetTypeId()).name());
+			this.filterByVariableType(datasetVariables, VariableType.SELECTION_METHOD),
+			DataSetType.findById(dataSetDto.getDatasetTypeId()).getReadableName());
 
 		xlsSheet.setColumnWidth(0, 20 * PIXEL_SIZE);
 		xlsSheet.setColumnWidth(1, 24 * PIXEL_SIZE);
@@ -307,6 +316,20 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		xlsSheet.setColumnWidth(6, 20 * PIXEL_SIZE);
 		xlsSheet.setColumnWidth(7, 20 * PIXEL_SIZE);
 		xlsSheet.setColumnWidth(8, 20 * PIXEL_SIZE);
+	}
+
+	private List<MeasurementVariable> fixEnvironmentalDetailsValues(
+		final int environmentDatasetId, final List<MeasurementVariable> environmentVariables) {
+		final List<MeasurementVariable> environmentDetails =
+			this.filterByVariableType(environmentVariables, VariableType.ENVIRONMENT_DETAIL);
+		final Map<String, String> geoLocationProps = this.studyDataManager.getGeolocationValues(environmentDatasetId);
+		for (final MeasurementVariable variable : environmentDetails) {
+			if (variable.getValue() == null) {
+				final String value = geoLocationProps.get(String.valueOf(variable.getTermId()));
+				variable.setValue(value);
+			}
+		}
+		return environmentDetails;
 	}
 
 	private int writeStudyDetails(
@@ -418,7 +441,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			final HSSFRow row = xlsSheet.createRow(currentRowNum);
 
 			HSSFCell cell = row.createCell(VARIABLE_NAME_COLUMN_INDEX, CellType.STRING);
-			cell.setCellValue(measurementVariable.getName());
+			cell.setCellValue(measurementVariable.getAlias());
 			cell.setCellStyle(backgroundStyle);
 
 			cell = row.createCell(DESCRIPTION_COLUMN_INDEX, CellType.STRING);
@@ -565,7 +588,8 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		return color.getIndex();
 	}
 
-	private static List<MeasurementVariable> filter(final List<MeasurementVariable> measurementVariables, final VariableType variableType) {
+	private static List<MeasurementVariable> filterByVariableType(
+		final List<MeasurementVariable> measurementVariables, final VariableType variableType) {
 		final Collection<MeasurementVariable> variablesByType = CollectionUtils.select(measurementVariables, new Predicate() {
 
 			@Override
