@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -65,6 +66,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 	private static final String STUDY = "STUDY";
 	private static final String ENVIRONMENT = "ENVIRONMENT";
 	private static final String PLOT = "PLOT";
+	private static final String BREEDING_METHOD_PROPERTY_NAME = "";
 
 	@Autowired
 	ResourceBundleMessageSource messageSource;
@@ -124,9 +126,16 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			final ObservationUnitData observationUnitData = dataRow.getVariables().get(column.getName());
 
 			final String dataCell = observationUnitData.getValue();
+			final HSSFCell cell = row.createCell(currentColNum++);
 			if (dataCell != null) {
-				final HSSFCell cell = row.createCell(currentColNum++);
-				if (NUMERIC_DATA_TYPE.equalsIgnoreCase(column.getDataType())) {
+				if (column.getPossibleValues() != null && !column.getPossibleValues()
+					.isEmpty() && column.getTermId() != TermId.BREEDING_METHOD_VARIATE.getId()
+					&& column.getTermId() != TermId.BREEDING_METHOD_VARIATE_CODE.getId() && !column.getProperty()
+					.equals(BREEDING_METHOD_PROPERTY_NAME)) {
+
+					cell.setCellValue(this.getCategoricalCellValue(dataCell, column.getPossibleValues()));
+
+				} else if (NUMERIC_DATA_TYPE.equalsIgnoreCase(column.getDataType())) {
 					if (!dataCell.isEmpty() && NumberUtils.isNumber(dataCell)) {
 						cell.setCellType(CellType.BLANK);
 						cell.setCellType(CellType.NUMERIC);
@@ -511,7 +520,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		}
 	}
 
-	public static String getCategoricalCellValue(final String idValue, final List<ValueReference> possibleValues) {
+	private static String getCategoricalCellValue(final String idValue, final List<ValueReference> possibleValues) {
 		// With the New Data Table, the idValue will contain the long text instead of the id.
 		if (idValue != null && possibleValues != null && !possibleValues.isEmpty()) {
 			for (final ValueReference possibleValue : possibleValues) {
