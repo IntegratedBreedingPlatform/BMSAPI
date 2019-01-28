@@ -247,7 +247,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environment.details",
 			this.getColorIndex(xlsBook, 124, 124, 124));
 
-		final List<MeasurementVariable> environmentDetails = this.fixEnvironmentalDetailsValues(environmentDatasetId, environmentVariables);
+		final List<MeasurementVariable> environmentDetails = this.fixEnvironmentalDetailsValues(environmentDatasetId, environmentVariables, dataSetDto.getInstances().get(0));
 
 		currentRowNum = this.writeSection(
 			currentRowNum,
@@ -329,7 +329,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 	}
 
 	private List<MeasurementVariable> fixEnvironmentalDetailsValues(
-		final int environmentDatasetId, final List<MeasurementVariable> environmentVariables) {
+		final int environmentDatasetId, final List<MeasurementVariable> environmentVariables, final StudyInstance instance) {
 		final List<MeasurementVariable> environmentDetails =
 			this.filterByVariableType(environmentVariables, VariableType.ENVIRONMENT_DETAIL);
 		final Map<String, String> geoLocationProps = this.studyDataManager.getGeolocationValues(environmentDatasetId);
@@ -337,6 +337,20 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			if (variable.getValue() == null) {
 				final String value = geoLocationProps.get(String.valueOf(variable.getTermId()));
 				variable.setValue(value);
+			}
+			switch (variable.getTermId()) {
+				case 8170:
+					variable.setValue(String.valueOf(instance.getInstanceNumber()));
+					break;
+				case 8190:
+					variable.setValue(String.valueOf(instance.getLocationName()));
+					break;
+				default:
+					if (variable.getValue() == null) {
+						final String value = geoLocationProps.get(String.valueOf(variable.getTermId()));
+						variable.setValue(value);
+					}
+					break;
 			}
 		}
 		return environmentDetails;
