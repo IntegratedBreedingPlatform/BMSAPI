@@ -263,15 +263,6 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			this.filterByVariableType(environmentVariables, VariableType.TRAIT), ENVIRONMENT);
 		xlsSheet.createRow(currentRowNum++);
 
-		/*currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.treatment.factors",
-			this.getColorIndex(xlsBook, 124, 124, 124));
-		currentRowNum = this.writeSection(
-			currentRowNum,
-			xlsBook,
-			xlsSheet,
-			this.filterByVariableType(plotVariables, VariableType.TREATMENT_FACTOR), STUDY);
-		xlsSheet.createRow(currentRowNum++);*/
-
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.germplasm.descriptors",
 			this.getColorIndex(xlsBook, 51, 153, 102));
 		currentRowNum = this.writeSection(
