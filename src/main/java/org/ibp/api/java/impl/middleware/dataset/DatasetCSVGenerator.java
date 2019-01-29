@@ -38,7 +38,6 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 			}
 
 			csvWriter.writeAll(rowValues);
-			csvWriter.close();
 			return newFile;
 		}
 
