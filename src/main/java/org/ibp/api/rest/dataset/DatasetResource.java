@@ -12,6 +12,8 @@ import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.java.impl.middleware.dataset.DatasetCSVExportServiceImpl;
+import org.ibp.api.java.impl.middleware.dataset.DatasetExcelExportServiceImpl;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +31,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -40,11 +41,16 @@ import java.util.Set;
 public class DatasetResource {
 
 	public static final String CSV = "csv";
+	public static final String XLS = "xls";
+
 	@Autowired
 	private DatasetService studyDatasetService;
 
 	@Autowired
-	private DatasetExportService datasetExportService;
+	private DatasetExportService datasetCSVExportServiceImpl;
+
+	@Autowired
+	private DatasetExportService datasetExcelExportServiceImpl;
 
 	@ApiOperation(value = "Get Dataset Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the dataset, "
 		+ "that will be shown in the Observation Table")
@@ -154,19 +160,14 @@ public class DatasetResource {
 
 				@Override
 				public long getCount() {
-					return DatasetResource.this.studyDatasetService.countTotalObservationUnitsForDataset (datasetId, instanceId);
+					return DatasetResource.this.studyDatasetService.countTotalObservationUnitsForDataset(datasetId, instanceId);
 				}
 
 				@Override
 				public List<ObservationUnitRow> getResults(final PagedResult<ObservationUnitRow> pagedResult) {
-					return DatasetResource.this.studyDatasetService.getObservationUnitRows(
-						studyId,
-						datasetId,
-						instanceId,
-						pagedResult.getPageNumber(),
-						pagedResult.getPageSize(),
-						sortBy,
-						sortOrder);
+					return DatasetResource.this.studyDatasetService
+							.getObservationUnitRows(studyId, datasetId, instanceId, pagedResult.getPageNumber(), pagedResult.getPageSize(),
+									sortBy, sortOrder);
 				}
 			});
 
@@ -209,7 +210,7 @@ public class DatasetResource {
 			value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations",
 			method = RequestMethod.PUT)
 	public ResponseEntity<Void> postObservationUnits(@PathVariable final String crop, @PathVariable final Integer studyId,
-			@PathVariable final Integer datasetId, @RequestBody ObservationsPutRequestInput input) {
+			@PathVariable final Integer datasetId, @RequestBody final ObservationsPutRequestInput input) {
 		this.studyDatasetService.importObservations(studyId, datasetId, input);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -222,23 +223,38 @@ public class DatasetResource {
 		return new ResponseEntity<>(this.studyDatasetService.getDatasetInstances(studyId, datasetId), HttpStatus.OK);
 	}
 
-
 	@ApiOperation(value = "Exports the dataset to a specified file type", notes = "Exports the dataset to a specified file type")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/{fileType}", method = RequestMethod.GET)
-	public ResponseEntity<FileSystemResource> exportDataset(@PathVariable final String crop,
+	public ResponseEntity<FileSystemResource> exportDataset(
+		@PathVariable final String crop,
 		@PathVariable final Integer studyId, @PathVariable final Integer datasetId, @PathVariable final String fileType,
-		@RequestParam(value = "instanceIds") final Set<Integer> instanceIds, @RequestParam(value = "collectionOrderId") final Integer collectionOrderId) {
+		@RequestParam(value = "instanceIds") final Set<Integer> instanceIds,
+		@RequestParam(value = "collectionOrderId") final Integer collectionOrderId,
+		@RequestParam(value = "singleFile") final boolean singleFile) {
 
-			if (CSV.equals(fileType)) {
-				final File file = this.datasetExportService.exportAsCSV(studyId, datasetId, instanceIds, collectionOrderId);
-				final HttpHeaders headers = new HttpHeaders();
-				headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
-				final FileSystemResource fileSystemResource = new FileSystemResource(file);
-				return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-			}
+		final DatasetExportService exportMethod = this.getExportFileStrategy(fileType);
+		if (exportMethod != null) {
+			final File file = exportMethod.export(studyId, datasetId, instanceIds, collectionOrderId, singleFile);
+			return this.getFileSystemResourceResponseEntity(file);
+		}
 
+		return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 	}
 
+	private DatasetExportService getExportFileStrategy(final String fileType) {
+		if (DatasetResource.CSV.equalsIgnoreCase(fileType.trim())) {
+			return this.datasetCSVExportServiceImpl;
+		} else if (DatasetResource.XLS.equalsIgnoreCase(fileType.trim())) {
+			return this.datasetExcelExportServiceImpl;
+		}
+		return null;
+	}
+
+	private ResponseEntity<FileSystemResource> getFileSystemResourceResponseEntity(final File file) {
+		final HttpHeaders headers = new HttpHeaders();
+		headers
+			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
+		final FileSystemResource fileSystemResource = new FileSystemResource(file);
+		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
+	}
 }
