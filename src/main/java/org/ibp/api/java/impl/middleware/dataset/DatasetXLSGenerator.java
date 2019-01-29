@@ -84,24 +84,18 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> reorderedObservationUnitRows,
 		final String fileNamePath) throws IOException {
-		final File newFile = new File(fileNamePath);
-		FileOutputStream fos = null;
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
 		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto);
 		this.writeObservationSheet(columns, reorderedObservationUnitRows, xlsBook);
 
-		try {
-			final File file = new File(fileNamePath);
-			fos = new FileOutputStream(file);
+		final File file = new File(fileNamePath);
+
+		try (final FileOutputStream fos = new FileOutputStream(file)) {
 			xlsBook.write(fos);
 
-		} finally {
-			if (fos != null) {
-				fos.close();
-			}
 		}
-		return newFile;
+		return file;
 	}
 
 	private void writeObservationSheet(

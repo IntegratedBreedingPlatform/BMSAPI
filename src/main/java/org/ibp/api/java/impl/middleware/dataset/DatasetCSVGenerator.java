@@ -20,32 +20,28 @@ import java.util.List;
 @Component
 public class DatasetCSVGenerator implements DatasetFileGenerator {
 
-	private CSVWriter csvWriter;
-
 	@Override
 	public File generateFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> observationUnitRows,
 		final String fileNameFullPath) throws IOException {
 
-		this.createCSVWriter(fileNameFullPath);
+		try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',')){
 
-		final File newFile = new File(fileNameFullPath);
-		// feed in your array (or convert your data to an array)
-		final List<String[]> rowValues = new ArrayList<>();
+			final File newFile = new File(fileNameFullPath);
+			// feed in your array (or convert your data to an array)
+			final List<String[]> rowValues = new ArrayList<>();
 
-		rowValues.add(this.getHeaderNames(columns).toArray(new String[] {}));
+			rowValues.add(this.getHeaderNames(columns).toArray(new String[] {}));
 
-		for (final ObservationUnitRow row : observationUnitRows) {
-			rowValues.add(this.getColumnValues(row, columns));
+			for (final ObservationUnitRow row : observationUnitRows) {
+				rowValues.add(this.getColumnValues(row, columns));
+			}
+
+			csvWriter.writeAll(rowValues);
+			csvWriter.close();
+			return newFile;
 		}
 
-		this.csvWriter.writeAll(rowValues);
-		this.csvWriter.close();
-		return newFile;
-	}
-
-	public void createCSVWriter(final String fileNameFullPath) throws FileNotFoundException {
-		this.setCSVWriter(new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ','));
 	}
 
 	protected String[] getColumnValues(final ObservationUnitRow row, final List<MeasurementVariable> subObservationSetColumns) {
@@ -64,7 +60,4 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 		return headerNames;
 	}
 
-	public void setCSVWriter(final CSVWriter csvWriter) {
-		this.csvWriter = csvWriter;
-	}
 }
