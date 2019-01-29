@@ -15,7 +15,7 @@ import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.PreconditionFailedException;
 import org.ibp.api.exception.ResourceNotFoundException;
-import org.ibp.api.java.dataset.DatasetCSVExportService;
+import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.DatasetCollectionOrderServiceImpl;
 import org.junit.Before;
@@ -63,7 +63,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	private DatasetService studyDatasetService;
 
 	@Autowired
-	private DatasetCSVExportService datasetCSVExportService;
+	private DatasetExportService datasetCSVExportService;
 
 	@Configuration
 	public static class TestConfiguration {
@@ -76,8 +76,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public DatasetCSVExportService datasetCSVExportService() {
-			return Mockito.mock(DatasetCSVExportService.class);
+		public DatasetExportService datasetCSVExportService() {
+			return Mockito.mock(DatasetExportService.class);
 		}
 	}
 
@@ -579,7 +579,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int collectionOrderId = DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId();
 
 		final File file = File.createTempFile("test", ".csv");
-		Mockito.when(this.datasetCSVExportService.export(studyId, datasetId, instanceIds, collectionOrderId)).thenReturn(file);
+		Mockito.when(this.datasetCSVExportService.export(studyId, datasetId, instanceIds, collectionOrderId, false)).thenReturn(file);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders

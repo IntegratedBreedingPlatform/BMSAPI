@@ -120,7 +120,7 @@ public class DatasetExportServiceImplTest {
 		when(this.zipUtil.zipFiles(eq(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
 
 		final File result = this.datasetExportService.export(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
-			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId());
+			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
 
 		verify(this.studyValidator).validate(this.study.getId(), false);
 		verify(this.datasetValidator).validateDataset(this.study.getId(), this.dataSetDTO.getDatasetId(), false);
@@ -141,7 +141,7 @@ public class DatasetExportServiceImplTest {
 		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(this.instanceId1, this.instanceId2));
 
 		this.datasetExportService.export(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
-			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId());
+			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
 
 	}
 
