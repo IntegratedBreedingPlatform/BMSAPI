@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public abstract class DatasetExportServiceImpl {
+public abstract class AbstractDatasetExportService {
 
 	public static final String XLS = "xls";
 	public static final String CSV = "csv";

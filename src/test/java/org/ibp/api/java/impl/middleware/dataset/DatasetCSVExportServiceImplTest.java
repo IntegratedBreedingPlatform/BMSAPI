@@ -44,7 +44,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DatasetExportServiceImplTest {
+public class DatasetCSVExportServiceImplTest {
 
 	public static final int RANDOM_STRING_LENGTH = 10;
 	@Mock
@@ -166,7 +166,7 @@ public class DatasetExportServiceImplTest {
 		final File result = this.datasetExportService
 			.generateFiles(
 				this.study, this.dataSetDTO, studyInstances, DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), this.datasetCSVGenerator,
-				DatasetExportServiceImpl.CSV);
+				AbstractDatasetExportService.CSV);
 
 		for (final StudyInstance studyInstance : studyInstances) {
 			verify(this.studyDatasetService)
@@ -202,7 +202,7 @@ public class DatasetExportServiceImplTest {
 		final File result = this.datasetExportService
 			.generateFiles(
 				this.study, this.dataSetDTO, Arrays.asList(studyInstance),
-				DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), this.datasetCSVGenerator, DatasetExportServiceImpl.CSV);
+				DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), this.datasetCSVGenerator, AbstractDatasetExportService.CSV);
 
 
 		verify(this.studyDatasetService)

@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class ProgramResourceTest extends ApiUnitTestBase {
 
-	private UsernamePasswordAuthenticationToken loggedInUser;
+//	private UsernamePasswordAuthenticationToken loggedInUser;
 	private WorkbenchUser me;
 	private WorkbenchUser myBreedingBuddy;
 
@@ -47,21 +47,23 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 		this.myBreedingBuddy.setUserid(2);
 		this.myBreedingBuddy.setPassword("password");
 
-		this.loggedInUser = new UsernamePasswordAuthenticationToken(this.me.getName(), this.me.getPassword());
-		SecurityContextHolder.getContext().setAuthentication(this.loggedInUser);
+//		this.loggedInUser = new UsernamePasswordAuthenticationToken(this.me.getName(), this.me.getPassword());
+//		SecurityContextHolder.getContext().setAuthentication(this.loggedInUser);
 
 		Mockito.when(this.workbenchDataManager.getUserById(this.me.getUserid())).thenReturn(this.me);
 		Mockito.when(this.workbenchDataManager.getUserById(this.myBreedingBuddy.getUserid())).thenReturn(this.myBreedingBuddy);
 
 		Mockito.when(this.workbenchDataManager.getUserByUsername(this.me.getName())).thenReturn(this.me);
 		Mockito.when(this.workbenchDataManager.getUserByUsername(this.myBreedingBuddy.getName())).thenReturn(this.myBreedingBuddy);
-		Mockito.when(securityService.getCurrentlyLoggedInUser()).thenCallRealMethod();
+//		Mockito.when(securityService.getCurrentlyLoggedInUser()).thenCallRealMethod();
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.me);
+
 	}
 
-	@After
-	public void afterEachTest() {
-		SecurityContextHolder.getContext().setAuthentication(null);
-	}
+//	@After
+//	public void afterEachTest() {
+//		SecurityContextHolder.getContext().setAuthentication(null);
+//	}
 
 	@Test
 	public void listAllMethods() throws Exception {

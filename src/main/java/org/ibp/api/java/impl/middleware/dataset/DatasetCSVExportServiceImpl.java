@@ -20,7 +20,7 @@ import java.util.Set;
 
 @Service
 @Transactional
-public class DatasetCSVExportServiceImpl extends DatasetExportServiceImpl implements DatasetExportService {
+public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService implements DatasetExportService {
 
 	@Resource
 	private StudyDataManager studyDataManager;

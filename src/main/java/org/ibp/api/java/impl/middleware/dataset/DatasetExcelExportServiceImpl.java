@@ -19,7 +19,7 @@ import java.util.Set;
 
 @Service
 @Transactional
-public class DatasetExcelExportServiceImpl extends DatasetExportServiceImpl implements DatasetExportService {
+public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService implements DatasetExportService {
 
 	@Resource
 	private DatasetXLSGenerator datasetXLSGenerator;
