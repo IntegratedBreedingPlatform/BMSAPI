@@ -14,24 +14,6 @@ import java.util.List;
 @Component
 public class DatasetCSVGenerator {
 
-	protected File generateCSVFile(
-		final List<MeasurementVariable> columns, final List<ObservationUnitRow> observationUnitRows,
-		final String fileNameFullPath, final CSVWriter csvWriter) throws IOException {
-		final File newFile = new File(fileNameFullPath);
-		// feed in your array (or convert your data to an array)
-		final List<String[]> rowValues = new ArrayList<>();
-
-		rowValues.add(this.getHeaderNames(columns).toArray(new String[] {}));
-
-		for (final ObservationUnitRow row : observationUnitRows) {
-			rowValues.add(this.getColumnValues(row, columns));
-		}
-
-		csvWriter.writeAll(rowValues);
-		csvWriter.close();
-		return newFile;
-	}
-
 	protected File generateCSVFileWithHeaders(
 		final List<MeasurementVariable> columns, final String fileNameFullPath, final CSVWriter csvWriter) {
 		final File newFile = new File(fileNameFullPath);

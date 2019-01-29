@@ -1,7 +1,18 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import au.com.bytecode.opencsv.CSVWriter;
-import com.google.common.io.Files;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Resource;
+
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.domain.dms.DataSetType;
@@ -18,7 +29,6 @@ import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
-import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,17 +36,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import javax.annotation.Resource;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.io.Files;
+
+import au.com.bytecode.opencsv.CSVWriter;
 
 @Service
 @Transactional
@@ -76,10 +78,25 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 
 		final Study study = this.studyDataManager.getStudy(studyId);
 		final DatasetDTO dataSet = this.datasetService.getDataset(datasetId);
+		final Map<Integer, StudyInstance>  selectedDatasetInstancesMap = getSelectedDatasetInstancesMap(dataSet.getInstances(),
+				instanceIds);
+
+		// Get all variables for the dataset
+		final List<MeasurementVariable> columns = this.reorderColumns(this.studyDatasetService.getAllDatasetVariables(study.getId(), dataSet.getDatasetId()));
+		final int trialDatasetId = this.studyDataManager.getDataSetsByType(study.getId(), DataSetType.SUMMARY_DATA).get(0).getId();
+		final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder = DatasetCollectionOrderServiceImpl.CollectionOrder.findById(collectionOrderId);
+
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
+			this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataSet.getDatasetId(), new ArrayList<>(
+				instanceIds));
+		this.datasetCollectionOrderService.reorder(collectionOrder, trialDatasetId, selectedDatasetInstancesMap, observationUnitRowMap);
 
 		try {
-			if(isExportInSingleFile) return this.generateCSVFileInSingleFile(study, dataSet, instanceIds, collectionOrderId);
-			return this.generateCSVFiles(study, dataSet, instanceIds, collectionOrderId);
+			if(isExportInSingleFile) {
+				return this.generateCSVFileInSingleFile(study, dataSet, selectedDatasetInstancesMap, observationUnitRowMap, columns);
+			} else  {				
+				return this.generateCSVFiles(study, dataSet, selectedDatasetInstancesMap, observationUnitRowMap, columns);
+			}
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("cannot.exportAsCSV.dataset", "");
@@ -87,28 +104,13 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 		}
 	}
 
-	protected File generateCSVFiles(
-		final Study study, final DatasetDTO dataSetDto, final Set<Integer> studyInstanceIds, final int collectionOrderId)
-		throws IOException {
-		final Map<Integer, StudyInstance>  selectedDatasetInstancesMap = getSelectedDatasetInstancesMap(dataSetDto.getInstances(),
-			studyInstanceIds);
-
+	protected File generateCSVFiles(final Study study, final DatasetDTO dataSetDto,
+			final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
+			final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns)
+			throws IOException {
 		final List<File> csvFiles = new ArrayList<>();
-
-		// Get all variables for the dataset
-		final List<MeasurementVariable> columns = this.reorderColumns(this.studyDatasetService.getAllDatasetVariables(study.getId(), dataSetDto.getDatasetId()));
-		final int trialDatasetId = this.studyDataManager.getDataSetsByType(study.getId(), DataSetType.SUMMARY_DATA).get(0).getId();
 		final File temporaryFolder = Files.createTempDir();
-		final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder = DatasetCollectionOrderServiceImpl.CollectionOrder.findById(collectionOrderId);
-
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
-			this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataSetDto.getDatasetId(), new ArrayList<>(
-				studyInstanceIds));
-		for(Integer instanceDBID: studyInstanceIds) {
-			final List<ObservationUnitRow> observationUnitRows = observationUnitRowMap.get(instanceDBID);
-
-			final List<ObservationUnitRow> reorderedObservationUnitRows = datasetCollectionOrderService
-				.reorder(collectionOrder, trialDatasetId, String.valueOf(selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber()), observationUnitRows);
+		for(final Integer instanceDBID: observationUnitRowMap.keySet()) {
 			// Build the filename with the following format:
 			// study_name + TRIAL_INSTANCE number + location_abbr +  dataset_type + dataset_name
 			final String sanitizedFileName = FileUtils.sanitizeFileName(String
@@ -117,10 +119,12 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 					DataSetType.findById(dataSetDto.getDatasetTypeId()).name(), dataSetDto.getName()));
 
 			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
-
 			final CSVWriter csvWriter =
 				new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',');
-			csvFiles.add(this.datasetCSVGenerator.generateCSVFile(columns, reorderedObservationUnitRows, fileNameFullPath, csvWriter));
+			final File csvFile = this.datasetCSVGenerator.generateCSVFileWithHeaders(columns, fileNameFullPath, csvWriter);
+			this.datasetCSVGenerator.writeInstanceObservationUnitRowsToCSVFile(columns, observationUnitRowMap.get(instanceDBID), csvWriter);
+			csvFiles.add(csvFile);
+			csvWriter.close();
 		}
 
 		if (csvFiles.size() == 1) {
@@ -131,22 +135,11 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 
 	}
 
-	protected File generateCSVFileInSingleFile(
-		final Study study, final DatasetDTO dataSetDto, final Set<Integer> studyInstanceIds, final int collectionOrderId)
-		throws IOException {
-		final Map<Integer, StudyInstance>  selectedDatasetInstancesMap = getSelectedDatasetInstancesMap(dataSetDto.getInstances(),
-			studyInstanceIds);
-		// Get all variables for the dataset
-		final List<MeasurementVariable> columns = this.reorderColumns(this.studyDatasetService.getAllDatasetVariables(study.getId(), dataSetDto.getDatasetId()));
-
-		final int trialDatasetId = this.studyDataManager.getDataSetsByType(study.getId(), DataSetType.SUMMARY_DATA).get(0).getId();
-		final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder = DatasetCollectionOrderServiceImpl.CollectionOrder.findById(collectionOrderId);
-
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
-			this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataSetDto.getDatasetId(), new ArrayList<>(
-				studyInstanceIds));
-		//final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = this.mockObservationUnitRowMap();
-
+	protected File generateCSVFileInSingleFile(final Study study, final DatasetDTO dataSetDto,
+			final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
+			final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns)
+			throws IOException {
+		
 		final File temporaryFolder = Files.createTempDir();
 		final String sanitizedFileName = FileUtils.sanitizeFileName(String.format("%s_AllInstances.csv", study.getName()));
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
@@ -154,13 +147,9 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 		final CSVWriter csvWriter =
 			new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',');
 		final File csvFile = this.datasetCSVGenerator.generateCSVFileWithHeaders(columns, fileNameFullPath, csvWriter);
-		for(Integer instanceDBID: studyInstanceIds) {
+		for(final Integer instanceDBID: observationUnitRowMap.keySet()) {
 			final List<ObservationUnitRow> observationUnitRows = observationUnitRowMap.get(instanceDBID);
-
-			final List<ObservationUnitRow> reorderedObservationUnitRows = datasetCollectionOrderService
-				.reorder(collectionOrder, trialDatasetId, String.valueOf(selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber()), observationUnitRows);
-
-			this.datasetCSVGenerator.writeInstanceObservationUnitRowsToCSVFile(columns, reorderedObservationUnitRows, csvWriter);
+			this.datasetCSVGenerator.writeInstanceObservationUnitRowsToCSVFile(columns, observationUnitRows, csvWriter);
 		}
 		csvWriter.close();
 		return csvFile;
