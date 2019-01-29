@@ -28,8 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-@Service
-@Transactional
 public abstract class DatasetExportServiceImpl {
 
 	public static final String XLS = "xls";

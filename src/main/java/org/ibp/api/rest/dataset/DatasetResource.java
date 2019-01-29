@@ -10,10 +10,10 @@ import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
-import org.ibp.api.java.dataset.DatasetCSVExportService;
-import org.ibp.api.java.dataset.DatasetExcelExportService;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.java.impl.middleware.dataset.DatasetCSVExportServiceImpl;
+import org.ibp.api.java.impl.middleware.dataset.DatasetExcelExportServiceImpl;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,10 +47,10 @@ public class DatasetResource {
 	private DatasetService studyDatasetService;
 
 	@Autowired
-	private DatasetCSVExportService datasetCSVExportService;
+	private DatasetExportService datasetCSVExportServiceImpl;
 
 	@Autowired
-	private DatasetExcelExportService datasetExcelExportService;
+	private DatasetExportService datasetExcelExportServiceImpl;
 
 	@ApiOperation(value = "Get Dataset Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the dataset, "
 		+ "that will be shown in the Observation Table")
@@ -160,19 +160,14 @@ public class DatasetResource {
 
 				@Override
 				public long getCount() {
-					return DatasetResource.this.studyDatasetService.countTotalObservationUnitsForDataset (datasetId, instanceId);
+					return DatasetResource.this.studyDatasetService.countTotalObservationUnitsForDataset(datasetId, instanceId);
 				}
 
 				@Override
 				public List<ObservationUnitRow> getResults(final PagedResult<ObservationUnitRow> pagedResult) {
-					return DatasetResource.this.studyDatasetService.getObservationUnitRows(
-						studyId,
-						datasetId,
-						instanceId,
-						pagedResult.getPageNumber(),
-						pagedResult.getPageSize(),
-						sortBy,
-						sortOrder);
+					return DatasetResource.this.studyDatasetService
+							.getObservationUnitRows(studyId, datasetId, instanceId, pagedResult.getPageNumber(), pagedResult.getPageSize(),
+									sortBy, sortOrder);
 				}
 			});
 
@@ -239,7 +234,7 @@ public class DatasetResource {
 
 		final DatasetExportService exportMethod = this.getExportFileStrategy(fileType);
 		if (exportMethod != null) {
-			final File file = exportMethod.export(studyId, datasetId, instanceIds, collectionOrderId);
+			final File file = exportMethod.export(studyId, datasetId, instanceIds, collectionOrderId, singleFile);
 			return this.getFileSystemResourceResponseEntity(file);
 		}
 
@@ -248,9 +243,9 @@ public class DatasetResource {
 
 	private DatasetExportService getExportFileStrategy(final String fileType) {
 		if (DatasetResource.CSV.equalsIgnoreCase(fileType.trim())) {
-			return this.datasetCSVExportService;
+			return this.datasetCSVExportServiceImpl;
 		} else if (DatasetResource.XLS.equalsIgnoreCase(fileType.trim())) {
-			return this.datasetExcelExportService;
+			return this.datasetExcelExportServiceImpl;
 		}
 		return null;
 	}

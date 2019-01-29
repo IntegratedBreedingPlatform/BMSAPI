@@ -4,7 +4,7 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
-import org.ibp.api.java.dataset.DatasetExcelExportService;
+import org.ibp.api.java.dataset.DatasetExportService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -19,7 +19,7 @@ import java.util.Set;
 
 @Service
 @Transactional
-public class DatasetExcelExportServiceImpl extends DatasetExportServiceImpl implements DatasetExcelExportService {
+public class DatasetExcelExportServiceImpl extends DatasetExportServiceImpl implements DatasetExportService {
 
 	@Resource
 	private DatasetXLSGenerator datasetXLSGenerator;
@@ -28,7 +28,7 @@ public class DatasetExcelExportServiceImpl extends DatasetExportServiceImpl impl
 	private org.generationcp.middleware.service.api.dataset.DatasetService datasetService;
 
 	@Override
-	public File export(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId) {
+	public File export(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId, final boolean singleFile) {
 
 		this.validate(studyId, datasetId, instanceIds);
 
