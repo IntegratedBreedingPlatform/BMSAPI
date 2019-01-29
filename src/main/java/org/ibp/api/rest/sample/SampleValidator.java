@@ -38,7 +38,7 @@ public class SampleValidator {
 			if (StringUtils.isNotBlank(sampleDTO.getPlateId()) && sampleDTO.getPlateId().length() > 255) {
 				errors.reject("sample.plate.id.exceed.length");
 			}
-			if (StringUtils.isNotBlank(sampleDTO.getPlateId()) && sampleDTO.getPlateId().length() > 255) {
+			if (StringUtils.isNotBlank(sampleDTO.getWell()) && sampleDTO.getWell().length() > 255) {
 				errors.reject("sample.well.exceed.length");
 			}
 			sampleBusinessKeys.add(sampleDTO.getSampleBusinessKey());

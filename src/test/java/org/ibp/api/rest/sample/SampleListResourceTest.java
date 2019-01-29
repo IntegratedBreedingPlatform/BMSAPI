@@ -137,12 +137,12 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		result.put("id", SampleListResourceTest.VALUE);
 		final SampleList sampleList = new SampleList();
 		sampleList.setId(Integer.valueOf(SampleListResourceTest.VALUE));
-		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sampleLists/maize/sampleList").build().encode();
+		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sampleLists/maize/sampleLists").build().encode();
 
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
 		Mockito.when(this.sampleListServiceMW.createSampleList(org.mockito.Matchers.any(SampleListDTO.class))).thenReturn(sampleList);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType)
+		this.mockMvc.perform(MockMvcRequestBuilders.put(uriComponents.toUriString()).contentType(this.contentType)
 			.content(this.convertObjectToByte(this.dto))).andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))));
 	}

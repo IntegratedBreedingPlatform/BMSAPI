@@ -15,8 +15,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
+import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,12 @@ public class SampleListServiceImplTest {
 
 	@Mock
 	private org.generationcp.middleware.service.api.SampleListService sampleListServiceMW;
+
+	@Mock
+	private SampleListValidator sampleListValidator;
+
+	@Mock
+	private SampleValidator sampleValidator;
 
 	private ResourceBundleMessageSource messageSource;
 
@@ -55,13 +63,12 @@ public class SampleListServiceImplTest {
 	public void testImportSamplePlateInformationSuccess() {
 		final int listId = 1;
 		final List<SampleDTO> sampleDTOs = this.createSampleDto();
-		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySetOf(String.class), Mockito.anyInt())).thenReturn(2l);
 		try {
 			this.sampleListService.importSamplePlateInformation(sampleDTOs, listId);
 			Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(Mockito.eq(listId), Mockito.anyMapOf(
-					String.class, SamplePlateInfo.class));
+				String.class, SamplePlateInfo.class));
 		} catch (ApiRequestValidationException e) {
-			Assert.fail("InvalidValuesException should not be thrown.");
+			Assert.fail("ApiRequestValidationException should not be thrown.");
 		}
 
 	}
@@ -70,14 +77,14 @@ public class SampleListServiceImplTest {
 	public void testImportSamplePlateInformationError() {
 		final int listId = 1;
 		final List<SampleDTO> sampleDTOs = this.createSampleDto();
-
-		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySetOf(String.class), Mockito.anyInt())).thenReturn(1l);
+		final ApiRequestValidationException exception = new ApiRequestValidationException(Arrays.asList(new ObjectError("", "")));
+		Mockito.doThrow(exception).when(this.sampleValidator).validateSamples(listId, sampleDTOs);
 
 		try {
 			this.sampleListService.importSamplePlateInformation(sampleDTOs, listId);
-			Assert.fail("InvalidValuesException should be thrown.");
+			Assert.fail("ApiRequestValidationException should be thrown.");
 		} catch (ApiRequestValidationException e) {
-			Assert.assertEquals("sample.sample.ids.not.present.in.file",  e.getErrors().get(0).getCodes()[1]);
+			//
 		}
 
 	}
@@ -109,6 +116,5 @@ public class SampleListServiceImplTest {
 		return sampleDTOs;
 
 	}
-
 
 }
