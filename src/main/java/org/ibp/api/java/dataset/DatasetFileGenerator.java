@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface DatasetFileGenerator {
 
-	public abstract File generateFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
+	File generateFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> observationUnitRows,
 		final String fileNamePath) throws IOException;
 }

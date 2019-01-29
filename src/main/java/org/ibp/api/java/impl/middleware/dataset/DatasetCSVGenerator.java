@@ -45,10 +45,7 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 	}
 
 	public void createCSVWriter(final String fileNameFullPath) throws FileNotFoundException {
-		if (this.csvWriter == null) {
-			this.setCSVWriter(
-				new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ','));
-		}
+		this.setCSVWriter(new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ','));
 	}
 
 	protected String[] getColumnValues(final ObservationUnitRow row, final List<MeasurementVariable> subObservationSetColumns) {
