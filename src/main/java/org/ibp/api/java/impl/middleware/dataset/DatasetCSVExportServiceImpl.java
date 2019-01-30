@@ -53,17 +53,6 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	public File export(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId, final boolean isExportInSingleFile) {
 
 		this.validate(studyId, datasetId, instanceIds);
-
-		try {
-			return this.exportAsCSV(studyId, datasetId, instanceIds, collectionOrderId, isExportInSingleFile);
-		} catch (final IOException e) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-			errors.reject("cannot.exportAsCSV.dataset", "");
-			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
-		}
-	}
-
-	public File exportAsCSV(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId, final boolean isExportInSingleFile) throws IOException {
 		final Study study = this.studyDataManager.getStudy(studyId);
 		final DatasetDTO dataSet = this.datasetService.getDataset(datasetId);
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap = getSelectedDatasetInstancesMap(dataSet.getInstances(),
@@ -79,10 +68,16 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 				instanceIds));
 		this.datasetCollectionOrderService.reorder(collectionOrder, trialDatasetId, selectedDatasetInstancesMap, observationUnitRowMap);
 
-		if(isExportInSingleFile) {
-			return this.generateCSVFileInSingleFile(study, observationUnitRowMap, columns);
-		} else  {
-			return this.generateCSVFiles(study, dataSet, selectedDatasetInstancesMap, observationUnitRowMap, columns);
+		try {
+			if(isExportInSingleFile) {
+				return this.generateCSVFileInSingleFile(study, observationUnitRowMap, columns);
+			} else  {
+				return this.generateCSVFiles(study, dataSet, selectedDatasetInstancesMap, observationUnitRowMap, columns);
+			}
+		} catch (final IOException e) {
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			errors.reject("cannot.exportAsCSV.dataset", "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 	}
 
