@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyListOf;
@@ -52,7 +51,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DatasetExportServiceImplTest {
+public class DatasetCSVExportServiceImplTest {
 
 	public static final int RANDOM_STRING_LENGTH = 10;
 	@Mock
@@ -83,22 +82,22 @@ public class DatasetExportServiceImplTest {
 	private ZipUtil zipUtil;
 
 	@InjectMocks
-	private DatasetExportServiceImpl datasetExportService;
+	private DatasetCSVExportServiceImpl datasetExportService;
 
 	final Random random = new Random();
 	final Study study = new Study();
 	final DataSet trialDataSet = new DataSet();
 	final DatasetDTO dataSetDTO = new DatasetDTO();
-	final int instanceId1 = random.nextInt();
-	final int instanceId2 = random.nextInt();
+	final int instanceId1 = this.random.nextInt();
+	final int instanceId2 = this.random.nextInt();
 
 	@Before
 	public void setUp() {
 
-		this.study.setId(random.nextInt());
+		this.study.setId(this.random.nextInt());
 		this.study.setName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
-		this.trialDataSet.setId(random.nextInt());
-		this.dataSetDTO.setDatasetId(random.nextInt());
+		this.trialDataSet.setId(this.random.nextInt());
+		this.dataSetDTO.setDatasetId(this.random.nextInt());
 		this.dataSetDTO.setDatasetTypeId(DataSetType.PLANT_SUBOBSERVATIONS.getId());
 		this.dataSetDTO.setName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
 		this.dataSetDTO.setInstances(this.createStudyInstances());
@@ -125,8 +124,8 @@ public class DatasetExportServiceImplTest {
 		final File result = datasetExportService.exportAsCSV(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
 			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
 
-		verify(this.studyValidator).validate(study.getId(), false);
-		verify(this.datasetValidator).validateDataset(study.getId(), dataSetDTO.getDatasetId(), false);
+		verify(this.studyValidator).validate(this.study.getId(), false);
+		verify(this.datasetValidator).validateDataset(this.study.getId(), this.dataSetDTO.getDatasetId(), false);
 		assertSame(result, zipFile);
 	}
 
@@ -135,7 +134,7 @@ public class DatasetExportServiceImplTest {
 
 		when(this.datasetCSVGenerator.generateCSVFileWithHeaders(anyListOf(MeasurementVariable.class), anyString(), any(CSVWriter.class)))
 			.thenThrow(IOException.class);
-		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(instanceId1, instanceId2));
+		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(this.instanceId1, this.instanceId2));
 
 		datasetExportService.exportAsCSV(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
 			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
@@ -166,7 +165,6 @@ public class DatasetExportServiceImplTest {
 
 		verify(zipUtil).zipFiles(eq(this.study.getName()), anyListOf(File.class));
 		assertSame(result, zipFile);
-
 	}
 
 	@Test
@@ -189,7 +187,6 @@ public class DatasetExportServiceImplTest {
 		verify( this.datasetCSVGenerator).generateCSVFileWithHeaders(eq(measurementVariables), anyString(), any(CSVWriter.class));
 		verify(this.datasetCSVGenerator, times(2)).writeInstanceObservationUnitRowsToCSVFile(eq(measurementVariables), eq(new ArrayList<ObservationUnitRow>()), any(CSVWriter.class));
 		assertSame(result, csvFile);
-
 	}
 
 	@Test
@@ -216,7 +213,7 @@ public class DatasetExportServiceImplTest {
 		verify(this.datasetCSVGenerator)
 			.generateCSVFileWithHeaders(eq(measurementVariables),anyString(), any(CSVWriter.class));
 
-		verify(zipUtil, times(0)).zipFiles(anyString(), anyListOf(File.class));
+		verify(this.zipUtil, times(0)).zipFiles(anyString(), anyListOf(File.class));
 		assertSame(result, csvFile);
 
 	}
@@ -238,15 +235,15 @@ public class DatasetExportServiceImplTest {
 	}
 
 	private List<StudyInstance> createStudyInstances() {
-		final StudyInstance studyInstance1 = createStudyInstance(instanceId1);
-		final StudyInstance studyInstance2 = createStudyInstance(instanceId2);
+		final StudyInstance studyInstance1 = this.createStudyInstance(this.instanceId1);
+		final StudyInstance studyInstance2 = this.createStudyInstance(this.instanceId2);
 		return new ArrayList<>(Arrays.asList(studyInstance1, studyInstance2));
 	}
 
 	private StudyInstance createStudyInstance(final Integer instanceId) {
 		final StudyInstance studyInstance = new StudyInstance();
 		studyInstance.setInstanceDbId(instanceId);
-		studyInstance.setInstanceNumber(random.nextInt());
+		studyInstance.setInstanceNumber(this.random.nextInt());
 		studyInstance.setLocationName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
 		return studyInstance;
 	}
