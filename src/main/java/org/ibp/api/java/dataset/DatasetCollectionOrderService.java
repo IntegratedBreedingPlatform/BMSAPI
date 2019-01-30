@@ -11,5 +11,8 @@ public interface DatasetCollectionOrderService {
 
 	void reorder(
 		DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder,
-		int trialDatasetId, final Map<Integer, StudyInstance>  selectedDatasetInstancesMap, Map<Integer, List<ObservationUnitRow>> observationUnitRowMap);
+		int trialDatasetId, Map<Integer, StudyInstance>  selectedDatasetInstancesMap, Map<Integer, List<ObservationUnitRow>> observationUnitRowMap);
+
+	void reorder(
+		DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder, int trialDatasetId, int instanceNumber, List<ObservationUnitRow> observationUnitRows);
 }

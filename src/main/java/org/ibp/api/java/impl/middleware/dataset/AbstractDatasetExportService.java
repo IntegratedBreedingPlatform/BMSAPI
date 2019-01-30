@@ -82,12 +82,7 @@ public abstract class AbstractDatasetExportService {
 
 		final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder =
 			DatasetCollectionOrderServiceImpl.CollectionOrder.findById(collectionOrderId);
-		final Map<Integer, StudyInstance> studyInstancesMap = new HashMap<>();
-		studyInstancesMap.put(studyInstance.getInstanceDbId(), studyInstance);
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = new HashMap<>();
-		observationUnitRowMap.put(studyInstance.getInstanceDbId(), observationUnitRows);
-		this.datasetCollectionOrderService
-			.reorder(collectionOrder, trialDatasetId, studyInstancesMap, observationUnitRowMap);
+		this.datasetCollectionOrderService.reorder(collectionOrder, trialDatasetId, studyInstance.getInstanceNumber(), observationUnitRows);
 		return observationUnitRows;
 	}
 
