@@ -240,7 +240,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environment.details",
 			this.getColorIndex(xlsBook, 124, 124, 124));
 
-		final List<MeasurementVariable> environmentDetails = this.fixEnvironmentalDetailsValues(environmentDatasetId, environmentVariables, dataSetDto.getInstances().get(0));
+		final List<MeasurementVariable> environmentDetails = this.getEnvironmentalDetails(environmentDatasetId, environmentVariables, dataSetDto.getInstances().get(0));
 
 		currentRowNum = this.writeSection(
 			currentRowNum,
@@ -312,16 +312,13 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		xlsSheet.setColumnWidth(8, 20 * PIXEL_SIZE);
 	}
 
-	private List<MeasurementVariable> fixEnvironmentalDetailsValues(
+	private List<MeasurementVariable> getEnvironmentalDetails(
 		final int environmentDatasetId, final List<MeasurementVariable> environmentVariables, final StudyInstance instance) {
 		final List<MeasurementVariable> environmentDetails =
 			this.filterByVariableType(environmentVariables, VariableType.ENVIRONMENT_DETAIL);
-		final Map<String, String> geoLocationProps = this.studyDataManager.getGeolocationValues(environmentDatasetId);
+		final Map<Integer, String> geoLocationMap =
+			this.studyDataManager.getGeolocationByVariableId(environmentDatasetId, instance.getInstanceDbId());
 		for (final MeasurementVariable variable : environmentDetails) {
-			if (variable.getValue() == null) {
-				final String value = geoLocationProps.get(String.valueOf(variable.getTermId()));
-				variable.setValue(value);
-			}
 			switch (variable.getTermId()) {
 				case 8170:
 					variable.setValue(String.valueOf(instance.getInstanceNumber()));
@@ -330,9 +327,9 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 					variable.setValue(String.valueOf(instance.getLocationName()));
 					break;
 				default:
-					if (variable.getValue() == null) {
-						final String value = geoLocationProps.get(String.valueOf(variable.getTermId()));
-						variable.setValue(value);
+					final String keyValue = geoLocationMap.get(variable.getTermId());
+					if (variable.getValue() == null && StringUtils.isNotBlank(keyValue)) {
+						variable.setValue(keyValue);
 					}
 					break;
 			}
