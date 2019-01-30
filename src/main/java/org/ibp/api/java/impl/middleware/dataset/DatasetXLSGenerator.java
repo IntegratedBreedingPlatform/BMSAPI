@@ -251,11 +251,15 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environmental.conditions",
 			this.getColorIndex(xlsBook, 124, 124, 124));
+
+		final List<MeasurementVariable> environmentConditions = this.getEnvironmentalConditions(environmentDatasetId, environmentVariables, dataSetDto.getInstances().get(0));
+
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filterByVariableType(environmentVariables, VariableType.STUDY_CONDITION), ENVIRONMENT);
+			this.filterByVariableType(environmentConditions, VariableType.STUDY_CONDITION), ENVIRONMENT);
+
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
@@ -335,6 +339,21 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			}
 		}
 		return environmentDetails;
+	}
+
+	private List<MeasurementVariable> getEnvironmentalConditions(
+		final int environmentDatasetId, final List<MeasurementVariable> environmentVariables, final StudyInstance instance) {
+		final List<MeasurementVariable> environmentConditions =
+			this.filterByVariableType(environmentVariables, VariableType.TRAIT);
+		final Map<Integer, String> environmentConditionMap =
+			this.studyDataManager.getPhenotypeByVariableId(environmentDatasetId, instance.getInstanceDbId());
+		for (final MeasurementVariable variable : environmentConditions) {
+			final String keyValue = environmentConditionMap.get(variable.getTermId());
+			if (variable.getValue() == null && StringUtils.isNotBlank(keyValue)) {
+				variable.setValue(keyValue);
+			}
+		}
+		return environmentConditions;
 	}
 
 	private int writeStudyDetails(
