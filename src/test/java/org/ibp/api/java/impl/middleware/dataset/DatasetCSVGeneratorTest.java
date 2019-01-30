@@ -64,19 +64,6 @@ public class DatasetCSVGeneratorTest {
 	}
 
 	@Test
-	public void testGenerateCSVFile() throws IOException {
-
-		final CSVWriter csvWriter = Mockito.mock(CSVWriter.class);
-		final String fileNameFullPath = RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH);
-
-		datasetCSVGenerator.generateCSVFile(measurementVariables, observationUnitRows, fileNameFullPath, csvWriter);
-
-		Mockito.verify(csvWriter).writeAll(Mockito.anyListOf(String[].class));
-		Mockito.verify(csvWriter).close();
-
-	}
-
-	@Test
 	public void testGetColumnValues() {
 
 		final String[] result = datasetCSVGenerator.getColumnValues(observationUnitRows.get(0), measurementVariables);
