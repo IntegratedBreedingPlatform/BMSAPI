@@ -47,8 +47,6 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	@Resource
 	private org.generationcp.middleware.service.api.dataset.DatasetService datasetService;
 
-	private ZipUtil zipUtil = new ZipUtil();
-
 	@Override
 	public File export(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId, final boolean isExportInSingleFile) {
 
