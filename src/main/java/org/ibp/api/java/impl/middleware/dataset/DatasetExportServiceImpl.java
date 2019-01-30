@@ -93,7 +93,7 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 
 		try {
 			if(isExportInSingleFile) {
-				return this.generateCSVFileInSingleFile(study, dataSet, selectedDatasetInstancesMap, observationUnitRowMap, columns);
+				return this.generateCSVFileInSingleFile(study, observationUnitRowMap, columns);
 			} else  {				
 				return this.generateCSVFiles(study, dataSet, selectedDatasetInstancesMap, observationUnitRowMap, columns);
 			}
@@ -135,8 +135,7 @@ public class DatasetExportServiceImpl implements DatasetExportService {
 
 	}
 
-	protected File generateCSVFileInSingleFile(final Study study, final DatasetDTO dataSetDto,
-			final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
+	protected File generateCSVFileInSingleFile(final Study study,
 			final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns)
 			throws IOException {
 		
