@@ -17,7 +17,7 @@ public interface DatasetService {
 
 	List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId);
 
-	long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> traitIds);
+	long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> variableIds);
 
 	long countPhenotypesByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId);
 
@@ -46,4 +46,6 @@ public interface DatasetService {
 	void importObservations(Integer studyId, Integer datasetId, ObservationsPutRequestInput input);
 
 	List<StudyInstance> getDatasetInstances(final Integer studyId, final Integer datasetId);
+
+	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
 }

@@ -47,11 +47,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
-import static org.mockito.ArgumentMatchers.isNull;
 
 public class DatasetResourceTest extends ApiUnitTestBase {
 
@@ -64,8 +63,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	private DatasetService studyDatasetService;
 
 	@Autowired
-	private DatasetExportService datasetExportService;
-
+	private DatasetExportService datasetCSVExportService;
 
 	@Configuration
 	public static class TestConfiguration {
@@ -78,7 +76,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public DatasetExportService datasetExportService() {
+		public DatasetExportService datasetCSVExportService() {
 			return Mockito.mock(DatasetExportService.class);
 		}
 	}
@@ -581,7 +579,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int collectionOrderId = DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId();
 
 		final File file = File.createTempFile("test", ".csv");
-		Mockito.when(this.datasetExportService.exportAsCSV(studyId, datasetId, instanceIds, collectionOrderId)).thenReturn(file);
+		Mockito.when(this.datasetCSVExportService.export(studyId, datasetId, instanceIds, collectionOrderId, false)).thenReturn(file);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
@@ -589,6 +587,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/{fileType}",
 					this.cropName, studyId, datasetId, DatasetResource.CSV)
 				.param("instanceIds", "1,2,3")
+				.param("singleFile", String.valueOf(Boolean.FALSE))
 				.param("collectionOrderId", String.valueOf(collectionOrderId))
 				.contentType(this.csvContentType))
 			.andDo(MockMvcResultHandlers.print())

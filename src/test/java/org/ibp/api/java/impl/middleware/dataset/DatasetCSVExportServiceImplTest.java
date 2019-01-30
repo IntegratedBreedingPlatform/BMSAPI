@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import au.com.bytecode.opencsv.CSVWriter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -35,6 +34,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyListOf;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -44,7 +44,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DatasetExportServiceImplTest {
+public class DatasetCSVExportServiceImplTest {
 
 	public static final int RANDOM_STRING_LENGTH = 10;
 	@Mock
@@ -75,22 +75,22 @@ public class DatasetExportServiceImplTest {
 	private ZipUtil zipUtil;
 
 	@InjectMocks
-	private DatasetExportServiceImpl datasetExportService;
+	private DatasetCSVExportServiceImpl datasetExportService;
 
 	final Random random = new Random();
 	final Study study = new Study();
 	final DataSet trialDataSet = new DataSet();
 	final DatasetDTO dataSetDTO = new DatasetDTO();
-	final int instanceId1 = random.nextInt();
-	final int instanceId2 = random.nextInt();
+	final int instanceId1 = this.random.nextInt();
+	final int instanceId2 = this.random.nextInt();
 
 	@Before
 	public void setUp() {
 
-		this.study.setId(random.nextInt());
+		this.study.setId(this.random.nextInt());
 		this.study.setName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
-		this.trialDataSet.setId(random.nextInt());
-		this.dataSetDTO.setDatasetId(random.nextInt());
+		this.trialDataSet.setId(this.random.nextInt());
+		this.dataSetDTO.setDatasetId(this.random.nextInt());
 		this.dataSetDTO.setDatasetTypeId(DataSetType.PLANT_SUBOBSERVATIONS.getId());
 		this.dataSetDTO.setName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
 		this.dataSetDTO.setInstances(this.createStudyInstances());
@@ -107,29 +107,41 @@ public class DatasetExportServiceImplTest {
 	public void testExportAsCSV() throws IOException {
 
 		final File zipFile = new File("");
-		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(instanceId1, instanceId2));
+		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(this.instanceId1, this.instanceId2));
 
-		when(this.datasetCSVGenerator.generateCSVFile(anyListOf(MeasurementVariable.class), anyListOf(ObservationUnitRow.class), anyString(), any(CSVWriter.class)))
+		when(this.datasetCSVGenerator
+			.generateFile(
+				any(Integer.class),
+				any(DatasetDTO.class),
+				anyListOf(MeasurementVariable.class),
+				anyListOf(ObservationUnitRow.class),
+				anyString()))
 			.thenReturn(new File(""));
 		when(this.zipUtil.zipFiles(eq(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
 
-		final File result = datasetExportService.exportAsCSV(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
-			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId());
+		final File result = this.datasetExportService.export(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
+			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
 
-		verify(this.studyValidator).validate(study.getId(), false);
-		verify(this.datasetValidator).validateDataset(study.getId(), dataSetDTO.getDatasetId(), false);
+		verify(this.studyValidator).validate(this.study.getId(), false);
+		verify(this.datasetValidator).validateDataset(this.study.getId(), this.dataSetDTO.getDatasetId(), false);
 		assertSame(result, zipFile);
 	}
 
 	@Test(expected = ResourceNotFoundException.class)
 	public void testExportAsCSVException() throws IOException {
 
-		when(this.datasetCSVGenerator.generateCSVFile(anyListOf(MeasurementVariable.class), anyListOf(ObservationUnitRow.class), anyString(), any(CSVWriter.class)))
+		when(this.datasetCSVGenerator
+			.generateFile(
+				any(Integer.class),
+				any(DatasetDTO.class),
+				anyListOf(MeasurementVariable.class),
+				anyListOf(ObservationUnitRow.class),
+				anyString()))
 			.thenThrow(IOException.class);
-		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(instanceId1, instanceId2));
+		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(this.instanceId1, this.instanceId2));
 
-		datasetExportService.exportAsCSV(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
-			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId());
+		this.datasetExportService.export(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
+			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
 
 	}
 
@@ -141,17 +153,25 @@ public class DatasetExportServiceImplTest {
 
 		final File zipFile = new File("");
 
-		when(this.datasetCSVGenerator.generateCSVFile(eq(measurementVariables), anyListOf(ObservationUnitRow.class), anyString(), any(CSVWriter.class)))
+		when(this.datasetCSVGenerator
+			.generateFile(
+				any(Integer.class),
+				any(DatasetDTO.class),
+				anyListOf(MeasurementVariable.class),
+				anyListOf(ObservationUnitRow.class),
+				anyString()))
 			.thenReturn(new File(""));
 		when(this.zipUtil.zipFiles(eq(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
 
-		final File result = datasetExportService
-			.generateCSVFiles(
-				this.study, this.dataSetDTO, studyInstances, DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId());
+		final File result = this.datasetExportService
+			.generateFiles(
+				this.study, this.dataSetDTO, studyInstances, DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), this.datasetCSVGenerator,
+				AbstractDatasetExportService.CSV);
 
 		for (final StudyInstance studyInstance : studyInstances) {
 			verify(this.studyDatasetService)
-				.getObservationUnitRows(this.study.getId(), this.dataSetDTO.getDatasetId(), studyInstance.getInstanceDbId(), Integer.MAX_VALUE,
+				.getObservationUnitRows(this.study.getId(), this.dataSetDTO.getDatasetId(), studyInstance.getInstanceDbId(),
+					Integer.MAX_VALUE,
 					Integer.MAX_VALUE, null, "");
 
 			verify(this.datasetCollectionOrderService)
@@ -159,10 +179,10 @@ public class DatasetExportServiceImplTest {
 					eq(String.valueOf(studyInstance.getInstanceNumber())), anyListOf(ObservationUnitRow.class));
 
 			verify(this.datasetCSVGenerator, times(studyInstances.size()))
-				.generateCSVFile(eq(measurementVariables), anyListOf(ObservationUnitRow.class), anyString(), any(CSVWriter.class));
+				.generateFile(anyInt(), any(DatasetDTO.class), eq(measurementVariables), anyListOf(ObservationUnitRow.class), anyString());
 		}
 
-		verify(zipUtil).zipFiles(eq(this.study.getName()), anyListOf(File.class));
+		verify(this.zipUtil).zipFiles(eq(this.study.getName()), anyListOf(File.class));
 		assertSame(result, zipFile);
 
 	}
@@ -170,19 +190,20 @@ public class DatasetExportServiceImplTest {
 	@Test
 	public void testGenerateCSVFilesOnlyOneInstance() throws IOException {
 
-		final StudyInstance studyInstance = this.createStudyInstance(instanceId1);
-		final List<String> headerNames = new ArrayList<>();
+		final StudyInstance studyInstance = this.createStudyInstance(this.instanceId1);
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 
 		final File csvFile = new File("");
 
-		when(this.datasetCSVGenerator.generateCSVFile(eq(measurementVariables), anyListOf(ObservationUnitRow.class), anyString(), any(CSVWriter.class)))
+		when(this.datasetCSVGenerator
+			.generateFile(anyInt(), any(DatasetDTO.class), eq(measurementVariables), anyListOf(ObservationUnitRow.class), anyString()))
 			.thenReturn(csvFile);
 
-		final File result = datasetExportService
-			.generateCSVFiles(
+		final File result = this.datasetExportService
+			.generateFiles(
 				this.study, this.dataSetDTO, Arrays.asList(studyInstance),
-				DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId());
+				DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), this.datasetCSVGenerator, AbstractDatasetExportService.CSV);
+
 
 		verify(this.studyDatasetService)
 			.getObservationUnitRows(this.study.getId(), this.dataSetDTO.getDatasetId(), studyInstance.getInstanceDbId(), Integer.MAX_VALUE,
@@ -193,9 +214,9 @@ public class DatasetExportServiceImplTest {
 				eq(String.valueOf(studyInstance.getInstanceNumber())), anyListOf(ObservationUnitRow.class));
 
 		verify(this.datasetCSVGenerator)
-			.generateCSVFile(eq(measurementVariables), anyListOf(ObservationUnitRow.class), anyString(), any(CSVWriter.class));
+			.generateFile(anyInt(), any(DatasetDTO.class), eq(measurementVariables), anyListOf(ObservationUnitRow.class), anyString());
 
-		verify(zipUtil, times(0)).zipFiles(anyString(), anyListOf(File.class));
+		verify(this.zipUtil, times(0)).zipFiles(anyString(), anyListOf(File.class));
 		assertSame(result, csvFile);
 
 	}
@@ -204,28 +225,29 @@ public class DatasetExportServiceImplTest {
 	public void testGetSelectedDatasetInstances() {
 
 		final List<StudyInstance> result1 =
-			datasetExportService
-				.getSelectedDatasetInstances(dataSetDTO.getInstances(), new HashSet<>(Arrays.asList(instanceId1, instanceId2)));
+			this.datasetExportService
+				.getSelectedDatasetInstances(this.dataSetDTO.getInstances(), new HashSet<>(Arrays.asList(this.instanceId1, this.instanceId2)));
 
 		assertEquals(2, result1.size());
 
 		final List<StudyInstance> result2 =
-			datasetExportService.getSelectedDatasetInstances(dataSetDTO.getInstances(), new HashSet<>(Arrays.asList(instanceId1)));
+			this.datasetExportService
+				.getSelectedDatasetInstances(this.dataSetDTO.getInstances(), new HashSet<>(Arrays.asList(this.instanceId1)));
 
 		assertEquals(1, result2.size());
 
 	}
 
 	private List<StudyInstance> createStudyInstances() {
-		final StudyInstance studyInstance1 = createStudyInstance(instanceId1);
-		final StudyInstance studyInstance2 = createStudyInstance(instanceId2);
+		final StudyInstance studyInstance1 = this.createStudyInstance(this.instanceId1);
+		final StudyInstance studyInstance2 = this.createStudyInstance(this.instanceId2);
 		return new ArrayList<>(Arrays.asList(studyInstance1, studyInstance2));
 	}
 
 	private StudyInstance createStudyInstance(final Integer instanceId) {
 		final StudyInstance studyInstance = new StudyInstance();
 		studyInstance.setInstanceDbId(instanceId);
-		studyInstance.setInstanceNumber(random.nextInt());
+		studyInstance.setInstanceNumber(this.random.nextInt());
 		studyInstance.setLocationName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
 		return studyInstance;
 	}

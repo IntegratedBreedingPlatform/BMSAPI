@@ -95,11 +95,11 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> traitIds) {
+	public long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 
-		return this.middlewareDatasetService.countPhenotypes(datasetId, traitIds);
+		return this.middlewareDatasetService.countPhenotypes(datasetId, variableIds);
 	}
 
 	@Override
@@ -371,6 +371,11 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new PreconditionFailedException(errors.getAllErrors());
 		}
 
+	}
+
+	@Override
+	public List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes) {
+		return this.middlewareDatasetService.getMeasurementVariables(projectId, variableTypes);
 	}
 
 	private BindingResult processObservationsDataWarningsAsErrors(final Table<String, String, String> table,
