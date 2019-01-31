@@ -20,7 +20,7 @@ public class SampleListValidator {
 		if (sampleListDto.getInstanceIds() == null) {
 			this.errors.reject("sample.list.instance.list.must.not.be.null","The Instance List must not be null");
 		}
-		if (sampleListDto.getInstanceIds().isEmpty()) {
+		if (sampleListDto.getInstanceIds() != null && sampleListDto.getInstanceIds().isEmpty()) {
 			this.errors.reject("sample.list.instance.list.must.not.empty","The Instance List must not be empty");
 		}
 		if (sampleListDto.getSelectionVariableId() == null) {
@@ -50,6 +50,8 @@ public class SampleListValidator {
 
 	public void validateFolderName(final String folderName) {
 
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
 		if (folderName == null) {
 			this.errors.reject("sample.list.folder.is.null","The folder name must not be null");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -57,6 +59,9 @@ public class SampleListValidator {
 	}
 
 	public void validateFolderId(final Integer parentId) {
+
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
 		if (parentId == null) {
 			this.errors.reject("sample.list.parent.id.is.null","The parent Id must not be null");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -64,6 +69,9 @@ public class SampleListValidator {
 	}
 
 	public void validateProgramUUID(final String programUUID) {
+
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
 		if (programUUID == null) {
 			this.errors.reject("sample.list.program.uuid.is.null","The program UUID must not be null");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());

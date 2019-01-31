@@ -1,6 +1,5 @@
 package org.ibp.api.rest.sample;
 
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
@@ -8,14 +7,12 @@ import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
-import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
 
 import java.text.ParseException;
 import java.util.HashMap;
@@ -27,6 +24,7 @@ import java.util.Map;
 public class SampleListServiceImpl implements SampleListService {
 
 	protected static final String PARENT_ID = "parentId";
+	public static final String ID = "id";
 
 	@Autowired
 	private org.generationcp.middleware.service.api.SampleListService sampleListServiceMW;
@@ -49,7 +47,7 @@ public class SampleListServiceImpl implements SampleListService {
 		final SampleListDTO sampleListDtoMW = this.translateToSampleListDto(sampleListDto);
 
 		final Integer newSampleId = this.sampleListServiceMW.createSampleList(sampleListDtoMW).getId();
-		mapResponse.put("id", String.valueOf(newSampleId));
+		mapResponse.put(ID, String.valueOf(newSampleId));
 
 		return mapResponse;
 	}
@@ -144,14 +142,14 @@ public class SampleListServiceImpl implements SampleListService {
 	@Override
 	public void importSamplePlateInformation(final List<SampleDTO> sampleDTOs, final Integer listId){
 
-		this.sampleValidator.validateSamples(listId, sampleDTOs);
+		this.sampleValidator.validateSamplesForImportPlate(listId, sampleDTOs);
 
 		final Map<String, SamplePlateInfo> samplePlateInfoMap = convertToSamplePlateInfoMap(sampleDTOs);
 		this.sampleListServiceMW.updateSamplePlateInfo(listId, samplePlateInfoMap);
 
 	}
 
-	private SampleListDTO translateToSampleListDto(final SampleListDto dto) {
+	protected SampleListDTO translateToSampleListDto(final SampleListDto dto) {
 		final SampleListDTO sampleListDTO = new SampleListDTO();
 
 		sampleListDTO.setCreatedBy(this.securityService.getCurrentlyLoggedInUser().getName());

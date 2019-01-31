@@ -21,7 +21,7 @@ public class SampleValidator {
 
 	private BindingResult errors;
 
-	public void validateSamples(final Integer listId, final List<SampleDTO> samples) {
+	public void validateSamplesForImportPlate(final Integer listId, final List<SampleDTO> samples) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), SampleDTO.class.getName());
 
