@@ -247,7 +247,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final int studyId, final int datasetId, final List<Integer> instanceId) {
 		validateStudyDatasetAndInstances(studyId, datasetId, instanceId, true);
 		final Map<Integer, List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow>> observationUnitRowsMap =
-			this.middlewareDatasetService.getInstanceObservationUnitRowsMap(studyId, datasetId, instanceId);
+			this.middlewareDatasetService.getInstanceIdToObservationUnitRowsMap(studyId, datasetId, instanceId);
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final Map<Integer, List<ObservationUnitRow>> map = new HashMap<>();
