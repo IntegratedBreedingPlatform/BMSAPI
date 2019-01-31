@@ -8,7 +8,6 @@ import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -19,6 +18,18 @@ import java.util.List;
 
 @Component
 public class DatasetCSVGenerator implements DatasetFileGenerator {
+
+	@Override
+	public File generateFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
+		final List<ObservationUnitRow> observationUnitRows,
+		final String fileNameFullPath) throws IOException {
+		final CSVWriter csvWriter =
+			new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',');
+		final File csvFile = this.generateCSVFileWithHeaders(columns, fileNameFullPath, csvWriter);
+		this.writeInstanceObservationUnitRowsToCSVFile(columns, observationUnitRows, csvWriter);
+		csvWriter.close();
+		return csvFile;
+	}
 
 	protected File generateCSVFileWithHeaders(
 		final List<MeasurementVariable> columns, final String fileNameFullPath, final CSVWriter csvWriter) {
@@ -36,14 +47,6 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 			rowValues.add(this.getColumnValues(row, columns));
 		}
 		csvWriter.writeAll(rowValues);
-	}
-
-	@Override
-	public File generateFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
-		final List<ObservationUnitRow> observationUnitRows,
-		final String fileNameFullPath) throws IOException {
-		//Do nothing. Return a new file. This method is not used.
-		return new File(fileNameFullPath);
 	}
 
 	protected String[] getColumnValues(final ObservationUnitRow row, final List<MeasurementVariable> subObservationSetColumns) {

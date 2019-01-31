@@ -28,28 +28,20 @@ public class DatasetCollectionOrderServiceImpl implements DatasetCollectionOrder
 		final int trialDatasetId,  final Map<Integer, StudyInstance>  selectedDatasetInstancesMap, final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap) {
 
 		for (final Integer instanceDBID : observationUnitRowMap.keySet()) {
+			final String blockId =
+				this.fieldMapService.getBlockId(trialDatasetId, String.valueOf(selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber()));
+
+			FieldmapBlockInfo fieldmapBlockInfo = null;
+			if (blockId != null) {
+				fieldmapBlockInfo = this.fieldMapService.getBlockInformation(Integer.valueOf(blockId));
+			}
+
 			List<ObservationUnitRow> observationUnitRows = observationUnitRowMap.get(instanceDBID);
-			reorder(collectionOrder, trialDatasetId, selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber(), observationUnitRows);
-		}
-	}
-
-	@Override
-	public void reorder(
-		final CollectionOrder collectionOrder, final int trialDatasetId,
-		final int instanceNumber, final List<ObservationUnitRow> observationUnitRows) {
-
-		final String blockId =
-		this.fieldMapService.getBlockId(trialDatasetId, String.valueOf(instanceNumber));
-
-		FieldmapBlockInfo fieldmapBlockInfo = null;
-		if (blockId != null) {
-			fieldmapBlockInfo = this.fieldMapService.getBlockInformation(Integer.valueOf(blockId));
-		}
-
-		if (collectionOrder == CollectionOrder.SERPENTINE_ALONG_ROWS) {
-			this.dataCollectionSorter.orderByRange(fieldmapBlockInfo, observationUnitRows);
-		} else if (collectionOrder == CollectionOrder.SERPENTINE_ALONG_COLUMNS) {
-			this.dataCollectionSorter.orderByColumn(fieldmapBlockInfo, observationUnitRows);
+			if (collectionOrder == CollectionOrder.SERPENTINE_ALONG_ROWS) {
+				this.dataCollectionSorter.orderByRange(fieldmapBlockInfo, observationUnitRows);
+			} else if (collectionOrder == CollectionOrder.SERPENTINE_ALONG_COLUMNS) {
+				this.dataCollectionSorter.orderByColumn(fieldmapBlockInfo, observationUnitRows);
+			}
 		}
 	}
 

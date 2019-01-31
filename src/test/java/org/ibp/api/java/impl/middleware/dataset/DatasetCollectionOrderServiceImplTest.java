@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.impl.middleware.study.FieldMapService;
@@ -8,13 +7,11 @@ import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,45 +35,38 @@ public class DatasetCollectionOrderServiceImplTest {
 
 	@Test
 	public void testReorderForPLOT_ORDER() {
-		this.datasetCollectionOrderService.reorder(DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER, 1,
-		1, new ArrayList<ObservationUnitRow>());
-		Mockito.verify(this.fieldMapService).getBlockId(1, String.valueOf(1));
-		Mockito.verify(this.fieldMapService, Mockito.never()).getBlockInformation(Matchers.anyInt());
-		final FieldmapBlockInfo fieldmapBlockInfo = null;
-		Mockito.verify(this.dataCollectionSorter, Mockito.never()).orderByRange(eq(fieldmapBlockInfo), any(ArrayList.class));
-		Mockito.verify(this.dataCollectionSorter, Mockito.never()).orderByColumn(eq(fieldmapBlockInfo), any(ArrayList.class));
+		final Map<Integer, StudyInstance> selectedDatasetInstancesMap = this.createStudyInstanceMap();
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = this.createObservationUnitRowMap();
+
+		this.datasetCollectionOrderService.reorder(DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER,
+			1, selectedDatasetInstancesMap, observationUnitRowMap);
+
+		Mockito.verify(this.fieldMapService, Mockito.times(2)).getBlockId(anyInt(), anyString());
+		Mockito.verify(this.fieldMapService, Mockito.never()).getBlockInformation(anyInt());
+		Mockito.verify(this.dataCollectionSorter, Mockito.never()).orderByRange(any(FieldmapBlockInfo.class), any(ArrayList.class));
+		Mockito.verify(this.dataCollectionSorter, Mockito.never()).orderByColumn(any(FieldmapBlockInfo.class), any(ArrayList.class));
 	}
 
 	@Test
 	public void testReorderForSERPENTINE_ALONG_ROWS() {
-		Mockito.when(this.fieldMapService.getBlockId(1, "1")).thenReturn("1");
+		Mockito.when(this.fieldMapService.getBlockId(anyInt(), anyString())).thenReturn("1");
 		final FieldmapBlockInfo fieldmapBlockInfo = Mockito.mock(FieldmapBlockInfo.class);
-		Mockito.when(this.fieldMapService.getBlockInformation(1)).thenReturn(fieldmapBlockInfo);
-		this.datasetCollectionOrderService.reorder(DatasetCollectionOrderServiceImpl.CollectionOrder.SERPENTINE_ALONG_ROWS, 1,
-			1, new ArrayList<ObservationUnitRow>());
+		Mockito.when(this.fieldMapService.getBlockInformation(anyInt())).thenReturn(fieldmapBlockInfo);
 
-		Mockito.verify(this.fieldMapService).getBlockId(1, String.valueOf(1));
-		Mockito.verify(this.fieldMapService).getBlockInformation(Matchers.anyInt());
-		Mockito.verify(this.dataCollectionSorter).orderByRange(eq(fieldmapBlockInfo), any(ArrayList.class));
+		final Map<Integer, StudyInstance> selectedDatasetInstancesMap = this.createStudyInstanceMap();
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = this.createObservationUnitRowMap();
+
+		this.datasetCollectionOrderService.reorder(DatasetCollectionOrderServiceImpl.CollectionOrder.SERPENTINE_ALONG_ROWS,
+			1, selectedDatasetInstancesMap, observationUnitRowMap);
+
+		Mockito.verify(this.fieldMapService, Mockito.times(2)).getBlockId(anyInt(), anyString());
+		Mockito.verify(this.fieldMapService, Mockito.times(2)).getBlockInformation(anyInt());
+		Mockito.verify(this.dataCollectionSorter, Mockito.times(2)).orderByRange(eq(fieldmapBlockInfo), any(ArrayList.class));
 		Mockito.verify(this.dataCollectionSorter, Mockito.never()).orderByColumn(eq(fieldmapBlockInfo), any(ArrayList.class));
 	}
 
 	@Test
 	public void testReorderForSERPENTINE_ALONG_COLUMNS() {
-		Mockito.when(this.fieldMapService.getBlockId(1, "1")).thenReturn("1");
-		final FieldmapBlockInfo fieldmapBlockInfo = Mockito.mock(FieldmapBlockInfo.class);
-		Mockito.when(this.fieldMapService.getBlockInformation(1)).thenReturn(fieldmapBlockInfo);
-		this.datasetCollectionOrderService.reorder(DatasetCollectionOrderServiceImpl.CollectionOrder.SERPENTINE_ALONG_COLUMNS, 1,
-			1, new ArrayList<ObservationUnitRow>());
-
-		Mockito.verify(this.fieldMapService).getBlockId(1, String.valueOf(1));
-		Mockito.verify(this.fieldMapService).getBlockInformation(Matchers.anyInt());
-		Mockito.verify(this.dataCollectionSorter, Mockito.never()).orderByRange(eq(fieldmapBlockInfo), any(ArrayList.class));
-		Mockito.verify(this.dataCollectionSorter).orderByColumn(eq(fieldmapBlockInfo), any(ArrayList.class));
-	}
-
-	@Test
-	public void testReorder() {
 		Mockito.when(this.fieldMapService.getBlockId(anyInt(), anyString())).thenReturn("1");
 		final FieldmapBlockInfo fieldmapBlockInfo = Mockito.mock(FieldmapBlockInfo.class);
 		Mockito.when(this.fieldMapService.getBlockInformation(anyInt())).thenReturn(fieldmapBlockInfo);
