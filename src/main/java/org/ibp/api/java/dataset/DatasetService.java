@@ -18,8 +18,6 @@ public interface DatasetService {
 
 	List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId);
 
-	List<MeasurementVariable> getAllDatasetVariables(final Integer studyId, final Integer subObservationSetId);
-
 	long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> variableIds);
 
 	long countPhenotypesByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId);

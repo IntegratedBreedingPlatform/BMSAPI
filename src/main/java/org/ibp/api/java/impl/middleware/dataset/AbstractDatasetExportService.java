@@ -48,7 +48,7 @@ public abstract class AbstractDatasetExportService {
 	protected DatasetCollectionOrderService datasetCollectionOrderService;
 
 	@Resource
-	private org.generationcp.middleware.service.api.dataset.DatasetService datasetService;
+	protected org.generationcp.middleware.service.api.dataset.DatasetService datasetService;
 
 	@Resource
 	protected StudyDataManager studyDataManager;
