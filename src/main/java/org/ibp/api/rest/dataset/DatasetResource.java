@@ -231,11 +231,11 @@ public class DatasetResource {
 
 		@RequestParam(value = "instanceIds") final Set<Integer> instanceIds,
 		@RequestParam(value = "collectionOrderId") final Integer collectionOrderId,
-		@RequestParam(value = "isExportInSingleFile") final boolean isExportInSingleFile) {
+		@RequestParam(value = "singleFile") final boolean singleFile) {
 
 		final DatasetExportService exportMethod = this.getExportFileStrategy(fileType);
 		if (exportMethod != null) {
-			final File file = exportMethod.export(studyId, datasetId, instanceIds, collectionOrderId, isExportInSingleFile);
+			final File file = exportMethod.export(studyId, datasetId, instanceIds, collectionOrderId, singleFile);
 			return this.getFileSystemResourceResponseEntity(file);
 		}
 

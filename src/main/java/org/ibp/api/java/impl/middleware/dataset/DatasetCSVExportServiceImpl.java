@@ -48,7 +48,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	private org.generationcp.middleware.service.api.dataset.DatasetService datasetService;
 
 	@Override
-	public File export(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId, final boolean isExportInSingleFile) {
+	public File export(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId, final boolean singleFile) {
 
 		this.validate(studyId, datasetId, instanceIds);
 		final Study study = this.studyDataManager.getStudy(studyId);
@@ -67,7 +67,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		this.datasetCollectionOrderService.reorder(collectionOrder, trialDatasetId, selectedDatasetInstancesMap, observationUnitRowMap);
 
 		try {
-			if(isExportInSingleFile) {
+			if(singleFile) {
 				return this.generateCSVFileInSingleFile(study, observationUnitRowMap, columns);
 			} else  {
 				return this.generateCSVFiles(study, dataSet, selectedDatasetInstancesMap, observationUnitRowMap, columns);

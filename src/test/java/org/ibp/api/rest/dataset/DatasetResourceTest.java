@@ -588,7 +588,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 					this.cropName, studyId, datasetId, DatasetResource.CSV)
 				.param("instanceIds", "1,2,3")
 				.param("collectionOrderId", String.valueOf(collectionOrderId))
-				.param("isExportInSingleFile", String.valueOf(false))
+				.param("singleFile", String.valueOf(false))
 				.contentType(this.csvContentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
