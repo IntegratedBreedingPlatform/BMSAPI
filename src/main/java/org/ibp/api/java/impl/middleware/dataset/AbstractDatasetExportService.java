@@ -78,7 +78,7 @@ public abstract class AbstractDatasetExportService {
 		this.datasetCollectionOrderService.reorder(collectionOrder, trialDatasetId, selectedDatasetInstancesMap, observationUnitRowMap);
 
 		if(singleFile) {
-			return this.generateInSingleFile(study, observationUnitRowMap, columns, fileExtension);
+			return this.generateInSingleFile(study, observationUnitRowMap, columns, generator, fileExtension);
 		} else  {
 			return this.generateFiles(study, dataSet, selectedDatasetInstancesMap, observationUnitRowMap, columns, generator, fileExtension);
 		}
@@ -86,19 +86,16 @@ public abstract class AbstractDatasetExportService {
 	}
 
 	public File generateInSingleFile(final Study study,
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns, final  String fileExtension)
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns, final DatasetFileGenerator generator, final  String fileExtension)
 		throws IOException {
 
 		final File temporaryFolder = Files.createTempDir();
 		final String sanitizedFileName = FileUtils.sanitizeFileName(String.format("%s_AllInstances." + fileExtension, study.getName()));
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 
-		return this.writeSingleFile(observationUnitRowMap, columns, fileNameFullPath);
+		return generator.generateMultiInstanceFile (observationUnitRowMap, columns, fileNameFullPath);
 	}
 
-	public abstract File writeSingleFile(
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
-		final String fileNameFullPath) throws IOException;
 
 	protected File generateFiles(final Study study, final DatasetDTO dataSetDto,
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
@@ -115,7 +112,7 @@ public abstract class AbstractDatasetExportService {
 					DataSetType.findById(dataSetDto.getDatasetTypeId()).name(), dataSetDto.getName()));
 			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 			files.add(
-				generator.generateFile(study.getId(), dataSetDto, columns, observationUnitRowMap.get(instanceDBID), fileNameFullPath));
+				generator.generateSingleInstanceFile(study.getId(), dataSetDto, columns, observationUnitRowMap.get(instanceDBID), fileNameFullPath));
 		}
 
 		if (files.size() == 1) {

@@ -48,14 +48,6 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 	}
 
 	@Override
-	public File writeSingleFile(
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
-		final String fileNameFullPath) throws IOException {
-		//Do nothing. Implement for the singleFile download XLS option
-		return new File("");
-	}
-
-	@Override
 	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(final Study study, final DatasetDTO dataset, final int collectionOrderId, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = new HashMap<>();
 		for(final Integer instanceDBID: selectedDatasetInstancesMap.keySet()) {

@@ -20,7 +20,7 @@ import java.util.List;
 public class DatasetCSVGenerator implements DatasetFileGenerator {
 
 	@Override
-	public File generateFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
+	public File generateSingleInstanceFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> observationUnitRows,
 		final String fileNameFullPath) throws IOException {
 		final CSVWriter csvWriter =

@@ -140,7 +140,7 @@ public class DatasetCSVExportServiceImplTest {
 
 		final File zipFile = new File("");
 
-		when(this.datasetCSVGenerator.generateFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString()))
+		when(this.datasetCSVGenerator.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString()))
 			.thenReturn(new File(""));
 		when(this.zipUtil.zipFiles(eq(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
 		this.datasetExportService.setZipUtil(this.zipUtil);
@@ -154,7 +154,7 @@ public class DatasetCSVExportServiceImplTest {
 			.generateFiles(
 				this.study, this.dataSetDTO, studyInstanceMap, instanceObservationUnitRowsMap, new ArrayList<MeasurementVariable>(), datasetCSVGenerator, AbstractDatasetExportService.CSV);
 		verify(this.datasetCSVGenerator, Mockito.times(studyInstanceMap.size()))
-			.generateFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString());
+			.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString());
 
 		verify(zipUtil).zipFiles(eq(this.study.getName()), anyListOf(File.class));
 		assertSame(result, zipFile);
@@ -164,21 +164,19 @@ public class DatasetCSVExportServiceImplTest {
 	public void testGenerateCSVFileInSingleFile() throws IOException{
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final File csvFile = new File("");
-
-		when(this.datasetCSVGenerator.generateCSVFileWithHeaders(eq(measurementVariables), anyString(), any(CSVWriter.class)))
-			.thenReturn(csvFile);
-
 		Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = new HashMap<>();
 		instanceObservationUnitRowsMap.put(1, new ArrayList<ObservationUnitRow>());
 		instanceObservationUnitRowsMap.put(2, new ArrayList<ObservationUnitRow>());
 
+		when(this.datasetCSVGenerator.generateMultiInstanceFile(eq(instanceObservationUnitRowsMap), eq(measurementVariables), anyString()))
+			.thenReturn(csvFile);
+
 		final File result = datasetExportService
 			.generateInSingleFile(
 				this.study, instanceObservationUnitRowsMap,
-				measurementVariables, AbstractDatasetExportService.CSV);
+				measurementVariables, this.datasetCSVGenerator, AbstractDatasetExportService.CSV);
 
-		verify( this.datasetCSVGenerator).generateCSVFileWithHeaders(eq(measurementVariables), anyString(), any(CSVWriter.class));
-		verify(this.datasetCSVGenerator, times(2)).writeInstanceObservationUnitRowsToCSVFile(eq(measurementVariables), eq(new ArrayList<ObservationUnitRow>()), any(CSVWriter.class));
+		verify(this.datasetCSVGenerator).generateMultiInstanceFile(eq(instanceObservationUnitRowsMap), eq(measurementVariables), anyString());
 		assertSame(result, csvFile);
 	}
 
@@ -188,7 +186,7 @@ public class DatasetCSVExportServiceImplTest {
 
 		final File csvFile = new File("");
 
-		when(this.datasetCSVGenerator.generateFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString()))
+		when(this.datasetCSVGenerator.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString()))
 			.thenReturn(csvFile);
 
 		Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = new HashMap<>();
@@ -202,7 +200,7 @@ public class DatasetCSVExportServiceImplTest {
 				this.study, this.dataSetDTO, studyInstanceMap, instanceObservationUnitRowsMap, new ArrayList<MeasurementVariable>(), datasetCSVGenerator, AbstractDatasetExportService.CSV);
 
 		verify(this.datasetCSVGenerator)
-			.generateFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString());
+			.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString());
 
 		verify(this.zipUtil, times(0)).zipFiles(anyString(), anyListOf(File.class));
 		assertSame(result, csvFile);

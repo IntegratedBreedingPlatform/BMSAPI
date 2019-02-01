@@ -1,10 +1,7 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,8 +28,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import com.google.common.collect.Lists;
-
-import au.com.bytecode.opencsv.CSVWriter;
 
 @Service
 @Transactional
@@ -116,21 +111,6 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	@Override
 	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(final Study study, final DatasetDTO dataSet, final int collectionOrderId, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
 		return this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataSet.getDatasetId(), new ArrayList<>(selectedDatasetInstancesMap.keySet()));
-	}
-
-	@Override
-	public File writeSingleFile(
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
-		final String fileNameFullPath) throws IOException {
-		final CSVWriter csvWriter =
-			new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',');
-		final File file = this.datasetCSVGenerator.generateCSVFileWithHeaders(columns, fileNameFullPath, csvWriter);
-		for(final Integer instanceDBID: observationUnitRowMap.keySet()) {
-			final List<ObservationUnitRow> observationUnitRows = observationUnitRowMap.get(instanceDBID);
-			this.datasetCSVGenerator.writeInstanceObservationUnitRowsToCSVFile(columns, observationUnitRows, csvWriter);
-		}
-		csvWriter.close();
-		return file;
 	}
 
 	protected List<MeasurementVariable> moveTrialInstanceInTheFirstColumn(List<MeasurementVariable> columns) {

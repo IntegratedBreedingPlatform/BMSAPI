@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
@@ -40,6 +41,8 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -79,7 +82,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 	private DatasetService datasetService;
 
 	@Override
-	public File generateFile(
+	public File generateSingleInstanceFile(
 		final Integer studyId,
 		final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> reorderedObservationUnitRows,
@@ -96,6 +99,13 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 
 		}
 		return file;
+	}
+
+	@Override
+	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
+		final String fileNameFullPath) throws IOException {
+		//Do nothing. Implement for the singleFile download XLS option
+		return new File(fileNameFullPath);
 	}
 
 	private void writeObservationSheet(
