@@ -1,6 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import au.com.bytecode.opencsv.CSVWriter;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
@@ -102,10 +103,14 @@ public class DatasetCSVExportServiceImplTest {
 		this.dataSetDTO.setInstances(this.createStudyInstances());
 
 		when(this.studyDataManager.getStudy(this.study.getId())).thenReturn(this.study);
-		when(this.studyDataManager.getDataSetsByType(this.study.getId(), DataSetType.SUMMARY_DATA))
+		when(this.studyDataManager.getDataSetsByType(anyInt(), eq(DataSetType.SUMMARY_DATA)))
 			.thenReturn(Arrays.asList(this.trialDataSet));
 
 		this.datasetExportService.setZipUtil(this.zipUtil);
+
+		when(this.datasetService.getDataset(anyInt())).thenReturn(this.dataSetDTO);
+		this.dataSetDTO.setParentDatasetId(1);
+
 	}
 
 	@Test
@@ -116,8 +121,6 @@ public class DatasetCSVExportServiceImplTest {
 		when(this.zipUtil.zipFiles(eq(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
 		Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = Mockito.mock(HashMap.class);
 		when(this.studyDatasetService.getInstanceObservationUnitRowsMap(eq(this.study.getId()), eq(this.dataSetDTO.getDatasetId()), any(ArrayList.class))).thenReturn(instanceObservationUnitRowsMap);
-		when(this.datasetService.getDataset(anyInt())).thenReturn(this.dataSetDTO);
-		this.dataSetDTO.setParentDatasetId(1);
 
 		final File result = datasetExportService.export(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
 			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
@@ -223,6 +226,32 @@ public class DatasetCSVExportServiceImplTest {
 		Assert.assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), reorderedColumns.get(0).getTermId());
 	}
 
+	@Test
+	public void testGetColumns() {
+		this.datasetExportService.getColumns(1, 1);
+		Mockito.verify(this.datasetService).getDataset(1);
+		Mockito.verify(this.studyDataManager).getDataSetsByType(1, DataSetType.SUMMARY_DATA);
+		Mockito.verify(this.datasetService).getMeasurementVariables(1, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
+		Mockito.verify( this.datasetService).getMeasurementVariables(anyInt(), eq(Lists.newArrayList(
+			VariableType.ENVIRONMENT_DETAIL.getId(),
+			VariableType.STUDY_CONDITION.getId())));
+		Mockito.verify(this.datasetService).getMeasurementVariables(eq(this.trialDataSet.getId()), eq(Lists.newArrayList(VariableType.TRAIT.getId())));
+		Mockito.verify(this.datasetService).getMeasurementVariables(1,
+			Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
+				VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId()));
+		Mockito.verify(this.datasetService).getMeasurementVariables(1, Lists.newArrayList(
+				VariableType.GERMPLASM_DESCRIPTOR.getId(),
+				VariableType.OBSERVATION_UNIT.getId()));
+		Mockito.verify(this.datasetService)	.getMeasurementVariables(1, Lists.newArrayList(TermId.MULTIFACTORIAL_INFO.getId()));
+		Mockito.verify(this.datasetService).getMeasurementVariables(1, Lists.newArrayList(VariableType.TRAIT.getId()));
+		Mockito.verify(this.datasetService).getMeasurementVariables(1, Lists.newArrayList(VariableType.SELECTION_METHOD.getId()));
+	}
+
+	@Test
+	public void testGetObservationUnitRowMap() {
+		this.datasetExportService.getObservationUnitRowMap(this.study, this.dataSetDTO, DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), new HashMap<Integer, StudyInstance>());
+		Mockito.verify(this.studyDatasetService).getInstanceObservationUnitRowsMap(this.study.getId(), this.dataSetDTO.getDatasetId(), new ArrayList<Integer>());
+	}
 	private List<StudyInstance> createStudyInstances() {
 		final StudyInstance studyInstance1 = this.createStudyInstance(this.instanceId1);
 		final StudyInstance studyInstance2 = this.createStudyInstance(this.instanceId2);

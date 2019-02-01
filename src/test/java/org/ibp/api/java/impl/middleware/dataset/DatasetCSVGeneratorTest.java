@@ -4,12 +4,16 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -74,5 +78,19 @@ public class DatasetCSVGeneratorTest {
 		assertEquals(this.measurementVariables.size(), result.size());
 		assertTrue(result.contains(this.variableName1));
 		assertTrue(result.contains(this.variableName2));
+	}
+
+	@Test
+	public void testGenerateMultiInstanceFile() throws IOException {
+		final String filename = "filename";
+		final File file = this.datasetCSVGenerator.generateMultiInstanceFile(new HashMap<Integer, List<ObservationUnitRow>>(), new ArrayList<MeasurementVariable>(), filename);
+		Assert.assertEquals(filename, file.getName());
+	}
+
+	@Test
+	public void testGenerateSingleInstanceFile() throws IOException {
+		final String filename = "filename";
+		final File file = this.datasetCSVGenerator.generateSingleInstanceFile(null, null, new ArrayList<MeasurementVariable>(), new ArrayList<ObservationUnitRow>(), filename);
+		Assert.assertEquals(filename, file.getName());
 	}
 }
