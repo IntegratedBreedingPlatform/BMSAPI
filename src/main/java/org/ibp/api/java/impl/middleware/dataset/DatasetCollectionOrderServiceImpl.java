@@ -37,7 +37,11 @@ public class DatasetCollectionOrderServiceImpl implements DatasetCollectionOrder
 			}
 
 			List<ObservationUnitRow> observationUnitRows = observationUnitRowMap.get(instanceDBID);
-			if (collectionOrder == CollectionOrder.SERPENTINE_ALONG_ROWS) {
+			if (collectionOrder == CollectionOrder.PLOT_ORDER || fieldmapBlockInfo == null) {
+				// meaning no fieldmap
+				// we just return the normal observations
+				continue;
+			} else if (collectionOrder == CollectionOrder.SERPENTINE_ALONG_ROWS) {
 				observationUnitRows = this.dataCollectionSorter.orderByRange(fieldmapBlockInfo, observationUnitRows);
 			} else if (collectionOrder == CollectionOrder.SERPENTINE_ALONG_COLUMNS) {
 				observationUnitRows = this.dataCollectionSorter.orderByColumn(fieldmapBlockInfo, observationUnitRows);
