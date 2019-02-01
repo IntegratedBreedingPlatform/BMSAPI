@@ -91,13 +91,16 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 				this.datasetService
 				.getMeasurementVariables(datasetId, Lists.newArrayList(
 						VariableType.GERMPLASM_DESCRIPTOR.getId(),
-						VariableType.TRAIT.getId(),
-						VariableType.SELECTION_METHOD.getId(),
 						VariableType.OBSERVATION_UNIT.getId()));
 		final List<MeasurementVariable> treatmentFactors =
 				this.datasetService
 				.getMeasurementVariables(plotDatasetId, Lists.newArrayList(TermId.MULTIFACTORIAL_INFO.getId()));
 		 plotDataSetColumns.removeAll(treatmentFactors);
+
+		final List<MeasurementVariable> traits =
+			this.datasetService.getMeasurementVariables(datasetId, Lists.newArrayList(VariableType.TRAIT.getId()));
+		final List<MeasurementVariable> selectionVariables =
+			this.datasetService.getMeasurementVariables(datasetId, Lists.newArrayList(VariableType.SELECTION_METHOD.getId()));
 		final List<MeasurementVariable> allVariables = new ArrayList<>();
 		allVariables.addAll(studyVariables);
 		allVariables.addAll(environmentDetailsVariables);
@@ -105,6 +108,8 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		allVariables.addAll(treatmentFactors);
 		allVariables.addAll(plotDataSetColumns);
 		allVariables.addAll(subObservationSetColumns);
+		allVariables.addAll(traits);
+		allVariables.addAll(selectionVariables);
 		return this.moveTrialInstanceInTheFirstColumn(allVariables);
 	}
 
