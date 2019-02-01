@@ -4,7 +4,7 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class LabelsNeededSummaryInput {
+public class LabelsInfoInput {
 
 	private Integer studyId;
 

@@ -6,10 +6,10 @@ import org.ibp.api.exception.NotSupportedException;
 import org.generationcp.middleware.domain.labelprinting.LabelPrintingType;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
-import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryInput;
+import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
+import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -32,9 +32,6 @@ public class LabelPrintingResource {
 	@Autowired
 	private LabelPrintingStrategy subObservationDatasetLabelPrinting;
 
-	@Autowired
-	private ResourceBundleMessageSource messageSource;
-
 	@RequestMapping(value = "/crops/{cropname}/labelPrinting/{labelPrintingType}/labels/summary", method = RequestMethod.POST)
 	@ApiOperation(value = "Get Summary of Labels Needed according to the specified printing label type",
 			notes = "Returns summary of labels needed according to the printing label type and input in the request body.")
@@ -45,11 +42,11 @@ public class LabelPrintingResource {
 			@PathVariable
 			String labelPrintingType,
 			@RequestBody
-			LabelsNeededSummaryInput labelsNeededSummaryInput) {
+				LabelsInfoInput labelsInfoInput) {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
-		labelPrintingStrategy.validateInputData(labelsNeededSummaryInput);
-		final LabelsNeededSummary labelsNeededSummary = labelPrintingStrategy.getSummaryOfLabelsNeeded(labelsNeededSummaryInput);
+		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput);
+		final LabelsNeededSummary labelsNeededSummary = labelPrintingStrategy.getSummaryOfLabelsNeeded(labelsInfoInput);
 		final LabelsNeededSummaryResponse labelsNeededSummaryResponse =
 				labelPrintingStrategy.transformLabelsNeededSummary(labelsNeededSummary);
 
@@ -66,11 +63,11 @@ public class LabelPrintingResource {
 			@PathVariable
 			String labelPrintingType,
 			@RequestBody
-			LabelsNeededSummaryInput labelsNeededSummaryInput) {
+			LabelsInfoInput labelsInfoInput) {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
-		labelPrintingStrategy.validateInputData(labelsNeededSummaryInput);
-		final Map<String, String> metadata = labelPrintingStrategy.getOriginResourceMetadata(labelsNeededSummaryInput);
+		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput);
+		final Map<String, String> metadata = labelPrintingStrategy.getOriginResourceMetadata(labelsInfoInput);
 
 		return new ResponseEntity<>(metadata, HttpStatus.OK);
 	}
@@ -80,18 +77,39 @@ public class LabelPrintingResource {
 			notes = "Returns list of available label fields grouped by type according to the printing label type and input in the request body.")
 	@ResponseBody
 	public ResponseEntity<List<LabelType>> getAvailableLabelFields(
-			@PathVariable
+		@PathVariable
 			String cropname,
-			@PathVariable
+		@PathVariable
 			String labelPrintingType,
-			@RequestBody
-			LabelsNeededSummaryInput labelsNeededSummaryInput) {
+		@PathVariable
+			String fileType,
+		@RequestBody
+			LabelsInfoInput labelsInfoInput) {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
-		labelPrintingStrategy.validateInputData(labelsNeededSummaryInput);
-		final List<LabelType> labelTypes = labelPrintingStrategy.getAvailableLabelFields(labelsNeededSummaryInput);
+		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput);
+		final List<LabelType> labelTypes = labelPrintingStrategy.getAvailableLabelFields(labelsInfoInput);
 
 		return new ResponseEntity<>(labelTypes, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/crops/{cropname}/labelPrinting/{labelPrintingType}/labels/{fileType}", method = RequestMethod.POST)
+	@ApiOperation(value = "Export the labels to a specified file type")
+	@ResponseBody
+	public ResponseEntity<List<LabelType>> getLabelsFile(
+		@PathVariable
+			String cropname,
+		@PathVariable
+			String labelPrintingType,
+		@PathVariable
+			String fileType,
+		@RequestBody
+			LabelsGeneratorInput labelsGeneratorInput ) {
+
+		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
+		labelPrintingStrategy.validateLabelsGeneratorInputData(labelsGeneratorInput);
+
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	private LabelPrintingStrategy getLabelPrintingStrategy(final String labelPrintingType) {
