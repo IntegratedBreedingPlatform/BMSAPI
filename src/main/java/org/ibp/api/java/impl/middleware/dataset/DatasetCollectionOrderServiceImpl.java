@@ -38,10 +38,11 @@ public class DatasetCollectionOrderServiceImpl implements DatasetCollectionOrder
 
 			List<ObservationUnitRow> observationUnitRows = observationUnitRowMap.get(instanceDBID);
 			if (collectionOrder == CollectionOrder.SERPENTINE_ALONG_ROWS) {
-				this.dataCollectionSorter.orderByRange(fieldmapBlockInfo, observationUnitRows);
+				observationUnitRows = this.dataCollectionSorter.orderByRange(fieldmapBlockInfo, observationUnitRows);
 			} else if (collectionOrder == CollectionOrder.SERPENTINE_ALONG_COLUMNS) {
-				this.dataCollectionSorter.orderByColumn(fieldmapBlockInfo, observationUnitRows);
+				observationUnitRows = this.dataCollectionSorter.orderByColumn(fieldmapBlockInfo, observationUnitRows);
 			}
+			observationUnitRowMap.put(instanceDBID, observationUnitRows);
 		}
 	}
 
