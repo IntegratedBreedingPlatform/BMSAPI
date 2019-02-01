@@ -271,7 +271,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 			fileExportInfo.setDownloadFileName(fileName);
 
 			Mockito.when(this.csvExportSampleListService.export(Mockito.anyListOf(SampleDetailsDTO.class), Mockito.anyString(), Mockito.anyListOf(
-					String.class)))
+					String.class), Mockito.anyString()))
 				.thenReturn(fileExportInfo);
 
 			this.mockMvc.perform(MockMvcRequestBuilders.get("/sampleLists/maize/download?listId=" + listId + "&listName=" + listName)
