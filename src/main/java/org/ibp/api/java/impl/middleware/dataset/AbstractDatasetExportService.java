@@ -105,9 +105,8 @@ public abstract class AbstractDatasetExportService {
 			// Build the filename with the following format:
 			// 'study_name'-'location_abbr'-'dataset_type'-'dataset_name'
 			final String sanitizedFileName = FileUtils.sanitizeFileName(String
-				.format(
-					"%s_%s_%s_%s." + fileExtension, study.getName(), studyInstance.getLocationAbbreviation(),
-					DataSetType.findById(dataSetDto.getDatasetTypeId()).name(), dataSetDto.getName()));
+				.format("%s_%s_%s_%s." + fileExtension, study.getName() + "-" + studyInstance.getInstanceNumber(),
+					studyInstance.getLocationAbbreviation(),DataSetType.findById(dataSetDto.getDatasetTypeId()).getReadableName(), dataSetDto.getName()));
 
 			final String fileNamePath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 
