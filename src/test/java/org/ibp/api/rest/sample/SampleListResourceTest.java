@@ -142,7 +142,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
 		Mockito.when(this.sampleListServiceMW.createSampleList(org.mockito.Matchers.any(SampleListDTO.class))).thenReturn(sampleList);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.put(uriComponents.toUriString()).contentType(this.contentType)
+		this.mockMvc.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType)
 			.content(this.convertObjectToByte(this.dto))).andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is(result.get("id"))));
 	}
