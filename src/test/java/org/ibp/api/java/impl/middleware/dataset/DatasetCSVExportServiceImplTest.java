@@ -220,8 +220,8 @@ public class DatasetCSVExportServiceImplTest {
 	}
 
 	@Test
-	public void testReorderColumns() {
-		final List<MeasurementVariable> reorderedColumns = this.datasetExportService.reorderColumns(this.createColumnHeaders());
+	public void testMoveTrialInstanceInTheFirstColumn() {
+		final List<MeasurementVariable> reorderedColumns = this.datasetExportService.moveTrialInstanceInTheFirstColumn(this.createColumnHeaders());
 		Assert.assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), reorderedColumns.get(0).getTermId());
 	}
 

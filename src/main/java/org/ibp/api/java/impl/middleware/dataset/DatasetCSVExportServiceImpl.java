@@ -105,8 +105,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		allVariables.addAll(treatmentFactors);
 		allVariables.addAll(plotDataSetColumns);
 		allVariables.addAll(subObservationSetColumns);
-		
-		return this.reorderColumns(allVariables);
+		return this.moveTrialInstanceInTheFirstColumn(allVariables);
 	}
 
 	@Override
@@ -129,7 +128,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		return file;
 	}
 
-	protected List<MeasurementVariable> reorderColumns(List<MeasurementVariable> columns) {
+	protected List<MeasurementVariable> moveTrialInstanceInTheFirstColumn(List<MeasurementVariable> columns) {
 		int trialInstanceIndex = 0;
 		for(MeasurementVariable column: columns) {
 			if(TermId.TRIAL_INSTANCE_FACTOR.getId() == column.getTermId()) {
