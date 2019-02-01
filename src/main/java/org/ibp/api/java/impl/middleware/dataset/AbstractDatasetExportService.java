@@ -104,7 +104,7 @@ public abstract class AbstractDatasetExportService {
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns, final DatasetFileGenerator generator, final String fileExtension)
 		throws IOException {
-		final List<File> csvFiles = new ArrayList<>();
+		final List<File> files = new ArrayList<>();
 		final File temporaryFolder = Files.createTempDir();
 		for(final Integer instanceDBID: observationUnitRowMap.keySet()) {
 			// Build the filename with the following format:
@@ -114,14 +114,14 @@ public abstract class AbstractDatasetExportService {
 					"%s_%s_%s_%s_%s." + fileExtension, study.getName(), selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber(), selectedDatasetInstancesMap.get(instanceDBID).getLocationAbbreviation(),
 					DataSetType.findById(dataSetDto.getDatasetTypeId()).name(), dataSetDto.getName()));
 			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
-			csvFiles.add(
+			files.add(
 				generator.generateFile(study.getId(), dataSetDto, columns, observationUnitRowMap.get(instanceDBID), fileNameFullPath));
 		}
 
-		if (csvFiles.size() == 1) {
-			return csvFiles.get(0);
+		if (files.size() == 1) {
+			return files.get(0);
 		} else {
-			return this.zipUtil.zipFiles(study.getName(), csvFiles);
+			return this.zipUtil.zipFiles(study.getName(), files);
 		}
 	}
 
