@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class DatasetCSVGenerator implements DatasetFileGenerator {
@@ -23,30 +24,31 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 	public File generateSingleInstanceFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> observationUnitRows,
 		final String fileNameFullPath) throws IOException {
-		final CSVWriter csvWriter =
-			new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',');
-		final File csvFile = this.generateCSVFileWithHeaders(columns, fileNameFullPath, csvWriter);
-		this.writeInstanceObservationUnitRowsToCSVFile(columns, observationUnitRows, csvWriter);
-		csvWriter.close();
-		return csvFile;
-	}
+		try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',')){
 
-	protected File generateCSVFileWithHeaders(
-		final List<MeasurementVariable> columns, final String fileNameFullPath, final CSVWriter csvWriter) {
-		final File newFile = new File(fileNameFullPath);
-		csvWriter.writeNext(this.getHeaderNames(columns).toArray(new String[] {}));
-		return newFile;
-	}
+			final File newFile = new File(fileNameFullPath);
+			// feed in your array (or convert your data to an array)
+			final List<String[]> rowValues = new ArrayList<>();
 
-	protected void writeInstanceObservationUnitRowsToCSVFile(
-		final List<MeasurementVariable> columns, final List<ObservationUnitRow> observationUnitRows,
-		final CSVWriter csvWriter) {
-		// feed in your array (or convert your data to an array)
-		final List<String[]> rowValues = new ArrayList<>();
-		for (final ObservationUnitRow row : observationUnitRows) {
-			rowValues.add(this.getColumnValues(row, columns));
+			rowValues.add(this.getHeaderNames(columns).toArray(new String[] {}));
+
+			for (final ObservationUnitRow row : observationUnitRows) {
+				rowValues.add(this.getColumnValues(row, columns));
+			}
+
+			csvWriter.writeAll(rowValues);
+			return newFile;
 		}
-		csvWriter.writeAll(rowValues);
+	}
+
+	@Override
+	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
+		final String fileNameFullPath) throws IOException {
+		final List<ObservationUnitRow> allObservationUnitRows = new ArrayList<>();
+		for(final List<ObservationUnitRow> observationUnitRows: observationUnitRowMap.values()) {
+			allObservationUnitRows.addAll(observationUnitRows);
+		}
+		return this.generateSingleInstanceFile(null, null, columns, allObservationUnitRows, fileNameFullPath);
 	}
 
 	protected String[] getColumnValues(final ObservationUnitRow row, final List<MeasurementVariable> subObservationSetColumns) {

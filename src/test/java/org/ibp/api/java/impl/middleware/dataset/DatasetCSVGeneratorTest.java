@@ -1,20 +1,15 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import au.com.bytecode.opencsv.CSVWriter;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -38,8 +33,6 @@ public class DatasetCSVGeneratorTest {
 
 	@InjectMocks
 	private DatasetCSVGenerator datasetCSVGenerator;
-	private Integer studyId;
-	private DatasetDTO datasetDTO;
 
 	@Before
 	public void setUp() {
@@ -81,22 +74,5 @@ public class DatasetCSVGeneratorTest {
 		assertEquals(this.measurementVariables.size(), result.size());
 		assertTrue(result.contains(this.variableName1));
 		assertTrue(result.contains(this.variableName2));
-	}
-
-	@Test
-	public void testGenerateCSVFileWithHeaders() throws IOException {
-		final CSVWriter csvWriter = Mockito.mock(CSVWriter.class);
-		final String fileNameFullPath = RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH);
-
-		datasetCSVGenerator.generateCSVFileWithHeaders(measurementVariables, fileNameFullPath, csvWriter);
-
-		Mockito.verify(csvWriter).writeNext(Mockito.any(String[].class));
-	}
-
-	@Test
-	public void testWriteInstanceObservationUnitRowsToCSVFile() {
-		final CSVWriter csvWriter = Mockito.mock(CSVWriter.class);
-		datasetCSVGenerator.writeInstanceObservationUnitRowsToCSVFile(measurementVariables, observationUnitRows, csvWriter);
-		Mockito.verify(csvWriter).writeAll(Mockito.anyListOf(String[].class));
 	}
 }
