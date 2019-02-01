@@ -40,6 +40,8 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -86,8 +88,9 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		final String fileNamePath) throws IOException {
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
+		final List<MeasurementVariable> orderedColumns = this.orderColumns(columns);
 		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto);
-		this.writeObservationSheet(columns, reorderedObservationUnitRows, xlsBook);
+		this.writeObservationSheet(orderedColumns, reorderedObservationUnitRows, xlsBook);
 
 		final File file = new File(fileNamePath);
 
@@ -96,6 +99,31 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 
 		}
 		return file;
+	}
+
+	private List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns) {
+		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
+		final List<MeasurementVariable> trait = new ArrayList<>();
+		final List<MeasurementVariable> selection = new ArrayList<>();
+		final List<Integer> discardColumns = Arrays.asList(TermId.REP_NO.getId(),TermId.ROW.getId(),TermId.BLOCK_NO.getId(),TermId.COL.getId());
+
+		for (MeasurementVariable measurementVariable : columns) {
+			if (TermId.OBS_UNIT_ID.getId() == measurementVariable.getTermId()) {
+				orderedColumns.add(0, measurementVariable);
+			} else if (discardColumns.contains(measurementVariable.getTermId())) {
+				continue;
+			} else if (VariableType.TRAIT.getId() == measurementVariable.getVariableType().getId()) {
+				trait.add(measurementVariable);
+			} else if (VariableType.SELECTION_METHOD.getId() == measurementVariable.getVariableType().getId()) {
+				selection.add(measurementVariable);
+			} else {
+				orderedColumns.add(measurementVariable);
+			}
+		}
+
+		orderedColumns.addAll(trait);
+		orderedColumns.addAll(selection);
+		return orderedColumns;
 	}
 
 	private void writeObservationSheet(
