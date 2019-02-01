@@ -65,6 +65,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	@Autowired
 	private DatasetExportService datasetCSVExportService;
 
+
 	@Configuration
 	public static class TestConfiguration {
 
@@ -127,8 +128,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-					.put("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/variables", this.cropName, studyId, datasetId)
-					.contentType(this.contentType).content(this.convertObjectToByte(datasetVariable)))
+				.put("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/variables", this.cropName, studyId, datasetId)
+				.contentType(this.contentType).content(this.convertObjectToByte(datasetVariable)))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
 	}
@@ -139,11 +140,27 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int datasetId = 102;
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-					.delete("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/variables", this.cropName, studyId, datasetId)
-					.param("variableIds", "1,2,3").contentType(this.contentType))
+				.delete("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/variables", this.cropName, studyId, datasetId)
+				.param("variableIds", "1,2,3").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
 		Mockito.verify(this.studyDatasetService).removeVariables(studyId, datasetId, Arrays.asList(1, 2, 3));
+	}
+
+	@Test
+	public void testGetVariables() throws Exception {
+		final int studyId = 100;
+		final int datasetId = 102;
+		final int variableTypeId = VariableType.SELECTION_METHOD.getId();
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.get(
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/variables/{variableTypeId}", this.cropName, studyId, datasetId,
+					variableTypeId)
+				.contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+		Mockito.verify(this.studyDatasetService).getVariables(studyId, datasetId, VariableType.getById(variableTypeId));
 	}
 
 	@Test
@@ -158,7 +175,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}", this.cropName, studyId,
-						datasetId, observationUnitId)
+					datasetId, observationUnitId)
 				.contentType(this.contentType)
 				.content(this.convertObjectToByte(observationDto)))
 			.andDo(MockMvcResultHandlers.print())
@@ -166,7 +183,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		Mockito.verify(this.studyDatasetService)
 			.addObservation(Matchers.eq(studyId), Matchers.eq(datasetId), Matchers.eq(observationUnitId),
-					Matchers.any(ObservationDto.class));
+				Matchers.any(ObservationDto.class));
 	}
 
 	@Test
@@ -181,8 +198,9 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.patch("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}",
-						this.cropName, studyId, datasetId, observationUnitId, observationId)
+				.patch(
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}",
+					this.cropName, studyId, datasetId, observationUnitId, observationId)
 				.contentType(this.contentType)
 				.content(this.convertObjectToByte(observationValue)))
 			.andDo(MockMvcResultHandlers.print())
@@ -190,7 +208,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		Mockito.verify(this.studyDatasetService)
 			.updateObservation(Matchers.eq(studyId), Matchers.eq(datasetId), Matchers.eq(observationId), Matchers.eq(observationUnitId),
-					Matchers.any(ObservationValue.class));
+				Matchers.any(ObservationValue.class));
 	}
 
 	@Test
@@ -606,9 +624,9 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final PreconditionFailedException exception = new PreconditionFailedException(new ArrayList<ObjectError>());
 		Mockito.doThrow(exception).when(this.studyDatasetService).importObservations(studyId, datasetId, observationsPutRequestInput);
 		this.mockMvc.perform(MockMvcRequestBuilders
-				.put("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations", this.cropName, studyId,
-						datasetId).contentType(this.contentType).content(this.convertObjectToByte(observationsPutRequestInput)))
-				.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+			.put("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations", this.cropName, studyId,
+				datasetId).contentType(this.contentType).content(this.convertObjectToByte(observationsPutRequestInput)))
+			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 	}
 
 	@Test
@@ -628,9 +646,9 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			}
 		}).when(this.studyDatasetService).importObservations(studyId, datasetId, observationsPutRequestInput);
 		this.mockMvc.perform(MockMvcRequestBuilders
-				.put("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations", this.cropName, studyId,
-						datasetId).contentType(this.contentType).content(this.convertObjectToByte(observationsPutRequestInput)))
-				.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk());
+			.put("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations", this.cropName, studyId,
+				datasetId).contentType(this.contentType).content(this.convertObjectToByte(observationsPutRequestInput)))
+			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk());
 	}
 
 	@Test
@@ -645,12 +663,13 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final ApiRequestValidationException exception = new ApiRequestValidationException(new ArrayList<ObjectError>());
 		Mockito.doThrow(exception).when(this.studyDatasetService).importObservations(studyId, datasetId, observationsPutRequestInput);
 		this.mockMvc.perform(MockMvcRequestBuilders
-				.put("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations", this.cropName, studyId,
-						datasetId).contentType(this.contentType).content(this.convertObjectToByte(observationsPutRequestInput)))
-				.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isBadRequest());
+			.put("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations", this.cropName, studyId,
+				datasetId).contentType(this.contentType).content(this.convertObjectToByte(observationsPutRequestInput)))
+			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isBadRequest());
 	}
 
-	private DatasetDTO createDataset(final int datasetType, final Integer datasetId,final String name, final String crop, final Integer studyId) {
+	private DatasetDTO createDataset(
+		final int datasetType, final Integer datasetId, final String name, final String crop, final Integer studyId) {
 		final DataSetType dataSetType = DataSetType.findById(datasetType);
 
 		final DatasetDTO datasetDTO = new DatasetDTO();

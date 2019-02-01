@@ -66,7 +66,7 @@ public class SampleResourceTest extends ApiUnitTestBase {
 		final List<SampleDTO> list = new ArrayList<>();
 		final SampleDTO sample =
 			new SampleDTO(randomAlphanumeric(6), randomAlphanumeric(6), randomAlphanumeric(6), samplingDate, randomAlphanumeric(6),
-				nextInt(), randomAlphanumeric(6), nextInt());
+				nextInt());
 		list.add(sample);
 
 		Mockito.doReturn(list).when(sampleService).filter(anyString(), Mockito.isNull(Integer.class), org.mockito.Matchers.any(Pageable.class));
@@ -82,8 +82,6 @@ public class SampleResourceTest extends ApiUnitTestBase {
 			// .andExpect(MockMvcResultMatchers
 			// 	.jsonPath("$[0].samplingDate", is(SampleListResourceTest.DATE_FORMAT.format(sample.getSamplingDate())))) //
 			.andExpect(jsonPath("$[0].sampleList", is(sample.getSampleList()))) //
-			.andExpect(jsonPath("$[0].plantNumber", is(sample.getPlantNumber()))) //
-			.andExpect(jsonPath("$[0].plantBusinessKey", is(sample.getPlantBusinessKey()))) //
 		;
 
 	}
