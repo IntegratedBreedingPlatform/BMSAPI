@@ -332,7 +332,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 					break;
 				default:
 					final String keyValue = geoLocationMap.get(variable.getTermId());
-					if (variable.getValue() == null && StringUtils.isNotBlank(keyValue)) {
+					if (StringUtils.isBlank(variable.getValue()) && StringUtils.isNotBlank(keyValue)) {
 						variable.setValue(keyValue);
 					}
 					break;
