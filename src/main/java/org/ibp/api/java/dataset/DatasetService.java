@@ -13,6 +13,7 @@ import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface DatasetService {
@@ -34,6 +35,8 @@ public interface DatasetService {
 	DatasetDTO generateSubObservationDataset(String cropName, Integer studyId, Integer parentId, DatasetGeneratorInput datasetGeneratorInput);
 
 	DatasetDTO getDataset(final String crop, final Integer studyId, final Integer datasetId);
+
+	Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(final int studyId, final int datasetId, final List<Integer> instanceId);
 
 	List<ObservationUnitRow>  getObservationUnitRows(final int studyId, final int datasetId, final int instanceId, final int pageNumber,
 		final int pageSize, final String sortBy, final String sortOrder);

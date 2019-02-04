@@ -81,7 +81,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 	private DatasetService datasetService;
 
 	@Override
-	public File generateFile(
+	public File generateSingleInstanceFile(
 		final Integer studyId,
 		final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> reorderedObservationUnitRows,
@@ -99,6 +99,13 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 
 		}
 		return file;
+	}
+
+	@Override
+	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
+		final String fileNameFullPath) throws IOException {
+		//Do nothing. Implement for the singleFile download XLS option
+		return new File(fileNameFullPath);
 	}
 
 	private List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns) {

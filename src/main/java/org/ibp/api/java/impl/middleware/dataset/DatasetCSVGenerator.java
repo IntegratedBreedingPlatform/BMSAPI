@@ -8,7 +8,6 @@ import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -16,15 +15,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class DatasetCSVGenerator implements DatasetFileGenerator {
 
 	@Override
-	public File generateFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
+	public File generateSingleInstanceFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> observationUnitRows,
 		final String fileNameFullPath) throws IOException {
-
 		try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',')){
 
 			final File newFile = new File(fileNameFullPath);
@@ -40,7 +39,16 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 			csvWriter.writeAll(rowValues);
 			return newFile;
 		}
+	}
 
+	@Override
+	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
+		final String fileNameFullPath) throws IOException {
+		final List<ObservationUnitRow> allObservationUnitRows = new ArrayList<>();
+		for(final List<ObservationUnitRow> observationUnitRows: observationUnitRowMap.values()) {
+			allObservationUnitRows.addAll(observationUnitRows);
+		}
+		return this.generateSingleInstanceFile(null, null, columns, allObservationUnitRows, fileNameFullPath);
 	}
 
 	protected String[] getColumnValues(final ObservationUnitRow row, final List<MeasurementVariable> subObservationSetColumns) {
