@@ -117,7 +117,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		this.dto.setInstanceIds(instanceIds);
 		this.dto.setTakenBy(SampleListResourceTest.ADMIN);
 		this.dto.setSamplingDate("2017-08-01");
-		this.dto.setStudyId(25025);
+		this.dto.setDatasetId(25025);
 		this.dto.setCropName("maize");
 		this.dto.setListName("SamplesTest");
 		this.dto.setCreatedDate("2017-10-12");
@@ -137,7 +137,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 		result.put("id", SampleListResourceTest.VALUE);
 		final SampleList sampleList = new SampleList();
 		sampleList.setId(Integer.valueOf(SampleListResourceTest.VALUE));
-		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sampleLists/maize/sampleList").build().encode();
+		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/sampleLists/maize/sampleLists").build().encode();
 
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.user);
 		Mockito.when(this.sampleListServiceMW.createSampleList(org.mockito.Matchers.any(SampleListDTO.class))).thenReturn(sampleList);
@@ -271,7 +271,7 @@ public class SampleListResourceTest extends ApiUnitTestBase {
 			fileExportInfo.setDownloadFileName(fileName);
 
 			Mockito.when(this.csvExportSampleListService.export(Mockito.anyListOf(SampleDetailsDTO.class), Mockito.anyString(), Mockito.anyListOf(
-					String.class)))
+					String.class), Mockito.anyString()))
 				.thenReturn(fileExportInfo);
 
 			this.mockMvc.perform(MockMvcRequestBuilders.get("/sampleLists/maize/download?listId=" + listId + "&listName=" + listName)

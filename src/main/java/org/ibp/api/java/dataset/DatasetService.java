@@ -2,6 +2,8 @@ package org.ibp.api.java.dataset;
 
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
@@ -11,6 +13,7 @@ import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface DatasetService {
@@ -23,6 +26,8 @@ public interface DatasetService {
 
 	MeasurementVariable addDatasetVariable(final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable);
 
+	List<MeasurementVariableDto> getVariables(Integer studyId, Integer datasetId, VariableType variableType);
+
 	void removeVariables(final Integer studyId, final Integer datasetId, final List<Integer> variableIds);
 
 	List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds);
@@ -30,6 +35,8 @@ public interface DatasetService {
 	DatasetDTO generateSubObservationDataset(String cropName, Integer studyId, Integer parentId, DatasetGeneratorInput datasetGeneratorInput);
 
 	DatasetDTO getDataset(final String crop, final Integer studyId, final Integer datasetId);
+
+	Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(final int studyId, final int datasetId, final List<Integer> instanceId);
 
 	List<ObservationUnitRow>  getObservationUnitRows(final int studyId, final int datasetId, final int instanceId, final int pageNumber,
 		final int pageSize, final String sortBy, final String sortOrder);

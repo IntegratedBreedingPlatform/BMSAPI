@@ -17,15 +17,14 @@ import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractDatasetExportService {
@@ -46,7 +45,10 @@ public abstract class AbstractDatasetExportService {
 	protected DatasetService studyDatasetService;
 
 	@Autowired
-	private DatasetCollectionOrderService datasetCollectionOrderService;
+	protected DatasetCollectionOrderService datasetCollectionOrderService;
+
+	@Resource
+	protected org.generationcp.middleware.service.api.dataset.DatasetService datasetService;
 
 	@Resource
 	protected StudyDataManager studyDataManager;
@@ -59,60 +61,58 @@ public abstract class AbstractDatasetExportService {
 		this.instanceValidator.validate(datasetId, instanceIds);
 	}
 
-	protected List<StudyInstance> getSelectedDatasetInstances(final List<StudyInstance> studyInstances, final Set<Integer> instanceIds) {
-		final Iterator<StudyInstance> iterator = studyInstances.iterator();
-		while (iterator.hasNext()) {
-			final StudyInstance studyInstance = iterator.next();
-			if (!instanceIds.contains(studyInstance.getInstanceDbId())) {
-				iterator.remove();
-			}
+	protected File generate(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId, final DatasetFileGenerator generator, final boolean singleFile, final String fileExtension) throws  IOException{
+
+		final Study study = this.studyDataManager.getStudy(studyId);
+		final DatasetDTO dataSet = this.datasetService.getDataset(datasetId);
+
+
+		// Get all variables for the dataset
+		final List<MeasurementVariable> columns = this.getColumns(study.getId(), dataSet.getDatasetId());
+		final Map<Integer, StudyInstance> selectedDatasetInstancesMap = getSelectedDatasetInstancesMap(dataSet.getInstances(),
+			instanceIds);
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
+			this.getObservationUnitRowMap(study, dataSet, collectionOrderId, selectedDatasetInstancesMap);
+		final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder = DatasetCollectionOrderServiceImpl.CollectionOrder.findById(collectionOrderId);
+		final int trialDatasetId = this.studyDataManager.getDataSetsByType(study.getId(), DataSetType.SUMMARY_DATA).get(0).getId();
+		this.datasetCollectionOrderService.reorder(collectionOrder, trialDatasetId, selectedDatasetInstancesMap, observationUnitRowMap);
+
+		if(singleFile) {
+			return this.generateInSingleFile(study, observationUnitRowMap, columns, generator, fileExtension);
+		} else  {
+			return this.generateFiles(study, dataSet, selectedDatasetInstancesMap, observationUnitRowMap, columns, generator, fileExtension);
 		}
-		return studyInstances;
+
 	}
 
-	protected List<ObservationUnitRow> getObservationUnitRows(
-		final Study study, final DatasetDTO dataSetDto, final int collectionOrderId, final int trialDatasetId,
-		final StudyInstance studyInstance) {
-		final List<ObservationUnitRow> observationUnitRows =
-			this.studyDatasetService
-				.getObservationUnitRows(study.getId(), dataSetDto.getDatasetId(), studyInstance.getInstanceDbId(), Integer.MAX_VALUE,
-					Integer.MAX_VALUE, null,
-					"");
+	public File generateInSingleFile(final Study study,
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns, final DatasetFileGenerator generator, final  String fileExtension)
+		throws IOException {
 
-		final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder =
-			DatasetCollectionOrderServiceImpl.CollectionOrder.findById(collectionOrderId);
-		return this.datasetCollectionOrderService
-			.reorder(collectionOrder, trialDatasetId, String.valueOf(studyInstance.getInstanceNumber()), observationUnitRows);
+		final File temporaryFolder = Files.createTempDir();
+		final String sanitizedFileName = FileUtils.sanitizeFileName(String.format("%s_AllInstances." + fileExtension, study.getName()));
+		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
+
+		return generator.generateMultiInstanceFile (observationUnitRowMap, columns, fileNameFullPath);
 	}
 
-	protected File generateFiles(
-		final Study study, final DatasetDTO dataSetDto, final List<StudyInstance> studyInstances, final int collectionOrderId,
-		final DatasetFileGenerator generator, final String fileExtension)
+
+	protected File generateFiles(final Study study, final DatasetDTO dataSetDto,
+		final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns, final DatasetFileGenerator generator, final String fileExtension)
 		throws IOException {
 		final List<File> files = new ArrayList<>();
-
-		// Get the visible variables in SubObservation table
-		final List<MeasurementVariable> columns =
-			this.studyDatasetService.getSubObservationSetColumns(study.getId(), dataSetDto.getDatasetId());
-
-		final int trialDatasetId = this.studyDataManager.getDataSetsByType(study.getId(), DataSetType.SUMMARY_DATA).get(0).getId();
 		final File temporaryFolder = Files.createTempDir();
-
-		for (final StudyInstance studyInstance : studyInstances) {
-			final List<ObservationUnitRow> reorderedObservationUnitRows =
-				this.getObservationUnitRows(study, dataSetDto, collectionOrderId, trialDatasetId, studyInstance);
-
+		for(final Integer instanceDBID: observationUnitRowMap.keySet()) {
 			// Build the filename with the following format:
-			// 'study_name'-'location_abbr'-'dataset_type'-'dataset_name'
+			// study_name + TRIAL_INSTANCE number + location_abbr +  dataset_type + dataset_name
 			final String sanitizedFileName = FileUtils.sanitizeFileName(String
 				.format(
-					"%s_%s_%s_%s." + fileExtension, study.getName(), studyInstance.getLocationAbbreviation(),
-					DataSetType.findById(dataSetDto.getDatasetTypeId()).name(), dataSetDto.getName()));
-
-			final String fileNamePath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
-
+					"%s_%s_%s_%s." + fileExtension, study.getName() + "-" + selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber(), selectedDatasetInstancesMap.get(instanceDBID).getLocationAbbreviation(),
+					DataSetType.findById(dataSetDto.getDatasetTypeId()).getReadableName(), dataSetDto.getName()));
+			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 			files.add(
-				generator.generateFile(study.getId(), dataSetDto, columns, reorderedObservationUnitRows, fileNamePath));
+				generator.generateSingleInstanceFile(study.getId(), dataSetDto, columns, observationUnitRowMap.get(instanceDBID), fileNameFullPath));
 		}
 
 		if (files.size() == 1) {
@@ -125,4 +125,19 @@ public abstract class AbstractDatasetExportService {
 	public void setZipUtil(final ZipUtil zipUtil) {
 		this.zipUtil = zipUtil;
 	}
+
+
+	protected Map<Integer, StudyInstance> getSelectedDatasetInstancesMap(final List<StudyInstance> studyInstances, final Set<Integer> instanceIds) {
+		Map<Integer, StudyInstance> studyInstanceMap = new HashMap<>();
+		for(StudyInstance studyInstance: studyInstances) {
+			if (instanceIds.contains(studyInstance.getInstanceDbId())) {
+				studyInstanceMap.put(studyInstance.getInstanceDbId(), studyInstance);
+			}
+		}
+		return studyInstanceMap;
+	}
+
+	public abstract List<MeasurementVariable> getColumns(int studyId, int datasetId);
+
+	public abstract Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(Study study, DatasetDTO dataset, int collectionOrderId, Map<Integer, StudyInstance> selectedDatasetInstancesMap);
 }

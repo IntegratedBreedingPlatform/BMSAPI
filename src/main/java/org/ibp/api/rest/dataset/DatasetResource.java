@@ -6,14 +6,14 @@ import com.wordnik.swagger.annotations.ApiParam;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
-import org.ibp.api.java.impl.middleware.dataset.DatasetCSVExportServiceImpl;
-import org.ibp.api.java.impl.middleware.dataset.DatasetExcelExportServiceImpl;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +94,15 @@ public class DatasetResource {
 		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
 		this.studyDatasetService.removeVariables(studyId, datasetId, Arrays.asList(variableIds));
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get the list of dataset variables filtered by variableType", notes = "Get the list of dataset variables filtered by variableType")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables/{variableTypeId}", method = RequestMethod.GET)
+	public ResponseEntity<List<MeasurementVariableDto>> getVariables(
+		@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId, @PathVariable final Integer variableTypeId) {
+		final List<MeasurementVariableDto> variables = this.studyDatasetService.getVariables(studyId, datasetId, VariableType.getById(variableTypeId));
+		return new ResponseEntity<>(variables, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Add Observation", notes = "Add Observation")
@@ -228,6 +237,7 @@ public class DatasetResource {
 	public ResponseEntity<FileSystemResource> exportDataset(
 		@PathVariable final String crop,
 		@PathVariable final Integer studyId, @PathVariable final Integer datasetId, @PathVariable final String fileType,
+
 		@RequestParam(value = "instanceIds") final Set<Integer> instanceIds,
 		@RequestParam(value = "collectionOrderId") final Integer collectionOrderId,
 		@RequestParam(value = "singleFile") final boolean singleFile) {

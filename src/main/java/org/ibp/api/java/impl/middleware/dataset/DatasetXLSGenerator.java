@@ -40,6 +40,8 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -79,15 +81,16 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 	private DatasetService datasetService;
 
 	@Override
-	public File generateFile(
+	public File generateSingleInstanceFile(
 		final Integer studyId,
 		final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> reorderedObservationUnitRows,
 		final String fileNamePath) throws IOException {
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
+		final List<MeasurementVariable> orderedColumns = this.orderColumns(columns);
 		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto);
-		this.writeObservationSheet(columns, reorderedObservationUnitRows, xlsBook);
+		this.writeObservationSheet(orderedColumns, reorderedObservationUnitRows, xlsBook);
 
 		final File file = new File(fileNamePath);
 
@@ -96,6 +99,38 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 
 		}
 		return file;
+	}
+
+	@Override
+	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
+		final String fileNameFullPath) throws IOException {
+		//Do nothing. Implement for the singleFile download XLS option
+		return new File(fileNameFullPath);
+	}
+
+	private List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns) {
+		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
+		final List<MeasurementVariable> trait = new ArrayList<>();
+		final List<MeasurementVariable> selection = new ArrayList<>();
+		final List<Integer> discardColumns = Arrays.asList(TermId.REP_NO.getId(),TermId.ROW.getId(),TermId.BLOCK_NO.getId(),TermId.COL.getId());
+
+		for (MeasurementVariable measurementVariable : columns) {
+			if (TermId.OBS_UNIT_ID.getId() == measurementVariable.getTermId()) {
+				orderedColumns.add(0, measurementVariable);
+			} else if (discardColumns.contains(measurementVariable.getTermId())) {
+				continue;
+			} else if (VariableType.TRAIT.getId() == measurementVariable.getVariableType().getId()) {
+				trait.add(measurementVariable);
+			} else if (VariableType.SELECTION_METHOD.getId() == measurementVariable.getVariableType().getId()) {
+				selection.add(measurementVariable);
+			} else {
+				orderedColumns.add(measurementVariable);
+			}
+		}
+
+		orderedColumns.addAll(trait);
+		orderedColumns.addAll(selection);
+		return orderedColumns;
 	}
 
 	private void writeObservationSheet(
@@ -240,7 +275,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environment.details",
 			this.getColorIndex(xlsBook, 124, 124, 124));
 
-		final List<MeasurementVariable> environmentDetails = this.fixEnvironmentalDetailsValues(environmentDatasetId, environmentVariables, dataSetDto.getInstances().get(0));
+		final List<MeasurementVariable> environmentDetails = this.getEnvironmentalDetails(environmentDatasetId, environmentVariables, dataSetDto.getInstances().get(0));
 
 		currentRowNum = this.writeSection(
 			currentRowNum,
@@ -251,11 +286,15 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environmental.conditions",
 			this.getColorIndex(xlsBook, 124, 124, 124));
+
+		final List<MeasurementVariable> environmentConditions = this.getEnvironmentalConditions(environmentDatasetId, environmentVariables, dataSetDto.getInstances().get(0));
+
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filterByVariableType(environmentVariables, VariableType.STUDY_CONDITION), ENVIRONMENT);
+			this.filterByVariableType(environmentConditions, VariableType.STUDY_CONDITION), ENVIRONMENT);
+
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
@@ -312,16 +351,13 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		xlsSheet.setColumnWidth(8, 20 * PIXEL_SIZE);
 	}
 
-	private List<MeasurementVariable> fixEnvironmentalDetailsValues(
+	private List<MeasurementVariable> getEnvironmentalDetails(
 		final int environmentDatasetId, final List<MeasurementVariable> environmentVariables, final StudyInstance instance) {
 		final List<MeasurementVariable> environmentDetails =
 			this.filterByVariableType(environmentVariables, VariableType.ENVIRONMENT_DETAIL);
-		final Map<String, String> geoLocationProps = this.studyDataManager.getGeolocationValues(environmentDatasetId);
+		final Map<Integer, String> geoLocationMap =
+			this.studyDataManager.getGeolocationByVariableId(environmentDatasetId, instance.getInstanceDbId());
 		for (final MeasurementVariable variable : environmentDetails) {
-			if (variable.getValue() == null) {
-				final String value = geoLocationProps.get(String.valueOf(variable.getTermId()));
-				variable.setValue(value);
-			}
 			switch (variable.getTermId()) {
 				case 8170:
 					variable.setValue(String.valueOf(instance.getInstanceNumber()));
@@ -330,14 +366,29 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 					variable.setValue(String.valueOf(instance.getLocationName()));
 					break;
 				default:
-					if (variable.getValue() == null) {
-						final String value = geoLocationProps.get(String.valueOf(variable.getTermId()));
-						variable.setValue(value);
+					final String keyValue = geoLocationMap.get(variable.getTermId());
+					if (StringUtils.isBlank(variable.getValue()) && StringUtils.isNotBlank(keyValue)) {
+						variable.setValue(keyValue);
 					}
 					break;
 			}
 		}
 		return environmentDetails;
+	}
+
+	private List<MeasurementVariable> getEnvironmentalConditions(
+		final int environmentDatasetId, final List<MeasurementVariable> environmentVariables, final StudyInstance instance) {
+		final List<MeasurementVariable> environmentConditions =
+			this.filterByVariableType(environmentVariables, VariableType.TRAIT);
+		final Map<Integer, String> environmentConditionMap =
+			this.studyDataManager.getPhenotypeByVariableId(environmentDatasetId, instance.getInstanceDbId());
+		for (final MeasurementVariable variable : environmentConditions) {
+			final String keyValue = environmentConditionMap.get(variable.getTermId());
+			if (variable.getValue() == null && StringUtils.isNotBlank(keyValue)) {
+				variable.setValue(keyValue);
+			}
+		}
+		return environmentConditions;
 	}
 
 	private int writeStudyDetails(
