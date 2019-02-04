@@ -33,7 +33,7 @@ public abstract class SampleTestDataGenerator {
 
 	public static SampleDetailsDTO createRandomSampleDetails() {
 		final SampleDetailsDTO sampleDetailsDTO =
-			new SampleDetailsDTO(Integer.valueOf(randomNumeric(6)), randomAlphanumeric(6), randomAlphanumeric(6), randomAlphanumeric(6));
+			new SampleDetailsDTO(Integer.valueOf(randomNumeric(6)), randomAlphanumeric(6), randomAlphanumeric(6));
 		sampleDetailsDTO.setTakenBy(randomAlphanumeric(6));
 		sampleDetailsDTO.setSampleDate(new Date());
 		sampleDetailsDTO.setSampleType(randomAlphanumeric(6));

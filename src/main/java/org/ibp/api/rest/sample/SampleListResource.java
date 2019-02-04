@@ -55,7 +55,7 @@ public class SampleListResource {
 	public CsvExportSampleListService csvExportSampleListService;
 
 	@ApiOperation(value = "Create sample list", notes = "Create sample list. ")
-	@RequestMapping(value = "/{crop}/sampleList", method = RequestMethod.POST)
+	@RequestMapping(value = "/{crop}/sampleLists", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity createSampleList(@PathVariable final String crop, @RequestBody final SampleListDto dto) {
 		dto.setCropName(crop);
@@ -167,7 +167,8 @@ public class SampleListResource {
 				CsvExportSampleListServiceImpl.SAMPLING_DATE, CsvExportSampleListServiceImpl.SAMPLE_UID,
 				CsvExportSampleListServiceImpl.PLATE_ID, CsvExportSampleListServiceImpl.WELL);
 
-		final FileExportInfo exportInfo = this.csvExportSampleListService.export(sampleDetailsDTOs, listName, visibleColumns);
+		// TODO: Set the enumerator variable name to blank for now, until we improve Manage Samples CSV Export to include enumerator variable columns
+		final FileExportInfo exportInfo = this.csvExportSampleListService.export(sampleDetailsDTOs, listName, visibleColumns, "");
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", exportInfo.getDownloadFileName()));

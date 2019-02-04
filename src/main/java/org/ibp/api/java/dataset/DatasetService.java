@@ -2,6 +2,8 @@ package org.ibp.api.java.dataset;
 
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
@@ -23,6 +25,8 @@ public interface DatasetService {
 	long countPhenotypesByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId);
 
 	MeasurementVariable addDatasetVariable(final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable);
+
+	List<MeasurementVariableDto> getVariables(Integer studyId, Integer datasetId, VariableType variableType);
 
 	void removeVariables(final Integer studyId, final Integer datasetId, final List<Integer> variableIds);
 

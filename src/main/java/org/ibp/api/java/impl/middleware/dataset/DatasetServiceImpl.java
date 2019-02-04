@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
@@ -124,6 +125,13 @@ public class DatasetServiceImpl implements DatasetService {
 		measurementVariable.setRequired(false);
 		return measurementVariable;
 
+	}
+
+	@Override
+	public List<MeasurementVariableDto> getVariables(final Integer studyId, final Integer datasetId, final VariableType variableType) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
+		return this.middlewareDatasetService.getVariables(datasetId, variableType);
 	}
 
 	@Override
