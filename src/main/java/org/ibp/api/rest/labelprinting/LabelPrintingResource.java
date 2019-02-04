@@ -81,8 +81,6 @@ public class LabelPrintingResource {
 			String cropname,
 		@PathVariable
 			String labelPrintingType,
-		@PathVariable
-			String fileType,
 		@RequestBody
 			LabelsInfoInput labelsInfoInput) {
 
