@@ -34,9 +34,11 @@ public class DatasetDTO implements Serializable {
 
 	private List<MeasurementVariable> variables;
 
+	private Boolean hasPendingData;
+
 
 	public Integer getDatasetId() {
-		return datasetId;
+		return this.datasetId;
 	}
 
 	public void setDatasetId(final Integer datasetId) {
@@ -44,39 +46,23 @@ public class DatasetDTO implements Serializable {
 	}
 
 	public Integer getDatasetTypeId() {
-		return datasetTypeId;
+		return this.datasetTypeId;
 	}
 
-	public void setDatasetTypeId(Integer datasetTypeId) {
+	public void setDatasetTypeId(final Integer datasetTypeId) {
 		this.datasetTypeId = datasetTypeId;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(final String name) {
 		this.name = name;
 	}
 
-	public Integer getParentDatasetId() {
-		return parentDatasetId;
-	}
-
-	public void setParentDatasetId(final Integer parentDatasetId) {
-		this.parentDatasetId = parentDatasetId;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(final String description) {
-		this.description = description;
-	}
-
 	public Integer getStudyId() {
-		return studyId;
+		return this.studyId;
 	}
 
 	public void setStudyId(final Integer studyId) {
@@ -84,7 +70,7 @@ public class DatasetDTO implements Serializable {
 	}
 
 	public String getCropName() {
-		return cropName;
+		return this.cropName;
 	}
 
 	public void setCropName(final String cropName) {
@@ -92,15 +78,15 @@ public class DatasetDTO implements Serializable {
 	}
 
 	public List<StudyInstance> getInstances() {
-		return instances;
+		return this.instances;
 	}
 
-	public void setInstances(List<StudyInstance> instances) {
+	public void setInstances(final List<StudyInstance> instances) {
 		this.instances = instances;
 	}
 
 	public List<MeasurementVariable> getVariables() {
-		return variables;
+		return this.variables;
 	}
 
 	public void setVariables(final List<MeasurementVariable> variables) {
