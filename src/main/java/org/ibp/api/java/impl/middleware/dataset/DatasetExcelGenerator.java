@@ -49,7 +49,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @Component
-public class DatasetXLSGenerator implements DatasetFileGenerator {
+public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	private static final String NUMERIC_DATA_TYPE = "Numeric";
 	private static final int PIXEL_SIZE = 250;
@@ -161,10 +161,10 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 				if (column.getPossibleValues() != null && !column.getPossibleValues()
 					.isEmpty() && column.getTermId() != TermId.BREEDING_METHOD_VARIATE.getId()
 					&& column.getTermId() != TermId.BREEDING_METHOD_VARIATE_CODE.getId() && !column.getProperty()
-					.equals(DatasetXLSGenerator.BREEDING_METHOD_PROPERTY_NAME)) {
+					.equals(DatasetExcelGenerator.BREEDING_METHOD_PROPERTY_NAME)) {
 					cell.setCellValue(this.getCategoricalCellValue(dataCell, column.getPossibleValues()));
 
-				} else if (DatasetXLSGenerator.NUMERIC_DATA_TYPE.equalsIgnoreCase(column.getDataType())) {
+				} else if (DatasetExcelGenerator.NUMERIC_DATA_TYPE.equalsIgnoreCase(column.getDataType())) {
 					if (!dataCell.isEmpty() && NumberUtils.isNumber(dataCell)) {
 						cell.setCellType(CellType.BLANK);
 						cell.setCellType(CellType.NUMERIC);
