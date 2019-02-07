@@ -14,6 +14,7 @@ import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.java.impl.middleware.dataset.DatasetKSUExcelGenerator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,8 @@ public class DatasetResource {
 
 	public static final String CSV = "csv";
 	public static final String XLS = "xls";
+	public static final String KSU_CSV = "ksu_csv";
+	public static final String KSU_XLS = "ksu_xls";
 
 	@Autowired
 	private DatasetService studyDatasetService;
@@ -51,6 +54,12 @@ public class DatasetResource {
 
 	@Autowired
 	private DatasetExportService datasetExcelExportServiceImpl;
+
+	@Autowired
+	private DatasetExportService datasetKSUCSVExportServiceImpl;
+
+	@Autowired
+	private DatasetExportService datasetKSUExcelExportServiceImpl;
 
 	@ApiOperation(value = "Get Dataset Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the dataset, "
 		+ "that will be shown in the Observation Table")
@@ -256,6 +265,10 @@ public class DatasetResource {
 			return this.datasetCSVExportServiceImpl;
 		} else if (DatasetResource.XLS.equalsIgnoreCase(fileType.trim())) {
 			return this.datasetExcelExportServiceImpl;
+		} else if (DatasetResource.KSU_CSV.equalsIgnoreCase(fileType.trim())) {
+			return this.datasetKSUCSVExportServiceImpl;
+		} else if (DatasetResource.KSU_XLS.equalsIgnoreCase(fileType.trim())) {
+			return this.datasetKSUExcelExportServiceImpl;
 		}
 		return null;
 	}
