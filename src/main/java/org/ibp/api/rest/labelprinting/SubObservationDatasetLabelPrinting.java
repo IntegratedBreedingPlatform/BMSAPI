@@ -196,6 +196,11 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 		return labelTypes;
 	}
 
+	@Override
+	public List<Map<String, String>> getLabelsData(final LabelsGeneratorInput labelsGeneratorInput) {
+		return null;
+	}
+
 	private List<Field> transform (final List<MeasurementVariable> measurementVariables) {
 		final List<Field> fields = new LinkedList<>();
 		for (final MeasurementVariable measurementVariable: measurementVariables) {

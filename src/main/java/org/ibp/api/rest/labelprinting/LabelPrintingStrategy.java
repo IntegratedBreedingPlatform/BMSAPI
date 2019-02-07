@@ -23,4 +23,6 @@ public interface LabelPrintingStrategy {
 
 	List<LabelType> getAvailableLabelFields(final LabelsInfoInput labelsInfoInput);
 
+	List<Map<String, String>> getLabelsData (final LabelsGeneratorInput labelsGeneratorInput);
+
 }

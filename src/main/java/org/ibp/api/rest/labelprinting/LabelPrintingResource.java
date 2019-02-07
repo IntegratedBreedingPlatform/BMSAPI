@@ -2,6 +2,7 @@ package org.ibp.api.rest.labelprinting;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import org.generationcp.commons.util.FileUtils;
 import org.ibp.api.exception.NotSupportedException;
 import org.generationcp.middleware.domain.labelprinting.LabelPrintingType;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
@@ -10,6 +11,8 @@ import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +35,9 @@ public class LabelPrintingResource {
 
 	@Autowired
 	private LabelPrintingStrategy subObservationDatasetLabelPrinting;
+
+	@Autowired
+	private CSVLabelsFileGenerator csvLabelsFileGenerator;
 
 	@RequestMapping(value = "/crops/{cropname}/labelPrinting/{labelPrintingType}/labels/summary", method = RequestMethod.POST)
 	@ApiOperation(value = "Get Summary of Labels Needed according to the specified printing label type",
@@ -94,7 +101,7 @@ public class LabelPrintingResource {
 	@RequestMapping(value = "/crops/{cropname}/labelPrinting/{labelPrintingType}/labels/{fileType}", method = RequestMethod.POST)
 	@ApiOperation(value = "Export the labels to a specified file type")
 	@ResponseBody
-	public ResponseEntity<List<LabelType>> getLabelsFile(
+	public ResponseEntity<FileSystemResource> getLabelsFile(
 		@PathVariable
 			String cropname,
 		@PathVariable
@@ -106,8 +113,14 @@ public class LabelPrintingResource {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
 		labelPrintingStrategy.validateLabelsGeneratorInputData(labelsGeneratorInput);
-
-		return new ResponseEntity<>(HttpStatus.OK);
+		final LabelsFileGenerator labelsFileGenerator = this.getLabelsFileGenerator(fileType);
+		final List<Map<String, String>> labelsData = labelPrintingStrategy.getLabelsData(labelsGeneratorInput);
+		final File file = labelsFileGenerator.generate(labelsGeneratorInput, labelsData);
+		final HttpHeaders headers = new HttpHeaders();
+		headers
+				.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
+		final FileSystemResource fileSystemResource = new FileSystemResource(file);
+		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
 
 	private LabelPrintingStrategy getLabelPrintingStrategy(final String labelPrintingType) {
@@ -130,6 +143,11 @@ public class LabelPrintingResource {
 		}
 
 		return labelPrintingStrategy;
+	}
+
+	private LabelsFileGenerator getLabelsFileGenerator(final String fileType) {
+		//TODO handle file type and unsupported expection
+		return csvLabelsFileGenerator;
 	}
 
 }
