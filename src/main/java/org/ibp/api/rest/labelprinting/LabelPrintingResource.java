@@ -5,6 +5,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.commons.util.FileUtils;
 import org.ibp.api.exception.NotSupportedException;
 import org.generationcp.middleware.domain.labelprinting.LabelPrintingType;
+import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
@@ -98,7 +99,7 @@ public class LabelPrintingResource {
 		return new ResponseEntity<>(labelTypes, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/crops/{cropname}/labelPrinting/{labelPrintingType}/labels/{fileType}", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropname}/labelPrinting/{labelPrintingType}/labels/{fileExtention}", method = RequestMethod.POST)
 	@ApiOperation(value = "Export the labels to a specified file type")
 	@ResponseBody
 	public ResponseEntity<FileSystemResource> getLabelsFile(
@@ -107,13 +108,13 @@ public class LabelPrintingResource {
 		@PathVariable
 			String labelPrintingType,
 		@PathVariable
-			String fileType,
+			String fileExtension,
 		@RequestBody
 			LabelsGeneratorInput labelsGeneratorInput ) {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
 		labelPrintingStrategy.validateLabelsGeneratorInputData(labelsGeneratorInput);
-		final LabelsFileGenerator labelsFileGenerator = this.getLabelsFileGenerator(fileType);
+		final LabelsFileGenerator labelsFileGenerator = this.getLabelsFileGenerator(fileExtension, labelPrintingStrategy);
 		final List<Map<String, String>> labelsData = labelPrintingStrategy.getLabelsData(labelsGeneratorInput);
 		final File file = labelsFileGenerator.generate(labelsGeneratorInput, labelsData);
 		final HttpHeaders headers = new HttpHeaders();
@@ -145,9 +146,22 @@ public class LabelPrintingResource {
 		return labelPrintingStrategy;
 	}
 
-	private LabelsFileGenerator getLabelsFileGenerator(final String fileType) {
-		//TODO handle file type and unsupported expection
-		return csvLabelsFileGenerator;
+	private LabelsFileGenerator getLabelsFileGenerator(final String fileExtension, final LabelPrintingStrategy labelPrintingStrategy) {
+		final LabelsFileGenerator labelsFileGenerator;
+		final FileType fileType = FileType.getEnum(fileExtension);
+		if (fileType == null || !labelPrintingStrategy.getSupportedFileTypes().contains(fileType)) {
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			errors.reject("file.type.not.supported", "");
+			throw new NotSupportedException(errors.getAllErrors().get(0));
+		}
+		switch (fileType) {
+			case CSV:
+				labelsFileGenerator = csvLabelsFileGenerator;
+				break;
+			default:
+				labelsFileGenerator = null;
+		}
+		return labelsFileGenerator;
 	}
 
 }

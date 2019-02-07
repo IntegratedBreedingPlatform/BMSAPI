@@ -1,5 +1,6 @@
 package org.ibp.api.rest.labelprinting;
 
+import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
@@ -24,5 +25,7 @@ public interface LabelPrintingStrategy {
 	List<LabelType> getAvailableLabelFields(final LabelsInfoInput labelsInfoInput);
 
 	List<Map<String, String>> getLabelsData (final LabelsGeneratorInput labelsGeneratorInput);
+
+	List<FileType> getSupportedFileTypes();
 
 }

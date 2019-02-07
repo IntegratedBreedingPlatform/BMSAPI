@@ -11,6 +11,7 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
+import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
@@ -57,6 +58,8 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 
 	private static String PLOT = "PLOT";
 	private static String OBS_UNIT_ID = "OBS_UNIT_ID";
+
+	private static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV);
 
 	@PostConstruct
 	void initStaticFields() {
@@ -199,6 +202,11 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 	@Override
 	public List<Map<String, String>> getLabelsData(final LabelsGeneratorInput labelsGeneratorInput) {
 		return null;
+	}
+
+	@Override
+	public List<FileType> getSupportedFileTypes() {
+		return SUPPORTED_FILE_TYPES;
 	}
 
 	private List<Field> transform (final List<MeasurementVariable> measurementVariables) {

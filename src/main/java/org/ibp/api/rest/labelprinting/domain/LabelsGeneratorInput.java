@@ -1,6 +1,6 @@
 package org.ibp.api.rest.labelprinting.domain;
 
-import com.sun.tools.javac.util.List;
+import java.util.List;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
