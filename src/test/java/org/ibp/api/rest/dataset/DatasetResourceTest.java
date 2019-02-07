@@ -283,7 +283,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.cropName", is(dataset.getCropName())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.datasetTypeId", is(dataset.getDatasetTypeId())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.studyId", is(dataset.getStudyId())))
-
+			.andExpect(MockMvcResultMatchers.jsonPath("$.hasPendingData", is(dataset.getHasPendingData())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].termId", is(dataset.getVariables().get(0).getTermId())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].name", is(dataset.getVariables().get(0).getName())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].description", is(dataset.getVariables().get(0).getDescription())))
@@ -678,6 +678,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		datasetDTO.setCropName(crop);
 		datasetDTO.setDatasetTypeId(dataSetType.getId());
 		datasetDTO.setStudyId(studyId);
+		datasetDTO.setHasPendingData(Boolean.FALSE);
 
 		final List<MeasurementVariable> variables = new ArrayList<>();
 		final List<StudyInstance> instances = new ArrayList<>();
@@ -716,6 +717,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			final DatasetDTO datasetDTO = new DatasetDTO();
 			datasetDTO.setDatasetTypeId(dataSetType.getId());
 			datasetDTO.setName(dataSetType.name() + "_" + num);
+			datasetDTO.setHasPendingData(Boolean.TRUE);
 			num--;
 		}
 		return datasets;
