@@ -12,12 +12,12 @@ import java.util.Objects;
 public class ObservationUnitData {
 
 	private Integer observationId;
-
 	private Integer categoricalValueId;
-
 	private String value;
-
 	private Phenotype.ValueStatus status;
+	private Integer variableId;
+	private Integer draftCategoricalValueId;
+	private String draftValue;
 
 	public ObservationUnitData(final Integer observationId, final Integer categoricalValueId, final String value,
 		final Phenotype.ValueStatus status) {
@@ -61,6 +61,23 @@ public class ObservationUnitData {
 	public void setStatus(final Phenotype.ValueStatus status) {
 		this.status = status;
 	}
+
+	public Integer getDraftCategoricalValueId() {
+		return this.draftCategoricalValueId;
+	}
+
+	public void setDraftCategoricalValueId(final Integer draftCategoricalValueId) {
+		this.draftCategoricalValueId = draftCategoricalValueId;
+	}
+
+	public String getDraftValue() {
+		return this.draftValue;
+	}
+
+	public void setDraftValue(final String draftValue) {
+		this.draftValue = draftValue;
+	}
+
 
 	@Override
 	public boolean equals(final Object o) {
