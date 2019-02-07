@@ -99,7 +99,7 @@ public class LabelPrintingResource {
 		return new ResponseEntity<>(labelTypes, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/crops/{cropname}/labelPrinting/{labelPrintingType}/labels/{fileExtention}", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropname}/labelPrinting/{labelPrintingType}/labels/{fileExtension}", method = RequestMethod.POST)
 	@ApiOperation(value = "Export the labels to a specified file type")
 	@ResponseBody
 	public ResponseEntity<FileSystemResource> getLabelsFile(
@@ -113,8 +113,9 @@ public class LabelPrintingResource {
 			LabelsGeneratorInput labelsGeneratorInput ) {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
-		labelPrintingStrategy.validateLabelsGeneratorInputData(labelsGeneratorInput);
 		final LabelsFileGenerator labelsFileGenerator = this.getLabelsFileGenerator(fileExtension, labelPrintingStrategy);
+
+		labelPrintingStrategy.validateLabelsGeneratorInputData(labelsGeneratorInput);
 		final List<Map<String, String>> labelsData = labelPrintingStrategy.getLabelsData(labelsGeneratorInput);
 		final File file = labelsFileGenerator.generate(labelsGeneratorInput, labelsData);
 		final HttpHeaders headers = new HttpHeaders();
