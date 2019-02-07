@@ -13,7 +13,7 @@ import java.util.List;
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"datasetId", "name", "description", "datasetTypeId", "studyId", "parentDatasetId", "cropName", "variables",
-	"instances"})
+	"instances", "hasPendingData"})
 public class DatasetDTO implements Serializable {
 
 	private Integer datasetId;
@@ -91,6 +91,14 @@ public class DatasetDTO implements Serializable {
 
 	public void setVariables(final List<MeasurementVariable> variables) {
 		this.variables = variables;
+	}
+
+	public Boolean getHasPendingData() {
+		return this.hasPendingData;
+	}
+
+	public void setHasPendingData(final Boolean hasPendingData) {
+		this.hasPendingData = hasPendingData;
 	}
 
 	@Override
