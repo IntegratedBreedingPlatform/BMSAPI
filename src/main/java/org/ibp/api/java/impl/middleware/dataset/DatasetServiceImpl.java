@@ -226,7 +226,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId) {
+	public Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId) {
 		return this.middlewareDatasetService.countTotalObservationUnitsForDataset(datasetId, instanceId);
 	}
 
