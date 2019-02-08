@@ -26,7 +26,6 @@ import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.PreconditionFailedException;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
@@ -197,16 +196,16 @@ public class DatasetServiceImplTest {
 		final int datasetId = random.nextInt();
 		final int observationUnitId = random.nextInt();
 		final int observationId = random.nextInt();
-		final ObservationValue observationValue = new ObservationValue();
-		observationValue.setCategoricalValueId(random.nextInt());
-		observationValue.setValue(random.toString());
-		this.studyDatasetService.updateObservation(studyId, datasetId, observationId, observationUnitId, observationValue);
+		final ObservationDto observationDto = new ObservationDto();
+		observationDto.setCategoricalValueId(random.nextInt());
+		observationDto.setValue(random.toString());
+		this.studyDatasetService.updateObservation(studyId, datasetId, observationId, observationUnitId, observationDto);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, true);
 		Mockito.verify(this.observationValidator).validateObservation(studyId, datasetId, observationUnitId, observationId,
-			observationValue.getValue());
+			observationDto);
 		Mockito.verify(this.middlewareDatasetService)
-				.updatePhenotype(observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue());
+				.updatePhenotype(observationUnitId, observationId, observationDto);
 	}
 	
 	@Test

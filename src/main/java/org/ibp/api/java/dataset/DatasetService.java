@@ -5,7 +5,6 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
@@ -44,7 +43,7 @@ public interface DatasetService {
 	ObservationDto addObservation(Integer studyId, Integer datasetId, Integer observationUnitId, final ObservationDto observation);
 
 	ObservationDto updateObservation(
-		Integer studyId, Integer datasetId, Integer observationId, Integer observationUnitId, ObservationValue observationValue);
+		Integer studyId, Integer datasetId, Integer observationId, Integer observationUnitId, ObservationDto observationDto);
 
 	Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId);
 	

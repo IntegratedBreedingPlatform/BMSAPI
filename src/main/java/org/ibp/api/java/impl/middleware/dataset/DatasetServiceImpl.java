@@ -12,7 +12,6 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ConflictException;
@@ -156,12 +155,12 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public ObservationDto updateObservation(
 		final Integer studyId, final Integer datasetId, final Integer observationId, final Integer observationUnitId,
-		final ObservationValue observationValue) {
+		final ObservationDto observationDto) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
-		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, observationValue.getValue());
+		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, observationDto);
 		return this.middlewareDatasetService
-			.updatePhenotype(observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue());
+			.updatePhenotype(observationUnitId, observationId, observationDto);
 
 	}
 

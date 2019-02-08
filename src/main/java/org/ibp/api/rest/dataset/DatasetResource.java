@@ -10,7 +10,6 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
@@ -121,10 +120,11 @@ public class DatasetResource {
 	public ResponseEntity<ObservationDto> updateObservation(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId, @PathVariable final Integer observationId,
-		@RequestBody final ObservationValue observationValue) {
-		final ObservationDto observation =
-			this.studyDatasetService.updateObservation(studyId, datasetId, observationId, observationUnitId, observationValue);
-		return new ResponseEntity<>(observation, HttpStatus.OK);
+		@ApiParam("Only some fields will be updated: ie. value, draftValue") @RequestBody final ObservationDto observationDto) {
+
+		return new ResponseEntity<>(
+			this.studyDatasetService.updateObservation(studyId, datasetId, observationId, observationUnitId, observationDto),
+			HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Count Phenotypes for specific instance (environment)", notes = "Returns count of phenotypes for specific instance (environment)")
