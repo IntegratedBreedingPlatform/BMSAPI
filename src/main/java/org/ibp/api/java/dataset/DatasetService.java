@@ -46,7 +46,7 @@ public interface DatasetService {
 	ObservationDto updateObservation(
 		Integer studyId, Integer datasetId, Integer observationId, Integer observationUnitId, ObservationValue observationValue);
 
-	int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId);
+	Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId);
 	
 	void deleteObservation(final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId);
 

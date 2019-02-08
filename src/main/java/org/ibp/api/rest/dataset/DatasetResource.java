@@ -149,11 +149,11 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "It will retrieve all the observation units", notes = "It will retrieve all the observation units including observations and props values in a format that will be used by the Observations table.")
-	@RequestMapping(value = "/{cropname}/studies/{studyId}/datasets/{datasetId}/instances/{instanceId}/observationUnits/table", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/table", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<ObservationUnitTable> getObservationUnitTable(@PathVariable final String cropname,
 		@PathVariable final Integer studyId, @PathVariable final Integer datasetId,
-		@PathVariable final Integer instanceId,
+		@RequestParam(value = "instanceId", required = false) final Integer instanceId,
 		@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "pageNumber",
 			required = false) final Integer pageNumber,
 		@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",

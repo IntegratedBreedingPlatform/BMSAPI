@@ -362,15 +362,15 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final Random random = new Random();
 		final int studyId = random.nextInt(10000);
 		final int datasetId = random.nextInt(10000);
-		final int instanceId = random.nextInt(10000);
+		final Integer instanceId = random.nextInt(10000);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.get(
-				"/crops/{cropname}/studies/{studyId}/datasets/{datasetId}/instances/{instanceId}/observationUnits/table",
+				"/crops/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/table",
 				this.cropName,
 				studyId,
-				datasetId,
-				instanceId).param("pageNumber", "1")
+				datasetId).param("instanceId", instanceId.toString())
+				.param("pageNumber", "1")
 				.param("pageSize", "100").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
