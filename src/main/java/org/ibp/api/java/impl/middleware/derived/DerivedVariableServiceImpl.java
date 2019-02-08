@@ -1,0 +1,166 @@
+package org.ibp.api.java.impl.middleware.derived;
+
+import com.google.common.base.Optional;
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
+import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
+import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.FormulaDto;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.generationcp.middleware.service.api.derived_variables.FormulaService;
+import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.derived.DerivedVariableService;
+import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
+
+import javax.annotation.Resource;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+@Service
+@Transactional
+public class DerivedVariableServiceImpl implements DerivedVariableService {
+
+	private static final Logger LOG = LoggerFactory.getLogger(DerivedVariableServiceImpl.class);
+
+	@Resource
+	private DatasetService datasetService;
+
+	@Resource
+	private DatasetValidator datasetValidator;
+
+	@Resource
+	private StudyValidator studyValidator;
+
+	@Resource
+	private DerivedVariableValidator derivedVariableValidator;
+
+	@Resource
+	private DerivedVariableProcessor processor;
+
+	@Resource
+	private FormulaService formulaService;
+
+	public DerivedVariableServiceImpl() {
+		// do nothing
+	}
+
+	@Override
+	public void execute(
+		final int studyId, final int datasetId, final Integer variableId, final List<Integer> geoLocationIds) {
+
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
+		this.studyValidator.validate(studyId, false);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.derivedVariableValidator.validate(variableId, geoLocationIds);
+		this.derivedVariableValidator.verifyMissingInputVariables(variableId, datasetId);
+
+		// Get the list of observation unit rows grouped by intances
+		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap =
+			datasetService.getInstanceIdToObservationUnitRowsMap(studyId, datasetId, geoLocationIds);
+		// Get the the measurement variables of all traits in a dataset so that we can determine the datatype and possibleValues
+		// of a ObservationUnitData.
+		final Map<Integer, MeasurementVariable> measurementVariablesMap = this.createVariableIdMeasurementVariableMap(datasetId);
+
+		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
+		final FormulaDto formula = formulaOptional.get();
+		final Map<String, Object> parameters = DerivedVariableUtils.extractParameters(formula.getDefinition());
+
+		// Calculate
+		final Set<String> inputMissingData = new HashSet<>();
+
+		// Iterate through the observations for each instances
+		for (final List<ObservationUnitRow> observations : instanceIdObservationUnitRowsMap.values()) {
+			for (final ObservationUnitRow observation : observations) {
+
+				// Get input data
+				final Set<String> rowInputMissingData = new HashSet<>();
+				try {
+					DerivedVariableUtils.extractValues(parameters, observation, measurementVariablesMap, rowInputMissingData);
+				} catch (ParseException e) {
+					LOG.error("Error parsing date value for parameters " + parameters, e);
+					errors.reject("study.execute.calculation.parsing.exception");
+					throw new ApiRequestValidationException(errors.getAllErrors());
+				}
+				inputMissingData.addAll(rowInputMissingData);
+
+				if (!rowInputMissingData.isEmpty() || parameters.values().contains("")) {
+					continue;
+				}
+
+				// Evaluate
+				String value;
+				try {
+					final String executableFormula = DerivedVariableUtils.replaceDelimiters(formula.getDefinition());
+					value = this.processor.evaluateFormula(executableFormula, parameters);
+				} catch (final Exception e) {
+					LOG.error("Error evaluating formula " + formula + " with inputs " + parameters, e);
+					errors.reject("study.execute.calculation.engine.exception");
+					throw new ApiRequestValidationException(errors.getAllErrors());
+				}
+
+				if (StringUtils.isBlank(value)) {
+					continue;
+				}
+
+				// Process calculation result
+				final ObservationUnitData target = observation.getVariables().get(formula.getTarget().getName());
+				final MeasurementVariable targetMeasurementVariable = measurementVariablesMap.get(formula.getTarget().getTargetTermId());
+
+				if (targetMeasurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+					for (final ValueReference possibleValue : targetMeasurementVariable.getPossibleValues()) {
+						if (value.equalsIgnoreCase(possibleValue.getName())) {
+							value = String.valueOf(possibleValue.getId());
+							break;
+						}
+					}
+					this.datasetService.updatePhenotype(target.getObservationId(), Integer.valueOf(value), null);
+				} else {
+					this.datasetService.updatePhenotype(target.getObservationId(), null, value);
+				}
+
+				if (!target.getValue().equals(value) && !target.getValue().isEmpty()) {
+					errors.reject("study.execute.calculation.overwrite.data");
+					throw new ApiRequestValidationException(errors.getAllErrors());
+				}
+
+			}
+
+		}
+
+		// Process response
+		if (!inputMissingData.isEmpty()) {
+			errors.reject("study.execute.calculation.missing.data", new String[] {StringUtils.join(inputMissingData.toArray(), ", ")}, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+	}
+
+	protected Map<Integer, MeasurementVariable> createVariableIdMeasurementVariableMap(final int datasetId) {
+		final Map<Integer, MeasurementVariable> variableIdMeasurementVariableMap = new HashMap<>();
+		final List<MeasurementVariable> measurementVariables =
+			this.datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()));
+		for (final MeasurementVariable measurementVariable : measurementVariables) {
+			variableIdMeasurementVariableMap.put(measurementVariable.getTermId(), measurementVariable);
+		}
+		return variableIdMeasurementVariableMap;
+	}
+
+}
