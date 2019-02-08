@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.validator.routines.DateValidator;
+import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -45,7 +46,7 @@ public class ObservationValidator {
 
 	public void validateObservation(
 		final Integer studyId, final Integer datasetId, final Integer observationUnitId,
-		final Integer observationId, final String value) {
+		final Integer observationId, final ObservationDto observationDto) {
 
 		this.validateObservationUnit(datasetId, observationUnitId);
 
@@ -55,8 +56,8 @@ public class ObservationValidator {
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
-		if (value != null) {
-			this.validateObservationValue(studyId, phenotype.getObservableId(), value);
+		if (observationDto != null) {
+			this.validateObservationValue(studyId, phenotype.getObservableId(), observationDto.getValue());
 		}
 	}
 

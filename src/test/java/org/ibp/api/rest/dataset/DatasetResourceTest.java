@@ -10,7 +10,6 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.PreconditionFailedException;
@@ -194,7 +193,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int datasetId = random.nextInt(10000);
 		final int observationUnitId = random.nextInt(10000);
 		final int observationId = random.nextInt(10000);
-		final ObservationValue observationValue = new ObservationValue();
+		final ObservationDto observationDto = new ObservationDto();
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
@@ -202,13 +201,13 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}",
 					this.cropName, studyId, datasetId, observationUnitId, observationId)
 				.contentType(this.contentType)
-				.content(this.convertObjectToByte(observationValue)))
+				.content(this.convertObjectToByte(observationDto)))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
 
 		Mockito.verify(this.studyDatasetService)
 			.updateObservation(Matchers.eq(studyId), Matchers.eq(datasetId), Matchers.eq(observationId), Matchers.eq(observationUnitId),
-				Matchers.any(ObservationValue.class));
+				Matchers.any(ObservationDto.class));
 	}
 
 	@Test
