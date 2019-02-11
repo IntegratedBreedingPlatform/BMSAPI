@@ -38,6 +38,7 @@ import org.springframework.validation.MapBindingResult;
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -296,7 +297,20 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 		final List<ObservationUnitRow> observationUnitRows =
 			this.middlewareDatasetService.getAllObservationUnitRows(labelsGeneratorInput.getStudyId(), labelsGeneratorInput.getDatasetId());
 
-		final List<Map<String, String>> results = new ArrayList<>();
+		Collections.sort(observationUnitRows, (observationUnitRow1, observationUnitRow2) -> {
+			int c;
+			c = Integer.valueOf(observationUnitRow1.getVariables().get("TRIAL_INSTANCE").getValue())
+				.compareTo(Integer.valueOf(observationUnitRow2.getVariables().get("TRIAL_INSTANCE").getValue()));
+			if (c == 0)
+				c = Integer.valueOf(observationUnitRow1.getVariables().get("PLOT_NO").getValue())
+					.compareTo(Integer.valueOf(observationUnitRow2.getVariables().get("PLOT_NO").getValue()));
+			if (c == 0)
+				c = Integer.valueOf(observationUnitRow1.getVariables().get("ENTRY_NO").getValue())
+					.compareTo(Integer.valueOf(observationUnitRow2.getVariables().get("ENTRY_NO").getValue()));
+			return c;
+		});
+
+		final List<Map<String, String>> results = new LinkedList<>();
 		for (final ObservationUnitRow observationUnitRow : observationUnitRows) {
 			final Map<String, String> row = new HashMap<>();
 			for (final String requiredField : allRequiredFields) {
