@@ -11,9 +11,11 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
@@ -62,6 +64,13 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 
 	@Autowired
 	private StudyValidator studyValidator;
+
+	@Autowired
+	private PedigreeService pedigreeService;
+
+	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
+
 
 	private static Field STUDY_NAME_FIELD;
 	private static Field YEAR_FIELD;
@@ -282,6 +291,7 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 		}
 		labelsGeneratorInput.getFields().forEach(f -> allRequiredFields.addAll(f));
 
+		final Map<String, String> gidPedigreeMap = new HashMap<>();
 
 		final List<ObservationUnitRow> observationUnitRows =
 			this.middlewareDatasetService.getAllObservationUnitRows(labelsGeneratorInput.getStudyId(), labelsGeneratorInput.getDatasetId());
@@ -292,15 +302,15 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 			for (final String requiredField : allRequiredFields) {
 				final Field field = termIdFieldMap.get(requiredField);
 				if (NumberUtils.isNumber(requiredField)) {
-					// Special cases: LOCATION_NAME, OBS_UNIT_ID
+					// Special cases: LOCATION_NAME, PLOT OBS_UNIT_ID
 					final String value;
-					switch (field.getName()) {
-						case "LOCATION_NAME":
+					switch (field.getId()) {
+						case "8190":
 							final Integer locationId = Integer.valueOf(observationUnitRow.getVariables().get("LOCATION_ID").getValue());
 							value = locationDbIdInstanceMap.get(locationId).getLocationName();
 							break;
-						case "OBS_UNIT_ID":
-							value = observationUnitRow.getVariables().get(subObsDatasetUnitIdFieldKey).getValue();
+						case "8201":
+							value = observationUnitRow.getVariables().get("PARENT_OBS_UNIT_ID").getValue();
 							break;
 						default:
 							value = observationUnitRow.getVariables().get(field.getName()).getValue();
@@ -310,7 +320,7 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 					// If it is not a number it is a special case
 					// Year, Season, Study Name, Parentage, subObsDatasetUnitIdFieldKey
 					if (requiredField.equals(YEAR_FIELD.getId())) {
-						row.put(requiredField, study.getSeason().getLabel());
+						row.put(requiredField, (StringUtils.isNotEmpty(study.getStartDate())) ? study.getStartDate().substring(0,4): "");
 						continue;
 					}
 					if (requiredField.equals(STUDY_NAME_FIELD.getId())) {
@@ -322,9 +332,19 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 						continue;
 					}
 					if (requiredField.equals(PARENTAGE_FIELD.getId())) {
+						final String gid = observationUnitRow.getVariables().get("GID").getValue();
+						String pedigree;
+						if (gidPedigreeMap.containsKey(gid)) {
+							pedigree = gidPedigreeMap.get(gid);
+						} else {
+							pedigree = pedigreeService.getCrossExpansion(Integer.valueOf(gid), crossExpansionProperties);
+							gidPedigreeMap.put(gid, pedigree);
+						}
+						row.put(requiredField, pedigree);
 						continue;
 					}
 					if (requiredField.equals(subObsDatasetUnitIdFieldKey)) {
+						row.put(subObsDatasetUnitIdFieldKey, observationUnitRow.getVariables().get("OBS_UNIT_ID").getValue());
 						continue;
 					}
 				}
