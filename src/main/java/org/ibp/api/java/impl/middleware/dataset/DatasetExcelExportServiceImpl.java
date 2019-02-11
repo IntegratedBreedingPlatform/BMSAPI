@@ -53,9 +53,9 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 		for(final Integer instanceDBID: selectedDatasetInstancesMap.keySet()) {
 			final List<ObservationUnitRow> observationUnitRows =
 				this.studyDatasetService
-					.getObservationUnitRows(study.getId(), dataset.getDatasetId(), selectedDatasetInstancesMap.get(instanceDBID).getInstanceDbId(), Integer.MAX_VALUE,
-						Integer.MAX_VALUE, null,
-						"");
+					.getObservationUnitRows(study.getId(), dataset.getDatasetId(),
+						selectedDatasetInstancesMap.get(instanceDBID).getInstanceDbId(), Integer.MAX_VALUE, Integer.MAX_VALUE, null, "",
+						null);
 			observationUnitRowMap.put(instanceDBID, observationUnitRows);
 		}
 		return observationUnitRowMap;

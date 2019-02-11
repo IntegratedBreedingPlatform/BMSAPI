@@ -46,6 +46,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -353,11 +354,11 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		Mockito.when(this.studyDatasetService.countTotalObservationUnitsForDataset(
 			org.mockito.Matchers.anyInt(),
-			org.mockito.Matchers.anyInt()))
+			org.mockito.Matchers.anyInt(), isNull(Boolean.class)))
 			.thenReturn(100);
 		Mockito.when(this.studyDatasetService.getObservationUnitRows(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
 			org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), isNull(String.class),
-			isNull(String.class))).thenReturn(Lists.newArrayList(obsDto));
+			isNull(String.class), isNull(Boolean.class))).thenReturn(Lists.newArrayList(obsDto));
 		final Random random = new Random();
 		final int studyId = random.nextInt(10000);
 		final int datasetId = random.nextInt(10000);

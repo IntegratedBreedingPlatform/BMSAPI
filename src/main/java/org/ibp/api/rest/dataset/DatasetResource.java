@@ -151,17 +151,33 @@ public class DatasetResource {
 	@ApiOperation(value = "It will retrieve all the observation units", notes = "It will retrieve all the observation units including observations and props values in a format that will be used by the Observations table.")
 	@RequestMapping(value = "/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/table", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<ObservationUnitTable> getObservationUnitTable(@PathVariable final String cropname,
-		@PathVariable final Integer studyId, @PathVariable final Integer datasetId,
-		@RequestParam(value = "instanceId", required = false) final Integer instanceId,
-		@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "pageNumber",
-			required = false) final Integer pageNumber,
-		@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
-			required = false) final Integer pageSize,
-		@ApiParam(value = "Sort order. Name of the field to sorty by. Should be termId of the field", required = false) @RequestParam(value = "sortBy",
-			required = false) final String sortBy,
-		@ApiParam(value = "Sort order direction. asc/desc.", required = false) @RequestParam(value = "sortOrder",
-			required = false) final String sortOrder,
+	public ResponseEntity<ObservationUnitTable> getObservationUnitTable(@PathVariable final String cropname, //
+		@PathVariable final Integer studyId, //
+		@PathVariable final Integer datasetId, //
+
+		@RequestParam(required = false)  //
+		final Integer instanceId, //
+
+		@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION, required = false) //
+		@RequestParam(required = false) //
+		final Integer pageNumber, //
+
+		@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION, required = false) //
+		@RequestParam(required = false) //
+		final Integer pageSize, //
+
+		@ApiParam(value = "Sort order. Name of the field to sorty by. Should be termId of the field", required = false) //
+		@RequestParam(required = false) //
+		final String sortBy, //
+
+		@ApiParam(value = "Sort order direction. asc/desc.", required = false) //
+		@RequestParam(required = false) //
+		final String sortOrder, //
+
+		@ApiParam(required = false)
+		@RequestParam(required = false) //
+		final Boolean draftMode, //
+
 		final HttpServletRequest req) {
 
 		final PagedResult<ObservationUnitRow> pageResult =
@@ -169,14 +185,14 @@ public class DatasetResource {
 
 				@Override
 				public long getCount() {
-					return DatasetResource.this.studyDatasetService.countTotalObservationUnitsForDataset(datasetId, instanceId);
+					return DatasetResource.this.studyDatasetService.countTotalObservationUnitsForDataset(datasetId, instanceId, draftMode);
 				}
 
 				@Override
 				public List<ObservationUnitRow> getResults(final PagedResult<ObservationUnitRow> pagedResult) {
 					return DatasetResource.this.studyDatasetService
 							.getObservationUnitRows(studyId, datasetId, instanceId, pagedResult.getPageNumber(), pagedResult.getPageSize(),
-									sortBy, sortOrder);
+									sortBy, sortOrder, draftMode);
 				}
 			});
 
