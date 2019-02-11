@@ -397,7 +397,7 @@ public class DatasetServiceImpl implements DatasetService {
 					observationUnitsTableBuilder.getDuplicatedFoundNumber());
 		}
 		if (!errors.hasErrors()) {
-			this.middlewareDatasetService.importDataset(datasetId, table);
+			this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode());
 		} else {
 			throw new PreconditionFailedException(errors.getAllErrors());
 		}
