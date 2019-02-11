@@ -59,7 +59,7 @@ public class ObservationValidator {
 		if (observationDto != null) {
 			this.validateObservationValue(studyId, phenotype.getObservableId(), observationDto.getValue());
 			if (observationDto.getDraftValue() != null) {
-				this.validateObservationValue(studyId, phenotype.getObservableId(), observationDto.getValue());
+				this.validateObservationValue(studyId, phenotype.getObservableId(), observationDto.getDraftValue());
 			}
 		}
 	}
