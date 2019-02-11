@@ -247,9 +247,10 @@ public class DatasetServiceImplTest {
 	public void testGetObservations() {
 		final List<ObservationUnitRow> observationDtoTestData = mockObservationUnitRowList();
 
-		Mockito.doReturn(observationDtoTestData).when(this.middlewareDatasetService).getObservationUnitRows(TEST_STUDY_IDENTIFIER, 1, 1, 1, 100, null, null);
+		Mockito.doReturn(observationDtoTestData).when(this.middlewareDatasetService)
+			.getObservationUnitRows(TEST_STUDY_IDENTIFIER, 1, 1, 1, 100, null, null, null);
 		final List<org.ibp.api.rest.dataset.ObservationUnitRow> actualObservations =
-			this.studyDatasetService.getObservationUnitRows(TEST_STUDY_IDENTIFIER, 1, 1, 1, 100, null, null);
+			this.studyDatasetService.getObservationUnitRows(TEST_STUDY_IDENTIFIER, 1, 1, 1, 100, null, null, null);
 
 		Assert.assertEquals(this.mapObservationUnitRows(observationDtoTestData), actualObservations);
 
