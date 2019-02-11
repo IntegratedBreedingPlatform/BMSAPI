@@ -256,23 +256,33 @@ public class DatasetServiceImpl implements DatasetService {
 		return map;
 	}
 
-	void validateStudyDatasetAndInstances(final int studyId, final int datasetId, final List<Integer> instanceId, final boolean shouldBeSubObservation) {
+	void validateStudyDatasetAndInstances(final int studyId, final int datasetId, final List<Integer> instanceIds, final boolean shouldBeSubObservation) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, shouldBeSubObservation);
-		this.instanceValidator.validate(datasetId, new HashSet<>(instanceId));
+		if (instanceIds != null) {
+			this.instanceValidator.validate(datasetId, new HashSet<>(instanceIds));
+		}
 	}
 
 	@Override
 	public List<ObservationUnitRow> getObservationUnitRows(
-		final int studyId, final int datasetId, final int instanceId,
+		final int studyId, final int datasetId, final Integer instanceId,
 		final int pageNumber, final int pageSize, final String sortBy, final String sortOrder) {
-		this.validateStudyDatasetAndInstances(studyId, datasetId, Arrays.asList(instanceId), true);
+
+		List<Integer> instanceIds = null;
+		if (instanceId != null) {
+			instanceIds = Arrays.asList(instanceId);
+		}
+		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds, true);
+
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
 			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
+
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final List<ObservationUnitRow> list = new ArrayList<>();
 		this.mapObservationUnitRows(observationUnitRowMapper, observationUnitRows, list);
+
 		return list;
 	}
 

@@ -37,7 +37,7 @@ public interface DatasetService {
 
 	Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(final int studyId, final int datasetId, final List<Integer> instanceId);
 
-	List<ObservationUnitRow>  getObservationUnitRows(final int studyId, final int datasetId, final int instanceId, final int pageNumber,
+	List<ObservationUnitRow>  getObservationUnitRows(final int studyId, final int datasetId, final Integer instanceId, final int pageNumber,
 		final int pageSize, final String sortBy, final String sortOrder);
 
 	ObservationDto addObservation(Integer studyId, Integer datasetId, Integer observationUnitId, final ObservationDto observation);
