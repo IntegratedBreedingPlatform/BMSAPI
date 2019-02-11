@@ -36,7 +36,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -342,7 +341,7 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 						continue;
 					}
 					if (requiredField.equals(SEASON_FIELD.getId())) {
-						row.put(requiredField, study.getSeason().getLabel());
+						row.put(requiredField, (study.getSeason() != null) ? study.getSeason().getLabel() : "");
 						continue;
 					}
 					if (requiredField.equals(PARENTAGE_FIELD.getId())) {
