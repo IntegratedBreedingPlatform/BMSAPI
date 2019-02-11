@@ -7,6 +7,7 @@ import org.ibp.api.exception.NotSupportedException;
 import org.generationcp.middleware.domain.labelprinting.LabelPrintingType;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
+import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
@@ -116,7 +117,8 @@ public class LabelPrintingResource {
 		final LabelsFileGenerator labelsFileGenerator = this.getLabelsFileGenerator(fileExtension, labelPrintingStrategy);
 
 		labelPrintingStrategy.validateLabelsGeneratorInputData(labelsGeneratorInput);
-		final List<Map<String, String>> labelsData = labelPrintingStrategy.getLabelsData(labelsGeneratorInput);
+
+		final LabelsData labelsData = labelPrintingStrategy.getLabelsData(labelsGeneratorInput);
 		final File file = labelsFileGenerator.generate(labelsGeneratorInput, labelsData);
 		final HttpHeaders headers = new HttpHeaders();
 		headers

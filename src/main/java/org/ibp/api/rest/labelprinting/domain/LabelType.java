@@ -1,6 +1,5 @@
 package org.ibp.api.rest.labelprinting.domain;
 
-import org.ibp.api.rest.labelprinting.domain.Field;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 

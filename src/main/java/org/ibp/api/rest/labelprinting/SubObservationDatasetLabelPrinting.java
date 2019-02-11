@@ -1,5 +1,7 @@
 package org.ibp.api.rest.labelprinting;
 
+import com.google.common.collect.Maps;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dms.DataSetType;
@@ -10,12 +12,15 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
+import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
@@ -29,6 +34,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -71,7 +77,7 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 	@PostConstruct
 	void initStaticFields() {
 		final String studyNamePropValue = messageSource.getMessage("label.printing.field.study.name", null, LocaleContextHolder.getLocale());
-		final String yearPropValue = messageSource.getMessage("label.printing.field.year", null, LocaleContextHolder.getLocale());
+		final String yearPropValue= messageSource.getMessage("label.printing.field.year", null, LocaleContextHolder.getLocale());
 		final String seasonNamePropValue = messageSource.getMessage("label.printing.field.season", null, LocaleContextHolder.getLocale());
 		final String parentagePropValue = messageSource.getMessage("label.printing.field.parentage", null, LocaleContextHolder.getLocale());
 
@@ -136,7 +142,7 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 		}
-		// add validation for the file name
+		// Validation for the file name
 		if (!FileUtils.isFilenameValid(labelsGeneratorInput.getFileName())) {
 			errors.reject("common.error.invalid.filename.windows", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -256,8 +262,77 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 	}
 
 	@Override
-	public List<Map<String, String>> getLabelsData(final LabelsGeneratorInput labelsGeneratorInput) {
-		return null;
+	public LabelsData getLabelsData(final LabelsGeneratorInput labelsGeneratorInput) {
+		final StudyDetails study = studyDataManager.getStudyDetails(labelsGeneratorInput.getStudyId());
+
+		final DatasetDTO dataSetDTO = middlewareDatasetService.getDataset(labelsGeneratorInput.getDatasetId());
+		final String subObsDatasetUnitIdFieldKey =
+			DataSetType.findById(dataSetDTO.getDatasetTypeId()).getReadableName().concat(" ").concat(OBS_UNIT_ID);
+		final Map<Integer, StudyInstance> locationDbIdInstanceMap = Maps.uniqueIndex(dataSetDTO.getInstances(),
+			StudyInstance::getInstanceDbId);
+
+		final Set<Field> availableKeys = new HashSet<>();
+		this.getAvailableLabelFields(labelsGeneratorInput).forEach(labelType -> availableKeys.addAll(labelType.getFields()));
+
+		final Map<String, Field> termIdFieldMap = Maps.uniqueIndex(availableKeys, Field::getId);
+
+		final Set<String> allRequiredFields = new HashSet<>();
+		if (labelsGeneratorInput.getBarcodeFields() != null) {
+			allRequiredFields.addAll(labelsGeneratorInput.getBarcodeFields());
+		}
+		labelsGeneratorInput.getFields().forEach(f -> allRequiredFields.addAll(f));
+
+
+		final List<ObservationUnitRow> observationUnitRows =
+			this.middlewareDatasetService.getAllObservationUnitRows(labelsGeneratorInput.getStudyId(), labelsGeneratorInput.getDatasetId());
+
+		final List<Map<String, String>> results = new ArrayList<>();
+		for (final ObservationUnitRow observationUnitRow : observationUnitRows) {
+			final Map<String, String> row = new HashMap<>();
+			for (final String requiredField : allRequiredFields) {
+				final Field field = termIdFieldMap.get(requiredField);
+				if (NumberUtils.isNumber(requiredField)) {
+					// Special cases: LOCATION_NAME, OBS_UNIT_ID
+					final String value;
+					switch (field.getName()) {
+						case "LOCATION_NAME":
+							final Integer locationId = Integer.valueOf(observationUnitRow.getVariables().get("LOCATION_ID").getValue());
+							value = locationDbIdInstanceMap.get(locationId).getLocationName();
+							break;
+						case "OBS_UNIT_ID":
+							value = observationUnitRow.getVariables().get(subObsDatasetUnitIdFieldKey).getValue();
+							break;
+						default:
+							value = observationUnitRow.getVariables().get(field.getName()).getValue();
+					}
+					row.put(requiredField, value);
+				} else {
+					// If it is not a number it is a special case
+					// Year, Season, Study Name, Parentage, subObsDatasetUnitIdFieldKey
+					if (requiredField.equals(YEAR_FIELD.getId())) {
+						row.put(requiredField, study.getSeason().getLabel());
+						continue;
+					}
+					if (requiredField.equals(STUDY_NAME_FIELD.getId())) {
+						row.put(requiredField, study.getStudyName());
+						continue;
+					}
+					if (requiredField.equals(SEASON_FIELD.getId())) {
+						row.put(requiredField, study.getSeason().getLabel());
+						continue;
+					}
+					if (requiredField.equals(PARENTAGE_FIELD.getId())) {
+						continue;
+					}
+					if (requiredField.equals(subObsDatasetUnitIdFieldKey)) {
+						continue;
+					}
+				}
+			}
+			results.add(row);
+		}
+
+		return new LabelsData(subObsDatasetUnitIdFieldKey, results);
 	}
 
 	@Override
