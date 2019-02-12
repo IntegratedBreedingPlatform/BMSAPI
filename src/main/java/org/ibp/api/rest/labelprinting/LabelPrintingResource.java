@@ -127,7 +127,7 @@ public class LabelPrintingResource {
 			file = labelsFileGenerator.generate(labelsGeneratorInput, labelsData);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-			errors.reject("cannot.exportAsCSV.labelPrinting", "");
+			errors.reject("cannot.export.labelPrinting", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 		final HttpHeaders headers = new HttpHeaders();
