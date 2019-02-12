@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import org.generationcp.commons.util.FileUtils;
@@ -29,6 +30,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,17 @@ public abstract class AbstractDatasetExportService {
 
 	public static final String XLS = "xls";
 	public static final String CSV = "csv";
+	public static String[] TRAIT_FILE_HEADERS = {"trait", "format", "defaultValue", "minimum",
+		"maximum", "details", "categories", "isVisible", "realPosition"};
+
+	public static final List<Integer> DATA_TYPE_LIST = Arrays.asList(
+		TermId.NUMERIC_VARIABLE.getId(),
+		TermId.CATEGORICAL_VARIABLE.getId(), TermId.DATE_VARIABLE.getId(), TermId.CHARACTER_VARIABLE.getId());
+
+	public static final ImmutableMap<Integer, String> DATA_TYPE_FORMATS = ImmutableMap.<Integer, String> builder()
+		.put(TermId.CATEGORICAL_VARIABLE.getId(), "categorical").put(TermId.NUMERIC_VARIABLE.getId(), "numeric")
+		.put(TermId.DATE_VARIABLE.getId(), "date").put(TermId.CHARACTER_VARIABLE.getId(), "text")
+		.put(0, "unrecognized").build();
 
 	@Autowired
 	private StudyValidator studyValidator;
@@ -163,8 +176,7 @@ public abstract class AbstractDatasetExportService {
 
 	protected List<String[]> convertTraitAndSelectionVariablesData(final List<MeasurementVariable> variables) {
 		final List<String[]> data = new ArrayList<>();
-
-		data.add(DatasetFileGenerator.TRAIT_FILE_HEADERS.toArray(new String[] {}));
+		data.add(AbstractDatasetExportService.TRAIT_FILE_HEADERS);
 
 		// get name of breeding method property and get all methods
 		final String propertyName = this.ontologyDataManager.getProperty(TermId.BREEDING_METHOD_PROP.getId()).getName();
@@ -222,13 +234,11 @@ public abstract class AbstractDatasetExportService {
 	}
 
 	public String getDataTypeDescription(final MeasurementVariable trait) {
-		final Integer dataType;
-		if (trait.getDataTypeId() == null || !DatasetFileGenerator.DATA_TYPE_LIST.contains(trait.getDataTypeId())) {
+		Integer dataType = trait.getDataTypeId();
+		if (trait.getDataTypeId() == null || !AbstractDatasetExportService.DATA_TYPE_LIST.contains(trait.getDataTypeId())) {
 			dataType = 0;
-		} else {
-			dataType = trait.getDataTypeId();
 		}
-		return DatasetFileGenerator.DATA_TYPE_FORMATS.get(dataType);
+		return AbstractDatasetExportService.DATA_TYPE_FORMATS.get(dataType);
 	}
 
 	public List<MeasurementVariable> getTraitAndSelectionVariables(final int datasetId) {
