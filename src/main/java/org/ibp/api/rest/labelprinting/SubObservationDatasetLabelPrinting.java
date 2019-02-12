@@ -286,8 +286,12 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 		final Map<String, Field> termIdFieldMap = Maps.uniqueIndex(availableKeys, Field::getId);
 
 		final Set<String> allRequiredFields = new HashSet<>();
-		if (labelsGeneratorInput.getBarcodeFields() != null) {
-			allRequiredFields.addAll(labelsGeneratorInput.getBarcodeFields());
+		if (labelsGeneratorInput.isBarcodeRequired()) {
+			if (labelsGeneratorInput.isAutomaticBarcode()) {
+				allRequiredFields.add(subObsDatasetUnitIdFieldKey);
+			} else {
+				allRequiredFields.addAll(labelsGeneratorInput.getBarcodeFields());
+			}
 		}
 		labelsGeneratorInput.getFields().forEach(f -> allRequiredFields.addAll(f));
 

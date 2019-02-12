@@ -16,7 +16,7 @@ public interface LabelPrintingStrategy {
 	void validateLabelsInfoInputData(final LabelsInfoInput labelsInfoInput);
 
 	//This function could end being generic for all the strategies, so re-review for next implementation and make
-	//this interface an abstract class if needed. 
+	//this interface an abstract class if needed.
 	void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput);
 
 	LabelsNeededSummary getSummaryOfLabelsNeeded (final LabelsInfoInput labelsInfoInput);

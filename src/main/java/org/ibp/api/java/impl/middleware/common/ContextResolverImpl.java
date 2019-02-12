@@ -17,6 +17,11 @@ public class ContextResolverImpl implements ContextResolver {
 
 	@Override
 	public String resolveDatabaseFromUrl() throws ContextResolutionException {
+		return String.format(Constants.DB_NAME_FORMAT, resolveCropNameFromUrl());
+	}
+
+	@Override
+	public String resolveCropNameFromUrl() throws ContextResolutionException {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
 		if (request == null) {
@@ -41,6 +46,6 @@ public class ContextResolverImpl implements ContextResolver {
 		}
 		ContextHolder.setCurrentCrop(cropName);
 		ContextResolverImpl.LOG.debug("Crop Name: " + cropName);
-		return String.format(Constants.DB_NAME_FORMAT, cropName);
+		return cropName;
 	}
 }
