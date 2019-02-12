@@ -277,8 +277,6 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 		final DatasetDTO dataSetDTO = middlewareDatasetService.getDataset(labelsGeneratorInput.getDatasetId());
 		final String subObsDatasetUnitIdFieldKey =
 			DataSetType.findById(dataSetDTO.getDatasetTypeId()).getReadableName().concat(" ").concat(OBS_UNIT_ID);
-		final Map<Integer, StudyInstance> locationDbIdInstanceMap = Maps.uniqueIndex(dataSetDTO.getInstances(),
-			StudyInstance::getInstanceDbId);
 
 		final Set<Field> availableKeys = new HashSet<>();
 		this.getAvailableLabelFields(labelsGeneratorInput).forEach(labelType -> availableKeys.addAll(labelType.getFields()));
@@ -323,8 +321,7 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 					final String value;
 					switch (field.getId()) {
 						case "8190":
-							final Integer locationId = Integer.valueOf(observationUnitRow.getVariables().get("LOCATION_ID").getValue());
-							value = locationDbIdInstanceMap.get(locationId).getLocationName();
+							value = observationUnitRow.getVariables().get("LOCATION_ID").getValue();
 							break;
 						case "8201":
 							value = observationUnitRow.getVariables().get("PARENT_OBS_UNIT_ID").getValue();
