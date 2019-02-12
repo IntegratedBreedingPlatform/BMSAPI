@@ -30,9 +30,9 @@ public class DerivedVariableResource {
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestBody final CalculateVariableRequest request) {
 
-		this.derivedVariableService.execute(studyId, datasetId, request.getVariableId(), request.getGeoLocationIds());
+		final Map<String, Object> result = this.derivedVariableService.execute(studyId, datasetId, request.getVariableId(), request.getGeoLocationIds());
 
-		return new ResponseEntity<>(results, HttpStatus.OK);
+		return new ResponseEntity<>(result, HttpStatus.OK);
 
 	}
 

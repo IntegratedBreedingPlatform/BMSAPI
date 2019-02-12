@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
+import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -19,6 +20,7 @@ import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -30,6 +32,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,6 +41,8 @@ import java.util.Set;
 public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DerivedVariableServiceImpl.class);
+	public static final String INPUT_MISSING_DATA_RESULT_KEY = "inputMissingData";
+	public static final String HAS_DATA_OVERWRITE_RESULT_KEY = "hasDataOverwrite";
 
 	@Resource
 	private DatasetService datasetService;
@@ -57,14 +62,19 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	@Resource
 	private FormulaService formulaService;
 
+	@Resource
+	private ResourceBundleMessageSource resourceBundleMessageSource;
+
 	public DerivedVariableServiceImpl() {
 		// do nothing
 	}
 
 	@Override
-	public void execute(
+	public Map<String, Object> execute(
 		final int studyId, final int datasetId, final Integer variableId, final List<Integer> geoLocationIds) {
 
+		final Map<String, Object> results = new HashMap<>();
+		boolean hasExistingDataOverwrite = false;
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		this.studyValidator.validate(studyId, false);
@@ -122,7 +132,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 				// Process calculation result
 				final ObservationUnitData target = observation.getVariables().get(formula.getTarget().getName());
-				final MeasurementVariable targetMeasurementVariable = measurementVariablesMap.get(formula.getTarget().getTargetTermId());
+				final MeasurementVariable targetMeasurementVariable = measurementVariablesMap.get(formula.getTarget().getId());
 
 				if (targetMeasurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 					for (final ValueReference possibleValue : targetMeasurementVariable.getPossibleValues()) {
@@ -131,14 +141,16 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 							break;
 						}
 					}
-					this.datasetService.updatePhenotype(target.getObservationId(), Integer.valueOf(value), null);
+					this.saveCalculatedResult(
+						null, value != null ? Integer.valueOf(value) : null, observation.getObservationUnitId(), target.getObservationId(),
+						targetMeasurementVariable);
 				} else {
-					this.datasetService.updatePhenotype(target.getObservationId(), null, value);
+					this.saveCalculatedResult(
+						value, null, observation.getObservationUnitId(), target.getObservationId(), targetMeasurementVariable);
 				}
 
-				if (!target.getValue().equals(value) && !target.getValue().isEmpty()) {
-					errors.reject("study.execute.calculation.overwrite.data");
-					throw new ApiRequestValidationException(errors.getAllErrors());
+				if (StringUtils.isNotEmpty(target.getValue()) && !target.getValue().equals(value)) {
+					hasExistingDataOverwrite = true;
 				}
 
 			}
@@ -147,8 +159,32 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 		// Process response
 		if (!inputMissingData.isEmpty()) {
-			errors.reject("study.execute.calculation.missing.data", new String[] {StringUtils.join(inputMissingData.toArray(), ", ")}, "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			results.put(
+				INPUT_MISSING_DATA_RESULT_KEY, this.resourceBundleMessageSource
+					.getMessage("study.execute.calculation.missing.data", new String[] {StringUtils.join(inputMissingData.toArray())},
+						Locale.getDefault()));
+		}
+
+		results.put(HAS_DATA_OVERWRITE_RESULT_KEY, hasExistingDataOverwrite);
+
+		return results;
+
+	}
+
+	protected void saveCalculatedResult(
+		final String value, final Integer categoricalId, final Integer observationUnitId, final Integer observationId,
+		final MeasurementVariable measurementVariable) {
+
+		// Update phenotype if it already exists, otherwise, create new phenotype.
+		if (observationId != null) {
+			this.datasetService.updatePhenotype(observationId, categoricalId, value);
+		} else {
+			final ObservationDto observationDto = new ObservationDto();
+			observationDto.setVariableId(measurementVariable.getTermId());
+			observationDto.setCategoricalValueId(categoricalId);
+			observationDto.setObservationUnitId(observationUnitId);
+			observationDto.setValue(value);
+			this.datasetService.createPhenotype(observationDto);
 		}
 
 	}

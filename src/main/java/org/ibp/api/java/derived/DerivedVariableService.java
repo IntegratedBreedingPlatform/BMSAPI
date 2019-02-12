@@ -8,6 +8,6 @@ import java.util.Map;
 
 public interface DerivedVariableService {
 
-	void execute(
+	Map<String, Object> execute(
 		final int studyId, final int datasetId, final Integer variableId, final List<Integer> geoLocationIds);
 }
