@@ -10,11 +10,11 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
-import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
@@ -74,7 +74,6 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 
 	private static Field STUDY_NAME_FIELD;
 	private static Field YEAR_FIELD;
-	private static Field SEASON_FIELD;
 	private static Field PARENTAGE_FIELD;
 	private static List<Field> DEFAULT_STUDY_DETAILS_FIELDS;
 
@@ -87,15 +86,13 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 	void initStaticFields() {
 		final String studyNamePropValue = messageSource.getMessage("label.printing.field.study.name", null, LocaleContextHolder.getLocale());
 		final String yearPropValue= messageSource.getMessage("label.printing.field.year", null, LocaleContextHolder.getLocale());
-		final String seasonNamePropValue = messageSource.getMessage("label.printing.field.season", null, LocaleContextHolder.getLocale());
 		final String parentagePropValue = messageSource.getMessage("label.printing.field.parentage", null, LocaleContextHolder.getLocale());
 
 		STUDY_NAME_FIELD = new Field(studyNamePropValue, studyNamePropValue);
 		YEAR_FIELD = new Field(yearPropValue, yearPropValue);
-		SEASON_FIELD = new Field(seasonNamePropValue, seasonNamePropValue);
 		PARENTAGE_FIELD = new Field(parentagePropValue, parentagePropValue);
 
-		DEFAULT_STUDY_DETAILS_FIELDS = Arrays.asList(STUDY_NAME_FIELD, YEAR_FIELD, SEASON_FIELD);
+		DEFAULT_STUDY_DETAILS_FIELDS = Arrays.asList(STUDY_NAME_FIELD, YEAR_FIELD);
 	}
 
 	@Override
@@ -326,6 +323,16 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 						case "8201":
 							value = observationUnitRow.getVariables().get("PARENT_OBS_UNIT_ID").getValue();
 							break;
+						case "8371":
+							final String seasonStr = observationUnitRow.getVariables().get(field.getName()).getValue();
+							if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_DRY.getId()) {
+								value = Season.DRY.getDefinition().toUpperCase();
+							} else if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_WET.getId()) {
+								value = Season.WET.getDefinition().toUpperCase();
+							} else {
+								value = Season.GENERAL.getDefinition().toUpperCase();
+							}
+							break;
 						default:
 							value = observationUnitRow.getVariables().get(field.getName()).getValue();
 					}
@@ -339,10 +346,6 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 					}
 					if (requiredField.equals(STUDY_NAME_FIELD.getId())) {
 						row.put(requiredField, study.getStudyName());
-						continue;
-					}
-					if (requiredField.equals(SEASON_FIELD.getId())) {
-						row.put(requiredField, (study.getSeason() != null) ? study.getSeason().getLabel() : "");
 						continue;
 					}
 					if (requiredField.equals(PARENTAGE_FIELD.getId())) {
