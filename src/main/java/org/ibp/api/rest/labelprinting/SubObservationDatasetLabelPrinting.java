@@ -326,11 +326,11 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 						case "8371":
 							final String seasonStr = observationUnitRow.getVariables().get(field.getName()).getValue();
 							if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_DRY.getId()) {
-								value = Season.DRY.getDefinition().toUpperCase();
+								value = Season.DRY.getLabel().toUpperCase();
 							} else if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_WET.getId()) {
-								value = Season.WET.getDefinition().toUpperCase();
+								value = Season.WET.getLabel().toUpperCase();
 							} else {
-								value = Season.GENERAL.getDefinition().toUpperCase();
+								value = Season.GENERAL.getLabel().toUpperCase();
 							}
 							break;
 						default:
