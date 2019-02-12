@@ -188,30 +188,7 @@ public abstract class AbstractDatasetExportService {
 				traitAndSelectionVariablesData.add("");
 			}
 			traitAndSelectionVariablesData.add(""); // details
-			if (variable.getPossibleValues() != null && !variable.getPossibleValues().isEmpty()
-				&& !variable.getProperty().equals(propertyName)) {
-				final StringBuilder possibleValuesString = new StringBuilder();
-				for (final ValueReference value : variable.getPossibleValues()) {
-					if (possibleValuesString.length() > 0) {
-						possibleValuesString.append("/");
-					}
-					possibleValuesString.append(value.getName());
-				}
-
-				traitAndSelectionVariablesData.add(possibleValuesString.toString());
-			} else if (variable.getProperty().equals(propertyName)) {
-				final StringBuilder possibleValuesString = new StringBuilder();
-				// add code for breeding method properties
-				for (final Method method : methods) {
-					if (possibleValuesString.length() > 0) {
-						possibleValuesString.append("/");
-					}
-					possibleValuesString.append(method.getMcode());
-				}
-				traitAndSelectionVariablesData.add(possibleValuesString.toString());
-			} else {
-				traitAndSelectionVariablesData.add(""); // categories
-			}
+			traitAndSelectionVariablesData.add(this.gePossibleValuesString(propertyName, methods, variable));
 			traitAndSelectionVariablesData.add("TRUE");
 			traitAndSelectionVariablesData.add(String.valueOf(index));
 			index++;
@@ -219,6 +196,29 @@ public abstract class AbstractDatasetExportService {
 		}
 
 		return data;
+	}
+
+	private String gePossibleValuesString(
+		final String propertyName, final List<Method> methods, final MeasurementVariable variable) {
+		final StringBuilder possibleValuesString = new StringBuilder();
+		if (variable.getPossibleValues() != null && !variable.getPossibleValues().isEmpty()
+			&& !variable.getProperty().equals(propertyName)) {
+			for (final ValueReference value : variable.getPossibleValues()) {
+				if (possibleValuesString.length() > 0) {
+					possibleValuesString.append("/");
+				}
+				possibleValuesString.append(value.getName());
+			}
+		} else if (variable.getProperty().equals(propertyName)) {
+			// add code for breeding method properties
+			for (final Method method : methods) {
+				if (possibleValuesString.length() > 0) {
+					possibleValuesString.append("/");
+				}
+				possibleValuesString.append(method.getMcode());
+			}
+		}
+		return possibleValuesString.toString();
 	}
 
 	public String getDataTypeDescription(final MeasurementVariable trait) {
