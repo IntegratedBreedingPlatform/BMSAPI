@@ -38,7 +38,9 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 		final File temporaryFolder = Files.createTempDir();
 		final String sanitizedFileName = FileUtils.sanitizeFileName(String
 			.format("%s." + "csv", labelsGeneratorInput.getFileName()));
+
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
+
 		try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',')){
 
 			final Set<Field> availableKeys = new HashSet<>();
@@ -52,8 +54,8 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 
 			rowValues.add(this.getHeaderNames(labelsGeneratorInput,termIdFieldMap).toArray(new String[] {}));
 
-			for (final Map<String, String> lables : labelsData.getData()) {
-				rowValues.add(this.getColumnValues(lables, labelsGeneratorInput, labelsData.getDefaultBarcodeKey()));
+			for (final Map<String, String> labels : labelsData.getData()) {
+				rowValues.add(this.getColumnValues(labels, labelsGeneratorInput, labelsData.getDefaultBarcodeKey()));
 			}
 
 			csvWriter.writeAll(rowValues);
@@ -61,31 +63,28 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 		}
 	}
 
-	private String[] getColumnValues(final Map<String, String> lables, final LabelsGeneratorInput labelsGeneratorInput,
-		final String defaultBarcodeKey) {
+	private String[] getColumnValues(final Map<String, String> labels, final LabelsGeneratorInput labelsGeneratorInput, final String defaultBarcodeKey) {
 		final List<String> values = new LinkedList<>();
 		for (final List<String> fieldsList : labelsGeneratorInput.getFields()) {
 			for (final String field : fieldsList) {
-				values.add(lables.get(field));
+				values.add(labels.get(field));
 			}
 			if (labelsGeneratorInput.isBarcodeRequired()) {
 				if (labelsGeneratorInput.isAutomaticBarcode()) {
-					values.add(lables.get(defaultBarcodeKey));
+					values.add(labels.get(defaultBarcodeKey));
 				} else {
-					String barcode = "";
+					StringBuffer barcode = new StringBuffer();
 					for (String barcodeField : labelsGeneratorInput.getBarcodeFields()) {
-						if (StringUtils.isEmpty(barcode)) {
-							barcode = lables.get(barcodeField);
-						} else {
-							barcode = barcode + " | " + lables.get(barcodeField);
+						if (StringUtils.isEmpty(barcode.toString())) {
+							barcode.append(labels.get(barcodeField));
+							continue;
 						}
-
+						barcode.append(" | ").append(labels.get(barcodeField));
 					}
-					values.add(barcode);
+					values.add(barcode.toString());
 				}
 			}
 		}
-
 		return values.toArray(new String[] {});
 	}
 
