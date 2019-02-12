@@ -38,6 +38,7 @@ import org.springframework.validation.MapBindingResult;
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -104,13 +105,9 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	@Override
 	public void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput) {
 		this.validateLabelsInfoInputData(labelsGeneratorInput);
-		final List<LabelType> availableFields = this.getAvailableLabelTypes(labelsGeneratorInput);
 		final Set<String> availableKeys = new HashSet<>();
-		for (final LabelType labelType: availableFields) {
-			for (final Field field: labelType.getFields()) {
-				availableKeys.add(field.getId());
-			}
-		}
+		getAvailableLabelTypes(labelsGeneratorInput)
+				.forEach(labelType -> labelType.getFields().forEach(field -> availableKeys.add(field.getId())));
 		final Set<String> requestedFields = new HashSet<>();
 		int totalRequestedFields = 0;
 		for (final List<String> list: labelsGeneratorInput.getFields()) {
@@ -120,7 +117,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			}
 		}
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		if (totalRequestedFields == 0) {
+		if (requestedFields.size() == 0) {
 			//Error, at least one requested field is needed
 			errors.reject("label.fields.selection.empty", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -292,18 +289,10 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final List<ObservationUnitRow> observationUnitRows =
 			this.middlewareDatasetService.getAllObservationUnitRows(labelsGeneratorInput.getStudyId(), labelsGeneratorInput.getDatasetId());
 
-		Collections.sort(observationUnitRows, (observationUnitRow1, observationUnitRow2) -> {
-			int c;
-			c = Integer.valueOf(observationUnitRow1.getVariables().get("TRIAL_INSTANCE").getValue())
-				.compareTo(Integer.valueOf(observationUnitRow2.getVariables().get("TRIAL_INSTANCE").getValue()));
-			if (c == 0)
-				c = Integer.valueOf(observationUnitRow1.getVariables().get("PLOT_NO").getValue())
-					.compareTo(Integer.valueOf(observationUnitRow2.getVariables().get("PLOT_NO").getValue()));
-			if (c == 0)
-				c = Integer.valueOf(observationUnitRow1.getVariables().get("ENTRY_NO").getValue())
-					.compareTo(Integer.valueOf(observationUnitRow2.getVariables().get("ENTRY_NO").getValue()));
-			return c;
-		});
+		Collections.sort(observationUnitRows,
+				Comparator.comparing((ObservationUnitRow o) -> Integer.valueOf(o.getVariables().get("TRIAL_INSTANCE").getValue()))
+						.thenComparing(o -> Integer.valueOf(o.getVariables().get("PLOT_NO").getValue()))
+						.thenComparing(o -> Integer.valueOf(o.getVariables().get("ENTRY_NO").getValue())));
 
 		final List<Map<String, String>> results = new LinkedList<>();
 		for (final ObservationUnitRow observationUnitRow : observationUnitRows) {

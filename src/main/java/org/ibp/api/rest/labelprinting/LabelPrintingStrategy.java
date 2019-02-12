@@ -38,7 +38,6 @@ public abstract class LabelPrintingStrategy {
 	Set<Field> getAllAvailableFields(final LabelsInfoInput labelsInfoInput) {
 		final Set<Field> availableFields = new HashSet<>();
 		this.getAvailableLabelTypes(labelsInfoInput).forEach(labelType -> availableFields.addAll(labelType.getFields()));
-
 		return availableFields;
 	}
 
