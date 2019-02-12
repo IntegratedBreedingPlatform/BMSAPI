@@ -232,14 +232,7 @@ public abstract class AbstractDatasetExportService {
 	}
 
 	public List<MeasurementVariable> getTraitAndSelectionVariables(final int datasetId) {
-		final List<MeasurementVariable> traits =
-			this.datasetService.getMeasurementVariables(datasetId, Lists.newArrayList(VariableType.TRAIT.getId()));
-		final List<MeasurementVariable> selectionVariables =
-			this.datasetService.getMeasurementVariables(datasetId, Lists.newArrayList(VariableType.SELECTION_METHOD.getId()));
-		final List<MeasurementVariable> allVariables = new ArrayList<>();
-		allVariables.addAll(traits);
-		allVariables.addAll(selectionVariables);
-		return allVariables;
+		return this.datasetService.getMeasurementVariables(datasetId, Lists.newArrayList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 	}
 	
 	protected List<MeasurementVariable> moveSelectedVariableInTheFirstColumn(List<MeasurementVariable> columns, final int variableId) {
