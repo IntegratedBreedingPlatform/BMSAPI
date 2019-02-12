@@ -5,6 +5,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.commons.util.FileUtils;
 import org.ibp.api.exception.NotSupportedException;
 import org.generationcp.middleware.domain.labelprinting.LabelPrintingType;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +121,15 @@ public class LabelPrintingResource {
 		labelPrintingStrategy.validateLabelsGeneratorInputData(labelsGeneratorInput);
 
 		final LabelsData labelsData = labelPrintingStrategy.getLabelsData(labelsGeneratorInput);
-		final File file = labelsFileGenerator.generate(labelsGeneratorInput, labelsData);
+
+		File file;
+		try {
+			file = labelsFileGenerator.generate(labelsGeneratorInput, labelsData);
+		} catch (final IOException e) {
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			errors.reject("cannot.exportAsCSV.labelPrinting", "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
 		final HttpHeaders headers = new HttpHeaders();
 		headers
 				.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
