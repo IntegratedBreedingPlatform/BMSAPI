@@ -1,13 +1,20 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
@@ -47,11 +54,17 @@ public abstract class AbstractDatasetExportService {
 	@Autowired
 	protected DatasetCollectionOrderService datasetCollectionOrderService;
 
+	@Autowired
+	protected OntologyDataManager ontologyDataManager;
+
 	@Resource
 	protected org.generationcp.middleware.service.api.dataset.DatasetService datasetService;
 
 	@Resource
 	protected StudyDataManager studyDataManager;
+
+	@Resource
+	protected FieldbookService fieldbookService;
 
 	protected ZipUtil zipUtil = new ZipUtil();
 
@@ -115,6 +128,17 @@ public abstract class AbstractDatasetExportService {
 				generator.generateSingleInstanceFile(study.getId(), dataSetDto, columns, observationUnitRowMap.get(instanceDBID), fileNameFullPath));
 		}
 
+		if(this instanceof DatasetKSUCSVExportServiceImpl || this instanceof DatasetKSUExcelExportServiceImpl) {
+			final String sanitizedTraitsAndSelectionFilename = FileUtils.sanitizeFileName(String
+				.format(
+					"%s_%s_%s.trt", study.getName(), DataSetType.findById(dataSetDto.getDatasetTypeId()).getReadableName(),
+					dataSetDto.getName()));
+			final String traitsAndSelectionFilename =
+				temporaryFolder.getAbsolutePath() + File.separator + sanitizedTraitsAndSelectionFilename;
+			final List<MeasurementVariable> traitAndSelectionVariables = this.getTraitAndSelectionVariables(dataSetDto.getDatasetId());
+			files.add(
+				generator.generateTraitAndSelectionVariablesFile(this.convertTraitsData(traitAndSelectionVariables), traitsAndSelectionFilename));
+		}
 		if (files.size() == 1) {
 			return files.get(0);
 		} else {
@@ -137,6 +161,87 @@ public abstract class AbstractDatasetExportService {
 		return studyInstanceMap;
 	}
 
+	protected List<String[]> convertTraitsData(final List<MeasurementVariable> variables) {
+		final List<String[]> data = new ArrayList<>();
+
+		data.add(DatasetFileGenerator.TRAIT_FILE_HEADERS.toArray(new String[] {}));
+
+		// get name of breeding method property and get all methods
+		final String propertyName = this.ontologyDataManager.getProperty(TermId.BREEDING_METHOD_PROP.getId()).getName();
+		final List<Method> methods = this.fieldbookService.getAllBreedingMethods(false);
+
+		int index = 1;
+		for (final MeasurementVariable variable : variables) {
+			final List<String> traitData = new ArrayList<>();
+			traitData.add(variable.getName());
+			traitData.add(this.getDataTypeDescription(variable));
+			// default value
+			traitData.add("");
+			if (variable.getMinRange() != null) {
+				traitData.add(variable.getMinRange().toString());
+			} else {
+				traitData.add("");
+			}
+			if (variable.getMaxRange() != null) {
+				traitData.add(variable.getMaxRange().toString());
+			} else {
+				traitData.add("");
+			}
+			traitData.add(""); // details
+			if (variable.getPossibleValues() != null && !variable.getPossibleValues().isEmpty()
+				&& !variable.getProperty().equals(propertyName)) {
+				final StringBuilder possibleValuesString = new StringBuilder();
+				for (final ValueReference value : variable.getPossibleValues()) {
+					if (possibleValuesString.length() > 0) {
+						possibleValuesString.append("/");
+					}
+					possibleValuesString.append(value.getName());
+				}
+
+				traitData.add(possibleValuesString.toString());
+			} else if (variable.getProperty().equals(propertyName)) {
+				final StringBuilder possibleValuesString = new StringBuilder();
+				// add code for breeding method properties
+				for (final Method method : methods) {
+					if (possibleValuesString.length() > 0) {
+						possibleValuesString.append("/");
+					}
+					possibleValuesString.append(method.getMcode());
+				}
+				traitData.add(possibleValuesString.toString());
+			} else {
+				traitData.add(""); // categories
+			}
+			traitData.add("TRUE");
+			traitData.add(String.valueOf(index));
+			index++;
+			data.add(traitData.toArray(new String[] {}));
+		}
+
+		return data;
+	}
+
+	public String getDataTypeDescription(final MeasurementVariable trait) {
+		final Integer dataType;
+		if (trait.getDataTypeId() == null || !DatasetFileGenerator.DATA_TYPE_LIST.contains(trait.getDataTypeId())) {
+			dataType = 0;
+		} else {
+			dataType = trait.getDataTypeId();
+		}
+		return DatasetFileGenerator.DATA_TYPE_FORMATS.get(dataType);
+	}
+
+	public List<MeasurementVariable> getTraitAndSelectionVariables(final int datasetId) {
+		final List<MeasurementVariable> traits =
+			this.datasetService.getMeasurementVariables(datasetId, Lists.newArrayList(VariableType.TRAIT.getId()));
+		final List<MeasurementVariable> selectionVariables =
+			this.datasetService.getMeasurementVariables(datasetId, Lists.newArrayList(VariableType.SELECTION_METHOD.getId()));
+		final List<MeasurementVariable> allVariables = new ArrayList<>();
+		allVariables.addAll(traits);
+		allVariables.addAll(selectionVariables);
+		return allVariables;
+	}
+	
 	protected List<MeasurementVariable> moveSelectedVariableInTheFirstColumn(List<MeasurementVariable> columns, final int variableId) {
 		int trialInstanceIndex = 0;
 		for(MeasurementVariable column: columns) {

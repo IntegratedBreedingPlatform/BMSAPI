@@ -109,6 +109,12 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		return null;
 	}
 
+	@Override
+	public File generateTraitAndSelectionVariablesFile(final List<String[]> rowValues, final String filenamePath) throws IOException{
+		//Do Nothing. This file is not needed for Subobservation Excel Download
+		return null;
+	}
+
 	private List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns) {
 		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
 		final List<MeasurementVariable> trait = new ArrayList<>();

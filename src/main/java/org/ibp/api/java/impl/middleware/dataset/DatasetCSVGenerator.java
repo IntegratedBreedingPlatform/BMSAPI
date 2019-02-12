@@ -42,6 +42,12 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 	}
 
 	@Override
+	public File generateTraitAndSelectionVariablesFile(final List<String[]> rowValues, final String filenamePath) throws IOException{
+		//Do Nothing. This file is not needed for Subobservation CSV Download
+		return null;
+	}
+
+	@Override
 	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
 		final String fileNameFullPath) throws IOException {
 		final List<ObservationUnitRow> allObservationUnitRows = new ArrayList<>();

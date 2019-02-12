@@ -42,6 +42,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataMana
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.service.DataImportServiceImpl;
@@ -213,6 +214,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public GermplasmListManager getGermplasmListManager() {
 		return new GermplasmListManagerImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public ListDataProjectSaver getListDataProjectSaver() {
+		return new ListDataProjectSaver(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
