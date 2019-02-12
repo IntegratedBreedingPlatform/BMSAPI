@@ -48,7 +48,7 @@ import java.util.Set;
 
 @Component
 @Transactional
-public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy {
+public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 	@Autowired
 	private ResourceBundleMessageSource messageSource;
@@ -104,7 +104,7 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 	@Override
 	public void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput) {
 		this.validateLabelsInfoInputData(labelsGeneratorInput);
-		final List<LabelType> availableFields = this.getAvailableLabelFields(labelsGeneratorInput);
+		final List<LabelType> availableFields = this.getAvailableLabelTypes(labelsGeneratorInput);
 		final Set<String> availableKeys = new HashSet<>();
 		for (final LabelType labelType: availableFields) {
 			for (final Field field: labelType.getFields()) {
@@ -218,7 +218,7 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 	}
 
 	@Override
-	public List<LabelType> getAvailableLabelFields(final LabelsInfoInput labelsInfoInput) {
+	public List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput) {
 		final List<LabelType> labelTypes = new LinkedList<>();
 
 		final String studyDetailsPropValue = messageSource.getMessage("label.printing.study.details", null, LocaleContextHolder.getLocale());
@@ -275,20 +275,17 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 		final String subObsDatasetUnitIdFieldKey =
 			DataSetType.findById(dataSetDTO.getDatasetTypeId()).getReadableName().concat(" ").concat(OBS_UNIT_ID);
 
-		final Set<Field> availableKeys = new HashSet<>();
-		this.getAvailableLabelFields(labelsGeneratorInput).forEach(labelType -> availableKeys.addAll(labelType.getFields()));
+		final Map<String, Field> termIdFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), Field::getId);
 
-		final Map<String, Field> termIdFieldMap = Maps.uniqueIndex(availableKeys, Field::getId);
-
-		final Set<String> allRequiredFields = new HashSet<>();
+		final Set<String> allRequiredKeys = new HashSet<>();
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
-				allRequiredFields.add(subObsDatasetUnitIdFieldKey);
+				allRequiredKeys.add(subObsDatasetUnitIdFieldKey);
 			} else {
-				allRequiredFields.addAll(labelsGeneratorInput.getBarcodeFields());
+				allRequiredKeys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}
 		}
-		labelsGeneratorInput.getFields().forEach(f -> allRequiredFields.addAll(f));
+		labelsGeneratorInput.getFields().forEach(f -> allRequiredKeys.addAll(f));
 
 		final Map<String, String> gidPedigreeMap = new HashMap<>();
 
@@ -311,7 +308,7 @@ public class SubObservationDatasetLabelPrinting implements LabelPrintingStrategy
 		final List<Map<String, String>> results = new LinkedList<>();
 		for (final ObservationUnitRow observationUnitRow : observationUnitRows) {
 			final Map<String, String> row = new HashMap<>();
-			for (final String requiredField : allRequiredFields) {
+			for (final String requiredField : allRequiredKeys) {
 				final Field field = termIdFieldMap.get(requiredField);
 				if (NumberUtils.isNumber(requiredField)) {
 					// Special cases: LOCATION_NAME, PLOT OBS_UNIT_ID

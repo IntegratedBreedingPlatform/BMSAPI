@@ -1,11 +1,17 @@
 package org.ibp.api.rest.labelprinting.domain;
 
 import java.util.List;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
 public class LabelsGeneratorInput extends LabelsInfoInput {
+
+	@JsonIgnore
+	private Set<Field> allAvailablefields;
 
 	private List<List<String>> fields;
 
@@ -55,6 +61,14 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 
 	public void setFileName(final String fileName) {
 		this.fileName = fileName;
+	}
+
+	public Set<Field> getAllAvailablefields() {
+		return allAvailablefields;
+	}
+
+	public void setAllAvailablefields(final Set<Field> allAvailablefields) {
+		this.allAvailablefields = allAvailablefields;
 	}
 
 	@Override

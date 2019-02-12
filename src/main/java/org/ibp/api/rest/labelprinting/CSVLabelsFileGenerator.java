@@ -9,7 +9,6 @@ import org.generationcp.commons.util.FileUtils;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -18,20 +17,15 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by clarysabel on 2/7/19.
  */
 @Component
 public class CSVLabelsFileGenerator implements LabelsFileGenerator {
-
-	@Autowired
-	private LabelPrintingStrategy subObservationDatasetLabelPrinting;
 
 	@Override
 	public File generate(final LabelsGeneratorInput labelsGeneratorInput, final LabelsData labelsData) throws IOException {
@@ -43,10 +37,7 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 
 		try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',')){
 
-			final Set<Field> availableKeys = new HashSet<>();
-			subObservationDatasetLabelPrinting.getAvailableLabelFields(labelsGeneratorInput).forEach(labelType -> availableKeys.addAll(labelType.getFields()));
-
-			final Map<String, Field> termIdFieldMap = Maps.uniqueIndex(availableKeys, Field::getId);
+			final Map<String, Field> termIdFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), Field::getId);
 
 			final File newFile = new File(fileNameFullPath);
 			// feed in your array (or convert your data to an array)

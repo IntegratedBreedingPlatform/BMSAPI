@@ -97,7 +97,7 @@ public class LabelPrintingResource {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
 		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput);
-		final List<LabelType> labelTypes = labelPrintingStrategy.getAvailableLabelFields(labelsInfoInput);
+		final List<LabelType> labelTypes = labelPrintingStrategy.getAvailableLabelTypes(labelsInfoInput);
 
 		return new ResponseEntity<>(labelTypes, HttpStatus.OK);
 	}
@@ -119,6 +119,8 @@ public class LabelPrintingResource {
 		final LabelsFileGenerator labelsFileGenerator = this.getLabelsFileGenerator(fileExtension, labelPrintingStrategy);
 
 		labelPrintingStrategy.validateLabelsGeneratorInputData(labelsGeneratorInput);
+
+		labelsGeneratorInput.setAllAvailablefields(labelPrintingStrategy.getAllAvailableFields(labelsGeneratorInput));
 
 		final LabelsData labelsData = labelPrintingStrategy.getLabelsData(labelsGeneratorInput);
 
