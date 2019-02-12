@@ -56,9 +56,10 @@ public class DatasetResource {
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/table/columns", method = RequestMethod.GET)
 	public ResponseEntity<List<MeasurementVariable>> getSubObservationSetColumns(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
-		@PathVariable final Integer datasetId) {
+		@PathVariable final Integer datasetId,
+		@RequestParam(required = false) final Boolean draftMode) {
 
-		final List<MeasurementVariable> subObservationSetColumns = this.studyDatasetService.getSubObservationSetColumns(studyId, datasetId);
+		final List<MeasurementVariable> subObservationSetColumns = this.studyDatasetService.getSubObservationSetColumns(studyId, datasetId, draftMode);
 
 		return new ResponseEntity<>(subObservationSetColumns, HttpStatus.OK);
 	}

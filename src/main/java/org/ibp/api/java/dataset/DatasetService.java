@@ -17,7 +17,7 @@ import java.util.Set;
 
 public interface DatasetService {
 
-	List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId);
+	List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId, final Boolean draftMode);
 
 	long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> variableIds);
 
