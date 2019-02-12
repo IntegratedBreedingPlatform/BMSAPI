@@ -4,7 +4,6 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import liquibase.util.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.generationcp.commons.util.FileUtils;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
@@ -43,12 +42,10 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 			// feed in your array (or convert your data to an array)
 			final List<String[]> rowValues = new ArrayList<>();
 
-			rowValues.add(this.getHeaderNames(labelsGeneratorInput,termIdFieldMap).toArray(new String[] {}));
+			rowValues.add(this.getHeaderNames(labelsGeneratorInput, termIdFieldMap).toArray(new String[] {}));
 
-			for (final Map<String, String> labels : labelsData.getData()) {
-				rowValues.add(this.getColumnValues(labels, labelsGeneratorInput, labelsData.getDefaultBarcodeKey()));
-			}
-
+			labelsData.getData().forEach(
+					labels -> rowValues.add(this.getColumnValues(labels, labelsGeneratorInput, labelsData.getDefaultBarcodeKey())));
 			csvWriter.writeAll(rowValues);
 			return newFile;
 		}
@@ -57,9 +54,7 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 	private String[] getColumnValues(final Map<String, String> labels, final LabelsGeneratorInput labelsGeneratorInput, final String defaultBarcodeKey) {
 		final List<String> values = new LinkedList<>();
 		for (final List<String> fieldsList : labelsGeneratorInput.getFields()) {
-			for (final String field : fieldsList) {
-				values.add(labels.get(field));
-			}
+			fieldsList.forEach(field -> values.add(labels.get(field)));
 			if (labelsGeneratorInput.isBarcodeRequired()) {
 				if (labelsGeneratorInput.isAutomaticBarcode()) {
 					values.add(labels.get(defaultBarcodeKey));
@@ -82,19 +77,11 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 	protected List<String> getHeaderNames(final LabelsGeneratorInput labelsGeneratorInput, final Map<String, Field> termIdFieldMap) {
 		final List<String> headerNames = new LinkedList<>();
 		for (final List<String> headers : labelsGeneratorInput.getFields()) {
-			for (final String header : headers) {
-				if (NumberUtils.isNumber(header)) {
-					headerNames.add(termIdFieldMap.get(header).getName());
-				} else {
-					headerNames.add(header);
-				}
-			}
+			headers.forEach(header -> headerNames.add(termIdFieldMap.get(header).getName()));
 		}
-
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			headerNames.add("Barcode");
 		}
-
 		return headerNames;
 	}
 
