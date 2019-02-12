@@ -256,7 +256,28 @@ public abstract class AbstractDatasetExportService {
 
 	}
 
-	public abstract List<MeasurementVariable> getColumns(int studyId, int datasetId);
+	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
+		final DatasetDTO dataSetDTO = this.datasetService.getDataset(datasetId);
+		final int plotDatasetId = dataSetDTO.getParentDatasetId();
 
-	public abstract Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(Study study, DatasetDTO dataset, int collectionOrderId, Map<Integer, StudyInstance> selectedDatasetInstancesMap);
+		final List<MeasurementVariable> plotDataSetColumns =
+			this.datasetService
+				.getMeasurementVariables(plotDatasetId,
+					Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
+						VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId()));
+		final List<MeasurementVariable> subObservationSetColumns =
+			this.datasetService
+				.getMeasurementVariables(datasetId, Lists.newArrayList(
+					VariableType.GERMPLASM_DESCRIPTOR.getId(),
+					VariableType.OBSERVATION_UNIT.getId()));
+
+		final List<MeasurementVariable> allVariables = new ArrayList<>();
+		allVariables.addAll(plotDataSetColumns);
+		allVariables.addAll(subObservationSetColumns);
+		return this.moveSelectedVariableInTheFirstColumn(allVariables, TermId.OBS_UNIT_ID.getId());
+	}
+
+	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(final Study study, final DatasetDTO dataset, final int collectionOrderId, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
+		return this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataset.getDatasetId(), new ArrayList<>(selectedDatasetInstancesMap.keySet()));
+	}
 }
