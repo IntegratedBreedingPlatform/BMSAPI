@@ -1,8 +1,11 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetExportService;
@@ -45,12 +48,29 @@ public class DatasetKSUExcelExportServiceImpl extends AbstractDatasetExportServi
 
 	@Override
 	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
-		return new ArrayList<>();
+		final DatasetDTO dataSetDTO = this.datasetService.getDataset(datasetId);
+		final int plotDatasetId = dataSetDTO.getParentDatasetId();
+
+		final List<MeasurementVariable> plotDataSetColumns =
+			this.datasetService
+				.getMeasurementVariables(plotDatasetId,
+					Lists.newArrayList(
+						VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
+						VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId()));
+		final List<MeasurementVariable> subObservationSetColumns =
+			this.datasetService
+				.getMeasurementVariables(datasetId, Lists.newArrayList(
+					VariableType.GERMPLASM_DESCRIPTOR.getId(),
+					VariableType.OBSERVATION_UNIT.getId()));
+
+		final List<MeasurementVariable> allVariables = new ArrayList<>();
+		allVariables.addAll(plotDataSetColumns);
+		allVariables.addAll(subObservationSetColumns);
+		return this.moveSelectedVariableInTheFirstColumn(allVariables, TermId.OBS_UNIT_ID.getId());
 	}
 
 	@Override
 	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(final Study study, final DatasetDTO dataset, final int collectionOrderId, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = new HashMap<>();
-		return observationUnitRowMap;
+		return this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataset.getDatasetId(), new ArrayList<>(selectedDatasetInstancesMap.keySet()));
 	}
 }

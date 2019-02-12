@@ -137,6 +137,20 @@ public abstract class AbstractDatasetExportService {
 		return studyInstanceMap;
 	}
 
+	protected List<MeasurementVariable> moveSelectedVariableInTheFirstColumn(List<MeasurementVariable> columns, final int variableId) {
+		int trialInstanceIndex = 0;
+		for(MeasurementVariable column: columns) {
+			if(variableId == column.getTermId()) {
+				final MeasurementVariable trialInstanceMeasurementVariable = columns.remove(trialInstanceIndex);
+				columns.add(0, trialInstanceMeasurementVariable);
+				break;
+			}
+			trialInstanceIndex++;
+		}
+		return columns;
+
+	}
+
 	public abstract List<MeasurementVariable> getColumns(int studyId, int datasetId);
 
 	public abstract Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(Study study, DatasetDTO dataset, int collectionOrderId, Map<Integer, StudyInstance> selectedDatasetInstancesMap);

@@ -11,9 +11,9 @@ import java.util.Map;
 
 public interface DatasetFileGenerator {
 
-	File generateSingleInstanceFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
-		final List<ObservationUnitRow> observationUnitRows,
-		final String fileNamePath) throws IOException;
+	File generateSingleInstanceFile(Integer studyId, DatasetDTO dataSetDto, List<MeasurementVariable> columns,
+		List<ObservationUnitRow> observationUnitRows,
+		String fileNamePath) throws IOException;
 
 	File generateMultiInstanceFile(Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, List<MeasurementVariable> columns,
 		String fileNameFullPath) throws IOException;

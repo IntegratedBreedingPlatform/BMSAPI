@@ -90,7 +90,8 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 		final List<MeasurementVariable> orderedColumns = this.orderColumns(columns);
 		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto);
-		this.writeObservationSheet(orderedColumns, reorderedObservationUnitRows, xlsBook);
+		final Locale locale = LocaleContextHolder.getLocale();
+		this.writeObservationSheet(orderedColumns, reorderedObservationUnitRows, xlsBook, this.messageSource.getMessage("export.study.sheet.observation", null, locale));
 
 		final File file = new File(fileNamePath);
 
@@ -105,7 +106,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
 		final String fileNameFullPath) throws IOException {
 		//Do nothing. Implement for the singleFile download XLS option
-		return new File(fileNameFullPath);
+		return null;
 	}
 
 	private List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns) {
@@ -133,11 +134,10 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		return orderedColumns;
 	}
 
-	private void writeObservationSheet(
+	void writeObservationSheet(
 		final List<MeasurementVariable> columns, final List<ObservationUnitRow> reorderedObservationUnitRows,
-		final HSSFWorkbook xlsBook) {
-		final Locale locale = LocaleContextHolder.getLocale();
-		final HSSFSheet xlsSheet = xlsBook.createSheet(this.messageSource.getMessage("export.study.sheet.observation", null, locale));
+		final HSSFWorkbook xlsBook, final String sheetName) {
+		final HSSFSheet xlsSheet = xlsBook.createSheet(sheetName);
 		this.writeObservationHeader(xlsBook, xlsSheet, columns);
 		int currentRowNum = 1;
 		for (final ObservationUnitRow dataRow : reorderedObservationUnitRows) {
