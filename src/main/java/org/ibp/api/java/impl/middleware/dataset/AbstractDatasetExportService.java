@@ -137,7 +137,7 @@ public abstract class AbstractDatasetExportService {
 				temporaryFolder.getAbsolutePath() + File.separator + sanitizedTraitsAndSelectionFilename;
 			final List<MeasurementVariable> traitAndSelectionVariables = this.getTraitAndSelectionVariables(dataSetDto.getDatasetId());
 			files.add(
-				generator.generateTraitAndSelectionVariablesFile(this.convertTraitsData(traitAndSelectionVariables), traitsAndSelectionFilename));
+				generator.generateTraitAndSelectionVariablesFile(this.convertTraitAndSelectionVariablesData(traitAndSelectionVariables), traitsAndSelectionFilename));
 		}
 		if (files.size() == 1) {
 			return files.get(0);
@@ -161,7 +161,7 @@ public abstract class AbstractDatasetExportService {
 		return studyInstanceMap;
 	}
 
-	protected List<String[]> convertTraitsData(final List<MeasurementVariable> variables) {
+	protected List<String[]> convertTraitAndSelectionVariablesData(final List<MeasurementVariable> variables) {
 		final List<String[]> data = new ArrayList<>();
 
 		data.add(DatasetFileGenerator.TRAIT_FILE_HEADERS.toArray(new String[] {}));
@@ -172,22 +172,22 @@ public abstract class AbstractDatasetExportService {
 
 		int index = 1;
 		for (final MeasurementVariable variable : variables) {
-			final List<String> traitData = new ArrayList<>();
-			traitData.add(variable.getName());
-			traitData.add(this.getDataTypeDescription(variable));
+			final List<String> traitAndSelectionVariablesData = new ArrayList<>();
+			traitAndSelectionVariablesData.add(variable.getName());
+			traitAndSelectionVariablesData.add(this.getDataTypeDescription(variable));
 			// default value
-			traitData.add("");
+			traitAndSelectionVariablesData.add("");
 			if (variable.getMinRange() != null) {
-				traitData.add(variable.getMinRange().toString());
+				traitAndSelectionVariablesData.add(variable.getMinRange().toString());
 			} else {
-				traitData.add("");
+				traitAndSelectionVariablesData.add("");
 			}
 			if (variable.getMaxRange() != null) {
-				traitData.add(variable.getMaxRange().toString());
+				traitAndSelectionVariablesData.add(variable.getMaxRange().toString());
 			} else {
-				traitData.add("");
+				traitAndSelectionVariablesData.add("");
 			}
-			traitData.add(""); // details
+			traitAndSelectionVariablesData.add(""); // details
 			if (variable.getPossibleValues() != null && !variable.getPossibleValues().isEmpty()
 				&& !variable.getProperty().equals(propertyName)) {
 				final StringBuilder possibleValuesString = new StringBuilder();
@@ -198,7 +198,7 @@ public abstract class AbstractDatasetExportService {
 					possibleValuesString.append(value.getName());
 				}
 
-				traitData.add(possibleValuesString.toString());
+				traitAndSelectionVariablesData.add(possibleValuesString.toString());
 			} else if (variable.getProperty().equals(propertyName)) {
 				final StringBuilder possibleValuesString = new StringBuilder();
 				// add code for breeding method properties
@@ -208,14 +208,14 @@ public abstract class AbstractDatasetExportService {
 					}
 					possibleValuesString.append(method.getMcode());
 				}
-				traitData.add(possibleValuesString.toString());
+				traitAndSelectionVariablesData.add(possibleValuesString.toString());
 			} else {
-				traitData.add(""); // categories
+				traitAndSelectionVariablesData.add(""); // categories
 			}
-			traitData.add("TRUE");
-			traitData.add(String.valueOf(index));
+			traitAndSelectionVariablesData.add("TRUE");
+			traitAndSelectionVariablesData.add(String.valueOf(index));
 			index++;
-			data.add(traitData.toArray(new String[] {}));
+			data.add(traitAndSelectionVariablesData.toArray(new String[] {}));
 		}
 
 		return data;
