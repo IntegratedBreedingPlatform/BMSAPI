@@ -48,7 +48,7 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 	}
 
 	@Override
-	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(final Study study, final DatasetDTO dataset, final int collectionOrderId, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
+	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(final Study study, final DatasetDTO dataset, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = new HashMap<>();
 		for(final Integer instanceDBID: selectedDatasetInstancesMap.keySet()) {
 			final List<ObservationUnitRow> observationUnitRows =

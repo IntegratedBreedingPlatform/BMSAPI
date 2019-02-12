@@ -85,7 +85,7 @@ public abstract class AbstractDatasetExportService {
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap = getSelectedDatasetInstancesMap(dataSet.getInstances(),
 			instanceIds);
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
-			this.getObservationUnitRowMap(study, dataSet, collectionOrderId, selectedDatasetInstancesMap);
+			this.getObservationUnitRowMap(study, dataSet, selectedDatasetInstancesMap);
 		final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder = DatasetCollectionOrderServiceImpl.CollectionOrder.findById(collectionOrderId);
 		final int trialDatasetId = this.studyDataManager.getDataSetsByType(study.getId(), DataSetType.SUMMARY_DATA).get(0).getId();
 		this.datasetCollectionOrderService.reorder(collectionOrder, trialDatasetId, selectedDatasetInstancesMap, observationUnitRowMap);
@@ -270,7 +270,7 @@ public abstract class AbstractDatasetExportService {
 		return this.moveSelectedVariableInTheFirstColumn(allVariables, TermId.OBS_UNIT_ID.getId());
 	}
 
-	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(final Study study, final DatasetDTO dataset, final int collectionOrderId, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
+	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(final Study study, final DatasetDTO dataset, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
 		return this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataset.getDatasetId(), new ArrayList<>(selectedDatasetInstancesMap.keySet()));
 	}
 }
