@@ -70,6 +70,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 	private static final String ENVIRONMENT = "ENVIRONMENT";
 	private static final String PLOT = "PLOT";
 	private static final String BREEDING_METHOD_PROPERTY_NAME = "";
+	private static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
 
 	@Autowired
 	ResourceBundleMessageSource messageSource;
@@ -89,7 +90,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
 		final List<MeasurementVariable> orderedColumns = this.orderColumns(columns);
-		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto);
+		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto, (Integer.valueOf(reorderedObservationUnitRows.get(0).getVariables().get(TRIAL_INSTANCE).getValue()))-1);
 		this.writeObservationSheet(orderedColumns, reorderedObservationUnitRows, xlsBook);
 
 		final File file = new File(fileNamePath);
