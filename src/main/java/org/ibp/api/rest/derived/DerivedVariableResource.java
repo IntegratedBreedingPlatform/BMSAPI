@@ -22,15 +22,15 @@ public class DerivedVariableResource {
 	@Resource
 	private DerivedVariableService derivedVariableService;
 
-	@ApiOperation(value = "Get Dataset Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the dataset, "
-		+ "that will be shown in the Observation Table")
-	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/calculate", method = RequestMethod.POST)
+	@ApiOperation(value = "Execute Derived Variable", notes = "Execute the formula of a derived variable for each observation of specified instances.")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variable/calculate", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> calculate(
 		@PathVariable final String crop,
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestBody final CalculateVariableRequest request) {
 
-		final Map<String, Object> result = this.derivedVariableService.execute(studyId, datasetId, request.getVariableId(), request.getGeoLocationIds());
+		final Map<String, Object> result =
+			this.derivedVariableService.execute(studyId, datasetId, request.getVariableId(), request.getGeoLocationIds());
 
 		return new ResponseEntity<>(result, HttpStatus.OK);
 
