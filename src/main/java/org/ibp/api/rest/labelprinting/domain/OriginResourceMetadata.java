@@ -12,6 +12,9 @@ public class OriginResourceMetadata {
 
 	private Map<String, String> metadata;
 
+	public OriginResourceMetadata() {
+	}
+
 	public OriginResourceMetadata(final String defaultFileName, final Map<String, String> metadata) {
 		this.defaultFileName = defaultFileName;
 		this.metadata = metadata;

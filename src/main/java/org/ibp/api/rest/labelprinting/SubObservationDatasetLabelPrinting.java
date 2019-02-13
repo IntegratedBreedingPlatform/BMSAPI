@@ -82,14 +82,20 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 	private static String PLOT = "PLOT";
 	private static String OBS_UNIT_ID = "OBS_UNIT_ID";
+	private static String PARENT_OBS_UNIT_ID = "PARENT_OBS_UNIT_ID";
+	private static String LOCATION_ID = "LOCATION_ID";
+	private static String GID = "GID";
+	private static String TRIAL_INSTANCE = "TRIAL_INSTANCE";
+	private static String PLOT_NO = "PLOT_NO";
+	private static String ENTRY_NO = "ENTRY_NO";
 
 	private static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV);
 
 	@PostConstruct
 	void initStaticFields() {
-		final String studyNamePropValue = messageSource.getMessage("label.printing.field.study.name", null, LocaleContextHolder.getLocale());
-		final String yearPropValue= messageSource.getMessage("label.printing.field.year", null, LocaleContextHolder.getLocale());
-		final String parentagePropValue = messageSource.getMessage("label.printing.field.parentage", null, LocaleContextHolder.getLocale());
+		final String studyNamePropValue = this.getMessage("label.printing.field.study.name");
+		final String yearPropValue = this.getMessage("label.printing.field.year");
+		final String parentagePropValue = this.getMessage("label.printing.field.parentage");
 
 		STUDY_NAME_FIELD = new Field(studyNamePropValue, studyNamePropValue);
 		YEAR_FIELD = new Field(yearPropValue, yearPropValue);
@@ -115,41 +121,41 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		for (final List<String> list: labelsGeneratorInput.getFields()) {
 			for (final String key: list) {
 				requestedFields.add(key);
-				totalRequestedFields+=1;
+				totalRequestedFields++;
 			}
 		}
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		if (requestedFields.size() == 0) {
+		if (requestedFields.isEmpty()) {
 			//Error, at least one requested field is needed
-			errors.reject("label.fields.selection.empty", "");
+			errors.reject("label.fields.selection.empty", StringUtils.EMPTY);
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		if (!availableKeys.containsAll(requestedFields)) {
 			//Error, some of the requested fields are not available to use
-			errors.reject("label.fields.invalid", "");
+			errors.reject("label.fields.invalid", StringUtils.EMPTY);
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		if (totalRequestedFields != requestedFields.size()) {
 			// Error, duplicated requested field
-			errors.reject("label.fields.duplicated", "");
+			errors.reject("label.fields.duplicated", StringUtils.EMPTY);
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 		if (labelsGeneratorInput.isBarcodeRequired() && !labelsGeneratorInput.isAutomaticBarcode()) {
 			//Validate that at least one is selected
-			if (labelsGeneratorInput.getBarcodeFields().size() == 0) {
+			if (labelsGeneratorInput.getBarcodeFields().isEmpty()) {
 				errors.reject("barcode.fields.empty", "");
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 			//Validate that selected are availableFields
 			if (!availableKeys.containsAll(labelsGeneratorInput.getBarcodeFields())) {
 				//Error, some of the requested fields are not available to use
-				errors.reject("barcode.fields.invalid", "");
+				errors.reject("barcode.fields.invalid", StringUtils.EMPTY);
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 		}
 		// Validation for the file name
 		if (!FileUtils.isFilenameValid(labelsGeneratorInput.getFileName())) {
-			errors.reject("common.error.invalid.filename.windows", "");
+			errors.reject("common.error.invalid.filename.windows", StringUtils.EMPTY);
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
@@ -158,15 +164,13 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	public LabelsNeededSummary getSummaryOfLabelsNeeded(final LabelsInfoInput labelsInfoInput) {
 		final LabelsNeededSummary labelsNeededSummary = new LabelsNeededSummary();
 		final Map<String, Long> observationsByInstance =
-				middlewareDatasetService.countObservationsGroupedByInstance(labelsInfoInput.getDatasetId());
+			middlewareDatasetService.countObservationsGroupedByInstance(labelsInfoInput.getDatasetId());
 		long totalNumberOfLabelsNeeded = 0;
 		for (final String key : observationsByInstance.keySet()) {
-			final LabelsNeededSummary.Row row = new LabelsNeededSummary.Row();
-			row.setInstanceNumber(key);
-			row.setLabelsNeeded(observationsByInstance.get(key));
-			row.setSubObservationNumber(observationsByInstance.get(key));
+			final Long observationsPerInstance = observationsByInstance.get(key);
+			final LabelsNeededSummary.Row row = new LabelsNeededSummary.Row(key, observationsPerInstance, observationsPerInstance);
 			labelsNeededSummary.addRow(row);
-			totalNumberOfLabelsNeeded += observationsByInstance.get(key);
+			totalNumberOfLabelsNeeded += observationsPerInstance;
 		}
 		labelsNeededSummary.setTotalNumberOfLabelsNeeded(totalNumberOfLabelsNeeded);
 		return labelsNeededSummary;
@@ -174,16 +178,13 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 	@Override
 	public LabelsNeededSummaryResponse transformLabelsNeededSummary(final LabelsNeededSummary labelsNeededSummary) {
-		final String labelsNeededText = messageSource.getMessage("label.printing.labels.needed", null, LocaleContextHolder.getLocale());
-		final String environmentText = messageSource.getMessage("label.printing.environment", null, LocaleContextHolder.getLocale());
-		final String numberOfSubObsNeededText =
-				messageSource.getMessage("label.printing.number.of.subobservations.needed", null, LocaleContextHolder.getLocale());
-		final LabelsNeededSummaryResponse response = new LabelsNeededSummaryResponse();
+		final String labelsNeededText = this.getMessage("label.printing.labels.needed");
+		final String environmentText = this.getMessage("label.printing.environment");
+		final String numberOfSubObsNeededText = this.getMessage("label.printing.number.of.subobservations.needed");
 		final List<String> headers = new LinkedList<>();
 		headers.add(environmentText);
 		headers.add(numberOfSubObsNeededText);
 		headers.add(labelsNeededText);
-		response.setHeaders(headers);
 		final List<Map<String, String>> values = new LinkedList<>();
 		for (LabelsNeededSummary.Row row : labelsNeededSummary.getRows()) {
 			final Map<String, String> valuesMap = new LinkedHashMap<>();
@@ -192,9 +193,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			valuesMap.put(labelsNeededText, String.valueOf(row.getLabelsNeeded()));
 			values.add(valuesMap);
 		}
-		response.setValues(values);
-		response.setTotalNumberOfLabelsNeeded(labelsNeededSummary.getTotalNumberOfLabelsNeeded());
-		return response;
+		return new LabelsNeededSummaryResponse(headers, values, labelsNeededSummary.getTotalNumberOfLabelsNeeded());
 	}
 
 	@Override
@@ -205,15 +204,12 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final String defaultFileName = getDefaultFileName(datasetDTO);
 
 		final Map<String, String> resultsMap = new LinkedHashMap<>();
-		resultsMap.put(messageSource.getMessage("label.printing.name", null, LocaleContextHolder.getLocale()), study.getStudyName());
-		resultsMap.put(messageSource.getMessage("label.printing.title", null, LocaleContextHolder.getLocale()), study.getDescription());
-		resultsMap.put(messageSource.getMessage("label.printing.objective", null, LocaleContextHolder.getLocale()),
-				(study.getObjective() == null) ? StringUtils.EMPTY : study.getObjective());
-
-		resultsMap.put(messageSource.getMessage("label.printing.selected.dataset", null, LocaleContextHolder.getLocale()),
-				datasetDTO.getName());
-		resultsMap.put(messageSource.getMessage("label.printing.number.of.environments.in.dataset", null, LocaleContextHolder.getLocale()),
-				String.valueOf(datasetDTO.getInstances().size()));
+		resultsMap.put(getMessage("label.printing.name"), study.getStudyName());
+		resultsMap.put(getMessage("label.printing.title"), study.getDescription());
+		resultsMap.put(getMessage("label.printing.objective"), (study.getObjective() == null) ? StringUtils.EMPTY : study.getObjective());
+		resultsMap.put(getMessage("label.printing.selected.dataset"), datasetDTO.getName());
+		resultsMap.put(getMessage("label.printing.number.of.environments.in.dataset"),
+			String.valueOf(datasetDTO.getInstances().size()));
 
 		return new OriginResourceMetadata(defaultFileName, resultsMap);
 	}
@@ -222,8 +218,8 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	public List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput) {
 		final List<LabelType> labelTypes = new LinkedList<>();
 
-		final String studyDetailsPropValue = messageSource.getMessage("label.printing.study.details", null, LocaleContextHolder.getLocale());
-		final String datasetDetailsPropValue = messageSource.getMessage("label.printing.dataset.details", null, LocaleContextHolder.getLocale());
+		final String studyDetailsPropValue = getMessage("label.printing.study.details");
+		final String datasetDetailsPropValue = getMessage("label.printing.dataset.details");
 
 		final DatasetDTO dataSetDTO = middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId());
 		final int environmentDatasetId =
@@ -294,9 +290,9 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			this.middlewareDatasetService.getAllObservationUnitRows(labelsGeneratorInput.getStudyId(), labelsGeneratorInput.getDatasetId());
 
 		Collections.sort(observationUnitRows,
-				Comparator.comparing((ObservationUnitRow o) -> Integer.valueOf(o.getVariables().get("TRIAL_INSTANCE").getValue()))
-						.thenComparing(o -> Integer.valueOf(o.getVariables().get("PLOT_NO").getValue()))
-						.thenComparing(o -> Integer.valueOf(o.getVariables().get("ENTRY_NO").getValue())));
+				Comparator.comparing((ObservationUnitRow o) -> Integer.valueOf(o.getVariables().get(TRIAL_INSTANCE).getValue()))
+						.thenComparing(o -> Integer.valueOf(o.getVariables().get(PLOT_NO).getValue()))
+						.thenComparing(o -> Integer.valueOf(o.getVariables().get(ENTRY_NO).getValue())));
 
 		final List<Map<String, String>> results = new LinkedList<>();
 		for (final ObservationUnitRow observationUnitRow : observationUnitRows) {
@@ -304,34 +300,27 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			for (final String requiredField : allRequiredKeys) {
 				final Field field = termIdFieldMap.get(requiredField);
 				if (NumberUtils.isNumber(requiredField)) {
-					// Special cases: LOCATION_NAME, PLOT OBS_UNIT_ID
-					final String value;
-					switch (field.getId()) {
-						case "8190":
-							value = observationUnitRow.getVariables().get("LOCATION_ID").getValue();
-							break;
-						case "8201":
-							value = observationUnitRow.getVariables().get("PARENT_OBS_UNIT_ID").getValue();
-							break;
-						case "8371":
-							final String seasonStr = observationUnitRow.getVariables().get(field.getName()).getValue();
-							if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_DRY.getId()) {
-								value = Season.DRY.getLabel().toUpperCase();
-							} else if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_WET.getId()) {
-								value = Season.WET.getLabel().toUpperCase();
-							} else {
-								value = Season.GENERAL.getLabel().toUpperCase();
-							}
-							break;
-						default:
-							value = observationUnitRow.getVariables().get(field.getName()).getValue();
+					// Special cases: LOCATION_NAME, PLOT OBS_UNIT_ID, CROP_SEASON_CODE
+					final Integer termId = Integer.parseInt(requiredField);
+					if (TermId.getById(termId).equals(TermId.LOCATION_ID)) {
+						row.put(requiredField, observationUnitRow.getVariables().get(LOCATION_ID).getValue());
+						continue;
 					}
-					row.put(requiredField, value);
+					if (TermId.getById(termId).equals(TermId.OBS_UNIT_ID)) {
+						row.put(requiredField, observationUnitRow.getVariables().get(PARENT_OBS_UNIT_ID).getValue());
+						continue;
+					}
+					if (TermId.getById(termId).equals(TermId.SEASON_VAR)) {
+						row.put(requiredField, getSeason(observationUnitRow.getVariables().get(field.getName()).getValue()));
+						continue;
+					}
+					row.put(requiredField, observationUnitRow.getVariables().get(field.getName()).getValue());
+
 				} else {
-					// If it is not a number it is a special case
-					// Year, Season, Study Name, Parentage, subObsDatasetUnitIdFieldKey
+					// If it is not a number it is a hardcoded field
+					// Year, Study Name, Parentage, subObsDatasetUnitIdFieldKey
 					if (requiredField.equals(YEAR_FIELD.getId())) {
-						row.put(requiredField, (StringUtils.isNotEmpty(study.getStartDate())) ? study.getStartDate().substring(0,4): "");
+						row.put(requiredField, (StringUtils.isNotEmpty(study.getStartDate())) ? study.getStartDate().substring(0,4): StringUtils.EMPTY);
 						continue;
 					}
 					if (requiredField.equals(STUDY_NAME_FIELD.getId())) {
@@ -339,19 +328,12 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 						continue;
 					}
 					if (requiredField.equals(PARENTAGE_FIELD.getId())) {
-						final String gid = observationUnitRow.getVariables().get("GID").getValue();
-						String pedigree;
-						if (gidPedigreeMap.containsKey(gid)) {
-							pedigree = gidPedigreeMap.get(gid);
-						} else {
-							pedigree = pedigreeService.getCrossExpansion(Integer.valueOf(gid), crossExpansionProperties);
-							gidPedigreeMap.put(gid, pedigree);
-						}
-						row.put(requiredField, pedigree);
+						final String gid = observationUnitRow.getVariables().get(GID).getValue();
+						row.put(requiredField, this.getPedigree(gid, gidPedigreeMap));
 						continue;
 					}
 					if (requiredField.equals(subObsDatasetUnitIdFieldKey)) {
-						row.put(subObsDatasetUnitIdFieldKey, observationUnitRow.getVariables().get("OBS_UNIT_ID").getValue());
+						row.put(subObsDatasetUnitIdFieldKey, observationUnitRow.getVariables().get(OBS_UNIT_ID).getValue());
 						continue;
 					}
 				}
@@ -385,5 +367,32 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final String fileName = "Labels-for-".concat(datasetDTO.getName()).concat("-").concat(String.valueOf(datasetDTO.getInstances().size()))
 			.concat("-").concat(DateUtil.getCurrentDateAsStringValue());
 		return FileUtils.cleanFileName(fileName);
+	}
+
+	private String getMessage(final String code) {
+		return messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
+	}
+
+	private String getPedigree(final String gid, final Map<String, String> gidPedigreeMap) {
+		String pedigree;
+		if (gidPedigreeMap.containsKey(gid)) {
+			pedigree = gidPedigreeMap.get(gid);
+		} else {
+			pedigree = pedigreeService.getCrossExpansion(Integer.valueOf(gid), crossExpansionProperties);
+			gidPedigreeMap.put(gid, pedigree);
+		}
+		return pedigree;
+	}
+
+	private String getSeason(final String seasonStr) {
+		String value;
+		if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_DRY.getId()) {
+			value = Season.DRY.getLabel().toUpperCase();
+		} else if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_WET.getId()) {
+			value = Season.WET.getLabel().toUpperCase();
+		} else {
+			value = Season.GENERAL.getLabel().toUpperCase();
+		}
+		return value;
 	}
 }

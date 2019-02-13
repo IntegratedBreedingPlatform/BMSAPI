@@ -16,6 +16,15 @@ public class LabelsNeededSummary {
 		private Long subObservationNumber;
 		private Long labelsNeeded;
 
+		public Row() {
+		}
+
+		public Row(final String instanceNumber, final Long subObservationNumber, final Long labelsNeeded) {
+			this.instanceNumber = instanceNumber;
+			this.subObservationNumber = subObservationNumber;
+			this.labelsNeeded = labelsNeeded;
+		}
+
 		public String getInstanceNumber() {
 			return instanceNumber;
 		}

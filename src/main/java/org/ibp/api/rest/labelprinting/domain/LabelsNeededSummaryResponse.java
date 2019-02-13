@@ -15,6 +15,13 @@ public class LabelsNeededSummaryResponse {
 
 	private Long totalNumberOfLabelsNeeded;
 
+	public LabelsNeededSummaryResponse(
+		final List<String> headers, final List<Map<String, String>> values, final Long totalNumberOfLabelsNeeded) {
+		this.headers = headers;
+		this.values = values;
+		this.totalNumberOfLabelsNeeded = totalNumberOfLabelsNeeded;
+	}
+
 	public List<String> getHeaders() {
 		return headers;
 	}
