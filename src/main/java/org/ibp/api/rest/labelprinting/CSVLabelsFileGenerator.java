@@ -26,23 +26,25 @@ import java.util.Map;
 @Component
 public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 
+	private static String BARCODE = "Barcode";
+
 	@Override
 	public File generate(final LabelsGeneratorInput labelsGeneratorInput, final LabelsData labelsData) throws IOException {
 		final File temporaryFolder = Files.createTempDir();
-		final String sanitizedFileName = FileUtils.sanitizeFileName(String
-			.format("%s." + "csv", labelsGeneratorInput.getFileName()));
+		final String sanitizedFileName = FileUtils.sanitizeFileName(String.format("%s." + "csv", labelsGeneratorInput.getFileName()));
 
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 
-		try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',')){
+		try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8),
+				',')) {
 
-			final Map<String, Field> termIdFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), Field::getId);
+			final Map<String, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), Field::getId);
 
 			final File newFile = new File(fileNameFullPath);
 			// feed in your array (or convert your data to an array)
 			final List<String[]> rowValues = new ArrayList<>();
 
-			rowValues.add(this.getHeaderNames(labelsGeneratorInput, termIdFieldMap).toArray(new String[] {}));
+			rowValues.add(this.getHeaderNames(labelsGeneratorInput, keyFieldMap).toArray(new String[] {}));
 
 			labelsData.getData().forEach(
 					labels -> rowValues.add(this.getColumnValues(labels, labelsGeneratorInput, labelsData.getDefaultBarcodeKey())));
@@ -80,7 +82,7 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 			headers.forEach(header -> headerNames.add(termIdFieldMap.get(header).getName()));
 		}
 		if (labelsGeneratorInput.isBarcodeRequired()) {
-			headerNames.add("Barcode");
+			headerNames.add(BARCODE);
 		}
 		return headerNames;
 	}
