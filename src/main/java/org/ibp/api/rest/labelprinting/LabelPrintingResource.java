@@ -13,6 +13,7 @@ import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
+import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
@@ -68,7 +69,7 @@ public class LabelPrintingResource {
 	@ApiOperation(value = "Get the metadata according to the specified printing label type and the input in the request body",
 			notes = "Returns summary of labels needed according to the printing label type and input in the request body.")
 	@ResponseBody
-	public ResponseEntity<Map<String, String>> getOriginResourceMetadada(
+	public ResponseEntity<OriginResourceMetadata> getOriginResourceMetadada(
 			@PathVariable
 			String cropname,
 			@PathVariable
@@ -78,9 +79,9 @@ public class LabelPrintingResource {
 
 		final LabelPrintingStrategy labelPrintingStrategy = this.getLabelPrintingStrategy(labelPrintingType);
 		labelPrintingStrategy.validateLabelsInfoInputData(labelsInfoInput);
-		final Map<String, String> metadata = labelPrintingStrategy.getOriginResourceMetadata(labelsInfoInput);
+		final OriginResourceMetadata originResourceMetadata = labelPrintingStrategy.getOriginResourceMetadata(labelsInfoInput);
 
-		return new ResponseEntity<>(metadata, HttpStatus.OK);
+		return new ResponseEntity<>(originResourceMetadata, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/crops/{cropname}/labelPrinting/{labelPrintingType}/labelTypes", method = RequestMethod.POST)

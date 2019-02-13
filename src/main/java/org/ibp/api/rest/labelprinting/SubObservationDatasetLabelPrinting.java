@@ -3,6 +3,7 @@ package org.ibp.api.rest.labelprinting;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.util.DateUtil;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -27,6 +28,7 @@ import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
+import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -196,9 +198,11 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	}
 
 	@Override
-	public Map<String, String> getOriginResourceMetadata(final LabelsInfoInput labelsInfoInput) {
+	public OriginResourceMetadata getOriginResourceMetadata(final LabelsInfoInput labelsInfoInput) {
 		final StudyDetails study = studyDataManager.getStudyDetails(labelsInfoInput.getStudyId());
 		final DatasetDTO datasetDTO = middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId());
+
+		final String defaultFileName = getDefaultFileName(datasetDTO);
 
 		final Map<String, String> resultsMap = new LinkedHashMap<>();
 		resultsMap.put(messageSource.getMessage("label.printing.name", null, LocaleContextHolder.getLocale()), study.getStudyName());
@@ -211,7 +215,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		resultsMap.put(messageSource.getMessage("label.printing.number.of.environments.in.dataset", null, LocaleContextHolder.getLocale()),
 				String.valueOf(datasetDTO.getInstances().size()));
 
-		return resultsMap;
+		return new OriginResourceMetadata(defaultFileName, resultsMap);
 	}
 
 	@Override
@@ -375,5 +379,11 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			fields.add(field);
 		}
 		return fields;
+	}
+
+	private String getDefaultFileName(final DatasetDTO datasetDTO) {
+		final String fileName = "Labels-for-".concat(datasetDTO.getName()).concat("-").concat(String.valueOf(datasetDTO.getInstances().size()))
+			.concat("-").concat(DateUtil.getCurrentDateAsStringValue());
+		return FileUtils.cleanFileName(fileName);
 	}
 }

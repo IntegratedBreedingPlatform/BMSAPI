@@ -1,6 +1,5 @@
 package org.ibp.api.rest.labelprinting;
 
-import com.google.common.collect.Maps;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
@@ -9,10 +8,10 @@ import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
+import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public abstract class LabelPrintingStrategy {
@@ -27,7 +26,7 @@ public abstract class LabelPrintingStrategy {
 
 	abstract LabelsNeededSummaryResponse transformLabelsNeededSummary(final LabelsNeededSummary labelsNeededSummary);
 
-	abstract Map<String, String> getOriginResourceMetadata (final LabelsInfoInput labelsInfoInput);
+	abstract OriginResourceMetadata getOriginResourceMetadata (final LabelsInfoInput labelsInfoInput);
 
 	abstract List<LabelType> getAvailableLabelTypes(final LabelsInfoInput labelsInfoInput);
 
