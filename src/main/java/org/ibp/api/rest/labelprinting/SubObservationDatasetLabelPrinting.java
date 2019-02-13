@@ -143,7 +143,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		if (labelsGeneratorInput.isBarcodeRequired() && !labelsGeneratorInput.isAutomaticBarcode()) {
 			//Validate that at least one is selected
 			if (labelsGeneratorInput.getBarcodeFields().isEmpty()) {
-				errors.reject("barcode.fields.empty", "");
+				errors.reject("barcode.fields.empty", StringUtils.EMPTY);
 				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 			//Validate that selected are availableFields
