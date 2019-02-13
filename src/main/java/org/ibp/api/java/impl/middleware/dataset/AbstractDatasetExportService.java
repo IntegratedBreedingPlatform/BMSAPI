@@ -200,7 +200,7 @@ public abstract class AbstractDatasetExportService {
 				traitAndSelectionVariablesData.add("");
 			}
 			traitAndSelectionVariablesData.add(""); // details
-			traitAndSelectionVariablesData.add(this.gePossibleValuesString(propertyName, methods, variable));
+			traitAndSelectionVariablesData.add(this.getPossibleValuesString(propertyName, methods, variable));
 			traitAndSelectionVariablesData.add("TRUE");
 			traitAndSelectionVariablesData.add(String.valueOf(index));
 			index++;
@@ -210,7 +210,7 @@ public abstract class AbstractDatasetExportService {
 		return data;
 	}
 
-	private String gePossibleValuesString(
+	protected String getPossibleValuesString(
 		final String propertyName, final List<Method> methods, final MeasurementVariable variable) {
 		final StringBuilder possibleValuesString = new StringBuilder();
 		if (variable.getPossibleValues() != null && !variable.getPossibleValues().isEmpty()
@@ -233,15 +233,15 @@ public abstract class AbstractDatasetExportService {
 		return possibleValuesString.toString();
 	}
 
-	public String getDataTypeDescription(final MeasurementVariable trait) {
-		Integer dataType = trait.getDataTypeId();
-		if (trait.getDataTypeId() == null || !AbstractDatasetExportService.DATA_TYPE_LIST.contains(trait.getDataTypeId())) {
+	protected String getDataTypeDescription(final MeasurementVariable variable) {
+		Integer dataType = variable.getDataTypeId();
+		if (variable.getDataTypeId() == null || !AbstractDatasetExportService.DATA_TYPE_LIST.contains(variable.getDataTypeId())) {
 			dataType = 0;
 		}
 		return AbstractDatasetExportService.DATA_TYPE_FORMATS.get(dataType);
 	}
 
-	public List<MeasurementVariable> getTraitAndSelectionVariables(final int datasetId) {
+	protected List<MeasurementVariable> getTraitAndSelectionVariables(final int datasetId) {
 		return this.datasetService.getMeasurementVariables(datasetId, Lists.newArrayList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 	}
 	
