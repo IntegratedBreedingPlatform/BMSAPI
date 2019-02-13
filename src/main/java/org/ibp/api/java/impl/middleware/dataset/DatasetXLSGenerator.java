@@ -90,7 +90,8 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
 		final List<MeasurementVariable> orderedColumns = this.orderColumns(columns);
-		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto, (Integer.valueOf(reorderedObservationUnitRows.get(0).getVariables().get(TRIAL_INSTANCE).getValue()))-1);
+		final Integer trialNumber = Integer.valueOf(reorderedObservationUnitRows.get(0).getVariables().get(TRIAL_INSTANCE).getValue());
+		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto, trialNumber);
 		this.writeObservationSheet(orderedColumns, reorderedObservationUnitRows, xlsBook);
 
 		final File file = new File(fileNamePath);
