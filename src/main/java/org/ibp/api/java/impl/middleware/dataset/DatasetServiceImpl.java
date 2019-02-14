@@ -410,6 +410,11 @@ public class DatasetServiceImpl implements DatasetService {
 		this.middlewareDatasetService.acceptDraftData(datasetId);
 	}
 
+	@Override
+	public void rejectDraftData(final Integer datasetId) {
+		this.middlewareDatasetService.rejectDraftData(datasetId);
+	}
+
 	private BindingResult processObservationsDataWarningsAsErrors(
 		final Table<String, String, String> table,
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData,

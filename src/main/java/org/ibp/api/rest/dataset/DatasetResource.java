@@ -293,4 +293,13 @@ public class DatasetResource {
 		this.studyDatasetService.acceptDraftData(datasetId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Reject draft value in sub-observation dataset", notes = "Reject information for the imported dataset")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/drafts/rejection", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> rejectDraftData(@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId) {
+		this.studyDatasetService.rejectDraftData(datasetId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 }
