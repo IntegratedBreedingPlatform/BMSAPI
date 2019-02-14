@@ -4,7 +4,9 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.OverwriteDataException;
 import org.ibp.api.java.derived.DerivedVariableService;
+import org.ibp.api.java.impl.middleware.derived.DerivedVariableServiceImpl;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,7 +44,8 @@ public class DerivedVariableResource {
 
 		try {
 			final Map<String, Object> result =
-				this.derivedVariableService.execute(studyId, datasetId, request.getVariableId(), request.getGeoLocationIds());
+				this.derivedVariableService
+					.execute(studyId, datasetId, request.getVariableId(), request.getGeoLocationIds(), request.isOverwriteExistingData());
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (final ApiRequestValidationException e) {
 			final ErrorResponse errorResponse = new ErrorResponse();
@@ -49,6 +53,10 @@ public class DerivedVariableResource {
 			errorResponse.addError(
 				resourceBundleMessageSource.getMessage(objectError.getCode(), objectError.getArguments(), LocaleContextHolder.getLocale()));
 			return new ResponseEntity(errorResponse, HttpStatus.CONFLICT);
+		} catch (final OverwriteDataException e2) {
+			final Map<String, Object> result = new HashMap<>();
+			result.put(DerivedVariableServiceImpl.HAS_DATA_OVERWRITE_RESULT_KEY, true);
+			return new ResponseEntity<>(result, HttpStatus.OK);
 		}
 
 	}

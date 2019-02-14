@@ -7,7 +7,8 @@ import java.util.Set;
 public interface DerivedVariableService {
 
 	Map<String, Object> execute(
-		final int studyId, final int datasetId, final Integer variableId, final List<Integer> geoLocationIds);
+		final int studyId, final int datasetId, final Integer variableId, final List<Integer> geoLocationIds,
+		final boolean overwriteExistingData);
 
 	Set<String> getDependencyVariables(final int studyId, final int datasetId);
 

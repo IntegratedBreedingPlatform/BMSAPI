@@ -16,6 +16,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.OverwriteDataException;
 import org.ibp.api.java.derived.DerivedVariableService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
@@ -42,8 +43,8 @@ import java.util.Set;
 public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DerivedVariableServiceImpl.class);
-	public static final String INPUT_MISSING_DATA_RESULT_KEY = "inputMissingData";
 	public static final String HAS_DATA_OVERWRITE_RESULT_KEY = "hasDataOverwrite";
+	public static final String INPUT_MISSING_DATA_RESULT_KEY = "inputMissingData";
 
 	@Resource
 	private DatasetService datasetService;
@@ -72,10 +73,10 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 	@Override
 	public Map<String, Object> execute(
-		final int studyId, final int datasetId, final Integer variableId, final List<Integer> geoLocationIds) {
+		final int studyId, final int datasetId, final Integer variableId, final List<Integer> geoLocationIds,
+		final boolean overwriteExistingData) {
 
 		final Map<String, Object> results = new HashMap<>();
-		boolean hasExistingDataOverwrite = false;
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		this.studyValidator.validate(studyId, false);
@@ -143,7 +144,8 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 						}
 					}
 					this.saveCalculatedResult(
-						null, value != null ? Integer.valueOf(value) : null, observation.getObservationUnitId(), target.getObservationId(),
+						null, value != null ? Integer.valueOf(value) : null, observation.getObservationUnitId(),
+						target.getObservationId(),
 						targetMeasurementVariable);
 				} else {
 					this.saveCalculatedResult(
@@ -151,7 +153,16 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 				}
 
 				if (StringUtils.isNotEmpty(target.getValue()) && !target.getValue().equals(value)) {
-					hasExistingDataOverwrite = true;
+					if (!overwriteExistingData) {
+						// If there is an existing measurement data and the user did not explicitly choose to overwrite it, then throw a runtime exception
+						// to rollback transaction so to prevent saving of calculated value.
+						errors.reject("study.execute.calculation.has.existing.data");
+						throw new OverwriteDataException(errors.getAllErrors());
+					} else {
+						// Else, just warn the user that there's data to overwrite.
+						results.put(HAS_DATA_OVERWRITE_RESULT_KEY, true);
+					}
+
 				}
 
 			}
@@ -160,13 +171,12 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 		// Process response
 		if (!inputMissingData.isEmpty()) {
+			// warn the user that there's missing data from input variables.
 			results.put(
 				INPUT_MISSING_DATA_RESULT_KEY, this.resourceBundleMessageSource
 					.getMessage("study.execute.calculation.missing.data", new String[] {StringUtils.join(inputMissingData.toArray())},
 						Locale.getDefault()));
 		}
-
-		results.put(HAS_DATA_OVERWRITE_RESULT_KEY, hasExistingDataOverwrite);
 
 		return results;
 

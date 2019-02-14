@@ -6,6 +6,8 @@ public class CalculateVariableRequest {
 	private Integer variableId;
 	private List<Integer> geoLocationIds;
 
+	private boolean overwriteExistingData;
+
 	public Integer getVariableId() {
 		return this.variableId;
 	}
@@ -20,6 +22,14 @@ public class CalculateVariableRequest {
 
 	public void setGeoLocationIds(final List<Integer> geoLocationIds) {
 		this.geoLocationIds = geoLocationIds;
+	}
+
+	public boolean isOverwriteExistingData() {
+		return overwriteExistingData;
+	}
+
+	public void setOverwriteExistingData(final boolean overwriteExistingData) {
+		this.overwriteExistingData = overwriteExistingData;
 	}
 
 }
