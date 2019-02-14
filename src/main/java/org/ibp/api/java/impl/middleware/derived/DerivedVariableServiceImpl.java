@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
+import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
@@ -168,6 +169,41 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		results.put(HAS_DATA_OVERWRITE_RESULT_KEY, hasExistingDataOverwrite);
 
 		return results;
+
+	}
+
+	@Override
+	public Set<String> getDependencyVariables(final int studyId, final int datasetId) {
+
+		this.studyValidator.validate(studyId, false);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
+
+		final Set<Integer> variableIdsOfTraitsInStudy = this.getVariableIdsOfTraitsInDataset(datasetId);
+		final Set<String> derivedVariablesDependencies = new HashSet<>();
+
+		final Set<FormulaVariable> formulaVariables = this.formulaService.getAllFormulaVariables(variableIdsOfTraitsInStudy);
+		for (final FormulaVariable formulaVariable : formulaVariables) {
+			if (!variableIdsOfTraitsInStudy.contains(formulaVariable.getId())) {
+				derivedVariablesDependencies.add(formulaVariable.getName());
+			}
+		}
+
+		return derivedVariablesDependencies;
+	}
+
+	protected Set<Integer> getVariableIdsOfTraitsInDataset(final int datasetId) {
+
+		final Set<Integer> variableIdsOfTraitsInDataset = new HashSet<>();
+		final List<MeasurementVariable> traits =
+			datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()));
+
+		if (!traits.isEmpty()) {
+			for (final MeasurementVariable trait : traits) {
+				variableIdsOfTraitsInDataset.add(trait.getTermId());
+			}
+		}
+
+		return variableIdsOfTraitsInDataset;
 
 	}
 
