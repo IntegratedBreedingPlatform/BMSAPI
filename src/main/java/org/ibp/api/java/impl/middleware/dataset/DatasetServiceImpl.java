@@ -91,6 +91,18 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public List<MeasurementVariable> getSubObservationSetVariables(
+		final Integer studyId, final Integer subObservationSetId) {
+
+		this.studyValidator.validate(studyId, false);
+
+		// TODO generalize to any obs dataset (plot/subobs), make 3rd param false
+		this.datasetValidator.validateDataset(studyId, subObservationSetId, true);
+
+		return this.middlewareDatasetService.getSubObservationSetVariables(subObservationSetId);
+	}
+
+	@Override
 	public long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);

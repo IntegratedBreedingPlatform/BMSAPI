@@ -44,7 +44,7 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 
 	@Override
 	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
-		return this.studyDatasetService.getSubObservationSetColumns(studyId, datasetId, false);
+		return this.studyDatasetService.getSubObservationSetVariables(studyId, datasetId);
 	}
 
 	@Override
