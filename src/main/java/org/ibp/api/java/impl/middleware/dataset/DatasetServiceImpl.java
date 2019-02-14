@@ -33,14 +33,11 @@ import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -77,9 +74,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private StudyDataManager studyDataManager;
-
-	@Resource
-	private ResourceBundleMessageSource resourceBundleMessageSource;
 
 	@Autowired
 	private ObservationsTableValidator observationsTableValidator;
@@ -162,7 +156,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, observationDto);
 		return this.middlewareDatasetService
-			.updatePhenotype(observationUnitId, observationId, observationDto);
+			.updatePhenotype(observationId, observationDto);
 
 	}
 
@@ -360,7 +354,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.observationsTableValidator.validateList(input.getData());
 
 		final List<MeasurementVariable> datasetMeasurementVariables =
-				this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId);
+			this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId);
 
 		if (datasetMeasurementVariables.isEmpty()) {
 			errors.reject("no.variables.dataset", null, "");
@@ -372,7 +366,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		// Get Map<OBS_UNIT_ID, Observations>
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = this.middlewareDatasetService
-				.getObservationUnitsAsMap(datasetId, datasetMeasurementVariables, new ArrayList<>(table.rowKeySet()));
+			.getObservationUnitsAsMap(datasetId, datasetMeasurementVariables, new ArrayList<>(table.rowKeySet()));
 
 		if (storedData.isEmpty()) {
 			errors.reject("none.obs.unit.id.matches", null, "");
@@ -396,7 +390,7 @@ public class DatasetServiceImpl implements DatasetService {
 		// Processing warnings
 		if (input.isProcessWarnings()) {
 			errors = this.processObservationsDataWarningsAsErrors(table, storedData, rowsNotBelongingToDataset,
-					observationUnitsTableBuilder.getDuplicatedFoundNumber());
+				observationUnitsTableBuilder.getDuplicatedFoundNumber(), input.isDraftMode());
 		}
 		if (!errors.hasErrors()) {
 			this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode());
@@ -411,9 +405,15 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.middlewareDatasetService.getMeasurementVariables(projectId, variableTypes);
 	}
 
-	private BindingResult processObservationsDataWarningsAsErrors(final Table<String, String, String> table,
-			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData,
-			final Integer rowsNotBelongingToDataset, final Integer duplicatedFoundNumber) {
+	@Override
+	public void acceptDraftData(final Integer datasetId) {
+		this.middlewareDatasetService.acceptDraftData(datasetId);
+	}
+
+	private BindingResult processObservationsDataWarningsAsErrors(
+		final Table<String, String, String> table,
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData,
+		final Integer rowsNotBelongingToDataset, final Integer duplicatedFoundNumber, final Boolean draftMode) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
 		if (duplicatedFoundNumber > 0) {
 			errors.reject("duplicated.obs.unit.id", null, "");
@@ -423,38 +423,16 @@ public class DatasetServiceImpl implements DatasetService {
 			errors.reject("some.obs.unit.id.matches", new String[] {String.valueOf(rowsNotBelongingToDataset)}, "");
 		}
 
-		if (this.isInputOverwritingData(table, storedData)) {
+		if (this.isInputOverwritingData(table, storedData, draftMode)) {
 			errors.reject("warning.import.overwrite.data", null, "");
 		}
 
 		return errors;
 	}
 
-	// DO NOT REMOVE THIS FUNCTION EVEN WHEN IT IS UNUSED, IT WILL BE USED WHEN WE IMPLEMENT THE PREVIEW PROCESS
-	private List<String> processObservationsDataWarningsAsStrings(final Table<String, String, String> table,
-			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData,
-			final Integer rowsNotBelongingToDataset, final Integer duplicatedFoundNumber) {
-		final List<String> warnings = new ArrayList<>();
-		if (duplicatedFoundNumber > 0) {
-			warnings.add(this.resourceBundleMessageSource.getMessage("duplicated.obs.unit.id", null, LocaleContextHolder.getLocale()));
-		}
-
-		if (rowsNotBelongingToDataset != 0) {
-			warnings.add(this.resourceBundleMessageSource
-					.getMessage("some.obs.unit.id.matches", new String[] {String.valueOf(rowsNotBelongingToDataset)},
-							LocaleContextHolder.getLocale()));
-		}
-
-		if (this.isInputOverwritingData(table, storedData)) {
-			warnings.add(
-					this.resourceBundleMessageSource.getMessage("warning.import.overwrite.data", null, LocaleContextHolder.getLocale()));
-		}
-
-		return warnings;
-	}
-
-	private Boolean isInputOverwritingData(final Table<String, String, String> table,
-			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData) {
+	private Boolean isInputOverwritingData(
+		final Table<String, String, String> table,
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData, final Boolean draftMode) {
 		boolean overwritingData = false;
 
 		externalLoop:
@@ -465,10 +443,17 @@ public class DatasetServiceImpl implements DatasetService {
 			for (final String variableName : table.columnKeySet()) {
 
 				final org.generationcp.middleware.service.api.dataset.ObservationUnitData observation =
-						storedObservations.getVariables().get(variableName);
+					storedObservations.getVariables().get(variableName);
 
-				if (observation != null && observation.getValue() != null && !observation.getValue()
-						.equalsIgnoreCase(table.get(observationUnitId, variableName))) {
+				if (observation == null) {
+					continue;
+				}
+
+				if ((!draftMode && observation.getValue() != null //
+						&& !observation.getValue().equalsIgnoreCase(table.get(observationUnitId, variableName))) //
+					|| (draftMode && observation.getDraftValue() != null //
+						&& !observation.getDraftValue().equalsIgnoreCase(table.get(observationUnitId, variableName)))) {
+
 					overwritingData = true;
 
 					break externalLoop;

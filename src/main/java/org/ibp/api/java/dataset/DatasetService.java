@@ -55,4 +55,6 @@ public interface DatasetService {
 	List<StudyInstance> getDatasetInstances(final Integer studyId, final Integer datasetId);
 
 	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
+
+	void acceptDraftData(Integer datasetId);
 }

@@ -284,4 +284,13 @@ public class DatasetResource {
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Move draft value to saved value in sub-observation dataset", notes = "Save information for the imported dataset")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/drafts/acceptance", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> acceptDraftData(@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId) {
+		this.studyDatasetService.acceptDraftData(datasetId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 }

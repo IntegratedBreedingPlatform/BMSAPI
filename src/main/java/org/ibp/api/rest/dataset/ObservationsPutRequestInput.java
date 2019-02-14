@@ -12,7 +12,8 @@ import java.util.List;
 public class ObservationsPutRequestInput {
 
 	private boolean processWarnings;
-	private boolean draftMode = false;
+	// DO NOT CHANGE THIS VARIABLE EVEN WHEN IT IS ALWAYS TRUE, IT WILL BE USED WHEN WE IMPLEMENT THE IMPORT DATASET PROCESS
+	private boolean draftMode = true;
 	private List<List<String>> data;
 
 	public boolean isProcessWarnings() {
@@ -25,10 +26,6 @@ public class ObservationsPutRequestInput {
 
 	public boolean isDraftMode() {
 		return this.draftMode;
-	}
-
-	public void setDraftMode(final boolean draftMode) {
-		this.draftMode = draftMode;
 	}
 
 	public List<List<String>> getData() {

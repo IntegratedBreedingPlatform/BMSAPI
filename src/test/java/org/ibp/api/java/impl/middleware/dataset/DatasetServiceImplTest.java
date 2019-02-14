@@ -55,15 +55,10 @@ public class DatasetServiceImplTest {
 	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
 	public static final String ENTRY_CODE = "ENTRY_CODE";
 	public static final String ENTRY_NO = "ENTRY_NO";
-	public static final String DESIGNATION = "DESIGNATION";
-	public static final String GID = "GID";
 	public static final String ENTRY_TYPE = "ENTRY_TYPE";
 	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
-	public static final String FIELD_MAP_ROW = "FieldMapRow";
 	public static final String FIELD_MAP_COLUMN = "FieldMapColumn";
 	public static final String FIELD_MAP_RANGE = "FIELD_MAP_RANGE";
-	public static final String LOCATION_ABBREVIATION = "LocationAbbreviation";
-	public static final String LOCATION_NAME = "LocationName";
 	public static final String COL = "COL";
 	public static final String ROW = "ROW";
 	public static final String BLOCK_NO = "BLOCK_NO";
@@ -205,7 +200,7 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.observationValidator).validateObservation(studyId, datasetId, observationUnitId, observationId,
 			observationDto);
 		Mockito.verify(this.middlewareDatasetService)
-				.updatePhenotype(observationUnitId, observationId, observationDto);
+				.updatePhenotype(observationId, observationDto);
 	}
 	
 	@Test
