@@ -94,7 +94,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
 		final List<MeasurementVariable> orderedColumns = this.orderColumns(columns);
-		final Integer trialNumber = Integer.valueOf(reorderedObservationUnitRows.get(0).getVariables().get(TRIAL_INSTANCE).getValue());
+		final Integer trialNumber = this.getTrialNumber(reorderedObservationUnitRows);
 		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto, trialNumber);
 		this.writeObservationSheet(orderedColumns, reorderedObservationUnitRows, xlsBook);
 
@@ -665,5 +665,12 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			}
 		});
 		return Lists.newArrayList(variablesByType);
+	}
+
+	private Integer getTrialNumber(List<ObservationUnitRow> reorderedObservationUnitRows) {
+		if (!CollectionUtils.isEmpty(reorderedObservationUnitRows)) {
+			return Integer.valueOf(reorderedObservationUnitRows.get(0).getVariables().get(TRIAL_INSTANCE).getValue());
+		}
+		return 1;
 	}
 }
