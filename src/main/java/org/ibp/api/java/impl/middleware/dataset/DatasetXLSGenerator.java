@@ -225,7 +225,8 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		final HSSFWorkbook xlsBook, final Integer studyId, final DatasetDTO dataSetDto, final Integer trialNumber) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFSheet xlsSheet = xlsBook.createSheet(this.messageSource.getMessage("export.study.sheet.description", null, locale));
-		final Integer trialNumberIndex = trialNumber-1; // Subtract 1 from trialNumber, zero-indexing
+		final List<StudyInstance> studyInstances = this.studyService.getStudyInstances(studyId);
+		final Integer trialNumberIndex = trialNumber-1;
 		int currentRowNum = 0;
 
 		final StudyDetails studyDetails = this.studyDataManager.getStudyDetails(studyId);
