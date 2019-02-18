@@ -14,10 +14,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DatasetKSUExcelGeneratorTest {
+public class DatasetKsuExcelGeneratorTest {
 
 	@InjectMocks
-	private DatasetKSUExcelGenerator generator;
+	private DatasetKsuExcelGenerator generator;
 
 	@Test
 	public void testGenerateSingleInstanceFile() throws IOException {

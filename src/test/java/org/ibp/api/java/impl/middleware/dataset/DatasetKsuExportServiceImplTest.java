@@ -54,7 +54,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DatasetKSUExportServiceImplTest {
+public class DatasetKsuExportServiceImplTest {
 
 	@Mock
 	private StudyValidator studyValidator;
@@ -87,16 +87,16 @@ public class DatasetKSUExportServiceImplTest {
 	private FieldbookService fieldbookService;
 
 	@Mock
-	private DatasetKSUCSVGenerator datasetKSUCSVGenerator;
+	private DatasetKsuCSVGenerator datasetKSUCSVGenerator;
 
 	@Mock
-	private DatasetKSUExcelGenerator datasetKSUExcelGenerator;
+	private DatasetKsuExcelGenerator datasetKSUExcelGenerator;
 
 	@InjectMocks
-	private DatasetKSUCSVExportServiceImpl datasetKSUCSVExportService;
+	private DatasetKsuCSVExportServiceImpl datasetKSUCSVExportService;
 
 	@InjectMocks
-	private DatasetKSUExcelExportServiceImpl datasetKSUExcelExportService;
+	private DatasetKsuExcelExportServiceImpl datasetKSUExcelExportService;
 
 	private MeasurementVariable measurementVariable = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.GENERAL_TRAIT_CLASS.getId(), "GW100", "2");
 

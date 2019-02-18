@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
-public class DatasetKSUExcelGenerator extends DatasetExcelGenerator implements DatasetFileGenerator {
+public class DatasetKsuExcelGenerator extends DatasetExcelGenerator implements DatasetFileGenerator {
 
 	@Override
 	public File generateSingleInstanceFile(

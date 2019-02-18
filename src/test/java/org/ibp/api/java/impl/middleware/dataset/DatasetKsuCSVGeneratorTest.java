@@ -10,12 +10,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DatasetKSUCSVGeneratorTest {
-	private DatasetKSUCSVGenerator generator;
+public class DatasetKsuCSVGeneratorTest {
+	private DatasetKsuCSVGenerator generator;
 
 	@Test
 	public void testGenerateTraitAndSelectionVariablesFile() throws IOException {
-		this.generator = new DatasetKSUCSVGenerator();
+		this.generator = new DatasetKsuCSVGenerator();
 		final String filename = "filename";
 		final File
 			file = this.generator.generateTraitAndSelectionVariablesFile(new ArrayList<String[]>(), filename);

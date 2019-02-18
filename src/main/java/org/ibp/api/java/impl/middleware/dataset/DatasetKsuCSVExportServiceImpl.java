@@ -15,10 +15,10 @@ import java.util.Set;
 
 @Service
 @Transactional
-public class DatasetKSUExcelExportServiceImpl extends AbstractDatasetExportService implements DatasetExportService {
+public class DatasetKsuCSVExportServiceImpl extends AbstractDatasetExportService implements DatasetExportService {
 
 	@Resource
-	private DatasetKSUExcelGenerator datasetKSUExcelGenerator;
+	private DatasetKsuCSVGenerator datasetKsuCSVGenerator;
 
 	@Override
 	public File export(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId, final boolean singleFile) {
@@ -26,8 +26,8 @@ public class DatasetKSUExcelExportServiceImpl extends AbstractDatasetExportServi
 		this.validate(studyId, datasetId, instanceIds);
 
 		try {
-			//TODO: use the singleFile boolean after implementing singleFile download for KSU Excel option
-			return this.generate(studyId, datasetId, instanceIds, collectionOrderId, this.datasetKSUExcelGenerator, false, XLS);
+			//TODO: use the singleFile boolean after implementing singleFile download for KSU CSV option
+			return this.generate(studyId, datasetId, instanceIds, collectionOrderId, this.datasetKsuCSVGenerator, false, CSV);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("cannot.exportAsXLS.dataset", "");

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class DatasetKSUCSVGenerator extends DatasetCSVGenerator implements DatasetFileGenerator {
+public class DatasetKsuCSVGenerator extends DatasetCSVGenerator implements DatasetFileGenerator {
 
 	@Override
 	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,

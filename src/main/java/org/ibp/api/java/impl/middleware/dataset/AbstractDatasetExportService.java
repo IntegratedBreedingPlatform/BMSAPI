@@ -141,7 +141,7 @@ public abstract class AbstractDatasetExportService {
 				generator.generateSingleInstanceFile(study.getId(), dataSetDto, columns, observationUnitRowMap.get(instanceDBID), fileNameFullPath));
 		}
 
-		if(this instanceof DatasetKSUCSVExportServiceImpl || this instanceof DatasetKSUExcelExportServiceImpl) {
+		if(this instanceof DatasetKsuCSVExportServiceImpl || this instanceof DatasetKsuExcelExportServiceImpl) {
 			final String sanitizedTraitsAndSelectionFilename = FileUtils.sanitizeFileName(String
 				.format(
 					"%s_%s_%s.trt", study.getName(), DataSetType.findById(dataSetDto.getDatasetTypeId()).getReadableName(),
