@@ -261,13 +261,14 @@ public class DatasetResource {
 	}
 
 	private DatasetExportService getExportFileStrategy(final String fileType) {
-		if (DatasetResource.CSV.equalsIgnoreCase(fileType.trim())) {
+		final String trimmedFileType = fileType.trim();
+		if (DatasetResource.CSV.equalsIgnoreCase(trimmedFileType)) {
 			return this.datasetCSVExportServiceImpl;
-		} else if (DatasetResource.XLS.equalsIgnoreCase(fileType.trim())) {
+		} else if (DatasetResource.XLS.equalsIgnoreCase(trimmedFileType)) {
 			return this.datasetExcelExportServiceImpl;
-		} else if (DatasetResource.KSU_CSV.equalsIgnoreCase(fileType.trim())) {
+		} else if (DatasetResource.KSU_CSV.equalsIgnoreCase(trimmedFileType)) {
 			return this.datasetKSUCSVExportServiceImpl;
-		} else if (DatasetResource.KSU_XLS.equalsIgnoreCase(fileType.trim())) {
+		} else if (DatasetResource.KSU_XLS.equalsIgnoreCase(trimmedFileType)) {
 			return this.datasetKSUExcelExportServiceImpl;
 		}
 		return null;
