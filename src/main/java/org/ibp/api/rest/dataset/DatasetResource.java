@@ -55,10 +55,10 @@ public class DatasetResource {
 	private DatasetExportService datasetExcelExportServiceImpl;
 
 	@Autowired
-	private DatasetExportService datasetKSUCSVExportServiceImpl;
+	private DatasetExportService datasetKsuCSVExportServiceImpl;
 
 	@Autowired
-	private DatasetExportService datasetKSUExcelExportServiceImpl;
+	private DatasetExportService datasetKsuExcelExportServiceImpl;
 
 	@ApiOperation(value = "Get Dataset Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the dataset, "
 		+ "that will be shown in the Observation Table")
@@ -266,9 +266,9 @@ public class DatasetResource {
 		} else if (DatasetResource.XLS.equalsIgnoreCase(trimmedFileType)) {
 			return this.datasetExcelExportServiceImpl;
 		} else if (DatasetResource.KSU_CSV.equalsIgnoreCase(trimmedFileType)) {
-			return this.datasetKSUCSVExportServiceImpl;
+			return this.datasetKsuCSVExportServiceImpl;
 		} else if (DatasetResource.KSU_XLS.equalsIgnoreCase(trimmedFileType)) {
-			return this.datasetKSUExcelExportServiceImpl;
+			return this.datasetKsuExcelExportServiceImpl;
 		}
 		return null;
 	}
