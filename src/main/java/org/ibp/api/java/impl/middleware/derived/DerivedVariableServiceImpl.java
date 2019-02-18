@@ -201,6 +201,15 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		return derivedVariablesDependencies;
 	}
 
+	@Override
+	public boolean isAnyDatasetContainsCalculatedTraits(final int studyId, final Set<Integer> datasetIds) {
+		this.studyValidator.validate(studyId, false);
+		for (final int datasetId : datasetIds) {
+			this.datasetValidator.validateDataset(studyId, datasetId, false);
+		}
+		return this.datasetService.isAnyDatasetContainsCalculatedTraits(datasetIds);
+	}
+
 	protected Set<Integer> getVariableIdsOfTraitsInDataset(final int datasetId) {
 
 		final Set<Integer> variableIdsOfTraitsInDataset = new HashSet<>();

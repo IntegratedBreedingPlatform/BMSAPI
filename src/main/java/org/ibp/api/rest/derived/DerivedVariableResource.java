@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
@@ -68,6 +69,14 @@ public class DerivedVariableResource {
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
 		return new ResponseEntity<>(this.derivedVariableService.getDependencyVariables(studyId, datasetId), HttpStatus.OK);
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/derived-variable/hasCalculatedTraits", method = RequestMethod.GET)
+	public ResponseEntity<Boolean> isAnyDatasetContainsCalculatedTraits(
+		@PathVariable final String crop,
+		@PathVariable final Integer studyId, @RequestParam(value = "datasetIds") final Set<Integer> datasetIds) {
+		return new ResponseEntity<>(this.derivedVariableService.isAnyDatasetContainsCalculatedTraits(studyId, datasetIds), HttpStatus.OK);
 	}
 
 }
