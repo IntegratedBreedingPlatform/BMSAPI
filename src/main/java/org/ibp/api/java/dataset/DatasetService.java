@@ -17,7 +17,10 @@ import java.util.Set;
 
 public interface DatasetService {
 
-	List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId);
+	List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId, final Boolean draftMode);
+
+	List<MeasurementVariable> getSubObservationSetVariables(
+		Integer studyId, Integer subObservationSetId);
 
 	long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> variableIds);
 
@@ -57,6 +60,8 @@ public interface DatasetService {
 	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
 
 	void acceptDraftData(Integer datasetId);
+
+	void rejectDraftData(Integer datasetId);
 
 	Boolean checkOutOfBoundDraftData(Integer datasetId);
 }

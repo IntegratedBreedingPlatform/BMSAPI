@@ -79,13 +79,27 @@ public class DatasetServiceImpl implements DatasetService {
 	private ObservationsTableValidator observationsTableValidator;
 
 	@Override
-	public List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId) {
+	public List<MeasurementVariable> getSubObservationSetColumns(
+		final Integer studyId, final Integer subObservationSetId, final Boolean draftMode) {
+
 		this.studyValidator.validate(studyId, false);
 
 		// TODO generalize to any obs dataset (plot/subobs), make 3rd param false
 		this.datasetValidator.validateDataset(studyId, subObservationSetId, true);
 
-		return this.middlewareDatasetService.getSubObservationSetColumns(subObservationSetId);
+		return this.middlewareDatasetService.getSubObservationSetColumns(subObservationSetId, draftMode);
+	}
+
+	@Override
+	public List<MeasurementVariable> getSubObservationSetVariables(
+		final Integer studyId, final Integer subObservationSetId) {
+
+		this.studyValidator.validate(studyId, false);
+
+		// TODO generalize to any obs dataset (plot/subobs), make 3rd param false
+		this.datasetValidator.validateDataset(studyId, subObservationSetId, true);
+
+		return this.middlewareDatasetService.getSubObservationSetVariables(subObservationSetId);
 	}
 
 	@Override
@@ -411,6 +425,11 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void acceptDraftData(final Integer datasetId) {
 		this.middlewareDatasetService.acceptDraftData(datasetId);
+	}
+
+	@Override
+	public void rejectDraftData(final Integer datasetId) {
+		this.middlewareDatasetService.rejectDraftData(datasetId);
 	}
 
 	private BindingResult processObservationsDataWarningsAsErrors(

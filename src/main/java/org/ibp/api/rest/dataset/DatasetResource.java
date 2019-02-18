@@ -56,9 +56,10 @@ public class DatasetResource {
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/table/columns", method = RequestMethod.GET)
 	public ResponseEntity<List<MeasurementVariable>> getSubObservationSetColumns(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
-		@PathVariable final Integer datasetId) {
+		@PathVariable final Integer datasetId,
+		@RequestParam(required = false) final Boolean draftMode) {
 
-		final List<MeasurementVariable> subObservationSetColumns = this.studyDatasetService.getSubObservationSetColumns(studyId, datasetId);
+		final List<MeasurementVariable> subObservationSetColumns = this.studyDatasetService.getSubObservationSetColumns(studyId, datasetId, draftMode);
 
 		return new ResponseEntity<>(subObservationSetColumns, HttpStatus.OK);
 	}
@@ -290,6 +291,15 @@ public class DatasetResource {
 	public ResponseEntity<Void> acceptDraftData(@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
 		this.studyDatasetService.acceptDraftData(datasetId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Reject draft value in sub-observation dataset", notes = "Reject information for the imported dataset")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/drafts/rejection", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> rejectDraftData(@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId) {
+		this.studyDatasetService.rejectDraftData(datasetId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
