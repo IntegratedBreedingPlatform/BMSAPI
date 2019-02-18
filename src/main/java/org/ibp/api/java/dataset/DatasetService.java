@@ -60,4 +60,6 @@ public interface DatasetService {
 	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
 
 	void acceptDraftData(Integer datasetId);
+
+	void rejectDraftData(Integer datasetId);
 }
