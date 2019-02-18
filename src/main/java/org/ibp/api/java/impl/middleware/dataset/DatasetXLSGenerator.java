@@ -283,7 +283,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environment.details",
 			this.getColorIndex(xlsBook, 124, 124, 124));
 
-		final List<MeasurementVariable> environmentDetails = this.getEnvironmentalDetails(environmentDatasetId, environmentVariables, dataSetDto.getInstances().get(trialNumberIndex));
+		final List<MeasurementVariable> environmentDetails = this.getEnvironmentalDetails(environmentDatasetId, environmentVariables, studyInstances.get(trialNumberIndex));
 
 		currentRowNum = this.writeSection(
 			currentRowNum,
@@ -295,7 +295,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environmental.conditions",
 			this.getColorIndex(xlsBook, 124, 124, 124));
 
-		final List<MeasurementVariable> environmentConditions = this.getEnvironmentalConditions(environmentDatasetId, environmentVariables, dataSetDto.getInstances().get(trialNumberIndex));
+		final List<MeasurementVariable> environmentConditions = this.getEnvironmentalConditions(environmentDatasetId, environmentVariables, studyInstances.get(trialNumberIndex));
 
 		currentRowNum = this.writeSection(
 			currentRowNum,
