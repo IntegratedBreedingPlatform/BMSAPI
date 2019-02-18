@@ -107,14 +107,12 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	@Override
 	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
 		final String fileNameFullPath) throws IOException {
-		//Do nothing. Implement for the singleFile download XLS option
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public File generateTraitAndSelectionVariablesFile(final List<String[]> rowValues, final String filenamePath) throws IOException{
-		//Do Nothing. This file is not needed for Subobservation Excel Download
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	private List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns) {

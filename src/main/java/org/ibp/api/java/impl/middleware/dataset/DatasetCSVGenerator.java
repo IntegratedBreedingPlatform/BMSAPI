@@ -43,8 +43,7 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 
 	@Override
 	public File generateTraitAndSelectionVariablesFile(final List<String[]> rowValues, final String filenamePath) throws IOException{
-		//Do Nothing. This file is not needed for Subobservation CSV Download
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

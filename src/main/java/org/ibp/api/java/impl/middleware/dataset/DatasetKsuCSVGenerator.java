@@ -20,8 +20,7 @@ public class DatasetKsuCSVGenerator extends DatasetCSVGenerator implements Datas
 	@Override
 	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
 		final String fileNameFullPath) throws IOException {
-		//Do nothing. Implement for the singleFile download KSU CSV option
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
