@@ -70,6 +70,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	private static final String ENVIRONMENT = "ENVIRONMENT";
 	private static final String PLOT = "PLOT";
 	private static final String BREEDING_METHOD_PROPERTY_NAME = "";
+	private static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
 
 	@Autowired
 	ResourceBundleMessageSource messageSource;
@@ -89,7 +90,8 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
 		final List<MeasurementVariable> orderedColumns = this.orderColumns(columns);
-		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto);
+		final Integer trialNumber = Integer.valueOf(reorderedObservationUnitRows.get(0).getVariables().get(TRIAL_INSTANCE).getValue());
+		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto, trialNumber);
 		final Locale locale = LocaleContextHolder.getLocale();
 		this.writeObservationSheet(orderedColumns, reorderedObservationUnitRows, xlsBook, this.messageSource.getMessage("export.study.sheet.observation", null, locale));
 
@@ -222,9 +224,10 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	}
 
 	private void writeDescriptionSheet(
-		final HSSFWorkbook xlsBook, final Integer studyId, final DatasetDTO dataSetDto) {
+		final HSSFWorkbook xlsBook, final Integer studyId, final DatasetDTO dataSetDto, final Integer trialNumber) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFSheet xlsSheet = xlsBook.createSheet(this.messageSource.getMessage("export.study.sheet.description", null, locale));
+		final Integer trialNumberIndex = trialNumber-1; // Subtract 1 from trialNumber, zero-indexing
 		int currentRowNum = 0;
 
 		final StudyDetails studyDetails = this.studyDataManager.getStudyDetails(studyId);
@@ -281,7 +284,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environment.details",
 			this.getColorIndex(xlsBook, 124, 124, 124));
 
-		final List<MeasurementVariable> environmentDetails = this.getEnvironmentalDetails(environmentDatasetId, environmentVariables, dataSetDto.getInstances().get(0));
+		final List<MeasurementVariable> environmentDetails = this.getEnvironmentalDetails(environmentDatasetId, environmentVariables, dataSetDto.getInstances().get(trialNumberIndex));
 
 		currentRowNum = this.writeSection(
 			currentRowNum,
@@ -293,7 +296,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environmental.conditions",
 			this.getColorIndex(xlsBook, 124, 124, 124));
 
-		final List<MeasurementVariable> environmentConditions = this.getEnvironmentalConditions(environmentDatasetId, environmentVariables, dataSetDto.getInstances().get(0));
+		final List<MeasurementVariable> environmentConditions = this.getEnvironmentalConditions(environmentDatasetId, environmentVariables, dataSetDto.getInstances().get(trialNumberIndex));
 
 		currentRowNum = this.writeSection(
 			currentRowNum,
