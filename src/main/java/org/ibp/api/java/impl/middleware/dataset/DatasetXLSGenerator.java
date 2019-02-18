@@ -26,6 +26,7 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.dataset.ObservationUnitData;
@@ -80,6 +81,9 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 
 	@Resource
 	private DatasetService datasetService;
+
+	@Resource
+	private StudyService studyService;
 
 	@Override
 	public File generateSingleInstanceFile(
