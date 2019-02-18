@@ -57,4 +57,6 @@ public interface DatasetService {
 	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
 
 	void acceptDraftData(Integer datasetId);
+
+	Boolean checkOutOfBoundDraftData(Integer datasetId);
 }
