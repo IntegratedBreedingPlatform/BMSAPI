@@ -15,7 +15,7 @@ import java.util.Set;
 
 @Service
 @Transactional
-public class DatasetKsuExcelExportServiceImpl extends AbstractDatasetExportService implements DatasetExportService {
+public class DatasetKsuExcelExportServiceImpl extends BaseDatasetKsuExportService implements DatasetExportService {
 
 	@Resource
 	private DatasetKsuExcelGenerator datasetKsuExcelGenerator;

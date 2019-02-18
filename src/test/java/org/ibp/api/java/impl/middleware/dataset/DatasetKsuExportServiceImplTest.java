@@ -176,7 +176,7 @@ public class DatasetKsuExportServiceImplTest {
 		final List<MeasurementVariable> measurementVariables = Arrays.asList(this.measurementVariable);
 		final List<String[]> results = this.datasetKSUCSVExportService.convertTraitAndSelectionVariablesData(measurementVariables);
 		Assert.assertEquals(2, results.size());
-		Assert.assertEquals(AbstractDatasetExportService.TRAIT_FILE_HEADERS, results.get(0));
+		Assert.assertEquals(BaseDatasetKsuExportService.TRAIT_FILE_HEADERS, results.get(0));
 	}
 
 	@Test

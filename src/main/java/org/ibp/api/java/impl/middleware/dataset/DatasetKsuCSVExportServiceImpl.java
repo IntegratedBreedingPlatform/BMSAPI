@@ -15,7 +15,7 @@ import java.util.Set;
 
 @Service
 @Transactional
-public class DatasetKsuCSVExportServiceImpl extends AbstractDatasetExportService implements DatasetExportService {
+public class DatasetKsuCSVExportServiceImpl extends BaseDatasetKsuExportService implements DatasetExportService {
 
 	@Resource
 	private DatasetKsuCSVGenerator datasetKsuCSVGenerator;
