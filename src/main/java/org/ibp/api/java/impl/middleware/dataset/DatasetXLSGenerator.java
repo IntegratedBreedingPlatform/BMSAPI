@@ -70,7 +70,6 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 	private static final String ENVIRONMENT = "ENVIRONMENT";
 	private static final String PLOT = "PLOT";
 	private static final String BREEDING_METHOD_PROPERTY_NAME = "";
-	private static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
 
 	@Autowired
 	ResourceBundleMessageSource messageSource;
