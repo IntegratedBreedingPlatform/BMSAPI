@@ -136,21 +136,21 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 				final ObservationUnitData target = observation.getVariables().get(formula.getTarget().getName());
 				final MeasurementVariable targetMeasurementVariable = measurementVariablesMap.get(formula.getTarget().getId());
 
+				// Check if the calculated value matches any of the possible categorical values and get its categorical id.
+				Integer categoricalId = null;
 				if (targetMeasurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 					for (final ValueReference possibleValue : targetMeasurementVariable.getPossibleValues()) {
 						if (value.equalsIgnoreCase(possibleValue.getName())) {
-							value = String.valueOf(possibleValue.getId());
+							categoricalId = possibleValue.getId();
 							break;
 						}
 					}
-					this.saveCalculatedResult(
-						null, value != null ? Integer.valueOf(value) : null, observation.getObservationUnitId(),
-						target.getObservationId(),
-						targetMeasurementVariable);
-				} else {
-					this.saveCalculatedResult(
-						value, null, observation.getObservationUnitId(), target.getObservationId(), targetMeasurementVariable);
 				}
+
+				this.saveCalculatedResult(
+					value, categoricalId, observation.getObservationUnitId(),
+					target.getObservationId(),
+					targetMeasurementVariable);
 
 				if (StringUtils.isNotEmpty(target.getValue()) && !target.getValue().equals(value)) {
 					if (!overwriteExistingData) {
