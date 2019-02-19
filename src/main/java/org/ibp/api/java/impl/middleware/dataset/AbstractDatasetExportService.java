@@ -155,7 +155,7 @@ public abstract class AbstractDatasetExportService {
 	
 	protected List<MeasurementVariable> moveSelectedVariableInTheFirstColumn(List<MeasurementVariable> columns, final int variableId) {
 		int trialInstanceIndex = 0;
-		for(MeasurementVariable column: columns) {
+		for(final MeasurementVariable column: columns) {
 			if(variableId == column.getTermId()) {
 				final MeasurementVariable trialInstanceMeasurementVariable = columns.remove(trialInstanceIndex);
 				columns.add(0, trialInstanceMeasurementVariable);
