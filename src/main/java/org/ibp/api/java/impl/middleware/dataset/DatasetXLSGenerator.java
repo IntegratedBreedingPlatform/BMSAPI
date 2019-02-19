@@ -108,7 +108,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		return new File(fileNameFullPath);
 	}
 
-	private List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns) {
+	protected List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns) {
 		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
 		final List<MeasurementVariable> trait = new ArrayList<>();
 		final List<MeasurementVariable> selection = new ArrayList<>();
@@ -658,5 +658,9 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			}
 		});
 		return Lists.newArrayList(variablesByType);
+	}
+
+	public void setMessageSource(final ResourceBundleMessageSource messageSource) {
+		this.messageSource = messageSource;
 	}
 }
