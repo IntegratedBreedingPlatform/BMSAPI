@@ -15,7 +15,6 @@ import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
-import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.OverwriteDataException;
 import org.ibp.api.java.derived.DerivedVariableService;
@@ -183,6 +182,13 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 	}
 
+	/**
+	 * Gets the list of formula dependencies of all derived variables that are not yet loaded in a dataset.
+	 *
+	 * @param studyId
+	 * @param datasetId
+	 * @return
+	 */
 	@Override
 	public Set<String> getDependencyVariables(final int studyId, final int datasetId) {
 
@@ -193,6 +199,35 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		final Set<String> derivedVariablesDependencies = new HashSet<>();
 
 		final Set<FormulaVariable> formulaVariables = this.formulaService.getAllFormulaVariables(variableIdsOfTraitsInStudy);
+		for (final FormulaVariable formulaVariable : formulaVariables) {
+			if (!variableIdsOfTraitsInStudy.contains(formulaVariable.getId())) {
+				derivedVariablesDependencies.add(formulaVariable.getName());
+			}
+		}
+
+		return derivedVariablesDependencies;
+	}
+
+	/**
+	 * Gets the list of formula dependencies of specific derived variables that are not yet loaded in a dataset.
+	 *
+	 * @param studyId
+	 * @param datasetId
+	 * @param variableId
+	 * @return
+	 */
+	@Override
+	public Set<String> getDependencyVariables(final int studyId, final int datasetId, final int variableId) {
+
+		this.studyValidator.validate(studyId, false);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
+
+		final List<Integer> variableIds = Arrays.asList(variableId);
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, false, variableIds);
+
+		final Set<Integer> variableIdsOfTraitsInStudy = this.getVariableIdsOfTraitsInDataset(datasetId);
+		final Set<String> derivedVariablesDependencies = new HashSet<>();
+		final Set<FormulaVariable> formulaVariables = this.formulaService.getAllFormulaVariables(new HashSet<Integer>(variableIds));
 		for (final FormulaVariable formulaVariable : formulaVariables) {
 			if (!variableIdsOfTraitsInStudy.contains(formulaVariable.getId())) {
 				derivedVariablesDependencies.add(formulaVariable.getName());

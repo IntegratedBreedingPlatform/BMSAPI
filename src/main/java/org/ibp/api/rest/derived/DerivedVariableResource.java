@@ -65,11 +65,21 @@ public class DerivedVariableResource {
 
 	@ResponseBody
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variable/dependencies", method = RequestMethod.GET)
-	public ResponseEntity<Set<String>> dependencyVariables(
+	public ResponseEntity<Set<String>> dependencyVariablesForAllDerivedTraitsInDataset(
 		@PathVariable final String crop,
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
 		return new ResponseEntity<>(this.derivedVariableService.getDependencyVariables(studyId, datasetId), HttpStatus.OK);
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variable/dependencies/{variableId}", method = RequestMethod.GET)
+	public ResponseEntity<Set<String>> dependencyVariablesForSpecificDerivedTrait(
+		@PathVariable final String crop,
+		@PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId,
+		@PathVariable final Integer variableId) {
+		return new ResponseEntity<>(this.derivedVariableService.getDependencyVariables(studyId, datasetId, variableId), HttpStatus.OK);
 	}
 
 	@ResponseBody

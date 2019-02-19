@@ -12,5 +12,7 @@ public interface DerivedVariableService {
 
 	Set<String> getDependencyVariables(final int studyId, final int datasetId);
 
+	Set<String> getDependencyVariables(int studyId, int datasetId, int variableId);
+
 	long countCalculatedVariablesInDatasets(int studyId, Set<Integer> datasetIds);
 }
