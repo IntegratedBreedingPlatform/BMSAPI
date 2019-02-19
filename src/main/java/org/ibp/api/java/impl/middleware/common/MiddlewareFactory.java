@@ -47,9 +47,11 @@ import org.generationcp.middleware.operation.transformer.etl.MeasurementVariable
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
+import org.generationcp.middleware.service.MethodServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
+import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
@@ -141,6 +143,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public FieldbookService getFieldbookService() {
 		return new FieldbookServiceImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public MethodService getMethodService() {
+		return new MethodServiceImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
 	}
 
 	@Bean

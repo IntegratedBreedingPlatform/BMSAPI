@@ -17,7 +17,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
@@ -84,7 +84,7 @@ public class DatasetKsuExportServiceImplTest {
 	private OntologyDataManager ontologyDataManager;
 
 	@Mock
-	private FieldbookService fieldbookService;
+	private MethodService methodService;
 
 	@Mock
 	private DatasetKsuCSVGenerator datasetKSUCSVGenerator;
@@ -161,7 +161,7 @@ public class DatasetKsuExportServiceImplTest {
 				any(HashMap.class), eq(instanceObservationUnitRowsMap));
 		verify(generator).generateTraitAndSelectionVariablesFile(any(ArrayList.class), anyString());
 		verify(this.ontologyDataManager).getProperty(TermId.BREEDING_METHOD_PROP.getId());
-		verify(this.fieldbookService).getAllBreedingMethods(false);
+		verify(this.methodService).getAllBreedingMethods();
 		assertSame(result, zipFile);
 	}
 

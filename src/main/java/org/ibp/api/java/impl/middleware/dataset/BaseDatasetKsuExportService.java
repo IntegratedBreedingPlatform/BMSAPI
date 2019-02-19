@@ -3,6 +3,8 @@ package org.ibp.api.java.impl.middleware.dataset;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -65,7 +67,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 
 		// get name of breeding method property and get all methods
 		final String propertyName = this.ontologyDataManager.getProperty(TermId.BREEDING_METHOD_PROP.getId()).getName();
-		final List<Method> methods = this.fieldbookService.getAllBreedingMethods(false);
+		final List<Method> methods = this.methodService.getAllBreedingMethods();
 
 		int index = 1;
 		for (final MeasurementVariable variable : variables) {
