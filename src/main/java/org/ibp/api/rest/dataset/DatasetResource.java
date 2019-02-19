@@ -286,7 +286,7 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "Move draft value to saved value in sub-observation dataset", notes = "Save information for the imported dataset")
-	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/drafts/acceptance", method = RequestMethod.POST)
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/acceptance", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> acceptDraftData(@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
@@ -301,5 +301,19 @@ public class DatasetResource {
 		@PathVariable final Integer datasetId) {
 		this.studyDatasetService.rejectDraftData(datasetId);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Check if exist draft values out of bounds in sub-observation dataset", notes = "Check out of bounds")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/out-of-bounds", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Void> checkOutOfBoundDraftData(
+		@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId) {
+		final Boolean hasOutOfBounds = this.studyDatasetService.checkOutOfBoundDraftData(datasetId);
+
+		if (hasOutOfBounds) {
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 }

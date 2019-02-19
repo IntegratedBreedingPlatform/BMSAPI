@@ -62,4 +62,6 @@ public interface DatasetService {
 	void acceptDraftData(Integer datasetId);
 
 	void rejectDraftData(Integer datasetId);
+
+	Boolean checkOutOfBoundDraftData(Integer datasetId);
 }
