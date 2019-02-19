@@ -15,6 +15,7 @@ import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.OverwriteDataException;
 import org.ibp.api.java.derived.DerivedVariableService;
@@ -202,12 +203,12 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	@Override
-	public boolean isAnyDatasetContainsCalculatedTraits(final int studyId, final Set<Integer> datasetIds) {
+	public long countCalculatedVariablesInDatasets(final int studyId, final Set<Integer> datasetIds) {
 		this.studyValidator.validate(studyId, false);
 		for (final int datasetId : datasetIds) {
 			this.datasetValidator.validateDataset(studyId, datasetId, false);
 		}
-		return this.datasetService.isAnyDatasetContainsCalculatedTraits(datasetIds);
+		return this.datasetService.countCalculatedVariablesInDatasets(datasetIds);
 	}
 
 	protected Set<Integer> getVariableIdsOfTraitsInDataset(final int datasetId) {

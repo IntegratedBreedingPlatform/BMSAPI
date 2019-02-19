@@ -12,5 +12,5 @@ public interface DerivedVariableService {
 
 	Set<String> getDependencyVariables(final int studyId, final int datasetId);
 
-	boolean isAnyDatasetContainsCalculatedTraits(int studyId, Set<Integer> datasetIds);
+	long countCalculatedVariablesInDatasets(int studyId, Set<Integer> datasetIds);
 }

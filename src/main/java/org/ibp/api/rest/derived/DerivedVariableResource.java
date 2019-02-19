@@ -9,6 +9,7 @@ import org.ibp.api.java.derived.DerivedVariableService;
 import org.ibp.api.java.impl.middleware.derived.DerivedVariableServiceImpl;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -72,11 +73,16 @@ public class DerivedVariableResource {
 	}
 
 	@ResponseBody
-	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/derived-variable/hasCalculatedTraits", method = RequestMethod.GET)
-	public ResponseEntity<Boolean> isAnyDatasetContainsCalculatedTraits(
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/derived-variable/countCalculatedVariables", method = RequestMethod.HEAD)
+	public ResponseEntity<String> countCalculatedVariables(
 		@PathVariable final String crop,
 		@PathVariable final Integer studyId, @RequestParam(value = "datasetIds") final Set<Integer> datasetIds) {
-		return new ResponseEntity<>(this.derivedVariableService.isAnyDatasetContainsCalculatedTraits(studyId, datasetIds), HttpStatus.OK);
+
+		final long count = this.derivedVariableService.countCalculatedVariablesInDatasets(studyId, datasetIds);
+		final HttpHeaders respHeaders = new HttpHeaders();
+		respHeaders.add("X-Total-Count", String.valueOf(count));
+
+		return new ResponseEntity<>("", respHeaders, HttpStatus.OK);
 	}
 
 }
