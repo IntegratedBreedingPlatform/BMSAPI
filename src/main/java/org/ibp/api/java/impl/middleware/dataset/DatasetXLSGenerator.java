@@ -26,7 +26,6 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
-import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.dataset.ObservationUnitData;
@@ -82,20 +81,16 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 	@Resource
 	private DatasetService datasetService;
 
-	@Resource
-	private StudyService studyService;
-
 	@Override
 	public File generateSingleInstanceFile(
 		final Integer studyId,
 		final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> reorderedObservationUnitRows,
-		final String fileNamePath) throws IOException {
+		final String fileNamePath, final  StudyInstance studyInstance) throws IOException {
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
 		final List<MeasurementVariable> orderedColumns = this.orderColumns(columns);
-		final Integer trialNumber = this.getTrialNumber(reorderedObservationUnitRows);
-		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto, trialNumber);
+		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto, studyInstance);
 		this.writeObservationSheet(orderedColumns, reorderedObservationUnitRows, xlsBook);
 
 		final File file = new File(fileNamePath);
@@ -222,11 +217,9 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 	}
 
 	private void writeDescriptionSheet(
-		final HSSFWorkbook xlsBook, final Integer studyId, final DatasetDTO dataSetDto, final Integer trialNumber) {
+		final HSSFWorkbook xlsBook, final Integer studyId, final DatasetDTO dataSetDto, final StudyInstance studyInstance) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFSheet xlsSheet = xlsBook.createSheet(this.messageSource.getMessage("export.study.sheet.description", null, locale));
-		final List<StudyInstance> studyInstances = this.studyService.getStudyInstances(studyId);
-		final Integer trialNumberIndex = trialNumber-1;
 		int currentRowNum = 0;
 
 		final StudyDetails studyDetails = this.studyDataManager.getStudyDetails(studyId);
@@ -283,7 +276,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environment.details",
 			this.getColorIndex(xlsBook, 124, 124, 124));
 
-		final List<MeasurementVariable> environmentDetails = this.getEnvironmentalDetails(environmentDatasetId, environmentVariables, studyInstances.get(trialNumberIndex));
+		final List<MeasurementVariable> environmentDetails = this.getEnvironmentalDetails(environmentDatasetId, environmentVariables, studyInstance);
 
 		currentRowNum = this.writeSection(
 			currentRowNum,
@@ -295,7 +288,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environmental.conditions",
 			this.getColorIndex(xlsBook, 124, 124, 124));
 
-		final List<MeasurementVariable> environmentConditions = this.getEnvironmentalConditions(environmentDatasetId, environmentVariables, studyInstances.get(trialNumberIndex));
+		final List<MeasurementVariable> environmentConditions = this.getEnvironmentalConditions(environmentDatasetId, environmentVariables, studyInstance);
 
 		currentRowNum = this.writeSection(
 			currentRowNum,
@@ -666,12 +659,5 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			}
 		});
 		return Lists.newArrayList(variablesByType);
-	}
-
-	private Integer getTrialNumber(List<ObservationUnitRow> reorderedObservationUnitRows) {
-		if (!CollectionUtils.isEmpty(reorderedObservationUnitRows)) {
-			return Integer.valueOf(reorderedObservationUnitRows.get(0).getVariables().get(TRIAL_INSTANCE).getValue());
-		}
-		return 1;
 	}
 }
