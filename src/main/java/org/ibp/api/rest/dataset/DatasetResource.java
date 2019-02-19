@@ -311,7 +311,7 @@ public class DatasetResource {
 		@PathVariable final Integer datasetId) {
 		final Boolean hasOutOfBounds = this.studyDatasetService.checkOutOfBoundDraftData(datasetId);
 
-		if (!hasOutOfBounds) {
+		if (hasOutOfBounds) {
 			return new ResponseEntity<>(HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
