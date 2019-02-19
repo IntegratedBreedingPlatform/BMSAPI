@@ -4,13 +4,10 @@ import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
-import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
-import org.generationcp.middleware.domain.ontology.FormulaVariable;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
@@ -47,7 +44,10 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	public static final String INPUT_MISSING_DATA_RESULT_KEY = "inputMissingData";
 
 	@Resource
-	private DatasetService datasetService;
+	private DatasetService middlwareDatasetService;
+
+	@Resource
+	private org.generationcp.middleware.service.api.derived_variables.DerivedVariableService middlewareDerivedVariableService;
 
 	@Resource
 	private DatasetValidator datasetValidator;
@@ -86,10 +86,11 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 		// Get the list of observation unit rows grouped by intances
 		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap =
-			datasetService.getInstanceIdToObservationUnitRowsMap(studyId, datasetId, geoLocationIds);
+			this.middlwareDatasetService.getInstanceIdToObservationUnitRowsMap(studyId, datasetId, geoLocationIds);
 		// Get the the measurement variables of all traits in a dataset so that we can determine the datatype and possibleValues
 		// of a ObservationUnitData.
-		final Map<Integer, MeasurementVariable> measurementVariablesMap = this.createVariableIdMeasurementVariableMap(datasetId);
+		final Map<Integer, MeasurementVariable> measurementVariablesMap =
+			this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMap(datasetId);
 
 		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
 		final FormulaDto formula = formulaOptional.get();
@@ -147,7 +148,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 					}
 				}
 
-				this.saveCalculatedResult(
+				this.middlewareDerivedVariableService.saveCalculatedResult(
 					value, categoricalId, observation.getObservationUnitId(),
 					target.getObservationId(),
 					targetMeasurementVariable);
@@ -182,40 +183,15 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 	}
 
-	/**
-	 * Gets the list of formula dependencies of all derived variables that are not yet loaded in a dataset.
-	 *
-	 * @param studyId
-	 * @param datasetId
-	 * @return
-	 */
 	@Override
 	public Set<String> getDependencyVariables(final int studyId, final int datasetId) {
 
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 
-		final Set<Integer> variableIdsOfTraitsInStudy = this.getVariableIdsOfTraitsInDataset(datasetId);
-		final Set<String> derivedVariablesDependencies = new HashSet<>();
-
-		final Set<FormulaVariable> formulaVariables = this.formulaService.getAllFormulaVariables(variableIdsOfTraitsInStudy);
-		for (final FormulaVariable formulaVariable : formulaVariables) {
-			if (!variableIdsOfTraitsInStudy.contains(formulaVariable.getId())) {
-				derivedVariablesDependencies.add(formulaVariable.getName());
-			}
-		}
-
-		return derivedVariablesDependencies;
+		return this.middlewareDerivedVariableService.getDependencyVariables(datasetId);
 	}
 
-	/**
-	 * Gets the list of formula dependencies of specific derived variables that are not yet loaded in a dataset.
-	 *
-	 * @param studyId
-	 * @param datasetId
-	 * @param variableId
-	 * @return
-	 */
 	@Override
 	public Set<String> getDependencyVariables(final int studyId, final int datasetId, final int variableId) {
 
@@ -225,16 +201,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		final List<Integer> variableIds = Arrays.asList(variableId);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, false, variableIds);
 
-		final Set<Integer> variableIdsOfTraitsInStudy = this.getVariableIdsOfTraitsInDataset(datasetId);
-		final Set<String> derivedVariablesDependencies = new HashSet<>();
-		final Set<FormulaVariable> formulaVariables = this.formulaService.getAllFormulaVariables(new HashSet<Integer>(variableIds));
-		for (final FormulaVariable formulaVariable : formulaVariables) {
-			if (!variableIdsOfTraitsInStudy.contains(formulaVariable.getId())) {
-				derivedVariablesDependencies.add(formulaVariable.getName());
-			}
-		}
-
-		return derivedVariablesDependencies;
+		return this.middlewareDerivedVariableService.getDependencyVariables(datasetId, variableId);
 	}
 
 	@Override
@@ -243,51 +210,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		for (final int datasetId : datasetIds) {
 			this.datasetValidator.validateDataset(studyId, datasetId, false);
 		}
-		return this.datasetService.countCalculatedVariablesInDatasets(datasetIds);
-	}
-
-	protected Set<Integer> getVariableIdsOfTraitsInDataset(final int datasetId) {
-
-		final Set<Integer> variableIdsOfTraitsInDataset = new HashSet<>();
-		final List<MeasurementVariable> traits =
-			datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()));
-
-		if (!traits.isEmpty()) {
-			for (final MeasurementVariable trait : traits) {
-				variableIdsOfTraitsInDataset.add(trait.getTermId());
-			}
-		}
-
-		return variableIdsOfTraitsInDataset;
-
-	}
-
-	protected void saveCalculatedResult(
-		final String value, final Integer categoricalId, final Integer observationUnitId, final Integer observationId,
-		final MeasurementVariable measurementVariable) {
-
-		// Update phenotype if it already exists, otherwise, create new phenotype.
-		if (observationId != null) {
-			this.datasetService.updatePhenotype(observationId, categoricalId, value);
-		} else {
-			final ObservationDto observationDto = new ObservationDto();
-			observationDto.setVariableId(measurementVariable.getTermId());
-			observationDto.setCategoricalValueId(categoricalId);
-			observationDto.setObservationUnitId(observationUnitId);
-			observationDto.setValue(value);
-			this.datasetService.createPhenotype(observationDto);
-		}
-
-	}
-
-	protected Map<Integer, MeasurementVariable> createVariableIdMeasurementVariableMap(final int datasetId) {
-		final Map<Integer, MeasurementVariable> variableIdMeasurementVariableMap = new HashMap<>();
-		final List<MeasurementVariable> measurementVariables =
-			this.datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()));
-		for (final MeasurementVariable measurementVariable : measurementVariables) {
-			variableIdMeasurementVariableMap.put(measurementVariable.getTermId(), measurementVariable);
-		}
-		return variableIdMeasurementVariableMap;
+		return this.middlewareDerivedVariableService.countCalculatedVariablesInDatasets(datasetIds);
 	}
 
 }
