@@ -25,7 +25,7 @@ public class PresetResource {
 	@Autowired
 	private PresetService presetService;
 
-	@RequestMapping(value = "/crops/{cropname}/presets", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropname}/presets", method = RequestMethod.PUT)
 	@ApiOperation(value = "Create a new Preset",
 		notes = "Create a new preset.")
 	@ResponseBody
