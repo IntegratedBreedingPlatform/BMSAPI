@@ -240,7 +240,7 @@ public class DatasetServiceImplTest {
 
 	@Test
 	public void testGetObservations() {
-		final List<ObservationUnitRow> observationDtoTestData = mockObservationUnitRowList();
+		final List<ObservationUnitRow> observationDtoTestData = this.mockObservationUnitRowList();
 
 		Mockito.doReturn(observationDtoTestData).when(this.middlewareDatasetService)
 			.getObservationUnitRows(TEST_STUDY_IDENTIFIER, 1, 1, 1, 100, null, null, null);
@@ -289,12 +289,12 @@ public class DatasetServiceImplTest {
 		data.add(row);
 		observationsPutRequestInput.setData(data);
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		Mockito.when(middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
-		Mockito.doNothing().when(studyValidator).validate(studyId, true);
-		Mockito.doNothing().when(datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
+		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
+		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId, true);
 		try {
 			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("no.variables.dataset"));
 			throw e;
 		}
@@ -316,14 +316,14 @@ public class DatasetServiceImplTest {
 		measurementVariable.setAlias("A");
 		measurementVariables.add(measurementVariable);
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = new HashMap<>();
-		Mockito.doNothing().when(studyValidator).validate(studyId, true);
-		Mockito.doNothing().when(datasetValidator).validateDataset(studyId, datasetId, true);
-		Mockito.when(middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
-		Mockito.when(middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
+		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
+		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
+		Mockito.when(this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
 				.thenReturn(storedData);
 		try {
 			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("none.obs.unit.id.matches"));
 			throw e;
 		}
@@ -352,14 +352,14 @@ public class DatasetServiceImplTest {
 		observationUnitRow.setObservationUnitId(1);
 		observationUnitRow.setVariables(observationUnitDataMap);
 		storedData.put("A", observationUnitRow);
-		Mockito.doNothing().when(studyValidator).validate(studyId, true);
-		Mockito.doNothing().when(datasetValidator).validateDataset(studyId, datasetId, true);
-		Mockito.when(middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
-		Mockito.when(middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
+		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
+		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
+		Mockito.when(this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
 				.thenReturn(storedData);
 		try {
 			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalidCellValue"));
 			throw e;
 		}
@@ -379,6 +379,7 @@ public class DatasetServiceImplTest {
 
 		observationsPutRequestInput.setData(data);
 		observationsPutRequestInput.setProcessWarnings(true);
+		observationsPutRequestInput.setDraftMode(false);
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		measurementVariable.setAlias("A");
@@ -391,14 +392,14 @@ public class DatasetServiceImplTest {
 		observationUnitRow.setObservationUnitId(1);
 		observationUnitRow.setVariables(observationUnitDataMap);
 		storedData.put("1", observationUnitRow);
-		Mockito.doNothing().when(studyValidator).validate(studyId, true);
-		Mockito.doNothing().when(datasetValidator).validateDataset(studyId, datasetId, true);
-		Mockito.when(middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
-		Mockito.when(middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
+		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
+		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
+		Mockito.when(this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
 				.thenReturn(storedData);
 		try {
 			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
-		} catch (PreconditionFailedException e) {
+		} catch (final PreconditionFailedException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.overwrite.data"));
 			throw e;
 		}
@@ -432,14 +433,14 @@ public class DatasetServiceImplTest {
 		observationUnitRow.setObservationUnitId(1);
 		observationUnitRow.setVariables(observationUnitDataMap);
 		storedData.put("1", observationUnitRow);
-		Mockito.doNothing().when(studyValidator).validate(studyId, true);
-		Mockito.doNothing().when(datasetValidator).validateDataset(studyId, datasetId, true);
-		Mockito.when(middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
-		Mockito.when(middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
+		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
+		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
+		Mockito.when(this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
 				.thenReturn(storedData);
 		try {
 			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
-		} catch (PreconditionFailedException e) {
+		} catch (final PreconditionFailedException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("duplicated.obs.unit.id"));
 			throw e;
 		}
@@ -473,15 +474,15 @@ public class DatasetServiceImplTest {
 		observationUnitRow.setObservationUnitId(1);
 		observationUnitRow.setVariables(observationUnitDataMap);
 		storedData.put("1", observationUnitRow);
-		Mockito.doNothing().when(studyValidator).validate(studyId, true);
-		Mockito.doNothing().when(datasetValidator).validateDataset(studyId, datasetId, true);
-		Mockito.when(middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
+		Mockito.doNothing().when(this.studyValidator).validate(studyId, true);
+		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId, true);
+		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
 		Mockito.when(
-				middlewareDatasetService.getObservationUnitsAsMap(anyInt(), anyListOf(MeasurementVariable.class), anyListOf(String.class)))
+			this.middlewareDatasetService.getObservationUnitsAsMap(anyInt(), anyListOf(MeasurementVariable.class), anyListOf(String.class)))
 				.thenReturn(storedData);
 		try {
 			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
-		} catch (PreconditionFailedException e) {
+		} catch (final PreconditionFailedException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("some.obs.unit.id.matches"));
 			throw e;
 		}

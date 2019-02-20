@@ -36,6 +36,10 @@ public class ObservationsPutRequestInput {
 		this.data = data;
 	}
 
+	public void setDraftMode(final boolean draftMode) {
+		this.draftMode = draftMode;
+	}
+
 	@Override
 	public int hashCode() {
 		return Pojomatic.hashCode(this);
