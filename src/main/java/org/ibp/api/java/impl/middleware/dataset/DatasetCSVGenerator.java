@@ -25,7 +25,7 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 	public File generateSingleInstanceFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> observationUnitRows,
 		final String fileNameFullPath, final StudyInstance studyInstance) throws IOException {
-		try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',')){
+		try (final CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',')){
 
 			final File newFile = new File(fileNameFullPath);
 			// feed in your array (or convert your data to an array)

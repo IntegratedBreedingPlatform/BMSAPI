@@ -66,7 +66,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		// Experimental Design variables have value at dataset level. Perform sorting to ensure that they come first
 		Collections.sort(environmentDetailsVariables, new Comparator<MeasurementVariable>() {
 			@Override
-			public int compare(MeasurementVariable var1, MeasurementVariable var2) {
+			public int compare(final MeasurementVariable var1, final MeasurementVariable var2) {
 				final String value1 = var1.getValue();
 				final String value2 = var2.getValue();
 		        if (value1 != null && value2 != null)
@@ -113,9 +113,9 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		return this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataSet.getDatasetId(), new ArrayList<>(selectedDatasetInstancesMap.keySet()));
 	}
 
-	protected List<MeasurementVariable> moveTrialInstanceInTheFirstColumn(List<MeasurementVariable> columns) {
+	protected List<MeasurementVariable> moveTrialInstanceInTheFirstColumn(final List<MeasurementVariable> columns) {
 		int trialInstanceIndex = 0;
-		for(MeasurementVariable column: columns) {
+		for(final MeasurementVariable column: columns) {
 			if(TermId.TRIAL_INSTANCE_FACTOR.getId() == column.getTermId()) {
 				final MeasurementVariable trialInstanceMeasurementVariable = columns.remove(trialInstanceIndex);
 				columns.add(0, trialInstanceMeasurementVariable);
