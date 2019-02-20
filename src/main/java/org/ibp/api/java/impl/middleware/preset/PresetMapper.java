@@ -2,10 +2,8 @@ package org.ibp.api.java.impl.middleware.preset;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
-import org.ibp.api.rest.preset.PresetDTO;
+import org.ibp.api.rest.preset.domain.PresetDTO;
 import org.springframework.stereotype.Component;
 
 /**

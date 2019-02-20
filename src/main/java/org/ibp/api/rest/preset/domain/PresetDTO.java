@@ -1,4 +1,4 @@
-package org.ibp.api.rest.preset;
+package org.ibp.api.rest.preset.domain;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -8,7 +8,7 @@ import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
-@JsonSubTypes(value = {@JsonSubTypes.Type(value = LabelPrintingPresetDTO.class, name = "LabelPrintingPreset"),})
+@JsonSubTypes(value = {@JsonSubTypes.Type(value = LabelPrintingPresetDTO.class, name = "LabelPrintingPreset")})
 public class PresetDTO {
 
 	public static class View {

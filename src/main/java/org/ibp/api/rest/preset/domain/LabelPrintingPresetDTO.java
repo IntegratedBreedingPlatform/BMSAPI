@@ -1,7 +1,5 @@
-package org.ibp.api.rest.preset;
+package org.ibp.api.rest.preset.domain;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -63,22 +61,21 @@ public class LabelPrintingPresetDTO extends PresetDTO {
 		}
 	}
 
-
-	@JsonView(PresetDTO.View.Configuration.class)
-	private String outputType;
-
 	@JsonView(PresetDTO.View.Configuration.class)
 	private List<List<Integer>> selectedFields;
 
 	@JsonView(PresetDTO.View.Configuration.class)
 	private BarcodeSetting barcodeSetting;
 
-	public String getOutputType() {
-		return outputType;
+	@JsonView(PresetDTO.View.Configuration.class)
+	private FilePresetConfigurationDTO fileConfiguration;
+
+	public FilePresetConfigurationDTO getFileConfiguration() {
+		return fileConfiguration;
 	}
 
-	public void setOutputType(final String outputType) {
-		this.outputType = outputType;
+	public void setFileConfiguration(final FilePresetConfigurationDTO fileConfiguration) {
+		this.fileConfiguration = fileConfiguration;
 	}
 
 	public List<List<Integer>> getSelectedFields() {
@@ -95,6 +92,21 @@ public class LabelPrintingPresetDTO extends PresetDTO {
 
 	public void setBarcodeSetting(final BarcodeSetting barcodeSetting) {
 		this.barcodeSetting = barcodeSetting;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
 	}
 
 }

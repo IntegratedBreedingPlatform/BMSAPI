@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.preset;
 
-import org.ibp.api.rest.preset.LabelPrintingPresetDTO;
-import org.ibp.api.rest.preset.PresetDTO;
+import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
+import org.ibp.api.rest.preset.domain.PresetDTO;
 import org.springframework.stereotype.Component;
 
 /**

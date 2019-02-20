@@ -1,15 +1,17 @@
 package org.ibp.api.java.preset;
 
 import java.util.List;
-import org.ibp.api.rest.preset.PresetDTO;
+import org.ibp.api.rest.preset.domain.PresetDTO;
 
 /**
  * Created by clarysabel on 2/19/19.
  */
 public interface PresetService {
 
-	void savePreset(PresetDTO presetDTO);
+	PresetDTO savePreset(PresetDTO presetDTO);
 
 	List<PresetDTO> getPresets (String programUUID, Integer toolId, String toolSection);
+
+	void deletePreset(Integer presetId);
 
 }

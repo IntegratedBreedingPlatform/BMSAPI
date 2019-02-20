@@ -1,4 +1,4 @@
-package org.ibp.api.rest.preset;
+package org.ibp.api.rest.preset.domain;
 
 public enum PresetType {
 

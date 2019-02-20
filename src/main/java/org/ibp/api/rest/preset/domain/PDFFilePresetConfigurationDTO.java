@@ -1,11 +1,11 @@
-package org.ibp.api.rest.preset;
+package org.ibp.api.rest.preset.domain;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class PDFLabelPrintingPresetDTO extends LabelPrintingPresetDTO {
+public class PDFFilePresetConfigurationDTO extends FilePresetConfigurationDTO {
 
 	@JsonView(PresetDTO.View.Configuration.class)
 	private Integer numberOfRowsPerPage;
@@ -40,8 +40,7 @@ public class PDFLabelPrintingPresetDTO extends LabelPrintingPresetDTO {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
-
 }
