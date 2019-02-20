@@ -143,7 +143,7 @@ public class DatasetCSVExportServiceImplTest {
 
 		final File zipFile = new File("");
 
-		when(this.datasetCSVGenerator.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString()))
+		when(this.datasetCSVGenerator.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString(), any(StudyInstance.class)))
 			.thenReturn(new File(""));
 		when(this.zipUtil.zipFiles(eq(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
 		this.datasetExportService.setZipUtil(this.zipUtil);
@@ -157,7 +157,7 @@ public class DatasetCSVExportServiceImplTest {
 			.generateFiles(
 				this.study, this.dataSetDTO, studyInstanceMap, instanceObservationUnitRowsMap, new ArrayList<MeasurementVariable>(), datasetCSVGenerator, AbstractDatasetExportService.CSV);
 		verify(this.datasetCSVGenerator, Mockito.times(studyInstanceMap.size()))
-			.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString());
+			.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString(), any(StudyInstance.class));
 
 		verify(zipUtil).zipFiles(eq(this.study.getName()), anyListOf(File.class));
 		assertSame(result, zipFile);
@@ -189,7 +189,7 @@ public class DatasetCSVExportServiceImplTest {
 
 		final File csvFile = new File("");
 
-		when(this.datasetCSVGenerator.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString()))
+		when(this.datasetCSVGenerator.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString(), any(StudyInstance.class)))
 			.thenReturn(csvFile);
 
 		Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = new HashMap<>();
@@ -203,7 +203,7 @@ public class DatasetCSVExportServiceImplTest {
 				this.study, this.dataSetDTO, studyInstanceMap, instanceObservationUnitRowsMap, new ArrayList<MeasurementVariable>(), datasetCSVGenerator, AbstractDatasetExportService.CSV);
 
 		verify(this.datasetCSVGenerator)
-			.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString());
+			.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString(), any(StudyInstance.class));
 
 		verify(this.zipUtil, times(0)).zipFiles(anyString(), anyListOf(File.class));
 		assertSame(result, csvFile);

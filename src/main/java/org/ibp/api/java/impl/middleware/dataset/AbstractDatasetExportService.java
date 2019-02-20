@@ -29,8 +29,8 @@ import java.util.Set;
 
 public abstract class AbstractDatasetExportService {
 
-	public static final String XLS = "xls";
-	public static final String CSV = "csv";
+	static final String XLS = "xls";
+	static final String CSV = "csv";
 
 	@Autowired
 	private StudyValidator studyValidator;
@@ -53,7 +53,7 @@ public abstract class AbstractDatasetExportService {
 	@Resource
 	protected StudyDataManager studyDataManager;
 
-	protected ZipUtil zipUtil = new ZipUtil();
+	private ZipUtil zipUtil = new ZipUtil();
 
 	protected void validate(final int studyId, final int datasetId, final Set<Integer> instanceIds) {
 		this.studyValidator.validate(studyId, false);
@@ -61,7 +61,7 @@ public abstract class AbstractDatasetExportService {
 		this.instanceValidator.validate(datasetId, instanceIds);
 	}
 
-	protected File generate(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId, final DatasetFileGenerator generator, final boolean singleFile, final String fileExtension) throws  IOException{
+	File generate(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId, final DatasetFileGenerator generator, final boolean singleFile, final String fileExtension) throws  IOException{
 
 		final Study study = this.studyDataManager.getStudy(studyId);
 		final DatasetDTO dataSet = this.datasetService.getDataset(datasetId);
@@ -85,7 +85,7 @@ public abstract class AbstractDatasetExportService {
 
 	}
 
-	public File generateInSingleFile(final Study study,
+	File generateInSingleFile(final Study study,
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns, final DatasetFileGenerator generator, final  String fileExtension)
 		throws IOException {
 
@@ -97,7 +97,7 @@ public abstract class AbstractDatasetExportService {
 	}
 
 
-	protected File generateFiles(final Study study, final DatasetDTO dataSetDto,
+	File generateFiles(final Study study, final DatasetDTO dataSetDto,
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns, final DatasetFileGenerator generator, final String fileExtension)
 		throws IOException {
@@ -112,7 +112,7 @@ public abstract class AbstractDatasetExportService {
 					DataSetType.findById(dataSetDto.getDatasetTypeId()).getReadableName(), dataSetDto.getName()));
 			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 			files.add(
-				generator.generateSingleInstanceFile(study.getId(), dataSetDto, columns, observationUnitRowMap.get(instanceDBID), fileNameFullPath));
+				generator.generateSingleInstanceFile(study.getId(), dataSetDto, columns, observationUnitRowMap.get(instanceDBID), fileNameFullPath, selectedDatasetInstancesMap.get(instanceDBID)));
 		}
 
 		if (files.size() == 1) {
@@ -122,12 +122,12 @@ public abstract class AbstractDatasetExportService {
 		}
 	}
 
-	public void setZipUtil(final ZipUtil zipUtil) {
+	void setZipUtil(final ZipUtil zipUtil) {
 		this.zipUtil = zipUtil;
 	}
 
 
-	protected Map<Integer, StudyInstance> getSelectedDatasetInstancesMap(final List<StudyInstance> studyInstances, final Set<Integer> instanceIds) {
+	Map<Integer, StudyInstance> getSelectedDatasetInstancesMap(final List<StudyInstance> studyInstances, final Set<Integer> instanceIds) {
 		Map<Integer, StudyInstance> studyInstanceMap = new HashMap<>();
 		for(StudyInstance studyInstance: studyInstances) {
 			if (instanceIds.contains(studyInstance.getInstanceDbId())) {
