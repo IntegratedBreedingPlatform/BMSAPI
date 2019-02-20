@@ -12,10 +12,10 @@ import java.util.Map;
 @Component
 public class DataCollectionSorter {
 
-	public static final String FIELDMAP_RANGE = "FIELDMAP RANGE";
-	public static final String FIELDMAP_COLUMN = "FIELDMAP COLUMN";
+	static final String FIELDMAP_RANGE = "FIELDMAP RANGE";
+	static final String FIELDMAP_COLUMN = "FIELDMAP COLUMN";
 
-	public List<ObservationUnitRow> orderByRange(
+	List<ObservationUnitRow> orderByRange(
 		final FieldmapBlockInfo blockInfo, final List<ObservationUnitRow> observationUnitRows) {
 
 		final List<ObservationUnitRow> reorderedObservationUnitRows = new LinkedList<>();
@@ -51,7 +51,7 @@ public class DataCollectionSorter {
 
 	}
 
-	public List<ObservationUnitRow> orderByColumn(
+	List<ObservationUnitRow> orderByColumn(
 		final FieldmapBlockInfo blockInfo, final List<ObservationUnitRow> observationUnitRows) {
 
 		final List<ObservationUnitRow> reorderedObservationUnitRows = new LinkedList<>();
@@ -87,7 +87,7 @@ public class DataCollectionSorter {
 
 	}
 
-	protected Map<String, List<ObservationUnitRow>> groupObservationUnitRowsByRangeAndColumn(
+	Map<String, List<ObservationUnitRow>> groupObservationUnitRowsByRangeAndColumn(
 		final List<ObservationUnitRow> observationUnitRows) {
 
 		final Map<String, List<ObservationUnitRow>> fieldmapExperiments = new HashMap();
@@ -107,7 +107,7 @@ public class DataCollectionSorter {
 		return fieldmapExperiments;
 	}
 
-	protected String coordinateKey(final Integer column, final Integer range) {
+	String coordinateKey(final Integer column, final Integer range) {
 		return column.toString() + ":" + range.toString();
 	}
 

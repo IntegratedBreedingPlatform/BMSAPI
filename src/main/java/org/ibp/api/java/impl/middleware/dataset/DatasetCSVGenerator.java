@@ -52,7 +52,7 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 		return this.generateSingleInstanceFile(null, null, columns, allObservationUnitRows, fileNameFullPath, null);
 	}
 
-	protected String[] getColumnValues(final ObservationUnitRow row, final List<MeasurementVariable> subObservationSetColumns) {
+	String[] getColumnValues(final ObservationUnitRow row, final List<MeasurementVariable> subObservationSetColumns) {
 		final List<String> values = new LinkedList<>();
 		for (final MeasurementVariable column : subObservationSetColumns) {
 			values.add(row.getVariables().get(column.getName()).getValue());
@@ -60,7 +60,7 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 		return values.toArray(new String[] {});
 	}
 
-	protected List<String> getHeaderNames(final List<MeasurementVariable> subObservationSetColumns) {
+	List<String> getHeaderNames(final List<MeasurementVariable> subObservationSetColumns) {
 		final List<String> headerNames = new LinkedList<>();
 		for (final MeasurementVariable measurementVariable : subObservationSetColumns) {
 			headerNames.add(measurementVariable.getAlias());

@@ -53,19 +53,19 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 
 	private static final String NUMERIC_DATA_TYPE = "Numeric";
 	private static final int PIXEL_SIZE = 250;
-	protected static final int VARIABLE_NAME_COLUMN_INDEX = 0;
-	protected static final int DESCRIPTION_COLUMN_INDEX = 1;
+	private static final int VARIABLE_NAME_COLUMN_INDEX = 0;
+	private static final int DESCRIPTION_COLUMN_INDEX = 1;
 	private static final int ONTOLOGY_ID_COLUMN_INDEX = 2;
-	protected static final int PROPERTY_COLUMN_INDEX = 3;
-	protected static final int SCALE_COLUMN_INDEX = 4;
-	protected static final int METHOD_COLUMN_INDEX = 5;
-	protected static final int DATATYPE_COLUMN_INDEX = 6;
-	protected static final int VARIABLE_VALUE_COLUMN_INDEX = 7;
-	protected static final int DATASET_COLUMN_INDEX = 8;
+	private static final int PROPERTY_COLUMN_INDEX = 3;
+	private static final int SCALE_COLUMN_INDEX = 4;
+	private static final int METHOD_COLUMN_INDEX = 5;
+	private static final int DATATYPE_COLUMN_INDEX = 6;
+	private static final int VARIABLE_VALUE_COLUMN_INDEX = 7;
+	private static final int DATASET_COLUMN_INDEX = 8;
 	private static final String MAX_ONLY = " and below";
 	private static final String MIN_ONLY = " and above";
 	private static final String NO_RANGE = "All values allowed";
-	public static final String POSSIBLE_VALUES_AS_STRING_DELIMITER = "/";
+	private static final String POSSIBLE_VALUES_AS_STRING_DELIMITER = "/";
 	private static final String STUDY = "STUDY";
 	private static final String ENVIRONMENT = "ENVIRONMENT";
 	private static final String PLOT = "PLOT";
@@ -108,7 +108,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		return new File(fileNameFullPath);
 	}
 
-	protected List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns) {
+	private List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns) {
 		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
 		final List<MeasurementVariable> trait = new ArrayList<>();
 		final List<MeasurementVariable> selection = new ArrayList<>();
@@ -117,14 +117,14 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		for (final MeasurementVariable measurementVariable : columns) {
 			if (TermId.OBS_UNIT_ID.getId() == measurementVariable.getTermId()) {
 				orderedColumns.add(0, measurementVariable);
-			} else if (discardColumns.contains(measurementVariable.getTermId())) {
-				continue;
-			} else if (VariableType.TRAIT.getId() == measurementVariable.getVariableType().getId()) {
-				trait.add(measurementVariable);
-			} else if (VariableType.SELECTION_METHOD.getId() == measurementVariable.getVariableType().getId()) {
-				selection.add(measurementVariable);
-			} else {
-				orderedColumns.add(measurementVariable);
+			} else if (!discardColumns.contains(measurementVariable.getTermId())) {
+				if (VariableType.TRAIT.getId().equals(measurementVariable.getVariableType().getId())) {
+					trait.add(measurementVariable);
+				} else if (VariableType.SELECTION_METHOD.getId().equals(measurementVariable.getVariableType().getId())) {
+					selection.add(measurementVariable);
+				} else {
+					orderedColumns.add(measurementVariable);
+				}
 			}
 		}
 
@@ -192,7 +192,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		}
 	}
 
-	protected CellStyle getObservationHeaderStyle(final boolean isFactor, final HSSFWorkbook xlsBook) {
+	private CellStyle getObservationHeaderStyle(final boolean isFactor, final HSSFWorkbook xlsBook) {
 		final CellStyle style;
 		if (isFactor) {
 			style = this.getHeaderStyle(xlsBook, this.getColorIndex(xlsBook, 51, 153, 102));
@@ -536,12 +536,11 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		}
 	}
 
-	protected void setContentOfVariableValueColumn(final HSSFCell cell, final MeasurementVariable measurementVariable) {
+	private void setContentOfVariableValueColumn(final HSSFCell cell, final MeasurementVariable measurementVariable) {
 
 		if (StringUtils.isBlank(measurementVariable.getValue()) && (measurementVariable.getVariableType() == VariableType.TRAIT
 			|| (measurementVariable.getRole() != null && measurementVariable.getRole().equals(PhenotypicType.VARIATE)))) {
-			/**
-			 If the variable is a 'Trait' then the VALUE column in Description sheet will be:
+			/**If the variable is a 'Trait' then the VALUE column in Description sheet will be:
 			 for numerical variables: we will see the Min and Max values (if any) separated by a dash "-", e.g.: 30 - 100 (we should allow decimal values too, e.g.: 0.50 - 23.09)
 			 for categorical variables: we will
 			 see the Categories values separated by a slash "/", e.g.: 1/2/3/4/5
@@ -554,7 +553,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		}
 	}
 
-	protected void setVariableValueBasedOnDataType(final HSSFCell cell, final MeasurementVariable measurementVariable) {
+	private void setVariableValueBasedOnDataType(final HSSFCell cell, final MeasurementVariable measurementVariable) {
 
 		if (DataType.NUMERIC_VARIABLE.getId().equals(measurementVariable.getDataTypeId()) && StringUtils
 			.isNotBlank(measurementVariable.getValue()) && NumberUtils.isNumber(measurementVariable.getValue())) {
@@ -589,7 +588,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		return idValue;
 	}
 
-	protected String getPossibleValueDetailAsStringBasedOnDataType(final MeasurementVariable measurementVariable) {
+	private String getPossibleValueDetailAsStringBasedOnDataType(final MeasurementVariable measurementVariable) {
 
 		if (DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId())) {
 			return this.convertPossibleValuesToString(measurementVariable.getPossibleValues(), POSSIBLE_VALUES_AS_STRING_DELIMITER);
@@ -658,7 +657,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		return Lists.newArrayList(variablesByType);
 	}
 
-	public void setMessageSource(final ResourceBundleMessageSource messageSource) {
+	protected void setMessageSource(final ResourceBundleMessageSource messageSource) {
 		this.messageSource = messageSource;
 	}
 }
