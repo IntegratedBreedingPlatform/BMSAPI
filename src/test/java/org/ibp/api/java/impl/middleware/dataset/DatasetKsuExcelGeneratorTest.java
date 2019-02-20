@@ -24,7 +24,7 @@ public class DatasetKsuExcelGeneratorTest {
 		final String filename = "filename";
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setName("DATASET");
-		final File file = this.generator.generateSingleInstanceFile(1, datasetDTO, new ArrayList<MeasurementVariable>(), new ArrayList<ObservationUnitRow>(), filename);
+		final File file = this.generator.generateSingleInstanceFile(1, datasetDTO, new ArrayList<MeasurementVariable>(), new ArrayList<ObservationUnitRow>(), filename, null);
 		Assert.assertEquals(filename, file.getName());
 	}
 
