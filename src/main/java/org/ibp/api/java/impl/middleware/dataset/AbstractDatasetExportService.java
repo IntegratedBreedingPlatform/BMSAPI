@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
@@ -47,6 +48,9 @@ public abstract class AbstractDatasetExportService {
 	@Autowired
 	protected DatasetCollectionOrderService datasetCollectionOrderService;
 
+	@Autowired
+	protected OntologyDataManager ontologyDataManager;
+
 	@Resource
 	protected org.generationcp.middleware.service.api.dataset.DatasetService datasetService;
 
@@ -72,7 +76,7 @@ public abstract class AbstractDatasetExportService {
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap = getSelectedDatasetInstancesMap(dataSet.getInstances(),
 			instanceIds);
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
-			this.getObservationUnitRowMap(study, dataSet, collectionOrderId, selectedDatasetInstancesMap);
+			this.getObservationUnitRowMap(study, dataSet, selectedDatasetInstancesMap);
 		final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder = DatasetCollectionOrderServiceImpl.CollectionOrder.findById(collectionOrderId);
 		final int trialDatasetId = this.studyDataManager.getDataSetsByType(study.getId(), DataSetType.SUMMARY_DATA).get(0).getId();
 		this.datasetCollectionOrderService.reorder(collectionOrder, trialDatasetId, selectedDatasetInstancesMap, observationUnitRowMap);
@@ -101,8 +105,26 @@ public abstract class AbstractDatasetExportService {
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns, final DatasetFileGenerator generator, final String fileExtension)
 		throws IOException {
-		final List<File> files = new ArrayList<>();
 		final File temporaryFolder = Files.createTempDir();
+		final List<File> files =
+			this.getInstanceFiles(study, dataSetDto, selectedDatasetInstancesMap, observationUnitRowMap, columns, generator, fileExtension,
+				temporaryFolder);
+		return this.getReturnFile(study, files);
+	}
+
+	File getReturnFile(final Study study, final List<File> files) throws IOException {
+		if (files.size() == 1) {
+			return files.get(0);
+		} else {
+			return this.zipUtil.zipFiles(study.getName(), files);
+		}
+	}
+
+	List<File> getInstanceFiles(
+		final Study study, final DatasetDTO dataSetDto, final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
+		final DatasetFileGenerator generator, final String fileExtension, final File temporaryFolder) throws IOException {
+		final List<File> files = new ArrayList<>();
 		for(final Integer instanceDBID: observationUnitRowMap.keySet()) {
 			// Build the filename with the following format:
 			// study_name + TRIAL_INSTANCE number + location_abbr +  dataset_type + dataset_name
@@ -114,18 +136,8 @@ public abstract class AbstractDatasetExportService {
 			files.add(
 				generator.generateSingleInstanceFile(study.getId(), dataSetDto, columns, observationUnitRowMap.get(instanceDBID), fileNameFullPath, selectedDatasetInstancesMap.get(instanceDBID)));
 		}
-
-		if (files.size() == 1) {
-			return files.get(0);
-		} else {
-			return this.zipUtil.zipFiles(study.getName(), files);
-		}
+		return files;
 	}
-
-	void setZipUtil(final ZipUtil zipUtil) {
-		this.zipUtil = zipUtil;
-	}
-
 
 	Map<Integer, StudyInstance> getSelectedDatasetInstancesMap(final List<StudyInstance> studyInstances, final Set<Integer> instanceIds) {
 		Map<Integer, StudyInstance> studyInstanceMap = new HashMap<>();
@@ -136,8 +148,25 @@ public abstract class AbstractDatasetExportService {
 		}
 		return studyInstanceMap;
 	}
+	
+	List<MeasurementVariable> moveSelectedVariableInTheFirstColumn(List<MeasurementVariable> columns, final int variableId) {
+		int trialInstanceIndex = 0;
+		for(final MeasurementVariable column: columns) {
+			if(variableId == column.getTermId()) {
+				final MeasurementVariable trialInstanceMeasurementVariable = columns.remove(trialInstanceIndex);
+				columns.add(0, trialInstanceMeasurementVariable);
+				break;
+			}
+			trialInstanceIndex++;
+		}
+		return columns;
+	}
 
-	public abstract List<MeasurementVariable> getColumns(int studyId, int datasetId);
+	protected abstract List<MeasurementVariable> getColumns(int studyId, int datasetId);
 
-	public abstract Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(Study study, DatasetDTO dataset, int collectionOrderId, Map<Integer, StudyInstance> selectedDatasetInstancesMap);
+	protected abstract Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(Study study, DatasetDTO dataset, Map<Integer, StudyInstance> selectedDatasetInstancesMap);
+
+	void setZipUtil(final ZipUtil zipUtil) {
+		this.zipUtil = zipUtil;
+	}
 }

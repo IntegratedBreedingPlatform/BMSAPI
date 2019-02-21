@@ -18,4 +18,6 @@ public interface DatasetFileGenerator {
 
 	File generateMultiInstanceFile(Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, List<MeasurementVariable> columns,
 		String fileNameFullPath) throws IOException;
+
+	File generateTraitAndSelectionVariablesFile(List<String[]> rowValues, String filenamePath) throws IOException;
 }

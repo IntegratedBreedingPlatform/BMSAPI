@@ -105,25 +105,11 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		allVariables.addAll(subObservationSetColumns);
 		allVariables.addAll(traits);
 		allVariables.addAll(selectionVariables);
-		return this.moveTrialInstanceInTheFirstColumn(allVariables);
+		return this.moveSelectedVariableInTheFirstColumn(allVariables, TermId.TRIAL_INSTANCE_FACTOR.getId());
 	}
 
 	@Override
-	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(final Study study, final DatasetDTO dataSet, final int collectionOrderId, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
-		return this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataSet.getDatasetId(), new ArrayList<>(selectedDatasetInstancesMap.keySet()));
-	}
-
-	protected List<MeasurementVariable> moveTrialInstanceInTheFirstColumn(final List<MeasurementVariable> columns) {
-		int trialInstanceIndex = 0;
-		for(final MeasurementVariable column: columns) {
-			if(TermId.TRIAL_INSTANCE_FACTOR.getId() == column.getTermId()) {
-				final MeasurementVariable trialInstanceMeasurementVariable = columns.remove(trialInstanceIndex);
-				columns.add(0, trialInstanceMeasurementVariable);
-				break;
-			}
-			trialInstanceIndex++;
-		}
-		return columns;
-
+	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(final Study study, final DatasetDTO dataset, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
+		return this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataset.getDatasetId(), new ArrayList<>(selectedDatasetInstancesMap.keySet()));
 	}
 }

@@ -222,7 +222,7 @@ public class DatasetCSVExportServiceImplTest {
 
 	@Test
 	public void testMoveTrialInstanceInTheFirstColumn() {
-		final List<MeasurementVariable> reorderedColumns = this.datasetExportService.moveTrialInstanceInTheFirstColumn(this.createColumnHeaders());
+		final List<MeasurementVariable> reorderedColumns = this.datasetExportService.moveSelectedVariableInTheFirstColumn(this.createColumnHeaders(), TermId.TRIAL_INSTANCE_FACTOR.getId());
 		Assert.assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), reorderedColumns.get(0).getTermId());
 	}
 
@@ -249,7 +249,7 @@ public class DatasetCSVExportServiceImplTest {
 
 	@Test
 	public void testGetObservationUnitRowMap() {
-		this.datasetExportService.getObservationUnitRowMap(this.study, this.dataSetDTO, DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), new HashMap<Integer, StudyInstance>());
+		this.datasetExportService.getObservationUnitRowMap(this.study, this.dataSetDTO, new HashMap<Integer, StudyInstance>());
 		Mockito.verify(this.studyDatasetService).getInstanceObservationUnitRowsMap(this.study.getId(), this.dataSetDTO.getDatasetId(), new ArrayList<Integer>());
 	}
 	private List<StudyInstance> createStudyInstances() {

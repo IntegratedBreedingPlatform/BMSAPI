@@ -40,7 +40,7 @@ public class DatasetExcelGeneratorTest {
 	private DatasetService datasetService;
 
 	@InjectMocks
-	private DatasetXLSGenerator datasetExcelGenerator;
+	private DatasetExcelGenerator datasetExcelGenerator;
 
 	@Before
 	public void setUp() {

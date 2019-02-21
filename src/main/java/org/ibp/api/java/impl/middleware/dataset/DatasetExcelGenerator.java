@@ -49,7 +49,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @Component
-public class DatasetXLSGenerator implements DatasetFileGenerator {
+public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	private static final String NUMERIC_DATA_TYPE = "Numeric";
 	private static final int PIXEL_SIZE = 250;
@@ -90,7 +90,8 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 
 		final List<MeasurementVariable> orderedColumns = this.orderColumns(columns);
 		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto, studyInstance);
-		this.writeObservationSheet(orderedColumns, reorderedObservationUnitRows, xlsBook);
+		final Locale locale = LocaleContextHolder.getLocale();
+		this.writeObservationSheet(orderedColumns, reorderedObservationUnitRows, xlsBook, this.messageSource.getMessage("export.study.sheet.observation", null, locale));
 
 		final File file = new File(fileNamePath);
 
@@ -103,9 +104,13 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 
 	@Override
 	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
-		final String fileNameFullPath) {
-		//Do nothing. Implement for the singleFile download XLS option
-		return new File(fileNameFullPath);
+		final String fileNameFullPath) throws IOException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public File generateTraitAndSelectionVariablesFile(final List<String[]> rowValues, final String filenamePath) throws IOException{
+		throw new UnsupportedOperationException();
 	}
 
 	private List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns) {
@@ -133,11 +138,10 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		return orderedColumns;
 	}
 
-	private void writeObservationSheet(
+	void writeObservationSheet(
 		final List<MeasurementVariable> columns, final List<ObservationUnitRow> reorderedObservationUnitRows,
-		final HSSFWorkbook xlsBook) {
-		final Locale locale = LocaleContextHolder.getLocale();
-		final HSSFSheet xlsSheet = xlsBook.createSheet(this.messageSource.getMessage("export.study.sheet.observation", null, locale));
+		final HSSFWorkbook xlsBook, final String sheetName) {
+		final HSSFSheet xlsSheet = xlsBook.createSheet(sheetName);
 		this.writeObservationHeader(xlsBook, xlsSheet, columns);
 		int currentRowNum = 1;
 		for (final ObservationUnitRow dataRow : reorderedObservationUnitRows) {
@@ -161,10 +165,9 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 				if (column.getPossibleValues() != null && !column.getPossibleValues()
 					.isEmpty() && column.getTermId() != TermId.BREEDING_METHOD_VARIATE.getId()
 					&& column.getTermId() != TermId.BREEDING_METHOD_VARIATE_CODE.getId() && !column.getProperty()
-					.equals(DatasetXLSGenerator.BREEDING_METHOD_PROPERTY_NAME)) {
-					cell.setCellValue(getCategoricalCellValue(dataCell, column.getPossibleValues()));
-
-				} else if (DatasetXLSGenerator.NUMERIC_DATA_TYPE.equalsIgnoreCase(column.getDataType())) {
+					.equals(DatasetExcelGenerator.BREEDING_METHOD_PROPERTY_NAME)) {
+					cell.setCellValue(this.getCategoricalCellValue(dataCell, column.getPossibleValues()));
+				} else if (DatasetExcelGenerator.NUMERIC_DATA_TYPE.equalsIgnoreCase(column.getDataType())) {
 					if (!dataCell.isEmpty() && NumberUtils.isNumber(dataCell)) {
 						cell.setCellType(CellType.BLANK);
 						cell.setCellType(CellType.NUMERIC);
