@@ -7,25 +7,25 @@ import org.pojomatic.annotations.AutoProperty;
 @AutoProperty
 public class Field {
 
-	private String id;
+	private Integer id;
 
 	private String name;
 
-	public Field(final String id, final String name) {
+	public Field(final Integer id, final String name) {
 		this.id = id;
 		this.name = name;
 	}
 
 	public Field (final MeasurementVariable measurementVariable) {
-		this.id = String.valueOf(measurementVariable.getTermId());
+		this.id = measurementVariable.getTermId();
 		this.name = String.valueOf(measurementVariable.getAlias());
 	}
 
-	public String getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(final String id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 

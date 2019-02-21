@@ -1,7 +1,6 @@
 package org.ibp.api.rest.labelprinting;
 
 import com.google.common.collect.Maps;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.commons.util.FileUtils;
@@ -17,6 +16,7 @@ import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.ibp.api.domain.common.LabelPrintingStaticField;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
@@ -91,17 +91,22 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 	private static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV);
 
+	private static List<Integer> STATIC_FIELD_IDS;
+
 	@PostConstruct
 	void initStaticFields() {
 		final String studyNamePropValue = this.getMessage("label.printing.field.study.name");
 		final String yearPropValue = this.getMessage("label.printing.field.year");
 		final String parentagePropValue = this.getMessage("label.printing.field.parentage");
 
-		STUDY_NAME_FIELD = new Field(studyNamePropValue, studyNamePropValue);
-		YEAR_FIELD = new Field(yearPropValue, yearPropValue);
-		PARENTAGE_FIELD = new Field(parentagePropValue, parentagePropValue);
+		STUDY_NAME_FIELD = new Field(LabelPrintingStaticField.STUDY_NAME.getFieldId(), studyNamePropValue);
+		YEAR_FIELD = new Field(LabelPrintingStaticField.YEAR.getFieldId(), yearPropValue);
+		PARENTAGE_FIELD = new Field(LabelPrintingStaticField.PARENTAGE.getFieldId(), parentagePropValue);
 
 		DEFAULT_STUDY_DETAILS_FIELDS = Arrays.asList(STUDY_NAME_FIELD, YEAR_FIELD);
+
+		STATIC_FIELD_IDS = Arrays.asList(LabelPrintingStaticField.STUDY_NAME.getFieldId(), LabelPrintingStaticField.YEAR.getFieldId(),
+				LabelPrintingStaticField.PARENTAGE.getFieldId(), LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId());
 	}
 
 	@Override
@@ -113,13 +118,13 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	@Override
 	public void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput) {
 		this.validateLabelsInfoInputData(labelsGeneratorInput);
-		final Set<String> availableKeys = new HashSet<>();
+		final Set<Integer> availableKeys = new HashSet<>();
 		getAvailableLabelTypes(labelsGeneratorInput)
 				.forEach(labelType -> labelType.getFields().forEach(field -> availableKeys.add(field.getId())));
-		final Set<String> requestedFields = new HashSet<>();
+		final Set<Integer> requestedFields = new HashSet<>();
 		int totalRequestedFields = 0;
-		for (final List<String> list: labelsGeneratorInput.getFields()) {
-			for (final String key: list) {
+		for (final List<Integer> list: labelsGeneratorInput.getFields()) {
+			for (final Integer key: list) {
 				requestedFields.add(key);
 				totalRequestedFields++;
 			}
@@ -252,7 +257,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final List<Field> datasetDetailsFields = new LinkedList<>();
 		datasetDetailsFields.addAll(transform(plotVariables));
 		// Requirement to add SubObs dataset type plus OBS_UNIT_ID when it is not a variable associated to the subObs dataset
-		final Field subObsUnitIdfield = new Field(DataSetType.findById(dataSetDTO.getDatasetTypeId()).getReadableName().concat(" ").concat(OBS_UNIT_ID),
+		final Field subObsUnitIdfield = new Field(LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId(),
 				DataSetType.findById(dataSetDTO.getDatasetTypeId()).getReadableName().concat(" ").concat(OBS_UNIT_ID));
 		datasetDetailsFields.add(subObsUnitIdfield);
 		datasetDetailsFields.addAll(transform(datasetVariables));
@@ -269,13 +274,11 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	public LabelsData getLabelsData(final LabelsGeneratorInput labelsGeneratorInput) {
 		final StudyDetails study = studyDataManager.getStudyDetails(labelsGeneratorInput.getStudyId());
 
-		final DatasetDTO dataSetDTO = middlewareDatasetService.getDataset(labelsGeneratorInput.getDatasetId());
-		final String subObsDatasetUnitIdFieldKey =
-			DataSetType.findById(dataSetDTO.getDatasetTypeId()).getReadableName().concat(" ").concat(OBS_UNIT_ID);
+		final Integer subObsDatasetUnitIdFieldKey = LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId();
 
-		final Map<String, Field> termIdFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), Field::getId);
+		final Map<Integer, Field> termIdFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), Field::getId);
 
-		final Set<String> allRequiredKeys = new HashSet<>();
+		final Set<Integer> allRequiredKeys = new HashSet<>();
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
 				allRequiredKeys.add(subObsDatasetUnitIdFieldKey);
@@ -295,14 +298,14 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 						.thenComparing(o -> Integer.valueOf(o.getVariables().get(PLOT_NO).getValue()))
 						.thenComparing(o -> Integer.valueOf(o.getVariables().get(ENTRY_NO).getValue())));
 
-		final List<Map<String, String>> results = new LinkedList<>();
+		final List<Map<Integer, String>> results = new LinkedList<>();
 		for (final ObservationUnitRow observationUnitRow : observationUnitRows) {
-			final Map<String, String> row = new HashMap<>();
-			for (final String requiredField : allRequiredKeys) {
+			final Map<Integer, String> row = new HashMap<>();
+			for (final Integer requiredField : allRequiredKeys) {
 				final Field field = termIdFieldMap.get(requiredField);
-				if (NumberUtils.isNumber(requiredField)) {
+				if (!STATIC_FIELD_IDS.contains(field.getId())) {
 					// Special cases: LOCATION_NAME, PLOT OBS_UNIT_ID, CROP_SEASON_CODE
-					final Integer termId = Integer.parseInt(requiredField);
+					final Integer termId = requiredField;
 					if (TermId.getById(termId).equals(TermId.LOCATION_ID)) {
 						row.put(requiredField, observationUnitRow.getVariables().get(LOCATION_ID).getValue());
 						continue;
