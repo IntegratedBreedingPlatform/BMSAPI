@@ -112,7 +112,7 @@ public abstract class AbstractDatasetExportService {
 		return this.getReturnFile(study, files);
 	}
 
-	protected File getReturnFile(final Study study, final List<File> files) throws IOException {
+	File getReturnFile(final Study study, final List<File> files) throws IOException {
 		if (files.size() == 1) {
 			return files.get(0);
 		} else {
@@ -120,7 +120,7 @@ public abstract class AbstractDatasetExportService {
 		}
 	}
 
-	protected List<File> getInstanceFiles(
+	List<File> getInstanceFiles(
 		final Study study, final DatasetDTO dataSetDto, final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
 		final DatasetFileGenerator generator, final String fileExtension, final File temporaryFolder) throws IOException {
@@ -139,7 +139,7 @@ public abstract class AbstractDatasetExportService {
 		return files;
 	}
 
-	protected Map<Integer, StudyInstance> getSelectedDatasetInstancesMap(final List<StudyInstance> studyInstances, final Set<Integer> instanceIds) {
+	Map<Integer, StudyInstance> getSelectedDatasetInstancesMap(final List<StudyInstance> studyInstances, final Set<Integer> instanceIds) {
 		Map<Integer, StudyInstance> studyInstanceMap = new HashMap<>();
 		for(StudyInstance studyInstance: studyInstances) {
 			if (instanceIds.contains(studyInstance.getInstanceDbId())) {
@@ -149,7 +149,7 @@ public abstract class AbstractDatasetExportService {
 		return studyInstanceMap;
 	}
 	
-	protected List<MeasurementVariable> moveSelectedVariableInTheFirstColumn(List<MeasurementVariable> columns, final int variableId) {
+	List<MeasurementVariable> moveSelectedVariableInTheFirstColumn(List<MeasurementVariable> columns, final int variableId) {
 		int trialInstanceIndex = 0;
 		for(final MeasurementVariable column: columns) {
 			if(variableId == column.getTermId()) {
