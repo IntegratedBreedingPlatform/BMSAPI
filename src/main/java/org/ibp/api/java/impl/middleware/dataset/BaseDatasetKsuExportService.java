@@ -14,10 +14,12 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,6 +28,10 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportService {
+
+	@Resource
+	protected MethodService methodService;
+
 	public static String[] TRAIT_FILE_HEADERS = {"trait", "format", "defaultValue", "minimum",
 		"maximum", "details", "categories", "isVisible", "realPosition"};
 

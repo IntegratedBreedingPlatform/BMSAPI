@@ -9,7 +9,6 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
@@ -57,9 +56,6 @@ public abstract class AbstractDatasetExportService {
 
 	@Resource
 	protected StudyDataManager studyDataManager;
-
-	@Resource
-	protected MethodService methodService;
 
 	private ZipUtil zipUtil = new ZipUtil();
 
