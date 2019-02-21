@@ -419,17 +419,23 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Boolean checkOutOfBoundDraftData(final Integer datasetId) {
+	public Boolean checkOutOfBoundDraftData(final Integer studyId, final Integer datasetId) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		return this.middlewareDatasetService.checkOutOfBoundDraftData(datasetId);
 	}
 
 	@Override
-	public void acceptDraftData(final Integer datasetId) {
+	public void acceptDraftData(final Integer studyId, final Integer datasetId) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		this.middlewareDatasetService.acceptDraftData(datasetId);
 	}
 
 	@Override
-	public void rejectDraftData(final Integer datasetId) {
+	public void rejectDraftData(final Integer studyId, final Integer datasetId) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		this.middlewareDatasetService.rejectDraftData(datasetId);
 	}
 

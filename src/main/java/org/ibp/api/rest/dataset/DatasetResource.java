@@ -290,7 +290,7 @@ public class DatasetResource {
 	@ResponseBody
 	public ResponseEntity<Void> acceptDraftData(@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
-		this.studyDatasetService.acceptDraftData(datasetId);
+		this.studyDatasetService.acceptDraftData(studyId, datasetId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -299,7 +299,7 @@ public class DatasetResource {
 	@ResponseBody
 	public ResponseEntity<Void> rejectDraftData(@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
-		this.studyDatasetService.rejectDraftData(datasetId);
+		this.studyDatasetService.rejectDraftData(studyId, datasetId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -309,7 +309,7 @@ public class DatasetResource {
 	public ResponseEntity<Void> checkOutOfBoundDraftData(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
-		final Boolean hasOutOfBounds = this.studyDatasetService.checkOutOfBoundDraftData(datasetId);
+		final Boolean hasOutOfBounds = this.studyDatasetService.checkOutOfBoundDraftData(studyId, datasetId);
 
 		if (hasOutOfBounds) {
 			return new ResponseEntity<>(HttpStatus.OK);
