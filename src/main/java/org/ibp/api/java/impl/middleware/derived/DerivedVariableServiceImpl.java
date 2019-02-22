@@ -42,6 +42,9 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	private static final Logger LOG = LoggerFactory.getLogger(DerivedVariableServiceImpl.class);
 	public static final String HAS_DATA_OVERWRITE_RESULT_KEY = "hasDataOverwrite";
 	public static final String INPUT_MISSING_DATA_RESULT_KEY = "inputMissingData";
+	public static final String STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION = "study.execute.calculation.parsing.exception";
+	public static final String STUDY_EXECUTE_CALCULATION_ENGINE_EXCEPTION = "study.execute.calculation.engine.exception";
+	public static final String STUDY_EXECUTE_CALCULATION_MISSING_DATA = "study.execute.calculation.missing.data";
 
 	@Resource
 	private DatasetService middlwareDatasetService;
@@ -109,7 +112,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 					DerivedVariableUtils.extractValues(parameters, observation, measurementVariablesMap, rowInputMissingData);
 				} catch (ParseException e) {
 					LOG.error("Error parsing date value for parameters " + parameters, e);
-					errors.reject("study.execute.calculation.parsing.exception");
+					errors.reject(STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION);
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				}
 				inputMissingData.addAll(rowInputMissingData);
@@ -125,7 +128,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 					value = this.processor.evaluateFormula(executableFormula, parameters);
 				} catch (final Exception e) {
 					LOG.error("Error evaluating formula " + formula + " with inputs " + parameters, e);
-					errors.reject("study.execute.calculation.engine.exception");
+					errors.reject(STUDY_EXECUTE_CALCULATION_ENGINE_EXCEPTION);
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				}
 
@@ -175,7 +178,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 			// warn the user that there's missing data from input variables.
 			results.put(
 				INPUT_MISSING_DATA_RESULT_KEY, this.resourceBundleMessageSource
-					.getMessage("study.execute.calculation.missing.data", new String[] {StringUtils.join(inputMissingData.toArray())},
+					.getMessage(STUDY_EXECUTE_CALCULATION_MISSING_DATA, new String[] {StringUtils.join(inputMissingData.toArray())},
 						Locale.getDefault()));
 		}
 
@@ -212,5 +215,15 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		}
 		return this.middlewareDerivedVariableService.countCalculatedVariablesInDatasets(datasetIds);
 	}
+
+	protected void setProcessor(final DerivedVariableProcessor processor) {
+		this.processor = processor;
+	}
+
+	protected void setResourceBundleMessageSource(final ResourceBundleMessageSource resourceBundleMessageSource) {
+		this.resourceBundleMessageSource = resourceBundleMessageSource;
+	}
+
+
 
 }

@@ -23,8 +23,9 @@ import java.util.Set;
 @Component
 public class DerivedVariableValidator {
 
-	private BindingResult errors;
-
+	public static final String STUDY_EXECUTE_CALCULATION_INVALID_REQUEST = "study.execute.calculation.invalid.request";
+	public static final String STUDY_EXECUTE_CALCULATION_FORMULA_NOT_FOUND = "study.execute.calculation.formula.not.found";
+	public static final String STUDY_EXECUTE_CALCULATION_MISSING_VARIABLES = "study.execute.calculation.missing.variables";
 	@Resource
 	private FormulaService formulaService;
 
@@ -33,24 +34,24 @@ public class DerivedVariableValidator {
 
 	public void validate(final Integer variableId, final List<Integer> geoLocationIds) {
 
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		if (geoLocationIds == null || variableId == null) {
-			errors.reject("study.execute.calculation.invalid.request");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
+			errors.reject(STUDY_EXECUTE_CALCULATION_INVALID_REQUEST);
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
 		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
 		if (!formulaOptional.isPresent()) {
-			errors.reject("study.execute.calculation.formula.not.found");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
+			errors.reject(STUDY_EXECUTE_CALCULATION_FORMULA_NOT_FOUND);
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
 	}
 
 	public void verifyMissingInputVariables(final Integer variableId, final Integer datasetId) {
 
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
 		if (formulaOptional.isPresent()) {
@@ -64,9 +65,10 @@ public class DerivedVariableValidator {
 				}
 			}
 			if (!inputMissingVariables.isEmpty()) {
-				errors.reject("study.execute.calculation.missing.variables",
+				errors.reject(
+					STUDY_EXECUTE_CALCULATION_MISSING_VARIABLES,
 					new String[] {StringUtils.join(inputMissingVariables.toArray(), ", ")}, "");
-				throw new ApiRequestValidationException(this.errors.getAllErrors());
+				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 
 		}
