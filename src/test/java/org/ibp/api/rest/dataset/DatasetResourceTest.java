@@ -46,7 +46,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static org.hamcrest.core.Is.is;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -362,14 +361,14 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final Random random = new Random();
 		final int studyId = random.nextInt(10000);
 		final int datasetId = random.nextInt(10000);
-		final Integer instanceId = random.nextInt(10000);
+		final int instanceId = random.nextInt(10000);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.get(
 				"/crops/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/table",
 				this.cropName,
 				studyId,
-				datasetId).param("instanceId", instanceId.toString())
+				datasetId).param("instanceId", Integer.toString(instanceId))
 				.param("pageNumber", "1")
 				.param("pageSize", "100").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
@@ -666,6 +665,54 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.put("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations", this.cropName, studyId,
 				datasetId).contentType(this.contentType).content(this.convertObjectToByte(observationsPutRequestInput)))
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isBadRequest());
+	}
+
+	@Test
+	public void testAcceptDrafData() throws Exception {
+		final DatasetDTO dataset = this.createDataset(10090, 101101, "Plant", this.cropName, 100);
+
+		final int studyId = dataset.getStudyId();
+		final int datasetId = dataset.getDatasetId();
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/acceptance", this.cropName, studyId,
+					datasetId)
+				.contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+
+	@Test
+	public void testDiscardDrafData() throws Exception {
+		final DatasetDTO dataset = this.createDataset(10090, 101101, "Plant", this.cropName, 100);
+
+		final int studyId = dataset.getStudyId();
+		final int datasetId = dataset.getDatasetId();
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/rejection", this.cropName, studyId,
+					datasetId)
+				.contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+
+	@Test
+	public void testCheckOutOfBoundDraftData() throws Exception {
+		final DatasetDTO dataset = this.createDataset(10090, 101101, "Plant", this.cropName, 100);
+
+		final int studyId = dataset.getStudyId();
+		final int datasetId = dataset.getDatasetId();
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.get("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/out-of-bounds", this.cropName, studyId,
+					datasetId)
+				.contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isNotFound());
 	}
 
 	private DatasetDTO createDataset(
