@@ -63,9 +63,9 @@ public class PresetResource {
 	public ResponseEntity<Void> deletePreset(
 		@PathVariable
 			String cropname,
-		@RequestParam
+		@PathVariable
 			Integer presetId) {
-		presetService.deletePreset(presetId);
+		presetService.deletePreset(cropname, presetId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

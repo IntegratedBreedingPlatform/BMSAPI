@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AutoProperty
@@ -20,6 +21,10 @@ public class LabelPrintingPresetDTO extends PresetDTO {
 
 		@JsonView(PresetDTO.View.Configuration.class)
 		private List<Integer> barcodeFields;
+
+		public BarcodeSetting(){
+			barcodeFields = new ArrayList<>();
+		}
 
 		public boolean isBarcodeNeeded() {
 			return barcodeNeeded;
@@ -42,7 +47,6 @@ public class LabelPrintingPresetDTO extends PresetDTO {
 		}
 
 		public void setBarcodeFields(final List<Integer> barcodeFields) {
-			this.barcodeFields = barcodeFields;
 		}
 
 		@Override

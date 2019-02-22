@@ -6,8 +6,11 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
+import org.ibp.api.domain.program.ProgramSummary;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.exception.ResourceNotFoundException;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.preset.PresetService;
 import org.ibp.api.java.program.ProgramService;
 import org.ibp.api.rest.preset.domain.PresetDTO;
@@ -29,6 +32,9 @@ public class PresetServiceImpl implements PresetService {
 	private PresetMapper presetMapper;
 
 	@Autowired
+	private SecurityService securityService;
+
+	@Autowired
 	private ProgramService programService;
 
 	private BindingResult errors;
@@ -38,6 +44,7 @@ public class PresetServiceImpl implements PresetService {
 		//TODO we could verify that the user trying to create a preset is a member of the program
 		presetDTO.setToolId(23);
 		presetDTOValidator.validate(crop, presetDTO);
+		validateUserIsAProgramMember(crop, securityService.getCurrentlyLoggedInUser().getName(), presetDTO.getProgramUUID());
 		final ProgramPreset programPreset = presetService.saveProgramPreset(presetMapper.map(presetDTO));
 		presetDTO.setId(programPreset.getProgramPresetId());
 		return presetDTO;
@@ -65,14 +72,30 @@ public class PresetServiceImpl implements PresetService {
 	}
 
 	@Override
-	public void deletePreset(final Integer presetId) {
+	public void deletePreset(final String crop, final Integer presetId) {
 		final ProgramPreset programPreset = presetService.getProgramPresetById(presetId);
 		if (programPreset == null) {
 			errors = new MapBindingResult(new HashMap<String, String>(), PresetDTO.class.getName());
 			errors.reject("preset.not.found", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
-		//TODO we could verify that the user trying to delete a preset is a member of the program
+		validateUserIsAProgramMember(crop, securityService.getCurrentlyLoggedInUser().getName(), programPreset.getProgramUuid());
 		presetService.deleteProgramPreset(presetId);
+	}
+
+	private void validateUserIsAProgramMember(final String crop, final String username, final String programUUID){
+		final ProgramSummary program = programService.getByUUIDAndCrop(crop, programUUID);
+		boolean found = false;
+		for (final String member: program.getMembers()) {
+			if (member.equals(username)) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			errors = new MapBindingResult(new HashMap<String, String>(), PresetDTO.class.getName());
+			errors.reject("preset.user.not.a.program.member", "");
+			throw new ForbiddenException(errors.getAllErrors().get(0));
+		}
 	}
 }

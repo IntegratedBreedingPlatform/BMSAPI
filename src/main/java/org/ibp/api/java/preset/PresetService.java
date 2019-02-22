@@ -12,6 +12,6 @@ public interface PresetService {
 
 	List<PresetDTO> getPresets (String programUUID, Integer toolId, String toolSection);
 
-	void deletePreset(Integer presetId);
+	void deletePreset(String crop, Integer presetId);
 
 }
