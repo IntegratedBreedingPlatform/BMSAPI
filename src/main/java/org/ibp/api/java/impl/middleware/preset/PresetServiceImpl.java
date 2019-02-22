@@ -85,14 +85,7 @@ public class PresetServiceImpl implements PresetService {
 
 	private void validateUserIsAProgramMember(final String crop, final String username, final String programUUID){
 		final ProgramSummary program = programService.getByUUIDAndCrop(crop, programUUID);
-		boolean found = false;
-		for (final String member: program.getMembers()) {
-			if (member.equals(username)) {
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
+		if (!program.getMembers().contains(username)) {
 			errors = new MapBindingResult(new HashMap<String, String>(), PresetDTO.class.getName());
 			errors.reject("preset.user.not.a.program.member", "");
 			throw new ForbiddenException(errors.getAllErrors().get(0));
