@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.preset.PresetService;
+import org.ibp.api.java.program.ProgramService;
 import org.ibp.api.rest.preset.domain.PresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,12 +28,16 @@ public class PresetServiceImpl implements PresetService {
 	@Autowired
 	private PresetMapper presetMapper;
 
+	@Autowired
+	private ProgramService programService;
+
 	private BindingResult errors;
 
 	@Override
-	public PresetDTO savePreset(final PresetDTO presetDTO) {
+	public PresetDTO savePreset(final String crop, final PresetDTO presetDTO) {
+		//TODO we could verify that the user trying to create a preset is a member of the program
 		presetDTO.setToolId(23);
-		presetDTOValidator.validate(presetDTO);
+		presetDTOValidator.validate(crop, presetDTO);
 		final ProgramPreset programPreset = presetService.saveProgramPreset(presetMapper.map(presetDTO));
 		presetDTO.setId(programPreset.getProgramPresetId());
 		return presetDTO;
@@ -38,6 +45,19 @@ public class PresetServiceImpl implements PresetService {
 
 	@Override
 	public List<PresetDTO> getPresets(final String programUUID, final Integer toolId, final String toolSection) {
+		errors = new MapBindingResult(new HashMap<String, String>(), PresetDTO.class.getName());
+		if (StringUtils.isEmpty(programUUID)) {
+			errors.reject("preset.program.required", "");
+		}
+		if (StringUtils.isEmpty(toolSection)) {
+			errors.reject("preset.tool.section.required", "");
+		}
+		if (toolId == null) {
+			errors.reject("preset.tool.id.required", "");
+		}
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
 		final List<ProgramPreset> programPresets = presetService.getProgramPresetFromProgramAndTool(programUUID, toolId, toolSection);
 		final List<PresetDTO> presetDTOs = new ArrayList<>();
 		programPresets.forEach(programPreset -> presetDTOs.add(presetMapper.map(programPreset)));
@@ -52,6 +72,7 @@ public class PresetServiceImpl implements PresetService {
 			errors.reject("preset.not.found", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
+		//TODO we could verify that the user trying to delete a preset is a member of the program
 		presetService.deleteProgramPreset(presetId);
 	}
 }

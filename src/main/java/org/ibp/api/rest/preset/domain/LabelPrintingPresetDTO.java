@@ -10,7 +10,7 @@ import java.util.List;
 public class LabelPrintingPresetDTO extends PresetDTO {
 
 	@AutoProperty
-	private static class BarcodeSetting {
+	public static class BarcodeSetting {
 
 		@JsonView(PresetDTO.View.Configuration.class)
 		private boolean barcodeNeeded;

@@ -1,5 +1,9 @@
 package org.ibp.api.rest.common;
 
+import java.util.List;
+
+import java.util.ArrayList;
+
 /**
  * Created by clarysabel on 2/7/19.
  */
@@ -30,4 +34,5 @@ public enum FileType {
 		}
 		return null;
 	}
+
 }

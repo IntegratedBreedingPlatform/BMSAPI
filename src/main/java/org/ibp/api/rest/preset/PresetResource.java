@@ -34,7 +34,7 @@ public class PresetResource {
 			String cropname,
 		@RequestBody
 			PresetDTO presetDTO) {
-		presetService.savePreset(presetDTO);
+		presetService.savePreset(cropname, presetDTO);
 		return new ResponseEntity<>( HttpStatus.OK);
 	}
 

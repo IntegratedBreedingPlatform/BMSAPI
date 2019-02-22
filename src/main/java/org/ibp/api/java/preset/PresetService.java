@@ -8,7 +8,7 @@ import org.ibp.api.rest.preset.domain.PresetDTO;
  */
 public interface PresetService {
 
-	PresetDTO savePreset(PresetDTO presetDTO);
+	PresetDTO savePreset(String crop, PresetDTO presetDTO);
 
 	List<PresetDTO> getPresets (String programUUID, Integer toolId, String toolSection);
 
