@@ -700,11 +700,13 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testCheckOutOfBoundDraftData() throws Exception {
+	public void testCheckWithoutOutOfBoundDraftData() throws Exception {
 		final DatasetDTO dataset = this.createDataset(10090, 101101, "Plant", this.cropName, 100);
 
 		final int studyId = dataset.getStudyId();
 		final int datasetId = dataset.getDatasetId();
+
+		Mockito.when(this.studyDatasetService.checkOutOfBoundDraftData(studyId, datasetId)).thenReturn(false);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
@@ -713,6 +715,24 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isNotFound());
+	}
+
+	@Test
+	public void testCheckWithOutOfBoundDraftData() throws Exception {
+		final DatasetDTO dataset = this.createDataset(10090, 101101, "Plant", this.cropName, 100);
+
+		final int studyId = dataset.getStudyId();
+		final int datasetId = dataset.getDatasetId();
+
+		Mockito.when(this.studyDatasetService.checkOutOfBoundDraftData(studyId, datasetId)).thenReturn(true);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.get("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/out-of-bounds",
+					this.cropName, studyId, datasetId)
+				.contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 
 	private DatasetDTO createDataset(
