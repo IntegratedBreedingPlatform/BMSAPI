@@ -295,7 +295,7 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "Reject draft value in sub-observation dataset", notes = "Reject information for the imported dataset")
-	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/drafts/rejection", method = RequestMethod.POST)
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/rejection", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> rejectDraftData(@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
