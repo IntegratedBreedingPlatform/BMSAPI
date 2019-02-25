@@ -63,6 +63,9 @@ public class DerivedVariableResource {
 
 	}
 
+	@ApiOperation(value = "Get Derived Traits Dependencies", notes =
+		"Gets the list of all formula dependencies of all derived traits in a dataset."
+			+ "This will only return the variables that are not yet added in the dataset.")
 	@ResponseBody
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variable/dependencies", method = RequestMethod.GET)
 	public ResponseEntity<Set<String>> dependencyVariablesForAllDerivedTraitsInDataset(
@@ -72,6 +75,9 @@ public class DerivedVariableResource {
 		return new ResponseEntity<>(this.derivedVariableService.getDependencyVariables(studyId, datasetId), HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Get Derived Traits Dependencies", notes =
+		"Gets the list of all formula dependencies of a specific trait in a dataset."
+			+ "This will only return the variables that are not yet added in the dataset.")
 	@ResponseBody
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variable/dependencies/{variableId}", method = RequestMethod.GET)
 	public ResponseEntity<Set<String>> dependencyVariablesForSpecificDerivedTrait(
@@ -82,6 +88,7 @@ public class DerivedVariableResource {
 		return new ResponseEntity<>(this.derivedVariableService.getDependencyVariables(studyId, datasetId, variableId), HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Count Calculated Traits", notes = "Count the calculated traits (derived traits) in a specified dataset(s)")
 	@ResponseBody
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/derived-variable/countCalculatedVariables", method = RequestMethod.HEAD)
 	public ResponseEntity<String> countCalculatedVariables(
