@@ -26,6 +26,12 @@ public class LabelPrintingPresetDTO extends PresetDTO {
 			barcodeFields = new ArrayList<>();
 		}
 
+		public BarcodeSetting(final boolean barcodeNeeded, final boolean automaticBarcode, final List<Integer> barcodeFields) {
+			this.barcodeNeeded = barcodeNeeded;
+			this.automaticBarcode = automaticBarcode;
+			this.barcodeFields = barcodeFields;
+		}
+
 		public boolean isBarcodeNeeded() {
 			return barcodeNeeded;
 		}

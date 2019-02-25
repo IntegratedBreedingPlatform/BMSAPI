@@ -41,7 +41,6 @@ public class PresetServiceImpl implements PresetService {
 
 	@Override
 	public PresetDTO savePreset(final String crop, final PresetDTO presetDTO) {
-		//TODO we could verify that the user trying to create a preset is a member of the program
 		presetDTO.setToolId(23);
 		presetDTOValidator.validate(crop, presetDTO);
 		validateUserIsAProgramMember(crop, securityService.getCurrentlyLoggedInUser().getName(), presetDTO.getProgramUUID());
