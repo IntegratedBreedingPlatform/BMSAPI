@@ -47,6 +47,11 @@ public class LabelPrintingPresetDTO extends PresetDTO {
 		}
 
 		public void setBarcodeFields(final List<Integer> barcodeFields) {
+			if (barcodeFields == null) {
+				this.barcodeFields = new ArrayList<>();
+			} else {
+				this.barcodeFields = barcodeFields;
+			}
 		}
 
 		@Override
