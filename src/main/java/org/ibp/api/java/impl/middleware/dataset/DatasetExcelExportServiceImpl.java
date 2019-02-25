@@ -25,7 +25,7 @@ import java.util.Set;
 public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService implements DatasetExportService {
 
 	@Resource
-	private DatasetXLSGenerator datasetXLSGenerator;
+	private DatasetExcelGenerator datasetExcelGenerator;
 
 	@Override
 	public File export(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId, final boolean singleFile) {
@@ -34,7 +34,7 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 
 		try {
 			//TODO: use the singleFile boolean after implementing singleFile download for XLS option
-			return this.generate(studyId, datasetId, instanceIds, collectionOrderId, this.datasetXLSGenerator, false, XLS);
+			return this.generate(studyId, datasetId, instanceIds, collectionOrderId, this.datasetExcelGenerator, false, XLS);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("cannot.exportAsXLS.dataset", "");
@@ -48,7 +48,7 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 	}
 
 	@Override
-	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(final Study study, final DatasetDTO dataset, final int collectionOrderId, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
+	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(final Study study, final DatasetDTO dataset, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = new HashMap<>();
 		for(final Integer instanceDBID: selectedDatasetInstancesMap.keySet()) {
 			final List<ObservationUnitRow> observationUnitRows =

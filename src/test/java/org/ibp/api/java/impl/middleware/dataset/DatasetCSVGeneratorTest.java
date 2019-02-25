@@ -90,7 +90,7 @@ public class DatasetCSVGeneratorTest {
 	@Test
 	public void testGenerateSingleInstanceFile() throws IOException {
 		final String filename = "filename";
-		final File file = this.datasetCSVGenerator.generateSingleInstanceFile(null, null, new ArrayList<MeasurementVariable>(), new ArrayList<ObservationUnitRow>(), filename);
+		final File file = this.datasetCSVGenerator.generateSingleInstanceFile(null, null, new ArrayList<MeasurementVariable>(), new ArrayList<ObservationUnitRow>(), filename, null);
 		Assert.assertEquals(filename, file.getName());
 	}
 }

@@ -193,7 +193,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-		final List<DatasetDTO> datasetDTOs = new ArrayList();
+		final List<DatasetDTO> datasetDTOs = new ArrayList<>();
 		for (final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO : datasetDTOS) {
 			final DatasetDTO datasetDto = mapper.map(datasetDTO, DatasetDTO.class);
 			datasetDTOs.add(datasetDto);
@@ -248,7 +248,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final Map<Integer, List<ObservationUnitRow>> map = new HashMap<>();
-		for(Integer instanceNumber: observationUnitRowsMap.keySet()) {
+		for(final Integer instanceNumber: observationUnitRowsMap.keySet()) {
 			final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows = observationUnitRowsMap.get(instanceNumber);
 			final  List<ObservationUnitRow> list = new ArrayList<>();
 			this.mapObservationUnitRows(observationUnitRowMapper, observationUnitRows, list);
@@ -325,9 +325,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	}
 
-	List<StudyInstance> convertToStudyInstances(final ModelMapper mapper, final List<org.generationcp.middleware.service.impl.study.StudyInstance> middlewareStudyInstances) {
+	private List<StudyInstance> convertToStudyInstances(final ModelMapper mapper, final List<org.generationcp.middleware.service.impl.study.StudyInstance> middlewareStudyInstances) {
 
-		final List<StudyInstance> instances = new ArrayList();
+		final List<StudyInstance> instances = new ArrayList<>();
 		for (final org.generationcp.middleware.service.impl.study.StudyInstance instance : middlewareStudyInstances) {
 			final StudyInstance datasetInstance = mapper.map(instance, StudyInstance.class);
 			instances.add(datasetInstance);
