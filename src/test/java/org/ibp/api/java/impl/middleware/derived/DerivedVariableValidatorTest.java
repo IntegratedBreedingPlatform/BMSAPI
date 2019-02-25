@@ -126,9 +126,9 @@ public class DerivedVariableValidatorTest {
 		final MeasurementVariable targetMeasurementVariable = new MeasurementVariable();
 		targetMeasurementVariable.setTermId(variableId);
 		final MeasurementVariable inputMeasurementVariable1 = new MeasurementVariable();
-		inputMeasurementVariable1.setTermId(variableId);
+		inputMeasurementVariable1.setTermId(formulaVariable1.getId());
 		final MeasurementVariable inputMeasurementVariable2 = new MeasurementVariable();
-		inputMeasurementVariable2.setTermId(variableId);
+		inputMeasurementVariable2.setTermId(formulaVariable2.getId());
 
 		when(this.formulaService.getByTargetId(variableId)).thenReturn(Optional.of(formulaDto));
 		when(this.datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId())))

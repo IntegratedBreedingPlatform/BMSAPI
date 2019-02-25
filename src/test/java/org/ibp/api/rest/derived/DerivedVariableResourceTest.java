@@ -5,11 +5,11 @@ import org.ibp.ApiUnitTestBase;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.OverwriteDataException;
 import org.ibp.api.java.derived.DerivedVariableService;
+import org.ibp.api.java.impl.middleware.derived.DerivedVariableServiceImpl;
 import org.junit.Test;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -39,14 +39,6 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		@Primary
 		public DerivedVariableService derivedVariableService() {
 			return mock(DerivedVariableService.class);
-		}
-
-		@Bean
-		@Primary
-		public ResourceBundleMessageSource resourceBundleMessageSource() {
-			final ResourceBundleMessageSource resourceBundleMessageSource = new ResourceBundleMessageSource();
-			resourceBundleMessageSource.setUseCodeAsDefaultMessage(true);
-			return resourceBundleMessageSource;
 		}
 	}
 
@@ -81,7 +73,8 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		calculateVariableRequest.setOverwriteExistingData(false);
 		calculateVariableRequest.setGeoLocationIds(Arrays.asList(RandomUtils.nextInt()));
 
-		final ObjectError objectError = new ObjectError("", new String[] {"code1"}, new Object[] {}, "");
+		final ObjectError objectError =
+			new ObjectError("", new String[] {DerivedVariableServiceImpl.STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION}, new Object[] {}, "");
 		final ApiRequestValidationException exception = new ApiRequestValidationException(Arrays.asList(objectError));
 
 		when(this.derivedVariableService
@@ -96,7 +89,9 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 				.contentType(this.contentType).content(this.convertObjectToByte(calculateVariableRequest)))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isConflict())
-			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is("code1")));
+			.andExpect(MockMvcResultMatchers.jsonPath(
+				"$.errors[0].message",
+				is("The system was unable to execute this formula; one or more date values may be invalid. Date values should follow yyyymmdd format.")));
 
 	}
 

@@ -45,6 +45,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	public static final String STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION = "study.execute.calculation.parsing.exception";
 	public static final String STUDY_EXECUTE_CALCULATION_ENGINE_EXCEPTION = "study.execute.calculation.engine.exception";
 	public static final String STUDY_EXECUTE_CALCULATION_MISSING_DATA = "study.execute.calculation.missing.data";
+	public static final String STUDY_EXECUTE_CALCULATION_HAS_EXISTING_DATA = "study.execute.calculation.has.existing.data";
 
 	@Resource
 	private DatasetService middlwareDatasetService;
@@ -160,7 +161,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 					if (!overwriteExistingData) {
 						// If there is an existing measurement data and the user did not explicitly choose to overwrite it, then throw a runtime exception
 						// to rollback transaction so to prevent saving of calculated value.
-						errors.reject("study.execute.calculation.has.existing.data");
+						errors.reject(STUDY_EXECUTE_CALCULATION_HAS_EXISTING_DATA);
 						throw new OverwriteDataException(errors.getAllErrors());
 					} else {
 						// Else, just warn the user that there's data to overwrite.
