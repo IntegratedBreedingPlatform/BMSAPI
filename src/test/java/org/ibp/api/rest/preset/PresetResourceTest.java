@@ -50,7 +50,7 @@ public class PresetResourceTest extends ApiUnitTestBase {
 	private FilePresetConfigurationDTO filePresetConfigurationDTO;
 
 	@Autowired
-	private PresetService bmsPresetService;
+	private PresetService bmsapiPresetService;
 
 
 	@Configuration
@@ -58,7 +58,7 @@ public class PresetResourceTest extends ApiUnitTestBase {
 
 		@Bean
 		@Primary
-		public PresetService bmsPresetService() {
+		public PresetService bmsapiPresetService() {
 			return Mockito.mock(PresetService.class);
 		}
 	}
@@ -86,7 +86,7 @@ public class PresetResourceTest extends ApiUnitTestBase {
 		final PresetDTO savedPresetDTO = SerializationUtils.clone(presetDTO);
 		savedPresetDTO.setId(1);
 
-		doReturn(savedPresetDTO).when(this.bmsPresetService).savePreset(this.cropName, presetDTO);
+		doReturn(savedPresetDTO).when(this.bmsapiPresetService).savePreset(this.cropName, presetDTO);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.put("/crops/{crop}/presets", this.cropName).contentType(this.contentType)
 				.content(this.convertObjectToByte(presetDTO))).andDo(MockMvcResultHandlers.print())
@@ -98,7 +98,7 @@ public class PresetResourceTest extends ApiUnitTestBase {
 	@Test
 	public void getPresets_Ok() throws Exception {
 		final List<PresetDTO> presetDTOs = Arrays.asList(buildPresetDTO());
-		doReturn(presetDTOs).when(this.bmsPresetService).getPresets(programUUID, toolId, toolSection);
+		doReturn(presetDTOs).when(this.bmsapiPresetService).getPresets(programUUID, toolId, toolSection);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/presets", this.cropName).param("programUUID", programUUID)
 				.param("toolId", String.valueOf(toolId)).param("toolSection", toolSection)).andDo(MockMvcResultHandlers.print())
@@ -109,7 +109,7 @@ public class PresetResourceTest extends ApiUnitTestBase {
 	@Test
 	public void deletePreset_Ok() throws Exception {
 
-		doNothing().when(this.bmsPresetService).deletePreset(this.cropName, 1);
+		doNothing().when(this.bmsapiPresetService).deletePreset(this.cropName, 1);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.delete("/crops/{crop}/presets/{presetId}", this.cropName, 1))
 				.andExpect(MockMvcResultMatchers.status().isOk());
