@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
 public class LabelPrintingPresetDTO extends PresetDTO {
 
 	@AutoProperty
-	public static class BarcodeSetting {
+	public static class BarcodeSetting implements Serializable {
 
 		@JsonView(PresetDTO.View.Configuration.class)
 		private boolean barcodeNeeded;

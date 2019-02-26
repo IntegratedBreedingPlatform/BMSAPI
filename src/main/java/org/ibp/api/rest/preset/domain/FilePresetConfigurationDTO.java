@@ -6,12 +6,14 @@ import com.fasterxml.jackson.annotation.JsonView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.io.Serializable;
+
 @AutoProperty
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "outputType", visible = true)
 @JsonSubTypes(value = {@JsonSubTypes.Type(value = PDFFilePresetConfigurationDTO.class, name = "pdf"),
 	@JsonSubTypes.Type(value = CSVXLSFilePresetConfigurationDTO.class, name = "csv"),
 	@JsonSubTypes.Type(value = CSVXLSFilePresetConfigurationDTO.class, name = "xls")})
-public class FilePresetConfigurationDTO {
+public class FilePresetConfigurationDTO implements Serializable {
 
 	@JsonView(PresetDTO.View.Configuration.class)
 	private String outputType;

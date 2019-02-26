@@ -67,7 +67,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		programUUID = RandomStringUtils.randomAlphabetic(10);
 		name = RandomStringUtils.randomAlphabetic(10);
 		toolSection = ToolSection.DATASET_LABEL_PRINTING_PRESET.name();
-		toolId = RandomUtils.nextInt();
+		toolId = 23;
 
 		type = PresetType.LABEL_PRINTING_PRESET.getName();
 		selectedField = Arrays.asList(Arrays.asList(4, 13));
@@ -77,15 +77,31 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 	}
 
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void validate_ThrowsException_IfToolSectionIsNull() {
+		final PresetDTO presetDTO = new PresetDTO();
+		presetDTOValidator.validate(CROP_NAME, presetDTO);
+	}
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void validate_ThrowsException_IfToolSectionIsInvalid() {
+		final PresetDTO presetDTO = new PresetDTO();
+		presetDTO.setId(RandomUtils.nextInt());
+		presetDTOValidator.validate(CROP_NAME, presetDTO);
+	}
+
 	@Test(expected = ApiRequestValidationException.class)
 	public void validate_ThrowsException_IfToolSectionIsEmpty() {
 		final PresetDTO presetDTO = new PresetDTO();
+		presetDTO.setToolId(toolId);
 		presetDTOValidator.validate(CROP_NAME, presetDTO);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void validate_ThrowsException_IfToolSectionIsNotValid() {
 		final PresetDTO presetDTO = new PresetDTO();
+		presetDTO.setToolId(toolId);
 		presetDTO.setToolSection(RandomStringUtils.random(2));
 		presetDTOValidator.validate(CROP_NAME, presetDTO);
 	}
@@ -93,6 +109,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 	@Test(expected = ApiRequestValidationException.class)
 	public void validate_ThrowsException_IfTypeIsEmpty() {
 		final PresetDTO presetDTO = new PresetDTO();
+		presetDTO.setToolId(toolId);
 		presetDTO.setToolSection(toolSection);
 		presetDTOValidator.validate(CROP_NAME, presetDTO);
 	}
@@ -100,6 +117,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 	@Test(expected = ApiRequestValidationException.class)
 	public void validate_ThrowsException_IfTypeIsNotAPresetType() {
 		final PresetDTO presetDTO = new PresetDTO();
+		presetDTO.setToolId(toolId);
 		presetDTO.setToolSection(toolSection);
 		presetDTO.setType(RandomStringUtils.random(3));
 		presetDTOValidator.validate(CROP_NAME, presetDTO);
@@ -108,6 +126,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 	@Test(expected = ApiRequestValidationException.class)
 	public void validate_ThrowsException_IfProgramUUIDDoesNotExist() {
 		final PresetDTO presetDTO = new PresetDTO();
+		presetDTO.setToolId(toolId);
 		presetDTO.setToolSection(toolSection);
 		presetDTO.setType(type);
 		presetDTO.setProgramUUID(programUUID);
@@ -118,6 +137,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 	@Test(expected = ApiRequestValidationException.class)
 	public void validate_ThrowsException_IfNameIsEmpty() {
 		final PresetDTO presetDTO = new PresetDTO();
+		presetDTO.setToolId(toolId);
 		presetDTO.setToolSection(toolSection);
 		presetDTO.setType(type);
 		presetDTO.setProgramUUID(programUUID);
@@ -128,10 +148,10 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 	@Test(expected = ConflictException.class)
 	public void validate_ThrowsException_IfNameAlreadyExists() {
 		final PresetDTO presetDTO = new PresetDTO();
+		presetDTO.setToolId(toolId);
 		presetDTO.setToolSection(toolSection);
 		presetDTO.setType(type);
 		presetDTO.setName(name);
-		presetDTO.setToolId(toolId);
 		presetDTO.setProgramUUID(programUUID);
 
 		final List<ProgramPreset> programPresets = Arrays.asList(new ProgramPreset());
@@ -146,10 +166,10 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 	@Test(expected = NotSupportedException.class)
 	public void validate_ThrowsException_IfPresetTypeNotImplementedYet() {
 		final PresetDTO presetDTO = new PresetDTO();
+		presetDTO.setToolId(toolId);
 		presetDTO.setToolSection(toolSection);
 		presetDTO.setType(PresetType.CROSSING_PRESET.getName());
 		presetDTO.setName(name);
-		presetDTO.setToolId(toolId);
 		presetDTO.setProgramUUID(programUUID);
 
 		Mockito.doReturn(new ProgramSummary()).when(programService).getByUUIDAndCrop(CROP_NAME, programUUID);
@@ -163,10 +183,10 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 	@Test(expected = ApiRequestValidationException.class)
 	public void validate_ThrowsException_IfFileConfigurationIsNull() {
 		final LabelPrintingPresetDTO presetDTO = new LabelPrintingPresetDTO();
+		presetDTO.setToolId(toolId);
 		presetDTO.setToolSection(toolSection);
 		presetDTO.setType(type);
 		presetDTO.setName(name);
-		presetDTO.setToolId(toolId);
 		presetDTO.setProgramUUID(programUUID);
 
 		Mockito.doReturn(new ProgramSummary()).when(programService).getByUUIDAndCrop(CROP_NAME, programUUID);
@@ -271,10 +291,10 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 	@Test(expected = ApiRequestValidationException.class)
 	public void validate_ThrowsException_IfIsBarcodeAndNotAutomaticNeededButFieldsAreNotProvided() {
 		final LabelPrintingPresetDTO presetDTO = new LabelPrintingPresetDTO();
+		presetDTO.setToolId(toolId);
 		presetDTO.setToolSection(toolSection);
 		presetDTO.setType(type);
 		presetDTO.setName(name);
-		presetDTO.setToolId(toolId);
 		presetDTO.setProgramUUID(programUUID);
 		presetDTO.setFileConfiguration(filePresetConfigurationDTO);
 		presetDTO.setBarcodeSetting(barcodeSetting);
@@ -301,10 +321,10 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 	@Test(expected = ApiRequestValidationException.class)
 	public void validate_ThrowsException_IfIsBarcodeAndNotAutomaticNeededButFieldsAreInvalid() {
 		final LabelPrintingPresetDTO presetDTO = new LabelPrintingPresetDTO();
+		presetDTO.setToolId(toolId);
 		presetDTO.setToolSection(toolSection);
 		presetDTO.setType(type);
 		presetDTO.setName(name);
-		presetDTO.setToolId(toolId);
 		presetDTO.setProgramUUID(programUUID);
 		presetDTO.setFileConfiguration(filePresetConfigurationDTO);
 		presetDTO.setBarcodeSetting(barcodeSetting);

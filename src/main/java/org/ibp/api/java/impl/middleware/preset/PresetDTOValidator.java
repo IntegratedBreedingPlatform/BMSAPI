@@ -43,6 +43,10 @@ public class PresetDTOValidator {
 
 		errors = new MapBindingResult(new HashMap<String, String>(), PresetDTO.class.getName());
 
+		if (presetDTO.getToolId() == null || presetDTO.getToolId()!=23) {
+			errors.reject("preset.invalid.tool", "");
+		}
+
 		//Validate toolSection
 		//As of now, this will only support DATASET_LABEL_PRINTING_PRESET
 		if (!ToolSection.DATASET_LABEL_PRINTING_PRESET.name().equals(presetDTO.getToolSection())) {
