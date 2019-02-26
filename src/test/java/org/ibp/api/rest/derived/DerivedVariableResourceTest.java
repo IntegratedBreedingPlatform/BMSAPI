@@ -53,7 +53,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.post(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variable/calculate", this.cropName, 100,
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variable/calculation", this.cropName, 100,
 					102)
 				.contentType(this.contentType).content(this.convertObjectToByte(calculateVariableRequest)))
 			.andDo(MockMvcResultHandlers.print())
@@ -84,11 +84,11 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.post(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variable/calculate", this.cropName, 100,
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variable/calculation", this.cropName, 100,
 					102)
 				.contentType(this.contentType).content(this.convertObjectToByte(calculateVariableRequest)))
 			.andDo(MockMvcResultHandlers.print())
-			.andExpect(MockMvcResultMatchers.status().isConflict())
+			.andExpect(MockMvcResultMatchers.status().isBadRequest())
 			.andExpect(MockMvcResultMatchers.jsonPath(
 				"$.errors[0].message",
 				is("The system was unable to execute this formula; one or more date values may be invalid. Date values should follow yyyymmdd format.")));
@@ -112,7 +112,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.post(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variable/calculate", this.cropName, 100,
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variable/calculation", this.cropName, 100,
 					102)
 				.contentType(this.contentType).content(this.convertObjectToByte(calculateVariableRequest)))
 			.andDo(MockMvcResultHandlers.print())
@@ -134,7 +134,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.get(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variable/dependencies", this.cropName, 100,
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/missing-dependencies", this.cropName, 100,
 					102)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
@@ -156,7 +156,8 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.get(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variable/dependencies/{variableId}", this.cropName, 100,
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/missing-dependencies",
+					this.cropName, 100,
 					102, 103)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
@@ -174,7 +175,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.head("/crops/{crop}/studies/{studyId}/datasets/derived-variable/countCalculatedVariables", this.cropName, 100, 102)
+				.head("/crops/{crop}/studies/{studyId}/datasets/derived-variables", this.cropName, 100, 102)
 				.param("datasetIds", "1,2,3").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())

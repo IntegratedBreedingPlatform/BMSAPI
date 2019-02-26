@@ -48,7 +48,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	public static final String STUDY_EXECUTE_CALCULATION_HAS_EXISTING_DATA = "study.execute.calculation.has.existing.data";
 
 	@Resource
-	private DatasetService middlwareDatasetService;
+	private DatasetService middlewareDatasetService;
 
 	@Resource
 	private org.generationcp.middleware.service.api.derived_variables.DerivedVariableService middlewareDerivedVariableService;
@@ -90,7 +90,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 		// Get the list of observation unit rows grouped by intances
 		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap =
-			this.middlwareDatasetService.getInstanceIdToObservationUnitRowsMap(studyId, datasetId, geoLocationIds);
+			this.middlewareDatasetService.getInstanceIdToObservationUnitRowsMap(studyId, datasetId, geoLocationIds);
 		// Get the the measurement variables of all traits in a dataset so that we can determine the datatype and possibleValues
 		// of a ObservationUnitData.
 		final Map<Integer, MeasurementVariable> measurementVariablesMap =
