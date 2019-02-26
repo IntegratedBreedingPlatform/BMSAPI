@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.preset;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -8,6 +9,7 @@ import org.generationcp.middleware.pojos.presets.ProgramPreset;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.rest.preset.domain.FilePresetConfigurationDTO;
 import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
+import org.ibp.api.rest.preset.domain.PresetDTO;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,8 @@ public class PresetMapperTest extends ApiUnitTestBase {
 
 	private String configuration;
 
+	private Integer programPresetId;
+
 	@Autowired
 	private PresetMapper presetMapper;
 
@@ -44,6 +48,8 @@ public class PresetMapperTest extends ApiUnitTestBase {
 		name = RandomStringUtils.randomAlphabetic(10);
 		toolSection = RandomStringUtils.randomAlphabetic(10);
 		toolId = RandomUtils.nextInt();
+		programPresetId = RandomUtils.nextInt();
+
 		type = "LabelPrintingPreset";
 		selectedField = Arrays.asList(Arrays.asList(4, 13));
 		barcodeSetting =
@@ -78,6 +84,26 @@ public class PresetMapperTest extends ApiUnitTestBase {
 
 	@Test
 	public void testMapPresetDTO() {
+		final ProgramPreset programPreset = new ProgramPreset();
+		programPreset.setProgramPresetId(programPresetId);
+		programPreset.setProgramUuid(programUuid);
+		programPreset.setToolId(toolId);
+		programPreset.setName(name);
+		programPreset.setToolSection(toolSection);
+		programPreset.setConfiguration(configuration);
+
+		final PresetDTO presetDTO = presetMapper.map(programPreset);
+		assertEquals(programPreset.getName(), presetDTO.getName());
+		assertEquals(programPreset.getToolId(), presetDTO.getToolId());
+		assertEquals(programPreset.getToolSection(), presetDTO.getToolSection());
+		assertEquals(programPreset.getProgramUuid(), presetDTO.getProgramUUID());
+		assertEquals(programPreset.getName(), presetDTO.getName());
+		assertTrue(presetDTO instanceof LabelPrintingPresetDTO);
+		final LabelPrintingPresetDTO labelPrintingPresetDTO = (LabelPrintingPresetDTO) presetDTO;
+
+		assertEquals(labelPrintingPresetDTO.getBarcodeSetting(), barcodeSetting);
+		assertEquals(labelPrintingPresetDTO.getSelectedFields(), selectedField);
+		assertEquals(labelPrintingPresetDTO.getFileConfiguration(), filePresetConfigurationDTO);
 
 	}
 
