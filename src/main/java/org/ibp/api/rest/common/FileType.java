@@ -25,7 +25,7 @@ public enum FileType {
 
 	public static FileType getEnum(final String extension) {
 		for (FileType e : FileType.values()) {
-			if (extension.equals(e.getExtension()))
+			if (e.getExtension().equals(extension))
 				return e;
 		}
 		return null;

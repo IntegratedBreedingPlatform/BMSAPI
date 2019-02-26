@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -102,6 +103,12 @@ public abstract class ApiUnitTestBase {
 		@Primary
 		public FormulaService formulaService() {
 			return Mockito.mock(FormulaService.class);
+		}
+
+		@Bean
+		@Primary
+		public PresetService presetService() {
+			return Mockito.mock(PresetService.class);
 		}
 
 		@Bean

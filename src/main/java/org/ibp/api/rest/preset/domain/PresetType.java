@@ -2,7 +2,8 @@ package org.ibp.api.rest.preset.domain;
 
 public enum PresetType {
 
-	LABEL_PRINTING_PRESET ("LabelPrintingPreset");
+	LABEL_PRINTING_PRESET ("LabelPrintingPreset"),
+	CROSSING_PRESET("CrossingPreset");
 
 	private String name;
 
@@ -20,7 +21,7 @@ public enum PresetType {
 
 	public static PresetType getEnum(final String name) {
 		for (PresetType e : PresetType.values()) {
-			if (name.equals(e.getName()))
+			if (e.getName().equals(name))
 				return e;
 		}
 		return null;
