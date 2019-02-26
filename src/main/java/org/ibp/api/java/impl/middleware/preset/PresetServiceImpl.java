@@ -41,10 +41,10 @@ public class PresetServiceImpl implements PresetService {
 
 	@Override
 	public PresetDTO savePreset(final String crop, final PresetDTO presetDTO) {
-		presetDTO.setToolId(23);
 		presetDTOValidator.validate(crop, presetDTO);
 		validateUserIsAProgramMember(crop, securityService.getCurrentlyLoggedInUser().getName(), presetDTO.getProgramUUID());
-		final ProgramPreset programPreset = presetService.saveProgramPreset(presetMapper.map(presetDTO));
+		ProgramPreset programPreset = presetMapper.map(presetDTO);
+		programPreset = presetService.saveProgramPreset(programPreset);
 		presetDTO.setId(programPreset.getProgramPresetId());
 		return presetDTO;
 	}

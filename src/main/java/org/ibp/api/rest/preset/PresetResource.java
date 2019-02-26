@@ -29,13 +29,14 @@ public class PresetResource {
 	@ApiOperation(value = "Create a new Preset",
 		notes = "Create a new preset.")
 	@ResponseBody
-	public ResponseEntity<Void> createPreset(
+	public ResponseEntity<PresetDTO> createPreset(
 		@PathVariable
 			String cropname,
 		@RequestBody
 			PresetDTO presetDTO) {
-		presetService.savePreset(cropname, presetDTO);
-		return new ResponseEntity<>( HttpStatus.OK);
+		presetDTO.setToolId(23);
+		presetDTO = presetService.savePreset(cropname, presetDTO);
+		return new ResponseEntity<>(presetDTO, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/crops/{cropname}/presets", method = RequestMethod.GET)

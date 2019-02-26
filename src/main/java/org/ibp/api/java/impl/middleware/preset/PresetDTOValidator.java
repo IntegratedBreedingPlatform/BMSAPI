@@ -87,7 +87,7 @@ public class PresetDTOValidator {
 		}
 	}
 
-	public void validateLabelPrintingPreset(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO) {
+	private void validateLabelPrintingPreset(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO) {
 		if (labelPrintingPresetDTO.getFileConfiguration() == null) {
 			errors.reject("label.printing.preset.file.configuration.required", "");
 		}
