@@ -16,7 +16,7 @@ import org.springframework.validation.MapBindingResult;
 
 public class ObservationUnitsTableBuilder {
 
-	public static String OBS_UNIT_ID = "OBS_UNIT_ID";
+	private static String OBS_UNIT_ID = "OBS_UNIT_ID";
 
 	private Integer duplicatedFoundNumber;
 
@@ -81,7 +81,7 @@ public class ObservationUnitsTableBuilder {
 		return table;
 	}
 
-	public Integer getDuplicatedFoundNumber() {
+	Integer getDuplicatedFoundNumber() {
 		return duplicatedFoundNumber;
 	}
 

@@ -49,23 +49,23 @@ import java.util.Locale;
 import java.util.Map;
 
 @Component
-public class DatasetXLSGenerator implements DatasetFileGenerator {
+public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	private static final String NUMERIC_DATA_TYPE = "Numeric";
 	private static final int PIXEL_SIZE = 250;
-	protected static final int VARIABLE_NAME_COLUMN_INDEX = 0;
-	protected static final int DESCRIPTION_COLUMN_INDEX = 1;
+	private static final int VARIABLE_NAME_COLUMN_INDEX = 0;
+	private static final int DESCRIPTION_COLUMN_INDEX = 1;
 	private static final int ONTOLOGY_ID_COLUMN_INDEX = 2;
-	protected static final int PROPERTY_COLUMN_INDEX = 3;
-	protected static final int SCALE_COLUMN_INDEX = 4;
-	protected static final int METHOD_COLUMN_INDEX = 5;
-	protected static final int DATATYPE_COLUMN_INDEX = 6;
-	protected static final int VARIABLE_VALUE_COLUMN_INDEX = 7;
-	protected static final int DATASET_COLUMN_INDEX = 8;
+	private static final int PROPERTY_COLUMN_INDEX = 3;
+	private static final int SCALE_COLUMN_INDEX = 4;
+	private static final int METHOD_COLUMN_INDEX = 5;
+	private static final int DATATYPE_COLUMN_INDEX = 6;
+	private static final int VARIABLE_VALUE_COLUMN_INDEX = 7;
+	private static final int DATASET_COLUMN_INDEX = 8;
 	private static final String MAX_ONLY = " and below";
 	private static final String MIN_ONLY = " and above";
 	private static final String NO_RANGE = "All values allowed";
-	public static final String POSSIBLE_VALUES_AS_STRING_DELIMITER = "/";
+	private static final String POSSIBLE_VALUES_AS_STRING_DELIMITER = "/";
 	private static final String STUDY = "STUDY";
 	private static final String ENVIRONMENT = "ENVIRONMENT";
 	private static final String PLOT = "PLOT";
@@ -85,12 +85,13 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		final Integer studyId,
 		final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> reorderedObservationUnitRows,
-		final String fileNamePath) throws IOException {
+		final String fileNamePath, final  StudyInstance studyInstance) throws IOException {
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
 		final List<MeasurementVariable> orderedColumns = this.orderColumns(columns);
-		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto);
-		this.writeObservationSheet(orderedColumns, reorderedObservationUnitRows, xlsBook);
+		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto, studyInstance);
+		final Locale locale = LocaleContextHolder.getLocale();
+		this.writeObservationSheet(orderedColumns, reorderedObservationUnitRows, xlsBook, this.messageSource.getMessage("export.study.sheet.observation", null, locale));
 
 		final File file = new File(fileNamePath);
 
@@ -104,8 +105,12 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 	@Override
 	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
 		final String fileNameFullPath) throws IOException {
-		//Do nothing. Implement for the singleFile download XLS option
-		return new File(fileNameFullPath);
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public File generateTraitAndSelectionVariablesFile(final List<String[]> rowValues, final String filenamePath) throws IOException{
+		throw new UnsupportedOperationException();
 	}
 
 	private List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns) {
@@ -114,17 +119,17 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		final List<MeasurementVariable> selection = new ArrayList<>();
 		final List<Integer> discardColumns = Arrays.asList(TermId.REP_NO.getId(),TermId.ROW.getId(),TermId.BLOCK_NO.getId(),TermId.COL.getId());
 
-		for (MeasurementVariable measurementVariable : columns) {
+		for (final MeasurementVariable measurementVariable : columns) {
 			if (TermId.OBS_UNIT_ID.getId() == measurementVariable.getTermId()) {
 				orderedColumns.add(0, measurementVariable);
-			} else if (discardColumns.contains(measurementVariable.getTermId())) {
-				continue;
-			} else if (VariableType.TRAIT.getId() == measurementVariable.getVariableType().getId()) {
-				trait.add(measurementVariable);
-			} else if (VariableType.SELECTION_METHOD.getId() == measurementVariable.getVariableType().getId()) {
-				selection.add(measurementVariable);
-			} else {
-				orderedColumns.add(measurementVariable);
+			} else if (!discardColumns.contains(measurementVariable.getTermId())) {
+				if (VariableType.TRAIT.getId().equals(measurementVariable.getVariableType().getId())) {
+					trait.add(measurementVariable);
+				} else if (VariableType.SELECTION_METHOD.getId().equals(measurementVariable.getVariableType().getId())) {
+					selection.add(measurementVariable);
+				} else {
+					orderedColumns.add(measurementVariable);
+				}
 			}
 		}
 
@@ -133,11 +138,10 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		return orderedColumns;
 	}
 
-	private void writeObservationSheet(
+	void writeObservationSheet(
 		final List<MeasurementVariable> columns, final List<ObservationUnitRow> reorderedObservationUnitRows,
-		final HSSFWorkbook xlsBook) {
-		final Locale locale = LocaleContextHolder.getLocale();
-		final HSSFSheet xlsSheet = xlsBook.createSheet(this.messageSource.getMessage("export.study.sheet.observation", null, locale));
+		final HSSFWorkbook xlsBook, final String sheetName) {
+		final HSSFSheet xlsSheet = xlsBook.createSheet(sheetName);
 		this.writeObservationHeader(xlsBook, xlsSheet, columns);
 		int currentRowNum = 1;
 		for (final ObservationUnitRow dataRow : reorderedObservationUnitRows) {
@@ -161,10 +165,9 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 				if (column.getPossibleValues() != null && !column.getPossibleValues()
 					.isEmpty() && column.getTermId() != TermId.BREEDING_METHOD_VARIATE.getId()
 					&& column.getTermId() != TermId.BREEDING_METHOD_VARIATE_CODE.getId() && !column.getProperty()
-					.equals(DatasetXLSGenerator.BREEDING_METHOD_PROPERTY_NAME)) {
+					.equals(DatasetExcelGenerator.BREEDING_METHOD_PROPERTY_NAME)) {
 					cell.setCellValue(this.getCategoricalCellValue(dataCell, column.getPossibleValues()));
-
-				} else if (DatasetXLSGenerator.NUMERIC_DATA_TYPE.equalsIgnoreCase(column.getDataType())) {
+				} else if (DatasetExcelGenerator.NUMERIC_DATA_TYPE.equalsIgnoreCase(column.getDataType())) {
 					if (!dataCell.isEmpty() && NumberUtils.isNumber(dataCell)) {
 						cell.setCellType(CellType.BLANK);
 						cell.setCellType(CellType.NUMERIC);
@@ -183,8 +186,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		final List<MeasurementVariable> variables) {
 		if (variables != null && !variables.isEmpty()) {
 			int currentColNum = 0;
-			int rowNumIndex = currentColNum;
-			final HSSFRow row = xlsSheet.createRow(rowNumIndex++);
+			final HSSFRow row = xlsSheet.createRow(0);
 			for (final MeasurementVariable variable : variables) {
 				final HSSFCell cell = row.createCell(currentColNum++);
 				cell.setCellStyle(this.getObservationHeaderStyle(variable.isFactor(), xlsBook));
@@ -193,7 +195,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		}
 	}
 
-	protected CellStyle getObservationHeaderStyle(final boolean isFactor, final HSSFWorkbook xlsBook) {
+	private CellStyle getObservationHeaderStyle(final boolean isFactor, final HSSFWorkbook xlsBook) {
 		final CellStyle style;
 		if (isFactor) {
 			style = this.getHeaderStyle(xlsBook, this.getColorIndex(xlsBook, 51, 153, 102));
@@ -216,7 +218,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 	}
 
 	private void writeDescriptionSheet(
-		final HSSFWorkbook xlsBook, final Integer studyId, final DatasetDTO dataSetDto) {
+		final HSSFWorkbook xlsBook, final Integer studyId, final DatasetDTO dataSetDto, final StudyInstance studyInstance) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFSheet xlsSheet = xlsBook.createSheet(this.messageSource.getMessage("export.study.sheet.description", null, locale));
 		int currentRowNum = 0;
@@ -262,20 +264,20 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filterByVariableType(environmentVariables, VariableType.EXPERIMENTAL_DESIGN),
+			filterByVariableType(environmentVariables, VariableType.EXPERIMENTAL_DESIGN),
 			ENVIRONMENT);
 
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filterByVariableType(plotVariables, VariableType.EXPERIMENTAL_DESIGN), PLOT);
+			filterByVariableType(plotVariables, VariableType.EXPERIMENTAL_DESIGN), PLOT);
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environment.details",
 			this.getColorIndex(xlsBook, 124, 124, 124));
 
-		final List<MeasurementVariable> environmentDetails = this.getEnvironmentalDetails(environmentDatasetId, environmentVariables, dataSetDto.getInstances().get(0));
+		final List<MeasurementVariable> environmentDetails = this.getEnvironmentalDetails(environmentDatasetId, environmentVariables, studyInstance);
 
 		currentRowNum = this.writeSection(
 			currentRowNum,
@@ -287,19 +289,19 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environmental.conditions",
 			this.getColorIndex(xlsBook, 124, 124, 124));
 
-		final List<MeasurementVariable> environmentConditions = this.getEnvironmentalConditions(environmentDatasetId, environmentVariables, dataSetDto.getInstances().get(0));
+		final List<MeasurementVariable> environmentConditions = this.getEnvironmentalConditions(environmentDatasetId, environmentVariables, studyInstance);
 
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filterByVariableType(environmentConditions, VariableType.STUDY_CONDITION), ENVIRONMENT);
+			filterByVariableType(environmentConditions, VariableType.STUDY_CONDITION), ENVIRONMENT);
 
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filterByVariableType(environmentVariables, VariableType.TRAIT), ENVIRONMENT);
+			filterByVariableType(environmentVariables, VariableType.TRAIT), ENVIRONMENT);
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.germplasm.descriptors",
@@ -308,7 +310,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filterByVariableType(plotVariables, VariableType.GERMPLASM_DESCRIPTOR), PLOT);
+			filterByVariableType(plotVariables, VariableType.GERMPLASM_DESCRIPTOR), PLOT);
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.observation.unit",
@@ -317,7 +319,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filterByVariableType(datasetVariables, VariableType.OBSERVATION_UNIT),
+			filterByVariableType(datasetVariables, VariableType.OBSERVATION_UNIT),
 			DataSetType.findById(dataSetDto.getDatasetTypeId()).getReadableName());
 		xlsSheet.createRow(currentRowNum++);
 
@@ -327,7 +329,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filterByVariableType(datasetVariables, VariableType.TRAIT),
+			filterByVariableType(datasetVariables, VariableType.TRAIT),
 			DataSetType.findById(dataSetDto.getDatasetTypeId()).getReadableName());
 		xlsSheet.createRow(currentRowNum++);
 
@@ -337,7 +339,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
-			this.filterByVariableType(datasetVariables, VariableType.SELECTION_METHOD),
+			filterByVariableType(datasetVariables, VariableType.SELECTION_METHOD),
 			DataSetType.findById(dataSetDto.getDatasetTypeId()).getReadableName());
 
 		xlsSheet.setColumnWidth(0, 20 * PIXEL_SIZE);
@@ -354,7 +356,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 	private List<MeasurementVariable> getEnvironmentalDetails(
 		final int environmentDatasetId, final List<MeasurementVariable> environmentVariables, final StudyInstance instance) {
 		final List<MeasurementVariable> environmentDetails =
-			this.filterByVariableType(environmentVariables, VariableType.ENVIRONMENT_DETAIL);
+			filterByVariableType(environmentVariables, VariableType.ENVIRONMENT_DETAIL);
 		final Map<Integer, String> geoLocationMap =
 			this.studyDataManager.getGeolocationByVariableId(environmentDatasetId, instance.getInstanceDbId());
 		for (final MeasurementVariable variable : environmentDetails) {
@@ -379,7 +381,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 	private List<MeasurementVariable> getEnvironmentalConditions(
 		final int environmentDatasetId, final List<MeasurementVariable> environmentVariables, final StudyInstance instance) {
 		final List<MeasurementVariable> environmentConditions =
-			this.filterByVariableType(environmentVariables, VariableType.TRAIT);
+			filterByVariableType(environmentVariables, VariableType.TRAIT);
 		final Map<Integer, String> environmentConditionMap =
 			this.studyDataManager.getPhenotypeByVariableId(environmentDatasetId, instance.getInstanceDbId());
 		for (final MeasurementVariable variable : environmentConditions) {
@@ -537,12 +539,11 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		}
 	}
 
-	protected void setContentOfVariableValueColumn(final HSSFCell cell, final MeasurementVariable measurementVariable) {
+	private void setContentOfVariableValueColumn(final HSSFCell cell, final MeasurementVariable measurementVariable) {
 
 		if (StringUtils.isBlank(measurementVariable.getValue()) && (measurementVariable.getVariableType() == VariableType.TRAIT
 			|| (measurementVariable.getRole() != null && measurementVariable.getRole().equals(PhenotypicType.VARIATE)))) {
-			/**
-			 If the variable is a 'Trait' then the VALUE column in Description sheet will be:
+			/**If the variable is a 'Trait' then the VALUE column in Description sheet will be:
 			 for numerical variables: we will see the Min and Max values (if any) separated by a dash "-", e.g.: 30 - 100 (we should allow decimal values too, e.g.: 0.50 - 23.09)
 			 for categorical variables: we will
 			 see the Categories values separated by a slash "/", e.g.: 1/2/3/4/5
@@ -555,7 +556,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		}
 	}
 
-	protected void setVariableValueBasedOnDataType(final HSSFCell cell, final MeasurementVariable measurementVariable) {
+	private void setVariableValueBasedOnDataType(final HSSFCell cell, final MeasurementVariable measurementVariable) {
 
 		if (DataType.NUMERIC_VARIABLE.getId().equals(measurementVariable.getDataTypeId()) && StringUtils
 			.isNotBlank(measurementVariable.getValue()) && NumberUtils.isNumber(measurementVariable.getValue())) {
@@ -563,8 +564,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			cell.setCellType(CellType.NUMERIC);
 		} else if (DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId())) {
 			cell.setCellValue(
-				this.getCategoricalCellValue(measurementVariable.getValue(), measurementVariable.getPossibleValues()));
-
+				getCategoricalCellValue(measurementVariable.getValue(), measurementVariable.getPossibleValues()));
 		} else {
 			cell.setCellValue(measurementVariable.getValue());
 		}
@@ -591,7 +591,7 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 		return idValue;
 	}
 
-	protected String getPossibleValueDetailAsStringBasedOnDataType(final MeasurementVariable measurementVariable) {
+	private String getPossibleValueDetailAsStringBasedOnDataType(final MeasurementVariable measurementVariable) {
 
 		if (DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId())) {
 			return this.convertPossibleValuesToString(measurementVariable.getPossibleValues(), POSSIBLE_VALUES_AS_STRING_DELIMITER);
@@ -658,5 +658,9 @@ public class DatasetXLSGenerator implements DatasetFileGenerator {
 			}
 		});
 		return Lists.newArrayList(variablesByType);
+	}
+
+	protected void setMessageSource(final ResourceBundleMessageSource messageSource) {
+		this.messageSource = messageSource;
 	}
 }
