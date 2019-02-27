@@ -30,7 +30,7 @@ public class DerivedVariableResource {
 	private DerivedVariableService derivedVariableService;
 
 	@ApiOperation(value = "Execute Derived Variable", notes = "Execute the formula of a derived variable for each observation of specified instances.")
-	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variable/calculation", method = RequestMethod.POST)
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/calculation", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> calculate(
 		@PathVariable final String crop,
 		@PathVariable final Integer studyId,
