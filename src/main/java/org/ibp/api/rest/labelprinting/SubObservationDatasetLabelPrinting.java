@@ -160,6 +160,11 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			}
 		}
 		// Validation for the file name
+		if (StringUtils.isEmpty(labelsGeneratorInput.getFileName())) {
+			errors.reject("common.error.filename.required", StringUtils.EMPTY);
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
 		if (!FileUtils.isFilenameValid(labelsGeneratorInput.getFileName())) {
 			errors.reject("common.error.invalid.filename.windows", StringUtils.EMPTY);
 			throw new ApiRequestValidationException(errors.getAllErrors());
