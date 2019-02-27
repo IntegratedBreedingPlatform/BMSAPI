@@ -19,6 +19,7 @@ import org.generationcp.middleware.manager.InventoryDataManagerImpl;
 import org.generationcp.middleware.manager.LocationDataManagerImpl;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.PedigreeDataManagerImpl;
+import org.generationcp.middleware.manager.PresetServiceImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.UserDataManagerImpl;
 import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
@@ -29,6 +30,7 @@ import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
+import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -262,7 +264,7 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public PedigreeService getPedigreeService() {
 		return PedigreeFactory.getPedigreeService(this.getCropDatabaseSessionProvider(),
-			this.getCrossExpansionProperties().getProfile(), this.getCurrentlySelectedCropDBName());
+				this.getCrossExpansionProperties().getProfile(), this.contextResolver.resolveCropNameFromUrl());
 	}
 
 	@Bean
@@ -351,6 +353,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public MeasurementVariableService getMeasurementVariableService() {
 		return new MeasurementVariableServiceImpl(this.getCropDatabaseSessionProvider().getSession());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public PresetService getPresetService() {
+		return new PresetServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
