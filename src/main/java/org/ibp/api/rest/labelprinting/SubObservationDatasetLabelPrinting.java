@@ -212,7 +212,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final StudyDetails study = studyDataManager.getStudyDetails(labelsInfoInput.getStudyId());
 		final DatasetDTO datasetDTO = middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId());
 
-		final String defaultFileName = getDefaultFileName(datasetDTO);
+		final String defaultFileName = getDefaultFileName(study, datasetDTO);
 
 		final Map<String, String> resultsMap = new LinkedHashMap<>();
 		resultsMap.put(getMessage("label.printing.name"), study.getStudyName());
@@ -372,8 +372,9 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		return fields;
 	}
 
-	private String getDefaultFileName(final DatasetDTO datasetDTO) {
-		final String fileName = "Labels-for-".concat(datasetDTO.getName()).concat("-").concat(String.valueOf(datasetDTO.getInstances().size()))
+	private String getDefaultFileName(final StudyDetails studyDetails, final DatasetDTO datasetDTO) {
+
+		final String fileName = "Labels-for-".concat(studyDetails.getStudyName()).concat("-").concat(datasetDTO.getName())
 			.concat("-").concat(DateUtil.getCurrentDateAsStringValue());
 		return FileUtils.cleanFileName(fileName);
 	}
