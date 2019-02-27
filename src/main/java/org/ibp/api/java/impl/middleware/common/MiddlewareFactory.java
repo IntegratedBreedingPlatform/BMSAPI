@@ -247,8 +247,7 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public PedigreeDataManager getPedigreeDataManager() {
-		final PedigreeDataManagerImpl pedigreeDataManager =
-			new PedigreeDataManagerImpl(this.getCropDatabaseSessionProvider(), this.getCurrentlySelectedCropDBName());
+		final PedigreeDataManagerImpl pedigreeDataManager = new PedigreeDataManagerImpl(this.getCropDatabaseSessionProvider());
 		pedigreeDataManager.setGermplasmDataManager(this.getGermplasmDataManager());
 		return pedigreeDataManager;
 	}
