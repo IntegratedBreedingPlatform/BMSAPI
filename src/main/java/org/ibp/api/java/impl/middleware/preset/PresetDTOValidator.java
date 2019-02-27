@@ -28,6 +28,8 @@ import java.util.List;
 @Component
 public class PresetDTOValidator {
 
+	private static Integer FIELDBOOK_TOOL_ID = 23;
+
 	@Autowired
 	private ProgramService programService;
 
@@ -43,7 +45,7 @@ public class PresetDTOValidator {
 
 		errors = new MapBindingResult(new HashMap<String, String>(), PresetDTO.class.getName());
 
-		if (presetDTO.getToolId() == null || presetDTO.getToolId()!=23) {
+		if (presetDTO.getToolId() == null || presetDTO.getToolId()!= FIELDBOOK_TOOL_ID) {
 			errors.reject("preset.invalid.tool", "");
 		}
 

@@ -52,7 +52,6 @@ public class PresetResourceTest extends ApiUnitTestBase {
 	@Autowired
 	private PresetService bmsapiPresetService;
 
-
 	@Configuration
 	public static class TestConfiguration {
 

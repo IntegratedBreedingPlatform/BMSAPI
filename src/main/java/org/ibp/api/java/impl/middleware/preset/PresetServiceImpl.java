@@ -42,7 +42,7 @@ public class PresetServiceImpl implements PresetService {
 	@Override
 	public PresetDTO savePreset(final String crop, final PresetDTO presetDTO) {
 		presetDTOValidator.validate(crop, presetDTO);
-		validateUserIsAProgramMember(crop, securityService.getCurrentlyLoggedInUser().getName(), presetDTO.getProgramUUID());
+		this.validateUserIsAProgramMember(crop, securityService.getCurrentlyLoggedInUser().getName(), presetDTO.getProgramUUID());
 		ProgramPreset programPreset = presetMapper.map(presetDTO);
 		programPreset = presetService.saveProgramPreset(programPreset);
 		presetDTO.setId(programPreset.getProgramPresetId());
@@ -78,7 +78,7 @@ public class PresetServiceImpl implements PresetService {
 			errors.reject("preset.not.found", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
-		validateUserIsAProgramMember(crop, securityService.getCurrentlyLoggedInUser().getName(), programPreset.getProgramUuid());
+		this.validateUserIsAProgramMember(crop, securityService.getCurrentlyLoggedInUser().getName(), programPreset.getProgramUuid());
 		presetService.deleteProgramPreset(presetId);
 	}
 
