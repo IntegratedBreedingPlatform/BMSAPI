@@ -12,7 +12,6 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ConflictException;
@@ -34,14 +33,11 @@ import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -79,20 +75,31 @@ public class DatasetServiceImpl implements DatasetService {
 	@Autowired
 	private StudyDataManager studyDataManager;
 
-	@Resource
-	private ResourceBundleMessageSource resourceBundleMessageSource;
-
 	@Autowired
 	private ObservationsTableValidator observationsTableValidator;
 
 	@Override
-	public List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId) {
+	public List<MeasurementVariable> getSubObservationSetColumns(
+		final Integer studyId, final Integer subObservationSetId, final Boolean draftMode) {
+
 		this.studyValidator.validate(studyId, false);
 
 		// TODO generalize to any obs dataset (plot/subobs), make 3rd param false
 		this.datasetValidator.validateDataset(studyId, subObservationSetId, true);
 
-		return this.middlewareDatasetService.getSubObservationSetColumns(subObservationSetId);
+		return this.middlewareDatasetService.getSubObservationSetColumns(subObservationSetId, draftMode);
+	}
+
+	@Override
+	public List<MeasurementVariable> getSubObservationSetVariables(
+		final Integer studyId, final Integer subObservationSetId) {
+
+		this.studyValidator.validate(studyId, false);
+
+		// TODO generalize to any obs dataset (plot/subobs), make 3rd param false
+		this.datasetValidator.validateDataset(studyId, subObservationSetId, true);
+
+		return this.middlewareDatasetService.getSubObservationSetVariables(subObservationSetId);
 	}
 
 	@Override
@@ -105,7 +112,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public long countPhenotypesByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId) {
-		validateStudyDatasetAndInstances(studyId, datasetId, Arrays.asList(instanceId), false);
+		this.validateStudyDatasetAndInstances(studyId, datasetId, Arrays.asList(instanceId), false);
 		return this.middlewareDatasetService.countPhenotypesByInstance(datasetId, instanceId);
 	}
 
@@ -156,12 +163,13 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public ObservationDto updateObservation(
 		final Integer studyId, final Integer datasetId, final Integer observationId, final Integer observationUnitId,
-		final ObservationValue observationValue) {
+		final ObservationDto observationDto) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
-		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, observationValue.getValue());
-		return this.middlewareDatasetService
-			.updatePhenotype(observationUnitId, observationId, observationValue.getCategoricalValueId(), observationValue.getValue());
+		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, observationDto);
+		observationDto.setObservationUnitId(observationUnitId);
+		observationDto.setObservationId(observationId);
+		return this.middlewareDatasetService.updatePhenotype(observationId, observationDto);
 
 	}
 
@@ -226,8 +234,9 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId) {
-		return this.middlewareDatasetService.countTotalObservationUnitsForDataset(datasetId, instanceId);
+	public Integer countTotalObservationUnitsForDataset(
+		final Integer datasetId, final Integer instanceId, final Boolean draftMode) {
+		return this.middlewareDatasetService.countTotalObservationUnitsForDataset(datasetId, instanceId, draftMode);
 	}
 
 	@Override
@@ -242,7 +251,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(
 		final int studyId, final int datasetId, final List<Integer> instanceIds) {
-		validateStudyDatasetAndInstances(studyId, datasetId, instanceIds, true);
+		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds, true);
 		final Map<Integer, List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow>> observationUnitRowsMap =
 			this.middlewareDatasetService.getInstanceIdToObservationUnitRowsMap(studyId, datasetId, instanceIds);
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
@@ -257,23 +266,34 @@ public class DatasetServiceImpl implements DatasetService {
 		return map;
 	}
 
-	void validateStudyDatasetAndInstances(final int studyId, final int datasetId, final List<Integer> instanceId, final boolean shouldBeSubObservation) {
+	void validateStudyDatasetAndInstances(final int studyId, final int datasetId, final List<Integer> instanceIds, final boolean shouldBeSubObservation) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, shouldBeSubObservation);
-		this.instanceValidator.validate(datasetId, new HashSet<>(instanceId));
+		if (instanceIds != null) {
+			this.instanceValidator.validate(datasetId, new HashSet<>(instanceIds));
+		}
 	}
 
 	@Override
 	public List<ObservationUnitRow> getObservationUnitRows(
-		final int studyId, final int datasetId, final int instanceId,
-		final int pageNumber, final int pageSize, final String sortBy, final String sortOrder) {
-		validateStudyDatasetAndInstances(studyId, datasetId, Arrays.asList(instanceId), true);
+		final int studyId, final int datasetId, final Integer instanceId,
+		final int pageNumber, final int pageSize, final String sortBy, final String sortOrder, final Boolean draftMode) {
+
+		List<Integer> instanceIds = null;
+		if (instanceId != null) {
+			instanceIds = Arrays.asList(instanceId);
+		}
+		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds, true);
+
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
-			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
+			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, instanceId, pageNumber, pageSize, sortBy, sortOrder,
+				draftMode);
+
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final List<ObservationUnitRow> list = new ArrayList<>();
 		this.mapObservationUnitRows(observationUnitRowMapper, observationUnitRows, list);
+
 		return list;
 	}
 
@@ -347,7 +367,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.observationsTableValidator.validateList(input.getData());
 
 		final List<MeasurementVariable> datasetMeasurementVariables =
-				this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId);
+			this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId);
 
 		if (datasetMeasurementVariables.isEmpty()) {
 			errors.reject("no.variables.dataset", null, "");
@@ -359,7 +379,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		// Get Map<OBS_UNIT_ID, Observations>
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = this.middlewareDatasetService
-				.getObservationUnitsAsMap(datasetId, datasetMeasurementVariables, new ArrayList<>(table.rowKeySet()));
+			.getObservationUnitsAsMap(datasetId, datasetMeasurementVariables, new ArrayList<>(table.rowKeySet()));
 
 		if (storedData.isEmpty()) {
 			errors.reject("none.obs.unit.id.matches", null, "");
@@ -383,10 +403,10 @@ public class DatasetServiceImpl implements DatasetService {
 		// Processing warnings
 		if (input.isProcessWarnings()) {
 			errors = this.processObservationsDataWarningsAsErrors(table, storedData, rowsNotBelongingToDataset,
-					observationUnitsTableBuilder.getDuplicatedFoundNumber());
+				observationUnitsTableBuilder.getDuplicatedFoundNumber(), input.isDraftMode());
 		}
 		if (!errors.hasErrors()) {
-			this.middlewareDatasetService.importDataset(datasetId, table);
+			this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode());
 		} else {
 			throw new PreconditionFailedException(errors.getAllErrors());
 		}
@@ -398,9 +418,31 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.middlewareDatasetService.getMeasurementVariables(projectId, variableTypes);
 	}
 
-	private BindingResult processObservationsDataWarningsAsErrors(final Table<String, String, String> table,
-			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData,
-			final Integer rowsNotBelongingToDataset, final Integer duplicatedFoundNumber) {
+	@Override
+	public Boolean checkOutOfBoundDraftData(final Integer studyId, final Integer datasetId) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		return this.middlewareDatasetService.checkOutOfBoundDraftData(datasetId);
+	}
+
+	@Override
+	public void acceptDraftData(final Integer studyId, final Integer datasetId) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.middlewareDatasetService.acceptDraftData(datasetId);
+	}
+
+	@Override
+	public void rejectDraftData(final Integer studyId, final Integer datasetId) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.middlewareDatasetService.rejectDraftData(datasetId);
+	}
+
+	private BindingResult processObservationsDataWarningsAsErrors(
+		final Table<String, String, String> table,
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData,
+		final Integer rowsNotBelongingToDataset, final Integer duplicatedFoundNumber, final Boolean draftMode) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
 		if (duplicatedFoundNumber > 0) {
 			errors.reject("duplicated.obs.unit.id", null, "");
@@ -410,38 +452,16 @@ public class DatasetServiceImpl implements DatasetService {
 			errors.reject("some.obs.unit.id.matches", new String[] {String.valueOf(rowsNotBelongingToDataset)}, "");
 		}
 
-		if (this.isInputOverwritingData(table, storedData)) {
+		if (this.isInputOverwritingData(table, storedData, draftMode)) {
 			errors.reject("warning.import.overwrite.data", null, "");
 		}
 
 		return errors;
 	}
 
-	// DO NOT REMOVE THIS FUNCTION EVEN WHEN IT IS UNUSED, IT WILL BE USED WHEN WE IMPLEMENT THE PREVIEW PROCESS
-	private List<String> processObservationsDataWarningsAsStrings(final Table<String, String, String> table,
-			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData,
-			final Integer rowsNotBelongingToDataset, final Integer duplicatedFoundNumber) {
-		final List<String> warnings = new ArrayList<>();
-		if (duplicatedFoundNumber > 0) {
-			warnings.add(this.resourceBundleMessageSource.getMessage("duplicated.obs.unit.id", null, LocaleContextHolder.getLocale()));
-		}
-
-		if (rowsNotBelongingToDataset != 0) {
-			warnings.add(this.resourceBundleMessageSource
-					.getMessage("some.obs.unit.id.matches", new String[] {String.valueOf(rowsNotBelongingToDataset)},
-							LocaleContextHolder.getLocale()));
-		}
-
-		if (this.isInputOverwritingData(table, storedData)) {
-			warnings.add(
-					this.resourceBundleMessageSource.getMessage("warning.import.overwrite.data", null, LocaleContextHolder.getLocale()));
-		}
-
-		return warnings;
-	}
-
-	private Boolean isInputOverwritingData(final Table<String, String, String> table,
-			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData) {
+	private Boolean isInputOverwritingData(
+		final Table<String, String, String> table,
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData, final Boolean draftMode) {
 		boolean overwritingData = false;
 
 		externalLoop:
@@ -452,10 +472,17 @@ public class DatasetServiceImpl implements DatasetService {
 			for (final String variableName : table.columnKeySet()) {
 
 				final org.generationcp.middleware.service.api.dataset.ObservationUnitData observation =
-						storedObservations.getVariables().get(variableName);
+					storedObservations.getVariables().get(variableName);
 
-				if (observation != null && observation.getValue() != null && !observation.getValue()
-						.equalsIgnoreCase(table.get(observationUnitId, variableName))) {
+				if (observation == null) {
+					continue;
+				}
+
+				if ((!draftMode && observation.getValue() != null //
+						&& !observation.getValue().equalsIgnoreCase(table.get(observationUnitId, variableName))) //
+					|| (draftMode && observation.getDraftValue() != null //
+						&& !observation.getDraftValue().equalsIgnoreCase(table.get(observationUnitId, variableName)))) {
+
 					overwritingData = true;
 
 					break externalLoop;
@@ -480,6 +507,4 @@ public class DatasetServiceImpl implements DatasetService {
 			list.add(observationUnitRow);
 		}
 	}
-
-
 }

@@ -77,7 +77,7 @@ public class ObservationValidatorTest {
 
 		when(datasetService.isValidObservationUnit(datasetId, observationUnitId)).thenReturn(false);
 
-		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, "");
+		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, null);
 	}
 	
 	@Test (expected = ResourceNotFoundException.class)
@@ -92,7 +92,7 @@ public class ObservationValidatorTest {
 		when(datasetService.isValidObservationUnit(datasetId, observationUnitId)).thenReturn(true);
 		when(datasetService.getPhenotype(observationUnitId, observationId)).thenReturn(null);
 
-		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, "");
+		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, null);
 	}
 
 }

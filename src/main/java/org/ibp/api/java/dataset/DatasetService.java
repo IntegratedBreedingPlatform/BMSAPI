@@ -5,7 +5,6 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
@@ -18,7 +17,10 @@ import java.util.Set;
 
 public interface DatasetService {
 
-	List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId);
+	List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId, final Boolean draftMode);
+
+	List<MeasurementVariable> getSubObservationSetVariables(
+		Integer studyId, Integer subObservationSetId);
 
 	long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> variableIds);
 
@@ -38,15 +40,16 @@ public interface DatasetService {
 
 	Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(final int studyId, final int datasetId, final List<Integer> instanceId);
 
-	List<ObservationUnitRow>  getObservationUnitRows(final int studyId, final int datasetId, final int instanceId, final int pageNumber,
-		final int pageSize, final String sortBy, final String sortOrder);
+	List<ObservationUnitRow>  getObservationUnitRows(
+		final int studyId, final int datasetId, final Integer instanceId, final int pageNumber,
+		final int pageSize, final String sortBy, final String sortOrder, final Boolean draftMode);
 
 	ObservationDto addObservation(Integer studyId, Integer datasetId, Integer observationUnitId, final ObservationDto observation);
 
 	ObservationDto updateObservation(
-		Integer studyId, Integer datasetId, Integer observationId, Integer observationUnitId, ObservationValue observationValue);
+		Integer studyId, Integer datasetId, Integer observationId, Integer observationUnitId, ObservationDto observationDto);
 
-	int countTotalObservationUnitsForDataset(final int datasetId, final int instanceId);
+	Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode);
 	
 	void deleteObservation(final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId);
 
@@ -55,4 +58,10 @@ public interface DatasetService {
 	List<StudyInstance> getDatasetInstances(final Integer studyId, final Integer datasetId);
 
 	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
+
+	void acceptDraftData(final Integer studyId, Integer datasetId);
+
+	void rejectDraftData(final Integer studyId, Integer datasetId);
+
+	Boolean checkOutOfBoundDraftData(final Integer studyId, Integer datasetId);
 }

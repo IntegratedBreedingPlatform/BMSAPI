@@ -10,7 +10,6 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
@@ -65,9 +64,10 @@ public class DatasetResource {
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/table/columns", method = RequestMethod.GET)
 	public ResponseEntity<List<MeasurementVariable>> getSubObservationSetColumns(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
-		@PathVariable final Integer datasetId) {
+		@PathVariable final Integer datasetId,
+		@RequestParam(required = false) final Boolean draftMode) {
 
-		final List<MeasurementVariable> subObservationSetColumns = this.studyDatasetService.getSubObservationSetColumns(studyId, datasetId);
+		final List<MeasurementVariable> subObservationSetColumns = this.studyDatasetService.getSubObservationSetColumns(studyId, datasetId, draftMode);
 
 		return new ResponseEntity<>(subObservationSetColumns, HttpStatus.OK);
 	}
@@ -129,10 +129,11 @@ public class DatasetResource {
 	public ResponseEntity<ObservationDto> updateObservation(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId, @PathVariable final Integer observationId,
-		@RequestBody final ObservationValue observationValue) {
-		final ObservationDto observation =
-			this.studyDatasetService.updateObservation(studyId, datasetId, observationId, observationUnitId, observationValue);
-		return new ResponseEntity<>(observation, HttpStatus.OK);
+		@ApiParam("Only some fields will be updated: ie. value, draftValue") @RequestBody final ObservationDto observationDto) {
+
+		return new ResponseEntity<>(
+			this.studyDatasetService.updateObservation(studyId, datasetId, observationId, observationUnitId, observationDto),
+			HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Count Phenotypes for specific instance (environment)", notes = "Returns count of phenotypes for specific instance (environment)")
@@ -157,19 +158,35 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "It will retrieve all the observation units", notes = "It will retrieve all the observation units including observations and props values in a format that will be used by the Observations table.")
-	@RequestMapping(value = "/{cropname}/studies/{studyId}/datasets/{datasetId}/instances/{instanceId}/observationUnits/table", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/table", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<ObservationUnitTable> getObservationUnitTable(@PathVariable final String cropname,
-		@PathVariable final Integer studyId, @PathVariable final Integer datasetId,
-		@PathVariable final Integer instanceId,
-		@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "pageNumber",
-			required = false) final Integer pageNumber,
-		@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
-			required = false) final Integer pageSize,
-		@ApiParam(value = "Sort order. Name of the field to sorty by. Should be termId of the field", required = false) @RequestParam(value = "sortBy",
-			required = false) final String sortBy,
-		@ApiParam(value = "Sort order direction. asc/desc.", required = false) @RequestParam(value = "sortOrder",
-			required = false) final String sortOrder,
+	public ResponseEntity<ObservationUnitTable> getObservationUnitTable(@PathVariable final String cropname, //
+		@PathVariable final Integer studyId, //
+		@PathVariable final Integer datasetId, //
+
+		@RequestParam(required = false)  //
+		final Integer instanceId, //
+
+		@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION, required = false) //
+		@RequestParam(required = false) //
+		final Integer pageNumber, //
+
+		@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION, required = false) //
+		@RequestParam(required = false) //
+		final Integer pageSize, //
+
+		@ApiParam(value = "Sort order. Name of the field to sorty by. Should be termId of the field", required = false) //
+		@RequestParam(required = false) //
+		final String sortBy, //
+
+		@ApiParam(value = "Sort order direction. asc/desc.", required = false) //
+		@RequestParam(required = false) //
+		final String sortOrder, //
+
+		@ApiParam(required = false)
+		@RequestParam(required = false) //
+		final Boolean draftMode, //
+
 		final HttpServletRequest req) {
 
 		final PagedResult<ObservationUnitRow> pageResult =
@@ -177,14 +194,14 @@ public class DatasetResource {
 
 				@Override
 				public long getCount() {
-					return DatasetResource.this.studyDatasetService.countTotalObservationUnitsForDataset(datasetId, instanceId);
+					return DatasetResource.this.studyDatasetService.countTotalObservationUnitsForDataset(datasetId, instanceId, draftMode);
 				}
 
 				@Override
 				public List<ObservationUnitRow> getResults(final PagedResult<ObservationUnitRow> pagedResult) {
 					return DatasetResource.this.studyDatasetService
 							.getObservationUnitRows(studyId, datasetId, instanceId, pagedResult.getPageNumber(), pagedResult.getPageSize(),
-									sortBy, sortOrder);
+									sortBy, sortOrder, draftMode);
 				}
 			});
 
@@ -279,5 +296,37 @@ public class DatasetResource {
 			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Move draft value to saved value in sub-observation dataset", notes = "Save information for the imported dataset")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/acceptance", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> acceptDraftData(@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId) {
+		this.studyDatasetService.acceptDraftData(studyId, datasetId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Reject draft value in sub-observation dataset", notes = "Reject information for the imported dataset")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/rejection", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> rejectDraftData(@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId) {
+		this.studyDatasetService.rejectDraftData(studyId, datasetId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Check if exist draft values out of bounds in sub-observation dataset", notes = "Check out of bounds")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/out-of-bounds", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Void> checkOutOfBoundDraftData(
+		@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId) {
+		final Boolean hasOutOfBounds = this.studyDatasetService.checkOutOfBoundDraftData(studyId, datasetId);
+
+		if (hasOutOfBounds) {
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 }

@@ -10,7 +10,6 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.dataset.ObservationValue;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.PreconditionFailedException;
@@ -194,7 +193,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int datasetId = random.nextInt(10000);
 		final int observationUnitId = random.nextInt(10000);
 		final int observationId = random.nextInt(10000);
-		final ObservationValue observationValue = new ObservationValue();
+		final ObservationDto observationDto = new ObservationDto();
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
@@ -202,13 +201,13 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}",
 					this.cropName, studyId, datasetId, observationUnitId, observationId)
 				.contentType(this.contentType)
-				.content(this.convertObjectToByte(observationValue)))
+				.content(this.convertObjectToByte(observationDto)))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
 
 		Mockito.verify(this.studyDatasetService)
 			.updateObservation(Matchers.eq(studyId), Matchers.eq(datasetId), Matchers.eq(observationId), Matchers.eq(observationUnitId),
-				Matchers.any(ObservationValue.class));
+				Matchers.any(ObservationDto.class));
 	}
 
 	@Test
@@ -283,7 +282,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.cropName", is(dataset.getCropName())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.datasetTypeId", is(dataset.getDatasetTypeId())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.studyId", is(dataset.getStudyId())))
-
+			.andExpect(MockMvcResultMatchers.jsonPath("$.hasPendingData", is(dataset.getHasPendingData())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].termId", is(dataset.getVariables().get(0).getTermId())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].name", is(dataset.getVariables().get(0).getName())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.variables[0].description", is(dataset.getVariables().get(0).getDescription())))
@@ -354,11 +353,11 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		Mockito.when(this.studyDatasetService.countTotalObservationUnitsForDataset(
 			org.mockito.Matchers.anyInt(),
-			org.mockito.Matchers.anyInt()))
+			org.mockito.Matchers.anyInt(), isNull(Boolean.class)))
 			.thenReturn(100);
 		Mockito.when(this.studyDatasetService.getObservationUnitRows(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
 			org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), isNull(String.class),
-			isNull(String.class))).thenReturn(Lists.newArrayList(obsDto));
+			isNull(String.class), isNull(Boolean.class))).thenReturn(Lists.newArrayList(obsDto));
 		final Random random = new Random();
 		final int studyId = random.nextInt(10000);
 		final int datasetId = random.nextInt(10000);
@@ -366,11 +365,11 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.get(
-				"/crops/{cropname}/studies/{studyId}/datasets/{datasetId}/instances/{instanceId}/observationUnits/table",
+				"/crops/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/table",
 				this.cropName,
 				studyId,
-				datasetId,
-				instanceId).param("pageNumber", "1")
+				datasetId).param("instanceId", Integer.toString(instanceId))
+				.param("pageNumber", "1")
 				.param("pageSize", "100").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -668,6 +667,74 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isBadRequest());
 	}
 
+	@Test
+	public void testAcceptDrafData() throws Exception {
+		final DatasetDTO dataset = this.createDataset(10090, 101101, "Plant", this.cropName, 100);
+
+		final int studyId = dataset.getStudyId();
+		final int datasetId = dataset.getDatasetId();
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/acceptance", this.cropName, studyId,
+					datasetId)
+				.contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+
+	@Test
+	public void testDiscardDrafData() throws Exception {
+		final DatasetDTO dataset = this.createDataset(10090, 101101, "Plant", this.cropName, 100);
+
+		final int studyId = dataset.getStudyId();
+		final int datasetId = dataset.getDatasetId();
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/rejection", this.cropName, studyId,
+					datasetId)
+				.contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+
+	@Test
+	public void testCheckWithoutOutOfBoundDraftData() throws Exception {
+		final DatasetDTO dataset = this.createDataset(10090, 101101, "Plant", this.cropName, 100);
+
+		final int studyId = dataset.getStudyId();
+		final int datasetId = dataset.getDatasetId();
+
+		Mockito.when(this.studyDatasetService.checkOutOfBoundDraftData(studyId, datasetId)).thenReturn(false);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.get("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/out-of-bounds", this.cropName, studyId,
+					datasetId)
+				.contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isNotFound());
+	}
+
+	@Test
+	public void testCheckWithOutOfBoundDraftData() throws Exception {
+		final DatasetDTO dataset = this.createDataset(10090, 101101, "Plant", this.cropName, 100);
+
+		final int studyId = dataset.getStudyId();
+		final int datasetId = dataset.getDatasetId();
+
+		Mockito.when(this.studyDatasetService.checkOutOfBoundDraftData(studyId, datasetId)).thenReturn(true);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.get("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/out-of-bounds",
+					this.cropName, studyId, datasetId)
+				.contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+
 	private DatasetDTO createDataset(
 		final int datasetType, final Integer datasetId, final String name, final String crop, final Integer studyId) {
 		final DataSetType dataSetType = DataSetType.findById(datasetType);
@@ -678,6 +745,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		datasetDTO.setCropName(crop);
 		datasetDTO.setDatasetTypeId(dataSetType.getId());
 		datasetDTO.setStudyId(studyId);
+		datasetDTO.setHasPendingData(Boolean.FALSE);
 
 		final List<MeasurementVariable> variables = new ArrayList<>();
 		final List<StudyInstance> instances = new ArrayList<>();
@@ -716,6 +784,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			final DatasetDTO datasetDTO = new DatasetDTO();
 			datasetDTO.setDatasetTypeId(dataSetType.getId());
 			datasetDTO.setName(dataSetType.name() + "_" + num);
+			datasetDTO.setHasPendingData(Boolean.TRUE);
 			num--;
 		}
 		return datasets;

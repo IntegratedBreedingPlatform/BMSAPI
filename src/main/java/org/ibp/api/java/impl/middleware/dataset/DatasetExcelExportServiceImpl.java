@@ -44,7 +44,7 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 
 	@Override
 	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
-		return this.studyDatasetService.getSubObservationSetColumns(studyId, datasetId);
+		return this.studyDatasetService.getSubObservationSetVariables(studyId, datasetId);
 	}
 
 	@Override
@@ -53,9 +53,9 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 		for(final Integer instanceDBID: selectedDatasetInstancesMap.keySet()) {
 			final List<ObservationUnitRow> observationUnitRows =
 				this.studyDatasetService
-					.getObservationUnitRows(study.getId(), dataset.getDatasetId(), selectedDatasetInstancesMap.get(instanceDBID).getInstanceDbId(), Integer.MAX_VALUE,
-						Integer.MAX_VALUE, null,
-						"");
+					.getObservationUnitRows(study.getId(), dataset.getDatasetId(),
+						selectedDatasetInstancesMap.get(instanceDBID).getInstanceDbId(), Integer.MAX_VALUE, Integer.MAX_VALUE, null, "",
+						null);
 			observationUnitRowMap.put(instanceDBID, observationUnitRows);
 		}
 		return observationUnitRowMap;

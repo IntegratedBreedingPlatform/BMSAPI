@@ -12,23 +12,32 @@ import java.util.List;
 public class ObservationsPutRequestInput {
 
 	private boolean processWarnings;
-
+	// DO NOT CHANGE THIS VARIABLE EVEN WHEN IT IS ALWAYS TRUE, IT WILL BE USED WHEN WE IMPLEMENT THE IMPORT DATASET PROCESS
+	private boolean draftMode = true;
 	private List<List<String>> data;
 
 	public boolean isProcessWarnings() {
-		return processWarnings;
+		return this.processWarnings;
 	}
 
 	public void setProcessWarnings(final boolean processWarnings) {
 		this.processWarnings = processWarnings;
 	}
 
+	public boolean isDraftMode() {
+		return this.draftMode;
+	}
+
 	public List<List<String>> getData() {
-		return data;
+		return this.data;
 	}
 
 	public void setData(final List<List<String>> data) {
 		this.data = data;
+	}
+
+	public void setDraftMode(final boolean draftMode) {
+		this.draftMode = draftMode;
 	}
 
 	@Override
@@ -42,7 +51,7 @@ public class ObservationsPutRequestInput {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
 
