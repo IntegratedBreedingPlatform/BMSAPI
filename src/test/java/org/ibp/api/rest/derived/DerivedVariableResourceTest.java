@@ -53,7 +53,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.post(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variable/calculation", this.cropName, 100,
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/calculation", this.cropName, 100,
 					102)
 				.contentType(this.contentType).content(this.convertObjectToByte(calculateVariableRequest)))
 			.andDo(MockMvcResultHandlers.print())
@@ -84,7 +84,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.post(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variable/calculation", this.cropName, 100,
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/calculation", this.cropName, 100,
 					102)
 				.contentType(this.contentType).content(this.convertObjectToByte(calculateVariableRequest)))
 			.andDo(MockMvcResultHandlers.print())
@@ -112,7 +112,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.post(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variable/calculation", this.cropName, 100,
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/calculation", this.cropName, 100,
 					102)
 				.contentType(this.contentType).content(this.convertObjectToByte(calculateVariableRequest)))
 			.andDo(MockMvcResultHandlers.print())
