@@ -58,7 +58,7 @@ public class DatasetCollectionOrderServiceImpl implements DatasetCollectionOrder
 
 		private int id;
 
-		private CollectionOrder(int id) {
+		CollectionOrder(int id) {
 			this.id = id;
 		}
 

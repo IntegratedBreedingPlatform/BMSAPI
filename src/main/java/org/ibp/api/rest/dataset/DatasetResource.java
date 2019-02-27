@@ -41,6 +41,8 @@ public class DatasetResource {
 
 	public static final String CSV = "csv";
 	public static final String XLS = "xls";
+	public static final String KSU_CSV = "ksu_csv";
+	public static final String KSU_XLS = "ksu_xls";
 
 	@Autowired
 	private DatasetService studyDatasetService;
@@ -50,6 +52,12 @@ public class DatasetResource {
 
 	@Autowired
 	private DatasetExportService datasetExcelExportServiceImpl;
+
+	@Autowired
+	private DatasetExportService datasetKsuCSVExportServiceImpl;
+
+	@Autowired
+	private DatasetExportService datasetKsuExcelExportServiceImpl;
 
 	@ApiOperation(value = "Get Dataset Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the dataset, "
 		+ "that will be shown in the Observation Table")
@@ -269,10 +277,15 @@ public class DatasetResource {
 	}
 
 	private DatasetExportService getExportFileStrategy(final String fileType) {
-		if (DatasetResource.CSV.equalsIgnoreCase(fileType.trim())) {
+		final String trimmedFileType = fileType.trim();
+		if (DatasetResource.CSV.equalsIgnoreCase(trimmedFileType)) {
 			return this.datasetCSVExportServiceImpl;
-		} else if (DatasetResource.XLS.equalsIgnoreCase(fileType.trim())) {
+		} else if (DatasetResource.XLS.equalsIgnoreCase(trimmedFileType)) {
 			return this.datasetExcelExportServiceImpl;
+		} else if (DatasetResource.KSU_CSV.equalsIgnoreCase(trimmedFileType)) {
+			return this.datasetKsuCSVExportServiceImpl;
+		} else if (DatasetResource.KSU_XLS.equalsIgnoreCase(trimmedFileType)) {
+			return this.datasetKsuExcelExportServiceImpl;
 		}
 		return null;
 	}
