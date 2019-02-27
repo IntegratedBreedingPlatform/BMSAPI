@@ -92,4 +92,38 @@ public class ProgramServiceImpl implements ProgramService {
 	public long countProgramsByFilter(final Map<ProgramFilters, Object> filter) {
 		return this.workbenchDataManager.countProjectsByFilter(filter);
 	}
+
+	@Override
+	public ProgramSummary getByUUIDAndCrop(final String crop, final String programUUID) {
+		try {
+			Project workbenchProgram = this.workbenchDataManager.getProjectByUuidAndCrop(programUUID, crop);
+			if (workbenchProgram != null) {
+				final ProgramSummary programSummary = new ProgramSummary();
+				programSummary.setId(workbenchProgram.getProjectId().toString());
+				programSummary.setName(workbenchProgram.getProjectName());
+				if (workbenchProgram.getCropType() != null) {
+					programSummary.setCrop(workbenchProgram.getCropType().getCropName());
+				}
+				final WorkbenchUser programUser = this.workbenchDataManager.getUserById(workbenchProgram.getUserId());
+				programSummary.setCreatedBy(programUser.getName());
+
+				final List<WorkbenchUser> allProgramMembers =
+						this.workbenchDataManager.getUsersByProjectId(workbenchProgram.getProjectId());
+				final Set<String> members = new HashSet<>();
+				for (final WorkbenchUser member : allProgramMembers) {
+					members.add(member.getName());
+				}
+				programSummary.setMembers(members);
+				programSummary.setUniqueID(workbenchProgram.getUniqueID());
+				if (workbenchProgram.getStartDate() != null) {
+					programSummary.setStartDate(ProgramServiceImpl.DATE_FORMAT.format(workbenchProgram.getStartDate()));
+				}
+				return programSummary;
+			}
+			return null;
+		} catch (final MiddlewareQueryException e) {
+			throw new ApiRuntimeException("Error!", e);
+		}
+
+	}
 }

@@ -15,4 +15,6 @@ public interface ProgramService {
 	List<ProgramDetailsDto> getProgramsByFilter(final int pageNumber, final int pageSize, final Map<ProgramFilters, Object> filters);
 
 	long countProgramsByFilter(final Map<ProgramFilters, Object> filter);
+
+	ProgramSummary getByUUIDAndCrop(String crop, String programUUID);
 }

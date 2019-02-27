@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -37,6 +38,11 @@ public class StudyValidator {
 	public void validate(final Integer studyId, final Boolean shouldBeUnlocked) {
 
 		errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
+		if (studyId == null) {
+			this.errors.reject("study.required", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 
 		final Study study = studyDataManager.getStudy(studyId);
 

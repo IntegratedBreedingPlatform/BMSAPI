@@ -250,10 +250,10 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(
-		final int studyId, final int datasetId, final List<Integer> instanceId) {
-		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceId, true);
+		final int studyId, final int datasetId, final List<Integer> instanceIds) {
+		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds, true);
 		final Map<Integer, List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow>> observationUnitRowsMap =
-			this.middlewareDatasetService.getInstanceIdToObservationUnitRowsMap(studyId, datasetId, instanceId);
+			this.middlewareDatasetService.getInstanceIdToObservationUnitRowsMap(studyId, datasetId, instanceIds);
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final Map<Integer, List<ObservationUnitRow>> map = new HashMap<>();
