@@ -7,7 +7,9 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsTableParamDto;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
@@ -19,6 +21,7 @@ import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.DatasetCollectionOrderServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -353,24 +356,29 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		Mockito.when(this.studyDatasetService.countTotalObservationUnitsForDataset(
 			org.mockito.Matchers.anyInt(),
-			org.mockito.Matchers.anyInt(), isNull(Boolean.class)))
+			org.mockito.Matchers.anyInt(), ArgumentMatchers.anyBoolean()))
 			.thenReturn(100);
 		Mockito.when(this.studyDatasetService.getObservationUnitRows(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
-			org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), isNull(String.class),
-			isNull(String.class), isNull(Boolean.class))).thenReturn(Lists.newArrayList(obsDto));
+			ArgumentMatchers.any()))
+			.thenReturn(Lists.newArrayList(obsDto));
 		final Random random = new Random();
 		final int studyId = random.nextInt(10000);
 		final int datasetId = random.nextInt(10000);
 		final int instanceId = random.nextInt(10000);
 
+		final ObservationUnitsTableParamDto params = new ObservationUnitsTableParamDto();
+		params.setInstanceId(instanceId);
+		final SortedPageRequest sortedRequest = new SortedPageRequest();
+		sortedRequest.setPageNumber(1);
+		sortedRequest.setPageSize(100);
+		params.setSortedRequest(sortedRequest);
+
 		this.mockMvc
-			.perform(MockMvcRequestBuilders.get(
+			.perform(MockMvcRequestBuilders.post(
 				"/crops/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/table",
 				this.cropName,
 				studyId,
-				datasetId).param("instanceId", Integer.toString(instanceId))
-				.param("pageNumber", "1")
-				.param("pageSize", "100").contentType(this.contentType))
+				datasetId).content(this.convertObjectToByte(params)).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.recordsFiltered", is(100)))

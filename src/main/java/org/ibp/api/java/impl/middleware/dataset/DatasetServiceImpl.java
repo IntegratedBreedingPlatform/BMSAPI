@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsTableParamDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
@@ -276,18 +277,16 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<ObservationUnitRow> getObservationUnitRows(
-		final int studyId, final int datasetId, final Integer instanceId,
-		final int pageNumber, final int pageSize, final String sortBy, final String sortOrder, final Boolean draftMode) {
+		final int studyId, final int datasetId, final ObservationUnitsTableParamDto params) {
 
 		List<Integer> instanceIds = null;
-		if (instanceId != null) {
-			instanceIds = Arrays.asList(instanceId);
+		if (params.getInstanceId() != null) {
+			instanceIds = Arrays.asList(params.getInstanceId());
 		}
 		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds, true);
 
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
-			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, instanceId, pageNumber, pageSize, sortBy, sortOrder,
-				draftMode);
+			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, params);
 
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
