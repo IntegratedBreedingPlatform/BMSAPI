@@ -1,6 +1,7 @@
 
 package org.ibp.api.brapi.v1.common;
 
+import com.google.common.base.Preconditions;
 import org.ibp.api.domain.common.PagedResult;
 
 public class BrapiPagedResult<T> extends PagedResult<T> {
@@ -14,9 +15,15 @@ public class BrapiPagedResult<T> extends PagedResult<T> {
 	public static final String PAGE_SIZE_DESCRIPTION = "Number of results to retrieve per page. Defaults to "
 			+ BrapiPagedResult.DEFAULT_PAGE_SIZE + " if not supplied. Max page size allowed is " + BrapiPagedResult.MAX_PAGE_SIZE + ".";
 
-	public BrapiPagedResult(final int pageNumber, final int pageSize, final long totalResults) {
+	public BrapiPagedResult(final int pageNumber, final int pageSize, final long totalResults, final long filteredResults) {
 		super();
 		this.totalResults = totalResults;
+		if (filteredResults == 0) {
+			this.filteredResults = totalResults;
+		} else {
+			this.filteredResults = filteredResults;
+		}
+		Preconditions.checkArgument(this.filteredResults <= totalResults, "Filtered results must be less than or equal to total results");
 
 		if (pageSize < 1 || pageSize > BrapiPagedResult.MAX_PAGE_SIZE) {
 			throw new IllegalArgumentException("Page size must between 1 and " + BrapiPagedResult.MAX_PAGE_SIZE + ".");

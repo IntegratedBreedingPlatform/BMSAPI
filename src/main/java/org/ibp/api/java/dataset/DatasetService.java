@@ -50,7 +50,10 @@ public interface DatasetService {
 		Integer studyId, Integer datasetId, Integer observationId, Integer observationUnitId, ObservationDto observationDto);
 
 	Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode);
-	
+
+	long countFilteredObservationUnitsForDataset(
+		Integer datasetId, Integer instanceId, final Boolean draftMode, ObservationUnitsSearchDTO.Filter filter);
+
 	void deleteObservation(final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId);
 
 	void importObservations(Integer studyId, Integer datasetId, ObservationsPutRequestInput input);

@@ -241,6 +241,12 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public long countFilteredObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode,
+		final ObservationUnitsSearchDTO.Filter filter) {
+		return this.middlewareDatasetService.countFilteredObservationUnitsForDataset(datasetId, instanceId, draftMode, filter);
+	}
+
+	@Override
 	public List<StudyInstance> getDatasetInstances(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);

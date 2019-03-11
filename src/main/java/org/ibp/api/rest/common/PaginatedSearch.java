@@ -25,9 +25,10 @@ public class PaginatedSearch {
 		}
 
 		final long totalResults = searchSpec.getCount();
+		final long filteredResults = searchSpec.getFilteredCount();
 
 		// Initialise page parameters/metadata and validate.
-		final PagedResult<T> pagedResult = new PagedResult<T>(pgeNum, pgeSize, totalResults);
+		final PagedResult<T> pagedResult = new PagedResult<T>(pgeNum, pgeSize, totalResults, filteredResults);
 
 		// Add list/search result
 		pagedResult.addPageResults(searchSpec.getResults(pagedResult));
@@ -48,9 +49,10 @@ public class PaginatedSearch {
 		}
 
 		final long totalResults = searchSpec.getCount();
+		final long filteredResults = searchSpec.getFilteredCount();
 
 		// Initialise page parameters/metadata and validate.
-		final BrapiPagedResult<T> pagedResult = new BrapiPagedResult<T>(pgeNum, pgeSize, totalResults);
+		final BrapiPagedResult<T> pagedResult = new BrapiPagedResult<T>(pgeNum, pgeSize, totalResults, filteredResults);
 
 		// Add list/search result
 		pagedResult.addPageResults(searchSpec.getResults(pagedResult));

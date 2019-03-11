@@ -1,5 +1,6 @@
 package org.ibp.api.rest.dataset;
 
+import com.google.common.base.Preconditions;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -30,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -167,7 +167,9 @@ public class DatasetResource {
 		@PathVariable final Integer datasetId, //
 		@RequestBody  final ObservationUnitsSearchDTO searchDTO) {
 
-		final SortedPageRequest sortedRequest = params.getSortedRequest();
+		Preconditions.checkNotNull(searchDTO, "params cannot be null");
+		final SortedPageRequest sortedRequest = searchDTO.getSortedRequest();
+		Preconditions.checkNotNull(sortedRequest, "sortedRequest inside params cannot be null");
 
 		final Integer pageNumber = sortedRequest.getPageNumber();
 		final Integer pageSize = sortedRequest.getPageSize();
@@ -184,6 +186,12 @@ public class DatasetResource {
 				}
 
 				@Override
+				public long getFilteredCount() {
+					return DatasetResource.this.studyDatasetService
+						.countFilteredObservationUnitsForDataset(datasetId, instanceId, searchDTO.getDraftMode(), searchDTO.getFilter());
+				}
+
+				@Override
 				public List<ObservationUnitRow> getResults(final PagedResult<ObservationUnitRow> pagedResult) {
 					return DatasetResource.this.studyDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO);
 				}
@@ -193,7 +201,7 @@ public class DatasetResource {
 		observationUnitTable.setData(pageResult.getPageResults());
 		observationUnitTable.setDraw(searchDTO.getDraw());
 		observationUnitTable.setRecordsTotal((int) pageResult.getTotalResults());
-		observationUnitTable.setRecordsFiltered((int) pageResult.getTotalResults());
+		observationUnitTable.setRecordsFiltered((int) pageResult.getFilteredResults());
 		return new ResponseEntity<>(observationUnitTable, HttpStatus.OK);
 	}
 
