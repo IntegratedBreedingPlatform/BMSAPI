@@ -8,7 +8,7 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.SortedPageRequest;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitsTableParamDto;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
@@ -165,15 +165,15 @@ public class DatasetResource {
 	public ResponseEntity<ObservationUnitTable> getObservationUnitTable(@PathVariable final String cropname, //
 		@PathVariable final Integer studyId, //
 		@PathVariable final Integer datasetId, //
-		@RequestBody  final ObservationUnitsTableParamDto params) {
+		@RequestBody  final ObservationUnitsSearchDTO searchDTO) {
 
 		final SortedPageRequest sortedRequest = params.getSortedRequest();
 
 		final Integer pageNumber = sortedRequest.getPageNumber();
 		final Integer pageSize = sortedRequest.getPageSize();
 
-		final Integer instanceId = params.getInstanceId();
-		final Boolean draftMode = params.getDraftMode();
+		final Integer instanceId = searchDTO.getInstanceId();
+		final Boolean draftMode = searchDTO.getDraftMode();
 
 		final PagedResult<ObservationUnitRow> pageResult =
 			new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<ObservationUnitRow>() {
@@ -185,13 +185,13 @@ public class DatasetResource {
 
 				@Override
 				public List<ObservationUnitRow> getResults(final PagedResult<ObservationUnitRow> pagedResult) {
-					return DatasetResource.this.studyDatasetService.getObservationUnitRows(studyId, datasetId, params);
+					return DatasetResource.this.studyDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO);
 				}
 			});
 
 		final ObservationUnitTable observationUnitTable = new ObservationUnitTable();
 		observationUnitTable.setData(pageResult.getPageResults());
-		observationUnitTable.setDraw(params.getDraw());
+		observationUnitTable.setDraw(searchDTO.getDraw());
 		observationUnitTable.setRecordsTotal((int) pageResult.getTotalResults());
 		observationUnitTable.setRecordsFiltered((int) pageResult.getTotalResults());
 		return new ResponseEntity<>(observationUnitTable, HttpStatus.OK);

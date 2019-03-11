@@ -9,7 +9,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitsTableParamDto;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
@@ -366,19 +366,19 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int datasetId = random.nextInt(10000);
 		final int instanceId = random.nextInt(10000);
 
-		final ObservationUnitsTableParamDto params = new ObservationUnitsTableParamDto();
-		params.setInstanceId(instanceId);
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+		searchDTO.setInstanceId(instanceId);
 		final SortedPageRequest sortedRequest = new SortedPageRequest();
 		sortedRequest.setPageNumber(1);
 		sortedRequest.setPageSize(100);
-		params.setSortedRequest(sortedRequest);
+		searchDTO.setSortedRequest(sortedRequest);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.post(
 				"/crops/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/table",
 				this.cropName,
 				studyId,
-				datasetId).content(this.convertObjectToByte(params)).contentType(this.contentType))
+				datasetId).content(this.convertObjectToByte(searchDTO)).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.recordsFiltered", is(100)))

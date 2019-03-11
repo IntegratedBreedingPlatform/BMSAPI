@@ -24,7 +24,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitsTableParamDto;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -247,7 +247,7 @@ public class DatasetServiceImplTest {
 		Mockito.doReturn(observationDtoTestData).when(this.middlewareDatasetService)
 			.getObservationUnitRows(TEST_STUDY_IDENTIFIER, 1, ArgumentMatchers.any());
 		final List<org.ibp.api.rest.dataset.ObservationUnitRow> actualObservations =
-			this.studyDatasetService.getObservationUnitRows(TEST_STUDY_IDENTIFIER, 1, new ObservationUnitsTableParamDto());
+			this.studyDatasetService.getObservationUnitRows(TEST_STUDY_IDENTIFIER, 1, new ObservationUnitsSearchDTO());
 
 		Assert.assertEquals(this.mapObservationUnitRows(observationDtoTestData), actualObservations);
 

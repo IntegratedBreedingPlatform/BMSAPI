@@ -3,7 +3,7 @@ package org.ibp.api.java.dataset;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitsTableParamDto;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
@@ -42,7 +42,7 @@ public interface DatasetService {
 	Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(final int studyId, final int datasetId, final List<Integer> instanceId);
 
 	List<ObservationUnitRow> getObservationUnitRows(
-		int studyId, int datasetId, ObservationUnitsTableParamDto observationUnitsTableParamDto);
+		int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO);
 
 	ObservationDto addObservation(Integer studyId, Integer datasetId, Integer observationUnitId, final ObservationDto observation);
 
