@@ -329,4 +329,13 @@ public class DatasetResource {
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
+
+	@ApiOperation(value = "Set missing value to saved value in sub-observation dataset", notes = "Set missing for the imported dataset")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/missing", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> setValuesToMissing(@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId) {
+		this.studyDatasetService.setValuesToMissing(studyId, datasetId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 }

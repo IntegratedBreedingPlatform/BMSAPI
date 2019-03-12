@@ -426,6 +426,13 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public void setValuesToMissing(final Integer studyId, final Integer datasetId) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.middlewareDatasetService.setValuesToMissing(datasetId);
+	}
+
+	@Override
 	public void acceptDraftData(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);

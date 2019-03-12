@@ -64,4 +64,6 @@ public interface DatasetService {
 	void rejectDraftData(final Integer studyId, Integer datasetId);
 
 	Boolean checkOutOfBoundDraftData(final Integer studyId, Integer datasetId);
+
+	void setValuesToMissing(Integer studyId, Integer datasetId);
 }
