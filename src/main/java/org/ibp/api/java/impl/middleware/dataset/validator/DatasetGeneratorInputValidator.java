@@ -120,7 +120,7 @@ public class DatasetGeneratorInputValidator {
 
 	public void validateDataConflicts(final Integer studyId, final DatasetGeneratorInput o, final Errors errors) {
 		final Study study = this.studyDataManager.getStudy(studyId);
-		if (!this.studyDatasetService.isDatasetNameAvailable(o.getDatasetName(), study.getProgramUUID())) {
+		if (!this.studyDatasetService.isDatasetNameAvailable(o.getDatasetName(), study.getId())) {
 			errors.reject("dataset.name.not.available", new String[] {o.getDatasetName()} , "");
 		}
 	}
