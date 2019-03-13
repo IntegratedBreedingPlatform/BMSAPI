@@ -32,6 +32,7 @@ import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -248,6 +249,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public List<GermplasmDTO> searchGermplasmDTO(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
 		try {
 			final List<GermplasmDTO> germplasmDTOList = germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO);
+			final int defaultPageSize = new Integer(BrapiPagedResult.DEFAULT_PAGE_SIZE);
+			final int defaultPageNumber = new Integer(BrapiPagedResult.DEFAULT_PAGE_NUMBER);
+
+			germplasmSearchRequestDTO.setPageSize(germplasmSearchRequestDTO.getPageSize() == null ? defaultPageSize : germplasmSearchRequestDTO.getPageSize());
+			germplasmSearchRequestDTO.setPage(germplasmSearchRequestDTO.getPage() == null ? defaultPageNumber : germplasmSearchRequestDTO.getPage());
+
 			if (germplasmDTOList != null) {
 				for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
 					germplasmDTO.setPedigree(
