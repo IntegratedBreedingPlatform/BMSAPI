@@ -78,7 +78,7 @@ public class DatasetGeneratorInputValidatorTest {
 		this.datasetGeneratorInputValidator.setEnvironment(this.environment);
 		this.datasetGeneratorInputValidator.init();
 
-		when(this.datasetService.isDatasetNameAvailable(name, program)).thenReturn(true);
+		when(this.datasetService.isDatasetNameAvailable(name, studyId)).thenReturn(true);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
@@ -100,7 +100,7 @@ public class DatasetGeneratorInputValidatorTest {
 
 		datasetInputGenerator.setDatasetTypeId(DataSetType.PLANT_SUBOBSERVATIONS.getId());
 
-		when(this.datasetService.isDatasetNameAvailable(name, program)).thenReturn(false);
+		when(this.datasetService.isDatasetNameAvailable(name, studyId)).thenReturn(false);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 
 		this.datasetGeneratorInputValidator.validateDataConflicts(studyId, datasetInputGenerator, errors);
