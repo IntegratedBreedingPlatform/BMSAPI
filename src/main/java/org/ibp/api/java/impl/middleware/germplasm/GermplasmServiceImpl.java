@@ -249,9 +249,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public List<GermplasmDTO> searchGermplasmDTO(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
 		try {
 			final List<GermplasmDTO> germplasmDTOList = germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO);
+			final int defaultPageSize = new Integer(BrapiPagedResult.DEFAULT_PAGE_SIZE);
+			final int defaultPageNumber = new Integer(BrapiPagedResult.DEFAULT_PAGE_NUMBER);
 
-			germplasmSearchRequestDTO.setPageSize(germplasmSearchRequestDTO.getPageSize() == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : germplasmSearchRequestDTO.getPageSize());
-			germplasmSearchRequestDTO.setPage(germplasmSearchRequestDTO.getPage() == null ?  BrapiPagedResult.DEFAULT_PAGE_NUMBER : germplasmSearchRequestDTO.getPage());
+			germplasmSearchRequestDTO.setPageSize(germplasmSearchRequestDTO.getPageSize() == null ? defaultPageSize : germplasmSearchRequestDTO.getPageSize());
+			germplasmSearchRequestDTO.setPage(germplasmSearchRequestDTO.getPage() == null ? defaultPageNumber : germplasmSearchRequestDTO.getPage());
 
 			if (germplasmDTOList != null) {
 				for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
