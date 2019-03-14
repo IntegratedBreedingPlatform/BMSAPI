@@ -76,7 +76,7 @@ public class DatasetGeneratorInputValidatorTest {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
 		this.datasetGeneratorInputValidator.validateDataConflicts(studyId, datasetInputGenerator, errors);
-		Assert.assertTrue(errors.getAllErrors().size() == 0);
+		Assert.assertTrue(errors.getAllErrors().isEmpty());
 	}
 
 	@Test
@@ -112,7 +112,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
 
 		this.datasetGeneratorInputValidator.validateDatasetTypeIsImplemented(datasetTypeId, errors);
-		Assert.assertTrue(errors.getAllErrors().size() == 0);
+		Assert.assertTrue(errors.getAllErrors().isEmpty());
 
 	}
 
@@ -166,7 +166,7 @@ public class DatasetGeneratorInputValidatorTest {
 		this.datasetGeneratorInputValidator.init();
 		datasetInputGenerator.setNumberOfSubObservationUnits(25);
 		variableDetails.setName("ChangedName");
-		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
+		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(variableType)));
 
 		when(this.datasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
@@ -175,7 +175,7 @@ public class DatasetGeneratorInputValidatorTest {
 			.thenReturn(variableDetails);
 		this.datasetGeneratorInputValidator.validateBasicData("maize", studyId, parentId, datasetInputGenerator, errors);
 
-		Assert.assertTrue(errors.getAllErrors().size() == 0);
+		Assert.assertTrue(errors.getAllErrors().isEmpty());
 	}
 
 	@Test
@@ -215,7 +215,7 @@ public class DatasetGeneratorInputValidatorTest {
 		this.datasetGeneratorInputValidator.init();
 
 		variableDetails.setName("ChangedName");
-		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
+		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(variableType)));
 
 		when(this.datasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
@@ -266,7 +266,7 @@ public class DatasetGeneratorInputValidatorTest {
 		this.datasetGeneratorInputValidator.init();
 
 		variableDetails.setName("ChangedName");
-		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
+		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(variableType)));
 
 		when(this.datasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
@@ -317,7 +317,7 @@ public class DatasetGeneratorInputValidatorTest {
 		this.datasetGeneratorInputValidator.init();
 
 		variableDetails.setName("ChangedName");
-		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
+		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(variableType)));
 
 		when(this.datasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
@@ -370,7 +370,7 @@ public class DatasetGeneratorInputValidatorTest {
 		this.datasetGeneratorInputValidator.init();
 
 		variableDetails.setName("ChangedName");
-		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
+		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(variableType)));
 
 		when(this.datasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
@@ -422,7 +422,7 @@ public class DatasetGeneratorInputValidatorTest {
 		this.datasetGeneratorInputValidator.init();
 
 		variableDetails.setName("ChangedName");
-		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
+		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(variableType)));
 
 		when(this.datasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
@@ -474,7 +474,7 @@ public class DatasetGeneratorInputValidatorTest {
 		this.datasetGeneratorInputValidator.init();
 
 		variableDetails.setName("ChangedName");
-		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
+		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(variableType)));
 
 		when(this.datasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
@@ -524,7 +524,7 @@ public class DatasetGeneratorInputValidatorTest {
 		when(this.datasetGeneratorInputValidator.getEnvironment().getProperty("maximum.number.of.sub.observation.sets")).thenReturn("5");
 
 		variableDetails.setName("ChangedName");
-		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
+		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(variableType)));
 
 		when(this.datasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
@@ -583,7 +583,7 @@ public class DatasetGeneratorInputValidatorTest {
 		this.datasetGeneratorInputValidator.init();
 
 		variableDetails.setName("ChangedName");
-		variableDetails.setVariableTypes(new HashSet<VariableType>(Collections.singletonList(variableType)));
+		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(variableType)));
 
 		when(this.datasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
