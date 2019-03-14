@@ -139,6 +139,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 		this.locationDataManger = locationDataManger;
 	}
 
+	void setCrossExpansionProperties(CrossExpansionProperties crossExpansionProperties) {
+		this.crossExpansionProperties = crossExpansionProperties;
+	}
+	
 	@Override
 	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
 		PedigreeDTO pedigreeDTO = null;
