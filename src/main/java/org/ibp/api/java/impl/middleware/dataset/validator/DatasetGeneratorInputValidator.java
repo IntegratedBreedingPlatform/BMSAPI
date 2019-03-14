@@ -21,6 +21,7 @@ import org.springframework.validation.Errors;
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Component
 public class DatasetGeneratorInputValidator {
@@ -129,6 +130,15 @@ public class DatasetGeneratorInputValidator {
 		final DataSetType type = DataSetType.findById(datasetTypeId);
 		if (!DataSetType.isSubObservationDatasetType(type)){
 			errors.reject("dataset.operation.not.implemented", new String[] {String.valueOf(datasetTypeId)}, "");
+		}
+	}
+
+	public void validateDatasetName( final DatasetGeneratorInput o, final Errors errors){
+		final String regex = "^[a-zA-Z0-9\\s(\\\\/:*?\\\"\"<>|.)]*$";
+		final Pattern pattern = Pattern.compile(regex);
+
+		if(!pattern.matcher(o.getDatasetName()).matches()){
+			errors.reject("dataset.name.invalid", new String[] {}, "");
 		}
 	}
 
