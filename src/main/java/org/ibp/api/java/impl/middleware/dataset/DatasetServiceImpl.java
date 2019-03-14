@@ -321,12 +321,6 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new NotSupportedException(bindingResult.getAllErrors().get(0));
 		}
 
-		// special characters
-		this.datasetGeneratorInputValidator.validateDatasetName(datasetGeneratorInput, bindingResult);
-		if (bindingResult.hasErrors()) {
-			throw new ConflictException(bindingResult.getAllErrors());
-		}
-
 		// conflict
 		this.datasetGeneratorInputValidator.validateDataConflicts(studyId, datasetGeneratorInput, bindingResult);
 		if (bindingResult.hasErrors()) {

@@ -600,32 +600,96 @@ public class DatasetGeneratorInputValidatorTest {
 	@Test
 	public void testValidateDataSpecialCharacters() {
 		final Study study = new Study();
-		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
+		final Random random = new Random();
+		final List<StudyInstance> studyInstances = new ArrayList<>();
+		final StudyInstance studyInstance = new StudyInstance();
+		final Integer[] instanceIds = new Integer[] {1};
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
+		final DatasetDTO dataset = new DatasetDTO();
+		final Integer parentId = random.nextInt();
+		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
+		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
+		final VariableType variableType = new VariableType(
+			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId().toString(),
+			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getName(),
+			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getDescription());
+
+		final int studyId = random.nextInt();
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-
+		studyInstance.setInstanceDbId(1);
+		studyInstances.add(studyInstance);
+		dataset.setInstances(studyInstances);
+		datasetInputGenerator.setInstanceIds(instanceIds);
+		datasetInputGenerator.setSequenceVariableId(123);
+		datasetInputGenerator.setNumberOfSubObservationUnits(10);
 		datasetInputGenerator.setDatasetTypeId(DataSetType.PLANT_SUBOBSERVATIONS.getId());
 		datasetInputGenerator.setDatasetName("Dataset name \\ / : * ? \" < > | .");
 
-		this.datasetGeneratorInputValidator.validateDatasetName(datasetInputGenerator, errors);
-		Assert.assertTrue(errors.getAllErrors().size() == 0);
+		when(this.datasetGeneratorInputValidator.getEnvironment().getProperty("maximum.number.of.sub.observation.parent.unit"))
+			.thenReturn("100");
+		when(this.datasetGeneratorInputValidator.getEnvironment().getProperty("maximum.number.of.sub.observation.sets")).thenReturn("25");
+		this.datasetGeneratorInputValidator.setEnvironment(this.environment);
+		this.datasetGeneratorInputValidator.init();
+		datasetInputGenerator.setNumberOfSubObservationUnits(25);
+		variableDetails.setName("ChangedName");
+		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(variableType)));
+
+		when(this.datasetService.getDataset(parentId)).thenReturn(dataset);
+		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
+		when(this.variableService
+			.getVariableById("maize", study.getProgramUUID(), String.valueOf(datasetInputGenerator.getSequenceVariableId())))
+			.thenReturn(variableDetails);
+		this.datasetGeneratorInputValidator.validateBasicData("maize", studyId, parentId, datasetInputGenerator, errors);
+		Assert.assertTrue(errors.getAllErrors().isEmpty());
 	}
 
 	@Test
 	public void testValidateDataSpecialCharactersError() {
 		final Study study = new Study();
-		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
+		final Random random = new Random();
+		final List<StudyInstance> studyInstances = new ArrayList<>();
+		final StudyInstance studyInstance = new StudyInstance();
+		final Integer[] instanceIds = new Integer[] {1};
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
+		final DatasetDTO dataset = new DatasetDTO();
+		final Integer parentId = random.nextInt();
+		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
+		final VariableDetails variableDetails = TestDataProvider.getTestVariableDetails();
+		final VariableType variableType = new VariableType(
+			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getId().toString(),
+			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getName(),
+			org.generationcp.middleware.domain.ontology.VariableType.OBSERVATION_UNIT.getDescription());
+
+		final int studyId = random.nextInt();
 		final String program = "MAIZE-Program";
 
 		study.setProgramUUID(program);
-
+		studyInstance.setInstanceDbId(1);
+		studyInstances.add(studyInstance);
+		dataset.setInstances(studyInstances);
+		datasetInputGenerator.setInstanceIds(instanceIds);
+		datasetInputGenerator.setSequenceVariableId(123);
+		datasetInputGenerator.setNumberOfSubObservationUnits(10);
 		datasetInputGenerator.setDatasetTypeId(DataSetType.PLANT_SUBOBSERVATIONS.getId());
 		datasetInputGenerator.setDatasetName("Dataset+");
 
-		this.datasetGeneratorInputValidator.validateDatasetName(datasetInputGenerator, errors);
+		when(this.datasetGeneratorInputValidator.getEnvironment().getProperty("maximum.number.of.sub.observation.parent.unit"))
+			.thenReturn("100");
+		when(this.datasetGeneratorInputValidator.getEnvironment().getProperty("maximum.number.of.sub.observation.sets")).thenReturn("25");
+		this.datasetGeneratorInputValidator.setEnvironment(this.environment);
+		this.datasetGeneratorInputValidator.init();
+		datasetInputGenerator.setNumberOfSubObservationUnits(25);
+		variableDetails.setName("ChangedName");
+		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(variableType)));
+
+		when(this.datasetService.getDataset(parentId)).thenReturn(dataset);
+		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
+		when(this.variableService
+			.getVariableById("maize", study.getProgramUUID(), String.valueOf(datasetInputGenerator.getSequenceVariableId())))
+			.thenReturn(variableDetails);
+		this.datasetGeneratorInputValidator.validateBasicData("maize", studyId, parentId, datasetInputGenerator, errors);
 
 		Assert.assertTrue(errors.getAllErrors().size() == 1);
 		final ObjectError objectError = errors.getAllErrors().get(0);
