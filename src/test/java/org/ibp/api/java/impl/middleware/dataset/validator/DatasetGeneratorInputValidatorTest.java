@@ -596,4 +596,39 @@ public class DatasetGeneratorInputValidatorTest {
 		final ObjectError objectError = errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.invalid.obs.unit.variable"));
 	}
+
+	@Test
+	public void testValidateDataSpecialCharacters() {
+		final Study study = new Study();
+		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
+		final String program = "MAIZE-Program";
+
+		study.setProgramUUID(program);
+
+		datasetInputGenerator.setDatasetTypeId(DataSetType.PLANT_SUBOBSERVATIONS.getId());
+		datasetInputGenerator.setDatasetName("Dataset name \\ / : * ? \" < > | .");
+
+		this.datasetGeneratorInputValidator.validateDatasetName(datasetInputGenerator, errors);
+		Assert.assertTrue(errors.getAllErrors().size() == 0);
+	}
+
+	@Test
+	public void testValidateDataSpecialCharactersError() {
+		final Study study = new Study();
+		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
+		final String program = "MAIZE-Program";
+
+		study.setProgramUUID(program);
+
+		datasetInputGenerator.setDatasetTypeId(DataSetType.PLANT_SUBOBSERVATIONS.getId());
+		datasetInputGenerator.setDatasetName("Dataset+");
+
+		this.datasetGeneratorInputValidator.validateDatasetName(datasetInputGenerator, errors);
+
+		Assert.assertTrue(errors.getAllErrors().size() == 1);
+		final ObjectError objectError = errors.getAllErrors().get(0);
+		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.name.invalid"));
+	}
 }
