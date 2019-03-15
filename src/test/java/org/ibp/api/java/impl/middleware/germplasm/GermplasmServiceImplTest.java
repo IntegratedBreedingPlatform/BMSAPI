@@ -17,6 +17,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
+import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.ArgumentCaptor;
 
 import com.google.common.collect.Lists;
 
@@ -98,9 +100,10 @@ public class GermplasmServiceImplTest {
 	}
 
 	@Test
-	public void testsearchGermplasmDTO () {
+	public void testSearchGermplasmDTO () {
 
-		final GermplasmSearchRequestDTO germplasmSearchRequestDTO = Mockito.mock(GermplasmSearchRequestDTO.class);
+		final GermplasmSearchRequestDTO germplasmSearchRequestDTO = new GermplasmSearchRequestDTO();
+		final ArgumentCaptor<GermplasmSearchRequestDTO> captorGermplasmSearchRequestDTO = ArgumentCaptor.forClass(GermplasmSearchRequestDTO.class);
 
 		final GermplasmDTO germplasmDTO = new GermplasmDTO();
 		germplasmDTO.setGermplasmDbId("1");
@@ -113,6 +116,11 @@ public class GermplasmServiceImplTest {
 
 		this.germplasmServiceImpl.searchGermplasmDTO(germplasmSearchRequestDTO);
 		Assert.assertEquals("CB1", germplasmDTOList.get(0).getPedigree());
+
+		Mockito.verify(this.germplasmDataManager, Mockito.times(1)).searchGermplasmDTO(captorGermplasmSearchRequestDTO.capture());
+		final GermplasmSearchRequestDTO germplasmSearchRequestDTOVal = captorGermplasmSearchRequestDTO.getValue();
+		Assert.assertEquals(Integer.valueOf(BrapiPagedResult.DEFAULT_PAGE_SIZE), germplasmSearchRequestDTOVal.getPageSize());
+		Assert.assertEquals(Integer.valueOf(BrapiPagedResult.DEFAULT_PAGE_NUMBER), germplasmSearchRequestDTOVal.getPage());
 	}
 
 
