@@ -27,9 +27,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DatasetExcelGeneratorTest {
+
 	private static final Integer STUDY_ID = 1;
 	private ResourceBundleMessageSource messageSource;
 
@@ -45,7 +48,7 @@ public class DatasetExcelGeneratorTest {
 	@Before
 	public void setUp() {
 		this.messageSource = new ResourceBundleMessageSource();
-		messageSource.setUseCodeAsDefaultMessage(true);
+		this.messageSource.setUseCodeAsDefaultMessage(true);
 		this.datasetExcelGenerator.setMessageSource(this.messageSource);
 		final DataSet dataSet = new DataSet();
 		dataSet.setId(DatasetExcelGeneratorTest.STUDY_ID);
@@ -84,4 +87,36 @@ public class DatasetExcelGeneratorTest {
 		Mockito.verify(this.studyDataManager).getPhenotypeByVariableId(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
 		Mockito.verify(this.studyDataManager).getGeolocationByVariableId(1, 1);
 	}
+
+	@Test(expected = UnsupportedOperationException.class)
+	public void testGenerateMultiInstanceFile() throws IOException {
+		final String filename = "filename";
+		final StudyInstance studyInstance = new StudyInstance();
+		studyInstance.setInstanceDbId(1);
+		final DatasetDTO datasetDTO = new DatasetDTO();
+		datasetDTO.setDatasetTypeId(DataSetType.PLANT_SUBOBSERVATIONS.getId());
+		datasetDTO.setDatasetId(1);
+		datasetDTO.setParentDatasetId(1);
+		final File file = this.datasetExcelGenerator
+			.generateMultiInstanceFile(new HashMap<Integer, List<ObservationUnitRow>>(), new ArrayList<MeasurementVariable>(), filename);
+		Assert.assertEquals(filename, file.getName());
+		Mockito.verify(this.studyDataManager).getStudyDetails(1);
+		Mockito.verify(this.datasetService)
+			.getMeasurementVariables(DatasetExcelGeneratorTest.STUDY_ID, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
+		Mockito.verify(this.studyDataManager).getDataSetsByType(DatasetExcelGeneratorTest.STUDY_ID, DataSetType.SUMMARY_DATA);
+		Mockito.verify(this.datasetService)
+			.getMeasurementVariables(
+				1, Lists
+					.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
+						VariableType.STUDY_CONDITION.getId(), VariableType.TRAIT.getId()));
+		Mockito.verify(this.datasetService).getMeasurementVariables(1, Lists
+			.newArrayList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId(),
+				VariableType.GERMPLASM_DESCRIPTOR.getId()));
+		Mockito.verify(this.datasetService)
+			.getMeasurementVariables(1, Lists
+				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
+		Mockito.verify(this.studyDataManager).getPhenotypeByVariableId(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
+		Mockito.verify(this.studyDataManager).getGeolocationByVariableId(1, 1);
+	}
+
 }
