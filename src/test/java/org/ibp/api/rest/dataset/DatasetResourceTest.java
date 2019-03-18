@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -35,6 +36,7 @@ import org.springframework.validation.MapBindingResult;
 import org.springframework.validation.ObjectError;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -57,6 +59,9 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	public static final int STUDY_ID = 12345;
 	public static final int PARENT_ID = 200;
 	public static final String DATASETS_GENERATION_URL = "/crops/{cropName}/studies/{studyId}/datasets/{parentId}/generation";
+	protected final MediaType xlsContentType =
+		new MediaType(MediaType.APPLICATION_OCTET_STREAM.getType(), MediaType.APPLICATION_OCTET_STREAM.getSubtype(),
+			Charset.forName("utf8"));
 
 	@Autowired
 	private DatasetService studyDatasetService;
@@ -607,6 +612,35 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				.param("collectionOrderId", String.valueOf(collectionOrderId))
 				.param("singleFile", String.valueOf(false))
 				.contentType(this.csvContentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+
+	}
+
+	@Test
+	public void testGetObservationUnitAsExcel() throws Exception {
+
+		final Random random = new Random();
+		final int studyId = random.nextInt(10000);
+		final int datasetId = random.nextInt(10000);
+		final Set<Integer> instanceIds = new HashSet<>();
+		instanceIds.add(1);
+		instanceIds.add(2);
+		instanceIds.add(3);
+		final int collectionOrderId = DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId();
+
+		final File file = File.createTempFile("test", ".xls");
+		Mockito.when(this.datasetCSVExportService.export(studyId, datasetId, instanceIds, collectionOrderId, false)).thenReturn(file);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.get(
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/{fileType}",
+					this.cropName, studyId, datasetId, DatasetResource.CSV)
+				.param("instanceIds", "1,2,3")
+				.param("collectionOrderId", String.valueOf(collectionOrderId))
+				.param("singleFile", String.valueOf(false))
+				.contentType(this.xlsContentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
 
