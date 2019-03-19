@@ -1,6 +1,8 @@
 
 package org.ibp.api.domain.common;
 
+import com.google.common.base.Preconditions;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +23,7 @@ public class PagedResult<T> {
 	protected int pageNumber;
 	protected int pageSize;
 	protected long totalResults;
+	protected long filteredResults;
 	private String sortBy;
 	private String sortOrder;
 
@@ -33,12 +36,18 @@ public class PagedResult<T> {
 	public static final String PAGE_SIZE_DESCRIPTION = "Number of results to retrieve per page. Defaults to "
 			+ PagedResult.DEFAULT_PAGE_SIZE + " if not supplied. Max page size allowed is " + PagedResult.MAX_PAGE_SIZE + ".";
 
-	public PagedResult() {
+	protected PagedResult() {
 		// Empty constructor needed for subclass constructor
 	}
 
-	public PagedResult(final int pageNumber, final int pageSize, final long totalResults) {
+	public PagedResult(final int pageNumber, final int pageSize, final long totalResults, final long filteredResults) {
 		this.totalResults = totalResults;
+		if (filteredResults == 0) {
+			this.filteredResults = totalResults;
+		} else {
+			this.filteredResults = filteredResults;
+		}
+		Preconditions.checkArgument(this.filteredResults <= totalResults, "Filtered results must be less than or equal to total results");
 
 		if (pageSize < 1 || pageSize > PagedResult.MAX_PAGE_SIZE) {
 			throw new IllegalArgumentException("Page size must between 1 and " + PagedResult.MAX_PAGE_SIZE + ".");
@@ -93,6 +102,10 @@ public class PagedResult<T> {
 		return this.totalResults;
 	}
 
+	public long getFilteredResults() {
+		return filteredResults;
+	}
+
 	public int getTotalPages() {
 		return (int) Math.ceil((double) this.getTotalResults() / (double) this.getPageSize());
 	}
@@ -112,5 +125,4 @@ public class PagedResult<T> {
 	public boolean isHasPreviousPage() {
 		return !this.isFirstPage();
 	}
-
 }

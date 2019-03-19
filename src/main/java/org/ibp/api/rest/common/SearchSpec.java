@@ -16,5 +16,9 @@ public interface SearchSpec<T> {
 
 	long getCount();
 
+	default long getFilteredCount() {
+		return 0;
+	}
+
 	List<T> getResults(PagedResult<T> pagedResult);
 }
