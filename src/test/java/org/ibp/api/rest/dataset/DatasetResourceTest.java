@@ -354,7 +354,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		map.put("TEST1", measurement);
 		obsDto.setVariables(map);
 
-		Mockito.when(this.studyDatasetService.countTotalObservationUnitsForDataset(
+		Mockito.when(this.studyDatasetService.countAllObservationUnitsForDataset(
 			org.mockito.Matchers.anyInt(),
 			org.mockito.Matchers.anyInt(), ArgumentMatchers.anyBoolean()))
 			.thenReturn(100);

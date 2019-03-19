@@ -182,7 +182,7 @@ public class DatasetResource {
 
 				@Override
 				public long getCount() {
-					return DatasetResource.this.studyDatasetService.countTotalObservationUnitsForDataset(datasetId, instanceId, draftMode);
+					return DatasetResource.this.studyDatasetService.countAllObservationUnitsForDataset(datasetId, instanceId, draftMode);
 				}
 
 				@Override
