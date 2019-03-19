@@ -46,6 +46,9 @@ public class DatasetGeneratorInputValidator {
 
 	static final String DATASET_NAME_REGEX = "^[a-zA-Z0-9\\s(\\\\/:*?\\\"\"<>|.)]*$";
 
+	static final Pattern DATASET_NAME_PATTERN = Pattern.compile(DatasetGeneratorInputValidator.DATASET_NAME_REGEX);
+
+
 
 	DatasetGeneratorInputValidator() {
 		this.observationUnitVariableType =
@@ -61,9 +64,6 @@ public class DatasetGeneratorInputValidator {
 	}
 
 	public void validateBasicData(final String crop, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetInputGenerator, final Errors errors) {
-
-		// special characters
-		final Pattern pattern = Pattern.compile(DatasetGeneratorInputValidator.DATASET_NAME_REGEX);
 
 		final DatasetDTO dataset = this.studyDatasetService.getDataset(parentId);
 
@@ -92,7 +92,7 @@ public class DatasetGeneratorInputValidator {
 			errors.reject("dataset.name.empty.name");
 		}
 		
-		if(!pattern.matcher(datasetInputGenerator.getDatasetName()).matches()){
+		if(!DatasetGeneratorInputValidator.DATASET_NAME_PATTERN.matcher(datasetInputGenerator.getDatasetName()).matches()){
 			errors.reject("dataset.name.invalid", new String[] {}, "");
 		}
 
