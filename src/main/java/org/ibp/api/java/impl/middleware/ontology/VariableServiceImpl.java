@@ -4,6 +4,7 @@ package org.ibp.api.java.impl.middleware.ontology;
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.apache.commons.collections4.CollectionUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -53,6 +54,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 	private static final String VARIABLE_NAME = "Variable";
 	private static final String ERROR_MESSAGE = "Error!";
+	private static final List EDITABLE_VARIABLES_TYPES = Arrays.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD, VariableType.STUDY_CONDITION);
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -210,6 +212,10 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			VariableDetails response = mapper.map(ontologyVariable, VariableDetails.class);
 
 			if (!deletable) {
+				if (CollectionUtils.containsAny(ontologyVariable.getVariableTypes(), VariableServiceImpl.EDITABLE_VARIABLES_TYPES)) {
+					response.getMetadata().addEditableField("alias");
+					response.getMetadata().addEditableField("expectedRange");
+				}
 				response.getMetadata().addEditableField("description");
 			} else {
 				response.getMetadata().addEditableField("name");
