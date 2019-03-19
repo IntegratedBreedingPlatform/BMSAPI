@@ -14,6 +14,7 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,8 +51,15 @@ public class DatasetExcelGeneratorTest {
 	public static final String OBSERVATION_UNIT_TEST = "ObservationUnitTest";
 	public static final String TRAITS_TEST = "TraitsTest";
 	public static final String SELECTION_TEST = "SelectionTest";
-
+	private static final String VARIABLE_NAME_1 = "VARIABLE_NAME_1";
+	private static final String VARIABLE_NAME_2 = "VARIABLE_NAME_2";
+	private static final String VARIABLE_VALUE_1 = "VARIABLE_VALUE_1";
+	private static final String VARIABLE_VALUE_2 = "VARIABLE_VALUE_2";
 	public static final int valueIndex = 7;
+
+	private List<ObservationUnitRow> observationUnitRows;
+
+	private List<MeasurementVariable> measurementVariables;
 
 	private ResourceBundleMessageSource messageSource;
 
@@ -122,6 +130,28 @@ public class DatasetExcelGeneratorTest {
 		dataSet.setId(DatasetExcelGeneratorTest.STUDY_ID);
 		final StudyDetails studyDetails = new StudyDetails();
 		studyDetails.setStudyType(StudyTypeDto.getTrialDto());
+		final ObservationUnitData observationUnitData1 = new ObservationUnitData();
+		observationUnitData1.setValue(this.VARIABLE_VALUE_1);
+		final ObservationUnitData observationUnitData2 = new ObservationUnitData();
+		observationUnitData2.setValue(this.VARIABLE_VALUE_2);
+		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
+		final Map<String, ObservationUnitData> variables = new HashMap<>();
+		variables.put(this.VARIABLE_NAME_1, observationUnitData1);
+		variables.put(this.VARIABLE_NAME_2, observationUnitData2);
+		observationUnitRow.setVariables(variables);
+		this.observationUnitRows = Arrays.asList(observationUnitRow);
+
+		final MeasurementVariable measurementVariable1 = new MeasurementVariable();
+		measurementVariable1.setAlias(this.VARIABLE_NAME_1);
+		measurementVariable1.setName(this.VARIABLE_NAME_1);
+		measurementVariable1.setVariableType(VariableType.TRAIT);
+		final MeasurementVariable measurementVariable2 = new MeasurementVariable();
+		measurementVariable2.setAlias(this.VARIABLE_NAME_2);
+		measurementVariable2.setName(this.VARIABLE_NAME_2);
+		measurementVariable2.setVariableType(VariableType.TRAIT);
+		this.measurementVariables = Arrays.asList(measurementVariable1, measurementVariable2);
+
+		this.measurementVariables = Arrays.asList(measurementVariable1, measurementVariable2);
 		Mockito.when(this.studyDataManager.getStudyDetails(DatasetExcelGeneratorTest.STUDY_ID)).thenReturn(studyDetails);
 		Mockito.when(this.studyDataManager.getDataSetsByType(DatasetExcelGeneratorTest.STUDY_ID, DataSetType.SUMMARY_DATA))
 			.thenReturn(Arrays.asList(dataSet));
@@ -203,12 +233,13 @@ public class DatasetExcelGeneratorTest {
 
 		final File
 			file = this.datasetExcelGenerator
-			.generateSingleInstanceFile(DatasetExcelGeneratorTest.STUDY_ID, datasetDTO, new ArrayList<MeasurementVariable>(),
-				new ArrayList<ObservationUnitRow>(), filename, studyInstance);
+			.generateSingleInstanceFile(DatasetExcelGeneratorTest.STUDY_ID, datasetDTO, this.measurementVariables,
+				this.observationUnitRows, filename, studyInstance);
 
 		final FileInputStream inputStream = new FileInputStream(file);
 		final Workbook workbook = new HSSFWorkbook(inputStream);
 		final Sheet descriptionSheet = workbook.getSheetAt(0);
+		final Sheet observationSheet = workbook.getSheetAt(1);
 		Assert.assertEquals(descriptionSheet.getRow(8).getCell(valueIndex).getStringCellValue(), STUDY_DETAIL_TEST);
 		Assert.assertEquals(descriptionSheet.getRow(11).getCell(valueIndex).getStringCellValue(), EXPERIMENTAL_DESIGN_TEST);
 		Assert.assertEquals(descriptionSheet.getRow(14).getCell(valueIndex).getStringCellValue(), ENVIRONMENTAL_DETAILS_TEST);
@@ -217,5 +248,9 @@ public class DatasetExcelGeneratorTest {
 		Assert.assertEquals(descriptionSheet.getRow(23).getCell(valueIndex).getStringCellValue(), OBSERVATION_UNIT_TEST);
 		Assert.assertEquals(descriptionSheet.getRow(26).getCell(valueIndex).getStringCellValue(), TRAITS_TEST);
 		Assert.assertEquals(descriptionSheet.getRow(29).getCell(valueIndex).getStringCellValue(), SELECTION_TEST);
+		Assert.assertEquals(observationSheet.getRow(0).getCell(0).getStringCellValue(), VARIABLE_NAME_1);
+		Assert.assertEquals(observationSheet.getRow(0).getCell(1).getStringCellValue(), VARIABLE_NAME_2);
+		Assert.assertEquals(observationSheet.getRow(1).getCell(0).getStringCellValue(), VARIABLE_VALUE_1);
+		Assert.assertEquals(observationSheet.getRow(1).getCell(1).getStringCellValue(), VARIABLE_VALUE_2);
 	}
 }
