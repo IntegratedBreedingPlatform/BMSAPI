@@ -63,10 +63,6 @@ public class DatasetGeneratorInputValidator {
 		final String datasetNameRegex = "^[a-zA-Z0-9\\s(\\\\/:*?\\\"\"<>|.)]*$";
 		final Pattern pattern = Pattern.compile(datasetNameRegex);
 
-		if(!pattern.matcher(datasetInputGenerator.getDatasetName()).matches()){
-			errors.reject("dataset.name.invalid", new String[] {}, "");
-		}
-
 		final DatasetDTO dataset = this.studyDatasetService.getDataset(parentId);
 
 		final DataSetType dataSetType = DataSetType.findById(datasetInputGenerator.getDatasetTypeId());
@@ -85,13 +81,17 @@ public class DatasetGeneratorInputValidator {
 			errors.reject("dataset.creation.not.allowed", new String[] {String.valueOf(this.maxAllowedDatasetsPerParent)}, "");
 			return;
 		}
-
+		
 		if (datasetInputGenerator.getDatasetName() != null && datasetInputGenerator.getDatasetName().length() > 100) {
 			errors.reject("dataset.name.exceed.length");
 		}
 
 		if (datasetInputGenerator.getDatasetName() != null && datasetInputGenerator.getDatasetName().isEmpty()) {
 			errors.reject("dataset.name.empty.name");
+		}
+		
+		if(!pattern.matcher(datasetInputGenerator.getDatasetName()).matches()){
+			errors.reject("dataset.name.invalid", new String[] {}, "");
 		}
 
 		final List<StudyInstance> studyInstances = dataset.getInstances();
