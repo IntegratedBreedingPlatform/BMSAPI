@@ -60,8 +60,8 @@ public class DatasetGeneratorInputValidator {
 	public void validateBasicData(final String crop, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetInputGenerator, final Errors errors) {
 
 		// special characters
-		final String regex = "^[a-zA-Z0-9\\s(\\\\/:*?\\\"\"<>|.)]*$";
-		final Pattern pattern = Pattern.compile(regex);
+		final String datasetNameRegex = "^[a-zA-Z0-9\\s(\\\\/:*?\\\"\"<>|.)]*$";
+		final Pattern pattern = Pattern.compile(datasetNameRegex);
 
 		if(!pattern.matcher(datasetInputGenerator.getDatasetName()).matches()){
 			errors.reject("dataset.name.invalid", new String[] {}, "");
