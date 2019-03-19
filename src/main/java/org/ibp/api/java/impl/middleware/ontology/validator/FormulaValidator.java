@@ -158,25 +158,4 @@ public class FormulaValidator implements Validator {
 		});
 	}
 
-	public void validateDelete(final FormulaDto formula, final Errors errors) {
-
-		final boolean isVariableUsedInStudy =
-			this.ontologyVariableDataManager.isVariableUsedInStudy(Integer.valueOf(formula.getTarget().getId()));
-
-		if (isVariableUsedInStudy) {
-			errors.reject("variable.formula.invalid.is.not.deletable", "");
-		}
-	}
-
-	public void validateUpdate(final FormulaDto formula, final Errors errors) {
-		this.validate(formula, errors);
-
-		final boolean isVariableUsedInStudy =
-			this.ontologyVariableDataManager.isVariableUsedInStudy(Integer.valueOf(formula.getTarget().getId()));
-
-		if (isVariableUsedInStudy) {
-			errors.reject("variable.formula.invalid.is.not.updatable", "");
-		}
-	}
-
 }
