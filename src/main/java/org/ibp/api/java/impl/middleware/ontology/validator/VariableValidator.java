@@ -1,13 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -25,7 +19,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import com.google.common.base.Strings;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Add/Update Variable Validation rules for Variable request Refer: http://confluence.leafnode.io/display/CD/Services+Validation 1. Name is
@@ -65,6 +65,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	private static final String SCALE_ID_NAME = "scaleId";
 	private static final String EXPECTED_RANGE_NAME = "expectedRange";
 	private static final String VARIABLE_NAME = "variable";
+	private static final List EDITABLE_VARIABLES_TYPES = Arrays.asList("1808", "1807", "1802");
 
 	@Override
 	public boolean supports(final Class<?> aClass) {
@@ -418,6 +419,13 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				return;
 			}
 
+			boolean editableVariable = false;
+			for (VariableType variableType : variable.getVariableTypes()) {
+				if (VariableValidator.EDITABLE_VARIABLES_TYPES.contains(variableType.getId())) {
+					editableVariable = true;
+				}
+			}
+
 			final Integer methodId = StringUtil.parseInt(variable.getMethod().getId(), null);
 			final Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
 			final Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
@@ -426,9 +434,9 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			final boolean propertyEqual = Objects.equals(propertyId, oldVariable.getProperty().getId());
 			final boolean methodEqual = Objects.equals(methodId, oldVariable.getMethod().getId());
 			final boolean scaleEqual = Objects.equals(scaleId, oldVariable.getScale().getId());
-			final boolean minValuesEqual = StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMin(), oldVariable.getMinValue());
-			final boolean maxValuesEqual = StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMax(), oldVariable.getMaxValue());
-			final boolean aliasEqual = StringUtil.areBothEmptyOrEqual(variable.getAlias(), oldVariable.getAlias());
+			final boolean minValuesEqual = editableVariable ? true : StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMin(), oldVariable.getMinValue());
+			final boolean maxValuesEqual = editableVariable ? true : StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMax(), oldVariable.getMaxValue());
+			final boolean aliasEqual = editableVariable ? true : StringUtil.areBothEmptyOrEqual(variable.getAlias(), oldVariable.getAlias());
 
 			if (!nameEqual) {
 				this.addCustomError(errors, "name", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,
