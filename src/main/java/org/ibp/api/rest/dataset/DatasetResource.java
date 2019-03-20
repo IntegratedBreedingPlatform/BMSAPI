@@ -1,5 +1,6 @@
 package org.ibp.api.rest.dataset;
 
+import com.google.common.base.Preconditions;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -7,6 +8,8 @@ import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.pojos.SortedPageRequest;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
@@ -28,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -158,58 +160,48 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "It will retrieve all the observation units", notes = "It will retrieve all the observation units including observations and props values in a format that will be used by the Observations table.")
-	@RequestMapping(value = "/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/table", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/table", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<ObservationUnitTable> getObservationUnitTable(@PathVariable final String cropname, //
 		@PathVariable final Integer studyId, //
 		@PathVariable final Integer datasetId, //
+		@RequestBody  final ObservationUnitsSearchDTO searchDTO) {
 
-		@RequestParam(required = false)  //
-		final Integer instanceId, //
+		Preconditions.checkNotNull(searchDTO, "params cannot be null");
+		final SortedPageRequest sortedRequest = searchDTO.getSortedRequest();
+		Preconditions.checkNotNull(sortedRequest, "sortedRequest inside params cannot be null");
 
-		@ApiParam(value = PagedResult.CURRENT_PAGE_DESCRIPTION, required = false) //
-		@RequestParam(required = false) //
-		final Integer pageNumber, //
+		final Integer pageNumber = sortedRequest.getPageNumber();
+		final Integer pageSize = sortedRequest.getPageSize();
 
-		@ApiParam(value = PagedResult.PAGE_SIZE_DESCRIPTION, required = false) //
-		@RequestParam(required = false) //
-		final Integer pageSize, //
-
-		@ApiParam(value = "Sort order. Name of the field to sorty by. Should be termId of the field", required = false) //
-		@RequestParam(required = false) //
-		final String sortBy, //
-
-		@ApiParam(value = "Sort order direction. asc/desc.", required = false) //
-		@RequestParam(required = false) //
-		final String sortOrder, //
-
-		@ApiParam(required = false)
-		@RequestParam(required = false) //
-		final Boolean draftMode, //
-
-		final HttpServletRequest req) {
+		final Integer instanceId = searchDTO.getInstanceId();
+		final Boolean draftMode = searchDTO.getDraftMode();
 
 		final PagedResult<ObservationUnitRow> pageResult =
 			new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<ObservationUnitRow>() {
 
 				@Override
 				public long getCount() {
-					return DatasetResource.this.studyDatasetService.countTotalObservationUnitsForDataset(datasetId, instanceId, draftMode);
+					return DatasetResource.this.studyDatasetService.countAllObservationUnitsForDataset(datasetId, instanceId, draftMode);
+				}
+
+				@Override
+				public long getFilteredCount() {
+					return DatasetResource.this.studyDatasetService
+						.countFilteredObservationUnitsForDataset(datasetId, instanceId, searchDTO.getDraftMode(), searchDTO.getFilter());
 				}
 
 				@Override
 				public List<ObservationUnitRow> getResults(final PagedResult<ObservationUnitRow> pagedResult) {
-					return DatasetResource.this.studyDatasetService
-							.getObservationUnitRows(studyId, datasetId, instanceId, pagedResult.getPageNumber(), pagedResult.getPageSize(),
-									sortBy, sortOrder, draftMode);
+					return DatasetResource.this.studyDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO);
 				}
 			});
 
 		final ObservationUnitTable observationUnitTable = new ObservationUnitTable();
 		observationUnitTable.setData(pageResult.getPageResults());
-		observationUnitTable.setDraw(req.getParameter("draw"));
+		observationUnitTable.setDraw(searchDTO.getDraw());
 		observationUnitTable.setRecordsTotal((int) pageResult.getTotalResults());
-		observationUnitTable.setRecordsFiltered((int) pageResult.getTotalResults());
+		observationUnitTable.setRecordsFiltered((int) pageResult.getFilteredResults());
 		return new ResponseEntity<>(observationUnitTable, HttpStatus.OK);
 	}
 

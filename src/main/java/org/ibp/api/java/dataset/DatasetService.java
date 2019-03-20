@@ -3,6 +3,7 @@ package org.ibp.api.java.dataset;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
@@ -42,17 +43,19 @@ public interface DatasetService {
 	Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(int studyId, int datasetId, List<Integer> instanceId);
 
 	List<ObservationUnitRow> getObservationUnitRows(
-		int studyId, int datasetId, Integer instanceId, int pageNumber,
-		int pageSize, String sortBy, String sortOrder, Boolean draftMode);
+		int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO);
 
 	ObservationDto addObservation(Integer studyId, Integer datasetId, Integer observationUnitId, ObservationDto observation);
 
 	ObservationDto updateObservation(
 		Integer studyId, Integer datasetId, Integer observationId, Integer observationUnitId, ObservationDto observationDto);
 
-	Integer countTotalObservationUnitsForDataset(Integer datasetId, Integer instanceId, Boolean draftMode);
+	Integer countAllObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode);
 
-	void deleteObservation(Integer studyId, Integer datasetId, Integer observationUnitId, Integer observationId);
+	long countFilteredObservationUnitsForDataset(
+		Integer datasetId, Integer instanceId, final Boolean draftMode, ObservationUnitsSearchDTO.Filter filter);
+
+	void deleteObservation(final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId);
 
 	void importObservations(Integer studyId, Integer datasetId, ObservationsPutRequestInput input);
 

@@ -7,7 +7,9 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
@@ -19,6 +21,7 @@ import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.DatasetCollectionOrderServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -27,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -35,6 +39,7 @@ import org.springframework.validation.MapBindingResult;
 import org.springframework.validation.ObjectError;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -57,6 +62,9 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	public static final int STUDY_ID = 12345;
 	public static final int PARENT_ID = 200;
 	public static final String DATASETS_GENERATION_URL = "/crops/{cropName}/studies/{studyId}/datasets/{parentId}/generation";
+	protected final MediaType xlsContentType =
+		new MediaType(MediaType.APPLICATION_OCTET_STREAM.getType(), MediaType.APPLICATION_OCTET_STREAM.getSubtype(),
+			Charset.forName("utf8"));
 
 	@Autowired
 	private DatasetService studyDatasetService;
@@ -351,26 +359,31 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		map.put("TEST1", measurement);
 		obsDto.setVariables(map);
 
-		Mockito.when(this.studyDatasetService.countTotalObservationUnitsForDataset(
+		Mockito.when(this.studyDatasetService.countAllObservationUnitsForDataset(
 			org.mockito.Matchers.anyInt(),
-			org.mockito.Matchers.anyInt(), isNull(Boolean.class)))
+			org.mockito.Matchers.anyInt(), ArgumentMatchers.anyBoolean()))
 			.thenReturn(100);
 		Mockito.when(this.studyDatasetService.getObservationUnitRows(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
-			org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(), isNull(String.class),
-			isNull(String.class), isNull(Boolean.class))).thenReturn(Lists.newArrayList(obsDto));
+			ArgumentMatchers.any()))
+			.thenReturn(Lists.newArrayList(obsDto));
 		final Random random = new Random();
 		final int studyId = random.nextInt(10000);
 		final int datasetId = random.nextInt(10000);
 		final int instanceId = random.nextInt(10000);
 
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+		searchDTO.setInstanceId(instanceId);
+		final SortedPageRequest sortedRequest = new SortedPageRequest();
+		sortedRequest.setPageNumber(1);
+		sortedRequest.setPageSize(100);
+		searchDTO.setSortedRequest(sortedRequest);
+
 		this.mockMvc
-			.perform(MockMvcRequestBuilders.get(
+			.perform(MockMvcRequestBuilders.post(
 				"/crops/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/table",
 				this.cropName,
 				studyId,
-				datasetId).param("instanceId", Integer.toString(instanceId))
-				.param("pageNumber", "1")
-				.param("pageSize", "100").contentType(this.contentType))
+				datasetId).content(this.convertObjectToByte(searchDTO)).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.recordsFiltered", is(100)))
@@ -607,6 +620,35 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				.param("collectionOrderId", String.valueOf(collectionOrderId))
 				.param("singleFile", String.valueOf(false))
 				.contentType(this.csvContentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+
+	}
+
+	@Test
+	public void testGetObservationUnitAsExcel() throws Exception {
+
+		final Random random = new Random();
+		final int studyId = random.nextInt(10000);
+		final int datasetId = random.nextInt(10000);
+		final Set<Integer> instanceIds = new HashSet<>();
+		instanceIds.add(1);
+		instanceIds.add(2);
+		instanceIds.add(3);
+		final int collectionOrderId = DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId();
+
+		final File file = File.createTempFile("test", ".xls");
+		Mockito.when(this.datasetCSVExportService.export(studyId, datasetId, instanceIds, collectionOrderId, false)).thenReturn(file);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.get(
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/{fileType}",
+					this.cropName, studyId, datasetId, DatasetResource.CSV)
+				.param("instanceIds", "1,2,3")
+				.param("collectionOrderId", String.valueOf(collectionOrderId))
+				.param("singleFile", String.valueOf(false))
+				.contentType(this.xlsContentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
 

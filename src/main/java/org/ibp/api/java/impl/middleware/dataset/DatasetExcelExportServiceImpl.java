@@ -3,6 +3,8 @@ package org.ibp.api.java.impl.middleware.dataset;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.pojos.SortedPageRequest;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetExportService;
@@ -51,11 +53,14 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(final Study study, final DatasetDTO dataset, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = new HashMap<>();
 		for(final Integer instanceDBID: selectedDatasetInstancesMap.keySet()) {
-			final List<ObservationUnitRow> observationUnitRows =
-				this.studyDatasetService
-					.getObservationUnitRows(study.getId(), dataset.getDatasetId(),
-						selectedDatasetInstancesMap.get(instanceDBID).getInstanceDbId(), Integer.MAX_VALUE, Integer.MAX_VALUE, null, "",
-						null);
+			final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+			searchDTO.setInstanceId(selectedDatasetInstancesMap.get(instanceDBID).getInstanceDbId());
+			final SortedPageRequest sortedRequest = new SortedPageRequest();
+			sortedRequest.setPageNumber(1);
+			sortedRequest.setPageSize(Integer.MAX_VALUE);
+			searchDTO.setSortedRequest(sortedRequest);
+			final List<ObservationUnitRow> observationUnitRows = this.studyDatasetService
+				.getObservationUnitRows(study.getId(), dataset.getDatasetId(), searchDTO);
 			observationUnitRowMap.put(instanceDBID, observationUnitRows);
 		}
 		return observationUnitRowMap;

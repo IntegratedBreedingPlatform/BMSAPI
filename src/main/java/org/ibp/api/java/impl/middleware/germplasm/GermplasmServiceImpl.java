@@ -32,6 +32,7 @@ import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,6 +139,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 		this.locationDataManger = locationDataManger;
 	}
 
+	void setCrossExpansionProperties(CrossExpansionProperties crossExpansionProperties) {
+		this.crossExpansionProperties = crossExpansionProperties;
+	}
+	
 	@Override
 	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
 		PedigreeDTO pedigreeDTO = null;
@@ -247,6 +252,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public List<GermplasmDTO> searchGermplasmDTO(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
 		try {
+
+			germplasmSearchRequestDTO.setPageSize(germplasmSearchRequestDTO.getPageSize() == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : germplasmSearchRequestDTO.getPageSize());
+			germplasmSearchRequestDTO.setPage(germplasmSearchRequestDTO.getPage() == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : germplasmSearchRequestDTO.getPage());
+
 			final List<GermplasmDTO> germplasmDTOList = germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO);
 			if (germplasmDTOList != null) {
 				for (final GermplasmDTO germplasmDTO : germplasmDTOList) {

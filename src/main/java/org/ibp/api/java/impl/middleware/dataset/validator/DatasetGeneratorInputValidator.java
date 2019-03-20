@@ -21,6 +21,7 @@ import org.springframework.validation.Errors;
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Component
 public class DatasetGeneratorInputValidator {
@@ -42,6 +43,12 @@ public class DatasetGeneratorInputValidator {
 	private Integer maxAllowedDatasetsPerParent;
 
 	private final VariableType observationUnitVariableType;
+
+	static final String DATASET_NAME_REGEX = "^[a-zA-Z0-9\\s(\\\\/:*?\\\"\"<>|.)]*$";
+
+	static final Pattern DATASET_NAME_PATTERN = Pattern.compile(DatasetGeneratorInputValidator.DATASET_NAME_REGEX);
+
+
 
 	DatasetGeneratorInputValidator() {
 		this.observationUnitVariableType =
@@ -76,13 +83,17 @@ public class DatasetGeneratorInputValidator {
 			errors.reject("dataset.creation.not.allowed", new String[] {String.valueOf(this.maxAllowedDatasetsPerParent)}, "");
 			return;
 		}
-
+		
 		if (datasetInputGenerator.getDatasetName() != null && datasetInputGenerator.getDatasetName().length() > 100) {
 			errors.reject("dataset.name.exceed.length");
 		}
 
 		if (datasetInputGenerator.getDatasetName() != null && datasetInputGenerator.getDatasetName().isEmpty()) {
 			errors.reject("dataset.name.empty.name");
+		}
+		
+		if(!DatasetGeneratorInputValidator.DATASET_NAME_PATTERN.matcher(datasetInputGenerator.getDatasetName()).matches()){
+			errors.reject("dataset.name.invalid", new String[] {}, "");
 		}
 
 		final List<StudyInstance> studyInstances = dataset.getInstances();
@@ -120,7 +131,7 @@ public class DatasetGeneratorInputValidator {
 
 	public void validateDataConflicts(final Integer studyId, final DatasetGeneratorInput o, final Errors errors) {
 		final Study study = this.studyDataManager.getStudy(studyId);
-		if (!this.studyDatasetService.isDatasetNameAvailable(o.getDatasetName(), study.getProgramUUID())) {
+		if (!this.studyDatasetService.isDatasetNameAvailable(o.getDatasetName(), study.getId())) {
 			errors.reject("dataset.name.not.available", new String[] {o.getDatasetName()} , "");
 		}
 	}
