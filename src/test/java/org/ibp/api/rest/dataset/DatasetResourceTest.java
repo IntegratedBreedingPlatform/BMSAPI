@@ -777,6 +777,22 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 
+	@Test
+	public void testSetAsMissingDrafData() throws Exception {
+		final DatasetDTO dataset = this.createDataset(10090, 101101, "Plant", this.cropName, 100);
+
+		final int studyId = dataset.getStudyId();
+		final int datasetId = dataset.getDatasetId();
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/set-as-missing", this.cropName, studyId,
+					datasetId)
+				.contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+
 	private DatasetDTO createDataset(
 		final int datasetType, final Integer datasetId, final String name, final String crop, final Integer studyId) {
 		final DataSetType dataSetType = DataSetType.findById(datasetType);
