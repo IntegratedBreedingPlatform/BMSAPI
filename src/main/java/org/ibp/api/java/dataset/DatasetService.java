@@ -17,53 +17,54 @@ import java.util.Set;
 
 public interface DatasetService {
 
-	List<MeasurementVariable> getSubObservationSetColumns(final Integer studyId, final Integer subObservationSetId, final Boolean draftMode);
+	List<MeasurementVariable> getSubObservationSetColumns(Integer studyId, Integer subObservationSetId, Boolean draftMode);
 
 	List<MeasurementVariable> getSubObservationSetVariables(
 		Integer studyId, Integer subObservationSetId);
 
-	long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> variableIds);
+	long countPhenotypes(Integer studyId, Integer datasetId, List<Integer> variableIds);
 
-	long countPhenotypesByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId);
+	long countPhenotypesByInstance(Integer studyId, Integer datasetId, Integer instanceId);
 
-	MeasurementVariable addDatasetVariable(final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable);
+	MeasurementVariable addDatasetVariable(Integer studyId, Integer datasetId, DatasetVariable datasetVariable);
 
 	List<MeasurementVariableDto> getVariables(Integer studyId, Integer datasetId, VariableType variableType);
 
-	void removeVariables(final Integer studyId, final Integer datasetId, final List<Integer> variableIds);
+	void removeVariables(Integer studyId, Integer datasetId, List<Integer> variableIds);
 
-	List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds);
+	List<DatasetDTO> getDatasets(Integer studyId, Set<Integer> datasetTypeIds);
 
-	DatasetDTO generateSubObservationDataset(String cropName, Integer studyId, Integer parentId, DatasetGeneratorInput datasetGeneratorInput);
+	DatasetDTO generateSubObservationDataset(
+		String cropName, Integer studyId, Integer parentId, DatasetGeneratorInput datasetGeneratorInput);
 
-	DatasetDTO getDataset(final String crop, final Integer studyId, final Integer datasetId);
+	DatasetDTO getDataset(String crop, Integer studyId, Integer datasetId);
 
-	Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(final int studyId, final int datasetId, final List<Integer> instanceId);
+	Map<Integer, List<ObservationUnitRow>> getInstanceObservationUnitRowsMap(int studyId, int datasetId, List<Integer> instanceId);
 
-	List<ObservationUnitRow>  getObservationUnitRows(
-		final int studyId, final int datasetId, final Integer instanceId, final int pageNumber,
-		final int pageSize, final String sortBy, final String sortOrder, final Boolean draftMode);
+	List<ObservationUnitRow> getObservationUnitRows(
+		int studyId, int datasetId, Integer instanceId, int pageNumber,
+		int pageSize, String sortBy, String sortOrder, Boolean draftMode);
 
-	ObservationDto addObservation(Integer studyId, Integer datasetId, Integer observationUnitId, final ObservationDto observation);
+	ObservationDto addObservation(Integer studyId, Integer datasetId, Integer observationUnitId, ObservationDto observation);
 
 	ObservationDto updateObservation(
 		Integer studyId, Integer datasetId, Integer observationId, Integer observationUnitId, ObservationDto observationDto);
 
-	Integer countTotalObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode);
-	
-	void deleteObservation(final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId);
+	Integer countTotalObservationUnitsForDataset(Integer datasetId, Integer instanceId, Boolean draftMode);
+
+	void deleteObservation(Integer studyId, Integer datasetId, Integer observationUnitId, Integer observationId);
 
 	void importObservations(Integer studyId, Integer datasetId, ObservationsPutRequestInput input);
 
-	List<StudyInstance> getDatasetInstances(final Integer studyId, final Integer datasetId);
+	List<StudyInstance> getDatasetInstances(Integer studyId, Integer datasetId);
 
-	List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes);
+	List<MeasurementVariable> getMeasurementVariables(Integer projectId, List<Integer> variableTypes);
 
-	void acceptDraftData(final Integer studyId, Integer datasetId);
+	void acceptDraftData(Integer studyId, Integer datasetId);
 
-	void rejectDraftData(final Integer studyId, Integer datasetId);
+	void rejectDraftData(Integer studyId, Integer datasetId);
 
-	Boolean checkOutOfBoundDraftData(final Integer studyId, Integer datasetId);
+	Boolean checkOutOfBoundDraftData(Integer studyId, Integer datasetId);
 
 	void setValuesToMissing(Integer studyId, Integer datasetId);
 }
