@@ -1,0 +1,4 @@
+rule-engine:
+  ruleSequenceConfiguration:
+    naming: ${naming.rules}
+    stock-id: ${stockid.rules}
