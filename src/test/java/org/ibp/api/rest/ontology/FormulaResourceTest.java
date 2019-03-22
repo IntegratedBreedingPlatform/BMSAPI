@@ -297,8 +297,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		this.mockMvc //
 			.perform(MockMvcRequestBuilders.delete("/ontology/{cropname}/formula/{formulaId}", this.cropName, formulaId)) //
 			.andDo(MockMvcResultHandlers.print()) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.errors", is(not(empty())))) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(getMessage("variable.formula.invalid.is.not.deletable"))))
+			.andExpect(MockMvcResultMatchers.status().isNoContent())
 		;
 	}
 

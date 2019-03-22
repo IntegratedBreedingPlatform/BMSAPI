@@ -214,6 +214,30 @@ public class TestDataProvider {
 		return variable;
 	}
 
+	public static Variable getTestVariable(final VariableType variableType) {
+		final Variable variable = new Variable();
+		variable.setId(TestDataProvider.VARIABLE_ID);
+		variable.setName(TestDataProvider.VARIABLE_NAME);
+		variable.setDefinition(TestDataProvider.VARIABLE_DESCRIPTION);
+		variable.setObservations(TestDataProvider.VARIABLE_OBSERVATIONS);
+		variable.setProperty(TestDataProvider.getTestProperty());
+		variable.setMethod(TestDataProvider.getTestMethod());
+		variable.setScale(TestDataProvider.getTestScale());
+		variable.setMinValue(TestDataProvider.VARIABLE_EXPECTED_MIN);
+		variable.setMaxValue(TestDataProvider.VARIABLE_EXPECTED_MAX);
+		variable.setAlias(TestDataProvider.VARIABLE_ALIAS);
+		variable.setIsFavorite(TestDataProvider.VARIABLE_IS_FAVOURITE);
+		variable.setDateCreated(TestDataProvider.getDateCreated());
+		variable.setStudies(TestDataProvider.VARIABLE_STUDIES);
+		variable.addVariableType(variableType);
+		variable.setDateCreated(TestDataProvider.getDateCreated());
+		variable.setDateLastModified(TestDataProvider.getDateModified());
+		variable.setFormula(variableType.equals(VariableType.TRAIT)?getTestFormula(): null);
+		variable.setAllowsFormula(true);
+		variable.setHasUsage(false);
+
+		return variable;
+	}
 	public static FormulaDto getTestFormula() {
 		final FormulaDto formulaDto = new FormulaDto();
 		final int inputId = RandomUtils.nextInt();
@@ -302,6 +326,23 @@ public class TestDataProvider {
 		variableDetails.setDescription(TestDataProvider.VARIABLE_DESCRIPTION);
 		variableDetails.setAlias(TestDataProvider.VARIABLE_ALIAS);
 		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(TRAIT_VARIABLE)));
+		variableDetails.setProperty(TestDataProvider.getTestPropertyDetails());
+		variableDetails.setMethod(TestDataProvider.getTestMethodDetails());
+		variableDetails.setScale(TestDataProvider.getTestScaleDetails());
+		variableDetails.setExpectedMin(TestDataProvider.VARIABLE_EXPECTED_MIN);
+		variableDetails.setExpectedMax(TestDataProvider.VARIABLE_EXPECTED_MAX);
+		variableDetails.setFavourite(TestDataProvider.VARIABLE_IS_FAVOURITE);
+		return variableDetails;
+	}
+
+	public static VariableDetails getTestVariableDetails(final org.ibp.api.domain.ontology.VariableType variableType) {
+		final VariableDetails variableDetails = new VariableDetails();
+		variableDetails.setProgramUuid(TestDataProvider.PROGRAM_UUID);
+		variableDetails.setId(String.valueOf(TestDataProvider.VARIABLE_ID));
+		variableDetails.setName(TestDataProvider.VARIABLE_NAME);
+		variableDetails.setDescription(TestDataProvider.VARIABLE_DESCRIPTION);
+		variableDetails.setAlias(TestDataProvider.VARIABLE_ALIAS);
+		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(variableType)));
 		variableDetails.setProperty(TestDataProvider.getTestPropertyDetails());
 		variableDetails.setMethod(TestDataProvider.getTestMethodDetails());
 		variableDetails.setScale(TestDataProvider.getTestScaleDetails());

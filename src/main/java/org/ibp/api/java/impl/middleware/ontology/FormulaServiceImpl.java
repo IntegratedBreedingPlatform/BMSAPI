@@ -60,11 +60,6 @@ public class FormulaServiceImpl implements FormulaService {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 
-		this.formulaValidator.validateDelete(formula.get(), bindingResult);
-
-		if (bindingResult.hasErrors()) {
-			throw new ApiRequestValidationException(bindingResult.getAllErrors());
-		}
 		VariableCache.removeFromCache(formula.get().getTarget().getId());
 		this.formulaService.delete(formulaId);
 	}
@@ -81,7 +76,7 @@ public class FormulaServiceImpl implements FormulaService {
 
 		this.extractInputs(formulaDto);
 		// This validation will also fill the the inputs ids if exists
-		this.formulaValidator.validateUpdate(formulaDto, bindingResult);
+		this.formulaValidator.validate(formulaDto, bindingResult);
 
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
