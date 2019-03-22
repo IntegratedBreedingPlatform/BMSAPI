@@ -286,6 +286,12 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 				variableInfo.addVariableType(VariableType.getById(this.parseVariableTypeAsInteger(variableType)));
 			}
 
+			for (org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
+				if (Arrays.asList("1808", "1807", "1802").contains(variableType.getId())) {
+					variableInfo.setAlias(variable.getAlias());
+				}
+			}
+
 			this.ontologyVariableDataManager.addVariable(variableInfo);
 			return new GenericResponse(String.valueOf(variableInfo.getId()));
 		} catch (MiddlewareException e) {
