@@ -220,7 +220,9 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			} else {
 				response.getMetadata().addEditableField("name");
 				response.getMetadata().addEditableField("description");
-				response.getMetadata().addEditableField("alias");
+				if (CollectionUtils.containsAny(ontologyVariable.getVariableTypes(), VariableServiceImpl.EDITABLE_VARIABLES_TYPES)) {
+					response.getMetadata().addEditableField("alias");
+				}
 				response.getMetadata().addEditableField("cropOntologyId");
 				response.getMetadata().addEditableField("variableTypes");
 				response.getMetadata().addEditableField("property");
