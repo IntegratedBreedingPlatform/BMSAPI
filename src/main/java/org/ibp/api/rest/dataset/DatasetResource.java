@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.generationcp.commons.ruleengine.naming.expression.ComponentPostProcessor;
+import org.generationcp.commons.ruleengine.provider.PropertyFileRuleConfigurationProvider;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -16,6 +18,7 @@ import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.java.ruleengine.RulesPostProcessor;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +63,12 @@ public class DatasetResource {
 
 	@Autowired
 	private DatasetExportService datasetKsuExcelExportServiceImpl;
+
+	@Autowired
+	private PropertyFileRuleConfigurationProvider propertyFileRuleConfigurationProvider;
+
+	@Autowired
+	private RulesPostProcessor rulesPostProcessor;
 
 	@ApiOperation(value = "Get Dataset Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the dataset, "
 		+ "that will be shown in the Observation Table")
