@@ -330,4 +330,15 @@ public class DatasetResource {
 		this.studyDatasetService.setValuesToMissing(studyId, datasetId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Move draft value to saved value in sub-observation dataset", notes = "Save information for the imported dataset")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables/{variableId}/observation-units/drafts/acceptance", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> acceptDraftDataByVariable(
+		@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId, @PathVariable final Integer variableId,
+		@RequestBody  final ObservationUnitsSearchDTO searchDTO) {
+		this.studyDatasetService.acceptDraftDataByVariable(studyId, datasetId, variableId, searchDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 }

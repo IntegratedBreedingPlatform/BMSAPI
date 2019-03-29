@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
@@ -435,6 +436,16 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		this.middlewareDatasetService.setValuesToMissing(datasetId);
+	}
+
+	@Override
+	public void acceptDraftDataByVariable(
+		final Integer studyId, final Integer datasetId, final Integer variableId,
+		final ObservationUnitsSearchDTO searchDTO) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, Lists.newArrayList(variableId));
+		this.middlewareDatasetService.acceptDraftDataByVariable(datasetId, variableId, searchDTO, studyId);
 	}
 
 	@Override
