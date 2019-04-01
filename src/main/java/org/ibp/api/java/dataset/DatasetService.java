@@ -3,6 +3,7 @@ package org.ibp.api.java.dataset;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
@@ -74,4 +75,7 @@ public interface DatasetService {
 	void acceptDraftDataByVariable(
 		Integer studyId, Integer datasetId, Integer variableId,
 		final ObservationUnitsSearchDTO searchDTO);
+
+	FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(Integer studyId, Integer datasetId,
+		ObservationUnitsSearchDTO filter);
 }

@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
+import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
@@ -368,7 +369,7 @@ public class DatasetServiceImpl implements DatasetService {
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
 
 		this.studyValidator.validate(studyId, true);
-		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
 
 		this.observationsTableValidator.validateList(input.getData());
 
@@ -460,6 +461,15 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		this.middlewareDatasetService.rejectDraftData(datasetId);
+	}
+
+	@Override
+	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(final Integer studyId,
+		final Integer datasetId, final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, Lists.newArrayList(observationUnitsSearchDTO.getFilter().getVariableId()));
+		return this.middlewareDatasetService.countFilteredInstancesAndPhenotypes(datasetId, observationUnitsSearchDTO);
 	}
 
 	private BindingResult processObservationsDataWarningsAsErrors(

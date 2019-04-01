@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.SortedPageRequest;
+import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.common.PagedResult;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Api(value = "Dataset Services")
@@ -330,6 +332,19 @@ public class DatasetResource {
 		this.studyDatasetService.setValuesToMissing(studyId, datasetId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Count Filtered Phenotypes and Instances per Variable", notes = "Returns count of phenotypes for variables")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/observations/filter/count", method = RequestMethod.POST)
+	public ResponseEntity<FilteredPhenotypesInstancesCountDTO> countFilteredPhenotypesAndInstances(
+		@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId, @RequestBody final ObservationUnitsSearchDTO filterParams) {
+
+		final FilteredPhenotypesInstancesCountDTO
+			result = this.studyDatasetService.countFilteredInstancesAndPhenotypes(studyId, datasetId, filterParams);
+
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+
 
 	@ApiOperation(value = "Move draft value to saved value in sub-observation dataset", notes = "Save information for the imported dataset")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables/{variableId}/observation-units/drafts/acceptance", method = RequestMethod.POST)
