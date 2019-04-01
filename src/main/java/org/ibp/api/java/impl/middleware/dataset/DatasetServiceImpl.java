@@ -441,12 +441,13 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void acceptDraftDataByVariable(
-		final Integer studyId, final Integer datasetId, final Integer variableId,
+		final Integer studyId, final Integer datasetId,
 		final ObservationUnitsSearchDTO searchDTO) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
-		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, Lists.newArrayList(variableId));
-		this.middlewareDatasetService.acceptDraftDataByVariable(datasetId, variableId, searchDTO, studyId);
+		this.datasetValidator
+			.validateExistingDatasetVariables(studyId, datasetId, true, Lists.newArrayList(searchDTO.getFilter().getVariableId()));
+		this.middlewareDatasetService.acceptDraftDataByVariable(datasetId, searchDTO, studyId);
 	}
 
 	@Override

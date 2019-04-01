@@ -35,7 +35,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Api(value = "Dataset Services")
@@ -347,13 +346,13 @@ public class DatasetResource {
 
 
 	@ApiOperation(value = "Move draft value to saved value in sub-observation dataset", notes = "Save information for the imported dataset")
-	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables/{variableId}/observation-units/drafts/acceptance", method = RequestMethod.POST)
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/filter/acceptance", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> acceptDraftDataByVariable(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
-		@PathVariable final Integer datasetId, @PathVariable final Integer variableId,
+		@PathVariable final Integer datasetId,
 		@RequestBody  final ObservationUnitsSearchDTO searchDTO) {
-		this.studyDatasetService.acceptDraftDataByVariable(studyId, datasetId, variableId, searchDTO);
+		this.studyDatasetService.acceptDraftDataByVariable(studyId, datasetId, searchDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
