@@ -156,7 +156,7 @@ public class PresetDTOValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		if (!fileType.equals(FileType.CSV)) {
+		if (fileType.equals(FileType.XLS)) {
 			errors.reject("preset.not.supported.file.type", "");
 			throw new NotSupportedException(errors.getAllErrors().get(0));
 		}

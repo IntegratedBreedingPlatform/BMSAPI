@@ -89,7 +89,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	private static String PLOT_NO = "PLOT_NO";
 	private static String ENTRY_NO = "ENTRY_NO";
 
-	private static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV);
+	private static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF);
 
 	private static List<Integer> STATIC_FIELD_IDS;
 
