@@ -97,7 +97,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testCountPhenotypes() throws Exception {
 		final long count = 10;
-		doReturn(count).when(this.studyDatasetService).countPhenotypes(100, 102, Arrays.asList(1, 2, 3));
+		doReturn(count).when(this.studyDatasetService).countObservationsByVariables(100, 102, Arrays.asList(1, 2, 3));
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
@@ -111,7 +111,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testCountPhenotypesByObservation() throws Exception {
 		final long count = 11;
-		doReturn(count).when(this.studyDatasetService).countPhenotypesByInstance(100, 102, 103);
+		doReturn(count).when(this.studyDatasetService).countObservationsByInstance(100, 102, 103);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
@@ -151,7 +151,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				.param("variableIds", "1,2,3").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
-		Mockito.verify(this.studyDatasetService).removeVariables(studyId, datasetId, Arrays.asList(1, 2, 3));
+		Mockito.verify(this.studyDatasetService).removeDatasetVariables(studyId, datasetId, Arrays.asList(1, 2, 3));
 	}
 
 	@Test
@@ -167,7 +167,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
-		Mockito.verify(this.studyDatasetService).getVariables(studyId, datasetId, VariableType.getById(variableTypeId));
+		Mockito.verify(this.studyDatasetService).getDatasetVariablesByType(studyId, datasetId, VariableType.getById(variableTypeId));
 	}
 
 	@Test
@@ -189,7 +189,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk());
 
 		Mockito.verify(this.studyDatasetService)
-			.addObservation(Matchers.eq(studyId), Matchers.eq(datasetId), Matchers.eq(observationUnitId),
+			.createObservation(Matchers.eq(studyId), Matchers.eq(datasetId), Matchers.eq(observationUnitId),
 				Matchers.any(ObservationDto.class));
 	}
 
@@ -748,7 +748,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int studyId = dataset.getStudyId();
 		final int datasetId = dataset.getDatasetId();
 
-		Mockito.when(this.studyDatasetService.checkOutOfBoundDraftData(studyId, datasetId)).thenReturn(false);
+		Mockito.when(this.studyDatasetService.hasDatasetDraftDataOutOfBounds(studyId, datasetId)).thenReturn(false);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
@@ -766,7 +766,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int studyId = dataset.getStudyId();
 		final int datasetId = dataset.getDatasetId();
 
-		Mockito.when(this.studyDatasetService.checkOutOfBoundDraftData(studyId, datasetId)).thenReturn(true);
+		Mockito.when(this.studyDatasetService.hasDatasetDraftDataOutOfBounds(studyId, datasetId)).thenReturn(true);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders

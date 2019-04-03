@@ -81,7 +81,7 @@ public class DatasetResource {
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
 
-		final long count = this.studyDatasetService.countPhenotypes(studyId, datasetId, Arrays.asList(variableIds));
+		final long count = this.studyDatasetService.countObservationsByVariables(studyId, datasetId, Arrays.asList(variableIds));
 		final HttpHeaders respHeaders = new HttpHeaders();
 		respHeaders.add("X-Total-Count", String.valueOf(count));
 
@@ -103,7 +103,7 @@ public class DatasetResource {
 	public ResponseEntity<Void> removeVariables(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
-		this.studyDatasetService.removeVariables(studyId, datasetId, Arrays.asList(variableIds));
+		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds));
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -112,7 +112,7 @@ public class DatasetResource {
 	public ResponseEntity<List<MeasurementVariableDto>> getVariables(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer variableTypeId) {
-		final List<MeasurementVariableDto> variables = this.studyDatasetService.getVariables(studyId, datasetId, VariableType.getById(variableTypeId));
+		final List<MeasurementVariableDto> variables = this.studyDatasetService.getDatasetVariablesByType(studyId, datasetId, VariableType.getById(variableTypeId));
 		return new ResponseEntity<>(variables, HttpStatus.OK);
 	}
 
@@ -124,7 +124,7 @@ public class DatasetResource {
 		@RequestBody final ObservationDto observation) {
 
 		return new ResponseEntity<>(
-			this.studyDatasetService.addObservation(studyId, datasetId, observationUnitId, observation), HttpStatus.OK);
+			this.studyDatasetService.createObservation(studyId, datasetId, observationUnitId, observation), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Update Observation", notes = "Update Observation")
@@ -145,7 +145,7 @@ public class DatasetResource {
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer instanceId) {
 
-		final long count = this.studyDatasetService.countPhenotypesByInstance(studyId, datasetId, instanceId);
+		final long count = this.studyDatasetService.countObservationsByInstance(studyId, datasetId, instanceId);
 		final HttpHeaders respHeaders = new HttpHeaders();
 		respHeaders.add("X-Total-Count", String.valueOf(count));
 
@@ -296,7 +296,7 @@ public class DatasetResource {
 	@ResponseBody
 	public ResponseEntity<Void> acceptDraftData(@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
-		this.studyDatasetService.acceptDraftData(studyId, datasetId);
+		this.studyDatasetService.acceptAllDatasetDraftData(studyId, datasetId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -305,7 +305,7 @@ public class DatasetResource {
 	@ResponseBody
 	public ResponseEntity<Void> rejectDraftData(@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
-		this.studyDatasetService.rejectDraftData(studyId, datasetId);
+		this.studyDatasetService.rejectDatasetDraftData(studyId, datasetId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -315,7 +315,7 @@ public class DatasetResource {
 	public ResponseEntity<Void> checkOutOfBoundDraftData(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
-		final Boolean hasOutOfBounds = this.studyDatasetService.checkOutOfBoundDraftData(studyId, datasetId);
+		final Boolean hasOutOfBounds = this.studyDatasetService.hasDatasetDraftDataOutOfBounds(studyId, datasetId);
 
 		if (hasOutOfBounds) {
 			return new ResponseEntity<>(HttpStatus.OK);
@@ -328,7 +328,7 @@ public class DatasetResource {
 	@ResponseBody
 	public ResponseEntity<Void> setValuesToMissing(@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
-		this.studyDatasetService.setValuesToMissing(studyId, datasetId);
+		this.studyDatasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -352,7 +352,7 @@ public class DatasetResource {
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId,
 		@RequestBody  final ObservationUnitsSearchDTO searchDTO) {
-		this.studyDatasetService.acceptDraftDataByVariable(studyId, datasetId, searchDTO);
+		this.studyDatasetService.acceptDraftDataFilteredByVariable(studyId, datasetId, searchDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

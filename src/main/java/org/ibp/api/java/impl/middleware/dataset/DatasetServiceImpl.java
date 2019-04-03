@@ -83,30 +83,30 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<MeasurementVariable> getSubObservationSetColumns(
-		final Integer studyId, final Integer subObservationSetId, final Boolean draftMode) {
+		final Integer studyId, final Integer datasetId, final Boolean draftMode) {
 
 		this.studyValidator.validate(studyId, false);
 
 		// TODO generalize to any obs dataset (plot/subobs), make 3rd param false
-		this.datasetValidator.validateDataset(studyId, subObservationSetId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
 
-		return this.middlewareDatasetService.getSubObservationSetColumns(subObservationSetId, draftMode);
+		return this.middlewareDatasetService.getSubObservationSetColumns(datasetId, draftMode);
 	}
 
 	@Override
 	public List<MeasurementVariable> getSubObservationSetVariables(
-		final Integer studyId, final Integer subObservationSetId) {
+		final Integer studyId, final Integer datasetId) {
 
 		this.studyValidator.validate(studyId, false);
 
 		// TODO generalize to any obs dataset (plot/subobs), make 3rd param false
-		this.datasetValidator.validateDataset(studyId, subObservationSetId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
 
-		return this.middlewareDatasetService.getSubObservationSetVariables(subObservationSetId);
+		return this.middlewareDatasetService.getSubObservationSetVariables(datasetId);
 	}
 
 	@Override
-	public long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
+	public long countObservationsByVariables(final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 
@@ -114,7 +114,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public long countPhenotypesByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId) {
+	public long countObservationsByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId) {
 		this.validateStudyDatasetAndInstances(studyId, datasetId, Arrays.asList(instanceId), false);
 		return this.middlewareDatasetService.countPhenotypesByInstance(datasetId, instanceId);
 	}
@@ -138,21 +138,21 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<MeasurementVariableDto> getVariables(final Integer studyId, final Integer datasetId, final VariableType variableType) {
+	public List<MeasurementVariableDto> getDatasetVariablesByType(final Integer studyId, final Integer datasetId, final VariableType variableType) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		return this.middlewareDatasetService.getVariables(datasetId, variableType);
 	}
 
 	@Override
-	public void removeVariables(final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
+	public void removeDatasetVariables(final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, variableIds);
 		this.middlewareDatasetService.removeVariables(datasetId, variableIds);
 	}
 
 	@Override
-	public ObservationDto addObservation(
+	public ObservationDto createObservation(
 		final Integer studyId, final Integer datasetId, final Integer observationUnitId, final ObservationDto observation) {
 
 		this.studyValidator.validate(studyId, true);
@@ -426,21 +426,21 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Boolean checkOutOfBoundDraftData(final Integer studyId, final Integer datasetId) {
+	public Boolean hasDatasetDraftDataOutOfBounds(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		return this.middlewareDatasetService.checkOutOfBoundDraftData(datasetId);
 	}
 
 	@Override
-	public void setValuesToMissing(final Integer studyId, final Integer datasetId) {
+	public void acceptDraftDataAndSetOutOfBoundsToMissing(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		this.middlewareDatasetService.setValuesToMissing(datasetId);
 	}
 
 	@Override
-	public void acceptDraftDataByVariable(
+	public void acceptDraftDataFilteredByVariable(
 		final Integer studyId, final Integer datasetId,
 		final ObservationUnitsSearchDTO searchDTO) {
 		this.studyValidator.validate(studyId, true);
@@ -451,14 +451,14 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void acceptDraftData(final Integer studyId, final Integer datasetId) {
+	public void acceptAllDatasetDraftData(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		this.middlewareDatasetService.acceptDraftData(datasetId);
 	}
 
 	@Override
-	public void rejectDraftData(final Integer studyId, final Integer datasetId) {
+	public void rejectDatasetDraftData(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		this.middlewareDatasetService.rejectDraftData(datasetId);
