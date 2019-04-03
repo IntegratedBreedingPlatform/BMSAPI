@@ -37,12 +37,15 @@ import java.util.Map;
 @Api(value = "Label Printing Services")
 @RestController
 public class LabelPrintingResource {
-
 	@Autowired
 	private LabelPrintingStrategy subObservationDatasetLabelPrinting;
 
 	@Autowired
 	private CSVLabelsFileGenerator csvLabelsFileGenerator;
+
+	@Autowired
+	private PDFLabelsFileGenerator pdfLabelsFileGenerator;
+
 
 	@RequestMapping(value = "/crops/{cropname}/labelPrinting/{labelPrintingType}/labels/summary", method = RequestMethod.POST)
 	@ApiOperation(value = "Get Summary of Labels Needed according to the specified printing label type",
@@ -173,6 +176,9 @@ public class LabelPrintingResource {
 		switch (fileType) {
 			case CSV:
 				labelsFileGenerator = csvLabelsFileGenerator;
+				break;
+			case PDF:
+				labelsFileGenerator = pdfLabelsFileGenerator;
 				break;
 			default:
 				labelsFileGenerator = null;
