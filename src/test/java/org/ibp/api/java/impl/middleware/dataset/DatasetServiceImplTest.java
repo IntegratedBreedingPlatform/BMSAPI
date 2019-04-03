@@ -117,7 +117,7 @@ public class DatasetServiceImplTest {
 
 		this.studyDatasetService.countObservationsByVariables(studyId, datasetId, traitIds);
 		Mockito.verify(this.studyValidator).validate(studyId, false);
-		Mockito.verify(this.middlewareDatasetService).countPhenotypes(datasetId, traitIds);
+		Mockito.verify(this.middlewareDatasetService).countObservationsByVariables(datasetId, traitIds);
 	}
 
 	@Test
@@ -131,7 +131,7 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.studyValidator).validate(studyId, false);
 		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, false);
 		Mockito.verify(this.instanceValidator).validate(datasetId, Sets.newHashSet(instanceId));
-		Mockito.verify(this.middlewareDatasetService).countPhenotypesByInstance(datasetId, instanceId);
+		Mockito.verify(this.middlewareDatasetService).countObservationsByInstance(datasetId, instanceId);
 	}
 
 	@Test
@@ -151,7 +151,7 @@ public class DatasetServiceImplTest {
 		this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator).validateDatasetVariable(studyId, datasetId, true, datasetVariable, false);
-		Mockito.verify(this.middlewareDatasetService).addVariable(datasetId, variableId, variableType, alias);
+		Mockito.verify(this.middlewareDatasetService).addDatasetVariable(datasetId, variableId, variableType, alias);
 		Mockito.verify(this.measurementVariableTransformer).transform(this.standardVariable, false);
 		Mockito.verify(this.variable).setName(alias);
 		Mockito.verify(this.variable).setVariableType(variableType);
@@ -167,7 +167,7 @@ public class DatasetServiceImplTest {
 		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, variableIds);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator).validateExistingDatasetVariables(studyId, datasetId, true, variableIds);
-		Mockito.verify(this.middlewareDatasetService).removeVariables(datasetId, variableIds);
+		Mockito.verify(this.middlewareDatasetService).removeDatasetVariables(datasetId, variableIds);
 	}
 
 	@Test
@@ -183,7 +183,7 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.datasetValidator)
 			.validateExistingDatasetVariables(studyId, datasetId, true, Arrays.asList(observationDto.getVariableId()));
 		Mockito.verify(this.observationValidator).validateObservationUnit(datasetId, observationUnitId);
-		Mockito.verify(this.middlewareDatasetService).addPhenotype(observationDto);
+		Mockito.verify(this.middlewareDatasetService).createObservation(observationDto);
 	}
 
 	@Test
