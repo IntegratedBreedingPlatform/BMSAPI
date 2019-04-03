@@ -64,12 +64,6 @@ public class DatasetResource {
 	@Autowired
 	private DatasetExportService datasetKsuExcelExportServiceImpl;
 
-	@Autowired
-	private PropertyFileRuleConfigurationProvider propertyFileRuleConfigurationProvider;
-
-	@Autowired
-	private RulesPostProcessor rulesPostProcessor;
-
 	@ApiOperation(value = "Get Dataset Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the dataset, "
 		+ "that will be shown in the Observation Table")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/table/columns", method = RequestMethod.GET)
