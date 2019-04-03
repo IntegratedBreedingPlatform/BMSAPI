@@ -1,20 +1,11 @@
 
 package org.ibp.api.java.impl.middleware.study;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import org.generationcp.middleware.domain.dms.DMSVariableType;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.Experiment;
-import org.generationcp.middleware.domain.dms.FolderReference;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
@@ -26,34 +17,18 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
-import org.generationcp.middleware.service.api.study.MeasurementDto;
-import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyFilters;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
-import org.generationcp.middleware.service.api.study.StudySearchParameters;
-import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.generationcp.middleware.service.api.study.*;
 import org.ibp.api.domain.common.Command;
 import org.ibp.api.domain.common.ValidationUtil;
 import org.ibp.api.domain.ontology.TermSummary;
-import org.ibp.api.domain.study.DatasetSummary;
-import org.ibp.api.domain.study.Environment;
-import org.ibp.api.domain.study.FieldMap;
-import org.ibp.api.domain.study.Measurement;
-import org.ibp.api.domain.study.Observation;
-import org.ibp.api.domain.study.StudyAttribute;
-import org.ibp.api.domain.study.StudyDetails;
-import org.ibp.api.domain.study.StudyFolder;
-import org.ibp.api.domain.study.StudyGermplasm;
-import org.ibp.api.domain.study.StudyImportDTO;
-import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
+import org.ibp.api.domain.study.*;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
@@ -68,10 +43,10 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -433,7 +408,7 @@ public class StudyServiceImpl implements StudyService {
 
 	@Transactional
 	@Override
-	public Integer importStudy(final StudyImportDTO studyImportDTO, final String programUUID, final String cropPrefix) {
+	public Integer importStudy(final StudyImportDTO studyImportDTO, final String programUUID, final CropType crop) {
 		try {
 
 			final Workbook workbook = this.conversionService.convert(studyImportDTO, Workbook.class);
@@ -441,7 +416,7 @@ public class StudyServiceImpl implements StudyService {
 					.setProgramUUID(programUUID);
 
 			// Save the study
-			final int studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, cropPrefix);
+			final int studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, crop);
 
 			// Create germplasm list
 			final GermplasmList germplasmList = this.conversionService.convert(studyImportDTO, GermplasmList.class);

@@ -223,7 +223,7 @@ public class StudyResource {
 		}
 
 		final Integer studyId = this.studyService.importStudy(studyImportDTO, programUUID,
-			this.workbenchDataManager.getCropTypeByName(cropname).getPlotCodePrefix());
+			this.workbenchDataManager.getCropTypeByName(cropname));
 		return new ResponseEntity<Integer>(studyId, HttpStatus.CREATED);
 	}
 

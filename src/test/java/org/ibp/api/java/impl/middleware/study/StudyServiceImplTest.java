@@ -15,6 +15,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
@@ -92,7 +93,7 @@ public class StudyServiceImplTest {
 
 	final PodamFactory factory = new PodamFactoryImpl();
 
-	private final String cropPrefix = "ABCD";
+	private CropType crop;
 	
 	final Function<ObservationDto, Observation> observationTransformFunction = new Function<ObservationDto, Observation>() {
 
@@ -122,6 +123,8 @@ public class StudyServiceImplTest {
 		Mockito.when(this.securityService.isAccessible(Matchers.any(org.generationcp.middleware.service.api.study.StudySummary.class),
 			Matchers.anyString()))
 				.thenReturn(true);
+		this.crop = new CropType();
+		this.crop.setUseUUID(true);
 	}
 
 	@Test
@@ -356,11 +359,11 @@ public class StudyServiceImplTest {
 		workbook.setStudyDetails(studyDetails);
 
 		Mockito.when(this.conversionService.convert(studyImportDTO, Workbook.class)).thenReturn(workbook);
-		this.studyServiceImpl.importStudy(studyImportDTO, this.programUID, this.cropPrefix);
+		this.studyServiceImpl.importStudy(studyImportDTO, this.programUID, this.crop);
 
 		// Only asserting interactions with key collaborators
 		Mockito.verify(this.conversionService).convert(studyImportDTO, Workbook.class);
-		Mockito.verify(this.dataImportService).saveDataset(workbook, true, false, this.programUID, this.cropPrefix);
+		Mockito.verify(this.dataImportService).saveDataset(workbook, true, false, this.programUID, this.crop);
 		Mockito.verify(this.conversionService).convert(studyImportDTO, GermplasmList.class);
 		Mockito.verify(this.germplasmListManager).addGermplasmList(isNull(GermplasmList.class));
 		Mockito.verify(this.germplasmListManager).addGermplasmListData(Matchers.anyListOf(GermplasmListData.class));
