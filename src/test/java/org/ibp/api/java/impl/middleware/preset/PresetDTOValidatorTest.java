@@ -13,6 +13,7 @@ import org.ibp.api.exception.ConflictException;
 import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.java.program.ProgramService;
+import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.preset.domain.FilePresetConfigurationDTO;
 import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
 import org.ibp.api.rest.preset.domain.PresetDTO;
@@ -448,7 +449,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		presetDTO.setToolId(toolId);
 		presetDTO.setProgramUUID(programUUID);
 		FilePresetConfigurationDTO filePresetConfigurationDTO = new FilePresetConfigurationDTO();
-		filePresetConfigurationDTO.setOutputType("pdf");
+		filePresetConfigurationDTO.setOutputType(FileType.XLS.getExtension());
 		presetDTO.setFileConfiguration(filePresetConfigurationDTO);
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
