@@ -46,8 +46,6 @@ public interface StudyService {
 
 	Map<Integer, FieldMap> getFieldMap(final String studyIdentifier);
 
-	Integer importStudy(final StudyImportDTO studyImportDTO, final String programUUID, final CropType crop);
-
 	List<StudyFolder> getAllStudyFolders();
 
 	String getProgramUUID(Integer studyIdentifier);

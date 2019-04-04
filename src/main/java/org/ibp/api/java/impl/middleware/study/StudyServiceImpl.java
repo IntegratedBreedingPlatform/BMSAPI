@@ -406,38 +406,6 @@ public class StudyServiceImpl implements StudyService {
 		return fieldMapService.getFieldMap(studyId);
 	}
 
-	@Transactional
-	@Override
-	public Integer importStudy(final StudyImportDTO studyImportDTO, final String programUUID, final CropType crop) {
-		try {
-
-			final Workbook workbook = this.conversionService.convert(studyImportDTO, Workbook.class);
-			workbook.getStudyDetails()
-					.setProgramUUID(programUUID);
-
-			// Save the study
-			final int studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, crop);
-
-			// Create germplasm list
-			final GermplasmList germplasmList = this.conversionService.convert(studyImportDTO, GermplasmList.class);
-			final Integer listId = this.germplasmListManager.addGermplasmList(germplasmList);
-
-			final List<GermplasmListData> germplasmListDatas = this.convert(studyImportDTO.getGermplasm(), GermplasmListData.class);
-			for (final GermplasmListData germData : germplasmListDatas) {
-				germData.setList(germplasmList);
-			}
-			this.germplasmListManager.addGermplasmListData(germplasmListDatas);
-
-			// Create the study's snapshot of the Germplasm list (ListDataProject)
-			final List<ListDataProject> listDataProjects = this.convert(studyImportDTO.getGermplasm(), ListDataProject.class);
-			this.fieldbookService.saveOrUpdateListDataProject(studyId, GermplasmListType.STUDY, listId, listDataProjects, studyImportDTO.getUserId());
-
-			return studyId;
-
-		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("Error caused by: " + e.getMessage(), e);
-		}
-	}
 
 	private final <T, S> List<T> convert(final List<S> beanList, final Class<T> clazz) {
 		if (null == beanList) {

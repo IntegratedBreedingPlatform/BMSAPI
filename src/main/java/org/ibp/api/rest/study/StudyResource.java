@@ -1,14 +1,9 @@
 
 package org.ibp.api.rest.study;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import javax.validation.ValidationException;
-
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.ObjectUtils;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
@@ -21,7 +16,6 @@ import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
-import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -46,9 +40,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
 
 @Api(value = "Study Services")
 @Controller
@@ -205,26 +200,6 @@ public class StudyResource {
 	@ResponseBody
 	public ResponseEntity<Map<Integer, FieldMap>> getFieldMap(@PathVariable final String cropname, @PathVariable final String studyId) {
 		return new ResponseEntity<Map<Integer, FieldMap>>(this.studyService.getFieldMap(studyId), HttpStatus.OK);
-	}
-
-	@ApiOperation(value = "Import a study",
-			notes = "Imports one study (Nursery, Trial, etc) along with its constituent parts mainly Germplasm, Traits and Measurements.")
-	@RequestMapping(value = "/study/{cropname}/import", method = RequestMethod.POST)
-	public ResponseEntity<Integer> importStudy(
-			final @PathVariable String cropname, //
-			@ApiParam(
-					value = "Unique id of the program to import this study into. Use the /programs/list service to list Programs and obtain unique id.") @RequestParam final String programUUID,
-					@RequestBody @Valid final StudyImportDTO studyImportDTO, final BindingResult bindingResult) {
-
-		if (bindingResult.hasErrors()) {
-			final String error = this.getErrorsAsString(bindingResult);
-			StudyResource.LOG.error(error);
-			throw new ValidationException(error);
-		}
-
-		final Integer studyId = this.studyService.importStudy(studyImportDTO, programUUID,
-			this.workbenchDataManager.getCropTypeByName(cropname));
-		return new ResponseEntity<Integer>(studyId, HttpStatus.CREATED);
 	}
 
 	private String getErrorsAsString(final BindingResult bindingResult) {

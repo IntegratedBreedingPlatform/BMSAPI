@@ -1,21 +1,12 @@
 
 package org.ibp.api.java.impl.middleware.study;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.gms.GermplasmListType;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
@@ -30,7 +21,6 @@ import org.ibp.api.domain.study.Measurement;
 import org.ibp.api.domain.study.MeasurementIdentifier;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.domain.study.StudyGermplasm;
-import org.ibp.api.domain.study.StudyImportDTO;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.Trait;
 import org.ibp.api.domain.study.validators.ObservationValidator;
@@ -46,14 +36,12 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
-import static org.mockito.ArgumentMatchers.isNull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class StudyServiceImplTest {
 
@@ -93,8 +81,6 @@ public class StudyServiceImplTest {
 
 	final PodamFactory factory = new PodamFactoryImpl();
 
-	private CropType crop;
-	
 	final Function<ObservationDto, Observation> observationTransformFunction = new Function<ObservationDto, Observation>() {
 
 		@Override
@@ -123,8 +109,6 @@ public class StudyServiceImplTest {
 		Mockito.when(this.securityService.isAccessible(Matchers.any(org.generationcp.middleware.service.api.study.StudySummary.class),
 			Matchers.anyString()))
 				.thenReturn(true);
-		this.crop = new CropType();
-		this.crop.setUseUUID(true);
 	}
 
 	@Test
@@ -345,32 +329,7 @@ public class StudyServiceImplTest {
 		return observation;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testImportStudy() {
 
-		// Minimal setup
-		final StudyImportDTO studyImportDTO = new StudyImportDTO();
-		studyImportDTO.setStudyType(StudyTypeDto.TRIAL_NAME);
-		studyImportDTO.setUserId(1);
-
-		final Workbook workbook = new Workbook();
-		final StudyDetails studyDetails = new StudyDetails();
-		workbook.setStudyDetails(studyDetails);
-
-		Mockito.when(this.conversionService.convert(studyImportDTO, Workbook.class)).thenReturn(workbook);
-		this.studyServiceImpl.importStudy(studyImportDTO, this.programUID, this.crop);
-
-		// Only asserting interactions with key collaborators
-		Mockito.verify(this.conversionService).convert(studyImportDTO, Workbook.class);
-		Mockito.verify(this.dataImportService).saveDataset(workbook, true, false, this.programUID, this.crop);
-		Mockito.verify(this.conversionService).convert(studyImportDTO, GermplasmList.class);
-		Mockito.verify(this.germplasmListManager).addGermplasmList(isNull(GermplasmList.class));
-		Mockito.verify(this.germplasmListManager).addGermplasmListData(Matchers.anyListOf(GermplasmListData.class));
-		Mockito.verify(this.fieldbookService).saveOrUpdateListDataProject(Matchers.anyInt(), Matchers.any(GermplasmListType.class),
-			Matchers.anyInt(), Matchers.anyListOf(ListDataProject.class), Matchers.anyInt());
-	}
-	
 	@Test
 	public void testGetStudyReference() {
 		int studyId = 101;
