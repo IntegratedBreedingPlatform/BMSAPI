@@ -82,15 +82,15 @@ public class DatasetServiceImpl implements DatasetService {
 	private static String PLOT_DATASET_NAME = "Observations";
 
 	@Override
-	public List<MeasurementVariable> getSubObservationSetColumns(
-		final Integer studyId, final Integer subObservationSetId, final Boolean draftMode) {
+	public List<MeasurementVariable> getObservationSetColumns(
+		final Integer studyId, final Integer observationSetId, final Boolean draftMode) {
 
 		this.studyValidator.validate(studyId, false);
 
 		// TODO generalize to any obs dataset (plot/subobs), make 3rd param false
-		this.datasetValidator.validateDataset(studyId, subObservationSetId, false);
+		this.datasetValidator.validateDataset(studyId, observationSetId, true);
 
-		return this.middlewareDatasetService.getSubObservationSetColumns(subObservationSetId, draftMode);
+		return this.middlewareDatasetService.getObservationSetColumns(observationSetId, draftMode);
 	}
 
 	@Override
