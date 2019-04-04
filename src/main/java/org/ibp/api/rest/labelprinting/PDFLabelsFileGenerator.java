@@ -42,12 +42,16 @@ import java.util.Map;
 
 @Component
 public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
+
 	private static final Logger LOG = LoggerFactory.getLogger(PDFLabelsFileGenerator.class);
 	private static final String UNSUPPORTED_CHARSET_IMG = "unsupported-char-set.png";
 	static final String ARIAL_UNI = "arialuni.ttf";
 	static final float COLUMN_WIDTH_SIZE = 265f;
 	private static final int WIDTH = 600;
 	private static final int HEIGHT = 75;
+	public static final String FIELDNAME_VALUE_SEPARATOR = " : ";
+	public static final String BARCODE_SEPARATOR = " | ";
+	public static final int BARCODE_LABEL_LIMIT = 79;
 
 	@Override
 	public File generate(final LabelsGeneratorInput labelsGeneratorInput, final LabelsData labelsData) throws IOException {
@@ -224,19 +228,19 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 		return file;
 	}
 
-	protected String getBarcodeLabel(final Map<Integer, String> labels, final List<Integer> barcodeFields, final Map<Integer, Field> keyFieldMap, final boolean includeLabel) {
+	String getBarcodeLabel(final Map<Integer, String> labels, final List<Integer> barcodeFields, final Map<Integer, Field> keyFieldMap, final boolean includeLabel) {
 		final StringBuffer barcode = new StringBuffer();
 		for (final Integer barcodeField : barcodeFields) {
 			if (StringUtils.isEmpty(barcode.toString())) {
 				if(includeLabel) {
-					barcode.append(keyFieldMap.get(barcodeField).getName() + " : ");
+					barcode.append(keyFieldMap.get(barcodeField).getName() + FIELDNAME_VALUE_SEPARATOR);
 				}
 				barcode.append(labels.get(barcodeField));
 				continue;
 			}
-			barcode.append(" | ");
+			barcode.append(BARCODE_SEPARATOR);
 			if(includeLabel) {
-				barcode.append(keyFieldMap.get(barcodeField).getName() + " : ");
+				barcode.append(keyFieldMap.get(barcodeField).getName() + FIELDNAME_VALUE_SEPARATOR);
 			}
 			barcode.append(labels.get(barcodeField));
 		}
@@ -245,7 +249,7 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 
 	protected String generateLabelText(final Map<Integer, String> labels, final List<Integer> selectedFields, final Map<Integer, Field> keyFieldMap, final int row) {
 		if(row < selectedFields.size()) {
-			return keyFieldMap.get(selectedFields.get(row)).getName() + " : " + labels.get(selectedFields.get(row));
+			return keyFieldMap.get(selectedFields.get(row)).getName() + FIELDNAME_VALUE_SEPARATOR + labels.get(selectedFields.get(row));
 		}
 		return "";
 	}
@@ -256,8 +260,8 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 	 * @return truncated barcode label
 	 */
 	String truncateBarcodeLabelForCode(String barcodeLabelForCode) {
-		if (barcodeLabelForCode != null && barcodeLabelForCode.length() > 79) {
-			barcodeLabelForCode = barcodeLabelForCode.substring(0, 79);
+		if (barcodeLabelForCode != null && barcodeLabelForCode.length() > BARCODE_LABEL_LIMIT) {
+			barcodeLabelForCode = barcodeLabelForCode.substring(0, BARCODE_LABEL_LIMIT);
 		}
 		return barcodeLabelForCode;
 	}
