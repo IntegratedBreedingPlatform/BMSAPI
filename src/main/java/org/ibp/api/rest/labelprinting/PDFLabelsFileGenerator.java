@@ -2,16 +2,25 @@ package org.ibp.api.rest.labelprinting;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.oned.Code128Writer;
+import com.lowagie.text.BadElementException;
 import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
 import com.lowagie.text.Font;
 import com.lowagie.text.Image;
+import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import liquibase.util.StringUtils;
 import org.generationcp.commons.util.FileUtils;
 import org.ibp.api.rest.labelprinting.domain.Field;
@@ -23,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,9 +43,11 @@ import java.util.Map;
 @Component
 public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 	private static final Logger LOG = LoggerFactory.getLogger(PDFLabelsFileGenerator.class);
-
-	@Resource
-	private LabelPrintingPDFUtil labelPrintingPDFUtil;
+	private static final String UNSUPPORTED_CHARSET_IMG = "unsupported-char-set.png";
+	static final String ARIAL_UNI = "arialuni.ttf";
+	static final float COLUMN_WIDTH_SIZE = 265f;
+	private static final int WIDTH = 600;
+	private static final int HEIGHT = 75;
 
 	@Override
 	public File generate(final LabelsGeneratorInput labelsGeneratorInput, final LabelsData labelsData) throws IOException {
@@ -53,14 +63,14 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 		final int totalPerPage = numberOfLabelPerRow * numberOfRowsPerPageOfLabel;
 		final FileOutputStream fileOutputStream = new FileOutputStream(fileNameFullPath);
 
-		File file = new File(fileNameFullPath);
+		final File file = new File(fileNameFullPath);
 		try {
 			final LabelPaper paper = LabelPaperFactory.generateLabelPaper(numberOfLabelPerRow, numberOfRowsPerPageOfLabel, pageSizeId);
-			final Document document = this.labelPrintingPDFUtil.getDocument(fileOutputStream, paper, pageSizeId);
+			final Document document = this.getDocument(fileOutputStream, paper, pageSizeId);
 
 			int i = 0;
 			final int fixTableRowSize = numberOfLabelPerRow;
-			final float[] widthColumns = this.labelPrintingPDFUtil.getWidthColumns(fixTableRowSize, LabelPrintingPDFUtil.COLUMN_WIDTH_SIZE);
+			final float[] widthColumns = this.getWidthColumns(fixTableRowSize, COLUMN_WIDTH_SIZE);
 
 			PdfPTable table = new PdfPTable(fixTableRowSize);
 			table.setWidths(widthColumns);
@@ -83,7 +93,7 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 						barcodeLabelForCode = barcodeLabel;
 					}
 				}
-				barcodeLabelForCode = this.labelPrintingPDFUtil.truncateBarcodeLabelForCode(barcodeLabelForCode);
+				barcodeLabelForCode = this.truncateBarcodeLabelForCode(barcodeLabelForCode);
 
 				final PdfPCell cell = new PdfPCell();
 				cell.setFixedHeight(cellHeight);
@@ -96,7 +106,7 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 				innerImageTableInfo.setWidthPercentage(82);
 				final PdfPCell cellImage = new PdfPCell();
 				if (labelsGeneratorInput.isBarcodeRequired()) {
-					final Image mainImage = this.labelPrintingPDFUtil.getBarcodeImage(filesToBeDeleted, barcodeLabelForCode);
+					final Image mainImage = this.getBarcodeImage(filesToBeDeleted, barcodeLabelForCode);
 					cellImage.addElement(mainImage);
 				} else {
 					cellImage.addElement(new Paragraph(" "));
@@ -109,7 +119,7 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 
 				final float fontSize = paper.getFontSize();
 
-				final BaseFont unicode = BaseFont.createFont(LabelPrintingPDFUtil.ARIAL_UNI, BaseFont.IDENTITY_H, BaseFont
+				final BaseFont unicode = BaseFont.createFont(ARIAL_UNI, BaseFont.IDENTITY_H, BaseFont
 					.EMBEDDED);
 				final com.lowagie.text.Font fontNormal = new com.lowagie.text.Font(unicode, fontSize);
 				fontNormal.setStyle(com.lowagie.text.Font.NORMAL);
@@ -200,7 +210,7 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 				}
 			}
 			// we need to add the last row
-			this.labelPrintingPDFUtil.addLastRow(numberOfLabelPerRow, numberOfRowsPerPageOfLabel, paper, document, i, fixTableRowSize,
+			this.addLastRow(numberOfLabelPerRow, numberOfRowsPerPageOfLabel, paper, document, i, fixTableRowSize,
 				table, widthColumns);
 			document.close();
 			for (final File fileTobeDeleted : filesToBeDeleted) {
@@ -215,8 +225,8 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 	}
 
 	protected String getBarcodeLabel(final Map<Integer, String> labels, final List<Integer> barcodeFields, final Map<Integer, Field> keyFieldMap, final boolean includeLabel) {
-		StringBuffer barcode = new StringBuffer();
-		for (Integer barcodeField : barcodeFields) {
+		final StringBuffer barcode = new StringBuffer();
+		for (final Integer barcodeField : barcodeFields) {
 			if (StringUtils.isEmpty(barcode.toString())) {
 				if(includeLabel) {
 					barcode.append(keyFieldMap.get(barcodeField).getName() + " : ");
@@ -238,5 +248,116 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 			return keyFieldMap.get(selectedFields.get(row)).getName() + " : " + labels.get(selectedFields.get(row));
 		}
 		return "";
+	}
+
+	/**
+	 * Truncate the barcode label for code instead of throwing an error in pdf
+	 * @param barcodeLabelForCode barcode label to truncate
+	 * @return truncated barcode label
+	 */
+	String truncateBarcodeLabelForCode(String barcodeLabelForCode) {
+		if (barcodeLabelForCode != null && barcodeLabelForCode.length() > 79) {
+			barcodeLabelForCode = barcodeLabelForCode.substring(0, 79);
+		}
+		return barcodeLabelForCode;
+	}
+
+	/**
+	 * Encode barcode label for pdf pages
+	 * @param barcodeLabelForCode barcode label to encode
+	 * @return barcode image
+	 */
+	BitMatrix encodeBarcode(final String barcodeLabelForCode) {
+		BitMatrix bitMatrix = null;
+		try {
+			bitMatrix = new Code128Writer().encode(barcodeLabelForCode, BarcodeFormat.CODE_128, WIDTH, HEIGHT, null);
+		} catch (final WriterException | IllegalArgumentException e) {
+			LOG.debug(e.getMessage(), e);
+		}
+		return bitMatrix;
+	}
+
+	void addLastRow(final int numberOfLabelPerRow, final int numberOfRowsPerPageOfLabel, final LabelPaper paper, final Document document, final int i,
+		final int fixTableRowSize, PdfPTable table, final float[] widthColumns) throws DocumentException {
+		if (i % numberOfLabelPerRow != 0) {
+			// we go the next line
+
+			final int remaining = numberOfLabelPerRow - i % numberOfLabelPerRow;
+			for (int neededCount = 0; neededCount < remaining; neededCount++) {
+				final PdfPCell cellNeeded = new PdfPCell();
+
+				cellNeeded.setBorder(Rectangle.NO_BORDER);
+				cellNeeded.setBackgroundColor(Color.white);
+
+				table.addCell(cellNeeded);
+			}
+
+			table.completeRow();
+			if (numberOfRowsPerPageOfLabel == 10) {
+
+				table.setSpacingAfter(paper.getSpacingAfter());
+			}
+
+			document.add(table);
+
+			table = new PdfPTable(fixTableRowSize);
+			table.setWidths(widthColumns);
+			table.setWidthPercentage(100);
+
+		}
+	}
+
+	Document getDocument(final FileOutputStream fileOutputStream, final LabelPaper paper, final int pageSizeId) throws
+		DocumentException {
+
+		Rectangle pageSize = PageSize.LETTER;
+
+		if (pageSizeId == LabelPaperFactory.SIZE_OF_PAPER_A4) {
+			pageSize = PageSize.A4;
+		}
+
+		final Document document = new Document(pageSize);
+
+		// float marginLeft, float marginRight, float marginTop, float marginBottom
+		document.setMargins(paper.getMarginLeft(), paper.getMarginRight(), paper.getMarginTop(), paper.getMarginBottom());
+
+		PdfWriter.getInstance(document, fileOutputStream);
+
+		// step 3
+		document.open();
+		return document;
+	}
+
+	float[] getWidthColumns(final int fixTableRowSize, final float columnWidthSize) {
+		final float[] widthColumns = new float[fixTableRowSize];
+
+		for (int counter = 0; counter < widthColumns.length; counter++) {
+			widthColumns[counter] = columnWidthSize;
+		}
+		return widthColumns;
+	}
+
+	com.lowagie.text.Image getBarcodeImage(final java.util.List<File> filesToBeDeleted, final String barcodeLabelForCode)
+		throws BadElementException, IOException {
+		FileOutputStream fout = null;
+
+		com.lowagie.text.Image mainImage = com.lowagie.text.Image.getInstance(PDFLabelsFileGenerator.class.getClassLoader().getResource(UNSUPPORTED_CHARSET_IMG));
+
+		final BitMatrix bitMatrix = this.encodeBarcode(barcodeLabelForCode);
+		if (bitMatrix != null) {
+			final String imageLocation = System.getProperty("user.home") + "/" + Math.random() + ".png";
+			final File imageFile = new File(imageLocation);
+			fout = new FileOutputStream(imageFile);
+			MatrixToImageWriter.writeToStream(bitMatrix, "png", fout);
+			filesToBeDeleted.add(imageFile);
+
+			mainImage = com.lowagie.text.Image.getInstance(imageLocation);
+		}
+
+		if (fout != null) {
+			fout.flush();
+			fout.close();
+		}
+		return mainImage;
 	}
 }
