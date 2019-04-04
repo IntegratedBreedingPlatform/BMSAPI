@@ -79,6 +79,8 @@ public class DatasetServiceImpl implements DatasetService {
 	@Autowired
 	private ObservationsTableValidator observationsTableValidator;
 
+	private static String PLOT_DATASET_NAME = "Observations";
+
 	@Override
 	public List<MeasurementVariable> getSubObservationSetColumns(
 		final Integer studyId, final Integer subObservationSetId, final Boolean draftMode) {
@@ -86,7 +88,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, false);
 
 		// TODO generalize to any obs dataset (plot/subobs), make 3rd param false
-		this.datasetValidator.validateDataset(studyId, subObservationSetId, true);
+		this.datasetValidator.validateDataset(studyId, subObservationSetId, false);
 
 		return this.middlewareDatasetService.getSubObservationSetColumns(subObservationSetId, draftMode);
 	}
@@ -205,6 +207,9 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<DatasetDTO> datasetDTOs = new ArrayList<>();
 		for (final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO : datasetDTOS) {
 			final DatasetDTO datasetDto = mapper.map(datasetDTO, DatasetDTO.class);
+			if (datasetDto.getDatasetTypeId().equals(DataSetType.PLOT_DATA.getId())) {
+				datasetDto.setName(PLOT_DATASET_NAME);
+			}
 			datasetDTOs.add(datasetDto);
 		}
 		return datasetDTOs;
@@ -227,6 +232,9 @@ public class DatasetServiceImpl implements DatasetService {
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final DatasetDTO datasetDto = mapper.map(datasetDTO, DatasetDTO.class);
+		if (datasetDto.getDatasetTypeId().equals(DataSetType.PLOT_DATA.getId())) {
+			datasetDto.setName(PLOT_DATASET_NAME);
+		}
 		datasetDto.setInstances(this.convertToStudyInstances(mapper, datasetDTO.getInstances()));
 		datasetDto.setStudyId(studyId);
 		datasetDto.setCropName(crop);
