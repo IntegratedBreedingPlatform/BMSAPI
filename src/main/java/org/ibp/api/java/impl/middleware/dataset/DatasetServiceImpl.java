@@ -124,7 +124,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		final Integer variableId = datasetVariable.getVariableId();
 		final StandardVariable traitVariable =
-			this.datasetValidator.validateDatasetVariable(studyId, datasetId, true, datasetVariable, false);
+			this.datasetValidator.validateDatasetVariable(studyId, datasetId, false, datasetVariable, false);
 
 		final String alias = datasetVariable.getStudyAlias() != null ? datasetVariable.getStudyAlias() : traitVariable.getName();
 		final VariableType type = VariableType.getById(datasetVariable.getVariableTypeId());
