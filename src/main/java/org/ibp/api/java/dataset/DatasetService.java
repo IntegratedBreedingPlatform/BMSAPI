@@ -18,7 +18,7 @@ import java.util.Set;
 
 public interface DatasetService {
 
-	List<MeasurementVariable> getSubObservationSetColumns(Integer studyId, Integer subObservationSetId, Boolean draftMode);
+	List<MeasurementVariable> getObservationSetColumns(Integer studyId, Integer subObservationSetId, Boolean draftMode);
 
 	List<MeasurementVariable> getSubObservationSetVariables(
 		Integer studyId, Integer subObservationSetId);
