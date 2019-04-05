@@ -88,7 +88,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, false);
 
 		// TODO generalize to any obs dataset (plot/subobs), make 3rd param false
-		this.datasetValidator.validateDataset(studyId, observationSetId, true);
+		this.datasetValidator.validateDataset(studyId, observationSetId, false);
 
 		return this.middlewareDatasetService.getObservationSetColumns(observationSetId, draftMode);
 	}
@@ -297,7 +297,7 @@ public class DatasetServiceImpl implements DatasetService {
 		if (searchDTO.getInstanceId() != null) {
 			instanceIds = Arrays.asList(searchDTO.getInstanceId());
 		}
-		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds, true);
+		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds, false);
 
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
 			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO);
