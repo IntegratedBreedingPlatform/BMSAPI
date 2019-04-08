@@ -168,7 +168,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Integer studyId, final Integer datasetId, final Integer observationId, final Integer observationUnitId,
 		final ObservationDto observationDto) {
 		this.studyValidator.validate(studyId, true);
-		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, observationDto);
 		observationDto.setObservationUnitId(observationUnitId);
 		observationDto.setObservationId(observationId);
@@ -352,7 +352,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void deleteObservation(final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId) {
 		this.studyValidator.validate(studyId, true);
-		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, null);
 		this.middlewareDatasetService.deletePhenotype(observationId);
 
