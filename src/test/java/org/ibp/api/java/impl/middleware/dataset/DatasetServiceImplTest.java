@@ -145,12 +145,12 @@ public class DatasetServiceImplTest {
 		final String alias = RandomStringUtils.randomAlphabetic(20);
 		final DatasetVariable datasetVariable = new DatasetVariable(variableTypeId, variableId, alias);
 		Mockito.doReturn(this.standardVariable).when(this.datasetValidator)
-			.validateDatasetVariable(studyId, datasetId, true, datasetVariable, false);
+			.validateDatasetVariable(studyId, datasetId, false, datasetVariable, false);
 		Mockito.doReturn(this.variable).when(this.measurementVariableTransformer).transform(this.standardVariable, false);
 
 		this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.datasetValidator).validateDatasetVariable(studyId, datasetId, true, datasetVariable, false);
+		Mockito.verify(this.datasetValidator).validateDatasetVariable(studyId, datasetId, false, datasetVariable, false);
 		Mockito.verify(this.middlewareDatasetService).addVariable(datasetId, variableId, variableType, alias);
 		Mockito.verify(this.measurementVariableTransformer).transform(this.standardVariable, false);
 		Mockito.verify(this.variable).setName(alias);

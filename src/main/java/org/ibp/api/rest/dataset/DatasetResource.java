@@ -116,7 +116,7 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "Add Observation", notes = "Add Observation")
-	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations", method = RequestMethod.POST)
 	public ResponseEntity<ObservationDto> addObservation(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId,
