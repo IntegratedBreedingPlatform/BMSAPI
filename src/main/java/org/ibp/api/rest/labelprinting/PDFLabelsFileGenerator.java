@@ -23,6 +23,7 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import liquibase.util.StringUtils;
 import org.generationcp.commons.util.FileUtils;
+import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
@@ -56,7 +57,7 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 	@Override
 	public File generate(final LabelsGeneratorInput labelsGeneratorInput, final LabelsData labelsData) throws IOException {
 		final File temporaryFolder = Files.createTempDir();
-		final String sanitizedFileName = FileUtils.sanitizeFileName(String.format("%s." + "pdf", labelsGeneratorInput.getFileName()));
+		final String sanitizedFileName = FileUtils.sanitizeFileName(String.format("%s." + FileType.PDF.getExtension(), labelsGeneratorInput.getFileName()));
 
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 		final Map<Integer, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), Field::getId);
