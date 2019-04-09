@@ -93,7 +93,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	public static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF);
 
 	//Variable ids of PI_NAME_ID and COOPERATOR_ID
-	static List<Integer> PAIR_ID_VARIABLES = Arrays.asList(8110, 8372);
+	static List<Integer> PAIR_ID_VARIABLES = Arrays.asList(TermId.PI_ID.getId(), TermId.COOPERATOOR_ID.getId());
 
 	private static List<Integer> STATIC_FIELD_IDS;
 
