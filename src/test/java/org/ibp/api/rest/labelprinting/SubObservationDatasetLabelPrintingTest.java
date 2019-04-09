@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
@@ -106,5 +107,13 @@ public class SubObservationDatasetLabelPrintingTest {
 		fields = this.subObservationDatasetLabelPrinting.transform(Arrays.asList(measurementVariable));
 		Assert.assertEquals(TermId.ENTRY_NO.getId(), fields.get(0).getId().intValue());
 		Assert.assertEquals(TermId.ENTRY_NO.name(), fields.get(0).getName());
+	}
+
+	@Test
+	public void testGetSupportedFileTypes() {
+		final List<FileType> fileTypes = this.subObservationDatasetLabelPrinting.getSupportedFileTypes();
+		Assert.assertTrue(fileTypes.contains(FileType.CSV));
+		Assert.assertTrue(fileTypes.contains(FileType.PDF));
+		Assert.assertFalse(fileTypes.contains(FileType.XLS));
 	}
 }
