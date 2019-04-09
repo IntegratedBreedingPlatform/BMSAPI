@@ -255,9 +255,9 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 	 * @param barcodeLabelForCode barcode label to truncate
 	 * @return truncated barcode label
 	 */
-	String truncateBarcodeLabelForCode(String barcodeLabelForCode) {
+	String truncateBarcodeLabelForCode(final String barcodeLabelForCode) {
 		if (barcodeLabelForCode != null && barcodeLabelForCode.length() > BARCODE_LABEL_LIMIT) {
-			barcodeLabelForCode = barcodeLabelForCode.substring(0, BARCODE_LABEL_LIMIT);
+			return barcodeLabelForCode.substring(0, BARCODE_LABEL_LIMIT);
 		}
 		return barcodeLabelForCode;
 	}
