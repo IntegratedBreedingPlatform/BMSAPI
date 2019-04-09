@@ -75,7 +75,7 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 
 			int i = 0;
 			final int fixTableRowSize = numberOfLabelPerRow;
-			final float[] widthColumns = this.getWidthColumns(fixTableRowSize, COLUMN_WIDTH_SIZE);
+			final float[] widthColumns = this.getWidthColumns(fixTableRowSize);
 
 			PdfPTable table = new PdfPTable(fixTableRowSize);
 			table.setWidths(widthColumns);
@@ -329,11 +329,11 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 		return document;
 	}
 
-	float[] getWidthColumns(final int fixTableRowSize, final float columnWidthSize) {
+	float[] getWidthColumns(final int fixTableRowSize) {
 		final float[] widthColumns = new float[fixTableRowSize];
 
 		for (int counter = 0; counter < widthColumns.length; counter++) {
-			widthColumns[counter] = columnWidthSize;
+			widthColumns[counter] = COLUMN_WIDTH_SIZE;
 		}
 		return widthColumns;
 	}
