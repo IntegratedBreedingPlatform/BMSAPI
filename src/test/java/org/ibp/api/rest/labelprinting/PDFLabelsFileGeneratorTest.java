@@ -83,13 +83,15 @@ public class PDFLabelsFileGeneratorTest {
 	}
 
 	@Test
-	public void testGetDocument() throws FileNotFoundException, DocumentException {
+	public void testGetDocument() throws FileNotFoundException, DocumentException, IOException {
 		final LabelPaper paper = LabelPaperFactory.generateLabelPaper(3, 9, 1);
 		Document document = this.pdfLabelsFileGenerator.getDocument(new FileOutputStream("temp"), paper, 1);
 		Assert.assertNotNull(document);
 		Assert.assertEquals(PageSize.A4, document.getPageSize());
-		document = this.pdfLabelsFileGenerator.getDocument(new FileOutputStream("temp"), paper, 2);
+		final FileOutputStream fileOutputStream = new FileOutputStream("temp");
+		document = this.pdfLabelsFileGenerator.getDocument(fileOutputStream, paper, 2);
 		Assert.assertEquals(PageSize.LETTER, document.getPageSize());
+		fileOutputStream.close();
 	}
 
 	@Test
