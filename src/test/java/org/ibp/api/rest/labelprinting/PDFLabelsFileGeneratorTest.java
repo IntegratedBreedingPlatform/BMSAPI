@@ -44,13 +44,11 @@ public class PDFLabelsFileGeneratorTest {
 		String expectedBarcodeWithoutLabel = "";
 		String expectedBarcodeWithLabel = "";
 		for(Integer barcodeField: barcodeFields) {
-			if(expectedBarcodeWithLabel.isEmpty()) {
-				expectedBarcodeWithLabel = keyFieldMap.get(barcodeField).getName() + PDFLabelsFileGenerator.FIELDNAME_VALUE_SEPARATOR + labels.get(barcodeField);
-				expectedBarcodeWithoutLabel = labels.get(barcodeField);
-				continue;
+			if(!expectedBarcodeWithLabel.isEmpty()) {
+				expectedBarcodeWithLabel += PDFLabelsFileGenerator.BARCODE_SEPARATOR;
+				expectedBarcodeWithoutLabel += PDFLabelsFileGenerator.BARCODE_SEPARATOR;
 			}
-			expectedBarcodeWithLabel += PDFLabelsFileGenerator.BARCODE_SEPARATOR;
-			expectedBarcodeWithoutLabel += PDFLabelsFileGenerator.BARCODE_SEPARATOR;
+
 			expectedBarcodeWithLabel += keyFieldMap.get(barcodeField).getName() + PDFLabelsFileGenerator.FIELDNAME_VALUE_SEPARATOR + labels.get(barcodeField);
 			expectedBarcodeWithoutLabel += labels.get(barcodeField);
 		}

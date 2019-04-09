@@ -229,16 +229,12 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 	}
 
 	String getBarcodeLabel(final Map<Integer, String> labels, final List<Integer> barcodeFields, final Map<Integer, Field> keyFieldMap, final boolean includeLabel) {
-		final StringBuffer barcode = new StringBuffer();
+		final StringBuilder barcode = new StringBuilder();
 		for (final Integer barcodeField : barcodeFields) {
-			if (StringUtils.isEmpty(barcode.toString())) {
-				if(includeLabel) {
-					barcode.append(keyFieldMap.get(barcodeField).getName() + FIELDNAME_VALUE_SEPARATOR);
-				}
-				barcode.append(labels.get(barcodeField));
-				continue;
+			if (!StringUtils.isEmpty(barcode.toString())) {
+				barcode.append(BARCODE_SEPARATOR);
 			}
-			barcode.append(BARCODE_SEPARATOR);
+
 			if(includeLabel) {
 				barcode.append(keyFieldMap.get(barcodeField).getName() + FIELDNAME_VALUE_SEPARATOR);
 			}
