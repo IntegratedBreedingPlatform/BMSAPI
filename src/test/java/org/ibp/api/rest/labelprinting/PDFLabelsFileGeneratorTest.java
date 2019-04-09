@@ -11,7 +11,8 @@ import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.ibp.api.rest.labelprinting.template.LabelPaper;
-import org.ibp.api.rest.labelprinting.template.LabelPaperFactory;
+import org.ibp.api.rest.labelprinting.template.Paper3by7A4;
+import org.ibp.api.rest.labelprinting.template.Paper3by7Letter;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +32,7 @@ import java.util.Set;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PDFLabelsFileGeneratorTest {
+
 	@InjectMocks
 	private PDFLabelsFileGenerator pdfLabelsFileGenerator;
 
@@ -83,12 +84,14 @@ public class PDFLabelsFileGeneratorTest {
 	}
 
 	@Test
-	public void testGetDocument() throws FileNotFoundException, DocumentException, IOException {
-		final LabelPaper paper = LabelPaperFactory.generateLabelPaper(3, 9, 1);
-		Document document = this.pdfLabelsFileGenerator.getDocument(new FileOutputStream("temp"), paper, 1);
+	public void testGetDocument() throws DocumentException, IOException {
+		LabelPaper paper = new Paper3by7A4();
+		final FileOutputStream fileOutputStream = new FileOutputStream("temp");
+		Document document = this.pdfLabelsFileGenerator.getDocument(fileOutputStream, paper, 1);
 		Assert.assertNotNull(document);
 		Assert.assertEquals(PageSize.A4, document.getPageSize());
-		final FileOutputStream fileOutputStream = new FileOutputStream("temp");
+
+		paper = new Paper3by7Letter();
 		document = this.pdfLabelsFileGenerator.getDocument(fileOutputStream, paper, 2);
 		Assert.assertEquals(PageSize.LETTER, document.getPageSize());
 		fileOutputStream.close();

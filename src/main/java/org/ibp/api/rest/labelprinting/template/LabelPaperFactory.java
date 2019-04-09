@@ -1,11 +1,14 @@
 
 package org.ibp.api.rest.labelprinting.template;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class LabelPaperFactory {
 	public static int SIZE_OF_PAPER_A4 = 1;
 	public static int SIZE_OF_PAPER_LETTER = 2;
 
-	public static LabelPaper generateLabelPaper(int labelsPerRow, int numberOfRowsPerPage, int pageSize) {
+	public LabelPaper generateLabelPaper(int labelsPerRow, int numberOfRowsPerPage, int pageSize) {
 		LabelPaper paper = new Paper3by7A4();
 		if (SIZE_OF_PAPER_LETTER == pageSize) {
 			if (labelsPerRow == 3) {

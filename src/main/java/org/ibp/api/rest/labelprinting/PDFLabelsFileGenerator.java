@@ -31,6 +31,7 @@ import org.ibp.api.rest.labelprinting.template.LabelPaper;
 import org.ibp.api.rest.labelprinting.template.LabelPaperFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
@@ -54,6 +55,9 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 	public static final String BARCODE_SEPARATOR = " | ";
 	public static final int BARCODE_LABEL_LIMIT = 79;
 
+	@Autowired
+	private LabelPaperFactory labelPaperFactory;
+
 	@Override
 	public File generate(final LabelsGeneratorInput labelsGeneratorInput, final LabelsData labelsData) throws IOException {
 		final File temporaryFolder = Files.createTempDir();
@@ -70,7 +74,7 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator  {
 
 		final File file = new File(fileNameFullPath);
 		try {
-			final LabelPaper paper = LabelPaperFactory.generateLabelPaper(numberOfLabelPerRow, numberOfRowsPerPageOfLabel, pageSizeId);
+			final LabelPaper paper = this.labelPaperFactory.generateLabelPaper(numberOfLabelPerRow, numberOfRowsPerPageOfLabel, pageSizeId);
 			final Document document = this.getDocument(fileOutputStream, paper, pageSizeId);
 
 			int i = 0;
