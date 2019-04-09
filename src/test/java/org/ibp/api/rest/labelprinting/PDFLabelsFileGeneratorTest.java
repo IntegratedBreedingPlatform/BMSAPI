@@ -112,6 +112,7 @@ public class PDFLabelsFileGeneratorTest {
 		final File file = this.pdfLabelsFileGenerator.generate(input, data);
 		Assert.assertNotNull(file);
 		Assert.assertEquals("filename.pdf", file.getName());
+		file.delete();
 	}
 
 	private Set<Field> mockAvailableFields() {
