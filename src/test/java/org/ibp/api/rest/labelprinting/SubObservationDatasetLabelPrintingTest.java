@@ -48,7 +48,7 @@ public class SubObservationDatasetLabelPrintingTest {
 	}
 
 	@Test
-	public void testgetAvailableLabelTypes() {
+	public void testGetAvailableLabelTypes() {
 		final LabelsInfoInput labelsInfoInput = new LabelsInfoInput();
 		labelsInfoInput.setStudyId(10);
 		final DataSet dataset = new DataSet();
