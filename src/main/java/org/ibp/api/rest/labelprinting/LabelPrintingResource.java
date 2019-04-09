@@ -165,7 +165,7 @@ public class LabelPrintingResource {
 		return labelPrintingStrategy;
 	}
 
-	private LabelsFileGenerator getLabelsFileGenerator(final String fileExtension, final LabelPrintingStrategy labelPrintingStrategy) {
+	LabelsFileGenerator getLabelsFileGenerator(final String fileExtension, final LabelPrintingStrategy labelPrintingStrategy) {
 		final LabelsFileGenerator labelsFileGenerator;
 		final FileType fileType = FileType.getEnum(fileExtension);
 		if (fileType == null || !labelPrintingStrategy.getSupportedFileTypes().contains(fileType)) {
