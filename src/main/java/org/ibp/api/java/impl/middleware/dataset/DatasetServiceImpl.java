@@ -100,9 +100,9 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, false);
 
 		// TODO generalize to any obs dataset (plot/subobs), make 3rd param false
-		this.datasetValidator.validateDataset(studyId, subObservationSetId, true);
+		this.datasetValidator.validateDataset(studyId, subObservationSetId, false);
 
-		return this.middlewareDatasetService.getSubObservationSetVariables(subObservationSetId);
+		return this.middlewareDatasetService.getObservationSetVariables(subObservationSetId);
 	}
 
 	@Override
