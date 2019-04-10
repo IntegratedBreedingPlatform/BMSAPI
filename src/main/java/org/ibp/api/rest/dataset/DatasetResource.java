@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.common.PagedResult;
@@ -353,6 +354,17 @@ public class DatasetResource {
 		@PathVariable final Integer datasetId,
 		@RequestBody  final ObservationUnitsSearchDTO searchDTO) {
 		this.studyDatasetService.acceptDraftDataFilteredByVariable(studyId, datasetId, searchDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Move draft value to saved value in sub-observation dataset", notes = "Save information for the imported dataset")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/filter/set-value", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> setValueToVariable(
+		@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId,
+		@RequestBody final ObservationUnitsParamDTO paramDTO) {
+		this.studyDatasetService.setValueToVariable(studyId, datasetId, paramDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

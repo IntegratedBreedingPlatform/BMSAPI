@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
@@ -448,6 +449,17 @@ public class DatasetServiceImpl implements DatasetService {
 		this.datasetValidator
 			.validateExistingDatasetVariables(studyId, datasetId, true, Lists.newArrayList(searchDTO.getFilter().getVariableId()));
 		this.middlewareDatasetService.acceptDraftDataFilteredByVariable(datasetId, searchDTO, studyId);
+	}
+
+	@Override
+	public void setValueToVariable(
+		final Integer studyId, final Integer datasetId, final ObservationUnitsParamDTO paramDTO) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.datasetValidator
+			.validateExistingDatasetVariables(
+				studyId, datasetId, true, Lists.newArrayList(paramDTO.getObservationUnitsSearchDTO().getFilter().getVariableId()));
+		this.middlewareDatasetService.setValueToVariable(datasetId, paramDTO, studyId);
 	}
 
 	@Override

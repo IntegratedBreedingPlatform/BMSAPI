@@ -4,6 +4,7 @@ import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
@@ -267,4 +268,6 @@ public interface DatasetService {
 	 */
 	void acceptDraftDataFilteredByVariable(Integer studyId, Integer datasetId,
 		final ObservationUnitsSearchDTO searchDTO);
+
+	void setValueToVariable(Integer studyId, Integer datasetId, ObservationUnitsParamDTO searchDTO);
 }
