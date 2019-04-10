@@ -228,7 +228,12 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			this.datasetService.getMeasurementVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
 		final int environmentDatasetId = this.studyDataManager.getDataSetsByType(studyId, DataSetType.SUMMARY_DATA).get(0).getId();
-		final int plotDatasetId = dataSetDto.getParentDatasetId();
+		final int plotDatasetId;
+		if (dataSetDto.getDatasetTypeId().equals(DataSetType.PLOT_DATA.getId())) {
+			plotDatasetId = dataSetDto.getDatasetId();
+		} else {
+			plotDatasetId = dataSetDto.getParentDatasetId();
+		}
 
 		final List<MeasurementVariable> environmentVariables =
 			this.datasetService
