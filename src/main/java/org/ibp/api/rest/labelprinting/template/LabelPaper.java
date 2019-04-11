@@ -6,8 +6,14 @@ package org.ibp.api.rest.labelprinting.template;
  *
  * Super class for the label printing paper template to be used
  */
-public class LabelPaper {
+public enum LabelPaper {
 
+	PAPER_3_BY_7_A4(108f, 15, 0, 42, 5, 6.8f, 0f),
+	PAPER_3_BY_8_A4(97f, 15, 0, 37, 5, 6.8f, 0f),
+	PAPER_3_BY_10_A4(72.5f, 6, 2, 17.5f, 5, 4.8f, 9f),
+	PAPER_3_BY_7_LETTER(108f, 10, 0, 17, 5, 6.8f, 0f),
+	PAPER_3_BY_8_LETTER(98.1f, 5, 0, 0, 5, 6.8f, 0f),
+	PAPER_3_BY_10_LETTER(72.5f, 2, 2, 33.3f, 5, 4.8f, 0f);
 	/** The cell height. */
 	private float cellHeight;
 
@@ -40,7 +46,7 @@ public class LabelPaper {
 	 * @param fontSize the font size
 	 * @param spacingAfter the spacing after
 	 */
-	public LabelPaper(float cellHeight, float marginLeft, float marginRight, float marginTop, float marginBottom, float fontSize,
+	LabelPaper(float cellHeight, float marginLeft, float marginRight, float marginTop, float marginBottom, float fontSize,
 			float spacingAfter) {
 		this.cellHeight = cellHeight;
 		this.marginLeft = marginLeft;
@@ -61,30 +67,12 @@ public class LabelPaper {
 	}
 
 	/**
-	 * Sets the cell height.
-	 *
-	 * @param cellHeight the new cell height
-	 */
-	public void setCellHeight(float cellHeight) {
-		this.cellHeight = cellHeight;
-	}
-
-	/**
 	 * Gets the margin left.
 	 *
 	 * @return the margin left
 	 */
 	public float getMarginLeft() {
 		return this.marginLeft;
-	}
-
-	/**
-	 * Sets the margin left.
-	 *
-	 * @param marginLeft the new margin left
-	 */
-	public void setMarginLeft(float marginLeft) {
-		this.marginLeft = marginLeft;
 	}
 
 	/**
@@ -97,30 +85,12 @@ public class LabelPaper {
 	}
 
 	/**
-	 * Sets the margin right.
-	 *
-	 * @param marginRight the new margin right
-	 */
-	public void setMarginRight(float marginRight) {
-		this.marginRight = marginRight;
-	}
-
-	/**
 	 * Gets the margin top.
 	 *
 	 * @return the margin top
 	 */
 	public float getMarginTop() {
 		return this.marginTop;
-	}
-
-	/**
-	 * Sets the margin top.
-	 *
-	 * @param marginTop the new margin top
-	 */
-	public void setMarginTop(float marginTop) {
-		this.marginTop = marginTop;
 	}
 
 	/**
@@ -133,15 +103,6 @@ public class LabelPaper {
 	}
 
 	/**
-	 * Sets the margin bottom.
-	 *
-	 * @param marginBottom the new margin bottom
-	 */
-	public void setMarginBottom(float marginBottom) {
-		this.marginBottom = marginBottom;
-	}
-
-	/**
 	 * Gets the font size.
 	 *
 	 * @return the font size
@@ -151,30 +112,12 @@ public class LabelPaper {
 	}
 
 	/**
-	 * Sets the font size.
-	 *
-	 * @param fontSize the new font size
-	 */
-	public void setFontSize(float fontSize) {
-		this.fontSize = fontSize;
-	}
-
-	/**
 	 * Gets the spacing after.
 	 *
 	 * @return the spacing after
 	 */
 	public float getSpacingAfter() {
 		return this.spacingAfter;
-	}
-
-	/**
-	 * Sets the spacing after.
-	 *
-	 * @param spacingAfter the new spacing after
-	 */
-	public void setSpacingAfter(float spacingAfter) {
-		this.spacingAfter = spacingAfter;
 	}
 
 }

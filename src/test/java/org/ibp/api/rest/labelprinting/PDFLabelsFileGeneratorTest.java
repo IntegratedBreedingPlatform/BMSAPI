@@ -11,8 +11,6 @@ import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.ibp.api.rest.labelprinting.template.LabelPaper;
-import org.ibp.api.rest.labelprinting.template.Paper3by7A4;
-import org.ibp.api.rest.labelprinting.template.Paper3by7Letter;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -85,13 +83,13 @@ public class PDFLabelsFileGeneratorTest {
 
 	@Test
 	public void testGetDocument() throws DocumentException, IOException {
-		LabelPaper paper = new Paper3by7A4();
+		LabelPaper paper = LabelPaper.PAPER_3_BY_7_A4;
 		final FileOutputStream fileOutputStream = new FileOutputStream("temp");
 		Document document = this.pdfLabelsFileGenerator.getDocument(fileOutputStream, paper, 1);
 		Assert.assertNotNull(document);
 		Assert.assertEquals(PageSize.A4, document.getPageSize());
 
-		paper = new Paper3by7Letter();
+		paper = LabelPaper.PAPER_3_BY_7_LETTER;
 		document = this.pdfLabelsFileGenerator.getDocument(fileOutputStream, paper, 2);
 		Assert.assertEquals(PageSize.LETTER, document.getPageSize());
 		fileOutputStream.close();

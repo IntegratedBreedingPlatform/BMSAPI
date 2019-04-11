@@ -13,22 +13,22 @@ public class LabelPaperFactoryTest {
 	@Test
 	public void testGenerateLabelPaper() {
 		LabelPaper labelPaper = this.labelPaperFactory.generateLabelPaper(3, 7, LabelPaperFactory.SIZE_OF_PAPER_LETTER);
-		Assert.assertEquals(Paper3by7Letter.class, labelPaper.getClass());
+		Assert.assertEquals(LabelPaper.PAPER_3_BY_7_LETTER, labelPaper.getClass());
 
 		labelPaper = this.labelPaperFactory.generateLabelPaper(3, 8, LabelPaperFactory.SIZE_OF_PAPER_LETTER);
-		Assert.assertEquals(Paper3by8Letter.class, labelPaper.getClass());
+		Assert.assertEquals(LabelPaper.PAPER_3_BY_8_LETTER, labelPaper.getClass());
 
 		labelPaper = this.labelPaperFactory.generateLabelPaper(3, 10, LabelPaperFactory.SIZE_OF_PAPER_LETTER);
-		Assert.assertEquals(Paper3by10Letter.class, labelPaper.getClass());
+		Assert.assertEquals(LabelPaper.PAPER_3_BY_10_LETTER, labelPaper.getClass());
 
 		labelPaper = this.labelPaperFactory.generateLabelPaper(3, 7, LabelPaperFactory.SIZE_OF_PAPER_A4);
-		Assert.assertEquals(Paper3by7A4.class, labelPaper.getClass());
+		Assert.assertEquals(LabelPaper.PAPER_3_BY_7_A4, labelPaper.getClass());
 
 		labelPaper = this.labelPaperFactory.generateLabelPaper(3, 8, LabelPaperFactory.SIZE_OF_PAPER_A4);
-		Assert.assertEquals(Paper3by8A4.class, labelPaper.getClass());
+		Assert.assertEquals(LabelPaper.PAPER_3_BY_8_A4, labelPaper.getClass());
 
 		labelPaper = this.labelPaperFactory.generateLabelPaper(3, 10, LabelPaperFactory.SIZE_OF_PAPER_A4);
-		Assert.assertEquals(Paper3by10A4.class, labelPaper.getClass());
+		Assert.assertEquals(LabelPaper.PAPER_3_BY_10_A4, labelPaper.getClass());
 	}
 
 }
