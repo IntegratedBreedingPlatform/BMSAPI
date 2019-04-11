@@ -8,7 +8,7 @@ public class LabelPaperFactory {
 	public static int SIZE_OF_PAPER_A4 = 1;
 	public static int SIZE_OF_PAPER_LETTER = 2;
 
-	public LabelPaper generateLabelPaper(int labelsPerRow, int numberOfRowsPerPage, int pageSize) {
+	public LabelPaper generateLabelPaper(final int labelsPerRow, final int numberOfRowsPerPage, final int pageSize) {
 		if (SIZE_OF_PAPER_LETTER == pageSize) {
 			if (labelsPerRow == 3) {
 				switch (numberOfRowsPerPage) {
