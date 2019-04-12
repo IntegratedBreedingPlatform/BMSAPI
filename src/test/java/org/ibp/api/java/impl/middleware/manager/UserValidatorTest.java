@@ -155,6 +155,21 @@ public class UserValidatorTest {
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
+		//Valid email
+		userDto.setEmail("cuenya.diego@leafnode.io");
+
+		this.uservalidator.validate(userDto, bindingResult, false);
+
+		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
+
+		//Valid email
+		userDto.setEmail("cuenya.diego@leafnode.email-valid.io");
+
+		this.uservalidator.validate(userDto, bindingResult, false);
+
+		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
+
+		//Invalid email
 		userDto.setEmail("cuenya.diego!@leafnode.io");
 
 		this.uservalidator.validate(userDto, bindingResult, false);
