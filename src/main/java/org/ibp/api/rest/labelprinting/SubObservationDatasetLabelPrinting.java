@@ -43,6 +43,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,7 +81,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	private static Field PARENTAGE_FIELD;
 	private static List<Field> DEFAULT_STUDY_DETAILS_FIELDS;
 
-	private static String PLOT = "PLOT";
+	static String PLOT = "PLOT";
 	private static String OBS_UNIT_ID = "OBS_UNIT_ID";
 	private static String PARENT_OBS_UNIT_ID = "PARENT_OBS_UNIT_ID";
 	private static String LOCATION_ID = "LOCATION_ID";
@@ -89,9 +90,13 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	private static String PLOT_NO = "PLOT_NO";
 	private static String ENTRY_NO = "ENTRY_NO";
 
-	private static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV);
+	public static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF);
+
+	//Variable ids of PI_NAME_ID and COOPERATOR_ID
+	static List<Integer> PAIR_ID_VARIABLES = Arrays.asList(TermId.PI_ID.getId(), TermId.COOPERATOOR_ID.getId());
 
 	private static List<Integer> STATIC_FIELD_IDS;
+
 
 	@PostConstruct
 	void initStaticFields() {
@@ -272,6 +277,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		labelTypes.add(studyDetailsLabelType);
 		labelTypes.add(datasetDetailsLabelType);
 
+		this.removePairIdVariables(labelTypes);
 		return labelTypes;
 	}
 
@@ -358,13 +364,13 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		return SUPPORTED_FILE_TYPES;
 	}
 
-	private List<Field> transform (final List<MeasurementVariable> measurementVariables) {
+	List<Field> transform (final List<MeasurementVariable> measurementVariables) {
 		final List<Field> fields = new LinkedList<>();
 		for (final MeasurementVariable measurementVariable: measurementVariables) {
 			final Field field = new Field(measurementVariable);
 			//Requirement to show PLOT OBS_UNIT_ID label when variable = OBS_UNIT_ID in Plot Dataset
 			//Which is in fact the only dataset that cointains this variable.
-			if (field.getId().equals(String.valueOf(TermId.OBS_UNIT_ID.getId()))){
+			if (field.getId() == TermId.OBS_UNIT_ID.getId()){
 				field.setName(PLOT.concat(" ").concat(field.getName()));
 			}
 			fields.add(field);
@@ -379,7 +385,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		return FileUtils.cleanFileName(fileName);
 	}
 
-	private String getMessage(final String code) {
+	String getMessage(final String code) {
 		return messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
 	}
 
@@ -404,5 +410,20 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			value = Season.GENERAL.getLabel().toUpperCase();
 		}
 		return value;
+	}
+
+	void removePairIdVariables(final List<LabelType> labelTypes) {
+		for(final LabelType labelType: labelTypes) {
+			final Iterator<Field> fieldIterator = labelType.getFields().iterator();
+			while (fieldIterator.hasNext()) {
+				if(PAIR_ID_VARIABLES.contains(fieldIterator.next().getId())) {
+					fieldIterator.remove();
+				}
+			}
+		}
+	}
+
+	void setMessageSource(final ResourceBundleMessageSource messageSource) {
+		this.messageSource = messageSource;
 	}
 }

@@ -10,6 +10,8 @@ import org.pojomatic.annotations.AutoProperty;
 @AutoProperty
 public class LabelsGeneratorInput extends LabelsInfoInput {
 
+	public static int LABEL_PER_ROW = 3;
+
 	@JsonIgnore
 	private Set<Field> allAvailablefields;
 
@@ -20,6 +22,10 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 	private boolean automaticBarcode;
 
 	private List<Integer> barcodeFields;
+
+	private String sizeOfLabelSheet;
+
+	private String numberOfRowsPerPageOfLabel;
 
 	private String fileName;
 
@@ -65,6 +71,22 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 
 	public Set<Field> getAllAvailablefields() {
 		return allAvailablefields;
+	}
+
+	public String getSizeOfLabelSheet() {
+		return this.sizeOfLabelSheet;
+	}
+
+	public void setSizeOfLabelSheet(final String sizeOfLabelSheet) {
+		this.sizeOfLabelSheet = sizeOfLabelSheet;
+	}
+
+	public String getNumberOfRowsPerPageOfLabel() {
+		return this.numberOfRowsPerPageOfLabel;
+	}
+
+	public void setNumberOfRowsPerPageOfLabel(final String numberOfRowsPerPageOfLabel) {
+		this.numberOfRowsPerPageOfLabel = numberOfRowsPerPageOfLabel;
 	}
 
 	public void setAllAvailablefields(final Set<Field> allAvailablefields) {

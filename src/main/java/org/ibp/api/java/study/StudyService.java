@@ -2,21 +2,15 @@
 package org.ibp.api.java.study;
 
 import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
-import org.ibp.api.domain.study.FieldMap;
-import org.ibp.api.domain.study.Observation;
-import org.ibp.api.domain.study.StudyDetails;
-import org.ibp.api.domain.study.StudyFolder;
-import org.ibp.api.domain.study.StudyGermplasm;
-import org.ibp.api.domain.study.StudyImportDTO;
-import org.ibp.api.domain.study.StudyInstance;
-import org.ibp.api.domain.study.StudySummary;
+import org.ibp.api.domain.study.*;
 
 import java.util.List;
 import java.util.Map;
@@ -51,8 +45,6 @@ public interface StudyService {
 	TrialObservationTable getTrialObservationTable(int studyIdentifier, Integer instanceDbId);
 
 	Map<Integer, FieldMap> getFieldMap(final String studyIdentifier);
-
-	Integer importStudy(final StudyImportDTO studyImportDTO, final String programUUID, final String cropPrefix);
 
 	List<StudyFolder> getAllStudyFolders();
 
