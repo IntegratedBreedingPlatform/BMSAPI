@@ -387,7 +387,6 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			return;
 		}
 
-
 		final Integer initialCount = errors.getErrorCount();
 
 		try {
