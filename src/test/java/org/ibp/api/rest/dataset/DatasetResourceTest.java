@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.dataset.DatasetVariable;
@@ -51,7 +52,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static org.hamcrest.core.Is.is;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -789,6 +789,68 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/set-as-missing", this.cropName, studyId,
 					datasetId)
 				.contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+
+	@Test
+	public void testSetValueToVariable() throws Exception {
+		final ObservationUnitsParamDTO paramDTO = new ObservationUnitsParamDTO();
+		final Random random = new Random();
+		final int studyId = random.nextInt(10000);
+		final int datasetId = random.nextInt(10000);
+		final int instanceId = random.nextInt(10000);
+
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+
+		final SortedPageRequest sortedRequest = new SortedPageRequest();
+		sortedRequest.setPageNumber(1);
+		sortedRequest.setPageSize(100);
+		searchDTO.setSortedRequest(sortedRequest);
+		searchDTO.setInstanceId(instanceId);
+
+		paramDTO.setObservationUnitsSearchDTO(searchDTO);
+		paramDTO.setNewValue("123");
+		paramDTO.setNewCategoricalValueId(12345);
+		searchDTO.setDatasetId(datasetId);
+		paramDTO.getObservationUnitsSearchDTO().getFilter().setVariableId(555);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/filter/set-value", this.cropName, studyId,
+					datasetId)
+				.contentType(this.contentType).content(this.convertObjectToByte(paramDTO)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+
+	@Test
+	public void testAcceptDraftDataByVariable() throws Exception {
+		final ObservationUnitsParamDTO paramDTO = new ObservationUnitsParamDTO();
+		final Random random = new Random();
+		final int studyId = random.nextInt(10000);
+		final int datasetId = random.nextInt(10000);
+		final int instanceId = random.nextInt(10000);
+
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+
+		final SortedPageRequest sortedRequest = new SortedPageRequest();
+		sortedRequest.setPageNumber(1);
+		sortedRequest.setPageSize(100);
+		searchDTO.setSortedRequest(sortedRequest);
+		searchDTO.setInstanceId(instanceId);
+
+		paramDTO.setObservationUnitsSearchDTO(searchDTO);
+		paramDTO.setNewValue("123");
+		paramDTO.setNewCategoricalValueId(12345);
+		searchDTO.setDatasetId(datasetId);
+		paramDTO.getObservationUnitsSearchDTO().getFilter().setVariableId(555);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/filter/acceptance", this.cropName, studyId,
+					datasetId)
+				.contentType(this.contentType).content(this.convertObjectToByte(paramDTO)))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
 	}
