@@ -269,5 +269,11 @@ public interface DatasetService {
 	void acceptDraftDataFilteredByVariable(Integer studyId, Integer datasetId,
 		final ObservationUnitsSearchDTO searchDTO);
 
+	/**
+	 * Set an specific variable to an specific variable
+	 * @param datasetId
+	 * @param searchDTO
+	 * @param studyId
+	 */
 	void setValueToVariable(Integer studyId, Integer datasetId, ObservationUnitsParamDTO searchDTO);
 }
