@@ -55,6 +55,10 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	private static final String VARIABLE_NAME = "Variable";
 	private static final String ERROR_MESSAGE = "Error!";
 	private static final List EDITABLE_VARIABLES_TYPES = Arrays.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD, VariableType.STUDY_CONDITION);
+	private static final List<Integer> EDITABLE_VARIABLES_TYPE_IDS = Arrays.asList( //
+		VariableType.TRAIT.getId(), //
+		VariableType.SELECTION_METHOD.getId(), //
+		VariableType.STUDY_CONDITION.getId());
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -289,7 +293,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			}
 
 			for (org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
-				if (Arrays.asList("1808", "1807", "1802").contains(variableType.getId())) {
+				if (Arrays.stream(EDITABLE_VARIABLES_TYPE_IDS.toArray()).anyMatch(Integer.valueOf(variableType.getId())::equals)) {
 					variableInfo.setAlias(variable.getAlias());
 				}
 			}

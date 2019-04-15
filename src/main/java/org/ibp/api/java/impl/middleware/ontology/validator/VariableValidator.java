@@ -65,7 +65,10 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	private static final String SCALE_ID_NAME = "scaleId";
 	private static final String EXPECTED_RANGE_NAME = "expectedRange";
 	private static final String VARIABLE_NAME = "variable";
-	private static final List EDITABLE_VARIABLES_TYPES = Arrays.asList("1808", "1807", "1802");
+	private static final List<Integer> EDITABLE_VARIABLES_TYPE_IDS = Arrays.asList( //
+		org.generationcp.middleware.domain.ontology.VariableType.TRAIT.getId(), //
+		org.generationcp.middleware.domain.ontology.VariableType.SELECTION_METHOD.getId(), //
+		org.generationcp.middleware.domain.ontology.VariableType.STUDY_CONDITION.getId());
 
 	@Override
 	public boolean supports(final Class<?> aClass) {
@@ -421,7 +424,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 			boolean editableVariable = false;
 			for (VariableType variableType : variable.getVariableTypes()) {
-				if (VariableValidator.EDITABLE_VARIABLES_TYPES.contains(variableType.getId())) {
+				if (Arrays.stream(EDITABLE_VARIABLES_TYPE_IDS.toArray()).anyMatch(Integer.valueOf(variableType.getId())::equals)) {
 					editableVariable = true;
 				}
 			}
