@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.ibp.ApiUnitTestBase;
@@ -853,6 +854,32 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				.contentType(this.contentType).content(this.convertObjectToByte(paramDTO)))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+
+	@Test
+	public void testCountFilteredPhenotypesAndInstances_Ok() throws Exception {
+		final Random random = new Random();
+		final int studyId = random.nextInt(10000);
+		final int datasetId = random.nextInt(10000);
+
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+		searchDTO.setDatasetId(datasetId);
+
+		final Integer totalInstances = 1;
+		final Integer totalPhenotypes = 5;
+		final FilteredPhenotypesInstancesCountDTO result = new FilteredPhenotypesInstancesCountDTO(totalPhenotypes, totalInstances);
+
+		Mockito.when(studyDatasetService.countFilteredInstancesAndPhenotypes(Mockito.anyInt(), Mockito.anyInt(), Mockito.any(ObservationUnitsSearchDTO.class))).thenReturn(result);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/observations/filter/count", this.cropName, studyId,
+					datasetId)
+				.contentType(this.contentType).content(this.convertObjectToByte(searchDTO)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.totalFilteredPhenotypes", is(totalPhenotypes)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.totalFilteredInstances", is(totalInstances)));
 	}
 
 	private DatasetDTO createDataset(
