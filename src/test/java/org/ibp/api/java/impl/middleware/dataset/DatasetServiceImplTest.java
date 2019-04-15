@@ -22,8 +22,10 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
+import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.domain.dataset.DatasetVariable;
@@ -543,6 +545,68 @@ public class DatasetServiceImplTest {
 		Assert.assertTrue(dto.getVariables().size() == 1);
 		Assert.assertTrue(CollectionUtils.isEqualCollection(dto.getInstances(), datasetDTO.getInstances()));
 		Assert.assertTrue(CollectionUtils.isEqualCollection(dto.getVariables(), datasetDTO.getVariables()));
+	}
+
+	@Test
+	public void testAcceptDraftDataByVariable() {
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int datasetId = random.nextInt();
+		final ObservationDto observationDto = new ObservationDto();
+		observationDto.setCategoricalValueId(random.nextInt());
+		observationDto.setValue(random.toString());
+		final ObservationUnitsParamDTO paramDTO = new ObservationUnitsParamDTO();
+		final int instanceId = random.nextInt(10000);
+
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+
+		final SortedPageRequest sortedRequest = new SortedPageRequest();
+		sortedRequest.setPageNumber(1);
+		sortedRequest.setPageSize(100);
+		searchDTO.setSortedRequest(sortedRequest);
+		searchDTO.setInstanceId(instanceId);
+
+		paramDTO.setObservationUnitsSearchDTO(searchDTO);
+		paramDTO.setNewValue("123");
+		paramDTO.setNewCategoricalValueId(12345);
+		searchDTO.setDatasetId(datasetId);
+		paramDTO.getObservationUnitsSearchDTO().getFilter().setVariableId(555);
+		this.studyDatasetService.acceptDraftDataFilteredByVariable(studyId, datasetId, searchDTO);
+		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, true);
+
+		Mockito.verify(this.middlewareDatasetService).acceptDraftDataFilteredByVariable(datasetId, searchDTO, studyId);
+	}
+
+	@Test
+	public void testSetValueToVariable() {
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int datasetId = random.nextInt();
+		final ObservationDto observationDto = new ObservationDto();
+		observationDto.setCategoricalValueId(random.nextInt());
+		observationDto.setValue(random.toString());
+		final ObservationUnitsParamDTO paramDTO = new ObservationUnitsParamDTO();
+		final int instanceId = random.nextInt(10000);
+
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+
+		final SortedPageRequest sortedRequest = new SortedPageRequest();
+		sortedRequest.setPageNumber(1);
+		sortedRequest.setPageSize(100);
+		searchDTO.setSortedRequest(sortedRequest);
+		searchDTO.setInstanceId(instanceId);
+
+		paramDTO.setObservationUnitsSearchDTO(searchDTO);
+		paramDTO.setNewValue("123");
+		paramDTO.setNewCategoricalValueId(12345);
+		searchDTO.setDatasetId(datasetId);
+		paramDTO.getObservationUnitsSearchDTO().getFilter().setVariableId(555);
+		this.studyDatasetService.setValueToVariable(studyId, datasetId, paramDTO);
+		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, true);
+
+		Mockito.verify(this.middlewareDatasetService).setValueToVariable(datasetId, paramDTO, studyId);
 	}
 
 }
