@@ -67,13 +67,11 @@ public class ObservationValidator {
 
 	public void validateObservationValue(final Integer studyId, final Integer variableId, final String value) {
 
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		final String programUuid = this.studyDataManager.getStudy(studyId).getProgramUUID();
 		final Variable var = this.ontologyVariableDataManager.getVariable(programUuid, variableId, true);
 
 		if (!isValidValue(var, value)) {
-			if (this.errors == null) {
-				this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-			}
 			this.errors.reject("invalid.observation.value");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
