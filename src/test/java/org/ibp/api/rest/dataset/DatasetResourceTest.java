@@ -826,7 +826,6 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testAcceptDraftDataByVariable() throws Exception {
-		final ObservationUnitsParamDTO paramDTO = new ObservationUnitsParamDTO();
 		final Random random = new Random();
 		final int studyId = random.nextInt(10000);
 		final int datasetId = random.nextInt(10000);
@@ -839,18 +838,13 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		sortedRequest.setPageSize(100);
 		searchDTO.setSortedRequest(sortedRequest);
 		searchDTO.setInstanceId(instanceId);
-
-		paramDTO.setObservationUnitsSearchDTO(searchDTO);
-		paramDTO.setNewValue("123");
-		paramDTO.setNewCategoricalValueId(12345);
 		searchDTO.setDatasetId(datasetId);
-		paramDTO.getObservationUnitsSearchDTO().getFilter().setVariableId(555);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/filter/acceptance", this.cropName, studyId,
 					datasetId)
-				.contentType(this.contentType).content(this.convertObjectToByte(paramDTO)))
+				.contentType(this.contentType).content(this.convertObjectToByte(searchDTO)))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
 	}
