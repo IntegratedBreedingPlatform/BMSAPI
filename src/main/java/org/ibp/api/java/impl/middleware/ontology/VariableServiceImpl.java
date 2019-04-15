@@ -293,7 +293,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			}
 
 			for (org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
-				if (Arrays.stream(EDITABLE_VARIABLES_TYPE_IDS.toArray()).anyMatch(Integer.valueOf(variableType.getId())::equals)) {
+				if (VariableServiceImpl.EDITABLE_VARIABLES_TYPE_IDS.contains(Integer.valueOf(variableType.getId()))) {
 					variableInfo.setAlias(variable.getAlias());
 				}
 			}

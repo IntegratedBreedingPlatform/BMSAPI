@@ -424,7 +424,7 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 			boolean editableVariable = false;
 			for (VariableType variableType : variable.getVariableTypes()) {
-				if (Arrays.stream(EDITABLE_VARIABLES_TYPE_IDS.toArray()).anyMatch(Integer.valueOf(variableType.getId())::equals)) {
+				if (VariableValidator.EDITABLE_VARIABLES_TYPE_IDS.contains(Integer.valueOf(variableType.getId()))) {
 					editableVariable = true;
 				}
 			}
