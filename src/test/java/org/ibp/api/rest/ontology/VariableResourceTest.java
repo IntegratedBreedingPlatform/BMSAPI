@@ -220,7 +220,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
 		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuidAndCrop(this.programUuid, this.cropName);
 
-		// Mock OntologyVariableInfo Class and when addVariable method called it will set id to 1 and return (self member alter if void is
+		// Mock OntologyVariableInfo Class and when addDatasetVariable method called it will set id to 1 and return (self member alter if void is
 		// return type of method)
 		Mockito.doAnswer(new Answer<Void>() {
 

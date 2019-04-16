@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
@@ -10,6 +11,8 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
+import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
@@ -81,40 +84,40 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<MeasurementVariable> getSubObservationSetColumns(
-		final Integer studyId, final Integer subObservationSetId, final Boolean draftMode) {
+		final Integer studyId, final Integer datasetId, final Boolean draftMode) {
 
 		this.studyValidator.validate(studyId, false);
 
 		// TODO generalize to any obs dataset (plot/subobs), make 3rd param false
-		this.datasetValidator.validateDataset(studyId, subObservationSetId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
 
-		return this.middlewareDatasetService.getSubObservationSetColumns(subObservationSetId, draftMode);
+		return this.middlewareDatasetService.getSubObservationSetColumns(datasetId, draftMode);
 	}
 
 	@Override
 	public List<MeasurementVariable> getSubObservationSetVariables(
-		final Integer studyId, final Integer subObservationSetId) {
+		final Integer studyId, final Integer datasetId) {
 
 		this.studyValidator.validate(studyId, false);
 
 		// TODO generalize to any obs dataset (plot/subobs), make 3rd param false
-		this.datasetValidator.validateDataset(studyId, subObservationSetId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
 
-		return this.middlewareDatasetService.getSubObservationSetVariables(subObservationSetId);
+		return this.middlewareDatasetService.getSubObservationSetVariables(datasetId);
 	}
 
 	@Override
-	public long countPhenotypes(final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
+	public long countObservationsByVariables(final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 
-		return this.middlewareDatasetService.countPhenotypes(datasetId, variableIds);
+		return this.middlewareDatasetService.countObservationsByVariables(datasetId, variableIds);
 	}
 
 	@Override
-	public long countPhenotypesByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId) {
+	public long countObservationsByInstance(final Integer studyId, final Integer datasetId, final Integer instanceId) {
 		this.validateStudyDatasetAndInstances(studyId, datasetId, Arrays.asList(instanceId), false);
-		return this.middlewareDatasetService.countPhenotypesByInstance(datasetId, instanceId);
+		return this.middlewareDatasetService.countObservationsByInstance(datasetId, instanceId);
 	}
 
 	@Override
@@ -126,7 +129,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final String alias = datasetVariable.getStudyAlias() != null ? datasetVariable.getStudyAlias() : traitVariable.getName();
 		final VariableType type = VariableType.getById(datasetVariable.getVariableTypeId());
-		this.middlewareDatasetService.addVariable(datasetId, variableId, type, alias);
+		this.middlewareDatasetService.addDatasetVariable(datasetId, variableId, type, alias);
 		final MeasurementVariable measurementVariable = this.measurementVariableTransformer.transform(traitVariable, false);
 		measurementVariable.setName(alias);
 		measurementVariable.setVariableType(type);
@@ -136,28 +139,28 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<MeasurementVariableDto> getVariables(final Integer studyId, final Integer datasetId, final VariableType variableType) {
+	public List<MeasurementVariableDto> getDatasetVariablesByType(final Integer studyId, final Integer datasetId, final VariableType variableType) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
-		return this.middlewareDatasetService.getVariables(datasetId, variableType);
+		return this.middlewareDatasetService.getDatasetVariablesByType(datasetId, variableType);
 	}
 
 	@Override
-	public void removeVariables(final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
+	public void removeDatasetVariables(final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, variableIds);
-		this.middlewareDatasetService.removeVariables(datasetId, variableIds);
+		this.middlewareDatasetService.removeDatasetVariables(datasetId, variableIds);
 	}
 
 	@Override
-	public ObservationDto addObservation(
+	public ObservationDto createObservation(
 		final Integer studyId, final Integer datasetId, final Integer observationUnitId, final ObservationDto observation) {
 
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, Arrays.asList(observation.getVariableId()));
 		this.observationValidator.validateObservationUnit(datasetId, observationUnitId);
 		this.observationValidator.validateObservationValue(studyId, observation.getVariableId(), observation.getValue());
-		return this.middlewareDatasetService.addPhenotype(observation);
+		return this.middlewareDatasetService.createObservation(observation);
 
 	}
 
@@ -367,7 +370,7 @@ public class DatasetServiceImpl implements DatasetService {
 		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
 
 		this.studyValidator.validate(studyId, true);
-		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
 
 		this.observationsTableValidator.validateList(input.getData());
 
@@ -424,31 +427,64 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public Boolean checkOutOfBoundDraftData(final Integer studyId, final Integer datasetId) {
+	public Boolean hasDatasetDraftDataOutOfBounds(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
-		return this.middlewareDatasetService.checkOutOfBoundDraftData(datasetId);
+		return this.middlewareDatasetService.hasDatasetDraftDataOutOfBounds(datasetId);
 	}
 
 	@Override
-	public void setValuesToMissing(final Integer studyId, final Integer datasetId) {
+	public void acceptDraftDataAndSetOutOfBoundsToMissing(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
-		this.middlewareDatasetService.setValuesToMissing(datasetId);
+		this.middlewareDatasetService.acceptDraftDataAndSetOutOfBoundsToMissing(datasetId);
 	}
 
 	@Override
-	public void acceptDraftData(final Integer studyId, final Integer datasetId) {
+	public void acceptDraftDataFilteredByVariable(
+		final Integer studyId, final Integer datasetId,
+		final ObservationUnitsSearchDTO searchDTO) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
-		this.middlewareDatasetService.acceptDraftData(datasetId);
+		this.datasetValidator
+			.validateExistingDatasetVariables(studyId, datasetId, true, Lists.newArrayList(searchDTO.getFilter().getVariableId()));
+		this.middlewareDatasetService.acceptDraftDataFilteredByVariable(datasetId, searchDTO, studyId);
 	}
 
 	@Override
-	public void rejectDraftData(final Integer studyId, final Integer datasetId) {
+	public void setValueToVariable(
+		final Integer studyId, final Integer datasetId, final ObservationUnitsParamDTO paramDTO) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
-		this.middlewareDatasetService.rejectDraftData(datasetId);
+		final Integer variableId = paramDTO.getObservationUnitsSearchDTO().getFilter().getVariableId();
+		this.datasetValidator
+			.validateExistingDatasetVariables(
+				studyId, datasetId, true, Lists.newArrayList(variableId));
+		this.observationValidator.validateObservationValue(studyId, variableId, paramDTO.getNewValue());
+		this.middlewareDatasetService.setValueToVariable(datasetId, paramDTO, studyId);
+	}
+
+	@Override
+	public void acceptAllDatasetDraftData(final Integer studyId, final Integer datasetId) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.middlewareDatasetService.acceptAllDatasetDraftData(datasetId);
+	}
+
+	@Override
+	public void rejectDatasetDraftData(final Integer studyId, final Integer datasetId) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.middlewareDatasetService.rejectDatasetDraftData(datasetId);
+	}
+
+	@Override
+	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(final Integer studyId,
+		final Integer datasetId, final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, Lists.newArrayList(observationUnitsSearchDTO.getFilter().getVariableId()));
+		return this.middlewareDatasetService.countFilteredInstancesAndPhenotypes(datasetId, observationUnitsSearchDTO);
 	}
 
 	private BindingResult processObservationsDataWarningsAsErrors(

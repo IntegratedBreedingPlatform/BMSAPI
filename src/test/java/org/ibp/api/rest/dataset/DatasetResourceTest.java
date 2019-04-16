@@ -9,6 +9,8 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.dataset.DatasetVariable;
@@ -51,7 +53,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static org.hamcrest.core.Is.is;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -97,7 +98,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testCountPhenotypes() throws Exception {
 		final long count = 10;
-		doReturn(count).when(this.studyDatasetService).countPhenotypes(100, 102, Arrays.asList(1, 2, 3));
+		doReturn(count).when(this.studyDatasetService).countObservationsByVariables(100, 102, Arrays.asList(1, 2, 3));
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
@@ -111,7 +112,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testCountPhenotypesByObservation() throws Exception {
 		final long count = 11;
-		doReturn(count).when(this.studyDatasetService).countPhenotypesByInstance(100, 102, 103);
+		doReturn(count).when(this.studyDatasetService).countObservationsByInstance(100, 102, 103);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
@@ -151,7 +152,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				.param("variableIds", "1,2,3").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
-		Mockito.verify(this.studyDatasetService).removeVariables(studyId, datasetId, Arrays.asList(1, 2, 3));
+		Mockito.verify(this.studyDatasetService).removeDatasetVariables(studyId, datasetId, Arrays.asList(1, 2, 3));
 	}
 
 	@Test
@@ -167,7 +168,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
-		Mockito.verify(this.studyDatasetService).getVariables(studyId, datasetId, VariableType.getById(variableTypeId));
+		Mockito.verify(this.studyDatasetService).getDatasetVariablesByType(studyId, datasetId, VariableType.getById(variableTypeId));
 	}
 
 	@Test
@@ -189,7 +190,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk());
 
 		Mockito.verify(this.studyDatasetService)
-			.addObservation(Matchers.eq(studyId), Matchers.eq(datasetId), Matchers.eq(observationUnitId),
+			.createObservation(Matchers.eq(studyId), Matchers.eq(datasetId), Matchers.eq(observationUnitId),
 				Matchers.any(ObservationDto.class));
 	}
 
@@ -748,7 +749,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int studyId = dataset.getStudyId();
 		final int datasetId = dataset.getDatasetId();
 
-		Mockito.when(this.studyDatasetService.checkOutOfBoundDraftData(studyId, datasetId)).thenReturn(false);
+		Mockito.when(this.studyDatasetService.hasDatasetDraftDataOutOfBounds(studyId, datasetId)).thenReturn(false);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
@@ -766,7 +767,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int studyId = dataset.getStudyId();
 		final int datasetId = dataset.getDatasetId();
 
-		Mockito.when(this.studyDatasetService.checkOutOfBoundDraftData(studyId, datasetId)).thenReturn(true);
+		Mockito.when(this.studyDatasetService.hasDatasetDraftDataOutOfBounds(studyId, datasetId)).thenReturn(true);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
@@ -791,6 +792,88 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+
+	@Test
+	public void testSetValueToVariable() throws Exception {
+		final ObservationUnitsParamDTO paramDTO = new ObservationUnitsParamDTO();
+		final Random random = new Random();
+		final int studyId = random.nextInt(10000);
+		final int datasetId = random.nextInt(10000);
+		final int instanceId = random.nextInt(10000);
+
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+
+		final SortedPageRequest sortedRequest = new SortedPageRequest();
+		sortedRequest.setPageNumber(1);
+		sortedRequest.setPageSize(100);
+		searchDTO.setSortedRequest(sortedRequest);
+		searchDTO.setInstanceId(instanceId);
+
+		paramDTO.setObservationUnitsSearchDTO(searchDTO);
+		paramDTO.setNewValue("123");
+		paramDTO.setNewCategoricalValueId(12345);
+		searchDTO.setDatasetId(datasetId);
+		paramDTO.getObservationUnitsSearchDTO().getFilter().setVariableId(555);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/filter/set-value", this.cropName, studyId,
+					datasetId)
+				.contentType(this.contentType).content(this.convertObjectToByte(paramDTO)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+
+	@Test
+	public void testAcceptDraftDataByVariable() throws Exception {
+		final Random random = new Random();
+		final int studyId = random.nextInt(10000);
+		final int datasetId = random.nextInt(10000);
+		final int instanceId = random.nextInt(10000);
+
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+
+		final SortedPageRequest sortedRequest = new SortedPageRequest();
+		sortedRequest.setPageNumber(1);
+		sortedRequest.setPageSize(100);
+		searchDTO.setSortedRequest(sortedRequest);
+		searchDTO.setInstanceId(instanceId);
+		searchDTO.setDatasetId(datasetId);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/filter/acceptance", this.cropName, studyId,
+					datasetId)
+				.contentType(this.contentType).content(this.convertObjectToByte(searchDTO)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+
+	@Test
+	public void testCountFilteredPhenotypesAndInstances_Ok() throws Exception {
+		final Random random = new Random();
+		final int studyId = random.nextInt(10000);
+		final int datasetId = random.nextInt(10000);
+
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+		searchDTO.setDatasetId(datasetId);
+
+		final Integer totalInstances = 1;
+		final Integer totalPhenotypes = 5;
+		final FilteredPhenotypesInstancesCountDTO result = new FilteredPhenotypesInstancesCountDTO(totalPhenotypes, totalInstances);
+
+		Mockito.when(studyDatasetService.countFilteredInstancesAndPhenotypes(Mockito.anyInt(), Mockito.anyInt(), Mockito.any(ObservationUnitsSearchDTO.class))).thenReturn(result);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/observations/filter/count", this.cropName, studyId,
+					datasetId)
+				.contentType(this.contentType).content(this.convertObjectToByte(searchDTO)))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.totalFilteredPhenotypes", is(totalPhenotypes)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.totalFilteredInstances", is(totalInstances)));
 	}
 
 	private DatasetDTO createDataset(

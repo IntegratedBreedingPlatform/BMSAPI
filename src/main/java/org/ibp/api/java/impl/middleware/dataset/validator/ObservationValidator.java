@@ -35,12 +35,12 @@ public class ObservationValidator {
 	private BindingResult errors;
 	
 	public void validateObservationUnit(final Integer datasetId, final Integer observationUnitId) {
-		errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		
 		final boolean isValid = this.datasetService.isValidObservationUnit(datasetId, observationUnitId);
 		if (!isValid) {
-			errors.reject("invalid.observation.unit.id", "");
-			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+			this.errors.reject("invalid.observation.unit.id", "");
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
 	}
 
@@ -52,8 +52,9 @@ public class ObservationValidator {
 
 		final Phenotype phenotype = this.datasetService.getPhenotype(observationUnitId, observationId);
 		if (phenotype == null) {
-			errors.reject("invalid.observation.id", "");
-			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+
+			this.errors.reject("invalid.observation.id", "");
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
 
 		if (observationDto != null) {
@@ -66,12 +67,13 @@ public class ObservationValidator {
 
 	public void validateObservationValue(final Integer studyId, final Integer variableId, final String value) {
 
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		final String programUuid = this.studyDataManager.getStudy(studyId).getProgramUUID();
 		final Variable var = this.ontologyVariableDataManager.getVariable(programUuid, variableId, true);
 
 		if (!isValidValue(var, value)) {
-			errors.reject("invalid.observation.value");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("invalid.observation.value");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
