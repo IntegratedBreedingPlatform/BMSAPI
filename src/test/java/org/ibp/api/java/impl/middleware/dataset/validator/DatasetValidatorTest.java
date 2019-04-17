@@ -75,7 +75,7 @@ public class DatasetValidatorTest  {
 			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final DatasetDTO dataset = new DatasetDTO();
 		dataset.setDatasetId(datasetId);
-		dataset.setDatasetTypeId(DataSetType.PLOT_DATA.getId());
+		dataset.setDatasetTypeId(DataSetType.MEANS_DATA.getId());
 		Mockito.when(this.studyDatasetService.getDataset(datasetId)).thenReturn(dataset);
 		
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
@@ -106,7 +106,7 @@ public class DatasetValidatorTest  {
 			.when(this.studyDatasetService)
 			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer variableId = ran.nextInt();
-		this.createDataset(studyId, datasetId, Optional.<Integer>absent());
+		this.createDataset(datasetId, Optional.<Integer>absent());
 		
 		final DatasetVariable datasetVariable = new DatasetVariable(ran.nextInt(), variableId, "");
 		this.datasetValidator.validateDatasetVariable(studyId, datasetId, ran.nextBoolean(), datasetVariable, ran.nextBoolean());
@@ -121,7 +121,7 @@ public class DatasetValidatorTest  {
 			.when(this.studyDatasetService)
 			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer variableId = ran.nextInt();
-		this.createDataset(studyId, datasetId, Optional.<Integer>absent());
+		this.createDataset(datasetId, Optional.<Integer>absent());
 		
 		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.ANALYSIS.getId(), variableId, "");
 		this.datasetValidator.validateDatasetVariable(studyId, datasetId, ran.nextBoolean(), datasetVariable, ran.nextBoolean());
@@ -135,14 +135,14 @@ public class DatasetValidatorTest  {
 		Mockito.doReturn(Lists.newArrayList(new DatasetDTO(datasetId)))
 			.when(this.studyDatasetService)
 			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
-		final Integer variableId = ran.nextInt();
+		final int variableId = ran.nextInt();
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(variableId);
 		final HashSet<VariableType> types = new HashSet<VariableType>();
 		types.add(VariableType.TRAIT);
 		types.add(VariableType.ANALYSIS_SUMMARY);
 		standardVariable.setVariableTypes(types);
-		this.createDataset(studyId, datasetId, Optional.of(variableId));
+		this.createDataset(datasetId, Optional.of(variableId));
 		Mockito.when(this.ontologyDataManager.getStandardVariable(variableId, this.PROGRAM_UUID)).thenReturn(standardVariable);
 		
 		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.SELECTION_METHOD.getId(), variableId, "");
@@ -152,13 +152,12 @@ public class DatasetValidatorTest  {
 	@Test (expected = ApiRequestValidationException.class)
 	public void testShouldNotBeDatasetVariableButItAlreadyIs() {
 		final Random ran = new Random();
-		final Integer studyId = ran.nextInt();
 		final Integer datasetId = ran.nextInt();
 		Mockito.doReturn(Lists.newArrayList(new DatasetDTO(datasetId)))
 			.when(this.studyDatasetService)
 			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer variableId = ran.nextInt();
-		final DatasetDTO dataset = this.createDataset(studyId, datasetId,  Optional.of(variableId));
+		final DatasetDTO dataset = this.createDataset(datasetId,  Optional.of(variableId));
 		
 		this.datasetValidator.validateIfDatasetVariableAlreadyExists(variableId, false, dataset);
 	}
@@ -166,13 +165,12 @@ public class DatasetValidatorTest  {
 	@Test (expected = ApiRequestValidationException.class)
 	public void testShouldBeDatasetVariableButItIsNot() {
 		final Random ran = new Random();
-		final Integer studyId = ran.nextInt();
 		final Integer datasetId = ran.nextInt();
 		Mockito.doReturn(Lists.newArrayList(new DatasetDTO(datasetId)))
 			.when(this.studyDatasetService)
 			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer variableId = ran.nextInt();
-		final DatasetDTO dataset = this.createDataset(studyId, datasetId, Optional.<Integer>absent());
+		final DatasetDTO dataset = this.createDataset(datasetId, Optional.<Integer>absent());
 		
 		this.datasetValidator.validateIfDatasetVariableAlreadyExists(variableId, true, dataset);;
 	}
@@ -180,13 +178,12 @@ public class DatasetValidatorTest  {
 	@Test (expected = NotSupportedException.class)
 	public void testShouldBeDatasetVariableButVariableTypeNotSupported() {
 		final Random ran = new Random();
-		final Integer studyId = ran.nextInt();
 		final Integer datasetId = ran.nextInt();
 		Mockito.doReturn(Lists.newArrayList(new DatasetDTO(datasetId)))
 			.when(this.studyDatasetService)
 			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer variableId = ran.nextInt();
-		final DatasetDTO dataset = this.createDataset(studyId, datasetId, Optional.of(variableId));
+		final DatasetDTO dataset = this.createDataset(datasetId, Optional.of(variableId));
 		dataset.getVariables().get(0).setVariableType(VariableType.ANALYSIS_SUMMARY);
 		
 		this.datasetValidator.validateIfDatasetVariableAlreadyExists(variableId, true, dataset);
@@ -202,9 +199,9 @@ public class DatasetValidatorTest  {
 			.when(this.studyDatasetService)
 			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer existingTraitId = ran.nextInt();
-		final Integer variableId = ran.nextInt();
+		final int variableId = ran.nextInt();
 		final StandardVariable standardVariable = this.createStandardVariable(existingTraitId);
-		this.createDataset(studyId, datasetId, Optional.of(existingTraitId));
+		this.createDataset(datasetId, Optional.of(existingTraitId));
 		Mockito.when(this.ontologyDataManager.getStandardVariable(variableId, this.PROGRAM_UUID)).thenReturn(standardVariable);
 		
 		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.SELECTION_METHOD.getId(), variableId, "");
@@ -221,7 +218,7 @@ public class DatasetValidatorTest  {
 			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final Integer variableId = ran.nextInt();
 		final StandardVariable standardVariable = this.createStandardVariable(variableId);
-		this.createDataset(studyId, datasetId, Optional.of(variableId));
+		this.createDataset(datasetId, Optional.of(variableId));
 		Mockito.when(this.ontologyDataManager.getStandardVariable(variableId, this.PROGRAM_UUID)).thenReturn(standardVariable);
 		
 		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.SELECTION_METHOD.getId(), variableId, "");
@@ -239,7 +236,7 @@ public class DatasetValidatorTest  {
 		final Integer variableId = ran.nextInt();
 		final StandardVariable standardVariable = this.createStandardVariable(variableId);
 		Mockito.when(this.ontologyDataManager.getStandardVariable(variableId, this.PROGRAM_UUID)).thenReturn(standardVariable);
-		this.createDataset(studyId, datasetId, Optional.of(variableId));
+		this.createDataset(datasetId, Optional.of(variableId));
 		final Integer nonDatasetVariableId = ran.nextInt();
 		final StandardVariable nonDatasetVariable = this.createStandardVariable(nonDatasetVariableId);
 		Mockito.when(this.ontologyDataManager.getStandardVariable(nonDatasetVariableId, this.PROGRAM_UUID)).thenReturn(nonDatasetVariable);
@@ -254,7 +251,7 @@ public class DatasetValidatorTest  {
 		return standardVariable;
 	}
 
-	private DatasetDTO createDataset(final Integer studyId, final Integer datasetId, final Optional<Integer> variableId) {
+	private DatasetDTO createDataset(final Integer datasetId, final Optional<Integer> variableId) {
 		final DatasetDTO dataset = new DatasetDTO();
 		dataset.setDatasetId(datasetId);
 		dataset.setDatasetTypeId(DataSetType.QUADRAT_SUBOBSERVATIONS.getId());
