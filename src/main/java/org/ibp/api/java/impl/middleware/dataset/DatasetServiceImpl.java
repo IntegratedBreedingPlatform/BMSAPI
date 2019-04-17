@@ -463,11 +463,11 @@ public class DatasetServiceImpl implements DatasetService {
 	public void setValueToVariable(
 		final Integer studyId, final Integer datasetId, final ObservationUnitsParamDTO paramDTO) {
 		this.studyValidator.validate(studyId, true);
-		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		final Integer variableId = paramDTO.getObservationUnitsSearchDTO().getFilter().getVariableId();
 		this.datasetValidator
 			.validateExistingDatasetVariables(
-				studyId, datasetId, true, Lists.newArrayList(variableId));
+				studyId, datasetId, false, Lists.newArrayList(variableId));
 		this.observationValidator.validateObservationValue(studyId, variableId, paramDTO.getNewValue());
 		this.middlewareDatasetService.setValueToVariable(datasetId, paramDTO, studyId);
 	}
@@ -475,7 +475,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void acceptAllDatasetDraftData(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
-		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		this.middlewareDatasetService.acceptAllDatasetDraftData(datasetId);
 	}
 
@@ -490,8 +490,8 @@ public class DatasetServiceImpl implements DatasetService {
 	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(final Integer studyId,
 		final Integer datasetId, final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
 		this.studyValidator.validate(studyId, true);
-		this.datasetValidator.validateDataset(studyId, datasetId, true);
-		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true, Lists.newArrayList(observationUnitsSearchDTO.getFilter().getVariableId()));
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, false, Lists.newArrayList(observationUnitsSearchDTO.getFilter().getVariableId()));
 		return this.middlewareDatasetService.countFilteredInstancesAndPhenotypes(datasetId, observationUnitsSearchDTO);
 	}
 
