@@ -55,6 +55,10 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 	private static final String VARIABLE_NAME = "Variable";
 	private static final String ERROR_MESSAGE = "Error!";
 	private static final List EDITABLE_VARIABLES_TYPES = Arrays.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD, VariableType.STUDY_CONDITION);
+	private static final List<Integer> EDITABLE_VARIABLES_TYPE_IDS = Arrays.asList( //
+		VariableType.TRAIT.getId(), //
+		VariableType.SELECTION_METHOD.getId(), //
+		VariableType.STUDY_CONDITION.getId());
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -220,7 +224,9 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			} else {
 				response.getMetadata().addEditableField("name");
 				response.getMetadata().addEditableField("description");
-				response.getMetadata().addEditableField("alias");
+				if (CollectionUtils.containsAny(ontologyVariable.getVariableTypes(), VariableServiceImpl.EDITABLE_VARIABLES_TYPES)) {
+					response.getMetadata().addEditableField("alias");
+				}
 				response.getMetadata().addEditableField("cropOntologyId");
 				response.getMetadata().addEditableField("variableTypes");
 				response.getMetadata().addEditableField("property");
@@ -284,6 +290,12 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 			for (org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
 				variableInfo.addVariableType(VariableType.getById(this.parseVariableTypeAsInteger(variableType)));
+			}
+
+			for (org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
+				if (VariableServiceImpl.EDITABLE_VARIABLES_TYPE_IDS.contains(Integer.valueOf(variableType.getId()))) {
+					variableInfo.setAlias(variable.getAlias());
+				}
 			}
 
 			this.ontologyVariableDataManager.addVariable(variableInfo);
