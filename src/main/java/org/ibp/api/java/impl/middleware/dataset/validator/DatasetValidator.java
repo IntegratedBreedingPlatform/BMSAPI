@@ -13,8 +13,6 @@ import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.exception.ResourceNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -27,8 +25,6 @@ import java.util.List;
 
 @Component
 public class DatasetValidator {
-	
-	private static final Logger LOG = LoggerFactory.getLogger(DatasetValidator.class);
 	
 	private static final List<VariableType> VALID_VARIABLE_TYPES = 
 			Arrays.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD);
@@ -67,7 +63,7 @@ public class DatasetValidator {
 
 		this.validateDatasetBelongsToStudy(studyId, dataSet.getDatasetId());
 
-		if (shouldBeSubobservationDataset && !DataSetType.isSubObservationDatasetType(DataSetType.findById(dataSet.getDatasetTypeId()))) {
+		if (shouldBeSubobservationDataset && !DataSetType.isObservationDatasetType(DataSetType.findById(dataSet.getDatasetTypeId()))) {
 			this.errors.reject("dataset.type.not.subobservation", "");
 			throw new NotSupportedException(this.errors.getAllErrors().get(0));
 		}
@@ -84,7 +80,7 @@ public class DatasetValidator {
 		final VariableType variableType = this.validateVariableType(datasetVariable.getVariableTypeId());
 		final Integer variableId = datasetVariable.getVariableId();
 		final StandardVariable standardVariable = this.ontologyDataManager.getStandardVariable(variableId, this.contextUtil.getCurrentProgramUUID());
-		this.validateVariable(standardVariable, variableType, variableId);
+		this.validateVariable(standardVariable, variableType);
 
 		this.validateIfDatasetVariableAlreadyExists(variableId, shouldBeDatasetVariable, dataSet);
 
@@ -154,7 +150,7 @@ public class DatasetValidator {
 
 	}
 
-	void validateVariable(final StandardVariable variable, final VariableType variableType, final Integer variableId) {
+	void validateVariable(final StandardVariable variable, final VariableType variableType) {
 		// Check if variable is configured to be given variable type
 		if (!variable.getVariableTypes().contains(variableType)) {
 			this.errors.reject("variable.not.of.given.variable.type", "");
