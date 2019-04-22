@@ -59,12 +59,12 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		
 		final List<MeasurementVariable> studyVariables = this.datasetService
 				.getMeasurementVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
-		final List<MeasurementVariable> environmentDetailsVariables = this.datasetService
+		final List<MeasurementVariable> environmentDetailAndConditionVariables = this.datasetService
 				.getMeasurementVariables(environmentDatasetId, Lists.newArrayList(
 						VariableType.ENVIRONMENT_DETAIL.getId(),
 						VariableType.STUDY_CONDITION.getId()));
 		// Experimental Design variables have value at dataset level. Perform sorting to ensure that they come first
-		Collections.sort(environmentDetailsVariables, new Comparator<MeasurementVariable>() {
+		Collections.sort(environmentDetailAndConditionVariables, new Comparator<MeasurementVariable>() {
 			@Override
 			public int compare(final MeasurementVariable var1, final MeasurementVariable var2) {
 				final String value1 = var1.getValue();
@@ -74,8 +74,6 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		        return (value1 == null) ? 1 : -1;
 		    }
 		});
-		final List<MeasurementVariable> environmentConditions = this.datasetService
-				.getMeasurementVariables(environmentDatasetId, Lists.newArrayList(VariableType.TRAIT.getId()));
 		
 		final List<MeasurementVariable> plotDataSetColumns =
 				this.datasetService
@@ -98,8 +96,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 			this.datasetService.getMeasurementVariables(datasetId, Lists.newArrayList(VariableType.SELECTION_METHOD.getId()));
 		final List<MeasurementVariable> allVariables = new ArrayList<>();
 		allVariables.addAll(studyVariables);
-		allVariables.addAll(environmentDetailsVariables);
-		allVariables.addAll(environmentConditions);
+		allVariables.addAll(environmentDetailAndConditionVariables);
 		allVariables.addAll(treatmentFactors);
 		allVariables.addAll(plotDataSetColumns);
 		allVariables.addAll(subObservationSetColumns);

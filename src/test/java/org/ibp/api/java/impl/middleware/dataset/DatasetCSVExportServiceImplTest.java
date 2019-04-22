@@ -235,7 +235,6 @@ public class DatasetCSVExportServiceImplTest {
 		Mockito.verify( this.datasetService).getMeasurementVariables(anyInt(), eq(Lists.newArrayList(
 			VariableType.ENVIRONMENT_DETAIL.getId(),
 			VariableType.STUDY_CONDITION.getId())));
-		Mockito.verify(this.datasetService).getMeasurementVariables(eq(this.trialDataSet.getId()), eq(Lists.newArrayList(VariableType.TRAIT.getId())));
 		Mockito.verify(this.datasetService).getMeasurementVariables(1,
 			Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 				VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId()));
