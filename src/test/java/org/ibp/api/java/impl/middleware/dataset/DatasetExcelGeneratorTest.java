@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -35,6 +36,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DatasetExcelGeneratorTest {
@@ -252,5 +254,39 @@ public class DatasetExcelGeneratorTest {
 		Assert.assertEquals(observationSheet.getRow(0).getCell(1).getStringCellValue(), VARIABLE_NAME_2);
 		Assert.assertEquals(observationSheet.getRow(1).getCell(0).getStringCellValue(), VARIABLE_VALUE_1);
 		Assert.assertEquals(observationSheet.getRow(1).getCell(1).getStringCellValue(), VARIABLE_VALUE_2);
+	}
+
+	@Test
+	public void testGetEnvironmentalConditions() {
+
+		final Random random = new Random();
+		final int environmentDatasetId = random.nextInt(10);
+		final StudyInstance studyInstance = new StudyInstance();
+		studyInstance.setInstanceDbId(random.nextInt(10));
+		final int studyConditionTermid = 100;
+		final String studyConditionValue = "99";
+
+		final MeasurementVariable studyConditionVariable = new MeasurementVariable();
+		final String variableName = "VariableName";
+		studyConditionVariable.setTermId(studyConditionTermid);
+		studyConditionVariable.setVariableType(VariableType.STUDY_CONDITION);
+		studyConditionVariable.setName(variableName);
+
+		final MeasurementVariable environmentDetailVariable = new MeasurementVariable();
+		environmentDetailVariable.setTermId(TermId.LOCATION_ID.getId());
+		environmentDetailVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		environmentDetailVariable.setName("LOCATION_ID");
+
+		final Map<Integer, String> environmentConditionMap = new HashMap<>();
+		environmentConditionMap.put(studyConditionVariable.getTermId(), studyConditionValue);
+
+		Mockito.when(this.studyDataManager.getPhenotypeByVariableId(environmentDatasetId, studyInstance.getInstanceDbId())).thenReturn(environmentConditionMap);
+		final List<MeasurementVariable> environmentVariables = Arrays.asList(studyConditionVariable, environmentDetailVariable);
+
+		final List<MeasurementVariable> result = this.datasetExcelGenerator.getEnvironmentalConditions(environmentDatasetId, environmentVariables, studyInstance);
+		Assert.assertEquals(1, result.size());
+		Assert.assertEquals(studyConditionTermid, result.get(0).getTermId());
+		Assert.assertEquals(studyConditionValue, result.get(0).getValue());
+
 	}
 }

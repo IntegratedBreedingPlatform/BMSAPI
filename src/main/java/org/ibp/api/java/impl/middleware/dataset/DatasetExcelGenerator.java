@@ -378,7 +378,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		return environmentDetails;
 	}
 
-	private List<MeasurementVariable> getEnvironmentalConditions(
+	protected List<MeasurementVariable> getEnvironmentalConditions(
 		final int environmentDatasetId, final List<MeasurementVariable> environmentVariables, final StudyInstance instance) {
 		final List<MeasurementVariable> environmentConditions =
 			filterByVariableType(environmentVariables, VariableType.STUDY_CONDITION);
