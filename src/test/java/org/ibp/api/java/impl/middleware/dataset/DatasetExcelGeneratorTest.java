@@ -242,18 +242,18 @@ public class DatasetExcelGeneratorTest {
 		final Workbook workbook = new HSSFWorkbook(inputStream);
 		final Sheet descriptionSheet = workbook.getSheetAt(0);
 		final Sheet observationSheet = workbook.getSheetAt(1);
-		Assert.assertEquals(descriptionSheet.getRow(8).getCell(valueIndex).getStringCellValue(), STUDY_DETAIL_TEST);
-		Assert.assertEquals(descriptionSheet.getRow(11).getCell(valueIndex).getStringCellValue(), EXPERIMENTAL_DESIGN_TEST);
-		Assert.assertEquals(descriptionSheet.getRow(14).getCell(valueIndex).getStringCellValue(), ENVIRONMENTAL_DETAILS_TEST);
-		Assert.assertEquals(descriptionSheet.getRow(17).getCell(valueIndex).getStringCellValue(), ENVIRONMENTAL_CONDITIONS_TEST);
-		Assert.assertEquals(descriptionSheet.getRow(20).getCell(valueIndex).getStringCellValue(), GERMPLASM_DESCRIPTORS_TEST);
-		Assert.assertEquals(descriptionSheet.getRow(23).getCell(valueIndex).getStringCellValue(), OBSERVATION_UNIT_TEST);
-		Assert.assertEquals(descriptionSheet.getRow(26).getCell(valueIndex).getStringCellValue(), TRAITS_TEST);
-		Assert.assertEquals(descriptionSheet.getRow(29).getCell(valueIndex).getStringCellValue(), SELECTION_TEST);
-		Assert.assertEquals(observationSheet.getRow(0).getCell(0).getStringCellValue(), VARIABLE_NAME_1);
-		Assert.assertEquals(observationSheet.getRow(0).getCell(1).getStringCellValue(), VARIABLE_NAME_2);
-		Assert.assertEquals(observationSheet.getRow(1).getCell(0).getStringCellValue(), VARIABLE_VALUE_1);
-		Assert.assertEquals(observationSheet.getRow(1).getCell(1).getStringCellValue(), VARIABLE_VALUE_2);
+		Assert.assertEquals(STUDY_DETAIL_TEST, descriptionSheet.getRow(8).getCell(valueIndex).getStringCellValue());
+		Assert.assertEquals(EXPERIMENTAL_DESIGN_TEST, descriptionSheet.getRow(11).getCell(valueIndex).getStringCellValue());
+		Assert.assertEquals(ENVIRONMENTAL_DETAILS_TEST, descriptionSheet.getRow(14).getCell(valueIndex).getStringCellValue());
+		Assert.assertEquals(ENVIRONMENTAL_CONDITIONS_TEST, descriptionSheet.getRow(17).getCell(valueIndex).getStringCellValue());
+		Assert.assertEquals(GERMPLASM_DESCRIPTORS_TEST, descriptionSheet.getRow(20).getCell(valueIndex).getStringCellValue());
+		Assert.assertEquals(OBSERVATION_UNIT_TEST, descriptionSheet.getRow(23).getCell(valueIndex).getStringCellValue());
+		Assert.assertEquals(TRAITS_TEST, descriptionSheet.getRow(26).getCell(valueIndex).getStringCellValue());
+		Assert.assertEquals(SELECTION_TEST, descriptionSheet.getRow(29).getCell(valueIndex).getStringCellValue());
+		Assert.assertEquals(VARIABLE_NAME_1, observationSheet.getRow(0).getCell(0).getStringCellValue());
+		Assert.assertEquals(VARIABLE_NAME_2, observationSheet.getRow(0).getCell(1).getStringCellValue());
+		Assert.assertEquals(VARIABLE_VALUE_1, observationSheet.getRow(1).getCell(0).getStringCellValue());
+		Assert.assertEquals(VARIABLE_VALUE_2, observationSheet.getRow(1).getCell(1).getStringCellValue());
 	}
 
 	@Test
@@ -280,10 +280,12 @@ public class DatasetExcelGeneratorTest {
 		final Map<Integer, String> environmentConditionMap = new HashMap<>();
 		environmentConditionMap.put(studyConditionVariable.getTermId(), studyConditionValue);
 
-		Mockito.when(this.studyDataManager.getPhenotypeByVariableId(environmentDatasetId, studyInstance.getInstanceDbId())).thenReturn(environmentConditionMap);
+		Mockito.when(this.studyDataManager.getPhenotypeByVariableId(environmentDatasetId, studyInstance.getInstanceDbId()))
+			.thenReturn(environmentConditionMap);
 		final List<MeasurementVariable> environmentVariables = Arrays.asList(studyConditionVariable, environmentDetailVariable);
 
-		final List<MeasurementVariable> result = this.datasetExcelGenerator.getEnvironmentalConditions(environmentDatasetId, environmentVariables, studyInstance);
+		final List<MeasurementVariable> result =
+			this.datasetExcelGenerator.getEnvironmentalConditions(environmentDatasetId, environmentVariables, studyInstance);
 		Assert.assertEquals(1, result.size());
 		Assert.assertEquals(studyConditionTermid, result.get(0).getTermId());
 		Assert.assertEquals(studyConditionValue, result.get(0).getValue());
