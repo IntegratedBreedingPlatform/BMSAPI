@@ -239,7 +239,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 				.getMeasurementVariables(
 					environmentDatasetId, Lists
 						.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-							VariableType.STUDY_CONDITION.getId(), VariableType.TRAIT.getId()));
+							VariableType.STUDY_CONDITION.getId()));
 
 		final List<MeasurementVariable> plotVariables =
 			this.datasetService.getMeasurementVariables(plotDatasetId, Lists

@@ -92,9 +92,9 @@ public class DatasetExcelGeneratorTest {
 		environmentDetailsVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
 
 		final MeasurementVariable environmentConditionsVariable = new MeasurementVariable();
-		environmentConditionsVariable.setDataTypeId(VariableType.TRAIT.getId());
+		environmentConditionsVariable.setDataTypeId(VariableType.STUDY_CONDITION.getId());
 		environmentConditionsVariable.setValue(ENVIRONMENTAL_CONDITIONS_TEST);
-		environmentConditionsVariable.setVariableType(VariableType.TRAIT);
+		environmentConditionsVariable.setVariableType(VariableType.STUDY_CONDITION);
 		environmentConditionsVariable.setTermId(1234);
 		final Map<Integer, String> environmentConditionMap = new HashMap<>();
 		environmentConditionMap.put(1234, ENVIRONMENTAL_CONDITIONS_TEST);
@@ -163,7 +163,7 @@ public class DatasetExcelGeneratorTest {
 		Mockito.when(this.datasetService
 			.getMeasurementVariables(DatasetExcelGeneratorTest.ENVIRONMENT_DATASET_ID, Lists
 				.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-					VariableType.STUDY_CONDITION.getId(), VariableType.TRAIT.getId()))).thenReturn(environmentVariables);
+					VariableType.STUDY_CONDITION.getId()))).thenReturn(environmentVariables);
 		Mockito.when(this.studyDataManager.getPhenotypeByVariableId(DatasetExcelGeneratorTest.ENVIRONMENT_DATASET_ID, INSTANCE_DB_ID))
 			.thenReturn(environmentConditionMap);
 
@@ -199,7 +199,7 @@ public class DatasetExcelGeneratorTest {
 			.getMeasurementVariables(
 				INSTANCE_DB_ID, Lists
 					.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-						VariableType.STUDY_CONDITION.getId(), VariableType.TRAIT.getId()));
+						VariableType.STUDY_CONDITION.getId()));
 		Mockito.verify(this.datasetService).getMeasurementVariables(INSTANCE_DB_ID, Lists
 			.newArrayList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId(),
 				VariableType.GERMPLASM_DESCRIPTOR.getId()));
