@@ -28,7 +28,20 @@ public class CropServiceImpl implements CropService {
 		return crops;
 	}
 
-	void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
+	@Override
+	public List<String> getAvailableCropsForUser(final int workbenchUserId) {
+		final List<String> crops = new ArrayList<>();
+
+		final List<CropType> availableCropsForUser = this.workbenchDataManager.getAvailableCropsForUser(workbenchUserId);
+
+		for (final CropType cropType : availableCropsForUser) {
+			crops.add(cropType.getCropName());
+		}
+
+		return crops;
+	}
+
+	void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}
 

@@ -6,6 +6,7 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.java.crop.CropService;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a>
@@ -29,7 +29,10 @@ public class CropResourceBrapi {
 	@Autowired
 	private CropService cropService;
 
-	@ApiOperation(value = "List of available crops", notes = "Get a list of available crops.")
+	@Autowired
+	private SecurityService securityService;
+
+	@ApiOperation(value = "List of available crops for the current user.", notes = "Get a list of available crops for the current user.")
 	@RequestMapping(value = "/brapi/v1/crops", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<CropDto> listAvailableCrops() {
@@ -43,7 +46,8 @@ public class CropResourceBrapi {
 		metadata.withPagination(new Pagination(0, 0, 0l, 0));
 		cropDto.setMetadata(metadata);
 
-		cropDto.setResult(new Result<String>(cropService.getInstalledCrops()));
+		cropDto.setResult(
+			new Result<String>(this.cropService.getAvailableCropsForUser(this.securityService.getCurrentlyLoggedInUser().getUserid())));
 
 		return new ResponseEntity<>(cropDto, HttpStatus.OK);
 
