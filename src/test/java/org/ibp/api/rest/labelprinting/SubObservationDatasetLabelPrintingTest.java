@@ -66,7 +66,7 @@ public class SubObservationDatasetLabelPrintingTest {
 		Mockito.verify(this.middlewareDatasetService).getMeasurementVariables(labelsInfoInput.getStudyId(), Arrays.asList(VariableType.STUDY_DETAIL.getId()));
 		Mockito.verify(this.middlewareDatasetService).getMeasurementVariables(dataset.getId(),
 			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-				VariableType.STUDY_CONDITION.getId(), VariableType.TRAIT.getId()));
+				VariableType.STUDY_CONDITION.getId()));
 		Mockito.verify(this.middlewareDatasetService).getMeasurementVariables(datasetDTO.getParentDatasetId(), Arrays.asList(VariableType.TREATMENT_FACTOR.getId()));
 		Mockito.verify(this.middlewareDatasetService).getMeasurementVariables(datasetDTO.getParentDatasetId(),
 			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()));
