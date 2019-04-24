@@ -303,13 +303,6 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			xlsSheet,
 			filterByVariableType(environmentConditions, VariableType.STUDY_CONDITION), ENVIRONMENT);
 
-		currentRowNum = this.writeSection(
-			currentRowNum,
-			xlsBook,
-			xlsSheet,
-			filterByVariableType(environmentVariables, VariableType.TRAIT), ENVIRONMENT);
-		xlsSheet.createRow(currentRowNum++);
-
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.germplasm.descriptors",
 			this.getColorIndex(xlsBook, 51, 153, 102));
 		currentRowNum = this.writeSection(
