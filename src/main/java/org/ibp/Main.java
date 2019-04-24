@@ -5,6 +5,7 @@ import org.ibp.api.java.impl.middleware.common.validator.CropNameValidationInter
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -35,6 +36,9 @@ public class Main extends WebMvcConfigurerAdapter {
 
 	@Autowired
 	private SpringSwaggerConfig springSwaggerConfig;
+
+	@Value("${swagger.enable}")
+	private boolean enableSwagger;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Main.class, args);
@@ -87,7 +91,7 @@ public class Main extends WebMvcConfigurerAdapter {
 
 	@Bean
 	public SwaggerSpringMvcPlugin customImplementation() {
-		return new SwaggerSpringMvcPlugin(this.springSwaggerConfig).apiInfo(this.apiInfo());
+		return new SwaggerSpringMvcPlugin(this.springSwaggerConfig).enable(enableSwagger).apiInfo(this.apiInfo());
 	}
 
 	@Bean
