@@ -67,29 +67,27 @@ public class UserServiceImpl implements UserService {
 
 		this.securityService.requireCurrentUserIsAdmin();
 
-		LOG.debug(user.toString());
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
 		final HashMap<String, Object> mapResponse = new HashMap<String, Object>();
 		mapResponse.put("id", String.valueOf(0));
 
-		userValidator.validate(user, errors, true);
+		this.userValidator.validate(user, errors, true);
 		if (errors.hasErrors()) {
-			LOG.debug("UserValidator returns errors");
-			translateErrorToMap(errors, mapResponse);
+			this.translateErrorToMap(errors, mapResponse);
 
 		} else {
 
-			final UserDto userdto = translateUserDetailsDtoToUserDto(user);
-			userdto.setPassword(passwordEncoder.encode(userdto.getUsername()));
+			final UserDto userdto = this.translateUserDetailsDtoToUserDto(user);
+			userdto.setPassword(this.passwordEncoder.encode(userdto.getUsername()));
 
 			try {
 				final Integer newUserId = this.workbenchDataManager.createUser(userdto);
 				mapResponse.put("id", String.valueOf(newUserId));
 
-			} catch (MiddlewareQueryException e) {
+			} catch (final MiddlewareQueryException e) {
 				LOG.info("Error on workbenchDataManager.createUser ", e);
 				errors.rejectValue(UserValidator.USER_ID, UserValidator.DATABASE_ERROR);
-				translateErrorToMap(errors, mapResponse);
+				this.translateErrorToMap(errors, mapResponse);
 			}
 		}
 
@@ -101,27 +99,26 @@ public class UserServiceImpl implements UserService {
 
 		this.securityService.requireCurrentUserIsAdmin();
 
-		LOG.debug(user.toString());
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
 		final HashMap<String, Object> mapResponse = new HashMap<String, Object>();
 		mapResponse.put("id", String.valueOf(0));
 
-		userValidator.validate(user, errors, false);
+		this.userValidator.validate(user, errors, false);
 		if (errors.hasErrors()) {
 			LOG.debug("UserValidator returns errors");
-			translateErrorToMap(errors, mapResponse);
+			this.translateErrorToMap(errors, mapResponse);
 
 		} else {
 
-			final UserDto userdto = translateUserDetailsDtoToUserDto(user);
+			final UserDto userdto = this.translateUserDetailsDtoToUserDto(user);
 
 			try {
 				final Integer updateUserId = this.workbenchDataManager.updateUser(userdto);
 				mapResponse.put("id", String.valueOf(updateUserId));
-			} catch (MiddlewareQueryException e) {
+			} catch (final MiddlewareQueryException e) {
 				LOG.info("Error on workbenchDataManager.updateUser", e);
 				errors.rejectValue(UserValidator.USER_ID, UserValidator.DATABASE_ERROR);
-				translateErrorToMap(errors, mapResponse);
+				this.translateErrorToMap(errors, mapResponse);
 			}
 		}
 
@@ -136,7 +133,7 @@ public class UserServiceImpl implements UserService {
 		Preconditions.checkNotNull(projectUUID, "The projectUUID must not be empty");
 
 		try {
-			List<UserDto> users = this.workbenchDataManager.getUsersByProjectUuid(projectUUID);
+			final List<UserDto> users = this.workbenchDataManager.getUsersByProjectUuid(projectUUID);
 			Preconditions.checkArgument(!users.isEmpty(), "users don't exists for this projectUUID");
 
 			for (final UserDto userDto : users) {
@@ -144,7 +141,7 @@ public class UserServiceImpl implements UserService {
 				result.add(userInfo);
 			}
 
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			LOG.info("Error on workbenchDataManager.getUsersByProjectUuid", e);
 			throw new ApiRuntimeException("An internal error occurred while trying to get the users");
 		}
@@ -180,46 +177,46 @@ public class UserServiceImpl implements UserService {
 	}
 
 	private void translateErrorToMap(final BindingResult errors, final HashMap<String, Object> mapErrors) {
-		ErrorResponse errResponse = new ErrorResponse();
+		final ErrorResponse errResponse = new ErrorResponse();
 
 		if (errors.getFieldErrorCount(UserValidator.FIRST_NAME) != 0) {
 			final String errorName = errors.getFieldError(UserValidator.FIRST_NAME).getCode();
-			errResponse.addError(translateCodeErrorValidator(errorName), UserValidator.FIRST_NAME);
+			errResponse.addError(this.translateCodeErrorValidator(errorName), UserValidator.FIRST_NAME);
 		}
 
 		if (errors.getFieldErrorCount(UserValidator.LAST_NAME) != 0) {
 			final String errorLastName = errors.getFieldError(UserValidator.LAST_NAME).getCode();
-			errResponse.addError(translateCodeErrorValidator(errorLastName), UserValidator.LAST_NAME);
+			errResponse.addError(this.translateCodeErrorValidator(errorLastName), UserValidator.LAST_NAME);
 		}
 
 		if (errors.getFieldErrorCount(UserValidator.USERNAME) != 0) {
 			final String errorUserName = errors.getFieldError(UserValidator.USERNAME).getCode();
-			errResponse.addError(translateCodeErrorValidator(errorUserName), UserValidator.USERNAME);
+			errResponse.addError(this.translateCodeErrorValidator(errorUserName), UserValidator.USERNAME);
 		}
 
 		if (errors.getFieldErrorCount(UserValidator.EMAIL) != 0) {
 			final String errorEmail = errors.getFieldError(UserValidator.EMAIL).getCode();
-			errResponse.addError(translateCodeErrorValidator(errorEmail), UserValidator.EMAIL);
+			errResponse.addError(this.translateCodeErrorValidator(errorEmail), UserValidator.EMAIL);
 		}
 
 		if (errors.getFieldErrorCount(UserValidator.ROLE) != 0) {
 			final String errorRole = errors.getFieldError(UserValidator.ROLE).getCode();
-			errResponse.addError(translateCodeErrorValidator(errorRole), UserValidator.ROLE);
+			errResponse.addError(this.translateCodeErrorValidator(errorRole), UserValidator.ROLE);
 		}
 
 		if (errors.getFieldErrorCount(UserValidator.STATUS) != 0) {
 			final String errorStatus = errors.getFieldError(UserValidator.STATUS).getCode();
-			errResponse.addError(translateCodeErrorValidator(errorStatus), UserValidator.STATUS);
+			errResponse.addError(this.translateCodeErrorValidator(errorStatus), UserValidator.STATUS);
 		}
 
 		if (errors.getFieldErrorCount(UserValidator.USER_ID) != 0) {
 			final String errorUserId = errors.getFieldError(UserValidator.USER_ID).getCode();
-			errResponse.addError(translateCodeErrorValidator(errorUserId), UserValidator.USER_ID);
+			errResponse.addError(this.translateCodeErrorValidator(errorUserId), UserValidator.USER_ID);
 		}
 
 		if (errors.getGlobalErrorCount() != 0) {
-			List<ObjectError> globalErrors = errors.getGlobalErrors();
-			for (ObjectError globalError : globalErrors) {
+			final List<ObjectError> globalErrors = errors.getGlobalErrors();
+			for (final ObjectError globalError : globalErrors) {
 				errResponse.addError(globalError.getCode());
 			}
 		}

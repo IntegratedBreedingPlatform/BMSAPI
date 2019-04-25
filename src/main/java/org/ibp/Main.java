@@ -1,6 +1,10 @@
 
 package org.ibp;
 
+import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
+import com.mangofactory.swagger.models.dto.ApiInfo;
+import com.mangofactory.swagger.plugin.EnableSwagger;
+import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
 import org.ibp.api.java.impl.middleware.common.validator.CropNameValidationInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,11 +26,6 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 
-import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
-import com.mangofactory.swagger.models.dto.ApiInfo;
-import com.mangofactory.swagger.plugin.EnableSwagger;
-import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
-
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class})
 @EnableSwagger
 @Configuration
@@ -40,14 +39,14 @@ public class Main extends WebMvcConfigurerAdapter {
 	@Value("${swagger.enable}")
 	private boolean enableSwagger;
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		SpringApplication.run(Main.class, args);
 		Main.LOGGER.info("Startup Complete!");
 	}
 
 	@Bean
 	public TemplateResolver templateResolver() {
-		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver();
+		final ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver();
 		templateResolver.setPrefix("/WEB-INF/html/");
 		templateResolver.setSuffix(".html");
 		templateResolver.setTemplateMode("HTML5");
@@ -58,7 +57,7 @@ public class Main extends WebMvcConfigurerAdapter {
 
 	@Bean
 	public SpringTemplateEngine templateEngine() {
-		SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+		final SpringTemplateEngine templateEngine = new SpringTemplateEngine();
 		templateEngine.setTemplateResolver(this.templateResolver());
 		templateEngine.addDialect(this.securityDialect());
 		return templateEngine;
@@ -75,23 +74,23 @@ public class Main extends WebMvcConfigurerAdapter {
 	}
 
 	@Override
-	public void configurePathMatch(PathMatchConfigurer configurer) {
+	public void configurePathMatch(final PathMatchConfigurer configurer) {
 		configurer.setUseSuffixPatternMatch(false);
 	}
 
 	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	public void addResourceHandlers(final ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/static/**").addResourceLocations("/WEB-INF/static/");
 	}
 
 	@Override
-	public void addInterceptors(InterceptorRegistry registry) {
+	public void addInterceptors(final InterceptorRegistry registry) {
 		registry.addInterceptor(this.getCropNameValidationInterceptor()).addPathPatterns("/**");
 	}
 
 	@Bean
 	public SwaggerSpringMvcPlugin customImplementation() {
-		return new SwaggerSpringMvcPlugin(this.springSwaggerConfig).enable(enableSwagger).apiInfo(this.apiInfo());
+		return new SwaggerSpringMvcPlugin(this.springSwaggerConfig).enable(this.enableSwagger).apiInfo(this.apiInfo());
 	}
 
 	@Bean
@@ -103,6 +102,6 @@ public class Main extends WebMvcConfigurerAdapter {
 
 	private ApiInfo apiInfo() {
 		return new ApiInfo("Welcome!", "Try out the Breeding Management System API methods listed below!", "http://bit.ly/KQX1nL",
-				"naymesh@leafnode.io", "GNU General Public License", "http://bit.ly/8Ztv8M");
+			"naymesh@leafnode.io", "GNU General Public License", "http://bit.ly/8Ztv8M");
 	}
 }

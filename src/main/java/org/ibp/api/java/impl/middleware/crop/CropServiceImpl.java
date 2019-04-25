@@ -1,13 +1,13 @@
 package org.ibp.api.java.impl.middleware.crop;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.ibp.api.java.crop.CropService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CropServiceImpl implements CropService {
@@ -17,11 +17,11 @@ public class CropServiceImpl implements CropService {
 
 	@Override
 	public List<String> getInstalledCrops() {
-		List<String> crops = new ArrayList<>();
+		final List<String> crops = new ArrayList<>();
 
-		List<CropType> installedCropDatabses = this.workbenchDataManager.getInstalledCropDatabses();
+		final List<CropType> installedCropDatabses = this.workbenchDataManager.getInstalledCropDatabses();
 
-		for (CropType cropType : installedCropDatabses) {
+		for (final CropType cropType : installedCropDatabses) {
 			crops.add(cropType.getCropName());
 		}
 
