@@ -10,6 +10,7 @@ import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.domain.user.UserMapper;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.manager.UserValidator;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.user.UserService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -40,10 +41,16 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	protected UserValidator userValidator;
 
+	@Autowired
+	protected SecurityService securityService;
+
 	private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 	@Override
 	public List<UserDetailDto> getAllUsersSortedByLastName() {
+
+		this.securityService.requireCurrentUserIsAdmin();
+
 		final List<UserDetailDto> result = new ArrayList<>();
 		final ModelMapper mapper = UserMapper.getInstance();
 		final List<UserDto> users = this.workbenchDataManager.getAllUsersSortedByLastName();
@@ -57,6 +64,9 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Map<String, Object> createUser(final UserDetailDto user) {
+
+		this.securityService.requireCurrentUserIsAdmin();
+
 		LOG.debug(user.toString());
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
 		final HashMap<String, Object> mapResponse = new HashMap<String, Object>();
@@ -88,6 +98,9 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Map<String, Object> updateUser(final UserDetailDto user) {
+
+		this.securityService.requireCurrentUserIsAdmin();
+
 		LOG.debug(user.toString());
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
 		final HashMap<String, Object> mapResponse = new HashMap<String, Object>();
@@ -148,6 +161,10 @@ public class UserServiceImpl implements UserService {
 		userdto.setEmail(user.getEmail());
 		userdto.setStatus("true".equals(user.getStatus()) ? 0 : 1);
 		return userdto;
+	}
+
+	public void setSecurityService(final SecurityService securityService) {
+		this.securityService = securityService;
 	}
 
 	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {

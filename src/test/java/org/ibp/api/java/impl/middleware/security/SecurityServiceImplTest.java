@@ -5,8 +5,10 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudySummary;
+import org.ibp.api.exception.ForbiddenException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,6 +22,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.google.common.collect.Lists;
 
+import javax.servlet.http.HttpServletRequest;
+
 public class SecurityServiceImplTest {
 
 	@Mock
@@ -27,6 +31,9 @@ public class SecurityServiceImplTest {
 
 	@Mock
 	private UserDataManager userDataManager;
+
+	@Mock
+	private HttpServletRequest httpServletRequest;
 
 	@InjectMocks
 	private final SecurityServiceImpl securityServiceImpl = new SecurityServiceImpl();
@@ -205,5 +212,39 @@ public class SecurityServiceImplTest {
 		final GermplasmList list = new GermplasmList();
 		list.setProgramUUID(null);
 		Assert.assertTrue("Lists with no program reference should be accessible to all.", this.securityServiceImpl.isAccessible(list, this.cropname));
+	}
+
+	@Test
+	public void testRequireCurrentUserIsAdminUserIsAdmin() {
+		Mockito.when(this.httpServletRequest.isUserInRole(Role.SUPERADMIN)).thenReturn(false);
+		Mockito.when(this.httpServletRequest.isUserInRole(Role.ADMIN)).thenReturn(true);
+		try {
+			this.securityServiceImpl.requireCurrentUserIsAdmin();
+		} catch (final ForbiddenException e) {
+			Assert.fail("Method should not throw an exception.");
+		}
+	}
+
+	@Test
+	public void testRequireCurrentUserIsAdminUserIsSuperadmin() {
+		Mockito.when(this.httpServletRequest.isUserInRole(Role.SUPERADMIN)).thenReturn(true);
+		Mockito.when(this.httpServletRequest.isUserInRole(Role.ADMIN)).thenReturn(false);
+		try {
+			this.securityServiceImpl.requireCurrentUserIsAdmin();
+		} catch (final ForbiddenException e) {
+			Assert.fail("Method should not throw an exception.");
+		}
+	}
+
+	@Test
+	public void testRequireCurrentUserIsAdminFail() {
+		Mockito.when(this.httpServletRequest.isUserInRole(Role.SUPERADMIN)).thenReturn(false);
+		Mockito.when(this.httpServletRequest.isUserInRole(Role.ADMIN)).thenReturn(false);
+		try {
+			this.securityServiceImpl.requireCurrentUserIsAdmin();
+			Assert.fail("Method should throw an exception.");
+		} catch (final ForbiddenException e) {
+			Assert.assertEquals(SecurityServiceImpl.CURRENT_USER_NOT_ADMIN_OR_SUPERADMIN, e.getError().getCode());
+		}
 	}
 }

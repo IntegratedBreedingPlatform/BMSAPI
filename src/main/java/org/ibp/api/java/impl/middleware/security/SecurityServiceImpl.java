@@ -9,15 +9,25 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudySummary;
+import org.ibp.api.exception.ForbiddenException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.ObjectError;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Service
 public class SecurityServiceImpl implements SecurityService {
+
+	public static final String CURRENT_USER_NOT_ADMIN_OR_SUPERADMIN = "current.user.not.admin.or.superadmin";
+
+	@Autowired
+	private HttpServletRequest request;
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -53,6 +63,14 @@ public class SecurityServiceImpl implements SecurityService {
 		}
 
 		return this.loggedInUserIsMemberOf(germplasmList.getProgramUUID(), cropname);
+	}
+
+	@Override
+	public void requireCurrentUserIsAdmin() {
+		if (!this.request.isUserInRole(Role.ADMIN) && !this.request.isUserInRole(Role.SUPERADMIN)) {
+			throw new ForbiddenException(
+				new ObjectError("", new String[] {CURRENT_USER_NOT_ADMIN_OR_SUPERADMIN}, null, ""));
+		}
 	}
 
 	private boolean loggedInUserIsMemberOf(String programUniqueId, String cropname) {
