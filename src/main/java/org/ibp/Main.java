@@ -104,4 +104,8 @@ public class Main extends WebMvcConfigurerAdapter {
 		return new ApiInfo("Welcome!", "Try out the Breeding Management System API methods listed below!", "http://bit.ly/KQX1nL",
 			"naymesh@leafnode.io", "GNU General Public License", "http://bit.ly/8Ztv8M");
 	}
+
+	protected void setEnableSwagger(final boolean enableSwagger) {
+		this.enableSwagger = enableSwagger;
+	}
 }
