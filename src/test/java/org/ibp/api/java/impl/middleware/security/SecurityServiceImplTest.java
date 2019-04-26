@@ -1,12 +1,14 @@
 package org.ibp.api.java.impl.middleware.security;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudySummary;
+import org.ibp.api.exception.ForbiddenException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -18,7 +20,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.google.common.collect.Lists;
+import javax.servlet.http.HttpServletRequest;
 
 public class SecurityServiceImplTest {
 
@@ -27,6 +29,9 @@ public class SecurityServiceImplTest {
 
 	@Mock
 	private UserDataManager userDataManager;
+
+	@Mock
+	private HttpServletRequest httpServletRequest;
 
 	@InjectMocks
 	private final SecurityServiceImpl securityServiceImpl = new SecurityServiceImpl();
@@ -78,15 +83,17 @@ public class SecurityServiceImplTest {
 		summaryStudyProgram.setProjectId(2L);
 		summaryStudyProgram.setUniqueID(summaryStudy.getProgramUUID());
 
-		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(summaryStudy.getProgramUUID(), this.cropname)).thenReturn(summaryStudyProgram);
+		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(summaryStudy.getProgramUUID(), this.cropname))
+			.thenReturn(summaryStudyProgram);
 
 		// Logged in user = me is a the member
 		Mockito.when(this.workbenchDataManager.getUsersByProjectId(summaryStudyProgram.getProjectId())).thenReturn(
-				Lists.newArrayList(this.me));
+			Lists.newArrayList(this.me));
 
 		// Hence accessible
-		Assert.assertTrue("Studies that are part of programs created by me, or I am a meber of, should be accessible to me.",
-				this.securityServiceImpl.isAccessible(summaryStudy, this.cropname));
+		Assert.assertTrue(
+			"Studies that are part of programs created by me, or I am a meber of, should be accessible to me.",
+			this.securityServiceImpl.isAccessible(summaryStudy, this.cropname));
 	}
 
 	/**
@@ -102,15 +109,17 @@ public class SecurityServiceImplTest {
 		summaryStudyProgram.setProjectId(2L);
 		summaryStudyProgram.setUniqueID(summaryStudy.getProgramUUID());
 
-		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(summaryStudy.getProgramUUID(), this.cropname)).thenReturn(summaryStudyProgram);
+		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(summaryStudy.getProgramUUID(), this.cropname))
+			.thenReturn(summaryStudyProgram);
 
 		// Logged in user = me is not the member, some other breeder is
 		Mockito.when(this.workbenchDataManager.getUsersByProjectId(summaryStudyProgram.getProjectId())).thenReturn(
-				Lists.newArrayList(this.otherBreeder));
+			Lists.newArrayList(this.otherBreeder));
 
 		// Hence not accessible
-		Assert.assertFalse("Studies that are part of programs I have not created nor I am a member of,  should not be accessible to me.",
-				this.securityServiceImpl.isAccessible(summaryStudy, this.cropname));
+		Assert.assertFalse(
+			"Studies that are part of programs I have not created nor I am a member of,  should not be accessible to me.",
+			this.securityServiceImpl.isAccessible(summaryStudy, this.cropname));
 	}
 
 	/**
@@ -122,8 +131,9 @@ public class SecurityServiceImplTest {
 		summary.setProgramUUID(null);
 
 		// Accessible to all
-		Assert.assertTrue("Studies with no pgoram reference (e.g. Templates) should be accessible to all.",
-				this.securityServiceImpl.isAccessible(summary, this.cropname));
+		Assert.assertTrue(
+			"Studies with no pgoram reference (e.g. Templates) should be accessible to all.",
+			this.securityServiceImpl.isAccessible(summary, this.cropname));
 	}
 
 	@Test
@@ -148,7 +158,8 @@ public class SecurityServiceImplTest {
 		final GermplasmList list = new GermplasmList();
 		list.setUserId(this.me.getUserid());
 		Mockito.when(this.userDataManager.getUserById(this.me.getUserid())).thenReturn(this.me.copyToUser());
-		Assert.assertTrue("Lists owned by logged in user should be accessible.", this.securityServiceImpl.isAccessible(list, this.cropname));
+		Assert
+			.assertTrue("Lists owned by logged in user should be accessible.", this.securityServiceImpl.isAccessible(list, this.cropname));
 	}
 
 	/**
@@ -166,10 +177,11 @@ public class SecurityServiceImplTest {
 		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(list.getProgramUUID(), this.cropname)).thenReturn(listProgram);
 		// Logged in user = me is not a the member
 		Mockito.when(this.workbenchDataManager.getUsersByProjectId(listProgram.getProjectId())).thenReturn(
-				Lists.newArrayList(this.otherBreeder));
+			Lists.newArrayList(this.otherBreeder));
 
 		Mockito.when(this.userDataManager.getUserById(this.otherBreeder.getUserid())).thenReturn(this.otherBreeder.copyToUser());
-		Assert.assertFalse("Lists not owned by logged in user should not be accessible.", this.securityServiceImpl.isAccessible(list, this.cropname));
+		Assert.assertFalse("Lists not owned by logged in user should not be accessible.",
+			this.securityServiceImpl.isAccessible(list, this.cropname));
 	}
 
 	/**
@@ -191,10 +203,11 @@ public class SecurityServiceImplTest {
 
 		// Logged in user = me is a the member
 		Mockito.when(this.workbenchDataManager.getUsersByProjectId(listProgram.getProjectId())).thenReturn(
-				Lists.newArrayList(this.me));
+			Lists.newArrayList(this.me));
 
-		Assert.assertTrue("Lists which are part of programs that logged in user is member of, should be accessible.",
-				this.securityServiceImpl.isAccessible(list, this.cropname));
+		Assert.assertTrue(
+			"Lists which are part of programs that logged in user is member of, should be accessible.",
+			this.securityServiceImpl.isAccessible(list, this.cropname));
 	}
 
 	/**
@@ -204,6 +217,41 @@ public class SecurityServiceImplTest {
 	public void testGermplasmListIsAccessibleIfNoProgramReference() {
 		final GermplasmList list = new GermplasmList();
 		list.setProgramUUID(null);
-		Assert.assertTrue("Lists with no program reference should be accessible to all.", this.securityServiceImpl.isAccessible(list, this.cropname));
+		Assert.assertTrue("Lists with no program reference should be accessible to all.",
+			this.securityServiceImpl.isAccessible(list, this.cropname));
+	}
+
+	@Test
+	public void testRequireCurrentUserIsAdminUserIsAdmin() {
+		Mockito.when(this.httpServletRequest.isUserInRole(Role.SUPERADMIN)).thenReturn(false);
+		Mockito.when(this.httpServletRequest.isUserInRole(Role.ADMIN)).thenReturn(true);
+		try {
+			this.securityServiceImpl.requireCurrentUserIsAdmin();
+		} catch (final ForbiddenException e) {
+			Assert.fail("Method should not throw an exception.");
+		}
+	}
+
+	@Test
+	public void testRequireCurrentUserIsAdminUserIsSuperadmin() {
+		Mockito.when(this.httpServletRequest.isUserInRole(Role.SUPERADMIN)).thenReturn(true);
+		Mockito.when(this.httpServletRequest.isUserInRole(Role.ADMIN)).thenReturn(false);
+		try {
+			this.securityServiceImpl.requireCurrentUserIsAdmin();
+		} catch (final ForbiddenException e) {
+			Assert.fail("Method should not throw an exception.");
+		}
+	}
+
+	@Test
+	public void testRequireCurrentUserIsAdminFail() {
+		Mockito.when(this.httpServletRequest.isUserInRole(Role.SUPERADMIN)).thenReturn(false);
+		Mockito.when(this.httpServletRequest.isUserInRole(Role.ADMIN)).thenReturn(false);
+		try {
+			this.securityServiceImpl.requireCurrentUserIsAdmin();
+			Assert.fail("Method should throw an exception.");
+		} catch (final ForbiddenException e) {
+			Assert.assertEquals(SecurityServiceImpl.CURRENT_USER_NOT_ADMIN_OR_SUPERADMIN, e.getError().getCode());
+		}
 	}
 }

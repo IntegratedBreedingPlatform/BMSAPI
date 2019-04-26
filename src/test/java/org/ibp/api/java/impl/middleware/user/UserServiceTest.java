@@ -1,12 +1,6 @@
 
 package org.ibp.api.java.impl.middleware.user;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -17,7 +11,6 @@ import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
 import org.ibp.api.java.impl.middleware.manager.UserValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
-import org.ibp.api.java.impl.middleware.user.UserServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +19,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
@@ -50,6 +49,7 @@ public class UserServiceTest {
 		this.userServiceImpl.setWorkbenchDataManager(this.workbenchDataManager);
 		this.userValidator.setWorkbenchDataManager(this.workbenchDataManager);
 		this.userServiceImpl.setUserValidator(this.userValidator);
+		this.userServiceImpl.setSecurityService(this.securityService);
 	}
 
 	/**
@@ -63,7 +63,8 @@ public class UserServiceTest {
 
 		Mockito.when(this.workbenchDataManager.getAllUsersSortedByLastName()).thenReturn(usersDto);
 		final List<UserDetailDto> usersDtlsDto = this.userServiceImpl.getAllUsersSortedByLastName();
-		
+
+		Mockito.verify(this.securityService).requireCurrentUserIsAdmin();
 		assertThat(usersDto.get(0).getFirstName(), equalTo(usersDtlsDto.get(0).getFirstName()));
 		assertThat(usersDto.get(0).getLastName(), equalTo(usersDtlsDto.get(0).getLastName()));
 		assertThat(usersDto.get(0).getUsername(), equalTo(usersDtlsDto.get(0).getUsername()));
@@ -82,10 +83,12 @@ public class UserServiceTest {
 	public void testCreateUser() throws Exception {
 		final UserDetailDto usrDtlDto = UserTestDataGenerator.initializeUserDetailDto(0);
 		final UserDto userDto = UserTestDataGenerator.initializeUserDto(0);
-		
+
 		Mockito.when(this.workbenchDataManager.createUser(userDto)).thenReturn(new Integer(7));
-		
+
 		final Map<String, Object> mapResponse = this.userServiceImpl.createUser(usrDtlDto);
+
+		Mockito.verify(this.securityService).requireCurrentUserIsAdmin();
 		assertThat((String) mapResponse.get("id"), equalTo("7"));
 	}
 
@@ -101,17 +104,19 @@ public class UserServiceTest {
 
 		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlDto.getUsername())).thenReturn(false);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlDto.getEmail())).thenReturn(false);
-		Mockito.when(this.workbenchDataManager.createUser(userDto)).thenThrow(new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + userDto.getUsername() + "): "));
-		
+		Mockito.when(this.workbenchDataManager.createUser(userDto)).thenThrow(new MiddlewareQueryException(
+			"Error encountered while saving User: UserDataManager.addUser(user=" + userDto.getUsername() + "): "));
+
 		final Map<String, Object> mapResponse = this.userServiceImpl.createUser(usrDtlDto);
-		final ErrorResponse error = (ErrorResponse)mapResponse.get("ERROR");
-		
+		final ErrorResponse error = (ErrorResponse) mapResponse.get("ERROR");
+
+		Mockito.verify(this.securityService).requireCurrentUserIsAdmin();
 		assertThat((String) mapResponse.get("id"), equalTo("0"));
 		assertThat(error.getErrors().size(), equalTo(1));
 		assertThat(error.getErrors().get(0).getFieldNames()[0], equalTo("userId"));
-		assertThat(error.getErrors().get(0).getMessage(), 	equalTo("DB error"));
+		assertThat(error.getErrors().get(0).getMessage(), equalTo("DB error"));
 	}
-	
+
 	/**
 	 * Should return the id 0, because happened a error during the creation user.
 	 *
@@ -125,8 +130,9 @@ public class UserServiceTest {
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlDto.getEmail())).thenReturn(true);
 
 		final Map<String, Object> mapResponse = this.userServiceImpl.createUser(usrDtlDto);
-		final ErrorResponse error = (ErrorResponse)mapResponse.get("ERROR");
-		
+		final ErrorResponse error = (ErrorResponse) mapResponse.get("ERROR");
+
+		Mockito.verify(this.securityService).requireCurrentUserIsAdmin();
 		assertThat((String) mapResponse.get("id"), equalTo("0"));
 		assertThat(error.getErrors().size(), equalTo(2));
 	}
@@ -141,12 +147,14 @@ public class UserServiceTest {
 		final UserDetailDto usrDtlDto = UserTestDataGenerator.initializeUserDetailDto(8);
 		final UserDto userDto = UserTestDataGenerator.initializeUserDto(8);
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(8);
-		
+
 		Mockito.when(this.workbenchDataManager.updateUser(userDto)).thenReturn(new Integer(8));
 		Mockito.when(this.workbenchDataManager.getUserById(8)).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlDto);
+
+		Mockito.verify(this.securityService).requireCurrentUserIsAdmin();
 		assertThat((String) mapResponse.get("id"), equalTo("8"));
 	}
 
@@ -168,8 +176,9 @@ public class UserServiceTest {
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlDto);
-		final ErrorResponse error = (ErrorResponse)mapResponse.get("ERROR");
-		
+		final ErrorResponse error = (ErrorResponse) mapResponse.get("ERROR");
+
+		Mockito.verify(this.securityService).requireCurrentUserIsAdmin();
 		assertThat((String) mapResponse.get("id"), equalTo("0"));
 		assertThat(error.getErrors().size(), equalTo(1));
 	}
@@ -190,16 +199,18 @@ public class UserServiceTest {
 		Mockito.when(this.workbenchDataManager.getUserById(usrDtlDto.getId())).thenReturn(usr);
 		Mockito.when(this.workbenchDataManager.isUsernameExists(usrDtlDto.getUsername())).thenReturn(false);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(usrDtlDto.getEmail())).thenReturn(false);
-		Mockito.when(this.workbenchDataManager.updateUser(userDto)).thenThrow(new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + userDto.getUsername() + "): "));
+		Mockito.when(this.workbenchDataManager.updateUser(userDto)).thenThrow(new MiddlewareQueryException(
+			"Error encountered while saving User: UserDataManager.addUser(user=" + userDto.getUsername() + "): "));
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlDto);
-		final ErrorResponse error = (ErrorResponse)mapResponse.get("ERROR");
-		
+		final ErrorResponse error = (ErrorResponse) mapResponse.get("ERROR");
+
+		Mockito.verify(this.securityService).requireCurrentUserIsAdmin();
 		assertThat((String) mapResponse.get("id"), equalTo("0"));
 		assertThat(error.getErrors().size(), equalTo(1));
 		assertThat(error.getErrors().get(0).getFieldNames()[0], equalTo("userId"));
-		assertThat(error.getErrors().get(0).getMessage(), 	equalTo("DB error"));
+		assertThat(error.getErrors().get(0).getMessage(), equalTo("DB error"));
 	}
 
 	/**
@@ -209,7 +220,7 @@ public class UserServiceTest {
 	 */
 	@Test
 	public void getUsersByProjectUUID() throws Exception {
-		List<UserDto> usersDto = UserTestDataGenerator.getAllListUser();
+		final List<UserDto> usersDto = UserTestDataGenerator.getAllListUser();
 
 		Mockito.when(this.workbenchDataManager.getUsersByProjectUuid(projectUUID)).thenReturn(usersDto);
 		final List<UserDetailDto> userDetailDtoList = this.userServiceImpl.getUsersByProjectUUID(projectUUID);
@@ -253,7 +264,5 @@ public class UserServiceTest {
 			.thenThrow(new MiddlewareQueryException("Error in getUsersByProjectUUId()"));
 		this.userServiceImpl.getUsersByProjectUUID(projectUUID);
 	}
-
-
 
 }
