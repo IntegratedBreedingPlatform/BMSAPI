@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
@@ -42,7 +43,7 @@ public class CropResourceBrapi {
 		// The response doesn't require pagination. The value for the "pagination" key is returned with all the keys set to zero.
 		final Metadata metadata = new Metadata();
 		metadata.withDatafiles(new URL[0]);
-		metadata.withStatus(new HashMap<String, String>());
+		metadata.withStatus(Collections.singletonList(new HashMap<>()));
 		metadata.withPagination(new Pagination(0, 0, 0l, 0));
 		cropDto.setMetadata(metadata);
 
