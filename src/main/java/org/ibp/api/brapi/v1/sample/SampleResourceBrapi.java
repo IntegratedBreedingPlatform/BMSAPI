@@ -1,5 +1,6 @@
 package org.ibp.api.brapi.v1.sample;
 
+import com.google.common.collect.ImmutableMap;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @Api(value = "BrAPI Sample Services")
@@ -36,8 +38,7 @@ public class SampleResourceBrapi {
 	public ResponseEntity<SampleSummaryDto> getSampleBySampleId(@PathVariable final String crop, final @PathVariable String sampleId) {
 		final SampleDetailsDTO sampleDetailsDTO = this.sampleService.getSampleObservation(sampleId);
 		if (StringUtils.isBlank(sampleDetailsDTO.getSampleBusinessKey())) {
-			final Map<String, String> status = new HashMap<>();
-			status.put("message", "not found sample");
+			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message",  "not found sample"));
 			final Metadata metadata = new Metadata(null, status);
 			final SampleSummaryDto sampleSummaryDto = new SampleSummaryDto().setMetadata(metadata);
 			return new ResponseEntity<>(sampleSummaryDto, HttpStatus.NOT_FOUND);
