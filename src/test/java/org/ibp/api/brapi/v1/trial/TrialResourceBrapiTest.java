@@ -1,9 +1,10 @@
 
 package org.ibp.api.brapi.v1.trial;
 
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
@@ -23,10 +24,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TrialResourceBrapiTest extends ApiUnitTestBase {
 
@@ -261,7 +260,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 						.queryParam("pageSize", 10).queryParam("page", 1).queryParam("sortBy", "invalid_sort_By").build().encode();
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isNotFound()) //
-				.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status.message",
+				.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message",
 						Matchers.is("sortBy bad filter, expect trialDbId/trialName/programDbId/programName/startDate/endDate/active"))) //
 		;
 	}
@@ -274,7 +273,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 				.andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status.message", Matchers.is("No inactive studies found."))) //
+				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("No inactive studies found."))) //
 		;
 	}
 
@@ -286,7 +285,7 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 				.andDo(MockMvcResultHandlers.print()).andExpect(
-						MockMvcResultMatchers.jsonPath("$.metadata.status.message", Matchers.is("sortOrder bad filter, expect asc/desc"))) //
+						MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("sortOrder bad filter, expect asc/desc"))) //
 		;
 	}
 }

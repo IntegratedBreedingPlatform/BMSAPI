@@ -1,9 +1,7 @@
 
 package org.ibp.api.brapi.v1.program;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
@@ -20,7 +18,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 
@@ -50,7 +49,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 				.andDo(MockMvcResultHandlers.print()) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status.message",
+				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message",
 						Matchers.is("crop " + ProgramResourceBrapiTest.INVALID_CROP + " doesn't exist"))); //
 
 	}
@@ -157,7 +156,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 				.andDo(MockMvcResultHandlers.print()) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status.message", Matchers.is("program not found.")));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("program not found.")));
 
 	}
 

@@ -2,6 +2,7 @@ package org.ibp.api.brapi.v1.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.google.common.collect.ImmutableMap;
 import org.pojomatic.Pojomatic;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -48,7 +49,7 @@ public class EntityListResponse<T> {
 	}
 
 	public EntityListResponse<T> withMessage(final String message) {
-		this.metadata.getStatus().put("message", message);
+		this.metadata.getStatus().add(ImmutableMap.of("message", message));
 		return this;
 	}
 

@@ -1,20 +1,15 @@
 
 package org.ibp.api.brapi.v1.study;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
-
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import liquibase.util.StringUtils;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -42,16 +37,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-
-import liquibase.util.StringUtils;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a> Study services.
@@ -103,7 +101,7 @@ public class StudyResourceBrapi {
 		final Result<org.ibp.api.brapi.v1.study.StudySummaryDto> results = new Result<>();
 		final Pagination pagination = new Pagination();
 		final Metadata metadata = new Metadata().withPagination(pagination)
-				.withStatus(Maps.newHashMap(ImmutableMap.of("message", "This call is not yet implemented.")));
+				.withStatus(Collections.singletonList(Maps.newHashMap(ImmutableMap.of("message", "This call is not yet implemented."))));
 		final StudySummariesDto studiesList = new StudySummariesDto().setMetadata(metadata).setResult(results);
 
 		return new ResponseEntity<>(studiesList, HttpStatus.OK);
@@ -128,8 +126,7 @@ public class StudyResourceBrapi {
 
 				return new ResponseEntity<>(HttpStatus.OK);
 			} else {
-				final Map<String, String> status = new HashMap<String, String>();
-				status.put("message", "Incorrect format");
+				final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", "Incorrect format"));
 				final Metadata metadata = new Metadata(null, status);
 				final StudyObservations observations = new StudyObservations().setMetadata(metadata);
 				return new ResponseEntity<>(observations, HttpStatus.NOT_FOUND);
@@ -176,7 +173,7 @@ public class StudyResourceBrapi {
 			final Metadata metadata = new Metadata();
 			final Pagination pagination = new Pagination().withPageNumber(1).withPageSize(1).withTotalCount(1L).withTotalPages(1);
 			metadata.setPagination(pagination);
-			metadata.setStatus(new HashMap<String, String>());
+			metadata.setStatus(Collections.singletonList(new HashMap<>()));
 			studyDetails.setMetadata(metadata);
 			final ModelMapper studyMapper = StudyMapper.getInstance();
 			final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);

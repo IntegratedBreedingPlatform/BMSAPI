@@ -1,9 +1,8 @@
 
 package org.ibp.api.brapi.v1.location;
 
-import java.util.HashMap;
-import java.util.List;
-
+import com.beust.jcommander.internal.Lists;
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -25,8 +24,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.beust.jcommander.internal.Lists;
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import java.util.HashMap;
+import java.util.List;
 
 public class LocationResourceBrapiTest extends ApiUnitTestBase {
 
@@ -105,7 +104,7 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 				.andDo(MockMvcResultHandlers.print()) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status.message", Matchers.is("not found locations"))); //
+				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("not found locations"))); //
 
 	}
 

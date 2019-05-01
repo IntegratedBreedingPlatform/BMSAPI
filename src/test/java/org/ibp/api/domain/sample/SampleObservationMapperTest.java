@@ -1,5 +1,6 @@
 package org.ibp.api.domain.sample;
 
+import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.ibp.api.java.impl.middleware.SampleTestDataGenerator;
 import org.junit.Test;
@@ -22,7 +23,7 @@ public class SampleObservationMapperTest {
 		assertThat(sampleObservationDto.getObservationUnitDbId(), equalTo(sampleDetailsDTO.getObsUnitId()));
 		assertThat(sampleObservationDto.getPlateDbId(), equalTo(sampleDetailsDTO.getPlateId()));
 		assertThat(sampleObservationDto.getSampleDbId(), equalTo(sampleDetailsDTO.getSampleBusinessKey()));
-		assertThat(sampleObservationDto.getSampleTimestamp(), equalTo(sampleDetailsDTO.getSampleDate()));
+		assertThat(sampleObservationDto.getSampleTimestamp(), equalTo(DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_TIMESTAMP_FORMAT).format(sampleDetailsDTO.getSampleDate())));
 		assertThat(sampleObservationDto.getStudyDbId(), equalTo(sampleDetailsDTO.getInstanceId()));
 		assertThat(sampleObservationDto.getTakenBy(), equalTo(sampleDetailsDTO.getTakenBy()));
 		assertThat(sampleObservationDto.getTissueType(), equalTo(sampleDetailsDTO.getTissueType()));

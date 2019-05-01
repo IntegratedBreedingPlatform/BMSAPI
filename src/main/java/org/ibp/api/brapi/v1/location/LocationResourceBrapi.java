@@ -1,12 +1,10 @@
 
 package org.ibp.api.brapi.v1.location;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.ImmutableMap;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
@@ -29,9 +27,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a> Location services.
@@ -99,8 +99,7 @@ public class LocationResourceBrapi {
 
 		} else {
 
-			final Map<String, String> status = new HashMap<>();
-			status.put("message", "not found locations");
+			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", "not found locations"));
 			final Metadata metadata = new Metadata(null, status);
 			final Locations locationList = new Locations().withMetadata(metadata);
 			return new ResponseEntity<>(locationList, HttpStatus.NOT_FOUND);
