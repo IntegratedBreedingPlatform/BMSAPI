@@ -2,8 +2,14 @@
 package org.ibp.api.exception;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.NOT_IMPLEMENTED;
+import static org.springframework.http.HttpStatus.PRECONDITION_FAILED;
 
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +30,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+
+import java.util.List;
 
 @ControllerAdvice
 public class DefaultExceptionHandler {
@@ -53,6 +61,7 @@ public class DefaultExceptionHandler {
 	@ResponseStatus(value = BAD_REQUEST)
 	@ResponseBody
 	public ErrorResponse httpMessageNotReadableException(HttpMessageNotReadableException ex) {
+		LOG.error("Error executing the API call.", ex);
 		ErrorResponse response = new ErrorResponse();
 		Throwable rootCause = ex.getRootCause();
 		if (rootCause instanceof UnrecognizedPropertyException) {
@@ -72,7 +81,8 @@ public class DefaultExceptionHandler {
 	@ResponseStatus(value = BAD_REQUEST)
 	@ResponseBody
 	public ErrorResponse httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
-		ErrorResponse response = new ErrorResponse();
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = new ErrorResponse();
 		DefaultExceptionHandler.LOG.error("Request not supported with given input", ex);
 		response.addError(this.messageSource.getMessage("request.method.not.supported", null, LocaleContextHolder.getLocale()));
 		return response;
@@ -83,10 +93,88 @@ public class DefaultExceptionHandler {
 	@ResponseStatus(value = BAD_REQUEST)
 	@ResponseBody
 	public ErrorResponse handleValidationException(ApiRequestValidationException ex) {
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = buildErrorResponse(ex.getErrors());
+		return response;
+	}
 
-		ErrorResponse response = new ErrorResponse();
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(ResourceNotFoundException.class)
+	@ResponseStatus(value = NOT_FOUND)
+	@ResponseBody
+	public ErrorResponse handleNotFoundException(ResourceNotFoundException ex) {
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = new ErrorResponse();
 
-		for (ObjectError error : ex.getErrors()) {
+		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
+		response.addError(message);
+
+		return response;
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(ForbiddenException.class)
+	@ResponseStatus(value = FORBIDDEN)
+	@ResponseBody
+	public ErrorResponse handleForbiddenException(ForbiddenException ex) {
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = new ErrorResponse();
+
+		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
+		response.addError(message);
+
+		return response;
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(NotSupportedException.class)
+	@ResponseStatus(value = NOT_IMPLEMENTED)
+	@ResponseBody
+	public ErrorResponse handleNotSupportedException(NotSupportedException ex) {
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = new ErrorResponse();
+
+		String message = this.messageSource.getMessage(ex.getError().getCode(), ex.getError().getArguments(), LocaleContextHolder.getLocale());
+		response.addError(message);
+
+		return response;
+	}
+
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(ConflictException.class)
+	@ResponseStatus(value = CONFLICT)
+	@ResponseBody
+	public ErrorResponse handleConflictException(ConflictException ex) {
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = buildErrorResponse(ex.getErrors());
+		return response;
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(MiddlewareRequestException.class)
+	@ResponseStatus(value = BAD_REQUEST)
+	@ResponseBody
+	public ErrorResponse handleUncaughtException(MiddlewareRequestException ex) {
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = new ErrorResponse();
+		response.addError(ex.getMessage());
+		return response;
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(PreconditionFailedException.class)
+	@ResponseStatus(value = PRECONDITION_FAILED)
+	@ResponseBody
+	public ErrorResponse handlePreconditionFailedException(PreconditionFailedException ex) {
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = buildErrorResponse(ex.getErrors());
+		return response;
+	}
+
+	private ErrorResponse buildErrorResponse(final List<ObjectError> objectErrors){
+		final ErrorResponse response = new ErrorResponse();
+		for (ObjectError error : objectErrors) {
 			String message = this.messageSource.getMessage(error.getCode(), error.getArguments(), LocaleContextHolder.getLocale());
 			if (error instanceof FieldError) {
 				FieldError fieldError = (FieldError) error;

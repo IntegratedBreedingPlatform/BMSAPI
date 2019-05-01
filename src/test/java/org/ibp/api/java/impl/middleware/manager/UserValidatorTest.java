@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -35,12 +35,12 @@ public class UserValidatorTest {
 
 	private UserValidator uservalidator;
 
-	@Mock 
+	@Mock
 	protected WorkbenchDataManager workbenchDataManager;
 
 	@Mock
 	private SecurityService securityService;
-	
+
 	private Role superAdminRole;
 
 	@Before
@@ -49,7 +49,7 @@ public class UserValidatorTest {
 		this.uservalidator = new UserValidator();
 		this.uservalidator.setWorkbenchDataManager(this.workbenchDataManager);
 		this.uservalidator.setSecurityService(this.securityService);
-		
+
 		Mockito.doReturn(this.createTestRoles()).when(this.workbenchDataManager).getAllRoles();
 	}
 
@@ -60,11 +60,9 @@ public class UserValidatorTest {
 
 	/**
 	 * Should validate all fields empty and with length exceed.* *
-	 *
-	 * @throws Exception
 	 */
 	@Test
-	public void testValidateFieldLength() throws Exception {
+	public void testValidateFieldLength() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = new UserDetailDto();
 
@@ -85,11 +83,9 @@ public class UserValidatorTest {
 
 	/**
 	 * Should validate the Role allow.* *
-	 *
-	 * @throws Exception
 	 */
 	@Test
-	public void testValidateRoleWhenNull() throws Exception {
+	public void testValidateRoleWhenNull() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
@@ -103,9 +99,9 @@ public class UserValidatorTest {
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat(UserValidator.SIGNUP_FIELD_INVALID_ROLE, equalTo(bindingResult.getFieldError("role").getCode()));
 	}
-	
+
 	@Test
-	public void testValidateRole() throws Exception {
+	public void testValidateRole() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
@@ -119,7 +115,7 @@ public class UserValidatorTest {
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.length.exceed", equalTo(bindingResult.getFieldError("role").getCode()));
 	}
-	
+
 	@Test
 	public void testValidateRoleWhenRoleIsSuperAdminRole() {
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
@@ -134,7 +130,7 @@ public class UserValidatorTest {
 		this.uservalidator.validate(userDto, bindingResult, true);
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat(UserValidator.CANNOT_ASSIGN_SUPERADMIN_ROLE, equalTo(bindingResult.getAllErrors().get(0).getCode()));
-		
+
 		bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		this.uservalidator.validate(userDto, bindingResult, false);
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
@@ -143,11 +139,9 @@ public class UserValidatorTest {
 
 	/**
 	 * Should validate the Email Format.* *
-	 *
-	 * @throws Exception
 	 */
 	@Test
-	public void testValidateEmail() throws Exception {
+	public void testValidateEmail() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
@@ -155,6 +149,21 @@ public class UserValidatorTest {
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
+		//Valid email
+		userDto.setEmail("cuenya.diego@leafnode.io");
+
+		this.uservalidator.validate(userDto, bindingResult, false);
+
+		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
+
+		//Valid email
+		userDto.setEmail("cuenya.diego@leafnode.email-valid.io");
+
+		this.uservalidator.validate(userDto, bindingResult, false);
+
+		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
+
+		//Invalid email
 		userDto.setEmail("cuenya.diego!@leafnode.io");
 
 		this.uservalidator.validate(userDto, bindingResult, false);
@@ -165,11 +174,9 @@ public class UserValidatorTest {
 
 	/**
 	 * Should validate the UserId.* *
-	 *
-	 * @throws Exception
 	 */
 	@Test
-	public void testValidateUserId() throws Exception {
+	public void testValidateUserId() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(777);
 
@@ -181,18 +188,12 @@ public class UserValidatorTest {
 
 	/**
 	 * Should validate the userId inexistent.* *
-	 *
-	 * @throws Exception
 	 */
 	@Test
-	public void testValidateUserIdInexistent() throws Exception {
+	public void testValidateUserIdInexistent() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(5);
 		this.uservalidator.validate(userDto, bindingResult, false);
-
-		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
-		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
 		assertThat("signup.field.invalid.userId", equalTo(bindingResult.getFieldError("userId").getCode()));
@@ -200,15 +201,13 @@ public class UserValidatorTest {
 
 	/**
 	 * Should validate the status allow.* *
-	 *
-	 * @throws Exception
 	 */
 	@Test
-	public void testValidateStatus() throws Exception {
+	public void testValidateStatus() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(20);
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20);
-		
+
 		userDto.setStatus("truee");
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
@@ -221,11 +220,9 @@ public class UserValidatorTest {
 
 	/**
 	 * Should validate if username and email exists.* *
-	 *
-	 * @throws Exception
 	 */
 	@Test
-	public void testValidateUserAndPeronalEmailExists() throws Exception {
+	public void testValidateUserAndPeronalEmailExists() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(0);
 
@@ -240,11 +237,9 @@ public class UserValidatorTest {
 
 	/**
 	 * Should validate update user.* *
-	 *
-	 * @throws Exception
 	 */
 	@Test
-	public void testValidateUpdateUser() throws Exception {
+	public void testValidateUpdateUser() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20);
@@ -262,11 +257,9 @@ public class UserValidatorTest {
 
 	/**
 	 * Should validate update user with diferent Email* *
-	 *
-	 * @throws Exception
 	 */
 	@Test
-	public void testValidateUpdateUserEmailExists() throws Exception {
+	public void testValidateUpdateUserEmailExists() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
@@ -286,11 +279,9 @@ public class UserValidatorTest {
 
 	/**
 	 * Should validate update user with diferent username* *
-	 *
-	 * @throws Exception
 	 */
 	@Test
-	public void testValidateUpdateUserUsernameExists() throws Exception {
+	public void testValidateUpdateUserUsernameExists() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
@@ -310,16 +301,14 @@ public class UserValidatorTest {
 
 	/**
 	 * Should validate update user.* *
-	 *
-	 * @throws Exception
 	 */
 	@Test
-	public void testValidateUpdateUserForExistingSuperAdminUser() throws Exception {
+	public void testValidateUpdateUserForExistingSuperAdminUser() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20);
 		user.setRoles(Arrays.asList(new UserRole(user, new Role(5, Role.SUPERADMIN))));
-		
+
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(false);
 		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userDto.getEmail())).thenReturn(false);
@@ -333,11 +322,9 @@ public class UserValidatorTest {
 
 	/**
 	 * Should validate create user.* *
-	 *
-	 * @throws Exception
 	 */
 	@Test
-	public void testValidateCreateUser() throws Exception {
+	public void testValidateCreateUser() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(0);
 
@@ -362,33 +349,33 @@ public class UserValidatorTest {
 		assertThat(0, not(equalTo(bindingResult.getGlobalErrorCount())));
 		assertThat(UserValidator.USER_AUTO_DEACTIVATION, equalTo(bindingResult.getGlobalErrors().get(0).getCode()));
 	}
-	
+
 	@Test
 	public void testIsSuperAdminRole(){
 		this.uservalidator.setSuperAdminRole(this.superAdminRole);
-		
+
 		// Should validate "SUPERADMIN" description
 		Assert.assertTrue(this.uservalidator.isSuperAdminRole(new Role(100, Role.SUPERADMIN)));
-		
+
 		// Should validate by superadmin ID from DB
 		Assert.assertTrue(this.uservalidator.isSuperAdminRole(new Role(SUPERADMIN_ID, "")));
-		
+
 		// Should not flag as superamin user if ID and description do not match
 		Assert.assertFalse(this.uservalidator.isSuperAdminRole(new Role(100, "Admin")));
 	}
-	
+
 	private List<Role> createTestRoles() {
 		final List<Role> allRoles = new ArrayList<>();
 		Role admin = new Role(1, "ADMIN");
 		Role breeder = new Role(2, "BREEDER");
 		Role technician = new Role(3, "TECHNICIAN");
 		this.superAdminRole = new Role(SUPERADMIN_ID, Role.SUPERADMIN);
-		
+
 		allRoles.add(admin);
 		allRoles.add(breeder);
 		allRoles.add(technician);
 		allRoles.add(this.superAdminRole);
-		
+
 		return allRoles;
 	}
 }

@@ -13,8 +13,12 @@ import org.ibp.api.domain.study.FieldPlot;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -30,19 +34,27 @@ import static org.mockito.Mockito.when;
  * The class <code>FieldMapServiceTest</code> contains tests for the class <code>{@link FieldMapService}</code>.
  *
  */
+@RunWith(MockitoJUnitRunner.class)
 public class FieldMapServiceTest {
 
 	private Map<Integer, FieldMap> simpleFieldMap;
 
+	@Mock
+	private StudyDataManager studyDataManager;
+
+	@Mock
+	private CrossExpansionProperties crossExpansionProperties;
+
+	@InjectMocks
+	private FieldMapService fieldMapService;
+
 	@Before
 	public void setup() throws Exception {
-		final StudyDataManager studyDataManager = Mockito.mock(StudyDataManager.class);
 		final List<FieldMapInfo> testFieldMapInfo = getSimpleMiddlewareFieldMapInfoObjectForTest();
 		when(studyDataManager.getStudyTypeByStudyId(123)).thenReturn(StudyTypeDto.getTrialDto());
 		when(
 				studyDataManager.getFieldMapInfoOfStudy(Matchers.<List<Integer>>any(),
 						any(CrossExpansionProperties.class))).thenReturn(testFieldMapInfo);
-		final FieldMapService fieldMapService = new FieldMapService(studyDataManager, Mockito.mock(CrossExpansionProperties.class));
 		simpleFieldMap = fieldMapService.getFieldMap("123");
 	}
 

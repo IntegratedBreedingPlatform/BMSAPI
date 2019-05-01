@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.PRECONDITION_FAILED;
 
 @ControllerAdvice
 public class TestExceptionHandler {
@@ -55,5 +58,30 @@ public class TestExceptionHandler {
 	@ResponseBody
 	public ErrorResponse handleValidationException(ApiRequestValidationException ex) {
 		return this.defaultExceptionHandler.handleValidationException(ex);
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(ResourceNotFoundException.class)
+	@ResponseStatus(value = NOT_FOUND)
+	@ResponseBody
+	public ErrorResponse handleNotFoundException(ResourceNotFoundException ex) {
+		return this.defaultExceptionHandler.handleNotFoundException(ex);
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(ForbiddenException.class)
+	@ResponseStatus(value = FORBIDDEN)
+	@ResponseBody
+	public ErrorResponse handleForbiddenException(ForbiddenException ex) {
+		return this.defaultExceptionHandler.handleForbiddenException(ex);
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(PreconditionFailedException.class)
+	@ResponseStatus(value = PRECONDITION_FAILED)
+	@ResponseBody
+	public ErrorResponse handlePreconditionFailedException(PreconditionFailedException ex) {
+
+		return this.defaultExceptionHandler.handlePreconditionFailedException(ex);
 	}
 }

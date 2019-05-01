@@ -34,7 +34,7 @@ public class SampleResource {
 	@RequestMapping(value = "/{crop}/samples", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<SampleDTO>> filter(@PathVariable final String crop,
-        @RequestParam(required = false) @ApiParam(value = "The plot to which the samples belong") final String plotId,
+        @RequestParam(required = false) @ApiParam(value = "The observation unit to which the samples belong") final String obsUnitId,
         @RequestParam(required = false) @ApiParam(value = "The list to which the samples belong") final Integer listId,
 		// TODO describe in swagger?
 		final Pageable pageable) {
@@ -44,18 +44,18 @@ public class SampleResource {
 
 				@Override
 				public long getCount() {
-					return sampleService.countFilter(plotId, listId);
+					return SampleResource.this.sampleService.countFilter(obsUnitId, listId);
 				}
 
 				@Override
 				public List<SampleDTO> getResults(final PagedResult<SampleDTO> pagedResult) {
-					return sampleService.filter(plotId, listId, pageable);
+					return SampleResource.this.sampleService.filter(obsUnitId, listId, pageable);
 				}
 			});
 
 		final List<SampleDTO> samples = resultPage.getPageResults();
 
-		HttpHeaders headers = new HttpHeaders();
+		final HttpHeaders headers = new HttpHeaders();
 		headers.add("X-Total-Count", Long.toString(resultPage.getTotalResults()));
 
 		return new ResponseEntity<>(samples, headers, HttpStatus.OK);

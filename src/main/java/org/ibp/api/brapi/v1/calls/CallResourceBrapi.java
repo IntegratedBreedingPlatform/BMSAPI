@@ -1,5 +1,6 @@
 package org.ibp.api.brapi.v1.calls;
 
+import com.google.common.collect.ImmutableMap;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -75,8 +76,7 @@ public class CallResourceBrapi {
 
 		} else {
 
-			final Map<String, String> status = new HashMap<>();
-			status.put("message", "not found calls");
+			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", "not found calls"));
 			final Metadata metadata = new Metadata(null, status);
 			final BrapiCalls brapiCalls = new BrapiCalls().withMetadata(metadata);
 			return new ResponseEntity<>(brapiCalls, HttpStatus.NOT_FOUND);

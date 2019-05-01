@@ -128,10 +128,10 @@ public class ScaleServiceImplTest {
 				.getRelationshipsWithObjectAndType(ScaleServiceImplTest.CATEGORICAL_SCALE, TermRelationshipId.HAS_SCALE);
 		Mockito.doReturn(true).when(this.termDataManager).isTermReferred(ScaleServiceImplTest.CATEGORICAL_SCALE);
 		Mockito.doReturn(true).when(this.ontologyVariableDataManager).areVariablesUsedInStudy(Matchers.anyListOf(Integer.class));
-		// Only 3 out of 5 valid values are being used in observations of non-deleted studies
+		// Only 3 out of 5 valid values are being used in non-deleted studies
 		final List<String> usedCategories = Arrays.asList("1", "2", "3");
 		Mockito.doReturn(usedCategories).when(this.termDataManager)
-				.getCategoriesReferredInPhenotype(ScaleServiceImplTest.CATEGORICAL_SCALE);
+				.getCategoriesUsedInStudies(ScaleServiceImplTest.CATEGORICAL_SCALE);
 
 		// Method to test
 		final ScaleDetails scaleDetails = this.scaleServiceImpl.getScaleById(ScaleServiceImplTest.CATEGORICAL_SCALE.toString());

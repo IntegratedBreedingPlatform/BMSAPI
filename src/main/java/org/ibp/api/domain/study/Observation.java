@@ -26,7 +26,7 @@ public class Observation {
 
 	private String plotNumber;
 
-	private String plotId;
+	private String obsUnitId;
 
 	private String blockNumber;
 
@@ -235,12 +235,12 @@ public class Observation {
 		return this.measurementsMap;
 	}
 
-	public String getPlotId() {
-		return this.plotId;
+	public String getObsUnitId() {
+		return this.obsUnitId;
 	}
 
-	public void setPlotId(final String plotId) {
-		this.plotId = plotId;
+	public void setObsUnitId(final String obsUnitId) {
+		this.obsUnitId = obsUnitId;
 	}
 
 	@Override

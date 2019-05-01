@@ -45,14 +45,14 @@ public class SampleResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testListSamplesNotFound() throws Exception {
-		final String plotId = null;
+		final String obsUnitId = null;
 		final Integer listId = null;
 
 		final List<SampleDTO> list = new ArrayList<>();
 
 		Mockito.when(this.sampleService.filter(null, null, null)).thenReturn(list);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/sample/maize/samples?plotId=" + plotId).contentType(this.contentType)) //
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/sample/maize/samples?obsUnitId=" + obsUnitId).contentType(this.contentType)) //
 			.andExpect(MockMvcResultMatchers.status().isOk()) //
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(jsonPath("$", Matchers.empty())) //
@@ -61,20 +61,17 @@ public class SampleResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testListSamples() throws Exception {
-		final String plotId = randomAlphanumeric(13);
-		final Integer listId = null;
+		final String obsUnitId = randomAlphanumeric(13);
 		final Date samplingDate = new Date();
 		final List<SampleDTO> list = new ArrayList<>();
 		final SampleDTO sample =
 			new SampleDTO(randomAlphanumeric(6), randomAlphanumeric(6), randomAlphanumeric(6), samplingDate, randomAlphanumeric(6),
-				nextInt(), randomAlphanumeric(6), nextInt());
+				nextInt());
 		list.add(sample);
 
-		Mockito.when(this.sampleService
-			.filter(anyString(), anyInt(), org.mockito.Matchers.any(Pageable.class)))
-			.thenReturn(list);
+		Mockito.doReturn(list).when(sampleService).filter(anyString(), Mockito.isNull(Integer.class), org.mockito.Matchers.any(Pageable.class));
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/sample/maize/samples?plotId=" + plotId).contentType(this.contentType))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/sample/maize/samples?obsUnitId=" + obsUnitId).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.status().isOk()) //
 			.andExpect(jsonPath("$", IsCollectionWithSize.hasSize(list.size()))) //
@@ -85,8 +82,6 @@ public class SampleResourceTest extends ApiUnitTestBase {
 			// .andExpect(MockMvcResultMatchers
 			// 	.jsonPath("$[0].samplingDate", is(SampleListResourceTest.DATE_FORMAT.format(sample.getSamplingDate())))) //
 			.andExpect(jsonPath("$[0].sampleList", is(sample.getSampleList()))) //
-			.andExpect(jsonPath("$[0].plantNumber", is(sample.getPlantNumber()))) //
-			.andExpect(jsonPath("$[0].plantBusinessKey", is(sample.getPlantBusinessKey()))) //
 		;
 
 	}

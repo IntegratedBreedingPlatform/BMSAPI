@@ -1,12 +1,12 @@
 
 package org.ibp.api.brapi.v1.crop;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.crop.CropService;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +18,17 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import java.util.Arrays;
+import java.util.List;
 
 public class CropResourceBrapiTest extends ApiUnitTestBase {
 
 	@Autowired
 	private CropService cropService;
+
+	@Autowired
+	private SecurityService securityService;
+
 
 	@Configuration
 	public static class TestConfiguration {
@@ -41,21 +46,25 @@ public class CropResourceBrapiTest extends ApiUnitTestBase {
 
 		final List<String> crops = Arrays.asList("Maize", "Wheat", "Cowpea", "pearlmillet");
 
-		Mockito.when(this.cropService.getInstalledCrops()).thenReturn(crops);
+		final WorkbenchUser workbenchUser = new WorkbenchUser();
+		workbenchUser.setUserid(1);
+
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(workbenchUser);
+		Mockito.when(this.cropService.getAvailableCropsForUser(workbenchUser.getUserid())).thenReturn(crops);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/brapi/v1/crops").build();
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(4)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0]", Matchers.is(crops.get(0))))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[1]", Matchers.is(crops.get(1))))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[2]", Matchers.is(crops.get(2))))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[3]", Matchers.is(crops.get(3))))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.currentPage", Matchers.is(0)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.pageSize", Matchers.is(0)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalCount", Matchers.is(0)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalPages", Matchers.is(0)));
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(4)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0]", Matchers.is(crops.get(0))))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[1]", Matchers.is(crops.get(1))))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[2]", Matchers.is(crops.get(2))))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[3]", Matchers.is(crops.get(3))))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.currentPage", Matchers.is(0)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.pageSize", Matchers.is(0)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalCount", Matchers.is(0)))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination.totalPages", Matchers.is(0)));
 
 	}
 

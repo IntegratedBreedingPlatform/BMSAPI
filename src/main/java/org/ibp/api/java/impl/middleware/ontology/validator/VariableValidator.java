@@ -1,13 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.ontology.validator;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -25,7 +19,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import com.google.common.base.Strings;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Add/Update Variable Validation rules for Variable request Refer: http://confluence.leafnode.io/display/CD/Services+Validation 1. Name is
@@ -65,6 +65,10 @@ public class VariableValidator extends OntologyValidator implements Validator {
 	private static final String SCALE_ID_NAME = "scaleId";
 	private static final String EXPECTED_RANGE_NAME = "expectedRange";
 	private static final String VARIABLE_NAME = "variable";
+	private static final List<Integer> EDITABLE_VARIABLES_TYPE_IDS = Arrays.asList( //
+		org.generationcp.middleware.domain.ontology.VariableType.TRAIT.getId(), //
+		org.generationcp.middleware.domain.ontology.VariableType.SELECTION_METHOD.getId(), //
+		org.generationcp.middleware.domain.ontology.VariableType.STUDY_CONDITION.getId());
 
 	@Override
 	public boolean supports(final Class<?> aClass) {
@@ -351,7 +355,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 		if (!isTrait && !StringUtils.isBlank(variable.getId())) {
 			final Integer requestId = Integer.valueOf(variable.getId());
-			final Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId, true, true);
+			final Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId, true);
+
 			if (oldVariable.getFormula() != null) {
 				this.addCustomError(errors, "variableTypes", "variable.type.formula", new Object[] {});
 			}
@@ -390,7 +395,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		try {
 
 			final Integer requestId = StringUtil.parseInt(variable.getId(), null);
-			final Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId, true, true);
+			final Variable oldVariable = this.ontologyVariableDataManager.getVariable(variable.getProgramUuid(), requestId, true);
+			ontologyVariableDataManager.fillVariableUsage(oldVariable);
 
 			if (oldVariable.getScale().getDataType() != null
 					&& Objects.equals(oldVariable.getScale().getDataType().isSystemDataType(), true)) {
@@ -416,6 +422,13 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				return;
 			}
 
+			boolean editableVariable = false;
+			for (VariableType variableType : variable.getVariableTypes()) {
+				if (VariableValidator.EDITABLE_VARIABLES_TYPE_IDS.contains(Integer.valueOf(variableType.getId()))) {
+					editableVariable = true;
+				}
+			}
+
 			final Integer methodId = StringUtil.parseInt(variable.getMethod().getId(), null);
 			final Integer propertyId = StringUtil.parseInt(variable.getProperty().getId(), null);
 			final Integer scaleId = StringUtil.parseInt(variable.getScale().getId(), null);
@@ -424,9 +437,9 @@ public class VariableValidator extends OntologyValidator implements Validator {
 			final boolean propertyEqual = Objects.equals(propertyId, oldVariable.getProperty().getId());
 			final boolean methodEqual = Objects.equals(methodId, oldVariable.getMethod().getId());
 			final boolean scaleEqual = Objects.equals(scaleId, oldVariable.getScale().getId());
-			final boolean minValuesEqual = StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMin(), oldVariable.getMinValue());
-			final boolean maxValuesEqual = StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMax(), oldVariable.getMaxValue());
-			final boolean aliasEqual = StringUtil.areBothEmptyOrEqual(variable.getAlias(), oldVariable.getAlias());
+			final boolean minValuesEqual = editableVariable ? true : StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMin(), oldVariable.getMinValue());
+			final boolean maxValuesEqual = editableVariable ? true : StringUtil.areBothEmptyOrEqual(variable.getExpectedRange().getMax(), oldVariable.getMaxValue());
+			final boolean aliasEqual = editableVariable ? true : StringUtil.areBothEmptyOrEqual(variable.getAlias(), oldVariable.getAlias());
 
 			if (!nameEqual) {
 				this.addCustomError(errors, "name", BaseValidator.RECORD_IS_NOT_EDITABLE, new Object[] {VariableValidator.VARIABLE_NAME,

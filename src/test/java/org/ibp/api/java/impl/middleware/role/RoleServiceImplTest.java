@@ -7,7 +7,6 @@ import java.util.List;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.java.impl.middleware.role.RoleServiceImpl;
 import org.ibp.api.domain.role.RoleDto;
 import org.junit.Assert;
 import org.junit.Before;

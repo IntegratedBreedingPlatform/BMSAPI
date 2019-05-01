@@ -26,7 +26,7 @@ public class SampleListDto {
 
 	private String samplingDate;
 
-	private Integer studyId;
+	private Integer datasetId;
 
 	private String cropName;
 
@@ -96,20 +96,20 @@ public class SampleListDto {
 		this.samplingDate = samplingDate;
 	}
 
-	public Integer getStudyId() {
-		return this.studyId;
-	}
-
-	public void setStudyId(final Integer studyId) {
-		this.studyId = studyId;
-	}
-
 	public String getCropName() {
 		return this.cropName;
 	}
 
 	public void setCropName(final String cropName) {
 		this.cropName = cropName;
+	}
+
+	public Integer getDatasetId() {
+		return datasetId;
+	}
+
+	public void setDatasetId(final Integer datasetId) {
+		this.datasetId = datasetId;
 	}
 
 	public Integer getParentId() {

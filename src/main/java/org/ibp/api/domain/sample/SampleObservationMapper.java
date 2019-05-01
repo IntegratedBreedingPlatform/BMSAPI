@@ -15,7 +15,7 @@ public class SampleObservationMapper {
 
 	private static final SimpleDateFormat DATE_FORMAT = DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT_3);
 
-	private static ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
+	private static final ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
 
 	static {
 		SampleObservationMapper.addSampleObservationMapper(SampleObservationMapper.applicationWideModelMapper);
@@ -28,10 +28,10 @@ public class SampleObservationMapper {
 		return SampleObservationMapper.applicationWideModelMapper;
 	}
 
-	private static void addSampleObservationMapper(ModelMapper mapper) {
+	private static void addSampleObservationMapper(final ModelMapper mapper) {
 		mapper.addMappings(new PropertyMap<SampleDetailsDTO, SampleObservationDto>() {
 
-			private Converter<Date, String> toDateConverter = new AbstractConverter<Date, String>() {
+			private final Converter<Date, String> toDateConverter = new AbstractConverter<Date, String>() {
 
 				protected String convert(final Date source) {
 					return source == null ? "" : DATE_FORMAT.format(source);
@@ -42,11 +42,10 @@ public class SampleObservationMapper {
 			protected void configure() {
 				this.map().setStudyDbId(this.source.getStudyDbId());
 				this.map().setLocationDbId(this.source.getLocationDbId());
-				this.map().setPlotId(this.source.getPlotId());
-				this.map().setPlantId(this.source.getPlantBusinessKey());
+				this.map().setObsUnitId(this.source.getObsUnitId());
 				this.map().setSampleId(this.source.getSampleBusinessKey());
 				this.map().setTakenBy(this.source.getTakenBy());
-				this.using(toDateConverter).map(this.source.getSampleDate()).setSampleDate(null);
+				this.using(this.toDateConverter).map(this.source.getSampleDate()).setSampleDate(null);
 				this.map().setSampleType(this.source.getSampleType());
 				this.map().setTissueType(this.source.getTissueType());
 				this.map().setNotes(this.source.getNotes());

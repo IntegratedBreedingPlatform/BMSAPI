@@ -68,11 +68,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		.and()
 		.authorizeRequests()
 				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-				.antMatchers("/", "/api-docs/**", "/authenticate", "/brapi/**/token", "/cooltools/**", "/breeding_view/**").permitAll()
+				.antMatchers("/", "/api-docs/**", "/authenticate", "/brapi/**/token", "/breeding_view/**").permitAll()
 		//  TODO Retrieve roles from DB		
-		.anyRequest().hasAnyAuthority(Role.ADMIN, "BREEDER", "TECHNICIAN", Role.SUPERADMIN)
+		.anyRequest().hasAnyAuthority(Role.ADMIN, "BREEDER", "TECHNICIAN", "READONLY", Role.SUPERADMIN)
 		.and()
-		.apply(this.securityConfigurerAdapter());
+		.apply(this.securityConfigurerAdapter())
+		.and()
+		.servletApi().rolePrefix("");
 	}
 
 	private XAuthTokenConfigurer securityConfigurerAdapter() {

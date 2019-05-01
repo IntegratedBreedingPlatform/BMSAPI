@@ -1,11 +1,10 @@
 package org.ibp.api.java.impl.middleware.ontology;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.collect.Maps;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
+import org.generationcp.middleware.manager.ontology.VariableCache;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.ontology.validator.FormulaValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermDeletableValidator;
@@ -47,7 +46,7 @@ public class FormulaServiceImpl implements FormulaService {
 		}
 
 		this.setStorageFormat(formulaDto);
-
+		VariableCache.removeFromCache(formulaDto.getTarget().getId());
 		return this.formulaService.save(formulaDto);
 	}
 
@@ -61,13 +60,31 @@ public class FormulaServiceImpl implements FormulaService {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 
-		this.formulaValidator.validateDelete(formula.get(), bindingResult);
+		VariableCache.removeFromCache(formula.get().getTarget().getId());
+		this.formulaService.delete(formulaId);
+	}
+
+	@Override
+	public FormulaDto update(final FormulaDto formulaDto) {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), FormulaDto.class.getName());
+		final Optional<FormulaDto> formula = this.formulaService.getById(formulaDto.getFormulaId());
+
+		if (!formula.isPresent()) {
+			bindingResult.reject("variable.formula.not.exist", new Integer[] {formulaDto.getFormulaId()}, "");
+			throw new ApiRequestValidationException(bindingResult.getAllErrors());
+		}
+
+		this.extractInputs(formulaDto);
+		// This validation will also fill the the inputs ids if exists
+		this.formulaValidator.validate(formulaDto, bindingResult);
 
 		if (bindingResult.hasErrors()) {
 			throw new ApiRequestValidationException(bindingResult.getAllErrors());
 		}
 
-		this.formulaService.delete(formulaId);
+		this.setStorageFormat(formulaDto);
+		VariableCache.removeFromCache(formula.get().getTarget().getId());
+		return this.formulaService.update(formulaDto);
 	}
 
 	private void extractInputs(final FormulaDto formulaDto) {

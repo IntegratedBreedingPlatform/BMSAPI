@@ -1,9 +1,10 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
+import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
@@ -31,6 +32,10 @@ import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -134,6 +139,35 @@ public class GermplasmServiceImpl implements GermplasmService {
 		this.locationDataManger = locationDataManger;
 	}
 
+	void setCrossExpansionProperties(CrossExpansionProperties crossExpansionProperties) {
+		this.crossExpansionProperties = crossExpansionProperties;
+	}
+	
+	@Override
+	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
+		PedigreeDTO pedigreeDTO = null;
+		try {
+			pedigreeDTO = this.germplasmDataManager.getPedigree(germplasmDbId, notation, includeSiblings);
+			if (pedigreeDTO != null) {
+				pedigreeDTO.setPedigree(this.pedigreeService.getCrossExpansion(germplasmDbId, crossExpansionProperties));
+			}
+		} catch (final MiddlewareQueryException e) {
+			throw new ApiRuntimeException("An error has occurred when trying to get the pedigree", e);
+		}
+		return pedigreeDTO;
+	}
+
+	@Override
+	public ProgenyDTO getProgeny(final Integer germplasmDbId) {
+		ProgenyDTO progenyDTO = null;
+		try {
+			progenyDTO = this.germplasmDataManager.getProgeny(germplasmDbId);
+		} catch (final MiddlewareQueryException e) {
+			throw new ApiRuntimeException("An error has occurred when trying to get the progeny", e);
+		}
+		return progenyDTO;
+	}
+
 	@Override
 	public PedigreeTree getPedigreeTree(String germplasmId, Integer levels) {
 
@@ -200,4 +234,48 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		return this.germplasmDataManager.countSearchForGermplasm(searchParameter);
 	}
+
+	@Override
+	public GermplasmDTO getGermplasmDTObyGID (final Integer germplasmId) {
+		final GermplasmDTO germplasmDTO;
+		try {
+			germplasmDTO = germplasmDataManager.getGermplasmDTOByGID(germplasmId);
+			if (germplasmDTO != null) {
+				germplasmDTO.setPedigree(pedigreeService.getCrossExpansion(germplasmId, crossExpansionProperties));
+			}
+		} catch (final MiddlewareQueryException e) {
+			throw new ApiRuntimeException("An error has occurred when trying to get a germplasm", e);
+		}
+		return germplasmDTO;
+	}
+
+	@Override
+	public List<GermplasmDTO> searchGermplasmDTO(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
+		try {
+
+			germplasmSearchRequestDTO.setPageSize(germplasmSearchRequestDTO.getPageSize() == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : germplasmSearchRequestDTO.getPageSize());
+			germplasmSearchRequestDTO.setPage(germplasmSearchRequestDTO.getPage() == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : germplasmSearchRequestDTO.getPage());
+
+			final List<GermplasmDTO> germplasmDTOList = germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO);
+			if (germplasmDTOList != null) {
+				for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
+					germplasmDTO.setPedigree(
+							pedigreeService.getCrossExpansion(Integer.parseInt(germplasmDTO.getGermplasmDbId()), crossExpansionProperties));
+				}
+			}
+			return germplasmDTOList;
+		} catch (final MiddlewareQueryException e) {
+			throw new ApiRuntimeException("An error has occurred when trying to search germplasms", e);
+		}
+	}
+
+	@Override
+	public long countGermplasmDTOs(final GermplasmSearchRequestDTO germplasmSearchRequestDTO) {
+		try {
+			return germplasmDataManager.countGermplasmDTOs(germplasmSearchRequestDTO);
+		} catch (final MiddlewareQueryException e) {
+			throw new ApiRuntimeException("An error has occurred when trying to count germplasms", e);
+		}
+	}
+
 }

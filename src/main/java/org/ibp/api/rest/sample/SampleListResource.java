@@ -7,6 +7,7 @@ import org.generationcp.commons.pojo.FileExportInfo;
 import org.generationcp.commons.service.CsvExportSampleListService;
 import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.SampleList;
@@ -62,7 +63,7 @@ public class SampleListResource {
 	public CsvExportSampleListService csvExportSampleListService;
 
 	@ApiOperation(value = "Create sample list", notes = "Create sample list. ")
-	@RequestMapping(value = "/{crop}/sampleList", method = RequestMethod.POST)
+	@RequestMapping(value = "/{crop}/sampleLists", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity createSampleList(@PathVariable final String crop, @RequestBody final SampleListDto dto) {
 		dto.setCropName(crop);
@@ -174,7 +175,8 @@ public class SampleListResource {
 				CsvExportSampleListServiceImpl.SAMPLING_DATE, CsvExportSampleListServiceImpl.SAMPLE_UID,
 				CsvExportSampleListServiceImpl.PLATE_ID, CsvExportSampleListServiceImpl.WELL);
 
-		final FileExportInfo exportInfo = this.csvExportSampleListService.export(sampleDetailsDTOs, listName, visibleColumns);
+		// TODO: Set the enumerator variable name to blank for now, until we improve Manage Samples CSV Export to include enumerator variable columns
+		final FileExportInfo exportInfo = this.csvExportSampleListService.export(sampleDetailsDTOs, listName, visibleColumns, "");
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", exportInfo.getDownloadFileName()));
@@ -185,11 +187,13 @@ public class SampleListResource {
 		return new ResponseEntity<>(fileSystemResource, headers, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Import Plate Information", notes = "Import Plate Information")
-	@RequestMapping(value = "/{crop}/plate-information/import", method = RequestMethod.POST)
+	//TODO: Is necessary make a refactor in the future with this service for do it more generic to import samples not only Plate Id and well.
+	@ApiOperation(value = "Import Plate Information", notes = "Current implementation only supports patch on plateId and well attributes")
+	@RequestMapping(value = "/{crop}/sampleList/{listId}/samples", method = RequestMethod.PATCH)
 	@ResponseBody
-	public ResponseEntity saveSamplePlateInformation(@PathVariable final String crop, @RequestBody final PlateInformationDto plateInformationDto) {
-		sampleListService.importSamplePlateInformation(plateInformationDto);
+	public ResponseEntity saveSamplePlateInformation(
+		@PathVariable final String crop, @PathVariable final Integer listId, @RequestBody final List<SampleDTO> sampleDTOs) {
+		sampleListService.importSamplePlateInformation(sampleDTOs, listId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

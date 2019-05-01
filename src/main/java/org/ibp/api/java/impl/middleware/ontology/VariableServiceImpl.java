@@ -4,6 +4,7 @@ package org.ibp.api.java.impl.middleware.ontology;
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.apache.commons.collections4.CollectionUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -53,6 +54,11 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 	private static final String VARIABLE_NAME = "Variable";
 	private static final String ERROR_MESSAGE = "Error!";
+	private static final List EDITABLE_VARIABLES_TYPES = Arrays.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD, VariableType.STUDY_CONDITION);
+	private static final List<Integer> EDITABLE_VARIABLES_TYPE_IDS = Arrays.asList( //
+		VariableType.TRAIT.getId(), //
+		VariableType.SELECTION_METHOD.getId(), //
+		VariableType.STUDY_CONDITION.getId());
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -180,7 +186,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		try {
 			Integer id = StringUtil.parseInt(variableId, null);
 
-			Variable ontologyVariable = this.ontologyVariableDataManager.getVariable(programId, id, true, true);
+			Variable ontologyVariable = this.ontologyVariableDataManager.getVariable(programId, id, true);
+			ontologyVariableDataManager.fillVariableUsage(ontologyVariable);
 
 			final FormulaDto formula = ontologyVariable.getFormula();
 			if (formula != null) {
@@ -200,7 +207,8 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			}
 
 			boolean deletable = true;
-			if (ontologyVariable.getHasUsage()) {
+
+			if (Boolean.TRUE.equals(ontologyVariable.getHasUsage())) {
 				deletable = false;
 			}
 
@@ -208,11 +216,17 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			VariableDetails response = mapper.map(ontologyVariable, VariableDetails.class);
 
 			if (!deletable) {
+				if (CollectionUtils.containsAny(ontologyVariable.getVariableTypes(), VariableServiceImpl.EDITABLE_VARIABLES_TYPES)) {
+					response.getMetadata().addEditableField("alias");
+					response.getMetadata().addEditableField("expectedRange");
+				}
 				response.getMetadata().addEditableField("description");
 			} else {
 				response.getMetadata().addEditableField("name");
 				response.getMetadata().addEditableField("description");
-				response.getMetadata().addEditableField("alias");
+				if (CollectionUtils.containsAny(ontologyVariable.getVariableTypes(), VariableServiceImpl.EDITABLE_VARIABLES_TYPES)) {
+					response.getMetadata().addEditableField("alias");
+				}
 				response.getMetadata().addEditableField("cropOntologyId");
 				response.getMetadata().addEditableField("variableTypes");
 				response.getMetadata().addEditableField("property");
@@ -276,6 +290,12 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 
 			for (org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
 				variableInfo.addVariableType(VariableType.getById(this.parseVariableTypeAsInteger(variableType)));
+			}
+
+			for (org.ibp.api.domain.ontology.VariableType variableType : variable.getVariableTypes()) {
+				if (VariableServiceImpl.EDITABLE_VARIABLES_TYPE_IDS.contains(Integer.valueOf(variableType.getId()))) {
+					variableInfo.setAlias(variable.getAlias());
+				}
 			}
 
 			this.ontologyVariableDataManager.addVariable(variableInfo);

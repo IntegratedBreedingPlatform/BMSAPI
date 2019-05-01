@@ -55,8 +55,7 @@ public class SampleResourceBrapiTest extends ApiUnitTestBase {
 				.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.studyDbId", Matchers.is(sampleDetailsDTO.getStudyDbId()))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.locationDbId", Matchers.is(sampleDetailsDTO.getLocationDbId()))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.plotId", Matchers.is(sampleDetailsDTO.getPlotId()))) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result.plantId", Matchers.is(sampleDetailsDTO.getPlantBusinessKey()))) //
+				.andExpect(MockMvcResultMatchers.jsonPath("$.result.obsUnitId", Matchers.is(sampleDetailsDTO.getObsUnitId()))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.sampleId", Matchers.is(sampleDetailsDTO.getSampleBusinessKey()))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.takenBy", Matchers.is(sampleDetailsDTO.getTakenBy()))) //
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result.sampleDate",
@@ -96,7 +95,7 @@ public class SampleResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
 				.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isNotFound())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination", Matchers.isEmptyOrNullString())) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status.message", Matchers.is("not found sample"))) //
+				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("not found sample"))) //
 		;
 	}
 }

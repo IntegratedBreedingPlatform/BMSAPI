@@ -146,7 +146,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuidAndCrop(this.programUuid, this.cropName);
 		Mockito.doReturn(ontologyVariable).when(this.ontologyVariableDataManager).getVariable(this.programUuid, ontologyVariable.getId(),
-				true, true);
+				true);
 		Mockito.doReturn(
 				new Term(ontologyVariable.getId(), ontologyVariable.getName(), ontologyVariable.getDefinition(), CvId.VARIABLES.getId(),
 						false)).when(this.termDataManager).getTermById(ontologyVariable.getId());
@@ -182,7 +182,8 @@ public class VariableResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.allowsFormula", is(ontologyVariable.isAllowsFormula())))
 		;
 
-		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).getVariable(this.programUuid, ontologyVariable.getId(), true, true);
+		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).getVariable(this.programUuid, ontologyVariable.getId(), true);
+
 	}
 
 	/**
@@ -219,7 +220,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
 		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuidAndCrop(this.programUuid, this.cropName);
 
-		// Mock OntologyVariableInfo Class and when addVariable method called it will set id to 1 and return (self member alter if void is
+		// Mock OntologyVariableInfo Class and when addDatasetVariable method called it will set id to 1 and return (self member alter if void is
 		// return type of method)
 		Mockito.doAnswer(new Answer<Void>() {
 
@@ -289,7 +290,8 @@ public class VariableResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(methodTerm).when(this.termDataManager).getTermById(methodId);
 		Mockito.doReturn(scaleTerm).when(this.termDataManager).getTermById(scaleId);
 		Mockito.doReturn(new ArrayList<>()).when(this.ontologyVariableDataManager).getWithFilter(variableFilter);
-		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(this.programUuid, variable.getId(), true, true);
+		Mockito.doReturn(variable).when(this.ontologyVariableDataManager).getVariable(this.programUuid, variable.getId(), true);
+
 		Mockito.doNothing().when(this.ontologyVariableDataManager).updateVariable(org.mockito.Matchers.any(OntologyVariableInfo.class));
 
 		this.mockMvc
@@ -318,7 +320,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(term).when(this.termDataManager).getTermById(ontologyVariable.getId());
 		Mockito.doReturn(ontologyVariable).when(this.ontologyVariableDataManager).getVariable(this.programUuid, ontologyVariable.getId(),
-				true, true);
+				true);
 		Mockito.doReturn(false).when(this.termDataManager).isTermReferred(ontologyVariable.getId());
 		Mockito.doNothing().when(this.ontologyVariableDataManager).deleteVariable(ontologyVariable.getId());
 

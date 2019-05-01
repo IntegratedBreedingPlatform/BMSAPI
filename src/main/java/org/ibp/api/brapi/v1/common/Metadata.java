@@ -1,17 +1,19 @@
 
 package org.ibp.api.brapi.v1.common;
 
-import java.net.URL;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @JsonPropertyOrder({"pagination", "status", "datafiles"})
 public class Metadata {
 
 	private Pagination pagination;
 
-	private Map<String, String> status;
+	private List<Map<String, String>> status;
 
 	private URL[] datafiles;
 
@@ -20,6 +22,9 @@ public class Metadata {
 	 *
 	 */
 	public Metadata() {
+		this.pagination = new Pagination(0, 0, 0L, 0);
+		this.status = new ArrayList<>();
+		this.datafiles = new URL[] {};
 	}
 
 	/**
@@ -27,7 +32,7 @@ public class Metadata {
 	 * @param status
 	 * @param pagination
 	 */
-	public Metadata(final Pagination pagination, final Map<String, String> status) {
+	public Metadata(final Pagination pagination, final List<Map<String, String>> status) {
 		this.pagination = pagination;
 		this.status = status;
 	}
@@ -38,7 +43,7 @@ public class Metadata {
 	 * @param status
 	 * @param datafiles
 	 */
-	public Metadata(final Pagination pagination, final Map<String, String> status, URL[] datafiles) {
+	public Metadata(final Pagination pagination, final List<Map<String, String>> status, URL[] datafiles) {
 		this.pagination = pagination;
 		this.status = status;
 		this.datafiles = datafiles;
@@ -69,7 +74,7 @@ public class Metadata {
 	 *
 	 * @return The status
 	 */
-	public Map<String, String> getStatus() {
+	public List<Map<String, String>> getStatus() {
 		return this.status;
 	}
 
@@ -77,11 +82,11 @@ public class Metadata {
 	 *
 	 * @param status The status
 	 */
-	public void setStatus(final Map<String, String> status) {
+	public void setStatus(final List<Map<String, String>> status) {
 		this.status = status;
 	}
 
-	public Metadata withStatus(final Map<String, String> status) {
+	public Metadata withStatus(final List<Map<String, String>> status) {
 		this.status = status;
 		return this;
 	}

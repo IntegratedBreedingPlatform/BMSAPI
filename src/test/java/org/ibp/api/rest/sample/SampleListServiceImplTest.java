@@ -1,26 +1,30 @@
 package org.ibp.api.rest.sample;
 
 import junit.framework.Assert;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.commons.util.DateUtil;
+import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.SampleList;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.MapBindingResult;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.validation.ObjectError;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SampleListServiceImplTest {
@@ -30,16 +34,28 @@ public class SampleListServiceImplTest {
 	@Mock
 	private org.generationcp.middleware.service.api.SampleListService sampleListServiceMW;
 
-	private ResourceBundleMessageSource messageSource;
+	@Mock
+	private SampleListValidator sampleListValidator;
+
+	@Mock
+	private SampleValidator sampleValidator;
+
+	@Mock
+	private SecurityService securityService;
 
 	@InjectMocks
 	private SampleListServiceImpl sampleListService;
 
+	final Random random = new Random();
+
 	@Before
 	public void init() {
 
-	}
+		final WorkbenchUser workbenchUser = new WorkbenchUser();
+		workbenchUser.setName("User1");
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(workbenchUser);
 
+	}
 
 	@Test
 	public void testMoveSampleListFolder() {
@@ -55,75 +71,126 @@ public class SampleListServiceImplTest {
 
 		final Map<String, Object> result = this.sampleListService.moveSampleListFolder(folderId, newParentId, isCropList, PROGRAM_UUID);
 
+		Mockito.verify(this.sampleListValidator).validateFolderId(folderId);
+		Mockito.verify(this.sampleListValidator).validateFolderId(newParentId);
 		Assert.assertEquals(String.valueOf(newParentId), result.get(SampleListServiceImpl.PARENT_ID));
 	}
 
 	@Test
 	public void testImportSamplePlateInformationSuccess() {
-
-		final PlateInformationDto plateInformationDto = this.createPlateInformationDto();
-		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySet(), Mockito.anyInt())).thenReturn(2l);
+		final int listId = 1;
+		final List<SampleDTO> sampleDTOs = this.createSampleDto();
 		try {
-			this.sampleListService.importSamplePlateInformation(plateInformationDto);
-			Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(Mockito.eq(plateInformationDto.getListId()), Mockito.anyMap());
+			this.sampleListService.importSamplePlateInformation(sampleDTOs, listId);
+			Mockito.verify(this.sampleListServiceMW).updateSamplePlateInfo(Mockito.eq(listId), Mockito.anyMapOf(
+				String.class, SamplePlateInfo.class));
+			Mockito.verify(this.sampleValidator).validateSamplesForImportPlate(listId, sampleDTOs);
 		} catch (ApiRequestValidationException e) {
-			Assert.fail("InvalidValuesException should not be thrown.");
+			Assert.fail("ApiRequestValidationException should not be thrown.");
 		}
 
 	}
 
 	@Test
 	public void testImportSamplePlateInformationError() {
-
-		final PlateInformationDto plateInformationDto = this.createPlateInformationDto();
-
-		Mockito.when(this.sampleListServiceMW.countSamplesByUIDs(Mockito.anySet(), Mockito.anyInt())).thenReturn(1l);
+		final int listId = 1;
+		final List<SampleDTO> sampleDTOs = this.createSampleDto();
+		final ApiRequestValidationException exception = new ApiRequestValidationException(Arrays.asList(new ObjectError("", "")));
+		Mockito.doThrow(exception).when(this.sampleValidator).validateSamplesForImportPlate(listId, sampleDTOs);
 
 		try {
-			this.sampleListService.importSamplePlateInformation(plateInformationDto);
-			Assert.fail("InvalidValuesException should be thrown.");
+			this.sampleListService.importSamplePlateInformation(sampleDTOs, listId);
+			Assert.fail("ApiRequestValidationException should be thrown.");
 		} catch (ApiRequestValidationException e) {
-			Assert.assertEquals("sample.sample.ids.not.present.in.file",  e.getErrors().get(0).getCodes()[1]);
+			//
 		}
 
 	}
 
 	@Test
 	public void testConvertToSamplePlateInfoMap() {
-
-		final PlateInformationDto plateInformationDto = this.createPlateInformationDto();
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), PlateInformationDto.class.getName());
-		final Map<String, SamplePlateInfo> map = this.sampleListService.convertToSamplePlateInfoMap(plateInformationDto, bindingResult);
+		final List<SampleDTO> sampleDTOs = this.createSampleDto();
+		final Map<String, SamplePlateInfo> map = this.sampleListService.convertToSamplePlateInfoMap(sampleDTOs);
 		Assert.assertEquals(2, map.size());
 		Assert.assertEquals("TestValue-1", map.get("SampleId-1").getPlateId());
-		Assert.assertEquals("TestValue-2", map.get("SampleId-1").getWell());
-		Assert.assertEquals("TestValue-3", map.get("SampleId-2").getPlateId());
-		Assert.assertEquals("TestValue-4", map.get("SampleId-2").getWell());
+		Assert.assertEquals("TestValue-4", map.get("SampleId-1").getWell());
+		Assert.assertEquals("TestValue-2", map.get("SampleId-2").getPlateId());
+		Assert.assertEquals("TestValue-5", map.get("SampleId-2").getWell());
 
 	}
 
-	private PlateInformationDto createPlateInformationDto() {
+	@Test
+	public void testCreateSampleList() {
 
-		final PlateInformationDto plateInformationDto = new PlateInformationDto();
-
-		final String sampleIdColumnName = "SAMPLE_ID";
-		final String plateIdColumnName = "PLATE_ID";
-		final String wellColumnName = "WELL";
-
-		final int listId = 1;
-		final List<List<String>> importData = new ArrayList<>();
-		importData.add(Arrays.asList(sampleIdColumnName, plateIdColumnName, wellColumnName));
-		importData.add(Arrays.asList("SampleId-1","TestValue-1", "TestValue-2"));
-		importData.add(Arrays.asList("SampleId-2","TestValue-3", "TestValue-4"));
-		plateInformationDto.setListId(listId);
-		plateInformationDto.setPlateIdHeader(plateIdColumnName);
-		plateInformationDto.setSampleIdHeader(sampleIdColumnName);
-		plateInformationDto.setWellHeader(wellColumnName);
-		plateInformationDto.setImportData(importData);
-
-		return plateInformationDto;
+		final Integer listId = 1;
+		final SampleListDto sampleListDto = createSampleListDto();
+		final SampleList sampleList = new SampleList();
+		sampleList.setId(listId);
+		Mockito.when(sampleListServiceMW.createSampleList(Mockito.any(SampleListDTO.class))).thenReturn(sampleList);
+		final Map<String, Object> result = this.sampleListService.createSampleList(sampleListDto);
+		Mockito.verify(this.sampleListValidator).validateSampleList(sampleListDto);
+		Assert.assertEquals(String.valueOf(listId), result.get(SampleListServiceImpl.ID));
 
 	}
 
+	@Test
+	public void testTranslateToSampleListDto() throws ParseException {
+
+		final SampleListDto sampleListDto = createSampleListDto();
+		final SampleListDTO sampleListDTO = this.sampleListService.translateToSampleListDto(sampleListDto);
+
+		Assert.assertEquals(sampleListDTO.getCreatedBy(), sampleListDto.getCreatedBy());
+		Assert.assertEquals(sampleListDTO.getCropName(), sampleListDto.getCropName());
+		Assert.assertEquals(sampleListDTO.getProgramUUID(), sampleListDto.getProgramUUID());
+		Assert.assertEquals(sampleListDTO.getDescription(), sampleListDto.getDescription());
+		Assert.assertEquals(sampleListDTO.getInstanceIds(), sampleListDto.getInstanceIds());
+		Assert.assertEquals(sampleListDTO.getNotes(), sampleListDto.getNotes());
+		Assert.assertEquals(
+			sampleListDTO.getSamplingDate(),
+			DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT).parse(sampleListDto.getSamplingDate()));
+		Assert.assertEquals(
+			sampleListDTO.getCreatedDate(),
+			DateUtil.getSimpleDateFormat(DateUtil.FRONTEND_DATE_FORMAT).parse(sampleListDto.getCreatedDate()));
+		Assert.assertEquals(sampleListDTO.getSelectionVariableId(), sampleListDto.getSelectionVariableId());
+		Assert.assertEquals(sampleListDTO.getDatasetId(), sampleListDto.getDatasetId());
+		Assert.assertEquals(sampleListDTO.getTakenBy(), sampleListDto.getTakenBy());
+		Assert.assertEquals(sampleListDTO.getParentId(), sampleListDto.getParentId());
+		Assert.assertEquals(sampleListDTO.getListName(), sampleListDto.getListName());
+
+	}
+
+	private List<SampleDTO> createSampleDto() {
+		final List<SampleDTO> sampleDTOs = new ArrayList<>();
+		SampleDTO sampleDTO = new SampleDTO();
+		sampleDTO.setSampleBusinessKey("SampleId-1");
+		sampleDTO.setPlateId("TestValue-1");
+		sampleDTO.setWell("TestValue-4");
+		sampleDTOs.add(sampleDTO);
+		sampleDTO = new SampleDTO();
+		sampleDTO.setSampleBusinessKey("SampleId-2");
+		sampleDTO.setPlateId("TestValue-2");
+		sampleDTO.setWell("TestValue-5");
+		sampleDTOs.add(sampleDTO);
+		return sampleDTOs;
+
+	}
+
+	private SampleListDto createSampleListDto() {
+
+		final SampleListDto sampleListDto = new SampleListDto();
+		sampleListDto.setCreatedBy("User1");
+		sampleListDto.setCropName(RandomStringUtils.randomAlphabetic(10));
+		sampleListDto.setProgramUUID(RandomStringUtils.randomAlphabetic(10));
+		sampleListDto.setDescription(RandomStringUtils.randomAlphabetic(10));
+		sampleListDto.setInstanceIds(new ArrayList<Integer>());
+		sampleListDto.setNotes(RandomStringUtils.randomAlphabetic(10));
+		sampleListDto.setSamplingDate("2019-01-01");
+		sampleListDto.setCreatedDate("2019-02-02");
+		sampleListDto.setSelectionVariableId(random.nextInt(100));
+		sampleListDto.setDatasetId(random.nextInt(100));
+		sampleListDto.setParentId(random.nextInt());
+		sampleListDto.setListName(RandomStringUtils.randomAlphabetic(10));
+		return sampleListDto;
+	}
 
 }

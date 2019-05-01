@@ -5,14 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.domain.dms.DMSVariableType;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.Experiment;
-import org.generationcp.middleware.domain.dms.FolderReference;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
@@ -24,35 +17,18 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
-import org.generationcp.middleware.service.api.study.MeasurementDto;
-import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyFilters;
-import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
-import org.generationcp.middleware.service.api.study.StudySearchParameters;
-import org.generationcp.middleware.service.api.study.TrialObservationTable;
-import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.generationcp.middleware.service.api.study.*;
 import org.ibp.api.domain.common.Command;
 import org.ibp.api.domain.common.ValidationUtil;
 import org.ibp.api.domain.ontology.TermSummary;
-import org.ibp.api.domain.study.DatasetSummary;
-import org.ibp.api.domain.study.Environment;
-import org.ibp.api.domain.study.FieldMap;
-import org.ibp.api.domain.study.Measurement;
-import org.ibp.api.domain.study.Observation;
-import org.ibp.api.domain.study.StudyAttribute;
-import org.ibp.api.domain.study.StudyDetails;
-import org.ibp.api.domain.study.StudyFolder;
-import org.ibp.api.domain.study.StudyGermplasm;
-import org.ibp.api.domain.study.StudyImportDTO;
-import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
+import org.ibp.api.domain.study.*;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
@@ -110,7 +86,7 @@ public class StudyServiceImpl implements StudyService {
 	private ValidationUtil validationUtil;
 
 	@Autowired
-	private CrossExpansionProperties crossExpansionProperties;
+	private FieldMapService fieldMapService;
 
 	@Override
 	public List<StudySummary> search(final String programUniqueId, final String cropname, final String principalInvestigator, final String location, final String season) {
@@ -427,42 +403,9 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public Map<Integer, FieldMap> getFieldMap(final String studyId) {
-		final FieldMapService fieldMapService = new FieldMapService(this.studyDataManager, this.crossExpansionProperties);
 		return fieldMapService.getFieldMap(studyId);
 	}
 
-	@Transactional
-	@Override
-	public Integer importStudy(final StudyImportDTO studyImportDTO, final String programUUID, final String cropPrefix) {
-		try {
-
-			final Workbook workbook = this.conversionService.convert(studyImportDTO, Workbook.class);
-			workbook.getStudyDetails()
-					.setProgramUUID(programUUID);
-
-			// Save the study
-			final int studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, cropPrefix);
-
-			// Create germplasm list
-			final GermplasmList germplasmList = this.conversionService.convert(studyImportDTO, GermplasmList.class);
-			final Integer listId = this.germplasmListManager.addGermplasmList(germplasmList);
-
-			final List<GermplasmListData> germplasmListDatas = this.convert(studyImportDTO.getGermplasm(), GermplasmListData.class);
-			for (final GermplasmListData germData : germplasmListDatas) {
-				germData.setList(germplasmList);
-			}
-			this.germplasmListManager.addGermplasmListData(germplasmListDatas);
-
-			// Create the study's snapshot of the Germplasm list (ListDataProject)
-			final List<ListDataProject> listDataProjects = this.convert(studyImportDTO.getGermplasm(), ListDataProject.class);
-			this.fieldbookService.saveOrUpdateListDataProject(studyId, GermplasmListType.STUDY, listId, listDataProjects, studyImportDTO.getUserId());
-
-			return studyId;
-
-		} catch (final MiddlewareQueryException e) {
-			throw new ApiRuntimeException("Error caused by: " + e.getMessage(), e);
-		}
-	}
 
 	private final <T, S> List<T> convert(final List<S> beanList, final Class<T> clazz) {
 		if (null == beanList) {
@@ -542,7 +485,7 @@ public class StudyServiceImpl implements StudyService {
 			@Override
 			public StudyInstance apply(final org.generationcp.middleware.service.impl.study.StudyInstance input) {
 				return new StudyInstance(input.getInstanceDbId(), input.getLocationName(), input.getLocationAbbreviation(),
-						input.getInstanceNumber());
+						input.getInstanceNumber(),input.getCustomLocationAbbreviation(), input.isHasFieldmap());
 			}
 		};
 		return Lists.transform(studyInstancesMW, transformer);
@@ -611,4 +554,13 @@ public class StudyServiceImpl implements StudyService {
 		}
 	}
 
+	@Override
+	public StudyReference getStudyReference(Integer studyId) {
+		return this.studyDataManager.getStudyReference(studyId);
+	}
+
+	@Override
+	public void updateStudy(final Study study) {
+		this.studyDataManager.updateStudyLockedStatus(study.getId(), study.isLocked());
+	}
 }
