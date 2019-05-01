@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware;
 
+import org.apache.commons.lang.math.RandomUtils;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.ibp.api.domain.sample.SampleObservationDto;
 
@@ -11,23 +12,22 @@ import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 public abstract class SampleTestDataGenerator {
 
 	public static SampleObservationDto createRandomSampleObservation() {
-		final SampleObservationDto sampleObservationDto =
-			new SampleObservationDto(Integer.valueOf(randomNumeric(6)), randomAlphanumeric(6), randomAlphanumeric(6),
-				randomAlphanumeric(6));
-		sampleObservationDto.setTakenBy(randomAlphanumeric(6));
-		sampleObservationDto.setSampleDate(randomAlphanumeric(10));
-		sampleObservationDto.setSampleType(randomAlphanumeric(6));
-		sampleObservationDto.setTissueType(randomAlphanumeric(6));
-		sampleObservationDto.setNotes(randomAlphanumeric(6));
-		sampleObservationDto.setStudyName(randomAlphanumeric(6));
-		sampleObservationDto.setSeason(randomAlphanumeric(6));
-		sampleObservationDto.setLocationName(randomAlphanumeric(6));
-		sampleObservationDto.setEntryNumber(Integer.valueOf(randomNumeric(6)));
-		sampleObservationDto.setPlotNumber(Integer.valueOf(randomNumeric(6)));
+		final SampleObservationDto sampleObservationDto = new SampleObservationDto();
 
-		sampleObservationDto.setGermplasmDbId(Integer.valueOf(randomNumeric(6)));
-		sampleObservationDto.setPlantingDate(randomAlphanumeric(6));
-		sampleObservationDto.setHarvestDate(randomAlphanumeric(6));
+		sampleObservationDto.setGermplasmDbId(RandomUtils.nextInt());
+		sampleObservationDto.setNotes(randomAlphanumeric(6));
+		sampleObservationDto.setObservationUnitDbId(randomAlphanumeric(10));
+		sampleObservationDto.setPlateDbId(randomAlphanumeric(10));
+		sampleObservationDto.setPlateDbId(randomAlphanumeric(10));
+		sampleObservationDto.setPlateIndex(RandomUtils.nextInt());
+		sampleObservationDto.setPlotDbId(RandomUtils.nextInt());
+		sampleObservationDto.setSampleDbId(randomAlphanumeric(6));
+		sampleObservationDto.setSampleType(randomAlphanumeric(6));
+		sampleObservationDto.setStudyDbId(RandomUtils.nextInt());
+		sampleObservationDto.setTakenBy(randomAlphanumeric(6));
+		sampleObservationDto.setTissueType(randomAlphanumeric(6));
+		sampleObservationDto.setSampleTimestamp("");
+
 		return sampleObservationDto;
 	}
 

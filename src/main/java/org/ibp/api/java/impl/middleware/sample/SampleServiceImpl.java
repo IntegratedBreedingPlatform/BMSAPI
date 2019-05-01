@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.sample;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.service.api.sample.SampleSearchRequestDto;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -38,4 +39,23 @@ public class SampleServiceImpl implements SampleService {
 		}
 		return sampleDetailsDTO;
 	}
+
+	@Override
+	public List<SampleDetailsDTO> searchSamples(final SampleSearchRequestDto sampleSearchRequestDto) {
+		try {
+			return this.sampleService.searchSampleObservations(sampleSearchRequestDto);
+		} catch (final MiddlewareException e) {
+			throw new ApiRuntimeException("an error happened when trying to search samples", e);
+		}
+	}
+
+	@Override
+	public long countSearchSamples(final SampleSearchRequestDto sampleSearchRequestDto) {
+		try {
+			return this.sampleService.countSearchSampleObservationsResults(sampleSearchRequestDto);
+		} catch (final MiddlewareException e) {
+			throw new ApiRuntimeException("an error happened when trying to count samples", e);
+		}
+	}
+
 }

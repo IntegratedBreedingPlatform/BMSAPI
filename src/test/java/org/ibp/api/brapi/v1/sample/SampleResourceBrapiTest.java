@@ -1,8 +1,6 @@
 
 package org.ibp.api.brapi.v1.sample;
 
-import java.text.SimpleDateFormat;
-
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.hamcrest.Matchers;
@@ -20,6 +18,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.text.SimpleDateFormat;
 
 public class SampleResourceBrapiTest extends ApiUnitTestBase {
 
@@ -94,8 +94,7 @@ public class SampleResourceBrapiTest extends ApiUnitTestBase {
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
 				.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isNotFound())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.pagination", Matchers.isEmptyOrNullString())) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status.message", Matchers.is("not found sample"))) //
+				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status.message", Matchers.is("no samples found"))) //
 		;
 	}
 }
