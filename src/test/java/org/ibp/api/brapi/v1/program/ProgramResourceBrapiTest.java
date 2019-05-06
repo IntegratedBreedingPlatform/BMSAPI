@@ -50,7 +50,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 				.andDo(MockMvcResultHandlers.print()) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status.message",
+				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message",
 						Matchers.is("crop " + ProgramResourceBrapiTest.INVALID_CROP + " doesn't exist"))); //
 
 	}
@@ -157,7 +157,7 @@ public class ProgramResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toString()).contentType(this.contentType)) //
 				.andExpect(MockMvcResultMatchers.status().isNotFound()) //
 				.andDo(MockMvcResultHandlers.print()) //
-				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status.message", Matchers.is("program not found.")));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.metadata.status[0].message", Matchers.is("program not found.")));
 
 	}
 
