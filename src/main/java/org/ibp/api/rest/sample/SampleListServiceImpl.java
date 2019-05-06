@@ -4,24 +4,22 @@ import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
+import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
-import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.rest.samplesubmission.domain.common.GOBiiHeader;
 import org.ibp.api.rest.samplesubmission.domain.common.GOBiiToken;
 import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProject;
-import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProjectPayload;
+import org.ibp.api.rest.samplesubmission.domain.sample.GOBiiSample;
+import org.ibp.api.rest.samplesubmission.domain.sample.GOBiiSampleList;
 import org.ibp.api.rest.samplesubmission.service.GOBiiAuthenticationService;
 import org.ibp.api.rest.samplesubmission.service.GOBiiProjectService;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
+import org.ibp.api.rest.samplesubmission.service.GOBiiSampleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional(propagation = Propagation.NEVER)
+@Transactional
 public class SampleListServiceImpl implements SampleListService {
 
 	protected static final String PARENT_ID = "parentId";
@@ -50,6 +48,9 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Autowired
 	private GOBiiProjectService goBiiProjectService;
+
+	@Autowired
+	private GOBiiSampleService goBiiSampleService;
 
 	@Autowired
 	private SampleListValidator sampleListValidator;
@@ -199,6 +200,18 @@ public class SampleListServiceImpl implements SampleListService {
 			if (projectId != null) {
 				sampleList.setGobiiProjectId(projectId);
 				this.saveOrUpdate(sampleList);
+				final GOBiiSampleList goBiiSampleList = new GOBiiSampleList();
+				goBiiSampleList.setProjectId(projectId);
+				for (final Sample sample: sampleList.getSamples()) {
+					final GOBiiSample goBiiSample = new GOBiiSample();
+					goBiiSample.setName(sample.getSampleName());
+					goBiiSample.setSampleUuid(sample.getSampleBusinessKey());
+					goBiiSample.setPlateName(sample.getPlateId());
+					goBiiSample.setWellRow(sample.getWell());
+					goBiiSample.setWellColumn(sample.getWell());
+					goBiiSampleList.getSamples().add(goBiiSample);
+				}
+				goBiiSampleService.postGOBiiSampleList(token, goBiiSampleList);
 				return projectId;
 			} else {
 				throw new ApiRuntimeException("An error has occurred when trying to send data to GOBii ");
@@ -257,27 +270,13 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	private GOBiiProject buildGOBiiProject(final SampleList sampleListDto) {
-		GOBiiProjectPayload.ProjectData data = new GOBiiProjectPayload.ProjectData();
-		data.setPiContact(1);
-		data.setProjectName(sampleListDto.getListName());
-		data.setProjectStatus(1);
-		data.setProjectCode(sampleListDto.getListName());
-		data.setCreatedBy(1);
-		data.setModifiedBy(1);
-
-		List<GOBiiProjectPayload.ProjectData> dataList = new ArrayList<>();
-		dataList.add(data);
-
-		GOBiiProject goBiiProject = new GOBiiProject();
-		GOBiiProjectPayload goBiiProjectPayload = new GOBiiProjectPayload();
-		goBiiProjectPayload.setData(dataList);
-
-		GOBiiHeader goBiiHeader = new GOBiiHeader();
-		goBiiHeader.setGobiiProcessType("CREATE");
-
-		goBiiProject.setPayload(goBiiProjectPayload);
-		goBiiProject.setHeader(goBiiHeader);
-
+		final GOBiiProject goBiiProject = new GOBiiProject();
+		goBiiProject.setCode(String.valueOf(sampleListDto.getId()));
+		goBiiProject.setDescription(sampleListDto.getListName());
+		goBiiProject.setName(sampleListDto.getListName());
+		goBiiProject.setPiContactId(1);
+		goBiiProject.setProperties(new HashMap<>());
+		goBiiProject.setStatus(1);
 		return goBiiProject;
 	}
 
