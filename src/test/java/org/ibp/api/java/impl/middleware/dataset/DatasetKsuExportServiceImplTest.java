@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
@@ -134,7 +135,7 @@ public class DatasetKsuExportServiceImplTest {
 		dataSetDTO.setInstances(this.createStudyInstances());
 
 		when(this.studyDataManager.getStudy(study.getId())).thenReturn(study);
-		when(this.studyDataManager.getDataSetsByType(anyInt(), eq(DataSetType.SUMMARY_DATA)))
+		when(this.studyDataManager.getDataSetsByType(anyInt(), eq(DatasetType.SUMMARY_DATA)))
 			.thenReturn(Arrays.asList(trialDataSet));
 
 		datasetKSUExportService.setZipUtil(this.zipUtil);

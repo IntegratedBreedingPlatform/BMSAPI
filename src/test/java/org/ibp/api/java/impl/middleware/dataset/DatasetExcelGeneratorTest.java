@@ -13,6 +13,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.dataset.ObservationUnitData;
@@ -155,7 +156,7 @@ public class DatasetExcelGeneratorTest {
 
 		this.measurementVariables = Arrays.asList(measurementVariable1, measurementVariable2);
 		Mockito.when(this.studyDataManager.getStudyDetails(DatasetExcelGeneratorTest.STUDY_ID)).thenReturn(studyDetails);
-		Mockito.when(this.studyDataManager.getDataSetsByType(DatasetExcelGeneratorTest.STUDY_ID, DataSetType.SUMMARY_DATA))
+		Mockito.when(this.studyDataManager.getDataSetsByType(DatasetExcelGeneratorTest.STUDY_ID, DatasetType.SUMMARY_DATA))
 			.thenReturn(Arrays.asList(dataSet));
 		Mockito.when(this.datasetService
 			.getMeasurementVariables(DatasetExcelGeneratorTest.ENVIRONMENT_DATASET_ID, Lists
@@ -194,7 +195,7 @@ public class DatasetExcelGeneratorTest {
 		Mockito.verify(this.studyDataManager).getStudyDetails(INSTANCE_DB_ID);
 		Mockito.verify(this.datasetService)
 			.getMeasurementVariables(DatasetExcelGeneratorTest.STUDY_ID, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
-		Mockito.verify(this.studyDataManager).getDataSetsByType(DatasetExcelGeneratorTest.STUDY_ID, DataSetType.SUMMARY_DATA);
+		Mockito.verify(this.studyDataManager).getDataSetsByType(DatasetExcelGeneratorTest.STUDY_ID, DatasetType.SUMMARY_DATA);
 		Mockito.verify(this.datasetService)
 			.getMeasurementVariables(
 				INSTANCE_DB_ID, Lists

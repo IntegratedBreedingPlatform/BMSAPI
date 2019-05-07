@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.java.dataset.DatasetService;
@@ -231,7 +232,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final List<MeasurementVariable> studyDetailsVariables =
 			this.datasetService.getMeasurementVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
-		final int environmentDatasetId = this.studyDataManager.getDataSetsByType(studyId, DataSetType.SUMMARY_DATA).get(0).getId();
+		final int environmentDatasetId = this.studyDataManager.getDataSetsByType(studyId, DatasetType.SUMMARY_DATA).get(0).getId();
 		final int plotDatasetId = dataSetDto.getParentDatasetId();
 
 		final List<MeasurementVariable> environmentVariables =

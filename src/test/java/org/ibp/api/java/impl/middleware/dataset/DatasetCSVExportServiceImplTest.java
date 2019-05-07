@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
 import org.ibp.api.java.dataset.DatasetService;
@@ -103,7 +104,7 @@ public class DatasetCSVExportServiceImplTest {
 		this.dataSetDTO.setInstances(this.createStudyInstances());
 
 		when(this.studyDataManager.getStudy(this.study.getId())).thenReturn(this.study);
-		when(this.studyDataManager.getDataSetsByType(anyInt(), eq(DataSetType.SUMMARY_DATA)))
+		when(this.studyDataManager.getDataSetsByType(anyInt(), eq(DatasetType.SUMMARY_DATA)))
 			.thenReturn(Arrays.asList(this.trialDataSet));
 
 		this.datasetExportService.setZipUtil(this.zipUtil);
@@ -245,7 +246,7 @@ public class DatasetCSVExportServiceImplTest {
 	public void testGetColumns() {
 		this.datasetExportService.getColumns(1, 1);
 		Mockito.verify(this.datasetService).getDataset(1);
-		Mockito.verify(this.studyDataManager).getDataSetsByType(1, DataSetType.SUMMARY_DATA);
+		Mockito.verify(this.studyDataManager).getDataSetsByType(1, DatasetType.SUMMARY_DATA);
 		Mockito.verify(this.datasetService).getMeasurementVariables(1, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 		Mockito.verify(this.datasetService).getMeasurementVariables(anyInt(), eq(Lists.newArrayList(
 			VariableType.ENVIRONMENT_DETAIL.getId(),

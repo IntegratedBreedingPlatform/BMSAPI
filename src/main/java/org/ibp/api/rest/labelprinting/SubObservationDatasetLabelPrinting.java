@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
@@ -239,7 +240,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 		final DatasetDTO dataSetDTO = middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId());
 		final int environmentDatasetId =
-				this.studyDataManager.getDataSetsByType(labelsInfoInput.getStudyId(), DataSetType.SUMMARY_DATA).get(0).getId();
+				this.studyDataManager.getDataSetsByType(labelsInfoInput.getStudyId(), DatasetType.SUMMARY_DATA).get(0).getId();
 		final int plotDatasetId = dataSetDTO.getParentDatasetId();
 
 		final List<MeasurementVariable> studyDetailsVariables = this.middlewareDatasetService

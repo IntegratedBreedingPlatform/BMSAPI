@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
@@ -78,7 +79,7 @@ public abstract class AbstractDatasetExportService {
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
 			this.getObservationUnitRowMap(study, dataSet, selectedDatasetInstancesMap);
 		final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder = DatasetCollectionOrderServiceImpl.CollectionOrder.findById(collectionOrderId);
-		final int trialDatasetId = this.studyDataManager.getDataSetsByType(study.getId(), DataSetType.SUMMARY_DATA).get(0).getId();
+		final int trialDatasetId = this.studyDataManager.getDataSetsByType(study.getId(), DatasetType.SUMMARY_DATA).get(0).getId();
 		this.datasetCollectionOrderService.reorder(collectionOrder, trialDatasetId, selectedDatasetInstancesMap, observationUnitRowMap);
 
 		if(singleFile) {

@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
@@ -54,7 +55,7 @@ public class SubObservationDatasetLabelPrintingTest {
 		labelsInfoInput.setStudyId(10);
 		final DataSet dataset = new DataSet();
 		dataset.setId(5);
-		Mockito.when(this.studyDataManager.getDataSetsByType(labelsInfoInput.getStudyId(), DataSetType.SUMMARY_DATA)).thenReturn(
+		Mockito.when(this.studyDataManager.getDataSetsByType(labelsInfoInput.getStudyId(), DatasetType.SUMMARY_DATA)).thenReturn(
 			Arrays.asList(dataset));
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setParentDatasetId(2);
@@ -62,7 +63,7 @@ public class SubObservationDatasetLabelPrintingTest {
 		Mockito.when(middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId())).thenReturn(datasetDTO);
 		final List<LabelType> labelTypes = this.subObservationDatasetLabelPrinting.getAvailableLabelTypes(labelsInfoInput);
 		Mockito.verify(middlewareDatasetService).getDataset(labelsInfoInput.getDatasetId());
-		Mockito.verify(this.studyDataManager).getDataSetsByType(labelsInfoInput.getStudyId(), DataSetType.SUMMARY_DATA);
+		Mockito.verify(this.studyDataManager).getDataSetsByType(labelsInfoInput.getStudyId(), DatasetType.SUMMARY_DATA);
 		Mockito.verify(this.middlewareDatasetService).getMeasurementVariables(labelsInfoInput.getStudyId(), Arrays.asList(VariableType.STUDY_DETAIL.getId()));
 		Mockito.verify(this.middlewareDatasetService).getMeasurementVariables(dataset.getId(),
 			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
