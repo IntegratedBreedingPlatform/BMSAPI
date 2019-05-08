@@ -3,7 +3,7 @@ package org.ibp.api.java.impl.middleware.search;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.generationcp.middleware.pojos.search.SearchRequest;
-import org.ibp.api.brapi.v1.search.SearchRequestDto;
+import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;

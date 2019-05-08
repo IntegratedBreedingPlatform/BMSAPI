@@ -1,7 +1,7 @@
 
 package org.ibp.api.java.search;
 
-import org.ibp.api.brapi.v1.search.SearchRequestDto;
+import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 
 public interface SearchRequestService {
 

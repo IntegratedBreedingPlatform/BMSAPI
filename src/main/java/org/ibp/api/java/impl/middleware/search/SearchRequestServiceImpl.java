@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.search;
 
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.search.SearchRequest;
-import org.ibp.api.brapi.v1.search.SearchRequestDto;
+import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class SearchRequestServiceImpl implements org.ibp.api.java.search.SearchRequestService {
@@ -18,7 +18,7 @@ public class SearchRequestServiceImpl implements org.ibp.api.java.search.SearchR
 		final String crop, final SearchRequestDto searchRequestDto) {
 
 		SearchRequest searchRequest = this.searchRequestMapper.map(searchRequestDto);
-		searchRequest = this.searchRequest.saveSearchRequest(searchRequest);
+		searchRequest = this.searchRequest.saveSearchRequest(null, SearchRequestDto.class);
 
 		return searchRequestDto;
 	}
