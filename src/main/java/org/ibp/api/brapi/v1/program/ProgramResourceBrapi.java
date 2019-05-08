@@ -1,12 +1,10 @@
 
 package org.ibp.api.brapi.v1.program;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.ImmutableMap;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -31,9 +29,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a> Location services.
@@ -68,8 +68,7 @@ public class ProgramResourceBrapi {
 		this.setFilters(filters, crop, programName);
 
 		if (filters.get(ProgramFilters.CROP_TYPE) == null) {
-			final Map<String, String> status = new HashMap<>();
-			status.put("message", "crop " + crop + " doesn't exist");
+			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message",  "crop " + crop + " doesn't exist"));
 			final Metadata metadata = new Metadata(null, status);
 			final Programs programList = new Programs().withMetadata(metadata);
 			return new ResponseEntity<>(programList, HttpStatus.NOT_FOUND);
@@ -113,8 +112,7 @@ public class ProgramResourceBrapi {
 			final Programs programList = new Programs().withMetadata(metadata).withResult(results);
 			return new ResponseEntity<>(programList, HttpStatus.OK);
 		}
-		final Map<String, String> status = new HashMap<>();
-		status.put("message", "program not found.");
+		final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message",  "program not found."));
 		final Metadata metadata = new Metadata(null, status);
 		final Programs programList = new Programs().withMetadata(metadata);
 		return new ResponseEntity<>(programList, HttpStatus.NOT_FOUND);
