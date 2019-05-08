@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.search;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.generationcp.middleware.pojos.search.BrapiSearchRequest;
+import org.generationcp.middleware.pojos.search.SearchRequest;
 import org.ibp.api.brapi.v1.search.SearchRequestDto;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +26,8 @@ public class SearchRequestMapper {
 		this.jacksonMapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
 	}
 
-	BrapiSearchRequest map(final SearchRequestDto searchRequestDto) {
-		final BrapiSearchRequest brapiSearchRequest = new BrapiSearchRequest();
+	SearchRequest map(final SearchRequestDto searchRequestDto) {
+		final SearchRequest brapiSearchRequest = new SearchRequest();
 		//TODO
 		//brapiSearchRequest.setRequestType(searchRequestDto.getClass());
 		try {
@@ -39,7 +39,7 @@ public class SearchRequestMapper {
 		return brapiSearchRequest;
 	}
 
-	SearchRequestDto map(final BrapiSearchRequest brapiSearchRequest) {
+	SearchRequestDto map(final SearchRequest brapiSearchRequest) {
 		final SearchRequestDto searchRequestDto;
 		try {
 			searchRequestDto = this.jacksonMapper.readValue(brapiSearchRequest.getParameters(), SearchRequestDto.class);

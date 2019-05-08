@@ -3,7 +3,7 @@ package org.ibp.api.java.search;
 
 import org.ibp.api.brapi.v1.search.SearchRequestDto;
 
-public interface BrapiSearchRequestService {
+public interface SearchRequestService {
 
 	SearchRequestDto saveSearchRequest(String crop, SearchRequestDto searchRequestDto);
 
