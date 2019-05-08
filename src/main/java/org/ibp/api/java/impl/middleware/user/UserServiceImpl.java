@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.ibp.api.domain.user.UserDetailDto;
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// TODO make Transactional, remove catch and translateErrorToMap
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -55,9 +57,9 @@ public class UserServiceImpl implements UserService {
 		final ModelMapper mapper = UserMapper.getInstance();
 		final List<UserDto> users = this.workbenchDataManager.getAllUsersSortedByLastName();
 
-		for (final UserDto userDto : users) {
-			final UserDetailDto userInfo = mapper.map(userDto, UserDetailDto.class);
-			result.add(userInfo);
+		for (final UserDto user : users) {
+			final UserDetailDto userDetailDto = mapper.map(user, UserDetailDto.class);
+			result.add(userDetailDto);
 		}
 		return result;
 	}
