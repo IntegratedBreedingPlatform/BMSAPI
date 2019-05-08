@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 public class SearchResourceBrapi {
 
 	@Autowired
-	private BrapiSearchRequestService germplasmService;
+	private BrapiSearchRequestService brapiSearchRequestService;
 
 
 }
