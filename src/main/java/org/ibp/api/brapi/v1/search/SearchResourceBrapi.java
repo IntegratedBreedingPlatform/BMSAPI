@@ -28,7 +28,7 @@ public class SearchResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/search/germplasm", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Integer> postSearchGermplasm(@PathVariable final String crop, @RequestBody final GermplasmSearchRequestDto germplasmSearchRequestDto) {
-		final SearchRequest searchRequest = this.searchRequestService.saveSearchRequest(germplasmSearchRequestDto, SearchRequestType.GERMPLASM);
+		final SearchRequest searchRequest = this.searchRequestService.saveSearchRequest(germplasmSearchRequestDto, GermplasmSearchRequestDto.class);
 		return new ResponseEntity<>(searchRequest.getRequestId(), HttpStatus.OK);
 
 	}
