@@ -1,11 +1,11 @@
 package org.ibp.api.rest.labelprinting;
 
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -36,6 +36,9 @@ public class SubObservationDatasetLabelPrintingTest {
 	@Mock
 	private StudyDataManager studyDataManager;
 
+	@Mock
+	private OntologyDataManager ontologyDataManager;
+
 	private final ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
 
 	@InjectMocks
@@ -57,10 +60,17 @@ public class SubObservationDatasetLabelPrintingTest {
 		dataset.setId(5);
 		Mockito.when(this.studyDataManager.getDataSetsByType(labelsInfoInput.getStudyId(), DatasetType.SUMMARY_DATA)).thenReturn(
 			Arrays.asList(dataset));
+
+		final DatasetType datasetType = new DatasetType(DatasetType.QUADRAT_SUBOBSERVATIONS);
+		datasetType.setName("QUADRAT");
+
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setParentDatasetId(2);
-		datasetDTO.setDatasetTypeId(10095);
+		datasetDTO.setDatasetTypeId(datasetType.getDatasetTypeId());
+
 		Mockito.when(middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId())).thenReturn(datasetDTO);
+		Mockito.when(this.ontologyDataManager.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
+
 		final List<LabelType> labelTypes = this.subObservationDatasetLabelPrinting.getAvailableLabelTypes(labelsInfoInput);
 		Mockito.verify(middlewareDatasetService).getDataset(labelsInfoInput.getDatasetId());
 		Mockito.verify(this.studyDataManager).getDataSetsByType(labelsInfoInput.getStudyId(), DatasetType.SUMMARY_DATA);

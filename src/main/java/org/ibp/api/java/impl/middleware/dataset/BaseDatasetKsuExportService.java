@@ -6,14 +6,15 @@ import com.google.common.io.Files;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.commons.util.FileUtils;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
@@ -31,6 +32,9 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 
 	@Resource
 	protected MethodService methodService;
+
+	@Resource
+	protected OntologyDataManager ontologyDataManager;
 
 	public static String[] TRAIT_FILE_HEADERS = {"trait", "format", "defaultValue", "minimum",
 		"maximum", "details", "categories", "isVisible", "realPosition"};
@@ -54,9 +58,10 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 			this.getInstanceFiles(study, dataSetDto, selectedDatasetInstancesMap, observationUnitRowMap, columns, generator, fileExtension,
 				temporaryFolder);
 
+		final DatasetType datasetType = this.ontologyDataManager.getDatasetTypeById(dataSetDto.getDatasetTypeId());
 		final String sanitizedTraitsAndSelectionFilename = FileUtils.sanitizeFileName(String
 			.format(
-				"%s_%s_%s.trt", study.getName(), DataSetType.findById(dataSetDto.getDatasetTypeId()).getReadableName(),
+				"%s_%s_%s.trt", study.getName(), datasetType.getName(),
 				dataSetDto.getName()));
 		final String traitsAndSelectionFilename =
 			temporaryFolder.getAbsolutePath() + File.separator + sanitizedTraitsAndSelectionFilename;

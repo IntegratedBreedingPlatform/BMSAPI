@@ -2,11 +2,11 @@ package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.collect.Lists;
 import org.generationcp.commons.util.ZipUtil;
+import org.generationcp.middleware.data.initializer.DatasetTypeTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MethodTestDataInitializer;
 import org.generationcp.middleware.data.initializer.ValueReferenceTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -106,6 +106,10 @@ public class DatasetKsuExportServiceImplTest {
 		final Property property = new Property(new Term());
 		property.setName("METHOD");
 		when(this.ontologyDataManager.getProperty(TermId.BREEDING_METHOD_PROP.getId())).thenReturn(property);
+		when(this.ontologyDataManager.getAllDatasetTypes()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
+		final DatasetType datasetType = new DatasetType(DatasetType.PLANT_SUBOBSERVATIONS);
+		datasetType.setName("PLANT_SUBOBSERVATIONS");
+		when(this.ontologyDataManager.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
 	}
 
 	@Test
@@ -130,7 +134,7 @@ public class DatasetKsuExportServiceImplTest {
 		study.setName("STUDY");
 		trialDataSet.setId(1);
 		dataSetDTO.setDatasetId(1);
-		dataSetDTO.setDatasetTypeId(DataSetType.PLANT_SUBOBSERVATIONS.getId());
+		dataSetDTO.setDatasetTypeId(DatasetType.PLANT_SUBOBSERVATIONS);
 		dataSetDTO.setName("PLANT");
 		dataSetDTO.setInstances(this.createStudyInstances());
 

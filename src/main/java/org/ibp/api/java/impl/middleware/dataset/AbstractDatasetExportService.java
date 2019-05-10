@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.dataset;
 import com.google.common.io.Files;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.commons.util.ZipUtil;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -126,13 +125,15 @@ public abstract class AbstractDatasetExportService {
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
 		final DatasetFileGenerator generator, final String fileExtension, final File temporaryFolder) throws IOException {
 		final List<File> files = new ArrayList<>();
+
+		final Map<Integer, DatasetType> datasetTypeMap = this.ontologyDataManager.getAllDatasetTypes();
 		for(final Integer instanceDBID: observationUnitRowMap.keySet()) {
 			// Build the filename with the following format:
 			// study_name + TRIAL_INSTANCE number + location_abbr +  dataset_type + dataset_name
 			final String sanitizedFileName = FileUtils.sanitizeFileName(String
 				.format(
 					"%s_%s_%s_%s." + fileExtension, study.getName() + "-" + selectedDatasetInstancesMap.get(instanceDBID).getInstanceNumber(), selectedDatasetInstancesMap.get(instanceDBID).getLocationAbbreviation(),
-					DataSetType.findById(dataSetDto.getDatasetTypeId()).getReadableName(), dataSetDto.getName()));
+					datasetTypeMap.get(dataSetDto.getDatasetTypeId()).getName(), dataSetDto.getName()));
 			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 			files.add(
 				generator.generateSingleInstanceFile(study.getId(), dataSetDto, columns, observationUnitRowMap.get(instanceDBID), fileNameFullPath, selectedDatasetInstancesMap.get(instanceDBID)));

@@ -3,14 +3,15 @@ package org.ibp.api.java.impl.middleware.dataset;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.util.ZipUtil;
+import org.generationcp.middleware.data.initializer.DatasetTypeTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -77,6 +78,9 @@ public class DatasetCSVExportServiceImplTest {
 	private InstanceValidator instanceValidator;
 
 	@Mock
+	private OntologyDataManager ontologyDataManager;
+
+	@Mock
 	private org.generationcp.middleware.service.api.dataset.DatasetService datasetService;
 
 	@Mock
@@ -99,7 +103,7 @@ public class DatasetCSVExportServiceImplTest {
 		this.study.setName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
 		this.trialDataSet.setId(this.random.nextInt());
 		this.dataSetDTO.setDatasetId(this.random.nextInt());
-		this.dataSetDTO.setDatasetTypeId(DataSetType.PLANT_SUBOBSERVATIONS.getId());
+		this.dataSetDTO.setDatasetTypeId(DatasetType.PLANT_SUBOBSERVATIONS);
 		this.dataSetDTO.setName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
 		this.dataSetDTO.setInstances(this.createStudyInstances());
 
@@ -111,6 +115,8 @@ public class DatasetCSVExportServiceImplTest {
 
 		when(this.datasetService.getDataset(anyInt())).thenReturn(this.dataSetDTO);
 		this.dataSetDTO.setParentDatasetId(1);
+
+		when(this.ontologyDataManager.getAllDatasetTypes()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
 
 	}
 

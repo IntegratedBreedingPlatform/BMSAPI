@@ -5,13 +5,13 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -38,6 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DatasetExcelGeneratorTest {
@@ -71,6 +73,9 @@ public class DatasetExcelGeneratorTest {
 
 	@Mock
 	private DatasetService datasetService;
+
+	@Mock
+	private OntologyDataManager ontologyDataManager;
 
 	@InjectMocks
 	private DatasetExcelGenerator datasetExcelGenerator;
@@ -155,27 +160,31 @@ public class DatasetExcelGeneratorTest {
 		this.measurementVariables = Arrays.asList(measurementVariable1, measurementVariable2);
 
 		this.measurementVariables = Arrays.asList(measurementVariable1, measurementVariable2);
-		Mockito.when(this.studyDataManager.getStudyDetails(DatasetExcelGeneratorTest.STUDY_ID)).thenReturn(studyDetails);
-		Mockito.when(this.studyDataManager.getDataSetsByType(DatasetExcelGeneratorTest.STUDY_ID, DatasetType.SUMMARY_DATA))
+		when(this.studyDataManager.getStudyDetails(DatasetExcelGeneratorTest.STUDY_ID)).thenReturn(studyDetails);
+		when(this.studyDataManager.getDataSetsByType(DatasetExcelGeneratorTest.STUDY_ID, DatasetType.SUMMARY_DATA))
 			.thenReturn(Arrays.asList(dataSet));
-		Mockito.when(this.datasetService
+		when(this.datasetService
 			.getMeasurementVariables(DatasetExcelGeneratorTest.ENVIRONMENT_DATASET_ID, Lists
 				.newArrayList(VariableType.STUDY_DETAIL.getId()))).thenReturn(studyDetailVariables);
-		Mockito.when(this.datasetService
+		when(this.datasetService
 			.getMeasurementVariables(DatasetExcelGeneratorTest.ENVIRONMENT_DATASET_ID, Lists
 				.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 					VariableType.STUDY_CONDITION.getId()))).thenReturn(environmentVariables);
-		Mockito.when(this.studyDataManager.getPhenotypeByVariableId(DatasetExcelGeneratorTest.ENVIRONMENT_DATASET_ID, INSTANCE_DB_ID))
+		when(this.studyDataManager.getPhenotypeByVariableId(DatasetExcelGeneratorTest.ENVIRONMENT_DATASET_ID, INSTANCE_DB_ID))
 			.thenReturn(environmentConditionMap);
 
-		Mockito.when(this.datasetService.getMeasurementVariables(PLOT_DATASET_ID, Lists
+		when(this.datasetService.getMeasurementVariables(PLOT_DATASET_ID, Lists
 			.newArrayList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId(),
 				VariableType.GERMPLASM_DESCRIPTOR.getId()))).thenReturn(plotVariables);
 
-		Mockito.when(this.datasetService
+		when(this.datasetService
 			.getMeasurementVariables(dataSet.getId(), Lists
 				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId())))
 			.thenReturn(datasetVariables);
+
+		final DatasetType datasetType = new DatasetType(DatasetType.PLANT_SUBOBSERVATIONS);
+		datasetType.setName("PLANT_SUBOBSERVATIONS");
+		when(this.ontologyDataManager.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
 	}
 
 	@Test
@@ -184,7 +193,7 @@ public class DatasetExcelGeneratorTest {
 		final StudyInstance studyInstance = new StudyInstance();
 		studyInstance.setInstanceDbId(INSTANCE_DB_ID);
 		final DatasetDTO datasetDTO = new DatasetDTO();
-		datasetDTO.setDatasetTypeId(DataSetType.PLANT_SUBOBSERVATIONS.getId());
+		datasetDTO.setDatasetTypeId(DatasetType.PLANT_SUBOBSERVATIONS);
 		datasetDTO.setDatasetId(INSTANCE_DB_ID);
 		datasetDTO.setParentDatasetId(INSTANCE_DB_ID);
 		final File
@@ -217,7 +226,7 @@ public class DatasetExcelGeneratorTest {
 		final StudyInstance studyInstance = new StudyInstance();
 		studyInstance.setInstanceDbId(INSTANCE_DB_ID);
 		final DatasetDTO datasetDTO = new DatasetDTO();
-		datasetDTO.setDatasetTypeId(DataSetType.PLANT_SUBOBSERVATIONS.getId());
+		datasetDTO.setDatasetTypeId(DatasetType.PLANT_SUBOBSERVATIONS);
 		datasetDTO.setDatasetId(INSTANCE_DB_ID);
 		datasetDTO.setParentDatasetId(INSTANCE_DB_ID);
 		this.datasetExcelGenerator
@@ -230,7 +239,7 @@ public class DatasetExcelGeneratorTest {
 		final StudyInstance studyInstance = new StudyInstance();
 		studyInstance.setInstanceDbId(INSTANCE_DB_ID);
 		final DatasetDTO datasetDTO = new DatasetDTO();
-		datasetDTO.setDatasetTypeId(DataSetType.PLANT_SUBOBSERVATIONS.getId());
+		datasetDTO.setDatasetTypeId(DatasetType.PLANT_SUBOBSERVATIONS);
 		datasetDTO.setDatasetId(INSTANCE_DB_ID);
 		datasetDTO.setParentDatasetId(INSTANCE_DB_ID);
 
@@ -281,7 +290,7 @@ public class DatasetExcelGeneratorTest {
 		final Map<Integer, String> environmentConditionMap = new HashMap<>();
 		environmentConditionMap.put(studyConditionVariable.getTermId(), studyConditionValue);
 
-		Mockito.when(this.studyDataManager.getPhenotypeByVariableId(environmentDatasetId, studyInstance.getInstanceDbId()))
+		when(this.studyDataManager.getPhenotypeByVariableId(environmentDatasetId, studyInstance.getInstanceDbId()))
 			.thenReturn(environmentConditionMap);
 		final List<MeasurementVariable> environmentVariables = Arrays.asList(studyConditionVariable, environmentDetailVariable);
 

@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
