@@ -11,6 +11,7 @@ import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.java.program.ProgramService;
 import org.ibp.api.rest.common.FileType;
+import org.ibp.api.rest.labelprinting.SubObservationDatasetLabelPrinting;
 import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
 import org.ibp.api.rest.preset.domain.PresetDTO;
 import org.ibp.api.rest.preset.domain.PresetType;
@@ -156,7 +157,7 @@ public class PresetDTOValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		if (!fileType.equals(FileType.CSV)) {
+		if (!SubObservationDatasetLabelPrinting.SUPPORTED_FILE_TYPES.contains(fileType)) {
 			errors.reject("preset.not.supported.file.type", "");
 			throw new NotSupportedException(errors.getAllErrors().get(0));
 		}

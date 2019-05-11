@@ -85,13 +85,15 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final Integer studyId,
 		final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> reorderedObservationUnitRows,
-		final String fileNamePath, final  StudyInstance studyInstance) throws IOException {
+		final String fileNamePath, final StudyInstance studyInstance) throws IOException {
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
 		final List<MeasurementVariable> orderedColumns = this.orderColumns(columns);
 		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto, studyInstance);
 		final Locale locale = LocaleContextHolder.getLocale();
-		this.writeObservationSheet(orderedColumns, reorderedObservationUnitRows, xlsBook, this.messageSource.getMessage("export.study.sheet.observation", null, locale));
+		this.writeObservationSheet(
+			orderedColumns, reorderedObservationUnitRows, xlsBook,
+			this.messageSource.getMessage("export.study.sheet.observation", null, locale));
 
 		final File file = new File(fileNamePath);
 
@@ -103,13 +105,14 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	}
 
 	@Override
-	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
+	public File generateMultiInstanceFile(
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
 		final String fileNameFullPath) throws IOException {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public File generateTraitAndSelectionVariablesFile(final List<String[]> rowValues, final String filenamePath) throws IOException{
+	public File generateTraitAndSelectionVariablesFile(final List<String[]> rowValues, final String filenamePath) throws IOException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -117,7 +120,8 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
 		final List<MeasurementVariable> trait = new ArrayList<>();
 		final List<MeasurementVariable> selection = new ArrayList<>();
-		final List<Integer> discardColumns = Arrays.asList(TermId.REP_NO.getId(),TermId.ROW.getId(),TermId.BLOCK_NO.getId(),TermId.COL.getId());
+		final List<Integer> discardColumns =
+			Arrays.asList(TermId.REP_NO.getId(), TermId.ROW.getId(), TermId.BLOCK_NO.getId(), TermId.COL.getId());
 
 		for (final MeasurementVariable measurementVariable : columns) {
 			if (TermId.OBS_UNIT_ID.getId() == measurementVariable.getTermId()) {
@@ -235,7 +239,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 				.getMeasurementVariables(
 					environmentDatasetId, Lists
 						.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-							VariableType.STUDY_CONDITION.getId(), VariableType.TRAIT.getId()));
+							VariableType.STUDY_CONDITION.getId()));
 
 		final List<MeasurementVariable> plotVariables =
 			this.datasetService.getMeasurementVariables(plotDatasetId, Lists
@@ -277,7 +281,8 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environment.details",
 			this.getColorIndex(xlsBook, 124, 124, 124));
 
-		final List<MeasurementVariable> environmentDetails = this.getEnvironmentalDetails(environmentDatasetId, environmentVariables, studyInstance);
+		final List<MeasurementVariable> environmentDetails =
+			this.getEnvironmentalDetails(environmentDatasetId, environmentVariables, studyInstance);
 
 		currentRowNum = this.writeSection(
 			currentRowNum,
@@ -289,19 +294,14 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.environmental.conditions",
 			this.getColorIndex(xlsBook, 124, 124, 124));
 
-		final List<MeasurementVariable> environmentConditions = this.getEnvironmentalConditions(environmentDatasetId, environmentVariables, studyInstance);
+		final List<MeasurementVariable> environmentConditions =
+			this.getEnvironmentalConditions(environmentDatasetId, environmentVariables, studyInstance);
 
 		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
 			filterByVariableType(environmentConditions, VariableType.STUDY_CONDITION), ENVIRONMENT);
-
-		currentRowNum = this.writeSection(
-			currentRowNum,
-			xlsBook,
-			xlsSheet,
-			filterByVariableType(environmentVariables, VariableType.TRAIT), ENVIRONMENT);
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.germplasm.descriptors",
@@ -378,10 +378,10 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		return environmentDetails;
 	}
 
-	private List<MeasurementVariable> getEnvironmentalConditions(
+	protected List<MeasurementVariable> getEnvironmentalConditions(
 		final int environmentDatasetId, final List<MeasurementVariable> environmentVariables, final StudyInstance instance) {
 		final List<MeasurementVariable> environmentConditions =
-			filterByVariableType(environmentVariables, VariableType.TRAIT);
+			filterByVariableType(environmentVariables, VariableType.STUDY_CONDITION);
 		final Map<Integer, String> environmentConditionMap =
 			this.studyDataManager.getPhenotypeByVariableId(environmentDatasetId, instance.getInstanceDbId());
 		for (final MeasurementVariable variable : environmentConditions) {

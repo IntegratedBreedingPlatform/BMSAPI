@@ -74,7 +74,7 @@ public class DatasetValidator {
 	}
 
 	public StandardVariable validateDatasetVariable(final Integer studyId, final Integer datasetId,
-			final Boolean shouldBeSubobservationDataset, final DatasetVariable datasetVariable, final Boolean shouldAlreadyBeDatasetVariable) {
+			final Boolean shouldBeSubobservationDataset, final DatasetVariable datasetVariable, final Boolean shouldBeDatasetVariable) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
@@ -86,7 +86,7 @@ public class DatasetValidator {
 		final StandardVariable standardVariable = this.ontologyDataManager.getStandardVariable(variableId, this.contextUtil.getCurrentProgramUUID());
 		this.validateVariable(standardVariable, variableType, variableId);
 
-		this.validateIfAlreadyDatasetVariable(variableId, shouldAlreadyBeDatasetVariable, dataSet);
+		this.validateIfDatasetVariableAlreadyExists(variableId, shouldBeDatasetVariable, dataSet);
 
 		return standardVariable;
 	}
@@ -101,12 +101,12 @@ public class DatasetValidator {
 		for (final Integer variableId : variableIds) {
 			// If the variable does not exist, MiddlewareQueryException will be thrown
 			this.ontologyDataManager.getStandardVariable(variableId, this.contextUtil.getCurrentProgramUUID());
-			this.validateIfAlreadyDatasetVariable(variableId, true, dataSet);
+			this.validateIfDatasetVariableAlreadyExists(variableId, true, dataSet);
 		}
 
 	}
 
-	public void validateIfAlreadyDatasetVariable(final Integer variableId, final Boolean shouldAlreadyBeDatasetVariable,
+	public void validateIfDatasetVariableAlreadyExists(final Integer variableId, final Boolean shouldAlreadyBeDatasetVariable,
 			final DatasetDTO dataSet) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		final List<MeasurementVariable> datasetVariables = dataSet.getVariables();

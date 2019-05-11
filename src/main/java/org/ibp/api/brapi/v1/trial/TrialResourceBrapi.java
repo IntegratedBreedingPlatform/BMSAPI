@@ -1,14 +1,11 @@
 
 package org.ibp.api.brapi.v1.trial;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.StringUtil;
 import org.generationcp.middleware.domain.dms.StudySummary;
@@ -34,10 +31,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.common.collect.ImmutableList;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/#reference/trials">BrAPI Trial services</a>.
@@ -73,8 +72,7 @@ public class TrialResourceBrapi {
 
 		final String validationError = this.parameterValidation(active, sortBy, sortOrder);
 		if (!StringUtils.isBlank(validationError)) {
-			final Map<String, String> status = new HashMap<>();
-			status.put("message", validationError);
+			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", validationError));
 			final Metadata metadata = new Metadata(null, status);
 			final TrialSummaries trialSummaries = new TrialSummaries().withMetadata(metadata).withResult(new Result<TrialSummary>());
 			return new ResponseEntity<>(trialSummaries, HttpStatus.NOT_FOUND);
