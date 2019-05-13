@@ -1,14 +1,12 @@
 package org.ibp.api.brapi.v1.germplasm;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
-import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
+import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -29,6 +27,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Api(value = "BrAPI Germplasm Services")
 @Controller
@@ -80,25 +81,27 @@ public class GermplasmResourceBrapi {
 			}
 		}
 
-		final GermplasmSearchRequestDTO germplasmSearchRequestDTO =
-				new GermplasmSearchRequestDTO(gid, germplasmName, germplasmPUI, currentPage, pageSize);
+		final GermplasmSearchRequestDto germplasmSearchRequestDTO =
+				new GermplasmSearchRequestDto(gid, germplasmName, germplasmPUI);
 
 		final PagedResult<GermplasmDTO> resultPage = new PaginatedSearch()
-				.executeBrapiSearch(germplasmSearchRequestDTO.getPage(), germplasmSearchRequestDTO.getPageSize(),
-						new SearchSpec<GermplasmDTO>() {
+			.executeBrapiSearch((currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage),
+				(pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize),
+				new SearchSpec<GermplasmDTO>() {
 
-							@Override
-							public long getCount() {
-								return GermplasmResourceBrapi.this.germplasmService.countGermplasmDTOs(germplasmSearchRequestDTO);
-							}
+					@Override
+					public long getCount() {
+						return GermplasmResourceBrapi.this.germplasmService.countGermplasmDTOs(germplasmSearchRequestDTO);
+					}
 
-							@Override
-							public List<GermplasmDTO> getResults(final PagedResult<GermplasmDTO> pagedResult) {
-								return GermplasmResourceBrapi.this.germplasmService.searchGermplasmDTO(germplasmSearchRequestDTO);
-							}
-						});
+					@Override
+					public List<GermplasmDTO> getResults(final PagedResult<GermplasmDTO> pagedResult) {
+						return GermplasmResourceBrapi.this.germplasmService
+							.searchGermplasmDTO(germplasmSearchRequestDTO, currentPage, pageSize);
+					}
+				});
 
-		List<Germplasm> germplasmList = new ArrayList<>();
+		final List<Germplasm> germplasmList = new ArrayList<>();
 
 		if (resultPage.getPageResults() != null) {
 			final ModelMapper mapper = new ModelMapper();
@@ -138,7 +141,7 @@ public class GermplasmResourceBrapi {
 
 		}
 
-		final GermplasmDTO germplasmDTO = germplasmService.getGermplasmDTObyGID(gid);
+		final GermplasmDTO germplasmDTO = this.germplasmService.getGermplasmDTObyGID(gid);
 
 		if (germplasmDTO != null) {
 			final ModelMapper mapper = new ModelMapper();
@@ -177,7 +180,7 @@ public class GermplasmResourceBrapi {
 				new SingleEntityResponse<PedigreeDTO>().withMessage("Search by pedigree not implemented"), HttpStatus.NOT_IMPLEMENTED);
 		}
 
-		Integer gid = null;
+		Integer gid;
 		try {
 			gid = Integer.valueOf(germplasmDbId);
 		} catch (final NumberFormatException e) {
@@ -203,7 +206,7 @@ public class GermplasmResourceBrapi {
 		final String germplasmDbId
 	) {
 
-		Integer gid = null;
+		Integer gid;
 		try {
 			gid = Integer.valueOf(germplasmDbId);
 		} catch (final NumberFormatException e) {

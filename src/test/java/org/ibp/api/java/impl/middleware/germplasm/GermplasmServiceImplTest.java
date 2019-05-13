@@ -1,11 +1,10 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
-import java.util.List;
-
-import org.generationcp.middleware.dao.germplasm.GermplasmSearchRequestDTO;
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
+import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -16,19 +15,19 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.ArgumentCaptor;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 public class GermplasmServiceImplTest {
 
@@ -100,10 +99,11 @@ public class GermplasmServiceImplTest {
 	}
 
 	@Test
-	public void testSearchGermplasmDTO () {
+	public void testSearchGermplasmDTO() {
 
-		final GermplasmSearchRequestDTO germplasmSearchRequestDTO = new GermplasmSearchRequestDTO();
-		final ArgumentCaptor<GermplasmSearchRequestDTO> captorGermplasmSearchRequestDTO = ArgumentCaptor.forClass(GermplasmSearchRequestDTO.class);
+		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
+		final ArgumentCaptor<GermplasmSearchRequestDto> captorGermplasmSearchRequestDTO =
+			ArgumentCaptor.forClass(GermplasmSearchRequestDto.class);
 
 		final GermplasmDTO germplasmDTO = new GermplasmDTO();
 		germplasmDTO.setGermplasmDbId("1");
@@ -111,16 +111,17 @@ public class GermplasmServiceImplTest {
 		germplasmDTO.setGermplasmSeedSource("AF07A-412-201");
 		List<GermplasmDTO> germplasmDTOList = Lists.newArrayList(germplasmDTO);
 
-		Mockito.when(germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO)).thenReturn(germplasmDTOList);
-		Mockito.when(pedigreeService.getCrossExpansion(Integer.parseInt(germplasmDTO.getGermplasmDbId()), this.crossExpansionProperties)).thenReturn("CB1");
+		Mockito.when(germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO, 1, 100)).thenReturn(germplasmDTOList);
+		Mockito.when(pedigreeService.getCrossExpansion(Integer.parseInt(germplasmDTO.getGermplasmDbId()), this.crossExpansionProperties))
+			.thenReturn("CB1");
 
-		this.germplasmServiceImpl.searchGermplasmDTO(germplasmSearchRequestDTO);
+		this.germplasmServiceImpl.searchGermplasmDTO(germplasmSearchRequestDTO, 1, 100);
 		Assert.assertEquals("CB1", germplasmDTOList.get(0).getPedigree());
 
-		Mockito.verify(this.germplasmDataManager, Mockito.times(1)).searchGermplasmDTO(captorGermplasmSearchRequestDTO.capture());
-		final GermplasmSearchRequestDTO germplasmSearchRequestDTOVal = captorGermplasmSearchRequestDTO.getValue();
-		Assert.assertEquals(Integer.valueOf(BrapiPagedResult.DEFAULT_PAGE_SIZE), germplasmSearchRequestDTOVal.getPageSize());
-		Assert.assertEquals(Integer.valueOf(BrapiPagedResult.DEFAULT_PAGE_NUMBER), germplasmSearchRequestDTOVal.getPage());
+		Mockito.verify(this.germplasmDataManager, Mockito.times(1)).searchGermplasmDTO(captorGermplasmSearchRequestDTO.capture(), 1, 100);
+		final GermplasmSearchRequestDto germplasmSearchRequestDTOVal = captorGermplasmSearchRequestDTO.getValue();
+		Assert.assertEquals(java.util.Optional.ofNullable(Integer.valueOf(BrapiPagedResult.DEFAULT_PAGE_SIZE)), 100);
+		Assert.assertEquals(java.util.Optional.ofNullable(Integer.valueOf(BrapiPagedResult.DEFAULT_PAGE_NUMBER)), 1);
 	}
 
 
