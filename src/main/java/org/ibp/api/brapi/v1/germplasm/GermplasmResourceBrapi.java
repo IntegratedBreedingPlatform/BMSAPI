@@ -1,5 +1,6 @@
 package org.ibp.api.brapi.v1.germplasm;
 
+import com.google.common.collect.Lists;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -69,20 +70,25 @@ public class GermplasmResourceBrapi {
 					required = false)
 			final String commonCropName) {
 
-		Integer gid  = null;
+		Integer gid;
+
+		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
+
+		germplasmSearchRequestDTO.setPreferredName(germplasmName);
+		if (germplasmPUI != null) {
+			germplasmSearchRequestDTO.setGermplasmPUIs(Lists.newArrayList(germplasmPUI));
+		}
 
 		try {
 			if (germplasmDbId != null) {
 				gid = Integer.parseInt(germplasmDbId);
+				germplasmSearchRequestDTO.setGermplasmDbIds(Lists.newArrayList(gid.toString()));
 			}
 		} catch (final NumberFormatException e) {
 			if (germplasmName == null && germplasmPUI == null) {
 				return new ResponseEntity<>(new EntityListResponse<>(new Result<>(new ArrayList<Germplasm>())), HttpStatus.OK);
 			}
 		}
-
-		final GermplasmSearchRequestDto germplasmSearchRequestDTO =
-				new GermplasmSearchRequestDto(gid, germplasmName, germplasmPUI);
 
 		final PagedResult<GermplasmDTO> resultPage = new PaginatedSearch()
 			.executeBrapiSearch((currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage),
@@ -180,7 +186,7 @@ public class GermplasmResourceBrapi {
 				new SingleEntityResponse<PedigreeDTO>().withMessage("Search by pedigree not implemented"), HttpStatus.NOT_IMPLEMENTED);
 		}
 
-		Integer gid;
+		final Integer gid;
 		try {
 			gid = Integer.valueOf(germplasmDbId);
 		} catch (final NumberFormatException e) {
@@ -206,7 +212,7 @@ public class GermplasmResourceBrapi {
 		final String germplasmDbId
 	) {
 
-		Integer gid;
+		final Integer gid;
 		try {
 			gid = Integer.valueOf(germplasmDbId);
 		} catch (final NumberFormatException e) {
