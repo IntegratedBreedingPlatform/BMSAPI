@@ -42,6 +42,7 @@ public class GermplasmResourceBrapi {
 	@ApiOperation(value = "Search germplasms", notes = "Search germplasms")
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm-search", method = RequestMethod.GET)
 	@ResponseBody
+	//@JsonView(Germplasm.View.GermplasmConfigurationBrapi.class)
 	public ResponseEntity<EntityListResponse<Germplasm>> searchGermplasms(
 			@PathVariable
 			final String crop,
@@ -70,7 +71,7 @@ public class GermplasmResourceBrapi {
 					required = false)
 			final String commonCropName) {
 
-		Integer gid;
+		final int gid;
 
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
 
@@ -82,7 +83,7 @@ public class GermplasmResourceBrapi {
 		try {
 			if (germplasmDbId != null) {
 				gid = Integer.parseInt(germplasmDbId);
-				germplasmSearchRequestDTO.setGermplasmDbIds(Lists.newArrayList(gid.toString()));
+				germplasmSearchRequestDTO.setGermplasmDbIds(Lists.newArrayList(Integer.toString(gid)));
 			}
 		} catch (final NumberFormatException e) {
 			if (germplasmName == null && germplasmPUI == null) {

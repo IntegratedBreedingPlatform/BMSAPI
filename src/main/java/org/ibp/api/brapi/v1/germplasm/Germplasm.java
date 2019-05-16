@@ -2,21 +2,28 @@ package org.ibp.api.brapi.v1.germplasm;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonView;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.pojomatic.Pojomatic;
-import org.pojomatic.annotations.AutoProperty;
 
 @JsonInclude(JsonInclude.Include.ALWAYS)
-@JsonPropertyOrder({"germplasmDbId", "defaultDisplayName", "accessionNumber", "germplasmName", "germplasmPUI", "pedigree",
-		"germplasmSeedSource", "synonyms", "commonCropName", "instituteCode", "instituteName", "biologicalStatusOfAccessionCode",
-		"countryOfOriginCode", "typeOfGermplasmStorageCode", "genus", "species", "taxonIds", "speciesAuthority", "subtaxa",
-		"subtaxaAuthority", "donors", "acquisitionDate"})
 @AutoProperty
 public class Germplasm {
+
+	public static class View {
+
+		public static class SearchGermplasmConfigurationBrapi {
+
+		}
+
+		public static class GermplasmConfigurationBrapi {
+
+		}
+	}
 
 	private String germplasmDbId;
 
@@ -63,11 +70,63 @@ public class Germplasm {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date acquisitionDate;
 
+	@JsonView(View.SearchGermplasmConfigurationBrapi.class)
+	private String breedingMethodDbId;
+
+	@JsonView(View.SearchGermplasmConfigurationBrapi.class)
+	private String germplasmGenus;
+
+	@JsonView(View.SearchGermplasmConfigurationBrapi.class)
+	private String germplasmSpecies;
+
+	@JsonView(View.SearchGermplasmConfigurationBrapi.class)
+	private String seedSource;
+
+	@JsonView(View.SearchGermplasmConfigurationBrapi.class)
+	private final static String documentationURL = null;
+
+
 	public Germplasm() {
 	}
 
+	public String getBreedingMethodDbId() {
+		return this.breedingMethodDbId;
+	}
+
+	public void setBreedingMethodDbId(final String breedingMethodDbId) {
+		this.breedingMethodDbId = breedingMethodDbId;
+	}
+
+	public String getGermplasmGenus() {
+		return this.germplasmGenus;
+	}
+
+	public void setGermplasmGenus(final String germplasmGenus) {
+		this.germplasmGenus = germplasmGenus;
+	}
+
+	public String getGermplasmSpecies() {
+		return this.germplasmSpecies;
+	}
+
+	public void setGermplasmSpecies(final String germplasmSpecies) {
+		this.germplasmSpecies = germplasmSpecies;
+	}
+
+	public String getSeedSource() {
+		return this.seedSource;
+	}
+
+	public void setSeedSource(final String seedSource) {
+		this.seedSource = seedSource;
+	}
+
+	public String getDocumentationURL() {
+		return this.documentationURL;
+	}
+
 	public String getGermplasmDbId() {
-		return germplasmDbId;
+		return this.germplasmDbId;
 	}
 
 	public void setGermplasmDbId(final String germplasmDbId) {
@@ -75,7 +134,7 @@ public class Germplasm {
 	}
 
 	public String getDefaultDisplayName() {
-		return defaultDisplayName;
+		return this.defaultDisplayName;
 	}
 
 	public void setDefaultDisplayName(final String defaultDisplayName) {
@@ -83,7 +142,7 @@ public class Germplasm {
 	}
 
 	public String getAccessionNumber() {
-		return accessionNumber;
+		return this.accessionNumber;
 	}
 
 	public void setAccessionNumber(final String accessionNumber) {
@@ -91,7 +150,7 @@ public class Germplasm {
 	}
 
 	public String getGermplasmName() {
-		return germplasmName;
+		return this.germplasmName;
 	}
 
 	public void setGermplasmName(final String germplasmName) {
@@ -99,7 +158,7 @@ public class Germplasm {
 	}
 
 	public String getGermplasmPUI() {
-		return germplasmPUI;
+		return this.germplasmPUI;
 	}
 
 	public void setGermplasmPUI(final String germplasmPUI) {
@@ -107,7 +166,7 @@ public class Germplasm {
 	}
 
 	public String getPedigree() {
-		return pedigree;
+		return this.pedigree;
 	}
 
 	public void setPedigree(final String pedigree) {
@@ -115,7 +174,7 @@ public class Germplasm {
 	}
 
 	public String getGermplasmSeedSource() {
-		return germplasmSeedSource;
+		return this.germplasmSeedSource;
 	}
 
 	public void setGermplasmSeedSource(final String germplasmSeedSource) {
@@ -123,7 +182,7 @@ public class Germplasm {
 	}
 
 	public List<String> getSynonyms() {
-		return synonyms;
+		return this.synonyms;
 	}
 
 	public void setSynonyms(final List<String> synonyms) {
@@ -131,7 +190,7 @@ public class Germplasm {
 	}
 
 	public String getCommonCropName() {
-		return commonCropName;
+		return this.commonCropName;
 	}
 
 	public void setCommonCropName(final String commonCropName) {
@@ -139,7 +198,7 @@ public class Germplasm {
 	}
 
 	public String getInstituteCode() {
-		return instituteCode;
+		return this.instituteCode;
 	}
 
 	public void setInstituteCode(final String instituteCode) {
@@ -147,7 +206,7 @@ public class Germplasm {
 	}
 
 	public String getInstituteName() {
-		return instituteName;
+		return this.instituteName;
 	}
 
 	public void setInstituteName(final String instituteName) {
@@ -155,7 +214,7 @@ public class Germplasm {
 	}
 
 	public Integer getBiologicalStatusOfAccessionCode() {
-		return biologicalStatusOfAccessionCode;
+		return this.biologicalStatusOfAccessionCode;
 	}
 
 	public void setBiologicalStatusOfAccessionCode(final Integer biologicalStatusOfAccessionCode) {
@@ -163,7 +222,7 @@ public class Germplasm {
 	}
 
 	public String getCountryOfOriginCode() {
-		return countryOfOriginCode;
+		return this.countryOfOriginCode;
 	}
 
 	public void setCountryOfOriginCode(final String countryOfOriginCode) {
@@ -171,7 +230,7 @@ public class Germplasm {
 	}
 
 	public List<String> getTypeOfGermplasmStorageCode() {
-		return typeOfGermplasmStorageCode;
+		return this.typeOfGermplasmStorageCode;
 	}
 
 	public void setTypeOfGermplasmStorageCode(final List<String> typeOfGermplasmStorageCode) {
@@ -179,7 +238,7 @@ public class Germplasm {
 	}
 
 	public String getGenus() {
-		return genus;
+		return this.genus;
 	}
 
 	public void setGenus(final String genus) {
@@ -187,7 +246,7 @@ public class Germplasm {
 	}
 
 	public String getSpecies() {
-		return species;
+		return this.species;
 	}
 
 	public void setSpecies(final String species) {
@@ -195,7 +254,7 @@ public class Germplasm {
 	}
 
 	public List<Taxon> getTaxonIds() {
-		return taxonIds;
+		return this.taxonIds;
 	}
 
 	public void setTaxonIds(final List<Taxon> taxonIds) {
@@ -203,7 +262,7 @@ public class Germplasm {
 	}
 
 	public String getSpeciesAuthority() {
-		return speciesAuthority;
+		return this.speciesAuthority;
 	}
 
 	public void setSpeciesAuthority(final String speciesAuthority) {
@@ -211,7 +270,7 @@ public class Germplasm {
 	}
 
 	public String getSubtaxa() {
-		return subtaxa;
+		return this.subtaxa;
 	}
 
 	public void setSubtaxa(final String subtaxa) {
@@ -219,7 +278,7 @@ public class Germplasm {
 	}
 
 	public String getSubtaxaAuthority() {
-		return subtaxaAuthority;
+		return this.subtaxaAuthority;
 	}
 
 	public void setSubtaxaAuthority(final String subtaxaAuthority) {
@@ -227,7 +286,7 @@ public class Germplasm {
 	}
 
 	public List<Donor> getDonors() {
-		return donors;
+		return this.donors;
 	}
 
 	public void setDonors(final List<Donor> donors) {
@@ -235,7 +294,7 @@ public class Germplasm {
 	}
 
 	public Date getAcquisitionDate() {
-		return acquisitionDate;
+		return this.acquisitionDate;
 	}
 
 	public void setAcquisitionDate(final Date acquisitionDate) {
@@ -253,7 +312,7 @@ public class Germplasm {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
 
