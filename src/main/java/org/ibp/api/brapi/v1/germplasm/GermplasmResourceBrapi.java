@@ -255,7 +255,7 @@ public class GermplasmResourceBrapi {
 		} catch (final MiddlewareException e) {
 			return new ResponseEntity<>(
 				new EntityListResponse<>(new Result<>(new ArrayList<Germplasm>())).withMessage("no search request found"),
-				HttpStatus.BAD_REQUEST);
+				HttpStatus.NOT_FOUND);
 		}
 
 		final PagedResult<GermplasmDTO> resultPage = new PaginatedSearch()
