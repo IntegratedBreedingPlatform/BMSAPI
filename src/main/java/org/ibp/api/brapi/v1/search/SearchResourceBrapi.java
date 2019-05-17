@@ -1,5 +1,6 @@
 package org.ibp.api.brapi.v1.search;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -56,7 +57,7 @@ public class SearchResourceBrapi {
 	@ApiOperation(value = "Post germplasm search", notes = "Get germplasm search")
 	@RequestMapping(value = "/{crop}/brapi/v1/search/germplasm/{searchResulstDbid}", method = RequestMethod.GET)
 	@ResponseBody
-	//@JsonView(Germplasm.View.SearchGermplasmConfigurationBrapi.class)
+	@JsonView(Germplasm.View.SearchGermplasmConfigurationBrapi.class)
 	public ResponseEntity<EntityListResponse<Germplasm>> getSearchGermplasm(
 		@PathVariable final String crop, @PathVariable final Integer searchResulstDbid,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
