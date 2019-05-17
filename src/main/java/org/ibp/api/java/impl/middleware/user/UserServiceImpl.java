@@ -159,6 +159,7 @@ public class UserServiceImpl implements UserService {
 		userdto.setRole(new Role(user.getRole().getId(), user.getRole().getDescription()));
 		userdto.setEmail(user.getEmail());
 		userdto.setStatus("true".equals(user.getStatus()) ? 0 : 1);
+		userdto.setCrops(user.getCrops());
 		return userdto;
 	}
 
