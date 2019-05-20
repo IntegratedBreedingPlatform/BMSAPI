@@ -246,20 +246,20 @@ public class DatasetCSVExportServiceImplTest {
 		this.datasetExportService.getColumns(1, 1);
 		Mockito.verify(this.datasetService).getDataset(1);
 		Mockito.verify(this.studyDataManager).getDataSetsByType(1, DataSetType.SUMMARY_DATA);
-		Mockito.verify(this.datasetService).getMeasurementVariables(1, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
-		Mockito.verify(this.datasetService).getMeasurementVariables(anyInt(), eq(Lists.newArrayList(
+		Mockito.verify(this.datasetService).getObservationSetVariables(1, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
+		Mockito.verify(this.datasetService).getObservationSetVariables(anyInt(), eq(Lists.newArrayList(
 			VariableType.ENVIRONMENT_DETAIL.getId(),
 			VariableType.STUDY_CONDITION.getId())));
-		Mockito.verify(this.datasetService).getMeasurementVariables(
+		Mockito.verify(this.datasetService).getObservationSetVariables(
 			1,
 			Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 				VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId()));
-		Mockito.verify(this.datasetService).getMeasurementVariables(1, Lists.newArrayList(
+		Mockito.verify(this.datasetService).getObservationSetVariables(1, Lists.newArrayList(
 			VariableType.GERMPLASM_DESCRIPTOR.getId(),
 			VariableType.OBSERVATION_UNIT.getId()));
-		Mockito.verify(this.datasetService).getMeasurementVariables(1, Lists.newArrayList(TermId.MULTIFACTORIAL_INFO.getId()));
-		Mockito.verify(this.datasetService).getMeasurementVariables(1, Lists.newArrayList(VariableType.TRAIT.getId()));
-		Mockito.verify(this.datasetService).getMeasurementVariables(1, Lists.newArrayList(VariableType.SELECTION_METHOD.getId()));
+		Mockito.verify(this.datasetService).getObservationSetVariables(1, Lists.newArrayList(TermId.MULTIFACTORIAL_INFO.getId()));
+		Mockito.verify(this.datasetService).getObservationSetVariables(1, Lists.newArrayList(VariableType.TRAIT.getId()));
+		Mockito.verify(this.datasetService).getObservationSetVariables(1, Lists.newArrayList(VariableType.SELECTION_METHOD.getId()));
 	}
 
 	@Test
