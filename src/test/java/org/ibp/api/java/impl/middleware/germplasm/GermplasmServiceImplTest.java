@@ -59,35 +59,35 @@ public class GermplasmServiceImplTest {
 	@Test
 	public void testSearchGermplasm() throws MiddlewareQueryException {
 
-		Germplasm gp = new Germplasm();
+		final Germplasm gp = new Germplasm();
 		gp.setGid(3);
 		gp.setGpid1(1);
 		gp.setGpid2(2);
 		gp.setMethodId(1);
 		gp.setLocationId(1);
 
-		List<Germplasm> middlewareSearchResults = Lists.newArrayList(gp);
-		Mockito.doReturn(middlewareSearchResults).when(germplasmDataManager).searchForGermplasm(Mockito.any(GermplasmSearchParameter.class));
+		final List<Germplasm> middlewareSearchResults = Lists.newArrayList(gp);
+		Mockito.doReturn(middlewareSearchResults).when(this.germplasmDataManager).searchForGermplasm(Mockito.any(GermplasmSearchParameter.class));
 
-		String gpPedigree = "CML1/CML2";
-		Mockito.doReturn(gpPedigree).when(pedigreeService).getCrossExpansion(gp.getGid(), this.crossExpansionProperties);
+		final String gpPedigree = "CML1/CML2";
+		Mockito.doReturn(gpPedigree).when(this.pedigreeService).getCrossExpansion(gp.getGid(), this.crossExpansionProperties);
 
-		Name gpName = new Name();
+		final Name gpName = new Name();
 		gpName.setGermplasmId(gp.getGid());
 		gpName.setNval("CML1");
-		List<Name> gpNames = Lists.newArrayList(gpName);
-		Mockito.doReturn(gpNames).when(germplasmDataManager).getNamesByGID(Matchers.anyInt(),ArgumentMatchers.isNull(Integer.class),
+		final List<Name> gpNames = Lists.newArrayList(gpName);
+		Mockito.doReturn(gpNames).when(this.germplasmDataManager).getNamesByGID(Matchers.anyInt(),ArgumentMatchers.isNull(Integer.class),
 				ArgumentMatchers.isNull(GermplasmNameType.class));
 
-		Method gpMethod = new Method();
+		final Method gpMethod = new Method();
 		gpMethod.setMname("Backcross");
-		Mockito.doReturn(gpMethod).when(germplasmDataManager).getMethodByID(Matchers.anyInt());
+		Mockito.doReturn(gpMethod).when(this.germplasmDataManager).getMethodByID(Matchers.anyInt());
 
-		Location gpLocation = new Location();
+		final Location gpLocation = new Location();
 		gpLocation.setLname("Mexico");
-		Mockito.doReturn(gpLocation).when(locationDataManger).getLocationByID(Matchers.anyInt());
+		Mockito.doReturn(gpLocation).when(this.locationDataManger).getLocationByID(Matchers.anyInt());
 
-		List<GermplasmSummary> germplasmSummaries = this.germplasmServiceImpl.searchGermplasm("CML", 1, 20);
+		final List<GermplasmSummary> germplasmSummaries = this.germplasmServiceImpl.searchGermplasm("CML", 1, 20);
 		Assert.assertTrue(!germplasmSummaries.isEmpty());
 
 		Assert.assertEquals(gp.getGid().toString(), germplasmSummaries.get(0).getGermplasmId());
@@ -103,24 +103,21 @@ public class GermplasmServiceImplTest {
 	public void testSearchGermplasmDTO () {
 
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
-		final ArgumentCaptor<GermplasmSearchRequestDto> captorGermplasmSearchRequestDTO = ArgumentCaptor.forClass(GermplasmSearchRequestDto.class);
+		final ArgumentCaptor<GermplasmDTO> captorGermplasmSearchRequestDTO = ArgumentCaptor.forClass(GermplasmDTO.class);
 
 		final GermplasmDTO germplasmDTO = new GermplasmDTO();
 		germplasmDTO.setGermplasmDbId("1");
 		germplasmDTO.setGermplasmName("CB1");
 		germplasmDTO.setGermplasmSeedSource("AF07A-412-201");
-		List<GermplasmDTO> germplasmDTOList = Lists.newArrayList(germplasmDTO);
+		final List<GermplasmDTO> germplasmDTOList = Lists.newArrayList(germplasmDTO);
 
-		Mockito.when(germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO, PAGE, PAGE_SIZE)).thenReturn(germplasmDTOList);
-		Mockito.when(pedigreeService.getCrossExpansion(Integer.parseInt(germplasmDTO.getGermplasmDbId()), this.crossExpansionProperties)).thenReturn("CB1");
+		Mockito.when(this.germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO, PAGE, PAGE_SIZE)).thenReturn(germplasmDTOList);
+		Mockito.when(this.pedigreeService.getCrossExpansion(Integer.parseInt(germplasmDTO.getGermplasmDbId()), this.crossExpansionProperties)).thenReturn("CB1");
 
 		this.germplasmServiceImpl.searchGermplasmDTO(germplasmSearchRequestDTO, PAGE, PAGE_SIZE);
 		Assert.assertEquals("CB1", germplasmDTOList.get(0).getPedigree());
 
-		//Mockito.verify(this.germplasmDataManager, Mockito.times(3)).searchGermplasmDTO(captorGermplasmSearchRequestDTO.capture(), PAGE, PAGE_SIZE);
-		//final GermplasmSearchRequestDto germplasmSearchRequestDTOVal = captorGermplasmSearchRequestDTO.getValue();
-		//Assert.assertEquals(Integer.valueOf(BrapiPagedResult.DEFAULT_PAGE_SIZE), PAGE_SIZE);
-		//Assert.assertEquals(Integer.valueOf(BrapiPagedResult.DEFAULT_PAGE_NUMBER), PAGE);
+		Mockito.verify(this.germplasmDataManager, Mockito.times(1)).searchGermplasmDTO(germplasmSearchRequestDTO, PAGE, PAGE_SIZE);
 	}
 
 
