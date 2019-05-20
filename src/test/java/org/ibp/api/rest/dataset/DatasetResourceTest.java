@@ -7,7 +7,6 @@ import org.generationcp.middleware.data.initializer.DatasetTypeTestDataInitializ
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -223,7 +222,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testGetDatasets() throws Exception {
-		final List<DatasetDTO> datasets = this.createDatasets(Arrays.asList(DatasetType.PLOT_DATA, DatasetType.PLANT_SUBOBSERVATIONS, DatasetType.QUADRAT_SUBOBSERVATIONS));
+		final List<DatasetDTO> datasets = this.createDatasets(
+			Arrays.asList(DatasetType.PLOT_DATA, DatasetType.PLANT_SUBOBSERVATIONS, DatasetType.QUADRAT_SUBOBSERVATIONS));
 		doReturn(datasets).when(this.studyDatasetService).getDatasets(100, null);
 
 		this.mockMvc
@@ -789,7 +789,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/set-as-missing", this.cropName, studyId,
+				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/set-as-missing", this.cropName,
+					studyId,
 					datasetId)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
@@ -845,7 +846,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/filter/acceptance", this.cropName, studyId,
+				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/filter/acceptance", this.cropName,
+					studyId,
 					datasetId)
 				.contentType(this.contentType).content(this.convertObjectToByte(searchDTO)))
 			.andDo(MockMvcResultHandlers.print())
@@ -865,11 +867,14 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final Integer totalPhenotypes = 5;
 		final FilteredPhenotypesInstancesCountDTO result = new FilteredPhenotypesInstancesCountDTO(totalPhenotypes, totalInstances);
 
-		Mockito.when(studyDatasetService.countFilteredInstancesAndPhenotypes(Mockito.anyInt(), Mockito.anyInt(), Mockito.any(ObservationUnitsSearchDTO.class))).thenReturn(result);
+		Mockito.when(this.studyDatasetService
+			.countFilteredInstancesAndPhenotypes(Mockito.anyInt(), Mockito.anyInt(), Mockito.any(ObservationUnitsSearchDTO.class)))
+			.thenReturn(result);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/observations/filter/count", this.cropName, studyId,
+				.post("/crops/{crop}/studies/{studyId}/datasets/{datasetId}/observation-units/observations/filter/count", this.cropName,
+					studyId,
 					datasetId)
 				.contentType(this.contentType).content(this.convertObjectToByte(searchDTO)))
 			.andDo(MockMvcResultHandlers.print())
@@ -880,7 +885,6 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 	private DatasetDTO createDataset(
 		final int datasetTypeId, final Integer datasetId, final String name, final String crop, final Integer studyId) {
-
 
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setDatasetId(datasetId);

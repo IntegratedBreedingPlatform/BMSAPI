@@ -44,11 +44,10 @@ public class SubObservationDatasetLabelPrintingTest {
 	@InjectMocks
 	private SubObservationDatasetLabelPrinting subObservationDatasetLabelPrinting;
 
-
 	@Before
 	public void setUp() {
 		this.messageSource.setUseCodeAsDefaultMessage(true);
-		this.subObservationDatasetLabelPrinting.setMessageSource(messageSource);
+		this.subObservationDatasetLabelPrinting.setMessageSource(this.messageSource);
 		this.subObservationDatasetLabelPrinting.initStaticFields();
 	}
 
@@ -68,20 +67,25 @@ public class SubObservationDatasetLabelPrintingTest {
 		datasetDTO.setParentDatasetId(2);
 		datasetDTO.setDatasetTypeId(datasetType.getDatasetTypeId());
 
-		Mockito.when(middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId())).thenReturn(datasetDTO);
+		Mockito.when(this.middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId())).thenReturn(datasetDTO);
 		Mockito.when(this.ontologyDataManager.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
 
 		final List<LabelType> labelTypes = this.subObservationDatasetLabelPrinting.getAvailableLabelTypes(labelsInfoInput);
-		Mockito.verify(middlewareDatasetService).getDataset(labelsInfoInput.getDatasetId());
+		Mockito.verify(this.middlewareDatasetService).getDataset(labelsInfoInput.getDatasetId());
 		Mockito.verify(this.studyDataManager).getDataSetsByType(labelsInfoInput.getStudyId(), DatasetType.SUMMARY_DATA);
-		Mockito.verify(this.middlewareDatasetService).getMeasurementVariables(labelsInfoInput.getStudyId(), Arrays.asList(VariableType.STUDY_DETAIL.getId()));
-		Mockito.verify(this.middlewareDatasetService).getMeasurementVariables(dataset.getId(),
+		Mockito.verify(this.middlewareDatasetService)
+			.getMeasurementVariables(labelsInfoInput.getStudyId(), Arrays.asList(VariableType.STUDY_DETAIL.getId()));
+		Mockito.verify(this.middlewareDatasetService).getMeasurementVariables(
+			dataset.getId(),
 			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 				VariableType.STUDY_CONDITION.getId()));
-		Mockito.verify(this.middlewareDatasetService).getMeasurementVariables(datasetDTO.getParentDatasetId(), Arrays.asList(VariableType.TREATMENT_FACTOR.getId()));
-		Mockito.verify(this.middlewareDatasetService).getMeasurementVariables(datasetDTO.getParentDatasetId(),
+		Mockito.verify(this.middlewareDatasetService)
+			.getMeasurementVariables(datasetDTO.getParentDatasetId(), Arrays.asList(VariableType.TREATMENT_FACTOR.getId()));
+		Mockito.verify(this.middlewareDatasetService).getMeasurementVariables(
+			datasetDTO.getParentDatasetId(),
 			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()));
-		Mockito.verify(this.middlewareDatasetService).getMeasurementVariables(labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId()));
+		Mockito.verify(this.middlewareDatasetService)
+			.getMeasurementVariables(labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId()));
 		final String studyDetailsPropValue = this.subObservationDatasetLabelPrinting.getMessage("label.printing.study.details");
 		final String datasetDetailsPropValue = this.subObservationDatasetLabelPrinting.getMessage("label.printing.dataset.details");
 		Assert.assertEquals(studyDetailsPropValue, labelTypes.get(0).getKey());
@@ -111,7 +115,8 @@ public class SubObservationDatasetLabelPrintingTest {
 		measurementVariable.setTermId(TermId.OBS_UNIT_ID.getId());
 		List<Field> fields = this.subObservationDatasetLabelPrinting.transform(Arrays.asList(measurementVariable));
 		Assert.assertEquals(TermId.OBS_UNIT_ID.getId(), fields.get(0).getId().intValue());
-		Assert.assertEquals(SubObservationDatasetLabelPrinting.PLOT.concat(" ").concat(measurementVariable.getAlias()), fields.get(0).getName());
+		Assert.assertEquals(SubObservationDatasetLabelPrinting.PLOT.concat(" ").concat(measurementVariable.getAlias()),
+			fields.get(0).getName());
 
 		measurementVariable.setAlias(TermId.ENTRY_NO.name());
 		measurementVariable.setTermId(TermId.ENTRY_NO.getId());

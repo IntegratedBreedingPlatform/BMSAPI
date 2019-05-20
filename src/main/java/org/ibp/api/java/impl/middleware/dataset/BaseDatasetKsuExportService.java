@@ -36,22 +36,25 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 	@Resource
 	protected OntologyDataManager ontologyDataManager;
 
-	public static String[] TRAIT_FILE_HEADERS = {"trait", "format", "defaultValue", "minimum",
+	public static String[] TRAIT_FILE_HEADERS = {
+		"trait", "format", "defaultValue", "minimum",
 		"maximum", "details", "categories", "isVisible", "realPosition"};
 
 	public static final List<Integer> DATA_TYPE_LIST = Arrays.asList(
 		TermId.NUMERIC_VARIABLE.getId(),
 		TermId.CATEGORICAL_VARIABLE.getId(), TermId.DATE_VARIABLE.getId(), TermId.CHARACTER_VARIABLE.getId());
 
-	public static final ImmutableMap<Integer, String> DATA_TYPE_FORMATS = ImmutableMap.<Integer, String> builder()
+	public static final ImmutableMap<Integer, String> DATA_TYPE_FORMATS = ImmutableMap.<Integer, String>builder()
 		.put(TermId.CATEGORICAL_VARIABLE.getId(), "categorical").put(TermId.NUMERIC_VARIABLE.getId(), "numeric")
 		.put(TermId.DATE_VARIABLE.getId(), "date").put(TermId.CHARACTER_VARIABLE.getId(), "text")
 		.put(0, "unrecognized").build();
 
 	@Override
-	protected File generateFiles(final Study study, final DatasetDTO dataSetDto,
+	protected File generateFiles(
+		final Study study, final DatasetDTO dataSetDto,
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns, final DatasetFileGenerator generator, final String fileExtension)
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
+		final DatasetFileGenerator generator, final String fileExtension)
 		throws IOException {
 		final File temporaryFolder = Files.createTempDir();
 		final List<File> files =
@@ -67,7 +70,8 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 			temporaryFolder.getAbsolutePath() + File.separator + sanitizedTraitsAndSelectionFilename;
 		final List<MeasurementVariable> traitAndSelectionVariables = this.getTraitAndSelectionVariables(dataSetDto.getDatasetId());
 		files.add(
-			generator.generateTraitAndSelectionVariablesFile(this.convertTraitAndSelectionVariablesData(traitAndSelectionVariables), traitsAndSelectionFilename));
+			generator.generateTraitAndSelectionVariablesFile(this.convertTraitAndSelectionVariablesData(traitAndSelectionVariables),
+				traitsAndSelectionFilename));
 
 		return this.getReturnFile(study, files);
 	}
@@ -116,7 +120,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 			for (final ValueReference value : variable.getPossibleValues()) {
 				possibleValues.add(value.getName());
 			}
-		// For scenario where the possible values are breeding methods
+			// For scenario where the possible values are breeding methods
 		} else if (variable.getProperty().equals(propertyName)) {
 			// add code for breeding method properties
 			for (final Method method : methods) {
@@ -135,7 +139,8 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 	}
 
 	protected List<MeasurementVariable> getTraitAndSelectionVariables(final int datasetId) {
-		return this.datasetService.getMeasurementVariables(datasetId, Lists.newArrayList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
+		return this.datasetService
+			.getMeasurementVariables(datasetId, Lists.newArrayList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 	}
 
 	@Override
@@ -145,7 +150,8 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 
 		final List<MeasurementVariable> plotDataSetColumns =
 			this.datasetService
-				.getMeasurementVariables(plotDatasetId,
+				.getMeasurementVariables(
+					plotDatasetId,
 					Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 						VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId()));
 		final List<MeasurementVariable> subObservationSetColumns =
@@ -161,8 +167,10 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 	}
 
 	@Override
-	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(final Study study, final DatasetDTO dataset, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
-		return this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataset.getDatasetId(), new ArrayList<>(selectedDatasetInstancesMap.keySet()));
+	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(
+		final Study study, final DatasetDTO dataset, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
+		return this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataset.getDatasetId(),
+			new ArrayList<>(selectedDatasetInstancesMap.keySet()));
 	}
 
 }

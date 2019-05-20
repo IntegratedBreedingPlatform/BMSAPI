@@ -19,7 +19,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.StandardEnvironment;
@@ -191,7 +190,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final DatasetType datasetType = new DatasetType(DatasetType.PLANT_SUBOBSERVATIONS);
 		datasetType.setName("PLANT_SUBOBSERVATIONS");
 		when(this.ontologyDataManager.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
-		
+
 		when(this.datasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		when(this.variableService

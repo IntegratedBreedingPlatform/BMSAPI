@@ -292,7 +292,8 @@ public class DatasetCSVExportServiceImplTest {
 
 	private List<MeasurementVariable> createColumnHeaders() {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		final MeasurementVariable mvar1 = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.GID.getId(), TermId.GID.name());
+		final MeasurementVariable mvar1 =
+			MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.GID.getId(), TermId.GID.name());
 		mvar1.setAlias("DIG");
 		measurementVariables.add(mvar1);
 
