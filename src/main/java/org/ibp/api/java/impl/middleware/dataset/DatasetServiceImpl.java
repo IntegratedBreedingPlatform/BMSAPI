@@ -432,7 +432,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<MeasurementVariable> getMeasurementVariables(final Integer projectId, final List<Integer> variableTypes) {
-		return this.middlewareDatasetService.getMeasurementVariables(projectId, variableTypes);
+		return this.middlewareDatasetService.getObservationSetVariables(projectId, variableTypes);
 	}
 
 	@Override

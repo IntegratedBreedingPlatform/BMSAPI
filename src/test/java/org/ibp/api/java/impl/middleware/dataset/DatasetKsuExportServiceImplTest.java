@@ -173,7 +173,7 @@ public class DatasetKsuExportServiceImplTest {
 	@Test
 	public void testGetTraitAndSelectionVariables() {
 		this.datasetKSUCSVExportService.getTraitAndSelectionVariables(1);
-		verify(this.datasetService).getMeasurementVariables(1, Lists.newArrayList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
+		verify(this.datasetService).getObservationSetVariables(1, Lists.newArrayList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 	}
 
 	@Test

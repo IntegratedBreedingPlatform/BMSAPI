@@ -139,8 +139,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 	}
 
 	protected List<MeasurementVariable> getTraitAndSelectionVariables(final int datasetId) {
-		return this.datasetService
-			.getMeasurementVariables(datasetId, Lists.newArrayList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
+		return this.datasetService.getObservationSetVariables(datasetId, Lists.newArrayList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 	}
 
 	@Override
@@ -150,13 +149,12 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 
 		final List<MeasurementVariable> plotDataSetColumns =
 			this.datasetService
-				.getMeasurementVariables(
-					plotDatasetId,
+				.getObservationSetVariables(plotDatasetId,
 					Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 						VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId()));
 		final List<MeasurementVariable> subObservationSetColumns =
 			this.datasetService
-				.getMeasurementVariables(datasetId, Lists.newArrayList(
+				.getObservationSetVariables(datasetId, Lists.newArrayList(
 					VariableType.GERMPLASM_DESCRIPTOR.getId(),
 					VariableType.OBSERVATION_UNIT.getId()));
 

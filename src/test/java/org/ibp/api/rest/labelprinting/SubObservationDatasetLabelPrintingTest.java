@@ -73,19 +73,14 @@ public class SubObservationDatasetLabelPrintingTest {
 		final List<LabelType> labelTypes = this.subObservationDatasetLabelPrinting.getAvailableLabelTypes(labelsInfoInput);
 		Mockito.verify(this.middlewareDatasetService).getDataset(labelsInfoInput.getDatasetId());
 		Mockito.verify(this.studyDataManager).getDataSetsByType(labelsInfoInput.getStudyId(), DatasetType.SUMMARY_DATA);
-		Mockito.verify(this.middlewareDatasetService)
-			.getMeasurementVariables(labelsInfoInput.getStudyId(), Arrays.asList(VariableType.STUDY_DETAIL.getId()));
-		Mockito.verify(this.middlewareDatasetService).getMeasurementVariables(
-			dataset.getId(),
+		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(labelsInfoInput.getStudyId(), Arrays.asList(VariableType.STUDY_DETAIL.getId()));
+		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(dataset.getId(),
 			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 				VariableType.STUDY_CONDITION.getId()));
-		Mockito.verify(this.middlewareDatasetService)
-			.getMeasurementVariables(datasetDTO.getParentDatasetId(), Arrays.asList(VariableType.TREATMENT_FACTOR.getId()));
-		Mockito.verify(this.middlewareDatasetService).getMeasurementVariables(
-			datasetDTO.getParentDatasetId(),
+		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(datasetDTO.getParentDatasetId(), Arrays.asList(VariableType.TREATMENT_FACTOR.getId()));
+		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(datasetDTO.getParentDatasetId(),
 			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()));
-		Mockito.verify(this.middlewareDatasetService)
-			.getMeasurementVariables(labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId()));
+		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId()));
 		final String studyDetailsPropValue = this.subObservationDatasetLabelPrinting.getMessage("label.printing.study.details");
 		final String datasetDetailsPropValue = this.subObservationDatasetLabelPrinting.getMessage("label.printing.dataset.details");
 		Assert.assertEquals(studyDetailsPropValue, labelTypes.get(0).getKey());
