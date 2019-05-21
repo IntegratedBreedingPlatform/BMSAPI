@@ -5,6 +5,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.search.SearchRequest;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +26,14 @@ public class SearchResourceBrapi {
 	@ApiOperation(value = "Post germplasm search", notes = "Post germplasm search")
 	@RequestMapping(value = "/{crop}/brapi/v1/search/germplasm", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Integer> postSearchGermplasm(
+	public ResponseEntity<SingleEntityResponse<Integer>> postSearchGermplasm(
 		@PathVariable final String crop, @RequestBody final GermplasmSearchRequestDto germplasmSearchRequestDto) {
 		final SearchRequest searchRequest =
 			this.searchRequestService.saveSearchRequest(germplasmSearchRequestDto, GermplasmSearchRequestDto.class);
-		return new ResponseEntity<>(searchRequest.getRequestId(), HttpStatus.OK);
+
+		final SingleEntityResponse<Integer> singleGermplasmResponse = new SingleEntityResponse<>(searchRequest.getRequestId());
+
+		return new ResponseEntity<SingleEntityResponse<Integer>>(singleGermplasmResponse, HttpStatus.OK);
 
 	}
 }
