@@ -55,7 +55,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		final DatasetDTO dataSetDTO = this.datasetService.getDataset(datasetId);
 
 		final int environmentDatasetId =
-				this.studyDataManager.getDataSetsByType(studyId, DataSetType.SUMMARY_DATA).get(0).getId();
+			this.studyDataManager.getDataSetsByType(studyId, DataSetType.SUMMARY_DATA).get(0).getId();
 
 		final int plotDatasetId;
 		if (DataSetType.PLOT_DATA.getId() == dataSetDTO.getDatasetTypeId()) {
@@ -63,6 +63,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		} else {
 			plotDatasetId = dataSetDTO.getParentDatasetId();
 		}
+
 		final List<MeasurementVariable> studyVariables = this.datasetService
 			.getObservationSetVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 		final List<MeasurementVariable> environmentDetailAndConditionVariables = this.datasetService
@@ -88,11 +89,6 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 					plotDatasetId,
 					Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 						VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId()));
-		final List<MeasurementVariable> subObservationSetColumns =
-			this.datasetService
-				.getObservationSetVariables(datasetId, Lists.newArrayList(
-					VariableType.GERMPLASM_DESCRIPTOR.getId(),
-					VariableType.OBSERVATION_UNIT.getId()));
 		final List<MeasurementVariable> treatmentFactors =
 			this.datasetService
 				.getObservationSetVariables(plotDatasetId, Lists.newArrayList(TermId.MULTIFACTORIAL_INFO.getId()));
@@ -112,10 +108,11 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		if (Arrays.stream(DataSetType.SUB_OBSERVATION_IDS).anyMatch(dataSetDTO.getDatasetTypeId()::equals)) {
 			final List<MeasurementVariable> subObservationSetColumns =
 				this.datasetService
-					.getMeasurementVariables(datasetId, Lists.newArrayList(
+					.getObservationSetVariables(datasetId, Lists.newArrayList(
 						VariableType.GERMPLASM_DESCRIPTOR.getId(),
 						VariableType.OBSERVATION_UNIT.getId()));
 			allVariables.addAll(subObservationSetColumns);
+
 		}
 		allVariables.addAll(traits);
 		allVariables.addAll(selectionVariables);
