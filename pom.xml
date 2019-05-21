@@ -5,7 +5,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>bmsapi</artifactId>
 	<packaging>${packaging.type}</packaging>
-        <version>11.4.2</version>
+        <version>12.0</version>
 	<name>BMS API</name>
 
 	<properties>
@@ -373,6 +373,8 @@
 				<directory>src/main/resources</directory>
 				<includes>
 					<include>**/*.properties</include>
+					<include>**/application*.yml</include>
+					<include>**/application*.yaml</include>
 				</includes>
 			</resource>
 			<resource>
@@ -383,6 +385,8 @@
 				</includes>
 				<excludes>
 					<exclude>**/*.properties</exclude>
+					<exclude>**/application*.yml</exclude>
+					<exclude>**/application*.yaml</exclude>
 				</excludes>
 			</resource>
 		</resources>
