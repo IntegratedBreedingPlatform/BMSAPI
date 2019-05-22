@@ -8,7 +8,6 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.pojos.dms.DatasetType;
@@ -80,9 +79,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private StudyDataManager studyDataManager;
-
-	@Autowired
-	private OntologyDataManager ontologyDataManager;
 
 	@Autowired
 	private ObservationsTableValidator observationsTableValidator;

@@ -149,7 +149,7 @@ public class DatasetGeneratorInputValidator {
 
 	public void validateDatasetTypeIsImplemented(final Integer datasetTypeId, final Errors errors) {
 		final DatasetType datasetType = this.datasetTypeService.getDatasetTypeById(datasetTypeId);
-		if (!DatasetTypeEnum.isSubObservationType(datasetType.getDatasetTypeId())) {
+		if (!datasetType.isSubObservationType()) {
 			errors.reject("dataset.operation.not.implemented", new String[] {String.valueOf(datasetTypeId)}, "");
 		}
 	}

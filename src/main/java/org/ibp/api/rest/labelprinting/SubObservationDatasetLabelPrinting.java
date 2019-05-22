@@ -11,7 +11,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.Season;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.PedigreeService;
@@ -68,9 +67,6 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 	@Autowired
 	private StudyDataManager studyDataManager;
-
-	@Autowired
-	private OntologyDataManager ontologyDataManager;
 
 	@Autowired
 	private StudyValidator studyValidator;
