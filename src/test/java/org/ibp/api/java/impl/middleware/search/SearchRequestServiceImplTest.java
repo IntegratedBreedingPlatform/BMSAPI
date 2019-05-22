@@ -52,9 +52,16 @@ public class SearchRequestServiceImplTest {
 		searchRequest.setParameters("{\"preferredName\":\"ABC\"}");
 		Mockito.when(this.daoFactory.getSearchRequestDAO().save(Mockito.any())).thenReturn(searchRequest);
 
-		final SearchRequest searchRequestResult =
+		final Integer searchRequestResult =
 			this.searchRequestServiceImpl.saveSearchRequest(germplasmSearchRequestDto, GermplasmSearchRequestDto.class);
-		Assert.assertTrue(searchRequestResult.getParameters().contains(germplasmSearchRequestDto.getPreferredName()));
+
+		Mockito.when(this.daoFactory.getSearchRequestDAO().save(searchRequest).getRequestId()).thenReturn(1);
+		Mockito.when(this.daoFactory.getSearchRequestDAO().getById(searchRequestResult)).thenReturn(searchRequest);
+
+		final GermplasmSearchRequestDto dto =
+			(GermplasmSearchRequestDto) this.searchRequestServiceImpl
+				.getSearchRequest(searchRequestResult, GermplasmSearchRequestDto.class);
+		Assert.assertTrue(dto.getPreferredName().contains(germplasmSearchRequestDto.getPreferredName()));
 	}
 
 	@Test
