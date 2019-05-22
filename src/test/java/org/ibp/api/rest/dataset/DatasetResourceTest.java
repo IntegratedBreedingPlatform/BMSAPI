@@ -7,6 +7,7 @@ import org.generationcp.middleware.data.initializer.DatasetTypeTestDataInitializ
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -223,7 +224,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testGetDatasets() throws Exception {
 		final List<DatasetDTO> datasets = this.createDatasets(
-			Arrays.asList(DatasetType.PLOT_DATA, DatasetType.PLANT_SUBOBSERVATIONS, DatasetType.QUADRAT_SUBOBSERVATIONS));
+			Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId(), DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId()));
 		doReturn(datasets).when(this.studyDatasetService).getDatasets(100, null);
 
 		this.mockMvc
@@ -236,7 +237,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testGetDatasetsWithFilter() throws Exception {
-		final List<DatasetDTO> datasets = this.createDatasets(Arrays.asList(DatasetType.PLOT_DATA));
+		final List<DatasetDTO> datasets = this.createDatasets(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()));
 		doReturn(datasets).when(this.studyDatasetService).getDatasets(100, null);
 
 		this.mockMvc
@@ -280,7 +281,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testGetDataset() throws Exception {
-		final DatasetDTO dataset = this.createDataset(DatasetType.PLOT_DATA, 101101, "Plant", this.cropName, 100);
+		final DatasetDTO dataset = this.createDataset(DatasetTypeEnum.PLOT_DATA.getId(), 101101, "Plant", this.cropName, 100);
 		doReturn(dataset).when(this.studyDatasetService).getDataset(this.cropName, 100, 101);
 
 		this.mockMvc
@@ -437,7 +438,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testGenerateDataset() throws Exception {
-		final int datasetTypeId = DatasetType.QUADRAT_SUBOBSERVATIONS;
+		final int datasetTypeId = DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId();
 		final DatasetDTO dataset = this.createDataset(datasetTypeId, 1234, DATASET_NAME, this.cropName, STUDY_ID);
 		final DatasetGeneratorInput datasetGeneratorInput = new DatasetGeneratorInput();
 		final Integer[] instanceIds = new Integer[1];
@@ -487,7 +488,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	public void testGenerateDatasetsErrorDuplicatedName() throws Exception {
 		final DatasetGeneratorInput datasetGeneratorInput = new DatasetGeneratorInput();
 		final Integer[] instanceIds = new Integer[1];
-		final int datasetTypeId = DatasetType.QUADRAT_SUBOBSERVATIONS;
+		final int datasetTypeId = DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId();
 		datasetGeneratorInput.setDatasetName(DATASET_NAME);
 		datasetGeneratorInput.setDatasetTypeId(datasetTypeId);
 		datasetGeneratorInput.setInstanceIds(instanceIds);
@@ -586,7 +587,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		Mockito.reset(this.studyDatasetService);
 		final DatasetGeneratorInput datasetGeneratorInput = new DatasetGeneratorInput();
 		final Integer[] instanceIds = new Integer[1];
-		final int datasetTypeId = DatasetType.QUADRAT_SUBOBSERVATIONS;
+		final int datasetTypeId = DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId();
 		datasetGeneratorInput.setDatasetName(DATASET_NAME);
 		datasetGeneratorInput.setDatasetTypeId(datasetTypeId);
 		datasetGeneratorInput.setInstanceIds(instanceIds);
@@ -714,7 +715,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testAcceptDrafData() throws Exception {
-		final DatasetDTO dataset = this.createDataset(DatasetType.PLOT_DATA, 101101, "Plant", this.cropName, 100);
+		final DatasetDTO dataset = this.createDataset(DatasetTypeEnum.PLOT_DATA.getId(), 101101, "Plant", this.cropName, 100);
 
 		final int studyId = dataset.getStudyId();
 		final int datasetId = dataset.getDatasetId();
@@ -730,7 +731,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testDiscardDrafData() throws Exception {
-		final DatasetDTO dataset = this.createDataset(DatasetType.PLOT_DATA, 101101, "Plant", this.cropName, 100);
+		final DatasetDTO dataset = this.createDataset(DatasetTypeEnum.PLOT_DATA.getId(), 101101, "Plant", this.cropName, 100);
 
 		final int studyId = dataset.getStudyId();
 		final int datasetId = dataset.getDatasetId();
@@ -746,7 +747,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testCheckWithoutOutOfBoundDraftData() throws Exception {
-		final DatasetDTO dataset = this.createDataset(DatasetType.PLOT_DATA, 101101, "Plant", this.cropName, 100);
+		final DatasetDTO dataset = this.createDataset(DatasetTypeEnum.PLOT_DATA.getId(), 101101, "Plant", this.cropName, 100);
 
 		final int studyId = dataset.getStudyId();
 		final int datasetId = dataset.getDatasetId();
@@ -764,7 +765,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testCheckWithOutOfBoundDraftData() throws Exception {
-		final DatasetDTO dataset = this.createDataset(DatasetType.PLOT_DATA, 101101, "Plant", this.cropName, 100);
+		final DatasetDTO dataset = this.createDataset(DatasetTypeEnum.PLOT_DATA.getId(), 101101, "Plant", this.cropName, 100);
 
 		final int studyId = dataset.getStudyId();
 		final int datasetId = dataset.getDatasetId();
@@ -782,7 +783,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testSetAsMissingDrafData() throws Exception {
-		final DatasetDTO dataset = this.createDataset(DatasetType.PLOT_DATA, 101101, "Plant", this.cropName, 100);
+		final DatasetDTO dataset = this.createDataset(DatasetTypeEnum.PLOT_DATA.getId(), 101101, "Plant", this.cropName, 100);
 
 		final int studyId = dataset.getStudyId();
 		final int datasetId = dataset.getDatasetId();

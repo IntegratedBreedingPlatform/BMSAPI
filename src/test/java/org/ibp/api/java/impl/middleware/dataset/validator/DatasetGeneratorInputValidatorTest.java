@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
@@ -61,17 +62,17 @@ public class DatasetGeneratorInputValidatorTest {
 	@Before
 	public void setup() {
 
-		final DatasetType quadratDatasetType = new DatasetType(DatasetType.QUADRAT_SUBOBSERVATIONS, "QUADRAT_SUBOBSERVATIONS");
+		final DatasetType quadratDatasetType = new DatasetType(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), "QUADRAT_SUBOBSERVATIONS");
 		quadratDatasetType.setSubObservationType(true);
-		when(this.ontologyDataManager.getDatasetTypeById(DatasetType.QUADRAT_SUBOBSERVATIONS)).thenReturn(quadratDatasetType);
+		when(this.ontologyDataManager.getDatasetTypeById(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())).thenReturn(quadratDatasetType);
 
-		final DatasetType plantDatasetType = new DatasetType(DatasetType.PLANT_SUBOBSERVATIONS, "PLANT_SUBOBSERVATIONS");
+		final DatasetType plantDatasetType = new DatasetType(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), "PLANT_SUBOBSERVATIONS");
 		plantDatasetType.setSubObservationType(true);
-		when(this.ontologyDataManager.getDatasetTypeById(DatasetType.PLANT_SUBOBSERVATIONS)).thenReturn(plantDatasetType);
+		when(this.ontologyDataManager.getDatasetTypeById(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())).thenReturn(plantDatasetType);
 
-		final DatasetType meansDatasetType = new DatasetType(DatasetType.MEANS_DATA, "MEANS_DATA");
+		final DatasetType meansDatasetType = new DatasetType(DatasetTypeEnum.MEANS_DATA.getId(), "MEANS_DATA");
 		meansDatasetType.setSubObservationType(true);
-		when(this.ontologyDataManager.getDatasetTypeById(DatasetType.MEANS_DATA)).thenReturn(meansDatasetType);
+		when(this.ontologyDataManager.getDatasetTypeById(DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(meansDatasetType);
 
 	}
 
@@ -87,7 +88,7 @@ public class DatasetGeneratorInputValidatorTest {
 		study.setProgramUUID(program);
 		study.setId(random.nextInt());
 		final DatasetGeneratorInput datasetInputGenerator = new DatasetGeneratorInput();
-		datasetInputGenerator.setDatasetTypeId(DatasetType.PLANT_SUBOBSERVATIONS);
+		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetInputGenerator.setDatasetName(name);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 		when(this.datasetService.isDatasetNameAvailable(datasetInputGenerator.getDatasetName(), study.getId())).thenReturn(true);
@@ -110,7 +111,7 @@ public class DatasetGeneratorInputValidatorTest {
 
 		study.setProgramUUID(program);
 
-		datasetInputGenerator.setDatasetTypeId(DatasetType.PLANT_SUBOBSERVATIONS);
+		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);
 
@@ -124,7 +125,7 @@ public class DatasetGeneratorInputValidatorTest {
 	@Test
 	public void testValidateDatasetTypeIsImplemented() {
 
-		final Integer datasetTypeId = DatasetType.PLANT_SUBOBSERVATIONS;
+		final Integer datasetTypeId = DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId();
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
 
@@ -138,11 +139,11 @@ public class DatasetGeneratorInputValidatorTest {
 		final Random random = new Random();
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
 
-		final DatasetType datasetType = new DatasetType(DatasetType.PLOT_DATA, "PLOT_DATA");
+		final DatasetType datasetType = new DatasetType(DatasetTypeEnum.PLOT_DATA.getId(), "PLOT_DATA");
 		datasetType.setSubObservationType(false);
-		when(this.ontologyDataManager.getDatasetTypeById(DatasetType.PLOT_DATA)).thenReturn(datasetType);
+		when(this.ontologyDataManager.getDatasetTypeById(DatasetTypeEnum.PLOT_DATA.getId())).thenReturn(datasetType);
 
-		this.datasetGeneratorInputValidator.validateDatasetTypeIsImplemented(DatasetType.PLOT_DATA, errors);
+		this.datasetGeneratorInputValidator.validateDatasetTypeIsImplemented(DatasetTypeEnum.PLOT_DATA.getId(), errors);
 		Assert.assertTrue(errors.getAllErrors().size() == 1);
 		final ObjectError objectError = errors.getAllErrors().get(0);
 		assertThat(Arrays.asList(objectError.getCodes()), CoreMatchers.hasItem("dataset.operation.not.implemented"));
@@ -172,7 +173,7 @@ public class DatasetGeneratorInputValidatorTest {
 		studyInstance.setInstanceDbId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
-		datasetInputGenerator.setDatasetTypeId(DatasetType.PLANT_SUBOBSERVATIONS);
+		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetInputGenerator.setDatasetName("NAME");
 		datasetInputGenerator.setInstanceIds(instanceIds);
 		datasetInputGenerator.setSequenceVariableId(123);
@@ -187,7 +188,7 @@ public class DatasetGeneratorInputValidatorTest {
 		variableDetails.setName("ChangedName");
 		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(variableType)));
 
-		final DatasetType datasetType = new DatasetType(DatasetType.PLANT_SUBOBSERVATIONS);
+		final DatasetType datasetType = new DatasetType(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetType.setName("PLANT_SUBOBSERVATIONS");
 		when(this.ontologyDataManager.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
 
@@ -272,7 +273,7 @@ public class DatasetGeneratorInputValidatorTest {
 		studyInstance.setInstanceDbId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
-		datasetInputGenerator.setDatasetTypeId(DatasetType.MEANS_DATA);
+		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.MEANS_DATA.getId());
 		datasetInputGenerator.setDatasetName("NAME");
 		datasetInputGenerator.setInstanceIds(instanceIds);
 		datasetInputGenerator.setSequenceVariableId(123);
@@ -319,7 +320,7 @@ public class DatasetGeneratorInputValidatorTest {
 		studyInstance.setInstanceDbId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
-		datasetInputGenerator.setDatasetTypeId(DatasetType.QUADRAT_SUBOBSERVATIONS);
+		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
 		datasetInputGenerator.setDatasetName("NAME");
 		datasetInputGenerator.setInstanceIds(instanceIds);
 		datasetInputGenerator.setSequenceVariableId(123);
@@ -367,7 +368,7 @@ public class DatasetGeneratorInputValidatorTest {
 		studyInstance.setInstanceDbId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
-		datasetInputGenerator.setDatasetTypeId(DatasetType.QUADRAT_SUBOBSERVATIONS);
+		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
 		datasetInputGenerator.setDatasetName(
 			"NAME123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960");
 		datasetInputGenerator.setInstanceIds(instanceIds);
@@ -420,7 +421,7 @@ public class DatasetGeneratorInputValidatorTest {
 		studyInstance.setInstanceDbId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
-		datasetInputGenerator.setDatasetTypeId(DatasetType.QUADRAT_SUBOBSERVATIONS);
+		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
 		datasetInputGenerator.setDatasetName("");
 		datasetInputGenerator.setInstanceIds(instanceIds);
 		datasetInputGenerator.setSequenceVariableId(123);
@@ -472,7 +473,7 @@ public class DatasetGeneratorInputValidatorTest {
 		studyInstance.setInstanceDbId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
-		datasetInputGenerator.setDatasetTypeId(DatasetType.QUADRAT_SUBOBSERVATIONS);
+		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
 		datasetInputGenerator.setDatasetName("NAME");
 		datasetInputGenerator.setInstanceIds(instanceIds);
 		datasetInputGenerator.setSequenceVariableId(123);
@@ -525,7 +526,7 @@ public class DatasetGeneratorInputValidatorTest {
 		studyInstance.setInstanceDbId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
-		datasetInputGenerator.setDatasetTypeId(DatasetType.QUADRAT_SUBOBSERVATIONS);
+		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
 		datasetInputGenerator.setDatasetName("NAME");
 		datasetInputGenerator.setInstanceIds(instanceIds);
 		datasetInputGenerator.setSequenceVariableId(123);
@@ -581,7 +582,7 @@ public class DatasetGeneratorInputValidatorTest {
 		studyInstance.setInstanceDbId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
-		datasetInputGenerator.setDatasetTypeId(DatasetType.QUADRAT_SUBOBSERVATIONS);
+		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
 		datasetInputGenerator.setDatasetName("NAME");
 		datasetInputGenerator.setInstanceIds(instanceIds);
 		datasetInputGenerator.setSequenceVariableId(123);
@@ -635,7 +636,7 @@ public class DatasetGeneratorInputValidatorTest {
 		datasetInputGenerator.setInstanceIds(instanceIds);
 		datasetInputGenerator.setSequenceVariableId(123);
 		datasetInputGenerator.setNumberOfSubObservationUnits(10);
-		datasetInputGenerator.setDatasetTypeId(DatasetType.PLANT_SUBOBSERVATIONS);
+		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetInputGenerator.setDatasetName("Dataset name \\ / : * ? \" < > | .");
 
 		when(this.datasetGeneratorInputValidator.getEnvironment().getProperty("maximum.number.of.sub.observation.parent.unit"))
@@ -683,7 +684,7 @@ public class DatasetGeneratorInputValidatorTest {
 		datasetInputGenerator.setInstanceIds(instanceIds);
 		datasetInputGenerator.setSequenceVariableId(123);
 		datasetInputGenerator.setNumberOfSubObservationUnits(10);
-		datasetInputGenerator.setDatasetTypeId(DatasetType.PLANT_SUBOBSERVATIONS);
+		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetInputGenerator.setDatasetName("Dataset+");
 
 		when(this.datasetGeneratorInputValidator.getEnvironment().getProperty("maximum.number.of.sub.observation.parent.unit"))

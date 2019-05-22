@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.pojos.dms.DatasetType;
@@ -532,12 +533,12 @@ public class DatasetServiceImplTest {
 
 		datasetDTO.setInstances(Lists.newArrayList(studyInstance1, studyInstance2, studyInstance3));
 		Mockito.doReturn(datasetDTO).when(this.middlewareDatasetService).generateSubObservationDataset(TEST_STUDY_IDENTIFIER, DATASET_NAME,
-			DatasetType.QUADRAT_SUBOBSERVATIONS, Lists.newArrayList(1, 2, 3), 8206, 3, PARENT_ID);
+			DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), Lists.newArrayList(1, 2, 3), 8206, 3, PARENT_ID);
 
 		// FIXME test the real method, not the mock IBP-2231
 		final DatasetDTO dto =
 			this.middlewareDatasetService.generateSubObservationDataset(TEST_STUDY_IDENTIFIER, DATASET_NAME,
-				DatasetType.QUADRAT_SUBOBSERVATIONS, Lists.newArrayList(1, 2, 3), 8206, 3, PARENT_ID);
+				DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), Lists.newArrayList(1, 2, 3), 8206, 3, PARENT_ID);
 
 		Assert.assertNotNull(dto);
 		Assert.assertTrue(dto.getName().equalsIgnoreCase(datasetDTO.getName()));

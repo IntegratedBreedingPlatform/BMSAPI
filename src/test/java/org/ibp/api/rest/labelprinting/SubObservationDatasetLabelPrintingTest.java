@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
@@ -57,10 +58,10 @@ public class SubObservationDatasetLabelPrintingTest {
 		labelsInfoInput.setStudyId(10);
 		final DataSet dataset = new DataSet();
 		dataset.setId(5);
-		Mockito.when(this.studyDataManager.getDataSetsByType(labelsInfoInput.getStudyId(), DatasetType.SUMMARY_DATA)).thenReturn(
+		Mockito.when(this.studyDataManager.getDataSetsByType(labelsInfoInput.getStudyId(), DatasetTypeEnum.SUMMARY_DATA.getId())).thenReturn(
 			Arrays.asList(dataset));
 
-		final DatasetType datasetType = new DatasetType(DatasetType.QUADRAT_SUBOBSERVATIONS);
+		final DatasetType datasetType = new DatasetType(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
 		datasetType.setName("QUADRAT");
 
 		final DatasetDTO datasetDTO = new DatasetDTO();
@@ -72,7 +73,7 @@ public class SubObservationDatasetLabelPrintingTest {
 
 		final List<LabelType> labelTypes = this.subObservationDatasetLabelPrinting.getAvailableLabelTypes(labelsInfoInput);
 		Mockito.verify(this.middlewareDatasetService).getDataset(labelsInfoInput.getDatasetId());
-		Mockito.verify(this.studyDataManager).getDataSetsByType(labelsInfoInput.getStudyId(), DatasetType.SUMMARY_DATA);
+		Mockito.verify(this.studyDataManager).getDataSetsByType(labelsInfoInput.getStudyId(), DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(labelsInfoInput.getStudyId(), Arrays.asList(VariableType.STUDY_DETAIL.getId()));
 		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(dataset.getId(),
 			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),

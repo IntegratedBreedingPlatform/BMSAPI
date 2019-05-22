@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
@@ -161,7 +162,7 @@ public class DatasetExcelGeneratorTest {
 
 		this.measurementVariables = Arrays.asList(measurementVariable1, measurementVariable2);
 		when(this.studyDataManager.getStudyDetails(DatasetExcelGeneratorTest.STUDY_ID)).thenReturn(studyDetails);
-		when(this.studyDataManager.getDataSetsByType(DatasetExcelGeneratorTest.STUDY_ID, DatasetType.SUMMARY_DATA))
+		when(this.studyDataManager.getDataSetsByType(DatasetExcelGeneratorTest.STUDY_ID, DatasetTypeEnum.SUMMARY_DATA.getId()))
 			.thenReturn(Arrays.asList(dataSet));
 		when(this.datasetService
 			.getMeasurementVariables(DatasetExcelGeneratorTest.ENVIRONMENT_DATASET_ID, Lists
@@ -182,7 +183,7 @@ public class DatasetExcelGeneratorTest {
 				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId())))
 			.thenReturn(datasetVariables);
 
-		final DatasetType datasetType = new DatasetType(DatasetType.PLANT_SUBOBSERVATIONS);
+		final DatasetType datasetType = new DatasetType(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetType.setName("PLANT_SUBOBSERVATIONS");
 		when(this.ontologyDataManager.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
 	}
@@ -193,7 +194,7 @@ public class DatasetExcelGeneratorTest {
 		final StudyInstance studyInstance = new StudyInstance();
 		studyInstance.setInstanceDbId(INSTANCE_DB_ID);
 		final DatasetDTO datasetDTO = new DatasetDTO();
-		datasetDTO.setDatasetTypeId(DatasetType.PLANT_SUBOBSERVATIONS);
+		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTO.setDatasetId(INSTANCE_DB_ID);
 		datasetDTO.setParentDatasetId(INSTANCE_DB_ID);
 		final File
@@ -204,7 +205,7 @@ public class DatasetExcelGeneratorTest {
 		Mockito.verify(this.studyDataManager).getStudyDetails(INSTANCE_DB_ID);
 		Mockito.verify(this.datasetService)
 			.getMeasurementVariables(DatasetExcelGeneratorTest.STUDY_ID, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
-		Mockito.verify(this.studyDataManager).getDataSetsByType(DatasetExcelGeneratorTest.STUDY_ID, DatasetType.SUMMARY_DATA);
+		Mockito.verify(this.studyDataManager).getDataSetsByType(DatasetExcelGeneratorTest.STUDY_ID, DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.verify(this.datasetService)
 			.getMeasurementVariables(
 				INSTANCE_DB_ID, Lists
@@ -226,7 +227,7 @@ public class DatasetExcelGeneratorTest {
 		final StudyInstance studyInstance = new StudyInstance();
 		studyInstance.setInstanceDbId(INSTANCE_DB_ID);
 		final DatasetDTO datasetDTO = new DatasetDTO();
-		datasetDTO.setDatasetTypeId(DatasetType.PLANT_SUBOBSERVATIONS);
+		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTO.setDatasetId(INSTANCE_DB_ID);
 		datasetDTO.setParentDatasetId(INSTANCE_DB_ID);
 		this.datasetExcelGenerator
@@ -239,7 +240,7 @@ public class DatasetExcelGeneratorTest {
 		final StudyInstance studyInstance = new StudyInstance();
 		studyInstance.setInstanceDbId(INSTANCE_DB_ID);
 		final DatasetDTO datasetDTO = new DatasetDTO();
-		datasetDTO.setDatasetTypeId(DatasetType.PLANT_SUBOBSERVATIONS);
+		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTO.setDatasetId(INSTANCE_DB_ID);
 		datasetDTO.setParentDatasetId(INSTANCE_DB_ID);
 

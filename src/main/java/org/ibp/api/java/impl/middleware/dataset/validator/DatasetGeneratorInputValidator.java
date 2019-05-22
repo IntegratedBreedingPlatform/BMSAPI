@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
@@ -79,7 +80,7 @@ public class DatasetGeneratorInputValidator {
 			return;
 		}
 
-		if (!datasetType.isObservationType()) {
+		if (!DatasetTypeEnum.get(datasetType.getDatasetTypeId()).isObservationType()) {
 			errors.reject("dataset.parent.not.allowed");
 			return;
 		}

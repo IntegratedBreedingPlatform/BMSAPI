@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -53,15 +54,15 @@ public class DatasetValidatorTest {
 		MockitoAnnotations.initMocks(this);
 		Mockito.doReturn(this.PROGRAM_UUID).when(this.contextUtil).getCurrentProgramUUID();
 
-		final DatasetType plotDatasetType = new DatasetType(DatasetType.PLOT_DATA);
+		final DatasetType plotDatasetType = new DatasetType(DatasetTypeEnum.PLOT_DATA.getId());
 		plotDatasetType.setName("PLOT_DATA");
 		plotDatasetType.setSubObservationType(false);
-		when(this.ontologyDataManager.getDatasetTypeById(DatasetType.PLOT_DATA)).thenReturn(plotDatasetType);
+		when(this.ontologyDataManager.getDatasetTypeById(DatasetTypeEnum.PLOT_DATA.getId())).thenReturn(plotDatasetType);
 
-		final DatasetType quadratDatasetType = new DatasetType(DatasetType.QUADRAT_SUBOBSERVATIONS);
+		final DatasetType quadratDatasetType = new DatasetType(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
 		quadratDatasetType.setName("QUADRAT_SUBOBSERVATIONS");
 		quadratDatasetType.setSubObservationType(true);
-		when(this.ontologyDataManager.getDatasetTypeById(DatasetType.QUADRAT_SUBOBSERVATIONS)).thenReturn(quadratDatasetType);
+		when(this.ontologyDataManager.getDatasetTypeById(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())).thenReturn(quadratDatasetType);
 
 	}
 
@@ -87,7 +88,7 @@ public class DatasetValidatorTest {
 			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final DatasetDTO dataset = new DatasetDTO();
 		dataset.setDatasetId(datasetId);
-		dataset.setDatasetTypeId(DatasetType.PLOT_DATA);
+		dataset.setDatasetTypeId(DatasetTypeEnum.PLOT_DATA.getId());
 		when(this.studyDatasetService.getDataset(datasetId)).thenReturn(dataset);
 
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
@@ -103,7 +104,7 @@ public class DatasetValidatorTest {
 			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final DatasetDTO dataset = new DatasetDTO();
 		dataset.setDatasetId(datasetId);
-		dataset.setDatasetTypeId(DatasetType.QUADRAT_SUBOBSERVATIONS);
+		dataset.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
 		when(this.studyDatasetService.getDataset(datasetId)).thenReturn(dataset);
 
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
@@ -269,7 +270,7 @@ public class DatasetValidatorTest {
 	private DatasetDTO createDataset(final Integer studyId, final Integer datasetId, final Optional<Integer> variableId) {
 		final DatasetDTO dataset = new DatasetDTO();
 		dataset.setDatasetId(datasetId);
-		dataset.setDatasetTypeId(DatasetType.QUADRAT_SUBOBSERVATIONS);
+		dataset.setDatasetTypeId(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
 
 		final List<MeasurementVariable> variables = new ArrayList<>();
 		if (variableId.isPresent()) {

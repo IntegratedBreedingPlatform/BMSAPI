@@ -14,6 +14,7 @@ import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Method;
@@ -107,7 +108,7 @@ public class DatasetKsuExportServiceImplTest {
 		property.setName("METHOD");
 		when(this.ontologyDataManager.getProperty(TermId.BREEDING_METHOD_PROP.getId())).thenReturn(property);
 		when(this.ontologyDataManager.getAllDatasetTypes()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
-		final DatasetType datasetType = new DatasetType(DatasetType.PLANT_SUBOBSERVATIONS);
+		final DatasetType datasetType = new DatasetType(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetType.setName("PLANT_SUBOBSERVATIONS");
 		when(this.ontologyDataManager.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
 	}
@@ -134,12 +135,12 @@ public class DatasetKsuExportServiceImplTest {
 		study.setName("STUDY");
 		trialDataSet.setId(1);
 		dataSetDTO.setDatasetId(1);
-		dataSetDTO.setDatasetTypeId(DatasetType.PLANT_SUBOBSERVATIONS);
+		dataSetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		dataSetDTO.setName("PLANT");
 		dataSetDTO.setInstances(this.createStudyInstances());
 
 		when(this.studyDataManager.getStudy(study.getId())).thenReturn(study);
-		when(this.studyDataManager.getDataSetsByType(anyInt(), eq(DatasetType.SUMMARY_DATA)))
+		when(this.studyDataManager.getDataSetsByType(anyInt(), eq(DatasetTypeEnum.SUMMARY_DATA.getId())))
 			.thenReturn(Arrays.asList(trialDataSet));
 
 		datasetKSUExportService.setZipUtil(this.zipUtil);
