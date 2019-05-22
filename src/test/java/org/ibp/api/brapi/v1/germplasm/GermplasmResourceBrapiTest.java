@@ -1,14 +1,23 @@
 package org.ibp.api.brapi.v1.germplasm;
 
+import com.google.common.collect.Lists;
+import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
+import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+import org.ibp.api.brapi.v1.program.ProgramResourceBrapiTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +31,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
-	private static Locale locale = Locale.getDefault();
+	private static final Locale locale = Locale.getDefault();
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
+
+	@Autowired
+	private SearchRequestService searchRequestService;
 
 	@Test
 	public void testGetPedigree() throws Exception {
@@ -70,6 +82,35 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(jsonPath("$.result.germplasmDbId", is(gid))) //
 			.andExpect(jsonPath("$.result.progeny[0].germplasmDbId", is(progenyDTO.getProgeny().get(0).getGermplasmDbId()))) //
 			.andExpect(jsonPath("$.result.progeny[0].parentType", is(progenyDTO.getProgeny().get(0).getParentType()))) //
+		;
+	}
+
+	@Test
+	public void testGetSearchGermplasm() throws Exception {
+		final int gid = nextInt();
+		final String germplasmDbId = String.valueOf(gid);
+		final int requestId = 1;
+		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
+		germplasmSearchRequestDTO.setGermplasmDbIds(Lists.newArrayList(germplasmDbId));
+		final List<GermplasmDTO> list = new ArrayList<>();
+		final GermplasmDTO germplasmDTO = new GermplasmDTO();
+		germplasmDTO.setGermplasmDbId(germplasmDbId);
+		list.add(germplasmDTO);
+
+		when(this.searchRequestService.getSearchRequest(requestId, GermplasmSearchRequestDto.class)).thenReturn(germplasmSearchRequestDTO);
+		when(this.germplasmDataManager
+			.searchGermplasmDTO(germplasmSearchRequestDTO, null, null))
+			.thenReturn(list);
+
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/search/germplasm/" + requestId ) //
+			.contentType(this.contentType)//
+			.locale(locale)) //
+			.andExpect(MockMvcResultMatchers.status().isOk()) //
+			.andDo(MockMvcResultHandlers.print()) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(list.size()))) //
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmDbId",
+				Matchers.is(germplasmDbId))) //
 		;
 	}
 }
