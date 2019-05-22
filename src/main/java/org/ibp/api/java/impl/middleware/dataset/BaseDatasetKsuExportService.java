@@ -16,6 +16,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.MethodService;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -35,6 +36,9 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 
 	@Resource
 	protected OntologyDataManager ontologyDataManager;
+
+	@Resource
+	protected DatasetTypeService datasetTypeService;
 
 	public static String[] TRAIT_FILE_HEADERS = {
 		"trait", "format", "defaultValue", "minimum",
@@ -61,7 +65,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 			this.getInstanceFiles(study, dataSetDto, selectedDatasetInstancesMap, observationUnitRowMap, columns, generator, fileExtension,
 				temporaryFolder);
 
-		final DatasetType datasetType = this.ontologyDataManager.getDatasetTypeById(dataSetDto.getDatasetTypeId());
+		final DatasetType datasetType = this.datasetTypeService.getDatasetTypeById(dataSetDto.getDatasetTypeId());
 		final String sanitizedTraitsAndSelectionFilename = FileUtils.sanitizeFileName(String
 			.format(
 				"%s_%s_%s.trt", study.getName(), datasetType.getName(),

@@ -27,6 +27,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.java.dataset.DatasetService;
@@ -84,6 +85,9 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	@Resource
 	private DatasetService datasetService;
+
+	@Resource
+	private DatasetTypeService datasetTypeService;
 
 	@Override
 	public File generateSingleInstanceFile(
@@ -232,7 +236,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final HSSFSheet xlsSheet = xlsBook.createSheet(this.messageSource.getMessage("export.study.sheet.description", null, locale));
 		int currentRowNum = 0;
 
-		final DatasetType datasetType = this.ontologyDataManager.getDatasetTypeById(dataSetDto.getDatasetTypeId());
+		final DatasetType datasetType = this.datasetTypeService.getDatasetTypeById(dataSetDto.getDatasetTypeId());
 
 		final StudyDetails studyDetails = this.studyDataManager.getStudyDetails(studyId);
 		final List<MeasurementVariable> studyDetailsVariables =

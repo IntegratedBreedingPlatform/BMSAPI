@@ -12,6 +12,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.NotSupportedException;
@@ -46,6 +47,9 @@ public class DatasetValidatorTest {
 	@Mock
 	private ContextUtil contextUtil;
 
+	@Mock
+	private DatasetTypeService datasetTypeService;
+
 	@InjectMocks
 	private DatasetValidator datasetValidator;
 
@@ -57,12 +61,12 @@ public class DatasetValidatorTest {
 		final DatasetType plotDatasetType = new DatasetType(DatasetTypeEnum.PLOT_DATA.getId());
 		plotDatasetType.setName("PLOT_DATA");
 		plotDatasetType.setSubObservationType(false);
-		when(this.ontologyDataManager.getDatasetTypeById(DatasetTypeEnum.PLOT_DATA.getId())).thenReturn(plotDatasetType);
+		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.PLOT_DATA.getId())).thenReturn(plotDatasetType);
 
 		final DatasetType quadratDatasetType = new DatasetType(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
 		quadratDatasetType.setName("QUADRAT_SUBOBSERVATIONS");
 		quadratDatasetType.setSubObservationType(true);
-		when(this.ontologyDataManager.getDatasetTypeById(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())).thenReturn(quadratDatasetType);
+		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())).thenReturn(quadratDatasetType);
 
 	}
 

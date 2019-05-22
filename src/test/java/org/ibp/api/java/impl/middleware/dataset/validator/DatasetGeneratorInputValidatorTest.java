@@ -7,6 +7,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.hamcrest.CoreMatchers;
 import org.ibp.api.domain.ontology.VariableDetails;
@@ -51,7 +52,7 @@ public class DatasetGeneratorInputValidatorTest {
 	private StudyDataManager studyDataManager;
 
 	@Mock
-	private OntologyDataManager ontologyDataManager;
+	private DatasetTypeService datasetTypeService;
 
 	@Mock
 	private VariableService variableService;
@@ -64,15 +65,15 @@ public class DatasetGeneratorInputValidatorTest {
 
 		final DatasetType quadratDatasetType = new DatasetType(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), "QUADRAT_SUBOBSERVATIONS");
 		quadratDatasetType.setSubObservationType(true);
-		when(this.ontologyDataManager.getDatasetTypeById(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())).thenReturn(quadratDatasetType);
+		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())).thenReturn(quadratDatasetType);
 
 		final DatasetType plantDatasetType = new DatasetType(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), "PLANT_SUBOBSERVATIONS");
 		plantDatasetType.setSubObservationType(true);
-		when(this.ontologyDataManager.getDatasetTypeById(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())).thenReturn(plantDatasetType);
+		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())).thenReturn(plantDatasetType);
 
 		final DatasetType meansDatasetType = new DatasetType(DatasetTypeEnum.MEANS_DATA.getId(), "MEANS_DATA");
 		meansDatasetType.setSubObservationType(true);
-		when(this.ontologyDataManager.getDatasetTypeById(DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(meansDatasetType);
+		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(meansDatasetType);
 
 	}
 
@@ -141,7 +142,7 @@ public class DatasetGeneratorInputValidatorTest {
 
 		final DatasetType datasetType = new DatasetType(DatasetTypeEnum.PLOT_DATA.getId(), "PLOT_DATA");
 		datasetType.setSubObservationType(false);
-		when(this.ontologyDataManager.getDatasetTypeById(DatasetTypeEnum.PLOT_DATA.getId())).thenReturn(datasetType);
+		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.PLOT_DATA.getId())).thenReturn(datasetType);
 
 		this.datasetGeneratorInputValidator.validateDatasetTypeIsImplemented(DatasetTypeEnum.PLOT_DATA.getId(), errors);
 		Assert.assertTrue(errors.getAllErrors().size() == 1);
@@ -190,7 +191,7 @@ public class DatasetGeneratorInputValidatorTest {
 
 		final DatasetType datasetType = new DatasetType(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetType.setName("PLANT_SUBOBSERVATIONS");
-		when(this.ontologyDataManager.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
+		when(this.datasetTypeService.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
 
 		when(this.datasetService.getDataset(parentId)).thenReturn(dataset);
 		when(this.studyDataManager.getStudy(studyId)).thenReturn(study);

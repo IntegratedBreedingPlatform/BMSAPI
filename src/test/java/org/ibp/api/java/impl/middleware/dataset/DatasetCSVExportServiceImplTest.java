@@ -12,9 +12,8 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.pojos.dms.DatasetType;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
 import org.ibp.api.java.dataset.DatasetService;
@@ -79,7 +78,7 @@ public class DatasetCSVExportServiceImplTest {
 	private InstanceValidator instanceValidator;
 
 	@Mock
-	private OntologyDataManager ontologyDataManager;
+	private DatasetTypeService datasetTypeService;
 
 	@Mock
 	private org.generationcp.middleware.service.api.dataset.DatasetService datasetService;
@@ -117,7 +116,7 @@ public class DatasetCSVExportServiceImplTest {
 		when(this.datasetService.getDataset(anyInt())).thenReturn(this.dataSetDTO);
 		this.dataSetDTO.setParentDatasetId(1);
 
-		when(this.ontologyDataManager.getAllDatasetTypes()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
+		when(this.datasetTypeService.getAllDatasetTypes()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
 
 	}
 

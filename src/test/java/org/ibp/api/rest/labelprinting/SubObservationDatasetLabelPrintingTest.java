@@ -6,10 +6,10 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
@@ -38,7 +38,7 @@ public class SubObservationDatasetLabelPrintingTest {
 	private StudyDataManager studyDataManager;
 
 	@Mock
-	private OntologyDataManager ontologyDataManager;
+	private DatasetTypeService datasetTypeService;
 
 	private final ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
 
@@ -69,7 +69,7 @@ public class SubObservationDatasetLabelPrintingTest {
 		datasetDTO.setDatasetTypeId(datasetType.getDatasetTypeId());
 
 		Mockito.when(this.middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId())).thenReturn(datasetDTO);
-		Mockito.when(this.ontologyDataManager.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
+		Mockito.when(this.datasetTypeService.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
 
 		final List<LabelType> labelTypes = this.subObservationDatasetLabelPrinting.getAvailableLabelTypes(labelsInfoInput);
 		Mockito.verify(this.middlewareDatasetService).getDataset(labelsInfoInput.getDatasetId());

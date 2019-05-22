@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.NotSupportedException;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,6 +43,9 @@ public class DatasetValidator {
 
 	@Autowired
 	private ContextUtil contextUtil;
+
+	@Resource
+	private DatasetTypeService datasetTypeService;
 
 	private BindingResult errors;
 
@@ -67,7 +72,7 @@ public class DatasetValidator {
 
 		this.validateDatasetBelongsToStudy(studyId, dataSet.getDatasetId());
 
-		final DatasetType datasetType = this.ontologyDataManager.getDatasetTypeById(dataSet.getDatasetTypeId());
+		final DatasetType datasetType = this.datasetTypeService.getDatasetTypeById(dataSet.getDatasetTypeId());
 		if (shouldBeSubobservationDataset && !datasetType.isSubObservationType()) {
 			this.errors.reject("dataset.type.not.subobservation", "");
 			throw new NotSupportedException(this.errors.getAllErrors().get(0));

@@ -20,6 +20,7 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.MethodService;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
@@ -94,6 +95,9 @@ public class DatasetKsuExportServiceImplTest {
 	@Mock
 	private DatasetKsuExcelGenerator datasetKSUExcelGenerator;
 
+	@Mock
+	private DatasetTypeService datasetTypeService;
+
 	@InjectMocks
 	private DatasetKsuCSVExportServiceImpl datasetKSUCSVExportService;
 
@@ -107,10 +111,10 @@ public class DatasetKsuExportServiceImplTest {
 		final Property property = new Property(new Term());
 		property.setName("METHOD");
 		when(this.ontologyDataManager.getProperty(TermId.BREEDING_METHOD_PROP.getId())).thenReturn(property);
-		when(this.ontologyDataManager.getAllDatasetTypes()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
+		when(this.datasetTypeService.getAllDatasetTypes()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
 		final DatasetType datasetType = new DatasetType(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetType.setName("PLANT_SUBOBSERVATIONS");
-		when(this.ontologyDataManager.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
+		when(this.datasetTypeService.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
 	}
 
 	@Test

@@ -10,6 +10,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
@@ -57,6 +58,9 @@ public abstract class AbstractDatasetExportService {
 
 	@Resource
 	protected StudyDataManager studyDataManager;
+
+	@Resource
+	protected DatasetTypeService datasetTypeService;
 
 	private ZipUtil zipUtil = new ZipUtil();
 
@@ -134,7 +138,7 @@ public abstract class AbstractDatasetExportService {
 		final DatasetFileGenerator generator, final String fileExtension, final File temporaryFolder) throws IOException {
 		final List<File> files = new ArrayList<>();
 
-		final Map<Integer, DatasetType> datasetTypeMap = this.ontologyDataManager.getAllDatasetTypes();
+		final Map<Integer, DatasetType> datasetTypeMap = this.datasetTypeService.getAllDatasetTypes();
 		for (final Integer instanceDBID : observationUnitRowMap.keySet()) {
 			// Build the filename with the following format:
 			// study_name + TRIAL_INSTANCE number + location_abbr +  dataset_type + dataset_name

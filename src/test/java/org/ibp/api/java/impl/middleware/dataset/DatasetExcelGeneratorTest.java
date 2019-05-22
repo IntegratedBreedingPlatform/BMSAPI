@@ -12,9 +12,9 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.dataset.ObservationUnitData;
@@ -76,7 +76,7 @@ public class DatasetExcelGeneratorTest {
 	private DatasetService datasetService;
 
 	@Mock
-	private OntologyDataManager ontologyDataManager;
+	private DatasetTypeService datasetTypeService;
 
 	@InjectMocks
 	private DatasetExcelGenerator datasetExcelGenerator;
@@ -185,7 +185,7 @@ public class DatasetExcelGeneratorTest {
 
 		final DatasetType datasetType = new DatasetType(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetType.setName("PLANT_SUBOBSERVATIONS");
-		when(this.ontologyDataManager.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
+		when(this.datasetTypeService.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
 	}
 
 	@Test

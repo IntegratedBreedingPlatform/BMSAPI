@@ -12,6 +12,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.pojos.dms.DatasetType;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
@@ -85,6 +86,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private ObservationsTableValidator observationsTableValidator;
+
+	@Autowired
+	private DatasetTypeService datasetTypeService;
 
 	@Override
 	public List<MeasurementVariable> getSubObservationSetColumns(
@@ -193,7 +197,7 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
-		final Map<Integer, DatasetType> datasetTypeMap = this.ontologyDataManager.getAllDatasetTypes();
+		final Map<Integer, DatasetType> datasetTypeMap = this.datasetTypeService.getAllDatasetTypes();
 		if (datasetTypeIds != null) {
 			for (final Integer dataSetTypeId : datasetTypeIds) {
 				if (!datasetTypeMap.containsKey(dataSetTypeId)) {

@@ -10,9 +10,9 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DatasetType;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
 import org.ibp.api.java.dataset.DatasetService;
@@ -81,7 +81,7 @@ public class DatasetExcelExportServiceImplTest {
 	private DatasetService studyDatasetService;
 
 	@Mock
-	private OntologyDataManager ontologyDataManager;
+	private DatasetTypeService datasetTypeService;
 
 	@Mock
 	private DatasetCollectionOrderService datasetCollectionOrderService;
@@ -119,7 +119,7 @@ public class DatasetExcelExportServiceImplTest {
 		this.dataSetDTO.setParentDatasetId(1);
 		this.createColumnHeaders();
 
-		when(this.ontologyDataManager.getAllDatasetTypes()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
+		when(this.datasetTypeService.getAllDatasetTypes()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
 	}
 
 	@Test
