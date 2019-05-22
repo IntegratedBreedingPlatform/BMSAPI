@@ -16,11 +16,11 @@ public class Germplasm {
 
 	public static class View {
 
-		public static class GermplasmBrapiV1M3 {
+		public static class GermplasmBrapiV1_3 {
 
 		}
 
-		public static class GermplasmBrapiV1M2 {
+		public static class GermplasmBrapiV1_2 {
 
 		}
 	}
@@ -37,7 +37,7 @@ public class Germplasm {
 
 	private String pedigree;
 
-	@JsonView(View.GermplasmBrapiV1M2.class)
+	@JsonView(View.GermplasmBrapiV1_2.class)
 	private String germplasmSeedSource;
 
 	private List<String> synonyms = new ArrayList<>();
@@ -71,19 +71,19 @@ public class Germplasm {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date acquisitionDate;
 
-	@JsonView(View.GermplasmBrapiV1M3.class)
+	@JsonView(View.GermplasmBrapiV1_3.class)
 	private String breedingMethodDbId;
 
-	@JsonView(View.GermplasmBrapiV1M3.class)
+	@JsonView(View.GermplasmBrapiV1_3.class)
 	private String germplasmGenus;
 
-	@JsonView(View.GermplasmBrapiV1M3.class)
+	@JsonView(View.GermplasmBrapiV1_3.class)
 	private String germplasmSpecies;
 
-	@JsonView(View.GermplasmBrapiV1M3.class)
+	@JsonView(View.GermplasmBrapiV1_3.class)
 	private String seedSource;
 
-	@JsonView(View.GermplasmBrapiV1M3.class)
+	@JsonView(View.GermplasmBrapiV1_3.class)
 	private final static String documentationURL = null;
 
 

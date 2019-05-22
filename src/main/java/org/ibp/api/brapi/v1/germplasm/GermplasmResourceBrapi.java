@@ -48,7 +48,7 @@ public class GermplasmResourceBrapi {
 	@ApiOperation(value = "Search germplasms", notes = "Search germplasms")
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm-search", method = RequestMethod.GET)
 	@ResponseBody
-	@JsonView(Germplasm.View.GermplasmBrapiV1M2.class)
+	@JsonView(Germplasm.View.GermplasmBrapiV1_2.class)
 	public ResponseEntity<EntityListResponse<Germplasm>> searchGermplasms(
 			@PathVariable
 			final String crop,
@@ -237,7 +237,7 @@ public class GermplasmResourceBrapi {
 	@ApiOperation(value = "Post germplasm search", notes = "Get germplasm search")
 	@RequestMapping(value = "/{crop}/brapi/v1/search/germplasm/{searchResulstDbid}", method = RequestMethod.GET)
 	@ResponseBody
-	@JsonView(Germplasm.View.GermplasmBrapiV1M3.class)
+	@JsonView(Germplasm.View.GermplasmBrapiV1_3.class)
 	public ResponseEntity<EntityListResponse<Germplasm>> getSearchGermplasm(
 		@PathVariable final String crop, @PathVariable final Integer searchResulstDbid,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
