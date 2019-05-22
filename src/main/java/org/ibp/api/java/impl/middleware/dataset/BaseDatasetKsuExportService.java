@@ -7,6 +7,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -14,7 +15,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -65,7 +65,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 			this.getInstanceFiles(study, dataSetDto, selectedDatasetInstancesMap, observationUnitRowMap, columns, generator, fileExtension,
 				temporaryFolder);
 
-		final DatasetType datasetType = this.datasetTypeService.getDatasetTypeById(dataSetDto.getDatasetTypeId());
+		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSetDto.getDatasetTypeId());
 		final String sanitizedTraitsAndSelectionFilename = FileUtils.sanitizeFileName(String
 			.format(
 				"%s_%s_%s.trt", study.getName(), datasetType.getName(),

@@ -1,11 +1,10 @@
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -63,13 +62,13 @@ public class DatasetGeneratorInputValidatorTest {
 	@Before
 	public void setup() {
 
-		final DatasetType quadratDatasetType = new DatasetType(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), "QUADRAT_SUBOBSERVATIONS");
+		final DatasetTypeDTO quadratDatasetType = new DatasetTypeDTO(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), "QUADRAT_SUBOBSERVATIONS");
 		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())).thenReturn(quadratDatasetType);
 
-		final DatasetType plantDatasetType = new DatasetType(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), "PLANT_SUBOBSERVATIONS");
+		final DatasetTypeDTO plantDatasetType = new DatasetTypeDTO(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), "PLANT_SUBOBSERVATIONS");
 		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())).thenReturn(plantDatasetType);
 
-		final DatasetType meansDatasetType = new DatasetType(DatasetTypeEnum.MEANS_DATA.getId(), "MEANS_DATA");
+		final DatasetTypeDTO meansDatasetType = new DatasetTypeDTO(DatasetTypeEnum.MEANS_DATA.getId(), "MEANS_DATA");
 		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(meansDatasetType);
 
 	}
@@ -137,7 +136,7 @@ public class DatasetGeneratorInputValidatorTest {
 		final Random random = new Random();
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
 
-		final DatasetType datasetType = new DatasetType(DatasetTypeEnum.PLOT_DATA.getId(), "PLOT_DATA");
+		final DatasetTypeDTO datasetType = new DatasetTypeDTO(DatasetTypeEnum.PLOT_DATA.getId(), "PLOT_DATA");
 		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.PLOT_DATA.getId())).thenReturn(datasetType);
 
 		this.datasetGeneratorInputValidator.validateDatasetTypeIsImplemented(DatasetTypeEnum.PLOT_DATA.getId(), errors);
@@ -185,8 +184,7 @@ public class DatasetGeneratorInputValidatorTest {
 		variableDetails.setName("ChangedName");
 		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(variableType)));
 
-		final DatasetType datasetType = new DatasetType(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
-		datasetType.setName("PLANT_SUBOBSERVATIONS");
+		final DatasetTypeDTO datasetType = new DatasetTypeDTO(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), "PLANT_SUBOBSERVATIONS");
 		when(this.datasetTypeService.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
 
 		when(this.datasetService.getDataset(parentId)).thenReturn(dataset);

@@ -3,10 +3,10 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -74,7 +74,7 @@ public class DatasetGeneratorInputValidator {
 
 		final DatasetDTO dataset = this.studyDatasetService.getDataset(parentId);
 
-		final DatasetType datasetType = this.datasetTypeService.getDatasetTypeById(datasetInputGenerator.getDatasetTypeId());
+		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(datasetInputGenerator.getDatasetTypeId());
 		if (datasetType == null) {
 			errors.reject("dataset.type.id.not.exist", new String[] {String.valueOf(datasetInputGenerator.getDatasetTypeId())}, "");
 			return;
@@ -148,7 +148,7 @@ public class DatasetGeneratorInputValidator {
 	}
 
 	public void validateDatasetTypeIsImplemented(final Integer datasetTypeId, final Errors errors) {
-		final DatasetType datasetType = this.datasetTypeService.getDatasetTypeById(datasetTypeId);
+		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(datasetTypeId);
 		if (!datasetType.isSubObservationType()) {
 			errors.reject("dataset.operation.not.implemented", new String[] {String.valueOf(datasetTypeId)}, "");
 		}

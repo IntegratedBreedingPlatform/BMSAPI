@@ -2,12 +2,12 @@ package org.ibp.api.rest.labelprinting;
 
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.ibp.api.rest.common.FileType;
@@ -61,8 +61,7 @@ public class SubObservationDatasetLabelPrintingTest {
 		Mockito.when(this.studyDataManager.getDataSetsByType(labelsInfoInput.getStudyId(), DatasetTypeEnum.SUMMARY_DATA.getId())).thenReturn(
 			Arrays.asList(dataset));
 
-		final DatasetType datasetType = new DatasetType(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
-		datasetType.setName("QUADRAT");
+		final DatasetTypeDTO datasetType = new DatasetTypeDTO(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), "QUADRAT");
 
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setParentDatasetId(2);

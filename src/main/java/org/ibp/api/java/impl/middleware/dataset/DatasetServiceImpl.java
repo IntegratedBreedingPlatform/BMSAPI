@@ -4,13 +4,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
@@ -193,7 +193,7 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
-		final Map<Integer, DatasetType> datasetTypeMap = this.datasetTypeService.getAllDatasetTypes();
+		final Map<Integer, DatasetTypeDTO> datasetTypeMap = this.datasetTypeService.getAllDatasetTypes();
 		if (datasetTypeIds != null) {
 			for (final Integer dataSetTypeId : datasetTypeIds) {
 				if (!datasetTypeMap.containsKey(dataSetTypeId)) {

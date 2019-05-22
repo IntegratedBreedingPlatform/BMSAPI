@@ -16,6 +16,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -26,7 +27,6 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
@@ -236,7 +236,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final HSSFSheet xlsSheet = xlsBook.createSheet(this.messageSource.getMessage("export.study.sheet.description", null, locale));
 		int currentRowNum = 0;
 
-		final DatasetType datasetType = this.datasetTypeService.getDatasetTypeById(dataSetDto.getDatasetTypeId());
+		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSetDto.getDatasetTypeId());
 
 		final StudyDetails studyDetails = this.studyDataManager.getStudyDetails(studyId);
 		final List<MeasurementVariable> studyDetailsVariables =

@@ -8,6 +8,7 @@ import org.generationcp.middleware.data.initializer.MethodTestDataInitializer;
 import org.generationcp.middleware.data.initializer.ValueReferenceTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.Property;
@@ -18,7 +19,6 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -112,8 +112,7 @@ public class DatasetKsuExportServiceImplTest {
 		property.setName("METHOD");
 		when(this.ontologyDataManager.getProperty(TermId.BREEDING_METHOD_PROP.getId())).thenReturn(property);
 		when(this.datasetTypeService.getAllDatasetTypes()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
-		final DatasetType datasetType = new DatasetType(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
-		datasetType.setName("PLANT_SUBOBSERVATIONS");
+		final DatasetTypeDTO datasetType = new DatasetTypeDTO(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), "PLANT_SUBOBSERVATIONS");
 		when(this.datasetTypeService.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
 	}
 

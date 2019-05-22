@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -12,7 +13,6 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
@@ -272,7 +272,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final List<Field> datasetDetailsFields = new LinkedList<>();
 		datasetDetailsFields.addAll(this.transform(plotVariables));
 		// Requirement to add SubObs dataset type plus OBS_UNIT_ID when it is not a variable associated to the subObs dataset
-		final DatasetType datasetType = this.datasetTypeService.getDatasetTypeById(dataSetDTO.getDatasetTypeId());
+		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSetDTO.getDatasetTypeId());
 		final Field subObsUnitIdfield = new Field(
 			LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId(),
 			datasetType.getName().concat(" ").concat(OBS_UNIT_ID));

@@ -4,12 +4,12 @@ import com.google.common.io.Files;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
@@ -138,7 +138,7 @@ public abstract class AbstractDatasetExportService {
 		final DatasetFileGenerator generator, final String fileExtension, final File temporaryFolder) throws IOException {
 		final List<File> files = new ArrayList<>();
 
-		final Map<Integer, DatasetType> datasetTypeMap = this.datasetTypeService.getAllDatasetTypes();
+		final Map<Integer, DatasetTypeDTO> datasetTypeMap = this.datasetTypeService.getAllDatasetTypes();
 		for (final Integer instanceDBID : observationUnitRowMap.keySet()) {
 			// Build the filename with the following format:
 			// study_name + TRIAL_INSTANCE number + location_abbr +  dataset_type + dataset_name

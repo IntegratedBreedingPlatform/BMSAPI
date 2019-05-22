@@ -5,12 +5,12 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.ibp.api.domain.dataset.DatasetVariable;
@@ -58,12 +58,10 @@ public class DatasetValidatorTest {
 		MockitoAnnotations.initMocks(this);
 		Mockito.doReturn(this.PROGRAM_UUID).when(this.contextUtil).getCurrentProgramUUID();
 
-		final DatasetType plotDatasetType = new DatasetType(DatasetTypeEnum.PLOT_DATA.getId());
-		plotDatasetType.setName("PLOT_DATA");
+		final DatasetTypeDTO plotDatasetType = new DatasetTypeDTO(DatasetTypeEnum.PLOT_DATA.getId(), "PLOT_DATA");
 		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.PLOT_DATA.getId())).thenReturn(plotDatasetType);
 
-		final DatasetType quadratDatasetType = new DatasetType(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
-		quadratDatasetType.setName("QUADRAT_SUBOBSERVATIONS");
+		final DatasetTypeDTO quadratDatasetType = new DatasetTypeDTO(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), "QUADRAT_SUBOBSERVATIONS");
 		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())).thenReturn(quadratDatasetType);
 
 	}

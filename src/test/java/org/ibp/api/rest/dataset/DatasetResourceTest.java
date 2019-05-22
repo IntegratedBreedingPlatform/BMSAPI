@@ -5,11 +5,11 @@ import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.data.initializer.DatasetTypeTestDataInitializer;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.SortedPageRequest;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
@@ -224,7 +224,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testGetDatasets() throws Exception {
 		final List<DatasetDTO> datasets = this.createDatasets(
-			Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId(), DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId()));
+			Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId(), DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(),
+				DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId()));
 		doReturn(datasets).when(this.studyDatasetService).getDatasets(100, null);
 
 		this.mockMvc
@@ -927,7 +928,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	private List<DatasetDTO> createDatasets(final List<Integer> datasetTypeIds) {
 		final List<DatasetDTO> datasets = new ArrayList<>();
 		int num = datasetTypeIds.size();
-		final Map<Integer, DatasetType> datasetTypeMap = DatasetTypeTestDataInitializer.createDatasetTypes();
+		final Map<Integer, DatasetTypeDTO> datasetTypeMap = DatasetTypeTestDataInitializer.createDatasetTypes();
 		for (final Integer datasetTypeId : datasetTypeIds) {
 			final DatasetDTO datasetDTO = new DatasetDTO();
 			datasetDTO.setDatasetTypeId(datasetTypeId);

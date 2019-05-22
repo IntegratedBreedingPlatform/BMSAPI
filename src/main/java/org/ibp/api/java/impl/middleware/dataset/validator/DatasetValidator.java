@@ -3,12 +3,11 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.ibp.api.domain.dataset.DatasetVariable;
@@ -73,7 +72,7 @@ public class DatasetValidator {
 
 		this.validateDatasetBelongsToStudy(studyId, dataSet.getDatasetId());
 
-		final DatasetType datasetType = this.datasetTypeService.getDatasetTypeById(dataSet.getDatasetTypeId());
+		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSet.getDatasetTypeId());
 		if (shouldBeSubobservationDataset && datasetType.isSubObservationType()) {
 			this.errors.reject("dataset.type.not.subobservation", "");
 			throw new NotSupportedException(this.errors.getAllErrors().get(0));
