@@ -64,15 +64,12 @@ public class DatasetGeneratorInputValidatorTest {
 	public void setup() {
 
 		final DatasetType quadratDatasetType = new DatasetType(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), "QUADRAT_SUBOBSERVATIONS");
-		quadratDatasetType.setSubObservationType(true);
 		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())).thenReturn(quadratDatasetType);
 
 		final DatasetType plantDatasetType = new DatasetType(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), "PLANT_SUBOBSERVATIONS");
-		plantDatasetType.setSubObservationType(true);
 		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())).thenReturn(plantDatasetType);
 
 		final DatasetType meansDatasetType = new DatasetType(DatasetTypeEnum.MEANS_DATA.getId(), "MEANS_DATA");
-		meansDatasetType.setSubObservationType(true);
 		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(meansDatasetType);
 
 	}
@@ -141,7 +138,6 @@ public class DatasetGeneratorInputValidatorTest {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), DatasetGeneratorInput.class.getName());
 
 		final DatasetType datasetType = new DatasetType(DatasetTypeEnum.PLOT_DATA.getId(), "PLOT_DATA");
-		datasetType.setSubObservationType(false);
 		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.PLOT_DATA.getId())).thenReturn(datasetType);
 
 		this.datasetGeneratorInputValidator.validateDatasetTypeIsImplemented(DatasetTypeEnum.PLOT_DATA.getId(), errors);

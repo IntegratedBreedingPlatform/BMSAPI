@@ -60,12 +60,10 @@ public class DatasetValidatorTest {
 
 		final DatasetType plotDatasetType = new DatasetType(DatasetTypeEnum.PLOT_DATA.getId());
 		plotDatasetType.setName("PLOT_DATA");
-		plotDatasetType.setSubObservationType(false);
 		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.PLOT_DATA.getId())).thenReturn(plotDatasetType);
 
 		final DatasetType quadratDatasetType = new DatasetType(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId());
 		quadratDatasetType.setName("QUADRAT_SUBOBSERVATIONS");
-		quadratDatasetType.setSubObservationType(true);
 		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())).thenReturn(quadratDatasetType);
 
 	}
