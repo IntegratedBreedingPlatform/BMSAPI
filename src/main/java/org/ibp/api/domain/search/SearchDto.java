@@ -1,7 +1,9 @@
 package org.ibp.api.domain.search;
 
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
+@AutoProperty
 public class SearchDto {
 
 	private int searchResultDbId;
