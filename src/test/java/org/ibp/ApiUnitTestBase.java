@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.manager.api.PresetService;
+import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -146,6 +147,12 @@ public abstract class ApiUnitTestBase {
 		public ContextUtil getContextUtil() {
 			return Mockito.mock(ContextUtil.class);
 		}
+
+		@Bean
+		@Primary
+		public SearchRequestService searchRequestService() {
+			return Mockito.mock(SearchRequestService.class);
+		}
 	}
 
 	@Before
@@ -160,8 +167,8 @@ public abstract class ApiUnitTestBase {
 		this.mockMvc = null;
 	}
 
-	public byte[] convertObjectToByte(Object object) throws JsonProcessingException {
-		ObjectWriter ow = jsonMapper.writer().withDefaultPrettyPrinter();
+	public byte[] convertObjectToByte(final Object object) throws JsonProcessingException {
+		final ObjectWriter ow = this.jsonMapper.writer().withDefaultPrettyPrinter();
 		Debug.println("Request:" + ow.writeValueAsString(object));
 		return ow.writeValueAsBytes(object);
 	}
