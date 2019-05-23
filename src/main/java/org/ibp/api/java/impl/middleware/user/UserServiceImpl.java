@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.ibp.api.domain.user.UserDetailDto;
@@ -17,6 +16,8 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// TODO make Transactional, remove catch and translateErrorToMap
+// TODO IBP-2778
+//  make Transactional
+//  remove try/catchs and translateErrorToMap,
+//  let the exception bubble up and be handled by DefaultExceptionHandler
+//  Remove messageSource
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -47,6 +52,9 @@ public class UserServiceImpl implements UserService {
 	protected SecurityService securityService;
 
 	private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+	@Autowired
+	private ResourceBundleMessageSource messageSource;
 
 	@Override
 	public List<UserDetailDto> getAllUsersSortedByLastName() {
@@ -220,13 +228,14 @@ public class UserServiceImpl implements UserService {
 		if (errors.getGlobalErrorCount() != 0) {
 			final List<ObjectError> globalErrors = errors.getGlobalErrors();
 			for (final ObjectError globalError : globalErrors) {
-				errResponse.addError(globalError.getCode());
+				errResponse.addError(this.getMessage(globalError.getCode(), globalError.getArguments()));
 			}
 		}
 
 		mapErrors.put(ERROR, errResponse);
 	}
 
+	// TODO move to properties and let the exception handler do the translation
 	private String translateCodeErrorValidator(final String codeError) {
 
 		if (UserValidator.SIGNUP_FIELD_INVALID_EMAIL_FORMAT.equals(codeError)) {
@@ -254,6 +263,14 @@ public class UserServiceImpl implements UserService {
 			return "invalid";
 		}
 		return "";
+	}
+
+	private String getMessage(final String code) {
+		return this.messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
+	}
+
+	private String getMessage(final String code, final Object[] args) {
+		return this.messageSource.getMessage(code, args, LocaleContextHolder.getLocale());
 	}
 
 }
