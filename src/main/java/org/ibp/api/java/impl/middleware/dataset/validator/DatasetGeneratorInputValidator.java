@@ -80,7 +80,7 @@ public class DatasetGeneratorInputValidator {
 			return;
 		}
 
-		if (!DatasetTypeEnum.get(datasetType.getDatasetTypeId()).isObservationType()) {
+		if (!datasetType.isObservationType()) {
 			errors.reject("dataset.parent.not.allowed");
 			return;
 		}

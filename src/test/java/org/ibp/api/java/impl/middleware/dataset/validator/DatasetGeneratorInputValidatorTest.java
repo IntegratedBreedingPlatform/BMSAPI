@@ -63,12 +63,18 @@ public class DatasetGeneratorInputValidatorTest {
 	public void setup() {
 
 		final DatasetTypeDTO quadratDatasetType = new DatasetTypeDTO(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), "QUADRAT_SUBOBSERVATIONS");
+		quadratDatasetType.setSubObservationType(true);
+		quadratDatasetType.setObservationType(true);
 		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())).thenReturn(quadratDatasetType);
 
 		final DatasetTypeDTO plantDatasetType = new DatasetTypeDTO(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), "PLANT_SUBOBSERVATIONS");
+		plantDatasetType.setSubObservationType(true);
+		plantDatasetType.setObservationType(true);
 		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())).thenReturn(plantDatasetType);
 
 		final DatasetTypeDTO meansDatasetType = new DatasetTypeDTO(DatasetTypeEnum.MEANS_DATA.getId(), "MEANS_DATA");
+		meansDatasetType.setSubObservationType(false);
+		meansDatasetType.setObservationType(false);
 		when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.MEANS_DATA.getId())).thenReturn(meansDatasetType);
 
 	}
@@ -185,6 +191,8 @@ public class DatasetGeneratorInputValidatorTest {
 		variableDetails.setVariableTypes(new HashSet<>(Collections.singletonList(variableType)));
 
 		final DatasetTypeDTO datasetType = new DatasetTypeDTO(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), "PLANT_SUBOBSERVATIONS");
+		datasetType.setObservationType(true);
+		datasetType.setSubObservationType(true);
 		when(this.datasetTypeService.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
 
 		when(this.datasetService.getDataset(parentId)).thenReturn(dataset);
@@ -268,6 +276,7 @@ public class DatasetGeneratorInputValidatorTest {
 		studyInstance.setInstanceDbId(1);
 		studyInstances.add(studyInstance);
 		dataset.setInstances(studyInstances);
+		dataset.setDatasetTypeId(DatasetTypeEnum.MEANS_DATA.getId());
 		datasetInputGenerator.setDatasetTypeId(DatasetTypeEnum.MEANS_DATA.getId());
 		datasetInputGenerator.setDatasetName("NAME");
 		datasetInputGenerator.setInstanceIds(instanceIds);
