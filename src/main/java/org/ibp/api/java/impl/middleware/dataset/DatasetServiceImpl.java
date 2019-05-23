@@ -193,7 +193,7 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
-		final Map<Integer, DatasetTypeDTO> datasetTypeMap = this.datasetTypeService.getAllDatasetTypes();
+		final Map<Integer, DatasetTypeDTO> datasetTypeMap = this.datasetTypeService.getAllDatasetTypesMap();
 		if (datasetTypeIds != null) {
 			for (final Integer dataSetTypeId : datasetTypeIds) {
 				if (!datasetTypeMap.containsKey(dataSetTypeId)) {

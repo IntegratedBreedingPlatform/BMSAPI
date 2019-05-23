@@ -116,7 +116,7 @@ public class DatasetCSVExportServiceImplTest {
 		when(this.datasetService.getDataset(anyInt())).thenReturn(this.dataSetDTO);
 		this.dataSetDTO.setParentDatasetId(1);
 
-		when(this.datasetTypeService.getAllDatasetTypes()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
+		when(this.datasetTypeService.getAllDatasetTypesMap()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
 
 	}
 

@@ -138,7 +138,7 @@ public abstract class AbstractDatasetExportService {
 		final DatasetFileGenerator generator, final String fileExtension, final File temporaryFolder) throws IOException {
 		final List<File> files = new ArrayList<>();
 
-		final Map<Integer, DatasetTypeDTO> datasetTypeMap = this.datasetTypeService.getAllDatasetTypes();
+		final Map<Integer, DatasetTypeDTO> datasetTypeMap = this.datasetTypeService.getAllDatasetTypesMap();
 		for (final Integer instanceDBID : observationUnitRowMap.keySet()) {
 			// Build the filename with the following format:
 			// study_name + TRIAL_INSTANCE number + location_abbr +  dataset_type + dataset_name
