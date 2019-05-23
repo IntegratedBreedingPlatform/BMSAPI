@@ -187,6 +187,10 @@ public class UserServiceImpl implements UserService {
 		this.passwordEncoder = passwordEncoder;
 	}
 
+	public void setMessageSource(final ResourceBundleMessageSource messageSource) {
+		this.messageSource = messageSource;
+	}
+
 	private void translateErrorToMap(final BindingResult errors, final HashMap<String, Object> mapErrors) {
 		final ErrorResponse errResponse = new ErrorResponse();
 
