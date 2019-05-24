@@ -242,8 +242,11 @@
       },
   {
     "call": "search/germplasm",
+    "dataTypes": [
+      "application/json"
+    ],
     "datatypes": [
-      "json"
+      "application/json"
     ],
     "methods": [
       "POST"
@@ -254,8 +257,11 @@
   },
   {
     "call": "search/germplasm/{searchResulstDbid}",
+    "dataTypes": [
+      "application/json"
+    ],
     "datatypes": [
-      "json"
+      "application/json"
     ],
     "methods": [
       "POST"
