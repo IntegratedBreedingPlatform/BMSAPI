@@ -1,0 +1,14 @@
+# property expansion is done at build time from BMSConfig application.properties
+# variables not expanded at build time will be injected
+#  from BMSAPI application.properties (e.g. ruleSequenceConfiguration)
+
+rule-engine:
+  ruleSequenceConfiguration:
+    naming: ${naming.rules}
+    stock-id: ${stockid.rules}
+
+germplasm-naming-properties:
+  germplasmOriginStudiesDefault: '${germplasm.origin.studies.default}'
+  germplasmOriginStudiesWheat: '${germplasm.origin.studies.wheat}'
+  germplasmOriginStudiesMaize: '${germplasm.origin.studies.maize}'
+  breedersCrossIDStudy: '${breeders.cross.id.study}'
