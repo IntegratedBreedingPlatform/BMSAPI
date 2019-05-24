@@ -25,7 +25,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -79,9 +78,6 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	@Resource
 	private StudyDataManager studyDataManager;
-
-	@Resource
-	private OntologyDataManager ontologyDataManager;
 
 	@Resource
 	private DatasetService datasetService;
