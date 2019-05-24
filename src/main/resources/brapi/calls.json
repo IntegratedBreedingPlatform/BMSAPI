@@ -256,7 +256,7 @@
     ]
   },
   {
-    "call": "search/germplasm/{searchResulstDbid}",
+    "call": "search/germplasm/{searchResultsDbid}",
     "dataTypes": [
       "application/json"
     ],
