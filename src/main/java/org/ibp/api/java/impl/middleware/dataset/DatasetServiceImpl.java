@@ -4,13 +4,15 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
-import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
@@ -82,6 +84,9 @@ public class DatasetServiceImpl implements DatasetService {
 	@Autowired
 	private ObservationsTableValidator observationsTableValidator;
 
+	@Autowired
+	private DatasetTypeService datasetTypeService;
+
 	private static String PLOT_DATASET_NAME = "Observations";
 
 	@Override
@@ -141,7 +146,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<MeasurementVariableDto> getDatasetVariablesByType(final Integer studyId, final Integer datasetId, final VariableType variableType) {
+	public List<MeasurementVariableDto> getDatasetVariablesByType(
+		final Integer studyId, final Integer datasetId, final VariableType variableType) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		return this.middlewareDatasetService.getDatasetVariablesByType(datasetId, variableType);
@@ -190,10 +196,10 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 
+		final Map<Integer, DatasetTypeDTO> datasetTypeMap = this.datasetTypeService.getAllDatasetTypesMap();
 		if (datasetTypeIds != null) {
 			for (final Integer dataSetTypeId : datasetTypeIds) {
-				final DataSetType dataSetType = DataSetType.findById(dataSetTypeId);
-				if (dataSetType == null) {
+				if (!datasetTypeMap.containsKey(dataSetTypeId)) {
 					errors.reject("dataset.type.id.not.exist", new Object[] {dataSetTypeId}, "");
 					throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 				} else {
@@ -210,7 +216,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<DatasetDTO> datasetDTOs = new ArrayList<>();
 		for (final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO : datasetDTOS) {
 			final DatasetDTO datasetDto = mapper.map(datasetDTO, DatasetDTO.class);
-			if (datasetDto.getDatasetTypeId().equals(DataSetType.PLOT_DATA.getId())) {
+			if (datasetDto.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 				datasetDto.setName(PLOT_DATASET_NAME);
 			}
 			datasetDTOs.add(datasetDto);
@@ -252,7 +258,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public long countFilteredObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode,
+	public long countFilteredObservationUnitsForDataset(
+		final Integer datasetId, final Integer instanceId, final Boolean draftMode,
 		final ObservationUnitsSearchDTO.Filter filter) {
 		return this.middlewareDatasetService.countFilteredObservationUnitsForDataset(datasetId, instanceId, draftMode, filter);
 	}
@@ -275,16 +282,18 @@ public class DatasetServiceImpl implements DatasetService {
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final Map<Integer, List<ObservationUnitRow>> map = new HashMap<>();
-		for(final Integer instanceNumber: observationUnitRowsMap.keySet()) {
-			final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows = observationUnitRowsMap.get(instanceNumber);
-			final  List<ObservationUnitRow> list = new ArrayList<>();
+		for (final Integer instanceNumber : observationUnitRowsMap.keySet()) {
+			final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
+				observationUnitRowsMap.get(instanceNumber);
+			final List<ObservationUnitRow> list = new ArrayList<>();
 			this.mapObservationUnitRows(observationUnitRowMapper, observationUnitRows, list);
 			map.put(instanceNumber, list);
 		}
 		return map;
 	}
 
-	void validateStudyDatasetAndInstances(final int studyId, final int datasetId, final List<Integer> instanceIds, final boolean shouldBeSubObservation) {
+	void validateStudyDatasetAndInstances(
+		final int studyId, final int datasetId, final List<Integer> instanceIds, final boolean shouldBeSubObservation) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, shouldBeSubObservation);
 		if (instanceIds != null) {
@@ -353,7 +362,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void deleteObservation(final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId) {
+	public void deleteObservation(
+		final Integer studyId, final Integer datasetId, final Integer observationUnitId, final Integer observationId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		this.observationValidator.validateObservation(studyId, datasetId, observationUnitId, observationId, null);
@@ -361,7 +371,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 	}
 
-	private List<StudyInstance> convertToStudyInstances(final ModelMapper mapper, final List<org.generationcp.middleware.service.impl.study.StudyInstance> middlewareStudyInstances) {
+	private List<StudyInstance> convertToStudyInstances(
+		final ModelMapper mapper, final List<org.generationcp.middleware.service.impl.study.StudyInstance> middlewareStudyInstances) {
 
 		final List<StudyInstance> instances = new ArrayList<>();
 		for (final org.generationcp.middleware.service.impl.study.StudyInstance instance : middlewareStudyInstances) {
@@ -370,7 +381,6 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 		return instances;
 	}
-
 
 	@Override
 	public void importObservations(final Integer studyId, final Integer datasetId, final ObservationsPutRequestInput input) {
@@ -487,9 +497,13 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(final Integer studyId,
+	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(
+		final Integer studyId,
 		final Integer datasetId, final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
 		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, true,
+			Lists.newArrayList(observationUnitsSearchDTO.getFilter().getVariableId()));
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, false, Lists.newArrayList(observationUnitsSearchDTO.getFilter().getVariableId()));
 		return this.middlewareDatasetService.countFilteredInstancesAndPhenotypes(datasetId, observationUnitsSearchDTO);
@@ -535,9 +549,9 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 
 				if ((!draftMode && observation.getValue() != null //
-						&& !observation.getValue().equalsIgnoreCase(table.get(observationUnitId, variableName))) //
+					&& !observation.getValue().equalsIgnoreCase(table.get(observationUnitId, variableName))) //
 					|| (draftMode && observation.getDraftValue() != null //
-						&& !observation.getDraftValue().equalsIgnoreCase(table.get(observationUnitId, variableName)))) {
+					&& !observation.getDraftValue().equalsIgnoreCase(table.get(observationUnitId, variableName)))) {
 
 					overwritingData = true;
 

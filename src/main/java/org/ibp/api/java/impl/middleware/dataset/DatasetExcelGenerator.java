@@ -15,8 +15,8 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FillPatternType;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -24,7 +24,9 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.java.dataset.DatasetService;
@@ -79,6 +81,9 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	@Resource
 	private DatasetService datasetService;
+
+	@Resource
+	private DatasetTypeService datasetTypeService;
 
 	@Override
 	public File generateSingleInstanceFile(
@@ -227,13 +232,15 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final HSSFSheet xlsSheet = xlsBook.createSheet(this.messageSource.getMessage("export.study.sheet.description", null, locale));
 		int currentRowNum = 0;
 
+		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSetDto.getDatasetTypeId());
+
 		final StudyDetails studyDetails = this.studyDataManager.getStudyDetails(studyId);
 		final List<MeasurementVariable> studyDetailsVariables =
 			this.datasetService.getMeasurementVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
-		final int environmentDatasetId = this.studyDataManager.getDataSetsByType(studyId, DataSetType.SUMMARY_DATA).get(0).getId();
+		final int environmentDatasetId = this.studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getId();
 		final int plotDatasetId;
-		if (dataSetDto.getDatasetTypeId().equals(DataSetType.PLOT_DATA.getId())) {
+		if (dataSetDto.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			plotDatasetId = dataSetDto.getDatasetId();
 		} else {
 			plotDatasetId = dataSetDto.getParentDatasetId();
@@ -325,7 +332,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			xlsBook,
 			xlsSheet,
 			filterByVariableType(datasetVariables, VariableType.OBSERVATION_UNIT),
-			DataSetType.findById(dataSetDto.getDatasetTypeId()).getReadableName());
+			datasetType.getName());
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.traits",
@@ -335,7 +342,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			xlsBook,
 			xlsSheet,
 			filterByVariableType(datasetVariables, VariableType.TRAIT),
-			DataSetType.findById(dataSetDto.getDatasetTypeId()).getReadableName());
+			datasetType.getName());
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.selections",
@@ -345,7 +352,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			xlsBook,
 			xlsSheet,
 			filterByVariableType(datasetVariables, VariableType.SELECTION_METHOD),
-			DataSetType.findById(dataSetDto.getDatasetTypeId()).getReadableName());
+			datasetType.getName());
 
 		xlsSheet.setColumnWidth(0, 20 * PIXEL_SIZE);
 		xlsSheet.setColumnWidth(1, 24 * PIXEL_SIZE);

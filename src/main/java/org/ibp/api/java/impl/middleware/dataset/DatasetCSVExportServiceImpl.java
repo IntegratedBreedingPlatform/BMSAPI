@@ -1,12 +1,12 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import org.generationcp.middleware.domain.dms.DataSetType;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetExportService;
@@ -55,10 +55,10 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		final DatasetDTO dataSetDTO = this.datasetService.getDataset(datasetId);
 
 		final int environmentDatasetId =
-			this.studyDataManager.getDataSetsByType(studyId, DataSetType.SUMMARY_DATA).get(0).getId();
-
+			this.studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getId();
 		final int plotDatasetId;
-		if (DataSetType.PLOT_DATA.getId() == dataSetDTO.getDatasetTypeId()) {
+
+		if (DatasetTypeEnum.PLOT_DATA.getId() == dataSetDTO.getDatasetTypeId()) {
 			plotDatasetId = dataSetDTO.getDatasetId();
 		} else {
 			plotDatasetId = dataSetDTO.getParentDatasetId();
@@ -105,7 +105,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		allVariables.addAll(plotDataSetColumns);
 
 		//Add variables that are specific to the sub-observation dataset types
-		if (Arrays.stream(DataSetType.SUB_OBSERVATION_IDS).anyMatch(dataSetDTO.getDatasetTypeId()::equals)) {
+		if (Arrays.stream(DatasetTypeEnum.SUBOBSERVATION_IDS).anyMatch(dataSetDTO.getDatasetTypeId()::equals)) {
 			final List<MeasurementVariable> subObservationSetColumns =
 				this.datasetService
 					.getObservationSetVariables(datasetId, Lists.newArrayList(

@@ -1,13 +1,15 @@
 package org.ibp.api.rest.labelprinting;
 
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
@@ -35,16 +37,18 @@ public class SubObservationDatasetLabelPrintingTest {
 	@Mock
 	private StudyDataManager studyDataManager;
 
+	@Mock
+	private DatasetTypeService datasetTypeService;
+
 	private final ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
 
 	@InjectMocks
 	private SubObservationDatasetLabelPrinting subObservationDatasetLabelPrinting;
 
-
 	@Before
 	public void setUp() {
 		this.messageSource.setUseCodeAsDefaultMessage(true);
-		this.subObservationDatasetLabelPrinting.setMessageSource(messageSource);
+		this.subObservationDatasetLabelPrinting.setMessageSource(this.messageSource);
 		this.subObservationDatasetLabelPrinting.initStaticFields();
 	}
 
@@ -54,15 +58,21 @@ public class SubObservationDatasetLabelPrintingTest {
 		labelsInfoInput.setStudyId(10);
 		final DataSet dataset = new DataSet();
 		dataset.setId(5);
-		Mockito.when(this.studyDataManager.getDataSetsByType(labelsInfoInput.getStudyId(), DataSetType.SUMMARY_DATA)).thenReturn(
+		Mockito.when(this.studyDataManager.getDataSetsByType(labelsInfoInput.getStudyId(), DatasetTypeEnum.SUMMARY_DATA.getId())).thenReturn(
 			Arrays.asList(dataset));
+
+		final DatasetTypeDTO datasetType = new DatasetTypeDTO(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), "QUADRAT");
+
 		final DatasetDTO datasetDTO = new DatasetDTO();
 		datasetDTO.setParentDatasetId(2);
-		datasetDTO.setDatasetTypeId(10095);
-		Mockito.when(middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId())).thenReturn(datasetDTO);
+		datasetDTO.setDatasetTypeId(datasetType.getDatasetTypeId());
+
+		Mockito.when(this.middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId())).thenReturn(datasetDTO);
+		Mockito.when(this.datasetTypeService.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
+
 		final List<LabelType> labelTypes = this.subObservationDatasetLabelPrinting.getAvailableLabelTypes(labelsInfoInput);
-		Mockito.verify(middlewareDatasetService).getDataset(labelsInfoInput.getDatasetId());
-		Mockito.verify(this.studyDataManager).getDataSetsByType(labelsInfoInput.getStudyId(), DataSetType.SUMMARY_DATA);
+		Mockito.verify(this.middlewareDatasetService).getDataset(labelsInfoInput.getDatasetId());
+		Mockito.verify(this.studyDataManager).getDataSetsByType(labelsInfoInput.getStudyId(), DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(labelsInfoInput.getStudyId(), Arrays.asList(VariableType.STUDY_DETAIL.getId()));
 		Mockito.verify(this.middlewareDatasetService).getObservationSetVariables(dataset.getId(),
 			Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
@@ -100,7 +110,8 @@ public class SubObservationDatasetLabelPrintingTest {
 		measurementVariable.setTermId(TermId.OBS_UNIT_ID.getId());
 		List<Field> fields = this.subObservationDatasetLabelPrinting.transform(Arrays.asList(measurementVariable));
 		Assert.assertEquals(TermId.OBS_UNIT_ID.getId(), fields.get(0).getId().intValue());
-		Assert.assertEquals(SubObservationDatasetLabelPrinting.PLOT.concat(" ").concat(measurementVariable.getAlias()), fields.get(0).getName());
+		Assert.assertEquals(SubObservationDatasetLabelPrinting.PLOT.concat(" ").concat(measurementVariable.getAlias()),
+			fields.get(0).getName());
 
 		measurementVariable.setAlias(TermId.ENTRY_NO.name());
 		measurementVariable.setTermId(TermId.ENTRY_NO.getId());
