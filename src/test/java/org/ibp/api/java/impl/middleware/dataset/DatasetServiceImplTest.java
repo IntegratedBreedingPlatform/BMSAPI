@@ -1,26 +1,15 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyListOf;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.pojos.SortedPageRequest;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -50,8 +39,18 @@ import org.mockito.Spy;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyListOf;
 
 public class DatasetServiceImplTest {
 
@@ -204,9 +203,9 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.observationValidator).validateObservation(studyId, datasetId, observationUnitId, observationId,
 			observationDto);
 		Mockito.verify(this.middlewareDatasetService)
-				.updatePhenotype(observationId, observationDto);
+			.updatePhenotype(observationId, observationDto);
 	}
-	
+
 	@Test
 	public void testDeleteObservation() {
 		final Random random = new Random();
@@ -220,14 +219,15 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.observationValidator).validateObservation(studyId, datasetId, observationUnitId, observationId, null);
 		Mockito.verify(this.middlewareDatasetService).deletePhenotype(observationId);
 	}
-	
 
 	@Test
 	public void testGetInstanceObservationUnitRowsMap() {
 		final Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = new HashMap<>();
 		instanceObservationUnitRowsMap.put(1, this.mockObservationUnitRowList());
-		Mockito.doReturn(instanceObservationUnitRowsMap).when(this.middlewareDatasetService).getInstanceIdToObservationUnitRowsMap(1, 1, Arrays.asList(1));
-		final Map<Integer, List<org.ibp.api.rest.dataset.ObservationUnitRow>> results = this.studyDatasetService.getInstanceObservationUnitRowsMap(1,1 ,Arrays.asList(1));
+		Mockito.doReturn(instanceObservationUnitRowsMap).when(this.middlewareDatasetService)
+			.getInstanceIdToObservationUnitRowsMap(1, 1, Arrays.asList(1));
+		final Map<Integer, List<org.ibp.api.rest.dataset.ObservationUnitRow>> results =
+			this.studyDatasetService.getInstanceObservationUnitRowsMap(1, 1, Arrays.asList(1));
 		Assert.assertNotNull(results);
 		Assert.assertEquals(1, results.size());
 		Assert.assertEquals(1, results.get(1).size());
@@ -324,7 +324,7 @@ public class DatasetServiceImplTest {
 		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId, true);
 		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
 		Mockito.when(this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
-				.thenReturn(storedData);
+			.thenReturn(storedData);
 		try {
 			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
 		} catch (final ApiRequestValidationException e) {
@@ -360,7 +360,7 @@ public class DatasetServiceImplTest {
 		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId, true);
 		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
 		Mockito.when(this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
-				.thenReturn(storedData);
+			.thenReturn(storedData);
 		try {
 			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
 		} catch (final ApiRequestValidationException e) {
@@ -400,7 +400,7 @@ public class DatasetServiceImplTest {
 		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId, true);
 		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
 		Mockito.when(this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
-				.thenReturn(storedData);
+			.thenReturn(storedData);
 		try {
 			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
 		} catch (final PreconditionFailedException e) {
@@ -441,7 +441,7 @@ public class DatasetServiceImplTest {
 		Mockito.doNothing().when(this.datasetValidator).validateDataset(studyId, datasetId, true);
 		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
 		Mockito.when(this.middlewareDatasetService.getObservationUnitsAsMap(datasetId, measurementVariables, Arrays.asList("1")))
-				.thenReturn(storedData);
+			.thenReturn(storedData);
 		try {
 			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
 		} catch (final PreconditionFailedException e) {
@@ -483,7 +483,7 @@ public class DatasetServiceImplTest {
 		Mockito.when(this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId)).thenReturn(measurementVariables);
 		Mockito.when(
 			this.middlewareDatasetService.getObservationUnitsAsMap(anyInt(), anyListOf(MeasurementVariable.class), anyListOf(String.class)))
-				.thenReturn(storedData);
+			.thenReturn(storedData);
 		try {
 			this.studyDatasetService.importObservations(studyId, datasetId, observationsPutRequestInput);
 		} catch (final PreconditionFailedException e) {
@@ -492,7 +492,8 @@ public class DatasetServiceImplTest {
 		}
 	}
 
-	private List<org.ibp.api.rest.dataset.ObservationUnitRow> mapObservationUnitRows(final List<ObservationUnitRow> observationDtoTestData) {
+	private List<org.ibp.api.rest.dataset.ObservationUnitRow> mapObservationUnitRows(
+		final List<ObservationUnitRow> observationDtoTestData) {
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final List<org.ibp.api.rest.dataset.ObservationUnitRow> list = new ArrayList<>();
@@ -531,12 +532,12 @@ public class DatasetServiceImplTest {
 
 		datasetDTO.setInstances(Lists.newArrayList(studyInstance1, studyInstance2, studyInstance3));
 		Mockito.doReturn(datasetDTO).when(this.middlewareDatasetService).generateSubObservationDataset(TEST_STUDY_IDENTIFIER, DATASET_NAME,
-			DataSetType.QUADRAT_SUBOBSERVATIONS.getId(), Lists.newArrayList(1, 2, 3), 8206, 3, PARENT_ID);
+			DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), Lists.newArrayList(1, 2, 3), 8206, 3, PARENT_ID);
 
 		// FIXME test the real method, not the mock IBP-2231
 		final DatasetDTO dto =
 			this.middlewareDatasetService.generateSubObservationDataset(TEST_STUDY_IDENTIFIER, DATASET_NAME,
-				DataSetType.QUADRAT_SUBOBSERVATIONS.getId(), Lists.newArrayList(1, 2, 3), 8206, 3, PARENT_ID);
+				DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), Lists.newArrayList(1, 2, 3), 8206, 3, PARENT_ID);
 
 		Assert.assertNotNull(dto);
 		Assert.assertTrue(dto.getName().equalsIgnoreCase(datasetDTO.getName()));

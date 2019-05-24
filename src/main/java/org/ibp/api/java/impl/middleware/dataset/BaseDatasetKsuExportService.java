@@ -6,15 +6,17 @@ import com.google.common.io.Files;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.commons.util.FileUtils;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.service.api.MethodService;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -32,37 +34,48 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 	@Resource
 	protected MethodService methodService;
 
-	public static String[] TRAIT_FILE_HEADERS = {"trait", "format", "defaultValue", "minimum",
+	@Resource
+	protected OntologyDataManager ontologyDataManager;
+
+	@Resource
+	protected DatasetTypeService datasetTypeService;
+
+	public static String[] TRAIT_FILE_HEADERS = {
+		"trait", "format", "defaultValue", "minimum",
 		"maximum", "details", "categories", "isVisible", "realPosition"};
 
 	public static final List<Integer> DATA_TYPE_LIST = Arrays.asList(
 		TermId.NUMERIC_VARIABLE.getId(),
 		TermId.CATEGORICAL_VARIABLE.getId(), TermId.DATE_VARIABLE.getId(), TermId.CHARACTER_VARIABLE.getId());
 
-	public static final ImmutableMap<Integer, String> DATA_TYPE_FORMATS = ImmutableMap.<Integer, String> builder()
+	public static final ImmutableMap<Integer, String> DATA_TYPE_FORMATS = ImmutableMap.<Integer, String>builder()
 		.put(TermId.CATEGORICAL_VARIABLE.getId(), "categorical").put(TermId.NUMERIC_VARIABLE.getId(), "numeric")
 		.put(TermId.DATE_VARIABLE.getId(), "date").put(TermId.CHARACTER_VARIABLE.getId(), "text")
 		.put(0, "unrecognized").build();
 
 	@Override
-	protected File generateFiles(final Study study, final DatasetDTO dataSetDto,
+	protected File generateFiles(
+		final Study study, final DatasetDTO dataSetDto,
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns, final DatasetFileGenerator generator, final String fileExtension)
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
+		final DatasetFileGenerator generator, final String fileExtension)
 		throws IOException {
 		final File temporaryFolder = Files.createTempDir();
 		final List<File> files =
 			this.getInstanceFiles(study, dataSetDto, selectedDatasetInstancesMap, observationUnitRowMap, columns, generator, fileExtension,
 				temporaryFolder);
 
+		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSetDto.getDatasetTypeId());
 		final String sanitizedTraitsAndSelectionFilename = FileUtils.sanitizeFileName(String
 			.format(
-				"%s_%s_%s.trt", study.getName(), DataSetType.findById(dataSetDto.getDatasetTypeId()).getReadableName(),
+				"%s_%s_%s.trt", study.getName(), datasetType.getName(),
 				dataSetDto.getName()));
 		final String traitsAndSelectionFilename =
 			temporaryFolder.getAbsolutePath() + File.separator + sanitizedTraitsAndSelectionFilename;
 		final List<MeasurementVariable> traitAndSelectionVariables = this.getTraitAndSelectionVariables(dataSetDto.getDatasetId());
 		files.add(
-			generator.generateTraitAndSelectionVariablesFile(this.convertTraitAndSelectionVariablesData(traitAndSelectionVariables), traitsAndSelectionFilename));
+			generator.generateTraitAndSelectionVariablesFile(this.convertTraitAndSelectionVariablesData(traitAndSelectionVariables),
+				traitsAndSelectionFilename));
 
 		return this.getReturnFile(study, files);
 	}
@@ -111,7 +124,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 			for (final ValueReference value : variable.getPossibleValues()) {
 				possibleValues.add(value.getName());
 			}
-		// For scenario where the possible values are breeding methods
+			// For scenario where the possible values are breeding methods
 		} else if (variable.getProperty().equals(propertyName)) {
 			// add code for breeding method properties
 			for (final Method method : methods) {
@@ -156,8 +169,10 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 	}
 
 	@Override
-	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(final Study study, final DatasetDTO dataset, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
-		return this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataset.getDatasetId(), new ArrayList<>(selectedDatasetInstancesMap.keySet()));
+	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(
+		final Study study, final DatasetDTO dataset, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
+		return this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataset.getDatasetId(),
+			new ArrayList<>(selectedDatasetInstancesMap.keySet()));
 	}
 
 }

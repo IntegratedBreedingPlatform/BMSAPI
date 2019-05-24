@@ -2,14 +2,16 @@ package org.ibp.api.java.impl.middleware.dataset;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.util.ZipUtil;
+import org.generationcp.middleware.data.initializer.DatasetTypeTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
 import org.ibp.api.java.dataset.DatasetService;
@@ -78,6 +80,9 @@ public class DatasetExcelExportServiceImplTest {
 	private DatasetService studyDatasetService;
 
 	@Mock
+	private DatasetTypeService datasetTypeService;
+
+	@Mock
 	private DatasetCollectionOrderService datasetCollectionOrderService;
 
 	@InjectMocks
@@ -99,12 +104,12 @@ public class DatasetExcelExportServiceImplTest {
 		this.study.setName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
 		this.trialDataSet.setId(this.random.nextInt());
 		this.dataSetDTO.setDatasetId(this.random.nextInt());
-		this.dataSetDTO.setDatasetTypeId(DataSetType.PLANT_SUBOBSERVATIONS.getId());
+		this.dataSetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		this.dataSetDTO.setName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
 		this.dataSetDTO.setInstances(this.createStudyInstances());
 
 		when(this.studyDataManager.getStudy(this.study.getId())).thenReturn(this.study);
-		when(this.studyDataManager.getDataSetsByType(anyInt(), eq(DataSetType.SUMMARY_DATA)))
+		when(this.studyDataManager.getDataSetsByType(anyInt(), eq(DatasetTypeEnum.SUMMARY_DATA.getId())))
 			.thenReturn(Arrays.asList(this.trialDataSet));
 
 		this.datasetExportService.setZipUtil(this.zipUtil);
@@ -112,6 +117,8 @@ public class DatasetExcelExportServiceImplTest {
 		when(this.datasetService.getDataset(anyInt())).thenReturn(this.dataSetDTO);
 		this.dataSetDTO.setParentDatasetId(1);
 		this.createColumnHeaders();
+
+		when(this.datasetTypeService.getAllDatasetTypesMap()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
 	}
 
 	@Test
@@ -201,8 +208,7 @@ public class DatasetExcelExportServiceImplTest {
 		final StudyInstance studyInstance = this.createStudyInstance(1);
 		final Map<Integer, StudyInstance> studyInstanceMap = new HashMap<>();
 		studyInstanceMap.put(1, studyInstance);
-		final File result = this.datasetExportService
-			.generateFiles(
+		final File result = this.datasetExportService.generateFiles(
 				this.study, this.dataSetDTO, studyInstanceMap, instanceObservationUnitRowsMap, new ArrayList<MeasurementVariable>(),
 				this.datasetExcelGenerator, AbstractDatasetExportService.XLS);
 

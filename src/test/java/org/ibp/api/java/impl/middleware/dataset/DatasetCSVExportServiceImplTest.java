@@ -3,15 +3,17 @@ package org.ibp.api.java.impl.middleware.dataset;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.util.ZipUtil;
+import org.generationcp.middleware.data.initializer.DatasetTypeTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
 import org.ibp.api.java.dataset.DatasetService;
@@ -76,6 +78,9 @@ public class DatasetCSVExportServiceImplTest {
 	private InstanceValidator instanceValidator;
 
 	@Mock
+	private DatasetTypeService datasetTypeService;
+
+	@Mock
 	private org.generationcp.middleware.service.api.dataset.DatasetService datasetService;
 
 	@Mock
@@ -98,18 +103,20 @@ public class DatasetCSVExportServiceImplTest {
 		this.study.setName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
 		this.trialDataSet.setId(this.random.nextInt());
 		this.dataSetDTO.setDatasetId(this.random.nextInt());
-		this.dataSetDTO.setDatasetTypeId(DataSetType.PLANT_SUBOBSERVATIONS.getId());
+		this.dataSetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		this.dataSetDTO.setName(RandomStringUtils.randomAlphabetic(RANDOM_STRING_LENGTH));
 		this.dataSetDTO.setInstances(this.createStudyInstances());
 
 		when(this.studyDataManager.getStudy(this.study.getId())).thenReturn(this.study);
-		when(this.studyDataManager.getDataSetsByType(anyInt(), eq(DataSetType.SUMMARY_DATA)))
+		when(this.studyDataManager.getDataSetsByType(anyInt(), eq(DatasetTypeEnum.SUMMARY_DATA.getId())))
 			.thenReturn(Arrays.asList(this.trialDataSet));
 
 		this.datasetExportService.setZipUtil(this.zipUtil);
 
 		when(this.datasetService.getDataset(anyInt())).thenReturn(this.dataSetDTO);
 		this.dataSetDTO.setParentDatasetId(1);
+
+		when(this.datasetTypeService.getAllDatasetTypesMap()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
 
 	}
 
@@ -245,7 +252,7 @@ public class DatasetCSVExportServiceImplTest {
 	public void testGetColumns() {
 		this.datasetExportService.getColumns(1, 1);
 		Mockito.verify(this.datasetService).getDataset(1);
-		Mockito.verify(this.studyDataManager).getDataSetsByType(1, DataSetType.SUMMARY_DATA);
+		Mockito.verify(this.studyDataManager).getDataSetsByType(1, DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.verify(this.datasetService).getObservationSetVariables(1, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 		Mockito.verify(this.datasetService).getObservationSetVariables(anyInt(), eq(Lists.newArrayList(
 			VariableType.ENVIRONMENT_DETAIL.getId(),
@@ -285,7 +292,8 @@ public class DatasetCSVExportServiceImplTest {
 
 	private List<MeasurementVariable> createColumnHeaders() {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		final MeasurementVariable mvar1 = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.GID.getId(), TermId.GID.name());
+		final MeasurementVariable mvar1 =
+			MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.GID.getId(), TermId.GID.name());
 		mvar1.setAlias("DIG");
 		measurementVariables.add(mvar1);
 
