@@ -2,22 +2,25 @@ package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.collect.Lists;
 import org.generationcp.commons.util.ZipUtil;
+import org.generationcp.middleware.data.initializer.DatasetTypeTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MethodTestDataInitializer;
 import org.generationcp.middleware.data.initializer.ValueReferenceTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.service.api.MethodService;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetCollectionOrderService;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
@@ -92,6 +95,9 @@ public class DatasetKsuExportServiceImplTest {
 	@Mock
 	private DatasetKsuExcelGenerator datasetKSUExcelGenerator;
 
+	@Mock
+	private DatasetTypeService datasetTypeService;
+
 	@InjectMocks
 	private DatasetKsuCSVExportServiceImpl datasetKSUCSVExportService;
 
@@ -105,6 +111,9 @@ public class DatasetKsuExportServiceImplTest {
 		final Property property = new Property(new Term());
 		property.setName("METHOD");
 		when(this.ontologyDataManager.getProperty(TermId.BREEDING_METHOD_PROP.getId())).thenReturn(property);
+		when(this.datasetTypeService.getAllDatasetTypesMap()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
+		final DatasetTypeDTO datasetType = new DatasetTypeDTO(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), "PLANT_SUBOBSERVATIONS");
+		when(this.datasetTypeService.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
 	}
 
 	@Test
@@ -129,12 +138,12 @@ public class DatasetKsuExportServiceImplTest {
 		study.setName("STUDY");
 		trialDataSet.setId(1);
 		dataSetDTO.setDatasetId(1);
-		dataSetDTO.setDatasetTypeId(DataSetType.PLANT_SUBOBSERVATIONS.getId());
+		dataSetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		dataSetDTO.setName("PLANT");
 		dataSetDTO.setInstances(this.createStudyInstances());
 
 		when(this.studyDataManager.getStudy(study.getId())).thenReturn(study);
-		when(this.studyDataManager.getDataSetsByType(anyInt(), eq(DataSetType.SUMMARY_DATA)))
+		when(this.studyDataManager.getDataSetsByType(anyInt(), eq(DatasetTypeEnum.SUMMARY_DATA.getId())))
 			.thenReturn(Arrays.asList(trialDataSet));
 
 		datasetKSUExportService.setZipUtil(this.zipUtil);

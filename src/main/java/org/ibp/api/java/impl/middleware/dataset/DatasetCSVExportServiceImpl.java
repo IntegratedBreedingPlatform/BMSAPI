@@ -1,12 +1,12 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetExportService;
@@ -53,7 +53,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 
 		final DatasetDTO dataSetDTO = this.datasetService.getDataset(datasetId);
 		final int environmentDatasetId =
-			this.studyDataManager.getDataSetsByType(studyId, DataSetType.SUMMARY_DATA).get(0).getId();
+			this.studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getId();
 		final int plotDatasetId = dataSetDTO.getParentDatasetId();
 
 		final List<MeasurementVariable> studyVariables = this.datasetService
