@@ -13,6 +13,7 @@ import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.service.api.MethodService;
@@ -151,7 +152,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 		final DatasetDTO dataSetDTO = this.datasetService.getDataset(datasetId);
 
 		final int plotDatasetId;
-		if (DataSetType.PLOT_DATA.getId() == dataSetDTO.getDatasetTypeId()) {
+		if (DatasetTypeEnum.PLOT_DATA.getId() == dataSetDTO.getDatasetTypeId()) {
 			plotDatasetId = dataSetDTO.getDatasetId();
 		} else {
 			plotDatasetId = dataSetDTO.getParentDatasetId();
@@ -166,7 +167,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 		final List<MeasurementVariable> allVariables = new ArrayList<>();
 		allVariables.addAll(plotDataSetColumns);
 		//Add variables that are specific to the sub-observation dataset types
-		if (Arrays.stream(DataSetType.SUB_OBSERVATION_IDS).anyMatch(dataSetDTO.getDatasetTypeId()::equals)) {
+		if (Arrays.stream(DatasetTypeEnum.SUB_OBSERVATION_IDS).anyMatch(dataSetDTO.getDatasetTypeId()::equals)) {
 			final List<MeasurementVariable> subObservationSetColumns =
 				this.datasetService
 					.getObservationSetVariables(datasetId, Lists.newArrayList(

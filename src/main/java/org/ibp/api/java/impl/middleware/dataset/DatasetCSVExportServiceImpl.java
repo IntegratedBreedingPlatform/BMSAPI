@@ -105,7 +105,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		allVariables.addAll(plotDataSetColumns);
 
 		//Add variables that are specific to the sub-observation dataset types
-		if (Arrays.stream(DatasetTypeEnum.SUBOBSERVATION_IDS).anyMatch(dataSetDTO.getDatasetTypeId()::equals)) {
+		if (Arrays.stream(DatasetTypeEnum.SUB_OBSERVATION_IDS).anyMatch(dataSetDTO.getDatasetTypeId()::equals)) {
 			final List<MeasurementVariable> subObservationSetColumns =
 				this.datasetService
 					.getObservationSetVariables(datasetId, Lists.newArrayList(

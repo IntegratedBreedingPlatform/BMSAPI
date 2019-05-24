@@ -241,7 +241,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		final DatasetDTO datasetDto = mapper.map(datasetDTO, DatasetDTO.class);
-		if (datasetDto.getDatasetTypeId().equals(DataSetType.PLOT_DATA.getId())) {
+		if (datasetDto.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			datasetDto.setName(PLOT_DATASET_NAME);
 		}
 		datasetDto.setInstances(this.convertToStudyInstances(mapper, datasetDTO.getInstances()));
