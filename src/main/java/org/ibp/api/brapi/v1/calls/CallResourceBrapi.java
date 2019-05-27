@@ -44,8 +44,9 @@ public class CallResourceBrapi {
 			required = false) final Integer currentPage,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
 			required = false) final Integer pageSize,
-		@ApiParam(value = "name of datatype", required = false, allowableValues = "csv,tsv,json") @RequestParam(value = "datatype",
-			required = false) final String datatype) {
+		@ApiParam(value = "data format supported by call", required = false, allowableValues = "csv, text/csv, tsv, text/tsv, json, application/json, application/flapjack")
+		@RequestParam(value = "dataType",
+			required = false) final String dataType) {
 
 		PagedResult<Map<String, Object>> resultPage = null;
 
@@ -53,14 +54,12 @@ public class CallResourceBrapi {
 
 			@Override
 			public long getCount() {
-				return CallResourceBrapi.this.callService.getAllCalls(datatype, null, null).size();
+				return CallResourceBrapi.this.callService.getAllCalls(dataType, null, null).size();
 			}
 
 			@Override
 			public List<Map<String, Object>> getResults(final PagedResult<Map<String, Object>> pagedResult) {
-				// BRAPI services have zero-based indexing for pages but paging for Middleware method starts at 1
-				final int pageNumber = pagedResult.getPageNumber() + 1;
-				return CallResourceBrapi.this.callService.getAllCalls(datatype, pageSize, currentPage);
+				return CallResourceBrapi.this.callService.getAllCalls(dataType, pageSize, currentPage);
 			}
 		});
 

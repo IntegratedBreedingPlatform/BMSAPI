@@ -23,8 +23,9 @@ public class CallServiceImpl implements CallService {
 		try {
 			List<Map<String, Object>> brapiCalls;
 			final String jsonPath;
+			// Look for the dataType parameter in "datatypes" (BrAPI 1.2) and "dataTypes" (BrAPI 1.3) sections
 			if (dataType != null) {
-				jsonPath = "$.data[?('" + dataType + "' in @['datatypes'])]";
+				jsonPath = "$.data[?('" + dataType + "' in @['datatypes'] || '" + dataType + "' in @['dataTypes'])]";
 			} else {
 				jsonPath = "$.data.*";
 			}
