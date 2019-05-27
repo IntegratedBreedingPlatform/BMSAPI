@@ -30,10 +30,7 @@ public class CropResourceBrapi {
 	@Autowired
 	private CropService cropService;
 
-	@Autowired
-	private SecurityService securityService;
-
-	@ApiOperation(value = "List of available crops for the current user.", notes = "Get a list of available crops for the current user.")
+	@ApiOperation(value = "List of available crops.", notes = "Get a list of available crops.")
 	@RequestMapping(value = "/brapi/v1/crops", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<CropDto> listAvailableCrops() {
@@ -48,7 +45,7 @@ public class CropResourceBrapi {
 		cropDto.setMetadata(metadata);
 
 		cropDto.setResult(
-			new Result<String>(this.cropService.getAvailableCropsForUser(this.securityService.getCurrentlyLoggedInUser().getUserid())));
+			new Result<>(this.cropService.getInstalledCrops()));
 
 		return new ResponseEntity<>(cropDto, HttpStatus.OK);
 
