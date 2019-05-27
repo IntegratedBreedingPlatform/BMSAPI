@@ -28,8 +28,8 @@ public class SearchResourceBrapi {
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchGermplasm(
 		@PathVariable final String crop, @RequestBody final GermplasmSearchRequestDto germplasmSearchRequestDto) {
-		final Integer searchRequestId =
-			this.searchRequestService.saveSearchRequest(germplasmSearchRequestDto, GermplasmSearchRequestDto.class);
+		final String searchRequestId =
+			this.searchRequestService.saveSearchRequest(germplasmSearchRequestDto, GermplasmSearchRequestDto.class).toString();
 
 		final SearchDto searchDto = new SearchDto(searchRequestId);
 		final SingleEntityResponse<SearchDto> singleGermplasmResponse = new SingleEntityResponse<SearchDto>(searchDto);
