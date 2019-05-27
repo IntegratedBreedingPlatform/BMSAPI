@@ -44,7 +44,7 @@ public class CallResourceBrapi {
 			required = false) final Integer currentPage,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
 			required = false) final Integer pageSize,
-		@ApiParam(value = "data format supported by call", required = false, allowableValues = "text/csv, text/tsv, application/json, application/flapjack")
+		@ApiParam(value = "data format supported by call", required = false, allowableValues = "csv, text/csv, tsv, text/tsv, json, application/json, application/flapjack")
 		@RequestParam(value = "dataType",
 			required = false) final String dataType) {
 
