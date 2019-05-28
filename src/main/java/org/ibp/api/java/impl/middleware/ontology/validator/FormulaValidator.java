@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
@@ -26,8 +27,11 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class FormulaValidator implements Validator {
@@ -130,16 +134,25 @@ public class FormulaValidator implements Validator {
 		try {
 			String formula = formulaDto.getDefinition();
 			final Map<String, Object> parameters = DerivedVariableUtils.extractParameters(formula);
+			final Map<String, List<Object>> data = new HashMap<>();
+
+			formula = DerivedVariableUtils.replaceDelimiters(formula);
 
 			// Create mock data for each variable.
 			for (final Map.Entry<String, Object> termEntry : parameters.entrySet()) {
+				final Matcher matcher =
+					Pattern.compile(DerivedVariableUtils.AGGREGATION_FUNCTIONS_REGEX.replace("TERM", termEntry.getKey())).matcher(formula);
+
 				if (inputVariablesDataTypeMap.get(termEntry.getKey()) == DataType.DATE_TIME_VARIABLE) {
 					termEntry.setValue(new Date());
+				} else if (matcher.matches()) {
+					data.put(termEntry.getKey(), Lists.newArrayList(1D));
+					parameters.remove(termEntry.getKey());
 				} else {
 					termEntry.setValue(BigDecimal.ONE);
 				}
 			}
-			formula = DerivedVariableUtils.replaceDelimiters(formula);
+			processor.setData(data);
 			processor.evaluateFormula(formula, parameters);
 		} catch (final Exception e) {
 			// Inform the ontology manager admin about the exception
