@@ -251,8 +251,9 @@ public class GermplasmResourceBrapi {
 
 		try {
 			germplasmSearchRequestDTO =
-				(GermplasmSearchRequestDto) this.searchRequestService.getSearchRequest(Integer.valueOf(searchResulstDbid), GermplasmSearchRequestDto.class);
-		} catch (final MiddlewareException e) {
+				(GermplasmSearchRequestDto) this.searchRequestService
+					.getSearchRequest(Integer.valueOf(searchResulstDbid), GermplasmSearchRequestDto.class);
+		} catch (final NumberFormatException | MiddlewareException e) {
 			return new ResponseEntity<>(
 				new EntityListResponse<>(new Result<>(new ArrayList<Germplasm>())).withMessage("no search request found"),
 				HttpStatus.NOT_FOUND);
