@@ -26,9 +26,6 @@ public class CropResourceBrapiTest extends ApiUnitTestBase {
 	@Autowired
 	private CropService cropService;
 
-	@Autowired
-	private SecurityService securityService;
-
 
 	@Configuration
 	public static class TestConfiguration {
@@ -45,12 +42,7 @@ public class CropResourceBrapiTest extends ApiUnitTestBase {
 	public void testListAvailableCrops() throws Exception {
 
 		final List<String> crops = Arrays.asList("Maize", "Wheat", "Cowpea", "pearlmillet");
-
-		final WorkbenchUser workbenchUser = new WorkbenchUser();
-		workbenchUser.setUserid(1);
-
-		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(workbenchUser);
-		Mockito.when(this.cropService.getAvailableCropsForUser(workbenchUser.getUserid())).thenReturn(crops);
+		Mockito.when(this.cropService.getInstalledCrops()).thenReturn(crops);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/brapi/v1/crops").build();
 

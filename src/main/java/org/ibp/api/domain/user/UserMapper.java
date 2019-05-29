@@ -44,6 +44,7 @@ public class UserMapper {
 				this.map().setRole(this.source.getRole());
 				using(toStatusConvert).map().setStatus(this.source.getStatus().toString());
 				this.map().setEmail(this.source.getEmail());
+				this.map().setCrops(this.source.getCrops());
 			}
 		});
 	}
