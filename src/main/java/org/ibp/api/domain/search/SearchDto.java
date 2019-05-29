@@ -6,18 +6,18 @@ import org.pojomatic.annotations.AutoProperty;
 @AutoProperty
 public class SearchDto {
 
-	private int searchResultDbId;
+	private String searchResultDbId;
 
-	public SearchDto(final int searchResultDbId) {
+	public SearchDto(final String searchResultDbId) {
 		super();
 		this.searchResultDbId = searchResultDbId;
 	}
 
-	public int getSearchResultDbId() {
+	public String getSearchResultDbId() {
 		return this.searchResultDbId;
 	}
 
-	public void setSearchResultDbId(final int searchResultDbId) {
+	public void setSearchResultDbId(final String searchResultDbId) {
 		this.searchResultDbId = searchResultDbId;
 	}
 
