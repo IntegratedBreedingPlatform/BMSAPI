@@ -53,7 +53,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
 
 		final DatasetDTO dataSetDTO = this.datasetService.getDataset(datasetId);
-
+		final List<Integer> subObsDatasetTypeIds = this.datasetTypeService.getSubObservationDatasetTypeIds();
 		final int environmentDatasetId =
 			this.studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getId();
 		final int plotDatasetId;
@@ -105,7 +105,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		allVariables.addAll(plotDataSetColumns);
 
 		//Add variables that are specific to the sub-observation dataset types
-		if (Arrays.stream(DatasetTypeEnum.SUB_OBSERVATION_IDS).anyMatch(dataSetDTO.getDatasetTypeId()::equals)) {
+		if (Arrays.stream(subObsDatasetTypeIds.toArray()).anyMatch(dataSetDTO.getDatasetTypeId()::equals)) {
 			final List<MeasurementVariable> subObservationSetColumns =
 				this.datasetService
 					.getObservationSetVariables(datasetId, Lists.newArrayList(

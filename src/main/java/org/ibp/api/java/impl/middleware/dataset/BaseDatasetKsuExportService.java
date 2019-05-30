@@ -150,6 +150,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 	@Override
 	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
 		final DatasetDTO dataSetDTO = this.datasetService.getDataset(datasetId);
+		final List<Integer> subObsDatasetTypeIds = this.datasetTypeService.getSubObservationDatasetTypeIds();
 
 		final int plotDatasetId;
 		if (DatasetTypeEnum.PLOT_DATA.getId() == dataSetDTO.getDatasetTypeId()) {
@@ -167,7 +168,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 		final List<MeasurementVariable> allVariables = new ArrayList<>();
 		allVariables.addAll(plotDataSetColumns);
 		//Add variables that are specific to the sub-observation dataset types
-		if (Arrays.stream(DatasetTypeEnum.SUB_OBSERVATION_IDS).anyMatch(dataSetDTO.getDatasetTypeId()::equals)) {
+		if (Arrays.stream(subObsDatasetTypeIds.toArray()).anyMatch(dataSetDTO.getDatasetTypeId()::equals)) {
 			final List<MeasurementVariable> subObservationSetColumns =
 				this.datasetService
 					.getObservationSetVariables(datasetId, Lists.newArrayList(
