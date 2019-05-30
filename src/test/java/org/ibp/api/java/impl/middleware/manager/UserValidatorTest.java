@@ -21,6 +21,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -51,6 +52,8 @@ public class UserValidatorTest {
 		this.uservalidator.setSecurityService(this.securityService);
 
 		Mockito.doReturn(this.createTestRoles()).when(this.workbenchDataManager).getAllRoles();
+		// TODO test validate crops
+		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectsByUser(ArgumentMatchers.any(WorkbenchUser.class));
 	}
 
 	@After

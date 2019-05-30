@@ -1,11 +1,10 @@
 
 package org.ibp.api.java.impl.middleware.manager;
 
-import java.util.List;
-import java.util.regex.Pattern;
-
+import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.domain.user.UserDetailDto;
@@ -16,6 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
+
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Component
 public class UserValidator implements Validator {
@@ -30,9 +34,14 @@ public class UserValidator implements Validator {
 	public static final String SIGNUP_FIELD_INVALID_ROLE = "signup.field.invalid.role";
 	public static final String SIGNUP_FIELD_INVALID_STATUS = "signup.field.invalid.status";
 	public static final String SIGNUP_FIELD_INVALID_USER_ID = "signup.field.invalid.userId";
+	/**
+	 * TODO move to properties
+	 *  See {@link org.ibp.api.java.impl.middleware.user.UserServiceImpl}
+	 */
 	public static final String USER_AUTO_DEACTIVATION = "A user cannot be auto-deactivated";
 	public static final String CANNOT_UPDATE_SUPERADMIN = "Updating this user is not allowed";
 	public static final String CANNOT_ASSIGN_SUPERADMIN_ROLE = "SuperAdmin role cannot be assigned to a user";
+	public static final String CANNOT_REMOVE_CROP = "site.admin.crops.user.in.program";
 
 	public static final String DATABASE_ERROR = "database.error";
 
@@ -145,8 +154,35 @@ public class UserValidator implements Validator {
 				if (!userUpdate.getPerson().getEmail().equalsIgnoreCase(user.getEmail())) {
 					this.validatePersonEmailIfExists(errors, user.getEmail());
 				}
+
+				this.validateCrops(errors, user, userUpdate);
+
 			} else {
 				errors.rejectValue(USER_ID, SIGNUP_FIELD_INVALID_USER_ID);
+			}
+		}
+	}
+
+	private void validateCrops(final Errors errors, final UserDetailDto userDto, final WorkbenchUser workbenchUser) {
+		final List<Project> programsByUser = this.workbenchDataManager.getProjectsByUser(workbenchUser);
+
+		if (programsByUser != null) {
+			final List<CropDto> cropDtos = userDto.getCrops();
+
+			if (cropDtos == null) {
+				errors.reject(CANNOT_REMOVE_CROP,
+					new String[] {programsByUser.stream().map(Project::getProjectName).collect(Collectors.joining(" and "))}, "");
+				return;
+			}
+
+			final Set<String> crops = cropDtos.stream().map(CropDto::getCropName).collect(Collectors.toSet());
+			final List<Project> programs = programsByUser.stream()
+				.filter(program -> !crops.contains(program.getCropType().getCropName()))
+				.collect(Collectors.toList());
+
+			if (!programs.isEmpty()) {
+				errors.reject(CANNOT_REMOVE_CROP,
+					new String[] {programs.stream().map(Project::getProjectName).collect(Collectors.joining(" and "))}, "");
 			}
 		}
 	}

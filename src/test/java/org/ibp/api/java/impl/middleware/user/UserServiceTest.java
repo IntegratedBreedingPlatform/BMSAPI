@@ -14,11 +14,13 @@ import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.context.support.ResourceBundleMessageSource;
 
 import java.util.List;
 import java.util.Map;
@@ -37,6 +39,8 @@ public class UserServiceTest {
 	@Mock
 	private SecurityService securityService;
 
+	private final ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+
 	@InjectMocks
 	protected UserValidator userValidator;
 
@@ -44,12 +48,18 @@ public class UserServiceTest {
 
 	@Before
 	public void beforeEachTest() {
+		// We cannot mock resourceBundleMessageSource.getMessage because the method is marked as final.
+		// So as a workaround, use a real class instance and set setUseCodeAsDefaultMessage to true
+		messageSource.setUseCodeAsDefaultMessage(true);
 		MockitoAnnotations.initMocks(this);
 		this.userServiceImpl = new UserServiceImpl();
 		this.userServiceImpl.setWorkbenchDataManager(this.workbenchDataManager);
 		this.userValidator.setWorkbenchDataManager(this.workbenchDataManager);
 		this.userServiceImpl.setUserValidator(this.userValidator);
 		this.userServiceImpl.setSecurityService(this.securityService);
+		this.userServiceImpl.setMessageSource(this.messageSource);
+
+		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectsByUser(ArgumentMatchers.any(WorkbenchUser.class));
 	}
 
 	/**
