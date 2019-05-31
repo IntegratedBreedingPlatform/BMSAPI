@@ -4,12 +4,12 @@ public class RoleDto {
 
 	private int id;
 
-	private String description;
+	private String name;
 
-	public RoleDto(int id, String description) {
+	public RoleDto(int id, String name) {
 		super();
 		this.id = id;
-		this.description = description;
+		this.name = name;
 	}
 
 	public int getId() {
@@ -20,19 +20,19 @@ public class RoleDto {
 		this.id = id;
 	}
 
-	public String getDescription() {
-		return description;
+	public String getName() {
+		return name;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String toString(){
 		StringBuffer str= new StringBuffer();
 		str.append("RoleDto ")
 		.append("[ id= ").append(id)
-		.append(" ,description= ").append(description)		
+		.append(" ,description= ").append(name)
 		.append(" ]");
 		return str.toString();
 	}
