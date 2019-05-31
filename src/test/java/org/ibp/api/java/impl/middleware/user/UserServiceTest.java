@@ -50,7 +50,7 @@ public class UserServiceTest {
 	public void beforeEachTest() {
 		// We cannot mock resourceBundleMessageSource.getMessage because the method is marked as final.
 		// So as a workaround, use a real class instance and set setUseCodeAsDefaultMessage to true
-		messageSource.setUseCodeAsDefaultMessage(true);
+		this.messageSource.setUseCodeAsDefaultMessage(true);
 		MockitoAnnotations.initMocks(this);
 		this.userServiceImpl = new UserServiceImpl();
 		this.userServiceImpl.setWorkbenchDataManager(this.workbenchDataManager);
@@ -81,7 +81,7 @@ public class UserServiceTest {
 		assertThat(usersDto.get(0).getUserId(), equalTo(usersDtlsDto.get(0).getId()));
 		assertThat(usersDto.get(0).getEmail(), equalTo(usersDtlsDto.get(0).getEmail()));
 		assertThat("true", equalTo(usersDtlsDto.get(0).getStatus()));
-		assertThat(usersDto.get(0).getRole().getDescription(), equalTo(usersDtlsDto.get(0).getRole().getDescription()));
+		assertThat(usersDto.get(0).getRole().getName(), equalTo(usersDtlsDto.get(0).getRole().getName()));
 	}
 
 	/**
@@ -240,7 +240,7 @@ public class UserServiceTest {
 		assertThat(usersDto.get(0).getUserId(), equalTo(userDetailDtoList.get(0).getId()));
 		assertThat(usersDto.get(0).getEmail(), equalTo(userDetailDtoList.get(0).getEmail()));
 		assertThat("true", equalTo(userDetailDtoList.get(0).getStatus()));
-		assertThat(usersDto.get(0).getRole().getDescription(), equalTo(userDetailDtoList.get(0).getRole().getDescription()));
+		assertThat(usersDto.get(0).getRole().getName(), equalTo(userDetailDtoList.get(0).getRole().getName()));
 	}
 
 	/**

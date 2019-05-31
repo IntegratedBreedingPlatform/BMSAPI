@@ -71,7 +71,7 @@ public class UserValidator implements Validator {
 	
 	private Role superAdminRole;
 
-	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
+	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}
 
@@ -80,7 +80,7 @@ public class UserValidator implements Validator {
 	}
 
 	@Override
-	public boolean supports(Class<?> aClass) {
+	public boolean supports(final Class<?> aClass) {
 		return UserDetailDto.class.equals(aClass);
 	}
 
@@ -90,7 +90,7 @@ public class UserValidator implements Validator {
 	}
 
 	public void validate(final Object o, final Errors errors, final boolean createUser) {
-		UserDetailDto user = (UserDetailDto) o;
+		final UserDetailDto user = (UserDetailDto) o;
 		this.retrieveSuperAdminRole();
 
 		this.validateFieldLength(errors, user.getFirstName(), FIRST_NAME, FIRST_NAME_STR, 20);
@@ -125,12 +125,12 @@ public class UserValidator implements Validator {
 		}
 	}
 
-	private void validateUserUpdate(Errors errors, UserDetailDto user) {
+	private void validateUserUpdate(final Errors errors, final UserDetailDto user) {
 		WorkbenchUser userUpdate = null;
 		if (null == errors.getFieldError(USER_ID)) {
 			try {
 				userUpdate = this.workbenchDataManager.getUserById(user.getId());
-			} catch (MiddlewareQueryException e) {
+			} catch (final MiddlewareQueryException e) {
 				errors.rejectValue(USER_ID, DATABASE_ERROR);
 				LOG.error(e.getMessage(), e);
 			}
@@ -224,7 +224,7 @@ public class UserValidator implements Validator {
 			if (null == errors.getFieldError(USERNAME) && this.workbenchDataManager.isUsernameExists(userName)) {
 				errors.rejectValue(USERNAME, SIGNUP_FIELD_USERNAME_EXISTS, new String[] {userName}, null);
 			}
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			errors.rejectValue(USERNAME, DATABASE_ERROR);
 			LOG.error(e.getMessage(), e);
 		}
@@ -235,7 +235,7 @@ public class UserValidator implements Validator {
 			if (null == errors.getFieldError(EMAIL) && this.workbenchDataManager.isPersonWithEmailExists(eMail)) {
 				errors.rejectValue(EMAIL, SIGNUP_FIELD_EMAIL_EXISTS);
 			}
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			errors.rejectValue(EMAIL, DATABASE_ERROR);
 			LOG.error(e.getMessage(), e);
 		}
@@ -247,7 +247,7 @@ public class UserValidator implements Validator {
 		} else if (this.isSuperAdminRole(role)) {
 			errors.reject(CANNOT_ASSIGN_SUPERADMIN_ROLE);
 		} else {
-	        this.validateFieldLength(errors, role.getDescription(), ROLE, ROLE_STR, 30);
+	        this.validateFieldLength(errors, role.getName(), ROLE, ROLE_STR, 30);
 		} 
 
     }
@@ -260,7 +260,7 @@ public class UserValidator implements Validator {
 	}
 
 	
-	public void setSuperAdminRole(Role superAdminRole) {
+	public void setSuperAdminRole(final Role superAdminRole) {
 		this.superAdminRole = superAdminRole;
 	}
 }

@@ -1,14 +1,5 @@
 package org.ibp.api.java.impl.middleware.manager;
 
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
@@ -28,6 +19,15 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserValidatorTest {
@@ -109,7 +109,7 @@ public class UserValidatorTest {
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
 
-		userDto.getRole().setDescription("Breeder qwertyuioiuytredsdfrtghjuklsl123");
+		userDto.getRole().setName("Breeder qwertyuioiuytredsdfrtghjuklsl123");
 		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
@@ -369,9 +369,9 @@ public class UserValidatorTest {
 
 	private List<Role> createTestRoles() {
 		final List<Role> allRoles = new ArrayList<>();
-		Role admin = new Role(1, "ADMIN");
-		Role breeder = new Role(2, "BREEDER");
-		Role technician = new Role(3, "TECHNICIAN");
+		final Role admin = new Role(1, "ADMIN");
+		final Role breeder = new Role(2, "BREEDER");
+		final Role technician = new Role(3, "TECHNICIAN");
 		this.superAdminRole = new Role(SUPERADMIN_ID, Role.SUPERADMIN);
 
 		allRoles.add(admin);
