@@ -34,7 +34,7 @@ public class RoleServiceImpl implements RoleService {
 		
 		final List<Role> assignableRoles = this.workbenchDataManager.getAssignableRoles();
 		for (final Role role : assignableRoles) {
-			roles.add(new RoleDto(role.getId(), role.getCapitalizedRole()));
+			roles.add(new RoleDto(role.getId(), role.getName()));
 		}
 
 		return roles;
