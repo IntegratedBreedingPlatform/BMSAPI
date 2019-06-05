@@ -132,7 +132,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber", Matchers.is(1)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.pageSize", Matchers.is(100)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageSize", Matchers.is(1000)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.totalResults", Matchers.is(100)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.totalPages", Matchers.is(1)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.firstPage", Matchers.is(true)))

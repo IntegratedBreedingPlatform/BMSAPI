@@ -120,7 +120,7 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 		.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults", IsCollectionWithSize.hasSize(matchingGermplasm.size())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber", Matchers.is(1)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.pageSize", Matchers.is(100)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageSize", Matchers.is(1000)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.totalResults", Matchers.is(1)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.firstPage", Matchers.is(true)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.lastPage", Matchers.is(true)))
