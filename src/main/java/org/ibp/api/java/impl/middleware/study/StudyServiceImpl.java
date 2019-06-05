@@ -344,6 +344,8 @@ public class StudyServiceImpl implements StudyService {
 				studyDetails.addTrait(trait);
 			}
 
+			final DataSet trialDataset =
+				this.studyDataManager.findOneDataSetByType(studyIdentifier, DatasetTypeEnum.SUMMARY_DATA.getId());
 			// Datasets
 			final List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(studyIdentifier);
 			if (datasetReferences != null && !datasetReferences.isEmpty()) {
@@ -355,9 +357,7 @@ public class StudyServiceImpl implements StudyService {
 					dsSummary.setDescription(dsRef.getDescription());
 					studyDetails.addDataSet(dsSummary);
 
-					// FIXME : Is there a cleaner way to tell whether a DataSet is an Environment dataset?
-					if (dsRef.getName()
-							.endsWith("-ENVIRONMENT")) {
+					if (dsRef.getId().equals(trialDataset.getId())) {
 						// Logic derived from by RepresentationDataSetQuery.loadItems(int, int) method of the GermplasmStudyBrowser,
 						// which is used to show dataset tables in the study browser UI.
 						final List<Experiment> experiments = this.studyDataManager.getExperiments(dsRef.getId(), 0, Integer.MAX_VALUE);
