@@ -5,30 +5,46 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.domain.dms.*;
-import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.gms.GermplasmListType;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.FolderReference;
+import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.service.api.DataImportService;
-import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
-import org.generationcp.middleware.service.api.study.*;
+import org.generationcp.middleware.service.api.study.MeasurementDto;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
+import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.service.api.study.StudyDetailsDto;
+import org.generationcp.middleware.service.api.study.StudyFilters;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudySearchParameters;
+import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.domain.common.Command;
 import org.ibp.api.domain.common.ValidationUtil;
 import org.ibp.api.domain.ontology.TermSummary;
+import org.ibp.api.domain.study.DatasetSummary;
+import org.ibp.api.domain.study.Environment;
+import org.ibp.api.domain.study.FieldMap;
+import org.ibp.api.domain.study.Measurement;
+import org.ibp.api.domain.study.Observation;
+import org.ibp.api.domain.study.StudyAttribute;
+import org.ibp.api.domain.study.StudyDetails;
+import org.ibp.api.domain.study.StudyFolder;
+import org.ibp.api.domain.study.StudyGermplasm;
+import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
-import org.ibp.api.domain.study.*;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
@@ -65,16 +81,7 @@ public class StudyServiceImpl implements StudyService {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
-	private FieldbookService fieldbookService;
-
-	@Autowired
-	private GermplasmListManager germplasmListManager;
-
-	@Autowired
 	private ConversionService conversionService;
-
-	@Autowired
-	private DataImportService dataImportService;
 
 	@Autowired
 	private SecurityService securityService;
@@ -427,20 +434,8 @@ public class StudyServiceImpl implements StudyService {
 		this.studyDataManager = studyDataManager;
 	}
 
-	void setFieldbookService(final FieldbookService fieldbookService) {
-		this.fieldbookService = fieldbookService;
-	}
-
-	void setGermplasmListManager(final GermplasmListManager germplasmListManager) {
-		this.germplasmListManager = germplasmListManager;
-	}
-
 	void setConversionService(final ConversionService conversionService) {
 		this.conversionService = conversionService;
-	}
-
-	void setDataImportService(final DataImportService dataImportService) {
-		this.dataImportService = dataImportService;
 	}
 
 	void setSecurityService(final SecurityService securityService) {
