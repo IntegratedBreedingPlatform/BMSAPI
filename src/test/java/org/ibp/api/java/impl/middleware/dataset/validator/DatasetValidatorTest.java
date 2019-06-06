@@ -92,7 +92,7 @@ public class DatasetValidatorTest {
 			.getDatasets(Matchers.anyInt(), Matchers.anySetOf(Integer.class));
 		final DatasetDTO dataset = new DatasetDTO();
 		dataset.setDatasetId(datasetId);
-		dataset.setDatasetTypeId(DatasetTypeEnum.MEANS_DATA.getId());
+		dataset.setDatasetTypeId(DatasetTypeEnum.PLOT_DATA.getId());
 		when(this.studyDatasetService.getDataset(datasetId)).thenReturn(dataset);
 
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
