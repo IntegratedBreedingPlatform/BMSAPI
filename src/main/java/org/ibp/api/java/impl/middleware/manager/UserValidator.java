@@ -136,7 +136,7 @@ public class UserValidator implements Validator {
 			}
 
 			if (userUpdate != null) {
-				final Role userRole = userUpdate.getRoles().get(0).getRole();
+				final Role userRole = (!userUpdate.getRoles().isEmpty()) ? userUpdate.getRoles().get(0).getRole() : null;
 				if (this.isSuperAdminRole(userRole)){
 					errors.reject(CANNOT_UPDATE_SUPERADMIN);
 				}
@@ -189,8 +189,8 @@ public class UserValidator implements Validator {
 
 	// Match by either "SUPERADMIN" description or by id of superadmin role from database
 	boolean isSuperAdminRole(final Role role) {
-		return Role.SUPERADMIN.equals(role.getCapitalizedRole())
-				|| (this.superAdminRole != null && this.superAdminRole.getId().equals(role.getId()));
+		return (role != null) && (Role.SUPERADMIN.equals(role.getCapitalizedRole())
+			|| (this.superAdminRole != null && this.superAdminRole.getId().equals(role.getId())));
 	}
 
 	private void validateUserId(final Errors errors, final Integer userId) {
