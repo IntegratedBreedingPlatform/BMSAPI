@@ -69,6 +69,7 @@ public class UserMapper {
 				this.map().setId(this.source.getUserId());
 				this.map().setUsername(this.source.getUsername());
 				this.map().setRole(this.source.getRole());
+				this.map().setUserRoles(this.source.getUserRoles());
 				using(toStatusConvert).map().setStatus(this.source.getStatus().toString());
 				this.map().setEmail(this.source.getEmail());
 				this.map().setCrops(this.source.getCrops());
