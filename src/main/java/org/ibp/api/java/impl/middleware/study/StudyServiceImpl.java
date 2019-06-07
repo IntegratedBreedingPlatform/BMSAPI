@@ -496,8 +496,8 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public StudyDetailsDto getStudyDetailsDto(final Integer studyId) {
-		return this.middlewareStudyService.getStudyDetails(studyId);
+	public StudyDetailsDto getStudyDetailsForGeolocation(final Integer geolocationId) {
+		return this.middlewareStudyService.getStudyDetailsForGeolocation(geolocationId);
 	}
 
 	@Override
