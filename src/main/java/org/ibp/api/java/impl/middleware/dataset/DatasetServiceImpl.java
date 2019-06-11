@@ -465,7 +465,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		this.datasetValidator
-			.validateExistingDatasetVariables(studyId, datasetId, true, Lists.newArrayList(searchDTO.getFilter().getVariableId()));
+			.validateExistingDatasetVariables(studyId, datasetId, false, Lists.newArrayList(searchDTO.getFilter().getVariableId()));
 		this.middlewareDatasetService.acceptDraftDataFilteredByVariable(datasetId, searchDTO, studyId);
 	}
 
