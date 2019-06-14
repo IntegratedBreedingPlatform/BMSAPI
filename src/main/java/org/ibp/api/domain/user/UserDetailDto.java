@@ -1,13 +1,12 @@
 package org.ibp.api.domain.user;
 
-import java.io.Serializable;
-import java.util.List;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.generationcp.middleware.domain.workbench.CropDto;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
+
+import java.io.Serializable;
+import java.util.List;
 
 public class UserDetailDto implements Serializable, Comparable<UserDto> {
 
@@ -17,7 +16,6 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 	private String username;
 	private String firstName;
 	private String lastName;
-	private Role role;
 	private List<UserRoleDto> userRoles;
 	private String status;
 	private String email;
@@ -53,14 +51,6 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
-	}
-
-	public Role getRole() {
-		return role;
-	}
-
-	public void setRole(final Role role) {
-		this.role = role;
 	}
 
 	public String getStatus() {
@@ -100,7 +90,6 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 		result = prime * result + (this.username == null ? 0 : this.username.hashCode());
 		result = prime * result + (this.firstName == null ? 0 : this.firstName.hashCode());
 		result = prime * result + (this.lastName == null ? 0 : this.lastName.hashCode());
-		result = prime * result + (this.role == null ? 0 : this.role.hashCode());
 		result = prime * result + (this.userRoles == null ? 0 : this.userRoles.hashCode());
 
 		result = prime * result + (this.email == null ? 0 : this.email.hashCode());
@@ -135,10 +124,10 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 			.append("username", username)
 			.append("firstName", firstName)
 			.append("lastName", lastName)
-			.append("role", role)
 			.append("status", status)
 			.append("email", email)
 			.append("crops", crops)
+			.append("userRoles", userRoles)
 			.toString();
 	}
 

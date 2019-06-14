@@ -4,7 +4,10 @@ import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.ProgramDto;
+import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.UserDto;
+import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;
@@ -33,6 +36,21 @@ public class UserMapper {
 			@Override
 			protected List<CropDto> convert(final List<CropType> source) {
 				return source.stream().map(CropDto::new).collect(Collectors.toList());
+			}
+		};
+
+	private static AbstractConverter<List<UserRole>, List<UserRoleDto>> userRolesConverter =
+		new AbstractConverter<List<UserRole>, List<UserRoleDto>>() {
+
+			@Override
+			protected List<UserRoleDto> convert(final List<UserRole> source) {
+				return source.stream().map(userRole -> new UserRoleDto(userRole.getId(),
+					new RoleDto(userRole.getRole().getId(), userRole.getRole().getName(), userRole.getRole().getDescription(),
+						userRole.getRole().getRoleType().getName(), userRole.getRole().getActive(), userRole.getRole().getEditable(),
+						userRole.getRole().getAssignable()), (userRole.getCropType() != null) ? new CropDto(userRole.getCropType()) : null,
+					(userRole.getWorkbenchProject() != null) ?
+						new ProgramDto(userRole.getWorkbenchProject().getProjectId(), userRole.getWorkbenchProject().getProjectName(),
+							new CropDto(userRole.getCropType())) : null)).collect(Collectors.toList());
 			}
 		};
 
@@ -68,7 +86,6 @@ public class UserMapper {
 				this.map().setLastName(this.source.getLastName());
 				this.map().setId(this.source.getUserId());
 				this.map().setUsername(this.source.getUsername());
-				this.map().setRole(this.source.getRole());
 				this.map().setUserRoles(this.source.getUserRoles());
 				using(toStatusConvert).map().setStatus(this.source.getStatus().toString());
 				this.map().setEmail(this.source.getEmail());
@@ -86,6 +103,7 @@ public class UserMapper {
 				this.map().setLastName(this.source.getPerson().getLastName());
 				this.map().setStatus(this.source.getStatus());
 				this.map().setEmail(this.source.getPerson().getEmail());
+				using(userRolesConverter).map(this.source.getRoles()).setUserRoles(null);
 				using(authoritiesConverter).map(this.source.getRoles()).setAuthorities(null); // TODO use Permissions
 				using(cropsConverter).map(this.source.getCrops()).setCrops(null);
 			}

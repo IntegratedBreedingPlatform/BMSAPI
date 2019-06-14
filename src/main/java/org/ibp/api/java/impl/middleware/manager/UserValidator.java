@@ -7,6 +7,7 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.slf4j.Logger;
@@ -99,7 +100,7 @@ public class UserValidator implements Validator {
 		this.validateFieldLength(errors, user.getEmail(), EMAIL, EMAIL_STR, 40);
 		this.validateFieldLength(errors, user.getStatus(), STATUS, STATUS_STR, 11);
 
-		this.validateUserRole(errors, user.getRole());
+		this.validateUserRoles(errors, user.getUserRoles());
 		this.validateEmailFormat(errors, user.getEmail());
 
 		this.validateUserStatus(errors, user.getStatus());
@@ -241,14 +242,15 @@ public class UserValidator implements Validator {
 		}
 	}
 
-    protected void validateUserRole(final Errors errors, final Role role) {
-		if (null == role) {
-            errors.rejectValue(ROLE, SIGNUP_FIELD_INVALID_ROLE);
-		} else if (this.isSuperAdminRole(role)) {
-			errors.reject(CANNOT_ASSIGN_SUPERADMIN_ROLE);
-		} else {
-	        this.validateFieldLength(errors, role.getName(), ROLE, ROLE_STR, 30);
-		} 
+	protected void validateUserRoles(final Errors errors, final List<UserRoleDto> userRoles) {
+		//TODO Reimplement based on new business rules
+		//		if (null == role) {
+		//            errors.rejectValue(ROLE, SIGNUP_FIELD_INVALID_ROLE);
+		//		} else if (this.isSuperAdminRole(role)) {
+		//			errors.reject(CANNOT_ASSIGN_SUPERADMIN_ROLE);
+		//		} else {
+		//	        this.validateFieldLength(errors, role.getName(), ROLE, ROLE_STR, 30);
+		//		}
 
     }
     

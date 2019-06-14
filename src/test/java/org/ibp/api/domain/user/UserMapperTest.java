@@ -22,7 +22,7 @@ public class UserMapperTest extends UserServiceTest {
 		assertThat(userDto.getLastName(), equalTo(userDetailDto.getLastName()));
 		assertThat(userDto.getUserId(), equalTo(userDetailDto.getId()));
 		assertThat(userDto.getUsername(), equalTo(userDetailDto.getUsername()));
-		assertThat(userDto.getRole().getName(), equalTo(userDetailDto.getRole().getName()));
+		assertThat(userDto.getUserRoles().get(0).getId(), equalTo(userDetailDto.getUserRoles().get(0).getId()));
 		assertThat((userDto.getStatus() == 0 ? "true" : "false"), equalTo(userDetailDto.getStatus()));
 		assertThat(userDto.getEmail(), equalTo(userDetailDto.getEmail()));
 

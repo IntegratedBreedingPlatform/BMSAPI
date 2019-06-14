@@ -81,7 +81,8 @@ public class UserServiceTest {
 		assertThat(usersDto.get(0).getUserId(), equalTo(usersDtlsDto.get(0).getId()));
 		assertThat(usersDto.get(0).getEmail(), equalTo(usersDtlsDto.get(0).getEmail()));
 		assertThat("true", equalTo(usersDtlsDto.get(0).getStatus()));
-		assertThat(usersDto.get(0).getRole().getName(), equalTo(usersDtlsDto.get(0).getRole().getName()));
+		assertThat(usersDto.get(0).getUserRoles().get(0).getRole().getName(),
+			equalTo(usersDtlsDto.get(0).getUserRoles().get(0).getRole().getName()));
 	}
 
 	/**
@@ -240,7 +241,6 @@ public class UserServiceTest {
 		assertThat(usersDto.get(0).getUserId(), equalTo(userDetailDtoList.get(0).getId()));
 		assertThat(usersDto.get(0).getEmail(), equalTo(userDetailDtoList.get(0).getEmail()));
 		assertThat("true", equalTo(userDetailDtoList.get(0).getStatus()));
-		assertThat(usersDto.get(0).getRole().getName(), equalTo(userDetailDtoList.get(0).getRole().getName()));
 	}
 
 	/**

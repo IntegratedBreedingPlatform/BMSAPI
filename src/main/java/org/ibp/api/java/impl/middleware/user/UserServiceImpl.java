@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.common.ErrorResponse;
@@ -179,7 +178,7 @@ public class UserServiceImpl implements UserService {
 		userdto.setUsername(user.getUsername());
 		userdto.setFirstName(user.getFirstName());
 		userdto.setLastName(user.getLastName());
-		userdto.setRole(new Role(user.getRole().getId(), user.getRole().getCapitalizedRole()));
+		userdto.setUserRoles(user.getUserRoles());
 		userdto.setEmail(user.getEmail());
 		userdto.setStatus("true".equals(user.getStatus()) ? 0 : 1);
 		userdto.setCrops(user.getCrops());

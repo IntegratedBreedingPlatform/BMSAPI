@@ -212,7 +212,6 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 				.andExpect(jsonPath("$.result.contacts[0].contactDbId", is(studyDetailsDto.getContacts().get(0).getUserId())))
 				.andExpect(jsonPath("$.result.contacts[0].name", is(studyDetailsDto.getContacts().get(0).getFirstName() + " " + studyDetailsDto.getContacts().get(0).getLastName())))
 				.andExpect(jsonPath("$.result.contacts[0].email", is(studyDetailsDto.getContacts().get(0).getEmail())))
-				.andExpect(jsonPath("$.result.contacts[0].type", is(studyDetailsDto.getContacts().get(0).getRole().getName())))
 				.andExpect(jsonPath("$.result.contacts[0].orcid", is("")))
 				.andExpect(jsonPath("$.result.additionalInfo", hasKey("prop1")))
 				.andExpect(jsonPath("$.result.additionalInfo", hasValue("val1")))
