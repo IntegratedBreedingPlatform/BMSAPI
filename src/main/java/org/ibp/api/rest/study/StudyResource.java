@@ -7,7 +7,6 @@ import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.ObjectUtils;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.domain.common.PagedResult;
@@ -53,9 +52,6 @@ public class StudyResource {
 
 	@Autowired
 	private StudyService studyService;
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
 
 	@Resource
 	private ResourceBundleMessageSource resourceBundleMessageSource;
