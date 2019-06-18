@@ -1,6 +1,7 @@
 package org.ibp.api.domain.user;
 
 import org.generationcp.middleware.domain.workbench.CropDto;
+import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -45,6 +46,7 @@ public class UserMapper {
 			@Override
 			protected List<UserRoleDto> convert(final List<UserRole> source) {
 				return source.stream().map(userRole -> new UserRoleDto(userRole.getId(),
+					// TODO new UserRoleDto(UserRole)
 					new RoleDto(userRole.getRole().getId(), userRole.getRole().getName(), userRole.getRole().getDescription(),
 						userRole.getRole().getRoleType().getName(), userRole.getRole().getActive(), userRole.getRole().getEditable(),
 						userRole.getRole().getAssignable()), (userRole.getCropType() != null) ? new CropDto(userRole.getCropType()) : null,
@@ -54,13 +56,12 @@ public class UserMapper {
 			}
 		};
 
-	private static AbstractConverter<List<UserRole>, Set<String>> authoritiesConverter =
-		new AbstractConverter<List<UserRole>, Set<String>>() {
+	private static AbstractConverter<List<PermissionDto>, Set<String>> authoritiesConverter =
+		new AbstractConverter<List<PermissionDto>, Set<String>>() {
 
 			@Override
-			protected Set<String> convert(final List<UserRole> source) {
-				// TODO Use Permissions
-				return source.stream().map(userRole -> userRole.getRole().getCapitalizedRole()).collect(Collectors.toSet());
+			protected Set<String> convert(final List<PermissionDto> source) {
+				return source.stream().map(PermissionDto::getName).collect(Collectors.toSet());
 			}
 		};
 
@@ -104,7 +105,7 @@ public class UserMapper {
 				this.map().setStatus(this.source.getStatus());
 				this.map().setEmail(this.source.getPerson().getEmail());
 				using(userRolesConverter).map(this.source.getRoles()).setUserRoles(null);
-				using(authoritiesConverter).map(this.source.getRoles()).setAuthorities(null); // TODO use Permissions
+				using(authoritiesConverter).map(this.source.getPermissions()).setAuthorities(null);
 				using(cropsConverter).map(this.source.getCrops()).setCrops(null);
 			}
 		});
