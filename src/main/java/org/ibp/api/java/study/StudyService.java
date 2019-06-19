@@ -4,13 +4,18 @@ package org.ibp.api.java.study;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
-import org.ibp.api.domain.study.*;
+import org.ibp.api.domain.study.FieldMap;
+import org.ibp.api.domain.study.Observation;
+import org.ibp.api.domain.study.StudyDetails;
+import org.ibp.api.domain.study.StudyFolder;
+import org.ibp.api.domain.study.StudyGermplasm;
+import org.ibp.api.domain.study.StudyInstance;
+import org.ibp.api.domain.study.StudySummary;
 
 import java.util.List;
 import java.util.Map;
@@ -52,7 +57,7 @@ public interface StudyService {
 
 	List<StudyInstance> getStudyInstances(int studyId);
 
-	StudyDetailsDto getStudyDetailsDto (final Integer studyId);
+	StudyDetailsDto getStudyDetailsForGeolocation (final Integer geolocationId);
 
 	Long countStudies(final Map<StudyFilters, String> filters);
 
