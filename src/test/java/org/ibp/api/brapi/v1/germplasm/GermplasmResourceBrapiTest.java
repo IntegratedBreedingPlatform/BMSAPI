@@ -12,8 +12,9 @@ import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
-import org.ibp.api.brapi.v1.program.ProgramResourceBrapiTest;
+import org.ibp.api.java.germplasm.GermplasmService;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -26,6 +27,7 @@ import java.util.Locale;
 import static org.apache.commons.lang.math.RandomUtils.nextInt;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -39,6 +41,9 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 	@Autowired
 	private SearchRequestService searchRequestService;
 
+	@Autowired
+	private GermplasmService germplasmService;
+
 	@Test
 	public void testGetPedigree() throws Exception {
 		final int gid = nextInt();
@@ -50,12 +55,12 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
 		when(this.germplasmDataManager.getPedigree(gid, null, null)).thenReturn(pedigreeDTO);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm/" + germplasmDbId + "/pedigree") //
-			.contentType(this.contentType) //
-			.locale(locale)) //
-			.andDo(MockMvcResultHandlers.print()) //
-			.andExpect(jsonPath("$.result.germplasmDbId", is(pedigreeDTO.getGermplasmDbId()))) //
-			.andExpect(jsonPath("$.result.pedigree", is(pedigreeDTO.getPedigree()))) //
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm/" + germplasmDbId + "/pedigree")
+			.contentType(this.contentType)
+			.locale(locale))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(jsonPath("$.result.germplasmDbId", is(pedigreeDTO.getGermplasmDbId())))
+			.andExpect(jsonPath("$.result.pedigree", is(pedigreeDTO.getPedigree())))
 		;
 	}
 
@@ -64,7 +69,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		final int gid = nextInt();
 		final String germplasmDbId = String.valueOf(gid);
 
-		final ProgenyDTO progenyDTO= new ProgenyDTO();
+		final ProgenyDTO progenyDTO = new ProgenyDTO();
 		progenyDTO.setGermplasmDbId(gid);
 		final List<ProgenyDTO.Progeny> progenies = new ArrayList<>();
 		final ProgenyDTO.Progeny progeny = new ProgenyDTO.Progeny();
@@ -75,13 +80,13 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
 		when(this.germplasmDataManager.getProgeny(gid)).thenReturn(progenyDTO);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm/" + germplasmDbId + "/progeny") //
-			.contentType(this.contentType) //
-			.locale(locale)) //
-			.andDo(MockMvcResultHandlers.print()) //
-			.andExpect(jsonPath("$.result.germplasmDbId", is(gid))) //
-			.andExpect(jsonPath("$.result.progeny[0].germplasmDbId", is(progenyDTO.getProgeny().get(0).getGermplasmDbId()))) //
-			.andExpect(jsonPath("$.result.progeny[0].parentType", is(progenyDTO.getProgeny().get(0).getParentType()))) //
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm/" + germplasmDbId + "/progeny")
+			.contentType(this.contentType)
+			.locale(locale))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(jsonPath("$.result.germplasmDbId", is(gid)))
+			.andExpect(jsonPath("$.result.progeny[0].germplasmDbId", is(progenyDTO.getProgeny().get(0).getGermplasmDbId())))
+			.andExpect(jsonPath("$.result.progeny[0].parentType", is(progenyDTO.getProgeny().get(0).getParentType())))
 		;
 	}
 
@@ -99,18 +104,44 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
 		when(this.searchRequestService.getSearchRequest(requestId, GermplasmSearchRequestDto.class)).thenReturn(germplasmSearchRequestDTO);
 		when(this.germplasmDataManager
-			.searchGermplasmDTO(germplasmSearchRequestDTO, null, null))
+			.searchGermplasmDTO(germplasmSearchRequestDTO, BrapiPagedResult.DEFAULT_PAGE_NUMBER, BrapiPagedResult.DEFAULT_PAGE_SIZE))
 			.thenReturn(list);
 
-
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/search/germplasm/" + requestId ) //
-			.contentType(this.contentType)//
-			.locale(locale)) //
-			.andExpect(MockMvcResultMatchers.status().isOk()) //
-			.andDo(MockMvcResultHandlers.print()) //
-			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(list.size()))) //
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/search/germplasm/" + requestId)
+			.contentType(this.contentType)
+			.locale(locale))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(list.size())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmDbId",
-				Matchers.is(germplasmDbId))) //
-		;
+				Matchers.is(germplasmDbId)));
+	}
+
+	@Test
+	public void testSearchGermplasms() throws Exception {
+
+		final int gid = nextInt();
+		final String germplasmDbId = String.valueOf(gid);
+		final int requestId = 1;
+		final List<GermplasmDTO> list = new ArrayList<>();
+		final GermplasmDTO germplasmDTO = new GermplasmDTO();
+		germplasmDTO.setGermplasmDbId(germplasmDbId);
+		list.add(germplasmDTO);
+
+		when(this.germplasmService.countGermplasmDTOs(any(GermplasmSearchRequestDto.class))).thenReturn(1l);
+		when(this.germplasmService
+			.searchGermplasmDTO(any(GermplasmSearchRequestDto.class), Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_NUMBER),
+				Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_SIZE)))
+			.thenReturn(list);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm-search")
+			.contentType(this.contentType)
+			.locale(locale))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data", IsCollectionWithSize.hasSize(list.size())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].germplasmDbId",
+				Matchers.is(germplasmDbId)));
+
 	}
 }
