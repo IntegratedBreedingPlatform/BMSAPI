@@ -50,32 +50,25 @@ public class GermplasmResourceBrapi {
 	@ResponseBody
 	@JsonView(Germplasm.View.GermplasmBrapiV1_2.class)
 	public ResponseEntity<EntityListResponse<Germplasm>> searchGermplasms(
-			@PathVariable
-			final String crop,
-			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
-			@RequestParam(value = "page",
-					required = false)
-			final Integer currentPage,
-			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
-			@RequestParam(value = "pageSize",
-					required = false)
-			final Integer pageSize,
-			@ApiParam(value = "Permanent unique identifier", required = false)
-			@RequestParam(value = "germplasmPUI",
-					required = false)
-			final String germplasmPUI,
-			@ApiParam(value = "Internal database identifier", required = false)
-			@RequestParam(value = "germplasmDbId",
-					required = false)
-			final String germplasmDbId,
-			@ApiParam(value = "Name of the germplasm", required = false)
-			@RequestParam(value = "germplasmName",
-					required = false)
-			final String germplasmName,
-			@ApiParam(value = "The common crop name. This value is discarded, crop needs to be included as part of the URL", required = false)
-			@RequestParam(value = "commonCropName",
-					required = false)
-			final String commonCropName) {
+		@PathVariable final String crop,
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
+		@RequestParam(value = "page",
+			required = false) final Integer currentPage,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
+		@RequestParam(value = "pageSize",
+			required = false) final Integer pageSize,
+		@ApiParam(value = "Permanent unique identifier", required = false)
+		@RequestParam(value = "germplasmPUI",
+			required = false) final String germplasmPUI,
+		@ApiParam(value = "Internal database identifier", required = false)
+		@RequestParam(value = "germplasmDbId",
+			required = false) final String germplasmDbId,
+		@ApiParam(value = "Name of the germplasm", required = false)
+		@RequestParam(value = "germplasmName",
+			required = false) final String germplasmName,
+		@ApiParam(value = "The common crop name. This value is discarded, crop needs to be included as part of the URL", required = false)
+		@RequestParam(value = "commonCropName",
+			required = false) final String commonCropName) {
 
 		final int gid;
 
@@ -110,7 +103,8 @@ public class GermplasmResourceBrapi {
 					@Override
 					public List<GermplasmDTO> getResults(final PagedResult<GermplasmDTO> pagedResult) {
 						return GermplasmResourceBrapi.this.germplasmService
-							.searchGermplasmDTO(germplasmSearchRequestDTO, (currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage),
+							.searchGermplasmDTO(germplasmSearchRequestDTO,
+								(currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage),
 								(pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize));
 					}
 				});
@@ -128,7 +122,7 @@ public class GermplasmResourceBrapi {
 
 		final Result<Germplasm> results = new Result<Germplasm>().withData(germplasmList);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
-				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
 
@@ -142,10 +136,8 @@ public class GermplasmResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<Germplasm>> searchGermplasm(
-			@PathVariable
-			final String crop,
-			@PathVariable
-			final String germplasmDbId) {
+		@PathVariable final String crop,
+		@PathVariable final String germplasmDbId) {
 
 		final Integer gid;
 		try {
@@ -175,18 +167,14 @@ public class GermplasmResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}/pedigree", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<PedigreeDTO>> getPedigree(
-		@PathVariable
-		final String crop,
+		@PathVariable final String crop,
 		@ApiParam(value = "the internal id of the germplasm")
-		@PathVariable(value = "germplasmDbId")
-		final String germplasmDbId,
+		@PathVariable(value = "germplasmDbId") final String germplasmDbId,
 		@ApiParam(value = "text representation of the pedigree <strong style='color: red'>(Not Implemented)</strong>", required = false)
-		@RequestParam(value = "notation", required = false)
-		final String notation,
+		@RequestParam(value = "notation", required = false) final String notation,
 		@ApiParam(value = "include array of siblings in response", required = false)
-		@RequestParam(value = "includeSiblings", required = false)
-		final Boolean includeSiblings
-		) {
+		@RequestParam(value = "includeSiblings", required = false) final Boolean includeSiblings
+	) {
 
 		// TODO
 		if (notation != null) {
@@ -213,11 +201,9 @@ public class GermplasmResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}/progeny", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<ProgenyDTO>> getProgeny(
-		@PathVariable
-		final String crop,
+		@PathVariable final String crop,
 		@ApiParam(value = "the internal id of the germplasm")
-		@PathVariable(value = "germplasmDbId")
-		final String germplasmDbId
+		@PathVariable(value = "germplasmDbId") final String germplasmDbId
 	) {
 
 		final Integer gid;
@@ -274,7 +260,8 @@ public class GermplasmResourceBrapi {
 					@Override
 					public List<GermplasmDTO> getResults(final PagedResult<GermplasmDTO> pagedResult) {
 						return GermplasmResourceBrapi.this.germplasmService
-							.searchGermplasmDTO(germplasmSearchRequestDTO, (currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage),
+							.searchGermplasmDTO(germplasmSearchRequestDTO,
+								(currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage),
 								(pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize));
 					}
 				});
