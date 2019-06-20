@@ -155,11 +155,6 @@ public abstract class ApiUnitTestBase {
 			return Mockito.mock(SearchRequestService.class);
 		}
 
-		@Bean
-		@Primary
-		public GermplasmService germplasmService() {
-			return Mockito.mock(GermplasmService.class);
-		}
 	}
 
 	@Before
