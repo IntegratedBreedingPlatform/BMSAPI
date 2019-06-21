@@ -240,7 +240,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers
 				.jsonPath(
 					"$.errors[0].message",
-					is(this.getMessage("variable.formula.target.not.trait", new Object[] {String.valueOf(targetTermId)}))))
+					is(this.getMessage("variable.formula.target.not.valid", new Object[] {String.valueOf(targetTermId)}))))
 		;
 
 	}

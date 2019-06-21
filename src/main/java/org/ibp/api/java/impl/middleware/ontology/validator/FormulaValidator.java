@@ -75,8 +75,8 @@ public class FormulaValidator implements Validator {
 			return;
 		}
 
-		if (!this.isTrait(targetTermId)) {
-			errors.reject("variable.formula.target.not.trait", new String[] {String.valueOf(targetTermId)}, "");
+		if (!this.isValidVariableTypeForFormula(targetTermId)) {
+			errors.reject("variable.formula.target.not.valid=", new String[] {String.valueOf(targetTermId)}, "");
 		}
 
 		// Validate inputs and set ids
@@ -99,7 +99,7 @@ public class FormulaValidator implements Validator {
 				}
 
 				input.setId(id); // it will be used to save the input
-				if (!this.isTrait(id)) {
+				if (!this.isValidVariableTypeForFormula(id)) {
 					nonTraitInputs.add(inputTerm);
 				}
 			}
@@ -148,12 +148,13 @@ public class FormulaValidator implements Validator {
 		}
 	}
 
-	private boolean isTrait(final int id) {
+	private boolean isValidVariableTypeForFormula(final int id) {
 		return Iterables.any(this.ontologyVariableDataManager.getVariableTypes(id), new Predicate<VariableType>() {
 
 			@Override
 			public boolean apply(@Nullable final VariableType variableType) {
-				return variableType.equals(VariableType.TRAIT);
+				return variableType.equals(VariableType.TRAIT) || variableType.equals(VariableType.ENVIRONMENT_DETAIL) || variableType
+					.equals(VariableType.STUDY_CONDITION);
 			}
 		});
 	}

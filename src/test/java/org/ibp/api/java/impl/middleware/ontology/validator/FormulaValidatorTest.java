@@ -98,7 +98,7 @@ public class FormulaValidatorTest {
 		this.formulaValidator.validate(formulaDto, errors);
 
 		verify(termValidator).validate(any(TermRequest.class), any(Errors.class));
-		verify(errors).reject("variable.formula.target.not.trait", new String[] {String.valueOf(formulaDto.getTarget().getId())}, "");
+		verify(errors).reject("variable.formula.target.not.valid", new String[] {String.valueOf(formulaDto.getTarget().getId())}, "");
 
 	}
 
