@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 
 public class UserMapper {
 
-	private static ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
+	private static final ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
 
-	private static Converter<Integer, String> toStatusConvert = new AbstractConverter<Integer, String>() {
+	private static final Converter<Integer, String> toStatusConvert = new AbstractConverter<Integer, String>() {
 
 		protected String convert(final Integer statusId) {
 			return statusId.equals(0) ? "true" : "false";
@@ -31,7 +31,7 @@ public class UserMapper {
 		}
 	};
 
-	private static AbstractConverter<List<CropType>, List<CropDto>> cropsConverter =
+	private static final AbstractConverter<List<CropType>, List<CropDto>> cropsConverter =
 		new AbstractConverter<List<CropType>, List<CropDto>>() {
 
 			@Override
@@ -40,23 +40,35 @@ public class UserMapper {
 			}
 		};
 
-	private static AbstractConverter<List<UserRole>, List<UserRoleDto>> userRolesConverter =
+	private static final AbstractConverter<List<UserRole>, List<UserRoleDto>> userRolesConverter =
 		new AbstractConverter<List<UserRole>, List<UserRoleDto>>() {
 
 			@Override
 			protected List<UserRoleDto> convert(final List<UserRole> source) {
-				return source.stream().map(userRole -> new UserRoleDto(userRole.getId(),
-					// TODO new UserRoleDto(UserRole)
-					new RoleDto(userRole.getRole().getId(), userRole.getRole().getName(), userRole.getRole().getDescription(),
-						userRole.getRole().getRoleType().getName(), userRole.getRole().getActive(), userRole.getRole().getEditable(),
-						userRole.getRole().getAssignable()), (userRole.getCropType() != null) ? new CropDto(userRole.getCropType()) : null,
-					(userRole.getWorkbenchProject() != null) ?
-						new ProgramDto(userRole.getWorkbenchProject().getProjectId(), userRole.getWorkbenchProject().getProjectName(),
-							new CropDto(userRole.getCropType())) : null)).collect(Collectors.toList());
+				return source.stream().map(userRole -> {
+					final Integer id = userRole.getRole().getId();
+					final String name = userRole.getRole().getName();
+					final String description = userRole.getRole().getDescription();
+					final String roleTypeName = userRole.getRole().getRoleType().getName();
+					final Boolean active = userRole.getRole().getActive();
+					final Boolean editable = userRole.getRole().getEditable();
+					final Boolean assignable = userRole.getRole().getAssignable();
+					final CropDto crop = (userRole.getCropType() != null) ? new CropDto(userRole.getCropType()) : null;
+					final Long projectId = userRole.getWorkbenchProject().getProjectId();
+					final String projectName = userRole.getWorkbenchProject().getProjectName();
+					final CropDto cropDto = new CropDto(userRole.getCropType());
+					final ProgramDto program = (userRole.getWorkbenchProject() != null) ?
+						new ProgramDto(projectId, projectName, cropDto) : null;
+					return new UserRoleDto(userRole.getId(),
+						// TODO new UserRoleDto(UserRole)
+						new RoleDto(id, name, description, roleTypeName, active, editable, assignable),
+						crop,
+						program);
+				}).collect(Collectors.toList());
 			}
 		};
 
-	private static AbstractConverter<List<PermissionDto>, Set<String>> authoritiesConverter =
+	private static final AbstractConverter<List<PermissionDto>, Set<String>> authoritiesConverter =
 		new AbstractConverter<List<PermissionDto>, Set<String>>() {
 
 			@Override
@@ -88,7 +100,7 @@ public class UserMapper {
 				this.map().setId(this.source.getUserId());
 				this.map().setUsername(this.source.getUsername());
 				this.map().setUserRoles(this.source.getUserRoles());
-				using(toStatusConvert).map().setStatus(this.source.getStatus().toString());
+				this.using(toStatusConvert).map().setStatus(this.source.getStatus().toString());
 				this.map().setEmail(this.source.getEmail());
 				this.map().setCrops(this.source.getCrops());
 			}
@@ -104,9 +116,9 @@ public class UserMapper {
 				this.map().setLastName(this.source.getPerson().getLastName());
 				this.map().setStatus(this.source.getStatus());
 				this.map().setEmail(this.source.getPerson().getEmail());
-				using(userRolesConverter).map(this.source.getRoles()).setUserRoles(null);
-				using(authoritiesConverter).map(this.source.getPermissions()).setAuthorities(null);
-				using(cropsConverter).map(this.source.getCrops()).setCrops(null);
+				this.using(userRolesConverter).map(this.source.getRoles()).setUserRoles(null);
+				this.using(authoritiesConverter).map(this.source.getPermissions()).setAuthorities(null);
+				this.using(cropsConverter).map(this.source.getCrops()).setCrops(null);
 			}
 		});
 	}

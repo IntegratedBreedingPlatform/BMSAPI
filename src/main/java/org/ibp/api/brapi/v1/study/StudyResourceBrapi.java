@@ -44,6 +44,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -166,7 +167,7 @@ public class StudyResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}", method = RequestMethod.GET)
 	public ResponseEntity<StudyDetails> getStudyDetails(@PathVariable final String crop, @PathVariable final Integer studyDbId) {
 
-		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsDto(studyDbId);
+		final StudyDetailsDto mwStudyDetails = this.studyService.getStudyDetailsForGeolocation(studyDbId);
 
 		if (mwStudyDetails != null) {
 			final StudyDetails studyDetails = new StudyDetails();
@@ -243,7 +244,7 @@ public class StudyResourceBrapi {
 
 		final FileOutputStream tempFileOutputStream = new FileOutputStream(resultFile);
 		final BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(tempFileOutputStream, 1024);
-		final OutputStreamWriter writerOutputStream = new OutputStreamWriter(bufferedOutputStream, "UTF-8");
+		final OutputStreamWriter writerOutputStream = new OutputStreamWriter(bufferedOutputStream, StandardCharsets.UTF_8);
 
 		myObjectWriter.writeValue(writerOutputStream, data);
 		return resultFile;
