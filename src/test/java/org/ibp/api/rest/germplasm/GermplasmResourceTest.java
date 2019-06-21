@@ -16,6 +16,7 @@ import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.domain.common.PagedResult;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -120,7 +121,7 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 		.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults", IsCollectionWithSize.hasSize(matchingGermplasm.size())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber", Matchers.is(1)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.pageSize", Matchers.is(1000)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageSize", Matchers.is(PagedResult.DEFAULT_PAGE_SIZE)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.totalResults", Matchers.is(1)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.firstPage", Matchers.is(true)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.lastPage", Matchers.is(true)))
