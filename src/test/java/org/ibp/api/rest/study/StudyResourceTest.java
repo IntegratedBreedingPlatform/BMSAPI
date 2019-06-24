@@ -28,6 +28,7 @@ import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.study.Observation;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
@@ -132,7 +133,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber", Matchers.is(1)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.pageSize", Matchers.is(1000)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageSize", Matchers.is(PagedResult.DEFAULT_PAGE_SIZE)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.totalResults", Matchers.is(100)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.totalPages", Matchers.is(1)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.firstPage", Matchers.is(true)))

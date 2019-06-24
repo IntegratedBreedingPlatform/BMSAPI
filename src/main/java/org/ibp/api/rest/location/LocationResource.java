@@ -44,7 +44,7 @@ public class LocationResource {
 			@RequestParam(value = "locationTypeId") final String locationTypeId, @ApiParam(
 					value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.",
 					required = false) @RequestParam(value = "pageNumber", required = false) Integer pageNumber, @ApiParam(
-					value = "Number of results to retrieve per page. Defaults to 1000 if not supplied. Max page size allowed is 10000.",
+					value = "Number of results to retrieve per page. Defaults to " + PagedResult.DEFAULT_PAGE_SIZE + " if not supplied. Max page size allowed is 10000.",
 					required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize) {
 
 		PagedResult<Location> result = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<Location>() {
