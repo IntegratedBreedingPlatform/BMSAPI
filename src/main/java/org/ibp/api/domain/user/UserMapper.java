@@ -5,8 +5,6 @@ import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.user.ProgramDto;
-import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.ibp.api.mapper.ApiMapper;
@@ -45,27 +43,7 @@ public class UserMapper {
 
 			@Override
 			protected List<UserRoleDto> convert(final List<UserRole> source) {
-				return source.stream().map(userRole -> {
-					final Integer id = userRole.getRole().getId();
-					final String name = userRole.getRole().getName();
-					final String description = userRole.getRole().getDescription();
-					final String roleTypeName = userRole.getRole().getRoleType().getName();
-					final Boolean active = userRole.getRole().getActive();
-					final Boolean editable = userRole.getRole().getEditable();
-					final Boolean assignable = userRole.getRole().getAssignable();
-					final CropDto crop = (userRole.getCropType() != null) ? new CropDto(userRole.getCropType()) : null;
-					final Long projectId = (userRole.getWorkbenchProject() != null) ? userRole.getWorkbenchProject().getProjectId() : null;
-					final String projectName =
-						(userRole.getWorkbenchProject() != null) ? userRole.getWorkbenchProject().getProjectName() : null;
-					final CropDto cropDto = (userRole.getCropType() != null) ? new CropDto(userRole.getCropType()) : null;
-					final ProgramDto program = (userRole.getWorkbenchProject() != null) ?
-						new ProgramDto(projectId, projectName, cropDto) : null;
-					return new UserRoleDto(userRole.getId(),
-						// TODO new UserRoleDto(UserRole)
-						new RoleDto(id, name, description, roleTypeName, active, editable, assignable),
-						crop,
-						program);
-				}).collect(Collectors.toList());
+				return source.stream().map(UserRoleDto::new).collect(Collectors.toList());
 			}
 		};
 
