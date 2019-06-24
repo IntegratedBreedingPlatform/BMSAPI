@@ -54,9 +54,10 @@ public class UserMapper {
 					final Boolean editable = userRole.getRole().getEditable();
 					final Boolean assignable = userRole.getRole().getAssignable();
 					final CropDto crop = (userRole.getCropType() != null) ? new CropDto(userRole.getCropType()) : null;
-					final Long projectId = userRole.getWorkbenchProject().getProjectId();
-					final String projectName = userRole.getWorkbenchProject().getProjectName();
-					final CropDto cropDto = new CropDto(userRole.getCropType());
+					final Long projectId = (userRole.getWorkbenchProject() != null) ? userRole.getWorkbenchProject().getProjectId() : null;
+					final String projectName =
+						(userRole.getWorkbenchProject() != null) ? userRole.getWorkbenchProject().getProjectName() : null;
+					final CropDto cropDto = (userRole.getCropType() != null) ? new CropDto(userRole.getCropType()) : null;
 					final ProgramDto program = (userRole.getWorkbenchProject() != null) ?
 						new ProgramDto(projectId, projectName, cropDto) : null;
 					return new UserRoleDto(userRole.getId(),
