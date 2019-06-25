@@ -232,8 +232,8 @@ public class UserServiceTest {
 	@Test
 	public void getUsersByProjectUUID() throws Exception {
 		final List<UserDto> usersDto = UserTestDataGenerator.getAllListUser();
-
-		Mockito.when(this.workbenchDataManager.getUsersByProjectUuid(projectUUID)).thenReturn(usersDto);
+		final String cropName = "maize";
+		Mockito.when(this.workbenchDataManager.getUsersByProjectUuid(projectUUID, cropName)).thenReturn(usersDto);
 		final List<UserDetailDto> userDetailDtoList = this.userServiceImpl.getUsersByProjectUUID(projectUUID);
 		assertThat(usersDto.get(0).getFirstName(), equalTo(userDetailDtoList.get(0).getFirstName()));
 		assertThat(usersDto.get(0).getLastName(), equalTo(userDetailDtoList.get(0).getLastName()));
@@ -270,7 +270,8 @@ public class UserServiceTest {
 	 */
 	@Test(expected = ApiRuntimeException.class)
 	public void getUsersByProjectUUIDErrorQuery() throws Exception {
-		Mockito.when(this.workbenchDataManager.getUsersByProjectUuid(projectUUID))
+		final String cropName = "maize";
+		Mockito.when(this.workbenchDataManager.getUsersByProjectUuid(projectUUID, cropName))
 			.thenThrow(new MiddlewareQueryException("Error in getUsersByProjectUUId()"));
 		this.userServiceImpl.getUsersByProjectUUID(projectUUID);
 	}
