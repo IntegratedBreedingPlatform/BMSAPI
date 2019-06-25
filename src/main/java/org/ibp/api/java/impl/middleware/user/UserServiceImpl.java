@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.user;
 
 import com.google.common.base.Preconditions;
 import org.generationcp.commons.security.SecurityUtil;
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -60,6 +61,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private org.generationcp.middleware.service.api.user.UserService userService;
+
+	@Autowired
+	private ContextUtil contextUtil;
 
 	@Override
 	public List<UserDetailDto> getAllUsersSortedByLastName() {
@@ -146,9 +150,9 @@ public class UserServiceImpl implements UserService {
 		final ModelMapper mapper = UserMapper.getInstance();
 
 		Preconditions.checkNotNull(projectUUID, "The projectUUID must not be empty");
-
 		try {
-			final List<UserDto> users = this.workbenchDataManager.getUsersByProjectUuid(projectUUID);
+			final String cropName = this.contextUtil.getProjectInContext().getCropType().getCropName();
+			final List<UserDto> users = this.workbenchDataManager.getUsersByProjectUuid(projectUUID, cropName);
 			Preconditions.checkArgument(!users.isEmpty(), "users don't exists for this projectUUID");
 
 			for (final UserDto userDto : users) {
