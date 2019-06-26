@@ -1,9 +1,11 @@
 package org.ibp.api.java.impl.middleware.user;
 
 import com.google.common.base.Preconditions;
+import org.generationcp.commons.security.SecurityUtil;
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.ibp.api.domain.user.UserDetailDto;
@@ -21,6 +23,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.validation.ObjectError;
@@ -55,6 +58,12 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private ResourceBundleMessageSource messageSource;
+
+	@Autowired
+	private org.generationcp.middleware.service.api.user.UserService userService;
+
+	@Autowired
+	private ContextUtil contextUtil;
 
 	@Override
 	public List<UserDetailDto> getAllUsersSortedByLastName() {
@@ -141,9 +150,9 @@ public class UserServiceImpl implements UserService {
 		final ModelMapper mapper = UserMapper.getInstance();
 
 		Preconditions.checkNotNull(projectUUID, "The projectUUID must not be empty");
-
 		try {
-			final List<UserDto> users = this.workbenchDataManager.getUsersByProjectUuid(projectUUID);
+			final String cropName = this.contextUtil.getProjectInContext().getCropType().getCropName();
+			final List<UserDto> users = this.workbenchDataManager.getUsersByProjectUuid(projectUUID, cropName);
 			Preconditions.checkArgument(!users.isEmpty(), "users don't exists for this projectUUID");
 
 			for (final UserDto userDto : users) {
@@ -158,13 +167,22 @@ public class UserServiceImpl implements UserService {
 		return result;
 	}
 
+	@Override
+	@Transactional
+	public UserDto getUserWithAuthorities(final String cropName, final String programUuid) {
+		final String userName = SecurityUtil.getLoggedInUserName();
+		final WorkbenchUser user = this.userService.getUserWithAuthorities(userName, cropName, programUuid);
+		final ModelMapper userMapper = UserMapper.getInstance();
+		return userMapper.map(user, UserDto.class);
+	}
+
 	private UserDto translateUserDetailsDtoToUserDto(final UserDetailDto user) {
 		final UserDto userdto = new UserDto();
 		userdto.setUserId(user.getId());
 		userdto.setUsername(user.getUsername());
 		userdto.setFirstName(user.getFirstName());
 		userdto.setLastName(user.getLastName());
-		userdto.setRole(new Role(user.getRole().getId(), user.getRole().getDescription()));
+		userdto.setUserRoles(user.getUserRoles());
 		userdto.setEmail(user.getEmail());
 		userdto.setStatus("true".equals(user.getStatus()) ? 0 : 1);
 		userdto.setCrops(user.getCrops());

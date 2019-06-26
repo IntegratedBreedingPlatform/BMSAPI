@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
-import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.FolderReference;
@@ -16,11 +15,13 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
@@ -81,7 +82,16 @@ public class StudyServiceImpl implements StudyService {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
+	private FieldbookService fieldbookService;
+
+	@Autowired
+	private GermplasmListManager germplasmListManager;
+
+	@Autowired
 	private ConversionService conversionService;
+
+	@Autowired
+	private DataImportService dataImportService;
 
 	@Autowired
 	private SecurityService securityService;
@@ -294,7 +304,7 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public StudyDetails getStudyDetails(final String studyId) {
 		try {
-			final Integer studyIdentifier = Integer.valueOf(studyId);
+			final int studyIdentifier = Integer.parseInt(studyId);
 			final Study study = this.studyDataManager.getStudy(studyIdentifier);
 			if (study == null) {
 				throw new ApiRuntimeException("No study identified by the supplied studyId [" + studyId + "] was found.");
@@ -351,8 +361,6 @@ public class StudyServiceImpl implements StudyService {
 				studyDetails.addTrait(trait);
 			}
 
-			final DataSet trialDataset =
-				this.studyDataManager.findOneDataSetByType(studyIdentifier, DatasetTypeEnum.SUMMARY_DATA.getId());
 			// Datasets
 			final List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(studyIdentifier);
 			if (datasetReferences != null && !datasetReferences.isEmpty()) {
@@ -364,7 +372,9 @@ public class StudyServiceImpl implements StudyService {
 					dsSummary.setDescription(dsRef.getDescription());
 					studyDetails.addDataSet(dsSummary);
 
-					if (dsRef.getId().equals(trialDataset.getId())) {
+					// FIXME : Is there a cleaner way to tell whether a DataSet is an Environment dataset?
+					if (dsRef.getName()
+							.endsWith("-ENVIRONMENT")) {
 						// Logic derived from by RepresentationDataSetQuery.loadItems(int, int) method of the GermplasmStudyBrowser,
 						// which is used to show dataset tables in the study browser UI.
 						final List<Experiment> experiments = this.studyDataManager.getExperiments(dsRef.getId(), 0, Integer.MAX_VALUE);
@@ -410,7 +420,7 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public Map<Integer, FieldMap> getFieldMap(final String studyId) {
-		return fieldMapService.getFieldMap(studyId);
+		return this.fieldMapService.getFieldMap(studyId);
 	}
 
 
@@ -434,8 +444,20 @@ public class StudyServiceImpl implements StudyService {
 		this.studyDataManager = studyDataManager;
 	}
 
+	void setFieldbookService(final FieldbookService fieldbookService) {
+		this.fieldbookService = fieldbookService;
+	}
+
+	void setGermplasmListManager(final GermplasmListManager germplasmListManager) {
+		this.germplasmListManager = germplasmListManager;
+	}
+
 	void setConversionService(final ConversionService conversionService) {
 		this.conversionService = conversionService;
+	}
+
+	void setDataImportService(final DataImportService dataImportService) {
+		this.dataImportService = dataImportService;
 	}
 
 	void setSecurityService(final SecurityService securityService) {
@@ -550,7 +572,7 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public StudyReference getStudyReference(Integer studyId) {
+	public StudyReference getStudyReference(final Integer studyId) {
 		return this.studyDataManager.getStudyReference(studyId);
 	}
 

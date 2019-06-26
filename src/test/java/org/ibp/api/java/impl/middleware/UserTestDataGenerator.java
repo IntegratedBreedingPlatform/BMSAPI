@@ -2,14 +2,19 @@ package org.ibp.api.java.impl.middleware;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.UserDto;
+import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.ibp.api.domain.user.UserDetailDto;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -93,7 +98,16 @@ public abstract class UserTestDataGenerator {
 		user.setLastName(lastName);
 
 		user.setStatus(0);
-		user.setRole(new Role(2, "Breeder"));
+		final List<UserRoleDto> userRoleDtos = new ArrayList<>();
+		final UserRoleDto userRoleDto = new UserRoleDto();
+		userRoleDto.setId(1);
+		final RoleDto roleDto = new RoleDto();
+		roleDto.setName("Breeder");
+		userRoleDto.setRole(roleDto);
+		userRoleDto.setCrop(new CropDto(new CropType("maize")));
+		userRoleDtos.add(userRoleDto);
+
+		user.setUserRoles(userRoleDtos);
 		user.setUserId(userId);
 
 		final String username = RandomStringUtils.randomAlphanumeric(30);
@@ -138,8 +152,17 @@ public abstract class UserTestDataGenerator {
 
 		final String email = RandomStringUtils.randomAlphanumeric(24);
 		user.setEmail("test" + email + "@leafnode.io");
-		
-		user.setRole(new Role(2, "Breeder"));
+
+		final List<UserRoleDto> userRoleDtos = new ArrayList<>();
+		final UserRoleDto userRoleDto = new UserRoleDto();
+		userRoleDto.setId(1);
+		final RoleDto roleDto = new RoleDto();
+		roleDto.setName("Breeder");
+		userRoleDto.setRole(roleDto);
+		userRoleDto.setCrop(new CropDto(new CropType("maize")));
+		userRoleDtos.add(userRoleDto);
+
+		user.setUserRoles(userRoleDtos);
 
 		return user;
 	}
@@ -159,7 +182,18 @@ public abstract class UserTestDataGenerator {
 		user.setFirstName(firstName);
 		user.setLastName(lastName);
 		user.setStatus("true");
-		user.setRole(new Role(2, "Breeder"));
+
+		final List<UserRoleDto> userRoleDtos = new ArrayList<>();
+		final UserRoleDto userRoleDto = new UserRoleDto();
+		userRoleDto.setId(1);
+		final RoleDto roleDto = new RoleDto();
+		roleDto.setName("Breeder");
+		userRoleDto.setRole(roleDto);
+		userRoleDto.setCrop(new CropDto(new CropType("maize")));
+		userRoleDtos.add(userRoleDto);
+
+		user.setUserRoles(userRoleDtos);
+
 		user.setId(userId);
 		user.setUsername(username);
 		return user;

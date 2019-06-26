@@ -50,7 +50,7 @@ public class UserServiceTest {
 	public void beforeEachTest() {
 		// We cannot mock resourceBundleMessageSource.getMessage because the method is marked as final.
 		// So as a workaround, use a real class instance and set setUseCodeAsDefaultMessage to true
-		messageSource.setUseCodeAsDefaultMessage(true);
+		this.messageSource.setUseCodeAsDefaultMessage(true);
 		MockitoAnnotations.initMocks(this);
 		this.userServiceImpl = new UserServiceImpl();
 		this.userServiceImpl.setWorkbenchDataManager(this.workbenchDataManager);
@@ -81,7 +81,8 @@ public class UserServiceTest {
 		assertThat(usersDto.get(0).getUserId(), equalTo(usersDtlsDto.get(0).getId()));
 		assertThat(usersDto.get(0).getEmail(), equalTo(usersDtlsDto.get(0).getEmail()));
 		assertThat("true", equalTo(usersDtlsDto.get(0).getStatus()));
-		assertThat(usersDto.get(0).getRole().getDescription(), equalTo(usersDtlsDto.get(0).getRole().getDescription()));
+		assertThat(usersDto.get(0).getUserRoles().get(0).getRole().getName(),
+			equalTo(usersDtlsDto.get(0).getUserRoles().get(0).getRole().getName()));
 	}
 
 	/**
@@ -231,8 +232,8 @@ public class UserServiceTest {
 	@Test
 	public void getUsersByProjectUUID() throws Exception {
 		final List<UserDto> usersDto = UserTestDataGenerator.getAllListUser();
-
-		Mockito.when(this.workbenchDataManager.getUsersByProjectUuid(projectUUID)).thenReturn(usersDto);
+		final String cropName = "maize";
+		Mockito.when(this.workbenchDataManager.getUsersByProjectUuid(projectUUID, cropName)).thenReturn(usersDto);
 		final List<UserDetailDto> userDetailDtoList = this.userServiceImpl.getUsersByProjectUUID(projectUUID);
 		assertThat(usersDto.get(0).getFirstName(), equalTo(userDetailDtoList.get(0).getFirstName()));
 		assertThat(usersDto.get(0).getLastName(), equalTo(userDetailDtoList.get(0).getLastName()));
@@ -240,7 +241,6 @@ public class UserServiceTest {
 		assertThat(usersDto.get(0).getUserId(), equalTo(userDetailDtoList.get(0).getId()));
 		assertThat(usersDto.get(0).getEmail(), equalTo(userDetailDtoList.get(0).getEmail()));
 		assertThat("true", equalTo(userDetailDtoList.get(0).getStatus()));
-		assertThat(usersDto.get(0).getRole().getDescription(), equalTo(userDetailDtoList.get(0).getRole().getDescription()));
 	}
 
 	/**
@@ -270,7 +270,8 @@ public class UserServiceTest {
 	 */
 	@Test(expected = ApiRuntimeException.class)
 	public void getUsersByProjectUUIDErrorQuery() throws Exception {
-		Mockito.when(this.workbenchDataManager.getUsersByProjectUuid(projectUUID))
+		final String cropName = "maize";
+		Mockito.when(this.workbenchDataManager.getUsersByProjectUuid(projectUUID, cropName))
 			.thenThrow(new MiddlewareQueryException("Error in getUsersByProjectUUId()"));
 		this.userServiceImpl.getUsersByProjectUUID(projectUUID);
 	}

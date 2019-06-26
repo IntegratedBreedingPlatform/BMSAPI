@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.role.RoleDto;
 import org.junit.Assert;
@@ -32,7 +33,7 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 		this.createTestRoles();
 		final List<Role> assignableRoles = new ArrayList<>(this.allRoles);
 		assignableRoles.remove(this.restrictedRole);
-		Mockito.doReturn(assignableRoles).when(this.workbenchDataManager).getAssignableRoles();
+		Mockito.doReturn(assignableRoles).when(this.workbenchDataManager).getRoles(new RoleSearchDto(Boolean.TRUE, null));
 		Mockito.doReturn(this.allRoles).when(this.workbenchDataManager).getAllRoles();
 	}
 	
@@ -40,14 +41,6 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 	public void testGetAllRoles() throws Exception {
 		final List<RoleDto> allRoles = this.roleServiceImpl.getAllRoles();
 		Assert.assertEquals(this.allRoles.size(), allRoles.size());
-	}
-	
-	@Test
-	public void testGetAssignableRoles() throws Exception {
-		final List<RoleDto> roles = this.roleServiceImpl.getAssignableRoles();
-		Mockito.verify(this.workbenchDataManager).getAssignableRoles();
-		Assert.assertEquals(this.allRoles.size() - 1, roles.size());
-		Assert.assertFalse(roles.contains(this.restrictedRole));
 	}
 
 	private void createTestRoles() {

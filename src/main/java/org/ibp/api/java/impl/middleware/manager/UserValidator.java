@@ -7,6 +7,7 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.slf4j.Logger;
@@ -71,7 +72,7 @@ public class UserValidator implements Validator {
 	
 	private Role superAdminRole;
 
-	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
+	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}
 
@@ -80,7 +81,7 @@ public class UserValidator implements Validator {
 	}
 
 	@Override
-	public boolean supports(Class<?> aClass) {
+	public boolean supports(final Class<?> aClass) {
 		return UserDetailDto.class.equals(aClass);
 	}
 
@@ -90,7 +91,7 @@ public class UserValidator implements Validator {
 	}
 
 	public void validate(final Object o, final Errors errors, final boolean createUser) {
-		UserDetailDto user = (UserDetailDto) o;
+		final UserDetailDto user = (UserDetailDto) o;
 		this.retrieveSuperAdminRole();
 
 		this.validateFieldLength(errors, user.getFirstName(), FIRST_NAME, FIRST_NAME_STR, 20);
@@ -99,7 +100,7 @@ public class UserValidator implements Validator {
 		this.validateFieldLength(errors, user.getEmail(), EMAIL, EMAIL_STR, 40);
 		this.validateFieldLength(errors, user.getStatus(), STATUS, STATUS_STR, 11);
 
-		this.validateUserRole(errors, user.getRole());
+		this.validateUserRoles(errors, user.getUserRoles());
 		this.validateEmailFormat(errors, user.getEmail());
 
 		this.validateUserStatus(errors, user.getStatus());
@@ -125,18 +126,18 @@ public class UserValidator implements Validator {
 		}
 	}
 
-	private void validateUserUpdate(Errors errors, UserDetailDto user) {
+	private void validateUserUpdate(final Errors errors, final UserDetailDto user) {
 		WorkbenchUser userUpdate = null;
 		if (null == errors.getFieldError(USER_ID)) {
 			try {
 				userUpdate = this.workbenchDataManager.getUserById(user.getId());
-			} catch (MiddlewareQueryException e) {
+			} catch (final MiddlewareQueryException e) {
 				errors.rejectValue(USER_ID, DATABASE_ERROR);
 				LOG.error(e.getMessage(), e);
 			}
 
 			if (userUpdate != null) {
-				final Role userRole = userUpdate.getRoles().get(0).getRole();
+				final Role userRole = (!userUpdate.getRoles().isEmpty()) ? userUpdate.getRoles().get(0).getRole() : null;
 				if (this.isSuperAdminRole(userRole)){
 					errors.reject(CANNOT_UPDATE_SUPERADMIN);
 				}
@@ -189,8 +190,8 @@ public class UserValidator implements Validator {
 
 	// Match by either "SUPERADMIN" description or by id of superadmin role from database
 	boolean isSuperAdminRole(final Role role) {
-		return Role.SUPERADMIN.equals(role.getCapitalizedRole())
-				|| (this.superAdminRole != null && this.superAdminRole.getId().equals(role.getId()));
+		return (role != null) && (Role.SUPERADMIN.equals(role.getCapitalizedRole())
+			|| (this.superAdminRole != null && this.superAdminRole.getId().equals(role.getId())));
 	}
 
 	private void validateUserId(final Errors errors, final Integer userId) {
@@ -224,7 +225,7 @@ public class UserValidator implements Validator {
 			if (null == errors.getFieldError(USERNAME) && this.workbenchDataManager.isUsernameExists(userName)) {
 				errors.rejectValue(USERNAME, SIGNUP_FIELD_USERNAME_EXISTS, new String[] {userName}, null);
 			}
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			errors.rejectValue(USERNAME, DATABASE_ERROR);
 			LOG.error(e.getMessage(), e);
 		}
@@ -235,20 +236,21 @@ public class UserValidator implements Validator {
 			if (null == errors.getFieldError(EMAIL) && this.workbenchDataManager.isPersonWithEmailExists(eMail)) {
 				errors.rejectValue(EMAIL, SIGNUP_FIELD_EMAIL_EXISTS);
 			}
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			errors.rejectValue(EMAIL, DATABASE_ERROR);
 			LOG.error(e.getMessage(), e);
 		}
 	}
 
-    protected void validateUserRole(final Errors errors, final Role role) {
-		if (null == role) {
-            errors.rejectValue(ROLE, SIGNUP_FIELD_INVALID_ROLE);
-		} else if (this.isSuperAdminRole(role)) {
-			errors.reject(CANNOT_ASSIGN_SUPERADMIN_ROLE);
-		} else {
-	        this.validateFieldLength(errors, role.getDescription(), ROLE, ROLE_STR, 30);
-		} 
+	protected void validateUserRoles(final Errors errors, final List<UserRoleDto> userRoles) {
+		//TODO Reimplement based on new business rules
+		//		if (null == role) {
+		//            errors.rejectValue(ROLE, SIGNUP_FIELD_INVALID_ROLE);
+		//		} else if (this.isSuperAdminRole(role)) {
+		//			errors.reject(CANNOT_ASSIGN_SUPERADMIN_ROLE);
+		//		} else {
+		//	        this.validateFieldLength(errors, role.getName(), ROLE, ROLE_STR, 30);
+		//		}
 
     }
     
@@ -260,7 +262,7 @@ public class UserValidator implements Validator {
 	}
 
 	
-	public void setSuperAdminRole(Role superAdminRole) {
+	public void setSuperAdminRole(final Role superAdminRole) {
 		this.superAdminRole = superAdminRole;
 	}
 }

@@ -2,8 +2,6 @@ package org.ibp.api.domain.user;
 
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
-import org.ibp.api.domain.user.UserDetailDto;
-import org.ibp.api.domain.user.UserMapper;
 import org.ibp.api.java.impl.middleware.user.UserServiceTest;
 import org.junit.Test;
 import org.modelmapper.ModelMapper;
@@ -24,7 +22,7 @@ public class UserMapperTest extends UserServiceTest {
 		assertThat(userDto.getLastName(), equalTo(userDetailDto.getLastName()));
 		assertThat(userDto.getUserId(), equalTo(userDetailDto.getId()));
 		assertThat(userDto.getUsername(), equalTo(userDetailDto.getUsername()));
-		assertThat(userDto.getRole().getDescription(), equalTo(userDetailDto.getRole().getDescription()));
+		assertThat(userDto.getUserRoles().get(0).getId(), equalTo(userDetailDto.getUserRoles().get(0).getId()));
 		assertThat((userDto.getStatus() == 0 ? "true" : "false"), equalTo(userDetailDto.getStatus()));
 		assertThat(userDto.getEmail(), equalTo(userDetailDto.getEmail()));
 
