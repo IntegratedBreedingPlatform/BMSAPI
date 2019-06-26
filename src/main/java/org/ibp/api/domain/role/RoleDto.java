@@ -1,15 +1,17 @@
 package org.ibp.api.domain.role;
 
+import org.generationcp.middleware.pojos.workbench.Role;
+
 public class RoleDto {
 
 	private int id;
 
 	private String name;
 
-	public RoleDto(int id, String name) {
+	public RoleDto(final Role role) {
 		super();
-		this.id = id;
-		this.name = name;
+		this.id = role.getId();
+		this.name = role.getName();
 	}
 
 	public int getId() {

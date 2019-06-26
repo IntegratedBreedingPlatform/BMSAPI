@@ -8,23 +8,22 @@ import org.ibp.api.java.role.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RoleServiceImpl implements RoleService {
-	
+
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Override
 	public List<RoleDto> getRoles(final RoleSearchDto roleSearchDto) {
-		final List<RoleDto> roles = new ArrayList<RoleDto>();
 
-		final List<Role> assignableRoles = this.workbenchDataManager.getRoles(roleSearchDto);
-		for (final Role role : assignableRoles) {
-			roles.add(new RoleDto(role.getId(), role.getName()));
-		}
+		final List<Role> filteredRoles = this.workbenchDataManager.getRoles(roleSearchDto);
+		final List<RoleDto> roles = filteredRoles.stream()
+			.map(role -> new RoleDto(role))
+			.collect(Collectors.toList());
 
 		return roles;
 	}
