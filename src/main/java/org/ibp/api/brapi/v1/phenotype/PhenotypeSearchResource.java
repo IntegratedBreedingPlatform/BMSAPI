@@ -5,6 +5,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
+import  org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
@@ -39,6 +40,10 @@ public class PhenotypeSearchResource {
 	public ResponseEntity<PhenotypeSearchSummariesDto> searchPhenotypes(@PathVariable final String crop,
 		@RequestBody final PhenotypeSearchRequestDTO requestDTO) {
 
+		final DatasetTypeEnum datasetType = DatasetTypeEnum.getByName(requestDTO.getObservationLevel().toUpperCase());
+		if(datasetType != null) {
+			requestDTO.setObservationLevel(Integer.toString(datasetType.getId()));
+		}
 
 		final PagedResult<PhenotypeSearchDTO> resultPage =
 			new PaginatedSearch().executeBrapiSearch(requestDTO.getPage(), requestDTO.getPageSize(), new SearchSpec<PhenotypeSearchDTO>() {
