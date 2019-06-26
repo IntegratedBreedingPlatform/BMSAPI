@@ -1,16 +1,8 @@
 
 package org.ibp.api.java.impl.middleware.program;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramDetailsDto;
@@ -22,6 +14,13 @@ import org.ibp.api.java.program.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -53,7 +52,7 @@ public class ProgramServiceImpl implements ProgramService {
 					final WorkbenchUser programUser = this.workbenchDataManager.getUserById(workbenchProgram.getUserId());
 					programSummary.setCreatedBy(programUser.getName());
 
-					final List<WorkbenchUser> allProgramMembers = this.workbenchDataManager.getUsersByProjectId(workbenchProgram.getProjectId());
+					final List<WorkbenchUser> allProgramMembers = this.workbenchDataManager.getUsersByProjectId(workbenchProgram.getProjectId(), workbenchProgram.getCropType().getCropName());
 					final Set<String> members = new HashSet<>();
 					for (final WorkbenchUser member : allProgramMembers) {
 						members.add(member.getName());
@@ -96,7 +95,7 @@ public class ProgramServiceImpl implements ProgramService {
 	@Override
 	public ProgramSummary getByUUIDAndCrop(final String crop, final String programUUID) {
 		try {
-			Project workbenchProgram = this.workbenchDataManager.getProjectByUuidAndCrop(programUUID, crop);
+			final Project workbenchProgram = this.workbenchDataManager.getProjectByUuidAndCrop(programUUID, crop);
 			if (workbenchProgram != null) {
 				final ProgramSummary programSummary = new ProgramSummary();
 				programSummary.setId(workbenchProgram.getProjectId().toString());
@@ -108,7 +107,7 @@ public class ProgramServiceImpl implements ProgramService {
 				programSummary.setCreatedBy(programUser.getName());
 
 				final List<WorkbenchUser> allProgramMembers =
-						this.workbenchDataManager.getUsersByProjectId(workbenchProgram.getProjectId());
+						this.workbenchDataManager.getUsersByProjectId(workbenchProgram.getProjectId(), workbenchProgram.getCropType().getCropName());
 				final Set<String> members = new HashSet<>();
 				for (final WorkbenchUser member : allProgramMembers) {
 					members.add(member.getName());
