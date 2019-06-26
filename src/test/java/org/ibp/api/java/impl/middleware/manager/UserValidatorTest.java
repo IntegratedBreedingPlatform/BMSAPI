@@ -51,7 +51,6 @@ public class UserValidatorTest {
 		this.uservalidator.setWorkbenchDataManager(this.workbenchDataManager);
 		this.uservalidator.setSecurityService(this.securityService);
 
-		Mockito.doReturn(this.createTestRoles()).when(this.workbenchDataManager).getAllRoles();
 		// TODO test validate crops
 		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectsByUser(ArgumentMatchers.any(WorkbenchUser.class));
 	}

@@ -23,19 +23,11 @@ public class RoleResource {
 	@Autowired
 	private RoleService roleService;
 
-	@ApiOperation(value = "List all roles", notes = "List all roles in this deployment instance of BMSAPI. ")
-	@RequestMapping(value = "/roles", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<List<RoleDto>> listRoles() {
-		return new ResponseEntity<>(this.roleService.getAllRoles(), HttpStatus.OK);
-	}
-
 	@ApiOperation(value = "Filter roles", notes = "Filter roles")
 	@RequestMapping(value = "/roles/search", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<List<RoleDto>> getFilteredRoles(@RequestBody final RoleSearchDto searchDTO) {
 		return new ResponseEntity<>(this.roleService.getRoles(searchDTO), HttpStatus.OK);
 	}
-
 
 }

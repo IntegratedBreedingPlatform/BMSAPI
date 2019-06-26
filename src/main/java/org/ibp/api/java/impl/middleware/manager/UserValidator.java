@@ -92,7 +92,8 @@ public class UserValidator implements Validator {
 
 	public void validate(final Object o, final Errors errors, final boolean createUser) {
 		final UserDetailDto user = (UserDetailDto) o;
-		this.retrieveSuperAdminRole();
+		// TODO Should be replaced by assignable check
+		//		this.retrieveSuperAdminRole();
 
 		this.validateFieldLength(errors, user.getFirstName(), FIRST_NAME, FIRST_NAME_STR, 20);
 		this.validateFieldLength(errors, user.getLastName(), LAST_NAME, LAST_NAME_STR, 50);
@@ -115,15 +116,6 @@ public class UserValidator implements Validator {
 			this.validateUserUpdate(errors, user);
 		}
 
-	}
-
-	private void retrieveSuperAdminRole() {
-		final List<Role> allRoles = this.workbenchDataManager.getAllRoles();
-		for (final Role role : allRoles) {
-			if (this.isSuperAdminRole(role)){
-				this.superAdminRole = role;
-			} 
-		}
 	}
 
 	private void validateUserUpdate(final Errors errors, final UserDetailDto user) {
