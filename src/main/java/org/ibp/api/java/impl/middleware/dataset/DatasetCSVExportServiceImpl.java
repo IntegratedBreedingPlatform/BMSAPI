@@ -52,16 +52,16 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	@Override
 	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
 
-		final DatasetDTO dataSetDTO = this.datasetService.getDataset(datasetId);
+		final DatasetDTO datasetDTO = this.datasetService.getDataset(datasetId);
 		final List<Integer> subObsDatasetTypeIds = this.datasetTypeService.getSubObservationDatasetTypeIds();
 		final int environmentDatasetId =
 			this.studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getId();
 		final int plotDatasetId;
 
-		if (DatasetTypeEnum.PLOT_DATA.getId() == dataSetDTO.getDatasetTypeId()) {
-			plotDatasetId = dataSetDTO.getDatasetId();
+		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
+			plotDatasetId = datasetDTO.getDatasetId();
 		} else {
-			plotDatasetId = dataSetDTO.getParentDatasetId();
+			plotDatasetId = datasetDTO.getParentDatasetId();
 		}
 
 		final List<MeasurementVariable> studyVariables = this.datasetService
@@ -105,7 +105,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		allVariables.addAll(plotDataSetColumns);
 
 		//Add variables that are specific to the sub-observation dataset types
-		if (Arrays.stream(subObsDatasetTypeIds.toArray()).anyMatch(dataSetDTO.getDatasetTypeId()::equals)) {
+		if (Arrays.stream(subObsDatasetTypeIds.toArray()).anyMatch(datasetDTO.getDatasetTypeId()::equals)) {
 			final List<MeasurementVariable> subObservationSetColumns =
 				this.datasetService
 					.getObservationSetVariables(datasetId, Lists.newArrayList(

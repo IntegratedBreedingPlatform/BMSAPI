@@ -153,7 +153,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 		final List<Integer> subObsDatasetTypeIds = this.datasetTypeService.getSubObservationDatasetTypeIds();
 
 		final int plotDatasetId;
-		if (DatasetTypeEnum.PLOT_DATA.getId() == dataSetDTO.getDatasetTypeId()) {
+		if (dataSetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			plotDatasetId = dataSetDTO.getDatasetId();
 		} else {
 			plotDatasetId = dataSetDTO.getParentDatasetId();
