@@ -250,6 +250,10 @@ public class DatasetCSVExportServiceImplTest {
 
 	@Test
 	public void testGetColumns() {
+		List<Integer> subObsTypeIds = new ArrayList<>();
+		subObsTypeIds.add(5);
+		when(this.datasetTypeService.getSubObservationDatasetTypeIds()).thenReturn(subObsTypeIds);
+
 		this.datasetExportService.getColumns(1, 1);
 		Mockito.verify(this.datasetService).getDataset(1);
 		Mockito.verify(this.studyDataManager).getDataSetsByType(1, DatasetTypeEnum.SUMMARY_DATA.getId());
