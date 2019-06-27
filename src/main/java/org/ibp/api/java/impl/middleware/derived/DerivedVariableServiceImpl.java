@@ -115,17 +115,11 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 				inputVariableDatasetMap);
 
 		// Iterate through the observations for each instances
-		for (final Map.Entry<Integer, List<ObservationUnitRow>> entryInstanceIdObservationUnitRows : instanceIdObservationUnitRowsMap
-			.entrySet()) {
-
-
-			final Set<String> instanceInputMissingData = new HashSet<>();
-			final int geoLocationId = entryInstanceIdObservationUnitRows.getKey();
-
-			for (final ObservationUnitRow observation : entryInstanceIdObservationUnitRows.getValue()) {
+		for (final List<ObservationUnitRow> observations : instanceIdObservationUnitRowsMap.values()) {
+			for (final ObservationUnitRow observation : observations) {
 
 				// Get input data
-				final Set<String> rowInputMissingData = new HashSet<>(instanceInputMissingData);
+				final Set<String> rowInputMissingData = new HashSet<>();
 				try {
 					// Fill parameters with input variable values from the current level if there's any.
 					DerivedVariableUtils.extractValues(parameters, observation, measurementVariablesMap, rowInputMissingData);
