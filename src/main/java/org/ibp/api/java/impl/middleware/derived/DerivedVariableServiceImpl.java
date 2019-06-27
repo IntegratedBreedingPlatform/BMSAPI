@@ -88,7 +88,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		this.derivedVariableValidator.validate(variableId, geoLocationIds);
-		// this.derivedVariableValidator.verifyMissingInputVariables(variableId, datasetId);
+		this.derivedVariableValidator.verifyMissingInputVariables(variableId, datasetId);
 
 		// Get the list of observation unit rows grouped by intances
 		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap =
@@ -106,10 +106,6 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		// Calculate
 		final Set<String> inputMissingData = new HashSet<>();
 
-		// Retrieve ENVIRONMENT_DETAIL and STUDY_CONDITION input variables' data from summary (environment) level.
-		final Map<Integer, Map<String, Object>> valuesFromSummaryObservation =
-			this.middlewareDerivedVariableService.getValuesFromSummaryObservation(studyId);
-
 		// TODO: What if the calculated variable is executed from SubObservation Level???
 		// Retrieve TRAIT input variables' data from sub-observation level. Aggregate values are grouped by plot observation's experimentId
 		final Map<Integer, Map<String, List<Object>>> valuesFromSubObservation =
@@ -125,16 +121,6 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 			final Set<String> instanceInputMissingData = new HashSet<>();
 			final int geoLocationId = entryInstanceIdObservationUnitRows.getKey();
-
-			try {
-				// Fill parameters with input variable values from the environment level if there's any.
-				this.fillWithEnvironmentLevelValues(parameters, geoLocationId, valuesFromSummaryObservation, measurementVariablesMap,
-					instanceInputMissingData);
-			} catch (ParseException e) {
-				LOG.error("Error parsing date value for parameters " + parameters, e);
-				errors.reject(STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION);
-				throw new ApiRequestValidationException(errors.getAllErrors());
-			}
 
 			for (final ObservationUnitRow observation : entryInstanceIdObservationUnitRows.getValue()) {
 
@@ -227,22 +213,6 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		}
 
 		return results;
-
-	}
-
-	private void fillWithEnvironmentLevelValues(final Map<String, Object> parameters, final int geoLocationId,
-		final Map<Integer, Map<String, Object>> valuesFromSummaryObservation,
-		final Map<Integer, MeasurementVariable> measurementVariablesMap,
-		final Set<String> rowInputMissingData) throws ParseException {
-
-		for (final Map.Entry<String, Object> entry : valuesFromSummaryObservation.get(geoLocationId).entrySet()) {
-			final Integer variableId = Integer.valueOf(entry.getKey());
-			final MeasurementVariable measurementVariable = measurementVariablesMap.get(variableId);
-			final String termKey = DerivedVariableUtils.wrapTerm(entry.getKey());
-			if (parameters.containsKey(termKey)) {
-				parameters.put(termKey, DerivedVariableUtils.parseValue(entry.getValue(), measurementVariable, rowInputMissingData));
-			}
-		}
 
 	}
 
