@@ -86,7 +86,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		this.studyValidator.validate(studyId, false);
-		this.datasetValidator.validateDataset(studyId, datasetId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		this.derivedVariableValidator.validate(variableId, geoLocationIds);
 		this.derivedVariableValidator.verifyMissingInputVariables(variableId, datasetId);
 

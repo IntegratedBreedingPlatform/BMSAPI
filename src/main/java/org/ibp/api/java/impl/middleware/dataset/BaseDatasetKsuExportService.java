@@ -13,6 +13,7 @@ import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.service.api.MethodService;
@@ -149,22 +150,32 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 	@Override
 	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
 		final DatasetDTO dataSetDTO = this.datasetService.getDataset(datasetId);
-		final int plotDatasetId = dataSetDTO.getParentDatasetId();
+		final List<Integer> subObsDatasetTypeIds = this.datasetTypeService.getSubObservationDatasetTypeIds();
+
+		final int plotDatasetId;
+		if (dataSetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
+			plotDatasetId = dataSetDTO.getDatasetId();
+		} else {
+			plotDatasetId = dataSetDTO.getParentDatasetId();
+		}
 
 		final List<MeasurementVariable> plotDataSetColumns =
 			this.datasetService
 				.getObservationSetVariables(plotDatasetId,
 					Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 						VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId()));
-		final List<MeasurementVariable> subObservationSetColumns =
-			this.datasetService
-				.getObservationSetVariables(datasetId, Lists.newArrayList(
-					VariableType.GERMPLASM_DESCRIPTOR.getId(),
-					VariableType.OBSERVATION_UNIT.getId()));
 
 		final List<MeasurementVariable> allVariables = new ArrayList<>();
 		allVariables.addAll(plotDataSetColumns);
-		allVariables.addAll(subObservationSetColumns);
+		//Add variables that are specific to the sub-observation dataset types
+		if (Arrays.stream(subObsDatasetTypeIds.toArray()).anyMatch(dataSetDTO.getDatasetTypeId()::equals)) {
+			final List<MeasurementVariable> subObservationSetColumns =
+				this.datasetService
+					.getObservationSetVariables(datasetId, Lists.newArrayList(
+						VariableType.GERMPLASM_DESCRIPTOR.getId(),
+						VariableType.OBSERVATION_UNIT.getId()));
+			allVariables.addAll(subObservationSetColumns);
+		}
 		return this.moveSelectedVariableInTheFirstColumn(allVariables, TermId.OBS_UNIT_ID.getId());
 	}
 
