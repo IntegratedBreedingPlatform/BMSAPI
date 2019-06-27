@@ -27,8 +27,8 @@ public class PagedResult<T> {
 	private String sortBy;
 	private String sortOrder;
 
-	public static final int MAX_PAGE_SIZE = 200;
-	public static final int DEFAULT_PAGE_SIZE = 100;
+	public static final int MAX_PAGE_SIZE = 10000;
+	public static final int DEFAULT_PAGE_SIZE = 1000;
 	public static final int DEFAULT_PAGE_NUMBER = 1;
 
 	public static final String CURRENT_PAGE_DESCRIPTION = "Page number to retrieve in case of multi paged results. Defaults to "
