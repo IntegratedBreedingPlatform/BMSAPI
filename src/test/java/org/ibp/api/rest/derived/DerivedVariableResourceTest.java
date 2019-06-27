@@ -61,6 +61,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 
 		verify(this.derivedVariableService)
 			.execute(100, 102, calculateVariableRequest.getVariableId(), calculateVariableRequest.getGeoLocationIds(),
+				calculateVariableRequest.getInputVariableDatasetMap(),
 				calculateVariableRequest.isOverwriteExistingData());
 
 	}
@@ -79,6 +80,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 
 		when(this.derivedVariableService
 			.execute(100, 102, calculateVariableRequest.getVariableId(), calculateVariableRequest.getGeoLocationIds(),
+				calculateVariableRequest.getInputVariableDatasetMap(),
 				calculateVariableRequest.isOverwriteExistingData())).thenThrow(exception);
 
 		this.mockMvc
@@ -107,6 +109,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 
 		when(this.derivedVariableService
 			.execute(100, 102, calculateVariableRequest.getVariableId(), calculateVariableRequest.getGeoLocationIds(),
+				calculateVariableRequest.getInputVariableDatasetMap(),
 				calculateVariableRequest.isOverwriteExistingData())).thenThrow(exception);
 
 		this.mockMvc

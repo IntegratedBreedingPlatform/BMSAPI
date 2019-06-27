@@ -39,7 +39,8 @@ public class DerivedVariableResource {
 		try {
 			final Map<String, Object> result =
 				this.derivedVariableService
-					.execute(studyId, datasetId, request.getVariableId(), request.getGeoLocationIds(), request.isOverwriteExistingData());
+					.execute(studyId, datasetId, request.getVariableId(), request.getGeoLocationIds(), request.getInputVariableDatasetMap(),
+						request.isOverwriteExistingData());
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (final OverwriteDataException e2) {
 			final Map<String, Object> result = new HashMap<>();

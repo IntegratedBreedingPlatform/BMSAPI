@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
@@ -78,6 +79,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	@Override
 	public Map<String, Object> execute(
 		final int studyId, final int datasetId, final Integer variableId, final List<Integer> geoLocationIds,
+		final Map<Integer, Integer> inputVariableDatasetMap,
 		final boolean overwriteExistingData) {
 
 		final Map<String, Object> results = new HashMap<>();
@@ -103,13 +105,36 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		// Calculate
 		final Set<String> inputMissingData = new HashSet<>();
 
+
+		// Retrieve ENVIRONMENT_DETAIL and STUDY_CONDITION input variables' data from summary (environment) level.
+		final Map<Integer, Map<String, Object>> valuesFromSummaryObservation =
+			this.middlewareDerivedVariableService.getValuesFromSummaryObservation(studyId);
+
+		// TODO: What if the calculated variable is executed from SubObservation Level???
+		// Retrieve TRAIT input variables' data from sub-observation level. Aggregate values are grouped by plot observation's experimentId
+		final Map<Integer, Map<String, List<Object>>> valuesFromSubObservation =
+			this.middlewareDerivedVariableService.getValuesFromObservations(studyId, Arrays
+					.asList(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(),
+						DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId(), DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId()),
+				inputVariableDatasetMap);
+
 		// Iterate through the observations for each instances
-		for (final List<ObservationUnitRow> observations : instanceIdObservationUnitRowsMap.values()) {
-			for (final ObservationUnitRow observation : observations) {
+		for (final Map.Entry<Integer, List<ObservationUnitRow>> entryInstanceIdObservationUnitRows : instanceIdObservationUnitRowsMap
+			.entrySet()) {
+
+			final int geoLocationId = entryInstanceIdObservationUnitRows.getKey();
+			for (final Map.Entry<String, Object> entry : valuesFromSummaryObservation.get(geoLocationId).entrySet()) {
+				final String termKey = DerivedVariableUtils.wrapTerm(entry.getKey());
+				// TODO: Determine the datatype and convert the value appropriately
+				parameters.put(termKey, entry.getValue());
+			}
+
+			for (final ObservationUnitRow observation : entryInstanceIdObservationUnitRows.getValue()) {
 
 				// Get input data
 				final Set<String> rowInputMissingData = new HashSet<>();
 				try {
+					// Fill parameter with input variable values from the current level if there's any.
 					DerivedVariableUtils.extractValues(parameters, observation, measurementVariablesMap, rowInputMissingData);
 				} catch (ParseException e) {
 					LOG.error("Error parsing date value for parameters " + parameters, e);
@@ -117,6 +142,18 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				}
 				inputMissingData.addAll(rowInputMissingData);
+
+				// Assign the aggregate values from subobservation level to the processor
+				final Map<String, List<Object>> variableAggregateValuesMap = new HashMap<>();
+				for (final Map.Entry<String, List<Object>> entry : valuesFromSubObservation.get(observation.getObservationUnitId())
+					.entrySet()) {
+					final String termKey = DerivedVariableUtils.wrapTerm(entry.getKey());
+					// TODO: Determine the datatype and convert the value appropriately
+					variableAggregateValuesMap.put(termKey, entry.getValue());
+					// If input variable is in sub-observation and has values, remove it from rowParameters map.
+				}
+				// Aggregate values from subobservation should be passed to processor.setData() not in rowParameters.
+				this.processor.setData(variableAggregateValuesMap);
 
 				if (!rowInputMissingData.isEmpty() || parameters.values().contains("")) {
 					continue;
@@ -224,7 +261,5 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	protected void setResourceBundleMessageSource(final ResourceBundleMessageSource resourceBundleMessageSource) {
 		this.resourceBundleMessageSource = resourceBundleMessageSource;
 	}
-
-
 
 }

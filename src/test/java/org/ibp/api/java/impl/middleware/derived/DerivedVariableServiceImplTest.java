@@ -74,6 +74,7 @@ public class DerivedVariableServiceImplTest {
 	public static final int STUDY_ID = RandomUtils.nextInt();
 	public static final int DATASET_ID = RandomUtils.nextInt();
 	public static final List<Integer> GEO_LOCATION_IDS = new ArrayList<>();
+	private Map<Integer, Integer> inputVariableDatasetMap;
 
 	@Mock
 	private DatasetService middlwareDatasetService;
@@ -127,7 +128,8 @@ public class DerivedVariableServiceImplTest {
 	public void testExecute() {
 
 		final Map<String, Object> result =
-			this.derivedVariableService.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, true);
+			this.derivedVariableService
+				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, inputVariableDatasetMap, true);
 
 		verify(this.studyValidator).validate(STUDY_ID, false);
 		verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, true);
@@ -168,7 +170,8 @@ public class DerivedVariableServiceImplTest {
 
 			// Set overwriteExistingData to false so that the system will throw a runtime exception that will prevent
 			// the calculated data from overwriting the existing data
-			this.derivedVariableService.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, false);
+			this.derivedVariableService
+				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, inputVariableDatasetMap, false);
 
 			fail("Should throw OverwriteDataException");
 
@@ -205,7 +208,8 @@ public class DerivedVariableServiceImplTest {
 			.thenReturn(instanceIdObservationUnitRowsMap);
 
 		final Map<String, Object> result =
-			this.derivedVariableService.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, true);
+			this.derivedVariableService
+				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, inputVariableDatasetMap, true);
 
 		verify(this.studyValidator).validate(STUDY_ID, false);
 		verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, true);
@@ -244,7 +248,8 @@ public class DerivedVariableServiceImplTest {
 			.thenReturn(instanceIdObservationUnitRowsMap);
 
 		try {
-			this.derivedVariableService.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, false);
+			this.derivedVariableService
+				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, inputVariableDatasetMap, false);
 			fail("Should throw ApiRequestValidationException");
 		} catch (final ApiRequestValidationException e) {
 
@@ -268,7 +273,8 @@ public class DerivedVariableServiceImplTest {
 		when(this.formulaService.getByTargetId(TARGET_VARIABLE_TERMID)).thenReturn(Optional.of(invalidFormula));
 
 		try {
-			this.derivedVariableService.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, false);
+			this.derivedVariableService
+				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, inputVariableDatasetMap, false);
 			fail("Should throw ApiRequestValidationException");
 		} catch (final ApiRequestValidationException e) {
 
@@ -298,7 +304,8 @@ public class DerivedVariableServiceImplTest {
 			.thenReturn(instanceIdObservationUnitRowsMap);
 
 		final Map<String, Object> result =
-			this.derivedVariableService.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, true);
+			this.derivedVariableService
+				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, inputVariableDatasetMap, true);
 
 		verify(this.studyValidator).validate(STUDY_ID, false);
 		verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, true);
