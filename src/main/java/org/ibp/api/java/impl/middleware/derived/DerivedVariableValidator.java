@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.dataset.DatasetService;
@@ -32,6 +33,9 @@ public class DerivedVariableValidator {
 	@Resource
 	private DatasetService datasetService;
 
+	@Resource
+	private DerivedVariableService middlewareDerivedVariableService;
+
 	public void validate(final Integer variableId, final List<Integer> geoLocationIds) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
@@ -49,18 +53,19 @@ public class DerivedVariableValidator {
 
 	}
 
-	public void verifyMissingInputVariables(final Integer variableId, final Integer datasetId) {
+	public void verifyInputVariablesArePresentInStudy(final Integer variableId, final Integer studyId) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
 		if (formulaOptional.isPresent()) {
 
-			// Verify that variables are present
-			final Set<Integer> variableIdsOfTraitsInStudy = getVariableIdsOfTraitsInDataset(datasetId);
+			// Verify that Environment Detail, Study Condition and Trait variables are present in study
+			final Set<Integer> variableIds =
+				this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMap(studyId).keySet();
 			final Set<String> inputMissingVariables = new HashSet<>();
 			for (final FormulaVariable formulaVariable : formulaOptional.get().getInputs()) {
-				if (!variableIdsOfTraitsInStudy.contains(formulaVariable.getId())) {
+				if (!variableIds.contains(formulaVariable.getId())) {
 					inputMissingVariables.add(formulaVariable.getName());
 				}
 			}
@@ -72,22 +77,6 @@ public class DerivedVariableValidator {
 			}
 
 		}
-
-	}
-
-	protected Set<Integer> getVariableIdsOfTraitsInDataset(final int datasetId) {
-
-		final Set<Integer> variableIdsOfTraitsInDataset = new HashSet<>();
-		final List<MeasurementVariable> traits =
-			datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()));
-
-		if (!traits.isEmpty()) {
-			for (final MeasurementVariable trait : traits) {
-				variableIdsOfTraitsInDataset.add(trait.getTermId());
-			}
-		}
-
-		return variableIdsOfTraitsInDataset;
 
 	}
 

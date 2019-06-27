@@ -134,7 +134,7 @@ public class DerivedVariableServiceImplTest {
 		verify(this.studyValidator).validate(STUDY_ID, false);
 		verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, false);
 		verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
-		verify(this.derivedVariableValidator).verifyMissingInputVariables(TARGET_VARIABLE_TERMID, DATASET_ID);
+		verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, STUDY_ID);
 
 		final ArgumentCaptor<String> captureValue = ArgumentCaptor.forClass(String.class);
 		final ArgumentCaptor<Integer> captureCategoricalId = ArgumentCaptor.forClass(Integer.class);
@@ -180,7 +180,7 @@ public class DerivedVariableServiceImplTest {
 			verify(this.studyValidator).validate(STUDY_ID, false);
 			verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, false);
 			verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
-			verify(this.derivedVariableValidator).verifyMissingInputVariables(TARGET_VARIABLE_TERMID, DATASET_ID);
+			verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, STUDY_ID);
 
 			final ArgumentCaptor<String> captureValue = ArgumentCaptor.forClass(String.class);
 			final ArgumentCaptor<Integer> captureCategoricalId = ArgumentCaptor.forClass(Integer.class);
@@ -214,7 +214,7 @@ public class DerivedVariableServiceImplTest {
 		verify(this.studyValidator).validate(STUDY_ID, false);
 		verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, false);
 		verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
-		verify(this.derivedVariableValidator).verifyMissingInputVariables(TARGET_VARIABLE_TERMID, DATASET_ID);
+		verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, STUDY_ID);
 
 		final ArgumentCaptor<String> captureValue = ArgumentCaptor.forClass(String.class);
 		final ArgumentCaptor<Integer> captureCategoricalId = ArgumentCaptor.forClass(Integer.class);
@@ -257,7 +257,7 @@ public class DerivedVariableServiceImplTest {
 			verify(this.studyValidator).validate(STUDY_ID, false);
 			verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, false);
 			verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
-			verify(this.derivedVariableValidator).verifyMissingInputVariables(TARGET_VARIABLE_TERMID, DATASET_ID);
+			verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, STUDY_ID);
 			verify(this.middlewareDerivedVariableService, times(0)).saveCalculatedResult(anyString(),
 				anyInt(), anyInt(), anyInt(),
 				any(MeasurementVariable.class));
@@ -282,7 +282,7 @@ public class DerivedVariableServiceImplTest {
 			verify(this.studyValidator).validate(STUDY_ID, false);
 			verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, false);
 			verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
-			verify(this.derivedVariableValidator).verifyMissingInputVariables(TARGET_VARIABLE_TERMID, DATASET_ID);
+			verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, STUDY_ID);
 			verify(this.middlewareDerivedVariableService, times(0)).saveCalculatedResult(anyString(),
 				anyInt(), anyInt(), anyInt(),
 				any(MeasurementVariable.class));
@@ -310,7 +310,7 @@ public class DerivedVariableServiceImplTest {
 		verify(this.studyValidator).validate(STUDY_ID, false);
 		verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, false);
 		verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
-		verify(this.derivedVariableValidator).verifyMissingInputVariables(TARGET_VARIABLE_TERMID, DATASET_ID);
+		verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, STUDY_ID);
 
 		assertEquals(
 			DerivedVariableServiceImpl.STUDY_EXECUTE_CALCULATION_MISSING_DATA,

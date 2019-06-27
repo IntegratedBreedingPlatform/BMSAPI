@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.dataset.DatasetService;
@@ -16,7 +17,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -30,6 +33,9 @@ public class DerivedVariableValidatorTest {
 
 	@Mock
 	private DatasetService datasetService;
+
+	@Mock
+	private DerivedVariableService middlewareDerivedVariableService;
 
 	@InjectMocks
 	private final DerivedVariableValidator variableValidator = new DerivedVariableValidator();
@@ -74,6 +80,7 @@ public class DerivedVariableValidatorTest {
 	@Test
 	public void testVerifyMissingInputVariablesVariablesAreNotPresentInADataset() {
 
+		final Integer studyId = RandomUtils.nextInt();
 		final Integer variableId = RandomUtils.nextInt();
 		final Integer datasetId = RandomUtils.nextInt();
 		final FormulaDto formulaDto = new FormulaDto();
@@ -89,15 +96,17 @@ public class DerivedVariableValidatorTest {
 		formulaDto.setTarget(targetVariable);
 
 		// Only the variable with formula is loaded in the dataset.
+		final Map<Integer, MeasurementVariable> measurementVariableMap = new HashMap<>();
 		final MeasurementVariable targetMeasurementVariable = new MeasurementVariable();
 		targetMeasurementVariable.setTermId(variableId);
+		measurementVariableMap.put(variableId, targetMeasurementVariable);
 
 		when(this.formulaService.getByTargetId(variableId)).thenReturn(Optional.of(formulaDto));
-		when(this.datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId())))
-			.thenReturn(Arrays.asList(targetMeasurementVariable));
+		when(this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMap(studyId))
+			.thenReturn(measurementVariableMap);
 
 		try {
-			this.variableValidator.verifyMissingInputVariables(variableId, datasetId);
+			this.variableValidator.verifyInputVariablesArePresentInStudy(variableId, studyId);
 			fail("Method should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertEquals(DerivedVariableValidator.STUDY_EXECUTE_CALCULATION_MISSING_VARIABLES, e.getErrors().get(0).getCode());
@@ -108,6 +117,7 @@ public class DerivedVariableValidatorTest {
 	@Test
 	public void testVerifyMissingInputVariablesVariablesArePresentInADataset() {
 
+		final Integer studyId = RandomUtils.nextInt();
 		final Integer variableId = RandomUtils.nextInt();
 		final Integer datasetId = RandomUtils.nextInt();
 		final FormulaDto formulaDto = new FormulaDto();
@@ -130,12 +140,17 @@ public class DerivedVariableValidatorTest {
 		final MeasurementVariable inputMeasurementVariable2 = new MeasurementVariable();
 		inputMeasurementVariable2.setTermId(formulaVariable2.getId());
 
+		final Map<Integer, MeasurementVariable> measurementVariableMap = new HashMap<>();
+		measurementVariableMap.put(variableId, targetMeasurementVariable);
+		measurementVariableMap.put(formulaVariable1.getId(), inputMeasurementVariable1);
+		measurementVariableMap.put(formulaVariable2.getId(), inputMeasurementVariable2);
+
 		when(this.formulaService.getByTargetId(variableId)).thenReturn(Optional.of(formulaDto));
-		when(this.datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId())))
-			.thenReturn(Arrays.asList(targetMeasurementVariable, inputMeasurementVariable1, inputMeasurementVariable2));
+		when(this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMap(studyId))
+			.thenReturn(measurementVariableMap);
 
 		try {
-			this.variableValidator.verifyMissingInputVariables(variableId, datasetId);
+			this.variableValidator.verifyInputVariablesArePresentInStudy(variableId, studyId);
 		} catch (final ApiRequestValidationException e) {
 			fail("Method should not throw an exception");
 		}
