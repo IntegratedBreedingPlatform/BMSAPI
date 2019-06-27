@@ -88,15 +88,16 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, true);
 		this.derivedVariableValidator.validate(variableId, geoLocationIds);
-		this.derivedVariableValidator.verifyMissingInputVariables(variableId, datasetId);
+		// this.derivedVariableValidator.verifyMissingInputVariables(variableId, datasetId);
 
 		// Get the list of observation unit rows grouped by intances
 		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap =
 			this.middlewareDatasetService.getInstanceIdToObservationUnitRowsMap(studyId, datasetId, geoLocationIds);
-		// Get the the measurement variables of all traits in a dataset so that we can determine the datatype and possibleValues
-		// of a ObservationUnitData.
+		// Get the the measurement variables of all environment details, environment conditions and traits in a study so
+		// that we can determine the datatype and possibleValue of a ObservationUnitData and input variable values from different
+		// levels.
 		final Map<Integer, MeasurementVariable> measurementVariablesMap =
-			this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMap(datasetId);
+			this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMap(studyId);
 
 		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
 		final FormulaDto formula = formulaOptional.get();
@@ -104,7 +105,6 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 		// Calculate
 		final Set<String> inputMissingData = new HashSet<>();
-
 
 		// Retrieve ENVIRONMENT_DETAIL and STUDY_CONDITION input variables' data from summary (environment) level.
 		final Map<Integer, Map<String, Object>> valuesFromSummaryObservation =
@@ -122,19 +122,26 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		for (final Map.Entry<Integer, List<ObservationUnitRow>> entryInstanceIdObservationUnitRows : instanceIdObservationUnitRowsMap
 			.entrySet()) {
 
+
+			final Set<String> instanceInputMissingData = new HashSet<>();
 			final int geoLocationId = entryInstanceIdObservationUnitRows.getKey();
-			for (final Map.Entry<String, Object> entry : valuesFromSummaryObservation.get(geoLocationId).entrySet()) {
-				final String termKey = DerivedVariableUtils.wrapTerm(entry.getKey());
-				// TODO: Determine the datatype and convert the value appropriately
-				parameters.put(termKey, entry.getValue());
+
+			try {
+				// Fill parameters with input variable values from the environment level if there's any.
+				this.fillWithEnvironmentLevelValues(parameters, geoLocationId, valuesFromSummaryObservation, measurementVariablesMap,
+					instanceInputMissingData);
+			} catch (ParseException e) {
+				LOG.error("Error parsing date value for parameters " + parameters, e);
+				errors.reject(STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION);
+				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 
 			for (final ObservationUnitRow observation : entryInstanceIdObservationUnitRows.getValue()) {
 
 				// Get input data
-				final Set<String> rowInputMissingData = new HashSet<>();
+				final Set<String> rowInputMissingData = new HashSet<>(instanceInputMissingData);
 				try {
-					// Fill parameter with input variable values from the current level if there's any.
+					// Fill parameters with input variable values from the current level if there's any.
 					DerivedVariableUtils.extractValues(parameters, observation, measurementVariablesMap, rowInputMissingData);
 				} catch (ParseException e) {
 					LOG.error("Error parsing date value for parameters " + parameters, e);
@@ -143,17 +150,16 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 				}
 				inputMissingData.addAll(rowInputMissingData);
 
-				// Assign the aggregate values from subobservation level to the processor
-				final Map<String, List<Object>> variableAggregateValuesMap = new HashMap<>();
-				for (final Map.Entry<String, List<Object>> entry : valuesFromSubObservation.get(observation.getObservationUnitId())
-					.entrySet()) {
-					final String termKey = DerivedVariableUtils.wrapTerm(entry.getKey());
-					// TODO: Determine the datatype and convert the value appropriately
-					variableAggregateValuesMap.put(termKey, entry.getValue());
-					// If input variable is in sub-observation and has values, remove it from rowParameters map.
+				try {
+					// Assign the aggregate values from subobservation level to the processor
+					this.fillWithSubObservationLevelValues(observation.getObservationUnitId(), valuesFromSubObservation,
+						measurementVariablesMap,
+						rowInputMissingData);
+				} catch (ParseException e) {
+					LOG.error("Error parsing date value for parameters " + parameters, e);
+					errors.reject(STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION);
+					throw new ApiRequestValidationException(errors.getAllErrors());
 				}
-				// Aggregate values from subobservation should be passed to processor.setData() not in rowParameters.
-				this.processor.setData(variableAggregateValuesMap);
 
 				if (!rowInputMissingData.isEmpty() || parameters.values().contains("")) {
 					continue;
@@ -221,6 +227,44 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		}
 
 		return results;
+
+	}
+
+	private void fillWithEnvironmentLevelValues(final Map<String, Object> parameters, final int geoLocationId,
+		final Map<Integer, Map<String, Object>> valuesFromSummaryObservation,
+		final Map<Integer, MeasurementVariable> measurementVariablesMap,
+		final Set<String> rowInputMissingData) throws ParseException {
+
+		for (final Map.Entry<String, Object> entry : valuesFromSummaryObservation.get(geoLocationId).entrySet()) {
+			final Integer variableId = Integer.valueOf(entry.getKey());
+			final MeasurementVariable measurementVariable = measurementVariablesMap.get(variableId);
+			final String termKey = DerivedVariableUtils.wrapTerm(entry.getKey());
+			if (parameters.containsKey(termKey)) {
+				parameters.put(termKey, DerivedVariableUtils.parseValue(entry.getValue(), measurementVariable, rowInputMissingData));
+			}
+		}
+
+	}
+
+	private void fillWithSubObservationLevelValues(final int observationUnitId,
+		final Map<Integer, Map<String, List<Object>>> valuesFromSubObservation,
+		final Map<Integer, MeasurementVariable> measurementVariablesMap,
+		final Set<String> rowInputMissingData) throws ParseException {
+
+		final Map<String, List<Object>> variableAggregateValuesMap = new HashMap<>();
+		final Map<String, List<Object>> valuesMap = valuesFromSubObservation.get(observationUnitId);
+
+		if (valuesMap != null) {
+			for (final Map.Entry<String, List<Object>> entry : valuesMap.entrySet()) {
+				final Integer variableId = Integer.valueOf(entry.getKey());
+				final MeasurementVariable measurementVariable = measurementVariablesMap.get(variableId);
+				final String termKey = DerivedVariableUtils.wrapTerm(entry.getKey());
+				variableAggregateValuesMap
+					.put(termKey, DerivedVariableUtils.parseValueList(entry.getValue(), measurementVariable, rowInputMissingData));
+			}
+			// Aggregate values from subobservation should be passed to processor.setData() not in parameters.
+			this.processor.setData(variableAggregateValuesMap);
+		}
 
 	}
 
