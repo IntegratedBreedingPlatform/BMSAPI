@@ -35,7 +35,7 @@ public class ProgramServiceImpl implements ProgramService {
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	@Override
-	public List<ProgramSummary> listAllPrograms() {
+	public List<ProgramSummary> listAllPrograms(final String cropName) {
 		final List<Project> workbenchProgramList;
 		final List<ProgramSummary> programSummaries = new ArrayList<>();
 		try {
@@ -43,26 +43,29 @@ public class ProgramServiceImpl implements ProgramService {
 			workbenchProgramList = this.workbenchDataManager.getProjectsByUser(loggedInUser);
 			if (!workbenchProgramList.isEmpty()) {
 				for (final Project workbenchProgram : workbenchProgramList) {
-					final ProgramSummary programSummary = new ProgramSummary();
-					programSummary.setId(workbenchProgram.getProjectId().toString());
-					programSummary.setName(workbenchProgram.getProjectName());
-					if (workbenchProgram.getCropType() != null) {
-						programSummary.setCrop(workbenchProgram.getCropType().getCropName());
-					}
-					final WorkbenchUser programUser = this.workbenchDataManager.getUserById(workbenchProgram.getUserId());
-					programSummary.setCreatedBy(programUser.getName());
+					if(workbenchProgram.getCropType().getCropName().equalsIgnoreCase(cropName)) {
+						final ProgramSummary programSummary = new ProgramSummary();
+						programSummary.setId(workbenchProgram.getProjectId().toString());
+						programSummary.setName(workbenchProgram.getProjectName());
+						if (workbenchProgram.getCropType() != null) {
+							programSummary.setCrop(workbenchProgram.getCropType().getCropName());
+						}
+						final WorkbenchUser programUser = this.workbenchDataManager.getUserById(workbenchProgram.getUserId());
+						programSummary.setCreatedBy(programUser.getName());
 
-					final List<WorkbenchUser> allProgramMembers = this.workbenchDataManager.getUsersByProjectId(workbenchProgram.getProjectId(), workbenchProgram.getCropType().getCropName());
-					final Set<String> members = new HashSet<>();
-					for (final WorkbenchUser member : allProgramMembers) {
-						members.add(member.getName());
+						final List<WorkbenchUser> allProgramMembers = this.workbenchDataManager
+							.getUsersByProjectId(workbenchProgram.getProjectId(), workbenchProgram.getCropType().getCropName());
+						final Set<String> members = new HashSet<>();
+						for (final WorkbenchUser member : allProgramMembers) {
+							members.add(member.getName());
+						}
+						programSummary.setMembers(members);
+						programSummary.setUniqueID(workbenchProgram.getUniqueID());
+						if (workbenchProgram.getStartDate() != null) {
+							programSummary.setStartDate(ProgramServiceImpl.DATE_FORMAT.format(workbenchProgram.getStartDate()));
+						}
+						programSummaries.add(programSummary);
 					}
-					programSummary.setMembers(members);
-					programSummary.setUniqueID(workbenchProgram.getUniqueID());
-					if (workbenchProgram.getStartDate() != null) {
-						programSummary.setStartDate(ProgramServiceImpl.DATE_FORMAT.format(workbenchProgram.getStartDate()));
-					}
-					programSummaries.add(programSummary);
 				}
 			}
 		} catch (final MiddlewareQueryException e) {
