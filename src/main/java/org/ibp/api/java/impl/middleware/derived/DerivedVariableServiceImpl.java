@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
+import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -260,6 +261,12 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 			this.datasetValidator.validateDataset(studyId, datasetId, false);
 		}
 		return this.middlewareDerivedVariableService.countCalculatedVariablesInDatasets(datasetIds);
+	}
+
+	@Override
+	public Map<Integer, Map<String, Object>> getInputVariableDatasetMap(final Integer studyId, final Integer variableId) {
+		this.studyValidator.validate(studyId, false);
+		return this.middlewareDerivedVariableService.createInputVariableDatasetReferenceMap(studyId, variableId);
 	}
 
 	protected void setProcessor(final DerivedVariableProcessor processor) {

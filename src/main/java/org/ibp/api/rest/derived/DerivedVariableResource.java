@@ -89,4 +89,15 @@ public class DerivedVariableResource {
 		return new ResponseEntity<>("", respHeaders, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Get a map of input variables and dataset(s) from where they belong to", notes = "")
+	@ResponseBody
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/variable-dataset", method = RequestMethod.GET)
+	public ResponseEntity<Map<Integer, Map<String, Object>>> getInputVariableDatasetMap(
+		@PathVariable final String crop,
+		@PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId,
+		@PathVariable final Integer variableId) {
+		return new ResponseEntity<>(this.derivedVariableService.getInputVariableDatasetMap(studyId, variableId), HttpStatus.OK);
+	}
+
 }
