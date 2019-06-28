@@ -14,6 +14,11 @@ public class RoleTypeDto {
 	public RoleTypeDto() {
 	}
 
+	public RoleTypeDto(final Integer id, final String name) {
+		this.id = id;
+		this.name = name;
+	}
+
 	public RoleTypeDto(final RoleType roleType) {
 		this.id = roleType.getId();
 		this.name = roleType.getName();
