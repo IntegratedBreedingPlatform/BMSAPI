@@ -11,6 +11,8 @@ logs
 # PROJECT SPECIFIC IGNORES
 studyObservations.csv
 studyObservations.tsv
+./filename
+/temp
 
 # INTELLIJ IDEA IGNORES
 *.iml

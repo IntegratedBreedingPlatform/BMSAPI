@@ -69,14 +69,14 @@ public class DatasetResource {
 	@ApiOperation(value = "Get Dataset Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the dataset, "
 		+ "that will be shown in the Observation Table")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/table/columns", method = RequestMethod.GET)
-	public ResponseEntity<List<MeasurementVariable>> getSubObservationSetColumns(@PathVariable final String crop,
+	public ResponseEntity<List<MeasurementVariable>> getObservationSetColumns(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId,
 		@RequestParam(required = false) final Boolean draftMode) {
 
-		final List<MeasurementVariable> subObservationSetColumns = this.studyDatasetService.getSubObservationSetColumns(studyId, datasetId, draftMode);
+		final List<MeasurementVariable> observationSetColumns = this.studyDatasetService.getObservationSetColumns(studyId, datasetId, draftMode);
 
-		return new ResponseEntity<>(subObservationSetColumns, HttpStatus.OK);
+		return new ResponseEntity<>(observationSetColumns, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Count Phenotypes", notes = "Returns count of phenotypes for variables")
@@ -121,7 +121,7 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "Add Observation", notes = "Add Observation")
-	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations", method = RequestMethod.POST)
 	public ResponseEntity<ObservationDto> addObservation(
 		@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId,
