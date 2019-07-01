@@ -35,7 +35,7 @@ public class ProgramServiceImpl implements ProgramService {
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	@Override
-	public List<ProgramSummary> listAllPrograms(final String cropName) {
+	public List<ProgramSummary> listProgramsByCropName(final String cropName) {
 		final List<Project> workbenchProgramList;
 		final List<ProgramSummary> programSummaries = new ArrayList<>();
 		try {
@@ -60,7 +60,6 @@ public class ProgramServiceImpl implements ProgramService {
 							members.add(member.getName());
 						}
 						programSummary.setMembers(members);
-						programSummary.setUniqueID(workbenchProgram.getUniqueID());
 						if (workbenchProgram.getStartDate() != null) {
 							programSummary.setStartDate(ProgramServiceImpl.DATE_FORMAT.format(workbenchProgram.getStartDate()));
 						}
