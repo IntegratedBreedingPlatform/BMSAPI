@@ -125,36 +125,14 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testDependencyVariables() throws Exception {
+	public void testMissingVariablesForSpecificDerivedVariable() throws Exception {
 
 		final Set<String> dependencies = new HashSet<>();
 		dependencies.add("VAR1");
 		dependencies.add("VAR2");
 
 		doReturn(dependencies).when(this.derivedVariableService)
-			.getDependencyVariables(100, 102);
-
-		this.mockMvc
-			.perform(MockMvcRequestBuilders
-				.get(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/missing-dependencies", this.cropName, 100,
-					102)
-				.contentType(this.contentType))
-			.andDo(MockMvcResultHandlers.print())
-			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(MockMvcResultMatchers.content().string("[\"VAR1\",\"VAR2\"]"));
-
-	}
-
-	@Test
-	public void testDependencyVariablesForSpecificDerivedTrait() throws Exception {
-
-		final Set<String> dependencies = new HashSet<>();
-		dependencies.add("VAR1");
-		dependencies.add("VAR2");
-
-		doReturn(dependencies).when(this.derivedVariableService)
-			.getDependencyVariables(100, 102, 103);
+			.getMissingInputVariablesInStudy(100, 102, 103);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders

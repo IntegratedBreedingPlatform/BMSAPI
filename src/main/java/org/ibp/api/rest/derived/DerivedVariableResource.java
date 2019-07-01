@@ -50,29 +50,17 @@ public class DerivedVariableResource {
 
 	}
 
-	@ApiOperation(value = "Get Derived Traits Dependencies", notes =
-		"Gets the list of all formula dependencies of all derived traits in a dataset."
-			+ "This will only return the variables that are not yet added in the dataset.")
+	@ApiOperation(value = "Get The Missing Input Variables", notes =
+		"Gets the list of input variables of specified calculated variable that are not yet added in study.")
 	@ResponseBody
-	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/missing-dependencies", method = RequestMethod.GET)
-	public ResponseEntity<Set<String>> dependencyVariablesForAllDerivedTraitsInDataset(
-		@PathVariable final String crop,
-		@PathVariable final Integer studyId,
-		@PathVariable final Integer datasetId) {
-		return new ResponseEntity<>(this.derivedVariableService.getDependencyVariables(studyId, datasetId), HttpStatus.OK);
-	}
-
-	@ApiOperation(value = "Get Derived Traits Dependencies of a Specific Trait", notes =
-		"Gets the list of all formula dependencies of a specific trait in a dataset."
-			+ "This will only return the variables that are not yet added in the dataset.")
-	@ResponseBody
-	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/missing-dependencies", method = RequestMethod.GET)
-	public ResponseEntity<Set<String>> dependencyVariablesForSpecificDerivedTrait(
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/missing-variables", method = RequestMethod.GET)
+	public ResponseEntity<Set<String>> missingVariablesForSpecificDerivedVariable(
 		@PathVariable final String crop,
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId,
 		@PathVariable final Integer variableId) {
-		return new ResponseEntity<>(this.derivedVariableService.getDependencyVariables(studyId, datasetId, variableId), HttpStatus.OK);
+		return new ResponseEntity<>(this.derivedVariableService.getMissingInputVariablesInStudy(studyId, datasetId, variableId),
+			HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Count Calculated Traits", notes = "Count the calculated traits (derived traits) in a specified dataset(s)")

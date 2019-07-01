@@ -4,7 +4,6 @@ import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
-import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -239,16 +238,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	@Override
-	public Set<String> getDependencyVariables(final int studyId, final int datasetId) {
-
-		this.studyValidator.validate(studyId, false);
-		this.datasetValidator.validateDataset(studyId, datasetId, false);
-
-		return this.middlewareDerivedVariableService.getDependencyVariables(datasetId);
-	}
-
-	@Override
-	public Set<String> getDependencyVariables(final int studyId, final int datasetId, final int variableId) {
+	public Set<String> getMissingInputVariablesInStudy(final int studyId, final int datasetId, final int variableId) {
 
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
@@ -256,7 +246,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		final List<Integer> variableIds = Arrays.asList(variableId);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, false, variableIds);
 
-		return this.middlewareDerivedVariableService.getDependencyVariables(datasetId, variableId);
+		return this.middlewareDerivedVariableService.getMissingInputVariablesInStudy(studyId, variableId);
 	}
 
 	@Override

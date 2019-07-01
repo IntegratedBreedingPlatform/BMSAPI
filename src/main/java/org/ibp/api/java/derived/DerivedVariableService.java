@@ -14,9 +14,7 @@ public interface DerivedVariableService {
 		final Map<Integer, Integer> inputVariableDatasetMap,
 		final boolean overwriteExistingData);
 
-	Set<String> getDependencyVariables(final int studyId, final int datasetId);
-
-	Set<String> getDependencyVariables(int studyId, int datasetId, int variableId);
+	Set<String> getMissingInputVariablesInStudy(final int studyId, final int datasetId, final int variableId);
 
 	long countCalculatedVariablesInDatasets(final int studyId, final Set<Integer> datasetIds);
 
