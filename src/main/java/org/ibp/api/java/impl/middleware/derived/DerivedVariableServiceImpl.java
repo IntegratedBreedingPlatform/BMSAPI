@@ -120,29 +120,32 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 			for (final ObservationUnitRow observation : observations) {
 
 				// Get input data
+				final Map<String, Object> rowParameters = new HashMap<>(parameters);
 				final Set<String> rowInputMissingData = new HashSet<>();
+
 				try {
-					// Fill parameters with input variable values from the current level if there's any.
-					DerivedVariableUtils.extractValues(parameters, observation, measurementVariablesMap, rowInputMissingData);
+					// Fill parameters with input variable values from the current level. Environment Detail and Study Condition variable
+					// values from environment level are already included in ObservationUnitRow.
+					DerivedVariableUtils.extractValues(rowParameters, observation, measurementVariablesMap, rowInputMissingData);
 				} catch (ParseException e) {
-					LOG.error("Error parsing date value for parameters " + parameters, e);
+					LOG.error("Error parsing date value for parameters " + rowParameters, e);
 					errors.reject(STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION);
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				}
 				inputMissingData.addAll(rowInputMissingData);
 
 				try {
-					// Assign the aggregate values from subobservation level to the processor
+					// Set the aggregate values from subobservation level to the processor
 					this.fillWithSubObservationLevelValues(observation.getObservationUnitId(), valuesFromSubObservation,
 						measurementVariablesMap,
-						rowInputMissingData);
+						rowInputMissingData, rowParameters);
 				} catch (ParseException e) {
-					LOG.error("Error parsing date value for parameters " + parameters, e);
+					LOG.error("Error parsing date value for parameters " + rowParameters, e);
 					errors.reject(STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION);
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				}
 
-				if (!rowInputMissingData.isEmpty() || parameters.values().contains("")) {
+				if (!rowInputMissingData.isEmpty() || rowParameters.values().contains("")) {
 					continue;
 				}
 
@@ -150,9 +153,9 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 				String value;
 				try {
 					final String executableFormula = DerivedVariableUtils.replaceDelimiters(formula.getDefinition());
-					value = this.processor.evaluateFormula(executableFormula, parameters);
+					value = this.processor.evaluateFormula(executableFormula, rowParameters);
 				} catch (final Exception e) {
-					LOG.error("Error evaluating formula " + formula + " with inputs " + parameters, e);
+					LOG.error("Error evaluating formula " + formula + " with inputs " + rowParameters, e);
 					errors.reject(STUDY_EXECUTE_CALCULATION_ENGINE_EXCEPTION);
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				}
@@ -214,7 +217,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	private void fillWithSubObservationLevelValues(final int observationUnitId,
 		final Map<Integer, Map<String, List<Object>>> valuesFromSubObservation,
 		final Map<Integer, MeasurementVariable> measurementVariablesMap,
-		final Set<String> rowInputMissingData) throws ParseException {
+		final Set<String> rowInputMissingData, final Map<String, Object> parameters) throws ParseException {
 
 		final Map<String, List<Object>> variableAggregateValuesMap = new HashMap<>();
 		final Map<String, List<Object>> valuesMap = valuesFromSubObservation.get(observationUnitId);
@@ -226,8 +229,10 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 				final String termKey = DerivedVariableUtils.wrapTerm(entry.getKey());
 				variableAggregateValuesMap
 					.put(termKey, DerivedVariableUtils.parseValueList(entry.getValue(), measurementVariable, rowInputMissingData));
+				// If the input variable is in sub-observation level, remove its key from parameters because
+				// aggregate data from subobservation should be passed through processor.setData() not parameters.
+				parameters.remove(termKey);
 			}
-			// Aggregate values from subobservation should be passed to processor.setData() not in parameters.
 			this.processor.setData(variableAggregateValuesMap);
 		}
 
