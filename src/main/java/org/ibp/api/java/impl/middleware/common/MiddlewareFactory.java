@@ -7,8 +7,10 @@ import com.rits.cloning.Cloner;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.service.BreedingViewImportService;
 import org.generationcp.commons.service.CsvExportSampleListService;
+import org.generationcp.commons.service.GermplasmNamingService;
 import org.generationcp.commons.service.impl.BreedingViewImportServiceImpl;
 import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
+import org.generationcp.commons.service.impl.GermplasmNamingServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.hibernate.DatasourceUtilities;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
@@ -324,6 +326,12 @@ public class MiddlewareFactory {
 	@Bean
 	public Cloner cloner() {
 		return new Cloner();
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public GermplasmNamingService getGermplasmNamingService() {
+		return new GermplasmNamingServiceImpl();
 	}
 
 	@Bean
