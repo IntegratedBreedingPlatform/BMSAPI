@@ -89,7 +89,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		this.derivedVariableValidator.validate(variableId, geoLocationIds);
-		this.derivedVariableValidator.verifyInputVariablesArePresentInStudy(variableId, studyId);
+		this.derivedVariableValidator.verifyInputVariablesArePresentInStudy(variableId, datasetId, studyId);
 
 		// Get the list of observation unit rows grouped by intances
 		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap =

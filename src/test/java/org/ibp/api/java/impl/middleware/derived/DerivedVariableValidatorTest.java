@@ -106,7 +106,7 @@ public class DerivedVariableValidatorTest {
 			.thenReturn(measurementVariableMap);
 
 		try {
-			this.variableValidator.verifyInputVariablesArePresentInStudy(variableId, studyId);
+			this.variableValidator.verifyInputVariablesArePresentInStudy(variableId, datasetId, studyId);
 			fail("Method should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertEquals(DerivedVariableValidator.STUDY_EXECUTE_CALCULATION_MISSING_VARIABLES, e.getErrors().get(0).getCode());
@@ -150,7 +150,7 @@ public class DerivedVariableValidatorTest {
 			.thenReturn(measurementVariableMap);
 
 		try {
-			this.variableValidator.verifyInputVariablesArePresentInStudy(variableId, studyId);
+			this.variableValidator.verifyInputVariablesArePresentInStudy(variableId, datasetId, studyId);
 		} catch (final ApiRequestValidationException e) {
 			fail("Method should not throw an exception");
 		}
