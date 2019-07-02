@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
+import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
@@ -238,15 +239,9 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	@Override
-	public Set<String> getMissingInputVariablesInStudy(final int studyId, final int datasetId, final int variableId) {
-
+	public Set<FormulaVariable> getMissingFormulaVariablesInStudy(final int studyId, final int variableId) {
 		this.studyValidator.validate(studyId, false);
-		this.datasetValidator.validateDataset(studyId, datasetId, false);
-
-		final List<Integer> variableIds = Arrays.asList(variableId);
-		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, false, variableIds);
-
-		return this.middlewareDerivedVariableService.getMissingInputVariablesInStudy(studyId, variableId);
+		return this.middlewareDerivedVariableService.getMissingFormulaVariablesInStudy(studyId, variableId);
 	}
 
 	@Override
@@ -259,7 +254,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	@Override
-	public Map<Integer, Map<String, Object>> getInputVariableDatasetMap(final Integer studyId, final Integer variableId) {
+	public Map<Integer, Map<String, Object>> getFormulaVariableDatasetMap(final Integer studyId, final Integer variableId) {
 		this.studyValidator.validate(studyId, false);
 		return this.middlewareDerivedVariableService.createInputVariableDatasetReferenceMap(studyId, variableId);
 	}

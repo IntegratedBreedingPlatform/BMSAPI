@@ -1,6 +1,7 @@
 package org.ibp.api.rest.derived;
 
 import org.apache.commons.lang.math.RandomUtils;
+import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.OverwriteDataException;
@@ -125,25 +126,27 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testMissingVariablesForSpecificDerivedVariable() throws Exception {
+	public void testGetMissingFormulaVariablesInStudy() throws Exception {
 
-		final Set<String> dependencies = new HashSet<>();
-		dependencies.add("VAR1");
-		dependencies.add("VAR2");
+		final Set<FormulaVariable> dependencies = new HashSet<>();
+		dependencies.add(new FormulaVariable(1, "VAR1", 3));
+		dependencies.add(new FormulaVariable(2, "VAR2", 3));
 
 		doReturn(dependencies).when(this.derivedVariableService)
-			.getMissingInputVariablesInStudy(100, 102, 103);
+			.getMissingFormulaVariablesInStudy(100, 103);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.get(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/missing-dependencies",
-					this.cropName, 100,
-					102, 103)
+					"/crops/{crop}/studies/{studyId}/derived-variables/{variableId}/missing-formula-variables",
+					this.cropName, 100, 103)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(MockMvcResultMatchers.content().string("[\"VAR1\",\"VAR2\"]"));
+			.andExpect(MockMvcResultMatchers.content().string(
+				"[{\"id\":1,\"vocabularyId\":0,\"name\":\"VAR1\",\"definition\":null,\"obsolete\":false,\"dateCreated\":null,"
+					+ "\"dateLastModified\":null,\"targetTermId\":3},{\"id\":2,\"vocabularyId\":0,\"name\":\"VAR2\",\"definition\":null,"
+					+ "\"obsolete\":false,\"dateCreated\":null,\"dateLastModified\":null,\"targetTermId\":3}]"));
 
 	}
 
@@ -156,7 +159,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.head("/crops/{crop}/studies/{studyId}/datasets/derived-variables", this.cropName, 100, 102)
+				.head("/crops/{crop}/studies/{studyId}/derived-variables", this.cropName, 100, 102)
 				.param("datasetIds", "1,2,3").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
