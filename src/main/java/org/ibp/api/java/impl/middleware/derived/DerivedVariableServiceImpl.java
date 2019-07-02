@@ -260,9 +260,9 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	@Override
-	public Map<Integer, Map<String, Object>> getFormulaVariableDatasetMap(final Integer studyId, final Integer variableId) {
+	public Map<Integer, Map<String, Object>> getFormulaVariableDatasetMap(final Integer studyId, final Integer datasetId, final Integer variableId) {
 		this.studyValidator.validate(studyId, false);
-		return this.middlewareDerivedVariableService.createInputVariableDatasetReferenceMap(studyId, variableId);
+		return this.middlewareDerivedVariableService.createInputVariableDatasetReferenceMap(studyId, datasetId, variableId);
 	}
 
 	protected void setProcessor(final DerivedVariableProcessor processor) {

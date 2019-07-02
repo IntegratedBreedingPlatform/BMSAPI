@@ -21,5 +21,5 @@ public interface DerivedVariableService {
 
 	long countCalculatedVariablesInDatasets(final int studyId, final Set<Integer> datasetIds);
 
-	Map<Integer, Map<String, Object>> getFormulaVariableDatasetMap(final Integer studyId, final Integer variableId);
+	Map<Integer, Map<String, Object>> getFormulaVariableDatasetMap(final Integer studyId, final Integer datasetId, final Integer variableId);
 }

@@ -89,12 +89,13 @@ public class DerivedVariableResource {
 
 	@ApiOperation(value = "Get a map of formula variables and dataset(s) from where they belong to", notes = "")
 	@ResponseBody
-	@RequestMapping(value = "/{crop}/studies/{studyId}/derived-variables/{variableId}/formula-variables/dataset-map", method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/formula-variables/dataset-map", method = RequestMethod.GET)
 	public ResponseEntity<Map<Integer, Map<String, Object>>> getFormulaVariableDatasetMap(
 		@PathVariable final String crop,
 		@PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId,
 		@PathVariable final Integer variableId) {
-		return new ResponseEntity<>(this.derivedVariableService.getFormulaVariableDatasetMap(studyId, variableId), HttpStatus.OK);
+		return new ResponseEntity<>(this.derivedVariableService.getFormulaVariableDatasetMap(studyId, datasetId, variableId), HttpStatus.OK);
 	}
 
 }
