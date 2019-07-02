@@ -239,9 +239,9 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	@Override
-	public Set<FormulaVariable> getMissingFormulaVariablesInStudy(final int studyId, final int variableId) {
+	public Set<FormulaVariable> getMissingFormulaVariablesInStudy(final int studyId, final int datasetId, final int variableId) {
 		this.studyValidator.validate(studyId, false);
-		return this.middlewareDerivedVariableService.getMissingFormulaVariablesInStudy(studyId, variableId);
+		return this.middlewareDerivedVariableService.getMissingFormulaVariablesInStudy(studyId, datasetId, variableId);
 	}
 
 	@Override

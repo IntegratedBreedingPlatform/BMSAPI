@@ -15,7 +15,7 @@ public interface DerivedVariableService {
 		final Map<Integer, Integer> inputVariableDatasetMap,
 		final boolean overwriteExistingData);
 
-	Set<FormulaVariable> getMissingFormulaVariablesInStudy(final int studyId, final int variableId);
+	Set<FormulaVariable> getMissingFormulaVariablesInStudy(final int studyId, final int datasetId, final int variableId);
 
 	Set<FormulaVariable> getFormulaVariablesInStudy(final int studyId);
 

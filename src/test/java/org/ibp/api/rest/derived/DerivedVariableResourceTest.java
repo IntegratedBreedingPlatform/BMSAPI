@@ -133,13 +133,13 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		dependencies.add(new FormulaVariable(2, "VAR2", 3));
 
 		doReturn(dependencies).when(this.derivedVariableService)
-			.getMissingFormulaVariablesInStudy(100, 103);
+			.getMissingFormulaVariablesInStudy(100, 101,103);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.get(
-					"/crops/{crop}/studies/{studyId}/derived-variables/{variableId}/formula-variables/missing",
-					this.cropName, 100, 103)
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/formula-variables/missing",
+					this.cropName, 100, 101, 103)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
