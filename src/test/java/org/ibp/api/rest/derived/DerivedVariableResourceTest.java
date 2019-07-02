@@ -138,7 +138,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.get(
-					"/crops/{crop}/studies/{studyId}/derived-variables/{variableId}/missing-formula-variables",
+					"/crops/{crop}/studies/{studyId}/derived-variables/{variableId}/formula-variables/missing",
 					this.cropName, 100, 103)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())

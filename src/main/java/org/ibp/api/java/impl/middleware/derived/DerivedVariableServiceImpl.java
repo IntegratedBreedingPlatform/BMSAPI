@@ -245,6 +245,12 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	@Override
+	public Set<FormulaVariable> getFormulaVariablesInStudy(final int studyId) {
+		this.studyValidator.validate(studyId, false);
+		return this.middlewareDerivedVariableService.getFormulaVariablesInStudy(studyId);
+	}
+
+	@Override
 	public long countCalculatedVariablesInDatasets(final int studyId, final Set<Integer> datasetIds) {
 		this.studyValidator.validate(studyId, false);
 		for (final int datasetId : datasetIds) {
