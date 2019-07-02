@@ -59,7 +59,7 @@ public class UserServiceTest {
 		this.userServiceImpl.setSecurityService(this.securityService);
 		this.userServiceImpl.setMessageSource(this.messageSource);
 
-		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectsByUser(ArgumentMatchers.any(WorkbenchUser.class));
+		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectsByUser(ArgumentMatchers.any(WorkbenchUser.class), ArgumentMatchers.any(String.class));
 	}
 
 	/**
