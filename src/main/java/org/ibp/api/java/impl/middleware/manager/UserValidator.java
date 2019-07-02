@@ -157,7 +157,7 @@ public class UserValidator implements Validator {
 	}
 
 	private void validateCrops(final Errors errors, final UserDetailDto userDto, final WorkbenchUser workbenchUser) {
-		final List<Project> programsByUser = this.workbenchDataManager.getProjectsByUser(workbenchUser);
+		final List<Project> programsByUser = this.workbenchDataManager.getProjectsByUser(workbenchUser, null);
 
 		if (programsByUser != null) {
 			final List<CropDto> cropDtos = userDto.getCrops();
