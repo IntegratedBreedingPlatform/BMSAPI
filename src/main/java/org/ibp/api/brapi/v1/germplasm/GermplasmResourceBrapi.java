@@ -204,7 +204,7 @@ public class GermplasmResourceBrapi {
 		return new ResponseEntity<>(new SingleEntityResponse<>(progenyDTO), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Post germplasm search", notes = "Get germplasm search")
+	@ApiOperation(value = "Get germplasm search", notes = "Get the results of a Germplasm search request")
 	@RequestMapping(value = "/{crop}/brapi/v1/search/germplasm/{searchResultsDbid}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(Germplasm.View.GermplasmBrapiV1_3.class)
