@@ -157,4 +157,25 @@ public class DerivedVariableValidatorTest {
 
 	}
 
+	@Test
+	public void testValidateSubobservationInputVariable() {
+		final FormulaDto formulaDto = new FormulaDto();
+		formulaDto.setDefinition("sum({{29001}})");
+		FormulaVariable formulaVariable = new FormulaVariable();
+		formulaVariable.setId(29001);
+
+		try {
+			this.variableValidator.validateSubobservationInputVariable(Optional.of(formulaDto), formulaVariable);
+		} catch (final ApiRequestValidationException e) {
+			fail("Method should not throw an exception");
+		}
+
+		try {
+			formulaDto.setDefinition("{{29001}}/{{1001}}");
+			this.variableValidator.validateSubobservationInputVariable(Optional.of(formulaDto), formulaVariable);
+			fail("Should throw an exception");
+		} catch (final ApiRequestValidationException e) {
+		}
+	}
+
 }

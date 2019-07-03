@@ -11,16 +11,20 @@ import org.generationcp.middleware.service.api.derived_variables.DerivedVariable
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.rest.dataset.DatasetDTO;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 @Component
 public class DerivedVariableValidator {
@@ -28,6 +32,7 @@ public class DerivedVariableValidator {
 	public static final String STUDY_EXECUTE_CALCULATION_INVALID_REQUEST = "study.execute.calculation.invalid.request";
 	public static final String STUDY_EXECUTE_CALCULATION_FORMULA_NOT_FOUND = "study.execute.calculation.formula.not.found";
 	public static final String STUDY_EXECUTE_CALCULATION_MISSING_VARIABLES = "study.execute.calculation.missing.variables";
+	public static final String STUDY_EXECUTE_CALCULATION_NOT_AGGREGATE_FUNCTION = "study.execute.calculation.not.aggregate.function";
 
 	@Resource
 	private FormulaService formulaService;
@@ -37,6 +42,8 @@ public class DerivedVariableValidator {
 
 	@Resource
 	private DerivedVariableService middlewareDerivedVariableService;
+
+	private static String AGGREGATE_FUNCTIONS = "(AVG|COUNT|DISTINCT_COUNT|MAX|MIN|SUM)";
 
 	public void validate(final Integer variableId, final List<Integer> geoLocationIds) {
 
@@ -87,6 +94,36 @@ public class DerivedVariableValidator {
 
 		}
 
+	}
+
+	public void verifySubObservationsInputVariablesInAggregateFunction(final int variableId, final int studyId, final int datasetId, final Map<Integer, Integer> inputVariableDatasetMap) {
+		Integer plotDatasetId = this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
+		if(!plotDatasetId.equals(datasetId)) {
+			return;
+		}
+
+		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
+		if (formulaOptional.isPresent()) {
+			final List<DatasetDTO> subobsDatasets = this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId(), DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId())));
+			final List<Integer> subobservationIds = new ArrayList<>();
+			for(DatasetDTO dataset: subobsDatasets) {
+				subobservationIds.add(dataset.getDatasetId());
+			}
+			for (final FormulaVariable formulaVariable : formulaOptional.get().getInputs()) {
+				if(subobservationIds.contains(inputVariableDatasetMap.get(formulaVariable.getId()))) {
+					validateSubobservationInputVariable(formulaOptional, formulaVariable);
+				}
+			}
+		}
+	}
+
+	void validateSubobservationInputVariable(final Optional<FormulaDto> formulaOptional, final FormulaVariable formulaVariable) {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		final Pattern pattern = Pattern.compile("^.*(?i)" + AGGREGATE_FUNCTIONS + "\\(\\{\\{" + formulaVariable.getId() + "}}\\).*$");
+		if(!pattern.matcher(formulaOptional.get().getDefinition()).matches()) {
+			errors.reject(STUDY_EXECUTE_CALCULATION_NOT_AGGREGATE_FUNCTION);
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
 	}
 
 	protected Set<Integer> getVariableIdsOfTraitsInDataset(final int datasetId) {
