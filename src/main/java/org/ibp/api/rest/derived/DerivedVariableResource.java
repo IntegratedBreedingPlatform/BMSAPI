@@ -66,7 +66,7 @@ public class DerivedVariableResource {
 	@ApiOperation(value = "Get All Formula Variables", notes =
 		"Gets the list of formula variables in study.")
 	@ResponseBody
-	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}derived-variables/formula-variables", method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/formula-variables", method = RequestMethod.GET)
 	public ResponseEntity<Set<FormulaVariable>> formulaVariables(
 		@PathVariable final String crop,
 		@PathVariable final Integer studyId,
