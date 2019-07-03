@@ -90,24 +90,7 @@ public class GermplasmResourceBrapi {
 			}
 		}
 
-		final PagedResult<GermplasmDTO> resultPage = new PaginatedSearch()
-			.executeBrapiSearch((currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage),
-				(pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize),
-				new SearchSpec<GermplasmDTO>() {
-
-					@Override
-					public long getCount() {
-						return GermplasmResourceBrapi.this.germplasmService.countGermplasmDTOs(germplasmSearchRequestDTO);
-					}
-
-					@Override
-					public List<GermplasmDTO> getResults(final PagedResult<GermplasmDTO> pagedResult) {
-						return GermplasmResourceBrapi.this.germplasmService
-							.searchGermplasmDTO(germplasmSearchRequestDTO,
-								(currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage),
-								(pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize));
-					}
-				});
+		final PagedResult<GermplasmDTO> resultPage = this.getGermplasmDTOPagedResult(germplasmSearchRequestDTO, currentPage, pageSize);
 
 		final List<Germplasm> germplasmList = new ArrayList<>();
 
@@ -246,25 +229,7 @@ public class GermplasmResourceBrapi {
 				HttpStatus.NOT_FOUND);
 		}
 
-		final PagedResult<GermplasmDTO> resultPage = new PaginatedSearch()
-			.executeBrapiSearch(
-				(currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage),
-				(pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize),
-				new SearchSpec<GermplasmDTO>() {
-
-					@Override
-					public long getCount() {
-						return GermplasmResourceBrapi.this.germplasmService.countGermplasmDTOs(germplasmSearchRequestDTO);
-					}
-
-					@Override
-					public List<GermplasmDTO> getResults(final PagedResult<GermplasmDTO> pagedResult) {
-						return GermplasmResourceBrapi.this.germplasmService
-							.searchGermplasmDTO(germplasmSearchRequestDTO,
-								(currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage),
-								(pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize));
-					}
-				});
+		final PagedResult<GermplasmDTO> resultPage = this.getGermplasmDTOPagedResult(germplasmSearchRequestDTO, currentPage, pageSize);
 
 		final List<Germplasm> germplasmList = new ArrayList<>();
 
@@ -287,6 +252,27 @@ public class GermplasmResourceBrapi {
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 
+	}
+
+	private PagedResult<GermplasmDTO> getGermplasmDTOPagedResult(final GermplasmSearchRequestDto germplasmSearchRequestDTO,
+		final Integer currentPage, final Integer pageSize) {
+		final Integer finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
+		final Integer finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
+		return new PaginatedSearch()
+			.executeBrapiSearch(finalPageNumber, finalPageSize,
+				new SearchSpec<GermplasmDTO>() {
+
+					@Override
+					public long getCount() {
+						return GermplasmResourceBrapi.this.germplasmService.countGermplasmDTOs(germplasmSearchRequestDTO);
+					}
+
+					@Override
+					public List<GermplasmDTO> getResults(final PagedResult<GermplasmDTO> pagedResult) {
+						return GermplasmResourceBrapi.this.germplasmService
+							.searchGermplasmDTO(germplasmSearchRequestDTO, finalPageNumber, finalPageSize);
+					}
+				});
 	}
 
 }
