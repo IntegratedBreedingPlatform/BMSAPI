@@ -16,6 +16,9 @@ import org.ibp.api.java.germplasm.GermplasmService;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -34,6 +37,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
 	private static final Locale locale = Locale.getDefault();
+
+	@Configuration
+	public static class TestConfiguration {
+		@Bean
+		@Primary
+		public GermplasmService germplasmService() {
+			return Mockito.mock(GermplasmService.class);
+		}
+	}
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -122,13 +134,12 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 
 		final int gid = nextInt();
 		final String germplasmDbId = String.valueOf(gid);
-		final int requestId = 1;
 		final List<GermplasmDTO> list = new ArrayList<>();
 		final GermplasmDTO germplasmDTO = new GermplasmDTO();
 		germplasmDTO.setGermplasmDbId(germplasmDbId);
 		list.add(germplasmDTO);
 
-		when(this.germplasmService.countGermplasmDTOs(any(GermplasmSearchRequestDto.class))).thenReturn(1l);
+		when(this.germplasmService.countGermplasmDTOs(any(GermplasmSearchRequestDto.class))).thenReturn(1L);
 		when(this.germplasmService
 			.searchGermplasmDTO(any(GermplasmSearchRequestDto.class), Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_NUMBER),
 				Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_SIZE)))
