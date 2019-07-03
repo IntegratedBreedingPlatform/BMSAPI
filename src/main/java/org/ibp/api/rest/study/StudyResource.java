@@ -108,7 +108,7 @@ public class StudyResource {
 			@ApiParam(value = "Page number to retrieve in case of multi paged results. Defaults to 1 (first page) if not supplied.",
 					required = false) //
 			@RequestParam(value = "pageNumber", required = false) final Integer pageNumber, //
-			@ApiParam(value = "Number of results to retrieve per page. Defaults to 100 if not supplied. Max page size allowed is 200.", required = false) //
+			@ApiParam(value = "Number of results to retrieve per page. Defaults to " + PagedResult.DEFAULT_PAGE_SIZE + " if not supplied. Max page size allowed is 10000.", required = false) //
 			@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
 
 		final PagedResult<Observation> pageResult = new PaginatedSearch().execute(pageNumber, pageSize, new SearchSpec<Observation>() {

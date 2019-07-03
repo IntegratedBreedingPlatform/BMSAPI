@@ -20,6 +20,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -51,10 +52,17 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	@Override
 	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
 
-		final DatasetDTO dataSetDTO = this.datasetService.getDataset(datasetId);
+		final DatasetDTO datasetDTO = this.datasetService.getDataset(datasetId);
+		final List<Integer> subObsDatasetTypeIds = this.datasetTypeService.getSubObservationDatasetTypeIds();
 		final int environmentDatasetId =
 			this.studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getId();
-		final int plotDatasetId = dataSetDTO.getParentDatasetId();
+		final int plotDatasetId;
+
+		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
+			plotDatasetId = datasetDTO.getDatasetId();
+		} else {
+			plotDatasetId = datasetDTO.getParentDatasetId();
+		}
 
 		final List<MeasurementVariable> studyVariables = this.datasetService
 			.getObservationSetVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
@@ -81,11 +89,6 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 					plotDatasetId,
 					Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 						VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId()));
-		final List<MeasurementVariable> subObservationSetColumns =
-			this.datasetService
-				.getObservationSetVariables(datasetId, Lists.newArrayList(
-					VariableType.GERMPLASM_DESCRIPTOR.getId(),
-					VariableType.OBSERVATION_UNIT.getId()));
 		final List<MeasurementVariable> treatmentFactors =
 			this.datasetService
 				.getObservationSetVariables(plotDatasetId, Lists.newArrayList(TermId.MULTIFACTORIAL_INFO.getId()));
@@ -100,7 +103,17 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 		allVariables.addAll(environmentDetailAndConditionVariables);
 		allVariables.addAll(treatmentFactors);
 		allVariables.addAll(plotDataSetColumns);
-		allVariables.addAll(subObservationSetColumns);
+
+		//Add variables that are specific to the sub-observation dataset types
+		if (Arrays.stream(subObsDatasetTypeIds.toArray()).anyMatch(datasetDTO.getDatasetTypeId()::equals)) {
+			final List<MeasurementVariable> subObservationSetColumns =
+				this.datasetService
+					.getObservationSetVariables(datasetId, Lists.newArrayList(
+						VariableType.GERMPLASM_DESCRIPTOR.getId(),
+						VariableType.OBSERVATION_UNIT.getId()));
+			allVariables.addAll(subObservationSetColumns);
+
+		}
 		allVariables.addAll(traits);
 		allVariables.addAll(selectionVariables);
 		return this.moveSelectedVariableInTheFirstColumn(allVariables, TermId.TRIAL_INSTANCE_FACTOR.getId());
