@@ -337,7 +337,7 @@ public class UserValidatorTest {
 
 	@Test
 	public void testIsSuperAdminRole(){
-		this.uservalidator.setSuperAdminRole(this.superAdminRole);
+		this.uservalidator.setSuperAdminRole(new Role(SUPERADMIN_ID, Role.SUPERADMIN));
 
 		// Should validate "SUPERADMIN" description
 		Assert.assertTrue(this.uservalidator.isSuperAdminRole(new Role(100, Role.SUPERADMIN)));
