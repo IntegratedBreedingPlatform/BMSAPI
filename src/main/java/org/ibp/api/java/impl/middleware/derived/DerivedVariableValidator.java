@@ -6,7 +6,6 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -69,16 +68,7 @@ public class DerivedVariableValidator {
 		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
 		if (formulaOptional.isPresent()) {
 
-			Integer plotDatasetId = this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
-			final Set<Integer> variableIds;
-			if(plotDatasetId.equals(datasetId)) {
-				// Get all possible input variables from Environment Detail, Study Condition, and Plot/Subobs Traits
-				variableIds = this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMap(studyId).keySet();
-			} else {
-				// Get all possible input variables from Subobs Traits
-				variableIds = this.getVariableIdsOfTraitsInDataset(datasetId);
-			}
-
+			final Set<Integer> variableIds = this.middlewareDerivedVariableService.extractVariableIdsFromDataset(studyId, datasetId);
 			final Set<String> inputMissingVariables = new HashSet<>();
 			for (final FormulaVariable formulaVariable : formulaOptional.get().getInputs()) {
 				if (!variableIds.contains(formulaVariable.getId())) {

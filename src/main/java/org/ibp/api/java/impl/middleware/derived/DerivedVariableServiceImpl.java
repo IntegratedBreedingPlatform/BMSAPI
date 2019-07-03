@@ -242,13 +242,15 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	@Override
 	public Set<FormulaVariable> getMissingFormulaVariablesInStudy(final int studyId, final int datasetId, final int variableId) {
 		this.studyValidator.validate(studyId, false);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		return this.middlewareDerivedVariableService.getMissingFormulaVariablesInStudy(studyId, datasetId, variableId);
 	}
 
 	@Override
-	public Set<FormulaVariable> getFormulaVariablesInStudy(final int studyId) {
+	public Set<FormulaVariable> getFormulaVariablesInStudy(final int studyId, final int datasetId) {
 		this.studyValidator.validate(studyId, false);
-		return this.middlewareDerivedVariableService.getFormulaVariablesInStudy(studyId);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
+		return this.middlewareDerivedVariableService.getFormulaVariablesInStudy(studyId, datasetId);
 	}
 
 	@Override
@@ -263,6 +265,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	@Override
 	public Map<Integer, Map<String, Object>> getFormulaVariableDatasetMap(final Integer studyId, final Integer datasetId, final Integer variableId) {
 		this.studyValidator.validate(studyId, false);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		return this.middlewareDerivedVariableService.createInputVariableDatasetReferenceMap(studyId, datasetId, variableId);
 	}
 
