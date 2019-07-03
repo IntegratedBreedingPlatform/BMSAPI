@@ -1,4 +1,3 @@
-
 package org.ibp.api.java.impl.middleware.role;
 
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -30,7 +29,7 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 		this.createTestRoles();
 		final List<Role> assignableRoles = new ArrayList<>(this.allRoles);
 		assignableRoles.remove(this.restrictedRole);
-		Mockito.doReturn(assignableRoles).when(this.workbenchDataManager).getRoles(new RoleSearchDto(Boolean.TRUE, null));
+		Mockito.doReturn(assignableRoles).when(this.workbenchDataManager).getRoles(new RoleSearchDto(Boolean.TRUE, null, null));
 	}
 
 	private void createTestRoles() {

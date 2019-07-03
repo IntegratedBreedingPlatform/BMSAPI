@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Map<String, Object> createUser(final UserDetailDto user) {
 
-		this.securityService.requireCurrentUserIsAdmin();
+		//TODO Check by SITE_ADMIN authority
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
 		final HashMap<String, Object> mapResponse = new HashMap<String, Object>();
