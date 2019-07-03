@@ -40,30 +40,28 @@ public class ProgramServiceImpl implements ProgramService {
 		final List<ProgramSummary> programSummaries = new ArrayList<>();
 		try {
 			final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-			workbenchProgramList = this.workbenchDataManager.getProjectsByUser(loggedInUser);
+			workbenchProgramList = this.workbenchDataManager.getProjectsByUser(loggedInUser, cropName);
 			if (!workbenchProgramList.isEmpty()) {
 				for (final Project workbenchProgram : workbenchProgramList) {
-					if(workbenchProgram.getCropType().getCropName().equalsIgnoreCase(cropName)) {
-						final ProgramSummary programSummary =
-							new ProgramSummary(workbenchProgram.getProjectId().toString(), workbenchProgram.getUniqueID(),
-								workbenchProgram.getProjectName(), workbenchProgram.getCropType().getCropName());
+					final ProgramSummary programSummary =
+						new ProgramSummary(workbenchProgram.getProjectId().toString(), workbenchProgram.getUniqueID(),
+							workbenchProgram.getProjectName(), workbenchProgram.getCropType().getCropName());
 
-						final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserById(workbenchProgram.getUserId());
-						programSummary.setCreatedBy(workbenchUser.getName());
+					final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserById(workbenchProgram.getUserId());
+					programSummary.setCreatedBy(workbenchUser.getName());
 
-						final List<WorkbenchUser> workbenchUsers = this.workbenchDataManager
-							.getUsersByProjectId(workbenchProgram.getProjectId(), workbenchProgram.getCropType().getCropName());
+					final List<WorkbenchUser> workbenchUsers = this.workbenchDataManager
+						.getUsersByProjectId(workbenchProgram.getProjectId(), workbenchProgram.getCropType().getCropName());
 
-						final Set<String> members = new HashSet<>();
-						for (final WorkbenchUser member : workbenchUsers) {
-							members.add(member.getName());
-						}
-						programSummary.setMembers(members);
-						if (workbenchProgram.getStartDate() != null) {
-							programSummary.setStartDate(ProgramServiceImpl.DATE_FORMAT.format(workbenchProgram.getStartDate()));
-						}
-						programSummaries.add(programSummary);
+					final Set<String> members = new HashSet<>();
+					for (final WorkbenchUser member : workbenchUsers) {
+						members.add(member.getName());
 					}
+					programSummary.setMembers(members);
+					if (workbenchProgram.getStartDate() != null) {
+						programSummary.setStartDate(ProgramServiceImpl.DATE_FORMAT.format(workbenchProgram.getStartDate()));
+					}
+					programSummaries.add(programSummary);
 				}
 			}
 		} catch (final MiddlewareQueryException e) {

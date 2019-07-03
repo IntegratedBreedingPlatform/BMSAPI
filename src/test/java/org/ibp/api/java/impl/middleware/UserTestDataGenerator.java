@@ -161,7 +161,9 @@ public abstract class UserTestDataGenerator {
 		userRoleDto.setRole(roleDto);
 		userRoleDto.setCrop(new CropDto(new CropType("maize")));
 		userRoleDtos.add(userRoleDto);
-
+		List<CropDto> cropDtos = new ArrayList<>();
+		cropDtos.add(new CropDto(new CropType("wheat")));
+		user.setCrops(cropDtos);
 		user.setUserRoles(userRoleDtos);
 
 		return user;

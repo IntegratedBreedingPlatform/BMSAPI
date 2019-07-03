@@ -151,7 +151,7 @@ public class UserServiceImpl implements UserService {
 
 		Preconditions.checkNotNull(projectUUID, "The projectUUID must not be empty");
 		try {
-			final String cropName = this.contextUtil.getProjectInContext().getCropType().getCropName();
+			final String cropName = this.getContextUtil().getProjectInContext().getCropType().getCropName();
 			final List<UserDto> users = this.workbenchDataManager.getUsersByProjectUuid(projectUUID, cropName);
 			Preconditions.checkArgument(!users.isEmpty(), "users don't exists for this projectUUID");
 
@@ -295,4 +295,11 @@ public class UserServiceImpl implements UserService {
 		return this.messageSource.getMessage(code, args, LocaleContextHolder.getLocale());
 	}
 
+	public ContextUtil getContextUtil() {
+		return contextUtil;
+	}
+
+	public void setContextUtil(ContextUtil contextUtil) {
+		this.contextUtil = contextUtil;
+	}
 }

@@ -72,18 +72,10 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 		final CropType cropType2 = new CropType();
 		cropType2.setCropName(cropName2);
 
-		final Project program3 =
-			new Project(3L, "46a7e160-45ca-337d-za7a-417zb3c79e93", "Program Wheat", null, this.myBreedingBuddy.getUserid(),
-				cropType2, null);
-
-		final String program3Date = "2016-08-11";
-		program3.setStartDate(ProgramServiceImpl.DATE_FORMAT.parse(program3Date));
-
 		programList.add(program1);
 		programList.add(program2);
-		programList.add(program3);
 
-		Mockito.doReturn(programList).when(this.workbenchDataManager).getProjectsByUser(Mockito.eq(this.me));
+		Mockito.doReturn(programList).when(this.workbenchDataManager).getProjectsByUser(Mockito.eq(this.me), Mockito.eq(cropName));
 		Mockito.doReturn(this.me).when(this.workbenchDataManager).getUserById(program1.getProjectId().intValue());
 		Mockito.doReturn(this.myBreedingBuddy).when(this.workbenchDataManager).getUserById(program2.getProjectId().intValue());
 

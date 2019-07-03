@@ -52,7 +52,7 @@ public class UserValidatorTest {
 		this.uservalidator.setSecurityService(this.securityService);
 
 		// TODO test validate crops
-		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectsByUser(ArgumentMatchers.any(WorkbenchUser.class));
+		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectsByUser(ArgumentMatchers.any(WorkbenchUser.class), ArgumentMatchers.any(String.class));
 	}
 
 	@After
@@ -337,7 +337,7 @@ public class UserValidatorTest {
 
 	@Test
 	public void testIsSuperAdminRole(){
-		this.uservalidator.setSuperAdminRole(this.superAdminRole);
+		this.uservalidator.setSuperAdminRole(new Role(SUPERADMIN_ID, Role.SUPERADMIN));
 
 		// Should validate "SUPERADMIN" description
 		Assert.assertTrue(this.uservalidator.isSuperAdminRole(new Role(100, Role.SUPERADMIN)));

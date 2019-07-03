@@ -1,8 +1,11 @@
 
 package org.ibp.api.java.impl.middleware.user;
 
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.common.ErrorResponse;
@@ -39,6 +42,9 @@ public class UserServiceTest {
 	@Mock
 	private SecurityService securityService;
 
+	@Mock
+	private ContextUtil contextUtil;
+
 	private final ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
 
 	@InjectMocks
@@ -58,8 +64,16 @@ public class UserServiceTest {
 		this.userServiceImpl.setUserValidator(this.userValidator);
 		this.userServiceImpl.setSecurityService(this.securityService);
 		this.userServiceImpl.setMessageSource(this.messageSource);
+		this.userServiceImpl.setContextUtil(this.contextUtil);
 
-		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectsByUser(ArgumentMatchers.any(WorkbenchUser.class));
+		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectsByUser(ArgumentMatchers.any(WorkbenchUser.class), ArgumentMatchers.isNull());
+		final CropType cropType = new CropType("maize");
+		Project project = new Project();
+		project.setUniqueID("");
+		project.setProjectId(1L);
+		project.setCropType(cropType);
+		Mockito.doReturn(project).when(this.contextUtil).getProjectInContext();
+
 	}
 
 	/**

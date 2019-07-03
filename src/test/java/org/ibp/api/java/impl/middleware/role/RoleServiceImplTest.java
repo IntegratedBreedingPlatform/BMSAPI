@@ -5,6 +5,7 @@ import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.ibp.ApiUnitTestBase;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -12,6 +13,7 @@ import org.mockito.Mockito;
 import java.util.ArrayList;
 import java.util.List;
 
+@Ignore
 public class RoleServiceImplTest extends ApiUnitTestBase {
 	
 	
