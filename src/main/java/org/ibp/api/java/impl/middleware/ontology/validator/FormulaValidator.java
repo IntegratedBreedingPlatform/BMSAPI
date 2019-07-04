@@ -76,7 +76,7 @@ public class FormulaValidator implements Validator {
 		}
 
 		if (!this.isValidVariableTypeForFormula(targetTermId)) {
-			errors.reject("variable.formula.target.not.valid=", new String[] {String.valueOf(targetTermId)}, "");
+			errors.reject("variable.formula.target.not.valid", new String[] {String.valueOf(targetTermId)}, "");
 		}
 
 		// Validate inputs and set ids

@@ -93,7 +93,7 @@ public class FormulaValidatorTest {
 
 		when(errors.hasErrors()).thenReturn(false);
 		when(ontologyVariableDataManager.getVariableTypes(formulaDto.getTarget().getId()))
-			.thenReturn(Arrays.asList(VariableType.ENVIRONMENT_DETAIL));
+			.thenReturn(Arrays.asList(VariableType.SELECTION_METHOD));
 
 		this.formulaValidator.validate(formulaDto, errors);
 
@@ -155,7 +155,7 @@ public class FormulaValidatorTest {
 
 		when(errors.hasErrors()).thenReturn(false);
 		when(ontologyVariableDataManager.getVariableTypes(formulaDto.getTarget().getId())).thenReturn(Arrays.asList(VariableType.TRAIT));
-		when(ontologyVariableDataManager.getVariableTypes(inputVariableTermId)).thenReturn(Arrays.asList(VariableType.ENVIRONMENT_DETAIL));
+		when(ontologyVariableDataManager.getVariableTypes(inputVariableTermId)).thenReturn(Arrays.asList(VariableType.SELECTION_METHOD));
 		when(termDataManager.getTermByName(inputVariableName)).thenReturn(inputVariableTerm);
 		when(ontologyVariableDataManager.getDataType(inputVariableTermId)).thenReturn(Optional.of(DataType.NUMERIC_VARIABLE));
 

@@ -227,7 +227,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		formulaDto.setDefinition("{{" + inputName + "}}");
 
 		doReturn(new Term()).when(this.termDataManager).getTermByName(inputName);
-		doReturn(Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL, VariableType.GERMPLASM_DESCRIPTOR))
+		doReturn(Lists.newArrayList(VariableType.TREATMENT_FACTOR, VariableType.SELECTION_METHOD))
 			.when(this.ontologyVariableDataManager).getVariableTypes(anyInt());
 
 		this.mockMvc //

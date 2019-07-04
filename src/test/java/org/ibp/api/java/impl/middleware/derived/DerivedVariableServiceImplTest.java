@@ -118,7 +118,7 @@ public class DerivedVariableServiceImplTest {
 
 		when(this.middlwareDatasetService.getInstanceIdToObservationUnitRowsMap(STUDY_ID, DATASET_ID, GEO_LOCATION_IDS))
 			.thenReturn(instanceIdObservationUnitRowsMap);
-		when(this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMap(DATASET_ID))
+		when(this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMap(STUDY_ID))
 			.thenReturn(measurementVariablesMap);
 		when(this.formulaService.getByTargetId(TARGET_VARIABLE_TERMID)).thenReturn(Optional.of(formula));
 
