@@ -5,6 +5,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
+import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -32,7 +33,7 @@ public class ObservationResourceBrapi {
 	@ApiOperation(value = "Get observation levels", notes = "Returns a list of supported observation levels")
 	@RequestMapping(value = "/{crop}/brapi/v1/observationLevels", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<ObservationLevels> getObservationLevels(
+	public ResponseEntity<EntityListResponse<String>> getObservationLevels(
 		@PathVariable final String crop,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
 		@RequestParam(value = "page",
@@ -58,19 +59,17 @@ public class ObservationResourceBrapi {
 				}
 			});
 
-		List<String> datasetTypeNames = resultPage.getPageResults();
+		final List<String> observationLevels = resultPage.getPageResults();
 
-		final Result<String> results = new Result<String>().withData(datasetTypeNames);
-		final Pagination pagination = new Pagination() //
-			.withPageNumber(resultPage.getPageNumber()) //
-			.withPageSize(resultPage.getPageSize()) //
-			.withTotalCount(resultPage.getTotalResults()) //
-			.withTotalPages(resultPage.getTotalPages());
+		final Result<String> results = new Result<String>().withData(observationLevels);
+		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+
 		final Metadata metadata = new Metadata().withPagination(pagination);
 
-		final ObservationLevels observationLevels = new ObservationLevels().setMetadata(metadata).setResult(results);
+		final EntityListResponse<String> entityListResponse = new EntityListResponse<>(metadata, results);
 
-		return new ResponseEntity<>(observationLevels, HttpStatus.OK);
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
 
 }
