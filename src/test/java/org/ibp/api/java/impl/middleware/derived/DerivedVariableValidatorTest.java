@@ -5,7 +5,6 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -17,9 +16,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -95,16 +94,7 @@ public class DerivedVariableValidatorTest {
 		formulaDto.setInputs(Arrays.asList(formulaVariable1, formulaVariable2));
 		formulaDto.setTarget(targetVariable);
 
-		// Only the variable with formula is loaded in the dataset.
-		final Map<Integer, MeasurementVariable> measurementVariableMap = new HashMap<>();
-		final MeasurementVariable targetMeasurementVariable = new MeasurementVariable();
-		targetMeasurementVariable.setTermId(variableId);
-		measurementVariableMap.put(variableId, targetMeasurementVariable);
-
 		when(this.formulaService.getByTargetId(variableId)).thenReturn(Optional.of(formulaDto));
-		when(this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMap(studyId))
-			.thenReturn(measurementVariableMap);
-
 		try {
 			this.variableValidator.verifyInputVariablesArePresentInStudy(variableId, datasetId, studyId);
 			fail("Method should throw an exception");
@@ -140,14 +130,13 @@ public class DerivedVariableValidatorTest {
 		final MeasurementVariable inputMeasurementVariable2 = new MeasurementVariable();
 		inputMeasurementVariable2.setTermId(formulaVariable2.getId());
 
-		final Map<Integer, MeasurementVariable> measurementVariableMap = new HashMap<>();
-		measurementVariableMap.put(variableId, targetMeasurementVariable);
-		measurementVariableMap.put(formulaVariable1.getId(), inputMeasurementVariable1);
-		measurementVariableMap.put(formulaVariable2.getId(), inputMeasurementVariable2);
+		final Set<Integer> variableIds = new HashSet<>();
+		variableIds.add(formulaVariable1.getId());
+		variableIds.add(formulaVariable2.getId());
 
 		when(this.formulaService.getByTargetId(variableId)).thenReturn(Optional.of(formulaDto));
-		when(this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMap(studyId))
-			.thenReturn(measurementVariableMap);
+		when(this.middlewareDerivedVariableService.extractVariableIdsFromDataset(studyId, datasetId))
+			.thenReturn(variableIds);
 
 		try {
 			this.variableValidator.verifyInputVariablesArePresentInStudy(variableId, datasetId, studyId);
