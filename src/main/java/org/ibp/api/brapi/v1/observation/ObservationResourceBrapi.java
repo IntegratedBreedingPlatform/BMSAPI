@@ -3,7 +3,7 @@ package org.ibp.api.brapi.v1.observation;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
+import org.ibp.api.java.dataset.DatasetTypeService;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.domain.common.PagedResult;
