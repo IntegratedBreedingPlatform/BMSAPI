@@ -87,7 +87,7 @@ public class DerivedVariableValidator {
 
 	}
 
-	public void verifySubObservationsInputVariablesInAggregateFunction(final int variableId, final int studyId, final int datasetId, final Map<Integer, Integer> inputVariableDatasetMap) {
+	void verifySubObservationsInputVariablesInAggregateFunction(final int variableId, final int studyId, final int datasetId, final Map<Integer, Integer> inputVariableDatasetMap) {
 		Integer plotDatasetId = this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
 		if(!plotDatasetId.equals(datasetId)) {
 			return;
@@ -116,20 +116,4 @@ public class DerivedVariableValidator {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
-
-	protected Set<Integer> getVariableIdsOfTraitsInDataset(final int datasetId) {
-		final Set<Integer> variableIdsOfTraitsInDataset = new HashSet<>();
-		final List<MeasurementVariable> traits =
-			datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId()));
-
-		if (!traits.isEmpty()) {
-			for (final MeasurementVariable trait : traits) {
-				variableIdsOfTraitsInDataset.add(trait.getTermId());
-			}
-		}
-
-		return variableIdsOfTraitsInDataset;
-
-	}
-
 }

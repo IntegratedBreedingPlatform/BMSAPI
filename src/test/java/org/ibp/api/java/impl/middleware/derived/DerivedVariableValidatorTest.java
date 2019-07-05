@@ -5,19 +5,24 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.rest.dataset.DatasetDTO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -27,6 +32,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DerivedVariableValidatorTest {
 
+	private static Integer VARIABLE_ID = 29001;
+	private static Integer STUDY_ID = 1001;
+	private static Integer DATASET_ID = 1002;
 	@Mock
 	private FormulaService formulaService;
 
@@ -163,6 +171,45 @@ public class DerivedVariableValidatorTest {
 			formulaDto.setDefinition("{{29001}}/{{1001}}");
 			this.variableValidator.validateSubobservationInputVariable(Optional.of(formulaDto), formulaVariable);
 			fail("Should throw an exception");
+		} catch (final ApiRequestValidationException e) {
+		}
+	}
+
+	@Test
+	public void testVerifySubObservationsInputVariablesInAggregateFunction() {
+		final Map<Integer, Integer> inputVariableDatasetMap = new HashMap<>();
+		inputVariableDatasetMap.put(VARIABLE_ID, 1003);
+		final DatasetDTO plotDataset = new DatasetDTO();
+		plotDataset.setDatasetId(DATASET_ID);
+		Mockito.when(this.datasetService.getDatasets(STUDY_ID, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId())))).thenReturn(Arrays.asList(plotDataset));
+
+		final FormulaDto formulaDto = new FormulaDto();
+		formulaDto.setDefinition("sum({{29001}})");
+		FormulaVariable formulaVariable = new FormulaVariable();
+		formulaVariable.setId(29001);
+		formulaDto.setInputs(Arrays.asList(formulaVariable));
+		Mockito.when(this.formulaService.getByTargetId(VARIABLE_ID)).thenReturn(Optional.of(formulaDto));
+
+		final DatasetDTO subobsDataset =  new DatasetDTO();
+		subobsDataset.setDatasetId(1003);
+		Mockito.when(this.datasetService.getDatasets(STUDY_ID, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId(), DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId())))).thenReturn(Arrays.asList(subobsDataset));
+
+		try {
+			this.variableValidator.verifySubObservationsInputVariablesInAggregateFunction(VARIABLE_ID, STUDY_ID, DATASET_ID, inputVariableDatasetMap);
+		} catch (final ApiRequestValidationException e) {
+			fail("Method should not throw an exception");
+		}
+
+		try {
+			this.variableValidator.verifySubObservationsInputVariablesInAggregateFunction(VARIABLE_ID, STUDY_ID, DATASET_ID, inputVariableDatasetMap);
+		} catch (final ApiRequestValidationException e) {
+			fail("Method should not throw an exception");
+		}
+
+		try {
+			formulaDto.setDefinition("{{29001}}/10");
+			this.variableValidator.verifySubObservationsInputVariablesInAggregateFunction(VARIABLE_ID, STUDY_ID, DATASET_ID, inputVariableDatasetMap);
+			fail("Method should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 		}
 	}
