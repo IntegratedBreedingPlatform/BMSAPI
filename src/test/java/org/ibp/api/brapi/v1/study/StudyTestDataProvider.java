@@ -24,7 +24,7 @@ public class StudyTestDataProvider {
 		user.setLastName("admin");
 		final UserRoleDto userRoleDto = new UserRoleDto(1,
 			new RoleDto(1, "Admin", "", "instance", true, true, true), null,
-			null);
+			null, null);
 		final List<UserRoleDto> userRoleDtos = new ArrayList<>();
 		userRoleDtos.add(userRoleDto);
 		user.setUserRoles(userRoleDtos);

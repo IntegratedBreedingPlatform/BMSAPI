@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<UserDetailDto> getAllUsersSortedByLastName() {
 
-		this.securityService.requireCurrentUserIsAdmin();
+		//TODO Check by SITE_ADMIN authority
 
 		final List<UserDetailDto> result = new ArrayList<>();
 		final ModelMapper mapper = UserMapper.getInstance();
@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Map<String, Object> updateUser(final UserDetailDto user) {
 
-		this.securityService.requireCurrentUserIsAdmin();
+		//TODO Check by SITE_ADMIN authority
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
 		final HashMap<String, Object> mapResponse = new HashMap<String, Object>();
@@ -186,6 +186,17 @@ public class UserServiceImpl implements UserService {
 		userdto.setEmail(user.getEmail());
 		userdto.setStatus("true".equals(user.getStatus()) ? 0 : 1);
 		userdto.setCrops(user.getCrops());
+
+		if (user.getUserRoles() != null && !user.getUserRoles().isEmpty()) {
+			final String userName = SecurityUtil.getLoggedInUserName();
+			final WorkbenchUser workbenchUser = this.workbenchDataManager.getUserByUsername(userName);
+			userdto.getUserRoles().forEach(userRoleDto -> {
+				if (user.getId() == null || user.getId() == 0 || userRoleDto.getCreatedBy() == null || userRoleDto.getCreatedBy() == 0) {
+					userRoleDto.setCreatedBy(workbenchUser.getUserid());
+				}
+			});
+		}
+
 		return userdto;
 	}
 

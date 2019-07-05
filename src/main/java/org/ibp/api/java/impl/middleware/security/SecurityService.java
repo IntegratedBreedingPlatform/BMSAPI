@@ -23,6 +23,7 @@ public interface SecurityService {
 	/**
 	 * Checks whether the currently logged-in user has ADMIN or SUPERADMIN role. Throws ForbiddenException if not.
 	 */
+	//TODO Remove this function
 	void requireCurrentUserIsAdmin();
 
 	/**
