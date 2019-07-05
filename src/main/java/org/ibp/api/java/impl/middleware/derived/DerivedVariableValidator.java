@@ -2,10 +2,8 @@ package org.ibp.api.java.impl.middleware.derived;
 
 import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
@@ -29,10 +27,10 @@ import java.util.regex.Pattern;
 @Component
 public class DerivedVariableValidator {
 
-	public static final String STUDY_EXECUTE_CALCULATION_INVALID_REQUEST = "study.execute.calculation.invalid.request";
-	public static final String STUDY_EXECUTE_CALCULATION_FORMULA_NOT_FOUND = "study.execute.calculation.formula.not.found";
-	public static final String STUDY_EXECUTE_CALCULATION_MISSING_VARIABLES = "study.execute.calculation.missing.variables";
-	public static final String STUDY_EXECUTE_CALCULATION_NOT_AGGREGATE_FUNCTION = "study.execute.calculation.not.aggregate.function";
+	static final String STUDY_EXECUTE_CALCULATION_INVALID_REQUEST = "study.execute.calculation.invalid.request";
+	static final String STUDY_EXECUTE_CALCULATION_FORMULA_NOT_FOUND = "study.execute.calculation.formula.not.found";
+	static final String STUDY_EXECUTE_CALCULATION_MISSING_VARIABLES = "study.execute.calculation.missing.variables";
+	private static final String STUDY_EXECUTE_CALCULATION_NOT_AGGREGATE_FUNCTION = "study.execute.calculation.not.aggregate.function";
 
 	@Resource
 	private FormulaService formulaService;
