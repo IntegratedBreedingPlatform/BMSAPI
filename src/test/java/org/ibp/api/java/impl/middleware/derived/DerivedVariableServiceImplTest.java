@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.derived;
 
+import com.beust.jcommander.internal.Sets;
 import com.google.common.base.Optional;
 import org.apache.commons.lang.math.RandomUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
@@ -7,6 +8,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
@@ -27,12 +29,16 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,6 +58,8 @@ public class DerivedVariableServiceImplTest {
 	public static final String VARIABLE4_NAME = "VARIABLE4";
 	public static final String VARIABLE5_NAME = "VARIABLE5";
 	public static final String VARIABLE6_NAME = "VARIABLE6";
+	public static final String VARIABLE7_NAME = "VARIABLE7";
+	public static final String VARIABLE8_NAME = "VARIABLE8";
 
 	public static final int TARGET_VARIABLE_TERMID = 321;
 	public static final int VARIABLE1_TERMID = 123;
@@ -60,6 +68,8 @@ public class DerivedVariableServiceImplTest {
 	public static final int VARIABLE4_TERMID = 20439;
 	public static final int VARIABLE5_TERMID = 8630;
 	public static final int VARIABLE6_TERMID = 8830;
+	public static final int VARIABLE7_TERMID = 1111;
+	public static final int VARIABLE8_TERMID = 2222;
 
 	private static final String TERM_VALUE_1 = "1000";
 	private static final String TERM_VALUE_2 = "12.5";
@@ -67,14 +77,16 @@ public class DerivedVariableServiceImplTest {
 	private static final String DATE_TERM1_VALUE = "20180101";
 	private static final String DATE_TERM2_VALUE = "20180101";
 
+	// TODO: When AVG and SUM functions are already implemented, verify the aggregate functions and sub-observation values are evaluated properly.
 	private static final String FORMULA = "({{" + VARIABLE1_TERMID + "}}/100)*((100-{{" + VARIABLE2_TERMID + "}})/(100-12.5))*(10/{{"
 		+ VARIABLE3_TERMID + "}}) + fn:daysdiff({{" + VARIABLE5_TERMID + "}},{{" + VARIABLE6_TERMID + "}})";
 	private static final String FORMULA_RESULT = "10";
 
 	public static final int STUDY_ID = RandomUtils.nextInt();
 	public static final int DATASET_ID = RandomUtils.nextInt();
+	public static final int OBSERVATION_UNIT_ID = RandomUtils.nextInt();
 	public static final List<Integer> GEO_LOCATION_IDS = new ArrayList<>();
-	private Map<Integer, Integer> inputVariableDatasetMap;
+	private final Map<Integer, Integer> inputVariableDatasetMap = new HashMap<>();
 
 	@Mock
 	private DatasetService middlwareDatasetService;
@@ -94,7 +106,7 @@ public class DerivedVariableServiceImplTest {
 	@Mock
 	private FormulaService formulaService;
 
-	private ResourceBundleMessageSource resourceBundleMessageSource = new ResourceBundleMessageSource();
+	private final ResourceBundleMessageSource resourceBundleMessageSource = new ResourceBundleMessageSource();
 
 	@InjectMocks
 	private final DerivedVariableServiceImpl derivedVariableService = new DerivedVariableServiceImpl();
@@ -106,14 +118,17 @@ public class DerivedVariableServiceImplTest {
 
 		// We cannot mock resourceBundleMessageSource.getMessage because the method is marked as final.
 		// So as a workaround, use a real class instance and set setUseCodeAsDefaultMessage to true
-		resourceBundleMessageSource.setUseCodeAsDefaultMessage(true);
-		derivedVariableService.setResourceBundleMessageSource(resourceBundleMessageSource);
-		derivedVariableService.setProcessor(processor);
+		this.resourceBundleMessageSource.setUseCodeAsDefaultMessage(true);
+		this.derivedVariableService.setResourceBundleMessageSource(this.resourceBundleMessageSource);
+		this.derivedVariableService.setProcessor(this.processor);
 
 		GEO_LOCATION_IDS.add(RandomUtils.nextInt());
 
-		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap = this.createInstanceIdObservationUnitRowsMap();
+		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap =
+			this.createInstanceIdObservationUnitRowsMap(OBSERVATION_UNIT_ID);
 		final Map<Integer, MeasurementVariable> measurementVariablesMap = this.createMeasurementVariablesMap();
+		final Map<Integer, Map<String, List<Object>>> aggregateValuesFromSubObservation =
+			this.createValuesFromSubObservationMap(OBSERVATION_UNIT_ID);
 		final FormulaDto formula = this.createFormula(FORMULA);
 
 		when(this.middlwareDatasetService.getInstanceIdToObservationUnitRowsMap(STUDY_ID, DATASET_ID, GEO_LOCATION_IDS))
@@ -121,6 +136,10 @@ public class DerivedVariableServiceImplTest {
 		when(this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMap(STUDY_ID))
 			.thenReturn(measurementVariablesMap);
 		when(this.formulaService.getByTargetId(TARGET_VARIABLE_TERMID)).thenReturn(Optional.of(formula));
+		when(this.middlewareDerivedVariableService.getValuesFromObservations(STUDY_ID, Arrays
+				.asList(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(),
+					DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId(), DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId()),
+			this.inputVariableDatasetMap)).thenReturn(aggregateValuesFromSubObservation);
 
 	}
 
@@ -129,12 +148,15 @@ public class DerivedVariableServiceImplTest {
 
 		final Map<String, Object> result =
 			this.derivedVariableService
-				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, inputVariableDatasetMap, true);
+				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, this.inputVariableDatasetMap, true);
 
 		verify(this.studyValidator).validate(STUDY_ID, false);
 		verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, false);
 		verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 		verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
+		verify(this.derivedVariableValidator)
+			.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+				this.inputVariableDatasetMap);
 
 		final ArgumentCaptor<String> captureValue = ArgumentCaptor.forClass(String.class);
 		final ArgumentCaptor<Integer> captureCategoricalId = ArgumentCaptor.forClass(Integer.class);
@@ -146,6 +168,7 @@ public class DerivedVariableServiceImplTest {
 			captureCategoricalId.capture(), captureObservationUnitId.capture(), captureObservationId.capture(),
 			captureTargetMeasurementVariable.capture());
 
+		// TODO: When AVG and SUM functions are already implemented, verify the aggregate functions and sub-observation values are evaluated properly.
 		assertTrue(result.isEmpty());
 		assertEquals(FORMULA_RESULT, captureValue.getValue());
 		assertNull(captureCategoricalId.getValue());
@@ -158,7 +181,8 @@ public class DerivedVariableServiceImplTest {
 	@Test
 	public void testExecuteHasDataToOverwriteButAvoidOverwriting() {
 
-		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap = this.createInstanceIdObservationUnitRowsMap();
+		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap =
+			this.createInstanceIdObservationUnitRowsMap(OBSERVATION_UNIT_ID);
 
 		// Set a value to the target trait variable so that the system will detect that it needs to be overwritten.
 		instanceIdObservationUnitRowsMap.get(1).get(0).getVariables().get(TARGET_VARIABLE_NAME).setValue("100");
@@ -171,7 +195,7 @@ public class DerivedVariableServiceImplTest {
 			// Set overwriteExistingData to false so that the system will throw a runtime exception that will prevent
 			// the calculated data from overwriting the existing data
 			this.derivedVariableService
-				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, inputVariableDatasetMap, false);
+				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, this.inputVariableDatasetMap, false);
 
 			fail("Should throw OverwriteDataException");
 
@@ -181,6 +205,9 @@ public class DerivedVariableServiceImplTest {
 			verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, false);
 			verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 			verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
+			verify(this.derivedVariableValidator)
+				.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+					this.inputVariableDatasetMap);
 
 			final ArgumentCaptor<String> captureValue = ArgumentCaptor.forClass(String.class);
 			final ArgumentCaptor<Integer> captureCategoricalId = ArgumentCaptor.forClass(Integer.class);
@@ -199,7 +226,8 @@ public class DerivedVariableServiceImplTest {
 	@Test
 	public void testExecuteHasDataToOverwrite() {
 
-		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap = this.createInstanceIdObservationUnitRowsMap();
+		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap =
+			this.createInstanceIdObservationUnitRowsMap(OBSERVATION_UNIT_ID);
 
 		// Set a value to the target trait variable so that the system will detect that it needs to be overwritten.
 		instanceIdObservationUnitRowsMap.get(1).get(0).getVariables().get(TARGET_VARIABLE_NAME).setValue("100");
@@ -209,12 +237,15 @@ public class DerivedVariableServiceImplTest {
 
 		final Map<String, Object> result =
 			this.derivedVariableService
-				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, inputVariableDatasetMap, true);
+				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, this.inputVariableDatasetMap, true);
 
 		verify(this.studyValidator).validate(STUDY_ID, false);
 		verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, false);
 		verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 		verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
+		verify(this.derivedVariableValidator)
+			.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+				this.inputVariableDatasetMap);
 
 		final ArgumentCaptor<String> captureValue = ArgumentCaptor.forClass(String.class);
 		final ArgumentCaptor<Integer> captureCategoricalId = ArgumentCaptor.forClass(Integer.class);
@@ -238,7 +269,8 @@ public class DerivedVariableServiceImplTest {
 	@Test
 	public void testExecuteParseDateError() {
 
-		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap = this.createInstanceIdObservationUnitRowsMap();
+		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap =
+			this.createInstanceIdObservationUnitRowsMap(OBSERVATION_UNIT_ID);
 
 		// Set a invalide date format value to the date type input variables
 		instanceIdObservationUnitRowsMap.get(1).get(0).getVariables().get(VARIABLE5_NAME).setValue("20202020");
@@ -249,7 +281,7 @@ public class DerivedVariableServiceImplTest {
 
 		try {
 			this.derivedVariableService
-				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, inputVariableDatasetMap, false);
+				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, this.inputVariableDatasetMap, false);
 			fail("Should throw ApiRequestValidationException");
 		} catch (final ApiRequestValidationException e) {
 
@@ -258,6 +290,9 @@ public class DerivedVariableServiceImplTest {
 			verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, false);
 			verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 			verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
+			verify(this.derivedVariableValidator)
+				.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+					this.inputVariableDatasetMap);
 			verify(this.middlewareDerivedVariableService, times(0)).saveCalculatedResult(anyString(),
 				anyInt(), anyInt(), anyInt(),
 				any(MeasurementVariable.class));
@@ -274,7 +309,7 @@ public class DerivedVariableServiceImplTest {
 
 		try {
 			this.derivedVariableService
-				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, inputVariableDatasetMap, false);
+				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, this.inputVariableDatasetMap, false);
 			fail("Should throw ApiRequestValidationException");
 		} catch (final ApiRequestValidationException e) {
 
@@ -283,6 +318,9 @@ public class DerivedVariableServiceImplTest {
 			verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, false);
 			verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 			verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
+			verify(this.derivedVariableValidator)
+				.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+					this.inputVariableDatasetMap);
 			verify(this.middlewareDerivedVariableService, times(0)).saveCalculatedResult(anyString(),
 				anyInt(), anyInt(), anyInt(),
 				any(MeasurementVariable.class));
@@ -294,7 +332,8 @@ public class DerivedVariableServiceImplTest {
 	@Test
 	public void testExecuteHasInputMissingData() {
 
-		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap = this.createInstanceIdObservationUnitRowsMap();
+		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap =
+			this.createInstanceIdObservationUnitRowsMap(OBSERVATION_UNIT_ID);
 
 		// Set empty values for input variables so that the system will detect it.
 		instanceIdObservationUnitRowsMap.get(1).get(0).getVariables().get(VARIABLE1_NAME).setValue("");
@@ -305,17 +344,76 @@ public class DerivedVariableServiceImplTest {
 
 		final Map<String, Object> result =
 			this.derivedVariableService
-				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, inputVariableDatasetMap, true);
+				.execute(STUDY_ID, DATASET_ID, TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS, this.inputVariableDatasetMap, true);
 
 		verify(this.studyValidator).validate(STUDY_ID, false);
 		verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, false);
 		verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 		verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
+		verify(this.derivedVariableValidator)
+			.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+				this.inputVariableDatasetMap);
 
 		assertEquals(
 			DerivedVariableServiceImpl.STUDY_EXECUTE_CALCULATION_MISSING_DATA,
 			result.get(DerivedVariableServiceImpl.INPUT_MISSING_DATA_RESULT_KEY));
 
+	}
+
+	@Test
+	public void testGetMissingFormulaVariablesInStudy() {
+
+		final Set<FormulaVariable> expectedResult = new HashSet<>();
+		expectedResult.add(new FormulaVariable());
+
+		when(this.middlewareDerivedVariableService.getMissingFormulaVariablesInStudy(STUDY_ID, DATASET_ID, VARIABLE1_TERMID))
+			.thenReturn(expectedResult);
+		final Set<FormulaVariable> result =
+			this.derivedVariableService.getMissingFormulaVariablesInStudy(STUDY_ID, DATASET_ID, VARIABLE1_TERMID);
+
+		verify(this.studyValidator).validate(STUDY_ID, false);
+		verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, false);
+		assertSame(expectedResult, result);
+
+	}
+
+	@Test
+	public void testGetFormulaVariablesInStudy() {
+
+		final Set<FormulaVariable> expectedResult = new HashSet<>();
+		expectedResult.add(new FormulaVariable());
+
+		when(this.middlewareDerivedVariableService.getFormulaVariablesInStudy(STUDY_ID, DATASET_ID)).thenReturn(expectedResult);
+		final Set<FormulaVariable> result = this.derivedVariableService.getFormulaVariablesInStudy(STUDY_ID, DATASET_ID);
+		verify(this.studyValidator).validate(STUDY_ID, false);
+		verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, false);
+
+		assertSame(expectedResult, result);
+	}
+
+	@Test
+	public void testCountCalculatedVariablesInDatasets() {
+		final Set<Integer> datasetIds = new HashSet<>(Arrays.asList(DATASET_ID));
+		when(this.middlewareDerivedVariableService.countCalculatedVariablesInDatasets(datasetIds)).thenReturn(1);
+		final long result = this.derivedVariableService.countCalculatedVariablesInDatasets(STUDY_ID, datasetIds);
+		verify(this.studyValidator).validate(STUDY_ID, false);
+		verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, false);
+		assertEquals(1, result);
+	}
+
+	@Test
+	public void testGetFormulaVariableDatasetMap() {
+
+		final Map<Integer, Map<String, Object>> expectedResult = new HashMap<>();
+
+		when(this.middlewareDerivedVariableService.createInputVariableDatasetReferenceMap(STUDY_ID, DATASET_ID, VARIABLE1_TERMID))
+			.thenReturn(expectedResult);
+		final Map<Integer, Map<String, Object>> result =
+			this.derivedVariableService.getFormulaVariableDatasetMap(STUDY_ID, DATASET_ID, VARIABLE1_TERMID);
+		verify(this.studyValidator).validate(STUDY_ID, false);
+		verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, false);
+
+		assertSame(expectedResult, result);
 	}
 
 	private FormulaDto createFormula(final String formula) {
@@ -366,6 +464,10 @@ public class DerivedVariableServiceImplTest {
 			DataType.DATE_TIME_VARIABLE));
 		measurementVariablesMap.put(VARIABLE6_TERMID, this.createMeasurementVariable(VARIABLE6_TERMID, VARIABLE6_NAME,
 			DataType.DATE_TIME_VARIABLE));
+		measurementVariablesMap.put(VARIABLE7_TERMID, this.createMeasurementVariable(VARIABLE7_TERMID, VARIABLE7_NAME,
+			DataType.NUMERIC_VARIABLE));
+		measurementVariablesMap.put(VARIABLE8_TERMID, this.createMeasurementVariable(VARIABLE8_TERMID, VARIABLE8_NAME,
+			DataType.NUMERIC_VARIABLE));
 
 		return measurementVariablesMap;
 
@@ -379,10 +481,19 @@ public class DerivedVariableServiceImplTest {
 		return measurementVariable;
 	}
 
-	private Map<Integer, List<ObservationUnitRow>> createInstanceIdObservationUnitRowsMap() {
+	private Map<Integer, List<ObservationUnitRow>> createInstanceIdObservationUnitRowsMap(final Integer observationUnitId) {
 		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap = new HashMap<>();
-		instanceIdObservationUnitRowsMap.put(1, Arrays.asList(this.createObservationUnitRowTestData(1)));
+		instanceIdObservationUnitRowsMap.put(1, Arrays.asList(this.createObservationUnitRowTestData(observationUnitId)));
 		return instanceIdObservationUnitRowsMap;
+	}
+
+	private Map<Integer, Map<String, List<Object>>> createValuesFromSubObservationMap(final Integer observationUnitId) {
+		final Map<Integer, Map<String, List<Object>>> valuesFromSubObservationMap = new HashMap<>();
+		final Map<String, List<Object>> valuesPerVariable = new HashMap<>();
+		valuesPerVariable.put(String.valueOf(VARIABLE7_TERMID), Arrays.asList("1", "2", "3"));
+		valuesPerVariable.put(String.valueOf(VARIABLE8_TERMID), Arrays.asList("4", "5", "6"));
+		valuesFromSubObservationMap.put(observationUnitId, valuesPerVariable);
+		return valuesFromSubObservationMap;
 	}
 
 	private ObservationUnitRow createObservationUnitRowTestData(final Integer observationUnitId) {

@@ -610,4 +610,24 @@ public class DatasetServiceImplTest {
 		Mockito.verify(this.middlewareDatasetService).setValueToVariable(datasetId, paramDTO, studyId);
 	}
 
+	@Test
+	public void testAcceptDraftDataAndSetOutOfBoundsToMissing() {
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int datasetId = random.nextInt();
+		this.studyDatasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId);
+		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, false);
+	}
+
+	@Test
+	public void testAcceptAllDatasetDraftData() {
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int datasetId = random.nextInt();
+		this.studyDatasetService.acceptAllDatasetDraftData(studyId, datasetId);
+		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId, false);
+	}
+
 }
