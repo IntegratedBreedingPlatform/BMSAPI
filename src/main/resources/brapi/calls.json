@@ -293,6 +293,21 @@
         "versions": [
           "1.3"
         ]
+      },
+      {
+        "call": "observationLevels",
+        "dataTypes": [
+          "application/json"
+        ],
+        "datatypes": [
+          "json"
+        ],
+        "methods": [
+          "GET"
+        ],
+        "versions": [
+          "1.3"
+        ]
       }
     ]
 }
