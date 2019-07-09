@@ -7,7 +7,6 @@ import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
@@ -31,6 +30,7 @@ import static org.apache.commons.lang.math.RandomUtils.nextInt;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -48,9 +48,6 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 	}
 
 	@Autowired
-	private GermplasmDataManager germplasmDataManager;
-
-	@Autowired
 	private SearchRequestService searchRequestService;
 
 	@Autowired
@@ -65,7 +62,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		pedigreeDTO.setGermplasmDbId(gid);
 		pedigreeDTO.setPedigree(randomAlphanumeric(255));
 
-		when(this.germplasmDataManager.getPedigree(gid, null, null)).thenReturn(pedigreeDTO);
+		doReturn(pedigreeDTO).when(this.germplasmService).getPedigree(gid, null, null);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm/" + germplasmDbId + "/pedigree")
 			.contentType(this.contentType)
@@ -90,7 +87,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		progenies.add(progeny);
 		progenyDTO.setProgeny(progenies);
 
-		when(this.germplasmDataManager.getProgeny(gid)).thenReturn(progenyDTO);
+		doReturn(progenyDTO).when(this.germplasmService).getProgeny(gid);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/germplasm/" + germplasmDbId + "/progeny")
 			.contentType(this.contentType)
@@ -114,10 +111,9 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		germplasmDTO.setGermplasmDbId(germplasmDbId);
 		list.add(germplasmDTO);
 
-		when(this.searchRequestService.getSearchRequest(requestId, GermplasmSearchRequestDto.class)).thenReturn(germplasmSearchRequestDTO);
-		when(this.germplasmDataManager
-			.searchGermplasmDTO(germplasmSearchRequestDTO, BrapiPagedResult.DEFAULT_PAGE_NUMBER, BrapiPagedResult.DEFAULT_PAGE_SIZE))
-			.thenReturn(list);
+		doReturn(germplasmSearchRequestDTO).when(this.searchRequestService).getSearchRequest(requestId, GermplasmSearchRequestDto.class);
+		doReturn(list).when(this.germplasmService)
+			.searchGermplasmDTO(germplasmSearchRequestDTO, BrapiPagedResult.DEFAULT_PAGE_NUMBER, BrapiPagedResult.DEFAULT_PAGE_SIZE);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/search/germplasm/" + requestId)
 			.contentType(this.contentType)
