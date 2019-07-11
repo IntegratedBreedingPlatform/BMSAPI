@@ -1,9 +1,9 @@
 package org.ibp.api.java.impl.middleware.derived;
 
-import com.beust.jcommander.internal.Sets;
 import com.google.common.base.Optional;
 import org.apache.commons.lang.math.RandomUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
+import org.generationcp.middleware.domain.dms.VariableDatasetsDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -133,7 +132,7 @@ public class DerivedVariableServiceImplTest {
 
 		when(this.middlwareDatasetService.getInstanceIdToObservationUnitRowsMap(STUDY_ID, DATASET_ID, GEO_LOCATION_IDS))
 			.thenReturn(instanceIdObservationUnitRowsMap);
-		when(this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMap(STUDY_ID))
+		when(this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMapInStudy(STUDY_ID))
 			.thenReturn(measurementVariablesMap);
 		when(this.formulaService.getByTargetId(TARGET_VARIABLE_TERMID)).thenReturn(Optional.of(formula));
 		when(this.middlewareDerivedVariableService.getValuesFromObservations(STUDY_ID, Arrays
@@ -404,12 +403,12 @@ public class DerivedVariableServiceImplTest {
 	@Test
 	public void testGetFormulaVariableDatasetMap() {
 
-		final Map<Integer, Map<String, Object>> expectedResult = new HashMap<>();
+		final Map<Integer,VariableDatasetsDTO> expectedResult = new HashMap<>();
 
-		when(this.middlewareDerivedVariableService.createInputVariableDatasetReferenceMap(STUDY_ID, DATASET_ID, VARIABLE1_TERMID))
+		when(this.middlewareDerivedVariableService.createVariableDatasetsMap(STUDY_ID, DATASET_ID, VARIABLE1_TERMID))
 			.thenReturn(expectedResult);
-		final Map<Integer, Map<String, Object>> result =
-			this.derivedVariableService.getFormulaVariableDatasetMap(STUDY_ID, DATASET_ID, VARIABLE1_TERMID);
+		final Map<Integer, VariableDatasetsDTO> result =
+			this.derivedVariableService.getFormulaVariableDatasetsMap(STUDY_ID, DATASET_ID, VARIABLE1_TERMID);
 		verify(this.studyValidator).validate(STUDY_ID, false);
 		verify(this.datasetValidator).validateDataset(STUDY_ID, DATASET_ID, false);
 

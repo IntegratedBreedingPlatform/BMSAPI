@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.dms.VariableDatasetsDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
@@ -90,7 +91,8 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		this.derivedVariableValidator.validate(variableId, geoLocationIds);
 		this.derivedVariableValidator.verifyInputVariablesArePresentInStudy(variableId, datasetId, studyId);
-		this.derivedVariableValidator.verifySubObservationsInputVariablesInAggregateFunction(variableId, studyId, datasetId, inputVariableDatasetMap);
+		this.derivedVariableValidator
+			.verifySubObservationsInputVariablesInAggregateFunction(variableId, studyId, datasetId, inputVariableDatasetMap);
 
 		// Get the list of observation unit rows grouped by intances
 		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap =
@@ -99,7 +101,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		// that we can determine the datatype and possibleValue of a ObservationUnitData and input variable values from different
 		// levels.
 		final Map<Integer, MeasurementVariable> measurementVariablesMap =
-			this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMap(studyId);
+			this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMapInStudy(studyId);
 
 		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
 		final FormulaDto formula = formulaOptional.get();
@@ -263,10 +265,11 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	@Override
-	public Map<Integer, Map<String, Object>> getFormulaVariableDatasetMap(final Integer studyId, final Integer datasetId, final Integer variableId) {
+	public Map<Integer, VariableDatasetsDTO> getFormulaVariableDatasetsMap(final Integer studyId, final Integer datasetId,
+		final Integer variableId) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
-		return this.middlewareDerivedVariableService.createInputVariableDatasetReferenceMap(studyId, datasetId, variableId);
+		return this.middlewareDerivedVariableService.createVariableDatasetsMap(studyId, datasetId, variableId);
 	}
 
 	protected void setProcessor(final DerivedVariableProcessor processor) {

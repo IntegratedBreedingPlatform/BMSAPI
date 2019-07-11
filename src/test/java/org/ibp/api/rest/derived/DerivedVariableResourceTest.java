@@ -206,7 +206,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 		formulaVariablesDatasetMap.put(termId, values);
 
 		doReturn(formulaVariablesDatasetMap).when(this.derivedVariableService)
-			.getFormulaVariableDatasetMap(100, 101, 103);
+			.getFormulaVariableDatasetsMap(100, 101, 103);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders

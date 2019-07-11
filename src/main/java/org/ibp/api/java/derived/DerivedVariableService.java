@@ -1,7 +1,6 @@
 package org.ibp.api.java.derived;
 
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableDatasetsDTO;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 
 import java.util.List;
@@ -21,5 +20,6 @@ public interface DerivedVariableService {
 
 	long countCalculatedVariablesInDatasets(final int studyId, final Set<Integer> datasetIds);
 
-	Map<Integer, Map<String, Object>> getFormulaVariableDatasetMap(final Integer studyId, final Integer datasetId, final Integer variableId);
+	Map<Integer, VariableDatasetsDTO> getFormulaVariableDatasetsMap(final Integer studyId, final Integer datasetId,
+		final Integer variableId);
 }

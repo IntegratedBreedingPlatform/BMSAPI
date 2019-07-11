@@ -2,6 +2,7 @@ package org.ibp.api.rest.derived;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.domain.dms.VariableDatasetsDTO;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.ibp.api.exception.OverwriteDataException;
 import org.ibp.api.java.derived.DerivedVariableService;
@@ -60,7 +61,8 @@ public class DerivedVariableResource {
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId,
 		@PathVariable final Integer variableId) {
-		return new ResponseEntity<>(this.derivedVariableService.getMissingFormulaVariablesInStudy(studyId, datasetId, variableId), HttpStatus.OK);
+		return new ResponseEntity<>(this.derivedVariableService.getMissingFormulaVariablesInStudy(studyId, datasetId, variableId),
+			HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Get All Formula Variables", notes =
@@ -92,12 +94,13 @@ public class DerivedVariableResource {
 	@ApiOperation(value = "Get a map of formula variables and dataset(s) from where they belong to", notes = "")
 	@ResponseBody
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/formula-variables/dataset-map", method = RequestMethod.GET)
-	public ResponseEntity<Map<Integer, Map<String, Object>>> getFormulaVariableDatasetMap(
+	public ResponseEntity<Map<Integer, VariableDatasetsDTO>> getFormulaVariableDatasetMap(
 		@PathVariable final String crop,
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId,
 		@PathVariable final Integer variableId) {
-		return new ResponseEntity<>(this.derivedVariableService.getFormulaVariableDatasetMap(studyId, datasetId, variableId), HttpStatus.OK);
+		return new ResponseEntity<>(this.derivedVariableService.getFormulaVariableDatasetsMap(studyId, datasetId, variableId),
+			HttpStatus.OK);
 	}
 
 }

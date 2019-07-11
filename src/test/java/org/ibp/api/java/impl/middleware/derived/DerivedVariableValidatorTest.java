@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.derived;
 
 import com.google.common.base.Optional;
 import org.apache.commons.lang.math.RandomUtils;
+import org.fest.util.Collections;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
@@ -32,9 +33,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DerivedVariableValidatorTest {
 
-	private static Integer VARIABLE_ID = 29001;
-	private static Integer STUDY_ID = 1001;
-	private static Integer DATASET_ID = 1002;
+	private static final Integer VARIABLE_ID = 29001;
+	private static final Integer STUDY_ID = 1001;
+	private static final Integer DATASET_ID = 1002;
 	@Mock
 	private FormulaService formulaService;
 
@@ -87,9 +88,9 @@ public class DerivedVariableValidatorTest {
 	@Test
 	public void testVerifyMissingInputVariablesVariablesAreNotPresentInADataset() {
 
-		final Integer studyId = RandomUtils.nextInt();
-		final Integer variableId = RandomUtils.nextInt();
-		final Integer datasetId = RandomUtils.nextInt();
+		final int studyId = RandomUtils.nextInt();
+		final int variableId = RandomUtils.nextInt();
+		final int datasetId = RandomUtils.nextInt();
 		final FormulaDto formulaDto = new FormulaDto();
 
 		// Create two input variables for the target variable.
@@ -103,6 +104,9 @@ public class DerivedVariableValidatorTest {
 		formulaDto.setTarget(targetVariable);
 
 		when(this.formulaService.getByTargetId(variableId)).thenReturn(Optional.of(formulaDto));
+		when(this.middlewareDerivedVariableService.getMissingFormulaVariablesInStudy(studyId, datasetId, variableId))
+			.thenReturn(Collections.set(formulaVariable1, formulaVariable2));
+
 		try {
 			this.variableValidator.verifyInputVariablesArePresentInStudy(variableId, datasetId, studyId);
 			fail("Method should throw an exception");
@@ -115,9 +119,9 @@ public class DerivedVariableValidatorTest {
 	@Test
 	public void testVerifyMissingInputVariablesVariablesArePresentInADataset() {
 
-		final Integer studyId = RandomUtils.nextInt();
-		final Integer variableId = RandomUtils.nextInt();
-		final Integer datasetId = RandomUtils.nextInt();
+		final int studyId = RandomUtils.nextInt();
+		final int variableId = RandomUtils.nextInt();
+		final int datasetId = RandomUtils.nextInt();
 		final FormulaDto formulaDto = new FormulaDto();
 
 		// Create two input variables for the target variable.
@@ -138,13 +142,9 @@ public class DerivedVariableValidatorTest {
 		final MeasurementVariable inputMeasurementVariable2 = new MeasurementVariable();
 		inputMeasurementVariable2.setTermId(formulaVariable2.getId());
 
-		final Set<Integer> variableIds = new HashSet<>();
-		variableIds.add(formulaVariable1.getId());
-		variableIds.add(formulaVariable2.getId());
-
 		when(this.formulaService.getByTargetId(variableId)).thenReturn(Optional.of(formulaDto));
-		when(this.middlewareDerivedVariableService.extractVariableIdsFromDataset(studyId, datasetId))
-			.thenReturn(variableIds);
+		when(this.middlewareDerivedVariableService.getMissingFormulaVariablesInStudy(studyId, datasetId, variableId))
+			.thenReturn(new HashSet<>());
 
 		try {
 			this.variableValidator.verifyInputVariablesArePresentInStudy(variableId, datasetId, studyId);
@@ -158,7 +158,7 @@ public class DerivedVariableValidatorTest {
 	public void testValidateSubobservationInputVariable() {
 		final FormulaDto formulaDto = new FormulaDto();
 		formulaDto.setDefinition("sum({{29001}})");
-		FormulaVariable formulaVariable = new FormulaVariable();
+		final FormulaVariable formulaVariable = new FormulaVariable();
 		formulaVariable.setId(29001);
 
 		try {
@@ -185,7 +185,7 @@ public class DerivedVariableValidatorTest {
 
 		final FormulaDto formulaDto = new FormulaDto();
 		formulaDto.setDefinition("sum({{29001}})");
-		FormulaVariable formulaVariable = new FormulaVariable();
+		final FormulaVariable formulaVariable = new FormulaVariable();
 		formulaVariable.setId(29001);
 		formulaDto.setInputs(Arrays.asList(formulaVariable));
 		Mockito.when(this.formulaService.getByTargetId(VARIABLE_ID)).thenReturn(Optional.of(formulaDto));
