@@ -5,8 +5,6 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -19,19 +17,18 @@ import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Collections;
 import java.util.List;
 
 public class GermplasmServiceImplTest {
 
-	public static final int PAGE_SIZE = 10;
-	public static final int PAGE = 1;
+	private static final int PAGE_SIZE = 10;
+	private static final int PAGE = 1;
 	private GermplasmServiceImpl germplasmServiceImpl;
 
 	@Mock
@@ -57,7 +54,7 @@ public class GermplasmServiceImplTest {
 	}
 
 	@Test
-	public void testSearchGermplasm() throws MiddlewareQueryException {
+	public void testSearchGermplasm() {
 
 		final Germplasm gp = new Germplasm();
 		gp.setGid(3);
@@ -70,27 +67,28 @@ public class GermplasmServiceImplTest {
 		Mockito.doReturn(middlewareSearchResults).when(this.germplasmDataManager).searchForGermplasm(Mockito.any(GermplasmSearchParameter.class));
 
 		final String gpPedigree = "CML1/CML2";
-		Mockito.doReturn(gpPedigree).when(this.pedigreeService).getCrossExpansion(gp.getGid(), this.crossExpansionProperties);
+		final Integer gid = gp.getGid();
+		Mockito.doReturn(gpPedigree).when(this.pedigreeService).getCrossExpansion(gid, this.crossExpansionProperties);
 
 		final Name gpName = new Name();
-		gpName.setGermplasmId(gp.getGid());
+		gpName.setGermplasmId(gid);
 		gpName.setNval("CML1");
 		final List<Name> gpNames = Lists.newArrayList(gpName);
-		Mockito.doReturn(gpNames).when(this.germplasmDataManager).getNamesByGID(Matchers.anyInt(),ArgumentMatchers.isNull(Integer.class),
-				ArgumentMatchers.isNull(GermplasmNameType.class));
+			Mockito.doReturn(gpNames).when(this.germplasmDataManager).getNamesByGID(ArgumentMatchers.anyInt(),ArgumentMatchers.eq(null),
+				ArgumentMatchers.eq(null));
 
 		final Method gpMethod = new Method();
 		gpMethod.setMname("Backcross");
-		Mockito.doReturn(gpMethod).when(this.germplasmDataManager).getMethodByID(Matchers.anyInt());
+		Mockito.doReturn(gpMethod).when(this.germplasmDataManager).getMethodByID(ArgumentMatchers.anyInt());
 
 		final Location gpLocation = new Location();
 		gpLocation.setLname("Mexico");
-		Mockito.doReturn(gpLocation).when(this.locationDataManger).getLocationByID(Matchers.anyInt());
+		Mockito.doReturn(gpLocation).when(this.locationDataManger).getLocationByID(ArgumentMatchers.anyInt());
 
 		final List<GermplasmSummary> germplasmSummaries = this.germplasmServiceImpl.searchGermplasm("CML", 1, 20);
 		Assert.assertTrue(!germplasmSummaries.isEmpty());
 
-		Assert.assertEquals(gp.getGid().toString(), germplasmSummaries.get(0).getGermplasmId());
+		Assert.assertEquals(gid.toString(), germplasmSummaries.get(0).getGermplasmId());
 		Assert.assertEquals(gp.getGpid1().toString(), germplasmSummaries.get(0).getParent1Id());
 		Assert.assertEquals(gp.getGpid2().toString(), germplasmSummaries.get(0).getParent2Id());
 		Assert.assertEquals(gpPedigree, germplasmSummaries.get(0).getPedigreeString());
@@ -103,7 +101,6 @@ public class GermplasmServiceImplTest {
 	public void testSearchGermplasmDTO () {
 
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
-		final ArgumentCaptor<GermplasmDTO> captorGermplasmSearchRequestDTO = ArgumentCaptor.forClass(GermplasmDTO.class);
 
 		final GermplasmDTO germplasmDTO = new GermplasmDTO();
 		germplasmDTO.setGermplasmDbId("1");
@@ -112,7 +109,9 @@ public class GermplasmServiceImplTest {
 		final List<GermplasmDTO> germplasmDTOList = Lists.newArrayList(germplasmDTO);
 
 		Mockito.when(this.germplasmDataManager.searchGermplasmDTO(germplasmSearchRequestDTO, PAGE, PAGE_SIZE)).thenReturn(germplasmDTOList);
-		Mockito.when(this.pedigreeService.getCrossExpansion(Integer.parseInt(germplasmDTO.getGermplasmDbId()), this.crossExpansionProperties)).thenReturn("CB1");
+		final int gid = Integer.parseInt(germplasmDTO.getGermplasmDbId());
+		Mockito.when(this.pedigreeService.getCrossExpansions(Collections.singleton(gid), null, this.crossExpansionProperties))
+			.thenReturn(Collections.singletonMap(gid, "CB1"));
 
 		this.germplasmServiceImpl.searchGermplasmDTO(germplasmSearchRequestDTO, PAGE, PAGE_SIZE);
 		Assert.assertEquals("CB1", germplasmDTOList.get(0).getPedigree());
