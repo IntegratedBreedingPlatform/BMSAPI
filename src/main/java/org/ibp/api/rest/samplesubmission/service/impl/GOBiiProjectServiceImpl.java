@@ -1,6 +1,7 @@
 package org.ibp.api.rest.samplesubmission.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Service;
+
 import org.ibp.api.rest.samplesubmission.domain.project.GOBiiProject;
 import org.ibp.api.rest.samplesubmission.domain.common.GOBiiToken;
 import org.ibp.api.rest.samplesubmission.service.GOBiiProjectService;
