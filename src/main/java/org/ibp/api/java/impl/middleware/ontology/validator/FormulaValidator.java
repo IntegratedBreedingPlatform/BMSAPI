@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.service.impl.derived_variables.DerivedVariableServiceImpl;
 import org.ibp.api.java.impl.middleware.ontology.TermRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -153,8 +154,7 @@ public class FormulaValidator implements Validator {
 
 			@Override
 			public boolean apply(@Nullable final VariableType variableType) {
-				return variableType.equals(VariableType.TRAIT) || variableType.equals(VariableType.ENVIRONMENT_DETAIL) || variableType
-					.equals(VariableType.STUDY_CONDITION);
+				return DerivedVariableServiceImpl.CALCULATED_VARIABLE_VARIABLE_TYPES.contains(variableType);
 			}
 		});
 	}

@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Component
 public class DerivedVariableValidator {
@@ -37,6 +39,9 @@ public class DerivedVariableValidator {
 
 	@Resource
 	private DatasetService datasetService;
+
+	@Resource
+	private DatasetTypeService datasetTypeService;
 
 	@Resource
 	private DerivedVariableService middlewareDerivedVariableService;
@@ -94,13 +99,9 @@ public class DerivedVariableValidator {
 
 		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
 		if (formulaOptional.isPresent()) {
-			final List<DatasetDTO> subobsDatasets = this.datasetService.getDatasets(studyId, new HashSet<>(Arrays
-				.asList(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(),
-					DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId(), DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId())));
-			final List<Integer> subobservationIds = new ArrayList<>();
-			for (final DatasetDTO dataset : subobsDatasets) {
-				subobservationIds.add(dataset.getDatasetId());
-			}
+			final List<DatasetDTO> subobsDatasets =
+				this.datasetService.getDatasets(studyId, new HashSet<>(this.datasetTypeService.getSubObservationDatasetTypeIds()));
+			final List<Integer> subobservationIds = subobsDatasets.stream().map(DatasetDTO::getDatasetId).collect(Collectors.toList());
 			for (final FormulaVariable formulaVariable : formulaOptional.get().getInputs()) {
 				if (subobservationIds.contains(inputVariableDatasetMap.get(formulaVariable.getId()))) {
 					this.validateSubobservationInputVariable(formulaOptional, formulaVariable);

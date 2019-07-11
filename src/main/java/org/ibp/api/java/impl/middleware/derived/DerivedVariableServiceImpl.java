@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
@@ -74,6 +75,9 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	@Resource
 	private ResourceBundleMessageSource resourceBundleMessageSource;
 
+	@Resource
+	private DatasetTypeService datasetTypeService;
+
 	public DerivedVariableServiceImpl() {
 		// do nothing
 	}
@@ -110,13 +114,12 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		// Calculate
 		final Set<String> inputMissingData = new HashSet<>();
 
-		// TODO: What if the calculated variable is executed from SubObservation Level???
 		// Retrieve TRAIT input variables' data from sub-observation level. Aggregate values are grouped by plot observation's experimentId
+
 		final Map<Integer, Map<String, List<Object>>> valuesFromSubObservation =
-			this.middlewareDerivedVariableService.getValuesFromObservations(studyId, Arrays
-					.asList(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(),
-						DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId(), DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId()),
-				inputVariableDatasetMap);
+			this.middlewareDerivedVariableService
+				.getValuesFromObservations(studyId, this.datasetTypeService.getSubObservationDatasetTypeIds(),
+					inputVariableDatasetMap);
 
 		// Iterate through the observations for each instances
 		for (final List<ObservationUnitRow> observations : instanceIdObservationUnitRowsMap.values()) {
