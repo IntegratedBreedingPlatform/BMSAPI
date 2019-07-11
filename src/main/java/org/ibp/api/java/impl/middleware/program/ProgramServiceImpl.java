@@ -39,8 +39,7 @@ public class ProgramServiceImpl implements ProgramService {
 		final List<Project> workbenchProgramList;
 		final List<ProgramSummary> programSummaries = new ArrayList<>();
 		try {
-			final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-			workbenchProgramList = this.workbenchDataManager.getProjectsByUser(loggedInUser, cropName);
+			workbenchProgramList = this.workbenchDataManager.getProjectsByCropName(cropName);
 			if (!workbenchProgramList.isEmpty()) {
 				for (final Project workbenchProgram : workbenchProgramList) {
 					final ProgramSummary programSummary =
