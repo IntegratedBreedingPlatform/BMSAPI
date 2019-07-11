@@ -1,7 +1,10 @@
 package org.ibp.api.domain.user;
 
 import java.io.Serializable;
+import java.util.List;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.service.api.user.UserDto;
 
@@ -10,85 +13,66 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 	private static final long serialVersionUID = -1086700590088326865L;
 
 	private Integer id;
-
 	private String username;
-
 	private String firstName;
-
 	private String lastName;
-
 	private Role role;
-
 	private String status;
-	
 	private String email;
+	private List<CropDto> crops;
 
-	
 	public Integer getId() {
 		return id;
 	}
 
-	
 	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	
 	public String getUsername() {
 		return username;
 	}
 
-	
 	public void setUsername(String username) {
 		this.username = username;
 	}
 
-	
 	public String getFirstName() {
 		return firstName;
 	}
 
-	
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
 
-	
 	public String getLastName() {
 		return lastName;
 	}
 
-	
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
 
-	
 	public Role getRole() {
 		return role;
 	}
 
-	
 	public void setRole(final Role role) {
 		this.role = role;
 	}
 
-	
 	public String getStatus() {
 		return status;
 	}
 
-	
 	public void setStatus(String status) {
 		this.status = status;
 	}
 
-	
 	public String getEmail() {
 		return email;
 	}
 
-	
 	public void setEmail(String email) {
 		this.email = email;
 	}
@@ -109,7 +93,7 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 		result = prime * result + (this.role == null ? 0 : this.role.hashCode());
 		result = prime * result + (this.email == null ? 0 : this.email.hashCode());
 		result = prime * result + (this.status == null ? 0 : this.status.hashCode());
-		
+
 		result = prime * result + this.id;
 		return result;
 	}
@@ -131,18 +115,26 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 		}
 		return true;
 	}
-	
-	public String toString(){
-		StringBuilder str= new StringBuilder();
-		str.append("UserDetails ")
-		.append("[ id= ").append(id)
-		.append(" ,username= ").append(username)
-		.append(" ,firstName= ").append(firstName)
-		.append(" ,lastName= ").append(lastName)
-		.append(" ,role= ").append(role)
-		.append(" ,status= ").append(status)
-		.append(" ,email= ").append(email)
-		.append(" ]");
-		return str.toString();
+
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this)
+			.append("id", id)
+			.append("username", username)
+			.append("firstName", firstName)
+			.append("lastName", lastName)
+			.append("role", role)
+			.append("status", status)
+			.append("email", email)
+			.append("crops", crops)
+			.toString();
+	}
+
+	public List<CropDto> getCrops() {
+		return crops;
+	}
+
+	public void setCrops(final List<CropDto> crops) {
+		this.crops = crops;
 	}
 }

@@ -16,6 +16,8 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// TODO IBP-2778
+//  make Transactional
+//  remove try/catchs and translateErrorToMap,
+//  let the exception bubble up and be handled by DefaultExceptionHandler
+//  Remove messageSource
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -46,6 +53,9 @@ public class UserServiceImpl implements UserService {
 
 	private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+	@Autowired
+	private ResourceBundleMessageSource messageSource;
+
 	@Override
 	public List<UserDetailDto> getAllUsersSortedByLastName() {
 
@@ -55,9 +65,9 @@ public class UserServiceImpl implements UserService {
 		final ModelMapper mapper = UserMapper.getInstance();
 		final List<UserDto> users = this.workbenchDataManager.getAllUsersSortedByLastName();
 
-		for (final UserDto userDto : users) {
-			final UserDetailDto userInfo = mapper.map(userDto, UserDetailDto.class);
-			result.add(userInfo);
+		for (final UserDto user : users) {
+			final UserDetailDto userDetailDto = mapper.map(user, UserDetailDto.class);
+			result.add(userDetailDto);
 		}
 		return result;
 	}
@@ -157,6 +167,7 @@ public class UserServiceImpl implements UserService {
 		userdto.setRole(new Role(user.getRole().getId(), user.getRole().getDescription()));
 		userdto.setEmail(user.getEmail());
 		userdto.setStatus("true".equals(user.getStatus()) ? 0 : 1);
+		userdto.setCrops(user.getCrops());
 		return userdto;
 	}
 
@@ -174,6 +185,10 @@ public class UserServiceImpl implements UserService {
 
 	public void setPasswordEncoder(final PasswordEncoder passwordEncoder) {
 		this.passwordEncoder = passwordEncoder;
+	}
+
+	public void setMessageSource(final ResourceBundleMessageSource messageSource) {
+		this.messageSource = messageSource;
 	}
 
 	private void translateErrorToMap(final BindingResult errors, final HashMap<String, Object> mapErrors) {
@@ -217,13 +232,14 @@ public class UserServiceImpl implements UserService {
 		if (errors.getGlobalErrorCount() != 0) {
 			final List<ObjectError> globalErrors = errors.getGlobalErrors();
 			for (final ObjectError globalError : globalErrors) {
-				errResponse.addError(globalError.getCode());
+				errResponse.addError(this.getMessage(globalError.getCode(), globalError.getArguments()));
 			}
 		}
 
 		mapErrors.put(ERROR, errResponse);
 	}
 
+	// TODO move to properties and let the exception handler do the translation
 	private String translateCodeErrorValidator(final String codeError) {
 
 		if (UserValidator.SIGNUP_FIELD_INVALID_EMAIL_FORMAT.equals(codeError)) {
@@ -251,6 +267,14 @@ public class UserServiceImpl implements UserService {
 			return "invalid";
 		}
 		return "";
+	}
+
+	private String getMessage(final String code) {
+		return this.messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
+	}
+
+	private String getMessage(final String code, final Object[] args) {
+		return this.messageSource.getMessage(code, args, LocaleContextHolder.getLocale());
 	}
 
 }
