@@ -154,7 +154,7 @@ public class FormulaValidator implements Validator {
 
 			@Override
 			public boolean apply(@Nullable final VariableType variableType) {
-				return DerivedVariableServiceImpl.CALCULATED_VARIABLE_VARIABLE_TYPES.contains(variableType);
+				return DerivedVariableServiceImpl.CALCULATED_VARIABLE_VARIABLE_TYPES.contains(variableType.getId());
 			}
 		});
 	}

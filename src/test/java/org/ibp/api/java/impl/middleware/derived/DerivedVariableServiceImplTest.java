@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
@@ -105,6 +106,9 @@ public class DerivedVariableServiceImplTest {
 	@Mock
 	private FormulaService formulaService;
 
+	@Mock
+	private DatasetTypeService datasetTypeService;
+
 	private final ResourceBundleMessageSource resourceBundleMessageSource = new ResourceBundleMessageSource();
 
 	@InjectMocks
@@ -129,15 +133,15 @@ public class DerivedVariableServiceImplTest {
 		final Map<Integer, Map<String, List<Object>>> aggregateValuesFromSubObservation =
 			this.createValuesFromSubObservationMap(OBSERVATION_UNIT_ID);
 		final FormulaDto formula = this.createFormula(FORMULA);
+		final List<Integer> subObservationDatasetTypeIds = Arrays.asList(1, 2, 3);
 
 		when(this.middlwareDatasetService.getInstanceIdToObservationUnitRowsMap(STUDY_ID, DATASET_ID, GEO_LOCATION_IDS))
 			.thenReturn(instanceIdObservationUnitRowsMap);
 		when(this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMapInStudy(STUDY_ID))
 			.thenReturn(measurementVariablesMap);
 		when(this.formulaService.getByTargetId(TARGET_VARIABLE_TERMID)).thenReturn(Optional.of(formula));
-		when(this.middlewareDerivedVariableService.getValuesFromObservations(STUDY_ID, Arrays
-				.asList(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(),
-					DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId(), DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId()),
+		when(this.datasetTypeService.getSubObservationDatasetTypeIds()).thenReturn(subObservationDatasetTypeIds);
+		when(this.middlewareDerivedVariableService.getValuesFromObservations(STUDY_ID, subObservationDatasetTypeIds,
 			this.inputVariableDatasetMap)).thenReturn(aggregateValuesFromSubObservation);
 
 	}
@@ -403,7 +407,7 @@ public class DerivedVariableServiceImplTest {
 	@Test
 	public void testGetFormulaVariableDatasetMap() {
 
-		final Map<Integer,VariableDatasetsDTO> expectedResult = new HashMap<>();
+		final Map<Integer, VariableDatasetsDTO> expectedResult = new HashMap<>();
 
 		when(this.middlewareDerivedVariableService.createVariableDatasetsMap(STUDY_ID, DATASET_ID, VARIABLE1_TERMID))
 			.thenReturn(expectedResult);
