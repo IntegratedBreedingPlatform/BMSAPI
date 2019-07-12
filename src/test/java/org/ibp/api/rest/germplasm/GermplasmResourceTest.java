@@ -1,10 +1,6 @@
 
 package org.ibp.api.rest.germplasm;
 
-import java.util.List;
-
-import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
-import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -17,6 +13,9 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.domain.germplasm.GermplasmName;
+import org.ibp.api.domain.germplasm.GermplasmSummary;
+import org.ibp.api.java.germplasm.GermplasmService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -53,6 +52,12 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 		public LocationDataManager locationDataManager() {
 			return Mockito.mock(LocationDataManager.class);
 		}
+
+		@Bean
+		@Primary
+		public GermplasmService germplasmService() {
+			return Mockito.mock(GermplasmService.class);
+		}
 	}
 
 	@Autowired
@@ -63,6 +68,9 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private LocationDataManager locationDataManger;
+
+	@Autowired
+	private GermplasmService germplasmService;
 
 	private Germplasm germplasm = new Germplasm();
 	private String pedigreeString = "Test1/Test2";
@@ -98,28 +106,25 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 
 		this.location.setLname("Test Location");
 		Mockito.when(this.locationDataManger.getLocationByID(this.germplasm.getLocationId())).thenReturn(this.location);
-		
+
 		this.nameType.setFcode("SELHIS");
 		this.nameType.setFname("Selection History");
 		Mockito.when(this.germplasmDataManager.getUserDefinedFieldByID(n.getTypeId())).thenReturn(this.nameType);
-		
+
 	}
 
 	@Test
 	public void testSearchGermplasm() throws Exception {
 
 		String searchString = "Test";
-		List<Germplasm> matchingGermplasm = Lists.newArrayList(this.germplasm);
-		Mockito.when(this.germplasmDataManager.searchForGermplasm(Mockito.any(GermplasmSearchParameter.class)))
-				.thenReturn(matchingGermplasm);
-
-		Mockito.when(this.germplasmDataManager.countSearchForGermplasm(Mockito.any(GermplasmSearchParameter.class))).thenReturn(1);
-
+		Mockito.doReturn(1).when(this.germplasmService).searchGermplasmCount(searchString);
+		Mockito.doReturn(Lists.newArrayList(this.createGermplasmSummary())).when(this.germplasmService).searchGermplasm(searchString, 1,
+			PagedResult.DEFAULT_PAGE_SIZE);
 		this.mockMvc
 		.perform(MockMvcRequestBuilders.get("/germplasm/maize/search?q={searchString}", searchString).contentType(this.contentType))
 		.andExpect(MockMvcResultMatchers.status().isOk())
 		.andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults", IsCollectionWithSize.hasSize(matchingGermplasm.size())))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.pageResults", IsCollectionWithSize.hasSize(1)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber", Matchers.is(1)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pageSize", Matchers.is(PagedResult.DEFAULT_PAGE_SIZE)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.totalResults", Matchers.is(1)))
@@ -148,6 +153,10 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void testGetGermplasmSummaryById() throws Exception {
+		final GermplasmSummary summary = createGermplasmSummary();
+
+		Mockito.doReturn(summary).when(this.germplasmService).getGermplasm(germplasm.getGid().toString());
+
 		this.mockMvc
 				.perform(
 						MockMvcRequestBuilders.get("/germplasm/{cropName}/{gid}", this.cropName, this.germplasm.getGid()).contentType(
@@ -170,5 +179,22 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 								Matchers.containsString("/germplasm/maize/" + this.germplasm.getGpid2().toString())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.pedigreeString", Matchers.is(this.pedigreeString)));
 
+	}
+
+	private GermplasmSummary createGermplasmSummary() {
+		final GermplasmSummary summary = new GermplasmSummary();
+		summary.setGermplasmId(this.germplasm.getGid().toString());
+		summary.setLocation(this.location.getLname());
+		summary.setBreedingMethod(this.method.getMname());
+		summary.setParent1Id(this.germplasm.getGpid1().toString());
+		summary.setParent2Id(this.germplasm.getGpid2().toString());
+		summary.setPedigreeString(this.pedigreeString);
+
+		final GermplasmName name = new GermplasmName();
+		name.setName(this.germplasm.getPreferredName().getNval());
+		name.setNameTypeCode(this.nameType.getFcode());
+		name.setNameTypeDescription(this.nameType.getFname());
+		summary.addNames(Lists.newArrayList(name));
+		return summary;
 	}
 }

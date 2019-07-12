@@ -17,6 +17,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.util.Debug;
+import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
 import org.junit.After;
 import org.junit.Before;
@@ -160,6 +161,7 @@ public abstract class ApiUnitTestBase {
 		public DatasetTypeService datasetTypeService() {
 			return Mockito.mock(DatasetTypeService.class);
 		}
+
 	}
 
 	@Before
