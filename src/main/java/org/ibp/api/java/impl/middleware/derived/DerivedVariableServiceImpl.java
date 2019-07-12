@@ -10,7 +10,6 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
@@ -31,7 +30,6 @@ import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -133,7 +131,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 					// Fill parameters with input variable values from the current level. Environment Detail and Study Condition variable
 					// values from environment level are already included in ObservationUnitRow.
 					DerivedVariableUtils.extractValues(rowParameters, observation, measurementVariablesMap, rowInputMissingData);
-				} catch (ParseException e) {
+				} catch (final ParseException e) {
 					LOG.error("Error parsing date value for parameters " + rowParameters, e);
 					errors.reject(STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION);
 					throw new ApiRequestValidationException(errors.getAllErrors());
@@ -145,7 +143,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 					this.fillWithSubObservationLevelValues(observation.getObservationUnitId(), valuesFromSubObservation,
 						measurementVariablesMap,
 						rowInputMissingData, rowParameters);
-				} catch (ParseException e) {
+				} catch (final ParseException e) {
 					LOG.error("Error parsing date value for parameters " + rowParameters, e);
 					errors.reject(STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION);
 					throw new ApiRequestValidationException(errors.getAllErrors());
