@@ -35,6 +35,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -256,10 +259,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final List<GermplasmDTO> germplasmDTOList = this.germplasmDataManager
 				.searchGermplasmDTO(germplasmSearchRequestDTO, page, pageSize);
 			if (germplasmDTOList != null) {
+				final Set<Integer> gids = germplasmDTOList.stream().map(germplasmDTO -> Integer.valueOf(germplasmDTO.getGermplasmDbId()))
+					.collect(Collectors.toSet());
+				final Map<Integer, String> crossExpansionsMap =
+					this.pedigreeService.getCrossExpansions(gids, null, this.crossExpansionProperties);
 				for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
-					germplasmDTO.setPedigree(
-						this.pedigreeService
-							.getCrossExpansion(Integer.parseInt(germplasmDTO.getGermplasmDbId()), this.crossExpansionProperties));
+					germplasmDTO.setPedigree(crossExpansionsMap.get(Integer.valueOf(germplasmDTO.getGermplasmDbId())));
 				}
 			}
 			return germplasmDTOList;

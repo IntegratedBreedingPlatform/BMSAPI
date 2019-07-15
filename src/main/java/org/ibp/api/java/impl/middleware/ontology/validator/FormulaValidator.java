@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.service.impl.derived_variables.DerivedVariableServiceImpl;
 import org.ibp.api.java.impl.middleware.ontology.TermRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -75,8 +76,8 @@ public class FormulaValidator implements Validator {
 			return;
 		}
 
-		if (!this.isTrait(targetTermId)) {
-			errors.reject("variable.formula.target.not.trait", new String[] {String.valueOf(targetTermId)}, "");
+		if (!this.isValidVariableTypeForFormula(targetTermId)) {
+			errors.reject("variable.formula.target.not.valid", new String[] {String.valueOf(targetTermId)}, "");
 		}
 
 		// Validate inputs and set ids
@@ -99,7 +100,7 @@ public class FormulaValidator implements Validator {
 				}
 
 				input.setId(id); // it will be used to save the input
-				if (!this.isTrait(id)) {
+				if (!this.isValidVariableTypeForFormula(id)) {
 					nonTraitInputs.add(inputTerm);
 				}
 			}
@@ -148,12 +149,12 @@ public class FormulaValidator implements Validator {
 		}
 	}
 
-	private boolean isTrait(final int id) {
+	private boolean isValidVariableTypeForFormula(final int id) {
 		return Iterables.any(this.ontologyVariableDataManager.getVariableTypes(id), new Predicate<VariableType>() {
 
 			@Override
 			public boolean apply(@Nullable final VariableType variableType) {
-				return variableType.equals(VariableType.TRAIT);
+				return DerivedVariableServiceImpl.CALCULATED_VARIABLE_VARIABLE_TYPES.contains(variableType.getId());
 			}
 		});
 	}

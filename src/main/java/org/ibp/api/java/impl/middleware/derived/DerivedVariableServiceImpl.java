@@ -5,10 +5,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.dms.VariableDatasetsDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
+import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
@@ -27,7 +30,6 @@ import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -71,6 +73,9 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	@Resource
 	private ResourceBundleMessageSource resourceBundleMessageSource;
 
+	@Resource
+	private DatasetTypeService datasetTypeService;
+
 	public DerivedVariableServiceImpl() {
 		// do nothing
 	}
@@ -78,6 +83,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	@Override
 	public Map<String, Object> execute(
 		final int studyId, final int datasetId, final Integer variableId, final List<Integer> geoLocationIds,
+		final Map<Integer, Integer> inputVariableDatasetMap,
 		final boolean overwriteExistingData) {
 
 		final Map<String, Object> results = new HashMap<>();
@@ -86,15 +92,18 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		this.derivedVariableValidator.validate(variableId, geoLocationIds);
-		this.derivedVariableValidator.verifyMissingInputVariables(variableId, datasetId);
+		this.derivedVariableValidator.verifyInputVariablesArePresentInStudy(variableId, datasetId, studyId);
+		this.derivedVariableValidator
+			.verifySubObservationsInputVariablesInAggregateFunction(variableId, studyId, datasetId, inputVariableDatasetMap);
 
 		// Get the list of observation unit rows grouped by intances
 		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap =
 			this.middlewareDatasetService.getInstanceIdToObservationUnitRowsMap(studyId, datasetId, geoLocationIds);
-		// Get the the measurement variables of all traits in a dataset so that we can determine the datatype and possibleValues
-		// of a ObservationUnitData.
+		// Get the the measurement variables of all environment details, environment conditions and traits in a study so
+		// that we can determine the datatype and possibleValue of a ObservationUnitData and input variable values from different
+		// levels.
 		final Map<Integer, MeasurementVariable> measurementVariablesMap =
-			this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMap(datasetId);
+			this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMapInStudy(studyId);
 
 		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
 		final FormulaDto formula = formulaOptional.get();
@@ -103,22 +112,44 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		// Calculate
 		final Set<String> inputMissingData = new HashSet<>();
 
+		// Retrieve TRAIT input variables' data from sub-observation level. Aggregate values are grouped by plot observation's experimentId
+
+		final Map<Integer, Map<String, List<Object>>> valuesFromSubObservation =
+			this.middlewareDerivedVariableService
+				.getValuesFromObservations(studyId, this.datasetTypeService.getSubObservationDatasetTypeIds(),
+					inputVariableDatasetMap);
+
 		// Iterate through the observations for each instances
 		for (final List<ObservationUnitRow> observations : instanceIdObservationUnitRowsMap.values()) {
 			for (final ObservationUnitRow observation : observations) {
 
 				// Get input data
+				final Map<String, Object> rowParameters = new HashMap<>(parameters);
 				final Set<String> rowInputMissingData = new HashSet<>();
+
 				try {
-					DerivedVariableUtils.extractValues(parameters, observation, measurementVariablesMap, rowInputMissingData);
-				} catch (ParseException e) {
-					LOG.error("Error parsing date value for parameters " + parameters, e);
+					// Fill parameters with input variable values from the current level. Environment Detail and Study Condition variable
+					// values from environment level are already included in ObservationUnitRow.
+					DerivedVariableUtils.extractValues(rowParameters, observation, measurementVariablesMap, rowInputMissingData);
+				} catch (final ParseException e) {
+					LOG.error("Error parsing date value for parameters " + rowParameters, e);
 					errors.reject(STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION);
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				}
 				inputMissingData.addAll(rowInputMissingData);
 
-				if (!rowInputMissingData.isEmpty() || parameters.values().contains("")) {
+				try {
+					// Set the aggregate values from subobservation level to the processor
+					this.fillWithSubObservationLevelValues(observation.getObservationUnitId(), valuesFromSubObservation,
+						measurementVariablesMap,
+						rowInputMissingData, rowParameters);
+				} catch (final ParseException e) {
+					LOG.error("Error parsing date value for parameters " + rowParameters, e);
+					errors.reject(STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION);
+					throw new ApiRequestValidationException(errors.getAllErrors());
+				}
+
+				if (!rowInputMissingData.isEmpty() || rowParameters.values().contains("")) {
 					continue;
 				}
 
@@ -126,9 +157,9 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 				String value;
 				try {
 					final String executableFormula = DerivedVariableUtils.replaceDelimiters(formula.getDefinition());
-					value = this.processor.evaluateFormula(executableFormula, parameters);
+					value = this.processor.evaluateFormula(executableFormula, rowParameters);
 				} catch (final Exception e) {
-					LOG.error("Error evaluating formula " + formula + " with inputs " + parameters, e);
+					LOG.error("Error evaluating formula " + formula + " with inputs " + rowParameters, e);
 					errors.reject(STUDY_EXECUTE_CALCULATION_ENGINE_EXCEPTION);
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				}
@@ -187,25 +218,42 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 	}
 
-	@Override
-	public Set<String> getDependencyVariables(final int studyId, final int datasetId) {
+	private void fillWithSubObservationLevelValues(final int observationUnitId,
+		final Map<Integer, Map<String, List<Object>>> valuesFromSubObservation,
+		final Map<Integer, MeasurementVariable> measurementVariablesMap,
+		final Set<String> rowInputMissingData, final Map<String, Object> parameters) throws ParseException {
 
-		this.studyValidator.validate(studyId, false);
-		this.datasetValidator.validateDataset(studyId, datasetId, false);
+		final Map<String, List<Object>> variableAggregateValuesMap = new HashMap<>();
+		final Map<String, List<Object>> valuesMap = valuesFromSubObservation.get(observationUnitId);
 
-		return this.middlewareDerivedVariableService.getDependencyVariables(datasetId);
+		if (valuesMap != null) {
+			for (final Map.Entry<String, List<Object>> entry : valuesMap.entrySet()) {
+				final Integer variableId = Integer.valueOf(entry.getKey());
+				final MeasurementVariable measurementVariable = measurementVariablesMap.get(variableId);
+				final String termKey = DerivedVariableUtils.wrapTerm(entry.getKey());
+				variableAggregateValuesMap
+					.put(termKey, DerivedVariableUtils.parseValueList(entry.getValue(), measurementVariable, rowInputMissingData));
+				// If the input variable is in sub-observation level, remove its key from parameters because
+				// aggregate data from subobservation should be passed through processor.setData() not parameters.
+				parameters.remove(termKey);
+			}
+			this.processor.setData(variableAggregateValuesMap);
+		}
+
 	}
 
 	@Override
-	public Set<String> getDependencyVariables(final int studyId, final int datasetId, final int variableId) {
-
+	public Set<FormulaVariable> getMissingFormulaVariablesInStudy(final int studyId, final int datasetId, final int variableId) {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
+		return this.middlewareDerivedVariableService.getMissingFormulaVariablesInStudy(studyId, datasetId, variableId);
+	}
 
-		final List<Integer> variableIds = Arrays.asList(variableId);
-		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, false, variableIds);
-
-		return this.middlewareDerivedVariableService.getDependencyVariables(datasetId, variableId);
+	@Override
+	public Set<FormulaVariable> getFormulaVariablesInStudy(final int studyId, final int datasetId) {
+		this.studyValidator.validate(studyId, false);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
+		return this.middlewareDerivedVariableService.getFormulaVariablesInStudy(studyId, datasetId);
 	}
 
 	@Override
@@ -217,6 +265,14 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		return this.middlewareDerivedVariableService.countCalculatedVariablesInDatasets(datasetIds);
 	}
 
+	@Override
+	public Map<Integer, VariableDatasetsDTO> getFormulaVariableDatasetsMap(final Integer studyId, final Integer datasetId,
+		final Integer variableId) {
+		this.studyValidator.validate(studyId, false);
+		this.datasetValidator.validateDataset(studyId, datasetId, false);
+		return this.middlewareDerivedVariableService.createVariableDatasetsMap(studyId, datasetId, variableId);
+	}
+
 	protected void setProcessor(final DerivedVariableProcessor processor) {
 		this.processor = processor;
 	}
@@ -224,7 +280,5 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	protected void setResourceBundleMessageSource(final ResourceBundleMessageSource resourceBundleMessageSource) {
 		this.resourceBundleMessageSource = resourceBundleMessageSource;
 	}
-
-
 
 }
