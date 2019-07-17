@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.derived;
 
 import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -22,16 +23,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Component
 public class DerivedVariableValidator {
-
 	static final String STUDY_EXECUTE_CALCULATION_INVALID_REQUEST = "study.execute.calculation.invalid.request";
 	static final String STUDY_EXECUTE_CALCULATION_FORMULA_NOT_FOUND = "study.execute.calculation.formula.not.found";
 	static final String STUDY_EXECUTE_CALCULATION_MISSING_VARIABLES = "study.execute.calculation.missing.variables";
 	private static final String STUDY_EXECUTE_CALCULATION_NOT_AGGREGATE_FUNCTION = "study.execute.calculation.not.aggregate.function";
+	private static final String STUDY_EXECUTE_CALCULATION_INPUT_NOT_IN_SUBLEVEL = "study.execute.calculation.input.not.in.sublevel";
 
 	@Resource
 	private FormulaService formulaService;
@@ -45,7 +45,7 @@ public class DerivedVariableValidator {
 	@Resource
 	private DerivedVariableService middlewareDerivedVariableService;
 
-	private static final String AGGREGATE_FUNCTIONS = "(AVG|COUNT|DISTINCT_COUNT|MAX|MIN|SUM)";
+
 
 	public void validate(final Integer variableId, final List<Integer> geoLocationIds) {
 
@@ -88,33 +88,45 @@ public class DerivedVariableValidator {
 
 	}
 
-	void verifySubObservationsInputVariablesInAggregateFunction(final int variableId, final int studyId, final int datasetId,
+	void validateForAggregateFunctions(final int variableId, final int studyId, final int datasetId,
 		final Map<Integer, Integer> inputVariableDatasetMap) {
-		final Integer plotDatasetId =
-			this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
-		if (!plotDatasetId.equals(datasetId)) {
-			return;
-		}
-
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
 		if (formulaOptional.isPresent()) {
+			final Integer plotDatasetId =
+				this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
+			if (!plotDatasetId.equals(datasetId)) {
+				errors.reject(STUDY_EXECUTE_CALCULATION_INPUT_NOT_IN_SUBLEVEL);
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
+			final List<String> aggregateInputVariables = DerivedVariableUtils.getAggregateFunctionInputVariables(formulaOptional.get().getDefinition(), false);
 			final List<DatasetDTO> subobsDatasets =
 				this.datasetService.getDatasets(studyId, new HashSet<>(this.datasetTypeService.getSubObservationDatasetTypeIds()));
 			final List<Integer> subobservationIds = subobsDatasets.stream().map(DatasetDTO::getDatasetId).collect(Collectors.toList());
-			for (final FormulaVariable formulaVariable : formulaOptional.get().getInputs()) {
-				if (subobservationIds.contains(inputVariableDatasetMap.get(formulaVariable.getId()))) {
-					this.validateSubobservationInputVariable(formulaOptional, formulaVariable);
-				}
+
+			this.verifySubObservationsInputVariablesInAggregateFunction(subobservationIds, inputVariableDatasetMap, formulaOptional, aggregateInputVariables);
+			this.verifyAggregateInputVariablesInSubObsLevel(subobservationIds, inputVariableDatasetMap, aggregateInputVariables);
+		}
+	}
+	
+	void verifySubObservationsInputVariablesInAggregateFunction(final List<Integer> subobservationIds, final Map<Integer, Integer> inputVariableDatasetMap, final Optional<FormulaDto> formulaOptional,
+		final List<String> aggregateInputVariables) {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		for (final FormulaVariable formulaVariable : formulaOptional.get().getInputs()) {
+			if (subobservationIds.contains(inputVariableDatasetMap.get(formulaVariable.getId())) && !aggregateInputVariables.contains(String.valueOf(formulaVariable.getId()))) {
+				errors.reject(STUDY_EXECUTE_CALCULATION_NOT_AGGREGATE_FUNCTION);
+				throw new ApiRequestValidationException(errors.getAllErrors());
 			}
 		}
 	}
 
-	void validateSubobservationInputVariable(final Optional<FormulaDto> formulaOptional, final FormulaVariable formulaVariable) {
+	void verifyAggregateInputVariablesInSubObsLevel(final List<Integer> subobservationIds, final Map<Integer, Integer> inputVariableDatasetMap, final List<String> aggregateInputVariables) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		final Pattern pattern = Pattern.compile("^.*(?i)" + AGGREGATE_FUNCTIONS + "\\(\\{\\{" + formulaVariable.getId() + "}}\\).*$");
-		if (!pattern.matcher(formulaOptional.get().getDefinition()).matches()) {
-			errors.reject(STUDY_EXECUTE_CALCULATION_NOT_AGGREGATE_FUNCTION);
-			throw new ApiRequestValidationException(errors.getAllErrors());
+		for(final String aggregateInputVariable: aggregateInputVariables) {
+			if(!subobservationIds.contains(inputVariableDatasetMap.get(Integer.valueOf(aggregateInputVariable)))) {
+				errors.reject(STUDY_EXECUTE_CALCULATION_INPUT_NOT_IN_SUBLEVEL);
+				throw new ApiRequestValidationException(errors.getAllErrors());
+			}
 		}
 	}
 }

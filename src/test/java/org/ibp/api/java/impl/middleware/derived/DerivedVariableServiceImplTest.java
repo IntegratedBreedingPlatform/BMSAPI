@@ -158,7 +158,7 @@ public class DerivedVariableServiceImplTest {
 		verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 		verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
 		verify(this.derivedVariableValidator)
-			.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+			.validateForAggregateFunctions(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
 				this.inputVariableDatasetMap);
 
 		final ArgumentCaptor<String> captureValue = ArgumentCaptor.forClass(String.class);
@@ -209,7 +209,7 @@ public class DerivedVariableServiceImplTest {
 			verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 			verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
 			verify(this.derivedVariableValidator)
-				.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+				.validateForAggregateFunctions(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
 					this.inputVariableDatasetMap);
 
 			final ArgumentCaptor<String> captureValue = ArgumentCaptor.forClass(String.class);
@@ -247,7 +247,7 @@ public class DerivedVariableServiceImplTest {
 		verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 		verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
 		verify(this.derivedVariableValidator)
-			.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+			.validateForAggregateFunctions(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
 				this.inputVariableDatasetMap);
 
 		final ArgumentCaptor<String> captureValue = ArgumentCaptor.forClass(String.class);
@@ -294,7 +294,7 @@ public class DerivedVariableServiceImplTest {
 			verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 			verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
 			verify(this.derivedVariableValidator)
-				.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+				.validateForAggregateFunctions(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
 					this.inputVariableDatasetMap);
 			verify(this.middlewareDerivedVariableService, times(0)).saveCalculatedResult(anyString(),
 				anyInt(), anyInt(), anyInt(),
@@ -322,7 +322,7 @@ public class DerivedVariableServiceImplTest {
 			verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 			verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
 			verify(this.derivedVariableValidator)
-				.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+				.validateForAggregateFunctions(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
 					this.inputVariableDatasetMap);
 			verify(this.middlewareDerivedVariableService, times(0)).saveCalculatedResult(anyString(),
 				anyInt(), anyInt(), anyInt(),
@@ -354,7 +354,7 @@ public class DerivedVariableServiceImplTest {
 		verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 		verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
 		verify(this.derivedVariableValidator)
-			.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+			.validateForAggregateFunctions(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
 				this.inputVariableDatasetMap);
 
 		assertEquals(
