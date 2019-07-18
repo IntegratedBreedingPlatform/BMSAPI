@@ -164,7 +164,6 @@ public class FormulaValidator implements Validator {
 			final String wrappedInputVariable = DerivedVariableUtils.wrapTerm(inputVariable);
 			if(DataType.NUMERIC_VARIABLE.getId() != inputVariablesDataTypeMap.get(wrappedInputVariable).getId()) {
 				errors.reject("variable.formula.avg.input.not.numeric", "");
-
 				return inputVariables;
 			}
 			aggregateInputVariable.add(wrappedInputVariable);
