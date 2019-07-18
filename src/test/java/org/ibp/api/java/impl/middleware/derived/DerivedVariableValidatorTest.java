@@ -208,6 +208,7 @@ public class DerivedVariableValidatorTest {
 			this.variableValidator.validateForAggregateFunctions(VARIABLE_ID, STUDY_ID, DATASET_ID, inputVariableDatasetMap);
 			fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
+			assertEquals(DerivedVariableValidator.STUDY_EXECUTE_CALCULATION_INPUT_NOT_IN_SUBLEVEL, e.getErrors().get(0).getCode());
 			Mockito.verify(this.datasetTypeService, never()).getSubObservationDatasetTypeIds();
 			Mockito.verify(this.datasetService, never()).getDatasets(STUDY_ID, new HashSet<>(SUBOBS_DATASET_TYPE_IDS));
 		}
@@ -230,6 +231,7 @@ public class DerivedVariableValidatorTest {
 			this.variableValidator.verifySubObservationsInputVariablesInAggregateFunction(subobsIds, inputVariableDatasetMap, formula, new ArrayList<>());
 			Assert.fail("Should throw an exception.");
 		} catch (final ApiRequestValidationException e) {
+			assertEquals(DerivedVariableValidator.STUDY_EXECUTE_CALCULATION_NOT_AGGREGATE_FUNCTION, e.getErrors().get(0).getCode());
 		}
 	}
 
@@ -250,6 +252,7 @@ public class DerivedVariableValidatorTest {
 			this.variableValidator.verifyAggregateInputVariablesInSubObsLevel(new ArrayList<>(), inputVariableDatasetMap, aggregateInputVariables);
 			Assert.fail("Should throw an exception.");
 		}  catch (final ApiRequestValidationException e) {
+			assertEquals(DerivedVariableValidator.STUDY_EXECUTE_CALCULATION_INPUT_NOT_IN_SUBLEVEL, e.getErrors().get(0).getCode());
 		}
 	}
 

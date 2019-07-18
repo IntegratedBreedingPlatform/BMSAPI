@@ -30,8 +30,8 @@ public class DerivedVariableValidator {
 	static final String STUDY_EXECUTE_CALCULATION_INVALID_REQUEST = "study.execute.calculation.invalid.request";
 	static final String STUDY_EXECUTE_CALCULATION_FORMULA_NOT_FOUND = "study.execute.calculation.formula.not.found";
 	static final String STUDY_EXECUTE_CALCULATION_MISSING_VARIABLES = "study.execute.calculation.missing.variables";
-	private static final String STUDY_EXECUTE_CALCULATION_NOT_AGGREGATE_FUNCTION = "study.execute.calculation.not.aggregate.function";
-	private static final String STUDY_EXECUTE_CALCULATION_INPUT_NOT_IN_SUBLEVEL = "study.execute.calculation.input.not.in.sublevel";
+	static final String STUDY_EXECUTE_CALCULATION_NOT_AGGREGATE_FUNCTION = "study.execute.calculation.not.aggregate.function";
+	static final String STUDY_EXECUTE_CALCULATION_INPUT_NOT_IN_SUBLEVEL = "study.execute.calculation.input.not.in.sublevel";
 
 	@Resource
 	private FormulaService formulaService;
@@ -108,7 +108,7 @@ public class DerivedVariableValidator {
 			this.verifyAggregateInputVariablesInSubObsLevel(subobservationIds, inputVariableDatasetMap, aggregateInputVariables);
 		}
 	}
-	
+
 	void verifySubObservationsInputVariablesInAggregateFunction(final List<Integer> subobservationIds, final Map<Integer, Integer> inputVariableDatasetMap, final Optional<FormulaDto> formulaOptional,
 		final List<String> aggregateInputVariables) {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
