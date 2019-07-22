@@ -1,5 +1,6 @@
 package org.ibp.api.rest.role;
 
+import com.google.common.base.Preconditions;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -25,6 +26,8 @@ public class RoleValidator {
 	public void validateRoleGeneratorInput(final RoleGeneratorInput roleGeneratorInput) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleGeneratorInput.class.getName());
+		Preconditions.checkNotNull(roleGeneratorInput.getName(), "name cannot be null");
+		Preconditions.checkNotNull(roleGeneratorInput.getRoleType() ,"role type cannot be null");
 
 		if (roleGeneratorInput.getName().length() > 100) {
 			errors.reject("role.name.lenght");
@@ -32,10 +35,6 @@ public class RoleValidator {
 
 		if (this.workbenchDataManager.getRoleByName(roleGeneratorInput.getName()) != null) {
 			errors.reject("role.name.already.exists");
-		}
-
-		if (this.workbenchDataManager.getRoleByDescription(roleGeneratorInput.getDescription()) != null) {
-			errors.reject("role.description.already.exists");
 		}
 
 		if (!roleGeneratorInput.getDescription().isEmpty()) {

@@ -54,12 +54,11 @@ public class RoleServiceImpl implements RoleService {
 		final Role role  = new Role();
 		role.setName(dto.getName());
 		role.setEditable(dto.isEditable());
-		role.setActive(dto.isActive());
 		role.setAssignable(dto.isAssignable());
 		role.setDescription(dto.getDescription());
 		role.setCreatedDate(new Date());
 		role.setCreatedBy(user);
-		role.setActive(dto.isActive());
+		role.setActive(true);
 		role.setPermissions(this.getPermission(dto.getPermissions()));
 		role.setRoleType(this.getRoleType(dto.getRoleType()));
 		role.setUpdatedBy(user);
@@ -91,7 +90,7 @@ public class RoleServiceImpl implements RoleService {
 
 		for (final Iterator<Permission> it = permissionList.iterator(); it.hasNext();) {
 			final Permission permission = it.next();
-			if (result.contains(permission.getParent().getPermissionId())) {
+			if (result != null && permission.getParent() != null && result.contains(permission.getParent().getPermissionId())) {
 				it.remove();
 			}
 		}

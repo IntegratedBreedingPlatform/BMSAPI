@@ -1,5 +1,6 @@
 package org.ibp.api.rest.role;
 
+import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.List;
@@ -14,8 +15,6 @@ public class RoleGeneratorInput {
 	private Integer roleType;
 
 	private List<Integer> permissions;
-
-	private boolean active;
 
 	private boolean editable;
 
@@ -53,14 +52,6 @@ public class RoleGeneratorInput {
 		this.permissions = permissions;
 	}
 
-	public boolean isActive() {
-		return this.active;
-	}
-
-	public void setActive(final boolean active) {
-		this.active = active;
-	}
-
 	public boolean isEditable() {
 		return this.editable;
 	}
@@ -75,5 +66,20 @@ public class RoleGeneratorInput {
 
 	public void setAssignable(final boolean assignable) {
 		this.assignable = assignable;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return Pojomatic.equals(this, o);
 	}
 }

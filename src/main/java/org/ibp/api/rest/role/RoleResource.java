@@ -35,8 +35,6 @@ public class RoleResource {
 	@RequestMapping(value = "/roles", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity createRole(@RequestBody final RoleGeneratorInput dto) {
-		Preconditions.checkNotNull(dto.getName(), "name cannot be null");
-		Preconditions.checkNotNull(dto.getRoleType() ,"role type cannot be null");
 		this.roleService.createRole(dto);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
