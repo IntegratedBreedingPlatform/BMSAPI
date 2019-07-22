@@ -109,7 +109,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
 		final FormulaDto formula = formulaOptional.get();
 		final Map<String, Object> parameters = DerivedVariableUtils.extractParameters(formula.getDefinition());
-		final List<String> aggregateInputVariables = DerivedVariableUtils.getAggregateFunctionInputVariables(formula.getDefinition(), false, true);
+		final List<String> aggregateInputVariables = DerivedVariableUtils.getAggregateFunctionInputVariables(formula.getDefinition(), true);
 		// Calculate
 		final Set<String> inputMissingData = new HashSet<>();
 

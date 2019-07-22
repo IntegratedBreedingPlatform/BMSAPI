@@ -93,7 +93,7 @@ public class DerivedVariableValidator {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
 		if (formulaOptional.isPresent()) {
-			final List<String> aggregateInputVariables = DerivedVariableUtils.getAggregateFunctionInputVariables(formulaOptional.get().getDefinition(), false, false);
+			final List<String> aggregateInputVariables = DerivedVariableUtils.getAggregateFunctionInputVariables(formulaOptional.get().getDefinition(), false);
 			if(!aggregateInputVariables.isEmpty()) {
 				final Integer plotDatasetId =
 					this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0)
