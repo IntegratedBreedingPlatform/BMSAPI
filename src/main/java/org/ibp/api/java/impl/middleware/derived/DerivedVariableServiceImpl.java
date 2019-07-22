@@ -30,6 +30,7 @@ import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -108,7 +109,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
 		final FormulaDto formula = formulaOptional.get();
 		final Map<String, Object> parameters = DerivedVariableUtils.extractParameters(formula.getDefinition());
-
+		final List<String> aggregateInputVariables = DerivedVariableUtils.getAggregateFunctionInputVariables(formula.getDefinition(), false, true);
 		// Calculate
 		final Set<String> inputMissingData = new HashSet<>();
 
@@ -142,7 +143,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 					// Set the aggregate values from subobservation level to the processor
 					this.fillWithSubObservationLevelValues(observation.getObservationUnitId(), valuesFromSubObservation,
 						measurementVariablesMap,
-						rowInputMissingData, rowParameters);
+						rowInputMissingData, rowParameters, aggregateInputVariables);
 				} catch (final ParseException e) {
 					LOG.error("Error parsing date value for parameters " + rowParameters, e);
 					errors.reject(STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION);
@@ -221,7 +222,8 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	private void fillWithSubObservationLevelValues(final int observationUnitId,
 		final Map<Integer, Map<String, List<Object>>> valuesFromSubObservation,
 		final Map<Integer, MeasurementVariable> measurementVariablesMap,
-		final Set<String> rowInputMissingData, final Map<String, Object> parameters) throws ParseException {
+		final Set<String> rowInputMissingData, final Map<String, Object> parameters,
+		final List<String> inputVariables) throws ParseException {
 
 		final Map<String, List<Object>> variableAggregateValuesMap = new HashMap<>();
 		final Map<String, List<Object>> valuesMap = valuesFromSubObservation.get(observationUnitId);
@@ -236,6 +238,12 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 				// If the input variable is in sub-observation level, remove its key from parameters because
 				// aggregate data from subobservation should be passed through processor.setData() not parameters.
 				parameters.remove(termKey);
+			}
+			for(final String inputVariable: inputVariables) {
+				if(parameters.containsKey(inputVariable)) {
+					parameters.remove(inputVariable);
+					variableAggregateValuesMap.put(inputVariable, new ArrayList<>());
+				}
 			}
 			this.processor.setData(variableAggregateValuesMap);
 		}
