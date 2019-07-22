@@ -21,8 +21,6 @@ public class RoleValidator {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
-	private BindingResult errors;
-
 	public void validateRoleGeneratorInput(final RoleGeneratorInput roleGeneratorInput) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleGeneratorInput.class.getName());
@@ -63,7 +61,7 @@ public class RoleValidator {
 					}
 				});
 				if (!result.contains(roleGeneratorInput.getRoleType())) {
-					errors.reject("role.roletype.does.not.correspond");
+					errors.reject("role.role.type.does.not.correspond");
 				}
 
 			}
