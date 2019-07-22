@@ -37,10 +37,8 @@ public class RoleValidator {
 			errors.reject("role.name.already.exists");
 		}
 
-		if (!roleGeneratorInput.getDescription().isEmpty()) {
-			if (roleGeneratorInput.getDescription().length() > 255) {
+		if (roleGeneratorInput.getDescription() != null && roleGeneratorInput.getDescription().length() > 255) {
 				errors.reject("role.description.lenght");
-			}
 		}
 
 		if (roleGeneratorInput.getRoleType() == null) {
