@@ -42,11 +42,11 @@ public class RoleValidator {
 		}
 
 		if (roleGeneratorInput.getRoleType() == null) {
-			errors.reject("role.roletype.null");
+			errors.reject("role.role.type.null");
 		}
 
 		if (this.workbenchDataManager.getRoleType(roleGeneratorInput.getRoleType()) == null) {
-			errors.reject("role.roletype.does.not.exist");
+			errors.reject("role.role.type.does.not.exist");
 		}
 		else {
 			for (final Integer permissionId : roleGeneratorInput.getPermissions()) {
