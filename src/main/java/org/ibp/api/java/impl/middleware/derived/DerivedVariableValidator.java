@@ -93,19 +93,23 @@ public class DerivedVariableValidator {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
 		if (formulaOptional.isPresent()) {
-			final Integer plotDatasetId =
-				this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0).getDatasetId();
-			if (!plotDatasetId.equals(datasetId)) {
-				errors.reject(STUDY_EXECUTE_CALCULATION_INPUT_NOT_IN_SUBLEVEL);
-				throw new ApiRequestValidationException(errors.getAllErrors());
-			}
-			final List<String> aggregateInputVariables = DerivedVariableUtils.getAggregateFunctionInputVariables(formulaOptional.get().getDefinition(), false);
-			final List<DatasetDTO> subobsDatasets =
-				this.datasetService.getDatasets(studyId, new HashSet<>(this.datasetTypeService.getSubObservationDatasetTypeIds()));
-			final List<Integer> subobservationIds = subobsDatasets.stream().map(DatasetDTO::getDatasetId).collect(Collectors.toList());
+			final List<String> aggregateInputVariables = DerivedVariableUtils.getAggregateFunctionInputVariables(formulaOptional.get().getDefinition(), false, false);
+			if(!aggregateInputVariables.isEmpty()) {
+				final Integer plotDatasetId =
+					this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0)
+						.getDatasetId();
+				if (!plotDatasetId.equals(datasetId)) {
+					errors.reject(STUDY_EXECUTE_CALCULATION_INPUT_NOT_IN_SUBLEVEL);
+					throw new ApiRequestValidationException(errors.getAllErrors());
+				}
+				final List<DatasetDTO> subobsDatasets =
+					this.datasetService.getDatasets(studyId, new HashSet<>(this.datasetTypeService.getSubObservationDatasetTypeIds()));
+				final List<Integer> subobservationIds = subobsDatasets.stream().map(DatasetDTO::getDatasetId).collect(Collectors.toList());
 
-			this.verifySubObservationsInputVariablesInAggregateFunction(subobservationIds, inputVariableDatasetMap, formulaOptional, aggregateInputVariables);
-			this.verifyAggregateInputVariablesInSubObsLevel(subobservationIds, inputVariableDatasetMap, aggregateInputVariables);
+				this.verifySubObservationsInputVariablesInAggregateFunction(
+					subobservationIds, inputVariableDatasetMap, formulaOptional, aggregateInputVariables);
+				this.verifyAggregateInputVariablesInSubObsLevel(subobservationIds, inputVariableDatasetMap, aggregateInputVariables);
+			}
 		}
 	}
 
