@@ -41,8 +41,7 @@ import java.util.Set;
 @Api(value = "Dataset Services")
 @Controller
 @RequestMapping("/crops")
-public class
-DatasetResource {
+public class DatasetResource {
 
 	public static final String CSV = "csv";
 	public static final String XLS = "xls";
