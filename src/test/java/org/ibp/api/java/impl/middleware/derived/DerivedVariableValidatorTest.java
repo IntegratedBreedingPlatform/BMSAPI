@@ -40,7 +40,7 @@ public class DerivedVariableValidatorTest {
 	private static final Integer VARIABLE_ID = 29001;
 	private static final Integer STUDY_ID = 1001;
 	private static final Integer DATASET_ID = 1002;
-	public static final Integer SUBOBS_ID = 1003;
+	private static final Integer SUBOBS_ID = 1003;
 	private static final List<Integer> SUBOBS_DATASET_TYPE_IDS = Arrays.asList(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(),
 		DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId(),
 		DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId());
@@ -209,8 +209,8 @@ public class DerivedVariableValidatorTest {
 			fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertEquals(DerivedVariableValidator.STUDY_EXECUTE_CALCULATION_INPUT_NOT_IN_SUBLEVEL, e.getErrors().get(0).getCode());
-			Mockito.verify(this.datasetTypeService, never()).getSubObservationDatasetTypeIds();
-			Mockito.verify(this.datasetService, never()).getDatasets(STUDY_ID, new HashSet<>(SUBOBS_DATASET_TYPE_IDS));
+			Mockito.verify(this.datasetTypeService).getSubObservationDatasetTypeIds();
+			Mockito.verify(this.datasetService).getDatasets(STUDY_ID, new HashSet<>(SUBOBS_DATASET_TYPE_IDS));
 		}
 	}
 
