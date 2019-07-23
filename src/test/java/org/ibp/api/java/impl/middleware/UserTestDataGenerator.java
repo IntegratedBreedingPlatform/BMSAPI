@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -50,7 +49,6 @@ public abstract class UserTestDataGenerator {
 
 		user.setPerson(person);
 		user.setUserid(userId);
-		user.setPersonid(person.getId());
 		user.setPerson(person);
 
 		final String username = RandomStringUtils.randomAlphanumeric(30);
@@ -61,20 +59,6 @@ public abstract class UserTestDataGenerator {
 		
 		user.setRoles(Arrays.asList(new UserRole(user, new Role(2, "Breeder"))));
 
-		return user;
-	}
-	
-	/**
-	 * initialize Workbench User
-	 *
-	 * @param userId Integer
-	 * @return user User
-	 */
-	public static User initializeUser(final Integer userId) {
-		final WorkbenchUser workbenchUser = UserTestDataGenerator.initializeWorkbenchUser(userId);
-		final User user = workbenchUser.copyToUser();
-		user.setUserid(userId);
-		
 		return user;
 	}
 

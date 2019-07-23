@@ -13,6 +13,7 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -40,6 +41,9 @@ public class UserValidatorTest {
 	protected WorkbenchDataManager workbenchDataManager;
 
 	@Mock
+	protected UserService userService;
+
+	@Mock
 	private SecurityService securityService;
 
 	private Role superAdminRole;
@@ -50,8 +54,9 @@ public class UserValidatorTest {
 		this.uservalidator = new UserValidator();
 		this.uservalidator.setWorkbenchDataManager(this.workbenchDataManager);
 		this.uservalidator.setSecurityService(this.securityService);
+		this.uservalidator.setUserService(this.userService);
 
-		Mockito.doReturn(this.createTestRoles()).when(this.workbenchDataManager).getAllRoles();
+		Mockito.doReturn(this.createTestRoles()).when(this.userService).getAllRoles();
 		// TODO test validate crops
 		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectsByUser(ArgumentMatchers.any(WorkbenchUser.class));
 	}
@@ -94,7 +99,7 @@ public class UserValidatorTest {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
 
 		userDto.setRole(null);
-		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		this.uservalidator.validate(userDto, bindingResult, false);
@@ -110,7 +115,7 @@ public class UserValidatorTest {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
 
 		userDto.getRole().setDescription("Breeder qwertyuioiuytredsdfrtghjuklsl123");
-		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		this.uservalidator.validate(userDto, bindingResult, false);
@@ -126,7 +131,7 @@ public class UserValidatorTest {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
 
 		userDto.setRole(new Role(5, Role.SUPERADMIN));
-		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		// On create and update mode, "SUPERADMIN" role should not be assignable
@@ -149,7 +154,7 @@ public class UserValidatorTest {
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
 
-		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		//Valid email
@@ -212,7 +217,7 @@ public class UserValidatorTest {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20);
 
 		userDto.setStatus("truee");
-		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		this.uservalidator.validate(userDto, bindingResult, false);
@@ -229,8 +234,8 @@ public class UserValidatorTest {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(0);
 
-		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(true);
-		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userDto.getEmail())).thenReturn(true);
+		Mockito.when(this.userService.isUsernameExists(userDto.getUsername())).thenReturn(true);
+		Mockito.when(this.userService.isPersonWithEmailExists(userDto.getEmail())).thenReturn(true);
 		this.uservalidator.validate(userDto, bindingResult, true);
 
 		assertThat(2, equalTo(bindingResult.getAllErrors().size()));
@@ -247,9 +252,9 @@ public class UserValidatorTest {
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20);
 
-		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
-		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(false);
-		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userDto.getEmail())).thenReturn(false);
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.userService.isUsernameExists(userDto.getUsername())).thenReturn(false);
+		Mockito.when(this.userService.isPersonWithEmailExists(userDto.getEmail())).thenReturn(false);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		this.uservalidator.validate(userDto, bindingResult, false);
@@ -268,9 +273,9 @@ public class UserValidatorTest {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
 
 		user.getPerson().setEmail("user@leafnode.io");
-		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
-		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(false);
-		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userDto.getEmail())).thenReturn(true);
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.userService.isUsernameExists(userDto.getUsername())).thenReturn(false);
+		Mockito.when(this.userService.isPersonWithEmailExists(userDto.getEmail())).thenReturn(true);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		this.uservalidator.validate(userDto, bindingResult, false);
@@ -290,9 +295,9 @@ public class UserValidatorTest {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
 		user.setName("Nahuel");
 
-		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
-		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(true);
-		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userDto.getEmail())).thenReturn(false);
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.userService.isUsernameExists(userDto.getUsername())).thenReturn(true);
+		Mockito.when(this.userService.isPersonWithEmailExists(userDto.getEmail())).thenReturn(false);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		this.uservalidator.validate(userDto, bindingResult, false);
@@ -312,9 +317,9 @@ public class UserValidatorTest {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20);
 		user.setRoles(Arrays.asList(new UserRole(user, new Role(5, Role.SUPERADMIN))));
 
-		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
-		Mockito.when(this.workbenchDataManager.isUsernameExists(userDto.getUsername())).thenReturn(false);
-		Mockito.when(this.workbenchDataManager.isPersonWithEmailExists(userDto.getEmail())).thenReturn(false);
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.userService.isUsernameExists(userDto.getUsername())).thenReturn(false);
+		Mockito.when(this.userService.isPersonWithEmailExists(userDto.getEmail())).thenReturn(false);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		this.uservalidator.validate(userDto, bindingResult, false);
@@ -344,7 +349,7 @@ public class UserValidatorTest {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20);
 
 		userDto.setStatus("false");
-		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		this.uservalidator.validate(userDto, bindingResult, false);

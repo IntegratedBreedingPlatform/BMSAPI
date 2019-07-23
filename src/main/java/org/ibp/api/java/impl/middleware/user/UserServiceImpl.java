@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
 	private static final String ERROR = "ERROR";
 
 	@Autowired
-	private org.generationcp.middleware.service.api.user.UserService middlewareUserService;
+	private org.generationcp.middleware.service.api.user.UserService userService;
 
 	@Autowired
 	protected UserValidator userValidator;
@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
 
 		final List<UserDetailDto> result = new ArrayList<>();
 		final ModelMapper mapper = UserMapper.getInstance();
-		final List<UserDto> users = this.middlewareUserService.getAllUsersSortedByLastName();
+		final List<UserDto> users = this.userService.getAllUsersSortedByLastName();
 
 		for (final UserDto user : users) {
 			final UserDetailDto userDetailDto = mapper.map(user, UserDetailDto.class);
@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
 			userdto.setPassword(this.passwordEncoder.encode(userdto.getUsername()));
 
 			try {
-				final Integer newUserId = this.middlewareUserService.createUser(userdto);
+				final Integer newUserId = this.userService.createUser(userdto);
 				mapResponse.put("id", String.valueOf(newUserId));
 
 			} catch (final MiddlewareQueryException e) {
@@ -122,7 +122,7 @@ public class UserServiceImpl implements UserService {
 			final UserDto userdto = this.translateUserDetailsDtoToUserDto(user);
 
 			try {
-				final Integer updateUserId = this.middlewareUserService.updateUser(userdto);
+				final Integer updateUserId = this.userService.updateUser(userdto);
 				mapResponse.put("id", String.valueOf(updateUserId));
 			} catch (final MiddlewareQueryException e) {
 				LOG.info("Error on userService.updateUser", e);
@@ -142,7 +142,7 @@ public class UserServiceImpl implements UserService {
 		Preconditions.checkNotNull(projectUUID, "The projectUUID must not be empty");
 
 		try {
-			final List<UserDto> users = this.middlewareUserService.getUsersByProjectUuid(projectUUID);
+			final List<UserDto> users = this.userService.getUsersByProjectUuid(projectUUID);
 			Preconditions.checkArgument(!users.isEmpty(), "users don't exists for this projectUUID");
 
 			for (final UserDto userDto : users) {
@@ -270,6 +270,10 @@ public class UserServiceImpl implements UserService {
 
 	private String getMessage(final String code, final Object[] args) {
 		return this.messageSource.getMessage(code, args, LocaleContextHolder.getLocale());
+	}
+
+	protected void setUserService(final org.generationcp.middleware.service.api.user.UserService userService) {
+		this.userService = userService;
 	}
 
 }

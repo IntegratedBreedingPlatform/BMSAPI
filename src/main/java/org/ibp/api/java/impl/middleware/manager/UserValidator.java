@@ -75,14 +75,6 @@ public class UserValidator implements Validator {
 	
 	private Role superAdminRole;
 
-	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
-		this.workbenchDataManager = workbenchDataManager;
-	}
-
-	public void setSecurityService(final SecurityService securityService) {
-		this.securityService = securityService;
-	}
-
 	@Override
 	public boolean supports(Class<?> aClass) {
 		return UserDetailDto.class.equals(aClass);
@@ -266,5 +258,17 @@ public class UserValidator implements Validator {
 	
 	public void setSuperAdminRole(Role superAdminRole) {
 		this.superAdminRole = superAdminRole;
+	}
+
+	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
+		this.workbenchDataManager = workbenchDataManager;
+	}
+
+	public void setSecurityService(final SecurityService securityService) {
+		this.securityService = securityService;
+	}
+
+	public void setUserService(final UserService userService) {
+		this.userService = userService;
 	}
 }

@@ -1,13 +1,13 @@
 package org.ibp.api.java.impl.middleware.security;
 
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudySummary;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.exception.ForbiddenException;
 import org.junit.After;
 import org.junit.Assert;
@@ -28,7 +28,7 @@ public class SecurityServiceImplTest {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Mock
-	private UserDataManager userDataManager;
+	private UserService userService;
 
 	@Mock
 	private HttpServletRequest httpServletRequest;
@@ -58,11 +58,11 @@ public class SecurityServiceImplTest {
 		this.loggedInUser = new UsernamePasswordAuthenticationToken(this.me.getName(), this.me.getPassword());
 		SecurityContextHolder.getContext().setAuthentication(this.loggedInUser);
 
-		Mockito.when(this.workbenchDataManager.getUserById(this.me.getUserid())).thenReturn(this.me);
-		Mockito.when(this.workbenchDataManager.getUserById(this.otherBreeder.getUserid())).thenReturn(this.otherBreeder);
+		Mockito.when(this.userService.getUserById(this.me.getUserid())).thenReturn(this.me);
+		Mockito.when(this.userService.getUserById(this.otherBreeder.getUserid())).thenReturn(this.otherBreeder);
 
-		Mockito.when(this.workbenchDataManager.getUserByUsername(this.me.getName())).thenReturn(this.me);
-		Mockito.when(this.workbenchDataManager.getUserByUsername(this.otherBreeder.getName())).thenReturn(this.otherBreeder);
+		Mockito.when(this.userService.getUserByUsername(this.me.getName())).thenReturn(this.me);
+		Mockito.when(this.userService.getUserByUsername(this.otherBreeder.getName())).thenReturn(this.otherBreeder);
 	}
 
 	@After
@@ -87,7 +87,7 @@ public class SecurityServiceImplTest {
 			.thenReturn(summaryStudyProgram);
 
 		// Logged in user = me is a the member
-		Mockito.when(this.workbenchDataManager.getUsersByProjectId(summaryStudyProgram.getProjectId())).thenReturn(
+		Mockito.when(this.userService.getUsersByProjectId(summaryStudyProgram.getProjectId())).thenReturn(
 			Lists.newArrayList(this.me));
 
 		// Hence accessible
@@ -113,7 +113,7 @@ public class SecurityServiceImplTest {
 			.thenReturn(summaryStudyProgram);
 
 		// Logged in user = me is not the member, some other breeder is
-		Mockito.when(this.workbenchDataManager.getUsersByProjectId(summaryStudyProgram.getProjectId())).thenReturn(
+		Mockito.when(this.userService.getUsersByProjectId(summaryStudyProgram.getProjectId())).thenReturn(
 			Lists.newArrayList(this.otherBreeder));
 
 		// Hence not accessible
@@ -157,7 +157,7 @@ public class SecurityServiceImplTest {
 	public void testGermplasmListIsAccessibleToOwner() {
 		final GermplasmList list = new GermplasmList();
 		list.setUserId(this.me.getUserid());
-		Mockito.when(this.userDataManager.getUserById(this.me.getUserid())).thenReturn(this.me.copyToUser());
+		Mockito.when(this.userService.getUserById(this.me.getUserid())).thenReturn(this.me);
 		Assert
 			.assertTrue("Lists owned by logged in user should be accessible.", this.securityServiceImpl.isAccessible(list, this.cropname));
 	}
@@ -176,10 +176,10 @@ public class SecurityServiceImplTest {
 		listProgram.setUniqueID(list.getProgramUUID());
 		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(list.getProgramUUID(), this.cropname)).thenReturn(listProgram);
 		// Logged in user = me is not a the member
-		Mockito.when(this.workbenchDataManager.getUsersByProjectId(listProgram.getProjectId())).thenReturn(
+		Mockito.when(this.userService.getUsersByProjectId(listProgram.getProjectId())).thenReturn(
 			Lists.newArrayList(this.otherBreeder));
 
-		Mockito.when(this.userDataManager.getUserById(this.otherBreeder.getUserid())).thenReturn(this.otherBreeder.copyToUser());
+		Mockito.when(this.userService.getUserById(this.otherBreeder.getUserid())).thenReturn(this.otherBreeder);
 		Assert.assertFalse("Lists not owned by logged in user should not be accessible.",
 			this.securityServiceImpl.isAccessible(list, this.cropname));
 	}
@@ -193,7 +193,7 @@ public class SecurityServiceImplTest {
 		list.setUserId(this.otherBreeder.getUserid());
 		list.setProgramUUID(this.programUUID);
 
-		Mockito.when(this.userDataManager.getUserById(this.otherBreeder.getUserid())).thenReturn(this.otherBreeder.copyToUser());
+		Mockito.when(this.userService.getUserById(this.otherBreeder.getUserid())).thenReturn(this.otherBreeder);
 
 		final Project listProgram = new Project();
 		listProgram.setProjectId(2L);
@@ -202,7 +202,7 @@ public class SecurityServiceImplTest {
 		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(list.getProgramUUID(), this.cropname)).thenReturn(listProgram);
 
 		// Logged in user = me is a the member
-		Mockito.when(this.workbenchDataManager.getUsersByProjectId(listProgram.getProjectId())).thenReturn(
+		Mockito.when(this.userService.getUsersByProjectId(listProgram.getProjectId())).thenReturn(
 			Lists.newArrayList(this.me));
 
 		Assert.assertTrue(

@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.impl.middleware.program.ProgramServiceImpl;
@@ -30,6 +31,9 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 	@Autowired
 	private SecurityServiceImpl securityService;
 
+	@Autowired
+	private UserService userService;
+
 	@Before
 	public void beforeEachTest() {
 
@@ -43,11 +47,11 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 		this.myBreedingBuddy.setUserid(2);
 		this.myBreedingBuddy.setPassword("password");
 
-		Mockito.when(this.workbenchDataManager.getUserById(this.me.getUserid())).thenReturn(this.me);
-		Mockito.when(this.workbenchDataManager.getUserById(this.myBreedingBuddy.getUserid())).thenReturn(this.myBreedingBuddy);
+		Mockito.when(this.userService.getUserById(this.me.getUserid())).thenReturn(this.me);
+		Mockito.when(this.userService.getUserById(this.myBreedingBuddy.getUserid())).thenReturn(this.myBreedingBuddy);
 
-		Mockito.when(this.workbenchDataManager.getUserByUsername(this.me.getName())).thenReturn(this.me);
-		Mockito.when(this.workbenchDataManager.getUserByUsername(this.myBreedingBuddy.getName())).thenReturn(this.myBreedingBuddy);
+		Mockito.when(this.userService.getUserByUsername(this.me.getName())).thenReturn(this.me);
+		Mockito.when(this.userService.getUserByUsername(this.myBreedingBuddy.getName())).thenReturn(this.myBreedingBuddy);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.me);
 
 	}
@@ -83,8 +87,8 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 
 		Mockito.doReturn(programList).when(this.workbenchDataManager).getProjectsByUser(Mockito.eq(this.me));
 
-		Mockito.when(this.workbenchDataManager.getUsersByProjectId(program1.getProjectId())).thenReturn(Lists.newArrayList(this.me));
-		Mockito.when(this.workbenchDataManager.getUsersByProjectId(program2.getProjectId())).thenReturn(
+		Mockito.when(this.userService.getUsersByProjectId(program1.getProjectId())).thenReturn(Lists.newArrayList(this.me));
+		Mockito.when(this.userService.getUsersByProjectId(program2.getProjectId())).thenReturn(
 				Lists.newArrayList(this.me, this.myBreedingBuddy));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/program/list").contentType(this.contentType))

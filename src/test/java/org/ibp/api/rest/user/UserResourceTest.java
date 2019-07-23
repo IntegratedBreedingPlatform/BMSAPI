@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,14 +29,14 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	@Configuration
 	public static class TestConfiguration {
 
-		@Bean
+		@Bean(name = "userServiceAPI")
 		@Primary
 		public UserService userService() {
-			return Mockito.mock(UserServiceImpl.class);
+			return Mockito.mock(UserService.class);
 		}
 	}
 
-	@Autowired
+	@Resource(name = "userServiceAPI")
 	private UserService userService;
 
 	/**

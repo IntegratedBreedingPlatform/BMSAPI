@@ -1,25 +1,27 @@
 
 package org.ibp.api.java.impl.middleware.role;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.role.RoleDto;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RoleServiceImplTest extends ApiUnitTestBase {
-	
-	
+
 	@Mock
-	private WorkbenchDataManager workbenchManager;
+	private UserService userService;
 
 	@InjectMocks
 	private RoleServiceImpl roleServiceImpl;
@@ -32,8 +34,8 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 		this.createTestRoles();
 		final List<Role> assignableRoles = new ArrayList<>(this.allRoles);
 		assignableRoles.remove(this.restrictedRole);
-		Mockito.doReturn(assignableRoles).when(this.workbenchDataManager).getAssignableRoles();
-		Mockito.doReturn(this.allRoles).when(this.workbenchDataManager).getAllRoles();
+		Mockito.doReturn(assignableRoles).when(this.userService).getAssignableRoles();
+		Mockito.doReturn(this.allRoles).when(this.userService).getAllRoles();
 	}
 	
 	@Test
@@ -45,7 +47,7 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 	@Test
 	public void testGetAssignableRoles() throws Exception {
 		final List<RoleDto> roles = this.roleServiceImpl.getAssignableRoles();
-		Mockito.verify(this.workbenchDataManager).getAssignableRoles();
+		Mockito.verify(this.userService).getAssignableRoles();
 		Assert.assertEquals(this.allRoles.size() - 1, roles.size());
 		Assert.assertFalse(roles.contains(this.restrictedRole));
 	}
