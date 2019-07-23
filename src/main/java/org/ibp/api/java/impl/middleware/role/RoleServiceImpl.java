@@ -63,7 +63,7 @@ public class RoleServiceImpl implements RoleService {
 		role.setRoleType(this.getRoleType(dto.getRoleType()));
 		role.setUpdatedBy(user);
 		role.setUpdatedDate(new Date());
-		this.workbenchDataManager.saveOrUpdateRole(role);
+		this.workbenchDataManager.saveRole(role);
 	}
 
 	private RoleType getRoleType(final Integer roleTypeId) {
@@ -73,12 +73,7 @@ public class RoleServiceImpl implements RoleService {
 
 	private List<Permission> getPermission(final List<Integer> permissions) {
 
-		final List<Permission> permissionList = new ArrayList<>();
-		for (final Integer permissionId : permissions) {
-			final Permission permission = this.workbenchDataManager.getPermission(permissionId);
-			permissionList.add(permission);
-
-		}
+		final List<Permission> permissionList = this.getPermissions(permissions);
 
 		final Collection result = CollectionUtils.collect(permissionList, new Transformer() {
 			@Override
@@ -95,6 +90,16 @@ public class RoleServiceImpl implements RoleService {
 			}
 		}
 
+		return permissionList;
+	}
+
+	private List<Permission> getPermissions(final List<Integer> permissions) {
+		final List<Permission> permissionList = new ArrayList<>();
+		for (final Integer permissionId : permissions) {
+			final Permission permission = this.workbenchDataManager.getPermission(permissionId);
+			permissionList.add(permission);
+
+		}
 		return permissionList;
 	}
 }
