@@ -45,12 +45,11 @@ public class StudyValidatorTest {
 
 	@InjectMocks
 	private StudyValidator studyValidator;
-	
+
 	@Before
 	public void setup() {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(USER_ID);
 		doReturn(user).when(this.securityService).getCurrentlyLoggedInUser();
-		doReturn(USER_ID).when(this.contextUtil).getIbdbUserId(ArgumentMatchers.anyInt());
 	}
 
 	@Test (expected = ResourceNotFoundException.class)
