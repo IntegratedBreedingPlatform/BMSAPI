@@ -7,6 +7,7 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.slf4j.Logger;
@@ -68,6 +69,9 @@ public class UserValidator implements Validator {
 
 	@Autowired
 	private SecurityService securityService;
+
+	@Autowired
+	private UserService userService;
 	
 	private Role superAdminRole;
 
@@ -117,7 +121,7 @@ public class UserValidator implements Validator {
 	}
 
 	private void retrieveSuperAdminRole() {
-		final List<Role> allRoles = this.workbenchDataManager.getAllRoles();
+		final List<Role> allRoles = this.userService.getAllRoles();
 		for (final Role role : allRoles) {
 			if (this.isSuperAdminRole(role)){
 				this.superAdminRole = role;
@@ -129,7 +133,7 @@ public class UserValidator implements Validator {
 		WorkbenchUser userUpdate = null;
 		if (null == errors.getFieldError(USER_ID)) {
 			try {
-				userUpdate = this.workbenchDataManager.getUserById(user.getId());
+				userUpdate = this.userService.getUserById(user.getId());
 			} catch (MiddlewareQueryException e) {
 				errors.rejectValue(USER_ID, DATABASE_ERROR);
 				LOG.error(e.getMessage(), e);
@@ -221,7 +225,7 @@ public class UserValidator implements Validator {
 
 	protected void validateUsernameIfExists(final Errors errors, final String userName) {
 		try {
-			if (null == errors.getFieldError(USERNAME) && this.workbenchDataManager.isUsernameExists(userName)) {
+			if (null == errors.getFieldError(USERNAME) && this.userService.isUsernameExists(userName)) {
 				errors.rejectValue(USERNAME, SIGNUP_FIELD_USERNAME_EXISTS, new String[] {userName}, null);
 			}
 		} catch (MiddlewareQueryException e) {
@@ -232,7 +236,7 @@ public class UserValidator implements Validator {
 
 	protected void validatePersonEmailIfExists(final Errors errors, final String eMail) {
 		try {
-			if (null == errors.getFieldError(EMAIL) && this.workbenchDataManager.isPersonWithEmailExists(eMail)) {
+			if (null == errors.getFieldError(EMAIL) && this.userService.isPersonWithEmailExists(eMail)) {
 				errors.rejectValue(EMAIL, SIGNUP_FIELD_EMAIL_EXISTS);
 			}
 		} catch (MiddlewareQueryException e) {

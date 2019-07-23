@@ -2,7 +2,6 @@ package org.ibp.api.java.impl.middleware.user;
 
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.common.ErrorResponse;
@@ -43,7 +42,7 @@ public class UserServiceImpl implements UserService {
 	private static final String ERROR = "ERROR";
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private org.generationcp.middleware.service.api.user.UserService middlewareUserService;
 
 	@Autowired
 	protected UserValidator userValidator;
@@ -63,7 +62,7 @@ public class UserServiceImpl implements UserService {
 
 		final List<UserDetailDto> result = new ArrayList<>();
 		final ModelMapper mapper = UserMapper.getInstance();
-		final List<UserDto> users = this.workbenchDataManager.getAllUsersSortedByLastName();
+		final List<UserDto> users = this.middlewareUserService.getAllUsersSortedByLastName();
 
 		for (final UserDto user : users) {
 			final UserDetailDto userDetailDto = mapper.map(user, UserDetailDto.class);
@@ -91,11 +90,11 @@ public class UserServiceImpl implements UserService {
 			userdto.setPassword(this.passwordEncoder.encode(userdto.getUsername()));
 
 			try {
-				final Integer newUserId = this.workbenchDataManager.createUser(userdto);
+				final Integer newUserId = this.middlewareUserService.createUser(userdto);
 				mapResponse.put("id", String.valueOf(newUserId));
 
 			} catch (final MiddlewareQueryException e) {
-				LOG.info("Error on workbenchDataManager.createUser ", e);
+				LOG.info("Error on userService.createUser ", e);
 				errors.rejectValue(UserValidator.USER_ID, UserValidator.DATABASE_ERROR);
 				this.translateErrorToMap(errors, mapResponse);
 			}
@@ -123,10 +122,10 @@ public class UserServiceImpl implements UserService {
 			final UserDto userdto = this.translateUserDetailsDtoToUserDto(user);
 
 			try {
-				final Integer updateUserId = this.workbenchDataManager.updateUser(userdto);
+				final Integer updateUserId = this.middlewareUserService.updateUser(userdto);
 				mapResponse.put("id", String.valueOf(updateUserId));
 			} catch (final MiddlewareQueryException e) {
-				LOG.info("Error on workbenchDataManager.updateUser", e);
+				LOG.info("Error on userService.updateUser", e);
 				errors.rejectValue(UserValidator.USER_ID, UserValidator.DATABASE_ERROR);
 				this.translateErrorToMap(errors, mapResponse);
 			}
@@ -143,7 +142,7 @@ public class UserServiceImpl implements UserService {
 		Preconditions.checkNotNull(projectUUID, "The projectUUID must not be empty");
 
 		try {
-			final List<UserDto> users = this.workbenchDataManager.getUsersByProjectUuid(projectUUID);
+			final List<UserDto> users = this.middlewareUserService.getUsersByProjectUuid(projectUUID);
 			Preconditions.checkArgument(!users.isEmpty(), "users don't exists for this projectUUID");
 
 			for (final UserDto userDto : users) {
@@ -152,7 +151,7 @@ public class UserServiceImpl implements UserService {
 			}
 
 		} catch (final MiddlewareQueryException e) {
-			LOG.info("Error on workbenchDataManager.getUsersByProjectUuid", e);
+			LOG.info("Error on userService.getUsersByProjectUuid", e);
 			throw new ApiRuntimeException("An internal error occurred while trying to get the users");
 		}
 		return result;
@@ -173,10 +172,6 @@ public class UserServiceImpl implements UserService {
 
 	public void setSecurityService(final SecurityService securityService) {
 		this.securityService = securityService;
-	}
-
-	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
-		this.workbenchDataManager = workbenchDataManager;
 	}
 
 	public void setUserValidator(final UserValidator userValidator) {
