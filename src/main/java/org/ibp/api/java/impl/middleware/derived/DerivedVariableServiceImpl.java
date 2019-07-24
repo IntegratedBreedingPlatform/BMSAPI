@@ -131,7 +131,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 				try {
 					// Fill parameters with input variable values from the current level. Environment Detail and Study Condition variable
 					// values from environment level are already included in ObservationUnitRow.
-					DerivedVariableUtils.extractValues(rowParameters, observation, measurementVariablesMap, rowInputMissingData);
+					DerivedVariableUtils.extractValues(rowParameters, observation, measurementVariablesMap, rowInputMissingData, aggregateInputVariables);
 				} catch (final ParseException e) {
 					LOG.error("Error parsing date value for parameters " + rowParameters, e);
 					errors.reject(STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION);
@@ -233,12 +233,15 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 				final Integer variableId = Integer.valueOf(entry.getKey());
 				final MeasurementVariable measurementVariable = measurementVariablesMap.get(variableId);
 				final String termKey = DerivedVariableUtils.wrapTerm(entry.getKey());
-				variableAggregateValuesMap
-					.put(termKey, DerivedVariableUtils.parseValueList(entry.getValue(), measurementVariable, rowInputMissingData));
-				// If the input variable is in sub-observation level, remove its key from parameters because
-				// aggregate data from subobservation should be passed through processor.setData() not parameters.
-				parameters.remove(termKey);
+				if(inputVariables.contains(termKey)) {
+					variableAggregateValuesMap
+						.put(termKey, DerivedVariableUtils.parseValueList(entry.getValue(), measurementVariable, rowInputMissingData));
+					// If the input variable is in sub-observation level, remove its key from parameters because
+					// aggregate data from subobservation should be passed through processor.setData() not parameters.
+					parameters.remove(termKey);
+				}
 			}
+			//Add empty list as parameter for variables with no data
 			for(final String inputVariable: inputVariables) {
 				if(parameters.containsKey(inputVariable)) {
 					parameters.remove(inputVariable);
