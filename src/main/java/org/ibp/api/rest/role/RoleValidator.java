@@ -1,19 +1,19 @@
 package org.ibp.api.rest.role;
 
-import com.google.common.base.Preconditions;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.RoleTypePermission;
-import org.ibp.api.exception.ApiRequestValidationException;
+import org.generationcp.middleware.service.api.permission.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class RoleValidator {
@@ -21,14 +21,25 @@ public class RoleValidator {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
-	public void validateRoleGeneratorInput(final RoleGeneratorInput roleGeneratorInput) {
+	@Autowired
+	private PermissionService permissionService;
+
+	public BindingResult validateRoleGeneratorInput(final RoleGeneratorInput roleGeneratorInput) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleGeneratorInput.class.getName());
-		Preconditions.checkNotNull(roleGeneratorInput.getName(), "name cannot be null");
-		Preconditions.checkNotNull(roleGeneratorInput.getRoleType() ,"role type cannot be null");
+
+		if (roleGeneratorInput.getName().isEmpty()) {
+			errors.reject("role.name.can.not.be.null.empty");
+			return errors;
+		}
+
+		if (roleGeneratorInput.getRoleType() == null) {
+			errors.reject("role.type.can.not.be.null");
+			return errors;
+		}
 
 		if (roleGeneratorInput.getName().length() > 100) {
-			errors.reject("role.name.lenght");
+			errors.reject("role.name.length");
 		}
 
 		if (this.workbenchDataManager.getRoleByName(roleGeneratorInput.getName()) != null) {
@@ -36,40 +47,56 @@ public class RoleValidator {
 		}
 
 		if (roleGeneratorInput.getDescription() != null && roleGeneratorInput.getDescription().length() > 255) {
-				errors.reject("role.description.lenght");
+				errors.reject("role.description.length");
 		}
 
 		if (roleGeneratorInput.getRoleType() == null) {
 			errors.reject("role.role.type.null");
 		}
 
-		if (this.workbenchDataManager.getRoleType(roleGeneratorInput.getRoleType()) == null) {
+		final org.generationcp.middleware.pojos.workbench.RoleType roleType = this.workbenchDataManager.getRoleType(roleGeneratorInput.getRoleType());
+		if (roleType == null) {
 			errors.reject("role.role.type.does.not.exist");
-		}
-		else {
-			for (final Integer permissionId : roleGeneratorInput.getPermissions()) {
-				final Permission permission = this.workbenchDataManager.getPermission(permissionId);
-				if (permission == null) {
-					errors.reject("role.permission.does.not.exist");
-				}
-
-				final Collection result = CollectionUtils.collect(permission.getRoleTypePermissions(), new Transformer() {
-					@Override
-					public Integer transform(final Object input) {
-						final RoleTypePermission roleTypePermission = (RoleTypePermission) input;
-						return Integer.valueOf(roleTypePermission.getRoleType().getId());
+		} else {
+			final Set<Integer> permissionsIdSet = new HashSet<>(roleGeneratorInput.getPermissions());
+			final List<Permission> permissionDtoList = this.permissionService.getPermissionsByIds(permissionsIdSet);
+			if (permissionDtoList.size() != permissionsIdSet.size()) {
+				permissionsIdSet.remove(permissionDtoList.stream().map(a -> a.getPermissionId()).collect(Collectors.toSet()));
+				errors.reject("role.permission.does.not.exist",
+					new String[] {permissionsIdSet.stream().map(a -> a.toString()).collect(Collectors.joining(" , "))},
+					"");
+			} else {
+				for (final Permission permission: permissionDtoList) {
+					boolean contain = false;
+					for (final RoleTypePermission roleTypePermission: permission.getRoleTypePermissions()) {
+						if (roleTypePermission.getRoleType().equals(roleType)) {
+							contain = true;
+							break;
+						}
 					}
-				});
-				if (!result.contains(roleGeneratorInput.getRoleType())) {
-					errors.reject("role.role.type.does.not.correspond");
+					if (!contain) {
+						errors.reject("role.role.type.does.not.correspond");
+						break;
+					}
 				}
 
+				for (final Permission permission: permissionDtoList) {
+					boolean contain = false;
+					for (final RoleTypePermission roleTypePermission: permission.getRoleTypePermissions()) {
+						if (roleTypePermission.getRoleType().equals(roleType) && !roleTypePermission.getSelectable()) {
+							contain = true;
+							break;
+						}
+					}
+					if (contain) {
+						errors.reject("role.permission.not.selectable");
+						break;
+					}
+				}
 			}
 		}
 
-		if (errors.hasErrors()) {
-			throw new ApiRequestValidationException(errors.getAllErrors());
-		}
+		return  errors;
 
 	}
 }

@@ -1,7 +1,6 @@
 package org.ibp.api.domain.role;
 
 import org.generationcp.middleware.pojos.workbench.Permission;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -15,8 +14,6 @@ public class PermissionDto {
 	private String name;
 
 	private PermissionDto parent;
-
-	private WorkbenchSidebarCategoryLink sidebarCategoryLink;
 
 	public PermissionDto() {
 	}
@@ -56,14 +53,6 @@ public class PermissionDto {
 
 	public void setParent(final PermissionDto parent) {
 		this.parent = parent;
-	}
-
-	public WorkbenchSidebarCategoryLink getSidebarCategoryLink() {
-		return this.sidebarCategoryLink;
-	}
-
-	public void setSidebarCategoryLink(final WorkbenchSidebarCategoryLink sidebarCategoryLink) {
-		this.sidebarCategoryLink = sidebarCategoryLink;
 	}
 
 	@Override

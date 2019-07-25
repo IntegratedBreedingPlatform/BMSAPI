@@ -1,24 +1,24 @@
 package org.ibp.api.java.impl.middleware.role;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
 import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.permission.PermissionService;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.ibp.api.domain.role.RoleDto;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.role.RoleService;
 import org.ibp.api.rest.role.RoleGeneratorInput;
 import org.ibp.api.rest.role.RoleValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +31,9 @@ public class RoleServiceImpl implements RoleService {
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private PermissionService permissionService;
 
 	@Override
 	public List<RoleDto> getRoles(final RoleSearchDto roleSearchDto) {
@@ -47,7 +50,11 @@ public class RoleServiceImpl implements RoleService {
 	public void createRole(final RoleGeneratorInput dto) {
 		//TODO Check by SITE_ADMIN authority
 
-		this.roleValidator.validateRoleGeneratorInput(dto);
+		BindingResult errors = this.roleValidator.validateRoleGeneratorInput(dto);
+
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
 
 		final String userName = SecurityUtil.getLoggedInUserName();
 		final WorkbenchUser user = this.workbenchDataManager.getUserByUsername(userName);
@@ -73,19 +80,11 @@ public class RoleServiceImpl implements RoleService {
 
 	private List<Permission> getPermission(final List<Integer> permissions) {
 
-		final List<Permission> permissionList = this.getPermissions(permissions);
-
-		final Collection result = CollectionUtils.collect(permissionList, new Transformer() {
-			@Override
-			public Integer transform(final Object input) {
-				final Permission permission = (Permission) input;
-				return Integer.valueOf(permission.getPermissionId());
-			}
-		});
+		final List<Permission> permissionList = this.permissionService.getPermissionsByIds(new HashSet<>(permissions));
 
 		for (final Iterator<Permission> it = permissionList.iterator(); it.hasNext();) {
 			final Permission permission = it.next();
-			if (result != null && permission.getParent() != null && result.contains(permission.getParent().getPermissionId())) {
+			if (permission.getParent() != null && permissions.contains(permission.getParent().getPermissionId())) {
 				it.remove();
 			}
 		}
@@ -93,13 +92,4 @@ public class RoleServiceImpl implements RoleService {
 		return permissionList;
 	}
 
-	private List<Permission> getPermissions(final List<Integer> permissions) {
-		final List<Permission> permissionList = new ArrayList<>();
-		for (final Integer permissionId : permissions) {
-			final Permission permission = this.workbenchDataManager.getPermission(permissionId);
-			permissionList.add(permission);
-
-		}
-		return permissionList;
-	}
 }
