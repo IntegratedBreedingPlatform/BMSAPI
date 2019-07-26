@@ -16,9 +16,9 @@ public class RoleGeneratorInput {
 
 	private List<Integer> permissions;
 
-	private boolean editable;
+	private Boolean editable;
 
-	private boolean assignable;
+	private Boolean assignable;
 
 	public String getName() {
 		return this.name;
@@ -52,19 +52,19 @@ public class RoleGeneratorInput {
 		this.permissions = permissions;
 	}
 
-	public boolean isEditable() {
+	public Boolean isEditable() {
 		return this.editable;
 	}
 
-	public void setEditable(final boolean editable) {
+	public void setEditable(final Boolean editable) {
 		this.editable = editable;
 	}
 
-	public boolean isAssignable() {
+	public Boolean isAssignable() {
 		return this.assignable;
 	}
 
-	public void setAssignable(final boolean assignable) {
+	public void setAssignable(final Boolean assignable) {
 		this.assignable = assignable;
 	}
 

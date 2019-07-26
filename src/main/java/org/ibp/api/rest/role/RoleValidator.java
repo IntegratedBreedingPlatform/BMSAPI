@@ -96,6 +96,14 @@ public class RoleValidator {
 			}
 		}
 
+		if (roleGeneratorInput.isAssignable() == null) {
+			errors.reject("role.assignable.null");
+		}
+
+		if (roleGeneratorInput.isEditable() == null) {
+			errors.reject("role.editable.null");
+		}
+
 		return  errors;
 
 	}
