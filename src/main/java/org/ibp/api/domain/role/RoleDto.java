@@ -1,5 +1,6 @@
 package org.ibp.api.domain.role;
 
+import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
