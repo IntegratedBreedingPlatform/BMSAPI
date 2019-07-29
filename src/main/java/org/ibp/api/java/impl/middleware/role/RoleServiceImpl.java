@@ -47,7 +47,7 @@ public class RoleServiceImpl implements RoleService {
 	}
 
 	@Override
-	public void createRole(final RoleGeneratorInput dto) {
+	public Integer createRole(final RoleGeneratorInput dto) {
 		//TODO Check by SITE_ADMIN authority
 
 		BindingResult errors = this.roleValidator.validateRoleGeneratorInput(dto);
@@ -71,6 +71,7 @@ public class RoleServiceImpl implements RoleService {
 		role.setUpdatedBy(user);
 		role.setUpdatedDate(new Date());
 		this.workbenchDataManager.saveRole(role);
+		return role.getId();
 	}
 
 	private RoleType getRoleType(final Integer roleTypeId) {

@@ -1,6 +1,5 @@
 package org.ibp.api.rest.role;
 
-import com.google.common.base.Preconditions;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.ibp.api.domain.role.RoleDto;
@@ -34,9 +33,9 @@ public class RoleResource {
 	@ApiOperation(value = "Save role", notes = "Save role. ")
 	@RequestMapping(value = "/roles", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity createRole(@RequestBody final RoleGeneratorInput dto) {
-		this.roleService.createRole(dto);
-		return new ResponseEntity<>(HttpStatus.OK);
+	public ResponseEntity<Integer> createRole(@RequestBody final RoleGeneratorInput dto) {
+		final Integer roleId = this.roleService.createRole(dto);
+		return new ResponseEntity<>(roleId, HttpStatus.OK);
 	}
 
 }
