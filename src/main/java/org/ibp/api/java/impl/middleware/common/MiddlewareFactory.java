@@ -46,7 +46,12 @@ import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataMana
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.operation.builder.DataSetBuilder;
+import org.generationcp.middleware.operation.builder.StockBuilder;
+import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
+import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
+import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.service.DataImportServiceImpl;
@@ -397,6 +402,37 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public DatasetTypeService getDatasetTypeService() {
 		return new DatasetTypeServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public TrialEnvironmentBuilder trialEnvironmentBuilder() {
+		return new TrialEnvironmentBuilder(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public DataSetBuilder dataSetBuilder() {
+		return new DataSetBuilder(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public StockBuilder stockBuilder() {
+		return new StockBuilder(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public WorkbookBuilder workbookBuilder() {
+		return new WorkbookBuilder(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public WorkbookSaver workbookSaver() {
+		return new WorkbookSaver(this.getCropDatabaseSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {
