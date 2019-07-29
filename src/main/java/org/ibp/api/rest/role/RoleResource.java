@@ -35,7 +35,7 @@ public class RoleResource {
 	@ResponseBody
 	public ResponseEntity<Integer> createRole(@RequestBody final RoleGeneratorInput dto) {
 		final Integer roleId = this.roleService.createRole(dto);
-		return new ResponseEntity<>(roleId, HttpStatus.OK);
+		return new ResponseEntity<>(roleId, HttpStatus.CREATED);
 	}
 
 }
