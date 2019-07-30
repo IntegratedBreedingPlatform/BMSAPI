@@ -88,7 +88,6 @@ public class UserServiceTest {
 		Mockito.when(this.workbenchDataManager.getAllUsersSortedByLastName()).thenReturn(usersDto);
 		final List<UserDetailDto> usersDtlsDto = this.userServiceImpl.getAllUsersSortedByLastName();
 
-		Mockito.verify(this.securityService).requireCurrentUserIsAdmin();
 		assertThat(usersDto.get(0).getFirstName(), equalTo(usersDtlsDto.get(0).getFirstName()));
 		assertThat(usersDto.get(0).getLastName(), equalTo(usersDtlsDto.get(0).getLastName()));
 		assertThat(usersDto.get(0).getUsername(), equalTo(usersDtlsDto.get(0).getUsername()));
@@ -113,7 +112,6 @@ public class UserServiceTest {
 
 		final Map<String, Object> mapResponse = this.userServiceImpl.createUser(usrDtlDto);
 
-		Mockito.verify(this.securityService).requireCurrentUserIsAdmin();
 		assertThat((String) mapResponse.get("id"), equalTo("7"));
 	}
 
@@ -135,7 +133,6 @@ public class UserServiceTest {
 		final Map<String, Object> mapResponse = this.userServiceImpl.createUser(usrDtlDto);
 		final ErrorResponse error = (ErrorResponse) mapResponse.get("ERROR");
 
-		Mockito.verify(this.securityService).requireCurrentUserIsAdmin();
 		assertThat((String) mapResponse.get("id"), equalTo("0"));
 		assertThat(error.getErrors().size(), equalTo(1));
 		assertThat(error.getErrors().get(0).getFieldNames()[0], equalTo("userId"));
@@ -157,8 +154,7 @@ public class UserServiceTest {
 		final Map<String, Object> mapResponse = this.userServiceImpl.createUser(usrDtlDto);
 		final ErrorResponse error = (ErrorResponse) mapResponse.get("ERROR");
 
-		Mockito.verify(this.securityService).requireCurrentUserIsAdmin();
-		assertThat((String) mapResponse.get("id"), equalTo("0"));
+		assertThat(mapResponse.get("id"), equalTo("0"));
 		assertThat(error.getErrors().size(), equalTo(2));
 	}
 
@@ -179,8 +175,7 @@ public class UserServiceTest {
 
 		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlDto);
 
-		Mockito.verify(this.securityService).requireCurrentUserIsAdmin();
-		assertThat((String) mapResponse.get("id"), equalTo("8"));
+		assertThat(mapResponse.get("id"), equalTo("8"));
 	}
 
 	/**
@@ -203,8 +198,7 @@ public class UserServiceTest {
 		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlDto);
 		final ErrorResponse error = (ErrorResponse) mapResponse.get("ERROR");
 
-		Mockito.verify(this.securityService).requireCurrentUserIsAdmin();
-		assertThat((String) mapResponse.get("id"), equalTo("0"));
+		assertThat(mapResponse.get("id"), equalTo("0"));
 		assertThat(error.getErrors().size(), equalTo(1));
 	}
 
@@ -231,8 +225,7 @@ public class UserServiceTest {
 		final Map<String, Object> mapResponse = this.userServiceImpl.updateUser(usrDtlDto);
 		final ErrorResponse error = (ErrorResponse) mapResponse.get("ERROR");
 
-		Mockito.verify(this.securityService).requireCurrentUserIsAdmin();
-		assertThat((String) mapResponse.get("id"), equalTo("0"));
+		assertThat(mapResponse.get("id"), equalTo("0"));
 		assertThat(error.getErrors().size(), equalTo(1));
 		assertThat(error.getErrors().get(0).getFieldNames()[0], equalTo("userId"));
 		assertThat(error.getErrors().get(0).getMessage(), equalTo("DB error"));

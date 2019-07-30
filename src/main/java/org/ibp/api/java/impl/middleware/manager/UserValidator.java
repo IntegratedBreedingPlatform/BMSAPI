@@ -47,7 +47,6 @@ public class UserValidator implements Validator {
 	 */
 	public static final String USER_AUTO_DEACTIVATION = "A user cannot be auto-deactivated";
 	public static final String CANNOT_UPDATE_SUPERADMIN = "Updating this user is not allowed";
-	public static final String CANNOT_ASSIGN_SUPERADMIN_ROLE = "SuperAdmin role cannot be assigned to a user";
 	public static final String CANNOT_REMOVE_CROP = "site.admin.crops.user.in.program";
 
 	public static final String DATABASE_ERROR = "database.error";

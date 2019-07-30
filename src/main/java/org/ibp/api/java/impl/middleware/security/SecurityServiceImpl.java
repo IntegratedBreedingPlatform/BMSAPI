@@ -23,8 +23,6 @@ import java.util.List;
 @Service
 public class SecurityServiceImpl implements SecurityService {
 
-	public static final String CURRENT_USER_NOT_ADMIN_OR_SUPERADMIN = "current.user.not.admin.or.superadmin";
-
 	@Autowired
 	private HttpServletRequest request;
 
@@ -62,14 +60,6 @@ public class SecurityServiceImpl implements SecurityService {
 		}
 
 		return this.loggedInUserIsMemberOf(germplasmList.getProgramUUID(), cropname);
-	}
-
-	@Override
-	public void requireCurrentUserIsAdmin() {
-		if (!this.request.isUserInRole(Role.ADMIN) && !this.request.isUserInRole(Role.SUPERADMIN)) {
-			throw new ForbiddenException(
-				new ObjectError("", new String[] {CURRENT_USER_NOT_ADMIN_OR_SUPERADMIN}, null, ""));
-		}
 	}
 
 	private boolean loggedInUserIsMemberOf(final String programUniqueId, final String cropname) {

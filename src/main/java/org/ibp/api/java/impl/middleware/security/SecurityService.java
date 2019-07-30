@@ -21,12 +21,6 @@ public interface SecurityService {
 	boolean isAccessible(GermplasmList germplasmList, String cropname);
 
 	/**
-	 * Checks whether the currently logged-in user has ADMIN or SUPERADMIN role. Throws ForbiddenException if not.
-	 */
-	//TODO Remove this function
-	void requireCurrentUserIsAdmin();
-
-	/**
 	 * Retrieves the workbench user details based on details of the logged in user in Spring security context.
 	 */
 	WorkbenchUser getCurrentlyLoggedInUser();

@@ -221,37 +221,4 @@ public class SecurityServiceImplTest {
 			this.securityServiceImpl.isAccessible(list, this.cropname));
 	}
 
-	@Test
-	public void testRequireCurrentUserIsAdminUserIsAdmin() {
-		Mockito.when(this.httpServletRequest.isUserInRole(Role.SUPERADMIN)).thenReturn(false);
-		Mockito.when(this.httpServletRequest.isUserInRole(Role.ADMIN)).thenReturn(true);
-		try {
-			this.securityServiceImpl.requireCurrentUserIsAdmin();
-		} catch (final ForbiddenException e) {
-			Assert.fail("Method should not throw an exception.");
-		}
-	}
-
-	@Test
-	public void testRequireCurrentUserIsAdminUserIsSuperadmin() {
-		Mockito.when(this.httpServletRequest.isUserInRole(Role.SUPERADMIN)).thenReturn(true);
-		Mockito.when(this.httpServletRequest.isUserInRole(Role.ADMIN)).thenReturn(false);
-		try {
-			this.securityServiceImpl.requireCurrentUserIsAdmin();
-		} catch (final ForbiddenException e) {
-			Assert.fail("Method should not throw an exception.");
-		}
-	}
-
-	@Test
-	public void testRequireCurrentUserIsAdminFail() {
-		Mockito.when(this.httpServletRequest.isUserInRole(Role.SUPERADMIN)).thenReturn(false);
-		Mockito.when(this.httpServletRequest.isUserInRole(Role.ADMIN)).thenReturn(false);
-		try {
-			this.securityServiceImpl.requireCurrentUserIsAdmin();
-			Assert.fail("Method should throw an exception.");
-		} catch (final ForbiddenException e) {
-			Assert.assertEquals(SecurityServiceImpl.CURRENT_USER_NOT_ADMIN_OR_SUPERADMIN, e.getError().getCode());
-		}
-	}
 }
