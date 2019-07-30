@@ -48,7 +48,6 @@ public class RoleServiceImpl implements RoleService {
 
 	@Override
 	public Integer createRole(final RoleGeneratorInput dto) {
-		//TODO Check by SITE_ADMIN authority
 
 		BindingResult errors = this.roleValidator.validateRoleGeneratorInput(dto);
 

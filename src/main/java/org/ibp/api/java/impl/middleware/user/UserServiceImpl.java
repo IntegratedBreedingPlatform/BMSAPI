@@ -67,9 +67,6 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<UserDetailDto> getAllUsersSortedByLastName() {
-
-		//TODO Check by SITE_ADMIN authority
-
 		final List<UserDetailDto> result = new ArrayList<>();
 		final ModelMapper mapper = UserMapper.getInstance();
 		final List<UserDto> users = this.workbenchDataManager.getAllUsersSortedByLastName();
@@ -83,9 +80,6 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Map<String, Object> createUser(final UserDetailDto user) {
-
-		//TODO Check by SITE_ADMIN authority
-
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
 		final HashMap<String, Object> mapResponse = new HashMap<String, Object>();
 		mapResponse.put("id", String.valueOf(0));
@@ -115,9 +109,6 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Map<String, Object> updateUser(final UserDetailDto user) {
-
-		//TODO Check by SITE_ADMIN authority
-
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
 		final HashMap<String, Object> mapResponse = new HashMap<String, Object>();
 		mapResponse.put("id", String.valueOf(0));
