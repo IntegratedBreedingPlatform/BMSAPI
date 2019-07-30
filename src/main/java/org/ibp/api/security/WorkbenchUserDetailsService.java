@@ -3,6 +3,7 @@ package org.ibp.api.security;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
@@ -51,7 +52,7 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 				final WorkbenchUser workbenchUser = matchingUsers.get(0);
 				// FIXME Populate flags for accountNonExpired, credentialsNonExpired, accountNonLocked properly, all true for now.
 				return new org.springframework.security.core.userdetails.User(workbenchUser.getName(), workbenchUser.getPassword(),
-						this.getRolesAsAuthorities(workbenchUser));
+						this.getAuthorities(workbenchUser));
 			}
 			throw new UsernameNotFoundException("Invalid username/password.");
 		} catch (final MiddlewareQueryException e) {
@@ -59,16 +60,14 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 		}
 	}
 
-	private Collection<? extends GrantedAuthority> getRolesAsAuthorities(final WorkbenchUser workbenchUser) {
+	private Collection<? extends GrantedAuthority> getAuthorities(final WorkbenchUser workbenchUser) {
 		//TODO Load permissions per crop and program
 		final List<PermissionDto> permissions = this.permissionService.getPermissions( //
 			workbenchUser.getUserid(), //
 			null, //
 			null);
-		final List<GrantedAuthority> authorities = new ArrayList<>();
-		for (final PermissionDto permissionDto : permissions) {
-			authorities.add(new SimpleGrantedAuthority(permissionDto.getName()));
-		}
+		final List<GrantedAuthority> authorities = permissions.stream().map(permissionDto -> new SimpleGrantedAuthority(permissionDto.getName())).collect(
+				Collectors.toCollection(ArrayList::new));
 		return authorities;
 	}
 
