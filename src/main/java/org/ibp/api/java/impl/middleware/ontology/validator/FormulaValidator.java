@@ -86,7 +86,7 @@ public class FormulaValidator implements Validator {
 		final Map<String, DataType> inputVariablesDataTypeMap = new HashMap<>();
 
 		for (final FormulaVariable input : formulaDto.getInputs()) {
-			final Term inputTerm = this.termDataManager.getTermByName(input.getName());
+			final Term inputTerm = this.termDataManager.getTermByNameAndCvId(input.getName(), CvId.VARIABLES.getId());
 			if (inputTerm == null) {
 				errors.reject("variable.input.not.exists", new Object[] {input.getName()}, "");
 			} else {
