@@ -1,4 +1,3 @@
-
 package org.ibp.api.security;
 
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -69,8 +68,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		.authorizeRequests()
 				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 				.antMatchers("/", "/api-docs/**", "/authenticate", "/brapi/**/token", "/breeding_view/**").permitAll()
-		//  TODO Retrieve roles from DB		
-		.anyRequest().hasAnyAuthority(Role.ADMIN, "BREEDER", "TECHNICIAN", "READONLY", Role.SUPERADMIN)
+			.anyRequest()
+			.authenticated()
 		.and()
 		.apply(this.securityConfigurerAdapter())
 		.and()

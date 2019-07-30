@@ -1,4 +1,3 @@
-
 package org.ibp.api.security;
 
 import java.util.ArrayList;
@@ -6,11 +5,12 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.permission.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,6 +28,9 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private PermissionService permissionService;
 
 	public WorkbenchUserDetailsService() {
 
@@ -57,14 +60,14 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 	}
 
 	private Collection<? extends GrantedAuthority> getRolesAsAuthorities(final WorkbenchUser workbenchUser) {
-		final List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-		if (workbenchUser != null) {
-			final List<UserRole> userRoles = workbenchUser.getRoles();
-			if (userRoles != null && !userRoles.isEmpty()) {
-				for (final UserRole role : userRoles) {
-					authorities.add(new SimpleGrantedAuthority(role.getRole().getCapitalizedRole()));
-				}
-			}
+		//TODO Load permissions per crop and program
+		final List<PermissionDto> permissions = this.permissionService.getPermissions( //
+			workbenchUser.getUserid(), //
+			null, //
+			null);
+		final List<GrantedAuthority> authorities = new ArrayList<>();
+		for (final PermissionDto permissionDto : permissions) {
+			authorities.add(new SimpleGrantedAuthority(permissionDto.getName()));
 		}
 		return authorities;
 	}
