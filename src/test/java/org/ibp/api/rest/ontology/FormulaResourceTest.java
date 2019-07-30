@@ -114,7 +114,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 
 		final Term term = new Term();
 		term.setId(inputId);
-		when(this.termDataManager.getTermByName(inputName)).thenReturn(term);
+		when(this.termDataManager.getTermByNameAndCvId(inputName, CvId.VARIABLES.getId())).thenReturn(term);
 
 		this.mockMvc //
 			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
@@ -311,7 +311,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 
 		final Optional<FormulaDto> formula = Optional.of(formulaDto);
 
-		when(this.termDataManager.getTermByName(input.getName())).thenReturn(term);
+		when(this.termDataManager.getTermByNameAndCvId(input.getName(), CvId.VARIABLES.getId())).thenReturn(term);
 
 		doReturn(formula).when(this.service).getById(formulaId);
 
