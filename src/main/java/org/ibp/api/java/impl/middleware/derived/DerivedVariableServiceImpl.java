@@ -44,11 +44,11 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DerivedVariableServiceImpl.class);
 	public static final String HAS_DATA_OVERWRITE_RESULT_KEY = "hasDataOverwrite";
-	public static final String INPUT_MISSING_DATA_RESULT_KEY = "inputMissingData";
+	static final String INPUT_MISSING_DATA_RESULT_KEY = "inputMissingData";
 	public static final String STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION = "study.execute.calculation.parsing.exception";
-	public static final String STUDY_EXECUTE_CALCULATION_ENGINE_EXCEPTION = "study.execute.calculation.engine.exception";
-	public static final String STUDY_EXECUTE_CALCULATION_MISSING_DATA = "study.execute.calculation.missing.data";
-	public static final String STUDY_EXECUTE_CALCULATION_HAS_EXISTING_DATA = "study.execute.calculation.has.existing.data";
+	static final String STUDY_EXECUTE_CALCULATION_ENGINE_EXCEPTION = "study.execute.calculation.engine.exception";
+	static final String STUDY_EXECUTE_CALCULATION_MISSING_DATA = "study.execute.calculation.missing.data";
+	private static final String STUDY_EXECUTE_CALCULATION_HAS_EXISTING_DATA = "study.execute.calculation.has.existing.data";
 
 	@Resource
 	private DatasetService middlewareDatasetService;
