@@ -114,7 +114,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 
 		final Term term = new Term();
 		term.setId(inputId);
-		when(this.termDataManager.getTermByName(inputName)).thenReturn(term);
+		when(this.termDataManager.getTermByNameAndCvId(inputName, CvId.VARIABLES.getId())).thenReturn(term);
 
 		this.mockMvc //
 			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
@@ -201,7 +201,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		formulaDto.setDefinition("{{" + inputName + "}}");
 
 
-		doReturn(null).when(this.termDataManager).getTermByName(inputName);
+		doReturn(null).when(this.termDataManager).getTermByNameAndCvId(inputName, CvId.VARIABLES.getId());
 
 		this.mockMvc //
 			.perform(MockMvcRequestBuilders.post("/ontology/{cropname}/formula/", this.cropName) //
@@ -250,6 +250,12 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 		final FormulaDto formulaDto = new FormulaDto();
 		formulaDto.setTarget(new FormulaVariable(nextInt(), "", null));
 		formulaDto.setDefinition("{{1}}");
+
+		final int inputId = nextInt();
+		final Term term = new Term();
+		term.setId(inputId);
+		when(this.termDataManager.getTermByNameAndCvId(anyString(), anyInt())).thenReturn(term);
+
 
 		doThrow(new JexlException(null, ERROR_JEXL_EXCEPTION)).when(this.processor).evaluateFormula(anyString(), anyMapOf(String.class, Object.class));
 
@@ -311,7 +317,7 @@ public class FormulaResourceTest extends ApiUnitTestBase {
 
 		final Optional<FormulaDto> formula = Optional.of(formulaDto);
 
-		when(this.termDataManager.getTermByName(input.getName())).thenReturn(term);
+		when(this.termDataManager.getTermByNameAndCvId(input.getName(), CvId.VARIABLES.getId())).thenReturn(term);
 
 		doReturn(formula).when(this.service).getById(formulaId);
 
