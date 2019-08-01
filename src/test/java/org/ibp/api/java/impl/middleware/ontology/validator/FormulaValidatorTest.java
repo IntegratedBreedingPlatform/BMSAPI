@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 import com.google.common.base.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
@@ -117,7 +118,7 @@ public class FormulaValidatorTest {
 
 		when(errors.hasErrors()).thenReturn(false);
 		when(ontologyVariableDataManager.getVariableTypes(formulaDto.getTarget().getId())).thenReturn(Arrays.asList(VariableType.TRAIT));
-		when(termDataManager.getTermByName(inputVariableName)).thenReturn(null);
+		when(termDataManager.getTermByNameAndCvId(inputVariableName, CvId.VARIABLES.getId())).thenReturn(null);
 
 		this.formulaValidator.validate(formulaDto, errors);
 
@@ -139,7 +140,7 @@ public class FormulaValidatorTest {
 
 		when(errors.hasErrors()).thenReturn(false);
 		when(ontologyVariableDataManager.getVariableTypes(formulaDto.getTarget().getId())).thenReturn(Arrays.asList(VariableType.TRAIT));
-		when(termDataManager.getTermByName(inputVariableName)).thenReturn(inputVariableTerm);
+		when(termDataManager.getTermByNameAndCvId(inputVariableName, CvId.VARIABLES.getId())).thenReturn(inputVariableTerm);
 		when(ontologyVariableDataManager.getDataType(inputVariableTermId)).thenReturn(Optional.of(DataType.NUMERIC_VARIABLE));
 
 		this.formulaValidator.validate(formulaDto, errors);
@@ -188,7 +189,7 @@ public class FormulaValidatorTest {
 		when(errors.hasErrors()).thenReturn(false);
 		when(ontologyVariableDataManager.getVariableTypes(formulaDto.getTarget().getId())).thenReturn(Arrays.asList(VariableType.TRAIT));
 		when(ontologyVariableDataManager.getVariableTypes(inputVariableTermId)).thenReturn(Arrays.asList(VariableType.SELECTION_METHOD));
-		when(termDataManager.getTermByName(inputVariableName)).thenReturn(inputVariableTerm);
+		when(termDataManager.getTermByNameAndCvId(inputVariableName, CvId.VARIABLES.getId())).thenReturn(inputVariableTerm);
 		when(ontologyVariableDataManager.getDataType(inputVariableTermId)).thenReturn(Optional.of(DataType.NUMERIC_VARIABLE));
 
 		this.formulaValidator.validate(formulaDto, errors);
@@ -212,7 +213,7 @@ public class FormulaValidatorTest {
 
 		when(errors.hasErrors()).thenReturn(false);
 		when(ontologyVariableDataManager.getVariableTypes(formulaDto.getTarget().getId())).thenReturn(Arrays.asList(VariableType.TRAIT));
-		when(termDataManager.getTermByName(inputVariableName)).thenReturn(inputVariableTerm);
+		when(termDataManager.getTermByNameAndCvId(inputVariableName, CvId.VARIABLES.getId())).thenReturn(inputVariableTerm);
 		when(ontologyVariableDataManager.getDataType(inputVariableTermId)).thenReturn(Optional.of(DataType.NUMERIC_VARIABLE));
 
 		this.formulaValidator.validate(formulaDto, errors);
@@ -235,7 +236,7 @@ public class FormulaValidatorTest {
 
 		when(errors.hasErrors()).thenReturn(false);
 		when(ontologyVariableDataManager.getVariableTypes(formulaDto.getTarget().getId())).thenReturn(Arrays.asList(VariableType.TRAIT));
-		when(termDataManager.getTermByName(inputVariableName)).thenReturn(inputVariableTerm);
+		when(termDataManager.getTermByNameAndCvId(inputVariableName, CvId.VARIABLES.getId())).thenReturn(inputVariableTerm);
 		when(ontologyVariableDataManager.getDataType(inputVariableTermId)).thenReturn(Optional.of(DataType.NUMERIC_VARIABLE));
 
 		this.formulaValidator.validate(formulaDto, errors);
@@ -258,7 +259,7 @@ public class FormulaValidatorTest {
 
 		when(errors.hasErrors()).thenReturn(false);
 		when(ontologyVariableDataManager.getVariableTypes(formulaDto.getTarget().getId())).thenReturn(Arrays.asList(VariableType.TRAIT));
-		when(termDataManager.getTermByName(inputVariableName)).thenReturn(inputVariableTerm);
+		when(termDataManager.getTermByNameAndCvId(inputVariableName, CvId.VARIABLES.getId())).thenReturn(inputVariableTerm);
 		when(ontologyVariableDataManager.getDataType(inputVariableTermId)).thenReturn(Optional.of(DataType.NUMERIC_VARIABLE));
 		when(processor.evaluateFormula(anyString(), anyMapOf(String.class, Object.class))).thenThrow(RuntimeException.class);
 
