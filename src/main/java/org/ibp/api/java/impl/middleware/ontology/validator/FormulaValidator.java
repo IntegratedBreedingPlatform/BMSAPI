@@ -141,7 +141,7 @@ public class FormulaValidator implements Validator {
 			// Create mock data for each variable.
 			for (final Map.Entry<String, Object> termEntry : parameters.entrySet()) {
 				if (avgInputVariables.contains(termEntry.getKey())) {
-					termEntry.setValue(new ArrayList<Double>());
+					termEntry.setValue(new ArrayList<>());
 				} else if (inputVariablesDataTypeMap.get(termEntry.getKey()) == DataType.DATE_TIME_VARIABLE){
 					termEntry.setValue(new Date());
 				} else {

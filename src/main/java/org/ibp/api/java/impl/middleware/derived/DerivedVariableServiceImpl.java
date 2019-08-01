@@ -219,7 +219,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 	}
 
-	private void fillWithSubObservationLevelValues(final int observationUnitId,
+	void fillWithSubObservationLevelValues(final int observationUnitId,
 		final Map<Integer, Map<String, List<Object>>> valuesFromSubObservation,
 		final Map<Integer, MeasurementVariable> measurementVariablesMap,
 		final Set<String> rowInputMissingData, final Map<String, Object> parameters,
