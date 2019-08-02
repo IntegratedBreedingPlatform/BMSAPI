@@ -22,9 +22,6 @@ import java.util.HashMap;
 public class StudyValidator {
 
 	@Autowired
-	private HttpServletRequest request;
-
-	@Autowired
 	private SecurityService securityService;
 
 	@Autowired
@@ -56,7 +53,7 @@ public class StudyValidator {
 		if (shouldBeUnlocked
 			&& study.isLocked()
 			&& !ObjectUtils.equals(study.getCreatedBy(), String.valueOf(contextUtil.getIbdbUserId(loggedInUser.getUserid())))
-			&& !request.isUserInRole(Role.SUPERADMIN)) {
+			&& !loggedInUser.isSuperAdmin()) {
 			errors.reject("study.is.locked", "");
 			throw new ForbiddenException(errors.getAllErrors().get(0));
 		}

@@ -83,45 +83,6 @@ public class UserValidatorTest {
 		assertThat("signup.field.required", equalTo(bindingResult.getFieldError("status").getCode()));
 	}
 
-	@Test
-	public void testValidateRole() {
-		//TODO Reimplement
-		//		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		//		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		//		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
-		//
-		//		userDto.getRole().setName("Breeder qwertyuioiuytredsdfrtghjuklsl123");
-		//		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
-		//		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
-		//
-		//		this.uservalidator.validate(userDto, bindingResult, false);
-		//
-		//		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
-		//		assertThat("signup.field.length.exceed", equalTo(bindingResult.getFieldError("role").getCode()));
-	}
-
-	@Test
-	public void testValidateRoleWhenRoleIsSuperAdminRole() {
-		//TODO Reimplement
-		//		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		//		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		//		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
-		//
-		//		userDto.setRole(new Role(5, Role.SUPERADMIN));
-		//		Mockito.when(this.workbenchDataManager.getUserById(userDto.getId())).thenReturn(user);
-		//		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
-		//
-		//		// On create and update mode, "SUPERADMIN" role should not be assignable
-		//		this.uservalidator.validate(userDto, bindingResult, true);
-		//		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
-		//		assertThat(UserValidator.CANNOT_ASSIGN_SUPERADMIN_ROLE, equalTo(bindingResult.getAllErrors().get(0).getCode()));
-		//
-		//		bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		//		this.uservalidator.validate(userDto, bindingResult, false);
-		//		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
-		//		assertThat(UserValidator.CANNOT_ASSIGN_SUPERADMIN_ROLE, equalTo(bindingResult.getAllErrors().get(0).getCode()));
-	}
-
 	/**
 	 * Should validate the Email Format.* *
 	 */
