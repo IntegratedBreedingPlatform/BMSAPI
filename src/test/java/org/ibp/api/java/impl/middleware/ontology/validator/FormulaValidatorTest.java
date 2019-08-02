@@ -12,14 +12,21 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.java.impl.middleware.ontology.TermRequest;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
+import org.springframework.validation.MapBindingResult;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import static org.mockito.Matchers.any;
@@ -141,6 +148,31 @@ public class FormulaValidatorTest {
 		verify(termValidator).validate(any(TermRequest.class), any(Errors.class));
 		verify(errors, times(0)).reject("variable.input.not.exists", new String[] {inputVariableName}, "");
 
+	}
+
+	@Test
+	public void testGetAggregateFunctionInputVariables() {
+		final String formula = "FN:avg({{GW_M_g100grn}}, {{GW_M_g200grn}},{{GW_M_g1000grn}})";
+		final Map<String, DataType> inputVariablesDataTypeMap = new HashMap<>();
+		inputVariablesDataTypeMap.put("__GW_M_g100grn__", DataType.NUMERIC_VARIABLE);
+		inputVariablesDataTypeMap.put("__GW_M_g200grn__", DataType.NUMERIC_VARIABLE);
+		inputVariablesDataTypeMap.put("__GW_M_g1000grn__", DataType.NUMERIC_VARIABLE);
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), FormulaDto.class.getName());
+		final List<String> inputVariables = this.formulaValidator.getAggregateFunctionInputVariables(formula, inputVariablesDataTypeMap, bindingResult);
+		Assert.assertEquals(3, inputVariables.size());
+		Assert.assertFalse(bindingResult.hasErrors());
+	}
+
+	@Test
+	public void testGetAggregateFunctionInputVariablesWithErrors() {
+		final String formula = "FN:avg({{GW_M_g100grn}}, {{GW_M_g200grn}},{{Ant_Date_ddmmyyyy}})";
+		final Map<String, DataType> inputVariablesDataTypeMap = new HashMap<>();
+		inputVariablesDataTypeMap.put("__GW_M_g100grn__", DataType.NUMERIC_VARIABLE);
+		inputVariablesDataTypeMap.put("__GW_M_g200grn__", DataType.NUMERIC_VARIABLE);
+		inputVariablesDataTypeMap.put("__Ant_Date_ddmmyyyy__", DataType.DATE_TIME_VARIABLE);
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), FormulaDto.class.getName());
+		this.formulaValidator.getAggregateFunctionInputVariables(formula, inputVariablesDataTypeMap, this.errors);
+		Mockito.verify(this.errors).reject("variable.formula.avg.input.not.numeric", "");
 	}
 
 	@Test

@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.derived;
 import com.google.common.base.Optional;
 import org.apache.commons.lang.math.RandomUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
+import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
 import org.generationcp.middleware.domain.dms.VariableDatasetsDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -18,17 +19,21 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.OverwriteDataException;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -158,7 +163,7 @@ public class DerivedVariableServiceImplTest {
 		verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 		verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
 		verify(this.derivedVariableValidator)
-			.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+			.validateForAggregateFunctions(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
 				this.inputVariableDatasetMap);
 
 		final ArgumentCaptor<String> captureValue = ArgumentCaptor.forClass(String.class);
@@ -209,7 +214,7 @@ public class DerivedVariableServiceImplTest {
 			verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 			verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
 			verify(this.derivedVariableValidator)
-				.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+				.validateForAggregateFunctions(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
 					this.inputVariableDatasetMap);
 
 			final ArgumentCaptor<String> captureValue = ArgumentCaptor.forClass(String.class);
@@ -247,7 +252,7 @@ public class DerivedVariableServiceImplTest {
 		verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 		verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
 		verify(this.derivedVariableValidator)
-			.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+			.validateForAggregateFunctions(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
 				this.inputVariableDatasetMap);
 
 		final ArgumentCaptor<String> captureValue = ArgumentCaptor.forClass(String.class);
@@ -294,7 +299,7 @@ public class DerivedVariableServiceImplTest {
 			verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 			verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
 			verify(this.derivedVariableValidator)
-				.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+				.validateForAggregateFunctions(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
 					this.inputVariableDatasetMap);
 			verify(this.middlewareDerivedVariableService, times(0)).saveCalculatedResult(anyString(),
 				anyInt(), anyInt(), anyInt(),
@@ -322,7 +327,7 @@ public class DerivedVariableServiceImplTest {
 			verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 			verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
 			verify(this.derivedVariableValidator)
-				.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+				.validateForAggregateFunctions(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
 					this.inputVariableDatasetMap);
 			verify(this.middlewareDerivedVariableService, times(0)).saveCalculatedResult(anyString(),
 				anyInt(), anyInt(), anyInt(),
@@ -354,7 +359,7 @@ public class DerivedVariableServiceImplTest {
 		verify(this.derivedVariableValidator).validate(TARGET_VARIABLE_TERMID, GEO_LOCATION_IDS);
 		verify(this.derivedVariableValidator).verifyInputVariablesArePresentInStudy(TARGET_VARIABLE_TERMID, DATASET_ID, STUDY_ID);
 		verify(this.derivedVariableValidator)
-			.verifySubObservationsInputVariablesInAggregateFunction(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
+			.validateForAggregateFunctions(TARGET_VARIABLE_TERMID, STUDY_ID, DATASET_ID,
 				this.inputVariableDatasetMap);
 
 		assertEquals(
@@ -419,6 +424,66 @@ public class DerivedVariableServiceImplTest {
 		assertSame(expectedResult, result);
 	}
 
+	@Test
+	public void testFillWithSubObservationLevelValuesWithNoValues() throws ParseException {
+		final DerivedVariableProcessor processor = Mockito.mock(DerivedVariableProcessor.class);
+		this.derivedVariableService.setProcessor(processor);
+		final int observationUnitId = 1;
+		final Map<Integer, Map<String, List<Object>>> valuesFromSubObservation = new HashMap<>();
+		final Map<String, List<Object>> valuesMap = new HashMap<>();
+
+		valuesFromSubObservation.put(observationUnitId, valuesMap);
+		final Map<Integer, MeasurementVariable> measurementVariablesMap = this.createMeasurementVariablesMap();
+		final List<String> inputVariables = Collections.singletonList(DerivedVariableUtils.wrapTerm(String.valueOf(VARIABLE1_TERMID)));
+		final Map<String, Object> parameters = new HashMap<>();
+		parameters.put(inputVariables.get(0), null);
+
+		this.derivedVariableService.fillWithSubObservationLevelValues(observationUnitId, valuesFromSubObservation, measurementVariablesMap, new HashSet<>(), parameters, inputVariables);
+		final ArgumentCaptor<Map<String, List<Object>>> variableAggregateValuesMapCaptor = ArgumentCaptor.forClass(Map.class);
+		Mockito.verify(processor).setData(variableAggregateValuesMapCaptor.capture());
+		final Map<String, List<Object>> variableAggregateValuesMap = variableAggregateValuesMapCaptor.getValue();
+		Assert.assertTrue(variableAggregateValuesMap.get(inputVariables.get(0)).isEmpty());
+		Assert.assertFalse(parameters.containsKey(inputVariables.get(0)));
+	}
+
+	@Test
+	public void testFillWithSubObservationLevelValues() throws ParseException {
+		final DerivedVariableProcessor processor = Mockito.mock(DerivedVariableProcessor.class);
+		this.derivedVariableService.setProcessor(processor);
+		final int observationUnitId = 1;
+		final Map<Integer, Map<String, List<Object>>> valuesFromSubObservation = new HashMap<>();
+		final Map<String, List<Object>> valuesMap = new HashMap<>();
+		valuesMap.put(String.valueOf(VARIABLE1_TERMID), Arrays.asList("1", "2", "3"));
+		valuesFromSubObservation.put(observationUnitId, valuesMap);
+		final Map<Integer, MeasurementVariable> measurementVariablesMap = this.createMeasurementVariablesMap();
+		final List<String> inputVariables = Collections.singletonList(DerivedVariableUtils.wrapTerm(String.valueOf(VARIABLE1_TERMID)));
+		final Map<String, Object> parameters = new HashMap<>();
+		parameters.put(inputVariables.get(0), null);
+
+		this.derivedVariableService.fillWithSubObservationLevelValues(observationUnitId, valuesFromSubObservation, measurementVariablesMap, new HashSet<>(), parameters, inputVariables);
+		final ArgumentCaptor<Map<String, List<Object>>> variableAggregateValuesMapCaptor = ArgumentCaptor.forClass(Map.class);
+		Mockito.verify(processor).setData(variableAggregateValuesMapCaptor.capture());
+		final Map<String, List<Object>> variableAggregateValuesMap = variableAggregateValuesMapCaptor.getValue();
+		Assert.assertEquals(3, variableAggregateValuesMap.get(inputVariables.get(0)).size());
+		Assert.assertFalse(parameters.containsKey(inputVariables.get(0)));
+	}
+
+	@Test(expected = ParseException.class)
+	public void testFillWithSubObservationLevelWithDateValues() throws ParseException {
+		final DerivedVariableProcessor processor = Mockito.mock(DerivedVariableProcessor.class);
+		this.derivedVariableService.setProcessor(processor);
+		final int observationUnitId = 1;
+		final Map<Integer, Map<String, List<Object>>> valuesFromSubObservation = new HashMap<>();
+		final Map<String, List<Object>> valuesMap = new HashMap<>();
+		valuesMap.put(String.valueOf(VARIABLE6_TERMID), Collections.singletonList("2019-08-21"));
+		valuesFromSubObservation.put(observationUnitId, valuesMap);
+		final Map<Integer, MeasurementVariable> measurementVariablesMap = this.createMeasurementVariablesMap();
+		final List<String> inputVariables = Collections.singletonList(DerivedVariableUtils.wrapTerm(String.valueOf(VARIABLE6_TERMID)));
+		final Map<String, Object> parameters = new HashMap<>();
+		parameters.put(inputVariables.get(0), null);
+
+		this.derivedVariableService.fillWithSubObservationLevelValues(observationUnitId, valuesFromSubObservation, measurementVariablesMap, new HashSet<>(), parameters, inputVariables);
+	}
 	private FormulaDto createFormula(final String formula) {
 		final FormulaDto formulaDto = new FormulaDto();
 		formulaDto.setInputs(this.createFormulaVariables());

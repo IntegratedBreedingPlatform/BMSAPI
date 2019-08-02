@@ -30,6 +30,7 @@ import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,11 +44,11 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DerivedVariableServiceImpl.class);
 	public static final String HAS_DATA_OVERWRITE_RESULT_KEY = "hasDataOverwrite";
-	public static final String INPUT_MISSING_DATA_RESULT_KEY = "inputMissingData";
+	static final String INPUT_MISSING_DATA_RESULT_KEY = "inputMissingData";
 	public static final String STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION = "study.execute.calculation.parsing.exception";
-	public static final String STUDY_EXECUTE_CALCULATION_ENGINE_EXCEPTION = "study.execute.calculation.engine.exception";
-	public static final String STUDY_EXECUTE_CALCULATION_MISSING_DATA = "study.execute.calculation.missing.data";
-	public static final String STUDY_EXECUTE_CALCULATION_HAS_EXISTING_DATA = "study.execute.calculation.has.existing.data";
+	static final String STUDY_EXECUTE_CALCULATION_ENGINE_EXCEPTION = "study.execute.calculation.engine.exception";
+	static final String STUDY_EXECUTE_CALCULATION_MISSING_DATA = "study.execute.calculation.missing.data";
+	private static final String STUDY_EXECUTE_CALCULATION_HAS_EXISTING_DATA = "study.execute.calculation.has.existing.data";
 
 	@Resource
 	private DatasetService middlewareDatasetService;
@@ -94,7 +95,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		this.derivedVariableValidator.validate(variableId, geoLocationIds);
 		this.derivedVariableValidator.verifyInputVariablesArePresentInStudy(variableId, datasetId, studyId);
 		this.derivedVariableValidator
-			.verifySubObservationsInputVariablesInAggregateFunction(variableId, studyId, datasetId, inputVariableDatasetMap);
+			.validateForAggregateFunctions(variableId, studyId, datasetId, inputVariableDatasetMap);
 
 		// Get the list of observation unit rows grouped by intances
 		final Map<Integer, List<ObservationUnitRow>> instanceIdObservationUnitRowsMap =
@@ -108,7 +109,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		final Optional<FormulaDto> formulaOptional = this.formulaService.getByTargetId(variableId);
 		final FormulaDto formula = formulaOptional.get();
 		final Map<String, Object> parameters = DerivedVariableUtils.extractParameters(formula.getDefinition());
-
+		final List<String> aggregateInputVariables = DerivedVariableUtils.getAggregateFunctionInputVariables(formula.getDefinition(), true);
 		// Calculate
 		final Set<String> inputMissingData = new HashSet<>();
 
@@ -130,7 +131,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 				try {
 					// Fill parameters with input variable values from the current level. Environment Detail and Study Condition variable
 					// values from environment level are already included in ObservationUnitRow.
-					DerivedVariableUtils.extractValues(rowParameters, observation, measurementVariablesMap, rowInputMissingData);
+					DerivedVariableUtils.extractValues(rowParameters, observation, measurementVariablesMap, rowInputMissingData, aggregateInputVariables);
 				} catch (final ParseException e) {
 					LOG.error("Error parsing date value for parameters " + rowParameters, e);
 					errors.reject(STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION);
@@ -142,7 +143,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 					// Set the aggregate values from subobservation level to the processor
 					this.fillWithSubObservationLevelValues(observation.getObservationUnitId(), valuesFromSubObservation,
 						measurementVariablesMap,
-						rowInputMissingData, rowParameters);
+						rowInputMissingData, rowParameters, aggregateInputVariables);
 				} catch (final ParseException e) {
 					LOG.error("Error parsing date value for parameters " + rowParameters, e);
 					errors.reject(STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION);
@@ -218,10 +219,11 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 	}
 
-	private void fillWithSubObservationLevelValues(final int observationUnitId,
+	void fillWithSubObservationLevelValues(final int observationUnitId,
 		final Map<Integer, Map<String, List<Object>>> valuesFromSubObservation,
 		final Map<Integer, MeasurementVariable> measurementVariablesMap,
-		final Set<String> rowInputMissingData, final Map<String, Object> parameters) throws ParseException {
+		final Set<String> rowInputMissingData, final Map<String, Object> parameters,
+		final List<String> inputVariables) throws ParseException {
 
 		final Map<String, List<Object>> variableAggregateValuesMap = new HashMap<>();
 		final Map<String, List<Object>> valuesMap = valuesFromSubObservation.get(observationUnitId);
@@ -231,11 +233,20 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 				final Integer variableId = Integer.valueOf(entry.getKey());
 				final MeasurementVariable measurementVariable = measurementVariablesMap.get(variableId);
 				final String termKey = DerivedVariableUtils.wrapTerm(entry.getKey());
-				variableAggregateValuesMap
-					.put(termKey, DerivedVariableUtils.parseValueList(entry.getValue(), measurementVariable, rowInputMissingData));
-				// If the input variable is in sub-observation level, remove its key from parameters because
-				// aggregate data from subobservation should be passed through processor.setData() not parameters.
-				parameters.remove(termKey);
+				if(inputVariables.contains(termKey)) {
+					variableAggregateValuesMap
+						.put(termKey, DerivedVariableUtils.parseValueList(entry.getValue(), measurementVariable, rowInputMissingData));
+					// If the input variable is in sub-observation level, remove its key from parameters because
+					// aggregate data from subobservation should be passed through processor.setData() not parameters.
+					parameters.remove(termKey);
+				}
+			}
+			//Add empty list as parameter for variables with no data
+			for(final String inputVariable: inputVariables) {
+				if(parameters.containsKey(inputVariable)) {
+					parameters.remove(inputVariable);
+					variableAggregateValuesMap.put(inputVariable, new ArrayList<>());
+				}
 			}
 			this.processor.setData(variableAggregateValuesMap);
 		}

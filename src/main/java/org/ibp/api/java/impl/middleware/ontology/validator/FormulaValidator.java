@@ -24,9 +24,11 @@ import org.springframework.validation.Validator;
 
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -130,11 +132,17 @@ public class FormulaValidator implements Validator {
 
 		try {
 			String formula = formulaDto.getDefinition();
+			final List<String> avgInputVariables = this.getAggregateFunctionInputVariables(formula, inputVariablesDataTypeMap, errors);
+			if(errors.hasErrors()) {
+				return;
+			}
 			final Map<String, Object> parameters = DerivedVariableUtils.extractParameters(formula);
 
 			// Create mock data for each variable.
 			for (final Map.Entry<String, Object> termEntry : parameters.entrySet()) {
-				if (inputVariablesDataTypeMap.get(termEntry.getKey()) == DataType.DATE_TIME_VARIABLE) {
+				if (avgInputVariables.contains(termEntry.getKey())) {
+					termEntry.setValue(new ArrayList<>());
+				} else if (inputVariablesDataTypeMap.get(termEntry.getKey()) == DataType.DATE_TIME_VARIABLE){
 					termEntry.setValue(new Date());
 				} else {
 					termEntry.setValue(BigDecimal.ONE);
@@ -147,6 +155,19 @@ public class FormulaValidator implements Validator {
 			// Mapping engine errors to UI errors would be impractical
 			errors.reject("variable.formula.invalid", new Object[] {e.getMessage(), e.getCause()}, "");
 		}
+	}
+
+	List<String> getAggregateFunctionInputVariables(final String formula, final Map<String, DataType> inputVariablesDataTypeMap, final Errors errors) {
+		final List<String> inputVariables = DerivedVariableUtils.getAggregateFunctionInputVariables(formula, true);
+		final List<String> aggregateInputVariable = new ArrayList<>();
+		for(final String inputVariable: inputVariables) {
+			if(DataType.NUMERIC_VARIABLE.getId() != inputVariablesDataTypeMap.get(inputVariable).getId()) {
+				errors.reject("variable.formula.avg.input.not.numeric", "");
+				return inputVariables;
+			}
+			aggregateInputVariable.add(inputVariable);
+		}
+		return aggregateInputVariable;
 	}
 
 	private boolean isValidVariableTypeForFormula(final int id) {
