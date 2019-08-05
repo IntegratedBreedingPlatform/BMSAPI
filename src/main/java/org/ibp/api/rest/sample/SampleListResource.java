@@ -146,7 +146,7 @@ public class SampleListResource {
 	@ApiOperation(value = "Search Sample List", notes = "Search Sample List")
 	@RequestMapping(value = "/{crop}/search", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<org.generationcp.middleware.pojos.SampleList>> search(
+	public ResponseEntity<List<org.generationcp.middleware.pojos.SampleList>> search(@PathVariable final String crop,
 			@ApiParam("Only return the exact match of the search text") @RequestParam final boolean exactMatch,
 			@ApiParam("The name of the list to be searched") @RequestParam final String searchString, final Pageable pageable) {
 		final List<org.generationcp.middleware.pojos.SampleList> sampleLists =
