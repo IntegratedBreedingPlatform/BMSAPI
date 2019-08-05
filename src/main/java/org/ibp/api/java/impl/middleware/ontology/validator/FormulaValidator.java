@@ -132,7 +132,7 @@ public class FormulaValidator implements Validator {
 
 		try {
 			String formula = formulaDto.getDefinition();
-			final List<String> avgInputVariables = this.getAggregateFunctionInputVariables(formula, inputVariablesDataTypeMap, errors);
+			final List<String> aggregateFunctionInputVariables = this.getAggregateFunctionInputVariables(formula, inputVariablesDataTypeMap, errors);
 			if(errors.hasErrors()) {
 				return;
 			}
@@ -140,7 +140,7 @@ public class FormulaValidator implements Validator {
 
 			// Create mock data for each variable.
 			for (final Map.Entry<String, Object> termEntry : parameters.entrySet()) {
-				if (avgInputVariables.contains(termEntry.getKey())) {
+				if (aggregateFunctionInputVariables.contains(termEntry.getKey())) {
 					termEntry.setValue(new ArrayList<>());
 				} else if (inputVariablesDataTypeMap.get(termEntry.getKey()) == DataType.DATE_TIME_VARIABLE){
 					termEntry.setValue(new Date());
@@ -158,11 +158,19 @@ public class FormulaValidator implements Validator {
 	}
 
 	List<String> getAggregateFunctionInputVariables(final String formula, final Map<String, DataType> inputVariablesDataTypeMap, final Errors errors) {
-		final List<String> inputVariables = DerivedVariableUtils.getAggregateFunctionInputVariables(formula, true);
+		final List<String> inputVariables = new ArrayList<>();
+		final Map<String, List<String>> aggregateFunctionInputVariablesMap = DerivedVariableUtils.getAggregateFunctionInputVariablesMap(formula, true);
+		for(final String aggregateFunction: DerivedVariableUtils.AGGREGATE_FUNCTIONS) {
+			inputVariables.addAll(this.validateAggregateInputVariable(inputVariablesDataTypeMap, errors, aggregateFunction, aggregateFunctionInputVariablesMap.get(aggregateFunction)));
+		}
+		return inputVariables;
+	}
+
+	List<String> validateAggregateInputVariable(final Map<String, DataType> inputVariablesDataTypeMap, final Errors errors, final String aggregateFunction, final List<String> inputVariables) {
 		final List<String> aggregateInputVariable = new ArrayList<>();
 		for(final String inputVariable: inputVariables) {
 			if(DataType.NUMERIC_VARIABLE.getId() != inputVariablesDataTypeMap.get(inputVariable).getId()) {
-				errors.reject("variable.formula.avg.input.not.numeric", "");
+				errors.reject("variable.formula." + aggregateFunction + ".input.not.numeric", "");
 				return inputVariables;
 			}
 			aggregateInputVariable.add(inputVariable);
