@@ -80,7 +80,7 @@ public class SampleListResource {
 	@RequestMapping(value = "/{crop}/sampleListFolder", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity createSampleListFolder(@PathVariable final String crop, @RequestParam final String folderName,
-			@RequestParam final Integer parentId, @RequestParam final String programUUID) {
+		@RequestParam final Integer parentId, @RequestParam final String programUUID) {
 		final Map<String, Object> map;
 		try {
 			map = this.sampleListService.createSampleListFolder(folderName, parentId, programUUID);
@@ -98,7 +98,7 @@ public class SampleListResource {
 	@RequestMapping(value = "/{crop}/sampleListFolder/{folderId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateSampleListFolderName(@PathVariable final String crop, @RequestParam final String newFolderName,
-			@PathVariable final Integer folderId) {
+		@PathVariable final Integer folderId) {
 		final Map<String, Object> map;
 		try {
 			map = this.sampleListService.updateSampleListFolderName(folderId, newFolderName);
@@ -115,7 +115,7 @@ public class SampleListResource {
 	@RequestMapping(value = "/{crop}/sampleListFolder/{folderId}/move", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity moveSampleListFolder(@PathVariable final String crop, @PathVariable final Integer folderId,
-			@RequestParam final Integer newParentId, @RequestParam final boolean isCropList, @RequestParam final String programUUID) {
+		@RequestParam final Integer newParentId, @RequestParam final boolean isCropList, @RequestParam final String programUUID) {
 		final Map<String, Object> map;
 		try {
 			map = this.sampleListService.moveSampleListFolder(folderId, newParentId, isCropList, programUUID);
@@ -147,17 +147,17 @@ public class SampleListResource {
 	@RequestMapping(value = "/{crop}/search", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<org.generationcp.middleware.pojos.SampleList>> search(@PathVariable final String crop,
-			@ApiParam("Only return the exact match of the search text") @RequestParam final boolean exactMatch,
-			@ApiParam("The name of the list to be searched") @RequestParam final String searchString, final Pageable pageable) {
+		@ApiParam("Only return the exact match of the search text") @RequestParam final boolean exactMatch,
+		@ApiParam("The name of the list to be searched") @RequestParam final String searchString, final Pageable pageable) {
 		final List<org.generationcp.middleware.pojos.SampleList> sampleLists =
-				sampleListService.search(searchString, exactMatch, contextUtil.getCurrentProgramUUID(), pageable);
+			this.sampleListService.search(searchString, exactMatch, this.contextUtil.getCurrentProgramUUID(), pageable);
 		return new ResponseEntity<>(sampleLists, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Download Sample List as CSV file", notes = "Download Sample List as CSV file")
 	@RequestMapping(value = "/{crop}/download", method = RequestMethod.GET)
 	public ResponseEntity<FileSystemResource> download(@PathVariable final String crop, @RequestParam final Integer listId,
-			@RequestParam final String listName) throws IOException {
+		@RequestParam final String listName) throws IOException {
 
 		final List<SampleDetailsDTO> sampleDetailsDTOs = this.sampleListService.getSampleDetailsDTOs(listId);
 
@@ -185,7 +185,7 @@ public class SampleListResource {
 	@ResponseBody
 	public ResponseEntity saveSamplePlateInformation(
 		@PathVariable final String crop, @PathVariable final Integer listId, @RequestBody final List<SampleDTO> sampleDTOs) {
-		sampleListService.importSamplePlateInformation(sampleDTOs, listId);
+		this.sampleListService.importSamplePlateInformation(sampleDTOs, listId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
