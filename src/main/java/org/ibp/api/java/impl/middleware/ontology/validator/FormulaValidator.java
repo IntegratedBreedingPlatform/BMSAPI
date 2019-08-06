@@ -159,7 +159,7 @@ public class FormulaValidator implements Validator {
 
 	List<String> getAggregateFunctionInputVariables(final String formula, final Map<String, DataType> inputVariablesDataTypeMap, final Errors errors) {
 		final List<String> inputVariables = new ArrayList<>();
-		final Map<String, List<String>> aggregateFunctionInputVariablesMap = DerivedVariableUtils.getAggregateFunctionInputVariablesMap(formula, true);
+		final Map<String, List<String>> aggregateFunctionInputVariablesMap = DerivedVariableUtils.getAggregateFunctionInputVariablesMap(formula);
 		for(final String aggregateFunction: DerivedVariableUtils.AGGREGATE_FUNCTIONS) {
 			inputVariables.addAll(this.validateAggregateInputVariable(inputVariablesDataTypeMap, errors, aggregateFunction, aggregateFunctionInputVariablesMap.get(aggregateFunction)));
 		}
