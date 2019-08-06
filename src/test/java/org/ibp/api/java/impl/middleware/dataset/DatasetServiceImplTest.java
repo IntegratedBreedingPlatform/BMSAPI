@@ -69,6 +69,7 @@ public class DatasetServiceImplTest {
 	public static final String REP_NO = "REP_NO";
 	private static final String STOCK_ID = "STOCK_ID";
 	private static final String FACT1 = "FACT1";
+	private static final String ENVFACTOR1 = "ENVFACTOR1";
 	public static final String DATASET_NAME = "ABC";
 	public static final int PARENT_ID = 123;
 
@@ -232,6 +233,8 @@ public class DatasetServiceImplTest {
 		Assert.assertEquals(1, results.size());
 		Assert.assertEquals(1, results.get(1).size());
 		Assert.assertEquals(this.mapObservationUnitRows(instanceObservationUnitRowsMap.get(1)), results.get(1));
+		Assert.assertNotNull(results.get(1).get(0).getVariables());
+		Assert.assertNotNull(results.get(1).get(0).getEnvironmentVariables());
 	}
 
 	@Test
@@ -278,6 +281,7 @@ public class DatasetServiceImplTest {
 		variables.put(FACT1, new org.generationcp.middleware.service.api.dataset.ObservationUnitData());
 
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> environmentVariables = new HashMap<>();
+		environmentVariables.put(ENVFACTOR1, new org.generationcp.middleware.service.api.dataset.ObservationUnitData());
 
 		observationUnitRow.setVariables(variables);
 		observationUnitRow.setEnvironmentVariables(environmentVariables);

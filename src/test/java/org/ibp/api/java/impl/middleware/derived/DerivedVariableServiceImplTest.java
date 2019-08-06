@@ -66,6 +66,7 @@ public class DerivedVariableServiceImplTest {
 	public static final String VARIABLE6_NAME = "VARIABLE6";
 	public static final String VARIABLE7_NAME = "VARIABLE7";
 	public static final String VARIABLE8_NAME = "VARIABLE8";
+	public static final String VARIABLE9_NAME = "VARIABLE9";
 
 	public static final int TARGET_VARIABLE_TERMID = 321;
 	public static final int VARIABLE1_TERMID = 123;
@@ -76,19 +77,23 @@ public class DerivedVariableServiceImplTest {
 	public static final int VARIABLE6_TERMID = 8830;
 	public static final int VARIABLE7_TERMID = 1111;
 	public static final int VARIABLE8_TERMID = 2222;
+	public static final int VARIABLE9_TERMID = 3333;
 
 	private static final String TERM_VALUE_1 = "1000";
 	private static final String TERM_VALUE_2 = "12.5";
 	private static final String TERM_VALUE_3 = "10";
 	private static final String DATE_TERM1_VALUE = "20180101";
 	private static final String DATE_TERM2_VALUE = "20180101";
+	private static final String TERM_VALUE_9 = "100";
 
-	// TODO: When AVG and SUM functions are already implemented, verify the aggregate functions and sub-observation values are evaluated properly.
+	// TODO: When SUM function is already implemented, verify the aggregate functions and sub-observation values are evaluated properly.
 	private static final String FORMULA = "({{" + VARIABLE1_TERMID + "}}/100)*((100-{{" + VARIABLE2_TERMID + "}})/(100-12.5))*(10/{{"
-		+ VARIABLE3_TERMID + "}}) + fn:daysdiff({{" + VARIABLE5_TERMID + "}},{{" + VARIABLE6_TERMID + "}})";
-	private static final String FORMULA_RESULT = "10";
+		+ VARIABLE3_TERMID + "}}) + fn:daysdiff({{" + VARIABLE5_TERMID + "}},{{" + VARIABLE6_TERMID + "}}) + fn:avg({{" + VARIABLE7_TERMID
+		+ "}}) + {{" + VARIABLE9_TERMID + "}}";
+	private static final String FORMULA_RESULT = "112";
 
 	public static final int STUDY_ID = RandomUtils.nextInt();
+	public static final int SUMMARY_DATASET_ID = RandomUtils.nextInt();
 	public static final int DATASET_ID = RandomUtils.nextInt();
 	public static final int OBSERVATION_UNIT_ID = RandomUtils.nextInt();
 	public static final List<Integer> GEO_LOCATION_IDS = new ArrayList<>();
@@ -141,6 +146,9 @@ public class DerivedVariableServiceImplTest {
 		final FormulaDto formula = this.createFormula(FORMULA);
 		final List<Integer> subObservationDatasetTypeIds = Arrays.asList(1, 2, 3);
 		final DatasetDTO summaryDataset = new DatasetDTO();
+		summaryDataset.setDatasetId(SUMMARY_DATASET_ID);
+
+		this.inputVariableDatasetMap.put(VARIABLE9_TERMID, SUMMARY_DATASET_ID);
 
 		when(this.middlwareDatasetService.getDatasets(STUDY_ID, org.fest.util.Collections.set(DatasetTypeEnum.SUMMARY_DATA.getId())))
 			.thenReturn(Arrays.asList(summaryDataset));
@@ -547,6 +555,8 @@ public class DerivedVariableServiceImplTest {
 			DataType.NUMERIC_VARIABLE));
 		measurementVariablesMap.put(VARIABLE8_TERMID, this.createMeasurementVariable(VARIABLE8_TERMID, VARIABLE8_NAME,
 			DataType.NUMERIC_VARIABLE));
+		measurementVariablesMap.put(VARIABLE9_TERMID, this.createMeasurementVariable(VARIABLE9_TERMID, VARIABLE9_NAME,
+			DataType.NUMERIC_VARIABLE));
 
 		return measurementVariablesMap;
 
@@ -579,6 +589,10 @@ public class DerivedVariableServiceImplTest {
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setObservationUnitId(observationUnitId);
 		observationUnitRow.setVariables(this.createObservationUnitDataTestData());
+
+		final Map<String, ObservationUnitData> observationUnitDataMap = new HashMap<>();
+		observationUnitDataMap.put(VARIABLE9_NAME, this.createObservationUnitDataTestData(VARIABLE9_TERMID, TERM_VALUE_9, null));
+		observationUnitRow.setEnvironmentVariables(observationUnitDataMap);
 		return observationUnitRow;
 	}
 
