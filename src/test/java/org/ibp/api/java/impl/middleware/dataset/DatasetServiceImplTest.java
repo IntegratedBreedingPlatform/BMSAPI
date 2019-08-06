@@ -276,7 +276,11 @@ public class DatasetServiceImplTest {
 		variables.put(FIELD_MAP_RANGE, new org.generationcp.middleware.service.api.dataset.ObservationUnitData());
 		variables.put(STOCK_ID, new org.generationcp.middleware.service.api.dataset.ObservationUnitData());
 		variables.put(FACT1, new org.generationcp.middleware.service.api.dataset.ObservationUnitData());
+
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> environmentVariables = new HashMap<>();
+
 		observationUnitRow.setVariables(variables);
+		observationUnitRow.setEnvironmentVariables(environmentVariables);
 
 		return Lists.newArrayList(observationUnitRow);
 	}

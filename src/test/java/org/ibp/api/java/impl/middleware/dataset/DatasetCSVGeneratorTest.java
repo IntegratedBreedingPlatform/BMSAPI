@@ -47,9 +47,11 @@ public class DatasetCSVGeneratorTest {
 		observationUnitData2.setValue(this.variableValue2);
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		final Map<String, ObservationUnitData> variables = new HashMap<>();
+		final Map<String, ObservationUnitData> environmentVariables = new HashMap<>();
 		variables.put(this.variableName1, observationUnitData1);
 		variables.put(this.variableName2, observationUnitData2);
 		observationUnitRow.setVariables(variables);
+		observationUnitRow.setEnvironmentVariables(environmentVariables);
 		this.observationUnitRows = Arrays.asList(observationUnitRow);
 
 		final MeasurementVariable measurementVariable1 = new MeasurementVariable();

@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import org.apache.commons.lang.math.RandomUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.VariableDatasetsDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -139,7 +140,10 @@ public class DerivedVariableServiceImplTest {
 			this.createValuesFromSubObservationMap(OBSERVATION_UNIT_ID);
 		final FormulaDto formula = this.createFormula(FORMULA);
 		final List<Integer> subObservationDatasetTypeIds = Arrays.asList(1, 2, 3);
+		final DatasetDTO summaryDataset = new DatasetDTO();
 
+		when(this.middlwareDatasetService.getDatasets(STUDY_ID, org.fest.util.Collections.set(DatasetTypeEnum.SUMMARY_DATA.getId())))
+			.thenReturn(Arrays.asList(summaryDataset));
 		when(this.middlwareDatasetService.getInstanceIdToObservationUnitRowsMap(STUDY_ID, DATASET_ID, GEO_LOCATION_IDS))
 			.thenReturn(instanceIdObservationUnitRowsMap);
 		when(this.middlewareDerivedVariableService.createVariableIdMeasurementVariableMapInStudy(STUDY_ID))
@@ -438,7 +442,9 @@ public class DerivedVariableServiceImplTest {
 		final Map<String, Object> parameters = new HashMap<>();
 		parameters.put(inputVariables.get(0), null);
 
-		this.derivedVariableService.fillWithSubObservationLevelValues(observationUnitId, valuesFromSubObservation, measurementVariablesMap, new HashSet<>(), parameters, inputVariables);
+		this.derivedVariableService
+			.fillWithSubObservationLevelValues(observationUnitId, valuesFromSubObservation, measurementVariablesMap, new HashSet<>(),
+				parameters, inputVariables);
 		final ArgumentCaptor<Map<String, List<Object>>> variableAggregateValuesMapCaptor = ArgumentCaptor.forClass(Map.class);
 		Mockito.verify(processor).setData(variableAggregateValuesMapCaptor.capture());
 		final Map<String, List<Object>> variableAggregateValuesMap = variableAggregateValuesMapCaptor.getValue();
@@ -460,7 +466,9 @@ public class DerivedVariableServiceImplTest {
 		final Map<String, Object> parameters = new HashMap<>();
 		parameters.put(inputVariables.get(0), null);
 
-		this.derivedVariableService.fillWithSubObservationLevelValues(observationUnitId, valuesFromSubObservation, measurementVariablesMap, new HashSet<>(), parameters, inputVariables);
+		this.derivedVariableService
+			.fillWithSubObservationLevelValues(observationUnitId, valuesFromSubObservation, measurementVariablesMap, new HashSet<>(),
+				parameters, inputVariables);
 		final ArgumentCaptor<Map<String, List<Object>>> variableAggregateValuesMapCaptor = ArgumentCaptor.forClass(Map.class);
 		Mockito.verify(processor).setData(variableAggregateValuesMapCaptor.capture());
 		final Map<String, List<Object>> variableAggregateValuesMap = variableAggregateValuesMapCaptor.getValue();
@@ -482,8 +490,11 @@ public class DerivedVariableServiceImplTest {
 		final Map<String, Object> parameters = new HashMap<>();
 		parameters.put(inputVariables.get(0), null);
 
-		this.derivedVariableService.fillWithSubObservationLevelValues(observationUnitId, valuesFromSubObservation, measurementVariablesMap, new HashSet<>(), parameters, inputVariables);
+		this.derivedVariableService
+			.fillWithSubObservationLevelValues(observationUnitId, valuesFromSubObservation, measurementVariablesMap, new HashSet<>(),
+				parameters, inputVariables);
 	}
+
 	private FormulaDto createFormula(final String formula) {
 		final FormulaDto formulaDto = new FormulaDto();
 		formulaDto.setInputs(this.createFormulaVariables());
