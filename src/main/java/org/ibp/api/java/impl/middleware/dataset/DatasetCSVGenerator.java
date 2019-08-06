@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.dataset;
 import au.com.bytecode.opencsv.CSVWriter;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -25,7 +26,8 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 	public File generateSingleInstanceFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> observationUnitRows,
 		final String fileNameFullPath, final StudyInstance studyInstance) throws IOException {
-		try (final CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',')){
+		try (final CSVWriter csvWriter = new CSVWriter(
+			new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',')) {
 
 			final File newFile = new File(fileNameFullPath);
 			// feed in your array (or convert your data to an array)
@@ -43,15 +45,16 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 	}
 
 	@Override
-	public File generateTraitAndSelectionVariablesFile(final List<String[]> rowValues, final String filenamePath) throws IOException{
+	public File generateTraitAndSelectionVariablesFile(final List<String[]> rowValues, final String filenamePath) throws IOException {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
+	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
+		final List<MeasurementVariable> columns,
 		final String fileNameFullPath) throws IOException {
 		final List<ObservationUnitRow> allObservationUnitRows = new ArrayList<>();
-		for(final List<ObservationUnitRow> observationUnitRows: observationUnitRowMap.values()) {
+		for (final List<ObservationUnitRow> observationUnitRows : observationUnitRowMap.values()) {
 			allObservationUnitRows.addAll(observationUnitRows);
 		}
 		return this.generateSingleInstanceFile(null, null, columns, allObservationUnitRows, fileNameFullPath, null);
@@ -60,7 +63,14 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 	String[] getColumnValues(final ObservationUnitRow row, final List<MeasurementVariable> subObservationSetColumns) {
 		final List<String> values = new LinkedList<>();
 		for (final MeasurementVariable column : subObservationSetColumns) {
-			values.add(row.getVariables().get(column.getName()).getValue());
+			if (row.getEnvironmentVariables().containsKey(column.getName()) && (
+				column.getVariableType().getId() == VariableType.ENVIRONMENT_DETAIL.getId()
+					|| column.getVariableType().getId() == VariableType.STUDY_CONDITION.getId())) {
+				values.add(row.getEnvironmentVariables().get(column.getName()).getValue());
+			} else {
+				values.add(row.getVariables().get(column.getName()).getValue());
+			}
+
 		}
 		return values.toArray(new String[] {});
 	}
