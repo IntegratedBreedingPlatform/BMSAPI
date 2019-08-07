@@ -32,8 +32,6 @@ import static org.hamcrest.Matchers.equalTo;
 @RunWith(MockitoJUnitRunner.class)
 public class UserValidatorTest {
 
-	private static final int SUPERADMIN_ID = 123;
-
 	private UserValidator uservalidator;
 
 	@Mock
@@ -41,8 +39,6 @@ public class UserValidatorTest {
 
 	@Mock
 	private SecurityService securityService;
-
-	private Role superAdminRole;
 
 	@Before
 	public void beforeEachTest() {
