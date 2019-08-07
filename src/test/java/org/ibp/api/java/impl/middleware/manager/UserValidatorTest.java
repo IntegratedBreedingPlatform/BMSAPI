@@ -296,20 +296,6 @@ public class UserValidatorTest {
 		assertThat(UserValidator.USER_AUTO_DEACTIVATION, equalTo(bindingResult.getGlobalErrors().get(0).getCode()));
 	}
 
-	@Test
-	public void testIsSuperAdminRole(){
-		this.uservalidator.setSuperAdminRole(new Role(SUPERADMIN_ID, Role.SUPERADMIN));
-
-		// Should validate "SUPERADMIN" description
-		Assert.assertTrue(this.uservalidator.isSuperAdminRole(new Role(100, Role.SUPERADMIN)));
-
-		// Should validate by superadmin ID from DB
-		Assert.assertTrue(this.uservalidator.isSuperAdminRole(new Role(SUPERADMIN_ID, "")));
-
-		// Should not flag as superamin user if ID and description do not match
-		Assert.assertFalse(this.uservalidator.isSuperAdminRole(new Role(100, "Admin")));
-	}
-
 	private List<Role> createTestRoles() {
 		final List<Role> allRoles = new ArrayList<>();
 		final Role admin = new Role(1, "ADMIN");
