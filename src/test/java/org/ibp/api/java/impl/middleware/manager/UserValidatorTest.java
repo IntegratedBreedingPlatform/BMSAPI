@@ -296,18 +296,4 @@ public class UserValidatorTest {
 		assertThat(UserValidator.USER_AUTO_DEACTIVATION, equalTo(bindingResult.getGlobalErrors().get(0).getCode()));
 	}
 
-	private List<Role> createTestRoles() {
-		final List<Role> allRoles = new ArrayList<>();
-		final Role admin = new Role(1, "ADMIN");
-		final Role breeder = new Role(2, "BREEDER");
-		final Role technician = new Role(3, "TECHNICIAN");
-		this.superAdminRole = new Role(SUPERADMIN_ID, Role.SUPERADMIN);
-
-		allRoles.add(admin);
-		allRoles.add(breeder);
-		allRoles.add(technician);
-		allRoles.add(this.superAdminRole);
-
-		return allRoles;
-	}
 }
