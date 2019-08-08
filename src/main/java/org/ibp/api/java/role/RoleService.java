@@ -11,4 +11,6 @@ public interface RoleService {
 	List<RoleDto> getRoles(RoleSearchDto roleSearchDto);
 
 	Integer createRole(RoleGeneratorInput dto);
+
+	RoleDto getRole(Integer id);
 }

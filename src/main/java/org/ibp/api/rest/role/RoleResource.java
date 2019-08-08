@@ -3,12 +3,14 @@ package org.ibp.api.rest.role;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.ibp.api.domain.role.RoleDto;
+import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.role.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,6 +40,13 @@ public class RoleResource {
 	public ResponseEntity<Integer> createRole(@RequestBody final RoleGeneratorInput dto) {
 		final Integer roleId = this.roleService.createRole(dto);
 		return new ResponseEntity<>(roleId, HttpStatus.CREATED);
+	}
+
+	@ApiOperation(value = "Get a role", notes = "Get role")
+	@RequestMapping(value = "/roles/{id}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<RoleDto> getRole(final @PathVariable Integer id) {
+		return new ResponseEntity<>(roleService.getRole(id), HttpStatus.OK);
 	}
 
 }
