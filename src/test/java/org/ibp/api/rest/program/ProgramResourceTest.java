@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.ibp.ApiUnitTestBase;
@@ -31,6 +32,9 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 	@Autowired
 	private SecurityServiceImpl securityService;
 
+	@Autowired
+	private UserService userService;
+
 	@Before
 	public void beforeEachTest() {
 
@@ -43,6 +47,12 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 		this.myBreedingBuddy.setName("My Breeding Buddy");
 		this.myBreedingBuddy.setUserid(2);
 		this.myBreedingBuddy.setPassword("password");
+
+		Mockito.when(this.userService.getUserById(this.me.getUserid())).thenReturn(this.me);
+		Mockito.when(this.userService.getUserById(this.myBreedingBuddy.getUserid())).thenReturn(this.myBreedingBuddy);
+
+		Mockito.when(this.userService.getUserByUsername(this.me.getName())).thenReturn(this.me);
+		Mockito.when(this.userService.getUserByUsername(this.myBreedingBuddy.getName())).thenReturn(this.myBreedingBuddy);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.me);
 
 	}
@@ -76,11 +86,12 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 		programList.add(program2);
 
 		Mockito.doReturn(programList).when(this.workbenchDataManager).getProjectsByUser(Mockito.eq(this.me), Mockito.eq(cropName));
-		Mockito.doReturn(this.me).when(this.workbenchDataManager).getUserById(program1.getProjectId().intValue());
-		Mockito.doReturn(this.myBreedingBuddy).when(this.workbenchDataManager).getUserById(program2.getProjectId().intValue());
+		Mockito.doReturn(this.me).when(this.userService).getUserById(program1.getProjectId().intValue());
+		Mockito.doReturn(this.myBreedingBuddy).when(this.userService).getUserById(program2.getProjectId().intValue());
 
-		Mockito.doReturn(Lists.newArrayList(this.me)).when(this.workbenchDataManager).getUsersByProjectId(new Long (program1.getUserId()),program1.getCropType().getCropName());
-		Mockito.doReturn(Lists.newArrayList(this.me, this.myBreedingBuddy)).when(this.workbenchDataManager).getUsersByProjectId(new Long (program2.getUserId()),program1.getCropType().getCropName());
+		Mockito.when(this.userService.getUsersByProjectId(program1.getProjectId())).thenReturn(Lists.newArrayList(this.me));
+		Mockito.when(this.userService.getUsersByProjectId(program2.getProjectId())).thenReturn(
+				Lists.newArrayList(this.me, this.myBreedingBuddy));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/program").param("cropName",cropName).contentType(this.contentType))
 				.andDo(MockMvcResultHandlers.print()).andExpect(status().isOk())

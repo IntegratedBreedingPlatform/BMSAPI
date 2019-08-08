@@ -45,12 +45,11 @@ public class StudyValidatorTest {
 
 	@InjectMocks
 	private StudyValidator studyValidator;
-	
+
 	@Before
 	public void setup() {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(USER_ID);
 		doReturn(user).when(this.securityService).getCurrentlyLoggedInUser();
-		doReturn(USER_ID).when(this.contextUtil).getIbdbUserId(ArgumentMatchers.anyInt());
 	}
 
 	@Test (expected = ResourceNotFoundException.class)
@@ -68,6 +67,7 @@ public class StudyValidatorTest {
 		final Study study = new Study();
 		study.setId(studyId);
 		study.setLocked(true);
+		study.setCreatedBy("1");
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
 		studyValidator.validate(studyId, true);
 	}
@@ -92,8 +92,10 @@ public class StudyValidatorTest {
 		final Study study = new Study();
 		study.setId(studyId);
 		study.setLocked(true);
+		study.setCreatedBy("1");
 		doReturn(true).when(this.request).isUserInRole(Role.SUPERADMIN);
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
+		System.out.println(studyValidator);
 		studyValidator.validate(studyId, true);
 		// no exceptions thrown
 	}

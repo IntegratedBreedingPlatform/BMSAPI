@@ -1,8 +1,8 @@
 package org.ibp.api.java.impl.middleware.role;
 
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.ApiUnitTestBase;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -15,10 +15,9 @@ import java.util.List;
 
 @Ignore
 public class RoleServiceImplTest extends ApiUnitTestBase {
-	
-	
+
 	@Mock
-	private WorkbenchDataManager workbenchManager;
+	private UserService userService;
 
 	@InjectMocks
 	private RoleServiceImpl roleServiceImpl;

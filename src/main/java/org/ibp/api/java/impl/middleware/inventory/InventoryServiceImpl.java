@@ -111,7 +111,6 @@ public class InventoryServiceImpl implements InventoryService {
 			trans.setQuantity(germplasmInventory.getQuantityTotal());
 			trans.setComments(germplasmInventory.getComments());
 			trans.setSourceType("?");
-			trans.setPersonId(1);
 			trans.setCommitmentDate(0);
 			trans.setPreviousAmount(Double.valueOf(0));
 			this.inventoryDataManager.addTransaction(trans);

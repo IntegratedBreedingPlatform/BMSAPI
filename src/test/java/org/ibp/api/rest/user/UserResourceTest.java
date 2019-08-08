@@ -6,11 +6,9 @@ import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
-import org.ibp.api.java.impl.middleware.user.UserServiceImpl;
 import org.ibp.api.java.user.UserService;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -20,6 +18,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,14 +27,14 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	@Configuration
 	public static class TestConfiguration {
 
-		@Bean
+		@Bean(name = "userServiceAPI")
 		@Primary
 		public UserService userService() {
-			return Mockito.mock(UserServiceImpl.class);
+			return Mockito.mock(UserService.class);
 		}
 	}
 
-	@Autowired
+	@Resource(name = "userServiceAPI")
 	private UserService userService;
 
 	/**

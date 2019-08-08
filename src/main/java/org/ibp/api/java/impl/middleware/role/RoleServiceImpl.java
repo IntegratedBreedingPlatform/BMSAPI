@@ -8,6 +8,7 @@ import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.permission.PermissionService;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.role.RoleDto;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.role.RoleService;
@@ -28,6 +29,9 @@ public class RoleServiceImpl implements RoleService {
 
 	@Autowired
 	private RoleValidator roleValidator;
+
+	@Autowired
+	private UserService userService;
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
@@ -56,7 +60,7 @@ public class RoleServiceImpl implements RoleService {
 		}
 
 		final String userName = SecurityUtil.getLoggedInUserName();
-		final WorkbenchUser user = this.workbenchDataManager.getUserByUsername(userName);
+		final WorkbenchUser user = this.userService.getUserByUsername(userName);
 		final Role role  = new Role();
 		role.setName(dto.getName());
 		role.setEditable(dto.isEditable());
