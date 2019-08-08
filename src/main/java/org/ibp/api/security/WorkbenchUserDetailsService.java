@@ -11,6 +11,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,15 +27,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkbenchUserDetailsService implements UserDetailsService {
 
+
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private UserService userService;
 
 	public WorkbenchUserDetailsService() {
 
-	}
-
-	public WorkbenchUserDetailsService(final WorkbenchDataManager workbenchDataManager) {
-		this.workbenchDataManager = workbenchDataManager;
 	}
 
 	@Override
@@ -43,7 +41,7 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 			// username must be converted from html-encode to utf-8 string to support chinese/utf-8 languages
 			username = StringEscapeUtils.unescapeHtml(username);
 
-			final List<WorkbenchUser> matchingUsers = this.workbenchDataManager.getUserByName(username, 0, 1, Operation.EQUAL);
+			final List<WorkbenchUser> matchingUsers = this.userService.getUserByName(username, 0, 1, Operation.EQUAL);
 			if (matchingUsers != null && !matchingUsers.isEmpty()) {
 				final WorkbenchUser workbenchUser = matchingUsers.get(0);
 				// FIXME Populate flags for accountNonExpired, credentialsNonExpired, accountNonLocked properly, all true for now.
@@ -69,7 +67,4 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 		return authorities;
 	}
 
-	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {
-		this.workbenchDataManager = workbenchDataManager;
-	}
 }

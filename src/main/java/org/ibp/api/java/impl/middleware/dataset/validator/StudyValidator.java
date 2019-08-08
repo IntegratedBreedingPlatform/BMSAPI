@@ -55,7 +55,7 @@ public class StudyValidator {
 
 		if (shouldBeUnlocked
 			&& study.isLocked()
-			&& !ObjectUtils.equals(study.getCreatedBy(), String.valueOf(contextUtil.getIbdbUserId(loggedInUser.getUserid())))
+			&& !study.getCreatedBy().equals(loggedInUser.getUserid().toString())
 			&& !request.isUserInRole(Role.SUPERADMIN)) {
 			errors.reject("study.is.locked", "");
 			throw new ForbiddenException(errors.getAllErrors().get(0));

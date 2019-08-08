@@ -9,13 +9,13 @@ import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Debug;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
@@ -69,8 +69,6 @@ public abstract class ApiUnitTestBase {
 	@Autowired
 	protected StudyDataManager studyDataManager;
 
-	@Autowired
-	protected UserDataManager userDataManager;
 
 	@Autowired
 	protected ObjectMapper jsonMapper;
@@ -95,11 +93,11 @@ public abstract class ApiUnitTestBase {
 		public StudyDataManager studyDataManager() {
 			return Mockito.mock(StudyDataManager.class);
 		}
-		
+
 		@Bean
 		@Primary
-		public UserDataManager userDataManager() {
-			return Mockito.mock(UserDataManager.class);
+		public UserService userService() {
+			return Mockito.mock(UserService.class);
 		}
 
 		@Bean
