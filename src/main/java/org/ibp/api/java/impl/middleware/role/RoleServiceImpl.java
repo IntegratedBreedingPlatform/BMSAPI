@@ -16,8 +16,10 @@ import org.ibp.api.rest.role.RoleValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -71,6 +73,18 @@ public class RoleServiceImpl implements RoleService {
 		role.setUpdatedDate(new Date());
 		this.workbenchDataManager.saveRole(role);
 		return role.getId();
+	}
+
+	@Override
+	public RoleDto getRole(final Integer id) {
+		final Role role = workbenchDataManager.getRoleById(id);
+		if (role == null) {
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			errors.reject("role.invalid.id");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+		final RoleDto roleDto = new RoleDto(role);
+		return roleDto;
 	}
 
 	private RoleType getRoleType(final Integer roleTypeId) {

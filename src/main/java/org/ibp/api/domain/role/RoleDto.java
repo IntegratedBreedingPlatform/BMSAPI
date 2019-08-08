@@ -2,9 +2,11 @@ package org.ibp.api.domain.role;
 
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +22,8 @@ public class RoleDto {
 	private RoleTypeDto roleType;
 
 	private List<PermissionDto> permissions;
+
+	private List<UserRoleDto> userRoles = new ArrayList<>();
 
 	private boolean active;
 
@@ -39,6 +43,7 @@ public class RoleDto {
 		this.active = role.getActive();
 		this.editable = role.getEditable();
 		this.assignable = role.getAssignable();
+		role.getUserRoles().forEach(userRole -> userRoles.add(new UserRoleDto(userRole)));
 	}
 
 	public int getId() {
@@ -103,6 +108,14 @@ public class RoleDto {
 
 	public void setAssignable(final boolean assignable) {
 		this.assignable = assignable;
+	}
+
+	public List<UserRoleDto> getUserRoles() {
+		return userRoles;
+	}
+
+	public void setUserRoles(final List<UserRoleDto> userRoles) {
+		this.userRoles = userRoles;
 	}
 
 	@Override
