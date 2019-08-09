@@ -5,7 +5,6 @@ import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.Role;
-import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.permission.PermissionService;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
@@ -17,6 +16,7 @@ import org.ibp.api.java.role.RoleService;
 import org.ibp.api.rest.role.RoleGeneratorInput;
 import org.ibp.api.rest.role.RoleValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -26,11 +26,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class RoleServiceImpl implements RoleService {
 
+	public static final String ROLE_ASSIGNED_TO_USER_WARNING_KEY = "roleAssignedToUserWarning";
+	public static final String PERMISSION_CHANGED_WARNING_KEY = "permissionChangedWarning";
 	@Autowired
 	private RoleValidator roleValidator;
 
@@ -42,6 +47,9 @@ public class RoleServiceImpl implements RoleService {
 
 	@Autowired
 	private PermissionService permissionService;
+
+	@Autowired
+	private ResourceBundleMessageSource resourceBundleMessageSource;
 
 	@Override
 	public List<RoleDto> getRoles(final RoleSearchDto roleSearchDto) {
@@ -74,7 +82,7 @@ public class RoleServiceImpl implements RoleService {
 		role.setCreatedBy(user);
 		role.setActive(true);
 		role.setPermissions(this.getPermission(dto.getPermissions()));
-		role.setRoleType(this.getRoleType(dto.getRoleType()));
+		role.setRoleType(this.workbenchDataManager.getRoleType(dto.getRoleType()));
 		role.setUpdatedBy(user);
 		role.setUpdatedDate(new Date());
 		this.workbenchDataManager.saveRole(role);
@@ -83,19 +91,19 @@ public class RoleServiceImpl implements RoleService {
 
 	@Override
 	public RoleDto getRole(final Integer id) {
-		final Role role = workbenchDataManager.getRoleById(id);
+		final Role role = this.workbenchDataManager.getRoleById(id);
 		if (role == null) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("role.invalid.id");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
-		final RoleDto roleDto = new RoleDto(role);
-		return roleDto;
+		return new RoleDto(role);
 	}
 
 	@Override
-	public Integer updateRole(final RoleGeneratorInput roleGeneratorInput) {
+	public Map<String, Object> updateRole(final RoleGeneratorInput roleGeneratorInput, final boolean showWarnings) {
 
+		final Map<String, Object> warningsMap = new HashMap<>();
 		final BindingResult errors = this.roleValidator.validateRoleGeneratorInput(roleGeneratorInput);
 
 		if (errors.hasErrors()) {
@@ -111,16 +119,28 @@ public class RoleServiceImpl implements RoleService {
 			throw new ConflictException(errors.getAllErrors());
 		}
 
+		if (showWarnings) {
+			if (roleUsers.size() > 1) {
+				warningsMap.put(ROLE_ASSIGNED_TO_USER_WARNING_KEY,
+					this.resourceBundleMessageSource.getMessage("role.has.more.than.one.user.assigned", null,
+						Locale.getDefault()));
+			}
+			final Set<Integer> rolePermissionIds = role.getPermissions().stream().map(p -> p.getPermissionId()).collect(Collectors.toSet());
+			// TODO: Verify if the permissionIds from received from client are all parentIds.
+			if (!Sets.symmetricDifference(rolePermissionIds, Sets.newHashSet(roleGeneratorInput.getPermissions())).isEmpty()) {
+				// Check if there are any changes to the permissions
+				warningsMap.put(PERMISSION_CHANGED_WARNING_KEY,
+					this.resourceBundleMessageSource.getMessage("role.permissions.changed", null, Locale.getDefault()));
+			}
+
+		}
+
 		role.setName(roleGeneratorInput.getName());
 		role.setDescription(roleGeneratorInput.getDescription());
 		role.setPermissions(this.permissionService.getPermissionsByIds(Sets.newHashSet(roleGeneratorInput.getPermissions())));
 		this.workbenchDataManager.saveRole(role);
-		return role.getId();
-	}
 
-	private RoleType getRoleType(final Integer roleTypeId) {
-		final RoleType roleType = this.workbenchDataManager.getRoleType(roleTypeId);
-		return roleType;
+		return warningsMap;
 	}
 
 	private List<Permission> getPermission(final List<Integer> permissions) {

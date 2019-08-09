@@ -5,6 +5,7 @@ import org.ibp.api.domain.role.RoleDto;
 import org.ibp.api.rest.role.RoleGeneratorInput;
 
 import java.util.List;
+import java.util.Map;
 
 public interface RoleService {
 
@@ -14,5 +15,5 @@ public interface RoleService {
 
 	RoleDto getRole(Integer id);
 
-	Integer updateRole(RoleGeneratorInput roleGeneratorInput);
+	Map<String, Object> updateRole(RoleGeneratorInput roleGeneratorInput, final boolean showWarnings);
 }
