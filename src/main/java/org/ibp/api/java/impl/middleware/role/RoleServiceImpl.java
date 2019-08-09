@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.role;
 
+import com.google.common.collect.Sets;
 import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Permission;
@@ -11,6 +12,7 @@ import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.role.RoleDto;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ConflictException;
 import org.ibp.api.java.role.RoleService;
 import org.ibp.api.rest.role.RoleGeneratorInput;
 import org.ibp.api.rest.role.RoleValidator;
@@ -63,7 +65,7 @@ public class RoleServiceImpl implements RoleService {
 
 		final String userName = SecurityUtil.getLoggedInUserName();
 		final WorkbenchUser user = this.userService.getUserByUsername(userName);
-		final Role role  = new Role();
+		final Role role = new Role();
 		role.setName(dto.getName());
 		role.setEditable(dto.isEditable());
 		role.setAssignable(dto.isAssignable());
@@ -91,8 +93,29 @@ public class RoleServiceImpl implements RoleService {
 		return roleDto;
 	}
 
+	@Override
+	public Integer updateRole(final RoleGeneratorInput roleGeneratorInput) {
+
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleServiceImpl.class.getName());
+
+		final Role role = this.workbenchDataManager.getRoleById(roleGeneratorInput.getId());
+		final List<WorkbenchUser> roleUsers = this.userService.getUsersWithRole(roleGeneratorInput.getId());
+
+		// If the role is already assigned to any user and the role type has changed, throw an error.
+		if (!roleUsers.isEmpty() && !role.getRoleType().getId().equals(roleGeneratorInput.getRoleType())) {
+			errors.reject("role.roletype.can.not.be.changed");
+			throw new ConflictException(errors.getAllErrors());
+		}
+
+		role.setName(roleGeneratorInput.getName());
+		role.setDescription(roleGeneratorInput.getDescription());
+		role.setPermissions(this.permissionService.getPermissionsByIds(Sets.newHashSet(roleGeneratorInput.getPermissions())));
+		this.workbenchDataManager.saveRole(role);
+		return role.getId();
+	}
+
 	private RoleType getRoleType(final Integer roleTypeId) {
-		final RoleType roleType =  this.workbenchDataManager.getRoleType(roleTypeId);
+		final RoleType roleType = this.workbenchDataManager.getRoleType(roleTypeId);
 		return roleType;
 	}
 
@@ -100,7 +123,7 @@ public class RoleServiceImpl implements RoleService {
 
 		final List<Permission> permissionList = this.permissionService.getPermissionsByIds(new HashSet<>(permissions));
 
-		for (final Iterator<Permission> it = permissionList.iterator(); it.hasNext();) {
+		for (final Iterator<Permission> it = permissionList.iterator(); it.hasNext(); ) {
 			final Permission permission = it.next();
 			if (permission.getParent() != null && permissions.contains(permission.getParent().getPermissionId())) {
 				it.remove();

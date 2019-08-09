@@ -8,6 +8,8 @@ import java.util.List;
 @AutoProperty
 public class RoleGeneratorInput {
 
+	private int id;
+
 	private String name;
 
 	private String description;
@@ -19,6 +21,14 @@ public class RoleGeneratorInput {
 	private Boolean editable;
 
 	private Boolean assignable;
+
+	public int getId() {
+		return this.id;
+	}
+
+	public void setId(final int id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return this.name;

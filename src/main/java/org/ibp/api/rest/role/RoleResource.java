@@ -2,8 +2,10 @@ package org.ibp.api.rest.role;
 
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
+import org.ibp.api.domain.common.ErrorResponse;
 import org.ibp.api.domain.role.RoleDto;
 import org.ibp.api.domain.user.UserDetailDto;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.role.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,6 +50,15 @@ public class RoleResource {
 	@ResponseBody
 	public ResponseEntity<RoleDto> getRole(final @PathVariable Integer id) {
 		return new ResponseEntity<>(roleService.getRole(id), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Update role", notes = "Update role. ")
+	@RequestMapping(value = "/roles", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity updateRole(@RequestBody final RoleGeneratorInput roleGeneratorInput,
+		@RequestParam final boolean comparePermissions) {
+		this.roleService.updateRole(roleGeneratorInput);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 }

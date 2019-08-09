@@ -13,4 +13,6 @@ public interface RoleService {
 	Integer createRole(RoleGeneratorInput dto);
 
 	RoleDto getRole(Integer id);
+
+	Integer updateRole(RoleGeneratorInput roleGeneratorInput);
 }
