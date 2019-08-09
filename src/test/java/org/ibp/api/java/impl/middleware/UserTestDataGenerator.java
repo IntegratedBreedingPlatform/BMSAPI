@@ -26,7 +26,7 @@ public abstract class UserTestDataGenerator {
 	 * @param userId Integer
 	 * @return user WorkbenchUser
 	 */
-	public static WorkbenchUser initializeWorkbenchUser(final Integer userId) {
+	public static WorkbenchUser initializeWorkbenchUser(final Integer userId, final Role role) {
 		final WorkbenchUser user = new WorkbenchUser();
 		final Person person = new Person();
 
@@ -61,8 +61,8 @@ public abstract class UserTestDataGenerator {
 		user.setAccess(0);
 		user.setInstalid(0);
 		user.setType(0);
-		
-		user.setRoles(Arrays.asList(new UserRole(user, new Role(2, "Breeder"))));
+
+		user.setRoles(Arrays.asList(new UserRole(user, role)));
 
 		return user;
 	}
@@ -142,6 +142,7 @@ public abstract class UserTestDataGenerator {
 		userRoleDto.setId(1);
 		final RoleDto roleDto = new RoleDto();
 		roleDto.setName("Breeder");
+		roleDto.setType("Instance");
 		userRoleDto.setRole(roleDto);
 		userRoleDto.setCrop(new CropDto(new CropType("maize")));
 		userRoleDtos.add(userRoleDto);

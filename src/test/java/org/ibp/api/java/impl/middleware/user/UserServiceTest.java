@@ -6,6 +6,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -169,7 +170,7 @@ public class UserServiceTest {
 	public void testUpdateUser() throws Exception {
 		final UserDetailDto usrDtlDto = UserTestDataGenerator.initializeUserDetailDto(8);
 		final UserDto userDto = UserTestDataGenerator.initializeUserDto(8);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(8);
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(8, new Role(2, "Breeder"));
 
 		Mockito.when(this.middlewareUserService.updateUser(userDto)).thenReturn(new Integer(8));
 		Mockito.when(this.middlewareUserService.getUserById(8)).thenReturn(user);
@@ -188,8 +189,8 @@ public class UserServiceTest {
 	@Test
 	public void testUpdateUserValidateError() throws Exception {
 		final UserDetailDto usrDtlDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser usr = UserTestDataGenerator.initializeWorkbenchUser(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(8);
+		final WorkbenchUser usr = UserTestDataGenerator.initializeWorkbenchUser(10, new Role(2, "Breeder"));
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(8, new Role(2, "Breeder"));
 
 		usr.getPerson().setEmail("diego.nicolas.cuenya@leafnode.io");
 		Mockito.when(this.middlewareUserService.getUserById(usrDtlDto.getId())).thenReturn(usr);
@@ -212,9 +213,9 @@ public class UserServiceTest {
 	@Test
 	public void testUpdateUserError() throws Exception {
 		final UserDetailDto usrDtlDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser usr = UserTestDataGenerator.initializeWorkbenchUser(10);
+		final WorkbenchUser usr = UserTestDataGenerator.initializeWorkbenchUser(10, new Role(2, "Breeder"));
 		final UserDto userDto = UserTestDataGenerator.initializeUserDto(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(8);
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(8, new Role(2, "Breeder"));
 
 		usr.getPerson().setEmail("diego.nicolas.cuenya@leafnode.io");
 		Mockito.when(this.middlewareUserService.getUserById(usrDtlDto.getId())).thenReturn(usr);

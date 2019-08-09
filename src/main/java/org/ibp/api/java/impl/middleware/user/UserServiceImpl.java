@@ -296,7 +296,8 @@ public class UserServiceImpl implements UserService {
 	public void setContextUtil(ContextUtil contextUtil) {
 		this.contextUtil = contextUtil;
 	}
-	protected void setUserService(final org.generationcp.middleware.service.api.user.UserService userService) {
+
+	public void setUserService(final org.generationcp.middleware.service.api.user.UserService userService) {
 		this.userService = userService;
 	}
 

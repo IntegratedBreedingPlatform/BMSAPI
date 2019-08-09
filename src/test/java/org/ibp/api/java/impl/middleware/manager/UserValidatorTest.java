@@ -88,7 +88,7 @@ public class UserValidatorTest {
 	public void testValidateEmail() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, new Role(2, "Breeder"));
 
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
@@ -150,7 +150,7 @@ public class UserValidatorTest {
 	public void testValidateStatus() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(20);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20);
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20, new Role(2, "Breeder"));
 
 		userDto.setStatus("truee");
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
@@ -186,7 +186,7 @@ public class UserValidatorTest {
 	public void testValidateUpdateUser() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20);
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20, new Role(2, "Breeder"));
 
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.userService.isUsernameExists(userDto.getUsername())).thenReturn(false);
@@ -206,7 +206,7 @@ public class UserValidatorTest {
 	public void testValidateUpdateUserEmailExists() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, new Role(2, "Breeder"));
 
 		user.getPerson().setEmail("user@leafnode.io");
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
@@ -228,7 +228,7 @@ public class UserValidatorTest {
 	public void testValidateUpdateUserUsernameExists() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, new Role(2, "Breeder"));
 		user.setName("Nahuel");
 
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
@@ -250,7 +250,7 @@ public class UserValidatorTest {
 	public void testValidateUpdateUserForExistingSuperAdminUser() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20);
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20, new Role(2, "Breeder"));
 		user.setRoles(Arrays.asList(new UserRole(user, new Role(5, Role.SUPERADMIN))));
 
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
@@ -282,7 +282,7 @@ public class UserValidatorTest {
 	public void testValidateUserCannotAutoDeactivate() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20);
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20, new Role(2, "Breeder"));
 
 		userDto.setStatus("false");
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
