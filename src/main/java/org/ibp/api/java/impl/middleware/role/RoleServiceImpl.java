@@ -96,7 +96,11 @@ public class RoleServiceImpl implements RoleService {
 	@Override
 	public Integer updateRole(final RoleGeneratorInput roleGeneratorInput) {
 
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleServiceImpl.class.getName());
+		final BindingResult errors = this.roleValidator.validateRoleGeneratorInput(roleGeneratorInput);
+
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
 
 		final Role role = this.workbenchDataManager.getRoleById(roleGeneratorInput.getId());
 		final List<WorkbenchUser> roleUsers = this.userService.getUsersWithRole(roleGeneratorInput.getId());
