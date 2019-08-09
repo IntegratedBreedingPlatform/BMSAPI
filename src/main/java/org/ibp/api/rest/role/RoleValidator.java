@@ -24,7 +24,7 @@ public class RoleValidator {
 	@Autowired
 	private PermissionService permissionService;
 
-	public BindingResult validateRoleGeneratorInput(final RoleGeneratorInput roleGeneratorInput) {
+	public BindingResult validateRoleGeneratorInput(final RoleGeneratorInput roleGeneratorInput, final boolean isNewRole) {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleGeneratorInput.class.getName());
 
@@ -42,7 +42,7 @@ public class RoleValidator {
 			errors.reject("role.name.length");
 		}
 
-		if (this.workbenchDataManager.getRoleByName(roleGeneratorInput.getName()) != null) {
+		if (isNewRole && this.workbenchDataManager.getRoleByName(roleGeneratorInput.getName()) != null) {
 			errors.reject("role.name.already.exists");
 		}
 

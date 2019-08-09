@@ -65,7 +65,7 @@ public class RoleServiceImpl implements RoleService {
 	@Override
 	public Integer createRole(final RoleGeneratorInput dto) {
 
-		BindingResult errors = this.roleValidator.validateRoleGeneratorInput(dto);
+		BindingResult errors = this.roleValidator.validateRoleGeneratorInput(dto, true);
 
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -104,7 +104,7 @@ public class RoleServiceImpl implements RoleService {
 	public Map<String, Object> updateRole(final RoleGeneratorInput roleGeneratorInput, final boolean showWarnings) {
 
 		final Map<String, Object> warningsMap = new HashMap<>();
-		final BindingResult errors = this.roleValidator.validateRoleGeneratorInput(roleGeneratorInput);
+		final BindingResult errors = this.roleValidator.validateRoleGeneratorInput(roleGeneratorInput, false);
 
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
