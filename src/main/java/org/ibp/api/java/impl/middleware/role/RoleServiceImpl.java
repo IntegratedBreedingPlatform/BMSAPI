@@ -26,8 +26,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -101,9 +99,7 @@ public class RoleServiceImpl implements RoleService {
 	}
 
 	@Override
-	public Map<String, Object> updateRole(final RoleGeneratorInput roleGeneratorInput, final boolean showWarnings) {
-
-		final Map<String, Object> warningsMap = new HashMap<>();
+	public void updateRole(final RoleGeneratorInput roleGeneratorInput) {
 		final BindingResult errors = this.roleValidator.validateRoleGeneratorInput(roleGeneratorInput, false);
 
 		if (errors.hasErrors()) {
@@ -116,31 +112,28 @@ public class RoleServiceImpl implements RoleService {
 		// If the role is already assigned to any user and the role type has changed, throw an error.
 		if (!roleUsers.isEmpty() && !role.getRoleType().getId().equals(roleGeneratorInput.getRoleType())) {
 			errors.reject("role.roletype.can.not.be.changed");
-			throw new ConflictException(errors.getAllErrors());
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		if (showWarnings) {
+		if (roleGeneratorInput.isShowWarnings()) {
 			if (roleUsers.size() > 1) {
-				warningsMap.put(ROLE_ASSIGNED_TO_USER_WARNING_KEY,
-					this.resourceBundleMessageSource.getMessage("role.has.more.than.one.user.assigned", null,
-						Locale.getDefault()));
+				errors.reject("role.has.more.than.one.user.assigned");
 			}
-			final Set<Integer> rolePermissionIds = role.getPermissions().stream().map(p -> p.getPermissionId()).collect(Collectors.toSet());
+			final Set<Integer> rolePermissionIds = role.getPermissions().stream().map(Permission::getPermissionId).collect(Collectors.toSet());
 			// TODO: Verify if the permissionIds from received from client are all parentIds.
 			if (!Sets.symmetricDifference(rolePermissionIds, Sets.newHashSet(roleGeneratorInput.getPermissions())).isEmpty()) {
 				// Check if there are any changes to the permissions
-				warningsMap.put(PERMISSION_CHANGED_WARNING_KEY,
-					this.resourceBundleMessageSource.getMessage("role.permissions.changed", null, Locale.getDefault()));
+				errors.reject("role.permissions.changed");
 			}
-
+			if (errors.hasErrors()) {
+				throw new ConflictException(errors.getAllErrors());
+			}
 		}
 
 		role.setName(roleGeneratorInput.getName());
 		role.setDescription(roleGeneratorInput.getDescription());
 		role.setPermissions(this.permissionService.getPermissionsByIds(Sets.newHashSet(roleGeneratorInput.getPermissions())));
 		this.workbenchDataManager.saveRole(role);
-
-		return warningsMap;
 	}
 
 	private List<Permission> getPermission(final List<Integer> permissions) {

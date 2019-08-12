@@ -15,5 +15,5 @@ public interface RoleService {
 
 	RoleDto getRole(Integer id);
 
-	Map<String, Object> updateRole(RoleGeneratorInput roleGeneratorInput, final boolean showWarnings);
+	void updateRole(RoleGeneratorInput roleGeneratorInput);
 }

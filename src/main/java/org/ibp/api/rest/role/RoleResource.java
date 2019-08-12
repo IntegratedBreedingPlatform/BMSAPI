@@ -53,9 +53,9 @@ public class RoleResource {
 	@ApiOperation(value = "Update role", notes = "Update role. ")
 	@RequestMapping(value = "/roles", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<Map<String, Object>> updateRole(@RequestBody final RoleGeneratorInput roleGeneratorInput,
-		@RequestParam final boolean showWarnings) {
-		return new ResponseEntity<Map<String, Object>>(this.roleService.updateRole(roleGeneratorInput, showWarnings), HttpStatus.OK);
+	public ResponseEntity updateRole(@RequestBody final RoleGeneratorInput roleGeneratorInput) {
+		this.roleService.updateRole(roleGeneratorInput);
+		return new ResponseEntity(HttpStatus.NO_CONTENT);
 	}
 
 }

@@ -22,6 +22,8 @@ public class RoleGeneratorInput {
 
 	private Boolean assignable;
 
+	private boolean showWarnings;
+
 	public int getId() {
 		return this.id;
 	}
@@ -76,6 +78,14 @@ public class RoleGeneratorInput {
 
 	public void setAssignable(final Boolean assignable) {
 		this.assignable = assignable;
+	}
+
+	public boolean isShowWarnings() {
+		return showWarnings;
+	}
+
+	public void setShowWarnings(final boolean showWarnings) {
+		this.showWarnings = showWarnings;
 	}
 
 	@Override
