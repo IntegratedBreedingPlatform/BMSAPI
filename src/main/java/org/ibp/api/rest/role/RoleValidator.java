@@ -18,6 +18,10 @@ import java.util.stream.Collectors;
 @Component
 public class RoleValidator {
 
+	public static final String ROLE_NAME_FIELD = "roleName";
+	public static final String ROLE_TYPE_FIELD = "roleType";
+	public static final String ROLE_DESCRIPTION_FIELD = "roleDescription";
+
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
@@ -29,29 +33,25 @@ public class RoleValidator {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleGeneratorInput.class.getName());
 
 		if (roleGeneratorInput.getName().isEmpty()) {
-			errors.reject("role.name.can.not.be.null.empty");
+			errors.rejectValue(ROLE_NAME_FIELD, "role.name.can.not.be.null.empty");
 			return errors;
 		}
 
 		if (roleGeneratorInput.getRoleType() == null) {
-			errors.reject("role.type.can.not.be.null");
+			errors.rejectValue(ROLE_TYPE_FIELD, "role.type.can.not.be.null");
 			return errors;
 		}
 
 		if (roleGeneratorInput.getName().length() > 100) {
-			errors.reject("role.name.length");
+			errors.rejectValue(ROLE_NAME_FIELD, "role.name.length");
 		}
 
 		if (isNewRole && this.workbenchDataManager.getRoleByName(roleGeneratorInput.getName()) != null) {
-			errors.reject("role.name.already.exists");
+			errors.rejectValue(ROLE_NAME_FIELD, "role.name.already.exists");
 		}
 
 		if (roleGeneratorInput.getDescription() != null && roleGeneratorInput.getDescription().length() > 255) {
-				errors.reject("role.description.length");
-		}
-
-		if (roleGeneratorInput.getRoleType() == null) {
-			errors.reject("role.role.type.null");
+			errors.rejectValue(ROLE_DESCRIPTION_FIELD, "role.description.length");
 		}
 
 		final org.generationcp.middleware.pojos.workbench.RoleType roleType = this.workbenchDataManager.getRoleType(roleGeneratorInput.getRoleType());
@@ -75,7 +75,7 @@ public class RoleValidator {
 						}
 					}
 					if (!contain) {
-						errors.reject("role.role.type.does.not.correspond");
+						errors.rejectValue(ROLE_TYPE_FIELD, "role.role.type.does.not.correspond");
 						break;
 					}
 				}
