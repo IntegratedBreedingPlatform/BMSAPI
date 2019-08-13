@@ -85,7 +85,7 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 		programList.add(program1);
 		programList.add(program2);
 
-		Mockito.doReturn(programList).when(this.workbenchDataManager).getProjectsByUser(Mockito.eq(this.me), Mockito.eq(cropName));
+		Mockito.doReturn(programList).when(this.workbenchDataManager).getProjectsByCropName(Mockito.eq(cropName));
 		Mockito.doReturn(this.me).when(this.userService).getUserById(program1.getProjectId().intValue());
 		Mockito.doReturn(this.myBreedingBuddy).when(this.userService).getUserById(program2.getProjectId().intValue());
 
