@@ -15,12 +15,16 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 @Component
 public class DatasetCSVGenerator implements DatasetFileGenerator {
+
+	private final static List<VariableType> ENVIRONMENT_VARIABLES_VARIABLE_TYPES =
+		Arrays.asList(VariableType.ENVIRONMENT_DETAIL, VariableType.STUDY_CONDITION);
 
 	@Override
 	public File generateSingleInstanceFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
@@ -63,9 +67,8 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 	String[] getColumnValues(final ObservationUnitRow row, final List<MeasurementVariable> subObservationSetColumns) {
 		final List<String> values = new LinkedList<>();
 		for (final MeasurementVariable column : subObservationSetColumns) {
-			if (row.getEnvironmentVariables().containsKey(column.getName()) && (
-				column.getVariableType().getId() == VariableType.ENVIRONMENT_DETAIL.getId()
-					|| column.getVariableType().getId() == VariableType.STUDY_CONDITION.getId())) {
+			if (row.getEnvironmentVariables().containsKey(column.getName()) && ENVIRONMENT_VARIABLES_VARIABLE_TYPES
+				.contains(column.getVariableType())) {
 				values.add(row.getEnvironmentVariables().get(column.getName()).getValue());
 			} else {
 				values.add(row.getVariables().get(column.getName()).getValue());
