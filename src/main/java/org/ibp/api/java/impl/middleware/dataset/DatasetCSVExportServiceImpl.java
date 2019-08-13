@@ -13,8 +13,6 @@ import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -35,8 +33,6 @@ import java.util.Set;
 @Service
 @Transactional
 public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService implements DatasetExportService {
-
-	private static final Logger LOG = LoggerFactory.getLogger(DatasetCSVExportServiceImpl.class);
 	static final String LOCATION_ID_VARIABLE_NAME = "LOCATION";
 
 	@Resource

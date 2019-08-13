@@ -102,12 +102,12 @@ public class DatasetCSVExportServiceImplTest {
 	@InjectMocks
 	private DatasetCSVExportServiceImpl datasetExportService;
 
-	final Random random = new Random();
-	final Study study = new Study();
-	final DataSet trialDataSet = new DataSet();
-	final DatasetDTO dataSetDTO = new DatasetDTO();
-	final int instanceId1 = this.random.nextInt();
-	final int instanceId2 = this.random.nextInt();
+	final private Random random = new Random();
+	final private Study study = new Study();
+	final private DataSet trialDataSet = new DataSet();
+	final private DatasetDTO dataSetDTO = new DatasetDTO();
+	final private int instanceId1 = this.random.nextInt();
+	final private int instanceId2 = this.random.nextInt();
 
 	@Before
 	public void setUp() {
@@ -295,9 +295,9 @@ public class DatasetCSVExportServiceImplTest {
 
 	@Test
 	public void testGetObservationUnitRowMap() {
-		this.datasetExportService.getObservationUnitRowMap(this.study, this.dataSetDTO, new HashMap<Integer, StudyInstance>());
+		this.datasetExportService.getObservationUnitRowMap(this.study, this.dataSetDTO, new HashMap<>());
 		Mockito.verify(this.studyDatasetService)
-			.getInstanceObservationUnitRowsMap(this.study.getId(), this.dataSetDTO.getDatasetId(), new ArrayList<Integer>());
+			.getInstanceObservationUnitRowsMap(this.study.getId(), this.dataSetDTO.getDatasetId(), new ArrayList<>());
 	}
 
 	@Test
