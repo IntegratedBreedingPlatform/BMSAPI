@@ -63,7 +63,7 @@ public class RoleServiceImpl implements RoleService {
 	@Override
 	public Integer createRole(final RoleGeneratorInput dto) {
 
-		BindingResult errors = this.roleValidator.validateRoleGeneratorInput(dto, true);
+		final BindingResult errors = this.roleValidator.validateRoleGeneratorInput(dto, true);
 
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -116,10 +116,12 @@ public class RoleServiceImpl implements RoleService {
 		}
 
 		if (roleGeneratorInput.isShowWarnings()) {
-			final Set<Integer> rolePermissionIds = role.getPermissions().stream().map(Permission::getPermissionId).collect(Collectors.toSet());
+			final Set<Integer> rolePermissionIds =
+				role.getPermissions().stream().map(Permission::getPermissionId).collect(Collectors.toSet());
 			// If the role is assigned to any user and permissions have changed, throw a conflict error.
-			if (!roleUsers.isEmpty() && !Sets.symmetricDifference(rolePermissionIds, Sets.newHashSet(roleGeneratorInput.getPermissions())).isEmpty()) {
-				errors.reject("role.permissions.changed", new Object[] { role.getName() }, "");
+			if (!roleUsers.isEmpty() && !Sets.symmetricDifference(rolePermissionIds, Sets.newHashSet(roleGeneratorInput.getPermissions()))
+				.isEmpty()) {
+				errors.reject("role.permissions.changed", new Object[] {role.getName()}, "");
 				throw new ConflictException(errors.getAllErrors());
 			}
 		}
