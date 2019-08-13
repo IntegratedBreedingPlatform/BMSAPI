@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -293,15 +294,12 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	private List<String> getInputVariablesFromSummary(final int studyId, final Map<Integer, Integer> inputVariableDatasetMap) {
-		final List<String> variablesFromObservation = new ArrayList<>();
 		final DatasetDTO summaryDataset =
 			this.middlewareDatasetService.getDatasets(studyId, Collections.set(DatasetTypeEnum.SUMMARY_DATA.getId())).get(0);
-		for (final Map.Entry<Integer, Integer> inputVariableDataset : inputVariableDatasetMap.entrySet()) {
-			if (inputVariableDataset.getValue().equals(summaryDataset.getDatasetId())) {
-				variablesFromObservation.add(String.valueOf(inputVariableDataset.getKey()));
-			}
-		}
-		return variablesFromObservation;
+		return inputVariableDatasetMap.entrySet().stream()
+			.filter(entry -> summaryDataset.getDatasetId().equals(entry.getValue()))
+			.map(entry -> entry.getKey().toString())
+			.collect(Collectors.toList());
 	}
 
 	protected void setProcessor(final DerivedVariableProcessor processor) {
