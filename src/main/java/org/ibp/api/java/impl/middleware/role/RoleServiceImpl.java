@@ -116,16 +116,10 @@ public class RoleServiceImpl implements RoleService {
 		}
 
 		if (roleGeneratorInput.isShowWarnings()) {
-			if (roleUsers.size() > 1) {
-				errors.reject("role.has.more.than.one.user.assigned");
-			}
 			final Set<Integer> rolePermissionIds = role.getPermissions().stream().map(Permission::getPermissionId).collect(Collectors.toSet());
-			// TODO: Verify if the permissionIds from received from client are all parentIds.
-			if (!Sets.symmetricDifference(rolePermissionIds, Sets.newHashSet(roleGeneratorInput.getPermissions())).isEmpty()) {
-				// Check if there are any changes to the permissions
-				errors.reject("role.permissions.changed");
-			}
-			if (errors.hasErrors()) {
+			// If the role is assigned to any user and permissions have changed, throw a conflict error.
+			if (!roleUsers.isEmpty() && !Sets.symmetricDifference(rolePermissionIds, Sets.newHashSet(roleGeneratorInput.getPermissions())).isEmpty()) {
+				errors.reject("role.permissions.changed", new Object[] { role.getName() }, "");
 				throw new ConflictException(errors.getAllErrors());
 			}
 		}
