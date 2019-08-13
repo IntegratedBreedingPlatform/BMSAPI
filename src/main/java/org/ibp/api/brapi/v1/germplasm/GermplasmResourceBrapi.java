@@ -209,7 +209,7 @@ public class GermplasmResourceBrapi {
 	@ResponseBody
 	@JsonView(Germplasm.View.GermplasmBrapiV1_3.class)
 	public ResponseEntity<EntityListResponse<Germplasm>> getSearchGermplasm(
-		@PathVariable final String crop, @PathVariable final String searchResulstDbid,
+		@PathVariable final String crop, @PathVariable final String searchResultsDbid,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
 		@RequestParam(value = "page",
 			required = false) final Integer currentPage,
@@ -222,7 +222,7 @@ public class GermplasmResourceBrapi {
 		try {
 			germplasmSearchRequestDTO =
 				(GermplasmSearchRequestDto) this.searchRequestService
-					.getSearchRequest(Integer.valueOf(searchResulstDbid), GermplasmSearchRequestDto.class);
+					.getSearchRequest(Integer.valueOf(searchResultsDbid), GermplasmSearchRequestDto.class);
 		} catch (final NumberFormatException | MiddlewareException e) {
 			return new ResponseEntity<>(
 				new EntityListResponse<>(new Result<>(new ArrayList<Germplasm>())).withMessage("no search request found"),
