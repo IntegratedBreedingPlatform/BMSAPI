@@ -1,11 +1,14 @@
 package org.ibp.api.java.impl.middleware;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.RoleDto;
@@ -201,4 +204,89 @@ public abstract class UserTestDataGenerator {
 		final List<UserDetailDto> users = Lists.newArrayList(UserTestDataGenerator.initializeUserDetailWithAdminRoleDto());
 		return users;
 	}
+
+	public static UserRoleDto initializeUserRoleDtoSuperAdmin() {
+		final RoleDto role = new RoleDto(5,"SuperAdmin","","1",true,false,false);
+		final UserRoleDto userRoleDto = new UserRoleDto(RandomUtils.nextInt(), role, null, null, 1);
+		userRoleDto.setRole(role);
+		return userRoleDto;
+	}
+
+	public static UserRoleDto initializeUserRoleDtoAdmin() {
+		final RoleDto role = new RoleDto(1,"Admin","","1",true,true,true);
+		final UserRoleDto userRoleDto = new UserRoleDto(RandomUtils.nextInt(), role, null, null, 1);
+		userRoleDto.setRole(role);
+		return userRoleDto;
+	}
+
+	public static UserRoleDto initializeUserRoleDtoBreeder(final CropDto cropDto) {
+		final RoleDto role = new RoleDto(2,"Breeder","","2",true,true,true);
+		final UserRoleDto userRoleDto = new UserRoleDto(RandomUtils.nextInt(), role, cropDto, null, 1);
+		userRoleDto.setRole(role);
+		return userRoleDto;
+	}
+
+	public static Role initializeUserRoleSuperAdmin() {
+		final Role role = new Role("", "SuperAdmin");
+		role.setActive(true);
+		role.setId(5);
+		role.setAssignable(false);
+		role.setEditable(false);
+		final RoleType roleType = new RoleType("INSTANCE");
+		roleType.setId(1);
+		role.setRoleType(roleType);
+		List<Permission> permissions = new ArrayList<>();
+		final Permission permission = new Permission();
+		permission.setPermissionId(1);
+		permission.setName("ADMIN");
+		permission.setDescription("Full");
+		permissions.add(permission);
+		role.setPermissions(permissions);
+		return role;
+	}
+
+	public static Role initializeUserRoleAdmin() {
+		final Role role = new Role("", "Admin");
+		role.setId(1);
+		role.setActive(true);
+		role.setAssignable(true);
+		role.setEditable(true);
+		final RoleType roleType = new RoleType("INSTANCE");
+		roleType.setId(1);
+		role.setRoleType(roleType);
+		List<Permission> permissions = new ArrayList<>();
+		final Permission permission = new Permission();
+		permission.setPermissionId(1);
+		permission.setName("ADMIN");
+		permission.setDescription("Full");
+		permissions.add(permission);
+		role.setPermissions(permissions);
+		return role;
+	}
+
+	public static Role initializeUserRoleBreeder() {
+		final Role role = new Role("", "Breeder");
+		role.setId(2);
+		role.setActive(true);
+		role.setAssignable(true);
+		role.setEditable(true);
+		final RoleType roleType = new RoleType("CROP");
+		roleType.setId(2);
+		role.setRoleType(roleType);
+		List<Permission> permissions = new ArrayList<>();
+		final Permission permission = new Permission();
+		final Permission parent = new Permission();
+		parent.setPermissionId(1);
+		parent.setName("ADMIN");
+		parent.setDescription("Full");
+
+		permission.setPermissionId(4);
+		permission.setName("BREEDING_ACTIVITIES");
+		permission.setDescription("Breeding Activities");
+		permission.setParent(parent);
+		permissions.add(permission);
+		role.setPermissions(permissions);
+		return role;
+	}
+
 }
