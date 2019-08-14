@@ -97,19 +97,20 @@ public class DerivedVariableValidator {
 			final List<DatasetDTO> subobsDatasets =
 				this.datasetService.getDatasets(studyId, new HashSet<>(this.datasetTypeService.getSubObservationDatasetTypeIds()));
 			final List<Integer> subobservationIds = subobsDatasets.stream().map(DatasetDTO::getDatasetId).collect(Collectors.toList());
+			final Integer plotDatasetId =
+				this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0)
+					.getDatasetId();
 			if(!aggregateInputVariables.isEmpty()) {
-				final Integer plotDatasetId =
-					this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0)
-						.getDatasetId();
 				if (!plotDatasetId.equals(datasetId)) {
 					errors.reject(STUDY_EXECUTE_CALCULATION_INPUT_NOT_IN_SUBLEVEL);
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				}
-
 				this.verifyAggregateInputVariablesInSubObsLevel(subobservationIds, inputVariableDatasetMap, aggregateInputVariables);
 			}
-			this.verifySubObservationsInputVariablesInAggregateFunction(
-				subobservationIds, inputVariableDatasetMap, formulaOptional, aggregateInputVariables);
+			if (plotDatasetId.equals(datasetId)) {
+				this.verifySubObservationsInputVariablesInAggregateFunction(
+					subobservationIds, inputVariableDatasetMap, formulaOptional, aggregateInputVariables);
+			}
 		}
 	}
 
