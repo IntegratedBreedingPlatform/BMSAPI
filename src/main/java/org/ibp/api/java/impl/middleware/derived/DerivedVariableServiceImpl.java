@@ -2,14 +2,17 @@ package org.ibp.api.java.impl.middleware.derived;
 
 import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
+import org.fest.util.Collections;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
 import org.generationcp.commons.derivedvariable.DerivedVariableUtils;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.VariableDatasetsDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
@@ -37,6 +40,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -110,11 +114,14 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		final FormulaDto formula = formulaOptional.get();
 		final Map<String, Object> parameters = DerivedVariableUtils.extractParameters(formula.getDefinition());
 		final List<String> aggregateInputVariables = DerivedVariableUtils.getAggregateFunctionInputVariables(formula.getDefinition(), true);
+
+		// Get the list of input variables that should be read from environment level.
+		final List<String> environmentInputVariables = this.getInputVariablesFromSummary(studyId, inputVariableDatasetMap);
+
 		// Calculate
 		final Set<String> inputMissingData = new HashSet<>();
 
 		// Retrieve TRAIT input variables' data from sub-observation level. Aggregate values are grouped by plot observation's experimentId
-
 		final Map<Integer, Map<String, List<Object>>> valuesFromSubObservation =
 			this.middlewareDerivedVariableService
 				.getValuesFromObservations(studyId, this.datasetTypeService.getSubObservationDatasetTypeIds(),
@@ -131,7 +138,9 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 				try {
 					// Fill parameters with input variable values from the current level. Environment Detail and Study Condition variable
 					// values from environment level are already included in ObservationUnitRow.
-					DerivedVariableUtils.extractValues(rowParameters, observation, measurementVariablesMap, rowInputMissingData, aggregateInputVariables);
+					rowInputMissingData.addAll(
+						DerivedVariableUtils.extractValues(rowParameters, observation, measurementVariablesMap, aggregateInputVariables,
+							environmentInputVariables));
 				} catch (final ParseException e) {
 					LOG.error("Error parsing date value for parameters " + rowParameters, e);
 					errors.reject(STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION);
@@ -233,7 +242,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 				final Integer variableId = Integer.valueOf(entry.getKey());
 				final MeasurementVariable measurementVariable = measurementVariablesMap.get(variableId);
 				final String termKey = DerivedVariableUtils.wrapTerm(entry.getKey());
-				if(inputVariables.contains(termKey)) {
+				if (inputVariables.contains(termKey)) {
 					variableAggregateValuesMap
 						.put(termKey, DerivedVariableUtils.parseValueList(entry.getValue(), measurementVariable, rowInputMissingData));
 					// If the input variable is in sub-observation level, remove its key from parameters because
@@ -242,8 +251,8 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 				}
 			}
 			//Add empty list as parameter for variables with no data
-			for(final String inputVariable: inputVariables) {
-				if(parameters.containsKey(inputVariable)) {
+			for (final String inputVariable : inputVariables) {
+				if (parameters.containsKey(inputVariable)) {
 					parameters.remove(inputVariable);
 					variableAggregateValuesMap.put(inputVariable, new ArrayList<>());
 				}
@@ -282,6 +291,15 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		this.studyValidator.validate(studyId, false);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
 		return this.middlewareDerivedVariableService.createVariableDatasetsMap(studyId, datasetId, variableId);
+	}
+
+	private List<String> getInputVariablesFromSummary(final int studyId, final Map<Integer, Integer> inputVariableDatasetMap) {
+		final DatasetDTO summaryDataset =
+			this.middlewareDatasetService.getDatasets(studyId, Collections.set(DatasetTypeEnum.SUMMARY_DATA.getId())).get(0);
+		return inputVariableDatasetMap.entrySet().stream()
+			.filter(entry -> summaryDataset.getDatasetId().equals(entry.getValue()))
+			.map(entry -> entry.getKey().toString())
+			.collect(Collectors.toList());
 	}
 
 	protected void setProcessor(final DerivedVariableProcessor processor) {

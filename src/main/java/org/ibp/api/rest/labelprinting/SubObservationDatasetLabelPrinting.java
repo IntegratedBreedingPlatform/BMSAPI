@@ -318,6 +318,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 				.thenComparing(o -> Integer.valueOf(o.getVariables().get(ENTRY_NO).getValue())));
 
 		final List<Map<Integer, String>> results = new LinkedList<>();
+		// TODO: IBP-2907
 		for (final ObservationUnitRow observationUnitRow : observationUnitRows) {
 			final Map<Integer, String> row = new HashMap<>();
 			for (final Integer requiredField : allRequiredKeys) {
@@ -337,7 +338,12 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 						row.put(requiredField, this.getSeason(observationUnitRow.getVariables().get(field.getName()).getValue()));
 						continue;
 					}
-					row.put(requiredField, observationUnitRow.getVariables().get(field.getName()).getValue());
+					if (observationUnitRow.getVariables().containsKey(field.getName())) {
+						row.put(requiredField, observationUnitRow.getVariables().get(field.getName()).getValue());
+					}
+					if (observationUnitRow.getEnvironmentVariables().containsKey(field.getName())) {
+						row.put(requiredField, observationUnitRow.getEnvironmentVariables().get(field.getName()).getValue());
+					}
 
 				} else {
 					// If it is not a number it is a hardcoded field
