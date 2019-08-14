@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.manager;
 
+import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -324,4 +325,73 @@ public class UserValidatorTest {
 		assertThat(UserValidator.USER_AUTO_DEACTIVATION, equalTo(bindingResult.getGlobalErrors().get(0).getCode()));
 	}
 
+	@Test
+	public void testValidateSuperAdminUserCannotAssignable() {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoSuperAdmin());
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleSuperAdmin());
+
+		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
+
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
+		this.uservalidator.validate(userDto, bindingResult, false);
+
+		assertThat(0, not(equalTo(bindingResult.getGlobalErrorCount())));
+		assertThat("user.not.assignable.roles", equalTo(bindingResult.getGlobalErrors().get(0).getCode()));
+	}
+
+	@Test
+	public void testValidateUserInvalidRole() {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleAdmin());
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
+		this.uservalidator.validate(userDto, bindingResult, false);
+
+		assertThat(0, not(equalTo(bindingResult.getGlobalErrorCount())));
+		assertThat("user.invalid.roles", equalTo(bindingResult.getGlobalErrors().get(0).getCode()));
+	}
+
+	@Test
+	public void testValidateUserCropNotAssociated() {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoBreeder(new CropDto(new CropType("maize"))));
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleBreeder());
+
+		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
+
+
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
+		this.uservalidator.validate(userDto, bindingResult, false);
+
+		assertThat(0, not(equalTo(bindingResult.getGlobalErrorCount())));
+		assertThat("user.crop.not.associated.to.user", equalTo(bindingResult.getGlobalErrors().get(0).getCode()));
+	}
+
+	@Test
+	public void testValidateUserCropNotExists() {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("bean"), UserTestDataGenerator.initializeUserRoleDtoBreeder(new CropDto(new CropType("bean"))));
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleBreeder());
+
+		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
+
+
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
+		this.uservalidator.validate(userDto, bindingResult, false);
+
+		assertThat(0, not(equalTo(bindingResult.getGlobalErrorCount())));
+		assertThat("user.crop.not.exist", equalTo(bindingResult.getGlobalErrors().get(0).getCode()));
+	}
 }
