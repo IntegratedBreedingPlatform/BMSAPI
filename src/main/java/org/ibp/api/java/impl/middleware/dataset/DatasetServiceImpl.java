@@ -568,12 +568,17 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows,
 		final List<ObservationUnitRow> list) {
 		for (final org.generationcp.middleware.service.api.dataset.ObservationUnitRow dto : observationUnitRows) {
-			final Map<String, ObservationUnitData> datas = new HashMap<>();
+			final Map<String, ObservationUnitData> variables = new HashMap<>();
+			final Map<String, ObservationUnitData> environmentVariables = new HashMap<>();
 			for (final String data : dto.getVariables().keySet()) {
-				datas.put(data, observationUnitRowMapper.map(dto.getVariables().get(data), ObservationUnitData.class));
+				variables.put(data, observationUnitRowMapper.map(dto.getVariables().get(data), ObservationUnitData.class));
+			}
+			for (final String data : dto.getEnvironmentVariables().keySet()) {
+				environmentVariables.put(data, observationUnitRowMapper.map(dto.getEnvironmentVariables().get(data), ObservationUnitData.class));
 			}
 			final ObservationUnitRow observationUnitRow = observationUnitRowMapper.map(dto, ObservationUnitRow.class);
-			observationUnitRow.setVariables(datas);
+			observationUnitRow.setVariables(variables);
+			observationUnitRow.setEnvironmentVariables(environmentVariables);
 			list.add(observationUnitRow);
 		}
 	}

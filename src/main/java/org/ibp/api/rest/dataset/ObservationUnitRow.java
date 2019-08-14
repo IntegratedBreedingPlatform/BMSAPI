@@ -24,6 +24,9 @@ public class ObservationUnitRow {
 
 	private Map<String, ObservationUnitData> variables;
 
+	// Contains variables added in Environment Details and Environment Conditions
+	private Map<String, ObservationUnitData> environmentVariables;
+
 	public ObservationUnitRow() {
 
 	}
@@ -66,6 +69,14 @@ public class ObservationUnitRow {
 
 	public void setVariables(final Map<String, ObservationUnitData> variables) {
 		this.variables = variables;
+	}
+
+	public Map<String, ObservationUnitData> getEnvironmentVariables() {
+		return this.environmentVariables;
+	}
+
+	public void setEnvironmentVariables(final Map<String, ObservationUnitData> environmentVariables) {
+		this.environmentVariables = environmentVariables;
 	}
 
 	public String getSamplesCount() {
