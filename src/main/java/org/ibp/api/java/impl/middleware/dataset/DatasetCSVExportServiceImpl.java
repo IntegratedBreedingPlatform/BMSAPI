@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -136,29 +137,25 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	void transformEntryTypeValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap) {
 		final List<Enumeration> entryTypes = this.ontologyDataManager
 			.getStandardVariable(TermId.ENTRY_TYPE.getId(), this.contextUtil.getCurrentProgramUUID()).getEnumerations();
-		final Map<String, String> entryTypeDescriptionNameMap = new HashMap<>();
-		for(final Enumeration entryType: entryTypes) {
-			entryTypeDescriptionNameMap.put(entryType.getDescription(), entryType.getName());
-		}
+		final Map<String, String> entryTypeDescriptionNameMap =
+			entryTypes.stream().collect(Collectors.toMap(Enumeration::getDescription, Enumeration::getName));
 
-		for(final Integer instanceId: observationUnitRowMap.keySet()) {
-			final List<ObservationUnitRow> observationUnitRows = observationUnitRowMap.get(instanceId);
-			for(final ObservationUnitRow row: observationUnitRows) {
-				final ObservationUnitData data = row.getVariables().get(TermId.ENTRY_TYPE.name());
-				data.setValue(entryTypeDescriptionNameMap.get(data.getValue()));
-			}
-		}
+		final List<ObservationUnitRow> allRows =
+			observationUnitRowMap.values().stream().flatMap(list -> list.stream()).collect(Collectors.toList());
+		allRows.forEach(row -> {
+			final ObservationUnitData data = row.getVariables().get(TermId.ENTRY_TYPE.name());
+			data.setValue(entryTypeDescriptionNameMap.get(data.getValue()));
+		});
 	}
 
 	void addLocationIdValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap) {
 		final Map<Integer, String> instanceIdLocationIdMap = this.studyDataManager.getInstanceIdLocationIdMap(new ArrayList<>(observationUnitRowMap.keySet()));
 		for(final Integer instanceId: observationUnitRowMap.keySet()) {
-			final List<ObservationUnitRow> observationUnitRows = observationUnitRowMap.get(instanceId);
 			final ObservationUnitData locationIdData = new ObservationUnitData();
 			locationIdData.setValue(instanceIdLocationIdMap.get(instanceId));
-			for(final ObservationUnitRow row: observationUnitRows) {
+			observationUnitRowMap.get(instanceId).forEach(row -> {
 				row.getVariables().put(LOCATION_ID_VARIABLE_NAME, locationIdData);
-			}
+			});
 		}
 
 	}
