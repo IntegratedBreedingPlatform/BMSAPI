@@ -141,9 +141,9 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 			entryTypeDescriptionNameMap.put(entryType.getDescription(), entryType.getName());
 		}
 
-		for(Integer instanceId: observationUnitRowMap.keySet()) {
+		for(final Integer instanceId: observationUnitRowMap.keySet()) {
 			final List<ObservationUnitRow> observationUnitRows = observationUnitRowMap.get(instanceId);
-			for(ObservationUnitRow row: observationUnitRows) {
+			for(final ObservationUnitRow row: observationUnitRows) {
 				final ObservationUnitData data = row.getVariables().get(TermId.ENTRY_TYPE.name());
 				data.setValue(entryTypeDescriptionNameMap.get(data.getValue()));
 			}
@@ -152,11 +152,11 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 
 	void addLocationIdValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap) {
 		final Map<Integer, String> instanceIdLocationIdMap = this.studyDataManager.getInstanceIdLocationIdMap(new ArrayList<>(observationUnitRowMap.keySet()));
-		for(Integer instanceId: observationUnitRowMap.keySet()) {
+		for(final Integer instanceId: observationUnitRowMap.keySet()) {
 			final List<ObservationUnitRow> observationUnitRows = observationUnitRowMap.get(instanceId);
 			final ObservationUnitData locationIdData = new ObservationUnitData();
 			locationIdData.setValue(instanceIdLocationIdMap.get(instanceId));
-			for(ObservationUnitRow row: observationUnitRows) {
+			for(final ObservationUnitRow row: observationUnitRows) {
 				row.getVariables().put(LOCATION_ID_VARIABLE_NAME, locationIdData);
 			}
 		}
