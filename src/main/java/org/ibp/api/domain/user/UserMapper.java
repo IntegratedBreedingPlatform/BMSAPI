@@ -97,7 +97,7 @@ public class UserMapper {
 				this.map().setEmail(this.source.getPerson().getEmail());
 				this.using(userRolesConverter).map(this.source.getRoles()).setUserRoles(null);
 				this.using(authoritiesConverter).map(this.source.getPermissions()).setAuthorities(null);
-				this.using(cropsConverter).map(this.source.getCrops()).setCrops(null);
+				this.using(cropsConverter).map(this.source.getPerson().getCrops()).setCrops(null);
 			}
 		});
 	}

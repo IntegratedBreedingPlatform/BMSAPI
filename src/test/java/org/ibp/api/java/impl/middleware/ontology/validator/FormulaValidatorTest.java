@@ -164,15 +164,25 @@ public class FormulaValidatorTest {
 	}
 
 	@Test
-	public void testGetAggregateFunctionInputVariablesWithErrors() {
+	public void testGetAggregateFunctionInputVariablesForAverageWithErrors() {
 		final String formula = "FN:avg({{GW_M_g100grn}}, {{GW_M_g200grn}},{{Ant_Date_ddmmyyyy}})";
 		final Map<String, DataType> inputVariablesDataTypeMap = new HashMap<>();
 		inputVariablesDataTypeMap.put("__GW_M_g100grn__", DataType.NUMERIC_VARIABLE);
 		inputVariablesDataTypeMap.put("__GW_M_g200grn__", DataType.NUMERIC_VARIABLE);
 		inputVariablesDataTypeMap.put("__Ant_Date_ddmmyyyy__", DataType.DATE_TIME_VARIABLE);
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), FormulaDto.class.getName());
 		this.formulaValidator.getAggregateFunctionInputVariables(formula, inputVariablesDataTypeMap, this.errors);
 		Mockito.verify(this.errors).reject("variable.formula.avg.input.not.numeric", "");
+	}
+
+	@Test
+	public void testGetAggregateFunctionInputVariablesForSumWithErrors() {
+		final String formula = "FN:sum({{GW_M_g100grn}}, {{GW_M_g200grn}},{{Ant_Date_ddmmyyyy}})";
+		final Map<String, DataType> inputVariablesDataTypeMap = new HashMap<>();
+		inputVariablesDataTypeMap.put("__GW_M_g100grn__", DataType.NUMERIC_VARIABLE);
+		inputVariablesDataTypeMap.put("__GW_M_g200grn__", DataType.NUMERIC_VARIABLE);
+		inputVariablesDataTypeMap.put("__Ant_Date_ddmmyyyy__", DataType.DATE_TIME_VARIABLE);
+		this.formulaValidator.getAggregateFunctionInputVariables(formula, inputVariablesDataTypeMap, this.errors);
+		Mockito.verify(this.errors).reject("variable.formula.sum.input.not.numeric", "");
 	}
 
 	@Test

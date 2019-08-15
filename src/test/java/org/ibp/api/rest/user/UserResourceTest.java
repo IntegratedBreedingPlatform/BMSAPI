@@ -124,7 +124,7 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	@Test
 	public void testCreateUser() throws Exception {
 		final String id = "10";
-		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailDto();
+		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
 		final HashMap<String, Object> mapResponse = this.initializeResponse(id);
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/users").build().encode();
 
@@ -144,7 +144,7 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	 */
 	@Test
 	public void testCreateUserError() throws Exception {
-		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailDto();
+		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
 		final HashMap<String, Object> mapResponse = this.initializeResponseError("email", "exists");
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/users").build().encode();
@@ -168,7 +168,7 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	@Test
 	public void testUpdateUser() throws Exception {
 		final String id = "7";
-		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailDto();
+		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
 		final HashMap<String, Object> mapResponse = this.initializeResponse(id);
 
 		Mockito.when(this.userService.updateUser(Mockito.any(UserDetailDto.class))).thenReturn(mapResponse);
@@ -188,7 +188,7 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	@Test
 	public void testUpdateUserError() throws Exception {
 		final String id = "7";
-		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailDto();
+		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
 		final HashMap<String, Object> mapResponse = this.initializeResponseError("username", "exists");
 		Mockito.when(this.userService.updateUser(Mockito.any(UserDetailDto.class))).thenReturn(mapResponse);
 
