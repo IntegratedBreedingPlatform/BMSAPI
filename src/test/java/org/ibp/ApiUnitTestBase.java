@@ -13,11 +13,14 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Debug;
 import org.ibp.api.java.germplasm.GermplasmService;
+import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
 import org.junit.After;
 import org.junit.Before;
@@ -75,6 +78,8 @@ public abstract class ApiUnitTestBase {
 	@Autowired
 	protected StudyDataManager studyDataManager;
 
+	@Autowired
+	private SecurityService securityService;
 
 	@Autowired
 	protected ObjectMapper jsonMapper;
@@ -173,6 +178,8 @@ public abstract class ApiUnitTestBase {
 		MockitoAnnotations.initMocks(this);
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
 		Mockito.doReturn(new CropType(this.cropName)).when(this.workbenchDataManager).getCropTypeByName(this.cropName);
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(1, UserTestDataGenerator.initializeUserRoleAdmin());
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 		this.loadPreAuthorizedRole();
 	}
 

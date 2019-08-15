@@ -8,6 +8,7 @@ import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -43,6 +44,7 @@ public class CropResourceBrapiTest extends ApiUnitTestBase {
 
 		final List<String> crops = Arrays.asList("Maize", "Wheat", "Cowpea", "pearlmillet");
 		Mockito.when(this.cropService.getInstalledCrops()).thenReturn(crops);
+		Mockito.when(this.cropService.getAvailableCropsForUser(ArgumentMatchers.anyInt())).thenReturn(crops); // TODO test with Permissions
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/brapi/v1/crops").build();
 
