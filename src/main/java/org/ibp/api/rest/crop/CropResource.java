@@ -2,7 +2,7 @@
 package org.ibp.api.rest.crop;
 
 import com.wordnik.swagger.annotations.ApiOperation;
-import org.generationcp.middleware.pojos.workbench.Permission;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +34,8 @@ public class CropResource {
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public ResponseEntity<List<String>> listAvailableCrops() {
 
-		if (request.isUserInRole(Permission.Permissions.ADMIN.name())
-			|| request.isUserInRole(Permission.Permissions.SITE_ADMIN.name())) {
+		if (request.isUserInRole(PermissionsEnum.ADMIN.name())
+			|| request.isUserInRole(PermissionsEnum.SITE_ADMIN.name())) {
 			return new ResponseEntity<>(
 				this.cropService.getInstalledCrops(), HttpStatus.OK);
 		} else {

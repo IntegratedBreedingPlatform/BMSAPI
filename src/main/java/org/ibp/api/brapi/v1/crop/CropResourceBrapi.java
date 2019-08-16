@@ -2,7 +2,7 @@ package org.ibp.api.brapi.v1.crop;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-import org.generationcp.middleware.pojos.workbench.Permission;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
@@ -52,8 +52,8 @@ public class CropResourceBrapi {
 		metadata.withPagination(new Pagination(0, 0, 0l, 0));
 		cropDto.setMetadata(metadata);
 
-		if (request.isUserInRole(Permission.Permissions.ADMIN.name())
-			|| request.isUserInRole(Permission.Permissions.SITE_ADMIN.name())) {
+		if (request.isUserInRole(PermissionsEnum.ADMIN.name())
+			|| request.isUserInRole(PermissionsEnum.SITE_ADMIN.name())) {
 			cropDto.setResult(new Result<>(this.cropService.getInstalledCrops()));
 		} else {
 			cropDto.setResult(
