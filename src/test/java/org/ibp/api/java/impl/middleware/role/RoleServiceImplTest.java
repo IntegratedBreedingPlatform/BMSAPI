@@ -29,7 +29,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -67,7 +66,6 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 		final int roleTypeId = 2;
 		final int permissionId = 3;
 
-		final List<Permission> permissions = new ArrayList<>();
 		final Permission permission = new Permission();
 		permission.setPermissionId(permissionId);
 
@@ -117,7 +115,6 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 		final int roleTypeId = 2;
 		final int permissionId = 3;
 
-		final List<Permission> permissions = new ArrayList<>();
 		final Permission permission = new Permission();
 		permission.setPermissionId(permissionId);
 
@@ -142,7 +139,6 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 			// do nothing
 		}
 		verify(this.roleValidator).validateRoleGeneratorInput(roleGeneratorInput, false);
-		verify(this.workbenchDataManager, times(0)).saveRole(role);
 		assertEquals("role.roletype.can.not.be.changed", errors.getAllErrors().get(0).getCode());
 	}
 
@@ -184,7 +180,6 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 			// do nothing
 		}
 		verify(this.roleValidator).validateRoleGeneratorInput(roleGeneratorInput, false);
-		verify(this.workbenchDataManager, times(0)).saveRole(role);
 		assertEquals("role.permissions.changed", errors.getAllErrors().get(0).getCode());
 	}
 
