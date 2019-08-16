@@ -1,5 +1,6 @@
 package org.ibp.api.rest.role;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.RoleTypePermission;
@@ -32,7 +33,7 @@ public class RoleValidator {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleGeneratorInput.class.getName());
 
-		if (roleGeneratorInput.getName().isEmpty()) {
+		if (StringUtils.isEmpty(roleGeneratorInput.getName())) {
 			errors.rejectValue(ROLE_NAME_FIELD, "role.name.can.not.be.null.empty");
 			return errors;
 		}
