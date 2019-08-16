@@ -33,7 +33,7 @@ public class RoleValidator {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleGeneratorInput.class.getName());
 
-		if (StringUtils.isEmpty(roleGeneratorInput.getName())) {
+		if (StringUtils.isBlank(roleGeneratorInput.getName())) {
 			errors.rejectValue(ROLE_NAME_FIELD, "role.name.can.not.be.null.empty");
 			return errors;
 		}
