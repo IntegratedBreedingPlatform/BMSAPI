@@ -16,7 +16,6 @@ import org.ibp.api.java.role.RoleService;
 import org.ibp.api.rest.role.RoleGeneratorInput;
 import org.ibp.api.rest.role.RoleValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -32,8 +31,6 @@ import java.util.stream.Collectors;
 @Service
 public class RoleServiceImpl implements RoleService {
 
-	public static final String ROLE_ASSIGNED_TO_USER_WARNING_KEY = "roleAssignedToUserWarning";
-	public static final String PERMISSION_CHANGED_WARNING_KEY = "permissionChangedWarning";
 	@Autowired
 	private RoleValidator roleValidator;
 
@@ -45,9 +42,6 @@ public class RoleServiceImpl implements RoleService {
 
 	@Autowired
 	private PermissionService permissionService;
-
-	@Autowired
-	private ResourceBundleMessageSource resourceBundleMessageSource;
 
 	@Override
 	public List<RoleDto> getRoles(final RoleSearchDto roleSearchDto) {
@@ -128,7 +122,7 @@ public class RoleServiceImpl implements RoleService {
 
 		role.setName(roleGeneratorInput.getName());
 		role.setDescription(roleGeneratorInput.getDescription());
-		role.setPermissions(this.permissionService.getPermissionsByIds(Sets.newHashSet(roleGeneratorInput.getPermissions())));
+		role.setPermissions(this.getPermission(roleGeneratorInput.getPermissions()));
 		this.workbenchDataManager.saveRole(role);
 	}
 
