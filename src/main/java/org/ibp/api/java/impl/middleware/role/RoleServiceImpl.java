@@ -8,6 +8,7 @@ import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.permission.PermissionService;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
+import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.role.RoleDto;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -89,7 +90,9 @@ public class RoleServiceImpl implements RoleService {
 			errors.reject("role.invalid.id");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
-		return new RoleDto(role);
+		final RoleDto roleDto = new RoleDto(role);
+		role.getUserRoles().forEach(userRole -> roleDto.getUserRoles().add(new UserRoleDto(userRole)));
+		return roleDto;
 	}
 
 	@Override

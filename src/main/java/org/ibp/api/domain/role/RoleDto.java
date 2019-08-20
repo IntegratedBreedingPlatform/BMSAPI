@@ -43,7 +43,6 @@ public class RoleDto {
 		this.active = role.getActive();
 		this.editable = role.getEditable();
 		this.assignable = role.getAssignable();
-		role.getUserRoles().forEach(userRole -> userRoles.add(new UserRoleDto(userRole)));
 	}
 
 	public int getId() {
