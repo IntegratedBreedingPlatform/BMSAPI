@@ -2,16 +2,20 @@ package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.data.initializer.DatasetTypeTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -20,6 +24,7 @@ import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
+import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.junit.Assert;
 import org.junit.Before;
@@ -55,7 +60,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DatasetCSVExportServiceImplTest {
 
-	public static final int RANDOM_STRING_LENGTH = 10;
+	private static final int RANDOM_STRING_LENGTH = 10;
+	private static final String TEST_ENTRY_DESCRIPTION = "Test Entry";
+	private static final String TEST_ENTRY_NAME = "T";
 	@Mock
 	private StudyValidator studyValidator;
 
@@ -86,15 +93,21 @@ public class DatasetCSVExportServiceImplTest {
 	@Mock
 	private ZipUtil zipUtil;
 
+	@Mock
+	private OntologyDataManager ontologyDataManager;
+
+	@Mock
+	private ContextUtil contextUtil;
+
 	@InjectMocks
 	private DatasetCSVExportServiceImpl datasetExportService;
 
-	final Random random = new Random();
-	final Study study = new Study();
-	final DataSet trialDataSet = new DataSet();
-	final DatasetDTO dataSetDTO = new DatasetDTO();
-	final int instanceId1 = this.random.nextInt();
-	final int instanceId2 = this.random.nextInt();
+	final private Random random = new Random();
+	final private Study study = new Study();
+	final private DataSet trialDataSet = new DataSet();
+	final private DatasetDTO dataSetDTO = new DatasetDTO();
+	final private int instanceId1 = this.random.nextInt();
+	final private int instanceId2 = this.random.nextInt();
 
 	@Before
 	public void setUp() {
@@ -117,6 +130,13 @@ public class DatasetCSVExportServiceImplTest {
 		this.dataSetDTO.setParentDatasetId(1);
 
 		when(this.datasetTypeService.getAllDatasetTypesMap()).thenReturn(DatasetTypeTestDataInitializer.createDatasetTypes());
+		final StandardVariable standardVariable = new StandardVariable();
+		final Enumeration enumeration = new Enumeration();
+		enumeration.setDescription(TEST_ENTRY_DESCRIPTION);
+		enumeration.setName(TEST_ENTRY_NAME);
+		standardVariable.setEnumerations(Arrays.asList(enumeration));
+		when(this.ontologyDataManager
+			.getStandardVariable(TermId.ENTRY_TYPE.getId(), this.contextUtil.getCurrentProgramUUID())).thenReturn(standardVariable);
 
 	}
 
@@ -275,9 +295,51 @@ public class DatasetCSVExportServiceImplTest {
 
 	@Test
 	public void testGetObservationUnitRowMap() {
-		this.datasetExportService.getObservationUnitRowMap(this.study, this.dataSetDTO, new HashMap<Integer, StudyInstance>());
+		this.datasetExportService.getObservationUnitRowMap(this.study, this.dataSetDTO, new HashMap<>());
 		Mockito.verify(this.studyDatasetService)
-			.getInstanceObservationUnitRowsMap(this.study.getId(), this.dataSetDTO.getDatasetId(), new ArrayList<Integer>());
+			.getInstanceObservationUnitRowsMap(this.study.getId(), this.dataSetDTO.getDatasetId(), new ArrayList<>());
+	}
+
+	@Test
+	public void testAddLocationIdVariable() {
+		final List<MeasurementVariable> measurementVariableList = new ArrayList<>();
+		this.datasetExportService.addLocationIdVariable(measurementVariableList);
+		Assert.assertEquals(1, measurementVariableList.size());
+		Assert.assertEquals(TermId.LOCATION_ID.name(), measurementVariableList.get(0).getAlias());
+		Assert.assertEquals(DatasetCSVExportServiceImpl.LOCATION_ID_VARIABLE_NAME, measurementVariableList.get(0).getName());
+	}
+
+	@Test
+	public void testAddLocationIdValues() {
+		final Map<Integer, String> instanceIdLocationIdMap = new HashMap<>();
+		instanceIdLocationIdMap.put(5, "10060");
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = this.createObservationUnitRowMap(TermId.LOCATION_ID.name(), "UNKNOWN");
+		Mockito.when(this.studyDataManager.getInstanceIdLocationIdMap(new ArrayList<>(observationUnitRowMap.keySet()))).thenReturn(instanceIdLocationIdMap);
+		this.datasetExportService.addLocationIdValues(observationUnitRowMap);
+		final Map<String, ObservationUnitData> variables = observationUnitRowMap.get(5).get(0).getVariables();
+		Assert.assertEquals(2, variables.size());
+		Assert.assertEquals("10060", variables.get(DatasetCSVExportServiceImpl.LOCATION_ID_VARIABLE_NAME).getValue());
+	}
+
+	@Test
+	public void testTransformEntryTypeValues() {
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = this.createObservationUnitRowMap(TermId.ENTRY_TYPE.name(), TEST_ENTRY_DESCRIPTION);
+		this.datasetExportService.transformEntryTypeValues(observationUnitRowMap);
+		final Map<String, ObservationUnitData> variables = observationUnitRowMap.get(5).get(0).getVariables();
+		Assert.assertEquals(1, variables.size());
+		Assert.assertEquals(TEST_ENTRY_NAME, variables.get(TermId.ENTRY_TYPE.name()).getValue());
+	}
+
+	private Map<Integer, List<ObservationUnitRow>> createObservationUnitRowMap(final String variableName, final String value) {
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = new HashMap<>();
+		final ObservationUnitRow row = new ObservationUnitRow();
+		final Map<String, ObservationUnitData> variables = new HashMap<>();
+		final ObservationUnitData observationUnitData = new ObservationUnitData();
+		observationUnitData.setValue(value);
+		variables.put(variableName, observationUnitData);
+		row.setVariables(variables);
+		observationUnitRowMap.put(5, Arrays.asList(row));
+		return  observationUnitRowMap;
 	}
 
 	private List<StudyInstance> createStudyInstances() {

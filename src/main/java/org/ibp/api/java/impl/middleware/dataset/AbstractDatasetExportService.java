@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.io.Files;
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -61,6 +62,9 @@ public abstract class AbstractDatasetExportService {
 
 	@Resource
 	protected DatasetTypeService datasetTypeService;
+
+	@Autowired
+	protected ContextUtil contextUtil;
 
 	private ZipUtil zipUtil = new ZipUtil();
 
