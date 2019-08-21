@@ -126,6 +126,7 @@ public class RoleServiceImpl implements RoleService {
 		role.setName(roleGeneratorInput.getName());
 		role.setDescription(roleGeneratorInput.getDescription());
 		role.setPermissions(this.getPermission(roleGeneratorInput.getPermissions()));
+		role.setRoleType(this.workbenchDataManager.getRoleType(roleGeneratorInput.getRoleType()));
 		this.workbenchDataManager.saveRole(role);
 	}
 
