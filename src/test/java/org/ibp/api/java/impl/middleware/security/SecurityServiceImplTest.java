@@ -85,7 +85,7 @@ public class SecurityServiceImplTest {
 			.thenReturn(summaryStudyProgram);
 
 		// Logged in user = me is a the member
-		Mockito.when(this.userService.getUsersByProjectId(summaryStudyProgram.getProjectId())).thenReturn(
+		Mockito.when(this.userService.getUsersByProjectId(summaryStudyProgram.getProjectId(), this.cropname)).thenReturn(
 			Lists.newArrayList(this.me));
 
 		// Hence accessible
@@ -111,7 +111,8 @@ public class SecurityServiceImplTest {
 			.thenReturn(summaryStudyProgram);
 
 		// Logged in user = me is not the member, some other breeder is
-		Mockito.when(this.userService.getUsersByProjectId(summaryStudyProgram.getProjectId())).thenReturn(
+		Mockito.when(this.userService.getUsersByProjectId(summaryStudyProgram.getProjectId(), this.cropname)).thenReturn(
+
 			Lists.newArrayList(this.otherBreeder));
 
 		// Hence not accessible
@@ -174,7 +175,7 @@ public class SecurityServiceImplTest {
 		listProgram.setUniqueID(list.getProgramUUID());
 		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(list.getProgramUUID(), this.cropname)).thenReturn(listProgram);
 		// Logged in user = me is not a the member
-		Mockito.when(this.userService.getUsersByProjectId(listProgram.getProjectId())).thenReturn(
+		Mockito.when(this.userService.getUsersByProjectId(listProgram.getProjectId(), this.cropname)).thenReturn(
 			Lists.newArrayList(this.otherBreeder));
 
 		Mockito.when(this.userService.getUserById(this.otherBreeder.getUserid())).thenReturn(this.otherBreeder);
@@ -200,7 +201,7 @@ public class SecurityServiceImplTest {
 		Mockito.when(this.workbenchDataManager.getProjectByUuidAndCrop(list.getProgramUUID(), this.cropname)).thenReturn(listProgram);
 
 		// Logged in user = me is a the member
-		Mockito.when(this.userService.getUsersByProjectId(listProgram.getProjectId())).thenReturn(
+		Mockito.when(this.userService.getUsersByProjectId(listProgram.getProjectId(), this.cropname)).thenReturn(
 			Lists.newArrayList(this.me));
 
 		Assert.assertTrue(

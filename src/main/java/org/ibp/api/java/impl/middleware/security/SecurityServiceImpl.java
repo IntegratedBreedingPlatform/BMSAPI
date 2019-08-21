@@ -60,7 +60,7 @@ public class SecurityServiceImpl implements SecurityService {
 		if (!StringUtils.isBlank(programUniqueId)) {
 			final WorkbenchUser loggedInUser = this.getCurrentlyLoggedInUser();
 			final Project program = this.workbenchDataManager.getProjectByUuidAndCrop(programUniqueId, cropname);
-			final List<WorkbenchUser> allProgramMembers = this.userService.getUsersByProjectId(program.getProjectId());
+			final List<WorkbenchUser> allProgramMembers = this.userService.getUsersByProjectId(program.getProjectId(), cropname);
 			return allProgramMembers.contains(loggedInUser);
 		}
 		return false;
