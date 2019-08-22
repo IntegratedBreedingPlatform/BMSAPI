@@ -18,7 +18,9 @@ import org.ibp.api.domain.user.UserDetailDto;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class UserTestDataGenerator {
@@ -134,7 +136,7 @@ public abstract class UserTestDataGenerator {
 
 		final List<UserRoleDto> userRoleDtoList = new ArrayList<>();
 		userRoleDtoList.add(userRoleDto);
-		final List<CropDto> cropDtoList = new ArrayList<>();
+		final Set<CropDto> cropDtoList = new HashSet<>();
 		cropDtoList.add(new CropDto(cropType));
 		user.setCrops(cropDtoList);
 		user.setUserRoles(userRoleDtoList);
@@ -155,7 +157,7 @@ public abstract class UserTestDataGenerator {
 
 		final List<UserRoleDto> userRoleDtoList = new ArrayList<>();
 		userRoleDtoList.add(UserTestDataGenerator.initializeUserRoleDtoAdmin());
-		final List<CropDto> cropDtoList = new ArrayList<>();
+		final Set<CropDto> cropDtoList = new HashSet<>();
 		cropDtoList.add(new CropDto(cropType));
 		user.setCrops(cropDtoList);
 		user.setUserRoles(userRoleDtoList);

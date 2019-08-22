@@ -8,9 +8,9 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.slf4j.Logger;
@@ -157,7 +157,7 @@ public class UserValidator implements Validator {
 		final List<Project> programsByUser = this.workbenchDataManager.getProjectsByUser(workbenchUser, null);
 
 		if (programsByUser != null) {
-			final List<CropDto> cropDtos = userDto.getCrops();
+			final Set<CropDto> cropDtos = userDto.getCrops();
 
 			if (cropDtos == null) {
 				errors.reject(CANNOT_REMOVE_CROP,

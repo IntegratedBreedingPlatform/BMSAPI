@@ -29,12 +29,12 @@ public class UserMapper {
 		}
 	};
 
-	private static final AbstractConverter<List<CropType>, List<CropDto>> cropsConverter =
-		new AbstractConverter<List<CropType>, List<CropDto>>() {
+	private static final AbstractConverter<Set<CropType>, Set<CropDto>> cropsConverter =
+		new AbstractConverter<Set<CropType>, Set<CropDto>>() {
 
 			@Override
-			protected List<CropDto> convert(final List<CropType> source) {
-				return source.stream().map(CropDto::new).collect(Collectors.toList());
+			protected Set<CropDto> convert(final Set<CropType> source) {
+				return source.stream().map(CropDto::new).collect(Collectors.toSet());
 			}
 		};
 

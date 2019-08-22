@@ -7,6 +7,7 @@ import org.generationcp.middleware.service.api.user.UserRoleDto;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 public class UserDetailDto implements Serializable, Comparable<UserDto> {
 
@@ -19,7 +20,7 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 	private List<UserRoleDto> userRoles;
 	private String status;
 	private String email;
-	private List<CropDto> crops;
+	private Set<CropDto> crops;
 
 	public Integer getId() {
 		return id;
@@ -131,11 +132,11 @@ public class UserDetailDto implements Serializable, Comparable<UserDto> {
 			.toString();
 	}
 
-	public List<CropDto> getCrops() {
+	public Set<CropDto> getCrops() {
 		return crops;
 	}
 
-	public void setCrops(final List<CropDto> crops) {
+	public void setCrops(final Set<CropDto> crops) {
 		this.crops = crops;
 	}
 }
