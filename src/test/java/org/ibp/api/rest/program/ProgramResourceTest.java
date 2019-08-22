@@ -90,9 +90,9 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(this.me).when(this.userService).getUserById(program1.getProjectId().intValue());
 		Mockito.doReturn(this.myBreedingBuddy).when(this.userService).getUserById(program2.getProjectId().intValue());
 
-		Mockito.when(this.userService.getUsersByProjectId(program1.getProjectId(), ArgumentMatchers.anyString()))
+		Mockito.when(this.userService.getUsersByProjectId(program1.getProjectId(), program1.getCropType().getCropName()))
 			.thenReturn(Lists.newArrayList(this.me));
-		Mockito.when(this.userService.getUsersByProjectId(program2.getProjectId(), ArgumentMatchers.anyString())).thenReturn(
+		Mockito.when(this.userService.getUsersByProjectId(program2.getProjectId(), program2.getCropType().getCropName())).thenReturn(
 				Lists.newArrayList(this.me, this.myBreedingBuddy));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/program").param("cropName",cropName).contentType(this.contentType))
