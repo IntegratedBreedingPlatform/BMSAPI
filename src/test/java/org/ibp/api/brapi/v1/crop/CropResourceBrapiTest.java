@@ -2,10 +2,10 @@
 package org.ibp.api.brapi.v1.crop;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.crop.CropService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,6 +25,9 @@ public class CropResourceBrapiTest extends ApiUnitTestBase {
 
 	@Autowired
 	private CropService cropService;
+
+	@Autowired
+	private HttpServletRequest request;
 
 
 	@Configuration
@@ -37,11 +41,13 @@ public class CropResourceBrapiTest extends ApiUnitTestBase {
 
 	}
 
-	@Test @Ignore // FIXME
-	public void testListAvailableCrops() throws Exception {
+	@Test
+	public void testListAvailableCropsForUserWithSiteAdminPermission() throws Exception {
 
 		final List<String> crops = Arrays.asList("Maize", "Wheat", "Cowpea", "pearlmillet");
 		Mockito.when(this.cropService.getInstalledCrops()).thenReturn(crops);
+		Mockito.when(this.request.isUserInRole(PermissionsEnum.ADMIN.name())).thenReturn(true);
+
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/brapi/v1/crops").build();
 
