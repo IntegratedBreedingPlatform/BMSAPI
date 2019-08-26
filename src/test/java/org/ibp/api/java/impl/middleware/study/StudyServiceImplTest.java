@@ -43,7 +43,7 @@ public class StudyServiceImplTest {
 
 	private static final int TEST_STUDY_IDENTIFIER = 2013;
 
-	private static final int TEST_OBSERVATION_IDENTIIFER = 5;
+	private static final int TEST_OBSERVATION_IDENTIFIER = 5;
 
 	private static final String TEST_CROP_NAME = "maize";
 
@@ -270,11 +270,11 @@ public class StudyServiceImplTest {
 		final List<ObservationDto> observationDtoTestData = Lists.newArrayList(this.factory.manufacturePojo(ObservationDto.class));
 		Mockito.when(
 				this.mockMiddlewareStudyService.getSingleObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,
-						StudyServiceImplTest.TEST_OBSERVATION_IDENTIIFER)).thenReturn(observationDtoTestData);
+						StudyServiceImplTest.TEST_OBSERVATION_IDENTIFIER)).thenReturn(observationDtoTestData);
 
 		final Observation actualObservations =
 				this.studyServiceImpl.getSingleObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,
-						StudyServiceImplTest.TEST_OBSERVATION_IDENTIIFER);
+						StudyServiceImplTest.TEST_OBSERVATION_IDENTIFIER);
 
 		Assert.assertEquals(Lists.transform(observationDtoTestData, this.observationTransformFunction).get(0), actualObservations);
 
