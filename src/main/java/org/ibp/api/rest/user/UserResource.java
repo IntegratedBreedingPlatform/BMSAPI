@@ -20,7 +20,6 @@ import java.util.Map;
 
 @RestController
 @Controller
-@PreAuthorize("hasAnyAuthority('ADMIN','SITE_ADMIN')")
 public class UserResource {
 
 	@Autowired
@@ -35,6 +34,7 @@ public class UserResource {
 	@ApiOperation(value = "List all users", notes = "List all users in this deployment instance of BMSAPI. ")
 	@RequestMapping(value = "/users", method = RequestMethod.GET)
 	@ResponseBody
+	@PreAuthorize("hasAnyAuthority('ADMIN','SITE_ADMIN')")
 	public ResponseEntity<List<UserDetailDto>> listUsers() {
 		return new ResponseEntity<>(this.userService.getAllUsersSortedByLastName(), HttpStatus.OK);
 	}
@@ -42,6 +42,7 @@ public class UserResource {
 	@ApiOperation(value = "Create user", notes = "Create user in this deployment instance of BMSAPI. ")
 	@RequestMapping(value = "/users", method = RequestMethod.POST)
 	@ResponseBody
+	@PreAuthorize("hasAnyAuthority('ADMIN','SITE_ADMIN')")
 	public ResponseEntity<Map<String, Object>> createUser(@RequestBody
 	UserDetailDto user) {
 		final Map<String, Object> map = this.userService.createUser(user);
@@ -55,6 +56,7 @@ public class UserResource {
 	@ApiOperation(value = "Update user", notes = "Update user in this deployment instance of BMSAPI. ")
 	@RequestMapping(value = "/users/{id}", method = RequestMethod.PUT)
 	@ResponseBody
+	@PreAuthorize("hasAnyAuthority('ADMIN','SITE_ADMIN')")
 	public ResponseEntity<Map<String, Object>> updateUser(final @PathVariable
 	String id, @RequestBody UserDetailDto user) {
 		Map<String, Object> map = this.userService.updateUser(user);
