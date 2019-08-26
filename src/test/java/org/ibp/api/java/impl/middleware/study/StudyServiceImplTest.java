@@ -4,11 +4,8 @@ package org.ibp.api.java.impl.middleware.study;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.service.api.DataImportService;
-import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
@@ -33,7 +30,6 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import uk.co.jemos.podam.api.PodamFactory;
@@ -58,18 +54,6 @@ public class StudyServiceImplTest {
 
 	@Mock
 	private StudyDataManager studyDataManager;
-
-	@Mock
-	private FieldbookService fieldbookService;
-
-	@Mock
-	private GermplasmListManager germplasmListManager;
-
-	@Mock
-	private ConversionService conversionService;
-
-	@Mock
-	private DataImportService dataImportService;
 
 	@Mock
 	private SecurityService securityService;
@@ -97,11 +81,7 @@ public class StudyServiceImplTest {
 		
 		this.studyServiceImpl = new StudyServiceImpl();
 		this.studyServiceImpl.setMiddlewareStudyService(this.mockMiddlewareStudyService);
-		this.studyServiceImpl.setConversionService(this.conversionService);
-		this.studyServiceImpl.setFieldbookService(this.fieldbookService);
-		this.studyServiceImpl.setGermplasmListManager(this.germplasmListManager);
 		this.studyServiceImpl.setStudyDataManager(this.studyDataManager);
-		this.studyServiceImpl.setDataImportService(this.dataImportService);
 		this.studyServiceImpl.setSecurityService(this.securityService);
 		this.studyServiceImpl.setValidationUtil(new ValidationUtil());
 		this.studyServiceImpl.setObservationValidator(this.observationValidator);
