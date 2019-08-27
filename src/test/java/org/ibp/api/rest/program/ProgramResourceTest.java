@@ -13,7 +13,6 @@ import org.ibp.api.java.impl.middleware.program.ProgramServiceImpl;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -90,9 +89,9 @@ public class ProgramResourceTest extends ApiUnitTestBase {
 		Mockito.doReturn(this.me).when(this.userService).getUserById(program1.getProjectId().intValue());
 		Mockito.doReturn(this.myBreedingBuddy).when(this.userService).getUserById(program2.getProjectId().intValue());
 
-		Mockito.when(this.userService.getUsersByProjectId(program1.getProjectId(), program1.getCropType().getCropName()))
+		Mockito.when(this.userService.getUsersByProjectId(program1.getProjectId()))
 			.thenReturn(Lists.newArrayList(this.me));
-		Mockito.when(this.userService.getUsersByProjectId(program2.getProjectId(), program2.getCropType().getCropName())).thenReturn(
+		Mockito.when(this.userService.getUsersByProjectId(program2.getProjectId())).thenReturn(
 				Lists.newArrayList(this.me, this.myBreedingBuddy));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/program").param("cropName",cropName).contentType(this.contentType))
