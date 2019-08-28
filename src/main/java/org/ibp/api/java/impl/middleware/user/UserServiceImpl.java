@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.common.ErrorResponse;
@@ -31,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 // TODO IBP-2778
 //  make Transactional
@@ -57,6 +60,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private ResourceBundleMessageSource messageSource;
+
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
 	private ContextUtil contextUtil;
@@ -138,15 +144,19 @@ public class UserServiceImpl implements UserService {
 
 		Preconditions.checkNotNull(projectUUID, "The projectUUID must not be empty");
 		try {
-			final String cropName = this.getContextUtil().getProjectInContext().getCropType().getCropName();
-			final List<UserDto> users = this.userService.getUsersByProjectUuid(projectUUID, cropName);
-			Preconditions.checkArgument(!users.isEmpty(), "users don't exists for this projectUUID");
+			final Project project = this.workbenchDataManager.getProjectByUuid(projectUUID);
+			if (project != null) {
+				//TODO Create a new mapper to map from WorkbenchUser to UserDto, out of the scope for IBP-2792
+				final List<WorkbenchUser> workbenchUsers = this.userService.getUsersByProjectId(project.getProjectId());
+				Preconditions.checkArgument(!workbenchUsers.isEmpty(), "users don't exists for this projectUUID");
 
-			for (final UserDto userDto : users) {
-				final UserDetailDto userInfo = mapper.map(userDto, UserDetailDto.class);
-				result.add(userInfo);
+				final List<UserDto> users = workbenchUsers.stream().map(wu -> new UserDto(wu)).collect(Collectors.toList());
+
+				for (final UserDto userDto : users) {
+					final UserDetailDto userInfo = mapper.map(userDto, UserDetailDto.class);
+					result.add(userInfo);
+				}
 			}
-
 		} catch (final MiddlewareQueryException e) {
 			LOG.info("Error on userService.getUsersByProjectUuid", e);
 			throw new ApiRuntimeException("An internal error occurred while trying to get the users");
