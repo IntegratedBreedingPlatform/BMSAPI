@@ -616,8 +616,11 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	protected String convertPossibleValuesToString(final List<ValueReference> possibleValues, final String delimiter) {
 
-		final StringBuilder sb = new StringBuilder();
+		if(possibleValues == null){
+			return "";
+		}
 
+		final StringBuilder sb = new StringBuilder();
 		final Iterator<ValueReference> iterator = possibleValues.iterator();
 		while (iterator.hasNext()) {
 			sb.append(iterator.next().getName());
