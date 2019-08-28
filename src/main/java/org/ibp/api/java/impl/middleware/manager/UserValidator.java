@@ -143,9 +143,6 @@ public class UserValidator implements Validator {
 					this.validatePersonEmailIfExists(errors, user.getEmail());
 				}
 
-				// May not be needed with new validations for userRoles
-				//				this.validateCrops(errors, user, userUpdate);
-
 			} else {
 				errors.rejectValue(USER_ID, SIGNUP_FIELD_INVALID_USER_ID);
 			}
