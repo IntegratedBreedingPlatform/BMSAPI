@@ -54,7 +54,7 @@ public class ProgramServiceImpl implements ProgramService {
 					programSummary.setCreatedBy(workbenchUser.getName());
 
 					final List<WorkbenchUser> workbenchUsers = this.userService
-						.getUsersByProjectId(workbenchProgram.getProjectId(), workbenchProgram.getCropType().getCropName());
+						.getUsersByProjectId(workbenchProgram.getProjectId());
 					final Set<String> members = new HashSet<>();
 					for (final WorkbenchUser member : workbenchUsers) {
 						members.add(member.getName());
@@ -108,7 +108,7 @@ public class ProgramServiceImpl implements ProgramService {
 				programSummary.setCreatedBy(programUser.getName());
 
 				final List<WorkbenchUser> allProgramMembers =
-					this.userService.getUsersByProjectId(workbenchProgram.getProjectId(), workbenchProgram.getCropType().getCropName());
+					this.userService.getUsersByProjectId(workbenchProgram.getProjectId());
 				final Set<String> members = new HashSet<>();
 				for (final WorkbenchUser member : allProgramMembers) {
 					members.add(member.getName());

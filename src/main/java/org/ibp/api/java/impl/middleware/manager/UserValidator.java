@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.manager;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -149,30 +148,6 @@ public class UserValidator implements Validator {
 
 			} else {
 				errors.rejectValue(USER_ID, SIGNUP_FIELD_INVALID_USER_ID);
-			}
-		}
-	}
-
-	private void validateCrops(final Errors errors, final UserDetailDto userDto, final WorkbenchUser workbenchUser) {
-		final List<Project> programsByUser = this.workbenchDataManager.getProjectsByUser(workbenchUser, null);
-
-		if (programsByUser != null) {
-			final Set<CropDto> cropDtos = userDto.getCrops();
-
-			if (cropDtos == null) {
-				errors.reject(CANNOT_REMOVE_CROP,
-					new String[] {programsByUser.stream().map(Project::getProjectName).collect(Collectors.joining(" and "))}, "");
-				return;
-			}
-
-			final Set<String> crops = cropDtos.stream().map(CropDto::getCropName).collect(Collectors.toSet());
-			final List<Project> programs = programsByUser.stream()
-				.filter(program -> !crops.contains(program.getCropType().getCropName()))
-				.collect(Collectors.toList());
-
-			if (!programs.isEmpty()) {
-				errors.reject(CANNOT_REMOVE_CROP,
-					new String[] {programs.stream().map(Project::getProjectName).collect(Collectors.joining(" and "))}, "");
 			}
 		}
 	}
