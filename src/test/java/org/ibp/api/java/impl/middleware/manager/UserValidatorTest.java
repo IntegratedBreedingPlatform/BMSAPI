@@ -1,40 +1,39 @@
 package org.ibp.api.java.impl.middleware.manager;
 
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
+import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.workbench.Role;
-import org.generationcp.middleware.pojos.workbench.UserRole;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 @RunWith(MockitoJUnitRunner.class)
 public class UserValidatorTest {
 
-	private static final int SUPERADMIN_ID = 123;
-
+	@InjectMocks
 	private UserValidator uservalidator;
 
 	@Mock
@@ -46,19 +45,11 @@ public class UserValidatorTest {
 	@Mock
 	private SecurityService securityService;
 
-	private Role superAdminRole;
-
 	@Before
 	public void beforeEachTest() {
-		MockitoAnnotations.initMocks(this);
-		this.uservalidator = new UserValidator();
-		this.uservalidator.setWorkbenchDataManager(this.workbenchDataManager);
-		this.uservalidator.setSecurityService(this.securityService);
-		this.uservalidator.setUserService(this.userService);
+		Mockito.when(this.workbenchDataManager.getInstalledCropDatabses())
+		.thenReturn(Arrays.asList(new CropType("maize"), new CropType("wheat")));
 
-		Mockito.doReturn(this.createTestRoles()).when(this.userService).getAllRoles();
-		// TODO test validate crops
-		Mockito.doReturn(null).when(this.workbenchDataManager).getProjectsByUser(ArgumentMatchers.any(WorkbenchUser.class));
 	}
 
 	@After
@@ -76,73 +67,17 @@ public class UserValidatorTest {
 
 		userDto.setLastName("zxcvbnmaaskjhdfsgeeqwfsafsafg6tk6kglkugt8oljhhlly11");
 		userDto.setUsername("wertyuioiuytredsdfrtghjuklsl123");
+		userDto.setUserRoles(new ArrayList<>());
 
 		this.uservalidator.validate(userDto, bindingResult, true);
 
-		assertThat(6, equalTo(bindingResult.getAllErrors().size()));
+		assertThat(5, equalTo(bindingResult.getAllErrors().size()));
 		assertThat(null, equalTo(bindingResult.getFieldError("firstName").getRejectedValue()));
 		assertThat("signup.field.length.exceed", equalTo(bindingResult.getFieldError("lastName").getCode()));
 		assertThat("30", equalTo(bindingResult.getFieldError("username").getArguments()[0]));
 		assertThat("Username", equalTo(bindingResult.getFieldError("username").getArguments()[1]));
 		assertThat(null, equalTo(bindingResult.getFieldError("email").getRejectedValue()));
-		assertThat(null, equalTo(bindingResult.getFieldError("role").getRejectedValue()));
 		assertThat("signup.field.required", equalTo(bindingResult.getFieldError("status").getCode()));
-	}
-
-	/**
-	 * Should validate the Role allow.* *
-	 */
-	@Test
-	public void testValidateRoleWhenNull() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
-
-		userDto.setRole(null);
-		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
-		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
-
-		this.uservalidator.validate(userDto, bindingResult, false);
-
-		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
-		assertThat(UserValidator.SIGNUP_FIELD_INVALID_ROLE, equalTo(bindingResult.getFieldError("role").getCode()));
-	}
-
-	@Test
-	public void testValidateRole() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
-
-		userDto.getRole().setDescription("Breeder qwertyuioiuytredsdfrtghjuklsl123");
-		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
-		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
-
-		this.uservalidator.validate(userDto, bindingResult, false);
-
-		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
-		assertThat("signup.field.length.exceed", equalTo(bindingResult.getFieldError("role").getCode()));
-	}
-
-	@Test
-	public void testValidateRoleWhenRoleIsSuperAdminRole() {
-		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
-
-		userDto.setRole(new Role(5, Role.SUPERADMIN));
-		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
-		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
-
-		// On create and update mode, "SUPERADMIN" role should not be assignable
-		this.uservalidator.validate(userDto, bindingResult, true);
-		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
-		assertThat(UserValidator.CANNOT_ASSIGN_SUPERADMIN_ROLE, equalTo(bindingResult.getAllErrors().get(0).getCode()));
-
-		bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		this.uservalidator.validate(userDto, bindingResult, false);
-		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
-		assertThat(UserValidator.CANNOT_ASSIGN_SUPERADMIN_ROLE, equalTo(bindingResult.getAllErrors().get(0).getCode()));
 	}
 
 	/**
@@ -151,8 +86,11 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateEmail() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto(10, new CropType("wheat"));
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleAdmin());
+		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(UserTestDataGenerator.initializeUserRoleAdmin()));
+
 
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
@@ -186,7 +124,9 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUserId() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(777);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto(777, new CropType("wheat"));
+		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(UserTestDataGenerator.initializeUserRoleAdmin()));
 
 		this.uservalidator.validate(userDto, bindingResult, false);
 
@@ -200,7 +140,10 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUserIdInexistent() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto(10, new CropType("wheat"));
+		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(UserTestDataGenerator.initializeUserRoleAdmin()));
+
 		this.uservalidator.validate(userDto, bindingResult, false);
 
 		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
@@ -213,8 +156,12 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateStatus() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(20);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20);
+		final UserDetailDto userDto =
+			UserTestDataGenerator.initializeUserDetailDto(20, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20, UserTestDataGenerator.initializeUserRoleAdmin());
+		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds)))
+			.thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
 
 		userDto.setStatus("truee");
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
@@ -232,8 +179,12 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUserAndPeronalEmailExists() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(0);
-
+		final UserDetailDto userDto =
+			UserTestDataGenerator.initializeUserDetailDto(20, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20, UserTestDataGenerator.initializeUserRoleAdmin());
+		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds)))
+			.thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
 		Mockito.when(this.userService.isUsernameExists(userDto.getUsername())).thenReturn(true);
 		Mockito.when(this.userService.isPersonWithEmailExists(userDto.getEmail())).thenReturn(true);
 		this.uservalidator.validate(userDto, bindingResult, true);
@@ -249,8 +200,12 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUpdateUser() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20, UserTestDataGenerator.initializeUserRoleAdmin());
+
+		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
+
 
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.userService.isUsernameExists(userDto.getUsername())).thenReturn(false);
@@ -269,8 +224,12 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUpdateUserEmailExists() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleAdmin());
+
+		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
+
 
 		user.getPerson().setEmail("user@leafnode.io");
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
@@ -291,9 +250,12 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUpdateUserUsernameExists() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleAdmin());
 		user.setName("Nahuel");
+		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
+
 
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.userService.isUsernameExists(userDto.getUsername())).thenReturn(true);
@@ -313,9 +275,12 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUpdateUserForExistingSuperAdminUser() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20);
-		user.setRoles(Arrays.asList(new UserRole(user, new Role(5, Role.SUPERADMIN))));
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(1, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoSuperAdmin());
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20,UserTestDataGenerator.initializeUserRoleSuperAdmin());
+
+		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
+
 
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.userService.isUsernameExists(userDto.getUsername())).thenReturn(false);
@@ -323,9 +288,7 @@ public class UserValidatorTest {
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
 		this.uservalidator.validate(userDto, bindingResult, false);
-		assertThat(1, equalTo(bindingResult.getAllErrors().size()));
-		assertThat(UserValidator.CANNOT_UPDATE_SUPERADMIN, equalTo(bindingResult.getAllErrors().get(0).getCode()));
-
+		assertThat(2, equalTo(bindingResult.getAllErrors().size()));
 	}
 
 	/**
@@ -334,10 +297,11 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateCreateUser() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(0);
-
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(0, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(0,UserTestDataGenerator.initializeUserRoleAdmin());
+		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
 		this.uservalidator.validate(userDto, bindingResult, true);
-
 		assertThat(0, equalTo(bindingResult.getAllErrors().size()));
 
 	}
@@ -345,8 +309,11 @@ public class UserValidatorTest {
 	@Test
 	public void testValidateUserCannotAutoDeactivate() {
 		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10);
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20);
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20, UserTestDataGenerator.initializeUserRoleAdmin());
+
+		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
 
 		userDto.setStatus("false");
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
@@ -359,31 +326,72 @@ public class UserValidatorTest {
 	}
 
 	@Test
-	public void testIsSuperAdminRole(){
-		this.uservalidator.setSuperAdminRole(this.superAdminRole);
+	public void testValidateSuperAdminUserCannotAssignable() {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoSuperAdmin());
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleSuperAdmin());
 
-		// Should validate "SUPERADMIN" description
-		Assert.assertTrue(this.uservalidator.isSuperAdminRole(new Role(100, Role.SUPERADMIN)));
+		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
 
-		// Should validate by superadmin ID from DB
-		Assert.assertTrue(this.uservalidator.isSuperAdminRole(new Role(SUPERADMIN_ID, "")));
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
-		// Should not flag as superamin user if ID and description do not match
-		Assert.assertFalse(this.uservalidator.isSuperAdminRole(new Role(100, "Admin")));
+		this.uservalidator.validate(userDto, bindingResult, false);
+
+		assertThat(0, not(equalTo(bindingResult.getGlobalErrorCount())));
+		assertThat("user.not.assignable.roles", equalTo(bindingResult.getGlobalErrors().get(0).getCode()));
 	}
 
-	private List<Role> createTestRoles() {
-		final List<Role> allRoles = new ArrayList<>();
-		Role admin = new Role(1, "ADMIN");
-		Role breeder = new Role(2, "BREEDER");
-		Role technician = new Role(3, "TECHNICIAN");
-		this.superAdminRole = new Role(SUPERADMIN_ID, Role.SUPERADMIN);
+	@Test
+	public void testValidateUserInvalidRole() {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleAdmin());
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
-		allRoles.add(admin);
-		allRoles.add(breeder);
-		allRoles.add(technician);
-		allRoles.add(this.superAdminRole);
+		this.uservalidator.validate(userDto, bindingResult, false);
 
-		return allRoles;
+		assertThat(0, not(equalTo(bindingResult.getGlobalErrorCount())));
+		assertThat("user.invalid.roles", equalTo(bindingResult.getGlobalErrors().get(0).getCode()));
+	}
+
+	@Test
+	public void testValidateUserCropNotAssociated() {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoBreeder(new CropDto(new CropType("maize"))));
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleBreeder());
+
+		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
+
+
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
+		this.uservalidator.validate(userDto, bindingResult, false);
+
+		assertThat(0, not(equalTo(bindingResult.getGlobalErrorCount())));
+		assertThat("user.crop.not.associated.to.user", equalTo(bindingResult.getGlobalErrors().get(0).getCode()));
+	}
+
+	@Test
+	public void testValidateUserCropNotExists() {
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("bean"), UserTestDataGenerator.initializeUserRoleDtoBreeder(new CropDto(new CropType("bean"))));
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleBreeder());
+
+		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
+
+
+		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
+		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
+
+		this.uservalidator.validate(userDto, bindingResult, false);
+
+		assertThat(0, not(equalTo(bindingResult.getGlobalErrorCount())));
+		assertThat("user.crop.not.exist", equalTo(bindingResult.getGlobalErrors().get(0).getCode()));
 	}
 }

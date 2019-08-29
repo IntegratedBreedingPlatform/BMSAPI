@@ -1,8 +1,12 @@
 package org.ibp.api.java.impl.middleware.user;
 
 import com.google.common.base.Preconditions;
+import org.generationcp.commons.security.SecurityUtil;
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.ibp.api.domain.user.UserDetailDto;
@@ -20,6 +24,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.validation.ObjectError;
@@ -28,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 // TODO IBP-2778
 //  make Transactional
@@ -55,11 +61,14 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private ResourceBundleMessageSource messageSource;
 
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private ContextUtil contextUtil;
+
 	@Override
 	public List<UserDetailDto> getAllUsersSortedByLastName() {
-
-		this.securityService.requireCurrentUserIsAdmin();
-
 		final List<UserDetailDto> result = new ArrayList<>();
 		final ModelMapper mapper = UserMapper.getInstance();
 		final List<UserDto> users = this.userService.getAllUsersSortedByLastName();
@@ -73,9 +82,6 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Map<String, Object> createUser(final UserDetailDto user) {
-
-		this.securityService.requireCurrentUserIsAdmin();
-
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
 		final HashMap<String, Object> mapResponse = new HashMap<String, Object>();
 		mapResponse.put("id", String.valueOf(0));
@@ -105,9 +111,6 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Map<String, Object> updateUser(final UserDetailDto user) {
-
-		this.securityService.requireCurrentUserIsAdmin();
-
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserServiceImpl.USER_NAME);
 		final HashMap<String, Object> mapResponse = new HashMap<String, Object>();
 		mapResponse.put("id", String.valueOf(0));
@@ -140,21 +143,34 @@ public class UserServiceImpl implements UserService {
 		final ModelMapper mapper = UserMapper.getInstance();
 
 		Preconditions.checkNotNull(projectUUID, "The projectUUID must not be empty");
-
 		try {
-			final List<UserDto> users = this.userService.getUsersByProjectUuid(projectUUID);
-			Preconditions.checkArgument(!users.isEmpty(), "users don't exists for this projectUUID");
+			final Project project = this.workbenchDataManager.getProjectByUuid(projectUUID);
+			if (project != null) {
+				//TODO Create a new mapper to map from WorkbenchUser to UserDto, out of the scope for IBP-2792
+				final List<WorkbenchUser> workbenchUsers = this.userService.getUsersByProjectId(project.getProjectId());
+				Preconditions.checkArgument(!workbenchUsers.isEmpty(), "users don't exists for this projectUUID");
 
-			for (final UserDto userDto : users) {
-				final UserDetailDto userInfo = mapper.map(userDto, UserDetailDto.class);
-				result.add(userInfo);
+				final List<UserDto> users = workbenchUsers.stream().map(wu -> new UserDto(wu)).collect(Collectors.toList());
+
+				for (final UserDto userDto : users) {
+					final UserDetailDto userInfo = mapper.map(userDto, UserDetailDto.class);
+					result.add(userInfo);
+				}
 			}
-
 		} catch (final MiddlewareQueryException e) {
 			LOG.info("Error on userService.getUsersByProjectUuid", e);
 			throw new ApiRuntimeException("An internal error occurred while trying to get the users");
 		}
 		return result;
+	}
+
+	@Override
+	@Transactional
+	public UserDto getUserWithAuthorities(final String cropName, final String programUuid) {
+		final String userName = SecurityUtil.getLoggedInUserName();
+		final WorkbenchUser user = this.userService.getUserWithAuthorities(userName, cropName, programUuid);
+		final ModelMapper userMapper = UserMapper.getInstance();
+		return userMapper.map(user, UserDto.class);
 	}
 
 	private UserDto translateUserDetailsDtoToUserDto(final UserDetailDto user) {
@@ -163,10 +179,21 @@ public class UserServiceImpl implements UserService {
 		userdto.setUsername(user.getUsername());
 		userdto.setFirstName(user.getFirstName());
 		userdto.setLastName(user.getLastName());
-		userdto.setRole(new Role(user.getRole().getId(), user.getRole().getDescription()));
+		userdto.setUserRoles(user.getUserRoles());
 		userdto.setEmail(user.getEmail());
 		userdto.setStatus("true".equals(user.getStatus()) ? 0 : 1);
 		userdto.setCrops(user.getCrops());
+
+		if (user.getUserRoles() != null && !user.getUserRoles().isEmpty()) {
+			final String userName = SecurityUtil.getLoggedInUserName();
+			final WorkbenchUser workbenchUser = this.userService.getUserByUsername(userName);
+			userdto.getUserRoles().forEach(userRoleDto -> {
+				if (user.getId() == null || user.getId() == 0 || userRoleDto.getCreatedBy() == null || userRoleDto.getCreatedBy() == 0) {
+					userRoleDto.setCreatedBy(workbenchUser.getUserid());
+				}
+			});
+		}
+
 		return userdto;
 	}
 
@@ -272,7 +299,15 @@ public class UserServiceImpl implements UserService {
 		return this.messageSource.getMessage(code, args, LocaleContextHolder.getLocale());
 	}
 
-	protected void setUserService(final org.generationcp.middleware.service.api.user.UserService userService) {
+	public ContextUtil getContextUtil() {
+		return contextUtil;
+	}
+
+	public void setContextUtil(ContextUtil contextUtil) {
+		this.contextUtil = contextUtil;
+	}
+
+	public void setUserService(final org.generationcp.middleware.service.api.user.UserService userService) {
 		this.userService = userService;
 	}
 

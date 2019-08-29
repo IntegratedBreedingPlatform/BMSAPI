@@ -81,9 +81,6 @@ public class StudyServiceImpl implements StudyService {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
-	private ConversionService conversionService;
-
-	@Autowired
 	private SecurityService securityService;
 
 	@Autowired
@@ -353,6 +350,7 @@ public class StudyServiceImpl implements StudyService {
 
 			final DataSet trialDataset =
 				this.studyDataManager.findOneDataSetByType(studyIdentifier, DatasetTypeEnum.SUMMARY_DATA.getId());
+
 			// Datasets
 			final List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(studyIdentifier);
 			if (datasetReferences != null && !datasetReferences.isEmpty()) {
@@ -410,20 +408,7 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public Map<Integer, FieldMap> getFieldMap(final String studyId) {
-		return fieldMapService.getFieldMap(studyId);
-	}
-
-
-	private final <T, S> List<T> convert(final List<S> beanList, final Class<T> clazz) {
-		if (null == beanList) {
-			return Collections.emptyList();
-		}
-
-		final List<T> convertedList = new ArrayList<>();
-		for (final S s : beanList) {
-			convertedList.add(this.conversionService.convert(s, clazz));
-		}
-		return convertedList;
+		return this.fieldMapService.getFieldMap(studyId);
 	}
 
 	void setMiddlewareStudyService(final org.generationcp.middleware.service.api.study.StudyService middlewareStudyService) {
@@ -432,10 +417,6 @@ public class StudyServiceImpl implements StudyService {
 
 	void setStudyDataManager(final StudyDataManager studyDataManager) {
 		this.studyDataManager = studyDataManager;
-	}
-
-	void setConversionService(final ConversionService conversionService) {
-		this.conversionService = conversionService;
 	}
 
 	void setSecurityService(final SecurityService securityService) {
@@ -550,7 +531,7 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public StudyReference getStudyReference(Integer studyId) {
+	public StudyReference getStudyReference(final Integer studyId) {
 		return this.studyDataManager.getStudyReference(studyId);
 	}
 

@@ -1,12 +1,14 @@
-
 package org.ibp.api.java.impl.middleware.manager;
 
-import org.generationcp.middleware.domain.workbench.CropDto;
+import org.apache.commons.collections.CollectionUtils;
+import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.RoleSearchDto;
+import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -17,8 +19,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -41,7 +47,6 @@ public class UserValidator implements Validator {
 	 */
 	public static final String USER_AUTO_DEACTIVATION = "A user cannot be auto-deactivated";
 	public static final String CANNOT_UPDATE_SUPERADMIN = "Updating this user is not allowed";
-	public static final String CANNOT_ASSIGN_SUPERADMIN_ROLE = "SuperAdmin role cannot be assigned to a user";
 	public static final String CANNOT_REMOVE_CROP = "site.admin.crops.user.in.program";
 
 	public static final String DATABASE_ERROR = "database.error";
@@ -72,11 +77,9 @@ public class UserValidator implements Validator {
 
 	@Autowired
 	private UserService userService;
-	
-	private Role superAdminRole;
 
 	@Override
-	public boolean supports(Class<?> aClass) {
+	public boolean supports(final Class<?> aClass) {
 		return UserDetailDto.class.equals(aClass);
 	}
 
@@ -86,8 +89,7 @@ public class UserValidator implements Validator {
 	}
 
 	public void validate(final Object o, final Errors errors, final boolean createUser) {
-		UserDetailDto user = (UserDetailDto) o;
-		this.retrieveSuperAdminRole();
+		final UserDetailDto user = (UserDetailDto) o;
 
 		this.validateFieldLength(errors, user.getFirstName(), FIRST_NAME, FIRST_NAME_STR, 20);
 		this.validateFieldLength(errors, user.getLastName(), LAST_NAME, LAST_NAME_STR, 50);
@@ -95,7 +97,7 @@ public class UserValidator implements Validator {
 		this.validateFieldLength(errors, user.getEmail(), EMAIL, EMAIL_STR, 40);
 		this.validateFieldLength(errors, user.getStatus(), STATUS, STATUS_STR, 11);
 
-		this.validateUserRole(errors, user.getRole());
+		this.validateUserRoles(errors, user);
 		this.validateEmailFormat(errors, user.getEmail());
 
 		this.validateUserStatus(errors, user.getStatus());
@@ -112,28 +114,18 @@ public class UserValidator implements Validator {
 
 	}
 
-	private void retrieveSuperAdminRole() {
-		final List<Role> allRoles = this.userService.getAllRoles();
-		for (final Role role : allRoles) {
-			if (this.isSuperAdminRole(role)){
-				this.superAdminRole = role;
-			} 
-		}
-	}
-
-	private void validateUserUpdate(Errors errors, UserDetailDto user) {
+	private void validateUserUpdate(final Errors errors, final UserDetailDto user) {
 		WorkbenchUser userUpdate = null;
 		if (null == errors.getFieldError(USER_ID)) {
 			try {
 				userUpdate = this.userService.getUserById(user.getId());
-			} catch (MiddlewareQueryException e) {
+			} catch (final MiddlewareQueryException e) {
 				errors.rejectValue(USER_ID, DATABASE_ERROR);
 				LOG.error(e.getMessage(), e);
 			}
 
 			if (userUpdate != null) {
-				final Role userRole = userUpdate.getRoles().get(0).getRole();
-				if (this.isSuperAdminRole(userRole)){
+				if (userUpdate.isSuperAdmin()) {
 					errors.reject(CANNOT_UPDATE_SUPERADMIN);
 				}
 				
@@ -151,42 +143,10 @@ public class UserValidator implements Validator {
 					this.validatePersonEmailIfExists(errors, user.getEmail());
 				}
 
-				this.validateCrops(errors, user, userUpdate);
-
 			} else {
 				errors.rejectValue(USER_ID, SIGNUP_FIELD_INVALID_USER_ID);
 			}
 		}
-	}
-
-	private void validateCrops(final Errors errors, final UserDetailDto userDto, final WorkbenchUser workbenchUser) {
-		final List<Project> programsByUser = this.workbenchDataManager.getProjectsByUser(workbenchUser);
-
-		if (programsByUser != null) {
-			final List<CropDto> cropDtos = userDto.getCrops();
-
-			if (cropDtos == null) {
-				errors.reject(CANNOT_REMOVE_CROP,
-					new String[] {programsByUser.stream().map(Project::getProjectName).collect(Collectors.joining(" and "))}, "");
-				return;
-			}
-
-			final Set<String> crops = cropDtos.stream().map(CropDto::getCropName).collect(Collectors.toSet());
-			final List<Project> programs = programsByUser.stream()
-				.filter(program -> !crops.contains(program.getCropType().getCropName()))
-				.collect(Collectors.toList());
-
-			if (!programs.isEmpty()) {
-				errors.reject(CANNOT_REMOVE_CROP,
-					new String[] {programs.stream().map(Project::getProjectName).collect(Collectors.joining(" and "))}, "");
-			}
-		}
-	}
-
-	// Match by either "SUPERADMIN" description or by id of superadmin role from database
-	boolean isSuperAdminRole(final Role role) {
-		return Role.SUPERADMIN.equals(role.getCapitalizedRole())
-				|| (this.superAdminRole != null && this.superAdminRole.getId().equals(role.getId()));
 	}
 
 	private void validateUserId(final Errors errors, final Integer userId) {
@@ -220,7 +180,7 @@ public class UserValidator implements Validator {
 			if (null == errors.getFieldError(USERNAME) && this.userService.isUsernameExists(userName)) {
 				errors.rejectValue(USERNAME, SIGNUP_FIELD_USERNAME_EXISTS, new String[] {userName}, null);
 			}
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			errors.rejectValue(USERNAME, DATABASE_ERROR);
 			LOG.error(e.getMessage(), e);
 		}
@@ -231,33 +191,163 @@ public class UserValidator implements Validator {
 			if (null == errors.getFieldError(EMAIL) && this.userService.isPersonWithEmailExists(eMail)) {
 				errors.rejectValue(EMAIL, SIGNUP_FIELD_EMAIL_EXISTS);
 			}
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			errors.rejectValue(EMAIL, DATABASE_ERROR);
 			LOG.error(e.getMessage(), e);
 		}
 	}
 
-    protected void validateUserRole(final Errors errors, final Role role) {
-		if (null == role) {
-            errors.rejectValue(ROLE, SIGNUP_FIELD_INVALID_ROLE);
-		} else if (this.isSuperAdminRole(role)) {
-			errors.reject(CANNOT_ASSIGN_SUPERADMIN_ROLE);
-		} else {
-	        this.validateFieldLength(errors, role.getDescription(), ROLE, ROLE_STR, 30);
-		} 
+	protected void validateUserRoles(final Errors errors, final UserDetailDto user) {
 
-    }
+		final List<UserRoleDto> userRoles = user.getUserRoles();
+
+		if (!userRoles.isEmpty()) {
+
+			// Roles in the list must exist
+			final Set<Integer> roleIds = userRoles.stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
+
+			final List<Role> savedRoles = workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds));
+
+			if (savedRoles.size() != roleIds.size()) {
+				errors.reject("user.invalid.roles", new String[] {
+					(String) CollectionUtils.subtract(roleIds, savedRoles.stream().map(x -> x.getId()).collect(Collectors.toSet())).stream()
+						.map(x -> x.toString())
+						.collect(Collectors.joining(" , "))}, "");
+				return;
+			}
+
+			// Roles in the list MUST be assignable
+			final Set<Role> notAssignableRoles = savedRoles.stream().filter(e -> !e.getAssignable()).collect(Collectors.toSet());
+
+			if (!notAssignableRoles.isEmpty()) {
+				errors.reject("user.not.assignable.roles",
+					new String[] {notAssignableRoles.stream().map(x -> x.getId()).collect(Collectors.toSet()).toString()}, "");
+				return;
+			}
+
+			// Crops in the list MUST exist
+			final Set<String> cropsUsedInUserRoles =
+				userRoles.stream().filter(p -> p.getCrop() != null).map(p -> p.getCrop().getCropName()).collect(Collectors.toSet());
+			final List<String> installedCrops =
+				this.workbenchDataManager.getInstalledCropDatabses().stream().map(p -> p.getCropName()).collect(Collectors.toList());
+
+			if (!installedCrops.containsAll(cropsUsedInUserRoles)) {
+				errors.reject("user.crop.not.exist",
+					new String[] {
+						(String) CollectionUtils.subtract(cropsUsedInUserRoles, installedCrops).stream().map(x -> x.toString())
+							.collect(Collectors.joining(" , "))}, "");
+				return;
+			}
+
+			// Crops in the list MUST be associated to the user
+			final Set<String> userCrops =
+				(user.getCrops() != null) ? user.getCrops().stream().map(p -> p.getCropName()).collect(Collectors.toSet()) :
+					new HashSet<>();
+			if (!userCrops.containsAll(cropsUsedInUserRoles)) {
+				errors.reject("user.crop.not.associated.to.user", new String[] {
+					(String) CollectionUtils.subtract(cropsUsedInUserRoles, userCrops).stream().map(x -> x.toString())
+						.collect(Collectors.joining(" , "))}, "");
+				return;
+			}
+
+			// ROLES must be consistent
+			// Instance ROLE can not have neither crop nor program
+			// Crop ROLE MUST have a crop and can not have a program
+			// Program ROLE MUST have crop and program and program MUST belong to the specified crop
+			Map<Integer, Role> savedRolesMap = savedRoles.stream().collect(
+				Collectors.toMap(Role::getId, Function.identity()));
+			for (final UserRoleDto userRoleDto : userRoles) {
+				final Role role = savedRolesMap.get(userRoleDto.getRole().getId());
+				if (role.getRoleType().getId().equals(RoleType.INSTANCE.getId())) {
+					if (userRoleDto.getCrop() != null || userRoleDto.getProgram() != null) {
+						errors.reject("user.invalid.instance.role", new String[] {role.getId().toString()}, "");
+					}
+				}
+				if (role.getRoleType().getId().equals(RoleType.CROP.getId())) {
+					if (userRoleDto.getCrop() == null || userRoleDto.getCrop().getCropName() == null || userRoleDto.getCrop().getCropName()
+						.isEmpty() || userRoleDto.getProgram() != null) {
+						errors.reject("user.invalid.crop.role", new String[] {role.getId().toString()}, "");
+
+					}
+
+				}
+				if (role.getRoleType().getId().equals(RoleType.PROGRAM.getId())) {
+					if (userRoleDto.getCrop() == null || userRoleDto.getCrop().getCropName() == null || userRoleDto.getCrop().getCropName()
+						.isEmpty() ||
+						userRoleDto.getProgram() == null || userRoleDto.getProgram().getUuid() == null || userRoleDto.getProgram().getUuid()
+						.isEmpty()) {
+						errors.reject("user.invalid.program.role", new String[] {role.getId().toString()}, "");
+
+					} else {
+						final Project project = workbenchDataManager
+							.getProjectByUuidAndCrop(userRoleDto.getProgram().getUuid(), userRoleDto.getCrop().getCropName());
+						if (project == null) {
+							errors.reject("user.invalid.crop.program.pair",
+								new String[] {userRoleDto.getProgram().getUuid(), userRoleDto.getCrop().getCropName()}, "");
+
+						}
+					}
+				}
+			}
+			if (errors.getErrorCount() > 0) {
+				return;
+			}
+
+			// ROLES must be unique in the context they are assigned.
+			// User can have only one INSTANCE role
+			int totalInstanceRoles = 0;
+			final Set<Integer> instanceRoleIds =
+				savedRoles.stream().filter(e -> e.getRoleType().getId().equals(RoleType.INSTANCE.getId())).map(p -> p.getId())
+					.collect(Collectors.toSet());
+			for (final UserRoleDto userRoleDto : userRoles) {
+				if (instanceRoleIds.contains(userRoleDto.getRole().getId())) {
+					totalInstanceRoles++;
+				}
+			}
+			if (totalInstanceRoles > 1) {
+				errors.reject("user.can.have.one.instance.role");
+				return;
+			}
+
+			// User can have only one CROP role per CROP
+			final Map<String, Integer> cropRolesPerCropMap = new HashMap<>();
+			for (final UserRoleDto userRoleDto : userRoles) {
+				final String cropName = (userRoleDto.getCrop() != null) ? userRoleDto.getCrop().getCropName() : null;
+				if (cropName != null && userRoleDto.getProgram() == null) {
+					cropRolesPerCropMap.putIfAbsent(cropName, 0);
+					cropRolesPerCropMap.replace(cropName, cropRolesPerCropMap.get(cropName) + 1);
+				}
+			}
+			if (!cropRolesPerCropMap.values().stream().filter(p -> p > 1).collect(Collectors.toList()).isEmpty()) {
+				errors.reject("user.can.have.one.crop.role.per.crop");
+				return;
+			}
+
+			// User can have only one PROGRAM role per PROGRAM
+			final Map<String, Integer> programRolesPerProgram = new HashMap<>();
+			for (final UserRoleDto userRoleDto : userRoles) {
+				final String cropName = (userRoleDto.getCrop() != null) ? userRoleDto.getCrop().getCropName() : null;
+				final String programUUID = (userRoleDto.getProgram() != null) ? userRoleDto.getProgram().getUuid() : null;
+
+				if (cropName != null && programUUID != null) {
+					final String key = cropName.concat(programUUID);
+					programRolesPerProgram.putIfAbsent(key, 0);
+					programRolesPerProgram.replace(key, programRolesPerProgram.get(key) + 1);
+				}
+			}
+			if (!programRolesPerProgram.values().stream().filter(p -> p > 1).collect(Collectors.toList()).isEmpty()) {
+				errors.reject("user.can.have.one.program.role.per.program");
+				return;
+			}
+		}
+
+	}
     
 	protected void validateUserStatus(final Errors errors, final String fieldValue) {
 		if (null == errors.getFieldError(STATUS) && fieldValue != null && !"true".equalsIgnoreCase(fieldValue)
 				&& !"false".equalsIgnoreCase(fieldValue)) {
 			errors.rejectValue(STATUS, SIGNUP_FIELD_INVALID_STATUS);
 		}
-	}
-
-	
-	public void setSuperAdminRole(Role superAdminRole) {
-		this.superAdminRole = superAdminRole;
 	}
 
 	public void setWorkbenchDataManager(WorkbenchDataManager workbenchDataManager) {

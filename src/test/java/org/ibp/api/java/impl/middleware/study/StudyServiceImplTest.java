@@ -30,7 +30,6 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import uk.co.jemos.podam.api.PodamFactory;
@@ -44,7 +43,7 @@ public class StudyServiceImplTest {
 
 	private static final int TEST_STUDY_IDENTIFIER = 2013;
 
-	private static final int TEST_OBSERVATION_IDENTIIFER = 5;
+	private static final int TEST_OBSERVATION_IDENTIFIER = 5;
 
 	private static final String TEST_CROP_NAME = "maize";
 
@@ -55,9 +54,6 @@ public class StudyServiceImplTest {
 
 	@Mock
 	private StudyDataManager studyDataManager;
-
-	@Mock
-	private ConversionService conversionService;
 
 	@Mock
 	private SecurityService securityService;
@@ -85,7 +81,6 @@ public class StudyServiceImplTest {
 		
 		this.studyServiceImpl = new StudyServiceImpl();
 		this.studyServiceImpl.setMiddlewareStudyService(this.mockMiddlewareStudyService);
-		this.studyServiceImpl.setConversionService(this.conversionService);
 		this.studyServiceImpl.setStudyDataManager(this.studyDataManager);
 		this.studyServiceImpl.setSecurityService(this.securityService);
 		this.studyServiceImpl.setValidationUtil(new ValidationUtil());
@@ -275,11 +270,11 @@ public class StudyServiceImplTest {
 		final List<ObservationDto> observationDtoTestData = Lists.newArrayList(this.factory.manufacturePojo(ObservationDto.class));
 		Mockito.when(
 				this.mockMiddlewareStudyService.getSingleObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,
-						StudyServiceImplTest.TEST_OBSERVATION_IDENTIIFER)).thenReturn(observationDtoTestData);
+						StudyServiceImplTest.TEST_OBSERVATION_IDENTIFIER)).thenReturn(observationDtoTestData);
 
 		final Observation actualObservations =
 				this.studyServiceImpl.getSingleObservation(StudyServiceImplTest.TEST_STUDY_IDENTIFIER,
-						StudyServiceImplTest.TEST_OBSERVATION_IDENTIIFER);
+						StudyServiceImplTest.TEST_OBSERVATION_IDENTIFIER);
 
 		Assert.assertEquals(Lists.transform(observationDtoTestData, this.observationTransformFunction).get(0), actualObservations);
 

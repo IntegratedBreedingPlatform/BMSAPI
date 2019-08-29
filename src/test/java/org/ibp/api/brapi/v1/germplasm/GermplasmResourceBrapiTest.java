@@ -103,7 +103,7 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 	public void testGetSearchGermplasm() throws Exception {
 		final int gid = nextInt();
 		final String germplasmDbId = String.valueOf(gid);
-		final int requestId = 1;
+		final int searchResultsDbid = 1;
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO = new GermplasmSearchRequestDto();
 		germplasmSearchRequestDTO.setGermplasmDbIds(Lists.newArrayList(germplasmDbId));
 		final List<GermplasmDTO> list = new ArrayList<>();
@@ -111,11 +111,11 @@ public class GermplasmResourceBrapiTest extends ApiUnitTestBase {
 		germplasmDTO.setGermplasmDbId(germplasmDbId);
 		list.add(germplasmDTO);
 
-		doReturn(germplasmSearchRequestDTO).when(this.searchRequestService).getSearchRequest(requestId, GermplasmSearchRequestDto.class);
+		doReturn(germplasmSearchRequestDTO).when(this.searchRequestService).getSearchRequest(searchResultsDbid, GermplasmSearchRequestDto.class);
 		doReturn(list).when(this.germplasmService)
 			.searchGermplasmDTO(germplasmSearchRequestDTO, BrapiPagedResult.DEFAULT_PAGE_NUMBER, BrapiPagedResult.DEFAULT_PAGE_SIZE);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/search/germplasm/" + requestId)
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/maize/brapi/v1/search/germplasm/" + searchResultsDbid)
 			.contentType(this.contentType)
 			.locale(locale))
 			.andExpect(MockMvcResultMatchers.status().isOk())

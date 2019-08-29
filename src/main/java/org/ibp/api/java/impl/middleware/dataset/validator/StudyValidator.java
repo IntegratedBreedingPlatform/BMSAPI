@@ -1,10 +1,7 @@
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
-import org.apache.commons.lang3.ObjectUtils;
-import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
@@ -15,23 +12,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 
 @Component
 public class StudyValidator {
 
 	@Autowired
-	private HttpServletRequest request;
-
-	@Autowired
 	private SecurityService securityService;
 
 	@Autowired
 	private StudyDataManager studyDataManager;
-
-	@Autowired
-	private ContextUtil contextUtil;
 
 	private BindingResult errors;
 
@@ -56,7 +46,7 @@ public class StudyValidator {
 		if (shouldBeUnlocked
 			&& study.isLocked()
 			&& !study.getCreatedBy().equals(loggedInUser.getUserid().toString())
-			&& !request.isUserInRole(Role.SUPERADMIN)) {
+			&& !loggedInUser.isSuperAdmin()) {
 			errors.reject("study.is.locked", "");
 			throw new ForbiddenException(errors.getAllErrors().get(0));
 		}

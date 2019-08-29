@@ -13,7 +13,7 @@ import java.util.List;
 
 public class StudyMapper {
 
-	private static ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
+	private static final ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
 
 	private StudyMapper() {
 	}
@@ -32,7 +32,7 @@ public class StudyMapper {
 			final List<Contact> contacts = new ArrayList<>();
 			for (final UserDto userDto : context.getSource()) {
 				contacts.add(new Contact(userDto.getUserId(), userDto.getEmail(), userDto.getFirstName() + " " + userDto.getLastName(),
-						userDto.getRole().getDescription(), ""));
+					"", ""));
 			}
 			return context.getMappingEngine().map(context.create(contacts, context.getDestinationType()));
 		}

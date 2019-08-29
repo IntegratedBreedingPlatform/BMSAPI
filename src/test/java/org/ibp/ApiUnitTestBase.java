@@ -30,6 +30,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,6 +42,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -167,6 +173,7 @@ public abstract class ApiUnitTestBase {
 		MockitoAnnotations.initMocks(this);
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
 		Mockito.doReturn(new CropType(this.cropName)).when(this.workbenchDataManager).getCropTypeByName(this.cropName);
+		this.loadPreAuthorizedRole();
 	}
 
 	@After
@@ -178,5 +185,16 @@ public abstract class ApiUnitTestBase {
 		final ObjectWriter ow = this.jsonMapper.writer().withDefaultPrettyPrinter();
 		Debug.println("Request:" + ow.writeValueAsString(object));
 		return ow.writeValueAsBytes(object);
+	}
+
+	/**
+	 * This method load preAuthorized role to test services that PreAuthorize role is required.
+	 */
+	public void loadPreAuthorizedRole(){
+		final List<GrantedAuthority> authorities = new ArrayList<>();
+		authorities.add(new SimpleGrantedAuthority("ADMIN"));
+		UsernamePasswordAuthenticationToken loggedInUser =
+			new UsernamePasswordAuthenticationToken("User", "Password@##@$@%$%$#^", authorities);
+		SecurityContextHolder.getContext().setAuthentication(loggedInUser);
 	}
 }

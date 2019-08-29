@@ -10,7 +10,7 @@ import org.ibp.api.domain.program.ProgramSummary;
 
 public interface ProgramService {
 
-	List<ProgramSummary> listAllPrograms();
+	List<ProgramSummary> listProgramsByCropName(final String cropName);
 
 	List<ProgramDetailsDto> getProgramsByFilter(final int pageNumber, final int pageSize, final Map<ProgramFilters, Object> filters);
 

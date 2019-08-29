@@ -69,6 +69,7 @@ import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
+import org.generationcp.middleware.service.api.permission.PermissionServiceImpl;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -320,6 +321,12 @@ public class MiddlewareFactory {
 	@DependsOn("WORKBENCH_SessionFactory")
 	public UserService getUserService() {
 		return new UserServiceImpl(this.getWorkbenchSessionProvider());
+	}
+
+	@Bean
+	@DependsOn("WORKBENCH_SessionFactory")
+	public PermissionServiceImpl getPermissionService() {
+		return new PermissionServiceImpl(this.getWorkbenchSessionProvider());
 	}
 
 	@Bean
