@@ -12,6 +12,7 @@ logs
 studyObservations.csv
 studyObservations.tsv
 ./filename
+filename
 /temp
 
 # INTELLIJ IDEA IGNORES
