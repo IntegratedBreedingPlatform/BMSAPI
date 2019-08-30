@@ -35,6 +35,7 @@ public class CropResource {
 	public ResponseEntity<List<String>> listAvailableCrops() {
 
 		if (request.isUserInRole(PermissionsEnum.ADMIN.name())
+			|| request.isUserInRole(PermissionsEnum.ADMINISTRATION.name())
 			|| request.isUserInRole(PermissionsEnum.SITE_ADMIN.name())) {
 			return new ResponseEntity<>(
 				this.cropService.getInstalledCrops(), HttpStatus.OK);

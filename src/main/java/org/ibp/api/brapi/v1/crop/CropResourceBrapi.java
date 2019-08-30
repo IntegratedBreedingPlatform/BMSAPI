@@ -53,6 +53,7 @@ public class CropResourceBrapi {
 		cropDto.setMetadata(metadata);
 
 		if (request.isUserInRole(PermissionsEnum.ADMIN.name())
+			|| request.isUserInRole(PermissionsEnum.ADMINISTRATION.name())
 			|| request.isUserInRole(PermissionsEnum.SITE_ADMIN.name())) {
 			cropDto.setResult(new Result<>(this.cropService.getInstalledCrops()));
 		} else {
