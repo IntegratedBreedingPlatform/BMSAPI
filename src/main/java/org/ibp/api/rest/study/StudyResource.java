@@ -4,11 +4,9 @@ package org.ibp.api.rest.study;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.ObjectUtils;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.study.FieldMap;
@@ -44,6 +42,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Api(value = "Study Services")
 @Controller
@@ -154,8 +153,8 @@ public class StudyResource {
 			final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 
 			if (study != null && study.getIsLocked()
-				&& !ObjectUtils.equals(study.getOwnerId(), loggedInUser.getUserid())
-				&& !request.isUserInRole(Role.SUPERADMIN)) {
+				&& !Objects.equals(study.getOwnerId(), loggedInUser.getUserid())
+				&& !loggedInUser.isSuperAdmin()) {
 				throw new IllegalArgumentException(
 						this.resourceBundleMessageSource.getMessage(NO_PERMISSION_FOR_LOCKED_STUDY,  new String[] {study.getOwnerName()}, LocaleContextHolder.getLocale()));
 			}
@@ -173,8 +172,8 @@ public class StudyResource {
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 
 		if (study.getIsLocked()
-			&& !ObjectUtils.equals(study.getOwnerId(), loggedInUser.getUserid())
-			&& !request.isUserInRole(Role.SUPERADMIN)) {
+			&& !Objects.equals(study.getOwnerId(), loggedInUser.getUserid())
+			&& !loggedInUser.isSuperAdmin()) {
 			throw new IllegalArgumentException(
 					this.resourceBundleMessageSource.getMessage(NO_PERMISSION_FOR_LOCKED_STUDY, new String[] {study.getOwnerName()}, LocaleContextHolder.getLocale()));
 		}

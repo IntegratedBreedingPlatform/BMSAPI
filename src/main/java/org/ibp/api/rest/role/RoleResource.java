@@ -20,7 +20,7 @@ import java.util.List;
 
 @RestController
 @Controller
-@PreAuthorize("hasAnyAuthority('ADMIN','SITE_ADMIN')")
+@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN')")
 public class RoleResource {
 
 	@Autowired
