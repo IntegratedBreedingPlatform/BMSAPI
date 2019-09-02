@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.core.Is.is;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserValidatorTest {
@@ -55,6 +56,18 @@ public class UserValidatorTest {
 	@After
 	public void validate() {
 		Mockito.validateMockitoUsage();
+	}
+
+	@Test
+	public void testValidateUsername() {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "User");
+		final UserDetailDto userDto = new UserDetailDto();
+		userDto.setUsername("[]%&");
+		userDto.setUserRoles(new ArrayList<>());
+
+		this.uservalidator.validate(userDto, errors, true);
+
+		assertThat(errors.getFieldError("username").getCode(), is("user.invalid.username"));
 	}
 
 	/**
