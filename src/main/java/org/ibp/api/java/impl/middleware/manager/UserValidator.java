@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.manager;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -8,6 +9,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
+import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.domain.user.UserDetailDto;
@@ -45,9 +47,9 @@ public class UserValidator implements Validator {
 	 * TODO move to properties
 	 *  See {@link org.ibp.api.java.impl.middleware.user.UserServiceImpl}
 	 */
-	public static final String USER_AUTO_DEACTIVATION = "A user cannot be auto-deactivated";
-	public static final String CANNOT_UPDATE_SUPERADMIN = "Updating this user is not allowed";
-	public static final String CANNOT_REMOVE_CROP = "site.admin.crops.user.in.program";
+	public static final String USER_AUTO_DEACTIVATION = "users.user.can.not.be.deactivated";
+	public static final String CANNOT_UPDATE_SUPERADMIN = "users.update.superadmin.not.allowed";
+	public static final String CANNOT_UPDATE_PERSON_MULTIPLE_USERS = "users.can.not.be.edited.multiple.persons";
 
 	public static final String DATABASE_ERROR = "database.error";
 
@@ -128,7 +130,14 @@ public class UserValidator implements Validator {
 				if (userUpdate.isSuperAdmin()) {
 					errors.reject(CANNOT_UPDATE_SUPERADMIN);
 				}
-				
+
+				//If person entity is associated to more than one user, block user edition
+				//Temporary validation, it should be removed when we unify persons and users
+				final List<UserDto> usersWithSamePersonId = this.userService.getUsersByPersonIds(Lists.newArrayList(userUpdate.getPerson().getId()));
+				if (usersWithSamePersonId.size()>1) {
+					errors.reject(CANNOT_UPDATE_PERSON_MULTIPLE_USERS);
+				}
+
 				final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 				// TODO change frontend status type to integer
 				if (loggedInUser.equals(userUpdate) && "false".equals(user.getStatus())) {
