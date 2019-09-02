@@ -29,10 +29,13 @@ import java.util.stream.Collectors;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserValidatorTest {
+
+	public static final String OBJECT_NAME = "User";
 
 	@InjectMocks
 	private UserValidator uservalidator;
@@ -60,13 +63,32 @@ public class UserValidatorTest {
 
 	@Test
 	public void testValidateUsername() {
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "User");
+		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
 		final UserDetailDto userDto = new UserDetailDto();
 		userDto.setUsername("[]%&");
 		userDto.setUserRoles(new ArrayList<>());
 
 		this.uservalidator.validate(userDto, errors, true);
+		assertThat(errors.getFieldError("username").getCode(), is("user.invalid.username"));
 
+		errors = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
+		userDto.setUsername("user-name");
+		this.uservalidator.validate(userDto, errors, true);
+		assertThat(errors.getFieldError("username"), nullValue());
+
+		errors = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
+		userDto.setUsername("user.name");
+		this.uservalidator.validate(userDto, errors, true);
+		assertThat(errors.getFieldError("username"), nullValue());
+
+		errors = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
+		userDto.setUsername("user_name.company");
+		this.uservalidator.validate(userDto, errors, true);
+		assertThat(errors.getFieldError("username"), nullValue());
+
+		errors = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
+		userDto.setUsername("user_name.company.");
+		this.uservalidator.validate(userDto, errors, true);
 		assertThat(errors.getFieldError("username").getCode(), is("user.invalid.username"));
 	}
 
@@ -75,7 +97,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void testValidateFieldLength() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
 		final UserDetailDto userDto = new UserDetailDto();
 
 		userDto.setLastName("zxcvbnmaaskjhdfsgeeqwfsafsafg6tk6kglkugt8oljhhlly11");
@@ -98,7 +120,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void testValidateEmail() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto(10, new CropType("wheat"));
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleAdmin());
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
@@ -136,7 +158,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void testValidateUserId() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto(777, new CropType("wheat"));
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
 		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(UserTestDataGenerator.initializeUserRoleAdmin()));
@@ -152,7 +174,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void testValidateUserIdInexistent() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto(10, new CropType("wheat"));
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
 		Mockito.when(this.workbenchDataManager.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(UserTestDataGenerator.initializeUserRoleAdmin()));
@@ -168,7 +190,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void testValidateStatus() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
 		final UserDetailDto userDto =
 			UserTestDataGenerator.initializeUserDetailDto(20, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20, UserTestDataGenerator.initializeUserRoleAdmin());
@@ -191,7 +213,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void testValidateUserAndPeronalEmailExists() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
 		final UserDetailDto userDto =
 			UserTestDataGenerator.initializeUserDetailDto(20, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20, UserTestDataGenerator.initializeUserRoleAdmin());
@@ -212,7 +234,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void testValidateUpdateUser() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20, UserTestDataGenerator.initializeUserRoleAdmin());
 
@@ -236,7 +258,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void testValidateUpdateUserEmailExists() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleAdmin());
 
@@ -262,7 +284,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void testValidateUpdateUserUsernameExists() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleAdmin());
 		user.setName("Nahuel");
@@ -287,7 +309,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void testValidateUpdateUserForExistingSuperAdminUser() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(1, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoSuperAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20,UserTestDataGenerator.initializeUserRoleSuperAdmin());
 
@@ -309,7 +331,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void testValidateCreateUser() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(0, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(0,UserTestDataGenerator.initializeUserRoleAdmin());
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
@@ -321,7 +343,7 @@ public class UserValidatorTest {
 
 	@Test
 	public void testValidateUserCannotAutoDeactivate() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20, UserTestDataGenerator.initializeUserRoleAdmin());
 
@@ -340,7 +362,7 @@ public class UserValidatorTest {
 
 	@Test
 	public void testValidateSuperAdminUserCannotAssignable() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoSuperAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleSuperAdmin());
 
@@ -358,7 +380,7 @@ public class UserValidatorTest {
 
 	@Test
 	public void testValidateUserInvalidRole() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleAdmin());
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
@@ -372,7 +394,7 @@ public class UserValidatorTest {
 
 	@Test
 	public void testValidateUserCropNotAssociated() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoBreeder(new CropDto(new CropType("maize"))));
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleBreeder());
 
@@ -391,7 +413,7 @@ public class UserValidatorTest {
 
 	@Test
 	public void testValidateUserCropNotExists() {
-		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "User");
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), OBJECT_NAME);
 		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("bean"), UserTestDataGenerator.initializeUserRoleDtoBreeder(new CropDto(new CropType("bean"))));
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleBreeder());
 

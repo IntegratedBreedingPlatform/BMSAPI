@@ -66,10 +66,10 @@ public class UserValidator implements Validator {
 	public static final String STATUS = "status";
 	public static final String USER_ID = "userId";
 
-	private static final String EMAIL_PATTERN =
-			"^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-
-	private static final Pattern USERNAME_PATTERN = Pattern.compile("[A-Za-z0-9-/_*():.]+");
+	public static final String EMAIL_LOCAL_PART_REGEX = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*";
+	private static final Pattern USERNAME_PATTERN = Pattern.compile(EMAIL_LOCAL_PART_REGEX);
+	private static final String EMAIL_REGEX = EMAIL_LOCAL_PART_REGEX
+				+ "@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
 
 	@Autowired
 	protected WorkbenchDataManager workbenchDataManager;
@@ -163,7 +163,7 @@ public class UserValidator implements Validator {
 	}
 
 	protected void validateEmailFormat(final Errors errors, final String eMail) {
-		if (null == errors.getFieldError(EMAIL) && null != eMail && !Pattern.compile(EMAIL_PATTERN).matcher(eMail).matches()) {
+		if (null == errors.getFieldError(EMAIL) && null != eMail && !Pattern.compile(EMAIL_REGEX).matcher(eMail).matches()) {
 			errors.rejectValue(EMAIL, SIGNUP_FIELD_INVALID_EMAIL_FORMAT);
 		}
 	}
