@@ -26,7 +26,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -161,7 +161,7 @@ public abstract class AbstractDatasetExportService {
 	}
 
 	Map<Integer, StudyInstance> getSelectedDatasetInstancesMap(final List<StudyInstance> studyInstances, final Set<Integer> instanceIds) {
-		final Map<Integer, StudyInstance> studyInstanceMap = new HashMap<>();
+		final Map<Integer, StudyInstance> studyInstanceMap = new LinkedHashMap<>();
 		for (final StudyInstance studyInstance : studyInstances) {
 			if (instanceIds.contains(studyInstance.getInstanceDbId())) {
 				studyInstanceMap.put(studyInstance.getInstanceDbId(), studyInstance);
