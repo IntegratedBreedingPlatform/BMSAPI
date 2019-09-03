@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -87,7 +88,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Autowired
 	private DatasetTypeService datasetTypeService;
 
-	private static String PLOT_DATASET_NAME = "Observations";
+	private static final String PLOT_DATASET_NAME = "Observations";
 
 	@Override
 	public List<MeasurementVariable> getObservationSetColumns(
@@ -281,7 +282,7 @@ public class DatasetServiceImpl implements DatasetService {
 			this.middlewareDatasetService.getInstanceIdToObservationUnitRowsMap(studyId, datasetId, instanceIds);
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-		final Map<Integer, List<ObservationUnitRow>> map = new HashMap<>();
+		final Map<Integer, List<ObservationUnitRow>> map = new LinkedHashMap<>();
 		for (final Integer instanceNumber : observationUnitRowsMap.keySet()) {
 			final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
 				observationUnitRowsMap.get(instanceNumber);
