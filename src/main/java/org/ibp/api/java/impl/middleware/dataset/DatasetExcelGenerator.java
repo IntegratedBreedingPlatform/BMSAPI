@@ -121,24 +121,20 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		throw new UnsupportedOperationException();
 	}
 
-	private List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns) {
+	List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns) {
 		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
 		final List<MeasurementVariable> trait = new ArrayList<>();
 		final List<MeasurementVariable> selection = new ArrayList<>();
-		final List<Integer> discardColumns =
-			Arrays.asList(TermId.REP_NO.getId(), TermId.ROW.getId(), TermId.BLOCK_NO.getId(), TermId.COL.getId());
 
 		for (final MeasurementVariable measurementVariable : columns) {
 			if (TermId.OBS_UNIT_ID.getId() == measurementVariable.getTermId()) {
 				orderedColumns.add(0, measurementVariable);
-			} else if (!discardColumns.contains(measurementVariable.getTermId())) {
-				if (VariableType.TRAIT.getId().equals(measurementVariable.getVariableType().getId())) {
-					trait.add(measurementVariable);
-				} else if (VariableType.SELECTION_METHOD.getId().equals(measurementVariable.getVariableType().getId())) {
-					selection.add(measurementVariable);
-				} else {
-					orderedColumns.add(measurementVariable);
-				}
+			} else if (VariableType.TRAIT.getId().equals(measurementVariable.getVariableType().getId())) {
+				trait.add(measurementVariable);
+			} else if (VariableType.SELECTION_METHOD.getId().equals(measurementVariable.getVariableType().getId())) {
+				selection.add(measurementVariable);
+			} else {
+				orderedColumns.add(measurementVariable);
 			}
 		}
 

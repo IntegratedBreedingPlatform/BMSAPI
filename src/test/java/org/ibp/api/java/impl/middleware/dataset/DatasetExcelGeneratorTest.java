@@ -302,4 +302,39 @@ public class DatasetExcelGeneratorTest {
 		Assert.assertEquals(studyConditionValue, result.get(0).getValue());
 
 	}
+
+	@Test
+	public void testOrderColumns() {
+		final List<MeasurementVariable> columns = new ArrayList<>();
+		final MeasurementVariable selectionVariable = new MeasurementVariable();
+		selectionVariable.setTermId(1003);
+		selectionVariable.setVariableType(VariableType.SELECTION_METHOD);
+		selectionVariable.setName("SELECTION");
+		columns.add(selectionVariable);
+
+		final MeasurementVariable traitVariable = new MeasurementVariable();
+		traitVariable.setTermId(1002);
+		traitVariable.setVariableType(VariableType.TRAIT);
+		traitVariable.setName("TRAIT");
+		columns.add(traitVariable);
+
+		final MeasurementVariable studyConditionVariable = new MeasurementVariable();
+		studyConditionVariable.setTermId(1001);
+		studyConditionVariable.setVariableType(VariableType.STUDY_CONDITION);
+		studyConditionVariable.setName("CONDITION");
+		columns.add(studyConditionVariable);
+
+		final MeasurementVariable observationUnitVariable = new MeasurementVariable();
+		observationUnitVariable.setTermId(TermId.OBS_UNIT_ID.getId());
+		observationUnitVariable.setVariableType(VariableType.GERMPLASM_DESCRIPTOR);
+		observationUnitVariable.setName("OBS_UNIT");
+		columns.add(observationUnitVariable);
+
+		final List<MeasurementVariable> orderedColumns = this.datasetExcelGenerator.orderColumns(columns);
+		Assert.assertEquals(observationUnitVariable, orderedColumns.get(0));
+		Assert.assertEquals(studyConditionVariable, orderedColumns.get(1));
+		Assert.assertEquals(traitVariable, orderedColumns.get(2));
+		Assert.assertEquals(selectionVariable, orderedColumns.get(3));
+
+	}
 }
