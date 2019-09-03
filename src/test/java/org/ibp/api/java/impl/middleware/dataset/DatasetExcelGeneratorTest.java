@@ -14,7 +14,6 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetService;
@@ -46,23 +45,23 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DatasetExcelGeneratorTest {
 
-	public static final int INSTANCE_DB_ID = 1;
+	private static final int INSTANCE_DB_ID = 1;
 	private static final Integer STUDY_ID = 1;
 	private static final Integer ENVIRONMENT_DATASET_ID = 1;
 	private static final Integer PLOT_DATASET_ID = 1;
-	public static final String STUDY_DETAIL_TEST = "StudyDetailTest";
-	public static final String EXPERIMENTAL_DESIGN_TEST = "ExperimentalDesignTest";
-	public static final String ENVIRONMENTAL_DETAILS_TEST = "EnvironmentalDesignTest";
-	public static final String ENVIRONMENTAL_CONDITIONS_TEST = "EnvironmentalConditionsTest";
-	public static final String GERMPLASM_DESCRIPTORS_TEST = "GermplasmDescriptorsTest";
-	public static final String OBSERVATION_UNIT_TEST = "ObservationUnitTest";
-	public static final String TRAITS_TEST = "TraitsTest";
-	public static final String SELECTION_TEST = "SelectionTest";
+	private static final String STUDY_DETAIL_TEST = "StudyDetailTest";
+	private static final String EXPERIMENTAL_DESIGN_TEST = "ExperimentalDesignTest";
+	private static final String ENVIRONMENTAL_DETAILS_TEST = "EnvironmentalDesignTest";
+	private static final String ENVIRONMENTAL_CONDITIONS_TEST = "EnvironmentalConditionsTest";
+	private static final String GERMPLASM_DESCRIPTORS_TEST = "GermplasmDescriptorsTest";
+	private static final String OBSERVATION_UNIT_TEST = "ObservationUnitTest";
+	private static final String TRAITS_TEST = "TraitsTest";
+	private static final String SELECTION_TEST = "SelectionTest";
 	private static final String VARIABLE_NAME_1 = "VARIABLE_NAME_1";
 	private static final String VARIABLE_NAME_2 = "VARIABLE_NAME_2";
 	private static final String VARIABLE_VALUE_1 = "VARIABLE_VALUE_1";
 	private static final String VARIABLE_VALUE_2 = "VARIABLE_VALUE_2";
-	public static final int valueIndex = 7;
+	private static final int valueIndex = 7;
 
 	private List<ObservationUnitRow> observationUnitRows;
 
@@ -141,23 +140,23 @@ public class DatasetExcelGeneratorTest {
 		final StudyDetails studyDetails = new StudyDetails();
 		studyDetails.setStudyType(StudyTypeDto.getTrialDto());
 		final ObservationUnitData observationUnitData1 = new ObservationUnitData();
-		observationUnitData1.setValue(this.VARIABLE_VALUE_1);
+		observationUnitData1.setValue(DatasetExcelGeneratorTest.VARIABLE_VALUE_1);
 		final ObservationUnitData observationUnitData2 = new ObservationUnitData();
-		observationUnitData2.setValue(this.VARIABLE_VALUE_2);
+		observationUnitData2.setValue(DatasetExcelGeneratorTest.VARIABLE_VALUE_2);
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		final Map<String, ObservationUnitData> variables = new HashMap<>();
-		variables.put(this.VARIABLE_NAME_1, observationUnitData1);
-		variables.put(this.VARIABLE_NAME_2, observationUnitData2);
+		variables.put(DatasetExcelGeneratorTest.VARIABLE_NAME_1, observationUnitData1);
+		variables.put(DatasetExcelGeneratorTest.VARIABLE_NAME_2, observationUnitData2);
 		observationUnitRow.setVariables(variables);
 		this.observationUnitRows = Arrays.asList(observationUnitRow);
 
 		final MeasurementVariable measurementVariable1 = new MeasurementVariable();
-		measurementVariable1.setAlias(this.VARIABLE_NAME_1);
-		measurementVariable1.setName(this.VARIABLE_NAME_1);
+		measurementVariable1.setAlias(DatasetExcelGeneratorTest.VARIABLE_NAME_1);
+		measurementVariable1.setName(DatasetExcelGeneratorTest.VARIABLE_NAME_1);
 		measurementVariable1.setVariableType(VariableType.TRAIT);
 		final MeasurementVariable measurementVariable2 = new MeasurementVariable();
-		measurementVariable2.setAlias(this.VARIABLE_NAME_2);
-		measurementVariable2.setName(this.VARIABLE_NAME_2);
+		measurementVariable2.setAlias(DatasetExcelGeneratorTest.VARIABLE_NAME_2);
+		measurementVariable2.setName(DatasetExcelGeneratorTest.VARIABLE_NAME_2);
 		measurementVariable2.setVariableType(VariableType.TRAIT);
 		this.measurementVariables = Arrays.asList(measurementVariable1, measurementVariable2);
 
@@ -199,8 +198,8 @@ public class DatasetExcelGeneratorTest {
 		datasetDTO.setParentDatasetId(INSTANCE_DB_ID);
 		final File
 			file = this.datasetExcelGenerator
-			.generateSingleInstanceFile(DatasetExcelGeneratorTest.STUDY_ID, datasetDTO, new ArrayList<MeasurementVariable>(),
-				new ArrayList<ObservationUnitRow>(), filename, studyInstance);
+			.generateSingleInstanceFile(DatasetExcelGeneratorTest.STUDY_ID, datasetDTO, new ArrayList<>(),
+				new ArrayList<>(), filename, studyInstance);
 		Assert.assertEquals(filename, file.getName());
 		Mockito.verify(this.studyDataManager).getStudyDetails(INSTANCE_DB_ID);
 		Mockito.verify(this.datasetService)
@@ -222,7 +221,7 @@ public class DatasetExcelGeneratorTest {
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
-	public void testGenerateMultiInstanceFile() throws IOException {
+	public void testGenerateMultiInstanceFile() {
 		final String filename = "filename";
 		final StudyInstance studyInstance = new StudyInstance();
 		studyInstance.setInstanceDbId(INSTANCE_DB_ID);
@@ -231,7 +230,7 @@ public class DatasetExcelGeneratorTest {
 		datasetDTO.setDatasetId(INSTANCE_DB_ID);
 		datasetDTO.setParentDatasetId(INSTANCE_DB_ID);
 		this.datasetExcelGenerator
-			.generateMultiInstanceFile(new HashMap<Integer, List<ObservationUnitRow>>(), new ArrayList<MeasurementVariable>(), filename);
+			.generateMultiInstanceFile(new HashMap<>(), new ArrayList<>(), filename);
 	}
 
 	@Test

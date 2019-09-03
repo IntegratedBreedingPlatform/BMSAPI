@@ -43,7 +43,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -112,7 +111,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	@Override
 	public File generateMultiInstanceFile(
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
-		final String fileNameFullPath) throws IOException {
+		final String fileNameFullPath) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -171,7 +170,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 					.isEmpty() && column.getTermId() != TermId.BREEDING_METHOD_VARIATE.getId()
 					&& column.getTermId() != TermId.BREEDING_METHOD_VARIATE_CODE.getId() && !column.getProperty()
 					.equals(DatasetExcelGenerator.BREEDING_METHOD_PROPERTY_NAME)) {
-					cell.setCellValue(this.getCategoricalCellValue(dataCell, column.getPossibleValues()));
+					cell.setCellValue(DatasetExcelGenerator.getCategoricalCellValue(dataCell, column.getPossibleValues()));
 				} else if (DatasetExcelGenerator.NUMERIC_DATA_TYPE.equalsIgnoreCase(column.getDataType())) {
 					if (!dataCell.isEmpty() && NumberUtils.isNumber(dataCell)) {
 						cell.setCellType(CellType.BLANK);
@@ -386,7 +385,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		return environmentDetails;
 	}
 
-	protected List<MeasurementVariable> getEnvironmentalConditions(
+	List<MeasurementVariable> getEnvironmentalConditions(
 		final int environmentDatasetId, final List<MeasurementVariable> environmentVariables, final StudyInstance instance) {
 		final List<MeasurementVariable> environmentConditions =
 			filterByVariableType(environmentVariables, VariableType.STUDY_CONDITION);
@@ -588,7 +587,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			}
 		}
 		// just in case an id was passed, but this won't be the case most of the time
-		if (idValue != null && NumberUtils.isNumber(idValue)) {
+		if (NumberUtils.isNumber(idValue)) {
 			for (final ValueReference ref : possibleValues) {
 				// Needs to convert to double to facilitate retrieving decimal value from categorical values
 				if (Double.valueOf(ref.getId()).equals(Double.valueOf(idValue))) {
@@ -610,7 +609,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		}
 	}
 
-	protected String convertPossibleValuesToString(final List<ValueReference> possibleValues, final String delimiter) {
+	private String convertPossibleValuesToString(final List<ValueReference> possibleValues, final String delimiter) {
 
 		if(possibleValues == null){
 			return "";
@@ -671,7 +670,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		return Lists.newArrayList(variablesByType);
 	}
 
-	protected void setMessageSource(final ResourceBundleMessageSource messageSource) {
+	void setMessageSource(final ResourceBundleMessageSource messageSource) {
 		this.messageSource = messageSource;
 	}
 }
