@@ -227,7 +227,7 @@ public class StudyResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testListStudyInstances() throws Exception {
 
-		final StudyInstance studyInstance = new StudyInstance(1, "Gujarat, India", "GUJ", 1, "", true);
+		final StudyInstance studyInstance = new StudyInstance(1, 1, "Gujarat, India", "GUJ", 1, "", true);
 		Mockito.when(this.studyServiceMW.getStudyInstances(org.mockito.Matchers.anyInt()))
 				.thenReturn(Lists.newArrayList(studyInstance));
 

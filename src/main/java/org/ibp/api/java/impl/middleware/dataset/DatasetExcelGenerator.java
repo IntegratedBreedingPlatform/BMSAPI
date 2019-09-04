@@ -15,9 +15,11 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FillPatternType;
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
@@ -25,7 +27,9 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
@@ -47,6 +51,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 
@@ -84,6 +89,15 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	@Resource
 	private DatasetTypeService datasetTypeService;
+
+	@Resource
+	private LocationDataManager locationDataManager;
+
+	@Resource
+	private FieldbookService fieldbookService;
+
+	@Autowired
+	private ContextUtil contextUtil;
 
 	@Override
 	public File generateSingleInstanceFile(
@@ -238,7 +252,8 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final List<MeasurementVariable> studyDetailsVariables =
 			this.datasetService.getMeasurementVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
-		final int environmentDatasetId = this.studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getId();
+		final int environmentDatasetId =
+			this.studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getId();
 		final int plotDatasetId;
 		if (dataSetDto.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			plotDatasetId = dataSetDto.getDatasetId();
@@ -371,22 +386,32 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			filterByVariableType(environmentVariables, VariableType.ENVIRONMENT_DETAIL);
 		final Map<Integer, String> geoLocationMap =
 			this.studyDataManager.getGeolocationByVariableId(environmentDatasetId, instance.getInstanceDbId());
-		for (final MeasurementVariable variable : environmentDetails) {
-			switch (variable.getTermId()) {
+
+		final ListIterator<MeasurementVariable> iterator = environmentDetails.listIterator();
+		while (iterator.hasNext()) {
+			final MeasurementVariable measurementVariable = iterator.next();
+			switch (measurementVariable.getTermId()) {
 				case 8170:
-					variable.setValue(String.valueOf(instance.getInstanceNumber()));
+					measurementVariable.setValue(String.valueOf(instance.getInstanceNumber()));
 					break;
 				case 8190:
-					variable.setValue(String.valueOf(instance.getLocationName()));
+					// Automatically add TRIAL_LOCATION (LOCATION_NAME) variable to environment details. So that both LOCATION_ID abd LOCATION_NAME variables are written
+					// in Description sheet of Exported Dataset Excel file.
+					iterator.add(this.createLocationNameVariable(measurementVariable.getAlias(), instance.getLocationName()));
+
+					// Rename the LOCATION_ID variable appropriately
+					measurementVariable.setAlias(TermId.LOCATION_ID.name());
+					measurementVariable.setValue(String.valueOf(instance.getLocationId()));
 					break;
 				default:
-					final String keyValue = geoLocationMap.get(variable.getTermId());
-					if (StringUtils.isBlank(variable.getValue()) && StringUtils.isNotBlank(keyValue)) {
-						variable.setValue(keyValue);
+					final String keyValue = geoLocationMap.get(measurementVariable.getTermId());
+					if (StringUtils.isBlank(measurementVariable.getValue()) && StringUtils.isNotBlank(keyValue)) {
+						measurementVariable.setValue(keyValue);
 					}
-					break;
 			}
+
 		}
+
 		return environmentDetails;
 	}
 
@@ -616,7 +641,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	protected String convertPossibleValuesToString(final List<ValueReference> possibleValues, final String delimiter) {
 
-		if(possibleValues == null){
+		if (possibleValues == null) {
 			return "";
 		}
 
@@ -673,6 +698,26 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			}
 		});
 		return Lists.newArrayList(variablesByType);
+	}
+
+	private MeasurementVariable createLocationNameVariable(final String variableAlias, final String locationName) {
+		final MeasurementVariable locationNameVariable = new MeasurementVariable();
+		final StandardVariable standardVariable =
+			this.fieldbookService.getStandardVariable(TermId.TRIAL_LOCATION.getId(), this.contextUtil.getCurrentProgramUUID());
+		locationNameVariable.setAlias(variableAlias);
+		locationNameVariable.setName(standardVariable.getName());
+		locationNameVariable.setDescription(standardVariable.getDescription());
+		locationNameVariable.setProperty(standardVariable.getProperty().getName());
+		locationNameVariable.setScale(standardVariable.getScale().getName());
+		locationNameVariable.setMethod(standardVariable.getMethod().getName());
+		locationNameVariable.setDataType(standardVariable.getDataType().getName());
+		locationNameVariable.setDataTypeId(standardVariable.getDataType().getId());
+		locationNameVariable.setValue(locationName);
+		locationNameVariable.setLabel(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0));
+		locationNameVariable.setTermId(TermId.TRIAL_LOCATION.getId());
+		locationNameVariable.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
+		locationNameVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		return locationNameVariable;
 	}
 
 	protected void setMessageSource(final ResourceBundleMessageSource messageSource) {
