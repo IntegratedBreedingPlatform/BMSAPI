@@ -4,9 +4,13 @@ import com.google.common.collect.Lists;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -14,12 +18,12 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -78,8 +83,16 @@ public class DatasetExcelGeneratorTest {
 	@Mock
 	private DatasetTypeService datasetTypeService;
 
+	@Mock
+	private FieldbookService fieldbookService;
+
+	@Mock
+	private ContextUtil contextUtil;
+
 	@InjectMocks
 	private DatasetExcelGenerator datasetExcelGenerator;
+
+	private Random random = new Random();
 
 	@Before
 	public void setUp() {
@@ -200,7 +213,7 @@ public class DatasetExcelGeneratorTest {
 			file = this.datasetExcelGenerator
 			.generateSingleInstanceFile(DatasetExcelGeneratorTest.STUDY_ID, datasetDTO, new ArrayList<>(),
 				new ArrayList<>(), filename, studyInstance);
-		Assert.assertEquals(filename, file.getName());
+		assertEquals(filename, file.getName());
 		Mockito.verify(this.studyDataManager).getStudyDetails(INSTANCE_DB_ID);
 		Mockito.verify(this.datasetService)
 			.getMeasurementVariables(DatasetExcelGeneratorTest.STUDY_ID, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
@@ -252,18 +265,18 @@ public class DatasetExcelGeneratorTest {
 		final Workbook workbook = new HSSFWorkbook(inputStream);
 		final Sheet descriptionSheet = workbook.getSheetAt(0);
 		final Sheet observationSheet = workbook.getSheetAt(1);
-		Assert.assertEquals(STUDY_DETAIL_TEST, descriptionSheet.getRow(8).getCell(valueIndex).getStringCellValue());
-		Assert.assertEquals(EXPERIMENTAL_DESIGN_TEST, descriptionSheet.getRow(11).getCell(valueIndex).getStringCellValue());
-		Assert.assertEquals(ENVIRONMENTAL_DETAILS_TEST, descriptionSheet.getRow(14).getCell(valueIndex).getStringCellValue());
-		Assert.assertEquals(ENVIRONMENTAL_CONDITIONS_TEST, descriptionSheet.getRow(17).getCell(valueIndex).getStringCellValue());
-		Assert.assertEquals(GERMPLASM_DESCRIPTORS_TEST, descriptionSheet.getRow(20).getCell(valueIndex).getStringCellValue());
-		Assert.assertEquals(OBSERVATION_UNIT_TEST, descriptionSheet.getRow(23).getCell(valueIndex).getStringCellValue());
-		Assert.assertEquals(TRAITS_TEST, descriptionSheet.getRow(26).getCell(valueIndex).getStringCellValue());
-		Assert.assertEquals(SELECTION_TEST, descriptionSheet.getRow(29).getCell(valueIndex).getStringCellValue());
-		Assert.assertEquals(VARIABLE_NAME_1, observationSheet.getRow(0).getCell(0).getStringCellValue());
-		Assert.assertEquals(VARIABLE_NAME_2, observationSheet.getRow(0).getCell(1).getStringCellValue());
-		Assert.assertEquals(VARIABLE_VALUE_1, observationSheet.getRow(1).getCell(0).getStringCellValue());
-		Assert.assertEquals(VARIABLE_VALUE_2, observationSheet.getRow(1).getCell(1).getStringCellValue());
+		assertEquals(STUDY_DETAIL_TEST, descriptionSheet.getRow(8).getCell(valueIndex).getStringCellValue());
+		assertEquals(EXPERIMENTAL_DESIGN_TEST, descriptionSheet.getRow(11).getCell(valueIndex).getStringCellValue());
+		assertEquals(ENVIRONMENTAL_DETAILS_TEST, descriptionSheet.getRow(14).getCell(valueIndex).getStringCellValue());
+		assertEquals(ENVIRONMENTAL_CONDITIONS_TEST, descriptionSheet.getRow(17).getCell(valueIndex).getStringCellValue());
+		assertEquals(GERMPLASM_DESCRIPTORS_TEST, descriptionSheet.getRow(20).getCell(valueIndex).getStringCellValue());
+		assertEquals(OBSERVATION_UNIT_TEST, descriptionSheet.getRow(23).getCell(valueIndex).getStringCellValue());
+		assertEquals(TRAITS_TEST, descriptionSheet.getRow(26).getCell(valueIndex).getStringCellValue());
+		assertEquals(SELECTION_TEST, descriptionSheet.getRow(29).getCell(valueIndex).getStringCellValue());
+		assertEquals(VARIABLE_NAME_1, observationSheet.getRow(0).getCell(0).getStringCellValue());
+		assertEquals(VARIABLE_NAME_2, observationSheet.getRow(0).getCell(1).getStringCellValue());
+		assertEquals(VARIABLE_VALUE_1, observationSheet.getRow(1).getCell(0).getStringCellValue());
+		assertEquals(VARIABLE_VALUE_2, observationSheet.getRow(1).getCell(1).getStringCellValue());
 	}
 
 	@Test
@@ -296,9 +309,91 @@ public class DatasetExcelGeneratorTest {
 
 		final List<MeasurementVariable> result =
 			this.datasetExcelGenerator.getEnvironmentalConditions(environmentDatasetId, environmentVariables, studyInstance);
-		Assert.assertEquals(1, result.size());
-		Assert.assertEquals(studyConditionTermid, result.get(0).getTermId());
-		Assert.assertEquals(studyConditionValue, result.get(0).getValue());
+		assertEquals(1, result.size());
+		assertEquals(studyConditionTermid, result.get(0).getTermId());
+		assertEquals(studyConditionValue, result.get(0).getValue());
+
+	}
+
+	@Test
+	public void testGetEnvironmentalDetails() {
+
+		final int environmentDatasetId = this.random.nextInt();
+		final int instanceNumber = this.random.nextInt();
+		final int instanceDbId = this.random.nextInt();
+		final int locationId = this.random.nextInt();
+		final String locationName = "Some Location";
+		final StudyInstance studyInstance = new StudyInstance();
+		studyInstance.setLocationId(locationId);
+		studyInstance.setLocationName(locationName);
+		studyInstance.setInstanceNumber(instanceNumber);
+		studyInstance.setInstanceDbId(instanceDbId);
+
+		final MeasurementVariable trialInstanceVariable = new MeasurementVariable();
+		trialInstanceVariable.setTermId(TermId.TRIAL_INSTANCE_FACTOR.getId());
+		trialInstanceVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		trialInstanceVariable.setName("TRIAL_INSTANCE");
+
+		final MeasurementVariable locationVariable = new MeasurementVariable();
+		locationVariable.setTermId(TermId.LOCATION_ID.getId());
+		locationVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		locationVariable.setName(TermId.LOCATION_ID.name());
+		locationVariable.setAlias("LOCATION_NAME");
+
+		final int someVariableTermId = this.random.nextInt();
+		final String someVariableValue = "Value";
+		final MeasurementVariable someVariable = new MeasurementVariable();
+		someVariable.setTermId(someVariableTermId);
+		someVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		someVariable.setName("SomeVariable");
+
+		final StandardVariable standardVariable =
+			StandardVariableTestDataInitializer.createStandardVariable(TermId.TRIAL_LOCATION.getId(), "LOCATION_NAME");
+		when(this.fieldbookService.getStandardVariable(TermId.TRIAL_LOCATION.getId(), this.contextUtil.getCurrentProgramUUID()))
+			.thenReturn(standardVariable);
+		final Map<Integer, String> geoLocationMap = new HashMap<>();
+		geoLocationMap.put(someVariableTermId, someVariableValue);
+		when(this.studyDataManager.getGeolocationByVariableId(environmentDatasetId, studyInstance.getInstanceDbId()))
+			.thenReturn(geoLocationMap);
+
+		final List<MeasurementVariable> result =
+			this.datasetExcelGenerator
+				.getEnvironmentalDetails(environmentDatasetId, Arrays.asList(trialInstanceVariable, locationVariable, someVariable),
+					studyInstance);
+
+		assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), result.get(0).getTermId());
+		assertEquals(instanceNumber, Integer.valueOf(result.get(0).getValue()).intValue());
+		assertEquals(TermId.LOCATION_ID.getId(), result.get(1).getTermId());
+		assertEquals(locationId, Integer.valueOf(result.get(1).getValue()).intValue());
+		assertEquals(TermId.TRIAL_LOCATION.getId(), result.get(2).getTermId());
+		assertEquals(locationName, result.get(2).getValue());
+		assertEquals(someVariableTermId, result.get(3).getTermId());
+		assertEquals(someVariableValue, result.get(3).getValue());
+
+	}
+
+	@Test
+	public void testCreateLocationNameVariable() {
+
+		final StandardVariable standardVariable =
+			StandardVariableTestDataInitializer.createStandardVariable(TermId.TRIAL_LOCATION.getId(), "LOCATION_NAME");
+		when(this.fieldbookService.getStandardVariable(TermId.TRIAL_LOCATION.getId(), this.contextUtil.getCurrentProgramUUID()))
+			.thenReturn(standardVariable);
+
+		final MeasurementVariable result = this.datasetExcelGenerator.createLocationNameVariable("Alias", "Philippines");
+		assertEquals("Alias", result.getAlias());
+		assertEquals("LOCATION_NAME", result.getName());
+		assertEquals("Philippines", result.getValue());
+		assertEquals(standardVariable.getDescription(), result.getDescription());
+		assertEquals(standardVariable.getProperty().getName(), result.getProperty());
+		assertEquals(standardVariable.getScale().getName(), result.getScale());
+		assertEquals(standardVariable.getMethod().getName(), result.getMethod());
+		assertEquals(standardVariable.getDataType().getName(), result.getDataType());
+		assertEquals(standardVariable.getDataType().getId(), result.getDataTypeId().intValue());
+		assertEquals(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0), result.getLabel());
+		assertEquals(TermId.TRIAL_LOCATION.getId(), result.getTermId());
+		assertEquals(PhenotypicType.TRIAL_ENVIRONMENT, result.getRole());
+		assertEquals(VariableType.ENVIRONMENT_DETAIL, result.getVariableType());
 
 	}
 
@@ -330,10 +425,10 @@ public class DatasetExcelGeneratorTest {
 		columns.add(observationUnitVariable);
 
 		final List<MeasurementVariable> orderedColumns = this.datasetExcelGenerator.orderColumns(columns);
-		Assert.assertEquals(observationUnitVariable, orderedColumns.get(0));
-		Assert.assertEquals(studyConditionVariable, orderedColumns.get(1));
-		Assert.assertEquals(traitVariable, orderedColumns.get(2));
-		Assert.assertEquals(selectionVariable, orderedColumns.get(3));
+		assertEquals(observationUnitVariable, orderedColumns.get(0));
+		assertEquals(studyConditionVariable, orderedColumns.get(1));
+		assertEquals(traitVariable, orderedColumns.get(2));
+		assertEquals(selectionVariable, orderedColumns.get(3));
 
 	}
 }

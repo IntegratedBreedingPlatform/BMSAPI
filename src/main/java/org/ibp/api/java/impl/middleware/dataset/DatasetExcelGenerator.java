@@ -375,7 +375,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		xlsSheet.setColumnWidth(8, 20 * PIXEL_SIZE);
 	}
 
-	private List<MeasurementVariable> getEnvironmentalDetails(
+	List<MeasurementVariable> getEnvironmentalDetails(
 		final int environmentDatasetId, final List<MeasurementVariable> environmentVariables, final StudyInstance instance) {
 		final List<MeasurementVariable> environmentDetails =
 			filterByVariableType(environmentVariables, VariableType.ENVIRONMENT_DETAIL);
@@ -390,8 +390,9 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 					measurementVariable.setValue(String.valueOf(instance.getInstanceNumber()));
 					break;
 				case 8190:
-					// Automatically add TRIAL_LOCATION (LOCATION_NAME) variable to environment details. So that both LOCATION_ID abd LOCATION_NAME variables are written
-					// in Description sheet of Exported Dataset Excel file.
+					// Automatically add  LOCATION_NAME variable to environment details. So that both LOCATION_ID abd LOCATION_NAME variables are present
+					// in Description sheet of the exported Dataset Excel file. This is to make sure that the location name is processed properly
+					// when the file is imported in Dataset Importer.
 					iterator.add(this.createLocationNameVariable(measurementVariable.getAlias(), instance.getLocationName()));
 
 					// Rename the LOCATION_ID variable appropriately
@@ -695,7 +696,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		return Lists.newArrayList(variablesByType);
 	}
 
-	private MeasurementVariable createLocationNameVariable(final String variableAlias, final String locationName) {
+	MeasurementVariable createLocationNameVariable(final String variableAlias, final String locationName) {
 		final MeasurementVariable locationNameVariable = new MeasurementVariable();
 		final StandardVariable standardVariable =
 			this.fieldbookService.getStandardVariable(TermId.TRIAL_LOCATION.getId(), this.contextUtil.getCurrentProgramUUID());
