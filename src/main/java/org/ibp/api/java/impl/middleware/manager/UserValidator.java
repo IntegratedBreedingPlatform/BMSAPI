@@ -68,8 +68,10 @@ public class UserValidator implements Validator {
 	public static final String STATUS = "status";
 	public static final String USER_ID = "userId";
 
-	private static final String EMAIL_PATTERN =
-			"^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
+	public static final String EMAIL_LOCAL_PART_REGEX = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*";
+	private static final Pattern USERNAME_PATTERN = Pattern.compile(EMAIL_LOCAL_PART_REGEX);
+	private static final String EMAIL_REGEX = EMAIL_LOCAL_PART_REGEX
+				+ "@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
 
 	@Autowired
 	protected WorkbenchDataManager workbenchDataManager;
@@ -92,6 +94,10 @@ public class UserValidator implements Validator {
 
 	public void validate(final Object o, final Errors errors, final boolean createUser) {
 		final UserDetailDto user = (UserDetailDto) o;
+
+		if (!USERNAME_PATTERN.matcher(user.getUsername()).matches()) {
+			errors.rejectValue(USERNAME, "user.invalid.username");
+		}
 
 		this.validateFieldLength(errors, user.getFirstName(), FIRST_NAME, FIRST_NAME_STR, 20);
 		this.validateFieldLength(errors, user.getLastName(), LAST_NAME, LAST_NAME_STR, 50);
@@ -130,14 +136,12 @@ public class UserValidator implements Validator {
 				if (userUpdate.isSuperAdmin()) {
 					errors.reject(CANNOT_UPDATE_SUPERADMIN);
 				}
-
-				//If person entity is associated to more than one user, block user edition
+//If person entity is associated to more than one user, block user edition
 				//Temporary validation, it should be removed when we unify persons and users
 				final List<UserDto> usersWithSamePersonId = this.userService.getUsersByPersonIds(Lists.newArrayList(userUpdate.getPerson().getId()));
 				if (usersWithSamePersonId.size()>1) {
 					errors.reject(CANNOT_UPDATE_PERSON_MULTIPLE_USERS);
 				}
-
 				final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 				// TODO change frontend status type to integer
 				if (loggedInUser.equals(userUpdate) && "false".equals(user.getStatus())) {
@@ -166,7 +170,7 @@ public class UserValidator implements Validator {
 	}
 
 	protected void validateEmailFormat(final Errors errors, final String eMail) {
-		if (null == errors.getFieldError(EMAIL) && null != eMail && !Pattern.compile(EMAIL_PATTERN).matcher(eMail).matches()) {
+		if (null == errors.getFieldError(EMAIL) && null != eMail && !Pattern.compile(EMAIL_REGEX).matcher(eMail).matches()) {
 			errors.rejectValue(EMAIL, SIGNUP_FIELD_INVALID_EMAIL_FORMAT);
 		}
 	}
