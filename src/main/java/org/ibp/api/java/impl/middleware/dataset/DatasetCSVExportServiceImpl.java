@@ -149,6 +149,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	}
 
 	void addLocationIdValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap) {
+		// FIXME IBP-3048: With location id now a property of StudyInstance, the query below is likely not needed
 		final Map<Integer, String> instanceIdLocationIdMap = this.studyDataManager.getInstanceIdLocationIdMap(new ArrayList<>(observationUnitRowMap.keySet()));
 		for(final Integer instanceId: observationUnitRowMap.keySet()) {
 			final ObservationUnitData locationIdData = new ObservationUnitData();
