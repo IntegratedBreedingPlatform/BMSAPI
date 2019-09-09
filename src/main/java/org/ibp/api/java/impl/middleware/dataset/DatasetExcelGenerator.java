@@ -27,9 +27,8 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
@@ -90,10 +89,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	private DatasetTypeService datasetTypeService;
 
 	@Resource
-	private LocationDataManager locationDataManager;
-
-	@Resource
-	private FieldbookService fieldbookService;
+	private OntologyDataManager ontologyDataManager;
 
 	@Autowired
 	private ContextUtil contextUtil;
@@ -699,7 +695,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	MeasurementVariable createLocationNameVariable(final String variableAlias, final String locationName) {
 		final MeasurementVariable locationNameVariable = new MeasurementVariable();
 		final StandardVariable standardVariable =
-			this.fieldbookService.getStandardVariable(TermId.TRIAL_LOCATION.getId(), this.contextUtil.getCurrentProgramUUID());
+			this.ontologyDataManager.getStandardVariable(TermId.TRIAL_LOCATION.getId(), this.contextUtil.getCurrentProgramUUID());
 		locationNameVariable.setAlias(variableAlias);
 		locationNameVariable.setName(standardVariable.getName());
 		locationNameVariable.setDescription(standardVariable.getDescription());

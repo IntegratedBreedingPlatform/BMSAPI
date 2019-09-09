@@ -17,8 +17,8 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetService;
@@ -84,7 +84,7 @@ public class DatasetExcelGeneratorTest {
 	private DatasetTypeService datasetTypeService;
 
 	@Mock
-	private FieldbookService fieldbookService;
+	private OntologyDataManager ontologyDataManager;
 
 	@Mock
 	private ContextUtil contextUtil;
@@ -349,7 +349,7 @@ public class DatasetExcelGeneratorTest {
 
 		final StandardVariable standardVariable =
 			StandardVariableTestDataInitializer.createStandardVariable(TermId.TRIAL_LOCATION.getId(), "LOCATION_NAME");
-		when(this.fieldbookService.getStandardVariable(TermId.TRIAL_LOCATION.getId(), this.contextUtil.getCurrentProgramUUID()))
+		when(this.ontologyDataManager.getStandardVariable(TermId.TRIAL_LOCATION.getId(), this.contextUtil.getCurrentProgramUUID()))
 			.thenReturn(standardVariable);
 		final Map<Integer, String> geoLocationMap = new HashMap<>();
 		geoLocationMap.put(someVariableTermId, someVariableValue);
@@ -377,7 +377,7 @@ public class DatasetExcelGeneratorTest {
 
 		final StandardVariable standardVariable =
 			StandardVariableTestDataInitializer.createStandardVariable(TermId.TRIAL_LOCATION.getId(), "LOCATION_NAME");
-		when(this.fieldbookService.getStandardVariable(TermId.TRIAL_LOCATION.getId(), this.contextUtil.getCurrentProgramUUID()))
+		when(this.ontologyDataManager.getStandardVariable(TermId.TRIAL_LOCATION.getId(), this.contextUtil.getCurrentProgramUUID()))
 			.thenReturn(standardVariable);
 
 		final MeasurementVariable result = this.datasetExcelGenerator.createLocationNameVariable("Alias", "Philippines");
