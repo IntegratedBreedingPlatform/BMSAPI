@@ -5,7 +5,6 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
