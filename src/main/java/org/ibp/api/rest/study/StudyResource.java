@@ -49,15 +49,6 @@ public class StudyResource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StudyResource.class);
 
-	@ApiOperation(
-			value = "List all study folders",
-			notes = "Returns a flat list (no tree structure) of all study folders. The parentFolderId could be used to build a tree if needed.")
-	@RequestMapping(value = "/study/{cropname}/folders", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<List<StudyFolder>> listAllFolders(final @PathVariable String cropname) {
-		return new ResponseEntity<List<StudyFolder>>(this.studyService.getAllStudyFolders(), HttpStatus.OK);
-	}
-
 	@ApiOperation(value = "List all study instances with basic metadata.",
 			notes = "Returns list of all study instances with basic metadata.")
 	@RequestMapping(value = "/study/{cropname}/{studyId}/instances", method = RequestMethod.GET)
