@@ -26,6 +26,11 @@ public class RPackageServiceImpl implements RPackageService {
 		return this.mapToDTO(this.workbenchDataManager.getAllRCalls());
 	}
 
+	@Override
+	public List<RCallDTO> getRCallsByPackageId(final Integer packageId) {
+		return this.mapToDTO(this.workbenchDataManager.getRCallsByPackageId(packageId));
+	}
+
 	private List<RCallDTO> mapToDTO(final List<RCall> rCalls) {
 		final List<RCallDTO> rCallDTOS = new ArrayList<>();
 		for (final RCall rCall : rCalls) {

@@ -7,4 +7,7 @@ import java.util.List;
 public interface RPackageService {
 
 	List<RCallDTO> getAllRCalls();
+
+	List<RCallDTO> getRCallsByPackageId(final Integer packageId);
+
 }
