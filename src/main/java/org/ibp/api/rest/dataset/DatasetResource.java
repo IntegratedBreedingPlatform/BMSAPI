@@ -367,4 +367,12 @@ public class DatasetResource {
 		this.studyDatasetService.setValueToVariable(studyId, datasetId, paramDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Get all Dataset Variables", notes = "Get all Dataset Variables")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables", method = RequestMethod.GET)
+	public ResponseEntity<List<MeasurementVariable>> getAllVariables(@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId) {
+		final List<MeasurementVariable> columns = this.studyDatasetService.getColumns(studyId, datasetId);
+		return new ResponseEntity<>(columns, HttpStatus.OK);
+	}
 }
