@@ -37,7 +37,7 @@ public class LotResource {
 	private SearchRequestService searchRequestService;
 
 	@ApiOperation(value = "Post lot search", notes = "Post lot search")
-	@RequestMapping(value = "/{cropName}/lots/search", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchLots(
 		@PathVariable final String cropName, @RequestBody final LotsSearchDto lotsSearchDto) {
@@ -52,7 +52,7 @@ public class LotResource {
 	}
 
 	@ApiOperation(value = "It will retrieve lots that matches search conditions", notes = "It will retrieve lots that matches search conditions")
-	@RequestMapping(value = "/{cropName}/lots/search/{searchRequestId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<LotDto>> getLots(@PathVariable final String cropName, //
 		@RequestParam final Integer searchRequestId, final Pageable pageable) {
