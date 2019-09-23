@@ -1,18 +1,17 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetExportService;
+import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -22,9 +21,6 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +34,9 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 
 	@Resource
 	private DatasetCSVGenerator datasetCSVGenerator;
+
+	@Autowired
+	private DatasetService studyDatasetService;
 
 	@Override
 	public File export(
@@ -56,71 +55,8 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	@Override
 	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
 
-		final DatasetDTO datasetDTO = this.datasetService.getDataset(datasetId);
-		final List<Integer> subObsDatasetTypeIds = this.datasetTypeService.getSubObservationDatasetTypeIds();
-		final int environmentDatasetId =
-			this.studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getId();
-		final int plotDatasetId;
-
-		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
-			plotDatasetId = datasetDTO.getDatasetId();
-		} else {
-			plotDatasetId = datasetDTO.getParentDatasetId();
-		}
-
-		final List<MeasurementVariable> studyVariables = this.datasetService
-			.getObservationSetVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
-		final List<MeasurementVariable> environmentDetailAndConditionVariables = this.datasetService
-			.getObservationSetVariables(environmentDatasetId, Lists.newArrayList(
-				VariableType.ENVIRONMENT_DETAIL.getId(),
-				VariableType.STUDY_CONDITION.getId()));
-		this.addLocationIdVariable(environmentDetailAndConditionVariables);
-		// Experimental Design variables have value at dataset level. Perform sorting to ensure that they come first
-		Collections.sort(environmentDetailAndConditionVariables, new Comparator<MeasurementVariable>() {
-
-			@Override
-			public int compare(final MeasurementVariable var1, final MeasurementVariable var2) {
-				final String value1 = var1.getValue();
-				final String value2 = var2.getValue();
-				if (value1 != null && value2 != null)
-					return value1.compareTo(value2);
-				return (value1 == null) ? 1 : -1;
-			}
-		});
-
-		final List<MeasurementVariable> plotDataSetColumns =
-			this.datasetService
-				.getObservationSetVariables(
-					plotDatasetId,
-					Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-						VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId()));
-		final List<MeasurementVariable> treatmentFactors =
-			this.datasetService
-				.getObservationSetVariables(plotDatasetId, Lists.newArrayList(TermId.MULTIFACTORIAL_INFO.getId()));
-		plotDataSetColumns.removeAll(treatmentFactors);
-
-		final List<MeasurementVariable> traits =
-			this.datasetService.getObservationSetVariables(datasetId, Lists.newArrayList(VariableType.TRAIT.getId()));
-		final List<MeasurementVariable> selectionVariables =
-			this.datasetService.getObservationSetVariables(datasetId, Lists.newArrayList(VariableType.SELECTION_METHOD.getId()));
 		final List<MeasurementVariable> allVariables = new ArrayList<>();
-		allVariables.addAll(studyVariables);
-		allVariables.addAll(environmentDetailAndConditionVariables);
-		allVariables.addAll(treatmentFactors);
-		allVariables.addAll(plotDataSetColumns);
-
-		//Add variables that are specific to the sub-observation dataset types
-		if (Arrays.stream(subObsDatasetTypeIds.toArray()).anyMatch(datasetDTO.getDatasetTypeId()::equals)) {
-			final List<MeasurementVariable> subObservationSetColumns =
-				this.datasetService
-					.getObservationSetVariables(datasetId, Lists.newArrayList(
-						VariableType.GERMPLASM_DESCRIPTOR.getId(),
-						VariableType.OBSERVATION_UNIT.getId()));
-			allVariables.addAll(subObservationSetColumns);
-
-		}
-		allVariables.addAll(traits);
-		allVariables.addAll(selectionVariables);
+		allVariables.addAll(this.studyDatasetService.getColumns(studyId, datasetId));
 		return this.moveSelectedVariableInTheFirstColumn(allVariables, TermId.TRIAL_INSTANCE_FACTOR.getId());
 	}
 
