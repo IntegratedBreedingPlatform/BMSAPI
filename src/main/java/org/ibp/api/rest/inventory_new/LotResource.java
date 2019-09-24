@@ -1,6 +1,9 @@
 package org.ibp.api.rest.inventory_new;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiImplicitParam;
+import com.wordnik.swagger.annotations.ApiImplicitParams;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.inventory_new.LotDto;
 import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
@@ -26,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Api(value = "Lot Resource")
+@Api(value = "Lot Services")
 @RestController
 public class LotResource {
 
@@ -53,9 +56,19 @@ public class LotResource {
 
 	@ApiOperation(value = "It will retrieve lots that matches search conditions", notes = "It will retrieve lots that matches search conditions")
 	@RequestMapping(value = "/crops/{cropName}/lots/search", method = RequestMethod.GET)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+					value = "Results page you want to retrieve (0..N)"),
+			@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+					value = "Number of records per page."),
+			@ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query",
+					value = "Sorting criteria in the format: property(,asc|desc). " +
+							"Default sort order is ascending. " +
+							"Multiple sort criteria are supported.")
+	})
 	@ResponseBody
 	public ResponseEntity<List<LotDto>> getLots(@PathVariable final String cropName, //
-		@RequestParam final Integer searchRequestId, final Pageable pageable) {
+		@RequestParam final Integer searchRequestId, @ApiIgnore final Pageable pageable) {
 
 		final LotsSearchDto searchDTO = (LotsSearchDto) this.searchRequestService
 			.getSearchRequest(searchRequestId, LotsSearchDto.class);
