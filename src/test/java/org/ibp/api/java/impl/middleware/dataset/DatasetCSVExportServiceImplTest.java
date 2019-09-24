@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.commons.util.ZipUtil;
@@ -13,7 +12,6 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -270,27 +268,12 @@ public class DatasetCSVExportServiceImplTest {
 
 	@Test
 	public void testGetColumns() {
-		List<Integer> subObsTypeIds = new ArrayList<>();
+		final List<Integer> subObsTypeIds = new ArrayList<>();
 		subObsTypeIds.add(5);
 		when(this.datasetTypeService.getSubObservationDatasetTypeIds()).thenReturn(subObsTypeIds);
 
 		this.datasetExportService.getColumns(1, 1);
-		Mockito.verify(this.datasetService).getDataset(1);
-		Mockito.verify(this.studyDataManager).getDataSetsByType(1, DatasetTypeEnum.SUMMARY_DATA.getId());
-		Mockito.verify(this.datasetService).getObservationSetVariables(1, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
-		Mockito.verify(this.datasetService).getObservationSetVariables(anyInt(), eq(Lists.newArrayList(
-			VariableType.ENVIRONMENT_DETAIL.getId(),
-			VariableType.STUDY_CONDITION.getId())));
-		Mockito.verify(this.datasetService).getObservationSetVariables(
-			1,
-			Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
-				VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId()));
-		Mockito.verify(this.datasetService).getObservationSetVariables(1, Lists.newArrayList(
-			VariableType.GERMPLASM_DESCRIPTOR.getId(),
-			VariableType.OBSERVATION_UNIT.getId()));
-		Mockito.verify(this.datasetService).getObservationSetVariables(1, Lists.newArrayList(TermId.MULTIFACTORIAL_INFO.getId()));
-		Mockito.verify(this.datasetService).getObservationSetVariables(1, Lists.newArrayList(VariableType.TRAIT.getId()));
-		Mockito.verify(this.datasetService).getObservationSetVariables(1, Lists.newArrayList(VariableType.SELECTION_METHOD.getId()));
+		Mockito.verify(this.studyDatasetService).getColumns(1, 1);
 	}
 
 	@Test
