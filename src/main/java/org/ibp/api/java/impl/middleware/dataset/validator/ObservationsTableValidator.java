@@ -52,10 +52,10 @@ public class ObservationsTableValidator {
 	public void validateObservationsValuesDataTypes(final Table<String, String, String> inputData,
 			final List<MeasurementVariable> measurementVariables) throws ApiRequestValidationException {
 
-		Map<String, MeasurementVariable> mappedVariables =
+		final Map<String, MeasurementVariable> mappedVariables =
 				Maps.uniqueIndex(measurementVariables, new Function<MeasurementVariable, String>() {
 
-					public String apply(MeasurementVariable from) {
+					public String apply(final MeasurementVariable from) {
 						return from.getAlias();
 					}
 				});
@@ -70,6 +70,10 @@ public class ObservationsTableValidator {
 					errors.reject("warning.import.save.invalidCellValue",
 							new String[] {variableName, inputData.get(observationUnitId, variableName)}, "");
 					throw new ApiRequestValidationException(errors.getAllErrors());
+				} else if (!this.validateCategoricalValue(mappedVariables.get(variableName))) {
+					errors.reject("warning.import.save.invalidCategoricalValue",
+							new String[] {variableName}, "");
+					throw new ApiRequestValidationException(errors.getAllErrors());
 				}
 			}
 		}
@@ -81,7 +85,7 @@ public class ObservationsTableValidator {
 		}
 		if (var.getMinRange() != null && var.getMaxRange() != null) {
 			return this.validateIfValueIsMissingOrNumber(value.trim());
-		} else if (var != null && var.getDataTypeId() != null && var.getDataTypeId() == TermId.DATE_VARIABLE.getId()) {
+		} else if (var.getDataTypeId() != null && var.getDataTypeId() == TermId.DATE_VARIABLE.getId()) {
 			return Util.isValidDate(value);
 		} else if (StringUtils.isNotBlank(var.getDataType()) && var.getDataType().equalsIgnoreCase(DATA_TYPE_NUMERIC)) {
 			return this.validateIfValueIsMissingOrNumber(value.trim());
@@ -94,6 +98,13 @@ public class ObservationsTableValidator {
 			return true;
 		}
 		return NumberUtils.isNumber(value);
+	}
+
+	private boolean validateCategoricalValue(final MeasurementVariable var) {
+		if (var.getDataTypeId() !=null && var.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+			return var.getPossibleValues() != null;
+		}
+		return true;
 	}
 
 }
