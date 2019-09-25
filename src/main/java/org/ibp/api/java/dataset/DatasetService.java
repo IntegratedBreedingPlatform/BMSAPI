@@ -277,5 +277,5 @@ public interface DatasetService {
 	 */
 	void setValueToVariable(Integer studyId, Integer datasetId, ObservationUnitsParamDTO searchDTO);
 
-	List<MeasurementVariable> getColumns(final int studyId, final int datasetId);
+	List<MeasurementVariable> getAllDatasetVariables(final int studyId, final int datasetId);
 }

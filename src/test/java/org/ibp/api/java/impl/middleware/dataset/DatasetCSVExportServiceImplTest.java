@@ -272,7 +272,7 @@ public class DatasetCSVExportServiceImplTest {
 		subObsTypeIds.add(5);
 
 		this.datasetExportService.getColumns(1, 1);
-		Mockito.verify(this.studyDatasetService).getColumns(1, 1);
+		Mockito.verify(this.studyDatasetService).getAllDatasetVariables(1, 1);
 	}
 
 	@Test

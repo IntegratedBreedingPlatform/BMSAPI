@@ -372,7 +372,7 @@ public class DatasetResource {
 	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables", method = RequestMethod.GET)
 	public ResponseEntity<List<MeasurementVariable>> getAllVariables(@PathVariable final String crop, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
-		final List<MeasurementVariable> columns = this.studyDatasetService.getColumns(studyId, datasetId);
+		final List<MeasurementVariable> columns = this.studyDatasetService.getAllDatasetVariables(studyId, datasetId);
 		return new ResponseEntity<>(columns, HttpStatus.OK);
 	}
 }

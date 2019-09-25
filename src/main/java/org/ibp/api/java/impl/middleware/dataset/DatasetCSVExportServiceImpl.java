@@ -56,7 +56,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
 
 		final List<MeasurementVariable> allVariables = new ArrayList<>();
-		allVariables.addAll(this.studyDatasetService.getColumns(studyId, datasetId));
+		allVariables.addAll(this.studyDatasetService.getAllDatasetVariables(studyId, datasetId));
 		return this.moveSelectedVariableInTheFirstColumn(allVariables, TermId.TRIAL_INSTANCE_FACTOR.getId());
 	}
 

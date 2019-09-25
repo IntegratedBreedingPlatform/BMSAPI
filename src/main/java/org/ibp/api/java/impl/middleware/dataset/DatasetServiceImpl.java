@@ -590,7 +590,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
+	public List<MeasurementVariable> getAllDatasetVariables(final int studyId, final int datasetId) {
 
 		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(datasetId);
 		final List<Integer> subObsDatasetTypeIds = this.datasetTypeService.getSubObservationDatasetTypeIds();
