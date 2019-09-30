@@ -1,6 +1,6 @@
 package org.ibp.api.rest.role.type;
 
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiOperation;
 import org.ibp.api.domain.role.RoleTypeDto;
 import org.ibp.api.java.role.type.RoleTypeService;
 import org.springframework.beans.factory.annotation.Autowired;

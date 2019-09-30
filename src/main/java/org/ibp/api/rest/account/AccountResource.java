@@ -1,7 +1,7 @@
 package org.ibp.api.rest.account;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiParam;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.java.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
