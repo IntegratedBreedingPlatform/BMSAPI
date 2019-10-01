@@ -2,10 +2,12 @@ package org.ibp.api.java.impl.middleware.dataset;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
+import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +18,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -38,9 +41,11 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 			final List<String[]> rowValues = new ArrayList<>();
 
 			rowValues.add(this.getHeaderNames(columns).toArray(new String[] {}));
-
-			for (final ObservationUnitRow row : observationUnitRows) {
-				rowValues.add(this.getColumnValues(row, columns));
+			if(!observationUnitRows.isEmpty()) {
+				final Map<String, Map<String, String>> categoricalValuesMap = this.getCategoricalValuesMap(observationUnitRows.get(0).getEnvironmentVariables(), columns);
+				for (final ObservationUnitRow row : observationUnitRows) {
+					rowValues.add(this.getColumnValues(row, columns, categoricalValuesMap));
+				}
 			}
 
 			csvWriter.writeAll(rowValues);
@@ -64,18 +69,45 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 		return this.generateSingleInstanceFile(null, null, columns, allObservationUnitRows, fileNameFullPath, null);
 	}
 
-	String[] getColumnValues(final ObservationUnitRow row, final List<MeasurementVariable> subObservationSetColumns) {
+	Map<String, Map<String, String>> getCategoricalValuesMap(final Map<String, ObservationUnitData> environmentVariables, final List<MeasurementVariable> columns) {
+		final Map<String, Map<String, String>> categoricalValuesMap = new HashMap<>();
+		for (final MeasurementVariable column : columns) {
+			if (((environmentVariables.containsKey(column.getName()) && ENVIRONMENT_VARIABLES_VARIABLE_TYPES
+				.contains(column.getVariableType())) || VariableType.STUDY_DETAIL.equals(column.getVariableType())) && column.getPossibleValues() != null && !column.getPossibleValues()
+				.isEmpty()) {
+				final Map<String, String> possibleValuesMap = new HashMap<>();
+				categoricalValuesMap.put(column.getName(), possibleValuesMap);
+				for (final ValueReference possibleValue : column.getPossibleValues()) {
+					possibleValuesMap.put(possibleValue.getId().toString(), possibleValue.getName());
+				}
+			}
+
+		}
+		return categoricalValuesMap;
+	}
+
+	String[] getColumnValues(final ObservationUnitRow row, final List<MeasurementVariable> subObservationSetColumns, final Map<String, Map<String, String>> categoricalValuesMap) {
 		final List<String> values = new LinkedList<>();
 		for (final MeasurementVariable column : subObservationSetColumns) {
 			if (row.getEnvironmentVariables().containsKey(column.getName()) && ENVIRONMENT_VARIABLES_VARIABLE_TYPES
 				.contains(column.getVariableType())) {
-				values.add(row.getEnvironmentVariables().get(column.getName()).getValue());
+				this.getCategoricalValue(categoricalValuesMap, values, column, row.getEnvironmentVariables().get(column.getName()).getValue());
+			} else if(VariableType.STUDY_DETAIL.equals(column.getVariableType())) {
+				this.getCategoricalValue(categoricalValuesMap, values, column, row.getVariables().get(column.getName()).getValue());
 			} else {
 				values.add(row.getVariables().get(column.getName()).getValue());
 			}
-
 		}
 		return values.toArray(new String[] {});
+	}
+
+	private void getCategoricalValue(final Map<String, Map<String, String>> categoricalValuesMap, final List<String> values,
+		final MeasurementVariable column, final String value) {
+		if(categoricalValuesMap.get(column.getName()) != null && categoricalValuesMap.get(column.getName()).get(value) != null) {
+			values.add(categoricalValuesMap.get(column.getName()).get(value));
+		} else {
+			values.add(value);
+		}
 	}
 
 	List<String> getHeaderNames(final List<MeasurementVariable> subObservationSetColumns) {
