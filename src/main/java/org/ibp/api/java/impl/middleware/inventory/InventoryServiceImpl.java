@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.inventory;
 
+import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
@@ -24,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -107,7 +107,7 @@ public class InventoryServiceImpl implements InventoryService {
 			final Transaction trans = new Transaction();
 			trans.setLot(lot);
 			trans.setUserId(germplasmInventory.getUserId());
-			trans.setTransactionDate(InventoryServiceImpl.getCurrentDate());
+			trans.setTransactionDate(DateUtil.getCurrentDate());
 			trans.setStatus(0);
 			trans.setQuantity(germplasmInventory.getQuantityTotal());
 			trans.setComments(germplasmInventory.getComments());
@@ -124,10 +124,6 @@ public class InventoryServiceImpl implements InventoryService {
 
 	private static Integer getCurrentDateInt() {
 		return Integer.valueOf(new SimpleDateFormat("yyyyMMdd").format(Calendar.getInstance().getTime()));
-	}
-
-	private static Date getCurrentDate() {
-		return Calendar.getInstance().getTime();
 	}
 
 	@Override
