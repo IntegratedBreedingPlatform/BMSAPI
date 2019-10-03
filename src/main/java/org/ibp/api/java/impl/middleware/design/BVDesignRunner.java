@@ -1,18 +1,25 @@
 package org.ibp.api.java.impl.middleware.design;
 
 import au.com.bytecode.opencsv.CSVReader;
+import org.generationcp.commons.pojo.ProcessTimeoutThread;
 import org.ibp.api.domain.design.BVDesignOutput;
-import org.ibp.api.rest.design.BVDesignProperties;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.DesignRunner;
+import org.ibp.api.java.design.ProcessRunner;
+import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.util.ExpDesignUtil;
+import org.ibp.api.rest.design.BVDesignProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.JAXBException;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 public class BVDesignRunner implements DesignRunner {
@@ -23,21 +30,53 @@ public class BVDesignRunner implements DesignRunner {
 	private static final Logger LOG = LoggerFactory.getLogger(BVDesignRunner.class);
 	private static final String XML_EXTENSION = ".xml";
 
+	private ProcessRunner processRunner = new BVDesignProcessRunner();
 	private BVDesignOutputReader outputReader = new BVDesignOutputReader();
 	private BVDesignXmlInputWriter inputWriter = new BVDesignXmlInputWriter();
 	private static long bvDesignRunnerTimeout;
 
 	@Override
 	public BVDesignOutput runBVDesign(final BVDesignProperties bvDesignProperties,
-			final MainDesign design) throws IOException {
-		/**
-		 * TODO:
-		 * 1. IBP-3123 Run BV Design and get the design output
-		 */
+		final MainDesign design) throws IOException {
+
+		final String bvDesignPath = bvDesignProperties.getBvDesignPath();
+
+		bvDesignRunnerTimeout = 60 * 1000 * Long.valueOf(bvDesignProperties.getBvDesignRunnerTimeout());
+
 		int returnCode = -1;
+
+		if (bvDesignPath != null && design != null && design.getDesign() != null) {
+
+			final String xml = this.getXMLStringForDesign(design);
+
+			final String filepath = this.inputWriter.write(xml, bvDesignProperties);
+
+			returnCode = this.processRunner.run(bvDesignPath, "-i" + filepath);
+		}
+
 		final BVDesignOutput output = new BVDesignOutput(returnCode);
 
+		if (returnCode == 0) {
+			output.setResults(outputReader.read(design.getDesign().getParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM)));
+		}
+
 		return output;
+	}
+
+	public String getXMLStringForDesign(final MainDesign design) {
+		String xml = "";
+		final Long currentTimeMillis = System.currentTimeMillis();
+		final String outputFilePath = currentTimeMillis + BVDesignRunner.BV_PREFIX + BVDesignRunner.CSV_EXTENSION;
+
+		design.getDesign().setParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM, outputFilePath);
+		design.getDesign().setParameterValue(ExperimentDesignGenerator.SEED_PARAM, this.getSeedValue(currentTimeMillis));
+
+		try {
+			xml = ExpDesignUtil.getXmlStringForSetting(design);
+		} catch (final JAXBException e) {
+			BVDesignRunner.LOG.error(e.getMessage(), e);
+		}
+		return xml;
 	}
 
 	private String getSeedValue(final Long currentTimeMillis) {
@@ -59,12 +98,63 @@ public class BVDesignRunner implements DesignRunner {
 		return System.currentTimeMillis() + BVDesignRunner.BV_PREFIX + extensionFileName;
 	}
 
+	public void setProcessRunner(final BVDesignProcessRunner processRunner) {
+		this.processRunner = processRunner;
+	}
+
 	public void setOutputReader(final BVDesignOutputReader outputReader) {
 		this.outputReader = outputReader;
 	}
 
 	public void setInputWriter(final BVDesignXmlInputWriter inputWriter) {
 		this.inputWriter = inputWriter;
+	}
+
+	public class BVDesignProcessRunner implements ProcessRunner {
+
+		@Override
+		public Integer run(final String... command) throws IOException {
+
+			final Integer returnCode = -1;
+
+			final ProcessBuilder pb = new ProcessBuilder(command);
+			final Process p = pb.start();
+			// add a timeout for the design runner
+			final ProcessTimeoutThread processTimeoutThread = new ProcessTimeoutThread(p, BVDesignRunner.bvDesignRunnerTimeout);
+			processTimeoutThread.start();
+			try {
+				final InputStreamReader isr = new InputStreamReader(p.getInputStream());
+				final BufferedReader br = new BufferedReader(isr);
+
+				String lineRead;
+				while ((lineRead = br.readLine()) != null) {
+					BVDesignRunner.LOG.debug(lineRead);
+				}
+
+				return p.waitFor();
+			} catch (final InterruptedException e) {
+				BVDesignRunner.LOG.error(e.getMessage(), e);
+			} finally {
+				if (processTimeoutThread != null) {
+					// Stop the thread if it's still running
+					processTimeoutThread.interrupt();
+				}
+				if (p != null) {
+					// missing these was causing the mass amounts of open 'files'
+					p.getInputStream().close();
+					p.getOutputStream().close();
+					p.getErrorStream().close();
+				}
+			}
+
+			return returnCode;
+
+		}
+
+		@Override
+		public void setDirectory(final String directory) {
+			// do nothing
+		}
 	}
 
 
