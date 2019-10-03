@@ -66,13 +66,13 @@ public class ObservationsTableValidator {
 
 			for (final String variableName : inputData.columnKeySet()) {
 
-				if (!this.isValidValue(mappedVariables.get(variableName), inputData.get(observationUnitId, variableName))) {
-					errors.reject("warning.import.save.invalidCellValue",
-							new String[] {variableName, inputData.get(observationUnitId, variableName)}, "");
-					throw new ApiRequestValidationException(errors.getAllErrors());
-				} else if (!this.validateCategoricalValue(mappedVariables.get(variableName))) {
+				if (!this.validateCategoricalVariableHasAPossibleValue(mappedVariables.get(variableName))) {
 					errors.reject("warning.import.save.invalidCategoricalValue",
 							new String[] {variableName}, "");
+					throw new ApiRequestValidationException(errors.getAllErrors());
+				} else if (!this.isValidValue(mappedVariables.get(variableName), inputData.get(observationUnitId, variableName))) {
+					errors.reject("warning.import.save.invalidCellValue",
+							new String[] {variableName, inputData.get(observationUnitId, variableName)}, "");
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				}
 			}
@@ -100,7 +100,7 @@ public class ObservationsTableValidator {
 		return NumberUtils.isNumber(value);
 	}
 
-	private boolean validateCategoricalValue(final MeasurementVariable var) {
+	private boolean validateCategoricalVariableHasAPossibleValue(final MeasurementVariable var) {
 		if (var.getDataTypeId() !=null && var.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 			return var.getPossibleValues() != null;
 		}

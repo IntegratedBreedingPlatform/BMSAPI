@@ -147,7 +147,7 @@ public class ObservationsTableValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testValidateObservationsValuesDataTypesNoCategoricalDefinedWithImportValue() {
+	public void testValidateObservationsValuesDataTypesNoCategoricalScaleDefinedWithImportValue() {
 		final Table<String, String, String> data = HashBasedTable.create();
 		data.put("Obs1", "A", "1");
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
@@ -164,7 +164,7 @@ public class ObservationsTableValidatorTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testValidateObservationsValuesDataTypesNoCategoricalDefinedNoImportValue() {
+	public void testValidateObservationsValuesDataTypesNoCategoricalScaleDefinedNoImportValue() {
 		final Table<String, String, String> data = HashBasedTable.create();
 		data.put("Obs1", "A", "");
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
