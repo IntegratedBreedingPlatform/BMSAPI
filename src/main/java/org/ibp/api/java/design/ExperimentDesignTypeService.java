@@ -7,7 +7,7 @@ import org.ibp.api.rest.design.ExperimentDesignInput;
 
 import java.util.List;
 
-public interface ExperimentDesignService {
+public interface ExperimentDesignTypeService {
 
 	Integer MAX_ENTRY_NO = 99999;
 	Integer MAX_PLOT_NO = 99999999;
@@ -22,7 +22,7 @@ public interface ExperimentDesignService {
 	/**
 	 * Validates the design parameters and germplasm list entries.
 	 *
-	 * @param expDesignParameter the exp design parameter
+	 * @param experimentDesignInput the exp design parameter
 	 * @return the exp design validation output
 	 */
 	ExperimentDesignValidationOutput validate(ExperimentDesignInput experimentDesignInput, List<ImportedGermplasm> germplasmList);

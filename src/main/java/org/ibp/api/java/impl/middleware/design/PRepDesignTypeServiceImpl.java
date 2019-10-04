@@ -4,7 +4,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.StringUtil;
-import org.ibp.api.java.design.ExperimentDesignService;
+import org.ibp.api.java.design.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidationOutput;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -18,7 +18,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 @Component
-public class PRepDesignServiceImpl implements ExperimentDesignService {
+public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
 	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId(),

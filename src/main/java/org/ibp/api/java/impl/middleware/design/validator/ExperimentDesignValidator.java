@@ -4,7 +4,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.ibp.api.exception.DesignValidationException;
-import org.ibp.api.java.design.ExperimentDesignService;
+import org.ibp.api.java.design.ExperimentDesignTypeService;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -69,7 +69,7 @@ public class ExperimentDesignValidator {
 
 		if (startingPlotNo != null && NumberUtils.isNumber(startingPlotNo)) {
 			final Integer plotNumber = Integer.valueOf(startingPlotNo);
-			if (plotNumber != 0 && ((treatmentSize + plotNumber - 1) <= ExperimentDesignService.MAX_PLOT_NO)) {
+			if (plotNumber != 0 && ((treatmentSize + plotNumber - 1) <= ExperimentDesignTypeService.MAX_PLOT_NO)) {
 				return;
 			}
 		}
@@ -86,7 +86,7 @@ public class ExperimentDesignValidator {
 
 		if (startingEntryNo != null && NumberUtils.isNumber(startingEntryNo)) {
 			final Integer entryNumber = Integer.valueOf(startingEntryNo);
-			if (entryNumber != 0 && ((treatmentSize + entryNumber - 1) <= ExperimentDesignService.MAX_ENTRY_NO)) {
+			if (entryNumber != 0 && ((treatmentSize + entryNumber - 1) <= ExperimentDesignTypeService.MAX_ENTRY_NO)) {
 				return;
 			}
 		}

@@ -5,7 +5,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.InsertionMannerItem;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
-import org.ibp.api.java.design.ExperimentDesignService;
+import org.ibp.api.java.design.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidationOutput;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -17,7 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
-public class EntryListOrderDesignServiceImpl implements ExperimentDesignService {
+public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
 	@Resource
 	private ResourceBundleMessageSource messageSource;

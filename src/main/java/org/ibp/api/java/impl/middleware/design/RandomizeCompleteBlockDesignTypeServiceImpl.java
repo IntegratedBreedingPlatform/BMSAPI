@@ -4,7 +4,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.StringUtil;
-import org.ibp.api.java.design.ExperimentDesignService;
+import org.ibp.api.java.design.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidationOutput;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -18,7 +18,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 @Component
-public class RandomizeCompleteBlockDesignServiceImpl implements ExperimentDesignService {
+public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
 	private final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId());
@@ -90,10 +90,10 @@ public class RandomizeCompleteBlockDesignServiceImpl implements ExperimentDesign
 		} else if (Objects.equals(plotNumber, 0)) {
 			output =
 				new ExperimentDesignValidationOutput(false, this.messageSource.getMessage("plot.number.should.be.in.range", null, locale));
-		} else if (entryNumber != null && maxEntry > ExperimentDesignService.MAX_ENTRY_NO) {
+		} else if (entryNumber != null && maxEntry > ExperimentDesignTypeService.MAX_ENTRY_NO) {
 			output = new ExperimentDesignValidationOutput(false,
 				this.messageSource.getMessage("experiment.design.entry.number.should.not.exceed", new Object[] {maxEntry}, locale));
-		} else if (entryNumber != null && plotNumber != null && maxPlot > ExperimentDesignService.MAX_PLOT_NO) {
+		} else if (entryNumber != null && plotNumber != null && maxPlot > ExperimentDesignTypeService.MAX_PLOT_NO) {
 			output = new ExperimentDesignValidationOutput(false,
 				this.messageSource.getMessage("experiment.design.plot.number.should.not.exceed", new Object[] {maxPlot}, locale));
 		}

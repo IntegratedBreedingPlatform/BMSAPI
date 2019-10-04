@@ -7,7 +7,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.exception.DesignValidationException;
-import org.ibp.api.java.design.ExperimentDesignService;
+import org.ibp.api.java.design.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidationOutput;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidator;
 import org.ibp.api.rest.design.ExperimentDesignInput;
@@ -24,7 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-public class AugmentedRandomizedBlockDesignServiceImpl implements ExperimentDesignService {
+public class AugmentedRandomizedBlockDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
 	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NBLKS.getId());
