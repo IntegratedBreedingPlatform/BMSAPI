@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.StringTokenizer;
 
 @Component
-public class ExperimentDesignValidator {
+public class ExperimentDesignTypeValidator {
 
 	private static final int MINIMUM_REPLICATION_PERCENTAGE = 0;
 	private static final int MAXIMUM_REPLICATION_PERCENTAGE = 100;

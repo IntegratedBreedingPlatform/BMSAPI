@@ -5,7 +5,7 @@ import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.InsertionMannerItem;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidator;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.validation.BindingResult;
@@ -21,7 +21,7 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 	private ResourceBundleMessageSource messageSource;
 
 	@Resource
-	private ExperimentDesignValidator experimentDesignValidator;
+	private ExperimentDesignTypeValidator experimentDesignTypeValidator;
 
 	private BindingResult errors;
 
@@ -30,7 +30,7 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 
 		// TODO: Get Germplasm list from DB
 		final List<ImportedGermplasm> germplasmList = new ArrayList<>();
-		this.experimentDesignValidator.validateEntryListOrderDesign(experimentDesignInput, germplasmList);
+		this.experimentDesignTypeValidator.validateEntryListOrderDesign(experimentDesignInput, germplasmList);
 
 		final List<ImportedGermplasm> checkList = new LinkedList<>();
 

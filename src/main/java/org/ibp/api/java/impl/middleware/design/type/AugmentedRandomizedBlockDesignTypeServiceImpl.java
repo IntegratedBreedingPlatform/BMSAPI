@@ -7,7 +7,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidator;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
@@ -29,7 +29,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 	private ResourceBundleMessageSource messageSource;
 
 	@Resource
-	public ExperimentDesignValidator experimentDesignValidator;
+	public ExperimentDesignTypeValidator experimentDesignTypeValidator;
 
 	@Resource
 	public OntologyDataManager ontologyDataManager;
@@ -39,7 +39,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 
 		// TODO: Get Germplasm list from DB
 		final List<ImportedGermplasm> germplasmList = new ArrayList<>();
-		this.experimentDesignValidator.validateAugmentedDesign(experimentDesignInput, germplasmList);
+		this.experimentDesignTypeValidator.validateAugmentedDesign(experimentDesignInput, germplasmList);
 
 		final Set<Integer> entryIdsOfChecks = this.getEntryIdsOfChecks(germplasmList);
 		final Set<Integer> entryIdsOfTestEntries = this.getEntryIdsOfTestEntries(germplasmList);

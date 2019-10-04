@@ -3,7 +3,7 @@ package org.ibp.api.java.impl.middleware.design.type;
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidator;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.stereotype.Component;
 
@@ -22,14 +22,14 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId());
 
 	@Resource
-	private ExperimentDesignValidator experimentDesignValidator;
+	private ExperimentDesignTypeValidator experimentDesignTypeValidator;
 
 	@Override
 	public void generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput, final String programUUID) {
 
 		// TODO: Get Germplasm list from DB
 		final List<ImportedGermplasm> germplasmList = new ArrayList<>();
-		this.experimentDesignValidator.validateResolvableIncompleteBlockDesign(experimentDesignInput, germplasmList);
+		this.experimentDesignTypeValidator.validateResolvableIncompleteBlockDesign(experimentDesignInput, germplasmList);
 		// TODO:
 		// 1. IBP-3123 Create BVDesign XML input file (e.g.)
 		/**

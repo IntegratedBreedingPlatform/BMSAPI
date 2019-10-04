@@ -8,7 +8,7 @@ import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidator;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 	private ExperimentDesignGenerator experimentDesignGenerator;
 
 	@Resource
-	private ExperimentDesignValidator experimentDesignValidator;
+	private ExperimentDesignTypeValidator experimentDesignTypeValidator;
 
 	@Resource
 	private OntologyDataManager ontologyDataManager;
@@ -43,7 +43,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 
 			// TODO: Get Germplasm list from DB
 			final List<ImportedGermplasm> germplasmList = new ArrayList<>();
-			this.experimentDesignValidator.validateRandomizedCompleteBlockDesign(experimentDesignInput, germplasmList);
+			this.experimentDesignTypeValidator.validateRandomizedCompleteBlockDesign(experimentDesignInput, germplasmList);
 
 			final StandardVariable replicatesFactor = this.ontologyDataManager.getStandardVariable(TermId.REP_NO.getId(), programUUID);
 			final StandardVariable plotNumberFactor = this.ontologyDataManager.getStandardVariable(TermId.PLOT_NO.getId(), programUUID);

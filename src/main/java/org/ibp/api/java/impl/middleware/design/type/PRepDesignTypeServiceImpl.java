@@ -3,7 +3,7 @@ package org.ibp.api.java.impl.middleware.design.type;
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidator;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -21,7 +21,7 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 			TermId.PERCENTAGE_OF_REPLICATION.getId());
 
 	@Resource
-	private ExperimentDesignValidator experimentDesignValidator;
+	private ExperimentDesignTypeValidator experimentDesignTypeValidator;
 
 	private BindingResult errors;
 
@@ -30,7 +30,7 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
 		// TODO: Get Germplasm list from DB
 		final List<ImportedGermplasm> germplasmList = new ArrayList<>();
-		this.experimentDesignValidator.validatePrepDesign(experimentDesignInput, germplasmList);
+		this.experimentDesignTypeValidator.validatePrepDesign(experimentDesignInput, germplasmList);
 
 		// TODO:
 		// 1. IBP-3123 Create BVDesign XML input file (e.g.)
