@@ -1,32 +1,36 @@
 package org.ibp.api.java.impl.middleware.design;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.InsertionMannerItem;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.ibp.api.java.design.ExperimentDesignTypeService;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidationOutput;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidator;
 import org.ibp.api.rest.design.ExperimentDesignInput;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.validation.BindingResult;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
 	@Resource
 	private ResourceBundleMessageSource messageSource;
 
+	@Resource
+	private ExperimentDesignValidator experimentDesignValidator;
+
+	private BindingResult errors;
+
 	@Override
-	public void generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput) {
+	public void generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput, final String programUUID) {
 
 		// TODO: Get Germplasm list from DB
 		final List<ImportedGermplasm> germplasmList = new ArrayList<>();
+		this.experimentDesignValidator.validateEntryListOrderDesign(experimentDesignInput, germplasmList);
 
 		final List<ImportedGermplasm> checkList = new LinkedList<>();
 
@@ -59,88 +63,6 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 			//    Treatment factors and checks should also be applied if applicable.
 		}
 
-	}
-
-	@Override
-	public ExperimentDesignValidationOutput validate(final ExperimentDesignInput experimentDesignInput,
-		final List<ImportedGermplasm> germplasmList) {
-		final Locale locale = LocaleContextHolder.getLocale();
-		try {
-			if (experimentDesignInput != null && germplasmList != null) {
-				if (experimentDesignInput.getStartingPlotNo() != null && !NumberUtils.isNumber(experimentDesignInput.getStartingPlotNo())) {
-					return new ExperimentDesignValidationOutput(Boolean.FALSE,
-						this.messageSource.getMessage("plot.number.should.be.in.range", null, locale));
-				} else {
-					final List<ImportedGermplasm> checkList = new LinkedList<>();
-
-					final List<ImportedGermplasm> testEntryList = new LinkedList<>();
-
-					this.loadChecksAndTestEntries(germplasmList, checkList, testEntryList);
-
-					if (testEntryList.isEmpty()) {
-						return new ExperimentDesignValidationOutput(Boolean.FALSE,
-							this.messageSource.getMessage("germplasm.list.all.entries.can.not.be.checks", null, locale));
-					}
-
-					if (experimentDesignInput.getTreatmentFactorsData().size() > 0) {
-						return new ExperimentDesignValidationOutput(Boolean.FALSE,
-							this.messageSource
-								.getMessage("experiment.design.treatment.factors.error", null, LocaleContextHolder.getLocale()));
-					}
-
-					if (!checkList.isEmpty()) {
-						if (experimentDesignInput.getCheckStartingPosition() == null || !NumberUtils
-							.isNumber(experimentDesignInput.getCheckStartingPosition())) {
-							return new ExperimentDesignValidationOutput(Boolean.FALSE,
-								this.messageSource.getMessage("germplasm.list.start.index.whole.number.error", null, locale));
-						}
-						if (experimentDesignInput.getCheckSpacing() == null || !NumberUtils
-							.isNumber(experimentDesignInput.getCheckSpacing())) {
-							return new ExperimentDesignValidationOutput(Boolean.FALSE, this.messageSource
-								.getMessage("germplasm.list.number.of.rows.between.insertion.should.be.a.whole.number", null, locale));
-						}
-						if (experimentDesignInput.getCheckInsertionManner() == null || !NumberUtils
-							.isNumber(experimentDesignInput.getCheckInsertionManner())) {
-							return new ExperimentDesignValidationOutput(Boolean.FALSE,
-								this.messageSource.getMessage("check.manner.of.insertion.invalid", null, locale));
-						}
-
-						final Integer checkStartingPosition =
-							(StringUtils.isEmpty(experimentDesignInput.getCheckStartingPosition())) ? null :
-								Integer.parseInt(experimentDesignInput.getCheckStartingPosition());
-
-						final Integer checkSpacing = (StringUtils.isEmpty(experimentDesignInput.getCheckSpacing())) ? null :
-							Integer.parseInt(experimentDesignInput.getCheckSpacing());
-
-						if (checkStartingPosition < 1) {
-							return new ExperimentDesignValidationOutput(Boolean.FALSE, this.messageSource
-								.getMessage("germplasm.list.starting.index.should.be.greater.than.zero", null, locale));
-						}
-						if (checkStartingPosition > testEntryList.size()) {
-							return new ExperimentDesignValidationOutput(Boolean.FALSE,
-								this.messageSource.getMessage("germplasm.list.start.index.less.than.germplasm.error", null, locale));
-						}
-						if (checkSpacing < 1) {
-							return new ExperimentDesignValidationOutput(Boolean.FALSE, this.messageSource
-								.getMessage("germplasm.list.number.of.rows.between.insertion.should.be.greater.than.zero", null,
-									locale));
-						}
-						if (checkSpacing > testEntryList.size()) {
-							return new ExperimentDesignValidationOutput(Boolean.FALSE,
-								this.messageSource.getMessage("germplasm.list.spacing.less.than.germplasm.error", null, locale));
-						}
-						if (germplasmList.size() - checkList.size() == 0) {
-							return new ExperimentDesignValidationOutput(Boolean.FALSE,
-								this.messageSource.getMessage("germplasm.list.all.entries.can.not.be.checks", null, locale));
-						}
-					}
-				}
-			}
-		} catch (final Exception e) {
-			return new ExperimentDesignValidationOutput(Boolean.FALSE,
-				this.messageSource.getMessage("experiment.design.invalid.generic.error", null, locale));
-		}
-		return new ExperimentDesignValidationOutput(Boolean.TRUE, StringUtils.EMPTY);
 	}
 
 	@Override

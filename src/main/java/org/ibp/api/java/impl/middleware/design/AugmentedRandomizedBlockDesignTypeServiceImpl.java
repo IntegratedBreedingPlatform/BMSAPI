@@ -6,12 +6,9 @@ import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.util.StringUtil;
-import org.ibp.api.exception.DesignValidationException;
 import org.ibp.api.java.design.ExperimentDesignTypeService;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidationOutput;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidator;
 import org.ibp.api.rest.design.ExperimentDesignInput;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
 import javax.annotation.Resource;
@@ -20,7 +17,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,10 +35,11 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 	public OntologyDataManager ontologyDataManager;
 
 	@Override
-	public void generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput) {
+	public void generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput, final String programUUID) {
 
 		// TODO: Get Germplasm list from DB
 		final List<ImportedGermplasm> germplasmList = new ArrayList<>();
+		this.experimentDesignValidator.validateAugmentedDesign(experimentDesignInput, germplasmList);
 
 		final Set<Integer> entryIdsOfChecks = this.getEntryIdsOfChecks(germplasmList);
 		final Set<Integer> entryIdsOfTestEntries = this.getEntryIdsOfTestEntries(germplasmList);
@@ -78,25 +75,6 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 		//    Treatment factors and checks should also be applied if applicable.
 		// 5. Save experimental design variables (check if this is study level or environment level).
 
-	}
-
-	@Override
-	public ExperimentDesignValidationOutput validate(final ExperimentDesignInput experimentDesignInput,
-		final List<ImportedGermplasm> germplasmList) {
-		final Locale locale = LocaleContextHolder.getLocale();
-		ExperimentDesignValidationOutput output = new ExperimentDesignValidationOutput(true, "");
-		try {
-
-			this.experimentDesignValidator.validateAugmentedDesign(experimentDesignInput, germplasmList);
-
-		} catch (final DesignValidationException e) {
-			output = new ExperimentDesignValidationOutput(false, e.getMessage());
-		} catch (final Exception e) {
-			output = new ExperimentDesignValidationOutput(false,
-				this.messageSource.getMessage("experiment.design.invalid.generic.error", null, locale));
-		}
-
-		return output;
 	}
 
 	@Override
