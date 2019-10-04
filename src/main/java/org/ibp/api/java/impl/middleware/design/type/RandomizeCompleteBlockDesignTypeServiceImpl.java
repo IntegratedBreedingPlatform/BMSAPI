@@ -1,4 +1,4 @@
-package org.ibp.api.java.impl.middleware.design;
+package org.ibp.api.java.impl.middleware.design.type;
 
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -6,7 +6,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.MainDesign;
-import org.ibp.api.java.design.ExperimentDesignTypeService;
+import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidator;
 import org.ibp.api.rest.design.ExperimentDesignInput;

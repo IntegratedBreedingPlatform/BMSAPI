@@ -1,10 +1,10 @@
-package org.ibp.api.java.impl.middleware.design;
+package org.ibp.api.java.impl.middleware.design.type;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.InsertionMannerItem;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
-import org.ibp.api.java.design.ExperimentDesignTypeService;
+import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidator;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.context.support.ResourceBundleMessageSource;

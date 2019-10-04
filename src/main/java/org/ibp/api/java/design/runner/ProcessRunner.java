@@ -1,4 +1,4 @@
-package org.ibp.api.java.design;
+package org.ibp.api.java.design.runner;
 
 import java.io.IOException;
 

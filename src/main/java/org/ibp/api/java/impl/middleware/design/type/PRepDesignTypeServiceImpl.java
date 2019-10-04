@@ -1,8 +1,8 @@
-package org.ibp.api.java.impl.middleware.design;
+package org.ibp.api.java.impl.middleware.design.type;
 
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.ibp.api.java.design.ExperimentDesignTypeService;
+import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidator;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.stereotype.Component;

@@ -1,8 +1,8 @@
-package org.ibp.api.java.impl.middleware.design;
+package org.ibp.api.java.impl.middleware.design.type;
 
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.ibp.api.java.design.ExperimentDesignTypeService;
+import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidator;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.stereotype.Component;
@@ -13,16 +13,13 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesignTypeService {
+public class ResolvableIncompleteBlockDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
-	private final List<Integer> EXPERIMENT_DESIGN_VARIABLES_LATINIZED = Arrays
-		.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.NO_OF_ROWS_IN_REPS.getId(),
-			TermId.NO_OF_COLS_IN_REPS.getId(), TermId.NO_OF_CROWS_LATINIZE.getId(), TermId.NO_OF_CCOLS_LATINIZE.getId(),
-			TermId.REPLICATIONS_MAP.getId(), TermId.NO_OF_REPS_IN_COLS.getId());
-
-	private final List<Integer> EXPERIMENT_DESIGN_VARIABLES = Arrays
-		.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.NO_OF_ROWS_IN_REPS.getId(),
-			TermId.NO_OF_COLS_IN_REPS.getId());
+	private final List<Integer> EXPERIMENT_DESIGN_VARIABLES_LATINIZED =
+		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId(),
+			TermId.NO_OF_CBLKS_LATINIZE.getId(), TermId.REPLICATIONS_MAP.getId(), TermId.NO_OF_REPS_IN_COLS.getId());
+	private final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
+		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId());
 
 	@Resource
 	private ExperimentDesignValidator experimentDesignValidator;
@@ -33,7 +30,6 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 		// TODO: Get Germplasm list from DB
 		final List<ImportedGermplasm> germplasmList = new ArrayList<>();
 		this.experimentDesignValidator.validateResolvableIncompleteBlockDesign(experimentDesignInput, germplasmList);
-
 		// TODO:
 		// 1. IBP-3123 Create BVDesign XML input file (e.g.)
 		/**

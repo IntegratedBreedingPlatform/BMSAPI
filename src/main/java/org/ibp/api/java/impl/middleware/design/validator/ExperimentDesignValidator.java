@@ -6,7 +6,7 @@ import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.design.ExperimentDesignTypeService;
+import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;

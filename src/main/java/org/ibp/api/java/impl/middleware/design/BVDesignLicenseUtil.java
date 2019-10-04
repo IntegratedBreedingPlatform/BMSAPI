@@ -5,7 +5,7 @@ import org.generationcp.commons.util.DateUtil;
 import org.ibp.api.domain.design.BVDesignLicenseInfo;
 import org.ibp.api.exception.BVLicenseParseException;
 import org.ibp.api.java.design.DesignLicenseUtil;
-import org.ibp.api.java.design.ProcessRunner;
+import org.ibp.api.java.design.runner.ProcessRunner;
 import org.ibp.api.rest.design.BVDesignProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
