@@ -1,4 +1,4 @@
-package org.ibp.api.java.design;
+package org.ibp.api.java.design.type;
 
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.StandardVariable;

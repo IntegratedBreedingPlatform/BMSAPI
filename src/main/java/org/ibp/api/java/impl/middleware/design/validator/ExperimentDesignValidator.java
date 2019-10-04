@@ -4,7 +4,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.ibp.api.exception.DesignValidationException;
-import org.ibp.api.java.design.ExperimentDesignTypeService;
+import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;

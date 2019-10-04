@@ -1,11 +1,11 @@
-package org.ibp.api.java.impl.middleware.design;
+package org.ibp.api.java.impl.middleware.design.runner;
 
 import au.com.bytecode.opencsv.CSVReader;
 import org.generationcp.commons.pojo.ProcessTimeoutThread;
 import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.MainDesign;
-import org.ibp.api.java.design.DesignRunner;
-import org.ibp.api.java.design.ProcessRunner;
+import org.ibp.api.java.design.runner.DesignRunner;
+import org.ibp.api.java.design.runner.ProcessRunner;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.util.ExpDesignUtil;
 import org.ibp.api.rest.design.BVDesignProperties;
