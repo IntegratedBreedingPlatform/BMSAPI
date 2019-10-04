@@ -1,11 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.inventory;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
+import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
@@ -26,6 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
 @Service
 @Transactional
 public class InventoryServiceImpl implements InventoryService {
@@ -39,20 +40,20 @@ public class InventoryServiceImpl implements InventoryService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(InventoryService.class);
 
 	@Override
-	public List<GermplasmInventory> getInventoryLotInfoForGermplasm(String germplasmId) {
+	public List<GermplasmInventory> getInventoryLotInfoForGermplasm(final String germplasmId) {
 
-		List<GermplasmInventory> germplasmInventory = new ArrayList<GermplasmInventory>();
+		final List<GermplasmInventory> germplasmInventory = new ArrayList<GermplasmInventory>();
 		try {
-			List<LotDetails> result = this.inventoryDataManager.getLotDetailsForGermplasm(Integer.valueOf(germplasmId));
+			final List<LotDetails> result = this.inventoryDataManager.getLotDetailsForGermplasm(Integer.valueOf(germplasmId));
 			if (result != null) {
-				for (LotDetails lotDetail : result) {
-					GermplasmInventory gpInverntory = new GermplasmInventory(lotDetail.getEntityIdOfLot());
+				for (final LotDetails lotDetail : result) {
+					final GermplasmInventory gpInverntory = new GermplasmInventory(lotDetail.getEntityIdOfLot());
 					gpInverntory.setLotId(lotDetail.getLotId());
 					gpInverntory.setQuantityAvailable(lotDetail.getAvailableLotBalance());
 					gpInverntory.setQuantityReserved(lotDetail.getReservedTotal());
 					gpInverntory.setQuantityTotal(lotDetail.getAvailableLotBalance() + lotDetail.getReservedTotal());
 
-					TermSummary quantityUnit = new TermSummary();
+					final TermSummary quantityUnit = new TermSummary();
 					quantityUnit.setId(String.valueOf(lotDetail.getScaleOfLot().getId()));
 					quantityUnit.setName(lotDetail.getScaleOfLot().getName());
 					quantityUnit.setDescription(lotDetail.getScaleOfLot().getDefinition());
@@ -60,13 +61,13 @@ public class InventoryServiceImpl implements InventoryService {
 					gpInverntory.setQuantityUnit(quantityUnit);
 					gpInverntory.setComments(lotDetail.getCommentOfLot());
 
-					InventoryLocation locationOfLot =
+					final InventoryLocation locationOfLot =
 							new InventoryLocation(lotDetail.getLocationOfLot().getLocid(), lotDetail.getLocationOfLot().getLname() + " ("
 									+ lotDetail.getLocationOfLot().getLabbr() + ")");
 
-					Location l1 = this.locationDataManager.getLocationByID(lotDetail.getLocationOfLot().getSnl1id());
-					Location l2 = this.locationDataManager.getLocationByID(lotDetail.getLocationOfLot().getSnl2id());
-					Location l3 = this.locationDataManager.getLocationByID(lotDetail.getLocationOfLot().getSnl3id());
+					final Location l1 = this.locationDataManager.getLocationByID(lotDetail.getLocationOfLot().getSnl1id());
+					final Location l2 = this.locationDataManager.getLocationByID(lotDetail.getLocationOfLot().getSnl2id());
+					final Location l3 = this.locationDataManager.getLocationByID(lotDetail.getLocationOfLot().getSnl3id());
 
 					locationOfLot.setLabel1(l1 != null ? l1.getLname() + " (" + l1.getLabbr() + ")" : "");
 					locationOfLot.setLabel2(l2 != null ? l2.getLname() + " (" + l2.getLabbr() + ")" : "");
@@ -81,18 +82,18 @@ public class InventoryServiceImpl implements InventoryService {
 					germplasmInventory.add(gpInverntory);
 				}
 			}
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
 		return germplasmInventory;
 	}
 
 	@Override
-	public void createInverntory(GermplasmInventory germplasmInventory, String germplasmId) {
+	public void createInverntory(final GermplasmInventory germplasmInventory, final String germplasmId) {
 		InventoryServiceImpl.LOGGER.debug(germplasmInventory.toString());
 
 		try {
-			Lot lot = new Lot();
+			final Lot lot = new Lot();
 			lot.setUserId(germplasmInventory.getUserId());
 			lot.setEntityType(EntityType.GERMPLSM.name());
 			lot.setEntityId(Integer.valueOf(germplasmId));
@@ -103,10 +104,10 @@ public class InventoryServiceImpl implements InventoryService {
 			this.inventoryDataManager.addLot(lot);
 			InventoryServiceImpl.LOGGER.debug("Lot created: LotId: " + lot.getId());
 
-			Transaction trans = new Transaction();
+			final Transaction trans = new Transaction();
 			trans.setLot(lot);
 			trans.setUserId(germplasmInventory.getUserId());
-			trans.setTransactionDate(InventoryServiceImpl.getCurrentDateInt());
+			trans.setTransactionDate(DateUtil.getCurrentDate());
 			trans.setStatus(0);
 			trans.setQuantity(germplasmInventory.getQuantityTotal());
 			trans.setComments(germplasmInventory.getComments());
@@ -116,7 +117,7 @@ public class InventoryServiceImpl implements InventoryService {
 			this.inventoryDataManager.addTransaction(trans);
 			InventoryServiceImpl.LOGGER.debug("Transaction created: TransactionId: " + trans.getId());
 
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("Error!", e);
 		}
 	}
@@ -126,14 +127,14 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 
 	@Override
-	public void updateInverntory(GermplasmInventory germplasmInventory, String germplasmId) {
+	public void updateInverntory(final GermplasmInventory germplasmInventory, final String germplasmId) {
 		InventoryServiceImpl.LOGGER.debug(germplasmId);
 		InventoryServiceImpl.LOGGER.debug(germplasmInventory.toString());
 		throw new UnsupportedOperationException("This operation has not yet been implemented.");
 	}
 
 	@Override
-	public void deleteInverntory(String germplasmId) {
+	public void deleteInverntory(final String germplasmId) {
 		InventoryServiceImpl.LOGGER.debug(germplasmId);
 		throw new UnsupportedOperationException("This operation has not yet been implemented.");
 	}
