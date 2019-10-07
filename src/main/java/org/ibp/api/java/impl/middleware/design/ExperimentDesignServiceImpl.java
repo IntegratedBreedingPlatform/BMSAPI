@@ -13,12 +13,16 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	public void generateAndSaveDesign(final int studyId, final ExperimentDesignInput experimentDesignInput) {
 		// This will be the main controller for generating and saving design
 
-		// TODO get List<ImportedGermplasm> germplasmList
+		// TODO 1. Get List<ImportedGermplasm> germplasmList
+		//1.1 Move ImportedGermplasm, ListDataProjectUtil from Fielbook to Middleware
+		//1.2 Create MW service to return List<ImportedGermplasm> for study germplasm list
 
-		// TODO get programUUID of study
+		// TODO 2. Get programUUID of study
 
-		// TODO determine applicable ExperimentDesignTypeService and call generateDesign
+		// TODO 3. Determine applicable ExperimentDesignTypeService and call generateDesign
 
-		// TODO Call MW save observation unit rows
+		// TODO 4. Call MW delete experiment design
+
+		// TODO 5. Call MW save observation unit rows and variables
 	}
 }
