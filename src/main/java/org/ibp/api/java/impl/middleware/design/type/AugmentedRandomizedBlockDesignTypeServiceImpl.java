@@ -1,15 +1,18 @@
 package org.ibp.api.java.impl.middleware.design.type;
 
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
+import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.util.StringUtil;
+import org.ibp.api.domain.study.DesignType;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -20,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Component
 public class AugmentedRandomizedBlockDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
 	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
@@ -80,6 +84,11 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 	@Override
 	public Boolean requiresBreedingViewLicence() {
 		return Boolean.TRUE;
+	}
+
+	@Override
+	public Integer getDesignTypeId() {
+		return ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK.getId();
 	}
 
 	Map<Integer, StandardVariable> convertStandardVariableListToMap(final List<StandardVariable> standardVariables) {

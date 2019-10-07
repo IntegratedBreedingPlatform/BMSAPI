@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.design.type;
 
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
+import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -82,6 +83,11 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 	@Override
 	public Boolean requiresBreedingViewLicence() {
 		return Boolean.TRUE;
+	}
+
+	@Override
+	public Integer getDesignTypeId() {
+		return ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getId();
 	}
 
 }

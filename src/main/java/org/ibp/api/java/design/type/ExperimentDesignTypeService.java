@@ -21,4 +21,6 @@ public interface ExperimentDesignTypeService {
 	 */
 	Boolean requiresBreedingViewLicence();
 
+	Integer getDesignTypeId();
+
 }

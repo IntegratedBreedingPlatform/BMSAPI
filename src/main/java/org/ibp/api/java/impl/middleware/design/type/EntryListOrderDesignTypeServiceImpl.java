@@ -2,12 +2,15 @@ package org.ibp.api.java.impl.middleware.design.type;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
+import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.InsertionMannerItem;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
+import org.ibp.api.domain.study.DesignType;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 
 import javax.annotation.Resource;
@@ -15,6 +18,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+@Component
 public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
 	@Resource
@@ -68,6 +72,11 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 	@Override
 	public Boolean requiresBreedingViewLicence() {
 		return Boolean.FALSE;
+	}
+
+	@Override
+	public Integer getDesignTypeId() {
+		return ExperimentDesignType.ENTRY_LIST_ORDER.getId();
 	}
 
 	private void loadChecksAndTestEntries(final List<ImportedGermplasm> importedGermplasmList, final List<ImportedGermplasm> checkList,

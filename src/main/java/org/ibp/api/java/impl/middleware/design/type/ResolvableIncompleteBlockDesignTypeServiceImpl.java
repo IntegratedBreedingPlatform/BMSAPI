@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.design.type;
 
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
+import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
@@ -48,5 +49,10 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 	@Override
 	public Boolean requiresBreedingViewLicence() {
 		return Boolean.TRUE;
+	}
+
+	@Override
+	public Integer getDesignTypeId() {
+		return ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getId();
 	}
 }
