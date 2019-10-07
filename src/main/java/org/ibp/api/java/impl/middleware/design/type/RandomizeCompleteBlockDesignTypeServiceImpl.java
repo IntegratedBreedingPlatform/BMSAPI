@@ -10,6 +10,7 @@ import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
+import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,12 +39,10 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 	private OntologyDataManager ontologyDataManager;
 
 	@Override
-	public void generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput, final String programUUID) {
+	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput, final String programUUID, final List<ImportedGermplasm> germplasmList) {
 
 		try {
 
-			// TODO: Get Germplasm list from DB
-			final List<ImportedGermplasm> germplasmList = new ArrayList<>();
 			this.experimentDesignTypeValidator.validateRandomizedCompleteBlockDesign(experimentDesignInput, germplasmList);
 
 			final StandardVariable replicatesFactor = this.ontologyDataManager.getStandardVariable(TermId.REP_NO.getId(), programUUID);
@@ -69,15 +68,13 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 			 */
 			// 2. IBP-3123 Run BV Design and get the design output
 			// 3. IBP-3124 Parse the design output and determine the variables / values that will be saved for each plot experiment.
-			// 4. IBP-3124 Directly save the plot experiments based on the design output. Create a service/method at Middleware level.
-			// 	  Germplasm factors (GID, ENTRY_NO, etc), Design factors (PLOT_NO, REP_NO, etc) should be saved at their respective tables in the DB.
-			//    Treatment factors and checks should also be applied if applicable.
-			// 5. Save experimental design variables (check if this is study level or environment level).
+			// 4. IBP-3122 Return list of ObservationUnit rows
 
 		} catch (final Exception e) {
 			RandomizeCompleteBlockDesignTypeServiceImpl.LOG.error(e.getMessage(), e);
 		}
 
+		return null;
 	}
 
 	@Override

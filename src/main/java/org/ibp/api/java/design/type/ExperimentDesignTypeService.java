@@ -1,6 +1,11 @@
 package org.ibp.api.java.design.type;
 
+import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
+import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
+
+import java.util.List;
+import java.util.Observable;
 
 public interface ExperimentDesignTypeService {
 
@@ -12,7 +17,7 @@ public interface ExperimentDesignTypeService {
 	 * @param experimentDesignInput
 	 * @param programUUID
 	 */
-	void generateDesign(int studyId, ExperimentDesignInput experimentDesignInput, String programUUID);
+	List<ObservationUnitRow> generateDesign(int studyId, ExperimentDesignInput experimentDesignInput, String programUUID, List<ImportedGermplasm> germplasmList);
 
 	/**
 	 * Defines if the experimental design requires breeding view licence to run

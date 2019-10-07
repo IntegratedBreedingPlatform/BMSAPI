@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.ibp.api.domain.study.DesignType;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
+import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
@@ -30,10 +31,8 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 	private BindingResult errors;
 
 	@Override
-	public void generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput, final String programUUID) {
+	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput, final String programUUID, final List<ImportedGermplasm> germplasmList) {
 
-		// TODO: Get Germplasm list from DB
-		final List<ImportedGermplasm> germplasmList = new ArrayList<>();
 		this.experimentDesignTypeValidator.validateEntryListOrderDesign(experimentDesignInput, germplasmList);
 
 		final List<ImportedGermplasm> checkList = new LinkedList<>();
@@ -61,12 +60,9 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 		for (int instanceNumber = 1; instanceNumber <= environments; instanceNumber++) {
 
 			Integer plotNumber = Integer.parseInt(experimentDesignInput.getStartingPlotNo());
-			// TODO:
-			//  IBP-3124 Directly save the plot experiments based on the germplasm entries. Create a service/method at Middleware level.
-			// 	  Germplasm factors (GID, ENTRY_NO, etc), Design factors (PLOT_NO, REP_NO, etc) should be saved at their respective tables in the DB.
-			//    Treatment factors and checks should also be applied if applicable.
+			// IBP-3122 Return list of ObservationUnit rows
 		}
-
+		return null;
 	}
 
 	@Override
