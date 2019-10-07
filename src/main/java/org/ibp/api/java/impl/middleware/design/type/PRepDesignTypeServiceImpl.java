@@ -2,18 +2,24 @@ package org.ibp.api.java.impl.middleware.design.type;
 
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.util.StringUtil;
+import org.ibp.api.domain.design.ListItem;
+import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
+import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.BindingResult;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
@@ -25,25 +31,52 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 	@Resource
 	private ExperimentDesignTypeValidator experimentDesignTypeValidator;
 
-	private BindingResult errors;
+	@Resource
+	private OntologyDataManager ontologyDataManager;
+
+	@Resource
+	private ExperimentDesignGenerator experimentDesignGenerator;
 
 	@Override
-	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput, final String programUUID, final List<ImportedGermplasm> germplasmList) {
+	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
+		final String programUUID, final List<ImportedGermplasm> germplasmList) {
 
 		this.experimentDesignTypeValidator.validatePrepDesign(experimentDesignInput, germplasmList);
 
-		// TODO:
-		// 1. IBP-3123 Create BVDesign XML input file (e.g.)
-		/**
-		 * 	final MainDesign mainDesign = this.experimentDesignGenerator
-		 * 				.createRandomizedCompleteBlockDesign(block, stdvarRep.getName(), stdvarPlot.getName(), plotNo, entryNo, stdvarTreatment.getName(), treatmentFactors,
-		 * 					levels, "");
-		 */
-		// 2. IBP-3123 Run BV Design and get the design output
-		// 3. IBP-3124 Parse the design output and determine the variables / values that will be saved for each plot experiment.
-		// 4. IBP-3122 Return list of ObservationUnit rows
+		final int nTreatments = germplasmList.size();
+		final int blockSize = Integer.parseInt(experimentDesignInput.getBlockSize());
+		final int replicationPercentage = experimentDesignInput.getReplicationPercentage();
+		final int replicationNumber = Integer.parseInt(experimentDesignInput.getReplicationsCount());
+		final int environments = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
+		final int environmentsToAdd = Integer.parseInt(experimentDesignInput.getNoOfEnvironmentsToAdd());
 
-		return null;
+		final StandardVariable entryNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.ENTRY_NO.getId(), programUUID);
+		final StandardVariable blockNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.BLOCK_NO.getId(), programUUID);
+		final StandardVariable plotNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.PLOT_NO.getId(), programUUID);
+
+		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), null);
+		Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
+
+		if (!Objects.equals(entryNumberVariable.getId(), TermId.ENTRY_NO.getId())) {
+			entryNo = null;
+		}
+
+		final List<ListItem> replicationListItems =
+			this.experimentDesignGenerator
+				.createReplicationListItemForPRepDesign(germplasmList, replicationPercentage, replicationNumber);
+		final MainDesign mainDesign = this.experimentDesignGenerator
+			.createPRepDesign(blockSize, nTreatments, replicationListItems, entryNumberVariable.getName(),
+				blockNumberVariable.getName(), plotNumberVariable.getName(), plotNo, entryNo);
+
+		/**
+		 * TODO: return ObservationUnitRows from  this.experimentDesignGenerator.generateExperimentDesignMeasurements
+		 measurementRowList = this.experimentDesignGenerator
+		 .generateExperimentDesignMeasurements(environments, environmentsToAdd, trialVariables, factors, nonTrialFactors,
+		 variates, treatmentVariables, new ArrayList<StandardVariable>(requiredVariablesMap.values()), germplasmList, mainDesign,
+		 entryNumberVariable.getName(), null,
+		 new HashMap<Integer, Integer>());
+		 **/
+		return new ArrayList<>();
 	}
 
 	@Override

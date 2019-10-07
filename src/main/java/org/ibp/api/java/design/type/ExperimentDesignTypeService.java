@@ -5,7 +5,6 @@ import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 
 import java.util.List;
-import java.util.Observable;
 
 public interface ExperimentDesignTypeService {
 
@@ -17,7 +16,8 @@ public interface ExperimentDesignTypeService {
 	 * @param experimentDesignInput
 	 * @param programUUID
 	 */
-	List<ObservationUnitRow> generateDesign(int studyId, ExperimentDesignInput experimentDesignInput, String programUUID, List<ImportedGermplasm> germplasmList);
+	List<ObservationUnitRow> generateDesign(int studyId, ExperimentDesignInput experimentDesignInput, String programUUID,
+		List<ImportedGermplasm> germplasmList);
 
 	/**
 	 * Defines if the experimental design requires breeding view licence to run

@@ -9,6 +9,7 @@ import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.util.ExpDesignUtil;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
@@ -19,7 +20,11 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Component
 public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDesignTypeService {
@@ -39,42 +44,45 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 	private OntologyDataManager ontologyDataManager;
 
 	@Override
-	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput, final String programUUID, final List<ImportedGermplasm> germplasmList) {
 
-		try {
+	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
+		final String programUUID, final List<ImportedGermplasm> germplasmList) {
 
-			this.experimentDesignTypeValidator.validateRandomizedCompleteBlockDesign(experimentDesignInput, germplasmList);
+		this.experimentDesignTypeValidator.validateRandomizedCompleteBlockDesign(experimentDesignInput, germplasmList);
 
-			final StandardVariable replicatesFactor = this.ontologyDataManager.getStandardVariable(TermId.REP_NO.getId(), programUUID);
-			final StandardVariable plotNumberFactor = this.ontologyDataManager.getStandardVariable(TermId.PLOT_NO.getId(), programUUID);
-			final String block = experimentDesignInput.getReplicationsCount();
-			final int environments = Integer.valueOf(experimentDesignInput.getNoOfEnvironments());
-			final int environmentsToAdd = Integer.valueOf(experimentDesignInput.getNoOfEnvironmentsToAdd());
-			final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), null);
-			final Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
+		final String block = experimentDesignInput.getReplicationsCount();
+		final int environments = Integer.valueOf(experimentDesignInput.getNoOfEnvironments());
+		final int environmentsToAdd = Integer.valueOf(experimentDesignInput.getNoOfEnvironmentsToAdd());
 
-			// TODO: Process treatment factors if available.
-			final MainDesign mainDesign = this.experimentDesignGenerator
-				.createRandomizedCompleteBlockDesign(block, replicatesFactor.getName(), plotNumberFactor.getName(), plotNo, entryNo,
-					null, null,
-					null, "");
+		final StandardVariable replicateNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.REP_NO.getId(), programUUID);
+		final StandardVariable plotNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.PLOT_NO.getId(), programUUID);
+		final StandardVariable entryNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.ENTRY_NO.getId(), programUUID);
 
-			// TODO:
-			// 1. IBP-3123 Create BVDesign XML input file (e.g.)
-			/**
-			 * 	final MainDesign mainDesign = this.experimentDesignGenerator
-			 * 				.createRandomizedCompleteBlockDesign(block, stdvarRep.getName(), stdvarPlot.getName(), plotNo, entryNo, stdvarTreatment.getName(), treatmentFactors,
-			 * 					levels, "");
-			 */
-			// 2. IBP-3123 Run BV Design and get the design output
-			// 3. IBP-3124 Parse the design output and determine the variables / values that will be saved for each plot experiment.
-			// 4. IBP-3122 Return list of ObservationUnit rows
+		final Map<String, List<String>> treatmentFactorValues =
+			this.getTreatmentFactorValues(experimentDesignInput.getTreatmentFactorsData());
+		final List<String> treatmentFactors = this.getTreatmentFactors(treatmentFactorValues);
+		final List<String> treatmentLevels = this.getLevels(treatmentFactorValues);
 
-		} catch (final Exception e) {
-			RandomizeCompleteBlockDesignTypeServiceImpl.LOG.error(e.getMessage(), e);
-		}
+		treatmentFactorValues.put(entryNumberVariable.getName(), Arrays.asList(Integer.toString(germplasmList.size())));
+		treatmentFactors.add(entryNumberVariable.getName());
+		treatmentLevels.add(Integer.toString(germplasmList.size()));
 
-		return null;
+		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), null);
+		final Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
+
+		final MainDesign mainDesign = this.experimentDesignGenerator
+			.createRandomizedCompleteBlockDesign(block, replicateNumberVariable.getName(), plotNumberVariable.getName(), plotNo, entryNo,
+				entryNumberVariable.getName(), treatmentFactors,
+				treatmentLevels, "");
+
+		/**
+		 * TODO: return ObservationUnitRows from  this.experimentDesignGenerator.generateExperimentDesignMeasurements
+		 final List<ObservationUnitRow> observationUnitRows = this.experimentDesignGenerator
+		 .generateExperimentDesignMeasurements(environments, environmentsToAdd, trialVariables, factors, nonTrialFactors,
+		 variates, treatmentVariables, reqVarList, germplasmList, mainDesign, stdvarTreatment.getName(),
+		 treatmentFactorValues, new HashMap<Integer, Integer>());
+		 **/
+		return new ArrayList<>();
 	}
 
 	@Override
@@ -85,6 +93,41 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 	@Override
 	public Integer getDesignTypeId() {
 		return ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getId();
+	}
+
+	Map<String, List<String>> getTreatmentFactorValues(final Map treatmentFactorsData) {
+
+		final Map<String, List<String>> treatmentFactorValues = new HashMap<>();
+
+		if (treatmentFactorsData != null) {
+			final Iterator keySetIter = treatmentFactorsData.keySet().iterator();
+			while (keySetIter.hasNext()) {
+				final String key = (String) keySetIter.next();
+				final Map treatmentData = (Map) treatmentFactorsData.get(key);
+				treatmentFactorValues.put(key, (List) treatmentData.get("labels"));
+			}
+		}
+
+		return treatmentFactorValues;
+	}
+
+	List<String> getTreatmentFactors(final Map<String, List<String>> treatmentFactorValues) {
+		final List<String> treatmentFactors = new ArrayList<>();
+		final Set<String> keySet = treatmentFactorValues.keySet();
+		for (final String key : keySet) {
+			treatmentFactors.add(ExpDesignUtil.cleanBVDesingKey(key));
+		}
+		return treatmentFactors;
+	}
+
+	List<String> getLevels(final Map<String, List<String>> treatmentFactorValues) {
+		final List<String> levels = new ArrayList<>();
+		final Set<String> keySet = treatmentFactorValues.keySet();
+		for (final String key : keySet) {
+			final int level = treatmentFactorValues.get(key).size();
+			levels.add(Integer.toString(level));
+		}
+		return levels;
 	}
 
 }

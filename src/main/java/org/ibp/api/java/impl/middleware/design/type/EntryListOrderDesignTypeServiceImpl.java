@@ -5,7 +5,6 @@ import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.InsertionMannerItem;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
-import org.ibp.api.domain.study.DesignType;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -31,7 +30,8 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 	private BindingResult errors;
 
 	@Override
-	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput, final String programUUID, final List<ImportedGermplasm> germplasmList) {
+	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
+		final String programUUID, final List<ImportedGermplasm> germplasmList) {
 
 		this.experimentDesignTypeValidator.validateEntryListOrderDesign(experimentDesignInput, germplasmList);
 
@@ -59,10 +59,19 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 
 		for (int instanceNumber = 1; instanceNumber <= environments; instanceNumber++) {
 
-			Integer plotNumber = Integer.parseInt(experimentDesignInput.getStartingPlotNo());
-			// IBP-3122 Return list of ObservationUnit rows
+			int plotNumber = Integer.parseInt(experimentDesignInput.getStartingPlotNo());
+
+			for (final ImportedGermplasm germplasm : mergedGermplasmList) {
+				/**
+				 * TODO: Create ObservationUnitRow per germplasm
+				 final MeasurementRow measurementRow =
+				 this.createMeasurementRow(instanceNumber, germplasm, germplasm.getEntryId(), plotNumber++, trialVariables, variates,
+				 nonTrialFactors, factors);
+				 measurementRows.add(measurementRow);
+				 **/
+			}
 		}
-		return null;
+		return new ArrayList<>();
 	}
 
 	@Override

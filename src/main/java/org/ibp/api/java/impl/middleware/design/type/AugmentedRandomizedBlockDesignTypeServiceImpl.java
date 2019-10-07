@@ -7,8 +7,9 @@ import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.util.StringUtil;
-import org.ibp.api.domain.study.DesignType;
+import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
+import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
@@ -37,10 +38,14 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 	public ExperimentDesignTypeValidator experimentDesignTypeValidator;
 
 	@Resource
+	public ExperimentDesignGenerator experimentDesignGenerator;
+
+	@Resource
 	public OntologyDataManager ontologyDataManager;
 
 	@Override
-	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput, final String programUUID, final List<ImportedGermplasm> germplasmList) {
+	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
+		final String programUUID, final List<ImportedGermplasm> germplasmList) {
 
 		this.experimentDesignTypeValidator.validateAugmentedDesign(experimentDesignInput, germplasmList);
 
@@ -59,23 +64,22 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 		final int noOfExistingEnvironments = Integer.valueOf(experimentDesignInput.getNoOfEnvironments());
 		final int noOfEnvironmentsToBeAdded = Integer.valueOf(experimentDesignInput.getNoOfEnvironmentsToAdd());
 
-		// TODO: Find a way to get the ProgramUUID without using ContextUtil
 		final StandardVariable stdvarEntryNo = this.ontologyDataManager.getStandardVariable(TermId.ENTRY_NO.getId(), "");
 		final StandardVariable stdvarBlock = this.ontologyDataManager.getStandardVariable(TermId.BLOCK_NO.getId(), "");
 		final StandardVariable stdvarPlot = this.ontologyDataManager.getStandardVariable(TermId.PLOT_NO.getId(), "");
 
-		// TODO:
-		// 1. IBP-3123 Create BVDesign XML input file (e.g.)
-		/**
-		 * 	final MainDesign mainDesign = this.experimentDesignGenerator
-		 * 				.createRandomizedCompleteBlockDesign(block, stdvarRep.getName(), stdvarPlot.getName(), plotNo, entryNo, stdvarTreatment.getName(), treatmentFactors,
-		 * 					levels, "");
-		 */
-		// 2. IBP-3123 Run BV Design and get the design output
-		// 3. IBP-3124 Parse the design output and determine the variables / values that will be saved for each plot experiment.
-		// 4. IBP-3122 Return list of ObservationUnit rows
+		final MainDesign mainDesign = this.experimentDesignGenerator
+			.createAugmentedRandomizedBlockDesign(numberOfBlocks, numberOfTreatments, numberOfControls, startingPlotNumber,
+				startingEntryNumber, stdvarEntryNo.getName(), stdvarBlock.getName(), stdvarPlot.getName());
 
-		return null;
+		/**
+		 * TODO: return ObservationUnitRows from  this.experimentDesignGenerator.generateExperimentDesignMeasurements
+		 final List<MeasurementRow> measurementRowList = experimentDesignGenerator
+		 .generateExperimentDesignMeasurements(noOfExistingEnvironments, noOfEnvironmentsToBeAdded, trialVariables, factors, nonTrialFactors,
+		 variates, treatmentVariables, requiredDesignVariables, germplasmList, mainDesign, stdvarEntryNo.getName(), null,
+		 designExpectedEntriesMap);
+		 **/
+		return new ArrayList<>();
 	}
 
 	@Override
