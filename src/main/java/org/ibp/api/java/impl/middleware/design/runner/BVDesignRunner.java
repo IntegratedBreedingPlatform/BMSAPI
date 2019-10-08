@@ -11,7 +11,9 @@ import org.ibp.api.java.impl.middleware.design.util.ExpDesignUtil;
 import org.ibp.api.rest.design.BVDesignProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -22,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
+@Component
 public class BVDesignRunner implements DesignRunner {
 
 	public static final String BV_PREFIX = "-bv";
@@ -35,13 +38,15 @@ public class BVDesignRunner implements DesignRunner {
 	private BVDesignXmlInputWriter inputWriter = new BVDesignXmlInputWriter();
 	private static long bvDesignRunnerTimeout;
 
+	@Resource
+	private BVDesignProperties bvDesignProperties;
+
 	@Override
-	public BVDesignOutput runBVDesign(final BVDesignProperties bvDesignProperties,
-		final MainDesign design) throws IOException {
+	public BVDesignOutput runBVDesign(final MainDesign design) throws IOException {
 
-		final String bvDesignPath = bvDesignProperties.getBvDesignPath();
+		final String bvDesignPath = this.bvDesignProperties.getBvDesignPath();
 
-		bvDesignRunnerTimeout = 60 * 1000 * Long.valueOf(bvDesignProperties.getBvDesignRunnerTimeout());
+		bvDesignRunnerTimeout = 60 * 1000 * Long.valueOf(this.bvDesignProperties.getBvDesignRunnerTimeout());
 
 		int returnCode = -1;
 
@@ -49,7 +54,7 @@ public class BVDesignRunner implements DesignRunner {
 
 			final String xml = this.getXMLStringForDesign(design);
 
-			final String filepath = this.inputWriter.write(xml, bvDesignProperties);
+			final String filepath = this.inputWriter.write(xml, this.bvDesignProperties);
 
 			returnCode = this.processRunner.run(bvDesignPath, "-i" + filepath);
 		}

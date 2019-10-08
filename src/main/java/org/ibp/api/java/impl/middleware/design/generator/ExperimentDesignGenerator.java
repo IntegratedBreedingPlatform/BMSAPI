@@ -1,16 +1,27 @@
 package org.ibp.api.java.impl.middleware.design.generator;
 
+import com.google.common.base.Optional;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
+import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.generationcp.middleware.util.StringUtil;
+import org.ibp.api.domain.design.BVDesignOutput;
+import org.ibp.api.domain.design.BVDesignTrialInstance;
 import org.ibp.api.domain.design.ExpDesign;
 import org.ibp.api.domain.design.ExpDesignParameter;
 import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
+import org.ibp.api.exception.BVDesignException;
+import org.ibp.api.java.impl.middleware.design.runner.BVDesignRunner;
+import org.ibp.api.java.impl.middleware.design.util.ExpDesignUtil;
 import org.ibp.api.rest.design.BVDesignProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +30,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +38,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class ExperimentDesignGenerator {
@@ -68,7 +82,7 @@ public class ExperimentDesignGenerator {
 		Arrays.asList(TermId.PLOT_NO.getId(), TermId.REP_NO.getId(), TermId.BLOCK_NO.getId(), TermId.ROW.getId(), TermId.COL.getId());
 
 	@Resource
-	private BVDesignProperties fieldbookProperties;
+	private BVDesignRunner bvDesignRunner;
 
 
 	private final Random random = new Random();
@@ -268,20 +282,178 @@ public class ExperimentDesignGenerator {
 		return replicationListItem;
 	}
 
-	public void generateExperimentDesignMeasurements(
+	public List<ObservationUnitRow> generateExperimentDesignMeasurements(
 		final int noOfExistingEnvironments, final int noOfEnvironmentsToAdd,
-		final List<MeasurementVariable> trialVariables, final List<MeasurementVariable> factors,
 		final List<MeasurementVariable> nonTrialFactors, final List<MeasurementVariable> variates,
 		final List<TreatmentVariable> treatmentVariables, final List<StandardVariable> requiredExpDesignVariable,
 		final List<ImportedGermplasm> germplasmList, final MainDesign mainDesign, final String entryNumberIdentifier,
-		final Map<String, List<String>> treatmentFactorValues, final Map<Integer, Integer> designExpectedEntriesMap) {
+		final Map<String, List<String>> treatmentFactorValues, final Map<Integer, Integer> designExpectedEntriesMap)throws BVDesignException {
 
-		/* TODO:
-			 IBP-3123 Run BV Design and get the design output
-		 */
+		// Specify number of study instances for BVDesign generation
+		mainDesign.getDesign().getParameters()
+			.add(this.createExpDesignParameter(NUMBER_TRIALS_PARAM, String.valueOf(noOfEnvironmentsToAdd), null));
+		BVDesignOutput bvOutput = null;
+		try {
+			bvOutput = this.bvDesignRunner.runBVDesign(mainDesign);
+		} catch (final Exception e) {
+			ExperimentDesignGenerator.LOG.error(e.getMessage(), e);
+			throw new BVDesignException("experiment.design.bv.exe.error.generate.generic.error");
+		}
+
+		if (bvOutput == null || !bvOutput.isSuccess()) {
+			throw new BVDesignException("experiment.design.generate.generic.error");
+		}
+
+		final List<MeasurementVariable> varList =
+			this.constructStudyVariableList(nonTrialFactors, variates, treatmentVariables, requiredExpDesignVariable);
+		//Converting germplasm List to map
+		final Map<Integer, ImportedGermplasm> importedGermplasmMap = germplasmList.stream().collect(Collectors.toMap(ImportedGermplasm::getEntryId,
+				Function.identity()));
+		final List<ObservationUnitRow> rows = new ArrayList<>();
+		int trialInstanceNumber = noOfExistingEnvironments - noOfEnvironmentsToAdd + 1;
+		for (final BVDesignTrialInstance instance : bvOutput.getTrialInstances()) {
+			for (final Map<String, String> row : instance.getRows()) {
+				final String entryNoValue = row.get(entryNumberIdentifier);
+				final Integer entryNumber = StringUtil.parseInt(entryNoValue, null);
+				if (entryNumber == null) {
+					throw new BVDesignException("experiment.design.bv.exe.error.output.invalid.error");
+				}
+				final Optional<ImportedGermplasm> importedGermplasm =
+					this.findImportedGermplasmByEntryNumberAndChecks(importedGermplasmMap, entryNumber, designExpectedEntriesMap);
+
+				if (!importedGermplasm.isPresent()) {
+					throw new BVDesignException("experiment.design.bv.exe.error.output.invalid.error");
+				}
+				final ObservationUnitRow observationUnitRow = this.createObservationUnitRow(varList, importedGermplasm.get(), row,
+					treatmentFactorValues, trialInstanceNumber);
+				rows.add(observationUnitRow);
+			}
+			trialInstanceNumber++;
+		}
+		return rows;
 	}
 
+	ObservationUnitRow createObservationUnitRow(
+		final List<MeasurementVariable> headerVariable, final ImportedGermplasm germplasm,
+		final Map<String, String> bvEntryMap, final Map<String, List<String>> treatmentFactorValues, final int trialNo) {
+		final ObservationUnitRow measurementRow = new ObservationUnitRow();
+		final Map<String, ObservationUnitData> observationUnitDataMap = new HashMap<>();
+		ObservationUnitData treatmentLevelData = null;
+		ObservationUnitData observationUnitData;
 
+		observationUnitData = this.createObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), String.valueOf(trialNo));
+		observationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
+
+		for (final MeasurementVariable var : headerVariable) {
+
+			observationUnitData = null;
+
+			final int termId = var.getTermId();
+
+			if (termId == TermId.ENTRY_NO.getId()) {
+				observationUnitData = this.createObservationUnitData(var.getTermId(), String.valueOf(germplasm.getEntryId()));
+			} else if (termId == TermId.SOURCE.getId() || termId == TermId.GERMPLASM_SOURCE.getId()) {
+				observationUnitData = this.createObservationUnitData(var.getTermId(), germplasm.getSource() != null ? germplasm.getSource() : "");
+			} else if (termId == TermId.GROUPGID.getId()) {
+				observationUnitData = this.createObservationUnitData(var.getTermId(),germplasm.getGroupId() != null ? germplasm.getGroupId().toString() : "");
+			} else if (termId == TermId.STOCKID.getId()) {
+				observationUnitData = this.createObservationUnitData(var.getTermId(), germplasm.getStockIDs() != null ? germplasm.getStockIDs() : "");
+			} else if (termId == TermId.CROSS.getId()) {
+				observationUnitData = this.createObservationUnitData(var.getTermId(), germplasm.getCross());
+			} else if (termId == TermId.DESIG.getId()) {
+				observationUnitData = this.createObservationUnitData(var.getTermId(), germplasm.getDesig());
+			} else if (termId == TermId.GID.getId()) {
+				observationUnitData = this.createObservationUnitData(var.getTermId(), germplasm.getGid());
+			} else if (termId == TermId.ENTRY_CODE.getId()) {
+				observationUnitData = this.createObservationUnitData(var.getTermId(), germplasm.getEntryCode());
+			} else if (EXP_DESIGN_VARIABLE_IDS.contains(termId)) {
+				observationUnitData = this.createObservationUnitData(var.getTermId(), bvEntryMap.get(var.getName()));
+			} else if (termId == TermId.CHECK.getId()) {
+				observationUnitData = this.createObservationUnitData(var.getTermId(), Integer.toString(germplasm.getEntryTypeCategoricalID()));
+			} else if (termId == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+				observationUnitData = this.createObservationUnitData(var.getTermId(), Integer.toString(trialNo));
+			} else if (var.getTreatmentLabel() != null && !"".equals(var.getTreatmentLabel())) {
+				if (treatmentLevelData == null) {
+					observationUnitData = this.createObservationUnitData(var.getTermId(), bvEntryMap.get(ExpDesignUtil.cleanBVDesingKey(Integer.toString(var.getTermId()))));
+					treatmentLevelData = observationUnitData;
+				} else {
+					final String level = treatmentLevelData.getValue();
+					if (NumberUtils.isNumber(level)) {
+						final int index = Integer.valueOf(level) - 1;
+						if (treatmentFactorValues != null && treatmentFactorValues
+							.containsKey(String.valueOf(treatmentLevelData.getVariableId()))) {
+							final Object tempObj =
+								treatmentFactorValues.get(String.valueOf(treatmentLevelData.getVariableId()))
+									.get(index);
+							String value = "";
+							if (tempObj != null) {
+								if (tempObj instanceof String) {
+									value = (String) tempObj;
+								} else {
+									value = Integer.toString((Integer) tempObj);
+								}
+							}
+							if (var.getDataTypeId() != null && var.getDataTypeId().intValue() == TermId.DATE_VARIABLE.getId()) {
+								value = DateUtil.convertToDBDateFormat(var.getDataTypeId(), value);
+								observationUnitData = this.createObservationUnitData(var.getTermId(), value);
+							} else if (var.getPossibleValues() != null && !var.getPossibleValues().isEmpty() && NumberUtils
+								.isNumber(value)) {
+								observationUnitData = this.createObservationUnitData(var.getTermId(), value);
+							} else {
+								observationUnitData = this.createObservationUnitData(var.getTermId(), value);
+							}
+						}
+					}
+					treatmentLevelData = null;
+				}
+
+			} else {
+				// meaning non factor
+				observationUnitData = this.createObservationUnitData(var.getTermId(), "");
+			}
+
+			observationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
+		}
+		measurementRow.setVariables(observationUnitDataMap);
+		return measurementRow;
+	}
+
+	ObservationUnitData createObservationUnitData(final Integer variableId, final String value) {
+		final ObservationUnitData observationUnitData = new ObservationUnitData();
+		observationUnitData.setVariableId(variableId);
+		observationUnitData.setValue(value);
+		return observationUnitData;
+	}
+
+	List<MeasurementVariable> constructStudyVariableList(
+		final List<MeasurementVariable> nonTrialFactors, final List<MeasurementVariable> variates,
+		final List<TreatmentVariable> treatmentVariables, final List<StandardVariable> requiredExpDesignVariables) {
+		final List<MeasurementVariable> varList = new ArrayList<>();
+		varList.addAll(nonTrialFactors);
+
+		final List<Integer> nonTrialFactorsIds = new ArrayList<>();
+		nonTrialFactors.forEach(nonTrialFactor -> nonTrialFactorsIds.add(nonTrialFactor.getTermId()));
+
+		requiredExpDesignVariables.forEach(requiredExpDesignVariable -> {
+			if(!nonTrialFactorsIds.contains(requiredExpDesignVariable.getId())) {
+				final MeasurementVariable measurementVariable = new MeasurementVariable();
+				measurementVariable.setTermId(requiredExpDesignVariable.getId());
+				measurementVariable.setName(requiredExpDesignVariable.getName());
+				varList.add(measurementVariable);
+			}
+		});
+
+		if(treatmentVariables != null) {
+			treatmentVariables.forEach(treatmentVariable -> {
+				varList.add(treatmentVariable.getLevelVariable());
+				varList.add(treatmentVariable.getValueVariable());
+			});
+		}
+
+		varList.addAll(variates);
+
+		return varList;
+	}
 
 	ExpDesignParameter createExpDesignParameter(final String name, final String value, final List<ListItem> items) {
 
@@ -290,6 +462,20 @@ public class ExperimentDesignGenerator {
 			designParam.setListItem(items);
 		}
 		return designParam;
+	}
+
+	Optional<ImportedGermplasm> findImportedGermplasmByEntryNumberAndChecks(
+		final Map<Integer, ImportedGermplasm> importedGermplasmMap,
+		final Integer entryNumber, final Map<Integer, Integer> designExpectedEntriesMap) {
+
+		final Integer resolvedEntryNumber = this.resolveMappedEntryNumber(entryNumber, designExpectedEntriesMap);
+
+		if (importedGermplasmMap.containsKey(resolvedEntryNumber)) {
+			return Optional.of(importedGermplasmMap.get(resolvedEntryNumber));
+		}
+
+		return Optional.absent();
+
 	}
 
 	Integer resolveMappedEntryNumber(final Integer entryNumber, final Map<Integer, Integer> designExpectedEntriesMap) {

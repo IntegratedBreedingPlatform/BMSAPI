@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public interface DesignRunner {
 
-	public BVDesignOutput runBVDesign(BVDesignProperties bvDesignProperties, MainDesign design)
+	public BVDesignOutput runBVDesign(MainDesign design)
 			throws IOException;
 
 }
