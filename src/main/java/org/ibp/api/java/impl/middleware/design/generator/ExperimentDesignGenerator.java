@@ -11,6 +11,11 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.util.StringUtil;
@@ -22,8 +27,8 @@ import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.impl.middleware.design.runner.BVDesignRunner;
+import org.ibp.api.java.impl.middleware.design.transformer.StandardVariableTransformer;
 import org.ibp.api.java.impl.middleware.design.util.ExpDesignUtil;
-import org.ibp.api.rest.design.BVDesignProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -85,6 +90,17 @@ public class ExperimentDesignGenerator {
 	@Resource
 	private BVDesignRunner bvDesignRunner;
 
+	@Resource
+	private StudyDataManager studyDataManager;
+
+	@Resource
+	private DatasetService datasetService;
+
+	@Resource
+	private OntologyDataManager ontologyDataManager;
+
+	@Resource
+	private StandardVariableTransformer standardVariableTransformer;
 
 	private final Random random = new Random();
 
@@ -287,7 +303,8 @@ public class ExperimentDesignGenerator {
 		final int noOfExistingEnvironments, final int noOfEnvironmentsToAdd, final List<MeasurementVariable> nonTrialFactors,
 		final List<TreatmentVariable> treatmentVariables, final List<StandardVariable> requiredExpDesignVariable,
 		final List<ImportedGermplasm> germplasmList, final MainDesign mainDesign, final String entryNumberIdentifier,
-		final Map<String, List<String>> treatmentFactorValues, final Map<Integer, Integer> designExpectedEntriesMap)throws BVDesignException {
+		final Map<String, List<String>> treatmentFactorValues, final Map<Integer, Integer> designExpectedEntriesMap)
+		throws BVDesignException {
 
 		// Specify number of study instances for BVDesign generation
 		mainDesign.getDesign().getParameters()
@@ -308,7 +325,8 @@ public class ExperimentDesignGenerator {
 			this.constructStudyVariableList(nonTrialFactors, treatmentVariables, requiredExpDesignVariable);
 
 		//Converting germplasm List to map
-		final Map<Integer, ImportedGermplasm> importedGermplasmMap = germplasmList.stream().collect(Collectors.toMap(ImportedGermplasm::getEntryId,
+		final Map<Integer, ImportedGermplasm> importedGermplasmMap =
+			germplasmList.stream().collect(Collectors.toMap(ImportedGermplasm::getEntryId,
 				Function.identity()));
 		final List<ObservationUnitRow> rows = new ArrayList<>();
 		int trialInstanceNumber = noOfExistingEnvironments - noOfEnvironmentsToAdd + 1;
@@ -354,11 +372,14 @@ public class ExperimentDesignGenerator {
 			if (termId == TermId.ENTRY_NO.getId()) {
 				observationUnitData = this.createObservationUnitData(var.getTermId(), String.valueOf(germplasm.getEntryId()));
 			} else if (termId == TermId.SOURCE.getId() || termId == TermId.GERMPLASM_SOURCE.getId()) {
-				observationUnitData = this.createObservationUnitData(var.getTermId(), germplasm.getSource() != null ? germplasm.getSource() : "");
+				observationUnitData =
+					this.createObservationUnitData(var.getTermId(), germplasm.getSource() != null ? germplasm.getSource() : "");
 			} else if (termId == TermId.GROUPGID.getId()) {
-				observationUnitData = this.createObservationUnitData(var.getTermId(),germplasm.getGroupId() != null ? germplasm.getGroupId().toString() : "");
+				observationUnitData = this.createObservationUnitData(var.getTermId(),
+					germplasm.getGroupId() != null ? germplasm.getGroupId().toString() : "");
 			} else if (termId == TermId.STOCKID.getId()) {
-				observationUnitData = this.createObservationUnitData(var.getTermId(), germplasm.getStockIDs() != null ? germplasm.getStockIDs() : "");
+				observationUnitData =
+					this.createObservationUnitData(var.getTermId(), germplasm.getStockIDs() != null ? germplasm.getStockIDs() : "");
 			} else if (termId == TermId.CROSS.getId()) {
 				observationUnitData = this.createObservationUnitData(var.getTermId(), germplasm.getCross());
 			} else if (termId == TermId.DESIG.getId()) {
@@ -370,12 +391,14 @@ public class ExperimentDesignGenerator {
 			} else if (EXP_DESIGN_VARIABLE_IDS.contains(termId)) {
 				observationUnitData = this.createObservationUnitData(var.getTermId(), bvEntryMap.get(var.getName()));
 			} else if (termId == TermId.CHECK.getId()) {
-				observationUnitData = this.createObservationUnitData(var.getTermId(), Integer.toString(germplasm.getEntryTypeCategoricalID()));
+				observationUnitData =
+					this.createObservationUnitData(var.getTermId(), Integer.toString(germplasm.getEntryTypeCategoricalID()));
 			} else if (termId == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 				observationUnitData = this.createObservationUnitData(var.getTermId(), Integer.toString(trialNo));
 			} else if (StringUtils.isEmpty(var.getTreatmentLabel())) {
 				if (treatmentLevelData == null) {
-					observationUnitData = this.createObservationUnitData(var.getTermId(), bvEntryMap.get(ExpDesignUtil.cleanBVDesingKey(Integer.toString(var.getTermId()))));
+					observationUnitData = this.createObservationUnitData(var.getTermId(),
+						bvEntryMap.get(ExpDesignUtil.cleanBVDesingKey(Integer.toString(var.getTermId()))));
 					treatmentLevelData = observationUnitData;
 				} else {
 					final String level = treatmentLevelData.getValue();
@@ -435,7 +458,7 @@ public class ExperimentDesignGenerator {
 		nonTrialFactors.forEach(nonTrialFactor -> nonTrialFactorsIds.add(nonTrialFactor.getTermId()));
 
 		requiredExpDesignVariables.forEach(requiredExpDesignVariable -> {
-			if(!nonTrialFactorsIds.contains(requiredExpDesignVariable.getId())) {
+			if (!nonTrialFactorsIds.contains(requiredExpDesignVariable.getId())) {
 				final MeasurementVariable measurementVariable = new MeasurementVariable();
 				measurementVariable.setTermId(requiredExpDesignVariable.getId());
 				measurementVariable.setName(requiredExpDesignVariable.getName());
@@ -443,7 +466,7 @@ public class ExperimentDesignGenerator {
 			}
 		});
 
-		if(treatmentVariables != null) {
+		if (treatmentVariables != null) {
 			treatmentVariables.forEach(treatmentVariable -> {
 				varList.add(treatmentVariable.getLevelVariable());
 				varList.add(treatmentVariable.getValueVariable());
@@ -562,6 +585,38 @@ public class ExperimentDesignGenerator {
 		}
 		return listItemList;
 
+	}
+
+	public Map<Integer, MeasurementVariable> getMeasurementVariablesMap(final int studyId, final String programUUID,
+		final List<Integer> designFactors, final List<Integer> treatmentFactors) {
+
+		final int plotDatasetId =
+			this.studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0).getId();
+
+		final List<MeasurementVariable> measurementVariables =
+			this.datasetService.getDatasetMeasurementVariablesByVariableType(plotDatasetId,
+				Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()));
+
+		final Map<Integer, MeasurementVariable> measurementVariablesMap = measurementVariables.stream()
+			.collect(Collectors.toMap(MeasurementVariable::getTermId, measurementVariable -> measurementVariable));
+
+		final List<StandardVariable> designFactorStanadardVariables =
+			this.ontologyDataManager.getStandardVariables(designFactors, programUUID);
+
+		for (final StandardVariable standardVariable : designFactorStanadardVariables) {
+			measurementVariablesMap.put(standardVariable.getId(),
+				this.standardVariableTransformer.convert(standardVariable, VariableType.EXPERIMENTAL_DESIGN));
+		}
+
+		final List<StandardVariable> treatmentFactorStanadardVariables =
+			this.ontologyDataManager.getStandardVariables(treatmentFactors, programUUID);
+
+		for (final StandardVariable standardVariable : designFactorStanadardVariables) {
+			measurementVariablesMap.put(standardVariable.getId(),
+				this.standardVariableTransformer.convert(standardVariable, VariableType.TREATMENT_FACTOR));
+		}
+
+		return measurementVariablesMap;
 	}
 
 }

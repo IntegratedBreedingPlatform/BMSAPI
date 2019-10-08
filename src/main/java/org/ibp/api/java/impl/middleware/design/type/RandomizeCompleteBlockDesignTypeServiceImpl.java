@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.design.type;
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.util.StringUtil;
@@ -25,13 +26,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RandomizeCompleteBlockDesignTypeServiceImpl.class);
 
-	private final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
+	private static final List<Integer> DESIGN_FACTOR_VARIABLES =
+		Arrays.asList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId());
+
+	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId());
 
 	@Resource
@@ -44,7 +49,6 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 	private OntologyDataManager ontologyDataManager;
 
 	@Override
-
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
 		final String programUUID, final List<ImportedGermplasm> germplasmList) {
 
@@ -54,25 +58,29 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 		final int environments = Integer.valueOf(experimentDesignInput.getNoOfEnvironments());
 		final int environmentsToAdd = Integer.valueOf(experimentDesignInput.getNoOfEnvironmentsToAdd());
 
-		final StandardVariable replicateNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.REP_NO.getId(), programUUID);
-		final StandardVariable plotNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.PLOT_NO.getId(), programUUID);
-		final StandardVariable entryNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.ENTRY_NO.getId(), programUUID);
+		final Map<Integer, StandardVariable> standardVariablesMap =
+			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
+				.collect(Collectors.toMap(StandardVariable::getId, standardVariable -> standardVariable));
+
+		final String entryNumberName = standardVariablesMap.get(TermId.ENTRY_NO.getId()).getName();
+		final String replicateNumberName = standardVariablesMap.get(TermId.REP_NO.getId()).getName();
+		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
 
 		final Map<String, List<String>> treatmentFactorValues =
 			this.getTreatmentFactorValues(experimentDesignInput.getTreatmentFactorsData());
 		final List<String> treatmentFactors = this.getTreatmentFactors(treatmentFactorValues);
 		final List<String> treatmentLevels = this.getLevels(treatmentFactorValues);
 
-		treatmentFactorValues.put(entryNumberVariable.getName(), Arrays.asList(Integer.toString(germplasmList.size())));
-		treatmentFactors.add(entryNumberVariable.getName());
+		treatmentFactorValues.put(entryNumberName, Arrays.asList(Integer.toString(germplasmList.size())));
+		treatmentFactors.add(entryNumberName);
 		treatmentLevels.add(Integer.toString(germplasmList.size()));
 
 		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), null);
 		final Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createRandomizedCompleteBlockDesign(block, replicateNumberVariable.getName(), plotNumberVariable.getName(), plotNo, entryNo,
-				entryNumberVariable.getName(), treatmentFactors,
+			.createRandomizedCompleteBlockDesign(block, replicateNumberName, plotNumberName, plotNo, entryNo,
+				entryNumberName, treatmentFactors,
 				treatmentLevels, "");
 
 		/**
@@ -93,6 +101,11 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 	@Override
 	public Integer getDesignTypeId() {
 		return ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getId();
+	}
+
+	@Override
+	public Map<Integer, MeasurementVariable> getMeasurementVariablesMap(final int studyId, final String programUUID) {
+		return this.experimentDesignGenerator.getMeasurementVariablesMap(studyId, programUUID, DESIGN_FACTOR_VARIABLES, new ArrayList<>());
 	}
 
 	Map<String, List<String>> getTreatmentFactorValues(final Map treatmentFactorsData) {

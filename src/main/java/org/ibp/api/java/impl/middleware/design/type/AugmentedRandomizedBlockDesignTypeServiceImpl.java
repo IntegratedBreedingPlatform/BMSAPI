@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.design.type;
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -24,9 +25,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class AugmentedRandomizedBlockDesignTypeServiceImpl implements ExperimentDesignTypeService {
+
+	private static final List<Integer> DESIGN_FACTOR_VARIABLES =
+		Arrays.asList(TermId.BLOCK_NO.getId(), TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId());
 
 	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NBLKS.getId());
@@ -64,13 +69,17 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 		final int noOfExistingEnvironments = Integer.valueOf(experimentDesignInput.getNoOfEnvironments());
 		final int noOfEnvironmentsToBeAdded = Integer.valueOf(experimentDesignInput.getNoOfEnvironmentsToAdd());
 
-		final StandardVariable stdvarEntryNo = this.ontologyDataManager.getStandardVariable(TermId.ENTRY_NO.getId(), "");
-		final StandardVariable stdvarBlock = this.ontologyDataManager.getStandardVariable(TermId.BLOCK_NO.getId(), "");
-		final StandardVariable stdvarPlot = this.ontologyDataManager.getStandardVariable(TermId.PLOT_NO.getId(), "");
+		final Map<Integer, StandardVariable> standardVariablesMap =
+			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
+				.collect(Collectors.toMap(StandardVariable::getId, standardVariable -> standardVariable));
+
+		final String entryNumberName = standardVariablesMap.get(TermId.ENTRY_NO.getId()).getName();
+		final String blockNumberName = standardVariablesMap.get(TermId.BLOCK_NO.getId()).getName();
+		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createAugmentedRandomizedBlockDesign(numberOfBlocks, numberOfTreatments, numberOfControls, startingPlotNumber,
-				startingEntryNumber, stdvarEntryNo.getName(), stdvarBlock.getName(), stdvarPlot.getName());
+				startingEntryNumber, entryNumberName, blockNumberName, plotNumberName);
 
 		/**
 		 * TODO: return ObservationUnitRows from  this.experimentDesignGenerator.generateExperimentDesignMeasurements
@@ -90,6 +99,11 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 	@Override
 	public Integer getDesignTypeId() {
 		return ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK.getId();
+	}
+
+	@Override
+	public Map<Integer, MeasurementVariable> getMeasurementVariablesMap(final int studyId, final String programUUID) {
+		return this.experimentDesignGenerator.getMeasurementVariablesMap(studyId, programUUID, DESIGN_FACTOR_VARIABLES, new ArrayList<>());
 	}
 
 	Map<Integer, StandardVariable> convertStandardVariableListToMap(final List<StandardVariable> standardVariables) {

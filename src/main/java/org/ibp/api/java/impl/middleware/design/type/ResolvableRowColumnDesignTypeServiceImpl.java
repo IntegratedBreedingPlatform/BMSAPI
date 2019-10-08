@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.util.StringUtil;
@@ -19,10 +20,15 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesignTypeService {
+
+	private static final List<Integer> DESIGN_FACTOR_VARIABLES =
+		Arrays.asList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId(), TermId.ROW.getId(), TermId.COL.getId());
 
 	private final List<Integer> EXPERIMENT_DESIGN_VARIABLES_LATINIZED = Arrays
 		.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.NO_OF_ROWS_IN_REPS.getId(),
@@ -54,6 +60,15 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 		final String replicates = experimentDesignInput.getReplicationsCount();
 		final int environments = Integer.valueOf(experimentDesignInput.getNoOfEnvironments());
 		final int environmentsToAdd = Integer.valueOf(experimentDesignInput.getNoOfEnvironmentsToAdd());
+
+		final Map<Integer, StandardVariable> standardVariablesMap =
+			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
+				.collect(Collectors.toMap(StandardVariable::getId, standardVariable -> standardVariable));
+
+		final String entryNumberName = standardVariablesMap.get(TermId.ENTRY_NO.getId()).getName();
+		final String replicateNumberName = standardVariablesMap.get(TermId.REP_NO.getId()).getName();
+		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
+		final String blockNumberName = standardVariablesMap.get(TermId.BLOCK_NO.getId()).getName();
 
 		final StandardVariable entryNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.ENTRY_NO.getId(), programUUID);
 		final StandardVariable replicateNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.REP_NO.getId(), programUUID);
@@ -114,4 +129,10 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 	public Integer getDesignTypeId() {
 		return ExperimentDesignType.ROW_COL.getId();
 	}
+
+	@Override
+	public Map<Integer, MeasurementVariable> getMeasurementVariablesMap(final int studyId, final String programUUID) {
+		return this.experimentDesignGenerator.getMeasurementVariablesMap(studyId, programUUID, DESIGN_FACTOR_VARIABLES, new ArrayList<>());
+	}
+
 }

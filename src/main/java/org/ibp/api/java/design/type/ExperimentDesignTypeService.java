@@ -1,10 +1,12 @@
 package org.ibp.api.java.design.type;
 
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ExperimentDesignTypeService {
 
@@ -27,5 +29,7 @@ public interface ExperimentDesignTypeService {
 	Boolean requiresBreedingViewLicence();
 
 	Integer getDesignTypeId();
+
+	Map<Integer, MeasurementVariable> getMeasurementVariablesMap(int studyId, String programUUID);
 
 }

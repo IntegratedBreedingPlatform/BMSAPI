@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.util.StringUtil;
@@ -19,14 +20,19 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class ResolvableIncompleteBlockDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
+	private static final List<Integer> DESIGN_FACTOR_VARIABLES =
+		Arrays.asList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId(), TermId.BLOCK_NO.getId());
+
 	private final List<Integer> EXPERIMENT_DESIGN_VARIABLES_LATINIZED =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId(),
 			TermId.NO_OF_CBLKS_LATINIZE.getId(), TermId.REPLICATIONS_MAP.getId(), TermId.NO_OF_REPS_IN_COLS.getId());
+
 	private final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId());
 
@@ -51,10 +57,14 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 		final int environments = Integer.valueOf(experimentDesignInput.getNoOfEnvironments());
 		final int environmentsToAdd = Integer.valueOf(experimentDesignInput.getNoOfEnvironmentsToAdd());
 
-		final StandardVariable entryNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.ENTRY_NO.getId(), programUUID);
-		final StandardVariable replicateNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.REP_NO.getId(), programUUID);
-		final StandardVariable blockNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.BLOCK_NO.getId(), programUUID);
-		final StandardVariable plotNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.PLOT_NO.getId(), programUUID);
+		final Map<Integer, StandardVariable> standardVariablesMap =
+			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
+				.collect(Collectors.toMap(StandardVariable::getId, standardVariable -> standardVariable));
+
+		final String entryNumberName = standardVariablesMap.get(TermId.ENTRY_NO.getId()).getName();
+		final String replicateNumberName = standardVariablesMap.get(TermId.REP_NO.getId()).getName();
+		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
+		final String blockNumberName = standardVariablesMap.get(TermId.BLOCK_NO.getId()).getName();
 
 		if (experimentDesignInput.getUseLatenized() != null && experimentDesignInput.getUseLatenized().booleanValue()) {
 			if (experimentDesignInput.getReplicationsArrangement() != null) {
@@ -76,15 +86,11 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 		}
 
 		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), null);
-		Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
-
-		if (!Objects.equals(entryNumberVariable.getId(), TermId.ENTRY_NO.getId())) {
-			entryNo = null;
-		}
+		final Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createResolvableIncompleteBlockDesign(blockSize, Integer.toString(nTreatments), replicates, entryNumberVariable.getName(),
-				replicateNumberVariable.getName(), blockNumberVariable.getName(), plotNumberVariable.getName(), plotNo, entryNo,
+			.createResolvableIncompleteBlockDesign(blockSize, Integer.toString(nTreatments), replicates, entryNumberName,
+				replicateNumberName, blockNumberName, plotNumberName, plotNo, entryNo,
 				experimentDesignInput.getNblatin(),
 				experimentDesignInput.getReplatinGroups(), "", experimentDesignInput.getUseLatenized());
 
@@ -107,5 +113,10 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 	@Override
 	public Integer getDesignTypeId() {
 		return ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getId();
+	}
+
+	@Override
+	public Map<Integer, MeasurementVariable> getMeasurementVariablesMap(final int studyId, final String programUUID) {
+		return this.experimentDesignGenerator.getMeasurementVariablesMap(studyId, programUUID, DESIGN_FACTOR_VARIABLES, new ArrayList<>());
 	}
 }
