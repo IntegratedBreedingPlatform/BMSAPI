@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.design.generator;
 
 import com.google.common.base.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
@@ -283,8 +284,7 @@ public class ExperimentDesignGenerator {
 	}
 
 	public List<ObservationUnitRow> generateExperimentDesignMeasurements(
-		final int noOfExistingEnvironments, final int noOfEnvironmentsToAdd,
-		final List<MeasurementVariable> nonTrialFactors, final List<MeasurementVariable> variates,
+		final int noOfExistingEnvironments, final int noOfEnvironmentsToAdd, final List<MeasurementVariable> nonTrialFactors,
 		final List<TreatmentVariable> treatmentVariables, final List<StandardVariable> requiredExpDesignVariable,
 		final List<ImportedGermplasm> germplasmList, final MainDesign mainDesign, final String entryNumberIdentifier,
 		final Map<String, List<String>> treatmentFactorValues, final Map<Integer, Integer> designExpectedEntriesMap)throws BVDesignException {
@@ -305,7 +305,8 @@ public class ExperimentDesignGenerator {
 		}
 
 		final List<MeasurementVariable> varList =
-			this.constructStudyVariableList(nonTrialFactors, variates, treatmentVariables, requiredExpDesignVariable);
+			this.constructStudyVariableList(nonTrialFactors, treatmentVariables, requiredExpDesignVariable);
+
 		//Converting germplasm List to map
 		final Map<Integer, ImportedGermplasm> importedGermplasmMap = germplasmList.stream().collect(Collectors.toMap(ImportedGermplasm::getEntryId,
 				Function.identity()));
@@ -372,7 +373,7 @@ public class ExperimentDesignGenerator {
 				observationUnitData = this.createObservationUnitData(var.getTermId(), Integer.toString(germplasm.getEntryTypeCategoricalID()));
 			} else if (termId == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 				observationUnitData = this.createObservationUnitData(var.getTermId(), Integer.toString(trialNo));
-			} else if (var.getTreatmentLabel() != null && !"".equals(var.getTreatmentLabel())) {
+			} else if (StringUtils.isEmpty(var.getTreatmentLabel())) {
 				if (treatmentLevelData == null) {
 					observationUnitData = this.createObservationUnitData(var.getTermId(), bvEntryMap.get(ExpDesignUtil.cleanBVDesingKey(Integer.toString(var.getTermId()))));
 					treatmentLevelData = observationUnitData;
@@ -425,8 +426,7 @@ public class ExperimentDesignGenerator {
 		return observationUnitData;
 	}
 
-	List<MeasurementVariable> constructStudyVariableList(
-		final List<MeasurementVariable> nonTrialFactors, final List<MeasurementVariable> variates,
+	List<MeasurementVariable> constructStudyVariableList(final List<MeasurementVariable> nonTrialFactors,
 		final List<TreatmentVariable> treatmentVariables, final List<StandardVariable> requiredExpDesignVariables) {
 		final List<MeasurementVariable> varList = new ArrayList<>();
 		varList.addAll(nonTrialFactors);
@@ -449,8 +449,6 @@ public class ExperimentDesignGenerator {
 				varList.add(treatmentVariable.getValueVariable());
 			});
 		}
-
-		varList.addAll(variates);
 
 		return varList;
 	}
