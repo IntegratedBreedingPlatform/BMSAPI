@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.MainDesign;
+import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.util.ExpDesignUtil;
@@ -50,7 +51,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
-		final String programUUID, final List<ImportedGermplasm> germplasmList) {
+		final String programUUID, final List<ImportedGermplasm> germplasmList) throws BVDesignException {
 
 		this.experimentDesignTypeValidator.validateRandomizedCompleteBlockDesign(experimentDesignInput, germplasmList);
 
@@ -83,14 +84,10 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 				entryNumberName, treatmentFactors,
 				treatmentLevels, "");
 
-		/**
-		 * TODO: return ObservationUnitRows from  this.experimentDesignGenerator.generateExperimentDesignMeasurements
-		 final List<ObservationUnitRow> observationUnitRows = this.experimentDesignGenerator
-		 .generateExperimentDesignMeasurements(environments, environmentsToAdd, trialVariables, factors, nonTrialFactors,
-		 variates, treatmentVariables, reqVarList, germplasmList, mainDesign, stdvarTreatment.getName(),
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
+		return this.experimentDesignGenerator
+		 .generateExperimentDesignMeasurements(environments, environmentsToAdd, measurementVariables, germplasmList, mainDesign, entryNumberName,
 		 treatmentFactorValues, new HashMap<Integer, Integer>());
-		 **/
-		return new ArrayList<>();
 	}
 
 	@Override

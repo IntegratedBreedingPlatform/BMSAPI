@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.MainDesign;
+import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
@@ -50,7 +51,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
-		final String programUUID, final List<ImportedGermplasm> germplasmList) {
+		final String programUUID, final List<ImportedGermplasm> germplasmList) throws BVDesignException {
 
 		this.experimentDesignTypeValidator.validateAugmentedDesign(experimentDesignInput, germplasmList);
 
@@ -81,14 +82,10 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 			.createAugmentedRandomizedBlockDesign(numberOfBlocks, numberOfTreatments, numberOfControls, startingPlotNumber,
 				startingEntryNumber, entryNumberName, blockNumberName, plotNumberName);
 
-		/**
-		 * TODO: return ObservationUnitRows from  this.experimentDesignGenerator.generateExperimentDesignMeasurements
-		 final List<MeasurementRow> measurementRowList = experimentDesignGenerator
-		 .generateExperimentDesignMeasurements(noOfExistingEnvironments, noOfEnvironmentsToBeAdded, trialVariables, factors, nonTrialFactors,
-		 variates, treatmentVariables, requiredDesignVariables, germplasmList, mainDesign, stdvarEntryNo.getName(), null,
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
+		return experimentDesignGenerator
+		 .generateExperimentDesignMeasurements(noOfExistingEnvironments, noOfEnvironmentsToBeAdded, measurementVariables, germplasmList, mainDesign, entryNumberName, null,
 		 designExpectedEntriesMap);
-		 **/
-		return new ArrayList<>();
 	}
 
 	@Override

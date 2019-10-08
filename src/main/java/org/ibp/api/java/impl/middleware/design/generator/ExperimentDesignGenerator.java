@@ -8,7 +8,6 @@ import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -16,8 +15,6 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.BVDesignTrialInstance;
@@ -29,6 +26,8 @@ import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.impl.middleware.design.runner.BVDesignRunner;
 import org.ibp.api.java.impl.middleware.design.transformer.StandardVariableTransformer;
 import org.ibp.api.java.impl.middleware.design.util.ExpDesignUtil;
+import org.ibp.api.rest.dataset.ObservationUnitData;
+import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -300,8 +299,7 @@ public class ExperimentDesignGenerator {
 	}
 
 	public List<ObservationUnitRow> generateExperimentDesignMeasurements(
-		final int noOfExistingEnvironments, final int noOfEnvironmentsToAdd, final List<MeasurementVariable> nonTrialFactors,
-		final List<TreatmentVariable> treatmentVariables, final List<StandardVariable> requiredExpDesignVariable,
+		final int noOfExistingEnvironments, final int noOfEnvironmentsToAdd, final List<MeasurementVariable> generateDesignVariables,
 		final List<ImportedGermplasm> germplasmList, final MainDesign mainDesign, final String entryNumberIdentifier,
 		final Map<String, List<String>> treatmentFactorValues, final Map<Integer, Integer> designExpectedEntriesMap)
 		throws BVDesignException {
@@ -320,9 +318,6 @@ public class ExperimentDesignGenerator {
 		if (bvOutput == null || !bvOutput.isSuccess()) {
 			throw new BVDesignException("experiment.design.generate.generic.error");
 		}
-
-		final List<MeasurementVariable> varList =
-			this.constructStudyVariableList(nonTrialFactors, treatmentVariables, requiredExpDesignVariable);
 
 		//Converting germplasm List to map
 		final Map<Integer, ImportedGermplasm> importedGermplasmMap =
@@ -343,7 +338,7 @@ public class ExperimentDesignGenerator {
 				if (!importedGermplasm.isPresent()) {
 					throw new BVDesignException("experiment.design.bv.exe.error.output.invalid.error");
 				}
-				final ObservationUnitRow observationUnitRow = this.createObservationUnitRow(varList, importedGermplasm.get(), row,
+				final ObservationUnitRow observationUnitRow = this.createObservationUnitRow(generateDesignVariables, importedGermplasm.get(), row,
 					treatmentFactorValues, trialInstanceNumber);
 				rows.add(observationUnitRow);
 			}
@@ -355,7 +350,7 @@ public class ExperimentDesignGenerator {
 	ObservationUnitRow createObservationUnitRow(
 		final List<MeasurementVariable> headerVariable, final ImportedGermplasm germplasm,
 		final Map<String, String> bvEntryMap, final Map<String, List<String>> treatmentFactorValues, final int trialNo) {
-		final ObservationUnitRow measurementRow = new ObservationUnitRow();
+		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		final Map<String, ObservationUnitData> observationUnitDataMap = new HashMap<>();
 		ObservationUnitData treatmentLevelData = null;
 		ObservationUnitData observationUnitData;
@@ -438,8 +433,8 @@ public class ExperimentDesignGenerator {
 
 			observationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
 		}
-		measurementRow.setVariables(observationUnitDataMap);
-		return measurementRow;
+		observationUnitRow.setVariables(observationUnitDataMap);
+		return observationUnitRow;
 	}
 
 	ObservationUnitData createObservationUnitData(final Integer variableId, final String value) {
@@ -447,33 +442,6 @@ public class ExperimentDesignGenerator {
 		observationUnitData.setVariableId(variableId);
 		observationUnitData.setValue(value);
 		return observationUnitData;
-	}
-
-	List<MeasurementVariable> constructStudyVariableList(final List<MeasurementVariable> nonTrialFactors,
-		final List<TreatmentVariable> treatmentVariables, final List<StandardVariable> requiredExpDesignVariables) {
-		final List<MeasurementVariable> varList = new ArrayList<>();
-		varList.addAll(nonTrialFactors);
-
-		final List<Integer> nonTrialFactorsIds = new ArrayList<>();
-		nonTrialFactors.forEach(nonTrialFactor -> nonTrialFactorsIds.add(nonTrialFactor.getTermId()));
-
-		requiredExpDesignVariables.forEach(requiredExpDesignVariable -> {
-			if (!nonTrialFactorsIds.contains(requiredExpDesignVariable.getId())) {
-				final MeasurementVariable measurementVariable = new MeasurementVariable();
-				measurementVariable.setTermId(requiredExpDesignVariable.getId());
-				measurementVariable.setName(requiredExpDesignVariable.getName());
-				varList.add(measurementVariable);
-			}
-		});
-
-		if (treatmentVariables != null) {
-			treatmentVariables.forEach(treatmentVariable -> {
-				varList.add(treatmentVariable.getLevelVariable());
-				varList.add(treatmentVariable.getValueVariable());
-			});
-		}
-
-		return varList;
 	}
 
 	ExpDesignParameter createExpDesignParameter(final String name, final String value, final List<ListItem> items) {

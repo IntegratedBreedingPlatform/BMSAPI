@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.MainDesign;
+import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -50,7 +52,7 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
-		final String programUUID, final List<ImportedGermplasm> germplasmList) {
+		final String programUUID, final List<ImportedGermplasm> germplasmList) throws BVDesignException {
 
 		this.experimentDesignTypeValidator.validateResolvableIncompleteBlockDesign(experimentDesignInput, germplasmList);
 
@@ -110,14 +112,10 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 				experimentDesignInput.getNrlatin(), experimentDesignInput.getNclatin(), experimentDesignInput.getReplatinGroups(), "",
 				experimentDesignInput.getUseLatenized());
 
-		/**
-		 * TODO: return ObservationUnitRows from  this.experimentDesignGenerator.generateExperimentDesignMeasurements
-		 measurementRowList = this.experimentDesignGenerator
-		 .generateExperimentDesignMeasurements(environments, environmentsToAdd, trialVariables, factors, nonTrialFactors,
-		 variates, treatmentVariables, reqVarList, germplasmList, mainDesign, entryNumberVariable.getName(), null,
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
+		return  this.experimentDesignGenerator
+		 .generateExperimentDesignMeasurements(environments, environmentsToAdd, measurementVariables, germplasmList, mainDesign, entryNumberVariable.getName(), null,
 		 new HashMap<Integer, Integer>());
-		 **/
-		return new ArrayList<>();
 	}
 
 	@Override

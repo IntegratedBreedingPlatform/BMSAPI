@@ -2,6 +2,7 @@ package org.ibp.api.java.design.type;
 
 import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 
@@ -19,7 +20,7 @@ public interface ExperimentDesignTypeService {
 	 * @param programUUID
 	 */
 	List<ObservationUnitRow> generateDesign(int studyId, ExperimentDesignInput experimentDesignInput, String programUUID,
-		List<ImportedGermplasm> germplasmList);
+		List<ImportedGermplasm> germplasmList) throws BVDesignException;
 
 	/**
 	 * Defines if the experimental design requires breeding view licence to run

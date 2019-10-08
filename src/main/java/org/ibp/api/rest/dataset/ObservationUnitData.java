@@ -78,6 +78,14 @@ public class ObservationUnitData {
 		this.draftValue = draftValue;
 	}
 
+	public void setVariableId(final Integer variableId) {
+		this.variableId = variableId;
+	}
+
+	public Integer getVariableId() {
+		return this.variableId;
+	}
+
 
 	@Override
 	public boolean equals(final Object o) {
