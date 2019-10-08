@@ -600,18 +600,18 @@ public class ExperimentDesignGenerator {
 		final Map<Integer, MeasurementVariable> measurementVariablesMap = measurementVariables.stream()
 			.collect(Collectors.toMap(MeasurementVariable::getTermId, measurementVariable -> measurementVariable));
 
-		final List<StandardVariable> designFactorStanadardVariables =
+		final List<StandardVariable> designFactorStandardVariables =
 			this.ontologyDataManager.getStandardVariables(designFactors, programUUID);
 
-		for (final StandardVariable standardVariable : designFactorStanadardVariables) {
+		for (final StandardVariable standardVariable : designFactorStandardVariables) {
 			measurementVariablesMap.put(standardVariable.getId(),
 				this.standardVariableTransformer.convert(standardVariable, VariableType.EXPERIMENTAL_DESIGN));
 		}
 
-		final List<StandardVariable> treatmentFactorStanadardVariables =
+		final List<StandardVariable> treatmentFactorStandardVariables =
 			this.ontologyDataManager.getStandardVariables(treatmentFactors, programUUID);
 
-		for (final StandardVariable standardVariable : designFactorStanadardVariables) {
+		for (final StandardVariable standardVariable : treatmentFactorStandardVariables) {
 			measurementVariablesMap.put(standardVariable.getId(),
 				this.standardVariableTransformer.convert(standardVariable, VariableType.TREATMENT_FACTOR));
 		}
