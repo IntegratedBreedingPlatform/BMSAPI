@@ -14,7 +14,8 @@ public class StandardVariableTransformer {
 				standardVariable
 					.getScale().getName(), standardVariable.getMethod().getName(), standardVariable.getProperty().getName(),
 				standardVariable
-					.getDataType().getName(), "", standardVariable.getPhenotypicType().getLabelList().get(0));
+					.getDataType().getName(), "",
+				standardVariable.getPhenotypicType() != null ? standardVariable.getPhenotypicType().getLabelList().get(0) : "");
 		measurementVariable.setDataTypeId(standardVariable.getDataType().getId());
 		measurementVariable.setVariableType(variableType);
 		return measurementVariable;
