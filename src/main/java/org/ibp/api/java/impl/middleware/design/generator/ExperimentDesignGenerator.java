@@ -351,7 +351,9 @@ public class ExperimentDesignGenerator {
 	ObservationUnitRow createObservationUnitRow(
 		final List<MeasurementVariable> headerVariable, final StudyGermplasmDto studyGermplasmDto,
 		final Map<String, String> bvEntryMap, final Map<String, List<String>> treatmentFactorValues, final int trialNo) {
+
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
+		observationUnitRow.setTrialInstance(trialNo);
 		final Map<String, ObservationUnitData> observationUnitDataMap = new HashMap<>();
 		ObservationUnitData treatmentLevelData = null;
 		ObservationUnitData observationUnitData;
@@ -366,7 +368,10 @@ public class ExperimentDesignGenerator {
 			final int termId = var.getTermId();
 
 			if (termId == TermId.ENTRY_NO.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), String.valueOf(studyGermplasmDto.getEntryNumber()));
+				final Integer entryNumber = studyGermplasmDto.getEntryNumber();
+				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), String.valueOf(
+					entryNumber));
+				observationUnitRow.setEntryNumber(entryNumber);
 			} else if (termId == TermId.SOURCE.getId() || termId == TermId.GERMPLASM_SOURCE.getId()) {
 				observationUnitData =
 					ExpDesignUtil.createObservationUnitData(var.getTermId(),
