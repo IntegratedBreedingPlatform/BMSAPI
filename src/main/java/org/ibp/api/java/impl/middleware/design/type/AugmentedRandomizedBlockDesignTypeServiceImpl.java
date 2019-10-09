@@ -1,12 +1,12 @@
 package org.ibp.api.java.impl.middleware.design.type;
 
-import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
@@ -47,19 +47,20 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
-		final String programUUID, final List<ImportedGermplasm> germplasmList) throws BVDesignException {
+		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) throws BVDesignException {
 
-		this.experimentDesignTypeValidator.validateAugmentedDesign(experimentDesignInput, germplasmList);
+		this.experimentDesignTypeValidator.validateAugmentedDesign(experimentDesignInput, studyGermplasmDtoList);
 
-		final Set<Integer> entryIdsOfChecks = this.getEntryIdsOfChecks(germplasmList);
-		final Set<Integer> entryIdsOfTestEntries = this.getEntryIdsOfTestEntries(germplasmList);
+		final Set<Integer> entryIdsOfChecks = this.getEntryIdsOfChecks(studyGermplasmDtoList);
+		final Set<Integer> entryIdsOfTestEntries = this.getEntryIdsOfTestEntries(studyGermplasmDtoList);
 
-		final Map<Integer, Integer> designExpectedEntriesMap = this.createMapOfDesignExpectedEntriesToGermplasmEntriesInTrial(germplasmList,
-			entryIdsOfChecks, entryIdsOfTestEntries);
+		final Map<Integer, Integer> designExpectedEntriesMap =
+			this.createMapOfDesignExpectedEntriesToGermplasmEntriesInTrial(studyGermplasmDtoList,
+				entryIdsOfChecks, entryIdsOfTestEntries);
 
 		final Integer numberOfBlocks = StringUtil.parseInt(experimentDesignInput.getNumberOfBlocks(), null);
 		final Integer numberOfControls = entryIdsOfChecks.size();
-		final Integer numberOfTreatments = germplasmList.size() - numberOfControls;
+		final Integer numberOfTreatments = studyGermplasmDtoList.size() - numberOfControls;
 		final Integer startingPlotNumber = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), null);
 		final Integer startingEntryNumber = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
 
@@ -78,10 +79,12 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 			.createAugmentedRandomizedBlockDesign(numberOfBlocks, numberOfTreatments, numberOfControls, startingPlotNumber,
 				startingEntryNumber, entryNumberName, blockNumberName, plotNumberName);
 
-		final List<MeasurementVariable> measurementVariables = new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
+		final List<MeasurementVariable> measurementVariables =
+			new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
 		return this.experimentDesignGenerator
-		 .generateExperimentDesignMeasurements(noOfExistingEnvironments, noOfEnvironmentsToBeAdded, measurementVariables, germplasmList, mainDesign, entryNumberName, null,
-		 designExpectedEntriesMap);
+			.generateExperimentDesignMeasurements(noOfExistingEnvironments, noOfEnvironmentsToBeAdded, measurementVariables,
+				studyGermplasmDtoList, mainDesign, entryNumberName, null,
+				designExpectedEntriesMap);
 	}
 
 	@Override
@@ -111,7 +114,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 
 	}
 
-	Map<Integer, Integer> createMapOfDesignExpectedEntriesToGermplasmEntriesInTrial(final List<ImportedGermplasm> importedGermplasmList,
+	Map<Integer, Integer> createMapOfDesignExpectedEntriesToGermplasmEntriesInTrial(final List<StudyGermplasmDto> studyGermplasmDtoList,
 		final Set<Integer> entryIdsOfChecks, final Set<Integer> entryIdsOfTestEntries) {
 
 		/**
@@ -127,42 +130,42 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 		final Map<Integer, Integer> designExpectedEntriesMap = new HashMap<>();
 
 		// Map the last entries to the check entries in the list.
-		int index = importedGermplasmList.size() - entryIdsOfChecks.size();
+		int index = studyGermplasmDtoList.size() - entryIdsOfChecks.size();
 		for (final Integer checkEntryId : entryIdsOfChecks) {
-			designExpectedEntriesMap.put(importedGermplasmList.get(index).getEntryId(), checkEntryId);
+			designExpectedEntriesMap.put(studyGermplasmDtoList.get(index).getEntryNumber(), checkEntryId);
 			index++;
 		}
 
 		// Map the top entries to the test entries in the list.
 		index = 0;
 		for (final Integer checkEntryId : entryIdsOfTestEntries) {
-			designExpectedEntriesMap.put(importedGermplasmList.get(index).getEntryId(), checkEntryId);
+			designExpectedEntriesMap.put(studyGermplasmDtoList.get(index).getEntryNumber(), checkEntryId);
 			index++;
 		}
 
 		return designExpectedEntriesMap;
 	}
 
-	Set<Integer> getEntryIdsOfChecks(final List<ImportedGermplasm> importedGermplasmList) {
+	Set<Integer> getEntryIdsOfChecks(final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
 		final HashSet<Integer> entryIdsOfChecks = new HashSet<>();
 
-		for (final ImportedGermplasm importedGermplasm : importedGermplasmList) {
-			if (importedGermplasm.getEntryTypeCategoricalID().equals(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId())) {
-				entryIdsOfChecks.add(importedGermplasm.getEntryId());
+		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
+			if (studyGermplasmDto.getCheckType().equals(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId())) {
+				entryIdsOfChecks.add(studyGermplasmDto.getEntryNumber());
 			}
 		}
 
 		return entryIdsOfChecks;
 	}
 
-	Set<Integer> getEntryIdsOfTestEntries(final List<ImportedGermplasm> importedGermplasmList) {
+	Set<Integer> getEntryIdsOfTestEntries(final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
 		final HashSet<Integer> entryIdsOfTestEntries = new HashSet<>();
 
-		for (final ImportedGermplasm importedGermplasm : importedGermplasmList) {
-			if (!importedGermplasm.getEntryTypeCategoricalID().equals(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId())) {
-				entryIdsOfTestEntries.add(importedGermplasm.getEntryId());
+		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
+			if (!studyGermplasmDto.getCheckType().equals(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId())) {
+				entryIdsOfTestEntries.add(studyGermplasmDto.getEntryNumber());
 			}
 		}
 

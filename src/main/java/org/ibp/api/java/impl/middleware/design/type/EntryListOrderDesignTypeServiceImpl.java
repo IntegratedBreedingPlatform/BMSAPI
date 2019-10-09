@@ -1,12 +1,13 @@
 package org.ibp.api.java.impl.middleware.design.type;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.InsertionMannerItem;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
@@ -34,15 +35,15 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
-		final String programUUID, final List<ImportedGermplasm> germplasmList) {
+		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
-		this.experimentDesignTypeValidator.validateEntryListOrderDesign(experimentDesignInput, germplasmList);
+		this.experimentDesignTypeValidator.validateEntryListOrderDesign(experimentDesignInput, studyGermplasmDtoList);
 
-		final List<ImportedGermplasm> checkList = new LinkedList<>();
+		final List<StudyGermplasmDto> checkList = new LinkedList<>();
 
-		final List<ImportedGermplasm> testEntryList = new LinkedList<>();
+		final List<StudyGermplasmDto> testEntryList = new LinkedList<>();
 
-		this.loadChecksAndTestEntries(germplasmList, checkList, testEntryList);
+		this.loadChecksAndTestEntries(studyGermplasmDtoList, checkList, testEntryList);
 
 		final Integer startingPosition =
 			(StringUtils.isEmpty(experimentDesignInput.getCheckStartingPosition())) ? null :
@@ -55,7 +56,7 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 			(StringUtils.isEmpty(experimentDesignInput.getCheckInsertionManner())) ? null :
 				Integer.parseInt(experimentDesignInput.getCheckInsertionManner());
 
-		final List<ImportedGermplasm> mergedGermplasmList =
+		final List<StudyGermplasmDto> mergedGermplasmList =
 			this.mergeTestAndCheckEntries(testEntryList, checkList, startingPosition, spacing, insertionManner);
 
 		final int environments = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
@@ -64,7 +65,7 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 
 			int plotNumber = Integer.parseInt(experimentDesignInput.getStartingPlotNo());
 
-			for (final ImportedGermplasm germplasm : mergedGermplasmList) {
+			for (final StudyGermplasmDto germplasm : mergedGermplasmList) {
 				/**
 				 * TODO: Create ObservationUnitRow per germplasm
 				 final MeasurementRow measurementRow =
@@ -92,19 +93,19 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 		return this.experimentDesignGenerator.getMeasurementVariablesMap(studyId, programUUID, DESIGN_FACTOR_VARIABLES, new ArrayList<>());
 	}
 
-	private void loadChecksAndTestEntries(final List<ImportedGermplasm> importedGermplasmList, final List<ImportedGermplasm> checkList,
-		final List<ImportedGermplasm> testEntryList) {
+	private void loadChecksAndTestEntries(final List<StudyGermplasmDto> studyGermplasmDtoList, final List<StudyGermplasmDto> checkList,
+		final List<StudyGermplasmDto> testEntryList) {
 
-		for (final ImportedGermplasm importedGermplasm : importedGermplasmList) {
-			if (importedGermplasm.getEntryTypeCategoricalID().equals(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())) {
-				testEntryList.add(importedGermplasm);
+		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
+			if (studyGermplasmDto.getCheckType().equals(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())) {
+				testEntryList.add(studyGermplasmDto);
 			} else {
-				checkList.add(importedGermplasm);
+				checkList.add(studyGermplasmDto);
 			}
 		}
 	}
 
-	private boolean isThereSomethingToMerge(final List<ImportedGermplasm> entriesList, final List<ImportedGermplasm> checkList,
+	private boolean isThereSomethingToMerge(final List<StudyGermplasmDto> entriesList, final List<StudyGermplasmDto> checkList,
 		final Integer startEntry, final Integer interval) {
 		Boolean isThereSomethingToMerge = Boolean.TRUE;
 		if (checkList == null || checkList.isEmpty()) {
@@ -117,36 +118,36 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 		return isThereSomethingToMerge;
 	}
 
-	private List<ImportedGermplasm> generateChecksToInsert(final List<ImportedGermplasm> checkList, final Integer checkIndex,
+	private List<StudyGermplasmDto> generateChecksToInsert(final List<StudyGermplasmDto> checkList, final Integer checkIndex,
 		final Integer insertionManner) {
-		final List<ImportedGermplasm> newList = new ArrayList<>();
+		final List<StudyGermplasmDto> newList = new ArrayList<>();
 		if (insertionManner.equals(InsertionMannerItem.INSERT_ALL_CHECKS.getId())) {
-			for (final ImportedGermplasm checkGerm : checkList) {
-				newList.add(checkGerm.copy());
+			for (final StudyGermplasmDto checkGermplasm : checkList) {
+				newList.add(SerializationUtils.clone(checkGermplasm));
 			}
 		} else {
-			final Integer checkListIndex = checkIndex % checkList.size();
-			final ImportedGermplasm checkGerm = checkList.get(checkListIndex);
-			newList.add(checkGerm.copy());
+			final int checkListIndex = checkIndex % checkList.size();
+			final StudyGermplasmDto checkGermplasm = checkList.get(checkListIndex);
+			newList.add(SerializationUtils.clone(checkGermplasm));
 		}
 		return newList;
 	}
 
-	private List<ImportedGermplasm> mergeTestAndCheckEntries(final List<ImportedGermplasm> testEntryList,
-		final List<ImportedGermplasm> checkList, final Integer startingIndex, final Integer spacing, final Integer insertionManner) {
+	private List<StudyGermplasmDto> mergeTestAndCheckEntries(final List<StudyGermplasmDto> testEntryList,
+		final List<StudyGermplasmDto> checkList, final Integer startingIndex, final Integer spacing, final Integer insertionManner) {
 
 		if (!this.isThereSomethingToMerge(testEntryList, checkList, startingIndex, spacing)) {
 			return testEntryList;
 		}
 
-		final List<ImportedGermplasm> newList = new ArrayList<>();
+		final List<StudyGermplasmDto> newList = new ArrayList<>();
 
 		int primaryEntry = 1;
 		boolean isStarted = Boolean.FALSE;
 		boolean shouldInsert = Boolean.FALSE;
 		int checkIndex = 0;
 		int intervalEntry = 0;
-		for (final ImportedGermplasm primaryGermplasm : testEntryList) {
+		for (final StudyGermplasmDto primaryGermplasm : testEntryList) {
 			if (primaryEntry == startingIndex || intervalEntry == spacing) {
 				isStarted = Boolean.TRUE;
 				shouldInsert = Boolean.TRUE;
@@ -159,13 +160,12 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 
 			if (shouldInsert) {
 				shouldInsert = Boolean.FALSE;
-				final List<ImportedGermplasm> checks = this.generateChecksToInsert(checkList, checkIndex, insertionManner);
+				final List<StudyGermplasmDto> checks = this.generateChecksToInsert(checkList, checkIndex, insertionManner);
 				checkIndex++;
 				newList.addAll(checks);
 			}
-			final ImportedGermplasm primaryNewGermplasm = primaryGermplasm.copy();
-			primaryNewGermplasm.setEntryTypeValue(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeValue());
-			primaryNewGermplasm.setEntryTypeCategoricalID(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
+			final StudyGermplasmDto primaryNewGermplasm = SerializationUtils.clone(primaryGermplasm);
+			primaryNewGermplasm.setCheckType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
 
 			newList.add(primaryNewGermplasm);
 

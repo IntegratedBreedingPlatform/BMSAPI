@@ -4,7 +4,6 @@ import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.commons.constant.AppConstants;
-import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -15,6 +14,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.BVDesignTrialInstance;
@@ -257,19 +257,19 @@ public class ExperimentDesignGenerator {
 	}
 
 	public List<ListItem> createReplicationListItemForPRepDesign(
-		final List<ImportedGermplasm> germplasmList, final float replicationPercentage,
+		final List<StudyGermplasmDto> studyGermplasmDtoList, final float replicationPercentage,
 		final int replicationNumber) {
 
-		// Count how many test entries we have in the germplasm list.
+		// Count how many test entries we have in the studyGermplasmDto list.
 		int testEntryCount = 0;
 
-		// Determine which of the germplasm entries are test entries
+		// Determine which of the studyGermplasmDto entries are test entries
 		final List<Integer> testEntryNumbers = new ArrayList<>();
 
-		for (final ImportedGermplasm importedGermplasm : germplasmList) {
-			if (SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() == importedGermplasm.getEntryTypeCategoricalID()) {
+		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
+			if (SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() == studyGermplasmDto.getCheckType()) {
 				testEntryCount++;
-				testEntryNumbers.add(importedGermplasm.getEntryId());
+				testEntryNumbers.add(studyGermplasmDto.getEntryNumber());
 			}
 		}
 
@@ -282,11 +282,11 @@ public class ExperimentDesignGenerator {
 		}
 
 		final List<ListItem> replicationListItem = new LinkedList<>();
-		for (final ImportedGermplasm importedGermplasm : germplasmList) {
-			if (SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() != importedGermplasm.getEntryTypeCategoricalID()) {
+		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
+			if (SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() != studyGermplasmDto.getCheckType()) {
 				// All Check Entries in the list should be replicated
 				replicationListItem.add(new ListItem(String.valueOf(replicationNumber)));
-			} else if (randomTestEntryNumbers.contains(importedGermplasm.getEntryId())) {
+			} else if (randomTestEntryNumbers.contains(studyGermplasmDto.getEntryNumber())) {
 				// Randomized Test Entries should be replicated
 				replicationListItem.add(new ListItem(String.valueOf(replicationNumber)));
 			} else {
@@ -300,7 +300,7 @@ public class ExperimentDesignGenerator {
 
 	public List<ObservationUnitRow> generateExperimentDesignMeasurements(
 		final int noOfExistingEnvironments, final int noOfEnvironmentsToAdd, final List<MeasurementVariable> generateDesignVariables,
-		final List<ImportedGermplasm> germplasmList, final MainDesign mainDesign, final String entryNumberIdentifier,
+		final List<StudyGermplasmDto> studyGermplasmDtoList, final MainDesign mainDesign, final String entryNumberIdentifier,
 		final Map<String, List<String>> treatmentFactorValues, final Map<Integer, Integer> designExpectedEntriesMap)
 		throws BVDesignException {
 
@@ -319,9 +319,9 @@ public class ExperimentDesignGenerator {
 			throw new BVDesignException("experiment.design.generate.generic.error");
 		}
 
-		//Converting germplasm List to map
-		final Map<Integer, ImportedGermplasm> importedGermplasmMap =
-			germplasmList.stream().collect(Collectors.toMap(ImportedGermplasm::getEntryId,
+		//Converting studyGermplasmDto List to map
+		final Map<Integer, StudyGermplasmDto> studyGermplasmDtoMap =
+			studyGermplasmDtoList.stream().collect(Collectors.toMap(StudyGermplasmDto::getEntryNumber,
 				Function.identity()));
 		final List<ObservationUnitRow> rows = new ArrayList<>();
 		int trialInstanceNumber = noOfExistingEnvironments - noOfEnvironmentsToAdd + 1;
@@ -332,14 +332,15 @@ public class ExperimentDesignGenerator {
 				if (entryNumber == null) {
 					throw new BVDesignException("experiment.design.bv.exe.error.output.invalid.error");
 				}
-				final Optional<ImportedGermplasm> importedGermplasm =
-					this.findImportedGermplasmByEntryNumberAndChecks(importedGermplasmMap, entryNumber, designExpectedEntriesMap);
+				final Optional<StudyGermplasmDto> studyGermplasmDto =
+					this.findStudyGermplasmDtoByEntryNumberAndChecks(studyGermplasmDtoMap, entryNumber, designExpectedEntriesMap);
 
-				if (!importedGermplasm.isPresent()) {
+				if (!studyGermplasmDto.isPresent()) {
 					throw new BVDesignException("experiment.design.bv.exe.error.output.invalid.error");
 				}
-				final ObservationUnitRow observationUnitRow = this.createObservationUnitRow(generateDesignVariables, importedGermplasm.get(), row,
-					treatmentFactorValues, trialInstanceNumber);
+				final ObservationUnitRow observationUnitRow =
+					this.createObservationUnitRow(generateDesignVariables, studyGermplasmDto.get(), row,
+						treatmentFactorValues, trialInstanceNumber);
 				rows.add(observationUnitRow);
 			}
 			trialInstanceNumber++;
@@ -348,7 +349,7 @@ public class ExperimentDesignGenerator {
 	}
 
 	ObservationUnitRow createObservationUnitRow(
-		final List<MeasurementVariable> headerVariable, final ImportedGermplasm germplasm,
+		final List<MeasurementVariable> headerVariable, final StudyGermplasmDto studyGermplasmDto,
 		final Map<String, String> bvEntryMap, final Map<String, List<String>> treatmentFactorValues, final int trialNo) {
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		final Map<String, ObservationUnitData> observationUnitDataMap = new HashMap<>();
@@ -365,29 +366,31 @@ public class ExperimentDesignGenerator {
 			final int termId = var.getTermId();
 
 			if (termId == TermId.ENTRY_NO.getId()) {
-				observationUnitData = this.createObservationUnitData(var.getTermId(), String.valueOf(germplasm.getEntryId()));
+				observationUnitData = this.createObservationUnitData(var.getTermId(), String.valueOf(studyGermplasmDto.getEntryNumber()));
 			} else if (termId == TermId.SOURCE.getId() || termId == TermId.GERMPLASM_SOURCE.getId()) {
 				observationUnitData =
-					this.createObservationUnitData(var.getTermId(), germplasm.getSource() != null ? germplasm.getSource() : "");
+					this.createObservationUnitData(var.getTermId(),
+						studyGermplasmDto.getSeedSource() != null ? studyGermplasmDto.getSeedSource() : "");
 			} else if (termId == TermId.GROUPGID.getId()) {
 				observationUnitData = this.createObservationUnitData(var.getTermId(),
-					germplasm.getGroupId() != null ? germplasm.getGroupId().toString() : "");
+					studyGermplasmDto.getGroupId() != null ? studyGermplasmDto.getGroupId().toString() : "");
 			} else if (termId == TermId.STOCKID.getId()) {
 				observationUnitData =
-					this.createObservationUnitData(var.getTermId(), germplasm.getStockIDs() != null ? germplasm.getStockIDs() : "");
+					this.createObservationUnitData(var.getTermId(),
+						studyGermplasmDto.getStockIds() != null ? studyGermplasmDto.getStockIds() : "");
 			} else if (termId == TermId.CROSS.getId()) {
-				observationUnitData = this.createObservationUnitData(var.getTermId(), germplasm.getCross());
+				observationUnitData = this.createObservationUnitData(var.getTermId(), studyGermplasmDto.getCross());
 			} else if (termId == TermId.DESIG.getId()) {
-				observationUnitData = this.createObservationUnitData(var.getTermId(), germplasm.getDesig());
+				observationUnitData = this.createObservationUnitData(var.getTermId(), studyGermplasmDto.getDesignation());
 			} else if (termId == TermId.GID.getId()) {
-				observationUnitData = this.createObservationUnitData(var.getTermId(), germplasm.getGid());
+				observationUnitData = this.createObservationUnitData(var.getTermId(), String.valueOf(studyGermplasmDto.getGermplasmId()));
 			} else if (termId == TermId.ENTRY_CODE.getId()) {
-				observationUnitData = this.createObservationUnitData(var.getTermId(), germplasm.getEntryCode());
+				observationUnitData = this.createObservationUnitData(var.getTermId(), studyGermplasmDto.getEntryCode());
 			} else if (EXP_DESIGN_VARIABLE_IDS.contains(termId)) {
 				observationUnitData = this.createObservationUnitData(var.getTermId(), bvEntryMap.get(var.getName()));
 			} else if (termId == TermId.CHECK.getId()) {
 				observationUnitData =
-					this.createObservationUnitData(var.getTermId(), Integer.toString(germplasm.getEntryTypeCategoricalID()));
+					this.createObservationUnitData(var.getTermId(), Integer.toString(studyGermplasmDto.getCheckType()));
 			} else if (termId == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 				observationUnitData = this.createObservationUnitData(var.getTermId(), Integer.toString(trialNo));
 			} else if (StringUtils.isEmpty(var.getTreatmentLabel())) {
@@ -453,14 +456,14 @@ public class ExperimentDesignGenerator {
 		return designParam;
 	}
 
-	Optional<ImportedGermplasm> findImportedGermplasmByEntryNumberAndChecks(
-		final Map<Integer, ImportedGermplasm> importedGermplasmMap,
+	Optional<StudyGermplasmDto> findStudyGermplasmDtoByEntryNumberAndChecks(
+		final Map<Integer, StudyGermplasmDto> studyGermplasmDtoMap,
 		final Integer entryNumber, final Map<Integer, Integer> designExpectedEntriesMap) {
 
 		final Integer resolvedEntryNumber = this.resolveMappedEntryNumber(entryNumber, designExpectedEntriesMap);
 
-		if (importedGermplasmMap.containsKey(resolvedEntryNumber)) {
-			return Optional.of(importedGermplasmMap.get(resolvedEntryNumber));
+		if (studyGermplasmDtoMap.containsKey(resolvedEntryNumber)) {
+			return Optional.of(studyGermplasmDtoMap.get(resolvedEntryNumber));
 		}
 
 		return Optional.absent();
