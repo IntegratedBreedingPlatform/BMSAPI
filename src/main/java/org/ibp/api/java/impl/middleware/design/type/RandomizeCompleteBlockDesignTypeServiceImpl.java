@@ -56,8 +56,8 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 		this.experimentDesignTypeValidator.validateRandomizedCompleteBlockDesign(experimentDesignInput, germplasmList);
 
 		final String block = experimentDesignInput.getReplicationsCount();
-		final int environments = Integer.valueOf(experimentDesignInput.getNoOfEnvironments());
-		final int environmentsToAdd = Integer.valueOf(experimentDesignInput.getNoOfEnvironmentsToAdd());
+		final int environments = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
+		final int environmentsToAdd = Integer.parseInt(experimentDesignInput.getNoOfEnvironmentsToAdd());
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()

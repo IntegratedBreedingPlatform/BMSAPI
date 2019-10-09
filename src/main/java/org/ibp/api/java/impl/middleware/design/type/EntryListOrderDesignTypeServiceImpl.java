@@ -58,7 +58,7 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 		final List<ImportedGermplasm> mergedGermplasmList =
 			this.mergeTestAndCheckEntries(testEntryList, checkList, startingPosition, spacing, insertionManner);
 
-		final int environments = Integer.valueOf(experimentDesignInput.getNoOfEnvironments());
+		final int environments = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
 
 		for (int instanceNumber = 1; instanceNumber <= environments; instanceNumber++) {
 

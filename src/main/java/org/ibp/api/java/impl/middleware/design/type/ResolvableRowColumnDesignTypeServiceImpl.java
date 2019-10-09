@@ -60,8 +60,8 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 		final String rows = experimentDesignInput.getRowsPerReplications();
 		final String cols = experimentDesignInput.getColsPerReplications();
 		final String replicates = experimentDesignInput.getReplicationsCount();
-		final int environments = Integer.valueOf(experimentDesignInput.getNoOfEnvironments());
-		final int environmentsToAdd = Integer.valueOf(experimentDesignInput.getNoOfEnvironmentsToAdd());
+		final int environments = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
+		final int environmentsToAdd = Integer.parseInt(experimentDesignInput.getNoOfEnvironmentsToAdd());
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -70,13 +70,8 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 		final String entryNumberName = standardVariablesMap.get(TermId.ENTRY_NO.getId()).getName();
 		final String replicateNumberName = standardVariablesMap.get(TermId.REP_NO.getId()).getName();
 		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
-		final String blockNumberName = standardVariablesMap.get(TermId.BLOCK_NO.getId()).getName();
-
-		final StandardVariable entryNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.ENTRY_NO.getId(), programUUID);
-		final StandardVariable replicateNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.REP_NO.getId(), programUUID);
-		final StandardVariable plotNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.PLOT_NO.getId(), programUUID);
-		final StandardVariable rowVariable = this.ontologyDataManager.getStandardVariable(TermId.ROW.getId(), programUUID);
-		final StandardVariable colVariable = this.ontologyDataManager.getStandardVariable(TermId.COL.getId(), programUUID);
+		final String rowName = standardVariablesMap.get(TermId.ROW.getId()).getName();
+		final String colName = standardVariablesMap.get(TermId.COL.getId()).getName();
 
 		if (experimentDesignInput.getUseLatenized() != null && experimentDesignInput.getUseLatenized().booleanValue()) {
 			if (experimentDesignInput.getReplicationsArrangement() != null) {
@@ -98,23 +93,18 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 		}
 
 		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), null);
-
-		Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
-
-		if (!Objects.equals(entryNumberVariable.getId(), TermId.ENTRY_NO.getId())) {
-			entryNo = null;
-		}
+		final Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createResolvableRowColDesign(Integer.toString(nTreatments), replicates, rows, cols, entryNumberVariable.getName(),
-				replicateNumberVariable.getName(), rowVariable.getName(), colVariable.getName(), plotNumberVariable.getName(), plotNo,
+			.createResolvableRowColDesign(Integer.toString(nTreatments), replicates, rows, cols, entryNumberName,
+				replicateNumberName, rowName, colName, plotNumberName, plotNo,
 				entryNo,
 				experimentDesignInput.getNrlatin(), experimentDesignInput.getNclatin(), experimentDesignInput.getReplatinGroups(), "",
 				experimentDesignInput.getUseLatenized());
 
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
 		return  this.experimentDesignGenerator
-		 .generateExperimentDesignMeasurements(environments, environmentsToAdd, measurementVariables, germplasmList, mainDesign, entryNumberVariable.getName(), null,
+		 .generateExperimentDesignMeasurements(environments, environmentsToAdd, measurementVariables, germplasmList, mainDesign, entryNumberName, null,
 		 new HashMap<Integer, Integer>());
 	}
 

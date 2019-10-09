@@ -63,8 +63,8 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 		final Integer startingPlotNumber = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), null);
 		final Integer startingEntryNumber = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
 
-		final int noOfExistingEnvironments = Integer.valueOf(experimentDesignInput.getNoOfEnvironments());
-		final int noOfEnvironmentsToBeAdded = Integer.valueOf(experimentDesignInput.getNoOfEnvironmentsToAdd());
+		final int noOfExistingEnvironments = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
+		final int noOfEnvironmentsToBeAdded = Integer.parseInt(experimentDesignInput.getNoOfEnvironmentsToAdd());
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -79,7 +79,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 				startingEntryNumber, entryNumberName, blockNumberName, plotNumberName);
 
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
-		return experimentDesignGenerator
+		return this.experimentDesignGenerator
 		 .generateExperimentDesignMeasurements(noOfExistingEnvironments, noOfEnvironmentsToBeAdded, measurementVariables, germplasmList, mainDesign, entryNumberName, null,
 		 designExpectedEntriesMap);
 	}
