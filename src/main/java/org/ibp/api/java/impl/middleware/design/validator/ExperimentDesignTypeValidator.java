@@ -59,8 +59,6 @@ public class ExperimentDesignTypeValidator {
 		"experiment.design.nrlatin.should.be.less.than.rows.per.replication";
 	public static final String EXPERIMENT_DESIGN_NCLATIN_SHOULD_BE_LESS_THAN_COLS_PER_REPLICATION =
 		"experiment.design.nclatin.should.be.less.than.cols.per.replication";
-	public static final String EXPERIMENT_DESIGN_REPLATING_GROUPS_NOT_EQUAL_TO_REPLICATES1 =
-		"experiment.design.replating.groups.not.equal.to.replicates";
 	public static final String GERMPLASM_LIST_CHECK_REQUIRED_AUGMENTED_DESIGN = "germplasm.list.check.required.augmented.design";
 	public static final String NUMBER_OF_BLOCKS_SHOULD_BE_NUMERIC = "number.of.blocks.should.be.numeric";
 	private static final String EXPERIMENT_DESIGN_REPLICATION_PERCENTAGE_SHOULD_BE_BETWEEN_ZERO_AND_HUNDRED =
@@ -77,7 +75,6 @@ public class ExperimentDesignTypeValidator {
 	public static final String GERMPLASM_LIST_NUMBER_OF_ROWS_BETWEEN_INSERTION_SHOULD_BE_GREATER_THAN_ZERO =
 		"germplasm.list.number.of.rows.between.insertion.should.be.greater.than.zero";
 	public static final String GERMPLASM_LIST_SPACING_LESS_THAN_GERMPLASM_ERROR = "germplasm.list.spacing.less.than.germplasm.error";
-	public static final String GERMPLASM_LIST_ALL_ENTRIES_CAN_NOT_BE_CHECKS1 = "germplasm.list.all.entries.can.not.be.checks";
 	public static final String EXPERIMENT_DESIGN_GENERATE_NO_GERMPLASM = "experiment.design.generate.no.germplasm";
 	public static final String EXPERIMENT_DESIGN_LICENSE_EXPIRED = "experiment.design.license.expired";
 
@@ -254,7 +251,7 @@ public class ExperimentDesignTypeValidator {
 							totalReplatingGroup += Integer.parseInt(tokenizer.nextToken());
 						}
 						if (totalReplatingGroup != replicationCount) {
-							this.errors.reject(EXPERIMENT_DESIGN_REPLATING_GROUPS_NOT_EQUAL_TO_REPLICATES1);
+							this.errors.reject(EXPERIMENT_DESIGN_REPLATING_GROUPS_NOT_EQUAL_TO_REPLICATES);
 						}
 					}
 				}
@@ -398,7 +395,7 @@ public class ExperimentDesignTypeValidator {
 						this.errors.reject(GERMPLASM_LIST_SPACING_LESS_THAN_GERMPLASM_ERROR);
 					}
 					if (germplasmList.size() - checkList.size() == 0) {
-						this.errors.reject(GERMPLASM_LIST_ALL_ENTRIES_CAN_NOT_BE_CHECKS1);
+						this.errors.reject(GERMPLASM_LIST_ALL_ENTRIES_CAN_NOT_BE_CHECKS);
 					}
 				}
 			}
