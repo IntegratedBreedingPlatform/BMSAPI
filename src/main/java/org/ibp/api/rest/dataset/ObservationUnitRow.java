@@ -1,12 +1,10 @@
 package org.ibp.api.rest.dataset;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Map;
-import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @AutoProperty
@@ -18,9 +16,9 @@ public class ObservationUnitRow {
 
 	private String designation;
 
-	private Integer stockId;
+	private Integer entryNumber;
 
-	private Integer geolocationId;
+	private Integer trialInstance;
 
 	private String action;
 
@@ -91,20 +89,20 @@ public class ObservationUnitRow {
 		this.samplesCount = samplesCount;
 	}
 
-	public Integer getStockId() {
-		return stockId;
+	public Integer getEntryNumber() {
+		return entryNumber;
 	}
 
-	public void setStockId(final Integer stockId) {
-		this.stockId = stockId;
+	public void setEntryNumber(final Integer entryNumber) {
+		this.entryNumber = entryNumber;
 	}
 
-	public Integer getGeolocationId() {
-		return geolocationId;
+	public Integer getTrialInstance() {
+		return trialInstance;
 	}
 
-	public void setGeolocationId(final Integer geolocationId) {
-		this.geolocationId = geolocationId;
+	public void setTrialInstance(final Integer trialInstance) {
+		this.trialInstance = trialInstance;
 	}
 
 	@Override
