@@ -11,6 +11,7 @@ import org.ibp.api.java.impl.middleware.design.util.ExpDesignUtil;
 import org.ibp.api.rest.design.BVDesignProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -25,6 +26,9 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 @Component
+@ConditionalOnProperty(
+	value = "design.runner",
+	havingValue = "org.ibp.api.java.impl.middleware.design.runner.BVDesignRunner")
 public class BVDesignRunner implements DesignRunner {
 
 	public static final String BV_PREFIX = "-bv";

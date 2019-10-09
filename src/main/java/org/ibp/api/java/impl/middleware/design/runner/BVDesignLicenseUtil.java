@@ -1,4 +1,4 @@
-package org.ibp.api.java.impl.middleware.design;
+package org.ibp.api.java.impl.middleware.design.runner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.generationcp.commons.util.DateUtil;
@@ -9,6 +9,7 @@ import org.ibp.api.java.design.runner.ProcessRunner;
 import org.ibp.api.rest.design.BVDesignProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Component
+@ConditionalOnProperty(
+	value = "design.runner.license.util",
+	havingValue = "org.ibp.api.java.impl.middleware.design.runner.BVDesignLicenseUtil")
 public class BVDesignLicenseUtil implements DesignLicenseUtil {
 
 	public static final String LICENSE_DATE_FORMAT = "dd-MMM-yyyy";

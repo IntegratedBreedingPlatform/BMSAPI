@@ -8,8 +8,8 @@ import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.BVDesignLicenseInfo;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.BVLicenseParseException;
+import org.ibp.api.java.design.DesignLicenseUtil;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
-import org.ibp.api.java.impl.middleware.design.BVDesignLicenseUtil;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -81,7 +81,7 @@ public class ExperimentDesignTypeValidator {
 	private BindingResult errors;
 
 	@Resource
-	private BVDesignLicenseUtil bvDesignLicenseUtil;
+	private DesignLicenseUtil bvDesignLicenseUtil;
 
 	/**
 	 * Validates the parameters and germplasm entries required for generating randomized block design.

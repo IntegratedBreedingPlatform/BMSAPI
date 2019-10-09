@@ -23,7 +23,7 @@ import org.ibp.api.domain.design.ExpDesignParameter;
 import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
-import org.ibp.api.java.impl.middleware.design.runner.BVDesignRunner;
+import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.impl.middleware.design.transformer.StandardVariableTransformer;
 import org.ibp.api.java.impl.middleware.design.util.ExpDesignUtil;
 import org.ibp.api.rest.dataset.ObservationUnitData;
@@ -87,7 +87,7 @@ public class ExperimentDesignGenerator {
 		Arrays.asList(TermId.PLOT_NO.getId(), TermId.REP_NO.getId(), TermId.BLOCK_NO.getId(), TermId.ROW.getId(), TermId.COL.getId());
 
 	@Resource
-	private BVDesignRunner bvDesignRunner;
+	private DesignRunner designRunner;
 
 	@Resource
 	private StudyDataManager studyDataManager;
@@ -309,7 +309,7 @@ public class ExperimentDesignGenerator {
 			.add(this.createExpDesignParameter(NUMBER_TRIALS_PARAM, String.valueOf(noOfEnvironmentsToAdd), null));
 		BVDesignOutput bvOutput = null;
 		try {
-			bvOutput = this.bvDesignRunner.runBVDesign(mainDesign);
+			bvOutput = this.designRunner.runBVDesign(mainDesign);
 		} catch (final Exception e) {
 			ExperimentDesignGenerator.LOG.error(e.getMessage(), e);
 			throw new BVDesignException("experiment.design.bv.exe.error.generate.generic.error");
