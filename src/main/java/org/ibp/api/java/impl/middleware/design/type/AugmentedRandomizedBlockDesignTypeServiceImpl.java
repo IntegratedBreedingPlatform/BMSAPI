@@ -15,7 +15,6 @@ import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerat
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -36,9 +35,6 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 
 	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NBLKS.getId());
-
-	@Resource
-	private ResourceBundleMessageSource messageSource;
 
 	@Resource
 	public ExperimentDesignTypeValidator experimentDesignTypeValidator;

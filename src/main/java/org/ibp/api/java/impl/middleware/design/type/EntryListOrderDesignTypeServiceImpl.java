@@ -12,9 +12,7 @@ import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerat
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.BindingResult;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -27,9 +25,6 @@ import java.util.Map;
 public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
 	private static final List<Integer> DESIGN_FACTOR_VARIABLES = Arrays.asList(TermId.PLOT_NO.getId());
-
-	@Resource
-	private ResourceBundleMessageSource messageSource;
 
 	@Resource
 	private ExperimentDesignTypeValidator experimentDesignTypeValidator;

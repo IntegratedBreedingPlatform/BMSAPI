@@ -9,9 +9,9 @@ import org.ibp.api.java.design.runner.ProcessRunner;
 import org.ibp.api.rest.design.BVDesignProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -21,7 +21,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-@Configurable
+@Component
 public class BVDesignLicenseUtil implements DesignLicenseUtil {
 
 	public static final String LICENSE_DATE_FORMAT = "dd-MMM-yyyy";
@@ -67,7 +67,7 @@ public class BVDesignLicenseUtil implements DesignLicenseUtil {
 		} catch (final NumberFormatException e) {
 
 			final String errorMessage =
-					this.messageSource.getMessage("bv.design.error.expiry.days.not.numeric", null, LocaleContextHolder.getLocale());
+				this.messageSource.getMessage("bv.design.error.expiry.days.not.numeric", null, LocaleContextHolder.getLocale());
 			BVDesignLicenseUtil.LOG.error(errorMessage, e);
 			return true;
 		}
@@ -99,7 +99,7 @@ public class BVDesignLicenseUtil implements DesignLicenseUtil {
 		} catch (final IOException e) {
 
 			final String errorMessage =
-					this.messageSource.getMessage("bv.design.error.cannot.read.license.file", null, LocaleContextHolder.getLocale());
+				this.messageSource.getMessage("bv.design.error.cannot.read.license.file", null, LocaleContextHolder.getLocale());
 			BVDesignLicenseUtil.LOG.error(errorMessage + ":" + e.getMessage(), e);
 			throw new BVLicenseParseException(errorMessage);
 		}
@@ -123,7 +123,7 @@ public class BVDesignLicenseUtil implements DesignLicenseUtil {
 
 		} catch (final Exception e) {
 			final String errorMessage =
-					this.messageSource.getMessage("bv.design.error.failed.license.generation", null, LocaleContextHolder.getLocale());
+				this.messageSource.getMessage("bv.design.error.failed.license.generation", null, LocaleContextHolder.getLocale());
 			BVDesignLicenseUtil.LOG.error(errorMessage + ":" + e.getMessage(), e);
 			throw new BVLicenseParseException(errorMessage);
 		}
