@@ -56,8 +56,7 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 		final int nTreatments = studyGermplasmDtoList.size();
 		final String blockSize = experimentDesignInput.getBlockSize();
 		final String replicates = experimentDesignInput.getReplicationsCount();
-		final int environments = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
-		final int environmentsToAdd = Integer.parseInt(experimentDesignInput.getNoOfEnvironmentsToAdd());
+		final int numberOfTrials = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -98,7 +97,7 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
 		 return  this.experimentDesignGenerator
-		 .generateExperimentDesignMeasurements(environments, environmentsToAdd, measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName, null,
+		 .generateExperimentDesignMeasurements(numberOfTrials, measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName, null,
 		 new HashMap<>());
 	}
 

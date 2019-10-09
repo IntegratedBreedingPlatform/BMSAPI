@@ -64,11 +64,11 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 		final List<StudyGermplasmDto> mergedGermplasmList =
 			this.mergeTestAndCheckEntries(testEntryList, checkList, startingPosition, spacing, insertionManner);
 
-		final int environments = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
+		final int numberOfTrials = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
 
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
 		final List<ObservationUnitRow> observationUnitRows = new ArrayList<>();
-		for (int instanceNumber = 1; instanceNumber <= environments; instanceNumber++) {
+		for (int instanceNumber = 1; instanceNumber <= numberOfTrials; instanceNumber++) {
 
 			int plotNumber = Integer.parseInt(experimentDesignInput.getStartingPlotNo());
 

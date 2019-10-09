@@ -59,8 +59,7 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 		final String rows = experimentDesignInput.getRowsPerReplications();
 		final String cols = experimentDesignInput.getColsPerReplications();
 		final String replicates = experimentDesignInput.getReplicationsCount();
-		final int environments = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
-		final int environmentsToAdd = Integer.parseInt(experimentDesignInput.getNoOfEnvironmentsToAdd());
+		final int numberOfTrials = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -104,7 +103,7 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 		final List<MeasurementVariable> measurementVariables =
 			new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
 		return this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(environments, environmentsToAdd, measurementVariables, studyGermplasmDtoList, mainDesign,
+			.generateExperimentDesignMeasurements(numberOfTrials, measurementVariables, studyGermplasmDtoList, mainDesign,
 				entryNumberName, null,
 				new HashMap<Integer, Integer>());
 	}

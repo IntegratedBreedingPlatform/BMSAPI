@@ -299,14 +299,14 @@ public class ExperimentDesignGenerator {
 	}
 
 	public List<ObservationUnitRow> generateExperimentDesignMeasurements(
-		final int noOfExistingEnvironments, final int noOfEnvironmentsToAdd, final List<MeasurementVariable> generateDesignVariables,
+		final int numberOfTrials, final List<MeasurementVariable> generateDesignVariables,
 		final List<StudyGermplasmDto> studyGermplasmDtoList, final MainDesign mainDesign, final String entryNumberIdentifier,
 		final Map<String, List<String>> treatmentFactorValues, final Map<Integer, Integer> designExpectedEntriesMap)
 		throws BVDesignException {
 
 		// Specify number of study instances for BVDesign generation
 		mainDesign.getDesign().getParameters()
-			.add(this.createExpDesignParameter(NUMBER_TRIALS_PARAM, String.valueOf(noOfEnvironmentsToAdd), null));
+			.add(this.createExpDesignParameter(NUMBER_TRIALS_PARAM, String.valueOf(numberOfTrials), null));
 		BVDesignOutput bvOutput = null;
 		try {
 			bvOutput = this.designRunner.runBVDesign(mainDesign);
@@ -324,7 +324,7 @@ public class ExperimentDesignGenerator {
 			studyGermplasmDtoList.stream().collect(Collectors.toMap(StudyGermplasmDto::getEntryNumber,
 				Function.identity()));
 		final List<ObservationUnitRow> rows = new ArrayList<>();
-		int trialInstanceNumber = noOfExistingEnvironments - noOfEnvironmentsToAdd + 1;
+		int trialInstanceNumber = 1;
 		for (final BVDesignTrialInstance instance : bvOutput.getTrialInstances()) {
 			for (final Map<String, String> row : instance.getRows()) {
 				final String entryNoValue = row.get(entryNumberIdentifier);
@@ -388,7 +388,8 @@ public class ExperimentDesignGenerator {
 			} else if (termId == TermId.DESIG.getId()) {
 				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), studyGermplasmDto.getDesignation());
 			} else if (termId == TermId.GID.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), String.valueOf(studyGermplasmDto.getGermplasmId()));
+				observationUnitData =
+					ExpDesignUtil.createObservationUnitData(var.getTermId(), String.valueOf(studyGermplasmDto.getGermplasmId()));
 			} else if (termId == TermId.ENTRY_CODE.getId()) {
 				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), studyGermplasmDto.getEntryCode());
 			} else if (EXP_DESIGN_VARIABLE_IDS.contains(termId)) {

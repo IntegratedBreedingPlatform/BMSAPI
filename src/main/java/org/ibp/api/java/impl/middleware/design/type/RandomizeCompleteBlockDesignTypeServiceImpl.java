@@ -56,8 +56,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 		this.experimentDesignTypeValidator.validateRandomizedCompleteBlockDesign(experimentDesignInput, studyGermplasmDtoList);
 
 		final String block = experimentDesignInput.getReplicationsCount();
-		final int environments = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
-		final int environmentsToAdd = Integer.parseInt(experimentDesignInput.getNoOfEnvironmentsToAdd());
+		final int numberOfTrials = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -76,8 +75,8 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 		treatmentFactors.add(entryNumberName);
 		treatmentLevels.add(Integer.toString(studyGermplasmDtoList.size()));
 
-		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), null);
-		final Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
+		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), 1);
+		final Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), 1);
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createRandomizedCompleteBlockDesign(block, replicateNumberName, plotNumberName, plotNo, entryNo,
@@ -86,7 +85,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
 		return this.experimentDesignGenerator
-		 .generateExperimentDesignMeasurements(environments, environmentsToAdd, measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName,
+		 .generateExperimentDesignMeasurements(numberOfTrials, measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName,
 		 treatmentFactorValues, new HashMap<Integer, Integer>());
 	}
 
