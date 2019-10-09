@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.Operation;
 import org.ibp.api.domain.design.MainDesign;
+import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,5 +35,12 @@ public class ExpDesignUtil {
 			return "_" + key.replace("-", "_");
 		}
 		return key;
+	}
+
+	public static ObservationUnitData createObservationUnitData(final Integer variableId, final String value) {
+		final ObservationUnitData observationUnitData = new ObservationUnitData();
+		observationUnitData.setVariableId(variableId);
+		observationUnitData.setValue(value);
+		return observationUnitData;
 	}
 }

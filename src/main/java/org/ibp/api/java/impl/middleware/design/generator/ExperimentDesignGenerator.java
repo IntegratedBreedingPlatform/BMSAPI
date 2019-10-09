@@ -355,7 +355,7 @@ public class ExperimentDesignGenerator {
 		ObservationUnitData treatmentLevelData = null;
 		ObservationUnitData observationUnitData;
 
-		observationUnitData = this.createObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), String.valueOf(trialNo));
+		observationUnitData = ExpDesignUtil.createObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), String.valueOf(trialNo));
 		observationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
 
 		for (final MeasurementVariable var : headerVariable) {
@@ -365,34 +365,34 @@ public class ExperimentDesignGenerator {
 			final int termId = var.getTermId();
 
 			if (termId == TermId.ENTRY_NO.getId()) {
-				observationUnitData = this.createObservationUnitData(var.getTermId(), String.valueOf(germplasm.getEntryId()));
+				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), String.valueOf(germplasm.getEntryId()));
 			} else if (termId == TermId.SOURCE.getId() || termId == TermId.GERMPLASM_SOURCE.getId()) {
 				observationUnitData =
-					this.createObservationUnitData(var.getTermId(), germplasm.getSource() != null ? germplasm.getSource() : "");
+					ExpDesignUtil.createObservationUnitData(var.getTermId(), germplasm.getSource() != null ? germplasm.getSource() : "");
 			} else if (termId == TermId.GROUPGID.getId()) {
-				observationUnitData = this.createObservationUnitData(var.getTermId(),
+				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(),
 					germplasm.getGroupId() != null ? germplasm.getGroupId().toString() : "");
 			} else if (termId == TermId.STOCKID.getId()) {
 				observationUnitData =
-					this.createObservationUnitData(var.getTermId(), germplasm.getStockIDs() != null ? germplasm.getStockIDs() : "");
+					ExpDesignUtil.createObservationUnitData(var.getTermId(), germplasm.getStockIDs() != null ? germplasm.getStockIDs() : "");
 			} else if (termId == TermId.CROSS.getId()) {
-				observationUnitData = this.createObservationUnitData(var.getTermId(), germplasm.getCross());
+				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), germplasm.getCross());
 			} else if (termId == TermId.DESIG.getId()) {
-				observationUnitData = this.createObservationUnitData(var.getTermId(), germplasm.getDesig());
+				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), germplasm.getDesig());
 			} else if (termId == TermId.GID.getId()) {
-				observationUnitData = this.createObservationUnitData(var.getTermId(), germplasm.getGid());
+				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), germplasm.getGid());
 			} else if (termId == TermId.ENTRY_CODE.getId()) {
-				observationUnitData = this.createObservationUnitData(var.getTermId(), germplasm.getEntryCode());
+				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), germplasm.getEntryCode());
 			} else if (EXP_DESIGN_VARIABLE_IDS.contains(termId)) {
-				observationUnitData = this.createObservationUnitData(var.getTermId(), bvEntryMap.get(var.getName()));
+				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), bvEntryMap.get(var.getName()));
 			} else if (termId == TermId.CHECK.getId()) {
 				observationUnitData =
-					this.createObservationUnitData(var.getTermId(), Integer.toString(germplasm.getEntryTypeCategoricalID()));
+					ExpDesignUtil.createObservationUnitData(var.getTermId(), Integer.toString(germplasm.getEntryTypeCategoricalID()));
 			} else if (termId == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
-				observationUnitData = this.createObservationUnitData(var.getTermId(), Integer.toString(trialNo));
+				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), Integer.toString(trialNo));
 			} else if (StringUtils.isEmpty(var.getTreatmentLabel())) {
 				if (treatmentLevelData == null) {
-					observationUnitData = this.createObservationUnitData(var.getTermId(),
+					observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(),
 						bvEntryMap.get(ExpDesignUtil.cleanBVDesingKey(Integer.toString(var.getTermId()))));
 					treatmentLevelData = observationUnitData;
 				} else {
@@ -414,12 +414,12 @@ public class ExperimentDesignGenerator {
 							}
 							if (var.getDataTypeId() != null && var.getDataTypeId().intValue() == TermId.DATE_VARIABLE.getId()) {
 								value = DateUtil.convertToDBDateFormat(var.getDataTypeId(), value);
-								observationUnitData = this.createObservationUnitData(var.getTermId(), value);
+								observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), value);
 							} else if (var.getPossibleValues() != null && !var.getPossibleValues().isEmpty() && NumberUtils
 								.isNumber(value)) {
-								observationUnitData = this.createObservationUnitData(var.getTermId(), value);
+								observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), value);
 							} else {
-								observationUnitData = this.createObservationUnitData(var.getTermId(), value);
+								observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), value);
 							}
 						}
 					}
@@ -428,20 +428,13 @@ public class ExperimentDesignGenerator {
 
 			} else {
 				// meaning non factor
-				observationUnitData = this.createObservationUnitData(var.getTermId(), "");
+				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), "");
 			}
 
 			observationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
 		}
 		observationUnitRow.setVariables(observationUnitDataMap);
 		return observationUnitRow;
-	}
-
-	ObservationUnitData createObservationUnitData(final Integer variableId, final String value) {
-		final ObservationUnitData observationUnitData = new ObservationUnitData();
-		observationUnitData.setVariableId(variableId);
-		observationUnitData.setValue(value);
-		return observationUnitData;
 	}
 
 	ExpDesignParameter createExpDesignParameter(final String name, final String value, final List<ListItem> items) {
