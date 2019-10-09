@@ -1,11 +1,11 @@
 package org.ibp.api.java.impl.middleware.design.type;
 
-import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
@@ -51,13 +51,13 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
-		final String programUUID, final List<ImportedGermplasm> germplasmList) throws BVDesignException {
+		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) throws BVDesignException {
 
-		this.experimentDesignTypeValidator.validateRandomizedCompleteBlockDesign(experimentDesignInput, germplasmList);
+		this.experimentDesignTypeValidator.validateRandomizedCompleteBlockDesign(experimentDesignInput, studyGermplasmDtoList);
 
 		final String block = experimentDesignInput.getReplicationsCount();
-		final int environments = Integer.valueOf(experimentDesignInput.getNoOfEnvironments());
-		final int environmentsToAdd = Integer.valueOf(experimentDesignInput.getNoOfEnvironmentsToAdd());
+		final int environments = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
+		final int environmentsToAdd = Integer.parseInt(experimentDesignInput.getNoOfEnvironmentsToAdd());
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -72,9 +72,9 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 		final List<String> treatmentFactors = this.getTreatmentFactors(treatmentFactorValues);
 		final List<String> treatmentLevels = this.getLevels(treatmentFactorValues);
 
-		treatmentFactorValues.put(entryNumberName, Arrays.asList(Integer.toString(germplasmList.size())));
+		treatmentFactorValues.put(entryNumberName, Arrays.asList(Integer.toString(studyGermplasmDtoList.size())));
 		treatmentFactors.add(entryNumberName);
-		treatmentLevels.add(Integer.toString(germplasmList.size()));
+		treatmentLevels.add(Integer.toString(studyGermplasmDtoList.size()));
 
 		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), null);
 		final Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
@@ -86,7 +86,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
 		return this.experimentDesignGenerator
-		 .generateExperimentDesignMeasurements(environments, environmentsToAdd, measurementVariables, germplasmList, mainDesign, entryNumberName,
+		 .generateExperimentDesignMeasurements(environments, environmentsToAdd, measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName,
 		 treatmentFactorValues, new HashMap<Integer, Integer>());
 	}
 

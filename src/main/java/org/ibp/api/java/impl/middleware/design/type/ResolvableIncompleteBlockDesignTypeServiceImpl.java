@@ -1,12 +1,12 @@
 package org.ibp.api.java.impl.middleware.design.type;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
@@ -49,15 +49,15 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
-		final String programUUID, final List<ImportedGermplasm> germplasmList) throws BVDesignException {
+		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) throws BVDesignException {
 
-		this.experimentDesignTypeValidator.validateResolvableIncompleteBlockDesign(experimentDesignInput, germplasmList);
+		this.experimentDesignTypeValidator.validateResolvableIncompleteBlockDesign(experimentDesignInput, studyGermplasmDtoList);
 
-		final int nTreatments = germplasmList.size();
+		final int nTreatments = studyGermplasmDtoList.size();
 		final String blockSize = experimentDesignInput.getBlockSize();
 		final String replicates = experimentDesignInput.getReplicationsCount();
-		final int environments = Integer.valueOf(experimentDesignInput.getNoOfEnvironments());
-		final int environmentsToAdd = Integer.valueOf(experimentDesignInput.getNoOfEnvironmentsToAdd());
+		final int environments = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
+		final int environmentsToAdd = Integer.parseInt(experimentDesignInput.getNoOfEnvironmentsToAdd());
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -98,7 +98,7 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
 		 return  this.experimentDesignGenerator
-		 .generateExperimentDesignMeasurements(environments, environmentsToAdd, measurementVariables, germplasmList, mainDesign, entryNumberName, null,
+		 .generateExperimentDesignMeasurements(environments, environmentsToAdd, measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName, null,
 		 new HashMap<>());
 	}
 

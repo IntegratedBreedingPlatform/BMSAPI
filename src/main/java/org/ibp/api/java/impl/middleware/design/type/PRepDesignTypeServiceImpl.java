@@ -1,11 +1,11 @@
 package org.ibp.api.java.impl.middleware.design.type;
 
-import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
@@ -46,11 +46,11 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
-		final String programUUID, final List<ImportedGermplasm> germplasmList) throws BVDesignException {
+		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) throws BVDesignException {
 
-		this.experimentDesignTypeValidator.validatePrepDesign(experimentDesignInput, germplasmList);
+		this.experimentDesignTypeValidator.validatePrepDesign(experimentDesignInput, studyGermplasmDtoList);
 
-		final int nTreatments = germplasmList.size();
+		final int nTreatments = studyGermplasmDtoList.size();
 		final int blockSize = Integer.parseInt(experimentDesignInput.getBlockSize());
 		final int replicationPercentage = experimentDesignInput.getReplicationPercentage();
 		final int replicationNumber = Integer.parseInt(experimentDesignInput.getReplicationsCount());
@@ -70,14 +70,14 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
 		final List<ListItem> replicationListItems =
 			this.experimentDesignGenerator
-				.createReplicationListItemForPRepDesign(germplasmList, replicationPercentage, replicationNumber);
+				.createReplicationListItemForPRepDesign(studyGermplasmDtoList, replicationPercentage, replicationNumber);
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createPRepDesign(blockSize, nTreatments, replicationListItems, entryNumberName,
 				blockNumberName, plotNumberName, plotNo, entryNo);
 
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
 		return this.experimentDesignGenerator
-		 .generateExperimentDesignMeasurements(environments, environmentsToAdd, measurementVariables, germplasmList, mainDesign,
+		 .generateExperimentDesignMeasurements(environments, environmentsToAdd, measurementVariables, studyGermplasmDtoList, mainDesign,
 		 entryNumberName, null,
 		 new HashMap<Integer, Integer>());
 	}
