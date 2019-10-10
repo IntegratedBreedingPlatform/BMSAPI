@@ -18,6 +18,7 @@ public class StandardVariableTransformer {
 				standardVariable.getPhenotypicType() != null ? standardVariable.getPhenotypicType().getLabelList().get(0) : "");
 		measurementVariable.setDataTypeId(standardVariable.getDataType().getId());
 		measurementVariable.setVariableType(variableType);
+		measurementVariable.setAlias(standardVariable.getName());
 		return measurementVariable;
 	}
 }
