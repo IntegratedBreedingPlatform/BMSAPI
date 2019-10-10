@@ -512,8 +512,8 @@ public class ExperimentDesignTypeValidator {
 	void validatePlotNumberAndEntryNumberShouldNotExceedLimit(final ExperimentDesignInput experimentDesignInput,
 		final int germplasmCount) {
 
-		final Integer entryNumber = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
-		final Integer plotNumber = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), null);
+		final Integer entryNumber = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), 1);
+		final Integer plotNumber = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), 1);
 		final Integer maxEntry = germplasmCount + entryNumber - 1;
 		final Integer maxPlot = (germplasmCount * Integer.parseInt(experimentDesignInput.getReplicationsCount())) + plotNumber - 1;
 
