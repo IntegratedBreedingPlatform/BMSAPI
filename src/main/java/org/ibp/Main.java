@@ -16,6 +16,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
@@ -26,6 +27,8 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 
+import javax.annotation.PostConstruct;
+
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class})
 @EnableSwagger
 @Configuration
@@ -35,6 +38,9 @@ public class Main extends WebMvcConfigurerAdapter {
 
 	@Autowired
 	private SpringSwaggerConfig springSwaggerConfig;
+
+	@Autowired
+	com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
 	@Value("${swagger.enable}")
 	private boolean enableSwagger;
@@ -108,4 +114,10 @@ public class Main extends WebMvcConfigurerAdapter {
 	protected void setEnableSwagger(final boolean enableSwagger) {
 		this.enableSwagger = enableSwagger;
 	}
+
+	@PostConstruct
+	private void setTimeZone() {
+		objectMapper.setTimeZone(LocaleContextHolder.getTimeZone());
+	}
+
 }
