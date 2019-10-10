@@ -359,9 +359,9 @@ public class ExperimentDesignGenerator {
 
 		final int plotDatasetId =
 			this.studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0).getId();
-		final List<MeasurementVariable> measurementVariables =
-			this.datasetService.getDatasetMeasurementVariablesByVariableType(plotDatasetId,
-				Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId()));
+		final Set<MeasurementVariable> measurementVariables =
+			new HashSet<>(this.datasetService.getDatasetMeasurementVariablesByVariableType(plotDatasetId,
+				Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId())));
 
 		measurementVariables.addAll(
 			this.convertToMeasurementVariables(experimentDesignFactors, VariableType.ENVIRONMENT_DETAIL, experimentDesignInput,
@@ -371,7 +371,7 @@ public class ExperimentDesignGenerator {
 		measurementVariables.addAll(
 			this.convertToMeasurementVariables(treatmentFactors, VariableType.TREATMENT_FACTOR, experimentDesignInput, programUUID));
 
-		return measurementVariables;
+		return new ArrayList<>(measurementVariables);
 	}
 
 	List<MeasurementVariable> convertToMeasurementVariables(final List<Integer> variableIds, final VariableType variableType,
@@ -397,100 +397,119 @@ public class ExperimentDesignGenerator {
 	}
 
 	ObservationUnitRow createObservationUnitRow(
-		final List<MeasurementVariable> headerVariable, final StudyGermplasmDto studyGermplasmDto,
+		final List<MeasurementVariable> measurementVariables, final StudyGermplasmDto studyGermplasmDto,
 		final Map<String, String> bvEntryMap, final Map<String, List<String>> treatmentFactorValues, final int trialNo) {
 
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setTrialInstance(trialNo);
 		final Map<String, ObservationUnitData> observationUnitDataMap = new HashMap<>();
+		final Map<String, ObservationUnitData> environmentObservationUnitDataMap = new HashMap<>();
 		ObservationUnitData treatmentLevelData = null;
 		ObservationUnitData observationUnitData;
 
 		observationUnitData = ExpDesignUtil.createObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), String.valueOf(trialNo));
 		observationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
 
-		for (final MeasurementVariable var : headerVariable) {
+		for (final MeasurementVariable measurementVariable : measurementVariables) {
 
+			final int termId = measurementVariable.getTermId();
 			observationUnitData = null;
 
-			final int termId = var.getTermId();
+			if (measurementVariable.getVariableType() == VariableType.ENVIRONMENT_DETAIL
+				|| measurementVariable.getVariableType() == VariableType.STUDY_CONDITION) {
+				observationUnitData = ExpDesignUtil
+					.createObservationUnitData(measurementVariable.getTermId(), String.valueOf(measurementVariable.getValue()));
 
-			if (termId == TermId.ENTRY_NO.getId()) {
-				final Integer entryNumber = studyGermplasmDto.getEntryNumber();
-				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), String.valueOf(
-					entryNumber));
-				observationUnitRow.setEntryNumber(entryNumber);
-			} else if (termId == TermId.SOURCE.getId() || termId == TermId.GERMPLASM_SOURCE.getId()) {
-				observationUnitData =
-					ExpDesignUtil.createObservationUnitData(var.getTermId(),
-						studyGermplasmDto.getSeedSource() != null ? studyGermplasmDto.getSeedSource() : "");
-			} else if (termId == TermId.GROUPGID.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(),
-					studyGermplasmDto.getGroupId() != null ? studyGermplasmDto.getGroupId().toString() : "");
-			} else if (termId == TermId.STOCKID.getId()) {
-				observationUnitData =
-					ExpDesignUtil.createObservationUnitData(var.getTermId(),
-						studyGermplasmDto.getStockIds() != null ? studyGermplasmDto.getStockIds() : "");
-			} else if (termId == TermId.CROSS.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), studyGermplasmDto.getCross());
-			} else if (termId == TermId.DESIG.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), studyGermplasmDto.getDesignation());
-			} else if (termId == TermId.GID.getId()) {
-				observationUnitData =
-					ExpDesignUtil.createObservationUnitData(var.getTermId(), String.valueOf(studyGermplasmDto.getGermplasmId()));
-			} else if (termId == TermId.ENTRY_CODE.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), studyGermplasmDto.getEntryCode());
-			} else if (EXP_DESIGN_VARIABLE_IDS.contains(termId)) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), bvEntryMap.get(var.getName()));
-			} else if (termId == TermId.CHECK.getId()) {
-				observationUnitData =
-					ExpDesignUtil.createObservationUnitData(var.getTermId(), Integer.toString(studyGermplasmDto.getCheckType()));
-			} else if (termId == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), Integer.toString(trialNo));
-			} else if (StringUtils.isEmpty(var.getTreatmentLabel())) {
-				if (treatmentLevelData == null) {
-					observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(),
-						bvEntryMap.get(ExpDesignUtil.cleanBVDesingKey(Integer.toString(var.getTermId()))));
-					treatmentLevelData = observationUnitData;
-				} else {
-					final String level = treatmentLevelData.getValue();
-					if (NumberUtils.isNumber(level)) {
-						final int index = Integer.valueOf(level) - 1;
-						if (treatmentFactorValues != null && treatmentFactorValues
-							.containsKey(String.valueOf(treatmentLevelData.getVariableId()))) {
-							final Object tempObj =
-								treatmentFactorValues.get(String.valueOf(treatmentLevelData.getVariableId()))
-									.get(index);
-							String value = "";
-							if (tempObj != null) {
-								if (tempObj instanceof String) {
-									value = (String) tempObj;
+				environmentObservationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
+			} else {
+				if (termId == TermId.ENTRY_NO.getId()) {
+					final Integer entryNumber = studyGermplasmDto.getEntryNumber();
+					observationUnitData = ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), String.valueOf(
+						entryNumber));
+					observationUnitRow.setEntryNumber(entryNumber);
+				} else if (termId == TermId.SOURCE.getId() || termId == TermId.GERMPLASM_SOURCE.getId()) {
+					observationUnitData =
+						ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(),
+							studyGermplasmDto.getSeedSource() != null ? studyGermplasmDto.getSeedSource() : "");
+				} else if (termId == TermId.GROUPGID.getId()) {
+					observationUnitData = ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(),
+						studyGermplasmDto.getGroupId() != null ? studyGermplasmDto.getGroupId().toString() : "");
+				} else if (termId == TermId.STOCKID.getId()) {
+					observationUnitData =
+						ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(),
+							studyGermplasmDto.getStockIds() != null ? studyGermplasmDto.getStockIds() : "");
+				} else if (termId == TermId.CROSS.getId()) {
+					observationUnitData =
+						ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), studyGermplasmDto.getCross());
+				} else if (termId == TermId.DESIG.getId()) {
+					observationUnitData =
+						ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), studyGermplasmDto.getDesignation());
+				} else if (termId == TermId.GID.getId()) {
+					observationUnitData =
+						ExpDesignUtil
+							.createObservationUnitData(measurementVariable.getTermId(), String.valueOf(studyGermplasmDto.getGermplasmId()));
+				} else if (termId == TermId.ENTRY_CODE.getId()) {
+					observationUnitData =
+						ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), studyGermplasmDto.getEntryCode());
+				} else if (EXP_DESIGN_VARIABLE_IDS.contains(termId)) {
+					observationUnitData = ExpDesignUtil
+						.createObservationUnitData(measurementVariable.getTermId(), bvEntryMap.get(measurementVariable.getName()));
+				} else if (termId == TermId.CHECK.getId()) {
+					observationUnitData =
+						ExpDesignUtil
+							.createObservationUnitData(measurementVariable.getTermId(), Integer.toString(studyGermplasmDto.getCheckType()));
+				} else if (termId == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+					observationUnitData =
+						ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), Integer.toString(trialNo));
+				} else if (StringUtils.isEmpty(measurementVariable.getTreatmentLabel())) {
+					if (treatmentLevelData == null) {
+						observationUnitData = ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(),
+							bvEntryMap.get(ExpDesignUtil.cleanBVDesingKey(Integer.toString(measurementVariable.getTermId()))));
+						treatmentLevelData = observationUnitData;
+					} else {
+						final String level = treatmentLevelData.getValue();
+						if (NumberUtils.isNumber(level)) {
+							final int index = Integer.valueOf(level) - 1;
+							if (treatmentFactorValues != null && treatmentFactorValues
+								.containsKey(String.valueOf(treatmentLevelData.getVariableId()))) {
+								final Object tempObj =
+									treatmentFactorValues.get(String.valueOf(treatmentLevelData.getVariableId()))
+										.get(index);
+								String value = "";
+								if (tempObj != null) {
+									if (tempObj instanceof String) {
+										value = (String) tempObj;
+									} else {
+										value = Integer.toString((Integer) tempObj);
+									}
+								}
+								if (measurementVariable.getDataTypeId() != null
+									&& measurementVariable.getDataTypeId().intValue() == TermId.DATE_VARIABLE.getId()) {
+									value = DateUtil.convertToDBDateFormat(measurementVariable.getDataTypeId(), value);
+									observationUnitData = ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), value);
+								} else if (measurementVariable.getPossibleValues() != null && !measurementVariable.getPossibleValues()
+									.isEmpty() && NumberUtils
+									.isNumber(value)) {
+									observationUnitData = ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), value);
 								} else {
-									value = Integer.toString((Integer) tempObj);
+									observationUnitData = ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), value);
 								}
 							}
-							if (var.getDataTypeId() != null && var.getDataTypeId().intValue() == TermId.DATE_VARIABLE.getId()) {
-								value = DateUtil.convertToDBDateFormat(var.getDataTypeId(), value);
-								observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), value);
-							} else if (var.getPossibleValues() != null && !var.getPossibleValues().isEmpty() && NumberUtils
-								.isNumber(value)) {
-								observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), value);
-							} else {
-								observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), value);
-							}
 						}
+						treatmentLevelData = null;
 					}
-					treatmentLevelData = null;
+
+				} else {
+					// meaning non factor
+					observationUnitData = ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), "");
 				}
 
-			} else {
-				// meaning non factor
-				observationUnitData = ExpDesignUtil.createObservationUnitData(var.getTermId(), "");
+				observationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
 			}
 
-			observationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
 		}
 		observationUnitRow.setVariables(observationUnitDataMap);
+		observationUnitRow.setEnvironmentVariables(environmentObservationUnitDataMap);
 		return observationUnitRow;
 	}
 
