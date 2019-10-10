@@ -18,7 +18,6 @@ import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -95,7 +94,7 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentDesignInput experimentDesignInput,
 		final String programUUID) {
 		return this.experimentDesignGenerator
-			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES, EXPERIMENT_DESIGN_VARIABLES, new ArrayList<>(),
+			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES, EXPERIMENT_DESIGN_VARIABLES,
 				experimentDesignInput);
 	}
 }

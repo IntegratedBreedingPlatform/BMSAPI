@@ -111,10 +111,10 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 
 		final List<MeasurementVariable> measurementVariables = this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES, EXPERIMENT_DESIGN_VARIABLES,
-				new ArrayList<>(), experimentDesignInput);
+				experimentDesignInput);
 
 		final Map treatmentFactorsData = experimentDesignInput.getTreatmentFactorsData();
-		if(treatmentFactorsData != null) {
+		if (treatmentFactorsData != null) {
 			final Map<Integer, Integer> treatmentFactorLevelToLabelIdMap = new HashMap<>();
 
 			final Iterator keySetIter = treatmentFactorsData.keySet().iterator();
@@ -132,19 +132,21 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 					Function.identity()));
 
 			final Set<Integer> treatmentFactorLevelIds = treatmentFactorLevelToLabelIdMap.keySet();
-			for(final Integer treatmentFactorLevelId: treatmentFactorLevelIds) {
-				final MeasurementVariable treatmentFactorLevelVariable = this.standardVariableTransformer.convert(standardVariableMap.get(treatmentFactorLevelId), VariableType.TREATMENT_FACTOR);
+			for (final Integer treatmentFactorLevelId : treatmentFactorLevelIds) {
+				final MeasurementVariable treatmentFactorLevelVariable = this.standardVariableTransformer
+					.convert(standardVariableMap.get(treatmentFactorLevelId), VariableType.TREATMENT_FACTOR);
 				treatmentFactorLevelVariable.setTreatmentLabel(treatmentFactorLevelVariable.getName());
 				measurementVariables.add(treatmentFactorLevelVariable);
 
 				final Integer treatmentFactorLabelId = treatmentFactorLevelToLabelIdMap.get(treatmentFactorLevelId);
-				final MeasurementVariable treatmentFactorLabelVariable = this.standardVariableTransformer.convert(standardVariableMap.get(treatmentFactorLabelId), VariableType.TREATMENT_FACTOR);
+				final MeasurementVariable treatmentFactorLabelVariable = this.standardVariableTransformer
+					.convert(standardVariableMap.get(treatmentFactorLabelId), VariableType.TREATMENT_FACTOR);
 				treatmentFactorLabelVariable.setTreatmentLabel(treatmentFactorLevelVariable.getName());
 				measurementVariables.add(treatmentFactorLabelVariable);
 			}
 		}
 
-		return  measurementVariables;
+		return measurementVariables;
 	}
 
 	Map<String, List<String>> getTreatmentFactorValues(final Map treatmentFactorsData) {

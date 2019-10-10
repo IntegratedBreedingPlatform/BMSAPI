@@ -18,7 +18,6 @@ import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -118,7 +117,6 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 		return this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES,
 				(experimentDesignInput.getUseLatenized() != null && experimentDesignInput.getUseLatenized()) ?
-					EXPERIMENT_DESIGN_VARIABLES_LATINIZED : EXPERIMENT_DESIGN_VARIABLES,
-				new ArrayList<>(), experimentDesignInput);
+					EXPERIMENT_DESIGN_VARIABLES_LATINIZED : EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput);
 	}
 }

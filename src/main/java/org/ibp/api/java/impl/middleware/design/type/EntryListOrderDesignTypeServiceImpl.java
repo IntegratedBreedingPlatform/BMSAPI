@@ -102,8 +102,7 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 		return this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES,
 				!StringUtils.isEmpty(experimentDesignInput.getCheckSpacing()) ? EXPERIMENT_DESIGN_VARIABLES_WITH_CHECK_PLAN :
-					EXPERIMENT_DESIGN_VARIABLES,
-				new ArrayList<>(), experimentDesignInput);
+					EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput);
 	}
 
 	ObservationUnitRow createObservationUnitRow(final int instanceNumber, final StudyGermplasmDto germplasm,

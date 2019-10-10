@@ -351,7 +351,7 @@ public class ExperimentDesignGenerator {
 	}
 
 	public List<MeasurementVariable> constructMeasurementVariables(final int studyId, final String programUUID,
-		final List<Integer> designFactors, final List<Integer> experimentDesignFactors, final List<Integer> treatmentFactors,
+		final List<Integer> designFactors, final List<Integer> experimentDesignFactors,
 		final ExperimentDesignInput experimentDesignInput) {
 
 		// Add the germplasm and environment detail variables from study.
@@ -368,8 +368,6 @@ public class ExperimentDesignGenerator {
 				programUUID));
 		measurementVariables.addAll(
 			this.convertToMeasurementVariables(designFactors, VariableType.EXPERIMENTAL_DESIGN, experimentDesignInput, programUUID));
-		measurementVariables.addAll(
-			this.convertToMeasurementVariables(treatmentFactors, VariableType.TREATMENT_FACTOR, experimentDesignInput, programUUID));
 
 		return new ArrayList<>(measurementVariables);
 	}
