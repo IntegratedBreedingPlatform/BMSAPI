@@ -30,7 +30,7 @@ public class ExperimentDesignResource {
 		@PathVariable final Integer studyId,
 		@RequestBody final ExperimentDesignInput experimentDesignInput) throws BVDesignException {
 
-		this.experimentDesignService.generateAndSaveDesign(studyId, experimentDesignInput);
+		this.experimentDesignService.generateAndSaveDesign(crop, studyId, experimentDesignInput);
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

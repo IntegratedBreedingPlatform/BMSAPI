@@ -1,6 +1,8 @@
 package org.ibp.api.java.impl.middleware.design;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.ExperimentDesignService;
@@ -38,10 +40,15 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	@Resource
 	private ExperimentDesignTypeServiceFactory experimentDesignTypeServiceFactory;
 
+	@Resource
+	private WorkbenchDataManager workbenchDataManager;
+
 	@Override
-	public void generateAndSaveDesign(final int studyId, final ExperimentDesignInput experimentDesignInput) throws BVDesignException {
+	public void generateAndSaveDesign(final String cropName, final int studyId, final ExperimentDesignInput experimentDesignInput)
+		throws BVDesignException {
 
 		this.studyValidator.validate(studyId, false);
+		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 
 		final String programUUID = this.studyService.getProgramUUID(studyId);
 		final List<StudyGermplasmDto> studyGermplasmDtoList = this.middlewareStudyService.getStudyGermplasmList(studyId);
@@ -56,7 +63,8 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 				Collectors.toList());
 
 		this.experimentDesignMiddlewareService.deleteExperimentDesign(studyId);
-		this.experimentDesignMiddlewareService.saveExperimentDesign(null, studyId, measurementVariables, this.convert(observationUnitRows));
+		this.experimentDesignMiddlewareService
+			.saveExperimentDesign(cropType, studyId, measurementVariables, this.convert(observationUnitRows));
 	}
 
 	List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> convert(final List<ObservationUnitRow> observationUnitRows) {
