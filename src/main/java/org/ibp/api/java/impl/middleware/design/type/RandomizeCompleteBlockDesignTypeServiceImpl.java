@@ -83,10 +83,10 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 				entryNumberName, treatmentFactors,
 				treatmentLevels, "");
 
-		final List<MeasurementVariable> measurementVariables = new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
+		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
 		return this.experimentDesignGenerator
-		 .generateExperimentDesignMeasurements(numberOfTrials, measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName,
-		 treatmentFactorValues, new HashMap<Integer, Integer>());
+			.generateExperimentDesignMeasurements(numberOfTrials, measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName,
+				treatmentFactorValues, new HashMap<Integer, Integer>());
 	}
 
 	@Override
@@ -100,8 +100,11 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 	}
 
 	@Override
-	public Map<Integer, MeasurementVariable> getMeasurementVariablesMap(final int studyId, final String programUUID) {
-		return this.experimentDesignGenerator.getMeasurementVariablesMap(studyId, programUUID, DESIGN_FACTOR_VARIABLES, new ArrayList<>());
+	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentDesignInput experimentDesignInput,
+		final String programUUID) {
+		return this.experimentDesignGenerator
+			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES, EXPERIMENT_DESIGN_VARIABLES,
+				new ArrayList<>(), experimentDesignInput);
 	}
 
 	Map<String, List<String>> getTreatmentFactorValues(final Map treatmentFactorsData) {

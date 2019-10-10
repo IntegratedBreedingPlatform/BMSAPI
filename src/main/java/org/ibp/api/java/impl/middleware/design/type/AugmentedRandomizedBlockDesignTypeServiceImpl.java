@@ -78,8 +78,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 			.createAugmentedRandomizedBlockDesign(numberOfBlocks, numberOfTreatments, numberOfControls, startingPlotNumber,
 				startingEntryNumber, entryNumberName, blockNumberName, plotNumberName);
 
-		final List<MeasurementVariable> measurementVariables =
-			new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
+		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
 		return this.experimentDesignGenerator
 			.generateExperimentDesignMeasurements(numberOfTrials, measurementVariables,
 				studyGermplasmDtoList, mainDesign, entryNumberName, null,
@@ -97,8 +96,11 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 	}
 
 	@Override
-	public Map<Integer, MeasurementVariable> getMeasurementVariablesMap(final int studyId, final String programUUID) {
-		return this.experimentDesignGenerator.getMeasurementVariablesMap(studyId, programUUID, DESIGN_FACTOR_VARIABLES, new ArrayList<>());
+	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentDesignInput experimentDesignInput,
+		final String programUUID) {
+		return this.experimentDesignGenerator
+			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES, new ArrayList<>(),
+				EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput);
 	}
 
 	Map<Integer, StandardVariable> convertStandardVariableListToMap(final List<StandardVariable> standardVariables) {

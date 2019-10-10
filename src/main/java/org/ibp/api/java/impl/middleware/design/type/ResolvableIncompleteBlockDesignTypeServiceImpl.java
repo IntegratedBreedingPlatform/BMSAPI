@@ -31,11 +31,11 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 	private static final List<Integer> DESIGN_FACTOR_VARIABLES =
 		Arrays.asList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId(), TermId.BLOCK_NO.getId());
 
-	private final List<Integer> EXPERIMENT_DESIGN_VARIABLES_LATINIZED =
+	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES_LATINIZED =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId(),
 			TermId.NO_OF_CBLKS_LATINIZE.getId(), TermId.REPLICATIONS_MAP.getId(), TermId.NO_OF_REPS_IN_COLS.getId());
 
-	private final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
+	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId());
 
 	@Resource
@@ -95,10 +95,11 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 				experimentDesignInput.getNblatin(),
 				experimentDesignInput.getReplatinGroups(), "", experimentDesignInput.getUseLatenized());
 
-		final List<MeasurementVariable> measurementVariables = new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
-		 return  this.experimentDesignGenerator
-		 .generateExperimentDesignMeasurements(numberOfTrials, measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName, null,
-		 new HashMap<>());
+		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
+		return this.experimentDesignGenerator
+			.generateExperimentDesignMeasurements(numberOfTrials, measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName,
+				null,
+				new HashMap<>());
 	}
 
 	@Override
@@ -112,7 +113,12 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 	}
 
 	@Override
-	public Map<Integer, MeasurementVariable> getMeasurementVariablesMap(final int studyId, final String programUUID) {
-		return this.experimentDesignGenerator.getMeasurementVariablesMap(studyId, programUUID, DESIGN_FACTOR_VARIABLES, new ArrayList<>());
+	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentDesignInput experimentDesignInput,
+		final String programUUID) {
+		return this.experimentDesignGenerator
+			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES,
+				(experimentDesignInput.getUseLatenized() != null && experimentDesignInput.getUseLatenized()) ?
+					EXPERIMENT_DESIGN_VARIABLES_LATINIZED : EXPERIMENT_DESIGN_VARIABLES,
+				new ArrayList<>(), experimentDesignInput);
 	}
 }

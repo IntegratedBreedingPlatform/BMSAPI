@@ -4,8 +4,6 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.InsertionMannerItem;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -31,6 +29,13 @@ import java.util.Map;
 public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
 	private static final List<Integer> DESIGN_FACTOR_VARIABLES = Arrays.asList(TermId.PLOT_NO.getId());
+
+	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
+		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+
+	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES_WITH_CHECK_PLAN =
+		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.CHECK_START.getId(), TermId.CHECK_INTERVAL.getId(),
+			TermId.CHECK_PLAN.getId());
 
 	@Resource
 	private ExperimentDesignTypeValidator experimentDesignTypeValidator;
@@ -66,7 +71,7 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 
 		final int numberOfTrials = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
 
-		final List<MeasurementVariable> measurementVariables = new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
+		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
 		final List<ObservationUnitRow> observationUnitRows = new ArrayList<>();
 		for (int instanceNumber = 1; instanceNumber <= numberOfTrials; instanceNumber++) {
 
@@ -92,8 +97,13 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 	}
 
 	@Override
-	public Map<Integer, MeasurementVariable> getMeasurementVariablesMap(final int studyId, final String programUUID) {
-		return this.experimentDesignGenerator.getMeasurementVariablesMap(studyId, programUUID, DESIGN_FACTOR_VARIABLES, new ArrayList<>());
+	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentDesignInput experimentDesignInput,
+		final String programUUID) {
+		return this.experimentDesignGenerator
+			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES,
+				!StringUtils.isEmpty(experimentDesignInput.getCheckSpacing()) ? EXPERIMENT_DESIGN_VARIABLES_WITH_CHECK_PLAN :
+					EXPERIMENT_DESIGN_VARIABLES,
+				new ArrayList<>(), experimentDesignInput);
 	}
 
 	ObservationUnitRow createObservationUnitRow(final int instanceNumber, final StudyGermplasmDto germplasm,
@@ -109,11 +119,14 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 			if (termId == TermId.ENTRY_NO.getId()) {
 				observationUnitData = ExpDesignUtil.createObservationUnitData(termId, String.valueOf(germplasm.getEntryNumber()));
 			} else if (termId == TermId.SOURCE.getId() || termId == TermId.GERMPLASM_SOURCE.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(termId, germplasm.getSeedSource() != null ? germplasm.getSeedSource() : StringUtils.EMPTY);
+				observationUnitData = ExpDesignUtil
+					.createObservationUnitData(termId, germplasm.getSeedSource() != null ? germplasm.getSeedSource() : StringUtils.EMPTY);
 			} else if (termId == TermId.GROUPGID.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(termId, germplasm.getGroupId() != null ? germplasm.getGroupId().toString() : StringUtils.EMPTY);
+				observationUnitData = ExpDesignUtil.createObservationUnitData(termId,
+					germplasm.getGroupId() != null ? germplasm.getGroupId().toString() : StringUtils.EMPTY);
 			} else if (termId == TermId.STOCKID.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(termId, germplasm.getStockIds() != null ? germplasm.getStockIds() : StringUtils.EMPTY);
+				observationUnitData = ExpDesignUtil
+					.createObservationUnitData(termId, germplasm.getStockIds() != null ? germplasm.getStockIds() : StringUtils.EMPTY);
 			} else if (termId == TermId.CROSS.getId()) {
 				observationUnitData = ExpDesignUtil.createObservationUnitData(termId, germplasm.getCross());
 			} else if (termId == TermId.DESIG.getId()) {

@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.StringUtil;
@@ -31,12 +32,12 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 	private static final List<Integer> DESIGN_FACTOR_VARIABLES =
 		Arrays.asList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId(), TermId.ROW.getId(), TermId.COL.getId());
 
-	private final List<Integer> EXPERIMENT_DESIGN_VARIABLES_LATINIZED = Arrays
+	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES_LATINIZED = Arrays
 		.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.NO_OF_ROWS_IN_REPS.getId(),
 			TermId.NO_OF_COLS_IN_REPS.getId(), TermId.NO_OF_CROWS_LATINIZE.getId(), TermId.NO_OF_CCOLS_LATINIZE.getId(),
 			TermId.REPLICATIONS_MAP.getId(), TermId.NO_OF_REPS_IN_COLS.getId());
 
-	private final List<Integer> EXPERIMENT_DESIGN_VARIABLES = Arrays
+	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES = Arrays
 		.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.NO_OF_ROWS_IN_REPS.getId(),
 			TermId.NO_OF_COLS_IN_REPS.getId());
 
@@ -100,8 +101,7 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 				experimentDesignInput.getNrlatin(), experimentDesignInput.getNclatin(), experimentDesignInput.getReplatinGroups(), "",
 				experimentDesignInput.getUseLatenized());
 
-		final List<MeasurementVariable> measurementVariables =
-			new ArrayList<>(this.getMeasurementVariablesMap(studyId, programUUID).values());
+		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
 		return this.experimentDesignGenerator
 			.generateExperimentDesignMeasurements(numberOfTrials, measurementVariables, studyGermplasmDtoList, mainDesign,
 				entryNumberName, null,
@@ -119,8 +119,13 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 	}
 
 	@Override
-	public Map<Integer, MeasurementVariable> getMeasurementVariablesMap(final int studyId, final String programUUID) {
-		return this.experimentDesignGenerator.getMeasurementVariablesMap(studyId, programUUID, DESIGN_FACTOR_VARIABLES, new ArrayList<>());
+	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentDesignInput experimentDesignInput,
+		final String programUUID) {
+		return this.experimentDesignGenerator
+			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES,
+				(experimentDesignInput.getUseLatenized() != null && experimentDesignInput.getUseLatenized()) ?
+					EXPERIMENT_DESIGN_VARIABLES_LATINIZED : EXPERIMENT_DESIGN_VARIABLES,
+				new ArrayList<>(), experimentDesignInput);
 	}
 
 }

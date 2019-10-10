@@ -7,7 +7,6 @@ import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ExperimentDesignTypeService {
 
@@ -31,6 +30,6 @@ public interface ExperimentDesignTypeService {
 
 	Integer getDesignTypeId();
 
-	Map<Integer, MeasurementVariable> getMeasurementVariablesMap(int studyId, String programUUID);
+	List<MeasurementVariable> getMeasurementVariables(int studyId, ExperimentDesignInput experimentDesignInput, String programUUID);
 
 }
