@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -63,8 +62,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		final List<ObservationUnitRow> observationUnitRows =
 			experimentDesignTypeService.generateDesign(studyId, experimentDesignInput, programUUID, studyGermplasmDtoList);
 		final List<MeasurementVariable> measurementVariables =
-			experimentDesignTypeService.getMeasurementVariablesMap(studyId, programUUID).values().stream().collect(
-				Collectors.toList());
+			experimentDesignTypeService.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
 
 		this.experimentDesignMiddlewareService.deleteExperimentDesign(studyId);
 		this.experimentDesignMiddlewareService
