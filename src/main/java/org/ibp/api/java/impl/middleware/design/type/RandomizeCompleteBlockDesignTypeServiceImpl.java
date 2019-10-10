@@ -4,6 +4,7 @@ import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.StringUtil;
@@ -11,6 +12,7 @@ import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.transformer.StandardVariableTransformer;
 import org.ibp.api.java.impl.middleware.design.util.ExpDesignUtil;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -27,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -48,6 +51,9 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 
 	@Resource
 	private OntologyDataManager ontologyDataManager;
+
+	@Resource
+	private StandardVariableTransformer standardVariableTransformer;
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
@@ -102,9 +108,43 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 	@Override
 	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentDesignInput experimentDesignInput,
 		final String programUUID) {
-		return this.experimentDesignGenerator
+
+		final List<MeasurementVariable> measurementVariables = this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES, EXPERIMENT_DESIGN_VARIABLES,
 				new ArrayList<>(), experimentDesignInput);
+
+		final Map treatmentFactorsData = experimentDesignInput.getTreatmentFactorsData();
+		if(treatmentFactorsData != null) {
+			final Map<Integer, Integer> treatmentFactorLevelToLabelIdMap = new HashMap<>();
+
+			final Iterator keySetIter = treatmentFactorsData.keySet().iterator();
+			while (keySetIter.hasNext()) {
+				final String key = (String) keySetIter.next();
+				final Map treatmentData = (Map) treatmentFactorsData.get(key);
+				treatmentFactorLevelToLabelIdMap.put(Integer.valueOf(key), (Integer) treatmentData.get("variableId"));
+			}
+
+			final List<Integer> treatmentFactorIds = new ArrayList<>(treatmentFactorLevelToLabelIdMap.values());
+			treatmentFactorIds.addAll(treatmentFactorLevelToLabelIdMap.keySet());
+			final List<StandardVariable> standardVariables = this.ontologyDataManager.getStandardVariables(treatmentFactorIds, programUUID);
+			Map<Integer, StandardVariable> standardVariableMap =
+				standardVariables.stream().collect(Collectors.toMap(StandardVariable::getId,
+					Function.identity()));
+
+			final Set<Integer> treatmentFactorLevelIds = treatmentFactorLevelToLabelIdMap.keySet();
+			for(final Integer treatmentFactorLevelId: treatmentFactorLevelIds) {
+				final MeasurementVariable treatmentFactorLevelVariable = this.standardVariableTransformer.convert(standardVariableMap.get(treatmentFactorLevelId), VariableType.TREATMENT_FACTOR);
+				treatmentFactorLevelVariable.setTreatmentLabel(treatmentFactorLevelVariable.getName());
+				measurementVariables.add(treatmentFactorLevelVariable);
+
+				final Integer treatmentFactorLabelId = treatmentFactorLevelToLabelIdMap.get(treatmentFactorLevelId);
+				final MeasurementVariable treatmentFactorLabelVariable = this.standardVariableTransformer.convert(standardVariableMap.get(treatmentFactorLabelId), VariableType.TREATMENT_FACTOR);
+				treatmentFactorLabelVariable.setTreatmentLabel(treatmentFactorLevelVariable.getName());
+				measurementVariables.add(treatmentFactorLabelVariable);
+			}
+		}
+
+		return  measurementVariables;
 	}
 
 	Map<String, List<String>> getTreatmentFactorValues(final Map treatmentFactorsData) {
