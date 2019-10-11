@@ -50,7 +50,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	public void generateAndSaveDesign(final String cropName, final int studyId, final ExperimentDesignInput experimentDesignInput)
 		throws BVDesignException {
 
-		this.studyValidator.validate(studyId, false);
+		this.studyValidator.validate(studyId, true);
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 
 		final String programUUID = this.studyService.getProgramUUID(studyId);
@@ -67,6 +67,12 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		this.experimentDesignMiddlewareService.deleteExperimentDesign(studyId);
 		this.experimentDesignMiddlewareService
 			.saveExperimentDesign(cropType, studyId, measurementVariables, this.mapObservationUnitRow(observationUnitRows));
+	}
+
+	@Override
+	public void deleteDesign(final int studyId) {
+		this.studyValidator.validate(studyId, true);
+		this.experimentDesignMiddlewareService.deleteExperimentDesign(studyId);
 	}
 
 	List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> mapObservationUnitRow(

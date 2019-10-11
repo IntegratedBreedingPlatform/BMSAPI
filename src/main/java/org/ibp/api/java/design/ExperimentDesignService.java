@@ -7,4 +7,6 @@ public interface ExperimentDesignService {
 
 	void generateAndSaveDesign(String cropName, int studyId, ExperimentDesignInput experimentDesignInput) throws BVDesignException;
 
+	void deleteDesign(int studyId);
+
 }
