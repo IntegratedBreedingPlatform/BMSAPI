@@ -60,8 +60,8 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 		final Integer numberOfBlocks = StringUtil.parseInt(experimentDesignInput.getNumberOfBlocks(), null);
 		final Integer numberOfControls = entryIdsOfChecks.size();
 		final Integer numberOfTreatments = studyGermplasmDtoList.size() - numberOfControls;
-		final Integer startingPlotNumber = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), null);
-		final Integer startingEntryNumber = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
+		final Integer startingPlotNumber = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), 1);
+		final Integer startingEntryNumber = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), 1);
 
 		final int numberOfTrials = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
 

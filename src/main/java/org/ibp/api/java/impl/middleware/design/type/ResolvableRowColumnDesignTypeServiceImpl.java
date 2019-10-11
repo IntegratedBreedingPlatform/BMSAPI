@@ -89,8 +89,8 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 			}
 		}
 
-		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), null);
-		final Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
+		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), 1);
+		final Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), 1);
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createResolvableRowColDesign(Integer.toString(nTreatments), replicates, rows, cols, entryNumberName,

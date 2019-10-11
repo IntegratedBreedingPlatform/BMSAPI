@@ -85,8 +85,8 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 			}
 		}
 
-		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), null);
-		final Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
+		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), 1);
+		final Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), 1);
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createResolvableIncompleteBlockDesign(blockSize, Integer.toString(nTreatments), replicates, entryNumberName,

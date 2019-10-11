@@ -101,7 +101,6 @@ public class ExperimentDesignTypeValidator {
 			this.validateReplicationCount(experimentDesignInput);
 			this.validateReplicationCountLimitForRCBD(experimentDesignInput);
 			this.validatePlotNumberRange(experimentDesignInput);
-			this.validateEntryNumberRange(experimentDesignInput);
 			this.validatePlotNumberAndEntryNumberShouldNotExceedLimit(experimentDesignInput, studyGermplasmDtoList.size());
 		}
 
@@ -129,7 +128,6 @@ public class ExperimentDesignTypeValidator {
 			this.validateReplicationCount(experimentDesignInput);
 			this.validateReplicationCountLimitResolvable(experimentDesignInput);
 			this.validatePlotNumberRange(experimentDesignInput);
-			this.validateEntryNumberRange(experimentDesignInput);
 			this.validatePlotNumberAndEntryNumberShouldNotExceedLimit(experimentDesignInput, studyGermplasmDtoList.size());
 			this.validateBlockSize(experimentDesignInput);
 
@@ -204,7 +202,6 @@ public class ExperimentDesignTypeValidator {
 		if (experimentDesignInput != null && studyGermplasmDtoList != null) {
 
 			this.validatePlotNumberRange(experimentDesignInput);
-			this.validateEntryNumberRange(experimentDesignInput);
 			this.validateReplicationCount(experimentDesignInput);
 			this.validateReplicationCountLimitResolvable(experimentDesignInput);
 			this.validatePlotNumberAndEntryNumberShouldNotExceedLimit(experimentDesignInput, studyGermplasmDtoList.size());
@@ -288,7 +285,6 @@ public class ExperimentDesignTypeValidator {
 			this.validateBlockSize(experimentDesignInput);
 			this.validateReplicationCount(experimentDesignInput);
 			this.validatePlotNumberRange(experimentDesignInput);
-			this.validateEntryNumberRange(experimentDesignInput);
 
 			if (experimentDesignInput.getTreatmentFactorsData().size() > 0) {
 				this.errors.reject(EXPERIMENT_DESIGN_TREATMENT_FACTORS_ERROR);
@@ -499,13 +495,6 @@ public class ExperimentDesignTypeValidator {
 		final Integer plotNumber = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), null);
 		if (plotNumber == null || Objects.equals(plotNumber, 0)) {
 			this.errors.reject(PLOT_NUMBER_SHOULD_BE_IN_RANGE);
-		}
-	}
-
-	void validateEntryNumberRange(final ExperimentDesignInput experimentDesignInput) {
-		final Integer entryNumber = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
-		if (entryNumber == null || Objects.equals(entryNumber, 0)) {
-			this.errors.reject(ENTRY_NUMBER_SHOULD_BE_IN_RANGE);
 		}
 	}
 

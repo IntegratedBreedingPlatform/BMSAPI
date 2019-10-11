@@ -63,8 +63,8 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 		final String blockNumberName = standardVariablesMap.get(TermId.BLOCK_NO.getId()).getName();
 		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
 
-		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), null);
-		final Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), null);
+		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), 1);
+		final Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), 1);
 
 		final List<ListItem> replicationListItems =
 			this.experimentDesignGenerator
