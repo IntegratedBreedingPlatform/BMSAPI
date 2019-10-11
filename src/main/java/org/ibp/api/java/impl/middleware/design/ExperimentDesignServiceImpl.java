@@ -50,7 +50,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	public void generateAndSaveDesign(final String cropName, final int studyId, final ExperimentDesignInput experimentDesignInput)
 		throws BVDesignException {
 
-		this.studyValidator.validate(studyId, false);
+		this.studyValidator.validate(studyId, true);
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 
 		final String programUUID = this.studyService.getProgramUUID(studyId);
