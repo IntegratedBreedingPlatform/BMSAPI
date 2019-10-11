@@ -20,11 +20,11 @@ public class TransactionServiceImpl implements TransactionService {
 	@Override
 	public List<TransactionDto> searchTransactions(
 		final TransactionsSearchDto transactionsSearchDto, final Pageable pageable) {
-		return transactionService.searchTransactions(transactionsSearchDto, pageable);
+		return this.transactionService.searchTransactions(transactionsSearchDto, pageable);
 	}
 
 	@Override
 	public long countSearchTransactions(final TransactionsSearchDto transactionsSearchDto) {
-		return transactionService.countSearchTransactions(transactionsSearchDto);
+		return this.transactionService.countSearchTransactions(transactionsSearchDto);
 	}
 }
