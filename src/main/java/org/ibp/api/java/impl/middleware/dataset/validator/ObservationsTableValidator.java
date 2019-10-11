@@ -15,6 +15,7 @@ import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -102,7 +103,7 @@ public class ObservationsTableValidator {
 
 	private boolean validateCategoricalVariableHasAPossibleValue(final MeasurementVariable var) {
 		if (var.getDataTypeId() !=null && var.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-			return var.getPossibleValues() != null && !var.getPossibleValues().isEmpty();
+			return !CollectionUtils.isEmpty(var.getPossibleValues());
 		}
 		return true;
 	}
