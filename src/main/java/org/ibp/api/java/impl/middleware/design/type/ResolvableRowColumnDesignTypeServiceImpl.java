@@ -52,7 +52,7 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) throws BVDesignException {
 
-		this.experimentDesignTypeValidator.validateResolvableIncompleteBlockDesign(experimentDesignInput, studyGermplasmDtoList);
+		this.experimentDesignTypeValidator.validateResolvableRowColumnDesign(experimentDesignInput, studyGermplasmDtoList);
 
 		final int nTreatments = studyGermplasmDtoList.size();
 		final String rows = experimentDesignInput.getRowsPerReplications();
