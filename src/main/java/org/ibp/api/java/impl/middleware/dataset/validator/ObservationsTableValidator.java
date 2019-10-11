@@ -102,7 +102,7 @@ public class ObservationsTableValidator {
 
 	private boolean validateCategoricalVariableHasAPossibleValue(final MeasurementVariable var) {
 		if (var.getDataTypeId() !=null && var.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-			return var.getPossibleValues() != null;
+			return var.getPossibleValues() != null && !var.getPossibleValues().isEmpty();
 		}
 		return true;
 	}
