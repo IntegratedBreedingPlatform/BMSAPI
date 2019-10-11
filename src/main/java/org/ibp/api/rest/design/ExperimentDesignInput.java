@@ -22,7 +22,6 @@ public class ExperimentDesignInput {
 	private String replatinGroups;
 	private boolean hasMeasurementData;
 	private String startingPlotNo;
-	private String startingEntryNo;
 	private String fileName;
 	private String numberOfBlocks;
 	private String checkStartingPosition;
@@ -177,14 +176,6 @@ public class ExperimentDesignInput {
 
 	public void setStartingPlotNo(final String startingPlotNo) {
 		this.startingPlotNo = startingPlotNo;
-	}
-
-	public String getStartingEntryNo() {
-		return this.startingEntryNo;
-	}
-
-	public void setStartingEntryNo(final String startingEntryNo) {
-		this.startingEntryNo = startingEntryNo;
 	}
 
 	public String getFileName() {

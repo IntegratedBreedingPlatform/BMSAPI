@@ -82,10 +82,9 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 		treatmentLevels.add(Integer.toString(studyGermplasmDtoList.size()));
 
 		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), 1);
-		final Integer entryNo = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), 1);
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createRandomizedCompleteBlockDesign(block, replicateNumberName, plotNumberName, plotNo, entryNo,
+			.createRandomizedCompleteBlockDesign(block, replicateNumberName, plotNumberName, plotNo,
 				entryNumberName, treatmentFactors,
 				treatmentLevels, "");
 

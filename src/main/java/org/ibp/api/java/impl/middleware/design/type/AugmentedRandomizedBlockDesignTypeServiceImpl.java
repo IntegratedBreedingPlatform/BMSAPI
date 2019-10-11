@@ -61,7 +61,6 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 		final Integer numberOfControls = entryIdsOfChecks.size();
 		final Integer numberOfTreatments = studyGermplasmDtoList.size() - numberOfControls;
 		final Integer startingPlotNumber = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), 1);
-		final Integer startingEntryNumber = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), 1);
 
 		final int numberOfTrials = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
 
@@ -74,8 +73,8 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createAugmentedRandomizedBlockDesign(numberOfBlocks, numberOfTreatments, numberOfControls, startingPlotNumber,
-				startingEntryNumber, entryNumberName, blockNumberName, plotNumberName);
+			.createAugmentedRandomizedBlockDesign(numberOfBlocks, numberOfTreatments, numberOfControls, startingPlotNumber, entryNumberName,
+				blockNumberName, plotNumberName);
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
 		return this.experimentDesignGenerator
