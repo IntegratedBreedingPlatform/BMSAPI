@@ -69,6 +69,12 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 			.saveExperimentDesign(cropType, studyId, measurementVariables, this.mapObservationUnitRow(observationUnitRows));
 	}
 
+	@Override
+	public void deleteDesign(final int studyId) {
+		this.studyValidator.validate(studyId, true);
+		this.experimentDesignMiddlewareService.deleteExperimentDesign(studyId);
+	}
+
 	List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> mapObservationUnitRow(
 		final List<ObservationUnitRow> observationUnitRows) {
 		final ModelMapper observationUnitRowMapper = new ModelMapper();

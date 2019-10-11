@@ -22,13 +22,23 @@ public class ExperimentDesignResource {
 	@Resource
 	private ExperimentDesignService experimentDesignService;
 
-	@ApiOperation(value = "Generate design", notes = "Generate design")
+	@ApiOperation(value = "Generate experiment design", notes = "Generate experiment design")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/design", method = RequestMethod.POST)
 	public ResponseEntity generateDesign(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
 		@RequestBody final ExperimentDesignInput experimentDesignInput) throws BVDesignException {
 
 		this.experimentDesignService.generateAndSaveDesign(crop, studyId, experimentDesignInput);
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+
+	@ApiOperation(value = "Delete experiment design", notes = "Delete experiment design")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/design", method = RequestMethod.DELETE)
+	public ResponseEntity deleteDesign(@PathVariable final String crop,
+		@PathVariable final Integer studyId) {
+		this.experimentDesignService.deleteDesign(studyId);
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
