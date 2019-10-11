@@ -101,7 +101,7 @@ public class ExperimentDesignTypeValidator {
 			this.validateReplicationCount(experimentDesignInput);
 			this.validateReplicationCountLimitForRCBD(experimentDesignInput);
 			this.validatePlotNumberRange(experimentDesignInput);
-			this.validatePlotNumberAndEntryNumberShouldNotExceedLimit(experimentDesignInput, studyGermplasmDtoList.size());
+			this.validatePlotNumberShouldNotExceedLimit(experimentDesignInput, studyGermplasmDtoList.size());
 		}
 
 		if (this.errors.hasErrors()) {
@@ -128,7 +128,7 @@ public class ExperimentDesignTypeValidator {
 			this.validateReplicationCount(experimentDesignInput);
 			this.validateReplicationCountLimitResolvable(experimentDesignInput);
 			this.validatePlotNumberRange(experimentDesignInput);
-			this.validatePlotNumberAndEntryNumberShouldNotExceedLimit(experimentDesignInput, studyGermplasmDtoList.size());
+			this.validatePlotNumberShouldNotExceedLimit(experimentDesignInput, studyGermplasmDtoList.size());
 			this.validateBlockSize(experimentDesignInput);
 
 			if (experimentDesignInput.getTreatmentFactorsData().size() > 0) {
@@ -204,7 +204,7 @@ public class ExperimentDesignTypeValidator {
 			this.validatePlotNumberRange(experimentDesignInput);
 			this.validateReplicationCount(experimentDesignInput);
 			this.validateReplicationCountLimitResolvable(experimentDesignInput);
-			this.validatePlotNumberAndEntryNumberShouldNotExceedLimit(experimentDesignInput, studyGermplasmDtoList.size());
+			this.validatePlotNumberShouldNotExceedLimit(experimentDesignInput, studyGermplasmDtoList.size());
 
 			final int size = studyGermplasmDtoList.size();
 			if (!NumberUtils.isNumber(experimentDesignInput.getRowsPerReplications())) {
@@ -317,7 +317,6 @@ public class ExperimentDesignTypeValidator {
 
 			this.validateIfCheckEntriesExistInstudyGermplasmDtoList(studyGermplasmDtoList);
 			this.validateStartingPlotNo(experimentDesignInput, treatmentSize);
-			this.validateStartingEntryNo(experimentDesignInput, treatmentSize);
 			this.validateNumberOfBlocks(experimentDesignInput);
 			this.validateTreatmentFactors(experimentDesignInput);
 
@@ -449,21 +448,6 @@ public class ExperimentDesignTypeValidator {
 
 	}
 
-	void validateStartingEntryNo(final ExperimentDesignInput experimentDesignInput, final int treatmentSize) {
-
-		final String startingEntryNo = experimentDesignInput.getStartingEntryNo();
-
-		if (startingEntryNo != null && NumberUtils.isNumber(startingEntryNo)) {
-			final int entryNumber = Integer.parseInt(startingEntryNo);
-			if (entryNumber != 0 && ((treatmentSize + entryNumber - 1) <= ExperimentDesignTypeService.MAX_ENTRY_NO)) {
-				return;
-			}
-		}
-
-		this.errors.reject(ENTRY_NUMBER_SHOULD_BE_IN_RANGE);
-
-	}
-
 	void validateNumberOfBlocks(final ExperimentDesignInput experimentDesignInput) {
 
 		if (!NumberUtils.isNumber(experimentDesignInput.getNumberOfBlocks())) {
@@ -498,21 +482,13 @@ public class ExperimentDesignTypeValidator {
 		}
 	}
 
-	void validatePlotNumberAndEntryNumberShouldNotExceedLimit(final ExperimentDesignInput experimentDesignInput,
+	void validatePlotNumberShouldNotExceedLimit(final ExperimentDesignInput experimentDesignInput,
 		final int germplasmCount) {
-
-		final Integer entryNumber = StringUtil.parseInt(experimentDesignInput.getStartingEntryNo(), 1);
 		final Integer plotNumber = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), 1);
-		final Integer maxEntry = germplasmCount + entryNumber - 1;
 		final Integer maxPlot = (germplasmCount * Integer.parseInt(experimentDesignInput.getReplicationsCount())) + plotNumber - 1;
-
-		if (entryNumber != null && maxEntry > ExperimentDesignTypeService.MAX_ENTRY_NO) {
-			this.errors.reject(EXPERIMENT_DESIGN_ENTRY_NUMBER_SHOULD_NOT_EXCEED, new Object[] {maxEntry}, "");
-		}
-		if (entryNumber != null && plotNumber != null && maxPlot > ExperimentDesignTypeService.MAX_PLOT_NO) {
+		if (plotNumber != null && maxPlot > ExperimentDesignTypeService.MAX_PLOT_NO) {
 			this.errors.reject(EXPERIMENT_DESIGN_PLOT_NUMBER_SHOULD_NOT_EXCEED, new Object[] {maxPlot}, "");
 		}
-
 	}
 
 	void validateReplicationCountLimitForRCBD(final ExperimentDesignInput experimentDesignInput) {
