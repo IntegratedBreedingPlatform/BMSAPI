@@ -2,7 +2,6 @@ package org.ibp.api.rest.design;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.ExperimentDesignService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +25,7 @@ public class ExperimentDesignResource {
 	@RequestMapping(value = "/{crop}/studies/{studyId}/design", method = RequestMethod.POST)
 	public ResponseEntity generateDesign(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
-		@RequestBody final ExperimentDesignInput experimentDesignInput) throws BVDesignException {
+		@RequestBody final ExperimentDesignInput experimentDesignInput) {
 
 		this.experimentDesignService.generateAndSaveDesign(crop, studyId, experimentDesignInput);
 

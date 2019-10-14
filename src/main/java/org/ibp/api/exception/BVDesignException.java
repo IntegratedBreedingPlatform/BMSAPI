@@ -1,7 +1,7 @@
 
 package org.ibp.api.exception;
 
-public class BVDesignException extends Exception {
+public class BVDesignException extends RuntimeException {
 
 	/**
 	 *

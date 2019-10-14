@@ -4,7 +4,6 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
-import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.ExperimentDesignService;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
@@ -47,8 +46,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Override
-	public void generateAndSaveDesign(final String cropName, final int studyId, final ExperimentDesignInput experimentDesignInput)
-		throws BVDesignException {
+	public void generateAndSaveDesign(final String cropName, final int studyId, final ExperimentDesignInput experimentDesignInput) {
 
 		this.studyValidator.validate(studyId, true);
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);

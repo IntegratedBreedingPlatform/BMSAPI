@@ -305,8 +305,7 @@ public class ExperimentDesignGenerator {
 	public List<ObservationUnitRow> generateExperimentDesignMeasurements(
 		final int numberOfTrials, final List<MeasurementVariable> generateDesignVariables,
 		final List<StudyGermplasmDto> studyGermplasmDtoList, final MainDesign mainDesign, final String entryNumberIdentifier,
-		final Map<String, List<String>> treatmentFactorValues, final Map<Integer, Integer> designExpectedEntriesMap)
-		throws BVDesignException {
+		final Map<String, List<String>> treatmentFactorValues, final Map<Integer, Integer> designExpectedEntriesMap) {
 
 		// Specify number of study instances for BVDesign generation
 		mainDesign.getDesign().getParameters()

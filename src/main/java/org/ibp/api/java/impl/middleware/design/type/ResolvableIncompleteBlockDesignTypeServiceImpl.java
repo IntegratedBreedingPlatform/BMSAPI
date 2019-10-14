@@ -9,7 +9,6 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.MainDesign;
-import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
@@ -48,7 +47,7 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
-		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) throws BVDesignException {
+		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
 		this.experimentDesignTypeValidator.validateResolvableIncompleteBlockDesign(experimentDesignInput, studyGermplasmDtoList);
 

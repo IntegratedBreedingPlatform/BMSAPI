@@ -19,7 +19,7 @@ public interface ExperimentDesignTypeService {
 	 * @param programUUID
 	 */
 	List<ObservationUnitRow> generateDesign(int studyId, ExperimentDesignInput experimentDesignInput, String programUUID,
-		List<StudyGermplasmDto> studyGermplasmDtoList) throws BVDesignException;
+		List<StudyGermplasmDto> studyGermplasmDtoList);
 
 	/**
 	 * Defines if the experimental design requires breeding view licence to run
