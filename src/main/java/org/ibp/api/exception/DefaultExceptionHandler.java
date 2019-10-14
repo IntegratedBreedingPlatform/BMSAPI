@@ -172,6 +172,18 @@ public class DefaultExceptionHandler {
 		return response;
 	}
 
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(BVDesignException.class)
+	@ResponseStatus(value = INTERNAL_SERVER_ERROR)
+	@ResponseBody
+	public ErrorResponse handleBVDesignException(BVDesignException ex) {
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = new ErrorResponse();
+		DefaultExceptionHandler.LOG.error("BVDesign app failed to execute.", ex);
+		response.addError(this.messageSource.getMessage(ex.getBvErrorCode(), null, LocaleContextHolder.getLocale()));
+		return response;
+	}
+
 	private ErrorResponse buildErrorResponse(final List<ObjectError> objectErrors){
 		final ErrorResponse response = new ErrorResponse();
 		for (ObjectError error : objectErrors) {
