@@ -45,11 +45,11 @@ public class ExperimentDesignGeneratorResource {
 		return new ResponseEntity<>(Arrays.asList(InsertionMannerItem.values()), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Returns true or false if the design generator license will expire in given amount of days")
-	@RequestMapping(value= "/design/generator/licenseValidity", method = RequestMethod.GET)
+	@ApiOperation(value = "Returns number of days before license for design generator expires")
+	@RequestMapping(value= "/design/generator/license/expiryDays", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Boolean> isLicenseExpiring(@PathVariable final Integer numberOfDays) {
-		return new ResponseEntity<>(false, HttpStatus.OK);
+	public ResponseEntity<Integer> getLicenseExpiryDays() {
+		return new ResponseEntity<>(100, HttpStatus.OK);
 	}
 
 }
