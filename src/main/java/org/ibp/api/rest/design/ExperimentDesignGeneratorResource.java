@@ -1,7 +1,8 @@
-package org.ibp.api.rest.design.type;
+package org.ibp.api.rest.design;
 
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
+import org.generationcp.middleware.domain.dms.InsertionMannerItem;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -11,14 +12,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
 @Controller
-public class ExperimentDesignTypeResource {
+public class ExperimentDesignGeneratorResource {
 
 	@ApiOperation(value = "Gets all experiment design types supported for design generation")
-	@RequestMapping(value= "/design-types", method = RequestMethod.GET)
+	@RequestMapping(value= "/design/types", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<ExperimentDesignType>> retrieveDesignTypes() {
 		final List<ExperimentDesignType> designTypes = new ArrayList<>();
@@ -32,6 +34,14 @@ public class ExperimentDesignTypeResource {
 		designTypes.add(ExperimentDesignType.P_REP);
 
 		return new ResponseEntity<>(designTypes, HttpStatus.OK);
+	}
+
+
+	@ApiOperation(value = "Gets insertion manners for checks")
+	@RequestMapping(value= "/design/checks/insertionManners", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<InsertionMannerItem>> retrieveCheckInsertionManners() {
+		return new ResponseEntity<>(Arrays.asList(InsertionMannerItem.values()), HttpStatus.OK);
 	}
 
 }
