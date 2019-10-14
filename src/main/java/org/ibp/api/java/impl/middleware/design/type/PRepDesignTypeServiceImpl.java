@@ -79,7 +79,7 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 	}
 
 	@Override
-	public Boolean requiresBreedingViewLicence() {
+	public Boolean requiresLicenseCheck() {
 		return Boolean.TRUE;
 	}
 

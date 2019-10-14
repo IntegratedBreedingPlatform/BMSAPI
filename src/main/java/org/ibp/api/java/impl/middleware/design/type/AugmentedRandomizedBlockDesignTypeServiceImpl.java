@@ -83,7 +83,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 	}
 
 	@Override
-	public Boolean requiresBreedingViewLicence() {
+	public Boolean requiresLicenseCheck() {
 		return Boolean.TRUE;
 	}
 

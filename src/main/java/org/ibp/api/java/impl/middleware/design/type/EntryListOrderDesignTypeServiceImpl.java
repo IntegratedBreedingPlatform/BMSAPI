@@ -87,7 +87,7 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 	}
 
 	@Override
-	public Boolean requiresBreedingViewLicence() {
+	public Boolean requiresLicenseCheck() {
 		return Boolean.FALSE;
 	}
 

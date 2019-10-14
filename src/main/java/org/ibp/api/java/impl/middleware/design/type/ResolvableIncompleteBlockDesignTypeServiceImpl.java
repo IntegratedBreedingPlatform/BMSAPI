@@ -100,7 +100,7 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 	}
 
 	@Override
-	public Boolean requiresBreedingViewLicence() {
+	public Boolean requiresLicenseCheck() {
 		return Boolean.TRUE;
 	}
 

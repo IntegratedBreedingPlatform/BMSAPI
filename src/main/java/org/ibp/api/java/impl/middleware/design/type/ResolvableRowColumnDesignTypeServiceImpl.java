@@ -104,7 +104,7 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 	}
 
 	@Override
-	public Boolean requiresBreedingViewLicence() {
+	public Boolean requiresLicenseCheck() {
 		return Boolean.TRUE;
 	}
 

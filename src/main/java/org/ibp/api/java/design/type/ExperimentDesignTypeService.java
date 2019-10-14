@@ -26,7 +26,7 @@ public interface ExperimentDesignTypeService {
 	 *
 	 * @return
 	 */
-	Boolean requiresBreedingViewLicence();
+	Boolean requiresLicenseCheck();
 
 	Integer getDesignTypeId();
 

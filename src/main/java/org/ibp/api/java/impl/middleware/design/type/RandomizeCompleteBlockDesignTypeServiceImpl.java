@@ -94,7 +94,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 	}
 
 	@Override
-	public Boolean requiresBreedingViewLicence() {
+	public Boolean requiresLicenseCheck() {
 		return Boolean.TRUE;
 	}
 
