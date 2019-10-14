@@ -3,15 +3,16 @@ package org.ibp.api.rest.design;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.InsertionMannerItem;
+import org.ibp.api.java.design.DesignLicenseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +20,9 @@ import java.util.List;
 @RestController
 @Controller
 public class ExperimentDesignGeneratorResource {
+
+	@Resource
+	private DesignLicenseService designLicenseService;
 
 	@ApiOperation(value = "Gets all experiment design types supported for design generation")
 	@RequestMapping(value= "/design/types", method = RequestMethod.GET)
@@ -49,7 +53,7 @@ public class ExperimentDesignGeneratorResource {
 	@RequestMapping(value= "/design/generator/license/expiryDays", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<Integer> getLicenseExpiryDays() {
-		return new ResponseEntity<>(100, HttpStatus.OK);
+		return new ResponseEntity<>(this.designLicenseService.getExpiryDays(), HttpStatus.OK);
 	}
 
 }
