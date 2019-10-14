@@ -4,6 +4,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.InsertionMannerItem;
 import org.ibp.api.java.design.DesignLicenseService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -49,11 +50,14 @@ public class ExperimentDesignGeneratorResource {
 		return new ResponseEntity<>(Arrays.asList(InsertionMannerItem.values()), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Returns number of days before license for design generator expires")
-	@RequestMapping(value= "/design/generator/license/expiryDays", method = RequestMethod.GET)
+	@ApiOperation(value = "Count number of days before license for design generator expires")
+	@RequestMapping(value= "/design/generator/license/expiryDays", method = RequestMethod.HEAD)
 	@ResponseBody
-	public ResponseEntity<Integer> getLicenseExpiryDays() {
-		return new ResponseEntity<>(this.designLicenseService.getExpiryDays(), HttpStatus.OK);
+	public ResponseEntity<String> getLicenseExpiryDays() {
+		final Integer expiryDays = this.designLicenseService.getExpiryDays();
+		final HttpHeaders respHeaders = new HttpHeaders();
+		respHeaders.add("X-Total-Count", String.valueOf(expiryDays));
+		return new ResponseEntity<>("", respHeaders, HttpStatus.OK);
 	}
 
 }
