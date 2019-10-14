@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.dms.InsertionMannerItem;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -42,6 +43,13 @@ public class ExperimentDesignGeneratorResource {
 	@ResponseBody
 	public ResponseEntity<List<InsertionMannerItem>> retrieveCheckInsertionManners() {
 		return new ResponseEntity<>(Arrays.asList(InsertionMannerItem.values()), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Returns true or false if the design generator license will expire in given amount of days")
+	@RequestMapping(value= "/design/generator/licenseValidity", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Boolean> isLicenseExpiring(@PathVariable final Integer numberOfDays) {
+		return new ResponseEntity<>(false, HttpStatus.OK);
 	}
 
 }
