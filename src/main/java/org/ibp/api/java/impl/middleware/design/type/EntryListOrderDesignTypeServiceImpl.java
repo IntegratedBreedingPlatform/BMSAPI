@@ -108,6 +108,8 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 	ObservationUnitRow createObservationUnitRow(final int instanceNumber, final StudyGermplasmDto germplasm,
 		final int plotNumber, final List<MeasurementVariable> measurementVariables) {
 		final ObservationUnitRow row = new ObservationUnitRow();
+		row.setTrialInstance(instanceNumber);
+
 		final Map<String, ObservationUnitData> observationUnitDataMap = new HashMap<>();
 		ObservationUnitData observationUnitData;
 
@@ -144,6 +146,9 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 			}
 			observationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
 		}
+
+		row.setVariables(observationUnitDataMap);
+		row.setEnvironmentVariables(new HashMap<>());
 		return row;
 	}
 
