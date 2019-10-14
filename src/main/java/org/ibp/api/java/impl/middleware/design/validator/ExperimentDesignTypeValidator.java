@@ -5,10 +5,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.StringUtil;
-import org.ibp.api.domain.design.BVDesignLicenseInfo;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.exception.BVLicenseParseException;
-import org.ibp.api.java.design.DesignLicenseUtil;
+import org.ibp.api.java.design.DesignLicenseService;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.stereotype.Component;
@@ -81,7 +79,7 @@ public class ExperimentDesignTypeValidator {
 	private BindingResult errors;
 
 	@Resource
-	private DesignLicenseUtil bvDesignLicenseUtil;
+	private DesignLicenseService designLicenseService;
 
 	/**
 	 * Validates the parameters and germplasm entries required for generating randomized block design.
@@ -300,7 +298,7 @@ public class ExperimentDesignTypeValidator {
 	 * Validates the parameters and germplasm entries required for generating augmented design.
 	 *
 	 * @param experimentDesignInput
-	 * @param gemplasmList
+	 * @param studyGermplasmDtoList
 	 * @);
 	 */
 	public void validateAugmentedDesign(final ExperimentDesignInput experimentDesignInput,
@@ -401,18 +399,10 @@ public class ExperimentDesignTypeValidator {
 	}
 
 	public void checkBVDesignLicense() {
-
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-
-		try {
-			final BVDesignLicenseInfo bvDesignLicenseInfo = this.bvDesignLicenseUtil.retrieveLicenseInfo();
-			if (this.bvDesignLicenseUtil.isExpired(bvDesignLicenseInfo)) {
-				this.errors.reject(EXPERIMENT_DESIGN_LICENSE_EXPIRED);
-			}
-		} catch (final BVLicenseParseException e) {
-			this.errors.reject(e.getMessage(), e.getMessage());
+		if (this.designLicenseService.isExpired()) {
+			this.errors.reject(EXPERIMENT_DESIGN_LICENSE_EXPIRED);
 		}
-
 	}
 
 	private void validateTreatmentFactors(final ExperimentDesignInput experimentDesignInput) {

@@ -1,6 +1,6 @@
 package org.ibp.api.domain.design;
 
-public class BVDesignLicenseInfo {
+public class DesignLicenseInfo {
 
 	private Status status;
 
@@ -17,7 +17,7 @@ public class BVDesignLicenseInfo {
 	@Override
 	public String toString()
 	{
-		return "BVDesignLicenseInfo [status = "+status+"]";
+		return "DesignLicenseInfo [status = "+status+"]";
 	}
 
 }

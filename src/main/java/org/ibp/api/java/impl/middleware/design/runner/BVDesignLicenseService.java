@@ -2,9 +2,9 @@ package org.ibp.api.java.impl.middleware.design.runner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.generationcp.commons.util.DateUtil;
-import org.ibp.api.domain.design.BVDesignLicenseInfo;
+import org.ibp.api.domain.design.DesignLicenseInfo;
 import org.ibp.api.exception.BVLicenseParseException;
-import org.ibp.api.java.design.DesignLicenseUtil;
+import org.ibp.api.java.design.DesignLicenseService;
 import org.ibp.api.java.design.runner.ProcessRunner;
 import org.ibp.api.rest.design.BVDesignProperties;
 import org.slf4j.Logger;
@@ -25,12 +25,12 @@ import java.util.Date;
 @Component
 @ConditionalOnProperty(
 	value = "design.runner.license.util",
-	havingValue = "org.ibp.api.java.impl.middleware.design.runner.BVDesignLicenseUtil")
-public class BVDesignLicenseUtil implements DesignLicenseUtil {
+	havingValue = "org.ibp.api.java.impl.middleware.design.runner.BVDesignLicenseService")
+public class BVDesignLicenseService implements DesignLicenseService {
 
 	public static final String LICENSE_DATE_FORMAT = "dd-MMM-yyyy";
 	public static final String LICENSE_SUCCESS_CODE = "0";
-	private static final Logger LOG = LoggerFactory.getLogger(BVDesignLicenseUtil.class);
+	private static final Logger LOG = LoggerFactory.getLogger(BVDesignLicenseService.class);
 
 	public static final String BVDESIGN_STATUS_OUTPUT_FILENAME = "son";
 
@@ -40,48 +40,28 @@ public class BVDesignLicenseUtil implements DesignLicenseUtil {
 	@Resource
 	private MessageSource messageSource;
 
-	private ObjectMapper objectMapper = new ObjectMapper();
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	private ProcessRunner bvDesignLicenseProcessRunner = new BVDesignLicenseProcessRunner();
 
 	@Override
-	public boolean isExpired(final BVDesignLicenseInfo bvDesignLicenseInfo) {
+	public boolean isExpired() {
 
 		try {
-
+			final DesignLicenseInfo designLicenseInfo = this.retrieveLicenseInfo();
 			final Format formatter = new SimpleDateFormat(LICENSE_DATE_FORMAT);
-			final Date expiryDate = (Date) formatter.parseObject(bvDesignLicenseInfo.getStatus().getLicense().getExpiry());
+			final Date expiryDate = (Date) formatter.parseObject(designLicenseInfo.getStatus().getLicense().getExpiry());
 			final Date currentDate = DateUtil.getCurrentDateWithZeroTime();
 			if (currentDate.compareTo(expiryDate) > 0) {
 				return true;
 			}
 		} catch (final ParseException e) {
-			BVDesignLicenseUtil.LOG.error(e.getMessage(), e);
+			BVDesignLicenseService.LOG.error(e.getMessage(), e);
 		}
 		return false;
 	}
 
-	@Override
-	public boolean isExpiringWithinThirtyDays(final BVDesignLicenseInfo bvDesignLicenseInfo) {
-
-		int expiryDays = 0;
-
-		try {
-			expiryDays = Integer.parseInt(bvDesignLicenseInfo.getStatus().getLicense().getExpiryDays());
-		} catch (final NumberFormatException e) {
-
-			final String errorMessage =
-				this.messageSource.getMessage("bv.design.error.expiry.days.not.numeric", null, LocaleContextHolder.getLocale());
-			BVDesignLicenseUtil.LOG.error(errorMessage, e);
-			return true;
-		}
-
-		return expiryDays <= 30;
-
-	}
-
-	@Override
-	public BVDesignLicenseInfo retrieveLicenseInfo() throws BVLicenseParseException {
+	private DesignLicenseInfo retrieveLicenseInfo() throws BVLicenseParseException {
 
 		final String bvDesignLocation = this.bvDesignProperties.getBvDesignPath();
 
@@ -92,32 +72,32 @@ public class BVDesignLicenseUtil implements DesignLicenseUtil {
 		return this.readLicenseInfoFromJsonFile(new File(jsonPathFile));
 	}
 
-	protected BVDesignLicenseInfo readLicenseInfoFromJsonFile(final File file) throws BVLicenseParseException {
+	private DesignLicenseInfo readLicenseInfoFromJsonFile(final File file) throws BVLicenseParseException {
 
-		BVDesignLicenseInfo bvDesignLicenseInfo = new BVDesignLicenseInfo();
+		DesignLicenseInfo designLicenseInfo;
 
 		try {
 
-			bvDesignLicenseInfo = objectMapper.readValue(file, BVDesignLicenseInfo.class);
+			designLicenseInfo = objectMapper.readValue(file, DesignLicenseInfo.class);
 
 		} catch (final IOException e) {
 
 			final String errorMessage =
 				this.messageSource.getMessage("bv.design.error.cannot.read.license.file", null, LocaleContextHolder.getLocale());
-			BVDesignLicenseUtil.LOG.error(errorMessage + ":" + e.getMessage(), e);
+			BVDesignLicenseService.LOG.error(errorMessage + ":" + e.getMessage(), e);
 			throw new BVLicenseParseException(errorMessage);
 		}
 
-		if (!LICENSE_SUCCESS_CODE.equals(bvDesignLicenseInfo.getStatus().getReturnCode())) {
+		if (!LICENSE_SUCCESS_CODE.equals(designLicenseInfo.getStatus().getReturnCode())) {
 			final String errorMessage = this.messageSource.getMessage("bv.design.error.generic", null, LocaleContextHolder.getLocale());
-			throw new BVLicenseParseException(errorMessage + bvDesignLicenseInfo.getStatus().getAppStatus());
+			throw new BVLicenseParseException(errorMessage + designLicenseInfo.getStatus().getAppStatus());
 		}
 
-		return bvDesignLicenseInfo;
+		return designLicenseInfo;
 
 	}
 
-	protected void generateBVDesignLicenseJsonFile(final String bvDesignLocation) throws BVLicenseParseException {
+	private void generateBVDesignLicenseJsonFile(final String bvDesignLocation) throws BVLicenseParseException {
 
 		try {
 
@@ -128,7 +108,7 @@ public class BVDesignLicenseUtil implements DesignLicenseUtil {
 		} catch (final Exception e) {
 			final String errorMessage =
 				this.messageSource.getMessage("bv.design.error.failed.license.generation", null, LocaleContextHolder.getLocale());
-			BVDesignLicenseUtil.LOG.error(errorMessage + ":" + e.getMessage(), e);
+			BVDesignLicenseService.LOG.error(errorMessage + ":" + e.getMessage(), e);
 			throw new BVLicenseParseException(errorMessage);
 		}
 
@@ -136,6 +116,12 @@ public class BVDesignLicenseUtil implements DesignLicenseUtil {
 
 	public void setBvDesignLicenseProcessRunner(final BVDesignLicenseProcessRunner bvDesignLicenseProcessRunner) {
 		this.bvDesignLicenseProcessRunner = bvDesignLicenseProcessRunner;
+	}
+
+	@Override
+	public Integer getExpiryDays() {
+		final DesignLicenseInfo designLicenseInfo = this.retrieveLicenseInfo();
+		return Integer.parseInt(designLicenseInfo.getStatus().getLicense().getExpiryDays());
 	}
 
 	class BVDesignLicenseProcessRunner implements ProcessRunner {
@@ -154,7 +140,7 @@ public class BVDesignLicenseUtil implements DesignLicenseUtil {
 			try {
 				return p.waitFor();
 			} catch (final InterruptedException e) {
-				BVDesignLicenseUtil.LOG.error(e.getMessage(), e);
+				BVDesignLicenseService.LOG.error(e.getMessage(), e);
 			}
 
 			return statusCode;
