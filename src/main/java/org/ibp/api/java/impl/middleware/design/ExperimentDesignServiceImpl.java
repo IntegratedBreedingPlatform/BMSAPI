@@ -4,6 +4,8 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.ibp.api.exception.ForbiddenException;
+import org.ibp.api.java.design.DesignLicenseService;
 import org.ibp.api.java.design.ExperimentDesignService;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
@@ -16,6 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.FieldError;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -26,6 +29,7 @@ import java.util.Map;
 @Service
 @Transactional
 public class ExperimentDesignServiceImpl implements ExperimentDesignService {
+	private   static final String EXPERIMENT_DESIGN_LICENSE_EXPIRED = "experiment.design.license.expired";
 
 	@Resource
 	private StudyValidator studyValidator;
@@ -45,8 +49,17 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	@Resource
 	private WorkbenchDataManager workbenchDataManager;
 
+	@Resource
+	private DesignLicenseService designLicenseService;
+
 	@Override
 	public void generateAndSaveDesign(final String cropName, final int studyId, final ExperimentDesignInput experimentDesignInput) {
+		// Check license validity first and foremost, if applicable for design type
+		final ExperimentDesignTypeService experimentDesignTypeService =
+			this.experimentDesignTypeServiceFactory.lookup(experimentDesignInput.getDesignType());
+		if (experimentDesignTypeService.requiresLicenseCheck()) {
+			this.checkLicense();
+		}
 
 		this.studyValidator.validate(studyId, true);
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
@@ -54,11 +67,10 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		final String programUUID = this.studyService.getProgramUUID(studyId);
 		final List<StudyGermplasmDto> studyGermplasmDtoList = this.middlewareStudyService.getStudyGermplasmList(studyId);
 
-		final ExperimentDesignTypeService experimentDesignTypeService =
-			this.experimentDesignTypeServiceFactory.lookup(experimentDesignInput.getDesignType());
-
 		final List<ObservationUnitRow> observationUnitRows =
 			experimentDesignTypeService.generateDesign(studyId, experimentDesignInput, programUUID, studyGermplasmDtoList);
+
+
 		final List<MeasurementVariable> measurementVariables =
 			experimentDesignTypeService.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
 
@@ -97,5 +109,15 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 			convertedRows.add(convertedRow);
 		}
 		return convertedRows;
+	}
+
+	void checkLicense() {
+		if (this.designLicenseService.isExpired()) {
+			final String []errorKey = {EXPERIMENT_DESIGN_LICENSE_EXPIRED};
+			final FieldError expiredError =
+				new FieldError("", "", null, false, errorKey, null,
+					"License is expired");
+			throw new ForbiddenException(expiredError);
+		}
 	}
 }

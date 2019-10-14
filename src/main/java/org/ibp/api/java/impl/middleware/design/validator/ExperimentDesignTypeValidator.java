@@ -6,14 +6,12 @@ import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.design.DesignLicenseService;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -74,12 +72,8 @@ public class ExperimentDesignTypeValidator {
 		"germplasm.list.number.of.rows.between.insertion.should.be.greater.than.zero";
 	public static final String GERMPLASM_LIST_SPACING_LESS_THAN_GERMPLASM_ERROR = "germplasm.list.spacing.less.than.germplasm.error";
 	public static final String EXPERIMENT_DESIGN_GENERATE_NO_GERMPLASM = "experiment.design.generate.no.germplasm";
-	public static final String EXPERIMENT_DESIGN_LICENSE_EXPIRED = "experiment.design.license.expired";
 
 	private BindingResult errors;
-
-	@Resource
-	private DesignLicenseService designLicenseService;
 
 	/**
 	 * Validates the parameters and germplasm entries required for generating randomized block design.
@@ -92,7 +86,6 @@ public class ExperimentDesignTypeValidator {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		this.checkBVDesignLicense();
 		this.validatestudyGermplasmDtoList(studyGermplasmDtoList);
 
 		if (experimentDesignInput != null && studyGermplasmDtoList != null) {
@@ -118,7 +111,6 @@ public class ExperimentDesignTypeValidator {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		this.checkBVDesignLicense();
 		this.validatestudyGermplasmDtoList(studyGermplasmDtoList);
 
 		if (experimentDesignInput != null && studyGermplasmDtoList != null) {
@@ -194,7 +186,6 @@ public class ExperimentDesignTypeValidator {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		this.checkBVDesignLicense();
 		this.validatestudyGermplasmDtoList(studyGermplasmDtoList);
 
 		if (experimentDesignInput != null && studyGermplasmDtoList != null) {
@@ -269,7 +260,6 @@ public class ExperimentDesignTypeValidator {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		this.checkBVDesignLicense();
 		this.validatestudyGermplasmDtoList(studyGermplasmDtoList);
 
 		if (experimentDesignInput != null && studyGermplasmDtoList != null) {
@@ -306,7 +296,6 @@ public class ExperimentDesignTypeValidator {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		this.checkBVDesignLicense();
 		this.validatestudyGermplasmDtoList(studyGermplasmDtoList);
 
 		if (experimentDesignInput != null && studyGermplasmDtoList != null) {
@@ -395,13 +384,6 @@ public class ExperimentDesignTypeValidator {
 		}
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-	}
-
-	public void checkBVDesignLicense() {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		if (this.designLicenseService.isExpired()) {
-			this.errors.reject(EXPERIMENT_DESIGN_LICENSE_EXPIRED);
 		}
 	}
 
