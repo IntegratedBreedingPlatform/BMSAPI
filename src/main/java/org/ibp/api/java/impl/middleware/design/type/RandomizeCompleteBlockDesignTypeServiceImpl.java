@@ -134,12 +134,14 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 				final MeasurementVariable treatmentFactorLevelVariable = this.standardVariableTransformer
 					.convert(standardVariableMap.get(treatmentFactorLevelId), VariableType.TREATMENT_FACTOR);
 				treatmentFactorLevelVariable.setTreatmentLabel(treatmentFactorLevelVariable.getName());
+				treatmentFactorLevelVariable.setValue(treatmentFactorLevelVariable.getName());
 				measurementVariables.add(treatmentFactorLevelVariable);
 
 				final Integer treatmentFactorLabelId = treatmentFactorLevelToLabelIdMap.get(treatmentFactorLevelId);
 				final MeasurementVariable treatmentFactorLabelVariable = this.standardVariableTransformer
 					.convert(standardVariableMap.get(treatmentFactorLabelId), VariableType.TREATMENT_FACTOR);
 				treatmentFactorLabelVariable.setTreatmentLabel(treatmentFactorLevelVariable.getName());
+				treatmentFactorLabelVariable.setValue(treatmentFactorLevelVariable.getName());
 				measurementVariables.add(treatmentFactorLabelVariable);
 			}
 		}
