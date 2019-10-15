@@ -9,6 +9,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
@@ -388,15 +389,16 @@ public class ExperimentDesignTypeValidator {
 	}
 
 	private void validateTreatmentFactors(final ExperimentDesignInput experimentDesignInput) {
-		if (experimentDesignInput.getTreatmentFactorsData().size() > 0) {
+		if (!CollectionUtils.isEmpty(experimentDesignInput.getTreatmentFactorsData())) {
 			this.errors.reject(EXPERIMENT_DESIGN_TREATMENT_FACTORS_ERROR);
 		}
 	}
 
 	void validateIfCheckEntriesExistInstudyGermplasmDtoList(final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
+		final Integer checkEntryType = Integer.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
 		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
-			if (studyGermplasmDto.getCheckType().equals(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId())) {
+			if (checkEntryType.equals(studyGermplasmDto.getCheckType())) {
 				return;
 			}
 		}
@@ -431,9 +433,9 @@ public class ExperimentDesignTypeValidator {
 	void loadChecksAndTestEntries(final List<StudyGermplasmDto> studyGermplasmDtoList, final List<StudyGermplasmDto> checkList,
 		final List<StudyGermplasmDto> testEntryList) {
 
+		final Integer testEntryType = Integer.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
 		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
-			if (studyGermplasmDto.getCheckType()
-				.equals(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())) {
+			if (testEntryType.equals(studyGermplasmDto.getCheckType())) {
 				testEntryList.add(studyGermplasmDto);
 			} else {
 				checkList.add(studyGermplasmDto);
