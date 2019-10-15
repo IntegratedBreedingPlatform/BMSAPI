@@ -3,7 +3,9 @@ package org.ibp.api.rest.design;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.InsertionMannerItem;
+import org.ibp.api.domain.ontology.TermSummary;
 import org.ibp.api.java.design.DesignLicenseService;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -46,8 +47,13 @@ public class ExperimentDesignGeneratorResource {
 	@ApiOperation(value = "Gets insertion manners for checks")
 	@RequestMapping(value= "/design/checks/insertionManners", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<List<InsertionMannerItem>> retrieveCheckInsertionManners() {
-		return new ResponseEntity<>(Arrays.asList(InsertionMannerItem.values()), HttpStatus.OK);
+	public ResponseEntity<List<TermSummary>> retrieveCheckInsertionManners() {
+		final List<TermSummary> terms = new ArrayList<>();
+		final ModelMapper map = new ModelMapper();
+		for (final InsertionMannerItem item : InsertionMannerItem.values()) {
+			terms.add(map.map(item, TermSummary.class));
+		}
+		return new ResponseEntity<>(terms, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Count number of days before license for design generator expires")
