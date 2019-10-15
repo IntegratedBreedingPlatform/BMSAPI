@@ -29,7 +29,7 @@ import java.util.Map;
 @Service
 @Transactional
 public class ExperimentDesignServiceImpl implements ExperimentDesignService {
-	private   static final String EXPERIMENT_DESIGN_LICENSE_EXPIRED = "experiment.design.license.expired";
+	static final String EXPERIMENT_DESIGN_LICENSE_EXPIRED = "experiment.design.license.expired";
 
 	@Resource
 	private StudyValidator studyValidator;
@@ -54,7 +54,8 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 
 	@Override
 	public void generateAndSaveDesign(final String cropName, final int studyId, final ExperimentDesignInput experimentDesignInput) {
-		// Check license validity first and foremost, if applicable for design type
+		// Check license validity first and foremost( if applicable for design type)
+		// Raise an error right away if license is not valid
 		final ExperimentDesignTypeService experimentDesignTypeService =
 			this.experimentDesignTypeServiceFactory.lookup(experimentDesignInput.getDesignType());
 		if (experimentDesignTypeService.requiresLicenseCheck()) {
