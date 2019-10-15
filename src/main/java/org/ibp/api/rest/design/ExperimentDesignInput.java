@@ -1,7 +1,11 @@
 package org.ibp.api.rest.design;
 
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
+
 import java.util.Map;
 
+@AutoProperty
 public class ExperimentDesignInput {
 
 	private static final long serialVersionUID = -3081300491744812262L;
@@ -226,4 +230,18 @@ public class ExperimentDesignInput {
 		this.replicationPercentage = replicationPercentage;
 	}
 
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return Pojomatic.equals(this, o);
+	}
 }
