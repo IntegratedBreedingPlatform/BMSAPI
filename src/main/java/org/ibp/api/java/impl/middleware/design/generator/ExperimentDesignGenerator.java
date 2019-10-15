@@ -460,7 +460,7 @@ public class ExperimentDesignGenerator {
 				} else if (termId == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 					observationUnitData =
 						ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), Integer.toString(trialNo));
-				} else if (StringUtils.isEmpty(measurementVariable.getTreatmentLabel())) {
+				} else if (!StringUtils.isEmpty(measurementVariable.getTreatmentLabel())) {
 					if (treatmentLevelData == null) {
 						observationUnitData = ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(),
 							bvEntryMap.get(ExpDesignUtil.cleanBVDesingKey(Integer.toString(measurementVariable.getTermId()))));
