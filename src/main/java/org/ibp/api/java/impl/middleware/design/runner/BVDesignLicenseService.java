@@ -24,7 +24,7 @@ import java.util.Date;
 
 @Component
 @ConditionalOnProperty(
-	value = "design.runner.license.util",
+	value = "design.runner.license.service",
 	havingValue = "org.ibp.api.java.impl.middleware.design.runner.BVDesignLicenseService")
 public class BVDesignLicenseService implements DesignLicenseService {
 

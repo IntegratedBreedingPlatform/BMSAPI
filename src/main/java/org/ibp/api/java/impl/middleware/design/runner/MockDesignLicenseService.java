@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConditionalOnProperty(
-	value = "design.runner.license.util",
+	value = "design.runner.license.service",
 	havingValue = "org.ibp.api.java.impl.middleware.design.runner.MockDesignLicenseService")
 public class MockDesignLicenseService implements DesignLicenseService {
 
