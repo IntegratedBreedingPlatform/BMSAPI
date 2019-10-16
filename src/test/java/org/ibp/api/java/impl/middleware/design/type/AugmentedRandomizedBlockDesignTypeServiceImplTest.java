@@ -73,9 +73,9 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 		final int studyId = 1;
 		final int numberOfTreatments = 10;
 		final int numberOfControls = 5;
-		final String numberOfBlocks = "5";
-		final String startingPlotNumber = "1";
-		final String numberOfTrials = "3";
+		final Integer numberOfBlocks = 5;
+		final Integer startingPlotNumber = 1;
+		final Integer numberOfTrials = 3;
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
@@ -85,8 +85,8 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 		experimentDesignInput.setNoOfEnvironments(numberOfTrials);
 
 		when(this.experimentDesignGenerator
-			.createAugmentedRandomizedBlockDesign(Integer.parseInt(numberOfBlocks), numberOfTreatments, numberOfControls,
-				Integer.parseInt(startingPlotNumber),
+			.createAugmentedRandomizedBlockDesign(numberOfBlocks, numberOfTreatments, numberOfControls,
+				startingPlotNumber,
 				ENTRY_NO,
 				BLOCK_NO, PLOT_NO)).thenReturn(mainDesign);
 		when(this.experimentDesignGenerator
@@ -94,7 +94,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 				AugmentedRandomizedBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(eq(Integer.parseInt(numberOfTrials)), refEq(measurementVariables),
+			.generateExperimentDesignMeasurements(eq(numberOfTrials), refEq(measurementVariables),
 				refEq(studyGermplasmDtoList), refEq(mainDesign),
 				eq(ENTRY_NO),
 				isNull(), any(Map.class))).thenReturn(observationUnitRowList);

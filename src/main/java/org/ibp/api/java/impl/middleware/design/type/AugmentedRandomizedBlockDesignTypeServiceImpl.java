@@ -7,7 +7,6 @@ import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
-import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
@@ -56,12 +55,12 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 			this.createMapOfDesignExpectedEntriesToGermplasmEntriesInTrial(studyGermplasmDtoList,
 				entryIdsOfChecks, entryIdsOfTestEntries);
 
-		final Integer numberOfBlocks = StringUtil.parseInt(experimentDesignInput.getNumberOfBlocks(), null);
+		final Integer numberOfBlocks = experimentDesignInput.getNumberOfBlocks();
 		final Integer numberOfControls = entryIdsOfChecks.size();
 		final Integer numberOfTreatments = studyGermplasmDtoList.size() - numberOfControls;
-		final Integer startingPlotNumber = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), 1);
+		final Integer startingPlotNumber = experimentDesignInput.getStartingPlotNo() == null? 1 : experimentDesignInput.getStartingPlotNo();
 
-		final int numberOfTrials = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
+		final int numberOfTrials = experimentDesignInput.getNoOfEnvironments();
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()

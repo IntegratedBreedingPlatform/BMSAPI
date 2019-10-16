@@ -7,7 +7,6 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
-import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
@@ -54,10 +53,10 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 		this.experimentDesignTypeValidator.validateResolvableRowColumnDesign(experimentDesignInput, studyGermplasmDtoList);
 
 		final int nTreatments = studyGermplasmDtoList.size();
-		final String rows = experimentDesignInput.getRowsPerReplications();
-		final String cols = experimentDesignInput.getColsPerReplications();
-		final String replicates = experimentDesignInput.getReplicationsCount();
-		final int numberOfTrials = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
+		final Integer rows = experimentDesignInput.getRowsPerReplications();
+		final Integer cols = experimentDesignInput.getColsPerReplications();
+		final Integer replicates = experimentDesignInput.getReplicationsCount();
+		final int numberOfTrials = experimentDesignInput.getNoOfEnvironments();
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -73,11 +72,11 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 			if (experimentDesignInput.getReplicationsArrangement() != null) {
 				if (experimentDesignInput.getReplicationsArrangement().intValue() == 1) {
 					// column
-					experimentDesignInput.setReplatinGroups(experimentDesignInput.getReplicationsCount());
+					experimentDesignInput.setReplatinGroups(String.valueOf(experimentDesignInput.getReplicationsCount()));
 				} else if (experimentDesignInput.getReplicationsArrangement().intValue() == 2) {
 					// rows
 					final StringBuilder rowReplatingGroupStringBuilder = new StringBuilder();
-					for (int i = 0; i < Integer.parseInt(experimentDesignInput.getReplicationsCount()); i++) {
+					for (int i = 0; i < experimentDesignInput.getReplicationsCount(); i++) {
 						if (StringUtils.isEmpty(rowReplatingGroupStringBuilder.toString())) {
 							rowReplatingGroupStringBuilder.append(",");
 						}
@@ -88,10 +87,10 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 			}
 		}
 
-		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), 1);
+		final Integer plotNo = experimentDesignInput.getStartingPlotNo() == null? 1 : experimentDesignInput.getStartingPlotNo();
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createResolvableRowColDesign(Integer.toString(nTreatments), replicates, rows, cols, entryNumberName,
+			.createResolvableRowColDesign(nTreatments, replicates, rows, cols, entryNumberName,
 				replicateNumberName, rowName, colName, plotNumberName, plotNo,
 				experimentDesignInput.getNrlatin(), experimentDesignInput.getNclatin(), experimentDesignInput.getReplatinGroups(), "",
 				experimentDesignInput.getUseLatenized());

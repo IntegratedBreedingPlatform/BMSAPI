@@ -108,7 +108,7 @@ public class ExperimentDesignGenerator {
 	private final Random random = new Random();
 
 	public MainDesign createRandomizedCompleteBlockDesign(
-		final String nBlock, final String blockFactor, final String plotFactor,
+		final Integer nBlock, final String blockFactor, final String plotFactor,
 		final Integer initialPlotNumber, final String entryNoVarName, final List<String> treatmentFactors,
 		final List<String> levels, final String outputfile) {
 
@@ -116,7 +116,7 @@ public class ExperimentDesignGenerator {
 
 		final List<ExpDesignParameter> paramList = new ArrayList<>();
 		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.SEED_PARAM, "", null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NBLOCKS_PARAM, nBlock, null));
+		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NBLOCKS_PARAM, String.valueOf(nBlock), null));
 		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.BLOCKFACTOR_PARAM, blockFactor, null));
 		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.PLOTFACTOR_PARAM, plotFactor, null));
 		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM,
@@ -137,18 +137,18 @@ public class ExperimentDesignGenerator {
 	}
 
 	public MainDesign createResolvableIncompleteBlockDesign(
-		final String blockSize, final String nTreatments, final String nReplicates,
+		final Integer blockSize, final Integer nTreatments, final Integer nReplicates,
 		final String treatmentFactor, final String replicateFactor, final String blockFactor, final String plotFactor,
-		final Integer initialPlotNumber, final String nBlatin, final String replatingGroups,
+		final Integer initialPlotNumber, final Integer nBlatin, final String replatingGroups,
 		final String outputfile, final boolean useLatinize) {
 
 		final String timeLimit = AppConstants.EXP_DESIGN_TIME_LIMIT.getString();
 
 		final List<ExpDesignParameter> paramList = new ArrayList<>();
 		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.SEED_PARAM, "", null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.BLOCKSIZE_PARAM, blockSize, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NTREATMENTS_PARAM, nTreatments, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NREPLICATES_PARAM, nReplicates, null));
+		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.BLOCKSIZE_PARAM, String.valueOf(blockSize), null));
+		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NTREATMENTS_PARAM, String.valueOf(nTreatments), null));
+		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NREPLICATES_PARAM, String.valueOf(nReplicates), null));
 		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.TREATMENTFACTOR_PARAM, treatmentFactor, null));
 
 		this.addInitialTreatmenNumberIfAvailable(STARTING_ENTRY_NUMBER, paramList);
@@ -159,7 +159,7 @@ public class ExperimentDesignGenerator {
 		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM,
 			this.getPlotNumberStringValueOrDefault(initialPlotNumber), null));
 
-		this.addLatinizeParametersForResolvableIncompleteBlockDesign(useLatinize, paramList, nBlatin, replatingGroups);
+		this.addLatinizeParametersForResolvableIncompleteBlockDesign(useLatinize, paramList, String.valueOf(nBlatin), replatingGroups);
 
 		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.TIMELIMIT_PARAM, timeLimit, null));
 		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.OUTPUTFILE_PARAM, outputfile, null));
@@ -170,10 +170,10 @@ public class ExperimentDesignGenerator {
 	}
 
 	public MainDesign createResolvableRowColDesign(
-		final String nTreatments, final String nReplicates, final String nRows,
-		final String nColumns, final String treatmentFactor, final String replicateFactor, final String rowFactor,
+		final Integer nTreatments, final Integer nReplicates, final Integer nRows,
+		final Integer nColumns, final String treatmentFactor, final String replicateFactor, final String rowFactor,
 		final String columnFactor, final String plotFactor, final Integer initialPlotNumber,
-		final String nrLatin, final String ncLatin, final String replatingGroups, final String outputfile, final Boolean useLatinize) {
+		final Integer nrLatin, final Integer ncLatin, final String replatingGroups, final String outputfile, final Boolean useLatinize) {
 
 		final String timeLimit = AppConstants.EXP_DESIGN_TIME_LIMIT.getString();
 
@@ -181,10 +181,10 @@ public class ExperimentDesignGenerator {
 
 		final List<ExpDesignParameter> paramList = new ArrayList<>();
 		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.SEED_PARAM, "", null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NTREATMENTS_PARAM, nTreatments, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NREPLICATES_PARAM, nReplicates, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NROWS_PARAM, nRows, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NCOLUMNS_PARAM, nColumns, null));
+		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NTREATMENTS_PARAM, String.valueOf(nTreatments), null));
+		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NREPLICATES_PARAM, String.valueOf(nReplicates), null));
+		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NROWS_PARAM, String.valueOf(nRows), null));
+		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NCOLUMNS_PARAM, String.valueOf(nColumns), null));
 		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.TREATMENTFACTOR_PARAM, treatmentFactor, null));
 
 		this.addInitialTreatmenNumberIfAvailable(STARTING_ENTRY_NUMBER, paramList);
@@ -580,11 +580,11 @@ public class ExperimentDesignGenerator {
 
 	void addLatinizeParametersForResolvableRowAndColumnDesign(
 		final Boolean useLatinize, final List<ExpDesignParameter> paramList,
-		final String replatingGroups, final String nrLatin, final String ncLatin) {
+		final String replatingGroups, final Integer nrLatin, final Integer ncLatin) {
 
 		if (useLatinize != null && useLatinize.booleanValue()) {
-			paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NRLATIN_PARAM, nrLatin, null));
-			paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NCLATIN_PARAM, ncLatin, null));
+			paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NRLATIN_PARAM, String.valueOf(nrLatin), null));
+			paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NCLATIN_PARAM, String.valueOf(ncLatin), null));
 			// we tokenize the replating groups
 			final StringTokenizer tokenizer = new StringTokenizer(replatingGroups, ",");
 			final List<ListItem> replatingList = new ArrayList<>();
@@ -657,19 +657,19 @@ public class ExperimentDesignGenerator {
 		} else if (termId == TermId.NO_OF_COLS_IN_REPS.getId()) {
 			return String.valueOf(experimentDesignInput.getColsPerReplications());
 		} else if (termId == TermId.NO_OF_CCOLS_LATINIZE.getId()) {
-			return experimentDesignInput.getNclatin();
+			return String.valueOf(experimentDesignInput.getNclatin());
 		} else if (termId == TermId.NO_OF_CROWS_LATINIZE.getId()) {
-			return experimentDesignInput.getNrlatin();
+			return String.valueOf(experimentDesignInput.getNrlatin());
 		} else if (termId == TermId.EXPT_DESIGN_SOURCE.getId()) {
 			return experimentDesignInput.getFileName();
 		} else if (termId == TermId.NBLKS.getId()) {
-			return experimentDesignInput.getNumberOfBlocks();
+			return String.valueOf(experimentDesignInput.getNumberOfBlocks());
 		} else if (termId == TermId.CHECK_START.getId()) {
-			return experimentDesignInput.getCheckStartingPosition();
+			return String.valueOf(experimentDesignInput.getCheckStartingPosition());
 		} else if (termId == TermId.CHECK_INTERVAL.getId()) {
-			return experimentDesignInput.getCheckSpacing();
+			return String.valueOf(experimentDesignInput.getCheckSpacing());
 		} else if (termId == TermId.CHECK_PLAN.getId()) {
-			return experimentDesignInput.getCheckInsertionManner();
+			return String.valueOf(experimentDesignInput.getCheckInsertionManner());
 		}
 		return "";
 	}

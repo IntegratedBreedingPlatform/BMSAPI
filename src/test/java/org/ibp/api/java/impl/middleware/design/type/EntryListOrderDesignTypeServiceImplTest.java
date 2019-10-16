@@ -65,17 +65,15 @@ public class EntryListOrderDesignTypeServiceImplTest {
 		final int studyId = 1;
 		final int numberOfTreatments = 5;
 		final int numberOfControls = 1;
-		final String numberOfTrials = "1";
-		final String startingPlotNumber = "1";
-		final String checkSpacing = "";
-		final String checkStartingPosition = "0";
+		final Integer numberOfTrials = 1;
+		final Integer startingPlotNumber = 1;
+		final Integer checkStartingPosition = 0;
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
 		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
 		experimentDesignInput.setNoOfEnvironments(numberOfTrials);
 		experimentDesignInput.setStartingPlotNo(startingPlotNumber);
-		experimentDesignInput.setCheckSpacing(checkSpacing);
 		experimentDesignInput.setCheckStartingPosition(checkStartingPosition);
 
 		when(this.experimentDesignGenerator
@@ -110,11 +108,11 @@ public class EntryListOrderDesignTypeServiceImplTest {
 		final int studyId = 1;
 		final int numberOfTreatments = 5;
 		final int numberOfControls = 1;
-		final String checkStartingPosition = "1";
-		final String checkSpacing = "2";
-		final String checkInsertionManner = InsertionMannerItem.INSERT_EACH_IN_TURN.getId().toString();
-		final String numberOfTrials = "1";
-		final String startingPlotNumber = "1";
+		final Integer checkStartingPosition = 1;
+		final Integer checkSpacing = 2;
+		final Integer checkInsertionManner = InsertionMannerItem.INSERT_EACH_IN_TURN.getId();
+		final Integer numberOfTrials = 1;
+		final Integer startingPlotNumber = 1;
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);

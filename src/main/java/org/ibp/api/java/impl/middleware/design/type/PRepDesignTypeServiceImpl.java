@@ -6,7 +6,6 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
-import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
@@ -49,10 +48,10 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 		this.experimentDesignTypeValidator.validatePrepDesign(experimentDesignInput, studyGermplasmDtoList);
 
 		final int nTreatments = studyGermplasmDtoList.size();
-		final int blockSize = Integer.parseInt(experimentDesignInput.getBlockSize());
+		final int blockSize = experimentDesignInput.getBlockSize();
 		final int replicationPercentage = experimentDesignInput.getReplicationPercentage();
-		final int replicationNumber = Integer.parseInt(experimentDesignInput.getReplicationsCount());
-		final int numberOfTrials = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
+		final int replicationNumber = experimentDesignInput.getReplicationsCount();
+		final int numberOfTrials = experimentDesignInput.getNoOfEnvironments();
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -62,7 +61,7 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 		final String blockNumberName = standardVariablesMap.get(TermId.BLOCK_NO.getId()).getName();
 		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
 
-		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), 1);
+		final Integer plotNo = experimentDesignInput.getStartingPlotNo() == null? 1 : experimentDesignInput.getStartingPlotNo();
 
 		final List<ListItem> replicationListItems =
 			this.experimentDesignGenerator

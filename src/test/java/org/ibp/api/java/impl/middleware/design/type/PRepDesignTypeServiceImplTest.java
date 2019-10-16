@@ -72,11 +72,11 @@ public class PRepDesignTypeServiceImplTest {
 		final int studyId = 1;
 		final int numberOfTreatments = 10;
 		final int numberOfControls = 5;
-		final String blockSize = "5";
-		final String replicationCount = "3";
-		final int replicationPercentage = 50;
-		final String numberOfTrials = "1";
-		final String startingPlotNumber = "1";
+		final Integer blockSize = 5;
+		final Integer replicationCount = 3;
+		final Integer replicationPercentage = 50;
+		final Integer numberOfTrials = 1;
+		final Integer startingPlotNumber = 1;
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
@@ -87,18 +87,18 @@ public class PRepDesignTypeServiceImplTest {
 		experimentDesignInput.setNoOfEnvironments(numberOfTrials);
 
 		when(this.experimentDesignGenerator
-			.createReplicationListItemForPRepDesign(studyGermplasmDtoList, replicationPercentage, Integer.parseInt(replicationCount)))
+			.createReplicationListItemForPRepDesign(studyGermplasmDtoList, replicationPercentage, replicationCount))
 			.thenReturn(replicationListItems);
 		when(this.experimentDesignGenerator
-			.createPRepDesign(Integer.parseInt(blockSize), studyGermplasmDtoList.size(), replicationListItems,
+			.createPRepDesign(blockSize, studyGermplasmDtoList.size(), replicationListItems,
 				ENTRY_NO,
-				BLOCK_NO, PLOT_NO, Integer.parseInt(startingPlotNumber))).thenReturn(mainDesign);
+				BLOCK_NO, PLOT_NO, startingPlotNumber)).thenReturn(mainDesign);
 		when(this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, PROGRAM_UUID, PRepDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				PRepDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(eq(Integer.parseInt(numberOfTrials)), refEq(measurementVariables),
+			.generateExperimentDesignMeasurements(eq(numberOfTrials), refEq(measurementVariables),
 				refEq(studyGermplasmDtoList), refEq(mainDesign),
 				eq(ENTRY_NO),
 				isNull(), any(Map.class))).thenReturn(observationUnitRowList);

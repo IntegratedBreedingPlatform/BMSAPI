@@ -7,7 +7,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
-import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
@@ -60,8 +59,8 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 
 		this.experimentDesignTypeValidator.validateRandomizedCompleteBlockDesign(experimentDesignInput, studyGermplasmDtoList);
 
-		final String block = experimentDesignInput.getReplicationsCount();
-		final int numberOfTrials = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
+		final Integer block = experimentDesignInput.getReplicationsCount();
+		final int numberOfTrials = experimentDesignInput.getNoOfEnvironments();
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -80,7 +79,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 		treatmentFactors.add(entryNumberName);
 		treatmentLevels.add(Integer.toString(studyGermplasmDtoList.size()));
 
-		final Integer plotNo = StringUtil.parseInt(experimentDesignInput.getStartingPlotNo(), 1);
+		final Integer plotNo = experimentDesignInput.getStartingPlotNo() == null ? 1 : experimentDesignInput.getStartingPlotNo();
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createRandomizedCompleteBlockDesign(block, replicateNumberName, plotNumberName, plotNo,

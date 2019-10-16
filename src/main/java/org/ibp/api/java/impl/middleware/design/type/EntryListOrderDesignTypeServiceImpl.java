@@ -55,27 +55,22 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 
 		this.loadChecksAndTestEntries(studyGermplasmDtoList, checkList, testEntryList);
 
-		final Integer startingPosition =
-			(StringUtils.isEmpty(experimentDesignInput.getCheckStartingPosition())) ? null :
-				Integer.parseInt(experimentDesignInput.getCheckStartingPosition());
+		final Integer startingPosition = experimentDesignInput.getCheckStartingPosition();
 
-		final Integer spacing = (StringUtils.isEmpty(experimentDesignInput.getCheckSpacing())) ? null :
-			Integer.parseInt(experimentDesignInput.getCheckSpacing());
+		final Integer spacing = experimentDesignInput.getCheckSpacing();
 
-		final Integer insertionManner =
-			(StringUtils.isEmpty(experimentDesignInput.getCheckInsertionManner())) ? null :
-				Integer.parseInt(experimentDesignInput.getCheckInsertionManner());
+		final Integer insertionManner = experimentDesignInput.getCheckInsertionManner();
 
 		final List<StudyGermplasmDto> mergedGermplasmList =
 			this.mergeTestAndCheckEntries(testEntryList, checkList, startingPosition, spacing, insertionManner);
 
-		final int numberOfTrials = Integer.parseInt(experimentDesignInput.getNoOfEnvironments());
+		final int numberOfTrials = experimentDesignInput.getNoOfEnvironments();
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
 		final List<ObservationUnitRow> observationUnitRows = new ArrayList<>();
 		for (int instanceNumber = 1; instanceNumber <= numberOfTrials; instanceNumber++) {
 
-			int plotNumber = Integer.parseInt(experimentDesignInput.getStartingPlotNo());
+			int plotNumber = experimentDesignInput.getStartingPlotNo();
 
 			for (final StudyGermplasmDto germplasm : mergedGermplasmList) {
 				final ObservationUnitRow observationUnitRow =
@@ -101,7 +96,7 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 		final String programUUID) {
 		return this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES,
-				!StringUtils.isEmpty(experimentDesignInput.getCheckSpacing()) ? EXPERIMENT_DESIGN_VARIABLES_WITH_CHECK_PLAN :
+				experimentDesignInput.getCheckSpacing() != null ? EXPERIMENT_DESIGN_VARIABLES_WITH_CHECK_PLAN :
 					EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput);
 	}
 
