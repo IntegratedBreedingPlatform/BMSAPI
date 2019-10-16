@@ -26,10 +26,10 @@ import java.util.stream.Collectors;
 @Component
 public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
-	private static final List<Integer> DESIGN_FACTOR_VARIABLES =
+	protected static final List<Integer> DESIGN_FACTOR_VARIABLES =
 		Arrays.asList(TermId.BLOCK_NO.getId(), TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId());
 
-	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
+	protected static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId(),
 			TermId.PERCENTAGE_OF_REPLICATION.getId());
 
