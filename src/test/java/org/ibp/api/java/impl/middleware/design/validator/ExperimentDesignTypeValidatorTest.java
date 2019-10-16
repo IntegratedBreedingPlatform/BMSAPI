@@ -1,0 +1,730 @@
+package org.ibp.api.java.impl.middleware.design.validator;
+
+import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.domain.dms.InsertionMannerItem;
+import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+public class ExperimentDesignTypeValidatorTest {
+	
+	private ExperimentDesignTypeValidator designTypeValidator = new ExperimentDesignTypeValidator();
+
+	@Before
+	public void init() {
+		this.designTypeValidator = new ExperimentDesignTypeValidator();
+	}
+
+	@Test
+	public void testValidateAugmentedDesignSuccess() {
+
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setNumberOfBlocks(2);
+		designInput.setStartingPlotNo(1);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		// Make the first ImportedGermplasm a check entry type.
+		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+
+		try {
+			this.designTypeValidator.validateAugmentedDesign(designInput, importedGermplasmList);
+		} catch (final ApiRequestValidationException e) {
+			Assert.fail("validateAugmentedDesign() should not throw an ApiRequestValidationException.");
+		}
+	}
+
+	@Test
+	public void testValidateAugmentedDesignFail_WhenNoGermplasmList() {
+
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setNumberOfBlocks(2);
+		designInput.setStartingPlotNo(1);
+
+		try {
+			this.designTypeValidator.validateAugmentedDesign(designInput, new ArrayList<>());
+			Assert.fail("validateAugmentedDesign() should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.generate.no.germplasm"));
+		}
+	}
+
+	@Test
+	public void testValidateAugmentedDesignFail_WhenNoChecks() {
+
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setNumberOfBlocks(2);
+		designInput.setStartingPlotNo(1);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+
+		try {
+			this.designTypeValidator.validateAugmentedDesign(designInput, importedGermplasmList);
+			Assert.fail("validateAugmentedDesign() should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("germplasm.list.check.required.augmented.design"));
+		}
+	}
+
+	@Test
+	public void testValidateAugmentedDesignFail_WhenTreatmentFactorsPresent() {
+
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setNumberOfBlocks(2);
+		designInput.setStartingPlotNo(1);
+		final Map<String, String> treatmentFactorsData = new HashMap<>();
+		treatmentFactorsData.put("1", "100");
+		designInput.setTreatmentFactorsData(treatmentFactorsData);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		// Make the first ImportedGermplasm a check entry type.
+		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+
+		try {
+			this.designTypeValidator.validateAugmentedDesign(designInput, importedGermplasmList);
+			Assert.fail("validateAugmentedDesign() should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.treatment.factors.error"));
+		}
+	}
+
+	@Test
+	public void testValidateRandomizedCompleteBlockDesignSuccess() {
+
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setNumberOfBlocks(2);
+		designInput.setStartingPlotNo(1);
+		designInput.setReplicationsCount(2);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+
+		try {
+			this.designTypeValidator.validateRandomizedCompleteBlockDesign(designInput, importedGermplasmList);
+		} catch (final ApiRequestValidationException e) {
+			Assert.fail("Should not throw an ApiRequestValidationException.");
+		}
+	}
+
+	@Test
+	public void testValidateRandomizedCompleteBlockDesignFail_WhenNoReplicationCount() {
+
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setNumberOfBlocks(2);
+		designInput.setStartingPlotNo(1);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+
+		try {
+			this.designTypeValidator.validateRandomizedCompleteBlockDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.replication.count.rcbd.error"));
+		}
+	}
+
+	@Test
+	public void testValidateRandomizedCompleteBlockDesignFail_WhenNoGermplasmList() {
+
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setNumberOfBlocks(2);
+		designInput.setStartingPlotNo(1);
+
+		try {
+			this.designTypeValidator.validateRandomizedCompleteBlockDesign(designInput, new ArrayList<>());
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.generate.no.germplasm"));
+		}
+	}
+
+	@Test
+	public void testValidateResolvableRowColumnDesignFail_WhenNoReplicationCount() {
+
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setNumberOfBlocks(2);
+		designInput.setStartingPlotNo(1);
+		designInput.setRowsPerReplications(1);
+		designInput.setColsPerReplications(1);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+
+		try {
+			this.designTypeValidator.validateResolvableRowColumnDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.replication.count.resolvable.error"));
+		}
+	}
+
+	@Test
+	public void testValidateResolvableRowColumnDesignSuccess() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setReplicationsCount(1);
+		designInput.setRowsPerReplications(2);
+		designInput.setColsPerReplications(5);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		try {
+			this.designTypeValidator.validateResolvableRowColumnDesign(designInput, importedGermplasmList);
+		} catch (final ApiRequestValidationException e) {
+			Assert.fail("Should not throw an ApiRequestValidationException.");
+		}
+	}
+
+	@Test
+	public void testValidateResolvableIncompleteBlockDesignFail_TreatmentFactorsPresent() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setReplicationsCount(1);
+		designInput.setBlockSize(1);
+		final Map<String, String> treatmentFactorsData = new HashMap<>();
+		treatmentFactorsData.put("1", "100");
+		designInput.setTreatmentFactorsData(treatmentFactorsData);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		try {
+			this.designTypeValidator.validateResolvableIncompleteBlockDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.treatment.factors.error"));
+		}
+	}
+
+	@Test
+	public void testValidateResolvableIncompleteBlockDesignFail_NoReplicationCount() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setBlockSize(1);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		try {
+			this.designTypeValidator.validateResolvableIncompleteBlockDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.replication.count.resolvable.error"));
+		}
+	}
+
+	@Test
+	public void testValidateResolvableIncompleteBlockDesignFail_NoBlockSize() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setReplicationsCount(1);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		try {
+			this.designTypeValidator.validateResolvableIncompleteBlockDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.block.size.should.be.a.greater.than.1"));
+		}
+	}
+
+	@Test
+	public void testValidateResolvableIncompleteBlockDesignFail_InvalidBlockLevel() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setReplicationsCount(1);
+		designInput.setBlockSize(10);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		try {
+			this.designTypeValidator.validateResolvableIncompleteBlockDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.block.level.should.be.greater.than.one"));
+		}
+	}
+
+	@Test
+	public void testValidateResolvableIncompleteBlockDesignFail_InvalidBlockSize() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setReplicationsCount(1);
+		designInput.setBlockSize(3);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		try {
+			this.designTypeValidator.validateResolvableIncompleteBlockDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.block.size.not.a.factor.of.treatment.size"));
+		}
+	}
+
+	@Test
+	public void testValidateResolvableIncompleteBlockDesignFail_WhenNoGermplasmList() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setBlockSize(1);
+		designInput.setStartingPlotNo(1);
+		designInput.setReplicationsCount(1);
+
+		try {
+			this.designTypeValidator.validateResolvableIncompleteBlockDesign(designInput, new ArrayList<>());
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.generate.no.germplasm"));
+		}
+	}
+
+	@Test
+	public void testValidateResolvableRowColumnDesignFail_TreatmentFactorsPresent() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setReplicationsCount(1);
+		designInput.setRowsPerReplications(1);
+		designInput.setColsPerReplications(1);
+		final Map<String, String> treatmentFactorsData = new HashMap<>();
+		treatmentFactorsData.put("1", "100");
+		designInput.setTreatmentFactorsData(treatmentFactorsData);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		try {
+			this.designTypeValidator.validateResolvableRowColumnDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.treatment.factors.error"));
+		}
+	}
+
+	@Test
+	public void testValidateResolvableRowColumnDesignFail_InvalidRowColProduct() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setReplicationsCount(1);
+		designInput.setRowsPerReplications(1);
+		designInput.setColsPerReplications(1);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		try {
+			this.designTypeValidator.validateResolvableRowColumnDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.resolvable.incorrect.row.and.col.product.to.germplasm.size"));
+		}
+	}
+
+	@Test
+	public void testValidateResolvableRowColumnDesignFail_WhenNoGermplasmList() {
+
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setNumberOfBlocks(2);
+		designInput.setStartingPlotNo(1);
+
+		try {
+			this.designTypeValidator.validateResolvableRowColumnDesign(designInput, new ArrayList<>());
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.generate.no.germplasm"));
+		}
+	}
+
+
+	@Test
+	public void testValidatePrepDesignSuccess() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setReplicationPercentage(50);
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		try {
+			this.designTypeValidator.validatePrepDesign(designInput, importedGermplasmList);
+		} catch (final ApiRequestValidationException e) {
+			Assert.fail("Should not throw an ApiRequestValidationException.");
+		}
+	}
+
+	@Test
+	public void testValidatePrepDesignFail_NoReplicationPercentage() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		try {
+			this.designTypeValidator.validatePrepDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.replication.percentage.should.be.between.zero.and.hundred"));
+		}
+	}
+
+	@Test
+	public void testValidatePrepDesignFail_InvalidReplicationPercentage() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setReplicationPercentage(101);
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		try {
+			this.designTypeValidator.validatePrepDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.replication.percentage.should.be.between.zero.and.hundred"));
+		}
+	}
+
+	@Test
+	public void testValidatePrepDesignFail_TreatmentFactorsPresent() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setReplicationPercentage(50);
+		final Map<String, String> treatmentFactorsData = new HashMap<>();
+		treatmentFactorsData.put("1", "100");
+		designInput.setTreatmentFactorsData(treatmentFactorsData);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		try {
+			this.designTypeValidator.validatePrepDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.treatment.factors.error"));
+		}
+	}
+
+	@Test
+	public void testValidateEntryListOrderDesignSuccess_WithChecks() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setCheckSpacing(1);
+		designInput.setCheckStartingPosition(1);
+		designInput.setCheckInsertionManner(InsertionMannerItem.INSERT_ALL_CHECKS.getId());
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		try {
+			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+		} catch (final ApiRequestValidationException e) {
+			Assert.fail("Should not throw an ApiRequestValidationException.");
+		}
+	}
+
+	@Test
+	public void testValidateEntryListOrderDesignSuccess_NoChecks() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		try {
+			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+		} catch (final ApiRequestValidationException e) {
+			Assert.fail("Should not throw an ApiRequestValidationException.");
+		}
+	}
+
+	@Test
+	public void testValidateEntryListOrderDesignFail_TreatmentFactorsPresent() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setReplicationPercentage(50);
+		final Map<String, String> treatmentFactorsData = new HashMap<>();
+		treatmentFactorsData.put("1", "100");
+		designInput.setTreatmentFactorsData(treatmentFactorsData);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		try {
+			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("experiment.design.treatment.factors.error"));
+		}
+	}
+
+	@Test
+	public void testValidateEntryListOrderDesignFail_NoTestEntries() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		for (final StudyGermplasmDto dto : importedGermplasmList) {
+			dto.setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		}
+		try {
+			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("germplasm.list.all.entries.can.not.be.checks"));
+		}
+	}
+
+	@Test
+	public void testValidateEntryListOrderDesignFail_NoCheckInsertionMannerForChecks() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setCheckSpacing(1);
+		designInput.setCheckStartingPosition(1);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		try {
+			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("check.manner.of.insertion.invalid"));
+		}
+	}
+
+	@Test
+	public void testValidateEntryListOrderDesignFail_NoCheckSpacing() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setCheckStartingPosition(1);
+		designInput.setCheckInsertionManner(InsertionMannerItem.INSERT_ALL_CHECKS.getId());
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		try {
+			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("germplasm.list.number.of.rows.between.insertion.should.be.a.whole.number"));
+		}
+	}
+
+	@Test
+	public void testValidateEntryListOrderDesignFail_NoCheckStartingPosition() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setCheckSpacing(1);
+		designInput.setCheckInsertionManner(InsertionMannerItem.INSERT_ALL_CHECKS.getId());
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		try {
+			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("germplasm.list.start.index.whole.number.error"));
+		}
+	}
+
+	@Test
+	public void testValidateEntryListOrderDesignFail_InvalidCheckStartingPosition() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setCheckSpacing(1);
+		designInput.setCheckStartingPosition(100);
+		designInput.setCheckInsertionManner(InsertionMannerItem.INSERT_ALL_CHECKS.getId());
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		try {
+			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("germplasm.list.start.index.less.than.germplasm.error"));
+		}
+	}
+
+	@Test
+	public void testValidateEntryListOrderDesignFail_InvalidCheckSpacing() {
+		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		designInput.setStartingPlotNo(1);
+		designInput.setCheckSpacing(100);
+		designInput.setCheckStartingPosition(1);
+		designInput.setCheckInsertionManner(InsertionMannerItem.INSERT_ALL_CHECKS.getId());
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+		try {
+			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+			Assert.fail("Should throw an ApiRequestValidationException.");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("germplasm.list.spacing.less.than.germplasm.error"));
+		}
+	}
+
+	@Test
+	public void testValidateReplicationCountLimit_ExceedsMaximum() {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.designTypeValidator.setErrors(errors);
+
+		final String errorCode = RandomStringUtils.randomAlphabetic(20);
+		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
+		experimentDesignInput.setReplicationsCount(13);
+		this.designTypeValidator.validateReplicationCountLimit(experimentDesignInput, errorCode);
+		assertThat(Arrays.asList(errors.getAllErrors().get(0).getCodes()),
+			hasItem(errorCode));
+	}
+
+	@Test
+	public void testValidateReplicationCountLimit_WhenZero() {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.designTypeValidator.setErrors(errors);
+
+		final String errorCode = RandomStringUtils.randomAlphabetic(20);
+		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
+		experimentDesignInput.setReplicationsCount(0);
+		this.designTypeValidator.validateReplicationCountLimit(experimentDesignInput, errorCode);
+		assertThat(Arrays.asList(errors.getAllErrors().get(0).getCodes()),
+			hasItem(errorCode));
+	}
+
+	@Test
+	public void testValidateReplicationCountLimit_LessThanOne() {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.designTypeValidator.setErrors(errors);
+
+		final String errorCode = RandomStringUtils.randomAlphabetic(20);
+		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
+		experimentDesignInput.setReplicationsCount(0);
+		this.designTypeValidator.validateReplicationCountLimit(experimentDesignInput, errorCode);
+		assertThat(Arrays.asList(errors.getAllErrors().get(0).getCodes()),
+			hasItem(errorCode));
+	}
+
+	@Test
+	public void testValidateIfCheckEntriesExistInGermplasmList_WhenCheckEntriesExist() {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.designTypeValidator.setErrors(errors);
+
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+		// Make the first ImportedGermplasm a check entry type.
+		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
+
+		this.designTypeValidator.validateIfCheckEntriesExistInstudyGermplasmDtoList(importedGermplasmList);
+		Assert.assertFalse(errors.hasErrors());
+	}
+
+	@Test
+	public void testValidateIfCheckEntriesExistInGermplasmList_WhenCheckEntriesDoNotExist() {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.designTypeValidator.setErrors(errors);
+		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
+
+		this.designTypeValidator.validateIfCheckEntriesExistInstudyGermplasmDtoList(importedGermplasmList);
+		assertThat(Arrays.asList(errors.getAllErrors().get(0).getCodes()),
+			hasItem("germplasm.list.check.required.augmented.design"));
+	}
+
+	@Test
+	public void testValidateStartingPlotNoSuccess() {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.designTypeValidator.setErrors(errors);
+		final int treatmentSize = 10;
+
+		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
+		experimentDesignInput.setStartingPlotNo(1);
+
+		this.designTypeValidator.validateStartingPlotNo(experimentDesignInput, treatmentSize);
+		Assert.assertFalse(errors.hasErrors());
+	}
+
+	@Test
+	public void testValidateStartingPlotNo_Empty() {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.designTypeValidator.setErrors(errors);
+		final int treatmentSize = 10;
+
+		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
+
+		this.designTypeValidator.validateStartingPlotNo(experimentDesignInput, treatmentSize);
+		assertThat(Arrays.asList(errors.getAllErrors().get(0).getCodes()),
+			hasItem("plot.number.should.be.in.range"));
+	}
+
+	@Test
+	public void testValidateStartingPlotNo_OutOfRange() {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.designTypeValidator.setErrors(errors);
+		final int treatmentSize = 10;
+
+		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
+		experimentDesignInput.setStartingPlotNo(100000000);
+
+		this.designTypeValidator.validateStartingPlotNo(experimentDesignInput, treatmentSize);
+		assertThat(Arrays.asList(errors.getAllErrors().get(0).getCodes()),
+			hasItem("plot.number.should.be.in.range"));
+	}
+
+	@Test
+	public void testValidateNoTreatmentFactors_WhenNoTreatmentFactors() {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.designTypeValidator.setErrors(errors);
+
+		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
+		experimentDesignInput.setTreatmentFactorsData(new HashMap<>());
+
+		this.designTypeValidator.validateNoTreatmentFactors(experimentDesignInput);
+		Assert.assertFalse(errors.hasErrors());
+	}
+
+	@Test
+	public void testValidateNoTreatmentFactors_WhenTreatmentFactorsPresent() {
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		this.designTypeValidator.setErrors(errors);
+
+		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
+		final Map<String, String> treatmentFactorsData = new HashMap<>();
+		treatmentFactorsData.put("1", "100");
+		experimentDesignInput.setTreatmentFactorsData(treatmentFactorsData);
+
+		this.designTypeValidator.validateNoTreatmentFactors(experimentDesignInput);
+		assertThat(Arrays.asList(errors.getAllErrors().get(0).getCodes()),
+			hasItem("experiment.design.treatment.factors.error"));
+	}
+
+
+
+	private List<StudyGermplasmDto> createStudyGermplasmList() {
+
+		final List<StudyGermplasmDto> importedGermplasmList = new LinkedList<>();
+
+		// Create 10 imported germplasm entries
+		for (int i = 1; i <= 10; i++) {
+			importedGermplasmList.add(this.createGermplasm(i));
+		}
+
+		return importedGermplasmList;
+
+	}
+
+	private StudyGermplasmDto createGermplasm(final int entryNo) {
+		final StudyGermplasmDto germplasm = new StudyGermplasmDto();
+		germplasm.setEntryNumber(entryNo);
+		germplasm.setEntryCode(String.valueOf(entryNo));
+		germplasm.setDesignation("DESIG" + entryNo);
+		germplasm.setSeedSource("SOURCE" + entryNo);
+		germplasm.setCheckType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
+		germplasm.setCross("");
+
+		return germplasm;
+	}
+}
