@@ -25,15 +25,15 @@ import java.util.stream.Collectors;
 @Component
 public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
-	private static final List<Integer> DESIGN_FACTOR_VARIABLES =
+	protected static final List<Integer> DESIGN_FACTOR_VARIABLES =
 		Arrays.asList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId(), TermId.ROW.getId(), TermId.COL.getId());
 
-	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES_LATINIZED = Arrays
+	protected static final List<Integer> EXPERIMENT_DESIGN_VARIABLES_LATINIZED = Arrays
 		.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.NO_OF_ROWS_IN_REPS.getId(),
 			TermId.NO_OF_COLS_IN_REPS.getId(), TermId.NO_OF_CROWS_LATINIZE.getId(), TermId.NO_OF_CCOLS_LATINIZE.getId(),
 			TermId.REPLICATIONS_MAP.getId(), TermId.NO_OF_REPS_IN_COLS.getId());
 
-	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES = Arrays
+	protected static final List<Integer> EXPERIMENT_DESIGN_VARIABLES = Arrays
 		.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.NO_OF_ROWS_IN_REPS.getId(),
 			TermId.NO_OF_COLS_IN_REPS.getId());
 
