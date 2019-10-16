@@ -25,14 +25,14 @@ import java.util.stream.Collectors;
 @Component
 public class ResolvableIncompleteBlockDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
-	private static final List<Integer> DESIGN_FACTOR_VARIABLES =
+	protected static final List<Integer> DESIGN_FACTOR_VARIABLES =
 		Arrays.asList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId(), TermId.BLOCK_NO.getId());
 
-	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES_LATINIZED =
+	protected static final List<Integer> EXPERIMENT_DESIGN_VARIABLES_LATINIZED =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId(),
 			TermId.NO_OF_CBLKS_LATINIZE.getId(), TermId.REPLICATIONS_MAP.getId(), TermId.NO_OF_REPS_IN_COLS.getId());
 
-	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
+	protected static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId());
 
 	@Resource
