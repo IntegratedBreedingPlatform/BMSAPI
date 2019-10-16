@@ -35,10 +35,10 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 
 	private static final Logger LOG = LoggerFactory.getLogger(RandomizeCompleteBlockDesignTypeServiceImpl.class);
 
-	private static final List<Integer> DESIGN_FACTOR_VARIABLES =
+	protected static final List<Integer> DESIGN_FACTOR_VARIABLES =
 		Arrays.asList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId());
 
-	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
+	protected static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId());
 
 	@Resource
@@ -181,6 +181,11 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 			levels.add(Integer.toString(level));
 		}
 		return levels;
+	}
+
+	protected void setStandardVariableTransformer(
+		final StandardVariableTransformer standardVariableTransformer) {
+		this.standardVariableTransformer = standardVariableTransformer;
 	}
 
 }
