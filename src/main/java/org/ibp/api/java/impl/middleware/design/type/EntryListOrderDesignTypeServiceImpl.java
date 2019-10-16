@@ -28,12 +28,12 @@ import java.util.Map;
 @Component
 public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
-	private static final List<Integer> DESIGN_FACTOR_VARIABLES = Arrays.asList(TermId.PLOT_NO.getId());
+	protected static final List<Integer> DESIGN_FACTOR_VARIABLES = Arrays.asList(TermId.PLOT_NO.getId());
 
-	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
+	protected static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId());
 
-	private static final List<Integer> EXPERIMENT_DESIGN_VARIABLES_WITH_CHECK_PLAN =
+	protected static final List<Integer> EXPERIMENT_DESIGN_VARIABLES_WITH_CHECK_PLAN =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.CHECK_START.getId(), TermId.CHECK_INTERVAL.getId(),
 			TermId.CHECK_PLAN.getId());
 
