@@ -23,6 +23,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.util.List;
 
 @Component
@@ -40,7 +41,6 @@ public class BVDesignRunner implements DesignRunner {
 	private ProcessRunner processRunner = new BVDesignProcessRunner();
 	private BVDesignOutputReader outputReader = new BVDesignOutputReader();
 	private BVDesignXmlInputWriter inputWriter = new BVDesignXmlInputWriter();
-	private static long bvDesignRunnerTimeout;
 
 	@Resource
 	private BVDesignProperties bvDesignProperties;
@@ -49,8 +49,6 @@ public class BVDesignRunner implements DesignRunner {
 	public BVDesignOutput runBVDesign(final MainDesign design) throws IOException {
 
 		final String bvDesignPath = this.bvDesignProperties.getBvDesignPath();
-
-		bvDesignRunnerTimeout = 60 * 1000 * Long.valueOf(this.bvDesignProperties.getBvDesignRunnerTimeout());
 
 		int returnCode = -1;
 
@@ -66,7 +64,7 @@ public class BVDesignRunner implements DesignRunner {
 		final BVDesignOutput output = new BVDesignOutput(returnCode);
 
 		if (returnCode == 0) {
-			output.setResults(outputReader.read(design.getDesign().getParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM)));
+			output.setResults(this.outputReader.read(design.getDesign().getParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM)));
 		}
 
 		return output;
@@ -119,6 +117,10 @@ public class BVDesignRunner implements DesignRunner {
 		this.inputWriter = inputWriter;
 	}
 
+	public void setBvDesignProperties(final BVDesignProperties bvDesignProperties) {
+		this.bvDesignProperties = bvDesignProperties;
+	}
+
 	public class BVDesignProcessRunner implements ProcessRunner {
 
 		@Override
@@ -129,7 +131,8 @@ public class BVDesignRunner implements DesignRunner {
 			final ProcessBuilder pb = new ProcessBuilder(command);
 			final Process p = pb.start();
 			// add a timeout for the design runner
-			final ProcessTimeoutThread processTimeoutThread = new ProcessTimeoutThread(p, BVDesignRunner.bvDesignRunnerTimeout);
+			final long bvDesignRunnerTimeout = 60 * 1000 * Long.valueOf(BVDesignRunner.this.bvDesignProperties.getBvDesignRunnerTimeout());
+			final ProcessTimeoutThread processTimeoutThread = new ProcessTimeoutThread(p, bvDesignRunnerTimeout);
 			processTimeoutThread.start();
 			try {
 				final InputStreamReader isr = new InputStreamReader(p.getInputStream());
@@ -167,19 +170,18 @@ public class BVDesignRunner implements DesignRunner {
 	}
 
 
-	public class BVDesignOutputReader {
+	public static class BVDesignOutputReader {
 
 		public List<String[]> read(final String filePath) throws IOException {
 
 			final File outputFile = new File(filePath);
 			final FileReader fileReader = new FileReader(outputFile);
-			final CSVReader reader = new CSVReader(fileReader);
-			final List<String[]> myEntries = reader.readAll();
-
-			fileReader.close();
-			reader.close();
-			outputFile.delete();
-
+			final List<String[]> myEntries;
+			try (final CSVReader reader = new CSVReader(fileReader)) {
+				myEntries = reader.readAll();
+				fileReader.close();
+			}
+			Files.delete(outputFile.toPath());
 			return myEntries;
 
 		}
@@ -187,7 +189,7 @@ public class BVDesignRunner implements DesignRunner {
 	}
 
 
-	public class BVDesignXmlInputWriter {
+	public static class BVDesignXmlInputWriter {
 
 		public String write(final String xml, final BVDesignProperties bvDesignProperties) {
 
@@ -195,9 +197,9 @@ public class BVDesignRunner implements DesignRunner {
 			try {
 
 				final File file = new File(filenamePath);
-				final BufferedWriter output = new BufferedWriter(new FileWriter(file));
-				output.write(xml);
-				output.close();
+				try (final BufferedWriter output = new BufferedWriter(new FileWriter(file))) {
+					output.write(xml);
+				}
 				filenamePath = file.getAbsolutePath();
 			} catch (final IOException e) {
 				BVDesignRunner.LOG.error(e.getMessage(), e);
