@@ -51,30 +51,30 @@ import java.util.stream.Collectors;
 @Component
 public class ExperimentDesignGenerator {
 
-	private static final String NCLATIN_PARAM = "nclatin";
-	private static final String NRLATIN_PARAM = "nrlatin";
-	static final String REPLATINGROUPS_PARAM = "replatingroups";
-	private static final String COLUMNFACTOR_PARAM = "columnfactor";
-	private static final String ROWFACTOR_PARAM = "rowfactor";
+	public static final String NCLATIN_PARAM = "nclatin";
+	public static final String NRLATIN_PARAM = "nrlatin";
+	public static final String REPLATINGROUPS_PARAM = "replatingroups";
+	public static final String COLUMNFACTOR_PARAM = "columnfactor";
+	public static final String ROWFACTOR_PARAM = "rowfactor";
 	public static final String NCOLUMNS_PARAM = "ncolumns";
 	public static final String NROWS_PARAM = "nrows";
-	static final String NBLATIN_PARAM = "nblatin";
-	static final String REPLICATEFACTOR_PARAM = "replicatefactor";
-	static final String TREATMENTFACTOR_PARAM = "treatmentfactor";
+	public static final String NBLATIN_PARAM = "nblatin";
+	public static final String REPLICATEFACTOR_PARAM = "replicatefactor";
+	public static final String TREATMENTFACTOR_PARAM = "treatmentfactor";
 	public static final String INITIAL_TREATMENT_NUMBER_PARAM = "initialtreatnum";
 	public static final String NREPLICATES_PARAM = "nreplicates";
 	public static final String NTREATMENTS_PARAM = "ntreatments";
-	static final String BLOCKSIZE_PARAM = "blocksize";
-	static final String TIMELIMIT_PARAM = "timelimit";
+	public static final String BLOCKSIZE_PARAM = "blocksize";
+	public static final String TIMELIMIT_PARAM = "timelimit";
 	public static final String LEVELS_PARAM = "levels";
 	public static final String TREATMENTFACTORS_PARAM = "treatmentfactors";
-	static final String PLOTFACTOR_PARAM = "plotfactor";
+	public static final String PLOTFACTOR_PARAM = "plotfactor";
 	public static final String INITIAL_PLOT_NUMBER_PARAM = "initialplotnum";
-	static final String BLOCKFACTOR_PARAM = "blockfactor";
+	public static final String BLOCKFACTOR_PARAM = "blockfactor";
 	public static final String NBLOCKS_PARAM = "nblocks";
 	public static final String OUTPUTFILE_PARAM = "outputfile";
 	public static final String SEED_PARAM = "seed";
-	static final String NCONTROLS_PARAM = "ncontrols";
+	public static final String NCONTROLS_PARAM = "ncontrols";
 	public static final String NUMBER_TRIALS_PARAM = "numbertrials";
 	public static final String NREPEATS_PARAM = "nrepeats";
 
