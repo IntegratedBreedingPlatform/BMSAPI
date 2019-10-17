@@ -1,17 +1,9 @@
 package org.ibp.api.java.impl.middleware.design.generator;
 
 import org.generationcp.commons.constant.AppConstants;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.commons.parsing.pojo.ImportedGermplasm;
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.ExpDesign;
@@ -20,11 +12,8 @@ import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.runner.DesignRunner;
-import org.ibp.api.java.impl.middleware.design.transformer.StandardVariableTransformer;
 import org.ibp.api.java.impl.middleware.design.type.StudyGermplasmTestDataGenerator;
-import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.BVDesignProperties;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,17 +29,16 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExperimentDesignGeneratorTest {
 	private static final String TRIAL_NO = "TRIAL_NO";
-	public static final String BLOCK_NO = "BLOCK_NO";
+	private static final String BLOCK_NO = "BLOCK_NO";
 	public static final String PLOT_NO = "PLOT_NO";
 	public static final String ENTRY_NO = "ENTRY_NO";
-	public static final String REP_NO = "REP_NO";
-	public static final Integer NBLOCK = 2;
-	public static final String OUTPUT_FILE = "outputfile.csv";
+	private static final String REP_NO = "REP_NO";
+	private static final Integer NBLOCK = 2;
+	private static final String OUTPUT_FILE = "outputfile.csv";
 
 	private static final int ENTRY_NO_9 = 9;
 	private static final int ENTRY_NO_3 = 3;
@@ -62,18 +50,6 @@ public class ExperimentDesignGeneratorTest {
 
 	@Mock
 	private DesignRunner designRunner;
-
-	@Mock
-	private StudyDataManager studyDataManager;
-
-	@Mock
-	private DatasetService datasetService;
-
-	@Mock
-	private OntologyDataManager ontologyDataManager;
-
-	@Mock
-	private StandardVariableTransformer standardVariableTransformer;
 
 	@Test
 	public void testCreateRandomizedCompleteBlockDesign() {
@@ -192,7 +168,7 @@ public class ExperimentDesignGeneratorTest {
 	}
 
 	@Test
-	public void testCeateAugmentedRandomizedBlockDesign() {
+	public void testCreateAugmentedRandomizedBlockDesign() {
 
 		final Integer numberOfBlocks = 2;
 		final Integer numberOfTreatments = 22;
@@ -494,19 +470,10 @@ public class ExperimentDesignGeneratorTest {
 			.thenReturn(this.createBvOutput(numberOfInstances));
 	}
 
-	private BVDesignOutput createBvOutput(int numberOfInstances) {
+	private BVDesignOutput createBvOutput(final int numberOfInstances) {
 		final BVDesignOutput bvOutput = new BVDesignOutput(0);
 		bvOutput.setResults(this.createEntries(numberOfInstances, 2, 5));
 		return bvOutput;
-	}
-
-	private List<StandardVariable> createRequiredVariables() {
-		final List<StandardVariable> reqVariables = new ArrayList<>();
-
-		reqVariables.add(this.createStandardVariable(TermId.REP_NO.getId(), ExperimentDesignGeneratorTest.REP_NO));
-		reqVariables.add(this.createStandardVariable(TermId.PLOT_NO.getId(), ExperimentDesignGeneratorTest.PLOT_NO));
-
-		return reqVariables;
 	}
 
 	private StandardVariable createStandardVariable(final int id, final String name) {
