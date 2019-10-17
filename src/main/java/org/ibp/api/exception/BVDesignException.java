@@ -9,7 +9,7 @@ public class BVDesignException extends RuntimeException {
 	private static final long serialVersionUID = 24993039887181720L;
 	private String bvErrorCode;
 
-	public BVDesignException(String bvErrorCode) {
+	public BVDesignException(final String bvErrorCode) {
 		super();
 		this.bvErrorCode = bvErrorCode;
 	}

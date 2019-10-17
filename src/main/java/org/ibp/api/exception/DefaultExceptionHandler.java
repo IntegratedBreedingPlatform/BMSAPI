@@ -1,14 +1,9 @@
 
 package org.ibp.api.exception;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CONFLICT;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.NOT_IMPLEMENTED;
-import static org.springframework.http.HttpStatus.PRECONDITION_FAILED;
-
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.slf4j.Logger;
@@ -27,11 +22,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
-
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NOT_IMPLEMENTED;
+import static org.springframework.http.HttpStatus.PRECONDITION_FAILED;
 
 @ControllerAdvice
 public class DefaultExceptionHandler {
@@ -181,6 +180,23 @@ public class DefaultExceptionHandler {
 		final ErrorResponse response = new ErrorResponse();
 		DefaultExceptionHandler.LOG.error("BVDesign app failed to execute.", ex);
 		response.addError(this.messageSource.getMessage(ex.getBvErrorCode(), null, LocaleContextHolder.getLocale()));
+		return response;
+	}
+
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ExceptionHandler(BVLicenseParseException.class)
+	@ResponseStatus(value = PRECONDITION_FAILED)
+	@ResponseBody
+	public ErrorResponse handleBVLicenseParseException(final BVLicenseParseException ex) {
+		LOG.error("Error executing the API call.", ex);
+		final ErrorResponse response = new ErrorResponse();
+		final String mainError = this.messageSource.getMessage(ex.getBvErrorCode(), null, LocaleContextHolder.getLocale());
+		DefaultExceptionHandler.LOG.error("BVDesign license checking failed: " + mainError, ex);
+		final StringBuilder sb = new StringBuilder(mainError);
+		if (ex.getMessageFromApp() != null) {
+			sb.append(ex.getMessageFromApp());
+		}
+		response.addError(sb.toString());
 		return response;
 	}
 
