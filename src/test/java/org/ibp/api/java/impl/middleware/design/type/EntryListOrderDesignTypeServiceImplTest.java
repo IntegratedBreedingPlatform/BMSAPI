@@ -48,15 +48,6 @@ public class EntryListOrderDesignTypeServiceImplTest {
 
 	private static final String PROGRAM_UUID = RandomStringUtils.randomAlphanumeric(10);
 
-	@Before
-	public void init() {
-
-		when(this.ontologyDataManager
-			.getStandardVariables(AugmentedRandomizedBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES, PROGRAM_UUID))
-			.thenReturn(this.createTestStandardVariables());
-
-	}
-
 	@Test
 	public void testGenerateDesign() {
 
