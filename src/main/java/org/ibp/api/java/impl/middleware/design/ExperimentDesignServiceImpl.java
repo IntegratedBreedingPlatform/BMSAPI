@@ -10,6 +10,7 @@ import org.ibp.api.java.design.ExperimentDesignService;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.design.type.ExperimentDesignTypeServiceFactory;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidator;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
@@ -33,6 +34,9 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 
 	@Resource
 	private StudyValidator studyValidator;
+
+	@Resource
+	private ExperimentDesignValidator experimentDesignValidator;
 
 	@Autowired
 	private StudyService studyService;
@@ -83,6 +87,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	@Override
 	public void deleteDesign(final int studyId) {
 		this.studyValidator.validate(studyId, true);
+		this.experimentDesignValidator.validateExperimentDesignExistence(studyId, true);
 		this.experimentDesignMiddlewareService.deleteExperimentDesign(studyId);
 	}
 

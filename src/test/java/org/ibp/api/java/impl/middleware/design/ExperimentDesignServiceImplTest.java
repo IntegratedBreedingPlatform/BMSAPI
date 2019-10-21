@@ -11,6 +11,7 @@ import org.ibp.api.java.design.DesignLicenseService;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.design.type.ExperimentDesignTypeServiceFactory;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidator;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
@@ -34,6 +35,9 @@ public class ExperimentDesignServiceImplTest {
 
 	@Mock
 	private StudyValidator studyValidator;
+
+	@Mock
+	private ExperimentDesignValidator experimentDesignValidator;
 
 	@Mock
 	private StudyService studyService;
@@ -97,6 +101,7 @@ public class ExperimentDesignServiceImplTest {
 	public void testDeleteDesign() {
 		this.experimentDesignService.deleteDesign(STUDY_ID);
 		Mockito.verify(this.studyValidator).validate(STUDY_ID, true);
+		Mockito.verify(this.experimentDesignValidator).validateExperimentDesignExistence(STUDY_ID, true);
 		Mockito.verify(this.middlewareExperimentDesignService).deleteExperimentDesign(STUDY_ID);
 	}
 
