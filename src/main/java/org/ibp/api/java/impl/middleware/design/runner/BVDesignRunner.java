@@ -45,7 +45,7 @@ public class BVDesignRunner implements DesignRunner {
 	private String uploadDirectory;
 
 	@Value("bv.design.runner.timeout")
-	private Integer bvDesignRunnerTimeout;
+	private String bvDesignRunnerTimeout;
 
 	@Value("bv.design.path")
 	private String bvDesignPath;
@@ -209,7 +209,7 @@ public class BVDesignRunner implements DesignRunner {
 		this.uploadDirectory = uploadDirectory;
 	}
 
-	public void setBvDesignRunnerTimeout(final Integer bvDesignRunnerTimeout) {
+	public void setBvDesignRunnerTimeout(final String bvDesignRunnerTimeout) {
 		this.bvDesignRunnerTimeout = bvDesignRunnerTimeout;
 	}
 
