@@ -10,7 +10,6 @@ public class BVDesignException extends RuntimeException {
 	private String bvErrorCode;
 
 	public BVDesignException(final String bvErrorCode) {
-		super();
 		this.bvErrorCode = bvErrorCode;
 	}
 

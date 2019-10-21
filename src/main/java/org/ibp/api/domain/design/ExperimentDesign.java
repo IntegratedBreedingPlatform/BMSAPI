@@ -7,21 +7,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExpDesign implements Serializable {
+public class ExperimentDesign implements Serializable {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 7602199355069487753L;
 	private String name;
-	private List<ExpDesignParameter> parameters;
+	private List<ExperimentDesignParameter> parameters;
 
-	public ExpDesign() {
-		super();
-	}
-
-	public ExpDesign(String name, List<ExpDesignParameter> parameters) {
-		super();
+	public ExperimentDesign(final String name, final List<ExperimentDesignParameter> parameters) {
 		this.name = name;
 		this.parameters = parameters;
 	}
@@ -31,23 +26,23 @@ public class ExpDesign implements Serializable {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
 	@XmlElement(name = "Parameter")
-	public List<ExpDesignParameter> getParameters() {
+	public List<ExperimentDesignParameter> getParameters() {
 		return this.parameters;
 	}
 
-	public void setParameters(List<ExpDesignParameter> parameters) {
+	public void setParameters(final List<ExperimentDesignParameter> parameters) {
 		this.parameters = parameters;
 	}
 
-	public void setParameterValue(String name, String value) {
+	public void setParameterValue(final String name, final String value) {
 		boolean isFound = false;
 		if (this.parameters != null) {
-			for (ExpDesignParameter param : this.parameters) {
+			for (final ExperimentDesignParameter param : this.parameters) {
 				if (name != null && param.getName() != null && param.getName().equalsIgnoreCase(name)) {
 					param.setValue(value);
 					isFound = true;
@@ -57,15 +52,15 @@ public class ExpDesign implements Serializable {
 		}
 		if (!isFound) {
 			if (this.parameters == null) {
-				this.parameters = new ArrayList<ExpDesignParameter>();
+				this.parameters = new ArrayList<>();
 			}
-			this.parameters.add(new ExpDesignParameter(name, value));
+			this.parameters.add(new ExperimentDesignParameter(name, value));
 		}
 	}
 
-	public String getParameterValue(String name) {
+	public String getParameterValue(final String name) {
 		if (this.parameters != null) {
-			for (ExpDesignParameter param : this.parameters) {
+			for (final ExperimentDesignParameter param : this.parameters) {
 				if (name != null && param.getName() != null && param.getName().equalsIgnoreCase(name)) {
 					return param.getValue();
 				}
@@ -74,14 +69,14 @@ public class ExpDesign implements Serializable {
 		return "";
 	}
 
-	public List<ListItem> getParameterList(String name) {
+	public List<ExperimentDesignParameterListItem> getParameterList(final String name) {
 		if (this.parameters != null) {
-			for (ExpDesignParameter param : this.parameters) {
+			for (final ExperimentDesignParameter param : this.parameters) {
 				if (name != null && param.getName() != null && param.getName().equalsIgnoreCase(name)) {
 					return param.getListItem();
 				}
 			}
 		}
-		return new ArrayList<ListItem>();
+		return new ArrayList<>();
 	}
 }

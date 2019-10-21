@@ -7,7 +7,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
-import org.ibp.api.domain.design.ListItem;
+import org.ibp.api.domain.design.ExperimentDesignParameterListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
@@ -67,7 +67,7 @@ public class PRepDesignTypeServiceImplTest {
 		final MainDesign mainDesign = new MainDesign();
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final List<ObservationUnitRow> observationUnitRowList = new ArrayList<>();
-		final List<ListItem> replicationListItems = new ArrayList<>();
+		final List<ExperimentDesignParameterListItem> replicationListItems = new ArrayList<>();
 
 		final int studyId = 1;
 		final int numberOfTreatments = 10;

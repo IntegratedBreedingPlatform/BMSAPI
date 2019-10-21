@@ -11,7 +11,7 @@ import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.transformer.StandardVariableTransformer;
-import org.ibp.api.java.impl.middleware.design.util.ExpDesignUtil;
+import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
@@ -168,7 +168,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 		final List<String> treatmentFactors = new ArrayList<>();
 		final Set<String> keySet = treatmentFactorValues.keySet();
 		for (final String key : keySet) {
-			treatmentFactors.add(ExpDesignUtil.cleanBVDesingKey(key));
+			treatmentFactors.add(ExperimentalDesignUtil.cleanBVDesignKey(key));
 		}
 		return treatmentFactors;
 	}

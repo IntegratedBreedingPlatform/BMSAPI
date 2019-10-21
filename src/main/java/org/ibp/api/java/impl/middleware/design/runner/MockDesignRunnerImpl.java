@@ -5,8 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.ibp.api.domain.design.BVDesignOutput;
-import org.ibp.api.domain.design.ExpDesign;
-import org.ibp.api.domain.design.ListItem;
+import org.ibp.api.domain.design.ExperimentDesign;
+import org.ibp.api.domain.design.ExperimentDesignParameterListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
@@ -35,36 +35,36 @@ public class MockDesignRunnerImpl implements DesignRunner {
 	@Override
 	public BVDesignOutput runBVDesign(final MainDesign design) {
 
-		final ExpDesign expDesign = design.getDesign();
+		final ExperimentDesign experimentDesign = design.getDesign();
 
 		final int numberOfTreatments = this.getNumberOfTreatments(design);
 		final int replications = this.getNumberOfReplications(design);
-		final String numberTrialsParam = expDesign.getParameterValue(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM);
+		final String numberTrialsParam = experimentDesign.getParameterValue(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM);
 		final int numberTrials = StringUtils.isNumeric(numberTrialsParam) ? Integer.valueOf(numberTrialsParam) : 1;
 
-		final String initEntryNoParam = expDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM);
+		final String initEntryNoParam = experimentDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM);
 		int startingEntryNo = StringUtils.isNumeric(initEntryNoParam) ? Integer.valueOf(initEntryNoParam) : 1;
 
-		final String blockSizeParam = expDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM);
+		final String blockSizeParam = experimentDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM);
 		final int blockSize = StringUtils.isNumeric(blockSizeParam) ? Integer.valueOf(blockSizeParam) : 1;
 
 		final List<Integer> entryNumbers = new ArrayList<>();
 		for (int i = 1; i <= numberOfTreatments; i++) {
 			entryNumbers.add(startingEntryNo++);
 		}
-		final String initPlotNoParam = expDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM);
+		final String initPlotNoParam = experimentDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM);
 
-		final List<List<String>> tfValuesListForCSV = this.getTreatmentFactorValuesCombinations(expDesign);
+		final List<List<String>> tfValuesListForCSV = this.getTreatmentFactorValuesCombinations(experimentDesign);
 		final List<String[]> csvLines = new ArrayList<>();
 
-		if (ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN.equals(expDesign.getName())) {
+		if (ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN.equals(experimentDesign.getName())) {
 			csvLines
 				.addAll(this.createDesignDataForRandomizedBlockDesign(design, numberTrials, initPlotNoParam, replications, entryNumbers,
 					tfValuesListForCSV));
-		} else if (ExperimentDesignGenerator.RESOLVABLE_ROW_COL_DESIGN.equals(expDesign.getName())) {
+		} else if (ExperimentDesignGenerator.RESOLVABLE_ROW_COL_DESIGN.equals(experimentDesign.getName())) {
 			csvLines.addAll(
 				this.createDesignDataForResolvableRowColumnDesign(design, numberTrials, initPlotNoParam, replications, entryNumbers));
-		} else if (ExperimentDesignGenerator.P_REP_DESIGN.equals(expDesign.getName())) {
+		} else if (ExperimentDesignGenerator.P_REP_DESIGN.equals(experimentDesign.getName())) {
 			csvLines.addAll(this.createDesignDataForPRepDesign(design, numberTrials, blockSize, initPlotNoParam, entryNumbers));
 		} else {
 			// Default data
@@ -108,12 +108,12 @@ public class MockDesignRunnerImpl implements DesignRunner {
 		final MainDesign design, final int numberTrials, final String initPlotNoParam, final int replications,
 		final List<Integer> entryNumbers, final List<List<String>> tfValuesList) {
 		final List<String[]> csvLines = new ArrayList<>();
-		final ExpDesign expDesign = design.getDesign();
+		final ExperimentDesign experimentDesign = design.getDesign();
 		// Add header
 		final List<String> constants = Arrays.asList(TRIAL, PLOT_NO, REP_NO);
 		final List<String> headers = new ArrayList<>(constants);
-		final List<ListItem> treatmentFactorsList = expDesign.getParameterList(ExperimentDesignGenerator.TREATMENTFACTORS_PARAM);
-		for (final ListItem item : treatmentFactorsList) {
+		final List<ExperimentDesignParameterListItem> treatmentFactorsList = experimentDesign.getParameterList(ExperimentDesignGenerator.TREATMENTFACTORS_PARAM);
+		for (final ExperimentDesignParameterListItem item : treatmentFactorsList) {
 			headers.add(item.getValue());
 		}
 		final String[] headersAsArray = new String[headers.size()];
@@ -161,11 +161,11 @@ public class MockDesignRunnerImpl implements DesignRunner {
 		final MainDesign design, final int numberTrials, final String initPlotNoParam, final int replications,
 		final List<Integer> entryNumbers) {
 		final List<String[]> csvLines = new ArrayList<>();
-		final ExpDesign expDesign = design.getDesign();
+		final ExperimentDesign experimentDesign = design.getDesign();
 
 		final List<Pair<Integer, Integer>> rowColTuples = new ArrayList<>();
-		final int rows = Integer.parseInt(expDesign.getParameterValue(ExperimentDesignGenerator.NROWS_PARAM));
-		final int cols = Integer.parseInt(expDesign.getParameterValue(ExperimentDesignGenerator.NCOLUMNS_PARAM));
+		final int rows = Integer.parseInt(experimentDesign.getParameterValue(ExperimentDesignGenerator.NROWS_PARAM));
+		final int cols = Integer.parseInt(experimentDesign.getParameterValue(ExperimentDesignGenerator.NCOLUMNS_PARAM));
 
 		for (int r = 1; r <= rows; r++) {
 			for (int c = 1; c <= cols; c++) {
@@ -210,14 +210,14 @@ public class MockDesignRunnerImpl implements DesignRunner {
 		// Add header
 		csvLines.add(new String[] {TRIAL, PLOT_NO, BLOCK_NO, ENTRY_NO});
 
-		final List<ListItem> nRepeats = design.getDesign().getParameterList(ExperimentDesignGenerator.NREPEATS_PARAM);
+		final List<ExperimentDesignParameterListItem> nRepeats = design.getDesign().getParameterList(ExperimentDesignGenerator.NREPEATS_PARAM);
 
 		for (int instance = 1; instance <= numberTrials; instance++) {
 			int startingPlotNo = StringUtils.isNumeric(initPlotNoParam) ? Integer.valueOf(initPlotNoParam) : 1;
 
 			final List<Integer> replicatedEntryNumbers = new ArrayList<>();
 			int entryIndex = 0;
-			for (final ListItem listItem : nRepeats) {
+			for (final ExperimentDesignParameterListItem listItem : nRepeats) {
 				final int replicates = Integer.parseInt(listItem.getValue());
 				for (int i = 0; i < replicates; i++) {
 					replicatedEntryNumbers.add(entryNumbers.get(entryIndex));
@@ -254,10 +254,10 @@ public class MockDesignRunnerImpl implements DesignRunner {
 		return csvLines;
 	}
 
-	public List<List<String>> getTreatmentFactorValuesCombinations(final ExpDesign expDesign) {
-		final List<ListItem> levelList = expDesign.getParameterList(ExperimentDesignGenerator.LEVELS_PARAM);
+	public List<List<String>> getTreatmentFactorValuesCombinations(final ExperimentDesign experimentDesign) {
+		final List<ExperimentDesignParameterListItem> levelList = experimentDesign.getParameterList(ExperimentDesignGenerator.LEVELS_PARAM);
 		final List<List<String>> tfValuesListForCSV = new ArrayList<>();
-		if (ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN.equals(expDesign.getName()) && levelList.size() != 1) {
+		if (ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN.equals(experimentDesign.getName()) && levelList.size() != 1) {
 			//Create the lists of treatment factor values
 			final List<List<String>> tfValuesList = new ArrayList<>();
 			for (int tfIndex = 0; tfIndex < levelList.size() - 1; tfIndex++) {
@@ -297,26 +297,26 @@ public class MockDesignRunnerImpl implements DesignRunner {
 	}
 
 	private int getNumberOfTreatments(final MainDesign design) {
-		final ExpDesign expDesign = design.getDesign();
-		if (ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN.equals(expDesign.getName())) {
-			final List<ListItem> levelList = expDesign.getParameterList(ExperimentDesignGenerator.LEVELS_PARAM);
+		final ExperimentDesign experimentDesign = design.getDesign();
+		if (ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN.equals(experimentDesign.getName())) {
+			final List<ExperimentDesignParameterListItem> levelList = experimentDesign.getParameterList(ExperimentDesignGenerator.LEVELS_PARAM);
 			return Integer.parseInt(levelList.get(levelList.size() - 1).getValue());
 		} else {
-			return Integer.parseInt(expDesign.getParameterValue(ExperimentDesignGenerator.NTREATMENTS_PARAM));
+			return Integer.parseInt(experimentDesign.getParameterValue(ExperimentDesignGenerator.NTREATMENTS_PARAM));
 		}
 	}
 
 	private int getNumberOfReplications(final MainDesign design) {
-		final ExpDesign expDesign = design.getDesign();
-		if (ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN.equals(expDesign.getName())) {
-			return Integer.parseInt(expDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM));
-		} else if (ExperimentDesignGenerator.AUGMENTED_RANDOMIZED_BLOCK_DESIGN.equals(expDesign.getName())) {
-			return Integer.parseInt(expDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM));
-		} else if (ExperimentDesignGenerator.P_REP_DESIGN.equals(expDesign.getName())) {
+		final ExperimentDesign experimentDesign = design.getDesign();
+		if (ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN.equals(experimentDesign.getName())) {
+			return Integer.parseInt(experimentDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM));
+		} else if (ExperimentDesignGenerator.AUGMENTED_RANDOMIZED_BLOCK_DESIGN.equals(experimentDesign.getName())) {
+			return Integer.parseInt(experimentDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM));
+		} else if (ExperimentDesignGenerator.P_REP_DESIGN.equals(experimentDesign.getName())) {
 			// If P-rep design, the replicates number is specified in nrepeats list items.
 			return 0;
 		} else {
-			return Integer.parseInt(expDesign.getParameterValue(ExperimentDesignGenerator.NREPLICATES_PARAM));
+			return Integer.parseInt(experimentDesign.getParameterValue(ExperimentDesignGenerator.NREPLICATES_PARAM));
 		}
 	}
 

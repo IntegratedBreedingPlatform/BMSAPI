@@ -11,7 +11,6 @@ public class BVDesignTrialInstance {
 
 
 	public BVDesignTrialInstance(final Integer instanceNumber, final List<Map<String, String>> rows) {
-		super();
 		this.instanceNumber = instanceNumber;
 		this.rows = rows;
 	}

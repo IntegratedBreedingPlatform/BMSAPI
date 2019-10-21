@@ -3,7 +3,7 @@ package org.ibp.api.java.impl.middleware.design.runner;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.BVDesignTrialInstance;
-import org.ibp.api.domain.design.ExpDesignParameter;
+import org.ibp.api.domain.design.ExperimentDesignParameter;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.junit.Assert;
@@ -28,7 +28,7 @@ public class MockDesignRunnerImplTest {
 				Collections.singletonList("20"),
 				"mock-bv-out.csv");
 		// Configure number of instances to be generated
-		mainDesign.getDesign().getParameters().add(new ExpDesignParameter(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM, "2"));
+		mainDesign.getDesign().getParameters().add(new ExperimentDesignParameter(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM, "2"));
 
 		try {
 			final BVDesignOutput output = this.mockDesignRunner.runBVDesign(mainDesign);
@@ -52,7 +52,7 @@ public class MockDesignRunnerImplTest {
 				Arrays.asList("_8260", "_8261", "ENTRY_NO"), Arrays.asList("3", "2", "20"),
 				"mock-bv-out.csv");
 		// Configure number of instances to be generated
-		mainDesign.getDesign().getParameters().add(new ExpDesignParameter(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM, "2"));
+		mainDesign.getDesign().getParameters().add(new ExperimentDesignParameter(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM, "2"));
 
 		try {
 			final BVDesignOutput output = this.mockDesignRunner.runBVDesign(mainDesign);
@@ -75,7 +75,7 @@ public class MockDesignRunnerImplTest {
 			.createResolvableIncompleteBlockDesign(2, 20, 2, "ENTRY_NO", "REP_NO", "BLOCK_NO", "PLOT_NO", 10, null, null,
 				"mock-bv-out.csv", false);
 		// Configure number of instances to be generated
-		mainDesign.getDesign().getParameters().add(new ExpDesignParameter(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM, "3"));
+		mainDesign.getDesign().getParameters().add(new ExperimentDesignParameter(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM, "3"));
 
 		try {
 			final BVDesignOutput output = this.mockDesignRunner.runBVDesign(mainDesign);
@@ -98,7 +98,7 @@ public class MockDesignRunnerImplTest {
 			.createResolvableRowColDesign(20, 2, 2, 10, "ENTRY_NO", "REP_NO", "ROW", "COL", "PLOT_NO", 10, null, null, "",
 				"mock-bv-out.csv", false);
 		// Configure number of instances to be generated
-		mainDesign.getDesign().getParameters().add(new ExpDesignParameter(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM, "5"));
+		mainDesign.getDesign().getParameters().add(new ExperimentDesignParameter(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM, "5"));
 
 		try {
 			final BVDesignOutput output = this.mockDesignRunner.runBVDesign(mainDesign);

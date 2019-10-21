@@ -12,23 +12,18 @@ public class MainDesign implements Serializable {
 	 *
 	 */
 	private static final long serialVersionUID = 3881877704058005795L;
-	private ExpDesign design;
+	private ExperimentDesign design;
 
-	public MainDesign() {
-
-	}
-
-	public MainDesign(ExpDesign design) {
-		super();
+	public MainDesign(final ExperimentDesign design) {
 		this.design = design;
 	}
 
 	@XmlElement(name = "Template")
-	public ExpDesign getDesign() {
+	public ExperimentDesign getDesign() {
 		return this.design;
 	}
 
-	public void setDesign(ExpDesign design) {
+	public void setDesign(final ExperimentDesign design) {
 		this.design = design;
 	}
 

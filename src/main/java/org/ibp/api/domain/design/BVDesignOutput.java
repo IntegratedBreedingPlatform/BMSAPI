@@ -15,7 +15,6 @@ public class BVDesignOutput implements Serializable {
 	private List<BVDesignTrialInstance> trialInstances;
 
 	public BVDesignOutput(int returnCode) {
-		super();
 		this.returnCode = returnCode;
 	}
 

@@ -6,9 +6,9 @@ import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.BVDesignOutput;
-import org.ibp.api.domain.design.ExpDesign;
-import org.ibp.api.domain.design.ExpDesignParameter;
-import org.ibp.api.domain.design.ListItem;
+import org.ibp.api.domain.design.ExperimentDesign;
+import org.ibp.api.domain.design.ExperimentDesignParameter;
+import org.ibp.api.domain.design.ExperimentDesignParameterListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.runner.DesignRunner;
@@ -63,25 +63,25 @@ public class ExperimentDesignGeneratorTest {
 				treatmentFactors,
 				levels, OUTPUT_FILE);
 
-		final ExpDesign expDesign = mainDesign.getDesign();
+		final ExperimentDesign experimentDesign = mainDesign.getDesign();
 
-		Assert.assertEquals(ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN, expDesign.getName());
-		Assert.assertEquals("", expDesign.getParameterValue(ExperimentDesignGenerator.SEED_PARAM));
-		Assert.assertEquals(String.valueOf(NBLOCK), expDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM));
-		Assert.assertEquals(BLOCK_NO, expDesign.getParameterValue(ExperimentDesignGenerator.BLOCKFACTOR_PARAM));
-		Assert.assertEquals(PLOT_NO, expDesign.getParameterValue(ExperimentDesignGenerator.PLOTFACTOR_PARAM));
+		Assert.assertEquals(ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN, experimentDesign.getName());
+		Assert.assertEquals("", experimentDesign.getParameterValue(ExperimentDesignGenerator.SEED_PARAM));
+		Assert.assertEquals(String.valueOf(NBLOCK), experimentDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM));
+		Assert.assertEquals(BLOCK_NO, experimentDesign.getParameterValue(ExperimentDesignGenerator.BLOCKFACTOR_PARAM));
+		Assert.assertEquals(PLOT_NO, experimentDesign.getParameterValue(ExperimentDesignGenerator.PLOTFACTOR_PARAM));
 		Assert.assertEquals(
 			String.valueOf(initialPlotNumber),
-			expDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM));
+			experimentDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM));
 		Assert.assertEquals(
 			treatmentFactors.size(),
-			expDesign.getParameterList(ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM).size());
-		Assert.assertEquals(treatmentFactors.size(), expDesign.getParameterList(ExperimentDesignGenerator.TREATMENTFACTORS_PARAM).size());
-		Assert.assertEquals(levels.size(), expDesign.getParameterList(ExperimentDesignGenerator.LEVELS_PARAM).size());
+			experimentDesign.getParameterList(ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM).size());
+		Assert.assertEquals(treatmentFactors.size(), experimentDesign.getParameterList(ExperimentDesignGenerator.TREATMENTFACTORS_PARAM).size());
+		Assert.assertEquals(levels.size(), experimentDesign.getParameterList(ExperimentDesignGenerator.LEVELS_PARAM).size());
 		Assert.assertEquals(
 			AppConstants.EXP_DESIGN_TIME_LIMIT.getString(),
-			expDesign.getParameterValue(ExperimentDesignGenerator.TIMELIMIT_PARAM));
-		Assert.assertEquals(OUTPUT_FILE, expDesign.getParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM));
+			experimentDesign.getParameterValue(ExperimentDesignGenerator.TIMELIMIT_PARAM));
+		Assert.assertEquals(OUTPUT_FILE, experimentDesign.getParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM));
 
 	}
 
@@ -99,29 +99,29 @@ public class ExperimentDesignGeneratorTest {
 			.createResolvableIncompleteBlockDesign(blockSize, numberOfTreatments, numberOfReplicates, ENTRY_NO, REP_NO, BLOCK_NO,
 				PLOT_NO, initialPlotNumber, nBLatin, replatinGroups,  OUTPUT_FILE,false);
 
-		final ExpDesign expDesign = mainDesign.getDesign();
+		final ExperimentDesign experimentDesign = mainDesign.getDesign();
 
-		Assert.assertEquals(ExperimentDesignGenerator.RESOLVABLE_INCOMPLETE_BLOCK_DESIGN, expDesign.getName());
-		Assert.assertEquals("", expDesign.getParameterValue(ExperimentDesignGenerator.SEED_PARAM));
-		Assert.assertEquals(String.valueOf(blockSize), expDesign.getParameterValue(ExperimentDesignGenerator.BLOCKSIZE_PARAM));
-		Assert.assertEquals(String.valueOf(numberOfTreatments), expDesign.getParameterValue(ExperimentDesignGenerator.NTREATMENTS_PARAM));
-		Assert.assertEquals(String.valueOf(numberOfReplicates), expDesign.getParameterValue(ExperimentDesignGenerator.NREPLICATES_PARAM));
+		Assert.assertEquals(ExperimentDesignGenerator.RESOLVABLE_INCOMPLETE_BLOCK_DESIGN, experimentDesign.getName());
+		Assert.assertEquals("", experimentDesign.getParameterValue(ExperimentDesignGenerator.SEED_PARAM));
+		Assert.assertEquals(String.valueOf(blockSize), experimentDesign.getParameterValue(ExperimentDesignGenerator.BLOCKSIZE_PARAM));
+		Assert.assertEquals(String.valueOf(numberOfTreatments), experimentDesign.getParameterValue(ExperimentDesignGenerator.NTREATMENTS_PARAM));
+		Assert.assertEquals(String.valueOf(numberOfReplicates), experimentDesign.getParameterValue(ExperimentDesignGenerator.NREPLICATES_PARAM));
 		Assert.assertEquals(
 			"1",
-			expDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM));
-		Assert.assertEquals(REP_NO, expDesign.getParameterValue(ExperimentDesignGenerator.REPLICATEFACTOR_PARAM));
-		Assert.assertEquals(BLOCK_NO, expDesign.getParameterValue(ExperimentDesignGenerator.BLOCKFACTOR_PARAM));
-		Assert.assertEquals(PLOT_NO, expDesign.getParameterValue(ExperimentDesignGenerator.PLOTFACTOR_PARAM));
+			experimentDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM));
+		Assert.assertEquals(REP_NO, experimentDesign.getParameterValue(ExperimentDesignGenerator.REPLICATEFACTOR_PARAM));
+		Assert.assertEquals(BLOCK_NO, experimentDesign.getParameterValue(ExperimentDesignGenerator.BLOCKFACTOR_PARAM));
+		Assert.assertEquals(PLOT_NO, experimentDesign.getParameterValue(ExperimentDesignGenerator.PLOTFACTOR_PARAM));
 		Assert.assertEquals(
 			String.valueOf(initialPlotNumber),
-			expDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM));
+			experimentDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM));
 
-		Assert.assertEquals("0", expDesign.getParameterValue(ExperimentDesignGenerator.NBLATIN_PARAM));
+		Assert.assertEquals("0", experimentDesign.getParameterValue(ExperimentDesignGenerator.NBLATIN_PARAM));
 
 		Assert.assertEquals(
 			AppConstants.EXP_DESIGN_TIME_LIMIT.getString(),
-			expDesign.getParameterValue(ExperimentDesignGenerator.TIMELIMIT_PARAM));
-		Assert.assertEquals(OUTPUT_FILE, expDesign.getParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM));
+			experimentDesign.getParameterValue(ExperimentDesignGenerator.TIMELIMIT_PARAM));
+		Assert.assertEquals(OUTPUT_FILE, experimentDesign.getParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM));
 
 	}
 
@@ -139,31 +139,31 @@ public class ExperimentDesignGeneratorTest {
 			.createResolvableIncompleteBlockDesign(blockSize, numberOfTreatments, numberOfReplicates, ENTRY_NO, REP_NO, BLOCK_NO,
 				PLOT_NO, initialPlotNumber, nBLatin, replatinGroups, OUTPUT_FILE, true);
 
-		final ExpDesign expDesign = mainDesign.getDesign();
+		final ExperimentDesign experimentDesign = mainDesign.getDesign();
 
-		Assert.assertEquals(ExperimentDesignGenerator.RESOLVABLE_INCOMPLETE_BLOCK_DESIGN, expDesign.getName());
-		Assert.assertEquals("", expDesign.getParameterValue(ExperimentDesignGenerator.SEED_PARAM));
-		Assert.assertEquals(String.valueOf(blockSize), expDesign.getParameterValue(ExperimentDesignGenerator.BLOCKSIZE_PARAM));
-		Assert.assertEquals(String.valueOf(numberOfTreatments), expDesign.getParameterValue(ExperimentDesignGenerator.NTREATMENTS_PARAM));
-		Assert.assertEquals(String.valueOf(numberOfReplicates), expDesign.getParameterValue(ExperimentDesignGenerator.NREPLICATES_PARAM));
+		Assert.assertEquals(ExperimentDesignGenerator.RESOLVABLE_INCOMPLETE_BLOCK_DESIGN, experimentDesign.getName());
+		Assert.assertEquals("", experimentDesign.getParameterValue(ExperimentDesignGenerator.SEED_PARAM));
+		Assert.assertEquals(String.valueOf(blockSize), experimentDesign.getParameterValue(ExperimentDesignGenerator.BLOCKSIZE_PARAM));
+		Assert.assertEquals(String.valueOf(numberOfTreatments), experimentDesign.getParameterValue(ExperimentDesignGenerator.NTREATMENTS_PARAM));
+		Assert.assertEquals(String.valueOf(numberOfReplicates), experimentDesign.getParameterValue(ExperimentDesignGenerator.NREPLICATES_PARAM));
 		Assert.assertEquals(
 			"1",
-			expDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM));
-		Assert.assertEquals(REP_NO, expDesign.getParameterValue(ExperimentDesignGenerator.REPLICATEFACTOR_PARAM));
-		Assert.assertEquals(BLOCK_NO, expDesign.getParameterValue(ExperimentDesignGenerator.BLOCKFACTOR_PARAM));
-		Assert.assertEquals(PLOT_NO, expDesign.getParameterValue(ExperimentDesignGenerator.PLOTFACTOR_PARAM));
+			experimentDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM));
+		Assert.assertEquals(REP_NO, experimentDesign.getParameterValue(ExperimentDesignGenerator.REPLICATEFACTOR_PARAM));
+		Assert.assertEquals(BLOCK_NO, experimentDesign.getParameterValue(ExperimentDesignGenerator.BLOCKFACTOR_PARAM));
+		Assert.assertEquals(PLOT_NO, experimentDesign.getParameterValue(ExperimentDesignGenerator.PLOTFACTOR_PARAM));
 		Assert.assertEquals(
 			String.valueOf(initialPlotNumber),
-			expDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM));
+			experimentDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM));
 
 		// Latinized Parameters
-		Assert.assertEquals(String.valueOf(nBLatin), expDesign.getParameterValue(ExperimentDesignGenerator.NBLATIN_PARAM));
-		Assert.assertEquals(2, expDesign.getParameterList(ExperimentDesignGenerator.REPLATINGROUPS_PARAM).size());
+		Assert.assertEquals(String.valueOf(nBLatin), experimentDesign.getParameterValue(ExperimentDesignGenerator.NBLATIN_PARAM));
+		Assert.assertEquals(2, experimentDesign.getParameterList(ExperimentDesignGenerator.REPLATINGROUPS_PARAM).size());
 
 		Assert.assertEquals(
 			AppConstants.EXP_DESIGN_TIME_LIMIT.getString(),
-			expDesign.getParameterValue(ExperimentDesignGenerator.TIMELIMIT_PARAM));
-		Assert.assertEquals(OUTPUT_FILE, expDesign.getParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM));
+			experimentDesign.getParameterValue(ExperimentDesignGenerator.TIMELIMIT_PARAM));
+		Assert.assertEquals(OUTPUT_FILE, experimentDesign.getParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM));
 
 	}
 
@@ -179,21 +179,21 @@ public class ExperimentDesignGeneratorTest {
 			.createAugmentedRandomizedBlockDesign(
 				numberOfBlocks, numberOfTreatments, numberOfControls, startingPlotNumber, ENTRY_NO, BLOCK_NO, PLOT_NO);
 
-		final ExpDesign expDesign = mainDesign.getDesign();
+		final ExperimentDesign experimentDesign = mainDesign.getDesign();
 
-		Assert.assertEquals(ExperimentDesignGenerator.AUGMENTED_RANDOMIZED_BLOCK_DESIGN, expDesign.getName());
-		Assert.assertEquals(String.valueOf(numberOfTreatments), expDesign.getParameterValue(ExperimentDesignGenerator.NTREATMENTS_PARAM));
-		Assert.assertEquals(String.valueOf(numberOfControls), expDesign.getParameterValue(ExperimentDesignGenerator.NCONTROLS_PARAM));
-		Assert.assertEquals(String.valueOf(numberOfBlocks), expDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM));
-		Assert.assertEquals(ENTRY_NO, expDesign.getParameterValue(ExperimentDesignGenerator.TREATMENTFACTOR_PARAM));
-		Assert.assertEquals(BLOCK_NO, expDesign.getParameterValue(ExperimentDesignGenerator.BLOCKFACTOR_PARAM));
-		Assert.assertEquals(PLOT_NO, expDesign.getParameterValue(ExperimentDesignGenerator.PLOTFACTOR_PARAM));
+		Assert.assertEquals(ExperimentDesignGenerator.AUGMENTED_RANDOMIZED_BLOCK_DESIGN, experimentDesign.getName());
+		Assert.assertEquals(String.valueOf(numberOfTreatments), experimentDesign.getParameterValue(ExperimentDesignGenerator.NTREATMENTS_PARAM));
+		Assert.assertEquals(String.valueOf(numberOfControls), experimentDesign.getParameterValue(ExperimentDesignGenerator.NCONTROLS_PARAM));
+		Assert.assertEquals(String.valueOf(numberOfBlocks), experimentDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM));
+		Assert.assertEquals(ENTRY_NO, experimentDesign.getParameterValue(ExperimentDesignGenerator.TREATMENTFACTOR_PARAM));
+		Assert.assertEquals(BLOCK_NO, experimentDesign.getParameterValue(ExperimentDesignGenerator.BLOCKFACTOR_PARAM));
+		Assert.assertEquals(PLOT_NO, experimentDesign.getParameterValue(ExperimentDesignGenerator.PLOTFACTOR_PARAM));
 		Assert.assertEquals(
 			"1",
-			expDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM));
+			experimentDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM));
 		Assert.assertEquals(
 			String.valueOf(startingPlotNumber),
-			expDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM));
+			experimentDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM));
 	}
 
 	@Test
@@ -202,31 +202,31 @@ public class ExperimentDesignGeneratorTest {
 		final Integer numberOfBlocks = 2;
 		final Integer numberOfTreatments = 22;
 		final Integer startingPlotNumber = 1;
-		final List<ListItem> nRepeatsListItem = Arrays.asList(new ListItem("1"));
+		final List<ExperimentDesignParameterListItem> nRepeatsListItem = Arrays.asList(new ExperimentDesignParameterListItem("1"));
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createPRepDesign(
 				numberOfBlocks, numberOfTreatments, nRepeatsListItem, ENTRY_NO, BLOCK_NO, PLOT_NO, startingPlotNumber);
 
-		final ExpDesign expDesign = mainDesign.getDesign();
+		final ExperimentDesign experimentDesign = mainDesign.getDesign();
 
 		Assert.assertEquals(
 			AppConstants.EXP_DESIGN_TIME_LIMIT.getString(),
-			expDesign.getParameterValue(ExperimentDesignGenerator.TIMELIMIT_PARAM));
-		Assert.assertEquals(String.valueOf(numberOfTreatments), expDesign.getParameterValue(ExperimentDesignGenerator.NTREATMENTS_PARAM));
-		Assert.assertEquals(String.valueOf(numberOfBlocks), expDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM));
-		Assert.assertNull(expDesign.getParameterValue(ExperimentDesignGenerator.NREPEATS_PARAM));
-		Assert.assertSame(nRepeatsListItem, expDesign.getParameterList(ExperimentDesignGenerator.NREPEATS_PARAM));
-		Assert.assertEquals(ENTRY_NO, expDesign.getParameterValue(ExperimentDesignGenerator.TREATMENTFACTOR_PARAM));
-		Assert.assertEquals(BLOCK_NO, expDesign.getParameterValue(ExperimentDesignGenerator.BLOCKFACTOR_PARAM));
-		Assert.assertEquals(PLOT_NO, expDesign.getParameterValue(ExperimentDesignGenerator.PLOTFACTOR_PARAM));
+			experimentDesign.getParameterValue(ExperimentDesignGenerator.TIMELIMIT_PARAM));
+		Assert.assertEquals(String.valueOf(numberOfTreatments), experimentDesign.getParameterValue(ExperimentDesignGenerator.NTREATMENTS_PARAM));
+		Assert.assertEquals(String.valueOf(numberOfBlocks), experimentDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM));
+		Assert.assertNull(experimentDesign.getParameterValue(ExperimentDesignGenerator.NREPEATS_PARAM));
+		Assert.assertSame(nRepeatsListItem, experimentDesign.getParameterList(ExperimentDesignGenerator.NREPEATS_PARAM));
+		Assert.assertEquals(ENTRY_NO, experimentDesign.getParameterValue(ExperimentDesignGenerator.TREATMENTFACTOR_PARAM));
+		Assert.assertEquals(BLOCK_NO, experimentDesign.getParameterValue(ExperimentDesignGenerator.BLOCKFACTOR_PARAM));
+		Assert.assertEquals(PLOT_NO, experimentDesign.getParameterValue(ExperimentDesignGenerator.PLOTFACTOR_PARAM));
 		Assert.assertEquals(
 			String.valueOf(1),
-			expDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM));
+			experimentDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM));
 		Assert.assertEquals(
 			String.valueOf(startingPlotNumber),
-			expDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM));
-		Assert.assertEquals(ExperimentDesignGenerator.P_REP_DESIGN, expDesign.getName());
+			experimentDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM));
+		Assert.assertEquals(ExperimentDesignGenerator.P_REP_DESIGN, experimentDesign.getName());
 
 	}
 
@@ -239,12 +239,12 @@ public class ExperimentDesignGeneratorTest {
 		final float noOfTestEntriesToReplicate = Math.round((float) noOfTestEntries * (replicationPercentage / 100));
 
 		final List<StudyGermplasmDto> importedGermplasmList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
-		final List<ListItem> listItems =
+		final List<ExperimentDesignParameterListItem> listItems =
 			this.experimentDesignGenerator
 				.createReplicationListItemForPRepDesign(importedGermplasmList, replicationPercentage, replicationNumber);
 
 		float countOfReplicatedListItem = 0;
-		for (final ListItem listItem : listItems) {
+		for (final ExperimentDesignParameterListItem listItem : listItems) {
 			if (listItem.getValue().equals(String.valueOf(replicationNumber))) {
 				countOfReplicatedListItem++;
 			}
@@ -269,12 +269,12 @@ public class ExperimentDesignGeneratorTest {
 		final StudyGermplasmDto checkImportedGermplasm = importedGermplasmList.get(0);
 		checkImportedGermplasm.setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
 
-		final List<ListItem> listItems =
+		final List<ExperimentDesignParameterListItem> listItems =
 			this.experimentDesignGenerator
 				.createReplicationListItemForPRepDesign(importedGermplasmList, replicationPercentage, replicationNumber);
 
 		float countOfReplicatedListItem = 0;
-		for (final ListItem listItem : listItems) {
+		for (final ExperimentDesignParameterListItem listItem : listItems) {
 			if (listItem.getValue().equals(String.valueOf(replicationNumber))) {
 				countOfReplicatedListItem++;
 			}
@@ -301,12 +301,12 @@ public class ExperimentDesignGeneratorTest {
 		final int customEntryTypeCategoricalId = 1000;
 		checkImportedGermplasm.setCheckType(customEntryTypeCategoricalId);
 
-		final List<ListItem> listItems =
+		final List<ExperimentDesignParameterListItem> listItems =
 			this.experimentDesignGenerator
 				.createReplicationListItemForPRepDesign(importedGermplasmList, replicationPercentage, replicationNumber);
 
 		float countOfReplicatedListItem = 0;
-		for (final ListItem listItem : listItems) {
+		for (final ExperimentDesignParameterListItem listItem : listItems) {
 			if (listItem.getValue().equals(String.valueOf(replicationNumber))) {
 				countOfReplicatedListItem++;
 			}
@@ -319,7 +319,7 @@ public class ExperimentDesignGeneratorTest {
 	@Test
 	public void testAddInitialTreatmenNumberIfAvailableInitialEntryNumberIsNull() {
 
-		final List<ExpDesignParameter> paramList = new ArrayList<>();
+		final List<ExperimentDesignParameter> paramList = new ArrayList<>();
 
 		final Integer initialEntryNumber = null;
 
@@ -332,7 +332,7 @@ public class ExperimentDesignGeneratorTest {
 	@Test
 	public void testAddInitialTreatmenNumberIfAvailableInitialEntryNumberHasValue() {
 
-		final List<ExpDesignParameter> paramList = new ArrayList<>();
+		final List<ExperimentDesignParameter> paramList = new ArrayList<>();
 
 		final Integer initialEntryNumber = 2;
 
@@ -354,7 +354,7 @@ public class ExperimentDesignGeneratorTest {
 		listOfString.add(sampleText1);
 		listOfString.add(sampleText2);
 
-		final List<ListItem> listItems = this.experimentDesignGenerator.convertToListItemList(listOfString);
+		final List<ExperimentDesignParameterListItem> listItems = this.experimentDesignGenerator.convertToListItemList(listOfString);
 
 		Assert.assertEquals(2, listItems.size());
 		Assert.assertEquals(sampleText1, listItems.get(0).getValue());
@@ -374,7 +374,7 @@ public class ExperimentDesignGeneratorTest {
 	@Test
 	public void testGetInitialTreatNumList() {
 		final List<String> treatmentFactors = Arrays.asList(TermId.ENTRY_NO.name(), "NFERT_NO");
-		final List<ListItem> listItems = this.experimentDesignGenerator.getInitialTreatNumList(treatmentFactors, 5, TermId.ENTRY_NO.name());
+		final List<ExperimentDesignParameterListItem> listItems = this.experimentDesignGenerator.getInitialTreatNumList(treatmentFactors, 5, TermId.ENTRY_NO.name());
 		Assert.assertEquals("5", listItems.get(0).getValue());
 		Assert.assertEquals("1", listItems.get(1).getValue());
 	}

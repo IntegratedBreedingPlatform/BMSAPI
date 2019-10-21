@@ -10,7 +10,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
-import org.ibp.api.java.impl.middleware.design.util.ExpDesignUtil;
+import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -108,36 +108,36 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 		final Map<String, ObservationUnitData> observationUnitDataMap = new HashMap<>();
 		ObservationUnitData observationUnitData;
 
-		observationUnitData = ExpDesignUtil.createObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), String.valueOf(instanceNumber));
+		observationUnitData = ExperimentalDesignUtil.createObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), String.valueOf(instanceNumber));
 		observationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
 		for (final MeasurementVariable var : measurementVariables) {
 			final Integer termId = var.getTermId();
 			if (termId == TermId.ENTRY_NO.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(termId, String.valueOf(germplasm.getEntryNumber()));
+				observationUnitData = ExperimentalDesignUtil.createObservationUnitData(termId, String.valueOf(germplasm.getEntryNumber()));
 			} else if (termId == TermId.SOURCE.getId() || termId == TermId.GERMPLASM_SOURCE.getId()) {
-				observationUnitData = ExpDesignUtil
+				observationUnitData = ExperimentalDesignUtil
 					.createObservationUnitData(termId, germplasm.getSeedSource() != null ? germplasm.getSeedSource() : StringUtils.EMPTY);
 			} else if (termId == TermId.GROUPGID.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(termId,
+				observationUnitData = ExperimentalDesignUtil.createObservationUnitData(termId,
 					germplasm.getGroupId() != null ? germplasm.getGroupId().toString() : StringUtils.EMPTY);
 			} else if (termId == TermId.STOCKID.getId()) {
-				observationUnitData = ExpDesignUtil
+				observationUnitData = ExperimentalDesignUtil
 					.createObservationUnitData(termId, germplasm.getStockIds() != null ? germplasm.getStockIds() : StringUtils.EMPTY);
 			} else if (termId == TermId.CROSS.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(termId, germplasm.getCross());
+				observationUnitData = ExperimentalDesignUtil.createObservationUnitData(termId, germplasm.getCross());
 			} else if (termId == TermId.DESIG.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(termId, germplasm.getDesignation());
+				observationUnitData = ExperimentalDesignUtil.createObservationUnitData(termId, germplasm.getDesignation());
 			} else if (termId == TermId.GID.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(termId, String.valueOf(germplasm.getGermplasmId()));
+				observationUnitData = ExperimentalDesignUtil.createObservationUnitData(termId, String.valueOf(germplasm.getGermplasmId()));
 			} else if (termId == TermId.ENTRY_CODE.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(termId, germplasm.getEntryCode());
+				observationUnitData = ExperimentalDesignUtil.createObservationUnitData(termId, germplasm.getEntryCode());
 			} else if (termId == TermId.PLOT_NO.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(termId, Integer.toString(plotNumber));
+				observationUnitData = ExperimentalDesignUtil.createObservationUnitData(termId, Integer.toString(plotNumber));
 			} else if (termId == TermId.ENTRY_TYPE.getId()) {
-				observationUnitData = ExpDesignUtil.createObservationUnitData(termId, Integer.toString(germplasm.getCheckType()));
+				observationUnitData = ExperimentalDesignUtil.createObservationUnitData(termId, Integer.toString(germplasm.getCheckType()));
 			} else {
 				// meaning non factor
-				observationUnitData = ExpDesignUtil.createObservationUnitData(termId, StringUtils.EMPTY);
+				observationUnitData = ExperimentalDesignUtil.createObservationUnitData(termId, StringUtils.EMPTY);
 			}
 			observationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
 		}

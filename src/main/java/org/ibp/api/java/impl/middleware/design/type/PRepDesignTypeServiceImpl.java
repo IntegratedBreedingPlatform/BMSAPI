@@ -6,7 +6,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
-import org.ibp.api.domain.design.ListItem;
+import org.ibp.api.domain.design.ExperimentDesignParameterListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
@@ -63,7 +63,7 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
 		final Integer plotNo = experimentDesignInput.getStartingPlotNo() == null? 1 : experimentDesignInput.getStartingPlotNo();
 
-		final List<ListItem> replicationListItems =
+		final List<ExperimentDesignParameterListItem> replicationListItems =
 			this.experimentDesignGenerator
 				.createReplicationListItemForPRepDesign(studyGermplasmDtoList, replicationPercentage, replicationNumber);
 		final MainDesign mainDesign = this.experimentDesignGenerator

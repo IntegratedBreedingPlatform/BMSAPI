@@ -1,24 +1,16 @@
 package org.ibp.api.java.impl.middleware.design.util;
 
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.manager.Operation;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.rest.dataset.ObservationUnitData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
 
-public class ExpDesignUtil {
+public class ExperimentalDesignUtil {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ExpDesignUtil.class);
-
-	private ExpDesignUtil() {
+	private ExperimentalDesignUtil() {
 		// hide implicit public constructor
 	}
 
@@ -30,7 +22,7 @@ public class ExpDesignUtil {
 		return writer.toString();
 	}
 
-	public static String cleanBVDesingKey(final String key) {
+	public static String cleanBVDesignKey(final String key) {
 		if (key != null) {
 			return "_" + key.replace("-", "_");
 		}

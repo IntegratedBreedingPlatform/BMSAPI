@@ -19,14 +19,14 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.BVDesignTrialInstance;
-import org.ibp.api.domain.design.ExpDesign;
-import org.ibp.api.domain.design.ExpDesignParameter;
-import org.ibp.api.domain.design.ListItem;
+import org.ibp.api.domain.design.ExperimentDesign;
+import org.ibp.api.domain.design.ExperimentDesignParameter;
+import org.ibp.api.domain.design.ExperimentDesignParameterListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.impl.middleware.design.transformer.StandardVariableTransformer;
-import org.ibp.api.java.impl.middleware.design.util.ExpDesignUtil;
+import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
@@ -114,24 +114,24 @@ public class ExperimentDesignGenerator {
 
 		final String timeLimit = AppConstants.EXP_DESIGN_TIME_LIMIT.getString();
 
-		final List<ExpDesignParameter> paramList = new ArrayList<>();
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.SEED_PARAM, "", null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NBLOCKS_PARAM, String.valueOf(nBlock), null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.BLOCKFACTOR_PARAM, blockFactor, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.PLOTFACTOR_PARAM, plotFactor, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM,
+		final List<ExperimentDesignParameter> paramList = new ArrayList<>();
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.SEED_PARAM, "", null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NBLOCKS_PARAM, String.valueOf(nBlock), null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.BLOCKFACTOR_PARAM, blockFactor, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.PLOTFACTOR_PARAM, plotFactor, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM,
 			this.getPlotNumberStringValueOrDefault(initialPlotNumber), null));
 
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM, null,
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM, null,
 			this.getInitialTreatNumList(treatmentFactors, STARTING_ENTRY_NUMBER, entryNoVarName)));
 
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.TREATMENTFACTORS_PARAM, null,
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.TREATMENTFACTORS_PARAM, null,
 			this.convertToListItemList(treatmentFactors)));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.LEVELS_PARAM, null, this.convertToListItemList(levels)));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.TIMELIMIT_PARAM, timeLimit, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.OUTPUTFILE_PARAM, outputfile, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.LEVELS_PARAM, null, this.convertToListItemList(levels)));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.TIMELIMIT_PARAM, timeLimit, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.OUTPUTFILE_PARAM, outputfile, null));
 
-		final ExpDesign design = new ExpDesign(ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN, paramList);
+		final ExperimentDesign design = new ExperimentDesign(ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN, paramList);
 
 		return new MainDesign(design);
 	}
@@ -144,27 +144,27 @@ public class ExperimentDesignGenerator {
 
 		final String timeLimit = AppConstants.EXP_DESIGN_TIME_LIMIT.getString();
 
-		final List<ExpDesignParameter> paramList = new ArrayList<>();
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.SEED_PARAM, "", null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.BLOCKSIZE_PARAM, String.valueOf(blockSize), null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NTREATMENTS_PARAM, String.valueOf(nTreatments), null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NREPLICATES_PARAM, String.valueOf(nReplicates), null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.TREATMENTFACTOR_PARAM, treatmentFactor, null));
+		final List<ExperimentDesignParameter> paramList = new ArrayList<>();
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.SEED_PARAM, "", null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.BLOCKSIZE_PARAM, String.valueOf(blockSize), null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NTREATMENTS_PARAM, String.valueOf(nTreatments), null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NREPLICATES_PARAM, String.valueOf(nReplicates), null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.TREATMENTFACTOR_PARAM, treatmentFactor, null));
 
 		this.addInitialTreatmenNumberIfAvailable(STARTING_ENTRY_NUMBER, paramList);
 
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.REPLICATEFACTOR_PARAM, replicateFactor, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.BLOCKFACTOR_PARAM, blockFactor, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.PLOTFACTOR_PARAM, plotFactor, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM,
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.REPLICATEFACTOR_PARAM, replicateFactor, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.BLOCKFACTOR_PARAM, blockFactor, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.PLOTFACTOR_PARAM, plotFactor, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM,
 			this.getPlotNumberStringValueOrDefault(initialPlotNumber), null));
 
 		this.addLatinizeParametersForResolvableIncompleteBlockDesign(useLatinize, paramList, String.valueOf(nBlatin), replatingGroups);
 
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.TIMELIMIT_PARAM, timeLimit, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.OUTPUTFILE_PARAM, outputfile, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.TIMELIMIT_PARAM, timeLimit, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.OUTPUTFILE_PARAM, outputfile, null));
 
-		final ExpDesign design = new ExpDesign(ExperimentDesignGenerator.RESOLVABLE_INCOMPLETE_BLOCK_DESIGN, paramList);
+		final ExperimentDesign design = new ExperimentDesign(ExperimentDesignGenerator.RESOLVABLE_INCOMPLETE_BLOCK_DESIGN, paramList);
 
 		return new MainDesign(design);
 	}
@@ -179,28 +179,28 @@ public class ExperimentDesignGenerator {
 
 		final String plotNumberStrValue = (initialPlotNumber == null) ? "1" : String.valueOf(initialPlotNumber);
 
-		final List<ExpDesignParameter> paramList = new ArrayList<>();
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.SEED_PARAM, "", null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NTREATMENTS_PARAM, String.valueOf(nTreatments), null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NREPLICATES_PARAM, String.valueOf(nReplicates), null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NROWS_PARAM, String.valueOf(nRows), null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NCOLUMNS_PARAM, String.valueOf(nColumns), null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.TREATMENTFACTOR_PARAM, treatmentFactor, null));
+		final List<ExperimentDesignParameter> paramList = new ArrayList<>();
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.SEED_PARAM, "", null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NTREATMENTS_PARAM, String.valueOf(nTreatments), null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NREPLICATES_PARAM, String.valueOf(nReplicates), null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NROWS_PARAM, String.valueOf(nRows), null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NCOLUMNS_PARAM, String.valueOf(nColumns), null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.TREATMENTFACTOR_PARAM, treatmentFactor, null));
 
 		this.addInitialTreatmenNumberIfAvailable(STARTING_ENTRY_NUMBER, paramList);
 
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.REPLICATEFACTOR_PARAM, replicateFactor, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.ROWFACTOR_PARAM, rowFactor, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.COLUMNFACTOR_PARAM, columnFactor, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.PLOTFACTOR_PARAM, plotFactor, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM, plotNumberStrValue, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.REPLICATEFACTOR_PARAM, replicateFactor, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.ROWFACTOR_PARAM, rowFactor, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.COLUMNFACTOR_PARAM, columnFactor, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.PLOTFACTOR_PARAM, plotFactor, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM, plotNumberStrValue, null));
 
 		this.addLatinizeParametersForResolvableRowAndColumnDesign(useLatinize, paramList, replatingGroups, nrLatin, ncLatin);
 
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.TIMELIMIT_PARAM, timeLimit, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.OUTPUTFILE_PARAM, outputfile, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.TIMELIMIT_PARAM, timeLimit, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.OUTPUTFILE_PARAM, outputfile, null));
 
-		final ExpDesign design = new ExpDesign(ExperimentDesignGenerator.RESOLVABLE_ROW_COL_DESIGN, paramList);
+		final ExperimentDesign design = new ExperimentDesign(ExperimentDesignGenerator.RESOLVABLE_ROW_COL_DESIGN, paramList);
 
 		return new MainDesign(design);
 	}
@@ -211,56 +211,56 @@ public class ExperimentDesignGenerator {
 		final String blockFactor,
 		final String plotFactor) {
 
-		final List<ExpDesignParameter> paramList = new ArrayList<>();
+		final List<ExperimentDesignParameter> paramList = new ArrayList<>();
 
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NTREATMENTS_PARAM, String.valueOf(numberOfTreatments), null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NCONTROLS_PARAM, String.valueOf(numberOfControls), null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NBLOCKS_PARAM, String.valueOf(numberOfBlocks), null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.TREATMENTFACTOR_PARAM, treatmentFactor, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.BLOCKFACTOR_PARAM, blockFactor, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.PLOTFACTOR_PARAM, plotFactor, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM,
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NTREATMENTS_PARAM, String.valueOf(numberOfTreatments), null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NCONTROLS_PARAM, String.valueOf(numberOfControls), null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NBLOCKS_PARAM, String.valueOf(numberOfBlocks), null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.TREATMENTFACTOR_PARAM, treatmentFactor, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.BLOCKFACTOR_PARAM, blockFactor, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.PLOTFACTOR_PARAM, plotFactor, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM,
 			this.getPlotNumberStringValueOrDefault(startingPlotNumber), null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.SEED_PARAM, "", null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.OUTPUTFILE_PARAM, "", null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.SEED_PARAM, "", null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.OUTPUTFILE_PARAM, "", null));
 
 		this.addInitialTreatmenNumberIfAvailable(STARTING_ENTRY_NUMBER, paramList);
 
-		final ExpDesign design = new ExpDesign(ExperimentDesignGenerator.AUGMENTED_RANDOMIZED_BLOCK_DESIGN, paramList);
+		final ExperimentDesign design = new ExperimentDesign(ExperimentDesignGenerator.AUGMENTED_RANDOMIZED_BLOCK_DESIGN, paramList);
 
 		return new MainDesign(design);
 	}
 
 	public MainDesign createPRepDesign(
-		final Integer numberOfBlocks, final Integer nTreatments, final List<ListItem> nRepeatsListItem,
+		final Integer numberOfBlocks, final Integer nTreatments, final List<ExperimentDesignParameterListItem> nRepeatsListItem,
 		final String treatmentFactor, final String blockFactor, final String plotFactor,
 		final Integer initialPlotNumber) {
 
 		final String timeLimit = AppConstants.EXP_DESIGN_TIME_LIMIT.getString();
 
-		final List<ExpDesignParameter> paramList = new ArrayList<>();
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.SEED_PARAM, "", null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NTREATMENTS_PARAM, String.valueOf(nTreatments), null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NBLOCKS_PARAM, String.valueOf(numberOfBlocks), null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NREPEATS_PARAM, null, nRepeatsListItem));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.TREATMENTFACTOR_PARAM, treatmentFactor, null));
+		final List<ExperimentDesignParameter> paramList = new ArrayList<>();
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.SEED_PARAM, "", null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NTREATMENTS_PARAM, String.valueOf(nTreatments), null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NBLOCKS_PARAM, String.valueOf(numberOfBlocks), null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NREPEATS_PARAM, null, nRepeatsListItem));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.TREATMENTFACTOR_PARAM, treatmentFactor, null));
 
 		this.addInitialTreatmenNumberIfAvailable(STARTING_ENTRY_NUMBER, paramList);
 
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.BLOCKFACTOR_PARAM, blockFactor, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.PLOTFACTOR_PARAM, plotFactor, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM,
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.BLOCKFACTOR_PARAM, blockFactor, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.PLOTFACTOR_PARAM, plotFactor, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM,
 			this.getPlotNumberStringValueOrDefault(initialPlotNumber), null));
 
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.TIMELIMIT_PARAM, timeLimit, null));
-		paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.OUTPUTFILE_PARAM, "", null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.TIMELIMIT_PARAM, timeLimit, null));
+		paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.OUTPUTFILE_PARAM, "", null));
 
-		final ExpDesign design = new ExpDesign(ExperimentDesignGenerator.P_REP_DESIGN, paramList);
+		final ExperimentDesign design = new ExperimentDesign(ExperimentDesignGenerator.P_REP_DESIGN, paramList);
 
 		return new MainDesign(design);
 	}
 
-	public List<ListItem> createReplicationListItemForPRepDesign(
+	public List<ExperimentDesignParameterListItem> createReplicationListItemForPRepDesign(
 		final List<StudyGermplasmDto> studyGermplasmDtoList, final float replicationPercentage,
 		final int replicationNumber) {
 
@@ -285,17 +285,17 @@ public class ExperimentDesignGenerator {
 			randomTestEntryNumbers.add(testEntryNumbers.get(this.random.nextInt(testEntryNumbers.size())));
 		}
 
-		final List<ListItem> replicationListItem = new LinkedList<>();
+		final List<ExperimentDesignParameterListItem> replicationListItem = new LinkedList<>();
 		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
 			if (SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() != studyGermplasmDto.getCheckType()) {
 				// All Check Entries in the list should be replicated
-				replicationListItem.add(new ListItem(String.valueOf(replicationNumber)));
+				replicationListItem.add(new ExperimentDesignParameterListItem(String.valueOf(replicationNumber)));
 			} else if (randomTestEntryNumbers.contains(studyGermplasmDto.getEntryNumber())) {
 				// Randomized Test Entries should be replicated
-				replicationListItem.add(new ListItem(String.valueOf(replicationNumber)));
+				replicationListItem.add(new ExperimentDesignParameterListItem(String.valueOf(replicationNumber)));
 			} else {
 				// Default replication number is 1
-				replicationListItem.add(new ListItem(String.valueOf(1)));
+				replicationListItem.add(new ExperimentDesignParameterListItem(String.valueOf(1)));
 			}
 		}
 
@@ -309,7 +309,7 @@ public class ExperimentDesignGenerator {
 
 		// Specify number of study instances for BVDesign generation
 		mainDesign.getDesign().getParameters()
-			.add(this.createExpDesignParameter(NUMBER_TRIALS_PARAM, String.valueOf(numberOfTrials), null));
+			.add(this.createExperimentDesignParameter(NUMBER_TRIALS_PARAM, String.valueOf(numberOfTrials), null));
 		BVDesignOutput bvOutput;
 		try {
 			bvOutput = this.designRunner.runBVDesign(mainDesign);
@@ -406,7 +406,7 @@ public class ExperimentDesignGenerator {
 		ObservationUnitData treatmentLevelData = null;
 		ObservationUnitData observationUnitData;
 
-		observationUnitData = ExpDesignUtil.createObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), String.valueOf(trialNo));
+		observationUnitData = ExperimentalDesignUtil.createObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), String.valueOf(trialNo));
 		observationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
 
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
@@ -416,54 +416,54 @@ public class ExperimentDesignGenerator {
 
 			if (measurementVariable.getVariableType() == VariableType.ENVIRONMENT_DETAIL
 				|| measurementVariable.getVariableType() == VariableType.STUDY_CONDITION) {
-				observationUnitData = ExpDesignUtil
+				observationUnitData = ExperimentalDesignUtil
 					.createObservationUnitData(measurementVariable.getTermId(), String.valueOf(measurementVariable.getValue()));
 
 				environmentObservationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
 			} else {
 				if (termId == TermId.ENTRY_NO.getId()) {
 					final Integer entryNumber = studyGermplasmDto.getEntryNumber();
-					observationUnitData = ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), String.valueOf(
+					observationUnitData = ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(), String.valueOf(
 						entryNumber));
 					observationUnitRow.setEntryNumber(entryNumber);
 				} else if (termId == TermId.SOURCE.getId() || termId == TermId.GERMPLASM_SOURCE.getId()) {
 					observationUnitData =
-						ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(),
+						ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(),
 							studyGermplasmDto.getSeedSource() != null ? studyGermplasmDto.getSeedSource() : "");
 				} else if (termId == TermId.GROUPGID.getId()) {
-					observationUnitData = ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(),
+					observationUnitData = ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(),
 						studyGermplasmDto.getGroupId() != null ? studyGermplasmDto.getGroupId().toString() : "");
 				} else if (termId == TermId.STOCKID.getId()) {
 					observationUnitData =
-						ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(),
+						ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(),
 							studyGermplasmDto.getStockIds() != null ? studyGermplasmDto.getStockIds() : "");
 				} else if (termId == TermId.CROSS.getId()) {
 					observationUnitData =
-						ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), studyGermplasmDto.getCross());
+						ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(), studyGermplasmDto.getCross());
 				} else if (termId == TermId.DESIG.getId()) {
 					observationUnitData =
-						ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), studyGermplasmDto.getDesignation());
+						ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(), studyGermplasmDto.getDesignation());
 				} else if (termId == TermId.GID.getId()) {
 					observationUnitData =
-						ExpDesignUtil
+						ExperimentalDesignUtil
 							.createObservationUnitData(measurementVariable.getTermId(), String.valueOf(studyGermplasmDto.getGermplasmId()));
 				} else if (termId == TermId.ENTRY_CODE.getId()) {
 					observationUnitData =
-						ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), studyGermplasmDto.getEntryCode());
+						ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(), studyGermplasmDto.getEntryCode());
 				} else if (EXP_DESIGN_VARIABLE_IDS.contains(termId)) {
-					observationUnitData = ExpDesignUtil
+					observationUnitData = ExperimentalDesignUtil
 						.createObservationUnitData(measurementVariable.getTermId(), bvEntryMap.get(measurementVariable.getName()));
 				} else if (termId == TermId.CHECK.getId()) {
 					observationUnitData =
-						ExpDesignUtil
+						ExperimentalDesignUtil
 							.createObservationUnitData(measurementVariable.getTermId(), Integer.toString(studyGermplasmDto.getCheckType()));
 				} else if (termId == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 					observationUnitData =
-						ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), Integer.toString(trialNo));
+						ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(), Integer.toString(trialNo));
 				} else if (!StringUtils.isEmpty(measurementVariable.getTreatmentLabel())) {
 					if (treatmentLevelData == null) {
-						observationUnitData = ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(),
-							bvEntryMap.get(ExpDesignUtil.cleanBVDesingKey(Integer.toString(measurementVariable.getTermId()))));
+						observationUnitData = ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(),
+							bvEntryMap.get(ExperimentalDesignUtil.cleanBVDesignKey(Integer.toString(measurementVariable.getTermId()))));
 						treatmentLevelData = observationUnitData;
 					} else {
 						final String level = treatmentLevelData.getValue();
@@ -485,13 +485,16 @@ public class ExperimentDesignGenerator {
 								if (measurementVariable.getDataTypeId() != null
 									&& measurementVariable.getDataTypeId().intValue() == TermId.DATE_VARIABLE.getId()) {
 									value = DateUtil.convertToDBDateFormat(measurementVariable.getDataTypeId(), value);
-									observationUnitData = ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), value);
+									observationUnitData = ExperimentalDesignUtil
+										.createObservationUnitData(measurementVariable.getTermId(), value);
 								} else if (measurementVariable.getPossibleValues() != null && !measurementVariable.getPossibleValues()
 									.isEmpty() && NumberUtils
 									.isNumber(value)) {
-									observationUnitData = ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), value);
+									observationUnitData = ExperimentalDesignUtil
+										.createObservationUnitData(measurementVariable.getTermId(), value);
 								} else {
-									observationUnitData = ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), value);
+									observationUnitData = ExperimentalDesignUtil
+										.createObservationUnitData(measurementVariable.getTermId(), value);
 								}
 							}
 						}
@@ -500,7 +503,7 @@ public class ExperimentDesignGenerator {
 
 				} else {
 					// meaning non factor
-					observationUnitData = ExpDesignUtil.createObservationUnitData(measurementVariable.getTermId(), "");
+					observationUnitData = ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(), "");
 				}
 
 				observationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
@@ -512,9 +515,9 @@ public class ExperimentDesignGenerator {
 		return observationUnitRow;
 	}
 
-	ExpDesignParameter createExpDesignParameter(final String name, final String value, final List<ListItem> items) {
+	ExperimentDesignParameter createExperimentDesignParameter(final String name, final String value, final List<ExperimentDesignParameterListItem> items) {
 
-		final ExpDesignParameter designParam = new ExpDesignParameter(name, value);
+		final ExperimentDesignParameter designParam = new ExperimentDesignParameter(name, value);
 		if (items != null && !items.isEmpty()) {
 			designParam.setListItem(items);
 		}
@@ -549,74 +552,74 @@ public class ExperimentDesignGenerator {
 		return (initialPlotNumber == null) ? "1" : String.valueOf(initialPlotNumber);
 	}
 
-	void addInitialTreatmenNumberIfAvailable(final Integer initialEntryNumber, final List<ExpDesignParameter> paramList) {
+	void addInitialTreatmenNumberIfAvailable(final Integer initialEntryNumber, final List<ExperimentDesignParameter> paramList) {
 
 		if (initialEntryNumber != null) {
-			paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM,
+			paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM,
 				String.valueOf(initialEntryNumber), null));
 		}
 
 	}
 
 	void addLatinizeParametersForResolvableIncompleteBlockDesign(
-		final boolean useLatinize, final List<ExpDesignParameter> paramList,
+		final boolean useLatinize, final List<ExperimentDesignParameter> paramList,
 		final String nBlatin, final String replatingGroups) {
 
 		if (useLatinize) {
-			paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NBLATIN_PARAM, nBlatin, null));
+			paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NBLATIN_PARAM, nBlatin, null));
 			// we add the string tokenize replating groups
 			// we tokenize the replating groups
 			final StringTokenizer tokenizer = new StringTokenizer(replatingGroups, ",");
-			final List<ListItem> replatingList = new ArrayList<>();
+			final List<ExperimentDesignParameterListItem> replatingList = new ArrayList<>();
 			while (tokenizer.hasMoreTokens()) {
-				replatingList.add(new ListItem(tokenizer.nextToken()));
+				replatingList.add(new ExperimentDesignParameterListItem(tokenizer.nextToken()));
 			}
-			paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.REPLATINGROUPS_PARAM, null, replatingList));
+			paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.REPLATINGROUPS_PARAM, null, replatingList));
 		} else {
-			paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NBLATIN_PARAM, "0", null));
+			paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NBLATIN_PARAM, "0", null));
 		}
 
 	}
 
 	void addLatinizeParametersForResolvableRowAndColumnDesign(
-		final Boolean useLatinize, final List<ExpDesignParameter> paramList,
+		final Boolean useLatinize, final List<ExperimentDesignParameter> paramList,
 		final String replatingGroups, final Integer nrLatin, final Integer ncLatin) {
 
 		if (useLatinize != null && useLatinize.booleanValue()) {
-			paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NRLATIN_PARAM, String.valueOf(nrLatin), null));
-			paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NCLATIN_PARAM, String.valueOf(ncLatin), null));
+			paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NRLATIN_PARAM, String.valueOf(nrLatin), null));
+			paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NCLATIN_PARAM, String.valueOf(ncLatin), null));
 			// we tokenize the replating groups
 			final StringTokenizer tokenizer = new StringTokenizer(replatingGroups, ",");
-			final List<ListItem> replatingList = new ArrayList<>();
+			final List<ExperimentDesignParameterListItem> replatingList = new ArrayList<>();
 			while (tokenizer.hasMoreTokens()) {
-				replatingList.add(new ListItem(tokenizer.nextToken()));
+				replatingList.add(new ExperimentDesignParameterListItem(tokenizer.nextToken()));
 			}
-			paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.REPLATINGROUPS_PARAM, null, replatingList));
+			paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.REPLATINGROUPS_PARAM, null, replatingList));
 		} else {
-			paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NRLATIN_PARAM, "0", null));
-			paramList.add(this.createExpDesignParameter(ExperimentDesignGenerator.NCLATIN_PARAM, "0", null));
+			paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NRLATIN_PARAM, "0", null));
+			paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NCLATIN_PARAM, "0", null));
 		}
 
 	}
 
-	List<ListItem> convertToListItemList(final List<String> listString) {
+	List<ExperimentDesignParameterListItem> convertToListItemList(final List<String> listString) {
 
-		final List<ListItem> listItemList = new ArrayList<>();
+		final List<ExperimentDesignParameterListItem> listItemList = new ArrayList<>();
 		for (final String value : listString) {
-			listItemList.add(new ListItem(value));
+			listItemList.add(new ExperimentDesignParameterListItem(value));
 		}
 		return listItemList;
 
 	}
 
-	List<ListItem> getInitialTreatNumList(final List<String> treatmentFactors, final Integer initialTreatNum, final String entryNoVarName) {
+	List<ExperimentDesignParameterListItem> getInitialTreatNumList(final List<String> treatmentFactors, final Integer initialTreatNum, final String entryNoVarName) {
 
-		final List<ListItem> listItemList = new ArrayList<>();
+		final List<ExperimentDesignParameterListItem> listItemList = new ArrayList<>();
 		for (final String treatmentFactor : treatmentFactors) {
 			if (treatmentFactor.equals(entryNoVarName)) {
-				listItemList.add(new ListItem(String.valueOf(initialTreatNum)));
+				listItemList.add(new ExperimentDesignParameterListItem(String.valueOf(initialTreatNum)));
 			} else {
-				listItemList.add(new ListItem("1"));
+				listItemList.add(new ExperimentDesignParameterListItem("1"));
 			}
 		}
 		return listItemList;

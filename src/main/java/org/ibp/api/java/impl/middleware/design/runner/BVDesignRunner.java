@@ -7,7 +7,7 @@ import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.design.runner.ProcessRunner;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
-import org.ibp.api.java.impl.middleware.design.util.ExpDesignUtil;
+import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -82,7 +82,7 @@ public class BVDesignRunner implements DesignRunner {
 		design.getDesign().setParameterValue(ExperimentDesignGenerator.SEED_PARAM, this.getSeedValue(currentTimeMillis));
 
 		try {
-			xml = ExpDesignUtil.getXmlStringForSetting(design);
+			xml = ExperimentalDesignUtil.getXmlStringForSetting(design);
 		} catch (final JAXBException e) {
 			BVDesignRunner.LOG.error(e.getMessage(), e);
 		}

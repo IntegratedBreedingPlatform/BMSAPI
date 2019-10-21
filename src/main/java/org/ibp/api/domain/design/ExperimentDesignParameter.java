@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlElement;
 import java.io.Serializable;
 import java.util.List;
 
-public class ExpDesignParameter implements Serializable {
+public class ExperimentDesignParameter implements Serializable {
 
 	/**
 	 *
@@ -14,13 +14,9 @@ public class ExpDesignParameter implements Serializable {
 	private static final long serialVersionUID = -926477529786318441L;
 	private String name;
 	private String value;
-	private List<ListItem> listItem; // would only be created in xml if not null
+	private List<ExperimentDesignParameterListItem> listItem; // would only be created in xml if not null
 
-	public ExpDesignParameter() {
-		super();
-	}
-
-	public ExpDesignParameter(String name, String value) {
+	public ExperimentDesignParameter(final String name, final String value) {
 		this.name = name;
 		this.value = value;
 	}
@@ -30,7 +26,7 @@ public class ExpDesignParameter implements Serializable {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -39,16 +35,16 @@ public class ExpDesignParameter implements Serializable {
 		return this.value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(final String value) {
 		this.value = value;
 	}
 
-	@XmlElement(name = "ListItem")
-	public List<ListItem> getListItem() {
+	@XmlElement(name = "ExperimentDesignParameterListItem")
+	public List<ExperimentDesignParameterListItem> getListItem() {
 		return this.listItem;
 	}
 
-	public void setListItem(List<ListItem> listItem) {
+	public void setListItem(final List<ExperimentDesignParameterListItem> listItem) {
 		this.listItem = listItem;
 	}
 
