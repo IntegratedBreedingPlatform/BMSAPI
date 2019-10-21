@@ -6,7 +6,6 @@ import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
-import org.ibp.api.rest.design.BVDesignProperties;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +20,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,10 +27,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class BVDesignRunnerTest {
 
-	public static final String BV_DESIGN_EXECUTABLE_PATH = "bvDesignExecutablePath";
-
-	@Mock
-	private BVDesignProperties bvDesignProperties;
+	private static final String BV_DESIGN_EXECUTABLE_PATH = "bvDesignExecutablePath";
 
 	@Mock
 	private BVDesignRunner.BVDesignOutputReader outputReader;
@@ -54,9 +49,7 @@ public class BVDesignRunnerTest {
 		this.bvDesignRunner.setOutputReader(this.outputReader);
 		this.bvDesignRunner.setProcessRunner(this.processRunner);
 		this.bvDesignRunner.setInputWriter(this.inputWriter);
-		this.bvDesignRunner.setBvDesignProperties(this.bvDesignProperties);
-
-		when(this.bvDesignProperties.getBvDesignPath()).thenReturn(BV_DESIGN_EXECUTABLE_PATH);
+		this.bvDesignRunner.setBvDesignPath(BV_DESIGN_EXECUTABLE_PATH);
 	}
 
 	@Test
@@ -67,9 +60,9 @@ public class BVDesignRunnerTest {
 
 		final MainDesign mainDesign = this.createRandomizedCompleteBlockDesign();
 
-		when(this.inputWriter.write(anyString(), eq(this.bvDesignProperties))).thenReturn(xmlInputFilePath);
+		when(this.inputWriter.write(anyString())).thenReturn(xmlInputFilePath);
 		when(this.processRunner.run(BV_DESIGN_EXECUTABLE_PATH, "-i" + xmlInputFilePath)).thenReturn(successfulReturnCode);
-		when(this.outputReader.read(anyString())).thenReturn(new ArrayList<String[]>());
+		when(this.outputReader.read(anyString())).thenReturn(new ArrayList<>());
 
 		final BVDesignOutput bvDesignOutput = this.bvDesignRunner.runBVDesign(mainDesign);
 
@@ -87,7 +80,7 @@ public class BVDesignRunnerTest {
 
 		final MainDesign mainDesign = this.createRandomizedCompleteBlockDesign();
 
-		when(this.inputWriter.write(anyString(), eq(this.bvDesignProperties))).thenReturn(xmlInputFilePath);
+		when(this.inputWriter.write(anyString())).thenReturn(xmlInputFilePath);
 		when(this.processRunner.run(BV_DESIGN_EXECUTABLE_PATH, "-i" + xmlInputFilePath)).thenReturn(failureReturnCode);
 
 		final BVDesignOutput bvDesignOutput = this.bvDesignRunner.runBVDesign(mainDesign);
@@ -263,7 +256,6 @@ public class BVDesignRunnerTest {
 		final String plotFactor = "PLOT_NO";
 
 		final int initialPlotNumber = 99;
-		final int initialEntryNumber = 100;
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createPRepDesign(numberOfBlocks, nTreatments, nRepeatsListItem, treatmentFactor, blockFactor, plotFactor, initialPlotNumber);

@@ -21,7 +21,6 @@ public class ExpDesignParameter implements Serializable {
 	}
 
 	public ExpDesignParameter(String name, String value) {
-		super();
 		this.name = name;
 		this.value = value;
 	}

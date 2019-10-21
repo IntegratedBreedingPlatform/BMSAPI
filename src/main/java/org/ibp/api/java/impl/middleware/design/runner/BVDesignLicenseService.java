@@ -7,13 +7,12 @@ import org.ibp.api.domain.design.DesignLicenseInfo;
 import org.ibp.api.exception.BVLicenseParseException;
 import org.ibp.api.java.design.DesignLicenseService;
 import org.ibp.api.java.design.runner.ProcessRunner;
-import org.ibp.api.rest.design.BVDesignProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.text.Format;
@@ -33,12 +32,12 @@ public class BVDesignLicenseService implements DesignLicenseService {
 
 	private static final String BVDESIGN_STATUS_OUTPUT_FILENAME = "son";
 
-	@Resource
-	private BVDesignProperties bvDesignProperties;
-
 	private ObjectMapper objectMapper = new ObjectMapper();
 
 	private ProcessRunner bvDesignLicenseProcessRunner = new BVDesignLicenseProcessRunner();
+
+	@Value("bv.design.path")
+	private String bvDesignPath;
 
 	@Override
 	public boolean isExpired() {
@@ -62,11 +61,9 @@ public class BVDesignLicenseService implements DesignLicenseService {
 
 	DesignLicenseInfo retrieveLicenseInfo() throws BVLicenseParseException {
 
-		final String bvDesignLocation = this.bvDesignProperties.getBvDesignPath();
+		this.generateBVDesignLicenseJsonFile();
 
-		this.generateBVDesignLicenseJsonFile(bvDesignLocation);
-
-		final String jsonPathFile = new File(bvDesignLocation).getParent() + File.separator + BVDESIGN_STATUS_OUTPUT_FILENAME;
+		final String jsonPathFile = new File(this.bvDesignPath).getParent() + File.separator + BVDESIGN_STATUS_OUTPUT_FILENAME;
 
 		return this.readLicenseInfoFromJsonFile(new File(jsonPathFile));
 	}
@@ -92,13 +89,13 @@ public class BVDesignLicenseService implements DesignLicenseService {
 
 	}
 
-	void generateBVDesignLicenseJsonFile(final String bvDesignLocation) throws BVLicenseParseException {
+	void generateBVDesignLicenseJsonFile() throws BVLicenseParseException {
 
 		try {
 
-			final String bvDesignDirectory = new File(bvDesignLocation).getParent();
+			final String bvDesignDirectory = new File(this.bvDesignPath).getParent();
 			bvDesignLicenseProcessRunner.setDirectory(bvDesignDirectory);
-			bvDesignLicenseProcessRunner.run(bvDesignLocation, "-status", "-json");
+			bvDesignLicenseProcessRunner.run(this.bvDesignPath, "-status", "-json");
 
 		} catch (final Exception e) {
 			BVDesignLicenseService.LOG.error(e.getMessage(), e);
@@ -109,10 +106,6 @@ public class BVDesignLicenseService implements DesignLicenseService {
 
 	void setBvDesignLicenseProcessRunner(final BVDesignLicenseProcessRunner bvDesignLicenseProcessRunner) {
 		this.bvDesignLicenseProcessRunner = bvDesignLicenseProcessRunner;
-	}
-
-	void setBvDesignProperties(final BVDesignProperties bvDesignProperties) {
-		this.bvDesignProperties = bvDesignProperties;
 	}
 
 	void setObjectMapper(final ObjectMapper objectMapper) {
@@ -153,4 +146,7 @@ public class BVDesignLicenseService implements DesignLicenseService {
 
 	}
 
+	public void setBvDesignPath(final String bvDesignPath) {
+		this.bvDesignPath = bvDesignPath;
+	}
 }

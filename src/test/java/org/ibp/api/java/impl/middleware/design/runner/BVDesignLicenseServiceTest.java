@@ -6,7 +6,6 @@ import org.ibp.api.domain.design.DesignLicenseInfo;
 import org.ibp.api.domain.design.License;
 import org.ibp.api.domain.design.Status;
 import org.ibp.api.exception.BVLicenseParseException;
-import org.ibp.api.rest.design.BVDesignProperties;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,9 +24,6 @@ public class BVDesignLicenseServiceTest {
 
 	@Mock
 	private BVDesignLicenseService.BVDesignLicenseProcessRunner processRunner;
-
-	@Mock
-	private BVDesignProperties bvDesignProperties;
 
 	@Mock
 	private ObjectMapper objectMapper;
@@ -150,9 +146,9 @@ public class BVDesignLicenseServiceTest {
 	public void testGenerateBVDesignLicenseJsonFileSuccess() throws IOException {
 
 		final String bvDesignLocation = "parentDirectory/bvDesign";
-
+		bvDesignLicenseService.setBvDesignPath(bvDesignLocation);
 		try {
-			bvDesignLicenseService.generateBVDesignLicenseJsonFile(bvDesignLocation);
+			bvDesignLicenseService.generateBVDesignLicenseJsonFile();
 			Mockito.verify(this.processRunner).setDirectory("parentDirectory");
 			Mockito.verify(this.processRunner).run(bvDesignLocation, "-status", "-json");
 		} catch (final BVLicenseParseException e) {
@@ -164,11 +160,11 @@ public class BVDesignLicenseServiceTest {
 	@Test
 	public void testGenerateBVDesignLicenseJsonFileFailed() throws IOException {
 		final String bvDesignLocation = "parentDirectory/bvDesign";
-
+		bvDesignLicenseService.setBvDesignPath(bvDesignLocation);
 		Mockito.when(this.processRunner.run(bvDesignLocation, "-status", "-json")).thenThrow(new IOException());
 
 		try {
-			this.bvDesignLicenseService.generateBVDesignLicenseJsonFile(bvDesignLocation);
+			this.bvDesignLicenseService.generateBVDesignLicenseJsonFile();
 			Assert.fail("generateBVDesignLicenseJsonFile should throw a BVLicenseParseException");
 		} catch (final BVLicenseParseException e) {
 			Assert.assertEquals("bv.design.error.failed.license.generation", e.getBvErrorCode());
@@ -182,13 +178,12 @@ public class BVDesignLicenseServiceTest {
 		final BVDesignLicenseService service = new BVDesignLicenseService();
 		service.setObjectMapper(this.objectMapper);
 		service.setBvDesignLicenseProcessRunner(this.processRunner);
-		service.setBvDesignProperties(this.bvDesignProperties);
-
 		final String bvDesignLocation = "parentDirectory/bvdesign";
+		service.setBvDesignPath(bvDesignLocation);
+
 		this.bvDesignLicenseInfo.getStatus().setReturnCode(BVDesignLicenseService.LICENSE_SUCCESS_CODE);
 
 		Mockito.when(objectMapper.readValue(ArgumentMatchers.any(File.class), ArgumentMatchers.eq(DesignLicenseInfo.class))).thenReturn(this.bvDesignLicenseInfo);
-		Mockito.when(bvDesignProperties.getBvDesignPath()).thenReturn(bvDesignLocation);
 
 		try {
 

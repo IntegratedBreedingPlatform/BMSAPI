@@ -8,13 +8,12 @@ import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.design.runner.ProcessRunner;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.util.ExpDesignUtil;
-import org.ibp.api.rest.design.BVDesignProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -42,13 +41,17 @@ public class BVDesignRunner implements DesignRunner {
 	private BVDesignOutputReader outputReader = new BVDesignOutputReader();
 	private BVDesignXmlInputWriter inputWriter = new BVDesignXmlInputWriter();
 
-	@Resource
-	private BVDesignProperties bvDesignProperties;
+	@Value("upload.directory")
+	private String uploadDirectory;
+
+	@Value("bv.design.runner.timeout")
+	private Integer bvDesignRunnerTimeout;
+
+	@Value("bv.design.path")
+	private String bvDesignPath;
 
 	@Override
 	public BVDesignOutput runBVDesign(final MainDesign design) throws IOException {
-
-		final String bvDesignPath = this.bvDesignProperties.getBvDesignPath();
 
 		int returnCode = -1;
 
@@ -56,7 +59,7 @@ public class BVDesignRunner implements DesignRunner {
 
 			final String xml = this.getXMLStringForDesign(design);
 
-			final String filepath = this.inputWriter.write(xml, this.bvDesignProperties);
+			final String filepath = this.inputWriter.write(xml);
 
 			returnCode = this.processRunner.run(bvDesignPath, "-i" + filepath);
 		}
@@ -94,13 +97,6 @@ public class BVDesignRunner implements DesignRunner {
 		return seedValue;
 	}
 
-	private static String generateBVFilePath(final String extensionFilename, final BVDesignProperties bvDesignProperties) {
-		final String filename = BVDesignRunner.generateBVFileName(extensionFilename);
-		final String filenamePath = bvDesignProperties.getUploadDirectory() + File.separator + filename;
-		final File f = new File(filenamePath);
-		return f.getAbsolutePath();
-	}
-
 	private static String generateBVFileName(final String extensionFileName) {
 		return System.currentTimeMillis() + BVDesignRunner.BV_PREFIX + extensionFileName;
 	}
@@ -117,10 +113,6 @@ public class BVDesignRunner implements DesignRunner {
 		this.inputWriter = inputWriter;
 	}
 
-	public void setBvDesignProperties(final BVDesignProperties bvDesignProperties) {
-		this.bvDesignProperties = bvDesignProperties;
-	}
-
 	public class BVDesignProcessRunner implements ProcessRunner {
 
 		@Override
@@ -131,7 +123,7 @@ public class BVDesignRunner implements DesignRunner {
 			final ProcessBuilder pb = new ProcessBuilder(command);
 			final Process p = pb.start();
 			// add a timeout for the design runner
-			final long bvDesignRunnerTimeout = 60 * 1000 * Long.valueOf(BVDesignRunner.this.bvDesignProperties.getBvDesignRunnerTimeout());
+			final long bvDesignRunnerTimeout = 60 * 1000 * Long.valueOf(BVDesignRunner.this.bvDesignRunnerTimeout);
 			final ProcessTimeoutThread processTimeoutThread = new ProcessTimeoutThread(p, bvDesignRunnerTimeout);
 			processTimeoutThread.start();
 			try {
@@ -189,11 +181,14 @@ public class BVDesignRunner implements DesignRunner {
 	}
 
 
-	public static class BVDesignXmlInputWriter {
+	public class BVDesignXmlInputWriter {
 
-		public String write(final String xml, final BVDesignProperties bvDesignProperties) {
+		public String write(final String xml) {
 
-			String filenamePath = BVDesignRunner.generateBVFilePath(BVDesignRunner.XML_EXTENSION, bvDesignProperties);
+			final String filename = BVDesignRunner.generateBVFileName(BVDesignRunner.XML_EXTENSION);
+			final String path = BVDesignRunner.this.uploadDirectory + File.separator + filename;
+			final File f = new File(path);
+			String filenamePath = f.getAbsolutePath();
 			try {
 
 				final File file = new File(filenamePath);
@@ -210,4 +205,15 @@ public class BVDesignRunner implements DesignRunner {
 
 	}
 
+	public void setUploadDirectory(final String uploadDirectory) {
+		this.uploadDirectory = uploadDirectory;
+	}
+
+	public void setBvDesignRunnerTimeout(final Integer bvDesignRunnerTimeout) {
+		this.bvDesignRunnerTimeout = bvDesignRunnerTimeout;
+	}
+
+	public void setBvDesignPath(final String bvDesignPath) {
+		this.bvDesignPath = bvDesignPath;
+	}
 }
