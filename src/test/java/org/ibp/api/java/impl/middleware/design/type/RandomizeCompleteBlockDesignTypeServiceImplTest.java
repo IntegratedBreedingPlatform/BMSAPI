@@ -5,7 +5,9 @@ import org.generationcp.middleware.data.initializer.StandardVariableTestDataInit
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
@@ -36,17 +38,20 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 
-	public static final int TREATMENT_FACTOR_KEY_VARIABLE = 8241;
-	public static final int TREATMENT_FACTOR_LABEL_VARIABLE = 8260;
+	private static final int TREATMENT_FACTOR_KEY_VARIABLE = 8241;
+	private static final int TREATMENT_FACTOR_LABEL_VARIABLE = 8260;
 	public static final String ENTRY_NO = "ENTRY_NO";
 	public static final String PLOT_NO = "PLOT_NO";
-	public static final String REP_NO = "REP_NO";
+	private static final String REP_NO = "REP_NO";
 
 	@Mock
 	public ExperimentDesignTypeValidator experimentDesignTypeValidator;
 
 	@Mock
 	public ExperimentDesignGenerator experimentDesignGenerator;
+
+	@Mock
+	public HibernateSessionProvider sessionProvider;
 
 	@Mock
 	public OntologyDataManager ontologyDataManager;
@@ -69,6 +74,8 @@ public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 
 	@Test
 	public void testGenerateDesign() {
+		final MeasurementVariableTransformer transformer = new MeasurementVariableTransformer(this.sessionProvider);
+		this.designTypeService.setMeasurementVariableTransformer(transformer);
 
 		final MainDesign mainDesign = new MainDesign();
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();

@@ -183,5 +183,8 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 		return levels;
 	}
 
-
+	void setMeasurementVariableTransformer(
+		final MeasurementVariableTransformer measurementVariableTransformer) {
+		this.measurementVariableTransformer = measurementVariableTransformer;
+	}
 }
