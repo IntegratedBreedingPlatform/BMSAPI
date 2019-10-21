@@ -14,6 +14,10 @@ public class MainDesign implements Serializable {
 	private static final long serialVersionUID = 3881877704058005795L;
 	private ExperimentDesign design;
 
+	public MainDesign() {
+
+	}
+
 	public MainDesign(final ExperimentDesign design) {
 		this.design = design;
 	}
