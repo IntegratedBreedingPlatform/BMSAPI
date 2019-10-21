@@ -36,7 +36,7 @@ public class BVDesignLicenseService implements DesignLicenseService {
 
 	private ProcessRunner bvDesignLicenseProcessRunner = new BVDesignLicenseProcessRunner();
 
-	@Value("bv.design.path")
+	@Value("${bv.design.path}")
 	private String bvDesignPath;
 
 	@Override

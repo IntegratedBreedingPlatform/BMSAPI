@@ -41,13 +41,13 @@ public class BVDesignRunner implements DesignRunner {
 	private BVDesignOutputReader outputReader = new BVDesignOutputReader();
 	private BVDesignXmlInputWriter inputWriter = new BVDesignXmlInputWriter();
 
-	@Value("upload.directory")
+	@Value("${upload.directory}")
 	private String uploadDirectory;
 
-	@Value("bv.design.runner.timeout")
+	@Value("${bv.design.runner.timeout}")
 	private String bvDesignRunnerTimeout;
 
-	@Value("bv.design.path")
+	@Value("${bv.design.path}")
 	private String bvDesignPath;
 
 	@Override
