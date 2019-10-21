@@ -14,6 +14,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.StringUtil;
@@ -25,7 +26,6 @@ import org.ibp.api.domain.design.ExperimentDesignParameterListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.runner.DesignRunner;
-import org.ibp.api.java.impl.middleware.design.transformer.StandardVariableTransformer;
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -103,7 +103,7 @@ public class ExperimentDesignGenerator {
 	private OntologyDataManager ontologyDataManager;
 
 	@Resource
-	private StandardVariableTransformer standardVariableTransformer;
+	private MeasurementVariableTransformer measurementVariableTransformer;
 
 	private final Random random = new Random();
 
@@ -390,7 +390,7 @@ public class ExperimentDesignGenerator {
 	MeasurementVariable convertToMeasurementVariable(final StandardVariable standardVariable, final VariableType variableType,
 		final String value) {
 		final MeasurementVariable measurementVariable =
-			this.standardVariableTransformer.convert(standardVariable, variableType);
+			this.measurementVariableTransformer.transform(standardVariable, true, variableType);
 		measurementVariable.setValue(value);
 		return measurementVariable;
 	}

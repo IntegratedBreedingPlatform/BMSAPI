@@ -9,7 +9,6 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
-import org.ibp.api.java.impl.middleware.design.transformer.StandardVariableTransformer;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
@@ -59,9 +58,6 @@ public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 
 	@Before
 	public void init() {
-
-		this.designTypeService.setStandardVariableTransformer(new StandardVariableTransformer());
-
 		when(this.ontologyDataManager
 			.getStandardVariables(RandomizeCompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES, PROGRAM_UUID))
 			.thenReturn(this.createTestStandardVariables());

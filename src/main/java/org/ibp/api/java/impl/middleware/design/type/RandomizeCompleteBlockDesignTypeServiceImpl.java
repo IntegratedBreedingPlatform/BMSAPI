@@ -6,11 +6,11 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
-import org.ibp.api.java.impl.middleware.design.transformer.StandardVariableTransformer;
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -51,7 +51,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 	private OntologyDataManager ontologyDataManager;
 
 	@Resource
-	private StandardVariableTransformer standardVariableTransformer;
+	private MeasurementVariableTransformer measurementVariableTransformer;
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
@@ -130,15 +130,15 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 
 			final Set<Integer> treatmentFactorLevelIds = treatmentFactorLevelToLabelIdMap.keySet();
 			for (final Integer treatmentFactorLevelId : treatmentFactorLevelIds) {
-				final MeasurementVariable treatmentFactorLevelVariable = this.standardVariableTransformer
-					.convert(standardVariableMap.get(treatmentFactorLevelId), VariableType.TREATMENT_FACTOR);
+				final MeasurementVariable treatmentFactorLevelVariable = this.measurementVariableTransformer
+					.transform(standardVariableMap.get(treatmentFactorLevelId), true, VariableType.TREATMENT_FACTOR);
 				treatmentFactorLevelVariable.setTreatmentLabel(treatmentFactorLevelVariable.getName());
 				treatmentFactorLevelVariable.setValue(treatmentFactorLevelVariable.getName());
 				measurementVariables.add(treatmentFactorLevelVariable);
 
 				final Integer treatmentFactorLabelId = treatmentFactorLevelToLabelIdMap.get(treatmentFactorLevelId);
-				final MeasurementVariable treatmentFactorLabelVariable = this.standardVariableTransformer
-					.convert(standardVariableMap.get(treatmentFactorLabelId), VariableType.TREATMENT_FACTOR);
+				final MeasurementVariable treatmentFactorLabelVariable = this.measurementVariableTransformer
+					.transform(standardVariableMap.get(treatmentFactorLabelId), true, VariableType.TREATMENT_FACTOR);
 				treatmentFactorLabelVariable.setTreatmentLabel(treatmentFactorLevelVariable.getName());
 				treatmentFactorLabelVariable.setValue(treatmentFactorLevelVariable.getName());
 				measurementVariables.add(treatmentFactorLabelVariable);
@@ -183,9 +183,5 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 		return levels;
 	}
 
-	protected void setStandardVariableTransformer(
-		final StandardVariableTransformer standardVariableTransformer) {
-		this.standardVariableTransformer = standardVariableTransformer;
-	}
 
 }
