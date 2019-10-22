@@ -69,7 +69,7 @@ public class ExperimentDesign implements Serializable {
 		return "";
 	}
 
-	public List<ExperimentDesignParameterListItem> getParameterList(final String name) {
+	public List<ListItem> getParameterList(final String name) {
 		if (this.parameters != null) {
 			for (final ExperimentDesignParameter param : this.parameters) {
 				if (name != null && param.getName() != null && param.getName().equalsIgnoreCase(name)) {

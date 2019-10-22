@@ -6,7 +6,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.ExperimentDesign;
-import org.ibp.api.domain.design.ExperimentDesignParameterListItem;
+import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
@@ -112,8 +112,8 @@ public class MockDesignRunnerImpl implements DesignRunner {
 		// Add header
 		final List<String> constants = Arrays.asList(TRIAL, PLOT_NO, REP_NO);
 		final List<String> headers = new ArrayList<>(constants);
-		final List<ExperimentDesignParameterListItem> treatmentFactorsList = experimentDesign.getParameterList(ExperimentDesignGenerator.TREATMENTFACTORS_PARAM);
-		for (final ExperimentDesignParameterListItem item : treatmentFactorsList) {
+		final List<ListItem> treatmentFactorsList = experimentDesign.getParameterList(ExperimentDesignGenerator.TREATMENTFACTORS_PARAM);
+		for (final ListItem item : treatmentFactorsList) {
 			headers.add(item.getValue());
 		}
 		final String[] headersAsArray = new String[headers.size()];
@@ -210,14 +210,14 @@ public class MockDesignRunnerImpl implements DesignRunner {
 		// Add header
 		csvLines.add(new String[] {TRIAL, PLOT_NO, BLOCK_NO, ENTRY_NO});
 
-		final List<ExperimentDesignParameterListItem> nRepeats = design.getDesign().getParameterList(ExperimentDesignGenerator.NREPEATS_PARAM);
+		final List<ListItem> nRepeats = design.getDesign().getParameterList(ExperimentDesignGenerator.NREPEATS_PARAM);
 
 		for (int instance = 1; instance <= numberTrials; instance++) {
 			int startingPlotNo = StringUtils.isNumeric(initPlotNoParam) ? Integer.valueOf(initPlotNoParam) : 1;
 
 			final List<Integer> replicatedEntryNumbers = new ArrayList<>();
 			int entryIndex = 0;
-			for (final ExperimentDesignParameterListItem listItem : nRepeats) {
+			for (final ListItem listItem : nRepeats) {
 				final int replicates = Integer.parseInt(listItem.getValue());
 				for (int i = 0; i < replicates; i++) {
 					replicatedEntryNumbers.add(entryNumbers.get(entryIndex));
@@ -255,7 +255,7 @@ public class MockDesignRunnerImpl implements DesignRunner {
 	}
 
 	public List<List<String>> getTreatmentFactorValuesCombinations(final ExperimentDesign experimentDesign) {
-		final List<ExperimentDesignParameterListItem> levelList = experimentDesign.getParameterList(ExperimentDesignGenerator.LEVELS_PARAM);
+		final List<ListItem> levelList = experimentDesign.getParameterList(ExperimentDesignGenerator.LEVELS_PARAM);
 		final List<List<String>> tfValuesListForCSV = new ArrayList<>();
 		if (ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN.equals(experimentDesign.getName()) && levelList.size() != 1) {
 			//Create the lists of treatment factor values
@@ -299,7 +299,7 @@ public class MockDesignRunnerImpl implements DesignRunner {
 	private int getNumberOfTreatments(final MainDesign design) {
 		final ExperimentDesign experimentDesign = design.getDesign();
 		if (ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN.equals(experimentDesign.getName())) {
-			final List<ExperimentDesignParameterListItem> levelList = experimentDesign.getParameterList(ExperimentDesignGenerator.LEVELS_PARAM);
+			final List<ListItem> levelList = experimentDesign.getParameterList(ExperimentDesignGenerator.LEVELS_PARAM);
 			return Integer.parseInt(levelList.get(levelList.size() - 1).getValue());
 		} else {
 			return Integer.parseInt(experimentDesign.getParameterValue(ExperimentDesignGenerator.NTREATMENTS_PARAM));

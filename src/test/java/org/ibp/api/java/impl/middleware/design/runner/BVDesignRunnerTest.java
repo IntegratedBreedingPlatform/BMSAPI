@@ -3,7 +3,7 @@ package org.ibp.api.java.impl.middleware.design.runner;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.domain.design.BVDesignOutput;
-import org.ibp.api.domain.design.ExperimentDesignParameterListItem;
+import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.junit.Before;
@@ -104,10 +104,10 @@ public class BVDesignRunnerTest {
 				+ ExperimentDesignGenerator.PLOTFACTOR_PARAM + "\" value=\"Plots\"/>" + "<Parameter name=\""
 				+ ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM + "\" value=\"301\"/>" + "<Parameter name=\""
 				+ ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM + "\">"
-				+ "<ExperimentDesignParameterListItem value=\"1\"/><ExperimentDesignParameterListItem value=\"1\"/></Parameter>" + "<Parameter name=\""
+				+ "<ListItem value=\"1\"/><ListItem value=\"1\"/></Parameter>" + "<Parameter name=\""
 				+ ExperimentDesignGenerator.TREATMENTFACTORS_PARAM
-				+ "\"><ExperimentDesignParameterListItem value=\"ENTRY_NO\"/><ExperimentDesignParameterListItem value=\"FERTILIZER\"/></Parameter>"
-				+ "<Parameter name=\"levels\"><ExperimentDesignParameterListItem value=\"24\"/><ExperimentDesignParameterListItem value=\"3\"/></Parameter>" + "<Parameter name=\""
+				+ "\"><ListItem value=\"ENTRY_NO\"/><ListItem value=\"FERTILIZER\"/></Parameter>"
+				+ "<Parameter name=\"levels\"><ListItem value=\"24\"/><ListItem value=\"3\"/></Parameter>" + "<Parameter name=\""
 				+ ExperimentDesignGenerator.TIMELIMIT_PARAM + "\" value=\"" + AppConstants.EXP_DESIGN_TIME_LIMIT.getString()
 				+ "\"/>" + "<Parameter name=\"" + ExperimentDesignGenerator.OUTPUTFILE_PARAM
 				+ "\" value=\":outputFile\"/></Template></Templates>";
@@ -247,10 +247,10 @@ public class BVDesignRunnerTest {
 	public void testGetXMLStringForPRepDesign() {
 		final int numberOfBlocks = 1;
 		final int nTreatments = 20;
-		final ArrayList<ExperimentDesignParameterListItem> nRepeatsListItem = new ArrayList<>();
-		nRepeatsListItem.add(new ExperimentDesignParameterListItem("1"));
-		nRepeatsListItem.add(new ExperimentDesignParameterListItem("2"));
-		nRepeatsListItem.add(new ExperimentDesignParameterListItem("3"));
+		final ArrayList<ListItem> nRepeatsListItem = new ArrayList<>();
+		nRepeatsListItem.add(new ListItem("1"));
+		nRepeatsListItem.add(new ListItem("2"));
+		nRepeatsListItem.add(new ListItem("3"));
 		final String treatmentFactor = "ENTRY_NO";
 		final String blockFactor = "BLOCK_NO";
 		final String plotFactor = "PLOT_NO";
@@ -267,9 +267,9 @@ public class BVDesignRunnerTest {
 			+ "<Parameter name=\"" + ExperimentDesignGenerator.NTREATMENTS_PARAM + "\" value=\"20\"/>"
 			+ "<Parameter name=\"" + ExperimentDesignGenerator.NBLOCKS_PARAM + "\" value=\"1\"/>"
 			+ "<Parameter name=\"" + ExperimentDesignGenerator.NREPEATS_PARAM + "\">"
-			+ "<ExperimentDesignParameterListItem value=\"1\"/>"
-			+ "<ExperimentDesignParameterListItem value=\"2\"/>"
-			+ "<ExperimentDesignParameterListItem value=\"3\"/>"
+			+ "<ListItem value=\"1\"/>"
+			+ "<ListItem value=\"2\"/>"
+			+ "<ListItem value=\"3\"/>"
 			+ "</Parameter>"
 			+ "<Parameter name=\"" + ExperimentDesignGenerator.TREATMENTFACTOR_PARAM + "\" value=\"ENTRY_NO\"/>"
 			+ "<Parameter name=\"" + ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM + "\" value=\"1\"/>"

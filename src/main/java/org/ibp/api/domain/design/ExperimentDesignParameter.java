@@ -14,7 +14,7 @@ public class ExperimentDesignParameter implements Serializable {
 	private static final long serialVersionUID = -926477529786318441L;
 	private String name;
 	private String value;
-	private List<ExperimentDesignParameterListItem> listItem; // would only be created in xml if not null
+	private List<ListItem> listItem; // would only be created in xml if not null
 
 	public ExperimentDesignParameter(final String name, final String value) {
 		this.name = name;
@@ -39,12 +39,12 @@ public class ExperimentDesignParameter implements Serializable {
 		this.value = value;
 	}
 
-	@XmlElement(name = "ExperimentDesignParameterListItem")
-	public List<ExperimentDesignParameterListItem> getListItem() {
+	@XmlElement(name = "ListItem")
+	public List<ListItem> getListItem() {
 		return this.listItem;
 	}
 
-	public void setListItem(final List<ExperimentDesignParameterListItem> listItem) {
+	public void setListItem(final List<ListItem> listItem) {
 		this.listItem = listItem;
 	}
 

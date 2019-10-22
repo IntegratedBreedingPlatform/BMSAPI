@@ -8,7 +8,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.ExperimentDesign;
 import org.ibp.api.domain.design.ExperimentDesignParameter;
-import org.ibp.api.domain.design.ExperimentDesignParameterListItem;
+import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.runner.DesignRunner;
@@ -202,7 +202,7 @@ public class ExperimentDesignGeneratorTest {
 		final Integer numberOfBlocks = 2;
 		final Integer numberOfTreatments = 22;
 		final Integer startingPlotNumber = 1;
-		final List<ExperimentDesignParameterListItem> nRepeatsListItem = Arrays.asList(new ExperimentDesignParameterListItem("1"));
+		final List<ListItem> nRepeatsListItem = Arrays.asList(new ListItem("1"));
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createPRepDesign(
@@ -239,12 +239,12 @@ public class ExperimentDesignGeneratorTest {
 		final float noOfTestEntriesToReplicate = Math.round((float) noOfTestEntries * (replicationPercentage / 100));
 
 		final List<StudyGermplasmDto> importedGermplasmList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
-		final List<ExperimentDesignParameterListItem> listItems =
+		final List<ListItem> listItems =
 			this.experimentDesignGenerator
 				.createReplicationListItemForPRepDesign(importedGermplasmList, replicationPercentage, replicationNumber);
 
 		float countOfReplicatedListItem = 0;
-		for (final ExperimentDesignParameterListItem listItem : listItems) {
+		for (final ListItem listItem : listItems) {
 			if (listItem.getValue().equals(String.valueOf(replicationNumber))) {
 				countOfReplicatedListItem++;
 			}
@@ -269,12 +269,12 @@ public class ExperimentDesignGeneratorTest {
 		final StudyGermplasmDto checkImportedGermplasm = importedGermplasmList.get(0);
 		checkImportedGermplasm.setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
 
-		final List<ExperimentDesignParameterListItem> listItems =
+		final List<ListItem> listItems =
 			this.experimentDesignGenerator
 				.createReplicationListItemForPRepDesign(importedGermplasmList, replicationPercentage, replicationNumber);
 
 		float countOfReplicatedListItem = 0;
-		for (final ExperimentDesignParameterListItem listItem : listItems) {
+		for (final ListItem listItem : listItems) {
 			if (listItem.getValue().equals(String.valueOf(replicationNumber))) {
 				countOfReplicatedListItem++;
 			}
@@ -301,12 +301,12 @@ public class ExperimentDesignGeneratorTest {
 		final int customEntryTypeCategoricalId = 1000;
 		checkImportedGermplasm.setCheckType(customEntryTypeCategoricalId);
 
-		final List<ExperimentDesignParameterListItem> listItems =
+		final List<ListItem> listItems =
 			this.experimentDesignGenerator
 				.createReplicationListItemForPRepDesign(importedGermplasmList, replicationPercentage, replicationNumber);
 
 		float countOfReplicatedListItem = 0;
-		for (final ExperimentDesignParameterListItem listItem : listItems) {
+		for (final ListItem listItem : listItems) {
 			if (listItem.getValue().equals(String.valueOf(replicationNumber))) {
 				countOfReplicatedListItem++;
 			}
@@ -354,7 +354,7 @@ public class ExperimentDesignGeneratorTest {
 		listOfString.add(sampleText1);
 		listOfString.add(sampleText2);
 
-		final List<ExperimentDesignParameterListItem> listItems = this.experimentDesignGenerator.convertToListItemList(listOfString);
+		final List<ListItem> listItems = this.experimentDesignGenerator.convertToListItemList(listOfString);
 
 		Assert.assertEquals(2, listItems.size());
 		Assert.assertEquals(sampleText1, listItems.get(0).getValue());
@@ -374,7 +374,7 @@ public class ExperimentDesignGeneratorTest {
 	@Test
 	public void testGetInitialTreatNumList() {
 		final List<String> treatmentFactors = Arrays.asList(TermId.ENTRY_NO.name(), "NFERT_NO");
-		final List<ExperimentDesignParameterListItem> listItems = this.experimentDesignGenerator.getInitialTreatNumList(treatmentFactors, 5, TermId.ENTRY_NO.name());
+		final List<ListItem> listItems = this.experimentDesignGenerator.getInitialTreatNumList(treatmentFactors, 5, TermId.ENTRY_NO.name());
 		Assert.assertEquals("5", listItems.get(0).getValue());
 		Assert.assertEquals("1", listItems.get(1).getValue());
 	}

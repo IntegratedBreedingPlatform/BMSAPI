@@ -22,7 +22,7 @@ import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.BVDesignTrialInstance;
 import org.ibp.api.domain.design.ExperimentDesign;
 import org.ibp.api.domain.design.ExperimentDesignParameter;
-import org.ibp.api.domain.design.ExperimentDesignParameterListItem;
+import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.runner.DesignRunner;
@@ -232,7 +232,7 @@ public class ExperimentDesignGenerator {
 	}
 
 	public MainDesign createPRepDesign(
-		final Integer numberOfBlocks, final Integer nTreatments, final List<ExperimentDesignParameterListItem> nRepeatsListItem,
+		final Integer numberOfBlocks, final Integer nTreatments, final List<ListItem> nRepeatsListItem,
 		final String treatmentFactor, final String blockFactor, final String plotFactor,
 		final Integer initialPlotNumber) {
 
@@ -260,7 +260,7 @@ public class ExperimentDesignGenerator {
 		return new MainDesign(design);
 	}
 
-	public List<ExperimentDesignParameterListItem> createReplicationListItemForPRepDesign(
+	public List<ListItem> createReplicationListItemForPRepDesign(
 		final List<StudyGermplasmDto> studyGermplasmDtoList, final float replicationPercentage,
 		final int replicationNumber) {
 
@@ -285,17 +285,17 @@ public class ExperimentDesignGenerator {
 			randomTestEntryNumbers.add(testEntryNumbers.get(this.random.nextInt(testEntryNumbers.size())));
 		}
 
-		final List<ExperimentDesignParameterListItem> replicationListItem = new LinkedList<>();
+		final List<ListItem> replicationListItem = new LinkedList<>();
 		for (final StudyGermplasmDto studyGermplasmDto : studyGermplasmDtoList) {
 			if (SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() != studyGermplasmDto.getCheckType()) {
 				// All Check Entries in the list should be replicated
-				replicationListItem.add(new ExperimentDesignParameterListItem(String.valueOf(replicationNumber)));
+				replicationListItem.add(new ListItem(String.valueOf(replicationNumber)));
 			} else if (randomTestEntryNumbers.contains(studyGermplasmDto.getEntryNumber())) {
 				// Randomized Test Entries should be replicated
-				replicationListItem.add(new ExperimentDesignParameterListItem(String.valueOf(replicationNumber)));
+				replicationListItem.add(new ListItem(String.valueOf(replicationNumber)));
 			} else {
 				// Default replication number is 1
-				replicationListItem.add(new ExperimentDesignParameterListItem(String.valueOf(1)));
+				replicationListItem.add(new ListItem(String.valueOf(1)));
 			}
 		}
 
@@ -515,7 +515,7 @@ public class ExperimentDesignGenerator {
 		return observationUnitRow;
 	}
 
-	ExperimentDesignParameter createExperimentDesignParameter(final String name, final String value, final List<ExperimentDesignParameterListItem> items) {
+	ExperimentDesignParameter createExperimentDesignParameter(final String name, final String value, final List<ListItem> items) {
 
 		final ExperimentDesignParameter designParam = new ExperimentDesignParameter(name, value);
 		if (items != null && !items.isEmpty()) {
@@ -570,9 +570,9 @@ public class ExperimentDesignGenerator {
 			// we add the string tokenize replating groups
 			// we tokenize the replating groups
 			final StringTokenizer tokenizer = new StringTokenizer(replatingGroups, ",");
-			final List<ExperimentDesignParameterListItem> replatingList = new ArrayList<>();
+			final List<ListItem> replatingList = new ArrayList<>();
 			while (tokenizer.hasMoreTokens()) {
-				replatingList.add(new ExperimentDesignParameterListItem(tokenizer.nextToken()));
+				replatingList.add(new ListItem(tokenizer.nextToken()));
 			}
 			paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.REPLATINGROUPS_PARAM, null, replatingList));
 		} else {
@@ -590,9 +590,9 @@ public class ExperimentDesignGenerator {
 			paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.NCLATIN_PARAM, String.valueOf(ncLatin), null));
 			// we tokenize the replating groups
 			final StringTokenizer tokenizer = new StringTokenizer(replatingGroups, ",");
-			final List<ExperimentDesignParameterListItem> replatingList = new ArrayList<>();
+			final List<ListItem> replatingList = new ArrayList<>();
 			while (tokenizer.hasMoreTokens()) {
-				replatingList.add(new ExperimentDesignParameterListItem(tokenizer.nextToken()));
+				replatingList.add(new ListItem(tokenizer.nextToken()));
 			}
 			paramList.add(this.createExperimentDesignParameter(ExperimentDesignGenerator.REPLATINGROUPS_PARAM, null, replatingList));
 		} else {
@@ -602,24 +602,24 @@ public class ExperimentDesignGenerator {
 
 	}
 
-	List<ExperimentDesignParameterListItem> convertToListItemList(final List<String> listString) {
+	List<ListItem> convertToListItemList(final List<String> listString) {
 
-		final List<ExperimentDesignParameterListItem> listItemList = new ArrayList<>();
+		final List<ListItem> listItemList = new ArrayList<>();
 		for (final String value : listString) {
-			listItemList.add(new ExperimentDesignParameterListItem(value));
+			listItemList.add(new ListItem(value));
 		}
 		return listItemList;
 
 	}
 
-	List<ExperimentDesignParameterListItem> getInitialTreatNumList(final List<String> treatmentFactors, final Integer initialTreatNum, final String entryNoVarName) {
+	List<ListItem> getInitialTreatNumList(final List<String> treatmentFactors, final Integer initialTreatNum, final String entryNoVarName) {
 
-		final List<ExperimentDesignParameterListItem> listItemList = new ArrayList<>();
+		final List<ListItem> listItemList = new ArrayList<>();
 		for (final String treatmentFactor : treatmentFactors) {
 			if (treatmentFactor.equals(entryNoVarName)) {
-				listItemList.add(new ExperimentDesignParameterListItem(String.valueOf(initialTreatNum)));
+				listItemList.add(new ListItem(String.valueOf(initialTreatNum)));
 			} else {
-				listItemList.add(new ExperimentDesignParameterListItem("1"));
+				listItemList.add(new ListItem("1"));
 			}
 		}
 		return listItemList;
