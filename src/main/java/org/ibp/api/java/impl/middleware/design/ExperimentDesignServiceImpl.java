@@ -79,7 +79,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		final List<MeasurementVariable> measurementVariables =
 			experimentDesignTypeService.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
 
-		this.experimentDesignMiddlewareService.deleteExperimentDesign(studyId);
+		this.experimentDesignMiddlewareService.deleteStudyExperimentDesign(studyId);
 		this.experimentDesignMiddlewareService
 			.saveExperimentDesign(cropType, studyId, measurementVariables, this.mapObservationUnitRow(observationUnitRows));
 	}
@@ -88,7 +88,7 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	public void deleteDesign(final int studyId) {
 		this.studyValidator.validate(studyId, true);
 		this.experimentDesignValidator.validateExperimentDesignExistence(studyId, true);
-		this.experimentDesignMiddlewareService.deleteExperimentDesign(studyId);
+		this.experimentDesignMiddlewareService.deleteStudyExperimentDesign(studyId);
 	}
 
 	List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> mapObservationUnitRow(

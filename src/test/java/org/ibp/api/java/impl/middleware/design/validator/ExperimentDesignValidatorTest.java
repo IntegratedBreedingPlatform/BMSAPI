@@ -33,7 +33,7 @@ public class ExperimentDesignValidatorTest {
 
 	@Test
 	public void testExperimentDesignShouldExist_DesignDoesNotExist() {
-		Mockito.doReturn(Optional.absent()).when(this.experimentDesignMiddlewareService).getExperimentDesignTypeTermId(STUDY_ID);
+		Mockito.doReturn(Optional.absent()).when(this.experimentDesignMiddlewareService).getStudyExperimentDesignTypeTermId(STUDY_ID);
 		try {
 			this.experimentDesignValidator.validateExperimentDesignExistence(STUDY_ID, true);
 			Assert.fail("Expected validation exception to be thrown but was not.");
@@ -46,7 +46,7 @@ public class ExperimentDesignValidatorTest {
 	@Test
 	public void testExperimentDesignShouldExist_DesignExists() {
 		Mockito.doReturn(Optional.of(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getId())).when(this.experimentDesignMiddlewareService)
-			.getExperimentDesignTypeTermId(STUDY_ID);
+			.getStudyExperimentDesignTypeTermId(STUDY_ID);
 		try {
 			this.experimentDesignValidator.validateExperimentDesignExistence(STUDY_ID, true);
 		} catch (final ApiRequestValidationException e) {
@@ -57,7 +57,7 @@ public class ExperimentDesignValidatorTest {
 	@Test
 	public void testExperimentDesignShouldNotExist_DesignExists() {
 		Mockito.doReturn(Optional.of(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getId())).when(this.experimentDesignMiddlewareService)
-			.getExperimentDesignTypeTermId(STUDY_ID);
+			.getStudyExperimentDesignTypeTermId(STUDY_ID);
 		try {
 			this.experimentDesignValidator.validateExperimentDesignExistence(STUDY_ID, false);
 			Assert.fail("Expected validation exception to be thrown but was not.");
@@ -69,7 +69,7 @@ public class ExperimentDesignValidatorTest {
 
 	@Test
 	public void testExperimentDesignShouldNotExist_DesignDoesNotExist() {
-		Mockito.doReturn(Optional.absent()).when(this.experimentDesignMiddlewareService).getExperimentDesignTypeTermId(STUDY_ID);
+		Mockito.doReturn(Optional.absent()).when(this.experimentDesignMiddlewareService).getStudyExperimentDesignTypeTermId(STUDY_ID);
 		try {
 			this.experimentDesignValidator.validateExperimentDesignExistence(STUDY_ID, false);
 		} catch (final ApiRequestValidationException e) {

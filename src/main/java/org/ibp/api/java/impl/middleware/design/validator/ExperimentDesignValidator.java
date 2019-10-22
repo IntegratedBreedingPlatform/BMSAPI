@@ -20,7 +20,7 @@ public class ExperimentDesignValidator {
 	public void validateExperimentDesignExistence(final Integer studyId, final Boolean experimentDesignShouldExist) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		final Optional<Integer> experimentDesignTypeTermId = this.experimentDesignMiddlewareService.getExperimentDesignTypeTermId(studyId);
+		final Optional<Integer> experimentDesignTypeTermId = this.experimentDesignMiddlewareService.getStudyExperimentDesignTypeTermId(studyId);
 
 		if (experimentDesignShouldExist && !experimentDesignTypeTermId.isPresent()) {
 			this.errors.reject("study.has.no.experiment.design");
