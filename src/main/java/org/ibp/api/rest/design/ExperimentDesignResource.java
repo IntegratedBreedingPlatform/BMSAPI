@@ -21,9 +21,9 @@ public class ExperimentDesignResource {
 	@Resource
 	private ExperimentDesignService experimentDesignService;
 
-	@ApiOperation(value = "Generate experiment design", notes = "Generate experiment design")
+	@ApiOperation(value = "Generate experiment design for study", notes = "Generate experiment design for study")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/design", method = RequestMethod.POST)
-	public ResponseEntity generateDesign(@PathVariable final String crop,
+	public ResponseEntity generateStudyExperimentDesign(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
 		@RequestBody final ExperimentDesignInput experimentDesignInput) {
 
@@ -33,9 +33,9 @@ public class ExperimentDesignResource {
 	}
 
 
-	@ApiOperation(value = "Delete experiment design", notes = "Delete experiment design")
+	@ApiOperation(value = "Delete experiment design of study", notes = "Delete experiment design of study")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/design", method = RequestMethod.DELETE)
-	public ResponseEntity deleteDesign(@PathVariable final String crop,
+	public ResponseEntity generateStudyExperimentDesign(@PathVariable final String crop,
 		@PathVariable final Integer studyId) {
 		this.experimentDesignService.deleteDesign(studyId);
 
