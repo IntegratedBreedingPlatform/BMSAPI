@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Api(value = "Breeding View", description = "Web Services to process the Breeding View output")
+@Api(value = "Breeding View Resource")
 @RestController
 @RequestMapping("/breeding_view")
 public class BreedingView {
@@ -47,27 +47,29 @@ public class BreedingView {
 	@RequestMapping(value = "{cropName}/ssa/save_result_summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_XML_VALUE})
 	@ResponseBody
 	public DataResponse saveSsaResultSummary(
-			@ApiParam(value = "Path and filename of the SSA output file", required = true) @RequestParam("mainOutputFilePath") String mainOutputFilePath,
+			@ApiParam(value = "Path and filename of the SSA output file", required = true) @RequestParam("mainOutputFilePath") final String mainOutputFilePath,
 
-			@ApiParam(value = "Path and filename of the Summary output file", required = true) @RequestParam("SummaryOutputFilePath") String summaryOutputFilePath,
+			@ApiParam(value = "Path and filename of the Summary output file", required = true) @RequestParam("SummaryOutputFilePath")
+			final String summaryOutputFilePath,
 
-			@ApiParam(value = "Path and filename of the Outlier output file", required = false) @RequestParam(value = "OutlierFilePath", required = false) String outlierOutputFilePath,
+			@ApiParam(value = "Path and filename of the Outlier output file", required = false) @RequestParam(value = "OutlierFilePath", required = false)
+			final String outlierOutputFilePath,
 
-			@ApiParam(value = "Current Project ID", required = true) @RequestParam("WorkbenchProjectId") String workbenchProjectId,
+			@ApiParam(value = "Current Project ID", required = true) @RequestParam("WorkbenchProjectId") final String workbenchProjectId,
 
-			@ApiParam(value = "Study ID", required = true) @RequestParam("StudyId") String studyId,
+			@ApiParam(value = "Study ID", required = true) @RequestParam("StudyId") final String studyId,
 
-			@ApiParam(value = "Input Dataset ID", required = true) @RequestParam("InputDataSetId") String inputDataSetId,
+			@ApiParam(value = "Input Dataset ID", required = true) @RequestParam("InputDataSetId") final String inputDataSetId,
 
-			@ApiParam(value = "Output Dataset ID", required = true) @RequestParam("OutputDataSetId") String outputDataSetId,
+			@ApiParam(value = "Output Dataset ID", required = true) @RequestParam("OutputDataSetId") final String outputDataSetId,
 
-			@PathVariable(value = "cropName") String cropName
+			@PathVariable(value = "cropName") final String cropName
 	) {
 		DataResponse response;
 
 		try {
-			Map<String, String> params = new HashMap<String, String>();
-			List<String> errors = new ArrayList<String>();
+			final Map<String, String> params = new HashMap<>();
+			final List<String> errors = new ArrayList<>();
 			if (mainOutputFilePath == null || mainOutputFilePath.isEmpty()) {
 				errors.add("mainOutputFilePath is a required field!");
 			}
@@ -102,7 +104,7 @@ public class BreedingView {
 			} else {
 				response = new DataResponse(false, "Errors invoking web service: " + errors);
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			BreedingView.LOG.debug(e.getMessage(), e);
 			response = new DataResponse(false, "Failed to invoke service: " + e.toString());
 		}
@@ -110,8 +112,9 @@ public class BreedingView {
 		return response;
 	}
 
-	public void setBreedingViewService(BreedingViewService breedingViewService) {
+	public void setBreedingViewService(final BreedingViewService breedingViewService) {
 		this.breedingViewService = breedingViewService;
 	}
+
 
 }
