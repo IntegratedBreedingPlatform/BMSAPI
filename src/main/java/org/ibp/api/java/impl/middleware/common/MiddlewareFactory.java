@@ -73,6 +73,7 @@ import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.permission.PermissionServiceImpl;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
@@ -85,6 +86,7 @@ import org.generationcp.middleware.service.impl.study.MeasurementVariableService
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
+import org.generationcp.middleware.service.impl.study.generation.ExperimentDesignServiceImpl;
 import org.generationcp.middleware.service.impl.user.UserServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -274,7 +276,7 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public PedigreeService getPedigreeService() {
 		return PedigreeFactory.getPedigreeService(this.getCropDatabaseSessionProvider(),
-				this.getCrossExpansionProperties().getProfile(), this.contextResolver.resolveCropNameFromUrl());
+			this.getCrossExpansionProperties().getProfile(), this.contextResolver.resolveCropNameFromUrl());
 	}
 
 	@Bean
@@ -413,7 +415,6 @@ public class MiddlewareFactory {
 		return new DatasetTypeServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
-
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public TrialEnvironmentBuilder trialEnvironmentBuilder() {
@@ -442,6 +443,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public WorkbookSaver workbookSaver() {
 		return new WorkbookSaver(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public ExperimentDesignService experimentDesignMiddlewareService() {
+		return new ExperimentDesignServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
