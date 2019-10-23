@@ -4,6 +4,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class DatasetCSVGenerator implements DatasetFileGenerator {
@@ -42,9 +44,9 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 
 			rowValues.add(this.getHeaderNames(columns).toArray(new String[] {}));
 			if(!observationUnitRows.isEmpty()) {
-				final Map<String, Map<String, String>> categoricalValuesMap = this.getCategoricalValuesMap(observationUnitRows.get(0).getEnvironmentVariables(), columns);
+				final Map<String, Map<String, String>> studyAndEnvironmentCategoricalValuesMap = this.getStudyAndEnvironmentCategoricalValuesMap(columns);
 				for (final ObservationUnitRow row : observationUnitRows) {
-					rowValues.add(this.getColumnValues(row, columns, categoricalValuesMap));
+					rowValues.add(this.getColumnValues(row, columns, studyAndEnvironmentCategoricalValuesMap));
 				}
 			}
 
@@ -69,31 +71,33 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 		return this.generateSingleInstanceFile(null, null, columns, allObservationUnitRows, fileNameFullPath, null);
 	}
 
-	Map<String, Map<String, String>> getCategoricalValuesMap(final Map<String, ObservationUnitData> environmentVariables, final List<MeasurementVariable> columns) {
+	Map<String, Map<String, String>> getStudyAndEnvironmentCategoricalValuesMap(final List<MeasurementVariable> columns) {
 		final Map<String, Map<String, String>> categoricalValuesMap = new HashMap<>();
-		for (final MeasurementVariable column : columns) {
-			if (((environmentVariables.containsKey(column.getName()) && ENVIRONMENT_VARIABLES_VARIABLE_TYPES
-				.contains(column.getVariableType())) || VariableType.STUDY_DETAIL.equals(column.getVariableType())) && column.getPossibleValues() != null && !column.getPossibleValues()
-				.isEmpty()) {
-				final Map<String, String> possibleValuesMap = new HashMap<>();
-				categoricalValuesMap.put(column.getName(), possibleValuesMap);
-				for (final ValueReference possibleValue : column.getPossibleValues()) {
-					possibleValuesMap.put(possibleValue.getId().toString(), possibleValue.getName());
-				}
+
+		final List<MeasurementVariable> studyAndEnvironmentCategoricalVariables = columns.stream()
+			.filter(column -> (((ENVIRONMENT_VARIABLES_VARIABLE_TYPES
+				.contains(column.getVariableType()) || VariableType.STUDY_DETAIL.equals(column.getVariableType()))
+					&& DataType.CATEGORICAL_VARIABLE.getName().equals(column.getDataType()))))
+			.collect(Collectors.toList());
+		for (final MeasurementVariable column : studyAndEnvironmentCategoricalVariables) {
+			final Map<String, String> possibleValuesMap = new HashMap<>();
+			for (final ValueReference possibleValue : column.getPossibleValues()) {
+				possibleValuesMap.put(possibleValue.getId().toString(), possibleValue.getName());
 			}
+			categoricalValuesMap.put(column.getName(), possibleValuesMap);
 
 		}
 		return categoricalValuesMap;
 	}
 
-	String[] getColumnValues(final ObservationUnitRow row, final List<MeasurementVariable> subObservationSetColumns, final Map<String, Map<String, String>> categoricalValuesMap) {
+	String[] getColumnValues(final ObservationUnitRow row, final List<MeasurementVariable> subObservationSetColumns, final Map<String, Map<String, String>> studyAndEnvironmentCategoricalValuesMap) {
 		final List<String> values = new LinkedList<>();
 		for (final MeasurementVariable column : subObservationSetColumns) {
 			if (row.getEnvironmentVariables().containsKey(column.getName()) && ENVIRONMENT_VARIABLES_VARIABLE_TYPES
 				.contains(column.getVariableType())) {
-				this.getCategoricalValue(categoricalValuesMap, values, column, row.getEnvironmentVariables().get(column.getName()).getValue());
+				this.getValue(studyAndEnvironmentCategoricalValuesMap, values, column, row.getEnvironmentVariables().get(column.getName()).getValue());
 			} else if(VariableType.STUDY_DETAIL.equals(column.getVariableType())) {
-				this.getCategoricalValue(categoricalValuesMap, values, column, row.getVariables().get(column.getName()).getValue());
+				this.getValue(studyAndEnvironmentCategoricalValuesMap, values, column, row.getVariables().get(column.getName()).getValue());
 			} else {
 				values.add(row.getVariables().get(column.getName()).getValue());
 			}
@@ -101,7 +105,7 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 		return values.toArray(new String[] {});
 	}
 
-	private void getCategoricalValue(final Map<String, Map<String, String>> categoricalValuesMap, final List<String> values,
+	private void getValue(final Map<String, Map<String, String>> categoricalValuesMap, final List<String> values,
 		final MeasurementVariable column, final String value) {
 		if(categoricalValuesMap.get(column.getName()) != null && categoricalValuesMap.get(column.getName()).get(value) != null) {
 			values.add(categoricalValuesMap.get(column.getName()).get(value));

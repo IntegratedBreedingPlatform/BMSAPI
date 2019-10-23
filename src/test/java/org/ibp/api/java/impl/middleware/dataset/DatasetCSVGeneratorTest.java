@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.dataset;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -83,6 +84,7 @@ public class DatasetCSVGeneratorTest {
 		final List<ValueReference> studyDetailPossibleValues = new ArrayList<>();
 		studyDetailPossibleValues.add(new ValueReference(1, DatasetCSVGeneratorTest.STUDY_DETAIL_CATEGORICAL_VALUE));
 		measurementVariable2.setPossibleValues(studyDetailPossibleValues);
+		measurementVariable2.setDataType(DataType.CATEGORICAL_VARIABLE.getName());
 
 		final MeasurementVariable measurementVariable3 = new MeasurementVariable();
 		measurementVariable3.setAlias(this.variableName3);
@@ -91,6 +93,7 @@ public class DatasetCSVGeneratorTest {
 		final List<ValueReference> environmentDetailPossibleValues = new ArrayList<>();
 		environmentDetailPossibleValues.add(new ValueReference(1, ENVIRONMENT_DETAIL_CATEGORICAL_VALUE));
 		measurementVariable3.setPossibleValues(environmentDetailPossibleValues);
+		measurementVariable3.setDataType(DataType.CATEGORICAL_VARIABLE.getName());
 
 		final MeasurementVariable measurementVariable4 = new MeasurementVariable();
 		measurementVariable4.setAlias(this.variableName4);
@@ -147,8 +150,8 @@ public class DatasetCSVGeneratorTest {
 	}
 
 	@Test
-	public void getCategoricalValuesMap() {
-		final Map<String, Map<String, String>> categoricalValuesMap = this.datasetCSVGenerator.getCategoricalValuesMap(this.observationUnitRows.get(0).getEnvironmentVariables(), this.measurementVariables);
+	public void testGetStudyAndEnvironmentCategoricalValuesMap() {
+		final Map<String, Map<String, String>> categoricalValuesMap = this.datasetCSVGenerator.getStudyAndEnvironmentCategoricalValuesMap(this.measurementVariables);
 		Assert.assertEquals(2, categoricalValuesMap.size());
 		Assert.assertNotNull(categoricalValuesMap.get(this.variableName2));
 		Assert.assertEquals(STUDY_DETAIL_CATEGORICAL_VALUE, categoricalValuesMap.get(this.variableName2).get("1"));
