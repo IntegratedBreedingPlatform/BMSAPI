@@ -17,11 +17,11 @@ import java.util.List;
 @RequestMapping("/program")
 public class ProgramResource {
 
-	@Autowired
-	private ProgramService programService;
+    @Autowired
+    private ProgramService programService;
 
-	@RequestMapping(method = RequestMethod.GET)
-	public ResponseEntity<List<ProgramSummary>> listPrograms(@RequestParam final String cropName) {
-		return new ResponseEntity<>(this.programService.listProgramsByCropName(cropName), HttpStatus.OK);
-	}
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<List<ProgramSummary>> listPrograms(@RequestParam final String cropName) {
+        return new ResponseEntity<>(this.programService.listProgramsByCropName(cropName), HttpStatus.OK);
+    }
 }
