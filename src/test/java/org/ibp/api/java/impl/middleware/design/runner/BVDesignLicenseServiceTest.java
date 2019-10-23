@@ -84,10 +84,8 @@ public class BVDesignLicenseServiceTest {
 	}
 
 	@Test
-	public void testGetExpiryDays() {
-		final Integer expiryDays = 101;
-		this.bvDesignLicenseInfo.getStatus().getLicense().setExpiryDays(String.valueOf(expiryDays));
-		Assert.assertEquals(expiryDays, this.bvDesignLicenseService.getExpiryDays());
+	public void testGetlicenseInfo() {
+		Assert.assertEquals(this.bvDesignLicenseInfo.getStatus().getLicense(), this.bvDesignLicenseService.getLicenseInfo());
 	}
 
 	@Test
@@ -202,7 +200,7 @@ public class BVDesignLicenseServiceTest {
 	private DesignLicenseInfo createBVDesignLicenseInfo() {
 		final DesignLicenseInfo bvDesignLicenseInfo = new DesignLicenseInfo();
 		final Status status = new Status();
-		final License license = new License();
+		final License license = new License("Succesful license checkout", "73", "31-DEC-2019");
 		status.setLicense(license);
 		bvDesignLicenseInfo.setStatus(status);
 		return bvDesignLicenseInfo;

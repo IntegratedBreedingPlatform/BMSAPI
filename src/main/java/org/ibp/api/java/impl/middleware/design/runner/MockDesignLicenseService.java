@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.design.runner;
 
 import org.ibp.api.domain.design.DesignLicenseInfo;
+import org.ibp.api.domain.design.License;
 import org.ibp.api.exception.BVLicenseParseException;
 import org.ibp.api.java.design.DesignLicenseService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -18,8 +19,8 @@ public class MockDesignLicenseService implements DesignLicenseService {
 	}
 
 	@Override
-	public Integer getExpiryDays() {
-		return 100;
+	public License getLicenseInfo() {
+		return new License("Succesful license checkout", "73", "31-DEC-2030");
 	}
 
 }

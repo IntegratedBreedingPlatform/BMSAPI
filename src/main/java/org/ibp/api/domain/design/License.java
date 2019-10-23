@@ -6,7 +6,17 @@ public class License {
 
 	private String expiryDays;
 
+	// Date string in DD-MMM-YYYY format representing last day of license validity
 	private String expiry;
+
+	public License() {
+	}
+
+	public License(final String message, final String expiryDays, final String expiry) {
+		this.message = message;
+		this.expiryDays = expiryDays;
+		this.expiry = expiry;
+	}
 
 	public String getMessage() {
 		return message;

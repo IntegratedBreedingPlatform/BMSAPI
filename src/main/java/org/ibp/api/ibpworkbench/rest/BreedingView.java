@@ -17,14 +17,10 @@ import com.wordnik.swagger.annotations.ApiParam;
 import org.ibp.api.ibpworkbench.constants.WebAPIConstants;
 import org.ibp.api.ibpworkbench.model.DataResponse;
 import org.ibp.api.ibpworkbench.service.BreedingViewService;
-import org.ibp.api.java.design.DesignLicenseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,9 +42,6 @@ public class BreedingView {
 
 	@Autowired
 	private BreedingViewService breedingViewService;
-
-	@Resource
-	private DesignLicenseService designLicenseService;
 
 	@ApiOperation(value = "Save the Single-Site Analysis CSV output file with heritability", notes = "", response = DataResponse.class)
 	@RequestMapping(value = "{cropName}/ssa/save_result_summary", method = RequestMethod.GET, produces = {MediaType.APPLICATION_XML_VALUE})
@@ -118,16 +110,6 @@ public class BreedingView {
 		}
 
 		return response;
-	}
-
-	@ApiOperation(value = "Count number of days before Breeding View license expires")
-	@RequestMapping(value= "/license/expiryDays", method = RequestMethod.HEAD)
-	@ResponseBody
-	public ResponseEntity<String> getLicenseExpiryDays() {
-		final Integer expiryDays = this.designLicenseService.getExpiryDays();
-		final HttpHeaders respHeaders = new HttpHeaders();
-		respHeaders.add("X-Total-Count", String.valueOf(expiryDays));
-		return new ResponseEntity<>("", respHeaders, HttpStatus.OK);
 	}
 
 	public void setBreedingViewService(final BreedingViewService breedingViewService) {

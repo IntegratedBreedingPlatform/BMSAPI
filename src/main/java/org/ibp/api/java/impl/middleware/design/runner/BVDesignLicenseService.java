@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.ibp.api.domain.design.DesignLicenseInfo;
+import org.ibp.api.domain.design.License;
 import org.ibp.api.exception.BVLicenseParseException;
 import org.ibp.api.java.design.DesignLicenseService;
 import org.ibp.api.java.design.runner.ProcessRunner;
@@ -44,9 +45,9 @@ public class BVDesignLicenseService implements DesignLicenseService {
 
 		try {
 			final DesignLicenseInfo designLicenseInfo = this.retrieveLicenseInfo();
-			final Format formatter = new SimpleDateFormat(LICENSE_DATE_FORMAT);
 			final String expiry = designLicenseInfo.getStatus().getLicense().getExpiry();
 			if (!StringUtils.isEmpty(expiry)) {
+				final Format formatter = new SimpleDateFormat(LICENSE_DATE_FORMAT);
 				final Date expiryDate = (Date) formatter.parseObject(expiry);
 				final Date currentDate = DateUtil.getCurrentDateWithZeroTime();
 				if (currentDate.compareTo(expiryDate) > 0) {
@@ -57,6 +58,12 @@ public class BVDesignLicenseService implements DesignLicenseService {
 			BVDesignLicenseService.LOG.error(e.getMessage(), e);
 		}
 		return false;
+	}
+
+	@Override
+	public License getLicenseInfo() {
+		final DesignLicenseInfo designLicenseInfo = this.retrieveLicenseInfo();
+		return designLicenseInfo.getStatus().getLicense();
 	}
 
 	DesignLicenseInfo retrieveLicenseInfo() throws BVLicenseParseException {
@@ -110,12 +117,6 @@ public class BVDesignLicenseService implements DesignLicenseService {
 
 	void setObjectMapper(final ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
-	}
-
-	@Override
-	public Integer getExpiryDays() {
-		final DesignLicenseInfo designLicenseInfo = this.retrieveLicenseInfo();
-		return Integer.parseInt(designLicenseInfo.getStatus().getLicense().getExpiryDays());
 	}
 
 	class BVDesignLicenseProcessRunner implements ProcessRunner {
