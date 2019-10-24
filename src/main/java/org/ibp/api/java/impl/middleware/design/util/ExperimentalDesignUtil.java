@@ -31,13 +31,6 @@ public class ExperimentalDesignUtil {
 		return key;
 	}
 
-	public static ObservationUnitData createObservationUnitData(final Integer variableId, final String value) {
-		final ObservationUnitData observationUnitData = new ObservationUnitData();
-		observationUnitData.setVariableId(variableId);
-		observationUnitData.setValue(value);
-		return observationUnitData;
-	}
-
 	public static void setReplatinGroups(final ExperimentDesignInput experimentDesignInput) {
 		if (experimentDesignInput.getUseLatenized() != null && experimentDesignInput.getUseLatenized() && experimentDesignInput.getReplicationsArrangement() != null) {
 			if (experimentDesignInput.getReplicationsArrangement() == 1) {
