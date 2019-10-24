@@ -18,12 +18,7 @@ import org.generationcp.middleware.operation.transformer.etl.MeasurementVariable
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.StringUtil;
-import org.ibp.api.domain.design.BVDesignOutput;
-import org.ibp.api.domain.design.BVDesignTrialInstance;
-import org.ibp.api.domain.design.ExperimentDesign;
-import org.ibp.api.domain.design.ExperimentDesignParameter;
-import org.ibp.api.domain.design.ListItem;
-import org.ibp.api.domain.design.MainDesign;
+import org.ibp.api.domain.design.*;
 import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
@@ -35,16 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -406,7 +392,7 @@ public class ExperimentDesignGenerator {
 		ObservationUnitData treatmentLevelData = null;
 		ObservationUnitData observationUnitData;
 
-		observationUnitData = ExperimentalDesignUtil.createObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), String.valueOf(trialNo));
+		observationUnitData = new ObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), String.valueOf(trialNo));
 		observationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
 
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
@@ -416,53 +402,46 @@ public class ExperimentDesignGenerator {
 
 			if (measurementVariable.getVariableType() == VariableType.ENVIRONMENT_DETAIL
 				|| measurementVariable.getVariableType() == VariableType.STUDY_CONDITION) {
-				observationUnitData = ExperimentalDesignUtil
-					.createObservationUnitData(measurementVariable.getTermId(), String.valueOf(measurementVariable.getValue()));
-
+				observationUnitData = new ObservationUnitData(measurementVariable.getTermId(), String.valueOf(measurementVariable.getValue()));
 				environmentObservationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
 			} else {
 				if (termId == TermId.ENTRY_NO.getId()) {
 					final Integer entryNumber = studyGermplasmDto.getEntryNumber();
-					observationUnitData = ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(), String.valueOf(
+					observationUnitData = new ObservationUnitData(measurementVariable.getTermId(), String.valueOf(
 						entryNumber));
 					observationUnitRow.setEntryNumber(entryNumber);
 				} else if (termId == TermId.SOURCE.getId() || termId == TermId.GERMPLASM_SOURCE.getId()) {
 					observationUnitData =
-						ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(),
+						new ObservationUnitData(measurementVariable.getTermId(),
 							studyGermplasmDto.getSeedSource() != null ? studyGermplasmDto.getSeedSource() : "");
 				} else if (termId == TermId.GROUPGID.getId()) {
-					observationUnitData = ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(),
+					observationUnitData = new ObservationUnitData(measurementVariable.getTermId(),
 						studyGermplasmDto.getGroupId() != null ? studyGermplasmDto.getGroupId().toString() : "");
 				} else if (termId == TermId.STOCKID.getId()) {
 					observationUnitData =
-						ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(),
+						new ObservationUnitData(measurementVariable.getTermId(),
 							studyGermplasmDto.getStockIds() != null ? studyGermplasmDto.getStockIds() : "");
 				} else if (termId == TermId.CROSS.getId()) {
 					observationUnitData =
-						ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(), studyGermplasmDto.getCross());
+						new ObservationUnitData(measurementVariable.getTermId(), studyGermplasmDto.getCross());
 				} else if (termId == TermId.DESIG.getId()) {
 					observationUnitData =
-						ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(), studyGermplasmDto.getDesignation());
+						new ObservationUnitData(measurementVariable.getTermId(), studyGermplasmDto.getDesignation());
 				} else if (termId == TermId.GID.getId()) {
-					observationUnitData =
-						ExperimentalDesignUtil
-							.createObservationUnitData(measurementVariable.getTermId(), String.valueOf(studyGermplasmDto.getGermplasmId()));
+					observationUnitData = new ObservationUnitData(measurementVariable.getTermId(), String.valueOf(studyGermplasmDto.getGermplasmId()));
 				} else if (termId == TermId.ENTRY_CODE.getId()) {
 					observationUnitData =
-						ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(), studyGermplasmDto.getEntryCode());
+						new ObservationUnitData(measurementVariable.getTermId(), studyGermplasmDto.getEntryCode());
 				} else if (EXP_DESIGN_VARIABLE_IDS.contains(termId)) {
-					observationUnitData = ExperimentalDesignUtil
-						.createObservationUnitData(measurementVariable.getTermId(), bvEntryMap.get(measurementVariable.getName()));
+					observationUnitData = new ObservationUnitData(measurementVariable.getTermId(), bvEntryMap.get(measurementVariable.getName()));
 				} else if (termId == TermId.CHECK.getId()) {
-					observationUnitData =
-						ExperimentalDesignUtil
-							.createObservationUnitData(measurementVariable.getTermId(), Integer.toString(studyGermplasmDto.getCheckType()));
+					observationUnitData = new ObservationUnitData(measurementVariable.getTermId(), Integer.toString(studyGermplasmDto.getCheckType()));
 				} else if (termId == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 					observationUnitData =
-						ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(), Integer.toString(trialNo));
+						new ObservationUnitData(measurementVariable.getTermId(), Integer.toString(trialNo));
 				} else if (!StringUtils.isEmpty(measurementVariable.getTreatmentLabel())) {
 					if (treatmentLevelData == null) {
-						observationUnitData = ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(),
+						observationUnitData = new ObservationUnitData(measurementVariable.getTermId(),
 							bvEntryMap.get(ExperimentalDesignUtil.cleanBVDesignKey(Integer.toString(measurementVariable.getTermId()))));
 						treatmentLevelData = observationUnitData;
 					} else {
@@ -485,16 +464,13 @@ public class ExperimentDesignGenerator {
 								if (measurementVariable.getDataTypeId() != null
 									&& measurementVariable.getDataTypeId().intValue() == TermId.DATE_VARIABLE.getId()) {
 									value = DateUtil.convertToDBDateFormat(measurementVariable.getDataTypeId(), value);
-									observationUnitData = ExperimentalDesignUtil
-										.createObservationUnitData(measurementVariable.getTermId(), value);
+									observationUnitData = new ObservationUnitData(measurementVariable.getTermId(), value);
 								} else if (measurementVariable.getPossibleValues() != null && !measurementVariable.getPossibleValues()
 									.isEmpty() && NumberUtils
 									.isNumber(value)) {
-									observationUnitData = ExperimentalDesignUtil
-										.createObservationUnitData(measurementVariable.getTermId(), value);
+									observationUnitData = new ObservationUnitData(measurementVariable.getTermId(), value);
 								} else {
-									observationUnitData = ExperimentalDesignUtil
-										.createObservationUnitData(measurementVariable.getTermId(), value);
+									observationUnitData = new ObservationUnitData(measurementVariable.getTermId(), value);
 								}
 							}
 						}
@@ -503,7 +479,7 @@ public class ExperimentDesignGenerator {
 
 				} else {
 					// meaning non factor
-					observationUnitData = ExperimentalDesignUtil.createObservationUnitData(measurementVariable.getTermId(), "");
+					observationUnitData = new ObservationUnitData(measurementVariable.getTermId(), "");
 				}
 
 				observationUnitDataMap.put(String.valueOf(observationUnitData.getVariableId()), observationUnitData);
