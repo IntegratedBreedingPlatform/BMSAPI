@@ -81,7 +81,8 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 
 		this.experimentDesignMiddlewareService.deleteStudyExperimentDesign(studyId);
 		this.experimentDesignMiddlewareService
-			.saveExperimentDesign(cropType, studyId, measurementVariables, this.mapObservationUnitRow(observationUnitRows));
+			.saveExperimentDesign(cropType, studyId, measurementVariables,
+				this.createInstanceObservationUnitRowsMap(observationUnitRows));
 	}
 
 	@Override
@@ -91,12 +92,12 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		this.experimentDesignMiddlewareService.deleteStudyExperimentDesign(studyId);
 	}
 
-	List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> mapObservationUnitRow(
+	Map<Integer, List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow>> createInstanceObservationUnitRowsMap(
 		final List<ObservationUnitRow> observationUnitRows) {
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 
-		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> convertedRows = new ArrayList<>();
+		final Map<Integer, List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow>> instanceRowsMap = new HashMap<>();
 		for (final ObservationUnitRow row : observationUnitRows) {
 			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> variables = new HashMap<>();
 			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> environmentVariables = new HashMap<>();
@@ -112,9 +113,12 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 				observationUnitRowMapper.map(row, org.generationcp.middleware.service.api.dataset.ObservationUnitRow.class);
 			convertedRow.setVariables(variables);
 			convertedRow.setEnvironmentVariables(environmentVariables);
-			convertedRows.add(convertedRow);
+
+			final Integer trialInstance = row.getTrialInstance();
+			instanceRowsMap.putIfAbsent(trialInstance, new ArrayList<>());
+			instanceRowsMap.get(trialInstance).add(convertedRow);
 		}
-		return convertedRows;
+		return instanceRowsMap;
 	}
 
 	void checkLicense() {

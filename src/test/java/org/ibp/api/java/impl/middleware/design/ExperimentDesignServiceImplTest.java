@@ -122,7 +122,7 @@ public class ExperimentDesignServiceImplTest {
 		Mockito.verify(this.middlewareExperimentDesignService).deleteStudyExperimentDesign(STUDY_ID);
 		Mockito.verify(this.middlewareExperimentDesignService)
 			.saveExperimentDesign(ArgumentMatchers.eq(this.cropType), ArgumentMatchers.eq(STUDY_ID), ArgumentMatchers.eq(this.variables),
-				ArgumentMatchers.anyList());
+				ArgumentMatchers.anyMap());
 	}
 
 }
