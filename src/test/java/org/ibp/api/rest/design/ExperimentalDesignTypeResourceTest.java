@@ -4,7 +4,7 @@ import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.java.design.ExperimentDesignService;
+import org.ibp.api.java.design.ExperimentalDesignService;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +21,15 @@ import java.util.List;
 public class ExperimentalDesignTypeResourceTest extends ApiUnitTestBase {
 
 	@Autowired
-	private ExperimentDesignService experimentDesignService;
+	private ExperimentalDesignService experimentalDesignService;
 
 	@Configuration
 	public static class TestConfiguration {
 
 		@Bean
 		@Primary
-		public ExperimentDesignService experimentDesignService() {
-			return Mockito.mock(ExperimentDesignService.class);
+		public ExperimentalDesignService experimentDesignService() {
+			return Mockito.mock(ExperimentalDesignService.class);
 		}
 
 	}
@@ -42,7 +42,7 @@ public class ExperimentalDesignTypeResourceTest extends ApiUnitTestBase {
 			ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK,
 			ExperimentDesignType.ENTRY_LIST_ORDER,
 			ExperimentDesignType.P_REP);
-		Mockito.doReturn(types).when(this.experimentDesignService).getExperimentalDesignTypes();
+		Mockito.doReturn(types).when(this.experimentalDesignService).getExperimentalDesignTypes();
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.get("/crops/{crop}/experimental-design-types", "maize")

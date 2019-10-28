@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ExperimentDesignServiceImplTest {
+public class ExperimentalDesignServiceImplTest {
 
 	private static final String CROP = "maize";
 	private static final int STUDY_ID = 123;
@@ -62,7 +62,7 @@ public class ExperimentDesignServiceImplTest {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@InjectMocks
-	private ExperimentDesignServiceImpl experimentDesignService;
+	private ExperimentalDesignServiceImpl experimentDesignService;
 
 	private final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 	private final CropType cropType = new CropType();
@@ -89,7 +89,7 @@ public class ExperimentDesignServiceImplTest {
 			Assert.fail("Expected Forbidden exception to be thrown but was not.");
 		} catch (final ForbiddenException e) {
 			Assert.assertNotNull(e.getError().getCodes());
-			Assert.assertEquals(ExperimentDesignServiceImpl.EXPERIMENT_DESIGN_LICENSE_EXPIRED, e.getError().getCodes()[0]);
+			Assert.assertEquals(ExperimentalDesignServiceImpl.EXPERIMENT_DESIGN_LICENSE_EXPIRED, e.getError().getCodes()[0]);
 		}
 		Mockito.verifyZeroInteractions(this.studyValidator);
 		Mockito.verifyZeroInteractions(this.studyService);

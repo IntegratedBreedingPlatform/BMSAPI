@@ -3,7 +3,7 @@ package org.ibp.api.rest.design;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
-import org.ibp.api.java.design.ExperimentDesignService;
+import org.ibp.api.java.design.ExperimentalDesignService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,13 +20,13 @@ import java.util.List;
 public class ExperimentalDesignTypeResource {
 
 	@Resource
-	private ExperimentDesignService experimentDesignService;
+	private ExperimentalDesignService experimentalDesignService;
 
 	@ApiOperation(value = "Gets all experimental design types supported for design generation")
 	@RequestMapping(value= "/{crop}/experimental-design-types", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<ExperimentDesignType>> retrieveDesignTypes() {
-		return new ResponseEntity<>(this.experimentDesignService.getExperimentalDesignTypes(),
+		return new ResponseEntity<>(this.experimentalDesignService.getExperimentalDesignTypes(),
 			HttpStatus.OK);
 	}
 

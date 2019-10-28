@@ -2,7 +2,7 @@ package org.ibp.api.rest.design;
 
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.java.design.ExperimentDesignService;
+import org.ibp.api.java.design.ExperimentalDesignService;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +17,15 @@ public class ExperimentalDesignResourceTest extends ApiUnitTestBase {
 
 
 	@Autowired
-	private ExperimentDesignService experimentDesignService;
+	private ExperimentalDesignService experimentalDesignService;
 	@Configuration
 	public static class TestConfiguration {
 
 
 		@Bean
 		@Primary
-		public ExperimentDesignService experimentDesignService() {
-			return Mockito.mock(ExperimentDesignService.class);
+		public ExperimentalDesignService experimentDesignService() {
+			return Mockito.mock(ExperimentalDesignService.class);
 		}
 
 	}
@@ -41,7 +41,7 @@ public class ExperimentalDesignResourceTest extends ApiUnitTestBase {
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
 
-		Mockito.verify(this.experimentDesignService).deleteDesign(studyId);
+		Mockito.verify(this.experimentalDesignService).deleteDesign(studyId);
 	}
 
 	@Test
@@ -57,7 +57,7 @@ public class ExperimentalDesignResourceTest extends ApiUnitTestBase {
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
 
-		Mockito.verify(this.experimentDesignService).generateAndSaveDesign(this.cropName, studyId, experimentalDesignInput);
+		Mockito.verify(this.experimentalDesignService).generateAndSaveDesign(this.cropName, studyId, experimentalDesignInput);
 	}
 
 }

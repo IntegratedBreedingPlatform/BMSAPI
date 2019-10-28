@@ -5,7 +5,7 @@ import org.ibp.api.rest.design.ExperimentalDesignInput;
 
 import java.util.List;
 
-public interface ExperimentDesignService {
+public interface ExperimentalDesignService {
 
 	void generateAndSaveDesign(String cropName, int studyId, ExperimentalDesignInput experimentalDesignInput);
 

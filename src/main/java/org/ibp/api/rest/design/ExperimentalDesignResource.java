@@ -2,7 +2,7 @@ package org.ibp.api.rest.design;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-import org.ibp.api.java.design.ExperimentDesignService;
+import org.ibp.api.java.design.ExperimentalDesignService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,7 +19,7 @@ import javax.annotation.Resource;
 public class ExperimentalDesignResource {
 
 	@Resource
-	private ExperimentDesignService experimentDesignService;
+	private ExperimentalDesignService experimentalDesignService;
 
 	@ApiOperation(value = "Generate experimental design for study", notes = "Generate experimental design for study")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/design", method = RequestMethod.POST)
@@ -27,7 +27,7 @@ public class ExperimentalDesignResource {
 		@PathVariable final Integer studyId,
 		@RequestBody final ExperimentalDesignInput experimentalDesignInput) {
 
-		this.experimentDesignService.generateAndSaveDesign(crop, studyId, experimentalDesignInput);
+		this.experimentalDesignService.generateAndSaveDesign(crop, studyId, experimentalDesignInput);
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -37,7 +37,7 @@ public class ExperimentalDesignResource {
 	@RequestMapping(value = "/{crop}/studies/{studyId}/design", method = RequestMethod.DELETE)
 	public ResponseEntity generateStudyExperimentDesign(@PathVariable final String crop,
 		@PathVariable final Integer studyId) {
-		this.experimentDesignService.deleteDesign(studyId);
+		this.experimentalDesignService.deleteDesign(studyId);
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
