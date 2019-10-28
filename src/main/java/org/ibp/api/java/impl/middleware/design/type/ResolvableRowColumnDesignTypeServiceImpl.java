@@ -10,7 +10,7 @@ import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.springframework.stereotype.Component;
@@ -38,7 +38,7 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 			TermId.NO_OF_COLS_IN_REPS.getId());
 
 	@Resource
-	private ExperimentDesignTypeValidator experimentDesignTypeValidator;
+	private ExperimentalDesignTypeValidator experimentalDesignTypeValidator;
 
 	@Resource
 	private OntologyDataManager ontologyDataManager;
@@ -50,7 +50,7 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
-		this.experimentDesignTypeValidator.validateResolvableRowColumnDesign(experimentalDesignInput, studyGermplasmDtoList);
+		this.experimentalDesignTypeValidator.validateResolvableRowColumnDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 		final int nTreatments = studyGermplasmDtoList.size();
 		final Integer rows = experimentalDesignInput.getRowsPerReplications();

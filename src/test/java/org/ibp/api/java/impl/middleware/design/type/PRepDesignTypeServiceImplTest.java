@@ -10,7 +10,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
@@ -42,7 +42,7 @@ public class PRepDesignTypeServiceImplTest {
 	public static final String PLOT_NO = "PLOT_NO";
 	public static final String BLOCK_NO = "BLOCK_NO";
 	@Mock
-	public ExperimentDesignTypeValidator experimentDesignTypeValidator;
+	public ExperimentalDesignTypeValidator experimentalDesignTypeValidator;
 
 	@Mock
 	public ExperimentDesignGenerator experimentDesignGenerator;
@@ -111,7 +111,7 @@ public class PRepDesignTypeServiceImplTest {
 			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
 		assertSame(result, observationUnitRowList);
-		verify(this.experimentDesignTypeValidator).validatePrepDesign(experimentalDesignInput, studyGermplasmDtoList);
+		verify(this.experimentalDesignTypeValidator).validatePrepDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 	}
 

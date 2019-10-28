@@ -22,13 +22,13 @@ import java.util.Map;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class ExperimentDesignTypeValidatorTest {
+public class ExperimentalDesignTypeValidatorTest {
 	
-	private ExperimentDesignTypeValidator designTypeValidator = new ExperimentDesignTypeValidator();
+	private ExperimentalDesignTypeValidator designTypeValidator = new ExperimentalDesignTypeValidator();
 
 	@Before
 	public void init() {
-		this.designTypeValidator = new ExperimentDesignTypeValidator();
+		this.designTypeValidator = new ExperimentalDesignTypeValidator();
 	}
 
 	@Test

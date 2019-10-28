@@ -12,7 +12,7 @@ import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 	private ExperimentDesignGenerator experimentDesignGenerator;
 
 	@Resource
-	private ExperimentDesignTypeValidator experimentDesignTypeValidator;
+	private ExperimentalDesignTypeValidator experimentalDesignTypeValidator;
 
 	@Resource
 	private OntologyDataManager ontologyDataManager;
@@ -57,7 +57,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
-		this.experimentDesignTypeValidator.validateRandomizedCompleteBlockDesign(experimentalDesignInput, studyGermplasmDtoList);
+		this.experimentalDesignTypeValidator.validateRandomizedCompleteBlockDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 		final Integer block = experimentalDesignInput.getReplicationsCount();
 

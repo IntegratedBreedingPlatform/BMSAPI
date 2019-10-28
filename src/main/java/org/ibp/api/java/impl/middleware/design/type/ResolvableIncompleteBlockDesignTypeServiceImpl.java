@@ -10,7 +10,7 @@ import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.springframework.stereotype.Component;
@@ -36,7 +36,7 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId());
 
 	@Resource
-	private ExperimentDesignTypeValidator experimentDesignTypeValidator;
+	private ExperimentalDesignTypeValidator experimentalDesignTypeValidator;
 
 	@Resource
 	private ExperimentDesignGenerator experimentDesignGenerator;
@@ -48,7 +48,7 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
-		this.experimentDesignTypeValidator.validateResolvableIncompleteBlockDesign(experimentalDesignInput, studyGermplasmDtoList);
+		this.experimentalDesignTypeValidator.validateResolvableIncompleteBlockDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 		final int nTreatments = studyGermplasmDtoList.size();
 		final Integer blockSize = experimentalDesignInput.getBlockSize();

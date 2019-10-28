@@ -9,7 +9,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
@@ -45,7 +45,7 @@ public class ResolvableRowColumnDesignTypeServiceImplTest {
 	public static final String COL = "COL";
 
 	@Mock
-	public ExperimentDesignTypeValidator experimentDesignTypeValidator;
+	public ExperimentalDesignTypeValidator experimentalDesignTypeValidator;
 
 	@Mock
 	public ExperimentDesignGenerator experimentDesignGenerator;
@@ -113,7 +113,7 @@ public class ResolvableRowColumnDesignTypeServiceImplTest {
 			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
 		assertSame(result, observationUnitRowList);
-		verify(this.experimentDesignTypeValidator).validateResolvableRowColumnDesign(experimentalDesignInput, studyGermplasmDtoList);
+		verify(this.experimentalDesignTypeValidator).validateResolvableRowColumnDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 	}
 
@@ -166,7 +166,7 @@ public class ResolvableRowColumnDesignTypeServiceImplTest {
 			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
 		assertSame(result, observationUnitRowList);
-		verify(this.experimentDesignTypeValidator).validateResolvableRowColumnDesign(experimentalDesignInput, studyGermplasmDtoList);
+		verify(this.experimentalDesignTypeValidator).validateResolvableRowColumnDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 	}
 

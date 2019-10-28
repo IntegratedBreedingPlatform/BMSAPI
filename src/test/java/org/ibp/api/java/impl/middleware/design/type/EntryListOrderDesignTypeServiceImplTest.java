@@ -11,7 +11,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Test;
@@ -40,7 +40,7 @@ public class EntryListOrderDesignTypeServiceImplTest {
 	public ExperimentDesignGenerator experimentDesignGenerator;
 
 	@Mock
-	public ExperimentDesignTypeValidator experimentDesignTypeValidator;
+	public ExperimentalDesignTypeValidator experimentalDesignTypeValidator;
 
 	@Mock
 	public OntologyDataManager ontologyDataManager;
@@ -78,7 +78,7 @@ public class EntryListOrderDesignTypeServiceImplTest {
 		final List<ObservationUnitRow> result =
 			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
-		verify(this.experimentDesignTypeValidator).validateEntryListOrderDesign(experimentalDesignInput, studyGermplasmDtoList);
+		verify(this.experimentalDesignTypeValidator).validateEntryListOrderDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 		assertEquals(5, result.size());
 		assertEquals(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()),
@@ -126,7 +126,7 @@ public class EntryListOrderDesignTypeServiceImplTest {
 		final List<ObservationUnitRow> result =
 			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
-		verify(this.experimentDesignTypeValidator).validateEntryListOrderDesign(experimentalDesignInput, studyGermplasmDtoList);
+		verify(this.experimentalDesignTypeValidator).validateEntryListOrderDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 		assertEquals(8, result.size());
 		assertEquals(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()),

@@ -10,7 +10,7 @@ import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.springframework.stereotype.Component;
@@ -33,7 +33,7 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 			TermId.PERCENTAGE_OF_REPLICATION.getId());
 
 	@Resource
-	private ExperimentDesignTypeValidator experimentDesignTypeValidator;
+	private ExperimentalDesignTypeValidator experimentalDesignTypeValidator;
 
 	@Resource
 	private OntologyDataManager ontologyDataManager;
@@ -45,7 +45,7 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
-		this.experimentDesignTypeValidator.validatePrepDesign(experimentalDesignInput, studyGermplasmDtoList);
+		this.experimentalDesignTypeValidator.validatePrepDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 		final int nTreatments = studyGermplasmDtoList.size();
 		final int blockSize = experimentalDesignInput.getBlockSize();
