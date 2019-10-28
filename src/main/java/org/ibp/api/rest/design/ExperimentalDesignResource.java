@@ -13,15 +13,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
 
-@Api(value = "Experiment Design Service")
+@Api(value = "Experimental Design Service")
 @Controller
 @RequestMapping("/crops")
-public class ExperimentDesignResource {
+public class ExperimentalDesignResource {
 
 	@Resource
 	private ExperimentDesignService experimentDesignService;
 
-	@ApiOperation(value = "Generate experiment design for study", notes = "Generate experiment design for study")
+	@ApiOperation(value = "Generate experimental design for study", notes = "Generate experimental design for study")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/design", method = RequestMethod.POST)
 	public ResponseEntity generateStudyExperimentDesign(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
@@ -33,7 +33,7 @@ public class ExperimentDesignResource {
 	}
 
 
-	@ApiOperation(value = "Delete experiment design of study", notes = "Delete experiment design of study")
+	@ApiOperation(value = "Delete experimental design of study", notes = "Delete experimental design of study")
 	@RequestMapping(value = "/{crop}/studies/{studyId}/design", method = RequestMethod.DELETE)
 	public ResponseEntity generateStudyExperimentDesign(@PathVariable final String crop,
 		@PathVariable final Integer studyId) {
