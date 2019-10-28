@@ -14,7 +14,7 @@ import org.ibp.api.java.impl.middleware.design.type.ExperimentDesignTypeServiceF
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignValidator;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,7 +64,7 @@ public class ExperimentDesignServiceImplTest {
 	@InjectMocks
 	private ExperimentDesignServiceImpl experimentDesignService;
 
-	private final ExperimentDesignInput designInput = new ExperimentDesignInput();
+	private final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 	private final CropType cropType = new CropType();
 	private final List<StudyGermplasmDto> studyList = new ArrayList<>();
 	private final List<MeasurementVariable> variables = new ArrayList<>();

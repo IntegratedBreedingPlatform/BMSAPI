@@ -11,7 +11,7 @@ import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -85,23 +85,23 @@ public class ResolvableRowColumnDesignTypeServiceImplTest {
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
-		experimentDesignInput.setReplicationsCount(replicationsCount);
-		experimentDesignInput.setRowsPerReplications(rowPerReplications);
-		experimentDesignInput.setColsPerReplications(colPerReplications);
-		experimentDesignInput.setStartingPlotNo(startingPlotNumber);
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setReplicationsCount(replicationsCount);
+		experimentalDesignInput.setRowsPerReplications(rowPerReplications);
+		experimentalDesignInput.setColsPerReplications(colPerReplications);
+		experimentalDesignInput.setStartingPlotNo(startingPlotNumber);
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
-		experimentDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
-		experimentDesignInput.setUseLatenized(false);
+		experimentalDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
+		experimentalDesignInput.setUseLatenized(false);
 
 		when(this.experimentDesignGenerator
 			.createResolvableRowColDesign(studyGermplasmDtoList.size(), replicationsCount, rowPerReplications, colPerReplications,
-				ENTRY_NO, REP_NO, ROW, COL, PLOT_NO, startingPlotNumber, experimentDesignInput.getNrlatin(),
-				experimentDesignInput.getNclatin(), experimentDesignInput.getReplatinGroups(), "", experimentDesignInput.getUseLatenized()))
+				ENTRY_NO, REP_NO, ROW, COL, PLOT_NO, startingPlotNumber, experimentalDesignInput.getNrlatin(),
+				experimentalDesignInput.getNclatin(), experimentalDesignInput.getReplatinGroups(), "", experimentalDesignInput.getUseLatenized()))
 			.thenReturn(mainDesign);
 		when(this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, PROGRAM_UUID, ResolvableRowColumnDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
-				ResolvableRowColumnDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput))
+				ResolvableRowColumnDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator
 			.generateExperimentDesignMeasurements(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
@@ -110,10 +110,10 @@ public class ResolvableRowColumnDesignTypeServiceImplTest {
 				isNull(), any(Map.class))).thenReturn(observationUnitRowList);
 
 		final List<ObservationUnitRow> result =
-			this.designTypeService.generateDesign(studyId, experimentDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
+			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
 		assertSame(result, observationUnitRowList);
-		verify(this.experimentDesignTypeValidator).validateResolvableRowColumnDesign(experimentDesignInput, studyGermplasmDtoList);
+		verify(this.experimentDesignTypeValidator).validateResolvableRowColumnDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 	}
 
@@ -135,26 +135,26 @@ public class ResolvableRowColumnDesignTypeServiceImplTest {
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
-		experimentDesignInput.setReplicationsCount(replicationsCount);
-		experimentDesignInput.setRowsPerReplications(rowPerReplications);
-		experimentDesignInput.setColsPerReplications(colPerReplications);
-		experimentDesignInput.setStartingPlotNo(startingPlotNumber);
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setReplicationsCount(replicationsCount);
+		experimentalDesignInput.setRowsPerReplications(rowPerReplications);
+		experimentalDesignInput.setColsPerReplications(colPerReplications);
+		experimentalDesignInput.setStartingPlotNo(startingPlotNumber);
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
-		experimentDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
+		experimentalDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
 
 		// Set value 1 for Column Arrangement
-		experimentDesignInput.setReplicationsArrangement(1);
-		experimentDesignInput.setUseLatenized(true);
+		experimentalDesignInput.setReplicationsArrangement(1);
+		experimentalDesignInput.setUseLatenized(true);
 
 		when(this.experimentDesignGenerator
 			.createResolvableRowColDesign(studyGermplasmDtoList.size(), replicationsCount, rowPerReplications, colPerReplications,
-				ENTRY_NO, REP_NO, ROW, COL, PLOT_NO, startingPlotNumber, experimentDesignInput.getNrlatin(),
-				experimentDesignInput.getNclatin(), String.valueOf(replicationsCount), "", experimentDesignInput.getUseLatenized()))
+				ENTRY_NO, REP_NO, ROW, COL, PLOT_NO, startingPlotNumber, experimentalDesignInput.getNrlatin(),
+				experimentalDesignInput.getNclatin(), String.valueOf(replicationsCount), "", experimentalDesignInput.getUseLatenized()))
 			.thenReturn(mainDesign);
 		when(this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, PROGRAM_UUID, ResolvableRowColumnDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
-				ResolvableRowColumnDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES_LATINIZED, experimentDesignInput))
+				ResolvableRowColumnDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES_LATINIZED, experimentalDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator
 			.generateExperimentDesignMeasurements(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
@@ -163,10 +163,10 @@ public class ResolvableRowColumnDesignTypeServiceImplTest {
 				isNull(), any(Map.class))).thenReturn(observationUnitRowList);
 
 		final List<ObservationUnitRow> result =
-			this.designTypeService.generateDesign(studyId, experimentDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
+			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
 		assertSame(result, observationUnitRowList);
-		verify(this.experimentDesignTypeValidator).validateResolvableRowColumnDesign(experimentDesignInput, studyGermplasmDtoList);
+		verify(this.experimentDesignTypeValidator).validateResolvableRowColumnDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 	}
 

@@ -12,7 +12,7 @@ import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerat
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -45,14 +45,14 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 	private OntologyDataManager ontologyDataManager;
 
 	@Override
-	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
+	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
-		this.experimentDesignTypeValidator.validateResolvableIncompleteBlockDesign(experimentDesignInput, studyGermplasmDtoList);
+		this.experimentDesignTypeValidator.validateResolvableIncompleteBlockDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 		final int nTreatments = studyGermplasmDtoList.size();
-		final Integer blockSize = experimentDesignInput.getBlockSize();
-		final Integer replicates = experimentDesignInput.getReplicationsCount();
+		final Integer blockSize = experimentalDesignInput.getBlockSize();
+		final Integer replicates = experimentalDesignInput.getReplicationsCount();
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -63,19 +63,19 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
 		final String blockNumberName = standardVariablesMap.get(TermId.BLOCK_NO.getId()).getName();
 
-		ExperimentalDesignUtil.setReplatinGroups(experimentDesignInput);
+		ExperimentalDesignUtil.setReplatinGroups(experimentalDesignInput);
 
-		final Integer plotNo = experimentDesignInput.getStartingPlotNo() == null? 1 : experimentDesignInput.getStartingPlotNo();
+		final Integer plotNo = experimentalDesignInput.getStartingPlotNo() == null? 1 : experimentalDesignInput.getStartingPlotNo();
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createResolvableIncompleteBlockDesign(blockSize, nTreatments, replicates, entryNumberName,
 				replicateNumberName, blockNumberName, plotNumberName, plotNo,
-				experimentDesignInput.getNblatin(),
-				experimentDesignInput.getReplatinGroups(), "", experimentDesignInput.getUseLatenized());
+				experimentalDesignInput.getNblatin(),
+				experimentalDesignInput.getReplatinGroups(), "", experimentalDesignInput.getUseLatenized());
 
-		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
+		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		return this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(experimentDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName,
+			.generateExperimentDesignMeasurements(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName,
 				null,
 				new HashMap<>());
 	}
@@ -91,11 +91,11 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 	}
 
 	@Override
-	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentDesignInput experimentDesignInput,
+	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID) {
 		return this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES,
-				(experimentDesignInput.getUseLatenized() != null && experimentDesignInput.getUseLatenized()) ?
-					EXPERIMENT_DESIGN_VARIABLES_LATINIZED : EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput);
+				(experimentalDesignInput.getUseLatenized() != null && experimentalDesignInput.getUseLatenized()) ?
+					EXPERIMENT_DESIGN_VARIABLES_LATINIZED : EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput);
 	}
 }

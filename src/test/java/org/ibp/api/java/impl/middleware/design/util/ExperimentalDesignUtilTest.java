@@ -1,6 +1,6 @@
 package org.ibp.api.java.impl.middleware.design.util;
 
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -9,7 +9,7 @@ public class ExperimentalDesignUtilTest {
     @Test
     public void testSetReplatinGroups() {
         final int replicationsCount = 3;
-        ExperimentDesignInput input = new ExperimentDesignInput();
+        ExperimentalDesignInput input = new ExperimentalDesignInput();
         input.setReplicationsCount(replicationsCount);
         input.setReplicationsArrangement(1);
 
@@ -19,7 +19,7 @@ public class ExperimentalDesignUtilTest {
 
 
         // latinized, columns arrangement
-        input = new ExperimentDesignInput();
+        input = new ExperimentalDesignInput();
         input.setReplicationsCount(replicationsCount);
         input.setUseLatenized(true);
         input.setReplicationsArrangement(1);
@@ -28,7 +28,7 @@ public class ExperimentalDesignUtilTest {
 
 
         // latinized, rows arrangement
-        input = new ExperimentDesignInput();
+        input = new ExperimentalDesignInput();
         input.setReplicationsCount(replicationsCount);
         input.setUseLatenized(true);
         input.setReplicationsArrangement(2);
@@ -36,7 +36,7 @@ public class ExperimentalDesignUtilTest {
         Assert.assertEquals("1,1,1", input.getReplatinGroups());
 
         // invalid reps arrangement
-        input = new ExperimentDesignInput();
+        input = new ExperimentalDesignInput();
         input.setReplicationsCount(replicationsCount);
         input.setUseLatenized(true);
         input.setReplicationsArrangement(3);

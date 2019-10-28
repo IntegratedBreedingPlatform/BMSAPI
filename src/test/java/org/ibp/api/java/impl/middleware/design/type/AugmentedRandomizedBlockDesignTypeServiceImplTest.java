@@ -11,7 +11,7 @@ import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,11 +81,11 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
-		experimentDesignInput.setNumberOfBlocks(numberOfBlocks);
-		experimentDesignInput.setStartingPlotNo(startingPlotNumber);
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setNumberOfBlocks(numberOfBlocks);
+		experimentalDesignInput.setStartingPlotNo(startingPlotNumber);
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
-		experimentDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
+		experimentalDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
 
 		when(this.experimentDesignGenerator
 			.createAugmentedRandomizedBlockDesign(numberOfBlocks, numberOfTreatments, numberOfControls,
@@ -94,7 +94,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 				BLOCK_NO, PLOT_NO)).thenReturn(mainDesign);
 		when(this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, PROGRAM_UUID, AugmentedRandomizedBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
-				AugmentedRandomizedBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput))
+				AugmentedRandomizedBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator
 			.generateExperimentDesignMeasurements(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
@@ -103,10 +103,10 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 				isNull(), any(Map.class))).thenReturn(observationUnitRowList);
 
 		final List<ObservationUnitRow> result =
-			this.designTypeService.generateDesign(studyId, experimentDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
+			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
 		assertSame(result, observationUnitRowList);
-		verify(this.experimentDesignTypeValidator).validateAugmentedDesign(experimentDesignInput, studyGermplasmDtoList);
+		verify(this.experimentDesignTypeValidator).validateAugmentedDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 	}
 

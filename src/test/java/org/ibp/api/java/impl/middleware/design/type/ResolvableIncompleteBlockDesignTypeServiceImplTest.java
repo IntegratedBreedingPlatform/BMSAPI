@@ -11,7 +11,7 @@ import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -82,21 +82,21 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
-		experimentDesignInput.setBlockSize(blockSize);
-		experimentDesignInput.setReplicationsCount(replicationsCount);
-		experimentDesignInput.setStartingPlotNo(startingPlotNumber);
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setBlockSize(blockSize);
+		experimentalDesignInput.setReplicationsCount(replicationsCount);
+		experimentalDesignInput.setStartingPlotNo(startingPlotNumber);
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
-		experimentDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
-		experimentDesignInput.setUseLatenized(false);
+		experimentalDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
+		experimentalDesignInput.setUseLatenized(false);
 
 		when(this.experimentDesignGenerator
 			.createResolvableIncompleteBlockDesign(blockSize, studyGermplasmDtoList.size(), replicationsCount,
-				ENTRY_NO, REP_NO, BLOCK_NO, PLOT_NO, startingPlotNumber, experimentDesignInput.getNblatin(),
-				experimentDesignInput.getReplatinGroups(), "", experimentDesignInput.getUseLatenized())).thenReturn(mainDesign);
+				ENTRY_NO, REP_NO, BLOCK_NO, PLOT_NO, startingPlotNumber, experimentalDesignInput.getNblatin(),
+				experimentalDesignInput.getReplatinGroups(), "", experimentalDesignInput.getUseLatenized())).thenReturn(mainDesign);
 		when(this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, PROGRAM_UUID, ResolvableIncompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
-				ResolvableIncompleteBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput))
+				ResolvableIncompleteBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator
 			.generateExperimentDesignMeasurements(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
@@ -105,10 +105,10 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 				isNull(), any(Map.class))).thenReturn(observationUnitRowList);
 
 		final List<ObservationUnitRow> result =
-			this.designTypeService.generateDesign(studyId, experimentDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
+			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
 		assertSame(result, observationUnitRowList);
-		verify(this.experimentDesignTypeValidator).validateResolvableIncompleteBlockDesign(experimentDesignInput, studyGermplasmDtoList);
+		verify(this.experimentDesignTypeValidator).validateResolvableIncompleteBlockDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 	}
 
@@ -129,24 +129,24 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
-		experimentDesignInput.setBlockSize(blockSize);
-		experimentDesignInput.setReplicationsCount(replicationsCount);
-		experimentDesignInput.setStartingPlotNo(startingPlotNumber);
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setBlockSize(blockSize);
+		experimentalDesignInput.setReplicationsCount(replicationsCount);
+		experimentalDesignInput.setStartingPlotNo(startingPlotNumber);
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
-		experimentDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
+		experimentalDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
 
 		// Set value 1 for Column Arrangement
-		experimentDesignInput.setReplicationsArrangement(1);
-		experimentDesignInput.setUseLatenized(true);
+		experimentalDesignInput.setReplicationsArrangement(1);
+		experimentalDesignInput.setUseLatenized(true);
 
 		when(this.experimentDesignGenerator
 			.createResolvableIncompleteBlockDesign(blockSize, studyGermplasmDtoList.size(), replicationsCount,
-				ENTRY_NO, REP_NO, BLOCK_NO, PLOT_NO, startingPlotNumber, experimentDesignInput.getNblatin(),
-				String.valueOf(replicationsCount), "", experimentDesignInput.getUseLatenized())).thenReturn(mainDesign);
+				ENTRY_NO, REP_NO, BLOCK_NO, PLOT_NO, startingPlotNumber, experimentalDesignInput.getNblatin(),
+				String.valueOf(replicationsCount), "", experimentalDesignInput.getUseLatenized())).thenReturn(mainDesign);
 		when(this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, PROGRAM_UUID, ResolvableIncompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
-				ResolvableIncompleteBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES_LATINIZED, experimentDesignInput))
+				ResolvableIncompleteBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES_LATINIZED, experimentalDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator
 			.generateExperimentDesignMeasurements(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
@@ -155,10 +155,10 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 				isNull(), any(Map.class))).thenReturn(observationUnitRowList);
 
 		final List<ObservationUnitRow> result =
-			this.designTypeService.generateDesign(studyId, experimentDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
+			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
 		assertSame(result, observationUnitRowList);
-		verify(this.experimentDesignTypeValidator).validateResolvableIncompleteBlockDesign(experimentDesignInput, studyGermplasmDtoList);
+		verify(this.experimentDesignTypeValidator).validateResolvableIncompleteBlockDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 	}
 

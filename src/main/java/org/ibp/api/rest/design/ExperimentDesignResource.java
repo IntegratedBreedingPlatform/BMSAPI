@@ -25,9 +25,9 @@ public class ExperimentDesignResource {
 	@RequestMapping(value = "/{crop}/studies/{studyId}/design", method = RequestMethod.POST)
 	public ResponseEntity generateStudyExperimentDesign(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
-		@RequestBody final ExperimentDesignInput experimentDesignInput) {
+		@RequestBody final ExperimentalDesignInput experimentalDesignInput) {
 
-		this.experimentDesignService.generateAndSaveDesign(crop, studyId, experimentDesignInput);
+		this.experimentDesignService.generateAndSaveDesign(crop, studyId, experimentalDesignInput);
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

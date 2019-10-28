@@ -14,7 +14,7 @@ import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerat
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -54,12 +54,12 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 	private MeasurementVariableTransformer measurementVariableTransformer;
 
 	@Override
-	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
+	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
-		this.experimentDesignTypeValidator.validateRandomizedCompleteBlockDesign(experimentDesignInput, studyGermplasmDtoList);
+		this.experimentDesignTypeValidator.validateRandomizedCompleteBlockDesign(experimentalDesignInput, studyGermplasmDtoList);
 
-		final Integer block = experimentDesignInput.getReplicationsCount();
+		final Integer block = experimentalDesignInput.getReplicationsCount();
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -70,7 +70,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
 
 		final Map<String, List<String>> treatmentFactorValues =
-			this.getTreatmentFactorValues(experimentDesignInput.getTreatmentFactorsData());
+			this.getTreatmentFactorValues(experimentalDesignInput.getTreatmentFactorsData());
 		final List<String> treatmentFactors = this.getTreatmentFactors(treatmentFactorValues);
 		final List<String> treatmentLevels = this.getLevels(treatmentFactorValues);
 
@@ -78,16 +78,16 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 		treatmentFactors.add(entryNumberName);
 		treatmentLevels.add(Integer.toString(studyGermplasmDtoList.size()));
 
-		final Integer plotNo = experimentDesignInput.getStartingPlotNo() == null ? 1 : experimentDesignInput.getStartingPlotNo();
+		final Integer plotNo = experimentalDesignInput.getStartingPlotNo() == null ? 1 : experimentalDesignInput.getStartingPlotNo();
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createRandomizedCompleteBlockDesign(block, replicateNumberName, plotNumberName, plotNo,
 				entryNumberName, treatmentFactors,
 				treatmentLevels, "");
 
-		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
+		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		return this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(experimentDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName,
+			.generateExperimentDesignMeasurements(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName,
 				treatmentFactorValues, new HashMap<Integer, Integer>());
 	}
 
@@ -102,14 +102,14 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 	}
 
 	@Override
-	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentDesignInput experimentDesignInput,
+	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID) {
 
 		final List<MeasurementVariable> measurementVariables = this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES, EXPERIMENT_DESIGN_VARIABLES,
-				experimentDesignInput);
+				experimentalDesignInput);
 
-		final Map treatmentFactorsData = experimentDesignInput.getTreatmentFactorsData();
+		final Map treatmentFactorsData = experimentalDesignInput.getTreatmentFactorsData();
 		if (treatmentFactorsData != null) {
 			final Map<Integer, Integer> treatmentFactorLevelToLabelIdMap = new HashMap<>();
 

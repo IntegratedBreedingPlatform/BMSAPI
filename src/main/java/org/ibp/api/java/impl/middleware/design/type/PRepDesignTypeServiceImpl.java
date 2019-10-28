@@ -12,7 +12,7 @@ import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -42,15 +42,15 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 	private ExperimentDesignGenerator experimentDesignGenerator;
 
 	@Override
-	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
+	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
-		this.experimentDesignTypeValidator.validatePrepDesign(experimentDesignInput, studyGermplasmDtoList);
+		this.experimentDesignTypeValidator.validatePrepDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 		final int nTreatments = studyGermplasmDtoList.size();
-		final int blockSize = experimentDesignInput.getBlockSize();
-		final int replicationPercentage = experimentDesignInput.getReplicationPercentage();
-		final int replicationNumber = experimentDesignInput.getReplicationsCount();
+		final int blockSize = experimentalDesignInput.getBlockSize();
+		final int replicationPercentage = experimentalDesignInput.getReplicationPercentage();
+		final int replicationNumber = experimentalDesignInput.getReplicationsCount();
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -60,7 +60,7 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 		final String blockNumberName = standardVariablesMap.get(TermId.BLOCK_NO.getId()).getName();
 		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
 
-		final Integer plotNo = experimentDesignInput.getStartingPlotNo() == null? 1 : experimentDesignInput.getStartingPlotNo();
+		final Integer plotNo = experimentalDesignInput.getStartingPlotNo() == null? 1 : experimentalDesignInput.getStartingPlotNo();
 
 		final List<ListItem> replicationListItems =
 			this.experimentDesignGenerator
@@ -69,9 +69,9 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 			.createPRepDesign(blockSize, nTreatments, replicationListItems, entryNumberName,
 				blockNumberName, plotNumberName, plotNo);
 
-		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
+		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		return this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(experimentDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign,
+			.generateExperimentDesignMeasurements(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign,
 				entryNumberName, null,
 				new HashMap<Integer, Integer>());
 	}
@@ -87,10 +87,10 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentDesignInput experimentDesignInput,
+	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID) {
 		return this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES, EXPERIMENT_DESIGN_VARIABLES,
-				experimentDesignInput);
+				experimentalDesignInput);
 	}
 }

@@ -13,7 +13,7 @@ import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerat
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -43,10 +43,10 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 	private ExperimentDesignGenerator experimentDesignGenerator;
 
 	@Override
-	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
+	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
-		this.experimentDesignTypeValidator.validateEntryListOrderDesign(experimentDesignInput, studyGermplasmDtoList);
+		this.experimentDesignTypeValidator.validateEntryListOrderDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 		final List<StudyGermplasmDto> checkList = new LinkedList<>();
 
@@ -54,19 +54,19 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 
 		this.loadChecksAndTestEntries(studyGermplasmDtoList, checkList, testEntryList);
 
-		final Integer startingPosition = experimentDesignInput.getCheckStartingPosition();
+		final Integer startingPosition = experimentalDesignInput.getCheckStartingPosition();
 
-		final Integer spacing = experimentDesignInput.getCheckSpacing();
+		final Integer spacing = experimentalDesignInput.getCheckSpacing();
 
-		final Integer insertionManner = experimentDesignInput.getCheckInsertionManner();
+		final Integer insertionManner = experimentalDesignInput.getCheckInsertionManner();
 
 		final List<StudyGermplasmDto> mergedGermplasmList =
 			this.mergeTestAndCheckEntries(testEntryList, checkList, startingPosition, spacing, insertionManner);
 
-		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
+		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		final List<ObservationUnitRow> observationUnitRows = new ArrayList<>();
-		for (final Integer instanceNumber : experimentDesignInput.getTrialInstancesForDesignGeneration()) {
-			int plotNumber = experimentDesignInput.getStartingPlotNo();
+		for (final Integer instanceNumber : experimentalDesignInput.getTrialInstancesForDesignGeneration()) {
+			int plotNumber = experimentalDesignInput.getStartingPlotNo();
 
 			for (final StudyGermplasmDto germplasm : mergedGermplasmList) {
 				final ObservationUnitRow observationUnitRow =
@@ -88,12 +88,12 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 	}
 
 	@Override
-	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentDesignInput experimentDesignInput,
+	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID) {
 		return this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES,
-				experimentDesignInput.getCheckSpacing() != null ? EXPERIMENT_DESIGN_VARIABLES_WITH_CHECK_PLAN :
-					EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput);
+				experimentalDesignInput.getCheckSpacing() != null ? EXPERIMENT_DESIGN_VARIABLES_WITH_CHECK_PLAN :
+					EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput);
 	}
 
 	ObservationUnitRow createObservationUnitRow(final int instanceNumber, final StudyGermplasmDto germplasm,

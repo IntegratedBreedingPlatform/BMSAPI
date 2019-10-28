@@ -13,7 +13,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -64,21 +64,21 @@ public class EntryListOrderDesignTypeServiceImplTest {
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
-		experimentDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
-		experimentDesignInput.setStartingPlotNo(startingPlotNumber);
-		experimentDesignInput.setCheckStartingPosition(checkStartingPosition);
+		experimentalDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
+		experimentalDesignInput.setStartingPlotNo(startingPlotNumber);
+		experimentalDesignInput.setCheckStartingPosition(checkStartingPosition);
 
 		when(this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, PROGRAM_UUID, EntryListOrderDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
-				EntryListOrderDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput))
+				EntryListOrderDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
 			.thenReturn(this.createMeasurementVariables());
 
 		final List<ObservationUnitRow> result =
-			this.designTypeService.generateDesign(studyId, experimentDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
+			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
-		verify(this.experimentDesignTypeValidator).validateEntryListOrderDesign(experimentDesignInput, studyGermplasmDtoList);
+		verify(this.experimentDesignTypeValidator).validateEntryListOrderDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 		assertEquals(5, result.size());
 		assertEquals(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()),
@@ -110,23 +110,23 @@ public class EntryListOrderDesignTypeServiceImplTest {
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
-		experimentDesignInput.setCheckStartingPosition(checkStartingPosition);
-		experimentDesignInput.setCheckSpacing(checkSpacing);
-		experimentDesignInput.setCheckInsertionManner(checkInsertionManner);
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setCheckStartingPosition(checkStartingPosition);
+		experimentalDesignInput.setCheckSpacing(checkSpacing);
+		experimentalDesignInput.setCheckInsertionManner(checkInsertionManner);
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
-		experimentDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
-		experimentDesignInput.setStartingPlotNo(startingPlotNumber);
+		experimentalDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
+		experimentalDesignInput.setStartingPlotNo(startingPlotNumber);
 
 		when(this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, PROGRAM_UUID, EntryListOrderDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
-				EntryListOrderDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES_WITH_CHECK_PLAN, experimentDesignInput))
+				EntryListOrderDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES_WITH_CHECK_PLAN, experimentalDesignInput))
 			.thenReturn(this.createMeasurementVariables());
 
 		final List<ObservationUnitRow> result =
-			this.designTypeService.generateDesign(studyId, experimentDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
+			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
-		verify(this.experimentDesignTypeValidator).validateEntryListOrderDesign(experimentDesignInput, studyGermplasmDtoList);
+		verify(this.experimentDesignTypeValidator).validateEntryListOrderDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 		assertEquals(8, result.size());
 		assertEquals(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()),

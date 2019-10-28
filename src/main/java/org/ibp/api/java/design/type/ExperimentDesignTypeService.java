@@ -2,9 +2,8 @@ package org.ibp.api.java.design.type;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
-import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 
 import java.util.List;
 
@@ -15,10 +14,10 @@ public interface ExperimentDesignTypeService {
 
 	/**
 	 * @param studyId
-	 * @param experimentDesignInput
+	 * @param experimentalDesignInput
 	 * @param programUUID
 	 */
-	List<ObservationUnitRow> generateDesign(int studyId, ExperimentDesignInput experimentDesignInput, String programUUID,
+	List<ObservationUnitRow> generateDesign(int studyId, ExperimentalDesignInput experimentalDesignInput, String programUUID,
 		List<StudyGermplasmDto> studyGermplasmDtoList);
 
 	/**
@@ -30,6 +29,6 @@ public interface ExperimentDesignTypeService {
 
 	Integer getDesignTypeId();
 
-	List<MeasurementVariable> getMeasurementVariables(int studyId, ExperimentDesignInput experimentDesignInput, String programUUID);
+	List<MeasurementVariable> getMeasurementVariables(int studyId, ExperimentalDesignInput experimentalDesignInput, String programUUID);
 
 }

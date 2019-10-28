@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 @AutoProperty
-public class ExperimentDesignInput {
+public class ExperimentalDesignInput {
 
 	private Set<Integer> trialInstancesForDesignGeneration;
 	private Integer designType;

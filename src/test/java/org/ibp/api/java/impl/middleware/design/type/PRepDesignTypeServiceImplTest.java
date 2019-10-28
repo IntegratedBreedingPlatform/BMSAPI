@@ -12,7 +12,7 @@ import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -83,12 +83,12 @@ public class PRepDesignTypeServiceImplTest {
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
-		experimentDesignInput.setBlockSize(blockSize);
-		experimentDesignInput.setReplicationPercentage(replicationPercentage);
-		experimentDesignInput.setReplicationsCount(replicationCount);
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setBlockSize(blockSize);
+		experimentalDesignInput.setReplicationPercentage(replicationPercentage);
+		experimentalDesignInput.setReplicationsCount(replicationCount);
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
-		experimentDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
+		experimentalDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
 
 		when(this.experimentDesignGenerator
 			.createReplicationListItemForPRepDesign(studyGermplasmDtoList, replicationPercentage, replicationCount))
@@ -99,7 +99,7 @@ public class PRepDesignTypeServiceImplTest {
 				BLOCK_NO, PLOT_NO, startingPlotNumber)).thenReturn(mainDesign);
 		when(this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, PROGRAM_UUID, PRepDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
-				PRepDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput))
+				PRepDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator
 			.generateExperimentDesignMeasurements(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
@@ -108,10 +108,10 @@ public class PRepDesignTypeServiceImplTest {
 				isNull(), any(Map.class))).thenReturn(observationUnitRowList);
 
 		final List<ObservationUnitRow> result =
-			this.designTypeService.generateDesign(studyId, experimentDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
+			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
 		assertSame(result, observationUnitRowList);
-		verify(this.experimentDesignTypeValidator).validatePrepDesign(experimentDesignInput, studyGermplasmDtoList);
+		verify(this.experimentDesignTypeValidator).validatePrepDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 	}
 

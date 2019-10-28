@@ -14,7 +14,7 @@ import org.ibp.api.java.impl.middleware.design.type.ExperimentDesignTypeServiceF
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignValidator;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,11 +58,11 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	private DesignLicenseService designLicenseService;
 
 	@Override
-	public void generateAndSaveDesign(final String cropName, final int studyId, final ExperimentDesignInput experimentDesignInput) {
+	public void generateAndSaveDesign(final String cropName, final int studyId, final ExperimentalDesignInput experimentalDesignInput) {
 		// Check license validity first and foremost( if applicable for design type)
 		// Raise an error right away if license is not valid
 		final ExperimentDesignTypeService experimentDesignTypeService =
-			this.experimentDesignTypeServiceFactory.lookup(experimentDesignInput.getDesignType());
+			this.experimentDesignTypeServiceFactory.lookup(experimentalDesignInput.getDesignType());
 		if (experimentDesignTypeService.requiresLicenseCheck()) {
 			this.checkLicense();
 		}
@@ -74,11 +74,11 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		final List<StudyGermplasmDto> studyGermplasmDtoList = this.middlewareStudyService.getStudyGermplasmList(studyId);
 
 		final List<ObservationUnitRow> observationUnitRows =
-			experimentDesignTypeService.generateDesign(studyId, experimentDesignInput, programUUID, studyGermplasmDtoList);
+			experimentDesignTypeService.generateDesign(studyId, experimentalDesignInput, programUUID, studyGermplasmDtoList);
 
 
 		final List<MeasurementVariable> measurementVariables =
-			experimentDesignTypeService.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
+			experimentDesignTypeService.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 
 		this.experimentDesignMiddlewareService
 			.saveExperimentDesign(cropType, studyId, measurementVariables,

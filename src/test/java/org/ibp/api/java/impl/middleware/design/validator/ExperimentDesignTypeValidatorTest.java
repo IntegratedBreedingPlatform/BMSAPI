@@ -5,7 +5,7 @@ import org.generationcp.middleware.domain.dms.InsertionMannerItem;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class ExperimentDesignTypeValidatorTest {
 	@Test
 	public void testValidateAugmentedDesignSuccess() {
 
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setNumberOfBlocks(2);
 		designInput.setStartingPlotNo(1);
 
@@ -52,7 +52,7 @@ public class ExperimentDesignTypeValidatorTest {
 	@Test
 	public void testValidateAugmentedDesignFail_WhenNoGermplasmList() {
 
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setNumberOfBlocks(2);
 		designInput.setStartingPlotNo(1);
 
@@ -68,7 +68,7 @@ public class ExperimentDesignTypeValidatorTest {
 	@Test
 	public void testValidateAugmentedDesignFail_WhenNoChecks() {
 
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setNumberOfBlocks(2);
 		designInput.setStartingPlotNo(1);
 
@@ -86,7 +86,7 @@ public class ExperimentDesignTypeValidatorTest {
 	@Test
 	public void testValidateAugmentedDesignFail_WhenTreatmentFactorsPresent() {
 
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setNumberOfBlocks(2);
 		designInput.setStartingPlotNo(1);
 		final Map<String, String> treatmentFactorsData = new HashMap<>();
@@ -109,7 +109,7 @@ public class ExperimentDesignTypeValidatorTest {
 	@Test
 	public void testValidateRandomizedCompleteBlockDesignSuccess() {
 
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setNumberOfBlocks(2);
 		designInput.setStartingPlotNo(1);
 		designInput.setReplicationsCount(2);
@@ -126,7 +126,7 @@ public class ExperimentDesignTypeValidatorTest {
 	@Test
 	public void testValidateRandomizedCompleteBlockDesignFail_WhenNoReplicationCount() {
 
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setNumberOfBlocks(2);
 		designInput.setStartingPlotNo(1);
 
@@ -144,7 +144,7 @@ public class ExperimentDesignTypeValidatorTest {
 	@Test
 	public void testValidateRandomizedCompleteBlockDesignFail_WhenNoGermplasmList() {
 
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setNumberOfBlocks(2);
 		designInput.setStartingPlotNo(1);
 
@@ -160,7 +160,7 @@ public class ExperimentDesignTypeValidatorTest {
 	@Test
 	public void testValidateResolvableRowColumnDesignFail_WhenNoReplicationCount() {
 
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setNumberOfBlocks(2);
 		designInput.setStartingPlotNo(1);
 		designInput.setRowsPerReplications(1);
@@ -179,7 +179,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateResolvableRowColumnDesignSuccess() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setReplicationsCount(1);
 		designInput.setRowsPerReplications(2);
@@ -195,7 +195,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateResolvableIncompleteBlockDesignFail_TreatmentFactorsPresent() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setReplicationsCount(1);
 		designInput.setBlockSize(1);
@@ -215,7 +215,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateResolvableIncompleteBlockDesignFail_NoReplicationCount() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setBlockSize(1);
 
@@ -231,7 +231,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateResolvableIncompleteBlockDesignFail_NoBlockSize() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setReplicationsCount(1);
 
@@ -247,7 +247,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateResolvableIncompleteBlockDesignFail_InvalidBlockLevel() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setReplicationsCount(1);
 		designInput.setBlockSize(10);
@@ -264,7 +264,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateResolvableIncompleteBlockDesignFail_InvalidBlockSize() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setReplicationsCount(1);
 		designInput.setBlockSize(3);
@@ -281,7 +281,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateResolvableIncompleteBlockDesignFail_WhenNoGermplasmList() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setBlockSize(1);
 		designInput.setStartingPlotNo(1);
 		designInput.setReplicationsCount(1);
@@ -297,7 +297,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateResolvableRowColumnDesignFail_TreatmentFactorsPresent() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setReplicationsCount(1);
 		designInput.setRowsPerReplications(1);
@@ -318,7 +318,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateResolvableRowColumnDesignFail_InvalidRowColProduct() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setReplicationsCount(1);
 		designInput.setRowsPerReplications(1);
@@ -337,7 +337,7 @@ public class ExperimentDesignTypeValidatorTest {
 	@Test
 	public void testValidateResolvableRowColumnDesignFail_WhenNoGermplasmList() {
 
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setNumberOfBlocks(2);
 		designInput.setStartingPlotNo(1);
 
@@ -353,7 +353,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidatePrepDesignSuccess() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setReplicationPercentage(50);
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
@@ -366,7 +366,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidatePrepDesignFail_NoReplicationPercentage() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
 			this.designTypeValidator.validatePrepDesign(designInput, importedGermplasmList);
@@ -379,7 +379,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidatePrepDesignFail_InvalidReplicationPercentage() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setReplicationPercentage(101);
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
@@ -394,7 +394,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidatePrepDesignFail_TreatmentFactorsPresent() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setReplicationPercentage(50);
 		final Map<String, String> treatmentFactorsData = new HashMap<>();
@@ -413,7 +413,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateEntryListOrderDesignSuccess_WithChecks() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setCheckSpacing(1);
 		designInput.setCheckStartingPosition(1);
@@ -430,7 +430,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateEntryListOrderDesignSuccess_NoChecks() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
@@ -443,7 +443,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateEntryListOrderDesignFail_TreatmentFactorsPresent() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setReplicationPercentage(50);
 		final Map<String, String> treatmentFactorsData = new HashMap<>();
@@ -463,7 +463,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateEntryListOrderDesignFail_NoTestEntries() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
@@ -481,7 +481,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateEntryListOrderDesignFail_NoCheckInsertionMannerForChecks() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setCheckSpacing(1);
 		designInput.setCheckStartingPosition(1);
@@ -499,7 +499,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateEntryListOrderDesignFail_NoCheckSpacing() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setCheckStartingPosition(1);
 		designInput.setCheckInsertionManner(InsertionMannerItem.INSERT_ALL_CHECKS.getId());
@@ -517,7 +517,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateEntryListOrderDesignFail_NoCheckStartingPosition() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setCheckSpacing(1);
 		designInput.setCheckInsertionManner(InsertionMannerItem.INSERT_ALL_CHECKS.getId());
@@ -535,7 +535,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateEntryListOrderDesignFail_InvalidCheckStartingPosition() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setCheckSpacing(1);
 		designInput.setCheckStartingPosition(100);
@@ -554,7 +554,7 @@ public class ExperimentDesignTypeValidatorTest {
 
 	@Test
 	public void testValidateEntryListOrderDesignFail_InvalidCheckSpacing() {
-		final ExperimentDesignInput designInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		designInput.setStartingPlotNo(1);
 		designInput.setCheckSpacing(100);
 		designInput.setCheckStartingPosition(1);
@@ -577,9 +577,9 @@ public class ExperimentDesignTypeValidatorTest {
 		this.designTypeValidator.setErrors(errors);
 
 		final String errorCode = RandomStringUtils.randomAlphabetic(20);
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
-		experimentDesignInput.setReplicationsCount(13);
-		this.designTypeValidator.validateReplicationCountLimit(experimentDesignInput, errorCode);
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setReplicationsCount(13);
+		this.designTypeValidator.validateReplicationCountLimit(experimentalDesignInput, errorCode);
 		assertThat(Arrays.asList(errors.getAllErrors().get(0).getCodes()),
 			hasItem(errorCode));
 	}
@@ -590,9 +590,9 @@ public class ExperimentDesignTypeValidatorTest {
 		this.designTypeValidator.setErrors(errors);
 
 		final String errorCode = RandomStringUtils.randomAlphabetic(20);
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
-		experimentDesignInput.setReplicationsCount(0);
-		this.designTypeValidator.validateReplicationCountLimit(experimentDesignInput, errorCode);
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setReplicationsCount(0);
+		this.designTypeValidator.validateReplicationCountLimit(experimentalDesignInput, errorCode);
 		assertThat(Arrays.asList(errors.getAllErrors().get(0).getCodes()),
 			hasItem(errorCode));
 	}
@@ -603,9 +603,9 @@ public class ExperimentDesignTypeValidatorTest {
 		this.designTypeValidator.setErrors(errors);
 
 		final String errorCode = RandomStringUtils.randomAlphabetic(20);
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
-		experimentDesignInput.setReplicationsCount(0);
-		this.designTypeValidator.validateReplicationCountLimit(experimentDesignInput, errorCode);
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setReplicationsCount(0);
+		this.designTypeValidator.validateReplicationCountLimit(experimentalDesignInput, errorCode);
 		assertThat(Arrays.asList(errors.getAllErrors().get(0).getCodes()),
 			hasItem(errorCode));
 	}
@@ -640,10 +640,10 @@ public class ExperimentDesignTypeValidatorTest {
 		this.designTypeValidator.setErrors(errors);
 		final int treatmentSize = 10;
 
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
-		experimentDesignInput.setStartingPlotNo(1);
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setStartingPlotNo(1);
 
-		this.designTypeValidator.validateStartingPlotNo(experimentDesignInput, treatmentSize);
+		this.designTypeValidator.validateStartingPlotNo(experimentalDesignInput, treatmentSize);
 		Assert.assertFalse(errors.hasErrors());
 	}
 
@@ -653,9 +653,9 @@ public class ExperimentDesignTypeValidatorTest {
 		this.designTypeValidator.setErrors(errors);
 		final int treatmentSize = 10;
 
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
 
-		this.designTypeValidator.validateStartingPlotNo(experimentDesignInput, treatmentSize);
+		this.designTypeValidator.validateStartingPlotNo(experimentalDesignInput, treatmentSize);
 		assertThat(Arrays.asList(errors.getAllErrors().get(0).getCodes()),
 			hasItem("plot.number.should.be.in.range"));
 	}
@@ -666,10 +666,10 @@ public class ExperimentDesignTypeValidatorTest {
 		this.designTypeValidator.setErrors(errors);
 		final int treatmentSize = 10;
 
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
-		experimentDesignInput.setStartingPlotNo(100000000);
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setStartingPlotNo(100000000);
 
-		this.designTypeValidator.validateStartingPlotNo(experimentDesignInput, treatmentSize);
+		this.designTypeValidator.validateStartingPlotNo(experimentalDesignInput, treatmentSize);
 		assertThat(Arrays.asList(errors.getAllErrors().get(0).getCodes()),
 			hasItem("plot.number.should.be.in.range"));
 	}
@@ -679,10 +679,10 @@ public class ExperimentDesignTypeValidatorTest {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		this.designTypeValidator.setErrors(errors);
 
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
-		experimentDesignInput.setTreatmentFactorsData(new HashMap<>());
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setTreatmentFactorsData(new HashMap<>());
 
-		this.designTypeValidator.validateNoTreatmentFactors(experimentDesignInput);
+		this.designTypeValidator.validateNoTreatmentFactors(experimentalDesignInput);
 		Assert.assertFalse(errors.hasErrors());
 	}
 
@@ -691,12 +691,12 @@ public class ExperimentDesignTypeValidatorTest {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		this.designTypeValidator.setErrors(errors);
 
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
 		final Map<String, String> treatmentFactorsData = new HashMap<>();
 		treatmentFactorsData.put("1", "100");
-		experimentDesignInput.setTreatmentFactorsData(treatmentFactorsData);
+		experimentalDesignInput.setTreatmentFactorsData(treatmentFactorsData);
 
-		this.designTypeValidator.validateNoTreatmentFactors(experimentDesignInput);
+		this.designTypeValidator.validateNoTreatmentFactors(experimentalDesignInput);
 		assertThat(Arrays.asList(errors.getAllErrors().get(0).getCodes()),
 			hasItem("experiment.design.treatment.factors.error"));
 	}

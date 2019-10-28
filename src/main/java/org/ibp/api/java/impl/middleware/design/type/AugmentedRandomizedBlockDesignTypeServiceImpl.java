@@ -12,7 +12,7 @@ import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -43,10 +43,10 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 	public OntologyDataManager ontologyDataManager;
 
 	@Override
-	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
+	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
-		this.experimentDesignTypeValidator.validateAugmentedDesign(experimentDesignInput, studyGermplasmDtoList);
+		this.experimentDesignTypeValidator.validateAugmentedDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 		final Set<Integer> entryIdsOfChecks = this.getEntryIdsOfChecks(studyGermplasmDtoList);
 		final Set<Integer> entryIdsOfTestEntries = this.getEntryIdsOfTestEntries(studyGermplasmDtoList);
@@ -55,10 +55,10 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 			this.createMapOfDesignExpectedEntriesToGermplasmEntriesInTrial(studyGermplasmDtoList,
 				entryIdsOfChecks, entryIdsOfTestEntries);
 
-		final Integer numberOfBlocks = experimentDesignInput.getNumberOfBlocks();
+		final Integer numberOfBlocks = experimentalDesignInput.getNumberOfBlocks();
 		final Integer numberOfControls = entryIdsOfChecks.size();
 		final Integer numberOfTreatments = studyGermplasmDtoList.size() - numberOfControls;
-		final Integer startingPlotNumber = experimentDesignInput.getStartingPlotNo() == null? 1 : experimentDesignInput.getStartingPlotNo();
+		final Integer startingPlotNumber = experimentalDesignInput.getStartingPlotNo() == null? 1 : experimentalDesignInput.getStartingPlotNo();
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -72,9 +72,9 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 			.createAugmentedRandomizedBlockDesign(numberOfBlocks, numberOfTreatments, numberOfControls, startingPlotNumber, entryNumberName,
 				blockNumberName, plotNumberName);
 
-		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
+		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		return this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(experimentDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables,
+			.generateExperimentDesignMeasurements(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables,
 				studyGermplasmDtoList, mainDesign, entryNumberName, null,
 				designExpectedEntriesMap);
 	}
@@ -90,11 +90,11 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 	}
 
 	@Override
-	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentDesignInput experimentDesignInput,
+	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID) {
 		return this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES,
-				EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput);
+				EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput);
 	}
 
 	Map<Integer, StandardVariable> convertStandardVariableListToMap(final List<StandardVariable> standardVariables) {

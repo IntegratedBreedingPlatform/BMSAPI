@@ -47,17 +47,17 @@ public class ExperimentDesignResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testGenerateExperimentDesign() throws Exception {
 		final int studyId = 111;
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
-		experimentDesignInput.setDesignType(ExperimentDesignType.ENTRY_LIST_ORDER.getId());
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setDesignType(ExperimentDesignType.ENTRY_LIST_ORDER.getId());
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.post("/crops/{crop}/studies/{studyId}/design", this.cropName, studyId)
 				.contentType(this.contentType)
-				.content(this.convertObjectToByte(experimentDesignInput)))
+				.content(this.convertObjectToByte(experimentalDesignInput)))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
 
-		Mockito.verify(this.experimentDesignService).generateAndSaveDesign(this.cropName, studyId, experimentDesignInput);
+		Mockito.verify(this.experimentDesignService).generateAndSaveDesign(this.cropName, studyId, experimentalDesignInput);
 	}
 
 }

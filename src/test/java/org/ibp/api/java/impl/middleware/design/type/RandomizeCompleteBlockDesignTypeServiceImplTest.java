@@ -13,7 +13,7 @@ import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -92,12 +92,12 @@ public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
-		experimentDesignInput.setReplicationsCount(replicationCount);
-		experimentDesignInput.setStartingPlotNo(startingPlotNumber);
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setReplicationsCount(replicationCount);
+		experimentalDesignInput.setStartingPlotNo(startingPlotNumber);
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
-		experimentDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
-		experimentDesignInput.setTreatmentFactorsData(this.createTreatmentFactorsDataMap());
+		experimentalDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
+		experimentalDesignInput.setTreatmentFactorsData(this.createTreatmentFactorsDataMap());
 
 		when(this.experimentDesignGenerator
 			.createRandomizedCompleteBlockDesign(eq(replicationCount), eq(REP_NO), eq(PLOT_NO),
@@ -105,7 +105,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 				eq(ENTRY_NO), any(List.class), any(List.class), eq(""))).thenReturn(mainDesign);
 		when(this.experimentDesignGenerator
 			.constructMeasurementVariables(studyId, PROGRAM_UUID, RandomizeCompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
-				RandomizeCompleteBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput))
+				RandomizeCompleteBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator
 			.generateExperimentDesignMeasurements(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
@@ -114,10 +114,10 @@ public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 				any(Map.class), any(Map.class))).thenReturn(observationUnitRowList);
 
 		final List<ObservationUnitRow> result =
-			this.designTypeService.generateDesign(studyId, experimentDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
+			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
 		assertSame(result, observationUnitRowList);
-		verify(this.experimentDesignTypeValidator).validateRandomizedCompleteBlockDesign(experimentDesignInput, studyGermplasmDtoList);
+		verify(this.experimentDesignTypeValidator).validateRandomizedCompleteBlockDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 	}
 

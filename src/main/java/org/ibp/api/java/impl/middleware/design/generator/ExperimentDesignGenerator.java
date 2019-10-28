@@ -29,7 +29,7 @@ import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -359,7 +359,7 @@ public class ExperimentDesignGenerator {
 
 	public List<MeasurementVariable> constructMeasurementVariables(final int studyId, final String programUUID,
 		final List<Integer> designFactors, final List<Integer> experimentDesignFactors,
-		final ExperimentDesignInput experimentDesignInput) {
+		final ExperimentalDesignInput experimentalDesignInput) {
 
 		// Add the germplasm and environment detail variables from study.
 		// This adds the specified trial design factor, experiment design factor and treatment factor variables.
@@ -371,16 +371,16 @@ public class ExperimentDesignGenerator {
 				Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId())));
 
 		measurementVariables.addAll(
-			this.convertToMeasurementVariables(experimentDesignFactors, VariableType.ENVIRONMENT_DETAIL, experimentDesignInput,
+			this.convertToMeasurementVariables(experimentDesignFactors, VariableType.ENVIRONMENT_DETAIL, experimentalDesignInput,
 				programUUID));
 		measurementVariables.addAll(
-			this.convertToMeasurementVariables(designFactors, VariableType.EXPERIMENTAL_DESIGN, experimentDesignInput, programUUID));
+			this.convertToMeasurementVariables(designFactors, VariableType.EXPERIMENTAL_DESIGN, experimentalDesignInput, programUUID));
 
 		return new ArrayList<>(measurementVariables);
 	}
 
 	List<MeasurementVariable> convertToMeasurementVariables(final List<Integer> variableIds, final VariableType variableType,
-		final ExperimentDesignInput experimentDesignInput,
+		final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID) {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final List<StandardVariable> treatmentFactorStandardVariables =
@@ -388,7 +388,7 @@ public class ExperimentDesignGenerator {
 
 		for (final StandardVariable standardVariable : treatmentFactorStandardVariables) {
 			measurementVariables.add(this.convertToMeasurementVariable(standardVariable, variableType,
-				this.getMeasurementValueFromDesignInput(experimentDesignInput, standardVariable.getId())));
+				this.getMeasurementValueFromDesignInput(experimentalDesignInput, standardVariable.getId())));
 		}
 		return measurementVariables;
 	}
@@ -622,22 +622,22 @@ public class ExperimentDesignGenerator {
 
 	}
 
-	String getMeasurementValueFromDesignInput(final ExperimentDesignInput experimentDesignInput, final int termId) {
+	String getMeasurementValueFromDesignInput(final ExperimentalDesignInput experimentalDesignInput, final int termId) {
 
 		if (termId == TermId.EXPERIMENT_DESIGN_FACTOR.getId()) {
-			if (experimentDesignInput.getDesignType() != null) {
+			if (experimentalDesignInput.getDesignType() != null) {
 				return String.valueOf(ExperimentDesignType
-					.getTermIdByDesignTypeId(experimentDesignInput.getDesignType(), experimentDesignInput.getUseLatenized()));
+					.getTermIdByDesignTypeId(experimentalDesignInput.getDesignType(), experimentalDesignInput.getUseLatenized()));
 			}
 		} else if (termId == TermId.NUMBER_OF_REPLICATES.getId()) {
-			return String.valueOf(experimentDesignInput.getReplicationsCount());
+			return String.valueOf(experimentalDesignInput.getReplicationsCount());
 		} else if (termId == TermId.PERCENTAGE_OF_REPLICATION.getId()) {
-			return String.valueOf(experimentDesignInput.getReplicationPercentage());
+			return String.valueOf(experimentalDesignInput.getReplicationPercentage());
 		} else if (termId == TermId.BLOCK_SIZE.getId()) {
-			return String.valueOf(experimentDesignInput.getBlockSize());
+			return String.valueOf(experimentalDesignInput.getBlockSize());
 		} else if (termId == TermId.REPLICATIONS_MAP.getId()) {
-			if (experimentDesignInput.getReplicationsArrangement() != null) {
-				switch (experimentDesignInput.getReplicationsArrangement()) {
+			if (experimentalDesignInput.getReplicationsArrangement() != null) {
+				switch (experimentalDesignInput.getReplicationsArrangement()) {
 					case 1:
 						return String.valueOf(TermId.REPS_IN_SINGLE_COL.getId());
 					case 2:
@@ -648,27 +648,27 @@ public class ExperimentDesignGenerator {
 				}
 			}
 		} else if (termId == TermId.NO_OF_REPS_IN_COLS.getId()) {
-			return experimentDesignInput.getReplatinGroups();
+			return experimentalDesignInput.getReplatinGroups();
 		} else if (termId == TermId.NO_OF_CBLKS_LATINIZE.getId()) {
-			return String.valueOf(experimentDesignInput.getNblatin());
+			return String.valueOf(experimentalDesignInput.getNblatin());
 		} else if (termId == TermId.NO_OF_ROWS_IN_REPS.getId()) {
-			return String.valueOf(experimentDesignInput.getRowsPerReplications());
+			return String.valueOf(experimentalDesignInput.getRowsPerReplications());
 		} else if (termId == TermId.NO_OF_COLS_IN_REPS.getId()) {
-			return String.valueOf(experimentDesignInput.getColsPerReplications());
+			return String.valueOf(experimentalDesignInput.getColsPerReplications());
 		} else if (termId == TermId.NO_OF_CCOLS_LATINIZE.getId()) {
-			return String.valueOf(experimentDesignInput.getNclatin());
+			return String.valueOf(experimentalDesignInput.getNclatin());
 		} else if (termId == TermId.NO_OF_CROWS_LATINIZE.getId()) {
-			return String.valueOf(experimentDesignInput.getNrlatin());
+			return String.valueOf(experimentalDesignInput.getNrlatin());
 		} else if (termId == TermId.EXPT_DESIGN_SOURCE.getId()) {
-			return experimentDesignInput.getFileName();
+			return experimentalDesignInput.getFileName();
 		} else if (termId == TermId.NBLKS.getId()) {
-			return String.valueOf(experimentDesignInput.getNumberOfBlocks());
+			return String.valueOf(experimentalDesignInput.getNumberOfBlocks());
 		} else if (termId == TermId.CHECK_START.getId()) {
-			return String.valueOf(experimentDesignInput.getCheckStartingPosition());
+			return String.valueOf(experimentalDesignInput.getCheckStartingPosition());
 		} else if (termId == TermId.CHECK_INTERVAL.getId()) {
-			return String.valueOf(experimentDesignInput.getCheckSpacing());
+			return String.valueOf(experimentalDesignInput.getCheckSpacing());
 		} else if (termId == TermId.CHECK_PLAN.getId()) {
-			return String.valueOf(experimentDesignInput.getCheckInsertionManner());
+			return String.valueOf(experimentalDesignInput.getCheckInsertionManner());
 		}
 		return "";
 	}
