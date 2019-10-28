@@ -30,6 +30,11 @@ public class ObservationUnitData {
 	public ObservationUnitData() {
 	}
 
+	public ObservationUnitData (final Integer variableId, final String value) {
+		this.setVariableId(variableId);
+		this.setValue(value);
+	}
+
 	public Integer getObservationId() {
 		return this.observationId;
 	}

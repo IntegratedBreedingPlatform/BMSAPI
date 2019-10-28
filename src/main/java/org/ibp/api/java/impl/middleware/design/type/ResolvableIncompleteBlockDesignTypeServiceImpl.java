@@ -10,6 +10,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
@@ -64,24 +65,7 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
 		final String blockNumberName = standardVariablesMap.get(TermId.BLOCK_NO.getId()).getName();
 
-		if (experimentDesignInput.getUseLatenized() != null && experimentDesignInput.getUseLatenized()) {
-			if (experimentDesignInput.getReplicationsArrangement() != null) {
-				if (experimentDesignInput.getReplicationsArrangement().intValue() == 1) {
-					// column
-					experimentDesignInput.setReplatinGroups(String.valueOf(experimentDesignInput.getReplicationsCount()));
-				} else if (experimentDesignInput.getReplicationsArrangement().intValue() == 2) {
-					// rows
-					final StringBuilder rowReplatingGroupStringBuilder = new StringBuilder();
-					for (int i = 0; i < experimentDesignInput.getReplicationsCount(); i++) {
-						if (StringUtils.isEmpty(rowReplatingGroupStringBuilder.toString())) {
-							rowReplatingGroupStringBuilder.append(",");
-						}
-						rowReplatingGroupStringBuilder.append("1");
-					}
-					experimentDesignInput.setReplatinGroups(rowReplatingGroupStringBuilder.toString());
-				}
-			}
-		}
+		ExperimentalDesignUtil.setReplatinGroups(experimentDesignInput);
 
 		final Integer plotNo = experimentDesignInput.getStartingPlotNo() == null? 1 : experimentDesignInput.getStartingPlotNo();
 
