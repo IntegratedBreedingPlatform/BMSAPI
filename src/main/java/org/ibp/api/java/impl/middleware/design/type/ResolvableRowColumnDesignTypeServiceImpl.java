@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.design.type;
 
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -57,7 +56,6 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 		final Integer rows = experimentDesignInput.getRowsPerReplications();
 		final Integer cols = experimentDesignInput.getColsPerReplications();
 		final Integer replicates = experimentDesignInput.getReplicationsCount();
-		final int numberOfTrials = experimentDesignInput.getNoOfEnvironments();
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -81,7 +79,7 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesig
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
 		return this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(numberOfTrials, measurementVariables, studyGermplasmDtoList, mainDesign,
+			.generateExperimentDesignMeasurements(experimentDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign,
 				entryNumberName, null,
 				new HashMap<>());
 	}

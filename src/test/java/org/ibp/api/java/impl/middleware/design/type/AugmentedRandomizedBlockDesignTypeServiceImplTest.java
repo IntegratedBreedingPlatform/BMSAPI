@@ -20,6 +20,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -82,7 +84,8 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
 		experimentDesignInput.setNumberOfBlocks(numberOfBlocks);
 		experimentDesignInput.setStartingPlotNo(startingPlotNumber);
-		experimentDesignInput.setNoOfEnvironments(numberOfTrials);
+		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
+		experimentDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
 
 		when(this.experimentDesignGenerator
 			.createAugmentedRandomizedBlockDesign(numberOfBlocks, numberOfTreatments, numberOfControls,
@@ -94,7 +97,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 				AugmentedRandomizedBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(eq(numberOfTrials), refEq(measurementVariables),
+			.generateExperimentDesignMeasurements(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
 				refEq(studyGermplasmDtoList), refEq(mainDesign),
 				eq(ENTRY_NO),
 				isNull(), any(Map.class))).thenReturn(observationUnitRowList);

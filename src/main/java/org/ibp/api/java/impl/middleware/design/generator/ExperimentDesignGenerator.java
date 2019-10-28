@@ -289,10 +289,11 @@ public class ExperimentDesignGenerator {
 	}
 
 	public List<ObservationUnitRow> generateExperimentDesignMeasurements(
-		final int numberOfTrials, final List<MeasurementVariable> generateDesignVariables,
+		final Set<Integer> trialInstanceForDesignGeneration, final List<MeasurementVariable> generateDesignVariables,
 		final List<StudyGermplasmDto> studyGermplasmDtoList, final MainDesign mainDesign, final String entryNumberIdentifier,
 		final Map<String, List<String>> treatmentFactorValues, final Map<Integer, Integer> designExpectedEntriesMap) {
 
+		final Integer numberOfTrials = trialInstanceForDesignGeneration.size();
 		// Specify number of study instances for BVDesign generation
 		mainDesign.getDesign().getParameters()
 			.add(this.createExperimentDesignParameter(NUMBER_TRIALS_PARAM, String.valueOf(numberOfTrials), null));
@@ -313,6 +314,7 @@ public class ExperimentDesignGenerator {
 			studyGermplasmDtoList.stream().collect(Collectors.toMap(StudyGermplasmDto::getEntryNumber,
 				Function.identity()));
 		final List<ObservationUnitRow> rows = new ArrayList<>();
+		// TODO replace BVOutput's trial instances with actual trial instances passed
 		int trialInstanceNumber = 1;
 		for (final BVDesignTrialInstance instance : bvOutput.getTrialInstances()) {
 			for (final Map<String, String> row : instance.getRows()) {

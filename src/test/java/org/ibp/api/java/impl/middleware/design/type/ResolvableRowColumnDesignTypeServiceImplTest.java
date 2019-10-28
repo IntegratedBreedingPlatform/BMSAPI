@@ -20,8 +20,11 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
@@ -87,7 +90,8 @@ public class ResolvableRowColumnDesignTypeServiceImplTest {
 		experimentDesignInput.setRowsPerReplications(rowPerReplications);
 		experimentDesignInput.setColsPerReplications(colPerReplications);
 		experimentDesignInput.setStartingPlotNo(startingPlotNumber);
-		experimentDesignInput.setNoOfEnvironments(numberOfTrials);
+		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
+		experimentDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
 		experimentDesignInput.setUseLatenized(false);
 
 		when(this.experimentDesignGenerator
@@ -100,7 +104,7 @@ public class ResolvableRowColumnDesignTypeServiceImplTest {
 				ResolvableRowColumnDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(eq(numberOfTrials), refEq(measurementVariables),
+			.generateExperimentDesignMeasurements(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
 				refEq(studyGermplasmDtoList), refEq(mainDesign),
 				eq(ENTRY_NO),
 				isNull(), any(Map.class))).thenReturn(observationUnitRowList);
@@ -136,7 +140,8 @@ public class ResolvableRowColumnDesignTypeServiceImplTest {
 		experimentDesignInput.setRowsPerReplications(rowPerReplications);
 		experimentDesignInput.setColsPerReplications(colPerReplications);
 		experimentDesignInput.setStartingPlotNo(startingPlotNumber);
-		experimentDesignInput.setNoOfEnvironments(numberOfTrials);
+		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
+		experimentDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
 
 		// Set value 1 for Column Arrangement
 		experimentDesignInput.setReplicationsArrangement(1);
@@ -152,7 +157,7 @@ public class ResolvableRowColumnDesignTypeServiceImplTest {
 				ResolvableRowColumnDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES_LATINIZED, experimentDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(eq(numberOfTrials), refEq(measurementVariables),
+			.generateExperimentDesignMeasurements(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
 				refEq(studyGermplasmDtoList), refEq(mainDesign),
 				eq(ENTRY_NO),
 				isNull(), any(Map.class))).thenReturn(observationUnitRowList);

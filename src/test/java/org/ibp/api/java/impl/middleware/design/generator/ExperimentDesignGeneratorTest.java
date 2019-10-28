@@ -26,9 +26,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExperimentDesignGeneratorTest {
@@ -409,20 +411,20 @@ public class ExperimentDesignGeneratorTest {
 				.createRandomizedCompleteBlockDesign(2, ExperimentDesignGeneratorTest.REP_NO, ExperimentDesignGeneratorTest.PLOT_NO,
 					301, TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>(), "");
 
-		final int environments = 7;
-		this.setMockValues(mainDesign, environments);
+		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
+		this.setMockValues(mainDesign, trialInstancesForDesignGeneration.size());
 
 		final Map<String, List<String>> treatmentFactorValues = new HashMap<>();
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
 		final List<ObservationUnitRow> measurementRowList =
 			this.experimentDesignGenerator
-				.generateExperimentDesignMeasurements(environments, new ArrayList<>(), studyGermplasmDtoList,
+				.generateExperimentDesignMeasurements(trialInstancesForDesignGeneration, new ArrayList<>(), studyGermplasmDtoList,
 					mainDesign, ExperimentDesignGeneratorTest.ENTRY_NO,
 					treatmentFactorValues, new HashMap<>());
 
 		Assert.assertEquals(
-			String.valueOf(environments),
+			String.valueOf(trialInstancesForDesignGeneration.size()),
 			mainDesign.getDesign().getParameterValue(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM));
 		Mockito.verify(this.designRunner, Mockito.times(1)).runBVDesign(mainDesign);
 	}
@@ -435,10 +437,12 @@ public class ExperimentDesignGeneratorTest {
 					301,  TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>(), "");
 		Mockito.doReturn(new BVDesignOutput(1)).when(this.designRunner)
 			.runBVDesign(mainDesign);
+		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2));
+
 		try {
 			final List<StudyGermplasmDto> studyGermplasmDtoList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
 			this.experimentDesignGenerator
-					.generateExperimentDesignMeasurements(2, new ArrayList<>(), studyGermplasmDtoList,
+					.generateExperimentDesignMeasurements(trialInstancesForDesignGeneration, new ArrayList<>(), studyGermplasmDtoList,
 						mainDesign, ExperimentDesignGeneratorTest.ENTRY_NO,	new HashMap<>(), new HashMap<>());
 			Assert.fail("Expected to throw BVDesignException but didn't.");
 		} catch (final BVDesignException e) {
@@ -457,7 +461,7 @@ public class ExperimentDesignGeneratorTest {
 		try {
 			final List<StudyGermplasmDto> studyGermplasmDtoList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
 			this.experimentDesignGenerator
-				.generateExperimentDesignMeasurements(2, new ArrayList<>(), studyGermplasmDtoList,
+				.generateExperimentDesignMeasurements(new HashSet<>(Arrays.asList(2)), new ArrayList<>(), studyGermplasmDtoList,
 					mainDesign, ExperimentDesignGeneratorTest.ENTRY_NO,	new HashMap<>(), new HashMap<>());
 			Assert.fail("Expected to throw BVDesignException but didn't.");
 		} catch (final BVDesignException e) {

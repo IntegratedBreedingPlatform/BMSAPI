@@ -10,7 +10,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
-import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -18,7 +17,12 @@ import org.ibp.api.rest.design.ExperimentDesignInput;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignTypeService {
@@ -59,12 +63,9 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignType
 		final List<StudyGermplasmDto> mergedGermplasmList =
 			this.mergeTestAndCheckEntries(testEntryList, checkList, startingPosition, spacing, insertionManner);
 
-		final int numberOfTrials = experimentDesignInput.getNoOfEnvironments();
-
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
 		final List<ObservationUnitRow> observationUnitRows = new ArrayList<>();
-		for (int instanceNumber = 1; instanceNumber <= numberOfTrials; instanceNumber++) {
-
+		for (final Integer instanceNumber : experimentDesignInput.getTrialInstancesForDesignGeneration()) {
 			int plotNumber = experimentDesignInput.getStartingPlotNo();
 
 			for (final StudyGermplasmDto germplasm : mergedGermplasmList) {

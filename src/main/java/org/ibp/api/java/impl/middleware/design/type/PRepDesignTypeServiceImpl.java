@@ -51,7 +51,6 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 		final int blockSize = experimentDesignInput.getBlockSize();
 		final int replicationPercentage = experimentDesignInput.getReplicationPercentage();
 		final int replicationNumber = experimentDesignInput.getReplicationsCount();
-		final int numberOfTrials = experimentDesignInput.getNoOfEnvironments();
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -72,7 +71,7 @@ public class PRepDesignTypeServiceImpl implements ExperimentDesignTypeService {
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
 		return this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(numberOfTrials, measurementVariables, studyGermplasmDtoList, mainDesign,
+			.generateExperimentDesignMeasurements(experimentDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign,
 				entryNumberName, null,
 				new HashMap<Integer, Integer>());
 	}

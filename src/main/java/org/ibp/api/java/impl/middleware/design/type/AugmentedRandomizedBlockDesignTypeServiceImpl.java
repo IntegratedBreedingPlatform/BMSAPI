@@ -60,8 +60,6 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 		final Integer numberOfTreatments = studyGermplasmDtoList.size() - numberOfControls;
 		final Integer startingPlotNumber = experimentDesignInput.getStartingPlotNo() == null? 1 : experimentDesignInput.getStartingPlotNo();
 
-		final int numberOfTrials = experimentDesignInput.getNoOfEnvironments();
-
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
 				.collect(Collectors.toMap(StandardVariable::getId, standardVariable -> standardVariable));
@@ -76,7 +74,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
 		return this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(numberOfTrials, measurementVariables,
+			.generateExperimentDesignMeasurements(experimentDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables,
 				studyGermplasmDtoList, mainDesign, entryNumberName, null,
 				designExpectedEntriesMap);
 	}

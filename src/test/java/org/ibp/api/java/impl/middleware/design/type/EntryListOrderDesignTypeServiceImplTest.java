@@ -14,7 +14,6 @@ import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerat
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentDesignInput;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -22,7 +21,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -63,7 +65,8 @@ public class EntryListOrderDesignTypeServiceImplTest {
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
 		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
-		experimentDesignInput.setNoOfEnvironments(numberOfTrials);
+		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
+		experimentDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
 		experimentDesignInput.setStartingPlotNo(startingPlotNumber);
 		experimentDesignInput.setCheckStartingPosition(checkStartingPosition);
 
@@ -111,7 +114,8 @@ public class EntryListOrderDesignTypeServiceImplTest {
 		experimentDesignInput.setCheckStartingPosition(checkStartingPosition);
 		experimentDesignInput.setCheckSpacing(checkSpacing);
 		experimentDesignInput.setCheckInsertionManner(checkInsertionManner);
-		experimentDesignInput.setNoOfEnvironments(numberOfTrials);
+		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
+		experimentDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
 		experimentDesignInput.setStartingPlotNo(startingPlotNumber);
 
 		when(this.experimentDesignGenerator

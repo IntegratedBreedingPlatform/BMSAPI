@@ -60,7 +60,6 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 		this.experimentDesignTypeValidator.validateRandomizedCompleteBlockDesign(experimentDesignInput, studyGermplasmDtoList);
 
 		final Integer block = experimentDesignInput.getReplicationsCount();
-		final int numberOfTrials = experimentDesignInput.getNoOfEnvironments();
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -88,7 +87,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDe
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
 		return this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(numberOfTrials, measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName,
+			.generateExperimentDesignMeasurements(experimentDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName,
 				treatmentFactorValues, new HashMap<Integer, Integer>());
 	}
 

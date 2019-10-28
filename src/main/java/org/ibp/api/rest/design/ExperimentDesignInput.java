@@ -3,13 +3,14 @@ package org.ibp.api.rest.design;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @AutoProperty
 public class ExperimentDesignInput {
 
-	private Integer noOfEnvironments;
-	private Integer noOfEnvironmentsToAdd;
+	private Set<Integer> trialInstancesForDesignGeneration;
 	private Integer designType;
 	private Integer replicationsCount;
 	private Boolean useLatenized;
@@ -37,12 +38,12 @@ public class ExperimentDesignInput {
 	 */
 	private Integer replicationsArrangement;
 
-	public Integer getNoOfEnvironments() {
-		return this.noOfEnvironments;
+	public Set<Integer> getTrialInstancesForDesignGeneration() {
+		return trialInstancesForDesignGeneration;
 	}
 
-	public void setNoOfEnvironments(final Integer noOfEnvironments) {
-		this.noOfEnvironments = noOfEnvironments;
+	public void setTrialInstancesForDesignGeneration(final Set<Integer> trialInstancesForDesignGeneration) {
+		this.trialInstancesForDesignGeneration = trialInstancesForDesignGeneration;
 	}
 
 	public Integer getDesignType() {
@@ -155,14 +156,6 @@ public class ExperimentDesignInput {
 
 	public void setReplicationsArrangement(final Integer replicationsArrangement) {
 		this.replicationsArrangement = replicationsArrangement;
-	}
-
-	public Integer getNoOfEnvironmentsToAdd() {
-		return this.noOfEnvironmentsToAdd;
-	}
-
-	public void setNoOfEnvironmentsToAdd(final Integer noOfEnvironmentsToAdd) {
-		this.noOfEnvironmentsToAdd = noOfEnvironmentsToAdd;
 	}
 
 	public boolean isHasMeasurementData() {
