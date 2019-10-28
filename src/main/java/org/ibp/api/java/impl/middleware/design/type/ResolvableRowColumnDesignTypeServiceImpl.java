@@ -7,7 +7,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
-import org.ibp.api.java.design.type.ExperimentDesignTypeService;
+import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentDesignTypeService {
+public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentalDesignTypeService {
 
 	protected static final List<Integer> DESIGN_FACTOR_VARIABLES =
 		Arrays.asList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId(), TermId.ROW.getId(), TermId.COL.getId());

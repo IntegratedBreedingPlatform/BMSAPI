@@ -9,7 +9,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
-import org.ibp.api.java.design.type.ExperimentDesignTypeService;
+import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
@@ -31,7 +31,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
-public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentDesignTypeService {
+public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentalDesignTypeService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RandomizeCompleteBlockDesignTypeServiceImpl.class);
 

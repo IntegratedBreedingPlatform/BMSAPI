@@ -8,9 +8,9 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.java.design.DesignLicenseService;
-import org.ibp.api.java.design.type.ExperimentDesignTypeService;
+import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
-import org.ibp.api.java.impl.middleware.design.type.ExperimentDesignTypeServiceFactory;
+import org.ibp.api.java.impl.middleware.design.type.ExperimentalDesignTypeServiceFactory;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignValidator;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -47,7 +47,7 @@ public class ExperimentDesignServiceImplTest {
 	private DesignLicenseService designLicenseService;
 
 	@Mock
-	private ExperimentDesignTypeServiceFactory experimentDesignTypeServiceFactory;
+	private ExperimentalDesignTypeServiceFactory experimentalDesignTypeServiceFactory;
 
 	@Mock
 	private org.generationcp.middleware.service.api.study.StudyService middlewareStudyService;
@@ -56,7 +56,7 @@ public class ExperimentDesignServiceImplTest {
 	private org.generationcp.middleware.service.api.study.generation.ExperimentDesignService middlewareExperimentDesignService;
 
 	@Mock
-	private ExperimentDesignTypeService designTypeService;
+	private ExperimentalDesignTypeService designTypeService;
 
 	@Mock
 	private WorkbenchDataManager workbenchDataManager;
@@ -73,7 +73,7 @@ public class ExperimentDesignServiceImplTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		Mockito.doReturn(this.designTypeService).when(this.experimentDesignTypeServiceFactory).lookup(ArgumentMatchers.anyInt());
+		Mockito.doReturn(this.designTypeService).when(this.experimentalDesignTypeServiceFactory).lookup(ArgumentMatchers.anyInt());
 		Mockito.doReturn(false).when(this.designTypeService).requiresLicenseCheck();
 
 		this.designInput.setDesignType(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getId());

@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.design.validator;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.design.type.ExperimentDesignTypeService;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -21,6 +20,7 @@ public class ExperimentalDesignTypeValidator {
 
 	private static final int MINIMUM_REPLICATION_PERCENTAGE = 0;
 	private static final int MAXIMUM_REPLICATION_PERCENTAGE = 100;
+	private static final Integer MAX_PLOT_NO = 99999999;
 
 	private static final String PLOT_NUMBER_SHOULD_BE_IN_RANGE = "plot.number.should.be.in.range";
 	private static final String EXPERIMENT_DESIGN_REPLICATION_COUNT_RCBD_ERROR = "experiment.design.replication.count.rcbd.error";
@@ -366,7 +366,7 @@ public class ExperimentalDesignTypeValidator {
 
 		if (startingPlotNo != null) {
 			final int plotNumber = startingPlotNo;
-			if (plotNumber != 0 && ((treatmentSize + plotNumber - 1) <= ExperimentDesignTypeService.MAX_PLOT_NO)) {
+			if (plotNumber != 0 && ((treatmentSize + plotNumber - 1) <= ExperimentalDesignTypeValidator.MAX_PLOT_NO)) {
 				return;
 			}
 		}
@@ -402,7 +402,7 @@ public class ExperimentalDesignTypeValidator {
 		final Integer plotNumber = experimentalDesignInput.getStartingPlotNo() == null? 1 : experimentalDesignInput.getStartingPlotNo();
 		final Integer replicationsCount = experimentalDesignInput.getReplicationsCount() == null? 1 : experimentalDesignInput.getReplicationsCount();
 		final Integer maxPlot = (germplasmCount * replicationsCount) + plotNumber - 1;
-		if (plotNumber != null && maxPlot > ExperimentDesignTypeService.MAX_PLOT_NO) {
+		if (plotNumber != null && maxPlot > ExperimentalDesignTypeValidator.MAX_PLOT_NO) {
 			this.errors.reject(EXPERIMENT_DESIGN_PLOT_NUMBER_SHOULD_NOT_EXCEED, new Object[] {maxPlot}, "");
 		}
 	}

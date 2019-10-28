@@ -8,7 +8,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
-import org.ibp.api.java.design.type.ExperimentDesignTypeService;
+import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitData;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class EntryListOrderDesignTypeServiceImpl implements ExperimentDesignTypeService {
+public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTypeService {
 
 	protected static final List<Integer> DESIGN_FACTOR_VARIABLES = Arrays.asList(TermId.PLOT_NO.getId());
 

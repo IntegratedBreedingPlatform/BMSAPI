@@ -7,15 +7,13 @@ import org.ibp.api.rest.design.ExperimentalDesignInput;
 
 import java.util.List;
 
-public interface ExperimentDesignTypeService {
-
-	Integer MAX_ENTRY_NO = 99999;
-	Integer MAX_PLOT_NO = 99999999;
+public interface ExperimentalDesignTypeService {
 
 	/**
 	 * @param studyId
 	 * @param experimentalDesignInput
 	 * @param programUUID
+	 * @param studyGermplasmDtoList
 	 */
 	List<ObservationUnitRow> generateDesign(int studyId, ExperimentalDesignInput experimentalDesignInput, String programUUID,
 		List<StudyGermplasmDto> studyGermplasmDtoList);
