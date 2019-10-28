@@ -3,7 +3,6 @@ package org.ibp.api.rest.design;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,14 +16,11 @@ public class ExperimentDesignInput {
 	private Integer blockSize;
 	private Integer rowsPerReplications;
 	private Integer colsPerReplications;
-	private Map treatmentFactors;
 	private Map treatmentFactorsData;
-	private Integer totalGermplasmListCount;
 	private Integer nclatin;
 	private Integer nrlatin;
 	private Integer nblatin;
 	private String replatinGroups;
-	private boolean hasMeasurementData;
 	private Integer startingPlotNo;
 	private String fileName;
 	private Integer numberOfBlocks;
@@ -94,28 +90,12 @@ public class ExperimentDesignInput {
 		this.colsPerReplications = colsPerReplications;
 	}
 
-	public Map getTreatmentFactors() {
-		return this.treatmentFactors;
-	}
-
-	public void setTreatmentFactors(final Map treatmentFactors) {
-		this.treatmentFactors = treatmentFactors;
-	}
-
 	public Map getTreatmentFactorsData() {
 		return this.treatmentFactorsData;
 	}
 
 	public void setTreatmentFactorsData(final Map treatmentFactorsData) {
 		this.treatmentFactorsData = treatmentFactorsData;
-	}
-
-	public Integer getTotalGermplasmListCount() {
-		return this.totalGermplasmListCount;
-	}
-
-	public void setTotalGermplasmListCount(final Integer totalGermplasmListCount) {
-		this.totalGermplasmListCount = totalGermplasmListCount;
 	}
 
 	public Integer getNclatin() {
@@ -156,14 +136,6 @@ public class ExperimentDesignInput {
 
 	public void setReplicationsArrangement(final Integer replicationsArrangement) {
 		this.replicationsArrangement = replicationsArrangement;
-	}
-
-	public boolean isHasMeasurementData() {
-		return this.hasMeasurementData;
-	}
-
-	public void setHasMeasurementData(final boolean hasMeasurementData) {
-		this.hasMeasurementData = hasMeasurementData;
 	}
 
 	public Integer getStartingPlotNo() {
