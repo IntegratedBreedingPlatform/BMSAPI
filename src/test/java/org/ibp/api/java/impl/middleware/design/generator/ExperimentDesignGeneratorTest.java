@@ -1,7 +1,6 @@
 package org.ibp.api.java.impl.middleware.design.generator;
 
 import org.generationcp.commons.constant.AppConstants;
-import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
@@ -25,6 +24,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -46,6 +46,8 @@ public class ExperimentDesignGeneratorTest {
 	private static final int ENTRY_NO_3 = 3;
 	private static final int ENTRY_NO_10 = 10;
 	private static final int ENTRY_NO_5 = 5;
+	public static final int NUMBER_OF_REPS = 2;
+	public static final int NUMBER_OF_ENTRIES = 5;
 
 	@InjectMocks
 	private ExperimentDesignGenerator experimentDesignGenerator;
@@ -204,7 +206,7 @@ public class ExperimentDesignGeneratorTest {
 		final Integer numberOfBlocks = 2;
 		final Integer numberOfTreatments = 22;
 		final Integer startingPlotNumber = 1;
-		final List<ListItem> nRepeatsListItem = Arrays.asList(new ListItem("1"));
+		final List<ListItem> nRepeatsListItem = Collections.singletonList(new ListItem("1"));
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createPRepDesign(
@@ -411,7 +413,8 @@ public class ExperimentDesignGeneratorTest {
 				.createRandomizedCompleteBlockDesign(2, ExperimentDesignGeneratorTest.REP_NO, ExperimentDesignGeneratorTest.PLOT_NO,
 					301, TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>(), "");
 
-		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
+		final List<Integer> trialInstances = Arrays.asList(2, 4, 6);
+		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(trialInstances);
 		this.setMockValues(mainDesign, trialInstancesForDesignGeneration.size());
 
 		final Map<String, List<String>> treatmentFactorValues = new HashMap<>();
@@ -422,6 +425,21 @@ public class ExperimentDesignGeneratorTest {
 				.generateExperimentDesignMeasurements(trialInstancesForDesignGeneration, new ArrayList<>(), studyGermplasmDtoList,
 					mainDesign, ExperimentDesignGeneratorTest.ENTRY_NO,
 					treatmentFactorValues, new HashMap<>());
+
+		final Map<Integer, List<ObservationUnitRow>> instancesRowMap = new HashMap<>();
+		for (final ObservationUnitRow row : measurementRowList) {
+			final Integer trialInstance = row.getTrialInstance();
+			if (instancesRowMap.get(trialInstance) == null) {
+				instancesRowMap.put(trialInstance, new ArrayList<>());
+			}
+			instancesRowMap.get(trialInstance).add(row);
+			// FIXME perform assertions on values wihin row
+		}
+		Assert.assertEquals(trialInstances, new ArrayList<>(instancesRowMap.keySet()));
+		Assert.assertEquals(NUMBER_OF_REPS * NUMBER_OF_ENTRIES, instancesRowMap.get(2).size());
+		Assert.assertEquals(NUMBER_OF_REPS * NUMBER_OF_ENTRIES, instancesRowMap.get(4).size());
+		Assert.assertEquals(NUMBER_OF_REPS * NUMBER_OF_ENTRIES, instancesRowMap.get(6).size());
+
 
 		Assert.assertEquals(
 			String.valueOf(trialInstancesForDesignGeneration.size()),
@@ -476,18 +494,10 @@ public class ExperimentDesignGeneratorTest {
 
 	private BVDesignOutput createBvOutput(final int numberOfInstances) {
 		final BVDesignOutput bvOutput = new BVDesignOutput(0);
-		bvOutput.setResults(this.createEntries(numberOfInstances, 2, 5));
+		bvOutput.setResults(this.createEntries(numberOfInstances));
 		return bvOutput;
 	}
-
-	private StandardVariable createStandardVariable(final int id, final String name) {
-		final StandardVariable var = new StandardVariable();
-		var.setId(id);
-		var.setName(name);
-		return var;
-	}
-
-	private List<String[]> createEntries(final Integer numOfInstances, final Integer numberofReps, final Integer numberOfEntries) {
+	private List<String[]> createEntries(final Integer numOfInstances) {
 		final List<String[]> entries = new ArrayList<String[]>();
 		final String[] headers = new String[] {TRIAL_NO, PLOT_NO, REP_NO,
 			ENTRY_NO};
@@ -496,8 +506,8 @@ public class ExperimentDesignGeneratorTest {
 		for (int i = 1; i <= numOfInstances; i++) {
 			final String trial = String.valueOf(i);
 			int plotNo = 100;
-			for (int j = 1; j <= numberofReps; j++) {
-				for (int k = 1; k <= numberOfEntries; k++) {
+			for (int j = 1; j <= NUMBER_OF_REPS; j++) {
+				for (int k = 1; k <= NUMBER_OF_ENTRIES; k++) {
 					final String plot = String.valueOf(plotNo++);
 					final String[] data = new String[] {trial, plot, String.valueOf(j), String.valueOf(k)};
 					entries.add(data);

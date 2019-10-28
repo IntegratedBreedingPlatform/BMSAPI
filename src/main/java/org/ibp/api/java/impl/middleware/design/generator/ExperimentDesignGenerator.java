@@ -18,7 +18,12 @@ import org.generationcp.middleware.operation.transformer.etl.MeasurementVariable
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.util.StringUtil;
-import org.ibp.api.domain.design.*;
+import org.ibp.api.domain.design.BVDesignOutput;
+import org.ibp.api.domain.design.BVDesignTrialInstance;
+import org.ibp.api.domain.design.ExperimentDesign;
+import org.ibp.api.domain.design.ExperimentDesignParameter;
+import org.ibp.api.domain.design.ListItem;
+import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
@@ -30,7 +35,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -314,9 +330,12 @@ public class ExperimentDesignGenerator {
 			studyGermplasmDtoList.stream().collect(Collectors.toMap(StudyGermplasmDto::getEntryNumber,
 				Function.identity()));
 		final List<ObservationUnitRow> rows = new ArrayList<>();
-		// TODO replace BVOutput's trial instances with actual trial instances passed
-		int trialInstanceNumber = 1;
+
+		final List<Integer> trialInstancesList = new ArrayList<>(trialInstanceForDesignGeneration);
+		Collections.sort(trialInstancesList);
+		final ListIterator<Integer> trialInstanceIterator = trialInstancesList.listIterator();
 		for (final BVDesignTrialInstance instance : bvOutput.getTrialInstances()) {
+			final Integer trialInstanceNumber = trialInstanceIterator.next();
 			for (final Map<String, String> row : instance.getRows()) {
 				final String entryNoValue = row.get(entryNumberIdentifier);
 				final Integer entryNumber = StringUtil.parseInt(entryNoValue, null);
@@ -334,7 +353,6 @@ public class ExperimentDesignGenerator {
 						treatmentFactorValues, trialInstanceNumber);
 				rows.add(observationUnitRow);
 			}
-			trialInstanceNumber++;
 		}
 		return rows;
 	}
