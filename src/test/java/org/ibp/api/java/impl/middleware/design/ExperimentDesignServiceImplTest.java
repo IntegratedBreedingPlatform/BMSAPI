@@ -25,6 +25,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ExperimentDesignServiceImplTest {
@@ -123,6 +124,18 @@ public class ExperimentDesignServiceImplTest {
 		Mockito.verify(this.middlewareExperimentDesignService)
 			.saveExperimentDesign(ArgumentMatchers.eq(this.cropType), ArgumentMatchers.eq(STUDY_ID), ArgumentMatchers.eq(this.variables),
 				ArgumentMatchers.anyMap());
+	}
+
+	@Test
+	public void testGetExperimentalDesignTypes() {
+		final List<ExperimentDesignType> types = Arrays.asList(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK,
+			ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK,
+			ExperimentDesignType.ROW_COL,
+			ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK,
+			ExperimentDesignType.CUSTOM_IMPORT,
+			ExperimentDesignType.ENTRY_LIST_ORDER,
+			ExperimentDesignType.P_REP);
+		Assert.assertEquals(types, this.experimentDesignService.getExperimentalDesignTypes());
 	}
 
 }

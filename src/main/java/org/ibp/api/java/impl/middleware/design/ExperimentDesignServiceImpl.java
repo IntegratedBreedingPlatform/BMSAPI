@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.design;
 
+import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -89,6 +90,21 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		this.studyValidator.validate(studyId, true);
 		this.experimentDesignValidator.validateExperimentDesignExistence(studyId, true);
 		this.experimentDesignMiddlewareService.deleteStudyExperimentDesign(studyId);
+	}
+
+	@Override
+	public List<ExperimentDesignType> getExperimentalDesignTypes() {
+		final List<ExperimentDesignType> designTypes = new ArrayList<>();
+
+		designTypes.add(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK);
+		designTypes.add(ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK);
+		designTypes.add(ExperimentDesignType.ROW_COL);
+		designTypes.add(ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK);
+		designTypes.add(ExperimentDesignType.CUSTOM_IMPORT);
+		designTypes.add(ExperimentDesignType.ENTRY_LIST_ORDER);
+		designTypes.add(ExperimentDesignType.P_REP);
+
+		return designTypes;
 	}
 
 	Map<Integer, List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow>> createInstanceObservationUnitRowsMap(
