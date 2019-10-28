@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 
 @Component
-public class ExperimentDesignValidator {
+public class ExperimentalDesignValidator {
 
 	@Resource
 	private org.generationcp.middleware.service.api.study.generation.ExperimentDesignService experimentDesignMiddlewareService;

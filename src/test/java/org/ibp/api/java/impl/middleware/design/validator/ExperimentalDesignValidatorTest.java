@@ -16,7 +16,7 @@ import java.util.Random;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 
-public class ExperimentDesignValidatorTest {
+public class ExperimentalDesignValidatorTest {
 
 	private static final Integer STUDY_ID = new Random().nextInt();
 
@@ -24,7 +24,7 @@ public class ExperimentDesignValidatorTest {
 	private org.generationcp.middleware.service.api.study.generation.ExperimentDesignService experimentDesignMiddlewareService;
 
 	@InjectMocks
-	private ExperimentDesignValidator experimentDesignValidator;
+	private ExperimentalDesignValidator experimentalDesignValidator;
 
 	@Before
 	public void init() {
@@ -35,7 +35,7 @@ public class ExperimentDesignValidatorTest {
 	public void testExperimentDesignShouldExist_DesignDoesNotExist() {
 		Mockito.doReturn(Optional.absent()).when(this.experimentDesignMiddlewareService).getStudyExperimentDesignTypeTermId(STUDY_ID);
 		try {
-			this.experimentDesignValidator.validateExperimentDesignExistence(STUDY_ID, true);
+			this.experimentalDesignValidator.validateExperimentDesignExistence(STUDY_ID, true);
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -48,7 +48,7 @@ public class ExperimentDesignValidatorTest {
 		Mockito.doReturn(Optional.of(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getId())).when(this.experimentDesignMiddlewareService)
 			.getStudyExperimentDesignTypeTermId(STUDY_ID);
 		try {
-			this.experimentDesignValidator.validateExperimentDesignExistence(STUDY_ID, true);
+			this.experimentalDesignValidator.validateExperimentDesignExistence(STUDY_ID, true);
 		} catch (final ApiRequestValidationException e) {
 			Assert.fail("Expected no validation exception but was thrown.");
 		}
@@ -59,7 +59,7 @@ public class ExperimentDesignValidatorTest {
 		Mockito.doReturn(Optional.of(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getId())).when(this.experimentDesignMiddlewareService)
 			.getStudyExperimentDesignTypeTermId(STUDY_ID);
 		try {
-			this.experimentDesignValidator.validateExperimentDesignExistence(STUDY_ID, false);
+			this.experimentalDesignValidator.validateExperimentDesignExistence(STUDY_ID, false);
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -71,7 +71,7 @@ public class ExperimentDesignValidatorTest {
 	public void testExperimentDesignShouldNotExist_DesignDoesNotExist() {
 		Mockito.doReturn(Optional.absent()).when(this.experimentDesignMiddlewareService).getStudyExperimentDesignTypeTermId(STUDY_ID);
 		try {
-			this.experimentDesignValidator.validateExperimentDesignExistence(STUDY_ID, false);
+			this.experimentalDesignValidator.validateExperimentDesignExistence(STUDY_ID, false);
 		} catch (final ApiRequestValidationException e) {
 			Assert.fail("Expected no validation exception but was thrown.");
 		}
