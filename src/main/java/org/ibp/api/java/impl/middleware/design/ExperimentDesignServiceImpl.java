@@ -79,7 +79,6 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 		final List<MeasurementVariable> measurementVariables =
 			experimentDesignTypeService.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
 
-		this.experimentDesignMiddlewareService.deleteStudyExperimentDesign(studyId);
 		this.experimentDesignMiddlewareService
 			.saveExperimentDesign(cropType, studyId, measurementVariables,
 				this.createInstanceObservationUnitRowsMap(observationUnitRows));

@@ -119,7 +119,7 @@ public class ExperimentDesignServiceImplTest {
 		Mockito.verify(this.studyValidator).validate(STUDY_ID, true);
 		Mockito.verify(this.designTypeService).generateDesign(STUDY_ID, this.designInput, PROGRAM_UUID, this.studyList);
 		Mockito.verify(this.designTypeService).getMeasurementVariables(STUDY_ID, this.designInput, PROGRAM_UUID);
-		Mockito.verify(this.middlewareExperimentDesignService).deleteStudyExperimentDesign(STUDY_ID);
+		// FIXME perform assertions on the observation unit rows map
 		Mockito.verify(this.middlewareExperimentDesignService)
 			.saveExperimentDesign(ArgumentMatchers.eq(this.cropType), ArgumentMatchers.eq(STUDY_ID), ArgumentMatchers.eq(this.variables),
 				ArgumentMatchers.anyMap());
