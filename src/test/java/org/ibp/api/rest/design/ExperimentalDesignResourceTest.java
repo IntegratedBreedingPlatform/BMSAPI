@@ -36,7 +36,7 @@ public class ExperimentalDesignResourceTest extends ApiUnitTestBase {
 	public void testDeleteExperimentDesign() throws Exception {
 		final int studyId = 111;
 		this.mockMvc
-			.perform(MockMvcRequestBuilders.delete("/crops/{crop}/studies/{studyId}/design", this.cropName, studyId)
+			.perform(MockMvcRequestBuilders.delete("/crops/{crop}/studies/{studyId}/experimental-designs", this.cropName, studyId)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
@@ -51,7 +51,7 @@ public class ExperimentalDesignResourceTest extends ApiUnitTestBase {
 		experimentalDesignInput.setDesignType(ExperimentDesignType.ENTRY_LIST_ORDER.getId());
 
 		this.mockMvc
-			.perform(MockMvcRequestBuilders.post("/crops/{crop}/studies/{studyId}/design", this.cropName, studyId)
+			.perform(MockMvcRequestBuilders.post("/crops/{crop}/studies/{studyId}/experimental-designs/generation", this.cropName, studyId)
 				.contentType(this.contentType)
 				.content(this.convertObjectToByte(experimentalDesignInput)))
 			.andDo(MockMvcResultHandlers.print())
