@@ -11,7 +11,6 @@ import org.generationcp.middleware.operation.transformer.etl.MeasurementVariable
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
@@ -34,7 +33,6 @@ import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.refEq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -45,9 +43,6 @@ public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 	public static final String ENTRY_NO = "ENTRY_NO";
 	public static final String PLOT_NO = "PLOT_NO";
 	private static final String REP_NO = "REP_NO";
-
-	@Mock
-	public ExperimentalDesignTypeValidator experimentalDesignTypeValidator;
 
 	@Mock
 	public ExperimentDesignGenerator experimentDesignGenerator;
@@ -117,8 +112,6 @@ public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
 		assertSame(result, observationUnitRowList);
-		verify(this.experimentalDesignTypeValidator).validateRandomizedCompleteBlockDesign(experimentalDesignInput, studyGermplasmDtoList);
-
 	}
 
 	@Test

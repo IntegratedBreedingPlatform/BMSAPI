@@ -10,7 +10,6 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.springframework.stereotype.Component;
@@ -34,9 +33,6 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NBLKS.getId());
 
 	@Resource
-	public ExperimentalDesignTypeValidator experimentalDesignTypeValidator;
-
-	@Resource
 	public ExperimentDesignGenerator experimentDesignGenerator;
 
 	@Resource
@@ -45,8 +41,6 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
-
-		this.experimentalDesignTypeValidator.validateAugmentedDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 		final Set<Integer> entryIdsOfChecks = this.getEntryIdsOfChecks(studyGermplasmDtoList);
 		final Set<Integer> entryIdsOfTestEntries = this.getEntryIdsOfTestEntries(studyGermplasmDtoList);

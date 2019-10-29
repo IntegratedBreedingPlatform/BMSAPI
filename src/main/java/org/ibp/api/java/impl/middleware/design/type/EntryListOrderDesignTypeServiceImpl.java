@@ -10,7 +10,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
@@ -37,16 +36,11 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTy
 			TermId.CHECK_PLAN.getId());
 
 	@Resource
-	private ExperimentalDesignTypeValidator experimentalDesignTypeValidator;
-
-	@Resource
 	private ExperimentDesignGenerator experimentDesignGenerator;
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
-
-		this.experimentalDesignTypeValidator.validateEntryListOrderDesign(experimentalDesignInput, studyGermplasmDtoList);
 
 		final List<StudyGermplasmDto> checkList = new LinkedList<>();
 

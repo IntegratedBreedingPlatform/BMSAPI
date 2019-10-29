@@ -12,6 +12,7 @@ import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.design.type.ExperimentalDesignTypeServiceFactory;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignValidator;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -57,6 +58,9 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 	private ExperimentalDesignTypeServiceFactory experimentalDesignTypeServiceFactory;
 
 	@Resource
+	private ExperimentalDesignTypeValidator experimentalDesignTypeValidator;
+
+	@Resource
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Resource
@@ -65,13 +69,14 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 	@Override
 	public void generateAndSaveDesign(final String cropName, final int studyId, final ExperimentalDesignInput experimentalDesignInput) {
 		this.studyValidator.validate(studyId, true);
-		this.experimentalDesignValidator.validateStudyExperimentalDesign(studyId, experimentalDesignInput.getDesignType());
+		final Integer designType = experimentalDesignInput.getDesignType();
+		this.experimentalDesignValidator.validateStudyExperimentalDesign(studyId, designType);
 		this.instanceValidator.validate(studyId, experimentalDesignInput.getTrialInstancesForDesignGeneration(), false);
 
 		// Check license validity first and foremost( if applicable for design type)
 		// Raise an error right away if license is not valid
 		final ExperimentalDesignTypeService experimentalDesignTypeService =
-			this.experimentalDesignTypeServiceFactory.lookup(experimentalDesignInput.getDesignType());
+			this.experimentalDesignTypeServiceFactory.lookup(designType);
 		if (experimentalDesignTypeService.requiresLicenseCheck()) {
 			this.checkLicense();
 		}
@@ -81,9 +86,9 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 		final String programUUID = this.studyService.getProgramUUID(studyId);
 		final List<StudyGermplasmDto> studyGermplasmDtoList = this.middlewareStudyService.getStudyGermplasmList(studyId);
 
+		this.experimentalDesignTypeValidator.validate(designType, experimentalDesignInput, studyGermplasmDtoList);
 		final List<ObservationUnitRow> observationUnitRows =
 			experimentalDesignTypeService.generateDesign(studyId, experimentalDesignInput, programUUID, studyGermplasmDtoList);
-
 
 		final List<MeasurementVariable> measurementVariables =
 			experimentalDesignTypeService.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);

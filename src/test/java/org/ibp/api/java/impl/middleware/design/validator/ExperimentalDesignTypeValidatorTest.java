@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.design.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.InsertionMannerItem;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
@@ -43,7 +44,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
 
 		try {
-			this.designTypeValidator.validateAugmentedDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK.getId(), designInput, importedGermplasmList);
 		} catch (final ApiRequestValidationException e) {
 			Assert.fail("validateAugmentedDesign() should not throw an ApiRequestValidationException.");
 		}
@@ -57,7 +58,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setStartingPlotNo(1);
 
 		try {
-			this.designTypeValidator.validateAugmentedDesign(designInput, new ArrayList<>());
+			this.designTypeValidator.validate(ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK.getId(), designInput, new ArrayList<>());
 			Assert.fail("validateAugmentedDesign() should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -75,7 +76,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 
 		try {
-			this.designTypeValidator.validateAugmentedDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK.getId(), designInput, importedGermplasmList);
 			Assert.fail("validateAugmentedDesign() should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -98,7 +99,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
 
 		try {
-			this.designTypeValidator.validateAugmentedDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK.getId(), designInput, importedGermplasmList);
 			Assert.fail("validateAugmentedDesign() should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -117,7 +118,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 
 		try {
-			this.designTypeValidator.validateRandomizedCompleteBlockDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getId(), designInput, importedGermplasmList);
 		} catch (final ApiRequestValidationException e) {
 			Assert.fail("Should not throw an ApiRequestValidationException.");
 		}
@@ -133,7 +134,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 
 		try {
-			this.designTypeValidator.validateRandomizedCompleteBlockDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -149,7 +150,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setStartingPlotNo(1);
 
 		try {
-			this.designTypeValidator.validateRandomizedCompleteBlockDesign(designInput, new ArrayList<>());
+			this.designTypeValidator.validate(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getId(), designInput, new ArrayList<>());
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -169,7 +170,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 
 		try {
-			this.designTypeValidator.validateResolvableRowColumnDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.ROW_COL.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -187,7 +188,7 @@ public class ExperimentalDesignTypeValidatorTest {
 
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
-			this.designTypeValidator.validateResolvableRowColumnDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.ROW_COL.getId(), designInput, importedGermplasmList);
 		} catch (final ApiRequestValidationException e) {
 			Assert.fail("Should not throw an ApiRequestValidationException.");
 		}
@@ -205,7 +206,7 @@ public class ExperimentalDesignTypeValidatorTest {
 
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
-			this.designTypeValidator.validateResolvableIncompleteBlockDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -221,7 +222,7 @@ public class ExperimentalDesignTypeValidatorTest {
 
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
-			this.designTypeValidator.validateResolvableIncompleteBlockDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -237,7 +238,7 @@ public class ExperimentalDesignTypeValidatorTest {
 
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
-			this.designTypeValidator.validateResolvableIncompleteBlockDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -254,7 +255,7 @@ public class ExperimentalDesignTypeValidatorTest {
 
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
-			this.designTypeValidator.validateResolvableIncompleteBlockDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -271,7 +272,7 @@ public class ExperimentalDesignTypeValidatorTest {
 
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
-			this.designTypeValidator.validateResolvableIncompleteBlockDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -287,7 +288,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setReplicationsCount(1);
 
 		try {
-			this.designTypeValidator.validateResolvableIncompleteBlockDesign(designInput, new ArrayList<>());
+			this.designTypeValidator.validate(ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getId(), designInput, new ArrayList<>());
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -308,7 +309,7 @@ public class ExperimentalDesignTypeValidatorTest {
 
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
-			this.designTypeValidator.validateResolvableRowColumnDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.ROW_COL.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -326,7 +327,7 @@ public class ExperimentalDesignTypeValidatorTest {
 
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
-			this.designTypeValidator.validateResolvableRowColumnDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.ROW_COL.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -342,7 +343,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setStartingPlotNo(1);
 
 		try {
-			this.designTypeValidator.validateResolvableRowColumnDesign(designInput, new ArrayList<>());
+			this.designTypeValidator.validate(ExperimentDesignType.ROW_COL.getId(), designInput, new ArrayList<>());
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -358,7 +359,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setReplicationPercentage(50);
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
-			this.designTypeValidator.validatePrepDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.P_REP.getId(), designInput, importedGermplasmList);
 		} catch (final ApiRequestValidationException e) {
 			Assert.fail("Should not throw an ApiRequestValidationException.");
 		}
@@ -369,7 +370,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		final ExperimentalDesignInput designInput = new ExperimentalDesignInput();
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
-			this.designTypeValidator.validatePrepDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.P_REP.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -384,7 +385,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		designInput.setReplicationPercentage(101);
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
-			this.designTypeValidator.validatePrepDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.P_REP.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -403,7 +404,7 @@ public class ExperimentalDesignTypeValidatorTest {
 
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
-			this.designTypeValidator.validatePrepDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.P_REP.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -422,7 +423,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
 		try {
-			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.ENTRY_LIST_ORDER.getId(), designInput, importedGermplasmList);
 		} catch (final ApiRequestValidationException e) {
 			Assert.fail("Should not throw an ApiRequestValidationException.");
 		}
@@ -435,7 +436,7 @@ public class ExperimentalDesignTypeValidatorTest {
 
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		try {
-			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.ENTRY_LIST_ORDER.getId(), designInput, importedGermplasmList);
 		} catch (final ApiRequestValidationException e) {
 			Assert.fail("Should not throw an ApiRequestValidationException.");
 		}
@@ -453,7 +454,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
 		try {
-			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.ENTRY_LIST_ORDER.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -471,7 +472,7 @@ public class ExperimentalDesignTypeValidatorTest {
 			dto.setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
 		}
 		try {
-			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.ENTRY_LIST_ORDER.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -489,7 +490,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
 		try {
-			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.ENTRY_LIST_ORDER.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -507,7 +508,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
 		try {
-			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.ENTRY_LIST_ORDER.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -525,7 +526,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
 		try {
-			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.ENTRY_LIST_ORDER.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -544,7 +545,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
 		try {
-			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.ENTRY_LIST_ORDER.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -563,7 +564,7 @@ public class ExperimentalDesignTypeValidatorTest {
 		final List<StudyGermplasmDto> importedGermplasmList = this.createStudyGermplasmList();
 		importedGermplasmList.get(0).setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
 		try {
-			this.designTypeValidator.validateEntryListOrderDesign(designInput, importedGermplasmList);
+			this.designTypeValidator.validate(ExperimentDesignType.ENTRY_LIST_ORDER.getId(), designInput, importedGermplasmList);
 			Assert.fail("Should throw an ApiRequestValidationException.");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
