@@ -422,7 +422,7 @@ public class ExperimentDesignGeneratorTest {
 		final List<StudyGermplasmDto> studyGermplasmDtoList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
 		final List<ObservationUnitRow> measurementRowList =
 			this.experimentDesignGenerator
-				.generateExperimentDesignMeasurements(trialInstancesForDesignGeneration, new ArrayList<>(), studyGermplasmDtoList,
+				.generateObservationUnitRowsFromExperimentalDesign(trialInstancesForDesignGeneration, new ArrayList<>(), studyGermplasmDtoList,
 					mainDesign, ExperimentDesignGeneratorTest.ENTRY_NO,
 					treatmentFactorValues, new HashMap<>());
 
@@ -460,7 +460,7 @@ public class ExperimentDesignGeneratorTest {
 		try {
 			final List<StudyGermplasmDto> studyGermplasmDtoList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
 			this.experimentDesignGenerator
-					.generateExperimentDesignMeasurements(trialInstancesForDesignGeneration, new ArrayList<>(), studyGermplasmDtoList,
+					.generateObservationUnitRowsFromExperimentalDesign(trialInstancesForDesignGeneration, new ArrayList<>(), studyGermplasmDtoList,
 						mainDesign, ExperimentDesignGeneratorTest.ENTRY_NO,	new HashMap<>(), new HashMap<>());
 			Assert.fail("Expected to throw BVDesignException but didn't.");
 		} catch (final BVDesignException e) {
@@ -479,7 +479,7 @@ public class ExperimentDesignGeneratorTest {
 		try {
 			final List<StudyGermplasmDto> studyGermplasmDtoList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
 			this.experimentDesignGenerator
-				.generateExperimentDesignMeasurements(new HashSet<>(Arrays.asList(2)), new ArrayList<>(), studyGermplasmDtoList,
+				.generateObservationUnitRowsFromExperimentalDesign(new HashSet<>(Arrays.asList(2)), new ArrayList<>(), studyGermplasmDtoList,
 					mainDesign, ExperimentDesignGeneratorTest.ENTRY_NO,	new HashMap<>(), new HashMap<>());
 			Assert.fail("Expected to throw BVDesignException but didn't.");
 		} catch (final BVDesignException e) {

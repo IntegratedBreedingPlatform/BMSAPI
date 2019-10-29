@@ -108,7 +108,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 				RandomizeCompleteBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
+			.generateObservationUnitRowsFromExperimentalDesign(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
 				refEq(studyGermplasmDtoList), refEq(mainDesign),
 				eq(ENTRY_NO),
 				any(Map.class), any(Map.class))).thenReturn(observationUnitRowList);

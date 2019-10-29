@@ -74,7 +74,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		return this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables,
+			.generateObservationUnitRowsFromExperimentalDesign(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables,
 				studyGermplasmDtoList, mainDesign, entryNumberName, null,
 				designExpectedEntriesMap);
 	}

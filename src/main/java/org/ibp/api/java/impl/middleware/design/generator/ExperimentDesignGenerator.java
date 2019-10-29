@@ -304,7 +304,7 @@ public class ExperimentDesignGenerator {
 		return replicationListItem;
 	}
 
-	public List<ObservationUnitRow> generateExperimentDesignMeasurements(
+	public List<ObservationUnitRow> generateObservationUnitRowsFromExperimentalDesign(
 		final Set<Integer> trialInstanceForDesignGeneration, final List<MeasurementVariable> generateDesignVariables,
 		final List<StudyGermplasmDto> studyGermplasmDtoList, final MainDesign mainDesign, final String entryNumberIdentifier,
 		final Map<String, List<String>> treatmentFactorValues, final Map<Integer, Integer> designExpectedEntriesMap) {
