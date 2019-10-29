@@ -23,12 +23,12 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "Create new study instance",
 		notes = "Create new study instance")
-	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/instance", method = RequestMethod.POST)
+	@RequestMapping(value = "/{cropname}/studies/{studyId}/instances/{instanceNumber}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity createStudyInstance(final @PathVariable String cropname,
-		@PathVariable final Integer studyId, @PathVariable final Integer datasetId, @PathVariable final String instanceNumber) {
+		@PathVariable final Integer studyId, @PathVariable final String instanceNumber) {
 
-		this.studyInstanceService.createStudyInstance(cropname, datasetId, instanceNumber);
+		this.studyInstanceService.createStudyInstance(cropname, studyId, instanceNumber);
 
 		return new ResponseEntity(HttpStatus.OK);
 
@@ -36,12 +36,12 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "Remove study instance",
 		notes = "Remove instance from study")
-	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/instance", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{crop}/studies/{studyId}/instances/{instanceNumber}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity removeStudyInstance(final @PathVariable String cropname,
-		@PathVariable final Integer studyId, @PathVariable final Integer datasetId, @PathVariable final String instanceNumber) {
+		@PathVariable final Integer studyId, @PathVariable final String instanceNumber) {
 
-		this.studyInstanceService.removeStudyInstance(cropname, datasetId, instanceNumber);
+		this.studyInstanceService.removeStudyInstance(cropname, studyId, instanceNumber);
 
 		return new ResponseEntity(HttpStatus.OK);
 
