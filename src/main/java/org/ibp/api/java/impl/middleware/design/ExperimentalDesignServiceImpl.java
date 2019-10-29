@@ -9,6 +9,7 @@ import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.java.design.DesignLicenseService;
 import org.ibp.api.java.design.ExperimentalDesignService;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
+import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.design.type.ExperimentalDesignTypeServiceFactory;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignValidator;
@@ -40,6 +41,9 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 	@Resource
 	private ExperimentalDesignValidator experimentalDesignValidator;
 
+	@Resource
+	private InstanceValidator instanceValidator;
+
 	@Autowired
 	private StudyService studyService;
 
@@ -60,6 +64,10 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 
 	@Override
 	public void generateAndSaveDesign(final String cropName, final int studyId, final ExperimentalDesignInput experimentalDesignInput) {
+		this.studyValidator.validate(studyId, true);
+		this.experimentalDesignValidator.validateStudyExperimentalDesign(studyId, experimentalDesignInput.getDesignType());
+		this.instanceValidator.validate(studyId, experimentalDesignInput.getTrialInstancesForDesignGeneration(), false);
+
 		// Check license validity first and foremost( if applicable for design type)
 		// Raise an error right away if license is not valid
 		final ExperimentalDesignTypeService experimentalDesignTypeService =
@@ -68,7 +76,6 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 			this.checkLicense();
 		}
 
-		this.studyValidator.validate(studyId, true);
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 
 		final String programUUID = this.studyService.getProgramUUID(studyId);
@@ -89,7 +96,7 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 	@Override
 	public void deleteDesign(final int studyId) {
 		this.studyValidator.validate(studyId, true);
-		this.experimentalDesignValidator.validateExperimentDesignExistence(studyId, true);
+		this.experimentalDesignValidator.validateExperimentalDesignExistence(studyId, true);
 		this.experimentDesignMiddlewareService.deleteStudyExperimentDesign(studyId);
 	}
 

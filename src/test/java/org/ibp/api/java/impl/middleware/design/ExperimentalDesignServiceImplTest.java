@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.design;
 
+import com.google.common.base.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -9,6 +10,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.java.design.DesignLicenseService;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
+import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.design.type.ExperimentalDesignTypeServiceFactory;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignValidator;
@@ -39,6 +41,9 @@ public class ExperimentalDesignServiceImplTest {
 
 	@Mock
 	private ExperimentalDesignValidator experimentalDesignValidator;
+
+	@Mock
+	private InstanceValidator instanceValidator;
 
 	@Mock
 	private StudyService studyService;
@@ -91,7 +96,9 @@ public class ExperimentalDesignServiceImplTest {
 			Assert.assertNotNull(e.getError().getCodes());
 			Assert.assertEquals(ExperimentalDesignServiceImpl.EXPERIMENT_DESIGN_LICENSE_EXPIRED, e.getError().getCodes()[0]);
 		}
-		Mockito.verifyZeroInteractions(this.studyValidator);
+		Mockito.verify(this.studyValidator).validate(STUDY_ID, true);
+		Mockito.verify(this.experimentalDesignValidator).validateStudyExperimentalDesign(STUDY_ID, this.designInput.getDesignType());
+		Mockito.verify(this.instanceValidator).validate(STUDY_ID, this.designInput.getTrialInstancesForDesignGeneration(), false);
 		Mockito.verifyZeroInteractions(this.studyService);
 		Mockito.verifyZeroInteractions(this.middlewareStudyService);
 		Mockito.verifyZeroInteractions(this.workbenchDataManager);
@@ -102,7 +109,7 @@ public class ExperimentalDesignServiceImplTest {
 	public void testDeleteDesign() {
 		this.experimentDesignService.deleteDesign(STUDY_ID);
 		Mockito.verify(this.studyValidator).validate(STUDY_ID, true);
-		Mockito.verify(this.experimentalDesignValidator).validateExperimentDesignExistence(STUDY_ID, true);
+		Mockito.verify(this.experimentalDesignValidator).validateExperimentalDesignExistence(STUDY_ID, true);
 		Mockito.verify(this.middlewareExperimentDesignService).deleteStudyExperimentDesign(STUDY_ID);
 	}
 
@@ -118,6 +125,8 @@ public class ExperimentalDesignServiceImplTest {
 		this.experimentDesignService.generateAndSaveDesign(CROP, STUDY_ID, this.designInput);
 		Mockito.verifyZeroInteractions(this.designLicenseService);
 		Mockito.verify(this.studyValidator).validate(STUDY_ID, true);
+		Mockito.verify(this.experimentalDesignValidator).validateStudyExperimentalDesign(STUDY_ID, this.designInput.getDesignType());
+		Mockito.verify(this.instanceValidator).validate(STUDY_ID, this.designInput.getTrialInstancesForDesignGeneration(), false);
 		Mockito.verify(this.designTypeService).generateDesign(STUDY_ID, this.designInput, PROGRAM_UUID, this.studyList);
 		Mockito.verify(this.designTypeService).getMeasurementVariables(STUDY_ID, this.designInput, PROGRAM_UUID);
 		// FIXME perform assertions on the observation unit rows map
@@ -136,6 +145,17 @@ public class ExperimentalDesignServiceImplTest {
 			ExperimentDesignType.ENTRY_LIST_ORDER,
 			ExperimentDesignType.P_REP);
 		Assert.assertEquals(types, this.experimentDesignService.getExperimentalDesignTypes());
+	}
+
+	@Test
+	public void testGetStudyExperimentalDesignTypeTermId() {
+		Mockito.doReturn(Optional.absent()).when(this.middlewareExperimentDesignService).getStudyExperimentDesignTypeTermId(STUDY_ID);
+		Assert.assertFalse(this.experimentDesignService.getStudyExperimentalDesignTypeTermId(STUDY_ID).isPresent());
+
+		final Integer termId = ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId();
+		Mockito.doReturn(Optional.of(termId)).when(this.middlewareExperimentDesignService).getStudyExperimentDesignTypeTermId(STUDY_ID);
+		Assert.assertEquals(termId, this.experimentDesignService.getStudyExperimentalDesignTypeTermId(STUDY_ID).get());
+
 	}
 
 }
