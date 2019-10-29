@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -105,6 +106,16 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 		designTypes.add(ExperimentDesignType.P_REP);
 
 		return designTypes;
+	}
+
+	@Override
+	public Optional<Integer> getStudyExperimentalDesignTypeTermId(final int studyId) {
+		final com.google.common.base.Optional<Integer> termIdOptional =
+			this.experimentDesignMiddlewareService.getStudyExperimentDesignTypeTermId(studyId);
+		if (termIdOptional.isPresent()) {
+			return Optional.of(termIdOptional.get());
+		}
+		return Optional.empty();
 	}
 
 	Map<Integer, List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow>> createInstanceObservationUnitRowsMap(

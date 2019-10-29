@@ -4,6 +4,7 @@ import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ExperimentalDesignService {
 
@@ -12,5 +13,7 @@ public interface ExperimentalDesignService {
 	void deleteDesign(int studyId);
 
 	List<ExperimentDesignType> getExperimentalDesignTypes();
+
+	Optional<Integer> getStudyExperimentalDesignTypeTermId(int studyId);
 
 }
