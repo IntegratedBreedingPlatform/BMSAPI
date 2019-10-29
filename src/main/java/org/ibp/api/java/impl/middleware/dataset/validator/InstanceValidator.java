@@ -79,12 +79,12 @@ public class InstanceValidator {
 		}
 
 		if (!instancesWithObservationsAlready.isEmpty()) {
-			this.errors.reject("instances.already.have.observation", new Object[] {StringUtils.join(instancesWithObservationsAlready, ",")}, null);
+			this.errors.reject("instances.already.have.observation", new Object[] {StringUtils.join(instancesWithObservationsAlready, ", ")}, null);
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		if (!instancesShouldHaveObservations.isEmpty()) {
-			this.errors.reject("instances.should.have.observations", new Object[] {StringUtils.join(instancesShouldHaveObservations, ",")}, null);
+			this.errors.reject("instances.should.have.observations", new Object[] {StringUtils.join(instancesShouldHaveObservations, ", ")}, null);
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}

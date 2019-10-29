@@ -122,11 +122,13 @@ public class InstanceValidatorTest {
 		observationsMap.put("2", 10L);
 		Mockito.doReturn(observationsMap).when(this.middlewareDatasetService).countObservationsGroupedByInstance(plotDatasetId);
 		try {
-			this.instanceValidator.validate(studyId, new HashSet<>(Arrays.asList(1,3)), false);
+			this.instanceValidator.validate(studyId, new HashSet<>(Arrays.asList(1,2,3)), false);
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("instances.already.have.observation"));
+			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getArguments()),
+				hasItem("1, 2"));
 		}
 	}
 
@@ -152,6 +154,8 @@ public class InstanceValidatorTest {
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("instances.should.have.observations"));
+			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getArguments()),
+				hasItem("3"));
 		}
 	}
 
