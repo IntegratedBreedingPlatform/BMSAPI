@@ -86,7 +86,7 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 		final String programUUID = this.studyService.getProgramUUID(studyId);
 		final List<StudyGermplasmDto> studyGermplasmDtoList = this.middlewareStudyService.getStudyGermplasmList(studyId);
 
-		this.experimentalDesignTypeValidator.validate(designType, experimentalDesignInput, studyGermplasmDtoList);
+		this.experimentalDesignTypeValidator.validate(experimentalDesignInput, studyGermplasmDtoList);
 		final List<ObservationUnitRow> observationUnitRows =
 			experimentalDesignTypeService.generateDesign(studyId, experimentalDesignInput, programUUID, studyGermplasmDtoList);
 

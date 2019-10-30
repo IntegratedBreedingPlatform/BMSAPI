@@ -64,10 +64,12 @@ public class ExperimentalDesignTypeValidator {
 
 	private BindingResult errors;
 
-	public void validate(final Integer experimentalDesignTypeId, final ExperimentalDesignInput experimentalDesignInput,
+	public void validate(final ExperimentalDesignInput experimentalDesignInput,
 		final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
+		final Integer experimentalDesignTypeId = experimentalDesignInput.getDesignType();
 
 		if (ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getId().equals(experimentalDesignTypeId)) {
 			this.validateRandomizedCompleteBlockDesign(experimentalDesignInput, studyGermplasmDtoList);

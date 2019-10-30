@@ -13,6 +13,7 @@ import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.design.type.ExperimentalDesignTypeServiceFactory;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
 import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignValidator;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -44,6 +45,9 @@ public class ExperimentalDesignServiceImplTest {
 
 	@Mock
 	private InstanceValidator instanceValidator;
+
+	@Mock
+	private ExperimentalDesignTypeValidator experimentalDesignTypeValidator;
 
 	@Mock
 	private StudyService studyService;
@@ -102,6 +106,7 @@ public class ExperimentalDesignServiceImplTest {
 		Mockito.verifyZeroInteractions(this.studyService);
 		Mockito.verifyZeroInteractions(this.middlewareStudyService);
 		Mockito.verifyZeroInteractions(this.workbenchDataManager);
+		Mockito.verifyZeroInteractions(this.experimentalDesignTypeValidator);
 		Mockito.verifyZeroInteractions(this.middlewareExperimentDesignService);
 	}
 
@@ -127,6 +132,7 @@ public class ExperimentalDesignServiceImplTest {
 		Mockito.verify(this.studyValidator).validate(STUDY_ID, true);
 		Mockito.verify(this.experimentalDesignValidator).validateStudyExperimentalDesign(STUDY_ID, this.designInput.getDesignType());
 		Mockito.verify(this.instanceValidator).validate(STUDY_ID, this.designInput.getTrialInstancesForDesignGeneration(), false);
+		Mockito.verify(this.experimentalDesignTypeValidator).validate(this.designInput, this.studyList);
 		Mockito.verify(this.designTypeService).generateDesign(STUDY_ID, this.designInput, PROGRAM_UUID, this.studyList);
 		Mockito.verify(this.designTypeService).getMeasurementVariables(STUDY_ID, this.designInput, PROGRAM_UUID);
 		// FIXME perform assertions on the observation unit rows map
