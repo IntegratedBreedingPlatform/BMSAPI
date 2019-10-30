@@ -61,7 +61,7 @@ public class TransactionResourceTest extends ApiUnitTestBase {
 		transactionsSearchDto.setStockId("ABC-1");
 		transactionsSearchDto.setTransactionIds(Lists.newArrayList(100, 200));
 		transactionsSearchDto.setTransactionType("Deposit");
-		transactionsSearchDto.setUser("admin");
+		transactionsSearchDto.setCreatedByUsername("admin");
 
 		final int searchResultsDbid = 1;
 		final Pageable pageable = Mockito.mock(Pageable.class);
