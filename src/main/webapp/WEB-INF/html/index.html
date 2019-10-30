@@ -5,98 +5,119 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" 	/>
 	<link th:href="@{/static/css/lib/bootstrap.min.css}" rel="stylesheet"/>
-	<script th:src="@{/static/js/lib/jquery.min.js}" type="text/javascript"></script>
-	<script th:src="@{/static/js/lib/bootstrap.min.js}" type="text/javascript"></script>    
-	
-	<!-- Swagger Begin-->
-	<link th:href="@{/static/swagger/css/reset.css}" media='screen' rel="stylesheet" type="text/css"/>
-	<link th:href="@{/static/swagger/css/screen.css}" media='screen' rel="stylesheet" type="text/css"/>
-	<link th:href="@{/static/swagger/css/screen.css}" media='print' rel="stylesheet" type="text/css"/>
-	<script th:src="@{/static/swagger/lib/shred.bundle.js}" type="text/javascript" ></script>
-	<script th:src="@{/static/swagger/lib/jquery.slideto.min.js}" type="text/javascript"></script>
-	<script th:src="@{/static/swagger/lib/jquery.wiggle.min.js}" type="text/javascript"></script>
-	<script th:src="@{/static/swagger/lib/jquery.ba-bbq.min.js}" type="text/javascript"></script>
-	<script th:src="@{/static/swagger/lib/handlebars-1.0.0.js}" type="text/javascript"></script>
-	<script th:src="@{/static/swagger/lib/underscore-min.js}" type="text/javascript"></script>
-	<script th:src="@{/static/swagger/lib/backbone-min.js}" type="text/javascript"></script>
-	<script th:src="@{/static/swagger/lib/swagger.js}" type="text/javascript"></script>
-	<script th:src="@{/static/swagger/swagger-ui.js}" type="text/javascript"></script>
-	<script th:src="@{/static/swagger/lib/highlight.7.3.pack.js}" type="text/javascript"></script>
-	<!-- enabling this will enable oauth2 implicit scope support 
-	<script th:src="@{/static/swagger/lib/swagger-oauth.js}" type="text/javascript"></script>
-	-->
-	
-	<script type="text/javascript">
-		// <![CDATA[		
-			
-			$(function () {
-			 	var apiUrl = window.location.protocol + "//" + window.location.host;
-			 	if (window.location.pathname.indexOf('/api') > 0) {
-			 	  apiUrl += window.location.pathname.substring(0, window.location.pathname.indexOf('/api'))
-			 	}
-			 	  
-			 	var contextPath = $("#contextPath").attr("href");
-			 	apiUrl += contextPath + "api-docs";
-			  	  
-			    window.swaggerUi = new SwaggerUi({
-			    url: apiUrl,
-			    dom_id: "swagger-ui-container",
-			    supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
-			    onComplete: function(swaggerApi, swaggerUi){
-			      log("Loaded SwaggerUI");
-			      $('pre code').each(function(i, e) {
-			        hljs.highlightBlock(e)
-			      });
-			    },
-			    onFailure: function(data) {
-			      log("Unable to Load SwaggerUI");
-			    },
-			    docExpansion: "none",
-			    sorter : "alpha"
-			  });
-			  
-			  window.swaggerUi.load();
-	            
-			  // Setup required for BMS authentication.
-			  function addApiKeyAuthorization() {
-				var authToken = localStorage.getItem("bms.xAuthToken");
-			    if (authToken) {
-			    	var authTokenJSON = JSON.parse(authToken);
-			    	if (authTokenJSON.expires && authTokenJSON.expires > new Date().getTime()) {
-						window.authorizations.add("key", new ApiKeyAuthorization("x-auth-token", authTokenJSON.token, "header"));
-						window.authorizations.add("brapiKey", new ApiKeyAuthorization("Authorization", "Bearer " + authTokenJSON.token, "header"));
-			    	} else {
-			    		alert("Authentication has expired. Please login to Workbench again, then refresh this page.");
-			    	}
-			    } else {
-			    	// Swagger front-end is not part of product so we as such do not expect users to see this screen. 
-			    	// This should happen only in cases where BMSAPI swagger front-end is loaded directly 
-			    	//  which should only happen for demo/development environments hence is fair enough to require being logged in to Workbench first.
-			    	alert("You don't seem to have logged in. Please login to Workbench first, then refresh this page.");
-			    }
-			  }
-			  
-			  addApiKeyAuthorization();
-			
-			});	
-		// ]]>
-		
-	</script>
-	<!-- Swagger End-->
+	<link th:href="@{/static/swagger3/swagger-ui.css}" rel="stylesheet"/>
+	<link rel="icon" type="image/png" th:href="@{/static/swagger3/favicon-32x32.png}" sizes="32x32" />
+	<link rel="icon" type="image/png" th:href="@{/static/swagger3/favicon-64x64.png}" sizes="64x64" />
+
+
 </head>
 
 <body>
-	<a id="contextPath" style="display: none;" th:href="@{/}">Context Path</a>
-	<nav class="navbar navbar-default" role="navigation">
-		<div class="container-fluid">
-			<div class="navbar-header">
-				<a class="navbar-brand" th:href="@{/}">BMS API</a>
-			</div>
+<a id="contextPath" style="display: none;" th:href="@{/}">Context Path</a>
+<nav class="navbar navbar-default" role="navigation">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<a class="navbar-brand" th:href="@{/}">BMS API</a>
 		</div>
-	</nav>
-	<div class="container swagger-section">
-		<div id="message-bar" class="swagger-ui-wrap">&nbsp;</div>
-		<div id="swagger-ui-container" class="swagger-ui-wrap"></div>
 	</div>
+</nav>
+<div class="container swagger-section">
+	<div id="message-bar" class="swagger-ui-wrap">&nbsp;</div>
+	<div id="swagger-ui"></div>
+
+	<script th:src="@{/static/js/lib/jquery.min.js}" type="text/javascript"></script>
+	<script th:src="@{/static/swagger3/swagger-ui-bundle.js}" type="text/javascript"></script>
+	<script th:src="@{/static/swagger3/swagger-ui-standalone-preset.js}" type="text/javascript"></script>
+	<script>
+		// <![CDATA[
+
+		// Setup required for BMS authentication.
+		function addApiKeyAuthorization() {
+			var authToken = localStorage.getItem("bms.xAuthToken");
+			if (authToken) {
+				var authTokenJSON = JSON.parse(authToken);
+				if (!authTokenJSON.expires || authTokenJSON.expires <= new Date().getTime()) {
+					alert("Authentication has expired. Please login to Workbench again, then refresh this page.");
+				}
+			} else {
+				// Swagger front-end is not part of product so we as such do not expect users to see this screen.
+				// This should happen only in cases where BMSAPI swagger front-end is loaded directly
+				//  which should only happen for demo/development environments hence is fair enough to require being logged in to Workbench first.
+				alert("You don't seem to have logged in. Please login to Workbench first, then refresh this page.");
+			}
+		}
+
+		addApiKeyAuthorization();
+
+		// ]]>
+		function HideTopbarPlugin() {
+			// this plugin overrides the Topbar component to return nothing
+			return {
+				components: {
+					Topbar: function() { return null }
+				}
+			}
+		}
+
+		window.onload = function() {
+
+			var apiUrl = window.location.protocol + "//" + window.location.host;
+			if (window.location.pathname.indexOf('/api') > 0) {
+				apiUrl += window.location.pathname.substring(0, window.location.pathname.indexOf('/api'))
+			}
+
+			var contextPath = $("#contextPath").attr("href");
+			apiUrl += contextPath + "v2/api-docs";
+
+			// Build a system
+			const ui = SwaggerUIBundle({
+				url: apiUrl,
+				dom_id: '#swagger-ui',
+				deepLinking: true,
+				requestInterceptor: function(req) {
+
+					var authToken = localStorage.getItem("bms.xAuthToken");
+					var token = null;
+					if (authToken) {
+						try {
+							token = JSON.parse(authToken);
+						} catch(e) {
+
+						}
+					}
+
+					if (token) {
+						var authKey = "Bearer " + token.token;
+						req.headers.Authorization = authKey;
+						req.headers['X-Auth-Token'] = token.token;
+					}
+
+					return req;
+				},
+				presets: [
+					SwaggerUIBundle.presets.apis,
+					SwaggerUIStandalonePreset
+				],
+				plugins: [
+					SwaggerUIBundle.plugins.DownloadUrl,
+					HideTopbarPlugin
+				],
+				layout: "StandaloneLayout",
+				securityDefinitions: {
+					ApiKeyAuth: {
+						"type": "apiKey",
+						"name": "Authorization",
+						"in": "header"
+					},
+				}
+			});
+
+
+			window.ui = ui;
+
+		}
+
+	</script>
+</div>
 </body>
 </html>

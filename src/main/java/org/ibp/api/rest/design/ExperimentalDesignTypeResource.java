@@ -1,7 +1,7 @@
 package org.ibp.api.rest.design;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
