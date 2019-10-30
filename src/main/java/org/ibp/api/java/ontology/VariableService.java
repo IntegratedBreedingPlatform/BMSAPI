@@ -1,11 +1,11 @@
 
 package org.ibp.api.java.ontology;
 
-import java.util.List;
-
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
+
+import java.util.List;
 
 public interface VariableService {
 
@@ -73,4 +73,6 @@ public interface VariableService {
 	 * @param programId program unique id
 	 */
 	void deleteVariablesFromCache(String cropname, final Integer[] variablesIds, String programId);
+
+	List<VariableDetails> getVariablesByFilter(VariableFilter variableFilter);
 }
