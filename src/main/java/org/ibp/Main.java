@@ -22,6 +22,8 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -35,6 +37,9 @@ public class Main extends WebMvcConfigurerAdapter {
 
 	@Value("${swagger.enable}")
 	private boolean enableSwagger;
+
+	@Value("${bms.version}")
+	private String bmsVersion;
 
 	public static void main(final String[] args) {
 		SpringApplication.run(Main.class, args);
@@ -88,6 +93,7 @@ public class Main extends WebMvcConfigurerAdapter {
 	@Bean
 	public Docket customImplementation() {
 		return new Docket(DocumentationType.SWAGGER_2)
+			.apiInfo(this.apiInfo())
 			.select()
 			.apis(RequestHandlerSelectors.any())
 			.paths(PathSelectors.any())
@@ -101,10 +107,16 @@ public class Main extends WebMvcConfigurerAdapter {
 		return resourceBundleMessageSource;
 	}
 
-//	private ApiInfo apiInfo() {
-//		return new ApiInfo("Welcome!", "Try out the Breeding Management System API methods listed below!", "http://bit.ly/KQX1nL",
-//			"support@integratedbreeding.net", "GNU General Public License", "http://bit.ly/8Ztv8M");
-//	}
+	private ApiInfo apiInfo() {
+		return new ApiInfo(
+				"Welcome!",
+				"Try out the Breeding Management System API methods listed below!",
+				this.bmsVersion,
+				"http://bit.ly/KQX1nL",
+				new Contact("BMS Support", "", "support@integratedbreeding.net"),
+				"GNU General Public License",
+				"http://bit.ly/8Ztv8M");
+	}
 
 	protected void setEnableSwagger(final boolean enableSwagger) {
 		this.enableSwagger = enableSwagger;
