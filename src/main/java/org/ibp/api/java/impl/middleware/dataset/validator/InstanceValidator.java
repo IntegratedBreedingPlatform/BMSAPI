@@ -1,17 +1,15 @@
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
-import org.apache.commons.lang3.StringUtils;
 import org.fest.util.Collections;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +23,6 @@ public class InstanceValidator {
 	private StudyDataManager studyDataManager;
 
 	@Autowired
-	private DatasetService middlewareDatasetService;
-
-	@Autowired
 	private StudyService middlewareStudyService;
 
 	private BindingResult errors;
@@ -36,10 +31,10 @@ public class InstanceValidator {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-        if (!this.studyDataManager.existInstances(instanceIds)) {
+		if (!this.studyDataManager.existInstances(instanceIds)) {
 			this.errors.reject("dataset.non.existent.instances", "");
-            throw new ApiRequestValidationException(this.errors.getAllErrors());
-        }
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 
 		if (datasetId != null && !this.studyDataManager.areAllInstancesExistInDataset(datasetId, instanceIds)) {
 			this.errors.reject("dataset.invalid.instances", "");
@@ -47,7 +42,7 @@ public class InstanceValidator {
 		}
 	}
 
-	public void validate(final Integer studyId, final Set<Integer> instanceNumbers, final Boolean shouldHaveObservations) {
+	public void validateForDesignGeneration(final Integer studyId, final Set<Integer> instanceNumbers) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		if (Collections.isEmpty(instanceNumbers)) {
@@ -62,31 +57,16 @@ public class InstanceValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		// Check if all specified instances have (or do not have) observations - depending on shouldHaveObservations flag
-		final Integer plotDatasetId = this.middlewareStudyService.getPlotDatasetId(studyId);
-		final Map<String, Long> observationsCountMap = this.middlewareDatasetService.countObservationsGroupedByInstance(plotDatasetId);
-		final List<Integer> instancesWithObservationsAlready = new ArrayList<>();
-		final List<Integer> instancesShouldHaveObservations = new ArrayList<>();
-		for (final Integer instance : instanceNumbers) {
-			final String instanceString = String.valueOf(instance);
-			if ((!shouldHaveObservations && observationsCountMap.containsKey(instanceString)
-				&& observationsCountMap.get(instanceString) > 0)) {
-				instancesWithObservationsAlready.add(instance);
-
-			} else if (shouldHaveObservations && !observationsCountMap.containsKey(instanceString)) {
-				instancesShouldHaveObservations.add(instance);
-			}
-		}
-
-		if (!instancesWithObservationsAlready.isEmpty()) {
-			this.errors.reject("instances.already.have.observation", new Object[] {StringUtils.join(instancesWithObservationsAlready, ", ")}, null);
+		// Check that at least one instance is not restricted from design regeneration
+		final List<StudyInstance> studyInstances = this.middlewareStudyService.getStudyInstances(studyId);
+		final List<Integer> restrictedInstances =
+			studyInstances.stream().filter(p -> !p.isDesignReGenerationAllowed()).map(p -> p.getInstanceNumber())
+				.collect(Collectors.toList());
+		if (restrictedInstances.containsAll(instanceNumbers)) {
+			this.errors.reject("all.selected.instances.cannot.be.regenerated");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if (!instancesShouldHaveObservations.isEmpty()) {
-			this.errors.reject("instances.should.have.observations", new Object[] {StringUtils.join(instancesShouldHaveObservations, ", ")}, null);
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
 	}
 
 }

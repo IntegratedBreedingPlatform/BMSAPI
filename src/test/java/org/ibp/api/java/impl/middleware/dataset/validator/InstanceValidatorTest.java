@@ -2,8 +2,8 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 
 import com.google.common.collect.Sets;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,10 +14,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -27,9 +29,6 @@ public class InstanceValidatorTest {
 
 	@Mock
 	private StudyDataManager studyDataManager;
-
-	@Mock
-	private DatasetService middlewareDatasetService;
 
 	@Mock
 	private StudyService middlewareStudyService;
@@ -64,10 +63,10 @@ public class InstanceValidatorTest {
 	}
 
 	@Test
-	public void testStudyInstanceNumbersFail_EmptyInstanceNumbers() {
+	public void testValidateForDesignGenerationFail_EmptyInstanceNumbers() {
 		try {
 			final Random random = new Random();
-			this.instanceValidator.validate(random.nextInt(), null, random.nextBoolean());
+			this.instanceValidator.validateForDesignGeneration(random.nextInt(), null);
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -76,11 +75,11 @@ public class InstanceValidatorTest {
 	}
 
 	@Test
-	public void testStudyInstanceNumbersFail_StudyHasNoInstances() {
+	public void testValidateForDesignGenerationFail_StudyHasNoInstances() {
 		Mockito.doReturn(Collections.emptyMap()).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
 		try {
 			final Random random = new Random();
-			this.instanceValidator.validate(random.nextInt(), new HashSet<>(Arrays.asList(1,2)), random.nextBoolean());
+			this.instanceValidator.validateForDesignGeneration(random.nextInt(), new HashSet<>(Arrays.asList(1,2)));
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -89,7 +88,7 @@ public class InstanceValidatorTest {
 	}
 
 	@Test
-	public void testStudyInstanceNumbersFail_InstancesDontExistInStudy() {
+	public void testValidateForDesignGenerationFail_InstancesDontExistInStudy() {
 		final Map<String, Integer> instancesMap = new HashMap<>();
 		instancesMap.put("1", 101);
 		instancesMap.put("2", 202);
@@ -97,7 +96,7 @@ public class InstanceValidatorTest {
 		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
 		final Random random = new Random();
 		try {
-			this.instanceValidator.validate(random.nextInt(), new HashSet<>(Arrays.asList(1,2,4)), random.nextBoolean());
+			this.instanceValidator.validateForDesignGeneration(random.nextInt(), new HashSet<>(Arrays.asList(1,2,4)));
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -106,94 +105,77 @@ public class InstanceValidatorTest {
 	}
 
 	@Test
-	public void testStudyInstanceNumbersFail_InstanceAlreadyHasObservations() {
+	public void testValidateForDesignGenerationFail_AllSelectedInstancesCantBeRegenerated() {
 		final Map<String, Integer> instancesMap = new HashMap<>();
 		instancesMap.put("1", 101);
 		instancesMap.put("2", 202);
 		instancesMap.put("3", 303);
 		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
 
-		final Random random = new Random();
-		final int studyId = random.nextInt();
-		final Integer plotDatasetId = random.nextInt();
-		Mockito.doReturn(plotDatasetId).when(this.middlewareStudyService).getPlotDatasetId(studyId);
-		final Map<String, Long> observationsMap = new HashMap<>();
-		observationsMap.put("1", 10L);
-		observationsMap.put("2", 10L);
-		Mockito.doReturn(observationsMap).when(this.middlewareDatasetService).countObservationsGroupedByInstance(plotDatasetId);
+		final int studyId = new Random().nextInt();
+		final List<StudyInstance> instances = new ArrayList<>();
+		for (int i = 1; i <= 3; i++) {
+			final StudyInstance instance = new StudyInstance();
+			instance.setInstanceNumber(i);
+			instance.setDesignReGenerationAllowed(true);
+			instances.add(instance);
+		}
+		instances.get(0).setDesignReGenerationAllowed(false);
+		instances.get(1).setDesignReGenerationAllowed(false);
+		Mockito.doReturn(instances).when(this.middlewareStudyService).getStudyInstances(studyId);
+
 		try {
-			this.instanceValidator.validate(studyId, new HashSet<>(Arrays.asList(1,2,3)), false);
+			this.instanceValidator.validateForDesignGeneration(studyId, new HashSet<>(Arrays.asList(1,2)));
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
-				hasItem("instances.already.have.observation"));
-			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getArguments()),
-				hasItem("1, 2"));
+				hasItem("all.selected.instances.cannot.be.regenerated"));
 		}
 	}
 
 	@Test
-	public void testStudyInstanceNumbersFail_InstanceDoesntHaveExpectedObservations() {
+	public void testValidateForDesignGenerationSuccess_SomeSelectedInstancesCantBeRegenerated() {
 		final Map<String, Integer> instancesMap = new HashMap<>();
 		instancesMap.put("1", 101);
 		instancesMap.put("2", 202);
 		instancesMap.put("3", 303);
 		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
 
-		final Random random = new Random();
-		final int studyId = random.nextInt();
-		final Integer plotDatasetId = random.nextInt();
-		Mockito.doReturn(plotDatasetId).when(this.middlewareStudyService).getPlotDatasetId(studyId);
-		final Map<String, Long> observationsMap = new HashMap<>();
-		observationsMap.put("1", 10L);
-		observationsMap.put("2", 10L);
-		Mockito.doReturn(observationsMap).when(this.middlewareDatasetService).countObservationsGroupedByInstance(plotDatasetId);
-		try {
-			this.instanceValidator.validate(studyId, new HashSet<>(Arrays.asList(1,3)), true);
-			Assert.fail("Expected validation exception to be thrown but was not.");
-		} catch (final ApiRequestValidationException e) {
-			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
-				hasItem("instances.should.have.observations"));
-			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getArguments()),
-				hasItem("3"));
+		final int studyId = new Random().nextInt();
+		final List<StudyInstance> instances = new ArrayList<>();
+		for (int i = 1; i <= 3; i++) {
+			final StudyInstance instance = new StudyInstance();
+			instance.setInstanceNumber(i);
+			instance.setDesignReGenerationAllowed(true);
+			instances.add(instance);
 		}
+		instances.get(0).setDesignReGenerationAllowed(false);
+		Mockito.doReturn(instances).when(this.middlewareStudyService).getStudyInstances(studyId);
+
+		this.instanceValidator.validateForDesignGeneration(studyId, new HashSet<>(Arrays.asList(1,2)));
 	}
 
 	@Test
-	public void testStudyInstanceNumbersSuccess_StudyHasNoObservations() {
+	public void testValidateForDesignGenerationSuccess_AllSelectedInstancesCanBeRegenerated() {
 		final Map<String, Integer> instancesMap = new HashMap<>();
 		instancesMap.put("1", 101);
 		instancesMap.put("2", 202);
 		instancesMap.put("3", 303);
 		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
 
-		final Random random = new Random();
-		final int studyId = random.nextInt();
-		final Integer plotDatasetId = random.nextInt();
-		Mockito.doReturn(plotDatasetId).when(this.middlewareStudyService).getPlotDatasetId(studyId);
-		Mockito.doReturn(Collections.emptyMap()).when(this.middlewareDatasetService).countObservationsGroupedByInstance(plotDatasetId);
+		final int studyId = new Random().nextInt();
+		final List<StudyInstance> instances = new ArrayList<>();
+		for (int i = 1; i <= 3; i++) {
+			final StudyInstance instance = new StudyInstance();
+			instance.setInstanceNumber(i);
+			instance.setDesignReGenerationAllowed(true);
+			instances.add(instance);
+		}
+		Mockito.doReturn(instances).when(this.middlewareStudyService).getStudyInstances(studyId);
 
-		this.instanceValidator.validate(studyId, new HashSet<>(Arrays.asList(1,3)), false);
+		this.instanceValidator.validateForDesignGeneration(studyId, new HashSet<>(Arrays.asList(1,2)));
 	}
 
-	@Test
-	public void testStudyInstanceNumbersSuccess_InstanceHasNoObservations() {
-		final Map<String, Integer> instancesMap = new HashMap<>();
-		instancesMap.put("1", 101);
-		instancesMap.put("2", 202);
-		instancesMap.put("3", 303);
-		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
 
-		final Random random = new Random();
-		final int studyId = random.nextInt();
-		final Integer plotDatasetId = random.nextInt();
-		Mockito.doReturn(plotDatasetId).when(this.middlewareStudyService).getPlotDatasetId(studyId);
-		final Map<String, Long> observationsMap = new HashMap<>();
-		observationsMap.put("1", 10L);
-		observationsMap.put("2", 10L);
-		Mockito.doReturn(observationsMap).when(this.middlewareDatasetService).countObservationsGroupedByInstance(plotDatasetId);
-
-		this.instanceValidator.validate(studyId, new HashSet<>(Collections.singletonList(3)), false);
-	}
 
 }
