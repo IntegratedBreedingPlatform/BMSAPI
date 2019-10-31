@@ -14,6 +14,9 @@ public class StudyInstance {
 	private String customLocationAbbreviation;
 	private int instanceNumber;
 	private boolean hasFieldmap;
+	private boolean hasExperimentalDesign;
+	private boolean hasMeasurements;
+	private boolean isDesignReGenerationAllowed;
 
 	public StudyInstance() {
 
@@ -76,6 +79,30 @@ public class StudyInstance {
 	
 	public void setHasFieldmap(boolean hasFieldmap) {
 		this.hasFieldmap = hasFieldmap;
+	}
+
+	public boolean isHasExperimentalDesign() {
+		return hasExperimentalDesign;
+	}
+
+	public void setHasExperimentalDesign(final boolean hasExperimentalDesign) {
+		this.hasExperimentalDesign = hasExperimentalDesign;
+	}
+
+	public boolean isHasMeasurements() {
+		return hasMeasurements;
+	}
+
+	public void setHasMeasurements(final boolean hasMeasurements) {
+		this.hasMeasurements = hasMeasurements;
+	}
+
+	public boolean isDesignReGenerationAllowed() {
+		return isDesignReGenerationAllowed;
+	}
+
+	public void setDesignReGenerationAllowed(final boolean designReGenerationAllowed) {
+		isDesignReGenerationAllowed = designReGenerationAllowed;
 	}
 
 	@Override
