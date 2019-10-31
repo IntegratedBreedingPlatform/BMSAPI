@@ -94,6 +94,7 @@ public class Main extends WebMvcConfigurerAdapter {
 	public Docket customImplementation() {
 		return new Docket(DocumentationType.SWAGGER_2)
 			.apiInfo(this.apiInfo())
+			.enable(this.enableSwagger)
 			.select()
 			.apis(RequestHandlerSelectors.any())
 			.paths(PathSelectors.any())
