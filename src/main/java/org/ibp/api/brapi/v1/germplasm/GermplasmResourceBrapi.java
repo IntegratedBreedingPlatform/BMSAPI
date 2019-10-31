@@ -151,7 +151,7 @@ public class GermplasmResourceBrapi {
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<PedigreeDTO>> getPedigree(
 		@PathVariable final String crop,
-		@ApiParam(value = "the internal id of the germplasm")
+		@ApiParam(value = "the internal id of the germplasm", required = true)
 		@PathVariable(value = "germplasmDbId") final String germplasmDbId,
 		@ApiParam(value = "text representation of the pedigree <strong style='color: red'>(Not Implemented)</strong>", required = false)
 		@RequestParam(value = "notation", required = false) final String notation,
@@ -185,7 +185,7 @@ public class GermplasmResourceBrapi {
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<ProgenyDTO>> getProgeny(
 		@PathVariable final String crop,
-		@ApiParam(value = "the internal id of the germplasm")
+		@ApiParam(value = "the internal id of the germplasm", required = true)
 		@PathVariable(value = "germplasmDbId") final String germplasmDbId
 	) {
 

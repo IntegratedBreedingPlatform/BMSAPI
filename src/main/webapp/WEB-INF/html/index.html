@@ -79,6 +79,8 @@
 				url: apiUrl,
 				dom_id: '#swagger-ui',
 				deepLinking: true,
+                defaultModelsExpandDepth: -1,
+                validatorUrl: null,
 				requestInterceptor: function(req) {
 
 					var authToken = localStorage.getItem("bms.xAuthToken");
@@ -108,13 +110,6 @@
 					HideTopbarPlugin
 				],
 				layout: "StandaloneLayout",
-				securityDefinitions: {
-					ApiKeyAuth: {
-						"type": "apiKey",
-						"name": "Authorization",
-						"in": "header"
-					},
-				}
 			});
 
 
