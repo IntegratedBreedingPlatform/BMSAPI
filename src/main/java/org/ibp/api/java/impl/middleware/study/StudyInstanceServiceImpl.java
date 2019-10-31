@@ -59,6 +59,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 		final List<DatasetDTO> datasets = this.datasetService.getDatasets(studyId, Collections.set(DatasetTypeEnum.SUMMARY_DATA.getId()));
 		if (!datasets.isEmpty()) {
+			// TODO: To be implemented in IBP-3160
 			this.studyInstanceMiddlewareService.removeStudyInstance(cropType, datasets.get(0).getDatasetId(), instanceNumber);
 		}
 	}
