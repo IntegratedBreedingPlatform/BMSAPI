@@ -60,7 +60,7 @@ public class InstanceValidator {
 		// Check that at least one instance is not restricted from design regeneration
 		final List<StudyInstance> studyInstances = this.middlewareStudyService.getStudyInstances(studyId);
 		final List<Integer> restrictedInstances =
-			studyInstances.stream().filter(p -> !p.isDesignReGenerationAllowed()).map(p -> p.getInstanceNumber())
+			studyInstances.stream().filter(p -> !p.isDesignRegenerationAllowed()).map(p -> p.getInstanceNumber())
 				.collect(Collectors.toList());
 		if (restrictedInstances.containsAll(instanceNumbers)) {
 			this.errors.reject("all.selected.instances.cannot.be.regenerated");
