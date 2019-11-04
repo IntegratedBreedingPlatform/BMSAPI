@@ -66,7 +66,7 @@ public class InstanceValidator {
 			if (BooleanUtils.isFalse(instance.isDesignRegenerationAllowed())) {
 				restrictedInstances.add(instance.getInstanceNumber());
 			}
-			if (instance.isHasExperimentalDesign()) {
+			if (BooleanUtils.isTrue(instance.isHasExperimentalDesign())) {
 				instancesWithDesign.add(instance.getInstanceNumber());
 			}
 		}

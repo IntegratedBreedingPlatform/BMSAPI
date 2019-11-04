@@ -118,6 +118,7 @@ public class InstanceValidatorTest {
 			final StudyInstance instance = new StudyInstance();
 			instance.setInstanceNumber(i);
 			instance.setDesignRegenerationAllowed(true);
+			instance.setHasExperimentalDesign(true);
 			instances.add(instance);
 		}
 		instances.get(0).setDesignRegenerationAllowed(false);
@@ -131,6 +132,58 @@ public class InstanceValidatorTest {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
 				hasItem("all.selected.instances.cannot.be.regenerated"));
 		}
+	}
+
+	@Test
+	public void testValidateForDesignGenerationFail_InstanceForRegenerationWithCrossOrAdvanceList() {
+		final Map<String, Integer> instancesMap = new HashMap<>();
+		instancesMap.put("1", 101);
+		instancesMap.put("2", 202);
+		instancesMap.put("3", 303);
+		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
+
+		final int studyId = new Random().nextInt();
+		final List<StudyInstance> instances = new ArrayList<>();
+		for (int i = 1; i <= 3; i++) {
+			final StudyInstance instance = new StudyInstance();
+			instance.setInstanceNumber(i);
+			instances.add(instance);
+		}
+		// First instance is for regeneration
+		instances.get(0).setHasExperimentalDesign(Boolean.TRUE);
+		instances.get(0).setDesignRegenerationAllowed(new Random().nextBoolean());
+		Mockito.doReturn(true).when(this.middlewareStudyService).hasAdvancedOrCrossesList(studyId);
+		Mockito.doReturn(instances).when(this.middlewareStudyService).getStudyInstances(studyId);
+
+		try {
+			this.instanceValidator.validateForDesignGeneration(studyId, new HashSet<>(Arrays.asList(1,2)));
+			Assert.fail("Expected validation exception to be thrown but was not.");
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("study.has.advance.or.cross.list"));
+		}
+	}
+
+	@Test
+	public void testValidateForDesignGenerationSuccess_AllNewInstancesWithCrossOrAdvanceList() {
+		final Map<String, Integer> instancesMap = new HashMap<>();
+		instancesMap.put("1", 101);
+		instancesMap.put("2", 202);
+		instancesMap.put("3", 303);
+		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
+
+		final int studyId = new Random().nextInt();
+		final List<StudyInstance> instances = new ArrayList<>();
+		for (int i = 1; i <= 3; i++) {
+			final StudyInstance instance = new StudyInstance();
+			instance.setInstanceNumber(i);
+			instances.add(instance);
+		}
+		Mockito.doReturn(true).when(this.middlewareStudyService).hasAdvancedOrCrossesList(studyId);
+		Mockito.doReturn(instances).when(this.middlewareStudyService).getStudyInstances(studyId);
+
+		this.instanceValidator.validateForDesignGeneration(studyId, new HashSet<>(Arrays.asList(1,2)));
+
 	}
 
 	@Test
