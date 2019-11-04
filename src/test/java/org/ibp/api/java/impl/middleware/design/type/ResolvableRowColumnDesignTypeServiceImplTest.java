@@ -9,6 +9,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
@@ -47,6 +48,9 @@ public class ResolvableRowColumnDesignTypeServiceImplTest {
 
 	@Mock
 	public OntologyDataManager ontologyDataManager;
+
+	@Mock
+	private MeasurementVariableGenerator measurementVariableGenerator;
 
 	@InjectMocks
 	private final ResolvableRowColumnDesignTypeServiceImpl designTypeService = new ResolvableRowColumnDesignTypeServiceImpl();
@@ -94,8 +98,8 @@ public class ResolvableRowColumnDesignTypeServiceImplTest {
 				ENTRY_NO, REP_NO, ROW, COL, PLOT_NO, startingPlotNumber, experimentalDesignInput.getNrlatin(),
 				experimentalDesignInput.getNclatin(), experimentalDesignInput.getReplatinGroups(), "", experimentalDesignInput.getUseLatenized()))
 			.thenReturn(mainDesign);
-		when(this.experimentDesignGenerator
-			.constructMeasurementVariables(studyId, PROGRAM_UUID, ResolvableRowColumnDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
+		when(this.measurementVariableGenerator
+			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, ResolvableRowColumnDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				ResolvableRowColumnDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator
@@ -145,8 +149,8 @@ public class ResolvableRowColumnDesignTypeServiceImplTest {
 				ENTRY_NO, REP_NO, ROW, COL, PLOT_NO, startingPlotNumber, experimentalDesignInput.getNrlatin(),
 				experimentalDesignInput.getNclatin(), String.valueOf(replicationsCount), "", experimentalDesignInput.getUseLatenized()))
 			.thenReturn(mainDesign);
-		when(this.experimentDesignGenerator
-			.constructMeasurementVariables(studyId, PROGRAM_UUID, ResolvableRowColumnDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
+		when(this.measurementVariableGenerator
+			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, ResolvableRowColumnDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				ResolvableRowColumnDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES_LATINIZED, experimentalDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator

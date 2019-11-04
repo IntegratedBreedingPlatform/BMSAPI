@@ -9,6 +9,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
@@ -45,6 +46,9 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 
 	@Mock
 	public OntologyDataManager ontologyDataManager;
+
+	@Mock
+	private MeasurementVariableGenerator measurementVariableGenerator;
 
 	@InjectMocks
 	private final ResolvableIncompleteBlockDesignTypeServiceImpl designTypeService = new ResolvableIncompleteBlockDesignTypeServiceImpl();
@@ -89,8 +93,8 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 			.createResolvableIncompleteBlockDesign(blockSize, studyGermplasmDtoList.size(), replicationsCount,
 				ENTRY_NO, REP_NO, BLOCK_NO, PLOT_NO, startingPlotNumber, experimentalDesignInput.getNblatin(),
 				experimentalDesignInput.getReplatinGroups(), "", experimentalDesignInput.getUseLatenized())).thenReturn(mainDesign);
-		when(this.experimentDesignGenerator
-			.constructMeasurementVariables(studyId, PROGRAM_UUID, ResolvableIncompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
+		when(this.measurementVariableGenerator
+			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, ResolvableIncompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				ResolvableIncompleteBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator
@@ -137,8 +141,8 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 			.createResolvableIncompleteBlockDesign(blockSize, studyGermplasmDtoList.size(), replicationsCount,
 				ENTRY_NO, REP_NO, BLOCK_NO, PLOT_NO, startingPlotNumber, experimentalDesignInput.getNblatin(),
 				String.valueOf(replicationsCount), "", experimentalDesignInput.getUseLatenized())).thenReturn(mainDesign);
-		when(this.experimentDesignGenerator
-			.constructMeasurementVariables(studyId, PROGRAM_UUID, ResolvableIncompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
+		when(this.measurementVariableGenerator
+			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, ResolvableIncompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				ResolvableIncompleteBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES_LATINIZED, experimentalDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator

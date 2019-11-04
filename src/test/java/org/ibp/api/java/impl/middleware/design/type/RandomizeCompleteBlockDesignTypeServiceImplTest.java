@@ -11,6 +11,7 @@ import org.generationcp.middleware.operation.transformer.etl.MeasurementVariable
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
@@ -52,6 +53,9 @@ public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 
 	@Mock
 	public OntologyDataManager ontologyDataManager;
+
+	@Mock
+	private MeasurementVariableGenerator measurementVariableGenerator;
 
 	@InjectMocks
 	private final RandomizeCompleteBlockDesignTypeServiceImpl designTypeService = new RandomizeCompleteBlockDesignTypeServiceImpl();
@@ -98,8 +102,8 @@ public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 			.createRandomizedCompleteBlockDesign(eq(replicationCount), eq(REP_NO), eq(PLOT_NO),
 				eq(startingPlotNumber),
 				eq(ENTRY_NO), any(List.class), any(List.class), eq(""))).thenReturn(mainDesign);
-		when(this.experimentDesignGenerator
-			.constructMeasurementVariables(studyId, PROGRAM_UUID, RandomizeCompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
+		when(this.measurementVariableGenerator
+			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, RandomizeCompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				RandomizeCompleteBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator

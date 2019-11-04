@@ -11,6 +11,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
@@ -48,6 +49,9 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 
 	@Resource
 	private MeasurementVariableTransformer measurementVariableTransformer;
+
+	@Resource
+	private MeasurementVariableGenerator measurementVariableGenerator;
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
@@ -99,8 +103,8 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID) {
 
-		final List<MeasurementVariable> measurementVariables = this.experimentDesignGenerator
-			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES, EXPERIMENT_DESIGN_VARIABLES,
+		final List<MeasurementVariable> measurementVariables = this.measurementVariableGenerator
+			.generateFromExperimentalDesignInput(studyId, programUUID, DESIGN_FACTOR_VARIABLES, EXPERIMENT_DESIGN_VARIABLES,
 				experimentalDesignInput);
 
 		final Map treatmentFactorsData = experimentalDesignInput.getTreatmentFactorsData();

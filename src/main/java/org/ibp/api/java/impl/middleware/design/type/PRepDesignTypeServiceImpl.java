@@ -10,6 +10,7 @@ import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.springframework.stereotype.Component;
@@ -36,6 +37,9 @@ public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService 
 
 	@Resource
 	private ExperimentDesignGenerator experimentDesignGenerator;
+
+	@Resource
+	private MeasurementVariableGenerator measurementVariableGenerator;
 
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
@@ -67,7 +71,7 @@ public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService 
 		return this.experimentDesignGenerator
 			.generateObservationUnitRowsFromExperimentalDesign(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign,
 				entryNumberName, null,
-				new HashMap<Integer, Integer>());
+				new HashMap<>());
 	}
 
 	@Override
@@ -83,8 +87,8 @@ public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService 
 	@Override
 	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID) {
-		return this.experimentDesignGenerator
-			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES, EXPERIMENT_DESIGN_VARIABLES,
+		return this.measurementVariableGenerator
+			.generateFromExperimentalDesignInput(studyId, programUUID, DESIGN_FACTOR_VARIABLES, EXPERIMENT_DESIGN_VARIABLES,
 				experimentalDesignInput);
 	}
 }

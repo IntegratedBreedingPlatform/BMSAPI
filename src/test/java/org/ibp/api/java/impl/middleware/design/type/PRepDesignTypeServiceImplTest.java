@@ -10,6 +10,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
@@ -45,6 +46,9 @@ public class PRepDesignTypeServiceImplTest {
 
 	@Mock
 	public OntologyDataManager ontologyDataManager;
+
+	@Mock
+	private MeasurementVariableGenerator measurementVariableGenerator;
 
 	@InjectMocks
 	private final PRepDesignTypeServiceImpl designTypeService = new PRepDesignTypeServiceImpl();
@@ -93,8 +97,8 @@ public class PRepDesignTypeServiceImplTest {
 			.createPRepDesign(blockSize, studyGermplasmDtoList.size(), replicationListItems,
 				ENTRY_NO,
 				BLOCK_NO, PLOT_NO, startingPlotNumber)).thenReturn(mainDesign);
-		when(this.experimentDesignGenerator
-			.constructMeasurementVariables(studyId, PROGRAM_UUID, PRepDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
+		when(this.measurementVariableGenerator
+			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, PRepDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				PRepDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator

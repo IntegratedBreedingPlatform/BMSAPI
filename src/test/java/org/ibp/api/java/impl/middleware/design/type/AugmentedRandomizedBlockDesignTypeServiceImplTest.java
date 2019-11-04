@@ -9,6 +9,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
@@ -42,10 +43,13 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 	public static final String BLOCK_NO = "BLOCK_NO";
 
 	@Mock
-	public ExperimentDesignGenerator experimentDesignGenerator;
+	private ExperimentDesignGenerator experimentDesignGenerator;
 
 	@Mock
-	public OntologyDataManager ontologyDataManager;
+	private MeasurementVariableGenerator measurementVariableGenerator;
+
+	@Mock
+	private OntologyDataManager ontologyDataManager;
 
 	@InjectMocks
 	private final AugmentedRandomizedBlockDesignTypeServiceImpl designTypeService = new AugmentedRandomizedBlockDesignTypeServiceImpl();
@@ -88,8 +92,8 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 				startingPlotNumber,
 				ENTRY_NO,
 				BLOCK_NO, PLOT_NO)).thenReturn(mainDesign);
-		when(this.experimentDesignGenerator
-			.constructMeasurementVariables(studyId, PROGRAM_UUID, AugmentedRandomizedBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
+		when(this.measurementVariableGenerator
+			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, AugmentedRandomizedBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				AugmentedRandomizedBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
 			.thenReturn(measurementVariables);
 		when(this.experimentDesignGenerator

@@ -10,6 +10,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,9 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 
 	@Resource
 	public ExperimentDesignGenerator experimentDesignGenerator;
+
+	@Resource
+	public MeasurementVariableGenerator measurementVariableGenerator;
 
 	@Resource
 	public OntologyDataManager ontologyDataManager;
@@ -86,8 +90,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 	@Override
 	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID) {
-		return this.experimentDesignGenerator
-			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES,
+		return this.measurementVariableGenerator.generateFromExperimentalDesignInput(studyId, programUUID, DESIGN_FACTOR_VARIABLES,
 				EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput);
 	}
 
