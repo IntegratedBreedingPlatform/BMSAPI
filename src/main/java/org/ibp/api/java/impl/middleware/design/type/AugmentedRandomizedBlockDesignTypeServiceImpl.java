@@ -10,6 +10,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignProcessor;
 import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
@@ -38,6 +39,9 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 
 	@Resource
 	public MeasurementVariableGenerator measurementVariableGenerator;
+
+	@Resource
+	private ExperimentalDesignProcessor experimentalDesignProcessor;
 
 	@Resource
 	public OntologyDataManager ontologyDataManager;
@@ -71,8 +75,8 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 				blockNumberName, plotNumberName);
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
-		return this.experimentDesignGenerator
-			.generateObservationUnitRowsFromExperimentalDesign(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables,
+		return this.experimentalDesignProcessor
+			.generateObservationUnitRows(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables,
 				studyGermplasmDtoList, mainDesign, entryNumberName, null,
 				designExpectedEntriesMap);
 	}

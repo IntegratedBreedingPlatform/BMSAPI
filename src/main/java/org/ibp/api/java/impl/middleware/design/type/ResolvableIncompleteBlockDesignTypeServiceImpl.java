@@ -9,6 +9,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignProcessor;
 import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -42,6 +43,9 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 	private MeasurementVariableGenerator measurementVariableGenerator;
 
 	@Resource
+	private ExperimentalDesignProcessor experimentalDesignProcessor;
+
+	@Resource
 	private OntologyDataManager ontologyDataManager;
 
 	@Override
@@ -72,8 +76,8 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 				experimentalDesignInput.getReplatinGroups(), "", experimentalDesignInput.getUseLatenized());
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
-		return this.experimentDesignGenerator
-			.generateObservationUnitRowsFromExperimentalDesign(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName,
+		return this.experimentalDesignProcessor
+			.generateObservationUnitRows(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName,
 				null,
 				new HashMap<>());
 	}

@@ -10,6 +10,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignProcessor;
 import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
@@ -49,6 +50,9 @@ public class PRepDesignTypeServiceImplTest {
 
 	@Mock
 	private MeasurementVariableGenerator measurementVariableGenerator;
+
+	@Mock
+	private ExperimentalDesignProcessor experimentalDesignProcessor;
 
 	@InjectMocks
 	private final PRepDesignTypeServiceImpl designTypeService = new PRepDesignTypeServiceImpl();
@@ -101,8 +105,8 @@ public class PRepDesignTypeServiceImplTest {
 			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, PRepDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				PRepDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
 			.thenReturn(measurementVariables);
-		when(this.experimentDesignGenerator
-			.generateObservationUnitRowsFromExperimentalDesign(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
+		when(this.experimentalDesignProcessor
+			.generateObservationUnitRows(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
 				refEq(studyGermplasmDtoList), refEq(mainDesign),
 				eq(ENTRY_NO),
 				isNull(), any(Map.class))).thenReturn(observationUnitRowList);

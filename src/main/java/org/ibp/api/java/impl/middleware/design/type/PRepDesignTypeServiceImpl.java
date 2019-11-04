@@ -10,6 +10,7 @@ import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignProcessor;
 import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
@@ -37,6 +38,9 @@ public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService 
 
 	@Resource
 	private ExperimentDesignGenerator experimentDesignGenerator;
+
+	@Resource
+	private ExperimentalDesignProcessor experimentalDesignProcessor;
 
 	@Resource
 	private MeasurementVariableGenerator measurementVariableGenerator;
@@ -68,8 +72,8 @@ public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService 
 				blockNumberName, plotNumberName, plotNo);
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
-		return this.experimentDesignGenerator
-			.generateObservationUnitRowsFromExperimentalDesign(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign,
+		return this.experimentalDesignProcessor
+			.generateObservationUnitRows(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign,
 				entryNumberName, null,
 				new HashMap<>());
 	}

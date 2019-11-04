@@ -11,6 +11,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignProcessor;
 import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -43,6 +44,9 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 
 	@Resource
 	private ExperimentDesignGenerator experimentDesignGenerator;
+
+	@Resource
+	private ExperimentalDesignProcessor experimentalDesignProcessor;
 
 	@Resource
 	private OntologyDataManager ontologyDataManager;
@@ -84,8 +88,8 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 				treatmentLevels, "");
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
-		return this.experimentDesignGenerator
-			.generateObservationUnitRowsFromExperimentalDesign(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName,
+		return this.experimentalDesignProcessor
+			.generateObservationUnitRows(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName,
 				treatmentFactorValues, new HashMap<Integer, Integer>());
 	}
 
@@ -120,7 +124,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 
 			final List<Integer> treatmentFactorIds = new ArrayList<>(treatmentFactorLevelToLabelIdMap.values());
 			treatmentFactorIds.addAll(treatmentFactorLevelToLabelIdMap.keySet());
-			final List<StandardVariable> standardVariables = this.ontologyDataManager.getStandardVariables(treatmentFactorIds, programUUID);
+				final List<StandardVariable> standardVariables = this.ontologyDataManager.getStandardVariables(treatmentFactorIds, programUUID);
 			Map<Integer, StandardVariable> standardVariableMap =
 				standardVariables.stream().collect(Collectors.toMap(StandardVariable::getId,
 					Function.identity()));

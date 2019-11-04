@@ -9,6 +9,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignProcessor;
 import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -46,6 +47,9 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentalDes
 	@Resource
 	private MeasurementVariableGenerator measurementVariableGenerator;
 
+	@Resource
+	private ExperimentalDesignProcessor experimentalDesignProcessor;
+
 	@Override
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
@@ -76,8 +80,8 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentalDes
 				experimentalDesignInput.getUseLatenized());
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
-		return this.experimentDesignGenerator
-			.generateObservationUnitRowsFromExperimentalDesign(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign,
+		return this.experimentalDesignProcessor
+			.generateObservationUnitRows(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign,
 				entryNumberName, null,
 				new HashMap<>());
 	}
