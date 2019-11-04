@@ -113,7 +113,7 @@ public class ExperimentalDesignServiceImplTest {
 	@Test
 	public void testDeleteDesign() {
 		this.experimentDesignService.deleteDesign(STUDY_ID);
-		Mockito.verify(this.studyValidator).validate(STUDY_ID, true);
+		Mockito.verify(this.studyValidator).validate(STUDY_ID, true, false);
 		Mockito.verify(this.experimentalDesignValidator).validateExperimentalDesignExistence(STUDY_ID, true);
 		Mockito.verify(this.middlewareExperimentDesignService).deleteStudyExperimentDesign(STUDY_ID);
 	}
