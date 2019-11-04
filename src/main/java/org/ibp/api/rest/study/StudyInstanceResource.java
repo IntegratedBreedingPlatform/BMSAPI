@@ -2,6 +2,7 @@ package org.ibp.api.rest.study;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.study.StudyInstanceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +26,10 @@ public class StudyInstanceResource {
 		notes = "Create new study instance")
 	@RequestMapping(value = "/{cropname}/studies/{studyId}/instances/{instanceNumber}", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity createStudyInstance(final @PathVariable String cropname,
+	public ResponseEntity<StudyInstance> createStudyInstance(final @PathVariable String cropname,
 		@PathVariable final Integer studyId, @PathVariable final String instanceNumber) {
-
-		this.studyInstanceService.createStudyInstance(cropname, studyId, instanceNumber);
-
-		return new ResponseEntity(HttpStatus.OK);
+		return new ResponseEntity<>(this.studyInstanceService.createStudyInstance(cropname, studyId, instanceNumber),
+			HttpStatus.OK);
 
 	}
 
