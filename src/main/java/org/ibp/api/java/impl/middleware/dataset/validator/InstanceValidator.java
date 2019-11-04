@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.fest.util.Collections;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,13 +59,30 @@ public class InstanceValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		// Check that at least one instance is not restricted from design regeneration
 		final List<StudyInstance> studyInstances = this.middlewareStudyService.getStudyInstances(studyId);
-		final List<Integer> restrictedInstances =
-			studyInstances.stream().filter(p -> !p.isDesignRegenerationAllowed()).map(p -> p.getInstanceNumber())
-				.collect(Collectors.toList());
+		final List<Integer> restrictedInstances = new ArrayList<>();
+		final List<Integer> instancesWithDesign = new ArrayList<>();
+		for (final StudyInstance instance : studyInstances) {
+			if (BooleanUtils.isFalse(instance.isDesignRegenerationAllowed())) {
+				restrictedInstances.add(instance.getInstanceNumber());
+			}
+			if (instance.isHasExperimentalDesign()) {
+				instancesWithDesign.add(instance.getInstanceNumber());
+			}
+		}
+
+		// Check that at least one instance is not restricted from design regeneration
 		if (restrictedInstances.containsAll(instanceNumbers)) {
 			this.errors.reject("all.selected.instances.cannot.be.regenerated");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		// If at least one instance is for regeneration, check that study has no advanced or crosses list
+		if (!instanceNumbers.stream()
+			.distinct()
+			.filter(instancesWithDesign::contains)
+			.collect(Collectors.toSet()).isEmpty() && this.middlewareStudyService.hasAdvancedOrCrossesList(studyId)) {
+			this.errors.reject("study.has.advance.or.cross.list");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
