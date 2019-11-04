@@ -70,24 +70,4 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		doReturn(user).when(this.securityService).getCurrentlyLoggedInUser();
 	}
 
-	@Test
-	public void testListStudyInstances() throws Exception {
-
-		final StudyInstance studyInstance = new StudyInstance(1, 1, "Gujarat, India", "GUJ", 1, "", true);
-		Mockito.when(this.studyServiceMW.getStudyInstances(org.mockito.Matchers.anyInt()))
-				.thenReturn(Lists.newArrayList(studyInstance));
-
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.get("/study/{cropname}/{studyId}/instances", "maize", "1")
-				.contentType(this.contentType))
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(1)))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].instanceDbId", Matchers.is(studyInstance.getInstanceDbId())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].locationName", Matchers.is(studyInstance.getLocationName())))
-				.andExpect(
-						MockMvcResultMatchers.jsonPath("$[0].locationAbbreviation", Matchers.is(studyInstance.getLocationAbbreviation())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].instanceNumber", Matchers.is(studyInstance.getInstanceNumber())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].hasFieldmap", Matchers.is(studyInstance.isHasFieldmap())));;
-	}
 }

@@ -450,22 +450,6 @@ public class StudyServiceImpl implements StudyService {
 		return this.middlewareStudyService.getProgramUUID(studyIdentifier);
 	}
 
-	@Override
-	public List<StudyInstance> getStudyInstances(final int studyId) {
-		final List<org.generationcp.middleware.service.impl.study.StudyInstance> studyInstancesMW =
-				this.middlewareStudyService.getStudyInstances(studyId);
-
-		final Function<org.generationcp.middleware.service.impl.study.StudyInstance, StudyInstance> transformer =
-				new Function<org.generationcp.middleware.service.impl.study.StudyInstance, StudyInstance>() {
-
-			@Override
-			public StudyInstance apply(final org.generationcp.middleware.service.impl.study.StudyInstance input) {
-				return new StudyInstance(input.getInstanceDbId(), input.getLocationName(), input.getLocationAbbreviation(),
-						input.getInstanceNumber(),input.getCustomLocationAbbreviation(), input.isHasFieldmap());
-			}
-		};
-		return Lists.transform(studyInstancesMW, transformer);
-	}
 
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
 		return this.middlewareStudyService.getTrialObservationTable(studyIdentifier);

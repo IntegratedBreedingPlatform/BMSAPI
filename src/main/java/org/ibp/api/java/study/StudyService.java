@@ -55,8 +55,6 @@ public interface StudyService {
 
 	String getProgramUUID(Integer studyIdentifier);
 
-	List<StudyInstance> getStudyInstances(int studyId);
-
 	StudyDetailsDto getStudyDetailsForGeolocation (final Integer geolocationId);
 
 	Long countStudies(final Map<StudyFilters, String> filters);

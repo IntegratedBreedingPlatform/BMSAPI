@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Api(value = "Study Instance Services")
 @Controller
@@ -31,6 +32,21 @@ public class StudyInstanceResource {
 		return new ResponseEntity<>(this.studyInstanceService.createStudyInstance(cropname, studyId, instanceNumber),
 			HttpStatus.OK);
 
+	}
+
+	@ApiOperation(value = "List all study instances with basic metadata.",
+		notes = "Returns list of all study instances with basic metadata.")
+	@RequestMapping(value = "/{cropname}/{studyId}/instances", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<StudyInstance>> listStudyInstances(final @PathVariable String cropname,
+		@PathVariable final Integer studyId) {
+		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
+
+		if (studyInstances.isEmpty()) {
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		}
+
+		return new ResponseEntity<>(studyInstances, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Remove study instance",
