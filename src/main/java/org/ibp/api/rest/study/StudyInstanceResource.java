@@ -36,7 +36,7 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "List all study instances with basic metadata.",
 		notes = "Returns list of all study instances with basic metadata.")
-	@RequestMapping(value = "/{cropname}/{studyId}/instances", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cropname}/studies/{studyId}/instances", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<StudyInstance>> listStudyInstances(final @PathVariable String cropname,
 		@PathVariable final Integer studyId) {
