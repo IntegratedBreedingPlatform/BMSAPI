@@ -10,6 +10,7 @@ import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.study.StudyInstanceService;
 import org.ibp.api.rest.dataset.DatasetDTO;
@@ -40,11 +41,14 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	@Resource
 	private DatasetValidator datasetValidator;
 
+	@Resource
+	private InstanceValidator instanceValidator;
+
 	@Override
 	public StudyInstance createStudyInstance(final String cropName, final Integer studyId, final String instanceNumber) {
 
 		this.studyValidator.validate(studyId, true);
-		// TODO: add validation to check if the instance number already exists before creating.
+		this.instanceValidator.checkStudyInstanceAlreadyExists(studyId, instanceNumber);
 
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 
@@ -73,7 +77,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 				@Override
 				public StudyInstance apply(final org.generationcp.middleware.service.impl.study.StudyInstance input) {
 					return new StudyInstance(input.getInstanceDbId(), input.getLocationName(), input.getLocationAbbreviation(),
-						input.getInstanceNumber(),input.getCustomLocationAbbreviation(), input.isHasFieldmap());
+						input.getInstanceNumber(), input.getCustomLocationAbbreviation(), input.isHasFieldmap());
 				}
 			};
 		return Lists.transform(studyInstancesMW, transformer);

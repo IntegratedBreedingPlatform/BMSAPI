@@ -8,6 +8,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 @Component
@@ -22,13 +23,22 @@ public class InstanceValidator {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-        if (!this.studyDataManager.existInstances(instanceIds)) {
+		if (!this.studyDataManager.existInstances(instanceIds)) {
 			this.errors.reject("dataset.non.existent.instances", "");
-            throw new ApiRequestValidationException(this.errors.getAllErrors());
-        }
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 
 		if (datasetId != null && !this.studyDataManager.areAllInstancesExistInDataset(datasetId, instanceIds)) {
 			this.errors.reject("dataset.invalid.instances", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	public void checkStudyInstanceAlreadyExists(final Integer studyId, final String instanceNumber) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		final Map<String, Integer> instanceGeolocationIdMap = this.studyDataManager.getInstanceGeolocationIdsMap(studyId);
+		if (instanceGeolocationIdMap.keySet().contains(instanceNumber)) {
+			this.errors.reject("instance.already.exists", new Object[] {instanceNumber}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
