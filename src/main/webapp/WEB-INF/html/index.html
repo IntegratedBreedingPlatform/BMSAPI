@@ -19,6 +19,7 @@
 
 <body>
 <a id="contextPath" style="display: none;" th:href="@{/}">Context Path</a>
+<a id="swaggerPath" style="display: none;" th:href="@{/v2/api-docs}">Swagger Path</a>
 <nav class="navbar navbar-default" role="navigation">
 	<div class="container-fluid">
 		<div class="navbar-header">
@@ -66,13 +67,7 @@
 
 		window.onload = function() {
 
-			var apiUrl = window.location.protocol + "//" + window.location.host;
-			if (window.location.pathname.indexOf('/api') > 0) {
-				apiUrl += window.location.pathname.substring(0, window.location.pathname.indexOf('/api'))
-			}
-
-			var contextPath = $("#contextPath").attr("href");
-			apiUrl += contextPath + "v2/api-docs";
+			var apiUrl = $("#swaggerPath").attr("href");
 
 			// Build a system
 			const ui = SwaggerUIBundle({
