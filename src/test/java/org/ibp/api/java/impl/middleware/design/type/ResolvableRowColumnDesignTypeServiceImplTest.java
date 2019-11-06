@@ -101,7 +101,7 @@ public class ResolvableRowColumnDesignTypeServiceImplTest {
 		when(this.experimentDesignGenerator
 			.createResolvableRowColDesign(studyGermplasmDtoList.size(), replicationsCount, rowPerReplications, colPerReplications,
 				ENTRY_NO, REP_NO, ROW, COL, PLOT_NO, startingPlotNumber, experimentalDesignInput.getNrlatin(),
-				experimentalDesignInput.getNclatin(), experimentalDesignInput.getReplatinGroups(), "", experimentalDesignInput.getUseLatenized()))
+				experimentalDesignInput.getNclatin(), experimentalDesignInput.getReplatinGroups(), experimentalDesignInput.getUseLatenized()))
 			.thenReturn(mainDesign);
 		when(this.measurementVariableGenerator
 			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, ResolvableRowColumnDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
@@ -152,7 +152,7 @@ public class ResolvableRowColumnDesignTypeServiceImplTest {
 		when(this.experimentDesignGenerator
 			.createResolvableRowColDesign(studyGermplasmDtoList.size(), replicationsCount, rowPerReplications, colPerReplications,
 				ENTRY_NO, REP_NO, ROW, COL, PLOT_NO, startingPlotNumber, experimentalDesignInput.getNrlatin(),
-				experimentalDesignInput.getNclatin(), String.valueOf(replicationsCount), "", experimentalDesignInput.getUseLatenized()))
+				experimentalDesignInput.getNclatin(), String.valueOf(replicationsCount), experimentalDesignInput.getUseLatenized()))
 			.thenReturn(mainDesign);
 		when(this.measurementVariableGenerator
 			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, ResolvableRowColumnDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,

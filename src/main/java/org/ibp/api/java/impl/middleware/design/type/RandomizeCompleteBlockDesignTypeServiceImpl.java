@@ -85,7 +85,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createRandomizedCompleteBlockDesign(block, replicateNumberName, plotNumberName, plotNo,
 				entryNumberName, treatmentFactors,
-				treatmentLevels, "");
+				treatmentLevels);
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		return this.experimentalDesignProcessor

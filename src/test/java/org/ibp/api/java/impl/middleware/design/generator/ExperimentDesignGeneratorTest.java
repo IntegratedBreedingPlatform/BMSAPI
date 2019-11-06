@@ -29,7 +29,6 @@ public class ExperimentDesignGeneratorTest {
 	private static final String ENTRY_NO = "ENTRY_NO";
 	private static final String REP_NO = "REP_NO";
 	private static final Integer NBLOCK = 2;
-	private static final String OUTPUT_FILE = "outputfile.csv";
 
 	@InjectMocks
 	private ExperimentDesignGenerator experimentDesignGenerator;
@@ -46,7 +45,7 @@ public class ExperimentDesignGeneratorTest {
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createRandomizedCompleteBlockDesign(NBLOCK, BLOCK_NO, PLOT_NO, initialPlotNumber, TermId.ENTRY_NO.name(),
 				treatmentFactors,
-				levels, OUTPUT_FILE);
+				levels);
 
 		final ExperimentDesign experimentDesign = mainDesign.getDesign();
 
@@ -66,8 +65,6 @@ public class ExperimentDesignGeneratorTest {
 		Assert.assertEquals(
 			AppConstants.EXP_DESIGN_TIME_LIMIT.getString(),
 			experimentDesign.getParameterValue(ExperimentDesignGenerator.TIMELIMIT_PARAM));
-		Assert.assertEquals(OUTPUT_FILE, experimentDesign.getParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM));
-
 	}
 
 	@Test
@@ -82,7 +79,7 @@ public class ExperimentDesignGeneratorTest {
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createResolvableIncompleteBlockDesign(blockSize, numberOfTreatments, numberOfReplicates, ENTRY_NO, REP_NO, BLOCK_NO,
-				PLOT_NO, initialPlotNumber, nBLatin, replatinGroups,  OUTPUT_FILE,false);
+				PLOT_NO, initialPlotNumber, nBLatin, replatinGroups, false);
 
 		final ExperimentDesign experimentDesign = mainDesign.getDesign();
 
@@ -106,8 +103,6 @@ public class ExperimentDesignGeneratorTest {
 		Assert.assertEquals(
 			AppConstants.EXP_DESIGN_TIME_LIMIT.getString(),
 			experimentDesign.getParameterValue(ExperimentDesignGenerator.TIMELIMIT_PARAM));
-		Assert.assertEquals(OUTPUT_FILE, experimentDesign.getParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM));
-
 	}
 
 	@Test
@@ -122,7 +117,7 @@ public class ExperimentDesignGeneratorTest {
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createResolvableIncompleteBlockDesign(blockSize, numberOfTreatments, numberOfReplicates, ENTRY_NO, REP_NO, BLOCK_NO,
-				PLOT_NO, initialPlotNumber, nBLatin, replatinGroups, OUTPUT_FILE, true);
+				PLOT_NO, initialPlotNumber, nBLatin, replatinGroups, true);
 
 		final ExperimentDesign experimentDesign = mainDesign.getDesign();
 
@@ -148,8 +143,6 @@ public class ExperimentDesignGeneratorTest {
 		Assert.assertEquals(
 			AppConstants.EXP_DESIGN_TIME_LIMIT.getString(),
 			experimentDesign.getParameterValue(ExperimentDesignGenerator.TIMELIMIT_PARAM));
-		Assert.assertEquals(OUTPUT_FILE, experimentDesign.getParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM));
-
 	}
 
 	@Test
@@ -308,7 +301,7 @@ public class ExperimentDesignGeneratorTest {
 
 		final Integer initialEntryNumber = null;
 
-		this.experimentDesignGenerator.addInitialTreatmenNumberIfAvailable(initialEntryNumber, paramList);
+		this.experimentDesignGenerator.addInitialTreatmentNumberIfAvailable(initialEntryNumber, paramList);
 
 		Assert.assertEquals("Initial Treatment Number param should not be added to the param list.", 0, paramList.size());
 
@@ -321,7 +314,7 @@ public class ExperimentDesignGeneratorTest {
 
 		final Integer initialEntryNumber = 2;
 
-		this.experimentDesignGenerator.addInitialTreatmenNumberIfAvailable(initialEntryNumber, paramList);
+		this.experimentDesignGenerator.addInitialTreatmentNumberIfAvailable(initialEntryNumber, paramList);
 
 		Assert.assertEquals("Initial Treatment Number param should  be added to the param list.", 1, paramList.size());
 		Assert.assertEquals(String.valueOf(initialEntryNumber), paramList.get(0).getValue());

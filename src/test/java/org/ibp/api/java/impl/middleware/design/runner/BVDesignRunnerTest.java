@@ -122,7 +122,7 @@ public class BVDesignRunnerTest {
 	public void testGetXMLStringForResolvableIncompleteBlockDesign() {
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createResolvableIncompleteBlockDesign(6, 24, 2, "Treat", "Reps",
-				"Subblocks", "Plots", 301, null, "0", "",
+				"Subblocks", "Plots", 301, null, "0",
 				false);
 
 		final String expectedString =
@@ -152,8 +152,7 @@ public class BVDesignRunnerTest {
 	public void testGetXMLStringForResolvableRowColExpDesign() {
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createResolvableRowColDesign(50, 2, 5, 10, "Treat", "Reps",
-				"Rows", "Columns", "Plots", 301, null, 0, "0",
-				"", false);
+				"Rows", "Columns", "Plots", 301, null, 0, "0", false);
 
 		final String expectedString =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Templates><Template name=\"ResolvableRowColumn\">"
@@ -185,7 +184,7 @@ public class BVDesignRunnerTest {
 	public void testGetXMLStringForResolvableIncompleteBlockDesignWithEntryNumber() {
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createResolvableIncompleteBlockDesign(6, 24, 2, "ENTRY_NO",
-				"Reps", "Subblocks", "Plots", 301, 0, "", "",
+				"Reps", "Subblocks", "Plots", 301, 0, "",
 				false);
 
 		final String expectedString =
@@ -215,8 +214,7 @@ public class BVDesignRunnerTest {
 	public void testGetXMLStringForResolvableRowColumnDesignWithEntryNumber() {
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createResolvableRowColDesign(24, 2, 5, 10, "ENTRY_NO",
-				"Reps", "Rows", "Columns", "Plots", 301, 0, 0, "",
-				"", false);
+				"Reps", "Rows", "Columns", "Plots", 301, 0, 0, "", false);
 
 		final String expectedString =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Templates><Template name=\"ResolvableRowColumn\">"
@@ -317,7 +315,7 @@ public class BVDesignRunnerTest {
 		levels.add("3");
 
 		return this.experimentDesignGenerator
-			.createRandomizedCompleteBlockDesign(6, "Reps", "Plots", 301, TermId.ENTRY_NO.name(), treatmentFactors, levels, "");
+			.createRandomizedCompleteBlockDesign(6, "Reps", "Plots", 301, TermId.ENTRY_NO.name(), treatmentFactors, levels);
 	}
 
 }

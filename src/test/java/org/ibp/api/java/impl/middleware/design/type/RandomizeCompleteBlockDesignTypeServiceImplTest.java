@@ -105,7 +105,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 		when(this.experimentDesignGenerator
 			.createRandomizedCompleteBlockDesign(eq(replicationCount), eq(REP_NO), eq(PLOT_NO),
 				eq(startingPlotNumber),
-				eq(ENTRY_NO), any(List.class), any(List.class), eq(""))).thenReturn(mainDesign);
+				eq(ENTRY_NO), any(List.class), any(List.class))).thenReturn(mainDesign);
 		when(this.measurementVariableGenerator
 			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, RandomizeCompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				RandomizeCompleteBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))

@@ -96,7 +96,7 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 		when(this.experimentDesignGenerator
 			.createResolvableIncompleteBlockDesign(blockSize, studyGermplasmDtoList.size(), replicationsCount,
 				ENTRY_NO, REP_NO, BLOCK_NO, PLOT_NO, startingPlotNumber, experimentalDesignInput.getNblatin(),
-				experimentalDesignInput.getReplatinGroups(), "", experimentalDesignInput.getUseLatenized())).thenReturn(mainDesign);
+				experimentalDesignInput.getReplatinGroups(), experimentalDesignInput.getUseLatenized())).thenReturn(mainDesign);
 		when(this.measurementVariableGenerator
 			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, ResolvableIncompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				ResolvableIncompleteBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
@@ -144,7 +144,7 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 		when(this.experimentDesignGenerator
 			.createResolvableIncompleteBlockDesign(blockSize, studyGermplasmDtoList.size(), replicationsCount,
 				ENTRY_NO, REP_NO, BLOCK_NO, PLOT_NO, startingPlotNumber, experimentalDesignInput.getNblatin(),
-				String.valueOf(replicationsCount), "", experimentalDesignInput.getUseLatenized())).thenReturn(mainDesign);
+				String.valueOf(replicationsCount), experimentalDesignInput.getUseLatenized())).thenReturn(mainDesign);
 		when(this.measurementVariableGenerator
 			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, ResolvableIncompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				ResolvableIncompleteBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES_LATINIZED, experimentalDesignInput))

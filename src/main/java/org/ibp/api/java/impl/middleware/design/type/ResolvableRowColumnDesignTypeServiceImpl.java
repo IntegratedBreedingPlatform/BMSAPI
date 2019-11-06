@@ -76,7 +76,7 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentalDes
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createResolvableRowColDesign(nTreatments, replicates, rows, cols, entryNumberName,
 				replicateNumberName, rowName, colName, plotNumberName, plotNo,
-				experimentalDesignInput.getNrlatin(), experimentalDesignInput.getNclatin(), experimentalDesignInput.getReplatinGroups(), "",
+				experimentalDesignInput.getNrlatin(), experimentalDesignInput.getNclatin(), experimentalDesignInput.getReplatinGroups(),
 				experimentalDesignInput.getUseLatenized());
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);

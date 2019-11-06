@@ -73,7 +73,7 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 			.createResolvableIncompleteBlockDesign(blockSize, nTreatments, replicates, entryNumberName,
 				replicateNumberName, blockNumberName, plotNumberName, plotNo,
 				experimentalDesignInput.getNblatin(),
-				experimentalDesignInput.getReplatinGroups(), "", experimentalDesignInput.getUseLatenized());
+				experimentalDesignInput.getReplatinGroups(), experimentalDesignInput.getUseLatenized());
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		return this.experimentalDesignProcessor

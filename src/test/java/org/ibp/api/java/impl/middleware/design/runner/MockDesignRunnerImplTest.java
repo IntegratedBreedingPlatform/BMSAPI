@@ -25,8 +25,7 @@ public class MockDesignRunnerImplTest {
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createRandomizedCompleteBlockDesign(2, "REP_NO", "PLOT_NO", 200, TermId.ENTRY_NO.name(),
 				Collections.singletonList("ENTRY_NO"),
-				Collections.singletonList("20"),
-				"mock-bv-out.csv");
+				Collections.singletonList("20"));
 		// Configure number of instances to be generated
 		mainDesign.getDesign().getParameters().add(new ExperimentDesignParameter(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM, "2"));
 
@@ -49,8 +48,7 @@ public class MockDesignRunnerImplTest {
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createRandomizedCompleteBlockDesign(2, "REP_NO", "PLOT_NO", 200, TermId.ENTRY_NO.name(),
-				Arrays.asList("_8260", "_8261", "ENTRY_NO"), Arrays.asList("3", "2", "20"),
-				"mock-bv-out.csv");
+				Arrays.asList("_8260", "_8261", "ENTRY_NO"), Arrays.asList("3", "2", "20"));
 		// Configure number of instances to be generated
 		mainDesign.getDesign().getParameters().add(new ExperimentDesignParameter(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM, "2"));
 
@@ -73,7 +71,7 @@ public class MockDesignRunnerImplTest {
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createResolvableIncompleteBlockDesign(2, 20, 2, "ENTRY_NO", "REP_NO", "BLOCK_NO", "PLOT_NO", 10, null, null,
-				"mock-bv-out.csv", false);
+				false);
 		// Configure number of instances to be generated
 		mainDesign.getDesign().getParameters().add(new ExperimentDesignParameter(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM, "3"));
 
@@ -96,7 +94,7 @@ public class MockDesignRunnerImplTest {
 
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createResolvableRowColDesign(20, 2, 2, 10, "ENTRY_NO", "REP_NO", "ROW", "COL", "PLOT_NO", 10, null, null, "",
-				"mock-bv-out.csv", false);
+				false);
 		// Configure number of instances to be generated
 		mainDesign.getDesign().getParameters().add(new ExperimentDesignParameter(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM, "5"));
 
@@ -118,8 +116,7 @@ public class MockDesignRunnerImplTest {
 	public void testGetTreatmentFactorValuesCombinations() {
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createRandomizedCompleteBlockDesign(2, "REP_NO", "PLOT_NO", 200, TermId.ENTRY_NO.name(),
-				Arrays.asList("_8260", "_8261", "ENTRY_NO"), Arrays.asList("3", "2", "20"),
-				"mock-bv-out.csv");
+				Arrays.asList("_8260", "_8261", "ENTRY_NO"), Arrays.asList("3", "2", "20"));
 		final List<List<String>> treatmentFactorValuesList =
 			this.mockDesignRunner.getTreatmentFactorValuesCombinations(mainDesign.getDesign());
 		Assert.assertEquals(6, treatmentFactorValuesList.size());

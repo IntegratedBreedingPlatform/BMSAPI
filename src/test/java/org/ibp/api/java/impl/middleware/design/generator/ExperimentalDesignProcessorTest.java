@@ -19,6 +19,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -78,7 +79,7 @@ public class ExperimentalDesignProcessorTest {
 		final MainDesign mainDesign =
 			this.experimentDesignGenerator
 				.createRandomizedCompleteBlockDesign(2, REP_NO, PLOT_NO,
-					301, TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>(), "");
+					301, TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>());
 
 		final List<Integer> trialInstances = Arrays.asList(2, 4, 6);
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(trialInstances);
@@ -117,7 +118,7 @@ public class ExperimentalDesignProcessorTest {
 		final MainDesign mainDesign =
 			this.experimentDesignGenerator
 				.createRandomizedCompleteBlockDesign(2, REP_NO, PLOT_NO,
-					301,  TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>(), "");
+					301,  TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>());
 		Mockito.doReturn(new BVDesignOutput(1)).when(this.designRunner)
 			.runBVDesign(mainDesign);
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2));
@@ -138,13 +139,13 @@ public class ExperimentalDesignProcessorTest {
 		final MainDesign mainDesign =
 			this.experimentDesignGenerator
 				.createRandomizedCompleteBlockDesign(2, REP_NO, PLOT_NO,
-					301, TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>(), "");
+					301, TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>());
 		Mockito.doThrow(new IOException()).when(this.designRunner)
 			.runBVDesign(mainDesign);
 		try {
 			final List<StudyGermplasmDto> studyGermplasmDtoList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
 			this.experimentalDesignProcessor
-				.generateObservationUnitRows(new HashSet<>(Arrays.asList(2)), new ArrayList<>(), studyGermplasmDtoList,
+				.generateObservationUnitRows(new HashSet<>(Collections.singletonList(2)), new ArrayList<>(), studyGermplasmDtoList,
 					mainDesign, ENTRY_NO,	new HashMap<>(), new HashMap<>());
 			Assert.fail("Expected to throw BVDesignException but didn't.");
 		} catch (final BVDesignException e) {
@@ -164,7 +165,7 @@ public class ExperimentalDesignProcessorTest {
 	}
 
 	private List<String[]> createEntries(final Integer numOfInstances) {
-		final List<String[]> entries = new ArrayList<String[]>();
+		final List<String[]> entries = new ArrayList<>();
 		final String[] headers = new String[] {TRIAL_NO, PLOT_NO, REP_NO,
 			ENTRY_NO};
 
