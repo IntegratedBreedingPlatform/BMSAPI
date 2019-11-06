@@ -63,7 +63,7 @@ public class InstanceValidator {
 		final List<Integer> restrictedInstances = new ArrayList<>();
 		final List<Integer> instancesWithDesign = new ArrayList<>();
 		for (final StudyInstance instance : studyInstances) {
-			if (BooleanUtils.isFalse(instance.isDesignRegenerationAllowed())) {
+			if (BooleanUtils.isFalse(instance.getCanBeDeleted())) {
 				restrictedInstances.add(instance.getInstanceNumber());
 			}
 			if (BooleanUtils.isTrue(instance.isHasExperimentalDesign())) {

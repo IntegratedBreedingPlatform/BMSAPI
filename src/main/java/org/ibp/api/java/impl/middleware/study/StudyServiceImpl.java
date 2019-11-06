@@ -463,7 +463,7 @@ public class StudyServiceImpl implements StudyService {
 						input.getInstanceNumber(), input.getCustomLocationAbbreviation(), input.isHasFieldmap());
 				studyInstance.setHasExperimentalDesign(input.isHasExperimentalDesign());
 				studyInstance.setHasMeasurements(input.isHasMeasurements());
-				studyInstance.setDesignRegenerationAllowed(input.isDesignRegenerationAllowed());
+				studyInstance.setCanBeDeleted(input.getCanBeDeleted());
 				return studyInstance;
 			}
 		};

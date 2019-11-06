@@ -16,7 +16,7 @@ public class StudyInstance {
 	private boolean hasFieldmap;
 	private Boolean hasExperimentalDesign;
 	private Boolean hasMeasurements;
-	private Boolean isDesignRegenerationAllowed;
+	private Boolean canBeDeleted;
 
 	public StudyInstance() {
 
@@ -97,12 +97,12 @@ public class StudyInstance {
 		this.hasMeasurements = hasMeasurements;
 	}
 
-	public Boolean isDesignRegenerationAllowed() {
-		return isDesignRegenerationAllowed;
+	public Boolean getCanBeDeleted() {
+		return canBeDeleted;
 	}
 
-	public void setDesignRegenerationAllowed(final Boolean designRegenerationAllowed) {
-		isDesignRegenerationAllowed = designRegenerationAllowed;
+	public void setCanBeDeleted(final Boolean canBeDeleted) {
+		this.canBeDeleted = canBeDeleted;
 	}
 
 	@Override

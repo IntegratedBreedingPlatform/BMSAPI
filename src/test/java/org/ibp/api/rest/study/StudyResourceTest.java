@@ -48,8 +48,8 @@ public class StudyResourceTest extends ApiUnitTestBase {
 		studyInstance.setHasExperimentalDesign(hasExptDesign);
 		final Boolean hasMeasurements = random.nextBoolean();
 		studyInstance.setHasMeasurements(hasMeasurements);
-		final Boolean canBeRegenerated = random.nextBoolean();
-		studyInstance.setDesignRegenerationAllowed(canBeRegenerated);
+		final Boolean canBeDeleted = random.nextBoolean();
+		studyInstance.setCanBeDeleted(canBeDeleted);
 		Mockito.when(this.studyServiceMW.getStudyInstances(ArgumentMatchers.anyInt()))
 				.thenReturn(Lists.newArrayList(studyInstance));
 
@@ -67,6 +67,6 @@ public class StudyResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].hasFieldmap", Matchers.is(studyInstance.isHasFieldmap())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].hasMeasurements", Matchers.is(studyInstance.isHasMeasurements())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].hasExperimentalDesign", Matchers.is(studyInstance.isHasExperimentalDesign())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].designRegenerationAllowed", Matchers.is(studyInstance.isDesignRegenerationAllowed())));
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].canBeDeleted", Matchers.is(studyInstance.getCanBeDeleted())));
 	}
 }
