@@ -1,5 +1,7 @@
 package org.ibp.api.java.impl.middleware.study;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.fest.util.Collections;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -62,6 +64,23 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			throw new ApiRuntimeException("No Environment Dataset by the supplied studyId [" + studyId + "] was found.");
 		}
 
+	}
+
+	@Override
+	public List<StudyInstance> getStudyInstances(final int studyId) {
+		final List<org.generationcp.middleware.service.impl.study.StudyInstance> studyInstancesMW =
+			this.studyInstanceMiddlewareService.getStudyInstances(studyId);
+
+		final Function<org.generationcp.middleware.service.impl.study.StudyInstance, StudyInstance> transformer =
+			new Function<org.generationcp.middleware.service.impl.study.StudyInstance, StudyInstance>() {
+
+				@Override
+				public StudyInstance apply(final org.generationcp.middleware.service.impl.study.StudyInstance input) {
+					return new StudyInstance(input.getInstanceDbId(), input.getLocationName(), input.getLocationAbbreviation(),
+						input.getInstanceNumber(), input.getCustomLocationAbbreviation(), input.isHasFieldmap());
+				}
+			};
+		return Lists.transform(studyInstancesMW, transformer);
 	}
 
 	@Override
