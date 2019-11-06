@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.design.generator;
 
 import org.generationcp.commons.constant.AppConstants;
+import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
@@ -53,7 +54,7 @@ public class ExperimentDesignGeneratorTest {
 
 		final ExperimentDesign experimentDesign = mainDesign.getDesign();
 
-		Assert.assertEquals(ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN, experimentDesign.getName());
+		Assert.assertEquals(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getBvDesignName(), experimentDesign.getName());
 		Assert.assertEquals("", experimentDesign.getParameterValue(ExperimentDesignGenerator.SEED_PARAM));
 		Assert.assertEquals(String.valueOf(NBLOCK), experimentDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM));
 		Assert.assertEquals(BLOCK_NO, experimentDesign.getParameterValue(ExperimentDesignGenerator.BLOCKFACTOR_PARAM));
@@ -94,7 +95,7 @@ public class ExperimentDesignGeneratorTest {
 
 		final ExperimentDesign experimentDesign = mainDesign.getDesign();
 
-		Assert.assertEquals(ExperimentDesignGenerator.RESOLVABLE_INCOMPLETE_BLOCK_DESIGN, experimentDesign.getName());
+		Assert.assertEquals(ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getBvDesignName(), experimentDesign.getName());
 		Assert.assertEquals("", experimentDesign.getParameterValue(ExperimentDesignGenerator.SEED_PARAM));
 		Assert.assertEquals(String.valueOf(blockSize), experimentDesign.getParameterValue(ExperimentDesignGenerator.BLOCKSIZE_PARAM));
 		Assert.assertEquals(String.valueOf(numberOfTreatments), experimentDesign.getParameterValue(ExperimentDesignGenerator.NTREATMENTS_PARAM));
@@ -139,7 +140,7 @@ public class ExperimentDesignGeneratorTest {
 
 		final ExperimentDesign experimentDesign = mainDesign.getDesign();
 
-		Assert.assertEquals(ExperimentDesignGenerator.RESOLVABLE_INCOMPLETE_BLOCK_DESIGN, experimentDesign.getName());
+		Assert.assertEquals(ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getBvDesignName(), experimentDesign.getName());
 		Assert.assertEquals("", experimentDesign.getParameterValue(ExperimentDesignGenerator.SEED_PARAM));
 		Assert.assertEquals(String.valueOf(blockSize), experimentDesign.getParameterValue(ExperimentDesignGenerator.BLOCKSIZE_PARAM));
 		Assert.assertEquals(String.valueOf(numberOfTreatments), experimentDesign.getParameterValue(ExperimentDesignGenerator.NTREATMENTS_PARAM));
@@ -180,7 +181,7 @@ public class ExperimentDesignGeneratorTest {
 
 		final ExperimentDesign experimentDesign = mainDesign.getDesign();
 
-		Assert.assertEquals(ExperimentDesignGenerator.AUGMENTED_RANDOMIZED_BLOCK_DESIGN, experimentDesign.getName());
+		Assert.assertEquals(ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK.getBvDesignName(), experimentDesign.getName());
 		Assert.assertEquals(String.valueOf(numberOfTreatments), experimentDesign.getParameterValue(ExperimentDesignGenerator.NTREATMENTS_PARAM));
 		Assert.assertEquals(String.valueOf(numberOfControls), experimentDesign.getParameterValue(ExperimentDesignGenerator.NCONTROLS_PARAM));
 		Assert.assertEquals(String.valueOf(numberOfBlocks), experimentDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM));
@@ -228,7 +229,7 @@ public class ExperimentDesignGeneratorTest {
 		Assert.assertEquals(
 			String.valueOf(startingPlotNumber),
 			experimentDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM));
-		Assert.assertEquals(ExperimentDesignGenerator.P_REP_DESIGN, experimentDesign.getName());
+		Assert.assertEquals(ExperimentDesignType.P_REP.getBvDesignName(), experimentDesign.getName());
 
 	}
 

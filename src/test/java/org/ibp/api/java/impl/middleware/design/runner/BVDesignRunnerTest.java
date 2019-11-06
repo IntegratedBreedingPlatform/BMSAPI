@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.design.runner;
 
 import org.generationcp.commons.constant.AppConstants;
+import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.ListItem;
@@ -290,7 +291,7 @@ public class BVDesignRunnerTest {
 
 		final String expectedString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
 			+ "<Templates>"
-			+ "<Template name=\"" + ExperimentDesignGenerator.P_REP_DESIGN + "\"><"
+			+ "<Template name=\"" + ExperimentDesignType.P_REP.getBvDesignName() + "\"><"
 			+ "Parameter name=\"" + ExperimentDesignGenerator.SEED_PARAM + "\" value=\":seedValue\"/>"
 			+ "<Parameter name=\"" + ExperimentDesignGenerator.NTREATMENTS_PARAM + "\" value=\"20\"/>"
 			+ "<Parameter name=\"" + ExperimentDesignGenerator.NBLOCKS_PARAM + "\" value=\"1\"/>"

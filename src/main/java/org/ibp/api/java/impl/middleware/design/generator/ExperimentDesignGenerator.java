@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.design.generator;
 
 import org.generationcp.commons.constant.AppConstants;
+import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.ExperimentDesign;
@@ -48,11 +49,7 @@ public class ExperimentDesignGenerator {
 	public static final String NUMBER_TRIALS_PARAM = "numbertrials";
 	public static final String NREPEATS_PARAM = "nrepeats";
 
-	public static final String RANDOMIZED_COMPLETE_BLOCK_DESIGN = "RandomizedBlock";
-	static final String RESOLVABLE_INCOMPLETE_BLOCK_DESIGN = "ResolvableIncompleteBlock";
-	public static final String RESOLVABLE_ROW_COL_DESIGN = "ResolvableRowColumn";
-	public static final String AUGMENTED_RANDOMIZED_BLOCK_DESIGN = "Augmented";
-	public static final String P_REP_DESIGN = "Prep";
+
 
 	private static final int STARTING_ENTRY_NUMBER = 1;
 
@@ -81,7 +78,7 @@ public class ExperimentDesignGenerator {
 		paramList.add(new ExperimentDesignParameter(ExperimentDesignGenerator.TIMELIMIT_PARAM, timeLimit, null));
 		paramList.add(new ExperimentDesignParameter(ExperimentDesignGenerator.OUTPUTFILE_PARAM, "", null));
 
-		final ExperimentDesign design = new ExperimentDesign(ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN, paramList);
+		final ExperimentDesign design = new ExperimentDesign(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getBvDesignName(), paramList);
 
 		return new MainDesign(design);
 	}
@@ -113,7 +110,7 @@ public class ExperimentDesignGenerator {
 		paramList.add(new ExperimentDesignParameter(ExperimentDesignGenerator.TIMELIMIT_PARAM, timeLimit, null));
 		paramList.add(new ExperimentDesignParameter(ExperimentDesignGenerator.OUTPUTFILE_PARAM, "", null));
 
-		final ExperimentDesign design = new ExperimentDesign(ExperimentDesignGenerator.RESOLVABLE_INCOMPLETE_BLOCK_DESIGN, paramList);
+		final ExperimentDesign design = new ExperimentDesign(ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK.getBvDesignName(), paramList);
 
 		return new MainDesign(design);
 	}
@@ -148,7 +145,7 @@ public class ExperimentDesignGenerator {
 		paramList.add(new ExperimentDesignParameter(ExperimentDesignGenerator.TIMELIMIT_PARAM, timeLimit, null));
 		paramList.add(new ExperimentDesignParameter(ExperimentDesignGenerator.OUTPUTFILE_PARAM, "", null));
 
-		final ExperimentDesign design = new ExperimentDesign(ExperimentDesignGenerator.RESOLVABLE_ROW_COL_DESIGN, paramList);
+		final ExperimentDesign design = new ExperimentDesign(ExperimentDesignType.ROW_COL.getBvDesignName(), paramList);
 
 		return new MainDesign(design);
 	}
@@ -174,7 +171,7 @@ public class ExperimentDesignGenerator {
 
 		this.addInitialTreatmentNumberIfAvailable(STARTING_ENTRY_NUMBER, paramList);
 
-		final ExperimentDesign design = new ExperimentDesign(ExperimentDesignGenerator.AUGMENTED_RANDOMIZED_BLOCK_DESIGN, paramList);
+		final ExperimentDesign design = new ExperimentDesign(ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK.getBvDesignName(), paramList);
 
 		return new MainDesign(design);
 	}
@@ -202,7 +199,7 @@ public class ExperimentDesignGenerator {
 		paramList.add(new ExperimentDesignParameter(ExperimentDesignGenerator.TIMELIMIT_PARAM, timeLimit, null));
 		paramList.add(new ExperimentDesignParameter(ExperimentDesignGenerator.OUTPUTFILE_PARAM, "", null));
 
-		final ExperimentDesign design = new ExperimentDesign(ExperimentDesignGenerator.P_REP_DESIGN, paramList);
+		final ExperimentDesign design = new ExperimentDesign(ExperimentDesignType.P_REP.getBvDesignName(), paramList);
 
 		return new MainDesign(design);
 	}

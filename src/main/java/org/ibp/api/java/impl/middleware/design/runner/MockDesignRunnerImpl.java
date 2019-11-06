@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.ExperimentDesign;
 import org.ibp.api.domain.design.ListItem;
@@ -57,14 +58,14 @@ public class MockDesignRunnerImpl implements DesignRunner {
 		final List<List<String>> tfValuesListForCSV = this.getTreatmentFactorValuesCombinations(experimentDesign);
 		final List<String[]> csvLines = new ArrayList<>();
 
-		if (ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN.equals(experimentDesign.getName())) {
+		if (ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getBvDesignName().equals(experimentDesign.getName())) {
 			csvLines
 				.addAll(this.createDesignDataForRandomizedBlockDesign(design, numberTrials, initPlotNoParam, replications, entryNumbers,
 					tfValuesListForCSV));
-		} else if (ExperimentDesignGenerator.RESOLVABLE_ROW_COL_DESIGN.equals(experimentDesign.getName())) {
+		} else if (ExperimentDesignType.ROW_COL.getBvDesignName().equals(experimentDesign.getName())) {
 			csvLines.addAll(
 				this.createDesignDataForResolvableRowColumnDesign(design, numberTrials, initPlotNoParam, replications, entryNumbers));
-		} else if (ExperimentDesignGenerator.P_REP_DESIGN.equals(experimentDesign.getName())) {
+		} else if (ExperimentDesignType.P_REP.getBvDesignName().equals(experimentDesign.getName())) {
 			csvLines.addAll(this.createDesignDataForPRepDesign(design, numberTrials, blockSize, initPlotNoParam, entryNumbers));
 		} else {
 			// Default data
@@ -169,7 +170,7 @@ public class MockDesignRunnerImpl implements DesignRunner {
 
 		for (int r = 1; r <= rows; r++) {
 			for (int c = 1; c <= cols; c++) {
-				rowColTuples.add(new ImmutablePair<Integer, Integer>(r, c));
+				rowColTuples.add(new ImmutablePair<>(r, c));
 			}
 		}
 
@@ -257,7 +258,7 @@ public class MockDesignRunnerImpl implements DesignRunner {
 	public List<List<String>> getTreatmentFactorValuesCombinations(final ExperimentDesign experimentDesign) {
 		final List<ListItem> levelList = experimentDesign.getParameterList(ExperimentDesignGenerator.LEVELS_PARAM);
 		final List<List<String>> tfValuesListForCSV = new ArrayList<>();
-		if (ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN.equals(experimentDesign.getName()) && levelList.size() != 1) {
+		if (ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getBvDesignName().equals(experimentDesign.getName()) && levelList.size() != 1) {
 			//Create the lists of treatment factor values
 			final List<List<String>> tfValuesList = new ArrayList<>();
 			for (int tfIndex = 0; tfIndex < levelList.size() - 1; tfIndex++) {
@@ -298,7 +299,7 @@ public class MockDesignRunnerImpl implements DesignRunner {
 
 	private int getNumberOfTreatments(final MainDesign design) {
 		final ExperimentDesign experimentDesign = design.getDesign();
-		if (ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN.equals(experimentDesign.getName())) {
+		if (ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getBvDesignName().equals(experimentDesign.getName())) {
 			final List<ListItem> levelList = experimentDesign.getParameterList(ExperimentDesignGenerator.LEVELS_PARAM);
 			return Integer.parseInt(levelList.get(levelList.size() - 1).getValue());
 		} else {
@@ -308,11 +309,11 @@ public class MockDesignRunnerImpl implements DesignRunner {
 
 	private int getNumberOfReplications(final MainDesign design) {
 		final ExperimentDesign experimentDesign = design.getDesign();
-		if (ExperimentDesignGenerator.RANDOMIZED_COMPLETE_BLOCK_DESIGN.equals(experimentDesign.getName())) {
+		if (ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getBvDesignName().equals(experimentDesign.getName())) {
 			return Integer.parseInt(experimentDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM));
-		} else if (ExperimentDesignGenerator.AUGMENTED_RANDOMIZED_BLOCK_DESIGN.equals(experimentDesign.getName())) {
+		} else if (ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK.getBvDesignName().equals(experimentDesign.getName())) {
 			return Integer.parseInt(experimentDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM));
-		} else if (ExperimentDesignGenerator.P_REP_DESIGN.equals(experimentDesign.getName())) {
+		} else if (ExperimentDesignType.P_REP.getBvDesignName().equals(experimentDesign.getName())) {
 			// If P-rep design, the replicates number is specified in nrepeats list items.
 			return 0;
 		} else {
