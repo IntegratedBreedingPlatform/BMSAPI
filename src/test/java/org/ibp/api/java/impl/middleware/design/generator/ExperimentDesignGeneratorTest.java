@@ -9,6 +9,7 @@ import org.ibp.api.domain.design.ExperimentDesignParameter;
 import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.type.StudyGermplasmTestDataGenerator;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,8 +43,11 @@ public class ExperimentDesignGeneratorTest {
 		final List<String> levels = new ArrayList<>(Arrays.asList("Level1", "Level2"));
 		final Integer initialPlotNumber = 99;
 
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setNumberOfBlocks(NBLOCK);
+		experimentalDesignInput.setStartingPlotNo(initialPlotNumber);
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createRandomizedCompleteBlockDesign(NBLOCK, BLOCK_NO, PLOT_NO, initialPlotNumber, TermId.ENTRY_NO.name(),
+			.createRandomizedCompleteBlockDesign(experimentalDesignInput, BLOCK_NO, PLOT_NO, TermId.ENTRY_NO.name(),
 				treatmentFactors,
 				levels);
 
@@ -77,9 +81,16 @@ public class ExperimentDesignGeneratorTest {
 		final Integer nBLatin = 1;
 		final String replatinGroups = "sample1,sample2";
 
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setBlockSize(blockSize);
+		experimentalDesignInput.setReplicationsCount(numberOfReplicates);
+		experimentalDesignInput.setStartingPlotNo(initialPlotNumber);
+		experimentalDesignInput.setNblatin(nBLatin);
+		experimentalDesignInput.setReplatinGroups(replatinGroups);
+		experimentalDesignInput.setUseLatenized(false);
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createResolvableIncompleteBlockDesign(blockSize, numberOfTreatments, numberOfReplicates, ENTRY_NO, REP_NO, BLOCK_NO,
-				PLOT_NO, initialPlotNumber, nBLatin, replatinGroups, false);
+			.createResolvableIncompleteBlockDesign(experimentalDesignInput, numberOfTreatments, ENTRY_NO, REP_NO, BLOCK_NO,
+				PLOT_NO);
 
 		final ExperimentDesign experimentDesign = mainDesign.getDesign();
 
@@ -115,9 +126,16 @@ public class ExperimentDesignGeneratorTest {
 		final Integer nBLatin = 1;
 		final String replatinGroups = "sample1,sample2";
 
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setBlockSize(blockSize);
+		experimentalDesignInput.setReplicationsCount(numberOfReplicates);
+		experimentalDesignInput.setStartingPlotNo(initialPlotNumber);
+		experimentalDesignInput.setNblatin(nBLatin);
+		experimentalDesignInput.setReplatinGroups(replatinGroups);
+		experimentalDesignInput.setUseLatenized(true);
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createResolvableIncompleteBlockDesign(blockSize, numberOfTreatments, numberOfReplicates, ENTRY_NO, REP_NO, BLOCK_NO,
-				PLOT_NO, initialPlotNumber, nBLatin, replatinGroups, true);
+			.createResolvableIncompleteBlockDesign(experimentalDesignInput, numberOfTreatments, ENTRY_NO, REP_NO, BLOCK_NO,
+				PLOT_NO);
 
 		final ExperimentDesign experimentDesign = mainDesign.getDesign();
 
@@ -153,9 +171,12 @@ public class ExperimentDesignGeneratorTest {
 		final Integer numberOfControls = 11;
 		final Integer startingPlotNumber = 1;
 
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setNumberOfBlocks(numberOfBlocks);
+		experimentalDesignInput.setStartingPlotNo(startingPlotNumber);
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.createAugmentedRandomizedBlockDesign(
-				numberOfBlocks, numberOfTreatments, numberOfControls, startingPlotNumber, ENTRY_NO, BLOCK_NO, PLOT_NO);
+				experimentalDesignInput, numberOfTreatments, numberOfControls, ENTRY_NO, BLOCK_NO, PLOT_NO);
 
 		final ExperimentDesign experimentDesign = mainDesign.getDesign();
 
@@ -182,9 +203,12 @@ public class ExperimentDesignGeneratorTest {
 		final Integer startingPlotNumber = 1;
 		final List<ListItem> nRepeatsListItem = Collections.singletonList(new ListItem("1"));
 
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setNumberOfBlocks(numberOfBlocks);
+		experimentalDesignInput.setStartingPlotNo(startingPlotNumber);
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createPRepDesign(
-				numberOfBlocks, numberOfTreatments, nRepeatsListItem, ENTRY_NO, BLOCK_NO, PLOT_NO, startingPlotNumber);
+			.createPRepDesign(experimentalDesignInput,
+				numberOfTreatments, nRepeatsListItem, ENTRY_NO, BLOCK_NO, PLOT_NO);
 
 		final ExperimentDesign experimentDesign = mainDesign.getDesign();
 

@@ -67,6 +67,6 @@ public class StudyResourceTest extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].hasFieldmap", Matchers.is(studyInstance.isHasFieldmap())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].hasMeasurements", Matchers.is(studyInstance.isHasMeasurements())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].hasExperimentalDesign", Matchers.is(studyInstance.isHasExperimentalDesign())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].isDesignRegenerationAllowed", Matchers.is(studyInstance.isDesignRegenerationAllowed())));
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].designRegenerationAllowed", Matchers.is(studyInstance.isDesignRegenerationAllowed())));
 	}
 }

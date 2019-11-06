@@ -82,7 +82,6 @@ public class PRepDesignTypeServiceImplTest {
 		final Integer blockSize = 5;
 		final Integer replicationCount = 3;
 		final Integer replicationPercentage = 50;
-		final Integer numberOfTrials = 1;
 		final Integer startingPlotNumber = 1;
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
@@ -91,6 +90,7 @@ public class PRepDesignTypeServiceImplTest {
 		experimentalDesignInput.setBlockSize(blockSize);
 		experimentalDesignInput.setReplicationPercentage(replicationPercentage);
 		experimentalDesignInput.setReplicationsCount(replicationCount);
+		experimentalDesignInput.setStartingPlotNo(startingPlotNumber);
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
 		experimentalDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
 
@@ -98,9 +98,9 @@ public class PRepDesignTypeServiceImplTest {
 			.createReplicationListItemForPRepDesign(studyGermplasmDtoList, replicationPercentage, replicationCount))
 			.thenReturn(replicationListItems);
 		when(this.experimentDesignGenerator
-			.createPRepDesign(blockSize, studyGermplasmDtoList.size(), replicationListItems,
+			.createPRepDesign(experimentalDesignInput, studyGermplasmDtoList.size(), replicationListItems,
 				ENTRY_NO,
-				BLOCK_NO, PLOT_NO, startingPlotNumber)).thenReturn(mainDesign);
+				BLOCK_NO, PLOT_NO)).thenReturn(mainDesign);
 		when(this.measurementVariableGenerator
 			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, PRepDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				PRepDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))

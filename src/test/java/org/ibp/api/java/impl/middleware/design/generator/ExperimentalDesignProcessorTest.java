@@ -1,21 +1,18 @@
 package org.ibp.api.java.impl.middleware.design.generator;
 
-import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.BVDesignOutput;
-import org.ibp.api.domain.design.ExperimentDesign;
-import org.ibp.api.domain.design.ExperimentDesignParameter;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.impl.middleware.design.type.StudyGermplasmTestDataGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.mockito.ArgumentMatchers.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -51,16 +48,18 @@ public class ExperimentalDesignProcessorTest {
 	@Mock
 	private DesignRunner designRunner;
 
-	@Mock
-	private ExperimentDesignGenerator experimentDesignGenerator;
+	private ExperimentDesignGenerator experimentDesignGenerator = new ExperimentDesignGenerator();
 
 	@InjectMocks
 	private ExperimentalDesignProcessor experimentalDesignProcessor;
 
+	private ExperimentalDesignInput designInput;
+
 	@Before
 	public void init() {
-		Mockito.doReturn(getTestDesign()).when(this.experimentDesignGenerator).createRandomizedCompleteBlockDesign(anyInt(), eq(REP_NO), eq(PLOT_NO),
-			anyInt(), eq(TermId.ENTRY_NO.name()), anyList(), anyList());
+		this.designInput = new ExperimentalDesignInput();
+		this.designInput.setNumberOfBlocks(2);
+		this.designInput.setStartingPlotNo(301);
 	}
 
 	@Test
@@ -89,8 +88,8 @@ public class ExperimentalDesignProcessorTest {
 	public void testGenerateObservationUnitRows() throws BVDesignException, IOException {
 		final MainDesign mainDesign =
 			this.experimentDesignGenerator
-				.createRandomizedCompleteBlockDesign(2, REP_NO, PLOT_NO,
-					301, TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>());
+				.createRandomizedCompleteBlockDesign(this.designInput, REP_NO, PLOT_NO,
+					TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>());
 
 		final List<Integer> trialInstances = Arrays.asList(2, 4, 6);
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(trialInstances);
@@ -116,7 +115,6 @@ public class ExperimentalDesignProcessorTest {
 		Assert.assertEquals(NUMBER_OF_REPS * NUMBER_OF_ENTRIES, instancesRowMap.get(4).size());
 		Assert.assertEquals(NUMBER_OF_REPS * NUMBER_OF_ENTRIES, instancesRowMap.get(6).size());
 
-
 		Assert.assertEquals(
 			String.valueOf(trialInstancesForDesignGeneration.size()),
 			mainDesign.getDesign().getParameterValue(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM));
@@ -127,8 +125,8 @@ public class ExperimentalDesignProcessorTest {
 	public void testGenerateMeasurementsBVDesignError() throws IOException {
 		final MainDesign mainDesign =
 			this.experimentDesignGenerator
-				.createRandomizedCompleteBlockDesign(2, REP_NO, PLOT_NO,
-					301,  TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>());
+				.createRandomizedCompleteBlockDesign(this.designInput, REP_NO, PLOT_NO,
+					TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>());
 		Mockito.doReturn(new BVDesignOutput(1)).when(this.designRunner)
 			.runBVDesign(mainDesign);
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2));
@@ -148,8 +146,8 @@ public class ExperimentalDesignProcessorTest {
 	public void testGenerateMeasurementsBVDesignIOException() throws IOException {
 		final MainDesign mainDesign =
 			this.experimentDesignGenerator
-				.createRandomizedCompleteBlockDesign(2, REP_NO, PLOT_NO,
-					301, TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>());
+				.createRandomizedCompleteBlockDesign(this.designInput, REP_NO, PLOT_NO,
+					TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>());
 		Mockito.doThrow(new IOException()).when(this.designRunner)
 			.runBVDesign(mainDesign);
 		try {
@@ -194,10 +192,4 @@ public class ExperimentalDesignProcessorTest {
 		return entries;
 	}
 
-	private MainDesign getTestDesign() {
-		final List<ExperimentDesignParameter> paramList = new ArrayList<>();
-		final ExperimentDesign design = new ExperimentDesign(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getBvDesignName(), paramList);
-		return new MainDesign(design);
-
-	}
 }

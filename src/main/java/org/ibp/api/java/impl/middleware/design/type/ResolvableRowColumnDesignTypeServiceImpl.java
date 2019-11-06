@@ -54,11 +54,6 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentalDes
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
-		final int nTreatments = studyGermplasmDtoList.size();
-		final Integer rows = experimentalDesignInput.getRowsPerReplications();
-		final Integer cols = experimentalDesignInput.getColsPerReplications();
-		final Integer replicates = experimentalDesignInput.getReplicationsCount();
-
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
 				.collect(Collectors.toMap(StandardVariable::getId, standardVariable -> standardVariable));
@@ -69,15 +64,12 @@ public class ResolvableRowColumnDesignTypeServiceImpl implements ExperimentalDes
 		final String rowName = standardVariablesMap.get(TermId.ROW.getId()).getName();
 		final String colName = standardVariablesMap.get(TermId.COL.getId()).getName();
 
+		final int nTreatments = studyGermplasmDtoList.size();
 		ExperimentalDesignUtil.setReplatinGroups(experimentalDesignInput);
 
-		final Integer plotNo = experimentalDesignInput.getStartingPlotNo() == null? 1 : experimentalDesignInput.getStartingPlotNo();
-
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createResolvableRowColDesign(nTreatments, replicates, rows, cols, entryNumberName,
-				replicateNumberName, rowName, colName, plotNumberName, plotNo,
-				experimentalDesignInput.getNrlatin(), experimentalDesignInput.getNclatin(), experimentalDesignInput.getReplatinGroups(),
-				experimentalDesignInput.getUseLatenized());
+			.createResolvableRowColDesign(experimentalDesignInput, nTreatments, entryNumberName,
+				replicateNumberName, rowName, colName, plotNumberName);
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		return this.experimentalDesignProcessor

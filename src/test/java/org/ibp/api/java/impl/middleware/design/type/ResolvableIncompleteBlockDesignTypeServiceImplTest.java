@@ -81,7 +81,6 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 		final Integer blockSize = 5;
 		final Integer replicationsCount = 6;
 		final Integer startingPlotNumber = 1;
-		final Integer numberOfTrials = 3;
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
@@ -94,10 +93,8 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 		experimentalDesignInput.setUseLatenized(false);
 
 		when(this.experimentDesignGenerator
-			.createResolvableIncompleteBlockDesign(blockSize, studyGermplasmDtoList.size(), replicationsCount,
-				ENTRY_NO, REP_NO, BLOCK_NO, PLOT_NO, startingPlotNumber, experimentalDesignInput.getNblatin(),
-				experimentalDesignInput.getReplatinGroups(), experimentalDesignInput.getUseLatenized())).thenReturn(mainDesign);
-		when(this.measurementVariableGenerator
+			.createResolvableIncompleteBlockDesign(experimentalDesignInput, studyGermplasmDtoList.size(),
+				ENTRY_NO, REP_NO, BLOCK_NO, PLOT_NO)).thenReturn(mainDesign);	when(this.measurementVariableGenerator
 			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, ResolvableIncompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				ResolvableIncompleteBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
 			.thenReturn(measurementVariables);
@@ -126,7 +123,6 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 		final Integer blockSize = 5;
 		final Integer replicationsCount = 6;
 		final Integer startingPlotNumber = 1;
-		final Integer numberOfTrials = 3;
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
@@ -142,9 +138,8 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 		experimentalDesignInput.setUseLatenized(true);
 
 		when(this.experimentDesignGenerator
-			.createResolvableIncompleteBlockDesign(blockSize, studyGermplasmDtoList.size(), replicationsCount,
-				ENTRY_NO, REP_NO, BLOCK_NO, PLOT_NO, startingPlotNumber, experimentalDesignInput.getNblatin(),
-				String.valueOf(replicationsCount), experimentalDesignInput.getUseLatenized())).thenReturn(mainDesign);
+			.createResolvableIncompleteBlockDesign(experimentalDesignInput, studyGermplasmDtoList.size(),
+				ENTRY_NO, REP_NO, BLOCK_NO, PLOT_NO)).thenReturn(mainDesign);
 		when(this.measurementVariableGenerator
 			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, ResolvableIncompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				ResolvableIncompleteBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES_LATINIZED, experimentalDesignInput))

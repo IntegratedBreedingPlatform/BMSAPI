@@ -103,8 +103,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 		experimentalDesignInput.setTreatmentFactorsData(this.createTreatmentFactorsDataMap());
 
 		when(this.experimentDesignGenerator
-			.createRandomizedCompleteBlockDesign(eq(replicationCount), eq(REP_NO), eq(PLOT_NO),
-				eq(startingPlotNumber),
+			.createRandomizedCompleteBlockDesign(eq(experimentalDesignInput), eq(REP_NO), eq(PLOT_NO),
 				eq(ENTRY_NO), any(List.class), any(List.class))).thenReturn(mainDesign);
 		when(this.measurementVariableGenerator
 			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, RandomizeCompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,

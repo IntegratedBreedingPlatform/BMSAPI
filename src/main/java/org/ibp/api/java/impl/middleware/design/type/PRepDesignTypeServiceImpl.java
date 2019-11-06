@@ -50,7 +50,6 @@ public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService 
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
 		final int nTreatments = studyGermplasmDtoList.size();
-		final int blockSize = experimentalDesignInput.getBlockSize();
 		final int replicationPercentage = experimentalDesignInput.getReplicationPercentage();
 		final int replicationNumber = experimentalDesignInput.getReplicationsCount();
 
@@ -62,14 +61,12 @@ public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService 
 		final String blockNumberName = standardVariablesMap.get(TermId.BLOCK_NO.getId()).getName();
 		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
 
-		final Integer plotNo = experimentalDesignInput.getStartingPlotNo() == null? 1 : experimentalDesignInput.getStartingPlotNo();
-
 		final List<ListItem> replicationListItems =
 			this.experimentDesignGenerator
 				.createReplicationListItemForPRepDesign(studyGermplasmDtoList, replicationPercentage, replicationNumber);
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createPRepDesign(blockSize, nTreatments, replicationListItems, entryNumberName,
-				blockNumberName, plotNumberName, plotNo);
+			.createPRepDesign(experimentalDesignInput, nTreatments, replicationListItems, entryNumberName,
+				blockNumberName, plotNumberName);
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		return this.experimentalDesignProcessor

@@ -92,8 +92,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 		experimentalDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
 
 		when(this.experimentDesignGenerator
-			.createAugmentedRandomizedBlockDesign(numberOfBlocks, numberOfTreatments, numberOfControls,
-				startingPlotNumber,
+			.createAugmentedRandomizedBlockDesign(experimentalDesignInput, numberOfTreatments, numberOfControls,
 				ENTRY_NO,
 				BLOCK_NO, PLOT_NO)).thenReturn(mainDesign);
 		when(this.measurementVariableGenerator

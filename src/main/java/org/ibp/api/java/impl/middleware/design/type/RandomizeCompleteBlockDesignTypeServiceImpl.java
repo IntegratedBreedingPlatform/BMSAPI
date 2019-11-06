@@ -61,8 +61,6 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
-		final Integer block = experimentalDesignInput.getReplicationsCount();
-
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
 				.collect(Collectors.toMap(StandardVariable::getId, standardVariable -> standardVariable));
@@ -80,10 +78,9 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 		treatmentFactors.add(entryNumberName);
 		treatmentLevels.add(Integer.toString(studyGermplasmDtoList.size()));
 
-		final Integer plotNo = experimentalDesignInput.getStartingPlotNo() == null ? 1 : experimentalDesignInput.getStartingPlotNo();
-
+		experimentalDesignInput.setNumberOfBlocks(experimentalDesignInput.getReplicationsCount());
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createRandomizedCompleteBlockDesign(block, replicateNumberName, plotNumberName, plotNo,
+			.createRandomizedCompleteBlockDesign(experimentalDesignInput, replicateNumberName, plotNumberName,
 				entryNumberName, treatmentFactors,
 				treatmentLevels);
 
@@ -125,7 +122,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 			final List<Integer> treatmentFactorIds = new ArrayList<>(treatmentFactorLevelToLabelIdMap.values());
 			treatmentFactorIds.addAll(treatmentFactorLevelToLabelIdMap.keySet());
 				final List<StandardVariable> standardVariables = this.ontologyDataManager.getStandardVariables(treatmentFactorIds, programUUID);
-			Map<Integer, StandardVariable> standardVariableMap =
+			final Map<Integer, StandardVariable> standardVariableMap =
 				standardVariables.stream().collect(Collectors.toMap(StandardVariable::getId,
 					Function.identity()));
 

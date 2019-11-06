@@ -53,8 +53,6 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
 		final int nTreatments = studyGermplasmDtoList.size();
-		final Integer blockSize = experimentalDesignInput.getBlockSize();
-		final Integer replicates = experimentalDesignInput.getReplicationsCount();
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
@@ -67,13 +65,9 @@ public class ResolvableIncompleteBlockDesignTypeServiceImpl implements Experimen
 
 		ExperimentalDesignUtil.setReplatinGroups(experimentalDesignInput);
 
-		final Integer plotNo = experimentalDesignInput.getStartingPlotNo() == null? 1 : experimentalDesignInput.getStartingPlotNo();
-
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createResolvableIncompleteBlockDesign(blockSize, nTreatments, replicates, entryNumberName,
-				replicateNumberName, blockNumberName, plotNumberName, plotNo,
-				experimentalDesignInput.getNblatin(),
-				experimentalDesignInput.getReplatinGroups(), experimentalDesignInput.getUseLatenized());
+			.createResolvableIncompleteBlockDesign(experimentalDesignInput, nTreatments, entryNumberName,
+				replicateNumberName, blockNumberName, plotNumberName);
 
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		return this.experimentalDesignProcessor

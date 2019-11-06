@@ -6,6 +6,7 @@ import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -120,10 +121,15 @@ public class BVDesignRunnerTest {
 
 	@Test
 	public void testGetXMLStringForResolvableIncompleteBlockDesign() {
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setBlockSize(6);
+		experimentalDesignInput.setReplicationsCount(2);
+		experimentalDesignInput.setStartingPlotNo(301);
+		experimentalDesignInput.setNblatin(0);
+		experimentalDesignInput.setUseLatenized(false);
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createResolvableIncompleteBlockDesign(6, 24, 2, "Treat", "Reps",
-				"Subblocks", "Plots", 301, null, "0",
-				false);
+			.createResolvableIncompleteBlockDesign(experimentalDesignInput, 24, "Treat", "Reps",
+				"Subblocks", "Plots");
 
 		final String expectedString =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Templates><Template name=\"ResolvableIncompleteBlock\">"
@@ -150,9 +156,17 @@ public class BVDesignRunnerTest {
 
 	@Test
 	public void testGetXMLStringForResolvableRowColExpDesign() {
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setReplicationsCount(2);
+		experimentalDesignInput.setRowsPerReplications(5);
+		experimentalDesignInput.setColsPerReplications(10);
+		experimentalDesignInput.setStartingPlotNo(301);
+		experimentalDesignInput.setNrlatin(0);
+		experimentalDesignInput.setNclatin(0);
+		experimentalDesignInput.setUseLatenized(false);
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createResolvableRowColDesign(50, 2, 5, 10, "Treat", "Reps",
-				"Rows", "Columns", "Plots", 301, null, 0, "0", false);
+			.createResolvableRowColDesign(experimentalDesignInput, 50, "Treat", "Reps",
+				"Rows", "Columns", "Plots");
 
 		final String expectedString =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Templates><Template name=\"ResolvableRowColumn\">"
@@ -182,10 +196,15 @@ public class BVDesignRunnerTest {
 
 	@Test
 	public void testGetXMLStringForResolvableIncompleteBlockDesignWithEntryNumber() {
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setBlockSize(6);
+		experimentalDesignInput.setReplicationsCount(2);
+		experimentalDesignInput.setStartingPlotNo(301);
+		experimentalDesignInput.setNblatin(0);
+		experimentalDesignInput.setUseLatenized(false);
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createResolvableIncompleteBlockDesign(6, 24, 2, "ENTRY_NO",
-				"Reps", "Subblocks", "Plots", 301, 0, "",
-				false);
+			.createResolvableIncompleteBlockDesign(experimentalDesignInput, 24, "ENTRY_NO",
+				"Reps", "Subblocks", "Plots");
 
 		final String expectedString =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Templates><Template name=\"ResolvableIncompleteBlock\">"
@@ -212,9 +231,17 @@ public class BVDesignRunnerTest {
 
 	@Test
 	public void testGetXMLStringForResolvableRowColumnDesignWithEntryNumber() {
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setReplicationsCount(2);
+		experimentalDesignInput.setRowsPerReplications(5);
+		experimentalDesignInput.setColsPerReplications(10);
+		experimentalDesignInput.setStartingPlotNo(301);
+		experimentalDesignInput.setNrlatin(0);
+		experimentalDesignInput.setNclatin(0);
+		experimentalDesignInput.setUseLatenized(false);
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createResolvableRowColDesign(24, 2, 5, 10, "ENTRY_NO",
-				"Reps", "Rows", "Columns", "Plots", 301, 0, 0, "", false);
+			.createResolvableRowColDesign(experimentalDesignInput, 24, "ENTRY_NO",
+				"Reps", "Rows", "Columns", "Plots");
 
 		final String expectedString =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Templates><Template name=\"ResolvableRowColumn\">"
@@ -255,8 +282,11 @@ public class BVDesignRunnerTest {
 
 		final int initialPlotNumber = 99;
 
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setStartingPlotNo(initialPlotNumber);
+		experimentalDesignInput.setNumberOfBlocks(numberOfBlocks);
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createPRepDesign(numberOfBlocks, nTreatments, nRepeatsListItem, treatmentFactor, blockFactor, plotFactor, initialPlotNumber);
+			.createPRepDesign(experimentalDesignInput, nTreatments, nRepeatsListItem, treatmentFactor, blockFactor, plotFactor);
 
 		final String expectedString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
 			+ "<Templates>"
@@ -314,8 +344,11 @@ public class BVDesignRunnerTest {
 		levels.add("24");
 		levels.add("3");
 
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setNumberOfBlocks(6);
+		experimentalDesignInput.setStartingPlotNo(301);
 		return this.experimentDesignGenerator
-			.createRandomizedCompleteBlockDesign(6, "Reps", "Plots", 301, TermId.ENTRY_NO.name(), treatmentFactors, levels);
+			.createRandomizedCompleteBlockDesign(experimentalDesignInput, "Reps", "Plots", TermId.ENTRY_NO.name(), treatmentFactors, levels);
 	}
 
 }
