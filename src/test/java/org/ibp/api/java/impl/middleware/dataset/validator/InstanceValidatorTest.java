@@ -117,12 +117,12 @@ public class InstanceValidatorTest {
 		for (int i = 1; i <= 3; i++) {
 			final StudyInstance instance = new StudyInstance();
 			instance.setInstanceNumber(i);
-			instance.setDesignRegenerationAllowed(true);
+			instance.setDesignRegenerationAllowed(Boolean.TRUE);
 			instance.setHasExperimentalDesign(true);
 			instances.add(instance);
 		}
-		instances.get(0).setDesignRegenerationAllowed(false);
-		instances.get(1).setDesignRegenerationAllowed(false);
+		instances.get(0).setDesignRegenerationAllowed(Boolean.FALSE);
+		instances.get(1).setDesignRegenerationAllowed(Boolean.FALSE);
 		Mockito.doReturn(instances).when(this.middlewareStudyService).getStudyInstances(studyId);
 
 		try {
@@ -199,10 +199,10 @@ public class InstanceValidatorTest {
 		for (int i = 1; i <= 3; i++) {
 			final StudyInstance instance = new StudyInstance();
 			instance.setInstanceNumber(i);
-			instance.setDesignRegenerationAllowed(true);
+			instance.setDesignRegenerationAllowed(Boolean.TRUE);
 			instances.add(instance);
 		}
-		instances.get(0).setDesignRegenerationAllowed(false);
+		instances.get(0).setDesignRegenerationAllowed(Boolean.FALSE);
 		Mockito.doReturn(instances).when(this.middlewareStudyService).getStudyInstances(studyId);
 
 		this.instanceValidator.validateForDesignGeneration(studyId, new HashSet<>(Arrays.asList(1,2)));
@@ -221,7 +221,7 @@ public class InstanceValidatorTest {
 		for (int i = 1; i <= 3; i++) {
 			final StudyInstance instance = new StudyInstance();
 			instance.setInstanceNumber(i);
-			instance.setDesignRegenerationAllowed(true);
+			instance.setDesignRegenerationAllowed(Boolean.TRUE);
 			instances.add(instance);
 		}
 		Mockito.doReturn(instances).when(this.middlewareStudyService).getStudyInstances(studyId);

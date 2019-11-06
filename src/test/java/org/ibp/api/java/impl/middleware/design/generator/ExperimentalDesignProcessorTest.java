@@ -1,16 +1,21 @@
 package org.ibp.api.java.impl.middleware.design.generator;
 
+import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.BVDesignOutput;
+import org.ibp.api.domain.design.ExperimentDesign;
+import org.ibp.api.domain.design.ExperimentDesignParameter;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.impl.middleware.design.type.StudyGermplasmTestDataGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import static org.mockito.ArgumentMatchers.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -51,6 +56,12 @@ public class ExperimentalDesignProcessorTest {
 
 	@InjectMocks
 	private ExperimentalDesignProcessor experimentalDesignProcessor;
+
+	@Before
+	public void init() {
+		Mockito.doReturn(getTestDesign()).when(this.experimentDesignGenerator).createRandomizedCompleteBlockDesign(anyInt(), eq(REP_NO), eq(PLOT_NO),
+			anyInt(), eq(TermId.ENTRY_NO.name()), anyList(), anyList());
+	}
 
 	@Test
 	public void testResolveMappedEntryNumber() {
@@ -99,7 +110,6 @@ public class ExperimentalDesignProcessorTest {
 			final Integer trialInstance = row.getTrialInstance();
 			instancesRowMap.putIfAbsent(trialInstance, new ArrayList<>());
 			instancesRowMap.get(trialInstance).add(row);
-			// FIXME perform assertions on values wihin row
 		}
 		Assert.assertEquals(trialInstances, new ArrayList<>(instancesRowMap.keySet()));
 		Assert.assertEquals(NUMBER_OF_REPS * NUMBER_OF_ENTRIES, instancesRowMap.get(2).size());
@@ -182,5 +192,12 @@ public class ExperimentalDesignProcessorTest {
 			}
 		}
 		return entries;
+	}
+
+	private MainDesign getTestDesign() {
+		final List<ExperimentDesignParameter> paramList = new ArrayList<>();
+		final ExperimentDesign design = new ExperimentDesign(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getBvDesignName(), paramList);
+		return new MainDesign(design);
+
 	}
 }

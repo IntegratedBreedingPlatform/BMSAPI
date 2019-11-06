@@ -13,6 +13,7 @@ import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.annotation.Resource;
@@ -31,7 +32,7 @@ public class EntryListOrderDesignTypeServiceImplTest {
 	public static final String PLOT_NO = "PLOT_NO";
 	public static final String ENTRY_NO = "ENTRY_NO";
 
-	@Resource
+	@Mock
 	private MeasurementVariableGenerator measurementVariableGenerator;
 
 	@InjectMocks
@@ -64,7 +65,7 @@ public class EntryListOrderDesignTypeServiceImplTest {
 		final List<ObservationUnitRow> result =
 			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
-		assertEquals(5, result.size());
+		assertEquals(5 * trialInstancesForDesignGeneration.size(), result.size());
 		assertEquals(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()),
 			result.get(0).getVariables().get(String.valueOf(TermId.ENTRY_TYPE.getId())).getValue());
 		assertEquals(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()),
@@ -107,7 +108,7 @@ public class EntryListOrderDesignTypeServiceImplTest {
 		final List<ObservationUnitRow> result =
 			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
-		assertEquals(8, result.size());
+		assertEquals(8 * trialInstancesForDesignGeneration.size(), result.size());
 		assertEquals(String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()),
 			result.get(0).getVariables().get(String.valueOf(TermId.ENTRY_TYPE.getId())).getValue());
 		assertEquals(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()),
