@@ -14,6 +14,7 @@ import org.ibp.api.domain.design.ExperimentDesignParameter;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.runner.DesignRunner;
+import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewDesignParameter;
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -53,7 +54,7 @@ public class ExperimentalDesignProcessor {
 		final Integer numberOfTrials = trialInstanceForDesignGeneration.size();
 		// Specify number of study instances for BVDesign generation
 		mainDesign.getDesign().getParameters()
-			.add(new ExperimentDesignParameter(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM, String.valueOf(numberOfTrials), null));
+			.add(new ExperimentDesignParameter(BreedingViewDesignParameter.NUMBER_TRIALS.getParameterName(), String.valueOf(numberOfTrials), null));
 		BVDesignOutput bvOutput;
 		try {
 			bvOutput = this.designRunner.runBVDesign(mainDesign);

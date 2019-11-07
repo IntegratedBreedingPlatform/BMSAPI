@@ -8,21 +8,24 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
-import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewDesignParameter;
+import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewVariableParameter;
+import org.ibp.api.java.impl.middleware.design.generator.AbstractExperimentalDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignProcessor;
 import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.RandomizeCompleteBlockDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,8 +37,6 @@ import java.util.stream.Collectors;
 @Component
 public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentalDesignTypeService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(RandomizeCompleteBlockDesignTypeServiceImpl.class);
-
 	protected static final List<Integer> DESIGN_FACTOR_VARIABLES =
 		Arrays.asList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId());
 
@@ -43,7 +44,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId());
 
 	@Resource
-	private ExperimentDesignGenerator experimentDesignGenerator;
+	private RandomizeCompleteBlockDesignGenerator experimentDesignGenerator;
 
 	@Resource
 	private ExperimentalDesignProcessor experimentalDesignProcessor;
@@ -65,29 +66,52 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
 				.collect(Collectors.toMap(StandardVariable::getId, standardVariable -> standardVariable));
 
+		// Resolve treatment factors parameters
 		final String entryNumberName = standardVariablesMap.get(TermId.ENTRY_NO.getId()).getName();
-		final String replicateNumberName = standardVariablesMap.get(TermId.REP_NO.getId()).getName();
-		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
-
 		final Map<String, List<String>> treatmentFactorValues =
 			this.getTreatmentFactorValues(experimentalDesignInput.getTreatmentFactorsData());
+		treatmentFactorValues.put(entryNumberName, Collections.singletonList(Integer.toString(studyGermplasmDtoList.size())));
+
 		final List<String> treatmentFactors = this.getTreatmentFactors(treatmentFactorValues);
 		final List<String> treatmentLevels = this.getLevels(treatmentFactorValues);
-
-		treatmentFactorValues.put(entryNumberName, Arrays.asList(Integer.toString(studyGermplasmDtoList.size())));
 		treatmentFactors.add(entryNumberName);
 		treatmentLevels.add(Integer.toString(studyGermplasmDtoList.size()));
 
 		experimentalDesignInput.setNumberOfBlocks(experimentalDesignInput.getReplicationsCount());
-		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createRandomizedCompleteBlockDesign(experimentalDesignInput, replicateNumberName, plotNumberName,
-				entryNumberName, treatmentFactors,
-				treatmentLevels);
 
+		// Generate experiment design parameter input to design runner
+		final Map<BreedingViewVariableParameter, String> map = getBreedingViewVariablesMap(standardVariablesMap);
+		final MainDesign mainDesign = this.experimentDesignGenerator
+			.generate(experimentalDesignInput, map, null, null, this.getListItemsMap(treatmentFactors, treatmentLevels, entryNumberName));
+
+		// Generate observation unit rows
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		return this.experimentalDesignProcessor
-			.generateObservationUnitRows(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyGermplasmDtoList, mainDesign, entryNumberName,
-				treatmentFactorValues, new HashMap<Integer, Integer>());
+			.generateObservationUnitRows(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables,
+				studyGermplasmDtoList, mainDesign, entryNumberName,
+				treatmentFactorValues, new HashMap<>());
+	}
+
+	private Map<BreedingViewDesignParameter, List<ListItem>> getListItemsMap(final List<String> treatmentFactors,
+		final List<String> treatmentLevels, final String entryVariableName) {
+
+		final Map<BreedingViewDesignParameter, List<ListItem>> listItemsMap = new HashMap<>();
+		listItemsMap.put(BreedingViewDesignParameter.INITIAL_TREATMENT_NUMBER, this.getInitialTreatNumList(treatmentFactors,
+			AbstractExperimentalDesignGenerator.STARTING_ENTRY_NUMBER, entryVariableName));
+		listItemsMap.put(BreedingViewDesignParameter.TREATMENTFACTORS, ExperimentalDesignUtil.convertToListItemList(treatmentFactors));
+		listItemsMap.put(BreedingViewDesignParameter.LEVELS, ExperimentalDesignUtil.convertToListItemList(treatmentLevels));
+
+		return listItemsMap;
+	}
+
+	private Map<BreedingViewVariableParameter, String> getBreedingViewVariablesMap(
+		final Map<Integer, StandardVariable> standardVariablesMap) {
+		final String replicateNumberName = standardVariablesMap.get(TermId.REP_NO.getId()).getName();
+		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
+		final Map<BreedingViewVariableParameter, String> map = new HashMap<>();
+		map.put(BreedingViewVariableParameter.BLOCK, replicateNumberName);
+		map.put(BreedingViewVariableParameter.PLOT, plotNumberName);
+		return map;
 	}
 
 	@Override
@@ -121,7 +145,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 
 			final List<Integer> treatmentFactorIds = new ArrayList<>(treatmentFactorLevelToLabelIdMap.values());
 			treatmentFactorIds.addAll(treatmentFactorLevelToLabelIdMap.keySet());
-				final List<StandardVariable> standardVariables = this.ontologyDataManager.getStandardVariables(treatmentFactorIds, programUUID);
+			final List<StandardVariable> standardVariables = this.ontologyDataManager.getStandardVariables(treatmentFactorIds, programUUID);
 			final Map<Integer, StandardVariable> standardVariableMap =
 				standardVariables.stream().collect(Collectors.toMap(StandardVariable::getId,
 					Function.identity()));
@@ -179,6 +203,20 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 			levels.add(Integer.toString(level));
 		}
 		return levels;
+	}
+
+	List<ListItem> getInitialTreatNumList(final List<String> treatmentFactors, final Integer initialTreatNum, final String entryNoVarName) {
+
+		final List<ListItem> listItemList = new ArrayList<>();
+		for (final String treatmentFactor : treatmentFactors) {
+			if (treatmentFactor.equals(entryNoVarName)) {
+				listItemList.add(new ListItem(String.valueOf(initialTreatNum)));
+			} else {
+				listItemList.add(new ListItem("1"));
+			}
+		}
+		return listItemList;
+
 	}
 
 	void setMeasurementVariableTransformer(

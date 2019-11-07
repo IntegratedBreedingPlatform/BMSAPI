@@ -8,9 +8,10 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
-import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignGeneratorTestDataUtil;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignProcessor;
 import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.ResolvableIncompleteBlockDesignGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
@@ -37,13 +38,13 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 
-	public static final String ENTRY_NO = "ENTRY_NO";
-	public static final String PLOT_NO = "PLOT_NO";
-	public static final String BLOCK_NO = "BLOCK_NO";
-	public static final String REP_NO = "REP_NO";
+	private static final String ENTRY_NO = RandomStringUtils.randomAlphabetic(10);
+	private static final String PLOT_NO = RandomStringUtils.randomAlphabetic(10);
+	private static final String BLOCK_NO = RandomStringUtils.randomAlphabetic(10);
+	private static final String REP_NO = RandomStringUtils.randomAlphabetic(10);
 
 	@Mock
-	public ExperimentDesignGenerator experimentDesignGenerator;
+	public ResolvableIncompleteBlockDesignGenerator experimentDesignGenerator;
 
 	@Mock
 	public OntologyDataManager ontologyDataManager;
@@ -93,8 +94,10 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 		experimentalDesignInput.setUseLatenized(false);
 
 		when(this.experimentDesignGenerator
-			.createResolvableIncompleteBlockDesign(experimentalDesignInput, studyGermplasmDtoList.size(),
-				ENTRY_NO, REP_NO, BLOCK_NO, PLOT_NO)).thenReturn(mainDesign);	when(this.measurementVariableGenerator
+			.generate(experimentalDesignInput, ExperimentalDesignGeneratorTestDataUtil
+					.getRIBDVariablesMap(BLOCK_NO, PLOT_NO, ENTRY_NO, REP_NO), studyGermplasmDtoList.size(),
+				null, null)).thenReturn(mainDesign);
+		when(this.measurementVariableGenerator
 			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, ResolvableIncompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				ResolvableIncompleteBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
 			.thenReturn(measurementVariables);
@@ -138,8 +141,8 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 		experimentalDesignInput.setUseLatenized(true);
 
 		when(this.experimentDesignGenerator
-			.createResolvableIncompleteBlockDesign(experimentalDesignInput, studyGermplasmDtoList.size(),
-				ENTRY_NO, REP_NO, BLOCK_NO, PLOT_NO)).thenReturn(mainDesign);
+			.generate(experimentalDesignInput, ExperimentalDesignGeneratorTestDataUtil.getRIBDVariablesMap(BLOCK_NO, PLOT_NO, ENTRY_NO, REP_NO), studyGermplasmDtoList.size(),
+				null, null)).thenReturn(mainDesign);
 		when(this.measurementVariableGenerator
 			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, ResolvableIncompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				ResolvableIncompleteBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES_LATINIZED, experimentalDesignInput))
@@ -156,7 +159,7 @@ public class ResolvableIncompleteBlockDesignTypeServiceImplTest {
 		assertSame(result, observationUnitRowList);
 	}
 
-	List<StandardVariable> createTestStandardVariables() {
+	private List<StandardVariable> createTestStandardVariables() {
 		final List<StandardVariable> standardVariables = new ArrayList<>();
 		standardVariables.add(StandardVariableTestDataInitializer.createStandardVariable(TermId.ENTRY_NO.getId(), ENTRY_NO));
 		standardVariables.add(StandardVariableTestDataInitializer.createStandardVariable(TermId.BLOCK_NO.getId(), BLOCK_NO));

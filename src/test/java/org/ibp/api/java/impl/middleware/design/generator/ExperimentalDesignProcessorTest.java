@@ -1,11 +1,11 @@
 package org.ibp.api.java.impl.middleware.design.generator;
 
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.exception.BVDesignException;
 import org.ibp.api.java.design.runner.DesignRunner;
+import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewDesignParameter;
 import org.ibp.api.java.impl.middleware.design.type.StudyGermplasmTestDataGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
@@ -48,8 +48,6 @@ public class ExperimentalDesignProcessorTest {
 	@Mock
 	private DesignRunner designRunner;
 
-	private ExperimentDesignGenerator experimentDesignGenerator = new ExperimentDesignGenerator();
-
 	@InjectMocks
 	private ExperimentalDesignProcessor experimentalDesignProcessor;
 
@@ -87,9 +85,9 @@ public class ExperimentalDesignProcessorTest {
 	@Test
 	public void testGenerateObservationUnitRows() throws BVDesignException, IOException {
 		final MainDesign mainDesign =
-			this.experimentDesignGenerator
-				.createRandomizedCompleteBlockDesign(this.designInput, REP_NO, PLOT_NO,
-					TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>());
+			new RandomizeCompleteBlockDesignGenerator()
+				.generate(this.designInput, ExperimentalDesignGeneratorTestDataUtil.getRCBDVariablesMap(REP_NO, PLOT_NO),
+					null, null, null);
 
 		final List<Integer> trialInstances = Arrays.asList(2, 4, 6);
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(trialInstances);
@@ -117,16 +115,16 @@ public class ExperimentalDesignProcessorTest {
 
 		Assert.assertEquals(
 			String.valueOf(trialInstancesForDesignGeneration.size()),
-			mainDesign.getDesign().getParameterValue(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM));
+			mainDesign.getDesign().getParameterValue(BreedingViewDesignParameter.NUMBER_TRIALS.getParameterName()));
 		Mockito.verify(this.designRunner, Mockito.times(1)).runBVDesign(mainDesign);
 	}
 
 	@Test
 	public void testGenerateMeasurementsBVDesignError() throws IOException {
 		final MainDesign mainDesign =
-			this.experimentDesignGenerator
-				.createRandomizedCompleteBlockDesign(this.designInput, REP_NO, PLOT_NO,
-					TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>());
+			new RandomizeCompleteBlockDesignGenerator()
+				.generate(this.designInput, ExperimentalDesignGeneratorTestDataUtil.getRCBDVariablesMap(REP_NO, PLOT_NO),
+					null, null, null);
 		Mockito.doReturn(new BVDesignOutput(1)).when(this.designRunner)
 			.runBVDesign(mainDesign);
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2));
@@ -145,9 +143,9 @@ public class ExperimentalDesignProcessorTest {
 	@Test
 	public void testGenerateMeasurementsBVDesignIOException() throws IOException {
 		final MainDesign mainDesign =
-			this.experimentDesignGenerator
-				.createRandomizedCompleteBlockDesign(this.designInput, REP_NO, PLOT_NO,
-					TermId.ENTRY_NO.name(), new ArrayList<>(), new ArrayList<>());
+			new RandomizeCompleteBlockDesignGenerator()
+				.generate(this.designInput, ExperimentalDesignGeneratorTestDataUtil.getRCBDVariablesMap(REP_NO, PLOT_NO),
+					null, null, null);
 		Mockito.doThrow(new IOException()).when(this.designRunner)
 			.runBVDesign(mainDesign);
 		try {

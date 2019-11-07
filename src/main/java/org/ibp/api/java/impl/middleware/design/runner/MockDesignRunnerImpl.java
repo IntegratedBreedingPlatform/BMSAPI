@@ -10,7 +10,7 @@ import org.ibp.api.domain.design.ExperimentDesign;
 import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.runner.DesignRunner;
-import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewDesignParameter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -40,20 +40,22 @@ public class MockDesignRunnerImpl implements DesignRunner {
 
 		final int numberOfTreatments = this.getNumberOfTreatments(design);
 		final int replications = this.getNumberOfReplications(design);
-		final String numberTrialsParam = experimentDesign.getParameterValue(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM);
+		final String numberTrialsParam = experimentDesign.getParameterValue(BreedingViewDesignParameter.NUMBER_TRIALS.getParameterName());
 		final int numberTrials = StringUtils.isNumeric(numberTrialsParam) ? Integer.valueOf(numberTrialsParam) : 1;
 
-		final String initEntryNoParam = experimentDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM);
+		final String initEntryNoParam =
+			experimentDesign.getParameterValue(BreedingViewDesignParameter.INITIAL_TREATMENT_NUMBER.getParameterName());
 		int startingEntryNo = StringUtils.isNumeric(initEntryNoParam) ? Integer.valueOf(initEntryNoParam) : 1;
 
-		final String blockSizeParam = experimentDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM);
+		final String blockSizeParam = experimentDesign.getParameterValue(BreedingViewDesignParameter.NBLOCKS.getParameterName());
 		final int blockSize = StringUtils.isNumeric(blockSizeParam) ? Integer.valueOf(blockSizeParam) : 1;
 
 		final List<Integer> entryNumbers = new ArrayList<>();
 		for (int i = 1; i <= numberOfTreatments; i++) {
 			entryNumbers.add(startingEntryNo++);
 		}
-		final String initPlotNoParam = experimentDesign.getParameterValue(ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM);
+		final String initPlotNoParam =
+			experimentDesign.getParameterValue(BreedingViewDesignParameter.INITIAL_PLOT_NUMBER.getParameterName());
 
 		final List<List<String>> tfValuesListForCSV = this.getTreatmentFactorValuesCombinations(experimentDesign);
 		final List<String[]> csvLines = new ArrayList<>();
@@ -113,7 +115,8 @@ public class MockDesignRunnerImpl implements DesignRunner {
 		// Add header
 		final List<String> constants = Arrays.asList(TRIAL, PLOT_NO, REP_NO);
 		final List<String> headers = new ArrayList<>(constants);
-		final List<ListItem> treatmentFactorsList = experimentDesign.getParameterList(ExperimentDesignGenerator.TREATMENTFACTORS_PARAM);
+		final List<ListItem> treatmentFactorsList =
+			experimentDesign.getParameterList(BreedingViewDesignParameter.TREATMENTFACTORS.getParameterName());
 		for (final ListItem item : treatmentFactorsList) {
 			headers.add(item.getValue());
 		}
@@ -165,8 +168,8 @@ public class MockDesignRunnerImpl implements DesignRunner {
 		final ExperimentDesign experimentDesign = design.getDesign();
 
 		final List<Pair<Integer, Integer>> rowColTuples = new ArrayList<>();
-		final int rows = Integer.parseInt(experimentDesign.getParameterValue(ExperimentDesignGenerator.NROWS_PARAM));
-		final int cols = Integer.parseInt(experimentDesign.getParameterValue(ExperimentDesignGenerator.NCOLUMNS_PARAM));
+		final int rows = Integer.parseInt(experimentDesign.getParameterValue(BreedingViewDesignParameter.NROWS.getParameterName()));
+		final int cols = Integer.parseInt(experimentDesign.getParameterValue(BreedingViewDesignParameter.NCOLUMNS.getParameterName()));
 
 		for (int r = 1; r <= rows; r++) {
 			for (int c = 1; c <= cols; c++) {
@@ -211,7 +214,7 @@ public class MockDesignRunnerImpl implements DesignRunner {
 		// Add header
 		csvLines.add(new String[] {TRIAL, PLOT_NO, BLOCK_NO, ENTRY_NO});
 
-		final List<ListItem> nRepeats = design.getDesign().getParameterList(ExperimentDesignGenerator.NREPEATS_PARAM);
+		final List<ListItem> nRepeats = design.getDesign().getParameterList(BreedingViewDesignParameter.NREPEATS.getParameterName());
 
 		for (int instance = 1; instance <= numberTrials; instance++) {
 			int startingPlotNo = StringUtils.isNumeric(initPlotNoParam) ? Integer.valueOf(initPlotNoParam) : 1;
@@ -256,7 +259,7 @@ public class MockDesignRunnerImpl implements DesignRunner {
 	}
 
 	public List<List<String>> getTreatmentFactorValuesCombinations(final ExperimentDesign experimentDesign) {
-		final List<ListItem> levelList = experimentDesign.getParameterList(ExperimentDesignGenerator.LEVELS_PARAM);
+		final List<ListItem> levelList = experimentDesign.getParameterList(BreedingViewDesignParameter.LEVELS.getParameterName());
 		final List<List<String>> tfValuesListForCSV = new ArrayList<>();
 		if (ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getBvDesignName().equals(experimentDesign.getName()) && levelList.size() != 1) {
 			//Create the lists of treatment factor values
@@ -300,24 +303,24 @@ public class MockDesignRunnerImpl implements DesignRunner {
 	private int getNumberOfTreatments(final MainDesign design) {
 		final ExperimentDesign experimentDesign = design.getDesign();
 		if (ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getBvDesignName().equals(experimentDesign.getName())) {
-			final List<ListItem> levelList = experimentDesign.getParameterList(ExperimentDesignGenerator.LEVELS_PARAM);
+			final List<ListItem> levelList = experimentDesign.getParameterList(BreedingViewDesignParameter.LEVELS.getParameterName());
 			return Integer.parseInt(levelList.get(levelList.size() - 1).getValue());
 		} else {
-			return Integer.parseInt(experimentDesign.getParameterValue(ExperimentDesignGenerator.NTREATMENTS_PARAM));
+			return Integer.parseInt(experimentDesign.getParameterValue(BreedingViewDesignParameter.NTREATMENTS.getParameterName()));
 		}
 	}
 
 	private int getNumberOfReplications(final MainDesign design) {
 		final ExperimentDesign experimentDesign = design.getDesign();
 		if (ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getBvDesignName().equals(experimentDesign.getName())) {
-			return Integer.parseInt(experimentDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM));
+			return Integer.parseInt(experimentDesign.getParameterValue(BreedingViewDesignParameter.NBLOCKS.getParameterName()));
 		} else if (ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK.getBvDesignName().equals(experimentDesign.getName())) {
-			return Integer.parseInt(experimentDesign.getParameterValue(ExperimentDesignGenerator.NBLOCKS_PARAM));
+			return Integer.parseInt(experimentDesign.getParameterValue(BreedingViewDesignParameter.NBLOCKS.getParameterName()));
 		} else if (ExperimentDesignType.P_REP.getBvDesignName().equals(experimentDesign.getName())) {
 			// If P-rep design, the replicates number is specified in nrepeats list items.
 			return 0;
 		} else {
-			return Integer.parseInt(experimentDesign.getParameterValue(ExperimentDesignGenerator.NREPLICATES_PARAM));
+			return Integer.parseInt(experimentDesign.getParameterValue(BreedingViewDesignParameter.NREPLICATES.getParameterName()));
 		}
 	}
 

@@ -9,7 +9,8 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
-import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewVariableParameter;
+import org.ibp.api.java.impl.middleware.design.generator.AugmentedRandomizedBlockDesignGenerator;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignProcessor;
 import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -35,7 +36,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NBLKS.getId());
 
 	@Resource
-	public ExperimentDesignGenerator experimentDesignGenerator;
+	public AugmentedRandomizedBlockDesignGenerator experimentDesignGenerator;
 
 	@Resource
 	public MeasurementVariableGenerator measurementVariableGenerator;
@@ -50,13 +51,8 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
+		// Generate experiment design parameters input to design runner
 		final Set<Integer> entryIdsOfChecks = this.getEntryIdsOfChecks(studyGermplasmDtoList);
-		final Set<Integer> entryIdsOfTestEntries = this.getEntryIdsOfTestEntries(studyGermplasmDtoList);
-
-		final Map<Integer, Integer> designExpectedEntriesMap =
-			this.createMapOfDesignExpectedEntriesToGermplasmEntriesInTrial(studyGermplasmDtoList,
-				entryIdsOfChecks, entryIdsOfTestEntries);
-
 		final Integer numberOfControls = entryIdsOfChecks.size();
 		final Integer numberOfTreatments = studyGermplasmDtoList.size() - numberOfControls;
 
@@ -64,19 +60,32 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
 				.collect(Collectors.toMap(StandardVariable::getId, standardVariable -> standardVariable));
 
-		final String entryNumberName = standardVariablesMap.get(TermId.ENTRY_NO.getId()).getName();
-		final String blockNumberName = standardVariablesMap.get(TermId.BLOCK_NO.getId()).getName();
-		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
-
 		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createAugmentedRandomizedBlockDesign(experimentalDesignInput, numberOfTreatments, numberOfControls, entryNumberName,
-				blockNumberName, plotNumberName);
+			.generate(experimentalDesignInput, this.getBreedingViewVariablesMap(standardVariablesMap), numberOfTreatments, numberOfControls, null);
 
+		// Generate observation unit rows
+		final Set<Integer> entryIdsOfTestEntries = this.getEntryIdsOfTestEntries(studyGermplasmDtoList);
+		final Map<Integer, Integer> designExpectedEntriesMap =
+			this.createMapOfDesignExpectedEntriesToGermplasmEntriesInTrial(studyGermplasmDtoList,
+				entryIdsOfChecks, entryIdsOfTestEntries);
+		final String entryNumberName = standardVariablesMap.get(TermId.ENTRY_NO.getId()).getName();
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		return this.experimentalDesignProcessor
 			.generateObservationUnitRows(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables,
 				studyGermplasmDtoList, mainDesign, entryNumberName, null,
 				designExpectedEntriesMap);
+	}
+
+	private Map<BreedingViewVariableParameter, String> getBreedingViewVariablesMap(final Map<Integer, StandardVariable> standardVariablesMap) {
+		final String entryNumberName = standardVariablesMap.get(TermId.ENTRY_NO.getId()).getName();
+		final String blockNumberName = standardVariablesMap.get(TermId.BLOCK_NO.getId()).getName();
+		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
+
+		final Map<BreedingViewVariableParameter, String> map = new HashMap<>();
+		map.put(BreedingViewVariableParameter.ENTRY, entryNumberName);
+		map.put(BreedingViewVariableParameter.BLOCK, blockNumberName);
+		map.put(BreedingViewVariableParameter.PLOT, plotNumberName);
+		return map;
 	}
 
 	@Override

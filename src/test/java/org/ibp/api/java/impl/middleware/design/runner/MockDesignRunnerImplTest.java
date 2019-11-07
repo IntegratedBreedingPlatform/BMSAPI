@@ -1,11 +1,15 @@
 package org.ibp.api.java.impl.middleware.design.runner;
 
-import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.BVDesignTrialInstance;
 import org.ibp.api.domain.design.ExperimentDesignParameter;
+import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
-import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewDesignParameter;
+import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignGeneratorTestDataUtil;
+import org.ibp.api.java.impl.middleware.design.generator.RandomizeCompleteBlockDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.ResolvableIncompleteBlockDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.ResolvableRowColumnDesignGenerator;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Assert;
 import org.junit.Test;
@@ -13,24 +17,27 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class MockDesignRunnerImplTest {
 
 	private final MockDesignRunnerImpl mockDesignRunner = new MockDesignRunnerImpl();
 
-	private final ExperimentDesignGenerator experimentDesignGenerator = new ExperimentDesignGenerator();
-
 	@Test
 	public void testMockDesignRunnerRCBD() {
+		final Map<BreedingViewDesignParameter, List<ListItem>> listItemsMap =
+			ExperimentalDesignGeneratorTestDataUtil
+				.getTreatmentFactorsParametersMap(Collections.singletonList("ENTRY_NO"), Collections.singletonList("20"));
+
 		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
 		experimentalDesignInput.setNumberOfBlocks(2);
 		experimentalDesignInput.setStartingPlotNo(200);
-		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createRandomizedCompleteBlockDesign(experimentalDesignInput, "REP_NO", "PLOT_NO", TermId.ENTRY_NO.name(),
-				Collections.singletonList("ENTRY_NO"),
-				Collections.singletonList("20"));
+		final MainDesign mainDesign = new RandomizeCompleteBlockDesignGenerator()
+			.generate(experimentalDesignInput, ExperimentalDesignGeneratorTestDataUtil.getRCBDVariablesMap("REP_NO", "PLOT_NO"),
+				null, null, listItemsMap);
 		// Configure number of instances to be generated
-		mainDesign.getDesign().getParameters().add(new ExperimentDesignParameter(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM, "2"));
+		mainDesign.getDesign().getParameters()
+			.add(new ExperimentDesignParameter(BreedingViewDesignParameter.NUMBER_TRIALS.getParameterName(), "2"));
 
 		try {
 			final BVDesignOutput output = this.mockDesignRunner.runBVDesign(mainDesign);
@@ -48,14 +55,19 @@ public class MockDesignRunnerImplTest {
 
 	@Test
 	public void testMockDesignRunnerRCBDWithTreatmentFactors() {
+		final Map<BreedingViewDesignParameter, List<ListItem>> listItemsMap =
+			ExperimentalDesignGeneratorTestDataUtil
+				.getTreatmentFactorsParametersMap(Arrays.asList("_8260", "_8261", "ENTRY_NO"), Arrays.asList("3", "2", "20"));
+
 		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
 		experimentalDesignInput.setNumberOfBlocks(2);
 		experimentalDesignInput.setStartingPlotNo(200);
-		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createRandomizedCompleteBlockDesign(experimentalDesignInput, "REP_NO", "PLOT_NO", TermId.ENTRY_NO.name(),
-				Arrays.asList("_8260", "_8261", "ENTRY_NO"), Arrays.asList("3", "2", "20"));
+		final MainDesign mainDesign = new RandomizeCompleteBlockDesignGenerator()
+			.generate(experimentalDesignInput, ExperimentalDesignGeneratorTestDataUtil.getRCBDVariablesMap("REP_NO", "PLOT_NO"), null, null,
+				listItemsMap);
 		// Configure number of instances to be generated
-		mainDesign.getDesign().getParameters().add(new ExperimentDesignParameter(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM, "2"));
+		mainDesign.getDesign().getParameters()
+			.add(new ExperimentDesignParameter(BreedingViewDesignParameter.NUMBER_TRIALS.getParameterName(), "2"));
 
 		try {
 			final BVDesignOutput output = this.mockDesignRunner.runBVDesign(mainDesign);
@@ -78,10 +90,13 @@ public class MockDesignRunnerImplTest {
 		experimentalDesignInput.setReplicationsCount(2);
 		experimentalDesignInput.setStartingPlotNo(10);
 		experimentalDesignInput.setUseLatenized(false);
-		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createResolvableIncompleteBlockDesign(experimentalDesignInput, 20, "ENTRY_NO", "REP_NO", "BLOCK_NO", "PLOT_NO");
+
+		final MainDesign mainDesign = new ResolvableIncompleteBlockDesignGenerator()
+			.generate(experimentalDesignInput,
+				ExperimentalDesignGeneratorTestDataUtil.getRIBDVariablesMap("BLOCK_NO", "PLOT_NO", "ENTRY_NO", "REP_NO"), 20, null, null);
 		// Configure number of instances to be generated
-		mainDesign.getDesign().getParameters().add(new ExperimentDesignParameter(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM, "3"));
+		mainDesign.getDesign().getParameters()
+			.add(new ExperimentDesignParameter(BreedingViewDesignParameter.NUMBER_TRIALS.getParameterName(), "3"));
 
 		try {
 			final BVDesignOutput output = this.mockDesignRunner.runBVDesign(mainDesign);
@@ -105,10 +120,13 @@ public class MockDesignRunnerImplTest {
 		experimentalDesignInput.setColsPerReplications(10);
 		experimentalDesignInput.setStartingPlotNo(10);
 		experimentalDesignInput.setUseLatenized(false);
-		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createResolvableRowColDesign(experimentalDesignInput, 20, "ENTRY_NO", "REP_NO", "ROW", "COL", "PLOT_NO");
+		final MainDesign mainDesign = new ResolvableRowColumnDesignGenerator()
+			.generate(experimentalDesignInput,
+				ExperimentalDesignGeneratorTestDataUtil.getRowColVariablesMap("ROW", "COL", "PLOT_NO", "ENTRY_NO", "REP_NO"), 20, null,
+				null);
 		// Configure number of instances to be generated
-		mainDesign.getDesign().getParameters().add(new ExperimentDesignParameter(ExperimentDesignGenerator.NUMBER_TRIALS_PARAM, "5"));
+		mainDesign.getDesign().getParameters()
+			.add(new ExperimentDesignParameter(BreedingViewDesignParameter.NUMBER_TRIALS.getParameterName(), "5"));
 
 		try {
 			final BVDesignOutput output = this.mockDesignRunner.runBVDesign(mainDesign);
@@ -129,9 +147,9 @@ public class MockDesignRunnerImplTest {
 		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
 		experimentalDesignInput.setReplicationsCount(2);
 		experimentalDesignInput.setStartingPlotNo(200);
-		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createRandomizedCompleteBlockDesign(experimentalDesignInput, "REP_NO", "PLOT_NO", TermId.ENTRY_NO.name(),
-				Arrays.asList("_8260", "_8261", "ENTRY_NO"), Arrays.asList("3", "2", "20"));
+		final MainDesign mainDesign = new RandomizeCompleteBlockDesignGenerator()
+			.generate(experimentalDesignInput, ExperimentalDesignGeneratorTestDataUtil.getRCBDVariablesMap("REP_NO", "PLOT_NO"),
+				null, null, ExperimentalDesignGeneratorTestDataUtil.getTreatmentFactorsParametersMap(Arrays.asList("_8260", "_8261", "ENTRY_NO"), Arrays.asList("3", "2", "20")));
 		final List<List<String>> treatmentFactorValuesList =
 			this.mockDesignRunner.getTreatmentFactorValuesCombinations(mainDesign.getDesign());
 		Assert.assertEquals(6, treatmentFactorValuesList.size());

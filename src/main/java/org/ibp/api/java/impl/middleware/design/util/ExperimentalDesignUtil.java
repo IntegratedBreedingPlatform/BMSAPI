@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.design.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 
@@ -8,6 +9,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExperimentalDesignUtil {
 
@@ -47,5 +50,15 @@ public class ExperimentalDesignUtil {
 				experimentalDesignInput.setReplatinGroups(rowReplatingGroupStringBuilder.toString());
 			}
 		}
+	}
+
+	public static List<ListItem> convertToListItemList(final List<String> listString) {
+
+		final List<ListItem> listItemList = new ArrayList<>();
+		for (final String value : listString) {
+			listItemList.add(new ListItem(value));
+		}
+		return listItemList;
+
 	}
 }

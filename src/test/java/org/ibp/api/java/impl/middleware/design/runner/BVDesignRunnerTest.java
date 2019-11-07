@@ -1,12 +1,18 @@
 package org.ibp.api.java.impl.middleware.design.runner;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
-import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewDesignParameter;
+import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewVariableParameter;
+import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignGeneratorTestDataUtil;
+import org.ibp.api.java.impl.middleware.design.generator.PRepDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.RandomizeCompleteBlockDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.ResolvableIncompleteBlockDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.ResolvableRowColumnDesignGenerator;
 import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +22,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -30,6 +39,12 @@ import static org.mockito.Mockito.when;
 public class BVDesignRunnerTest {
 
 	private static final String BV_DESIGN_EXECUTABLE_PATH = "bvDesignExecutablePath";
+	private static final String ENTRY_NO = RandomStringUtils.randomAlphabetic(10);
+	private static final String PLOT_NO = RandomStringUtils.randomAlphabetic(10);
+	private static final String REP_NO = RandomStringUtils.randomAlphabetic(10);
+	private static final String BLOCK_NO = RandomStringUtils.randomAlphabetic(10);
+	private static final String ROW = RandomStringUtils.randomAlphabetic(10);
+	private static final String COL = RandomStringUtils.randomAlphabetic(10);
 
 	@Mock
 	private BVDesignRunner.BVDesignOutputReader outputReader;
@@ -39,8 +54,6 @@ public class BVDesignRunnerTest {
 
 	@Mock
 	private BVDesignRunner.BVDesignXmlInputWriter inputWriter;
-
-	private final ExperimentDesignGenerator experimentDesignGenerator = new ExperimentDesignGenerator();
 
 	private BVDesignRunner bvDesignRunner;
 
@@ -69,7 +82,7 @@ public class BVDesignRunnerTest {
 		final BVDesignOutput bvDesignOutput = this.bvDesignRunner.runBVDesign(mainDesign);
 
 		verify(this.processRunner).run(BV_DESIGN_EXECUTABLE_PATH, "-i" + xmlInputFilePath);
-		verify(this.outputReader).read(mainDesign.getDesign().getParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM));
+		verify(this.outputReader).read(mainDesign.getDesign().getParameterValue(BreedingViewDesignParameter.OUTPUTFILE.getParameterName()));
 		assertTrue(bvDesignOutput.isSuccess());
 
 	}
@@ -88,7 +101,7 @@ public class BVDesignRunnerTest {
 		final BVDesignOutput bvDesignOutput = this.bvDesignRunner.runBVDesign(mainDesign);
 
 		verify(this.processRunner).run(BV_DESIGN_EXECUTABLE_PATH, "-i" + xmlInputFilePath);
-		verify(this.outputReader, never()).read(mainDesign.getDesign().getParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM));
+		verify(this.outputReader, never()).read(mainDesign.getDesign().getParameterValue(BreedingViewDesignParameter.OUTPUTFILE.getParameterName()));
 		assertFalse(bvDesignOutput.isSuccess());
 
 	}
@@ -100,18 +113,18 @@ public class BVDesignRunnerTest {
 
 		final String expectedString =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Templates><Template name=\"RandomizedBlock\">"
-				+ "<Parameter name=\"" + ExperimentDesignGenerator.SEED_PARAM + "\" value=\":seedValue\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.NBLOCKS_PARAM + "\" value=\"6\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.BLOCKFACTOR_PARAM + "\" value=\"Reps\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.PLOTFACTOR_PARAM + "\" value=\"Plots\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM + "\" value=\"301\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM + "\">"
+				+ "<Parameter name=\"" + BreedingViewDesignParameter.SEED.getParameterName() + "\" value=\":seedValue\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.NBLOCKS.getParameterName() + "\" value=\"6\"/>" + "<Parameter name=\""
+				+BreedingViewVariableParameter.BLOCK.getParameterName() + "\" value=\"Reps\"/>" + "<Parameter name=\""
+				+BreedingViewVariableParameter.PLOT.getParameterName() + "\" value=\"Plots\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.INITIAL_PLOT_NUMBER.getParameterName() + "\" value=\"301\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.INITIAL_TREATMENT_NUMBER.getParameterName() + "\">"
 				+ "<ListItem value=\"1\"/><ListItem value=\"1\"/></Parameter>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.TREATMENTFACTORS_PARAM
+				+ BreedingViewVariableParameter.ENTRY.getParameterName()
 				+ "\"><ListItem value=\"ENTRY_NO\"/><ListItem value=\"FERTILIZER\"/></Parameter>"
 				+ "<Parameter name=\"levels\"><ListItem value=\"24\"/><ListItem value=\"3\"/></Parameter>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.TIMELIMIT_PARAM + "\" value=\"" + AppConstants.EXP_DESIGN_TIME_LIMIT.getString()
-				+ "\"/>" + "<Parameter name=\"" + ExperimentDesignGenerator.OUTPUTFILE_PARAM
+				+ BreedingViewDesignParameter.TIMELIMIT.getParameterName() + "\" value=\"" + AppConstants.EXP_DESIGN_TIME_LIMIT.getString()
+				+ "\"/>" + "<Parameter name=\"" + BreedingViewDesignParameter.OUTPUTFILE.getParameterName()
 				+ "\" value=\":outputFile\"/></Template></Templates>";
 
 		final BVDesignRunner runner = new BVDesignRunner();
@@ -128,25 +141,26 @@ public class BVDesignRunnerTest {
 		experimentalDesignInput.setStartingPlotNo(301);
 		experimentalDesignInput.setNblatin(0);
 		experimentalDesignInput.setUseLatenized(false);
-		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createResolvableIncompleteBlockDesign(experimentalDesignInput, 24, "Treat", "Reps",
-				"Subblocks", "Plots");
+
+		final MainDesign mainDesign = new ResolvableIncompleteBlockDesignGenerator()
+			.generate(experimentalDesignInput,
+				ExperimentalDesignGeneratorTestDataUtil.getRIBDVariablesMap(BLOCK_NO, PLOT_NO, ENTRY_NO, REP_NO), 24, null, null);
 
 		final String expectedString =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Templates><Template name=\"ResolvableIncompleteBlock\">"
-				+ "<Parameter name=\"" + ExperimentDesignGenerator.SEED_PARAM + "\" value=\":seedValue\"/><Parameter name=\""
-				+ ExperimentDesignGenerator.BLOCKSIZE_PARAM + "\" value=\"6\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.NTREATMENTS_PARAM + "\" value=\"24\"/><Parameter name=\""
-				+ ExperimentDesignGenerator.NREPLICATES_PARAM + "\" value=\"2\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.TREATMENTFACTOR_PARAM + "\" value=\"Treat\"/><Parameter name=\""
-				+ ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM + "\" value=\"1\"/><Parameter name=\""
-				+ ExperimentDesignGenerator.REPLICATEFACTOR_PARAM + "\" value=\"Reps\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.BLOCKFACTOR_PARAM + "\" value=\"Subblocks\"/><Parameter name=\""
-				+ ExperimentDesignGenerator.PLOTFACTOR_PARAM + "\" value=\"Plots\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM + "\" value=\"301\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.NBLATIN_PARAM + "\" value=\"0\"/><Parameter name=\""
-				+ ExperimentDesignGenerator.TIMELIMIT_PARAM + "\" value=\"" + AppConstants.EXP_DESIGN_TIME_LIMIT.getString()
-				+ "\"/>" + "<Parameter name=\"" + ExperimentDesignGenerator.OUTPUTFILE_PARAM
+				+ "<Parameter name=\"" + BreedingViewDesignParameter.SEED.getParameterName() + "\" value=\":seedValue\"/><Parameter name=\""
+				+ BreedingViewDesignParameter.BLOCKSIZE.getParameterName() + "\" value=\"6\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.NTREATMENTS.getParameterName() + "\" value=\"24\"/><Parameter name=\""
+				+ BreedingViewDesignParameter.NREPLICATES.getParameterName() + "\" value=\"2\"/>" + "<Parameter name=\""
+				+ BreedingViewVariableParameter.ENTRY.getParameterName() + "\" value=\"Treat\"/><Parameter name=\""
+				+ BreedingViewDesignParameter.INITIAL_TREATMENT_NUMBER.getParameterName() + "\" value=\"1\"/><Parameter name=\""
+				+BreedingViewVariableParameter.REP.getParameterName() + "\" value=\"Reps\"/>" + "<Parameter name=\""
+				+BreedingViewVariableParameter.BLOCK.getParameterName() + "\" value=\"Subblocks\"/><Parameter name=\""
+				+BreedingViewVariableParameter.PLOT.getParameterName() + "\" value=\"Plots\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.INITIAL_PLOT_NUMBER.getParameterName() + "\" value=\"301\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.NBLATIN.getParameterName() + "\" value=\"0\"/><Parameter name=\""
+				+ BreedingViewDesignParameter.TIMELIMIT.getParameterName() + "\" value=\"" + AppConstants.EXP_DESIGN_TIME_LIMIT.getString()
+				+ "\"/>" + "<Parameter name=\"" + BreedingViewDesignParameter.OUTPUTFILE.getParameterName()
 				+ "\" value=\":outputFile\"/></Template></Templates>";
 
 		final BVDesignRunner runner = new BVDesignRunner();
@@ -165,28 +179,34 @@ public class BVDesignRunnerTest {
 		experimentalDesignInput.setNrlatin(0);
 		experimentalDesignInput.setNclatin(0);
 		experimentalDesignInput.setUseLatenized(false);
-		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createResolvableRowColDesign(experimentalDesignInput, 50, "Treat", "Reps",
-				"Rows", "Columns", "Plots");
+
+		final Map<BreedingViewVariableParameter, String> bvVariablesMap = new HashMap<>();
+		bvVariablesMap.put(BreedingViewVariableParameter.ROW, ROW);
+		bvVariablesMap.put(BreedingViewVariableParameter.COLUMN, COL);
+		bvVariablesMap.put(BreedingViewVariableParameter.PLOT, PLOT_NO);
+		bvVariablesMap.put(BreedingViewVariableParameter.ENTRY, ENTRY_NO);
+		bvVariablesMap.put(BreedingViewVariableParameter.REP, REP_NO);
+		final MainDesign mainDesign = new ResolvableRowColumnDesignGenerator()
+			.generate(experimentalDesignInput, bvVariablesMap, 50, null, null);
 
 		final String expectedString =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Templates><Template name=\"ResolvableRowColumn\">"
-				+ "<Parameter name=\"" + ExperimentDesignGenerator.SEED_PARAM + "\" value=\":seedValue\"/><Parameter name=\""
-				+ ExperimentDesignGenerator.NTREATMENTS_PARAM + "\" value=\"50\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.NREPLICATES_PARAM + "\" value=\"2\"/><Parameter name=\""
-				+ ExperimentDesignGenerator.NROWS_PARAM + "\" value=\"5\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.NCOLUMNS_PARAM + "\" value=\"10\"/><Parameter name=\""
-				+ ExperimentDesignGenerator.TREATMENTFACTOR_PARAM + "\" value=\"Treat\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM + "\" value=\"1\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.REPLICATEFACTOR_PARAM + "\" value=\"Reps\"/><Parameter name=\""
-				+ ExperimentDesignGenerator.ROWFACTOR_PARAM + "\" value=\"Rows\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.COLUMNFACTOR_PARAM + "\" value=\"Columns\"/><Parameter name=\""
-				+ ExperimentDesignGenerator.PLOTFACTOR_PARAM + "\" value=\"Plots\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM + "\" value=\"301\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.NRLATIN_PARAM + "\" value=\"0\"/><Parameter name=\""
-				+ ExperimentDesignGenerator.NCLATIN_PARAM + "\" value=\"0\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.TIMELIMIT_PARAM + "\" value=\"" + AppConstants.EXP_DESIGN_TIME_LIMIT.getString()
-				+ "\"/>" + "<Parameter name=\"" + ExperimentDesignGenerator.OUTPUTFILE_PARAM
+				+ "<Parameter name=\"" + BreedingViewDesignParameter.SEED.getParameterName() + "\" value=\":seedValue\"/><Parameter name=\""
+				+ BreedingViewDesignParameter.NTREATMENTS.getParameterName() + "\" value=\"50\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.NREPLICATES.getParameterName() + "\" value=\"2\"/><Parameter name=\""
+				+ BreedingViewDesignParameter.NROWS.getParameterName() + "\" value=\"5\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.NCOLUMNS.getParameterName() + "\" value=\"10\"/><Parameter name=\""
+				+ BreedingViewVariableParameter.ENTRY.getParameterName() + "\" value=\"Treat\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.INITIAL_TREATMENT_NUMBER.getParameterName() + "\" value=\"1\"/>" + "<Parameter name=\""
+				+BreedingViewVariableParameter.REP.getParameterName() + "\" value=\"Reps\"/><Parameter name=\""
+				+BreedingViewVariableParameter.ROW.getParameterName() + "\" value=\"Rows\"/>" + "<Parameter name=\""
+				+BreedingViewVariableParameter.COLUMN.getParameterName() + "\" value=\"Columns\"/><Parameter name=\""
+				+BreedingViewVariableParameter.PLOT.getParameterName() + "\" value=\"Plots\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.INITIAL_PLOT_NUMBER.getParameterName() + "\" value=\"301\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.NRLATIN.getParameterName() + "\" value=\"0\"/><Parameter name=\""
+				+ BreedingViewDesignParameter.NCLATIN.getParameterName() + "\" value=\"0\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.TIMELIMIT.getParameterName() + "\" value=\"" + AppConstants.EXP_DESIGN_TIME_LIMIT.getString()
+				+ "\"/>" + "<Parameter name=\"" + BreedingViewDesignParameter.OUTPUTFILE.getParameterName()
 				+ "\" value=\":outputFile\"/></Template></Templates>";
 
 		final BVDesignRunner runner = new BVDesignRunner();
@@ -203,25 +223,30 @@ public class BVDesignRunnerTest {
 		experimentalDesignInput.setStartingPlotNo(301);
 		experimentalDesignInput.setNblatin(0);
 		experimentalDesignInput.setUseLatenized(false);
-		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createResolvableIncompleteBlockDesign(experimentalDesignInput, 24, "ENTRY_NO",
-				"Reps", "Subblocks", "Plots");
+
+		final Map<BreedingViewVariableParameter, String> bvVariablesMap = new HashMap<>();
+		bvVariablesMap.put(BreedingViewVariableParameter.BLOCK, BLOCK_NO);
+		bvVariablesMap.put(BreedingViewVariableParameter.PLOT, PLOT_NO);
+		bvVariablesMap.put(BreedingViewVariableParameter.ENTRY, ENTRY_NO);
+		bvVariablesMap.put(BreedingViewVariableParameter.REP, REP_NO);
+		final MainDesign mainDesign = new ResolvableIncompleteBlockDesignGenerator()
+			.generate(experimentalDesignInput, bvVariablesMap, 24, null, null);
 
 		final String expectedString =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Templates><Template name=\"ResolvableIncompleteBlock\">"
-				+ "<Parameter name=\"" + ExperimentDesignGenerator.SEED_PARAM + "\" value=\":seedValue\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.BLOCKSIZE_PARAM + "\" value=\"6\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.NTREATMENTS_PARAM + "\" value=\"24\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.NREPLICATES_PARAM + "\" value=\"2\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.TREATMENTFACTOR_PARAM + "\" value=\"ENTRY_NO\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM + "\" value=\"1\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.REPLICATEFACTOR_PARAM + "\" value=\"Reps\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.BLOCKFACTOR_PARAM + "\" value=\"Subblocks\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.PLOTFACTOR_PARAM + "\" value=\"Plots\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM + "\" value=\"301\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.NBLATIN_PARAM + "\" value=\"0\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.TIMELIMIT_PARAM + "\" value=\"" + AppConstants.EXP_DESIGN_TIME_LIMIT.getString()
-				+ "\"/>" + "<Parameter name=\"" + ExperimentDesignGenerator.OUTPUTFILE_PARAM
+				+ "<Parameter name=\"" + BreedingViewDesignParameter.SEED.getParameterName() + "\" value=\":seedValue\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.BLOCKSIZE.getParameterName() + "\" value=\"6\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.NTREATMENTS.getParameterName() + "\" value=\"24\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.NREPLICATES.getParameterName() + "\" value=\"2\"/>" + "<Parameter name=\""
+				+ BreedingViewVariableParameter.ENTRY.getParameterName() + "\" value=\"ENTRY_NO\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.INITIAL_TREATMENT_NUMBER.getParameterName() + "\" value=\"1\"/>" + "<Parameter name=\""
+				+BreedingViewVariableParameter.REP.getParameterName() + "\" value=\"Reps\"/>" + "<Parameter name=\""
+				+BreedingViewVariableParameter.BLOCK.getParameterName() + "\" value=\"Subblocks\"/>" + "<Parameter name=\""
+				+BreedingViewVariableParameter.PLOT.getParameterName() + "\" value=\"Plots\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.INITIAL_PLOT_NUMBER.getParameterName() + "\" value=\"301\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.NBLATIN.getParameterName() + "\" value=\"0\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.TIMELIMIT.getParameterName() + "\" value=\"" + AppConstants.EXP_DESIGN_TIME_LIMIT.getString()
+				+ "\"/>" + "<Parameter name=\"" + BreedingViewDesignParameter.OUTPUTFILE.getParameterName()
 				+ "\" value=\":outputFile\"/></Template></Templates>";
 
 		final BVDesignRunner runner = new BVDesignRunner();
@@ -240,28 +265,34 @@ public class BVDesignRunnerTest {
 		experimentalDesignInput.setNrlatin(0);
 		experimentalDesignInput.setNclatin(0);
 		experimentalDesignInput.setUseLatenized(false);
-		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createResolvableRowColDesign(experimentalDesignInput, 24, "ENTRY_NO",
-				"Reps", "Rows", "Columns", "Plots");
+
+		final Map<BreedingViewVariableParameter, String> bvVariablesMap = new HashMap<>();
+		bvVariablesMap.put(BreedingViewVariableParameter.ROW, ROW);
+		bvVariablesMap.put(BreedingViewVariableParameter.COLUMN, COL);
+		bvVariablesMap.put(BreedingViewVariableParameter.PLOT, PLOT_NO);
+		bvVariablesMap.put(BreedingViewVariableParameter.ENTRY, ENTRY_NO);
+		bvVariablesMap.put(BreedingViewVariableParameter.REP, REP_NO);
+		final MainDesign mainDesign = new ResolvableRowColumnDesignGenerator()
+			.generate(experimentalDesignInput, bvVariablesMap, 24, null, null);
 
 		final String expectedString =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Templates><Template name=\"ResolvableRowColumn\">"
-				+ "<Parameter name=\"" + ExperimentDesignGenerator.SEED_PARAM + "\" value=\":seedValue\"/><Parameter name=\""
-				+ ExperimentDesignGenerator.NTREATMENTS_PARAM + "\" value=\"24\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.NREPLICATES_PARAM + "\" value=\"2\"/><Parameter name=\""
-				+ ExperimentDesignGenerator.NROWS_PARAM + "\" value=\"5\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.NCOLUMNS_PARAM + "\" value=\"10\"/><Parameter name=\""
-				+ ExperimentDesignGenerator.TREATMENTFACTOR_PARAM + "\" value=\"ENTRY_NO\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM + "\" value=\"1\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.REPLICATEFACTOR_PARAM + "\" value=\"Reps\"/><Parameter name=\""
-				+ ExperimentDesignGenerator.ROWFACTOR_PARAM + "\" value=\"Rows\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.COLUMNFACTOR_PARAM + "\" value=\"Columns\"/><Parameter name=\""
-				+ ExperimentDesignGenerator.PLOTFACTOR_PARAM + "\" value=\"Plots\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.INITIAL_PLOT_NUMBER_PARAM + "\" value=\"301\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.NRLATIN_PARAM + "\" value=\"0\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.NCLATIN_PARAM + "\" value=\"0\"/>" + "<Parameter name=\""
-				+ ExperimentDesignGenerator.TIMELIMIT_PARAM + "\" value=\"" + AppConstants.EXP_DESIGN_TIME_LIMIT.getString()
-				+ "\"/>" + "<Parameter name=\"" + ExperimentDesignGenerator.OUTPUTFILE_PARAM
+				+ "<Parameter name=\"" + BreedingViewDesignParameter.SEED.getParameterName() + "\" value=\":seedValue\"/><Parameter name=\""
+				+ BreedingViewDesignParameter.NTREATMENTS.getParameterName() + "\" value=\"24\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.NREPLICATES.getParameterName() + "\" value=\"2\"/><Parameter name=\""
+				+ BreedingViewDesignParameter.NROWS.getParameterName() + "\" value=\"5\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.NCOLUMNS.getParameterName() + "\" value=\"10\"/><Parameter name=\""
+				+ BreedingViewVariableParameter.ENTRY.getParameterName() + "\" value=\"ENTRY_NO\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.INITIAL_TREATMENT_NUMBER.getParameterName() + "\" value=\"1\"/>" + "<Parameter name=\""
+				+BreedingViewVariableParameter.REP.getParameterName() + "\" value=\"Reps\"/><Parameter name=\""
+				+BreedingViewVariableParameter.ROW.getParameterName() + "\" value=\"Rows\"/>" + "<Parameter name=\""
+				+BreedingViewVariableParameter.COLUMN.getParameterName() + "\" value=\"Columns\"/><Parameter name=\""
+				+BreedingViewVariableParameter.PLOT.getParameterName() + "\" value=\"Plots\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.INITIAL_PLOT_NUMBER.getParameterName() + "\" value=\"301\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.NRLATIN.getParameterName() + "\" value=\"0\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.NCLATIN.getParameterName() + "\" value=\"0\"/>" + "<Parameter name=\""
+				+ BreedingViewDesignParameter.TIMELIMIT.getParameterName() + "\" value=\"" + AppConstants.EXP_DESIGN_TIME_LIMIT.getString()
+				+ "\"/>" + "<Parameter name=\"" + BreedingViewDesignParameter.OUTPUTFILE.getParameterName()
 				+ "\" value=\":outputFile\"/></Template></Templates>";
 
 		final BVDesignRunner runner = new BVDesignRunner();
@@ -277,36 +308,39 @@ public class BVDesignRunnerTest {
 		nRepeatsListItem.add(new ListItem("1"));
 		nRepeatsListItem.add(new ListItem("2"));
 		nRepeatsListItem.add(new ListItem("3"));
-		final String treatmentFactor = "ENTRY_NO";
-		final String blockFactor = "BLOCK_NO";
-		final String plotFactor = "PLOT_NO";
 
 		final int initialPlotNumber = 99;
 
 		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
 		experimentalDesignInput.setStartingPlotNo(initialPlotNumber);
 		experimentalDesignInput.setNumberOfBlocks(numberOfBlocks);
-		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createPRepDesign(experimentalDesignInput, nTreatments, nRepeatsListItem, treatmentFactor, blockFactor, plotFactor);
+
+		final Map<BreedingViewVariableParameter, String> bvVariablesMap = new HashMap<>();
+		bvVariablesMap.put(BreedingViewVariableParameter.BLOCK, BLOCK_NO);
+		bvVariablesMap.put(BreedingViewVariableParameter.PLOT, PLOT_NO);
+		bvVariablesMap.put(BreedingViewVariableParameter.ENTRY, ENTRY_NO);
+		final MainDesign mainDesign = new PRepDesignGenerator()
+			.generate(experimentalDesignInput, bvVariablesMap, nTreatments, null, Collections
+				.singletonMap(BreedingViewDesignParameter.NREPEATS, nRepeatsListItem));
 
 		final String expectedString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
 			+ "<Templates>"
 			+ "<Template name=\"" + ExperimentDesignType.P_REP.getBvDesignName() + "\"><"
-			+ "Parameter name=\"" + ExperimentDesignGenerator.SEED_PARAM + "\" value=\":seedValue\"/>"
-			+ "<Parameter name=\"" + ExperimentDesignGenerator.NTREATMENTS_PARAM + "\" value=\"20\"/>"
-			+ "<Parameter name=\"" + ExperimentDesignGenerator.NBLOCKS_PARAM + "\" value=\"1\"/>"
-			+ "<Parameter name=\"" + ExperimentDesignGenerator.NREPEATS_PARAM + "\">"
+			+ "Parameter name=\"" + BreedingViewDesignParameter.SEED.getParameterName() + "\" value=\":seedValue\"/>"
+			+ "<Parameter name=\"" + BreedingViewDesignParameter.NTREATMENTS.getParameterName() + "\" value=\"20\"/>"
+			+ "<Parameter name=\"" + BreedingViewDesignParameter.NBLOCKS.getParameterName() + "\" value=\"1\"/>"
+			+ "<Parameter name=\"" + BreedingViewDesignParameter.NREPEATS.getParameterName() + "\">"
 			+ "<ListItem value=\"1\"/>"
 			+ "<ListItem value=\"2\"/>"
 			+ "<ListItem value=\"3\"/>"
 			+ "</Parameter>"
-			+ "<Parameter name=\"" + ExperimentDesignGenerator.TREATMENTFACTOR_PARAM + "\" value=\"ENTRY_NO\"/>"
-			+ "<Parameter name=\"" + ExperimentDesignGenerator.INITIAL_TREATMENT_NUMBER_PARAM + "\" value=\"1\"/>"
-			+ "<Parameter name=\"" + ExperimentDesignGenerator.BLOCKFACTOR_PARAM + "\" value=\"BLOCK_NO\"/>"
-			+ "<Parameter name=\"" + ExperimentDesignGenerator.PLOTFACTOR_PARAM
+			+ "<Parameter name=\"" + BreedingViewVariableParameter.ENTRY.getParameterName() + "\" value=\"ENTRY_NO\"/>"
+			+ "<Parameter name=\"" + BreedingViewDesignParameter.INITIAL_TREATMENT_NUMBER.getParameterName() + "\" value=\"1\"/>"
+			+ "<Parameter name=\"" +BreedingViewVariableParameter.BLOCK.getParameterName() + "\" value=\"BLOCK_NO\"/>"
+			+ "<Parameter name=\"" +BreedingViewVariableParameter.PLOT.getParameterName()
 			+ "\" value=\"PLOT_NO\"/><Parameter name=\"initialplotnum\" value=\"99\"/>"
-			+ "<Parameter name=\"" + ExperimentDesignGenerator.TIMELIMIT_PARAM + "\" value=\"0.1\"/>"
-			+ "<Parameter name=\"" + ExperimentDesignGenerator.OUTPUTFILE_PARAM
+			+ "<Parameter name=\"" + BreedingViewDesignParameter.TIMELIMIT.getParameterName() + "\" value=\"0.1\"/>"
+			+ "<Parameter name=\"" + BreedingViewDesignParameter.OUTPUTFILE.getParameterName()
 			+ "\" value=\":outputFile\"/>"
 			+ "</Template>"
 			+ "</Templates>";
@@ -318,7 +352,7 @@ public class BVDesignRunnerTest {
 	}
 
 	private void assertXMLStringEqualsExpected(final MainDesign mainDesign, String expectedString, final String xmlString) {
-		final String outputFile = mainDesign.getDesign().getParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM);
+		final String outputFile = mainDesign.getDesign().getParameterValue(BreedingViewDesignParameter.OUTPUTFILE.getParameterName());
 		final String outputFileMillisecs = outputFile.replace(BVDesignRunner.BV_PREFIX + BVDesignRunner.CSV_EXTENSION, "");
 		final String seedValue = this.getSeedValue(outputFileMillisecs);
 		expectedString = expectedString.replace(":seedValue", seedValue);
@@ -348,8 +382,10 @@ public class BVDesignRunnerTest {
 		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
 		experimentalDesignInput.setNumberOfBlocks(6);
 		experimentalDesignInput.setStartingPlotNo(301);
-		return this.experimentDesignGenerator
-			.createRandomizedCompleteBlockDesign(experimentalDesignInput, "Reps", "Plots", TermId.ENTRY_NO.name(), treatmentFactors, levels);
+
+		return new RandomizeCompleteBlockDesignGenerator()
+			.generate(experimentalDesignInput, ExperimentalDesignGeneratorTestDataUtil.getRCBDVariablesMap(REP_NO, PLOT_NO), null, null,
+				ExperimentalDesignGeneratorTestDataUtil.getTreatmentFactorsParametersMap(treatmentFactors, levels));
 	}
 
 }
