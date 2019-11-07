@@ -28,7 +28,7 @@ public class StudyInstanceResource {
 	@RequestMapping(value = "/{cropname}/studies/{studyId}/instances/{instanceNumber}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity<StudyInstance> createStudyInstance(final @PathVariable String cropname,
-		@PathVariable final Integer studyId, @PathVariable final String instanceNumber) {
+		@PathVariable final Integer studyId, @PathVariable final int instanceNumber) {
 		return new ResponseEntity<>(this.studyInstanceService.createStudyInstance(cropname, studyId, instanceNumber),
 			HttpStatus.OK);
 

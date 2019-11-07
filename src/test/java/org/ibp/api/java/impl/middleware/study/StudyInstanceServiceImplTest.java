@@ -68,7 +68,7 @@ public class StudyInstanceServiceImplTest {
 
 		final int studyId = this.random.nextInt(BOUND);
 		final int datasetId = this.random.nextInt(BOUND);
-		final String instanceNumber = "1";
+		final int instanceNumber = this.random.nextInt(BOUND);
 		final DatasetDTO summaryDataset = new DatasetDTO();
 		summaryDataset.setDatasetId(datasetId);
 		final List<DatasetDTO> datasets = Arrays.asList(summaryDataset);
@@ -78,7 +78,7 @@ public class StudyInstanceServiceImplTest {
 				RandomStringUtils.random(BOUND),
 				RandomStringUtils.random(
 					BOUND),
-				Integer.parseInt(instanceNumber),
+				instanceNumber,
 				RandomStringUtils.random(BOUND), false);
 
 		when(this.datasetService.getDatasets(studyId, Collections.set(DatasetTypeEnum.SUMMARY_DATA.getId()))).thenReturn(datasets);
@@ -105,7 +105,7 @@ public class StudyInstanceServiceImplTest {
 	public void testCreateStudyInstanceNoEnvironmentDataset() {
 
 		final int studyId = this.random.nextInt(BOUND);
-		final String instanceNumber = "1";
+		final int instanceNumber = this.random.nextInt(BOUND);
 		when(this.datasetService.getDatasets(studyId, Collections.set(DatasetTypeEnum.SUMMARY_DATA.getId()))).thenReturn(new ArrayList<>());
 
 		try {
@@ -119,17 +119,17 @@ public class StudyInstanceServiceImplTest {
 	}
 
 	@Test
-	public void testgetStudyInstances() {
+	public void testGetStudyInstances() {
 
 		final int studyId = this.random.nextInt(BOUND);
-		final String instanceNumber = "1";
+		final int instanceNumber = this.random.nextInt(BOUND);
 
 		final org.generationcp.middleware.service.impl.study.StudyInstance studyInstance =
 			new StudyInstance(this.random.nextInt(BOUND), this.random.nextInt(BOUND), this.random.nextInt(BOUND),
 				RandomStringUtils.random(BOUND),
 				RandomStringUtils.random(
 					BOUND),
-				Integer.parseInt(instanceNumber),
+				instanceNumber,
 				RandomStringUtils.random(BOUND), false);
 
 		when(this.studyInstanceMiddlewareService.getStudyInstances(studyId))

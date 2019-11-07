@@ -44,7 +44,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	private InstanceValidator instanceValidator;
 
 	@Override
-	public StudyInstance createStudyInstance(final String cropName, final Integer studyId, final String instanceNumber) {
+	public StudyInstance createStudyInstance(final String cropName, final int studyId, final int instanceNumber) {
 
 		this.studyValidator.validate(studyId, true);
 		this.instanceValidator.checkStudyInstanceAlreadyExists(studyId, instanceNumber);
