@@ -13,6 +13,7 @@ import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.service.api.LotIDGenerator;
 import org.generationcp.middleware.service.impl.inventory.LotIDGeneratorImpl;
 import org.ibp.api.domain.inventory.GermplasmInventory;
@@ -120,7 +121,7 @@ public class InventoryServiceImpl implements InventoryService {
 			trans.setLot(lot);
 			trans.setUserId(germplasmInventory.getUserId());
 			trans.setTransactionDate(DateUtil.getCurrentDate());
-			trans.setStatus(0);
+			trans.setStatus(TransactionStatus.COMMITTED.getIntValue());
 			trans.setQuantity(germplasmInventory.getQuantityTotal());
 			trans.setComments(germplasmInventory.getComments());
 			trans.setSourceType("?");
