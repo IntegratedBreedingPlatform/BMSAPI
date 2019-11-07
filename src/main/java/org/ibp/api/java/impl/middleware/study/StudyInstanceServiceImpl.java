@@ -1,7 +1,5 @@
 package org.ibp.api.java.impl.middleware.study;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.fest.util.Collections;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -21,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -68,33 +67,12 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Override
 	public List<StudyInstance> getStudyInstances(final int studyId) {
-		final List<org.generationcp.middleware.service.impl.study.StudyInstance> studyInstancesMW =
+		final List<org.generationcp.middleware.service.impl.study.StudyInstance> studyInstances =
 			this.studyInstanceMiddlewareService.getStudyInstances(studyId);
 
-		final Function<org.generationcp.middleware.service.impl.study.StudyInstance, StudyInstance> transformer =
-			new Function<org.generationcp.middleware.service.impl.study.StudyInstance, StudyInstance>() {
-
-				@Override
-				public StudyInstance apply(final org.generationcp.middleware.service.impl.study.StudyInstance input) {
-					return new StudyInstance(input.getInstanceDbId(), input.getLocationName(), input.getLocationAbbreviation(),
-						input.getInstanceNumber(), input.getCustomLocationAbbreviation(), input.isHasFieldmap());
-				}
-			};
-		return Lists.transform(studyInstancesMW, transformer);
+		final ModelMapper mapper = new ModelMapper();
+		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+		return studyInstances.stream().map(o -> mapper.map(o, StudyInstance.class)).collect(Collectors.toList());
 	}
 
-	@Override
-	public void removeStudyInstance(final String cropName, final Integer studyId, final String instanceNumber) {
-
-		this.studyValidator.validate(studyId, true);
-		// TODO: add validation to check if the instance number exists before removing.
-
-		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
-
-		final List<DatasetDTO> datasets = this.datasetService.getDatasets(studyId, Collections.set(DatasetTypeEnum.SUMMARY_DATA.getId()));
-		if (!datasets.isEmpty()) {
-			// TODO: To be implemented in IBP-3160
-			this.studyInstanceMiddlewareService.removeStudyInstance(cropType, datasets.get(0).getDatasetId(), instanceNumber);
-		}
-	}
 }

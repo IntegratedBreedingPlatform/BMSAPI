@@ -49,17 +49,4 @@ public class StudyInstanceResource {
 		return new ResponseEntity<>(studyInstances, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Remove study instance",
-		notes = "Remove instance from study")
-	@RequestMapping(value = "/{crop}/studies/{studyId}/instances/{instanceNumber}", method = RequestMethod.DELETE)
-	@ResponseBody
-	public ResponseEntity removeStudyInstance(final @PathVariable String cropname,
-		@PathVariable final Integer studyId, @PathVariable final String instanceNumber) {
-
-		this.studyInstanceService.removeStudyInstance(cropname, studyId, instanceNumber);
-
-		return new ResponseEntity(HttpStatus.OK);
-
-	}
-
 }
