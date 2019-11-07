@@ -3,6 +3,8 @@ package org.ibp.api.rest.ontology;
 
 import java.util.List;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.MethodDetails;
 import org.ibp.api.java.ontology.MethodService;
@@ -16,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
 
 @Api(value = "Ontology Method Service")
 @Controller

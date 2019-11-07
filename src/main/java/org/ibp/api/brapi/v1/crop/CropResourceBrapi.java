@@ -1,7 +1,7 @@
 package org.ibp.api.brapi.v1.crop;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;

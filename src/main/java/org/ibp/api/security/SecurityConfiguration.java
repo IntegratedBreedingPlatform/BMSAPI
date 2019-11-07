@@ -50,7 +50,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(final WebSecurity web) throws Exception {
-		web.ignoring().antMatchers("/static/**").antMatchers("/api-docs/**");
+		web.ignoring().antMatchers("/static/**").antMatchers("/v2/api-docs/**");
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		.and()
 		.authorizeRequests()
 				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-				.antMatchers("/", "/api-docs/**", "/authenticate", "/brapi/**/token", "/breeding_view/**").permitAll()
+				.antMatchers("/", "/v2/api-docs/**", "/authenticate", "/brapi/**/token", "/breeding_view/**").permitAll()
 			.anyRequest()
 			.authenticated()
 		.and()

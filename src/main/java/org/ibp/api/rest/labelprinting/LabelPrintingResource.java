@@ -1,18 +1,18 @@
 package org.ibp.api.rest.labelprinting;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.generationcp.commons.util.FileUtils;
-import org.ibp.api.exception.NotSupportedException;
 import org.generationcp.middleware.domain.labelprinting.LabelPrintingType;
+import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
-import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
-import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
-import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
+import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
+import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
+import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Api(value = "Label Printing Services")
 @RestController
