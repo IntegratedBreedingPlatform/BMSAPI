@@ -1,7 +1,7 @@
 package org.ibp.api.rest.inventory_new;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
