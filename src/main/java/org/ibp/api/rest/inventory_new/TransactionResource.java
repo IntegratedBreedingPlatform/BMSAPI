@@ -1,10 +1,9 @@
 package org.ibp.api.rest.inventory_new;
 
-import com.mangofactory.swagger.annotations.ApiIgnore;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiImplicitParam;
-import com.wordnik.swagger.annotations.ApiImplicitParams;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.inventory_new.TransactionDto;
 import org.generationcp.middleware.domain.inventory_new.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -70,7 +70,8 @@ public class TransactionResource {
 	@ResponseBody
 	public ResponseEntity<List<TransactionDto>> getTransactions(
 		@PathVariable final String cropName, //
-		@RequestParam final Integer searchRequestId, @ApiIgnore final Pageable pageable) {
+		@RequestParam final Integer searchRequestId, @ApiIgnore
+	final Pageable pageable) {
 
 		final TransactionsSearchDto searchDTO = (TransactionsSearchDto) this.searchRequestService
 			.getSearchRequest(searchRequestId, TransactionsSearchDto.class);
