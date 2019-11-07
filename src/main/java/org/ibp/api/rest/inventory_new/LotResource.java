@@ -4,6 +4,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory_new.LotDto;
 import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -32,6 +34,7 @@ import java.util.List;
 @Api(value = "Lot Services")
 @RestController
 public class LotResource {
+
 
 	@Autowired
 	private LotService lotService;
@@ -67,15 +70,15 @@ public class LotResource {
 							"Multiple sort criteria are supported.")
 	})
 	@ResponseBody
-	public ResponseEntity<List<LotDto>> getLots(@PathVariable final String cropName, //
+	public ResponseEntity<List<ExtendedLotDto>> getLots(@PathVariable final String cropName, //
 		@RequestParam final Integer searchRequestId, @ApiIgnore
 	final Pageable pageable) {
 
 		final LotsSearchDto searchDTO = (LotsSearchDto) this.searchRequestService
 			.getSearchRequest(searchRequestId, LotsSearchDto.class);
 
-		final PagedResult<LotDto> resultPage =
-			new PaginatedSearch().executeBrapiSearch(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<LotDto>() {
+		final PagedResult<ExtendedLotDto> resultPage =
+			new PaginatedSearch().executeBrapiSearch(pageable.getPageNumber(), pageable.getPageSize(), new SearchSpec<ExtendedLotDto>() {
 
 				@Override
 				public long getCount() {
@@ -83,18 +86,27 @@ public class LotResource {
 				}
 
 				@Override
-				public List<LotDto> getResults(final PagedResult<LotDto> pagedResult) {
+				public List<ExtendedLotDto> getResults(final PagedResult<ExtendedLotDto> pagedResult) {
 					return LotResource.this.lotService.searchLots(searchDTO, pageable);
 				}
 			});
 
-		final List<LotDto> lotDtos = resultPage.getPageResults();
+		final List<ExtendedLotDto> extendedLotDtos = resultPage.getPageResults();
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add("X-Total-Count", Long.toString(resultPage.getTotalResults()));
 
-		return new ResponseEntity<>(lotDtos, headers, HttpStatus.OK);
+		return new ResponseEntity<>(extendedLotDtos, headers, HttpStatus.OK);
 
 	}
 
+	@ApiOperation(value = "Create Lot with Initial Transaction", notes = "Create a new lot and its initial transaction")
+	@RequestMapping(value = "/crops/{cropName}/lots", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Integer> createLot(
+			@PathVariable final String cropName,
+			@ApiParam("Lot with one transaction to be created")
+			@RequestBody final LotDto lotDto) {
+		return new ResponseEntity<>(0, HttpStatus.CREATED);
+	}
 }

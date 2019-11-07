@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.inventory_new;
 
+import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory_new.LotDto;
 import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
 import org.ibp.api.java.inventory_new.LotService;
@@ -18,12 +19,18 @@ public class LotServiceImpl implements LotService {
 	private org.generationcp.middleware.service.api.inventory.LotService lotService;
 
 	@Override
-	public List<LotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
+	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
 		return lotService.searchLots(lotsSearchDto, pageable);
 	}
 
 	@Override
 	public long countSearchLots(final LotsSearchDto lotsSearchDto) {
 		return lotService.countSearchLots(lotsSearchDto);
+	}
+
+	@Override
+	public Integer saveLot(final LotDto lotDto) {
+		//Validate Lot
+		return lotService.saveLot(lotDto);
 	}
 }
