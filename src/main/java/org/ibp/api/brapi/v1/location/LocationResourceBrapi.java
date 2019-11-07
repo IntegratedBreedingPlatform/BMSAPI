@@ -2,9 +2,9 @@
 package org.ibp.api.brapi.v1.location;
 
 import com.google.common.collect.ImmutableMap;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;

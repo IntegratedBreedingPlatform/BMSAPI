@@ -1,7 +1,7 @@
 package org.ibp.api.rest.breedingview;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.ibp.api.domain.design.License;
 import org.ibp.api.java.design.DesignLicenseService;
 import org.springframework.http.HttpHeaders;

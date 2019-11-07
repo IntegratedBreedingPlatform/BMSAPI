@@ -1,8 +1,8 @@
 
 package org.ibp.api.rest.study;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.ibp.api.domain.study.StudyInstance;

@@ -1,7 +1,7 @@
 
 package org.ibp.api.domain.inventory;
 
-import com.wordnik.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModel;
 
 @ApiModel("Location Information")
 public class InventoryLocation {

@@ -1,6 +1,6 @@
 package org.ibp.api.rest.role;
 
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.ibp.api.domain.role.RoleDto;
 import org.ibp.api.java.role.RoleService;

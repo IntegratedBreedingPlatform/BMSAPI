@@ -1,6 +1,6 @@
 package org.ibp.api.rest.user;
 
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiOperation;
 import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
