@@ -107,6 +107,6 @@ public class LotResource {
 			@PathVariable final String cropName,
 			@ApiParam("Lot with one transaction to be created")
 			@RequestBody final LotDto lotDto) {
-		return new ResponseEntity<>(0, HttpStatus.CREATED);
+		return new ResponseEntity<>(lotService.saveLot(lotDto), HttpStatus.CREATED);
 	}
 }
