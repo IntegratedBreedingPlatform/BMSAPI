@@ -1,10 +1,9 @@
 
 package org.ibp.api.domain.inventory;
 
+import io.swagger.annotations.ApiModel;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.ibp.api.domain.ontology.TermSummary;
-
-import com.wordnik.swagger.annotations.ApiModel;
 
 @ApiModel("Germplasm Inventory Information")
 public class GermplasmInventory {

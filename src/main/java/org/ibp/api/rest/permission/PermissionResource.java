@@ -1,6 +1,6 @@
 package org.ibp.api.rest.permission;
 
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.ibp.api.java.permission.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,8 +1,8 @@
 
 package org.ibp.api.brapi.v1.security.auth;
 
-import java.net.URL;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.security.xauth.Token;
 import org.ibp.api.security.xauth.TokenProvider;
@@ -19,8 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import java.net.URL;
 
 /**
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a> Authentication services.

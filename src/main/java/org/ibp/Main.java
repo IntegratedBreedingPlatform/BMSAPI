@@ -1,10 +1,6 @@
 
 package org.ibp;
 
-import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
-import com.mangofactory.swagger.models.dto.ApiInfo;
-import com.mangofactory.swagger.plugin.EnableSwagger;
-import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
 import org.ibp.api.java.impl.middleware.common.validator.CropNameValidationInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,24 +22,31 @@ import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.annotation.PostConstruct;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class})
-@EnableSwagger
+@EnableSwagger2
 @Configuration
 public class Main extends WebMvcConfigurerAdapter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-	@Autowired
-	private SpringSwaggerConfig springSwaggerConfig;
+	@Value("${swagger.enable}")
+	private boolean enableSwagger;
 
 	@Autowired
 	com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
-	@Value("${swagger.enable}")
-	private boolean enableSwagger;
+	@Value("${bms.version}")
+	private String bmsVersion;
 
 	public static void main(final String[] args) {
 		SpringApplication.run(Main.class, args);
@@ -95,8 +98,14 @@ public class Main extends WebMvcConfigurerAdapter {
 	}
 
 	@Bean
-	public SwaggerSpringMvcPlugin customImplementation() {
-		return new SwaggerSpringMvcPlugin(this.springSwaggerConfig).enable(this.enableSwagger).apiInfo(this.apiInfo());
+	public Docket customImplementation() {
+		return new Docket(DocumentationType.SWAGGER_2)
+			.apiInfo(this.apiInfo())
+			.enable(this.enableSwagger)
+			.select()
+			.apis(RequestHandlerSelectors.any())
+			.paths(PathSelectors.any())
+			.build();
 	}
 
 	@Bean
@@ -107,8 +116,14 @@ public class Main extends WebMvcConfigurerAdapter {
 	}
 
 	private ApiInfo apiInfo() {
-		return new ApiInfo("Welcome!", "Try out the Breeding Management System API methods listed below!", "http://bit.ly/KQX1nL",
-			"support@integratedbreeding.net", "GNU General Public License", "http://bit.ly/8Ztv8M");
+		return new ApiInfo(
+				"Welcome!",
+				"Try out the Breeding Management System API methods listed below!",
+				this.bmsVersion,
+				"http://bit.ly/KQX1nL",
+				new Contact("BMS Support", "", "support@integratedbreeding.net"),
+				"GNU General Public License",
+				"http://bit.ly/8Ztv8M");
 	}
 
 	protected void setEnableSwagger(final boolean enableSwagger) {

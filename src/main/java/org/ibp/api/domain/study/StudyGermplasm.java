@@ -1,15 +1,14 @@
 
 package org.ibp.api.domain.study;
 
-import javax.validation.constraints.NotNull;
-
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.validator.constraints.NotBlank;
 import org.ibp.api.domain.germplasm.GermplasmListEntrySummary;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.wordnik.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.NotNull;
 
 public class StudyGermplasm {
 

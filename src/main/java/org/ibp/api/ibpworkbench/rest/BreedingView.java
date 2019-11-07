@@ -11,9 +11,9 @@
 
 package org.ibp.api.ibpworkbench.rest;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.ibp.api.ibpworkbench.constants.WebAPIConstants;
 import org.ibp.api.ibpworkbench.model.DataResponse;
 import org.ibp.api.ibpworkbench.service.BreedingViewService;
@@ -36,6 +36,7 @@ import java.util.Map;
 @Api(value = "Breeding View Resource")
 @RestController
 @RequestMapping("/breeding_view")
+// TODO rename to BreedingViewResource
 public class BreedingView {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BreedingView.class);

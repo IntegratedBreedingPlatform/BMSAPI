@@ -6,8 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import com.mangofactory.swagger.annotations.ApiIgnore;
+import springfox.documentation.annotations.ApiIgnore;
 
 @Controller
 public class WebContentController {
