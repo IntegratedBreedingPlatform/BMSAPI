@@ -87,7 +87,7 @@ public class ExperimentalDesignProcessorTest {
 		final MainDesign mainDesign =
 			new RandomizeCompleteBlockDesignGenerator()
 				.generate(this.designInput, ExperimentalDesignGeneratorTestDataUtil.getRCBDVariablesMap(REP_NO, PLOT_NO),
-					null, null, null);
+					null, null, Collections.emptyMap());
 
 		final List<Integer> trialInstances = Arrays.asList(2, 4, 6);
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(trialInstances);
@@ -124,7 +124,7 @@ public class ExperimentalDesignProcessorTest {
 		final MainDesign mainDesign =
 			new RandomizeCompleteBlockDesignGenerator()
 				.generate(this.designInput, ExperimentalDesignGeneratorTestDataUtil.getRCBDVariablesMap(REP_NO, PLOT_NO),
-					null, null, null);
+					null, null, Collections.emptyMap());
 		Mockito.doReturn(new BVDesignOutput(1)).when(this.designRunner)
 			.runBVDesign(mainDesign);
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2));
@@ -145,7 +145,7 @@ public class ExperimentalDesignProcessorTest {
 		final MainDesign mainDesign =
 			new RandomizeCompleteBlockDesignGenerator()
 				.generate(this.designInput, ExperimentalDesignGeneratorTestDataUtil.getRCBDVariablesMap(REP_NO, PLOT_NO),
-					null, null, null);
+					null, null, Collections.emptyMap());
 		Mockito.doThrow(new IOException()).when(this.designRunner)
 			.runBVDesign(mainDesign);
 		try {

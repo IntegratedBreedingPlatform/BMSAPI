@@ -11,7 +11,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewDesignParameter;
-import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewVariableParameter;
+import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignGeneratorTestDataUtil;
 import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignProcessor;
 import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.java.impl.middleware.design.generator.PRepDesignGenerator;
@@ -21,24 +21,22 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -80,6 +78,7 @@ public class PRepDesignTypeServiceImplTest {
 		final MainDesign mainDesign = new MainDesign();
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		final List<ObservationUnitRow> observationUnitRowList = new ArrayList<>();
+		observationUnitRowList.add(new ObservationUnitRow());
 
 		final int studyId = 1;
 		final int numberOfTreatments = 10;
@@ -99,28 +98,26 @@ public class PRepDesignTypeServiceImplTest {
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
 		experimentalDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
 
-		final Map<BreedingViewVariableParameter, String> bvVariablesMap = new HashMap<>();
-		bvVariablesMap.put(BreedingViewVariableParameter.BLOCK, BLOCK_NO);
-		bvVariablesMap.put(BreedingViewVariableParameter.PLOT, PLOT_NO);
-		bvVariablesMap.put(BreedingViewVariableParameter.ENTRY, ENTRY_NO);
+
 		when(this.experimentDesignGenerator
-			.generate(experimentalDesignInput, bvVariablesMap, studyGermplasmDtoList.size(), null, Collections.singletonMap(
-				BreedingViewDesignParameter.NREPEATS, new ArrayList<>()))).thenReturn(mainDesign);
+			.generate(eq(experimentalDesignInput), eq(ExperimentalDesignGeneratorTestDataUtil.getPRepVariablesMap(BLOCK_NO, ENTRY_NO, PLOT_NO)), eq(studyGermplasmDtoList.size()), eq(null), ArgumentMatchers
+				.anyMap())).thenReturn(mainDesign);
 
 		when(this.measurementVariableGenerator
 			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, PRepDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
 				PRepDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
 			.thenReturn(measurementVariables);
-		when(this.experimentalDesignProcessor
-			.generateObservationUnitRows(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
-				refEq(studyGermplasmDtoList), refEq(mainDesign),
+
+		this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
+
+		Mockito.verify(this.experimentDesignGenerator)
+			.generate(eq(experimentalDesignInput), eq(ExperimentalDesignGeneratorTestDataUtil.getPRepVariablesMap(BLOCK_NO, ENTRY_NO, PLOT_NO)),
+				eq(studyGermplasmDtoList.size()), isNull(), any(Map.class));
+		Mockito.verify(this.experimentalDesignProcessor)
+			.generateObservationUnitRows(eq(trialInstancesForDesignGeneration), eq(measurementVariables),
+				eq(studyGermplasmDtoList), eq(mainDesign),
 				eq(ENTRY_NO),
-				isNull(), any(Map.class))).thenReturn(observationUnitRowList);
-
-		final List<ObservationUnitRow> result =
-			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
-
-		assertSame(result, observationUnitRowList);
+				isNull(), any(Map.class));
 	}
 
 	@Test
@@ -128,17 +125,14 @@ public class PRepDesignTypeServiceImplTest {
 
 		final int noOfTestEntries = 5;
 		final int replicationNumber = 3;
-		final int replicationPercentage = 50;
+		final float replicationPercentage = 50.0f;
 		final float noOfTestEntriesToReplicate = Math.round((float) noOfTestEntries * (replicationPercentage / 100));
 
 		final List<StudyGermplasmDto> importedGermplasmList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
 
-		final ExperimentalDesignInput input = new ExperimentalDesignInput();
-		input.setReplicationPercentage(replicationPercentage);
-		input.setReplicationsCount(replicationNumber);
 		final Map<BreedingViewDesignParameter, List<ListItem>> map =
 			this.designTypeService
-				.createReplicationListItems(importedGermplasmList, input);
+				.createReplicationListItems(importedGermplasmList, replicationPercentage, replicationNumber);
 
 		Assert.assertNotNull(map);
 		Assert.assertEquals(1, map.size());
@@ -151,7 +145,7 @@ public class PRepDesignTypeServiceImplTest {
 			}
 		}
 
-		Assert.assertEquals(String.valueOf(countOfReplicatedListItem), String.valueOf(noOfTestEntriesToReplicate));
+		Assert.assertEquals(String.valueOf(noOfTestEntriesToReplicate), String.valueOf(countOfReplicatedListItem));
 
 	}
 
@@ -161,7 +155,7 @@ public class PRepDesignTypeServiceImplTest {
 		final int noOfTestEntries = 4;
 		final int noOfCheckEntries = 1;
 		final int replicationNumber = 3;
-		final int replicationPercentage = 50;
+		final float replicationPercentage = 50.0f;
 		final float noOfTestEntriesToReplicate = Math.round((float) noOfTestEntries * (replicationPercentage / 100));
 
 		final List<StudyGermplasmDto> importedGermplasmList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
@@ -170,12 +164,9 @@ public class PRepDesignTypeServiceImplTest {
 		final StudyGermplasmDto checkImportedGermplasm = importedGermplasmList.get(0);
 		checkImportedGermplasm.setCheckType(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
 
-		final ExperimentalDesignInput input = new ExperimentalDesignInput();
-		input.setReplicationPercentage(replicationPercentage);
-		input.setReplicationsCount(replicationNumber);
 		final Map<BreedingViewDesignParameter, List<ListItem>> map =
 			this.designTypeService
-				.createReplicationListItems(importedGermplasmList, input);
+				.createReplicationListItems(importedGermplasmList, replicationPercentage, replicationNumber);
 
 		Assert.assertNotNull(map);
 		Assert.assertEquals(1, map.size());
@@ -198,7 +189,7 @@ public class PRepDesignTypeServiceImplTest {
 		final int noOfTestEntries = 4;
 		final int noOfCheckEntries = 1;
 		final int replicationNumber = 3;
-		final int replicationPercentage = 50;
+		final float replicationPercentage = 50;
 		final float noOfTestEntriesToReplicate = Math.round((float) noOfTestEntries * (replicationPercentage / 100));
 
 		final List<StudyGermplasmDto> importedGermplasmList = StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(5, 0);
@@ -209,12 +200,9 @@ public class PRepDesignTypeServiceImplTest {
 		final int customEntryTypeCategoricalId = 1000;
 		checkImportedGermplasm.setCheckType(customEntryTypeCategoricalId);
 
-		final ExperimentalDesignInput input = new ExperimentalDesignInput();
-		input.setReplicationPercentage(replicationPercentage);
-		input.setReplicationsCount(replicationNumber);
 		final Map<BreedingViewDesignParameter, List<ListItem>> map =
 			this.designTypeService
-				.createReplicationListItems(importedGermplasmList, input);
+				.createReplicationListItems(importedGermplasmList, replicationPercentage, replicationNumber);
 
 		Assert.assertNotNull(map);
 		Assert.assertEquals(1, map.size());

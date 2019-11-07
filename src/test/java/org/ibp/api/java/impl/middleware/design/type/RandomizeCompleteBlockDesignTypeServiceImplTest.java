@@ -38,6 +38,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.when;
 
@@ -106,7 +107,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 		experimentalDesignInput.setTreatmentFactorsData(this.createTreatmentFactorsDataMap());
 
 		when(this.experimentDesignGenerator
-			.generate(eq(experimentalDesignInput), eq(ExperimentalDesignGeneratorTestDataUtil.getRCBDVariablesMap(REP_NO, PLOT_NO)), null, null,
+			.generate(eq(experimentalDesignInput), eq(ExperimentalDesignGeneratorTestDataUtil.getRCBDVariablesMap(REP_NO, PLOT_NO)), isNull(), isNull(),
 				any(Map.class))).thenReturn(mainDesign);
 		when(this.measurementVariableGenerator
 			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, RandomizeCompleteBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
