@@ -31,13 +31,13 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 	public void testCreateStudyInstance() throws Exception {
 
 		final int studyId = 1;
-		final String instanceNumber = "1";
+		final int instanceNumber = 1;
 
 		final StudyInstance studyInstance = new StudyInstance(this.random.nextInt(BOUND), this.random.nextInt(BOUND),
 			RandomStringUtils.random(BOUND),
 			RandomStringUtils.random(
 				BOUND),
-			Integer.parseInt(instanceNumber),
+			instanceNumber,
 			RandomStringUtils.random(BOUND), false);
 		when(this.studyInstanceService.createStudyInstance(CropType.CropEnum.MAIZE.name().toLowerCase(), studyId, instanceNumber))
 			.thenReturn(studyInstance);
@@ -62,13 +62,13 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 	public void testGetStudyInstances() throws Exception {
 
 		final int studyId = 1;
-		final String instanceNumber = "1";
+		final int instanceNumber = 1;
 
 		final StudyInstance studyInstance = new StudyInstance(this.random.nextInt(BOUND), this.random.nextInt(BOUND),
 			RandomStringUtils.random(BOUND),
 			RandomStringUtils.random(
 				BOUND),
-			Integer.parseInt(instanceNumber),
+			instanceNumber,
 			RandomStringUtils.random(BOUND), false);
 		when(this.studyInstanceService.getStudyInstances(studyId))
 			.thenReturn(Arrays.asList(studyInstance));
