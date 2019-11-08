@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.inventory_new;
 import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory_new.LotDto;
 import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
+import org.ibp.api.java.impl.middleware.inventory_new.validator.LotValidator;
 import org.ibp.api.java.inventory_new.LotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,9 @@ import java.util.List;
 @Service
 @Transactional
 public class LotServiceImpl implements LotService {
+
+	@Autowired
+	private LotValidator lotValidator;
 
 	@Autowired
 	private org.generationcp.middleware.service.api.inventory.LotService lotService;
@@ -30,7 +34,7 @@ public class LotServiceImpl implements LotService {
 
 	@Override
 	public Integer saveLot(final LotDto lotDto) {
-		//Validate Lot
+		lotValidator.validate(lotDto);
 		return lotService.saveLot(lotDto);
 	}
 }
