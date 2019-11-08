@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 import org.apache.commons.lang3.BooleanUtils;
 import org.fest.util.Collections;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -23,6 +24,9 @@ public class InstanceValidator {
 
 	@Autowired
 	private StudyDataManager studyDataManager;
+
+	@Autowired
+	private StudyInstanceService studyInstanceService;
 
 	@Autowired
 	private StudyService middlewareStudyService;
@@ -59,7 +63,7 @@ public class InstanceValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		final List<StudyInstance> studyInstances = this.middlewareStudyService.getStudyInstances(studyId);
+		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
 		final List<Integer> restrictedInstances = new ArrayList<>();
 		final List<Integer> instancesWithDesign = new ArrayList<>();
 		for (final StudyInstance instance : studyInstances) {
@@ -83,6 +87,15 @@ public class InstanceValidator {
 			.filter(instancesWithDesign::contains)
 			.collect(Collectors.toSet()).isEmpty() && this.middlewareStudyService.hasAdvancedOrCrossesList(studyId)) {
 			this.errors.reject("study.has.advance.or.cross.list");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	public void checkStudyInstanceAlreadyExists(final Integer studyId, final int instanceNumber) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		final Map<String, Integer> instanceGeolocationIdMap = this.studyDataManager.getInstanceGeolocationIdsMap(studyId);
+		if (instanceGeolocationIdMap.keySet().contains(String.valueOf(instanceNumber))) {
+			this.errors.reject("instance.already.exists", new Object[] {instanceNumber}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 

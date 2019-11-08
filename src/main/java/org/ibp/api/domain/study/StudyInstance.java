@@ -9,6 +9,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class StudyInstance {
 
 	private int instanceDbId;
+	private int experimentId;
 	private String locationName;
 	private String locationAbbreviation;
 	private String customLocationAbbreviation;
@@ -22,8 +23,10 @@ public class StudyInstance {
 
 	}
 
-	public StudyInstance(final int instanceDbId, final String locationName, final String locationAbbreviation, final int instanceNumber, final String customLocationAbbreviation, final boolean hasFieldmap) {
+	public StudyInstance(final int instanceDbId, final int experimentId, final String locationName, final String locationAbbreviation,
+		final int instanceNumber, final String customLocationAbbreviation, final boolean hasFieldmap) {
 		this.instanceDbId = instanceDbId;
+		this.experimentId = experimentId;
 		this.locationName = locationName;
 		this.locationAbbreviation = locationAbbreviation;
 		this.instanceNumber = instanceNumber;
@@ -71,11 +74,9 @@ public class StudyInstance {
 		this.customLocationAbbreviation = customLocationAbbreviation;
 	}
 
-
 	public boolean getHasFieldmap() {
 		return hasFieldmap;
 	}
-
 
 	public void setHasFieldmap(boolean hasFieldmap) {
 		this.hasFieldmap = hasFieldmap;
@@ -103,6 +104,14 @@ public class StudyInstance {
 
 	public void setCanBeDeleted(final Boolean canBeDeleted) {
 		this.canBeDeleted = canBeDeleted;
+	}
+
+	public int getExperimentId() {
+		return this.experimentId;
+	}
+
+	public void setExperimentId(final int experimentId) {
+		this.experimentId = experimentId;
 	}
 
 	@Override
