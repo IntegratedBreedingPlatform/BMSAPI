@@ -110,6 +110,7 @@ public class PRepDesignTypeServiceImplTest {
 
 		this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
+		Assert.assertEquals(blockSize, experimentalDesignInput.getNumberOfBlocks());
 		Mockito.verify(this.experimentDesignGenerator)
 			.generate(eq(experimentalDesignInput), eq(ExperimentalDesignGeneratorTestDataUtil.getPRepVariablesMap(BLOCK_NO, ENTRY_NO, PLOT_NO)),
 				eq(studyGermplasmDtoList.size()), isNull(), any(Map.class));

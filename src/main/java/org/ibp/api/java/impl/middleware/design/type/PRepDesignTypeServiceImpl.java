@@ -66,6 +66,7 @@ public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService 
 		final Map<BreedingViewDesignParameter, List<ListItem>> listItems =
 			this.createReplicationListItems(studyGermplasmDtoList, experimentalDesignInput.getReplicationPercentage(),
 				experimentalDesignInput.getReplicationsCount());
+		experimentalDesignInput.setNumberOfBlocks(experimentalDesignInput.getBlockSize());
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.generate(experimentalDesignInput, this.getBreedingViewVariablesMap(standardVariablesMap), studyGermplasmDtoList.size(), null,
 				listItems);
