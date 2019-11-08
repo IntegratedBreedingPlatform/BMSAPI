@@ -31,9 +31,6 @@ import static org.mockito.Mockito.when;
 public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Mock
-	private StudyDataManager studyDataManager;
-
-	@Mock
 	private StudyService middlewareStudyService;
 
 	@Mock
