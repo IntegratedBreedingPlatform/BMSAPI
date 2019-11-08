@@ -16,11 +16,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -45,9 +46,8 @@ public class EntryListOrderDesignTypeServiceImplTest {
 
 		final int studyId = 1;
 		final int numberOfTreatments = 5;
-		final int numberOfControls = 1;
+		final int numberOfControls = 0;
 		final Integer startingPlotNumber = 1;
-		final Integer checkStartingPosition = 0;
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
@@ -55,7 +55,6 @@ public class EntryListOrderDesignTypeServiceImplTest {
 		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
 		experimentalDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
 		experimentalDesignInput.setStartingPlotNo(startingPlotNumber);
-		experimentalDesignInput.setCheckStartingPosition(checkStartingPosition);
 
 		when(this.measurementVariableGenerator
 			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, EntryListOrderDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
@@ -65,17 +64,37 @@ public class EntryListOrderDesignTypeServiceImplTest {
 		final List<ObservationUnitRow> result =
 			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
-		assertEquals(5 * trialInstancesForDesignGeneration.size(), result.size());
-		assertEquals(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()),
-			result.get(0).getVariables().get(String.valueOf(TermId.ENTRY_TYPE.getId())).getValue());
-		assertEquals(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()),
-			result.get(1).getVariables().get(String.valueOf(TermId.ENTRY_TYPE.getId())).getValue());
-		assertEquals(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()),
-			result.get(2).getVariables().get(String.valueOf(TermId.ENTRY_TYPE.getId())).getValue());
-		assertEquals(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()),
-			result.get(3).getVariables().get(String.valueOf(TermId.ENTRY_TYPE.getId())).getValue());
-		assertEquals(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()),
-			result.get(4).getVariables().get(String.valueOf(TermId.ENTRY_TYPE.getId())).getValue());
+		assertEquals(numberOfTreatments * trialInstancesForDesignGeneration.size(), result.size());
+		final Map<Integer, List<ObservationUnitRow>> instancesRowMap = new HashMap<>();
+		Integer currentTrialInstance = 1;
+		Integer index = 1;
+		Integer germplasmId = 100;
+		for (final ObservationUnitRow row : result) {
+			final Integer trialInstance = row.getTrialInstance();
+			if (currentTrialInstance != trialInstance) {
+				currentTrialInstance = trialInstance;
+				index = 1;
+				germplasmId = 100;
+			}
+			System.out.println("ROW " + index);
+			instancesRowMap.putIfAbsent(trialInstance, new ArrayList<>());
+			instancesRowMap.get(trialInstance).add(row);
+
+			// Verify row values
+			assertEquals(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()),
+				row.getVariables().get(String.valueOf(TermId.ENTRY_TYPE.getId())).getValue());
+			assertEquals(index, row.getEntryNumber());
+			assertEquals(row.getEntryNumber().toString(), row.getVariables().get(String.valueOf(TermId.ENTRY_NO.getId())).getValue());
+			assertEquals(row.getEntryNumber().toString(), row.getVariables().get(String.valueOf(TermId.PLOT_NO.getId())).getValue());
+			assertEquals(germplasmId.toString(),
+				row.getVariables().get(String.valueOf(TermId.GID.getId())).getValue());
+			index++;
+			germplasmId++;
+
+		}
+		assertEquals(numberOfTreatments, instancesRowMap.get(1).size());
+		assertEquals(numberOfTreatments, instancesRowMap.get(2).size());
+		assertEquals(numberOfTreatments, instancesRowMap.get(3).size());
 
 	}
 

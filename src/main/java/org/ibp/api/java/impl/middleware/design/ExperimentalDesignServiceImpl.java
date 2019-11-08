@@ -81,18 +81,20 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 			this.checkLicense();
 		}
 
-		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
-
-		final String programUUID = this.studyService.getProgramUUID(studyId);
+		// Validate design type parameters based on study germplasm list
 		final List<StudyGermplasmDto> studyGermplasmDtoList = this.middlewareStudyService.getStudyGermplasmList(studyId);
-
 		this.experimentalDesignTypeValidator.validate(experimentalDesignInput, studyGermplasmDtoList);
+
+		// Generate observation unit rows
+		final String programUUID = this.studyService.getProgramUUID(studyId);
 		final List<ObservationUnitRow> observationUnitRows =
 			experimentalDesignTypeService.generateDesign(studyId, experimentalDesignInput, programUUID, studyGermplasmDtoList);
 
+		// Save experimental design and observation unit rows
 		final List<MeasurementVariable> measurementVariables =
 			experimentalDesignTypeService.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 
+		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 		this.experimentDesignMiddlewareService
 			.saveExperimentDesign(cropType, studyId, measurementVariables,
 				this.createInstanceObservationUnitRowsMap(observationUnitRows));

@@ -103,7 +103,9 @@ public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTy
 		for (final MeasurementVariable var : measurementVariables) {
 			final Integer termId = var.getTermId();
 			if (termId == TermId.ENTRY_NO.getId()) {
-				observationUnitData = new ObservationUnitData(termId, String.valueOf(germplasm.getEntryNumber()));
+				final Integer entryNumber = germplasm.getEntryNumber();
+				observationUnitData = new ObservationUnitData(termId, String.valueOf(entryNumber));
+				row.setEntryNumber(entryNumber);
 			} else if (termId == TermId.SOURCE.getId() || termId == TermId.GERMPLASM_SOURCE.getId()) {
 				observationUnitData = new ObservationUnitData(termId, germplasm.getSeedSource() != null ? germplasm.getSeedSource() : StringUtils.EMPTY);
 			} else if (termId == TermId.GROUPGID.getId()) {
