@@ -52,7 +52,6 @@ import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
@@ -60,7 +59,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -460,8 +458,13 @@ public class StudyServiceImpl implements StudyService {
 
 			@Override
 			public StudyInstance apply(final org.generationcp.middleware.service.impl.study.StudyInstance input) {
-				return new StudyInstance(input.getInstanceDbId(), input.getLocationName(), input.getLocationAbbreviation(),
-						input.getInstanceNumber(),input.getCustomLocationAbbreviation(), input.isHasFieldmap());
+				final StudyInstance studyInstance =
+					new StudyInstance(input.getInstanceDbId(), input.getLocationName(), input.getLocationAbbreviation(),
+						input.getInstanceNumber(), input.getCustomLocationAbbreviation(), input.isHasFieldmap());
+				studyInstance.setHasExperimentalDesign(input.isHasExperimentalDesign());
+				studyInstance.setHasMeasurements(input.isHasMeasurements());
+				studyInstance.setCanBeDeleted(input.getCanBeDeleted());
+				return studyInstance;
 			}
 		};
 		return Lists.transform(studyInstancesMW, transformer);

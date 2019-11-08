@@ -1,19 +1,22 @@
 package org.ibp.api.java.impl.middleware.design;
 
+import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.java.design.DesignLicenseService;
-import org.ibp.api.java.design.ExperimentDesignService;
-import org.ibp.api.java.design.type.ExperimentDesignTypeService;
+import org.ibp.api.java.design.ExperimentalDesignService;
+import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
+import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
-import org.ibp.api.java.impl.middleware.design.type.ExperimentDesignTypeServiceFactory;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignValidator;
+import org.ibp.api.java.impl.middleware.design.type.ExperimentalDesignTypeServiceFactory;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignTypeValidator;
+import org.ibp.api.java.impl.middleware.design.validator.ExperimentalDesignValidator;
 import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,17 +29,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Transactional
-public class ExperimentDesignServiceImpl implements ExperimentDesignService {
+public class ExperimentalDesignServiceImpl implements ExperimentalDesignService {
 	static final String EXPERIMENT_DESIGN_LICENSE_EXPIRED = "experiment.design.license.expired";
 
 	@Resource
 	private StudyValidator studyValidator;
 
 	@Resource
-	private ExperimentDesignValidator experimentDesignValidator;
+	private ExperimentalDesignValidator experimentalDesignValidator;
+
+	@Resource
+	private InstanceValidator instanceValidator;
 
 	@Autowired
 	private StudyService studyService;
@@ -48,7 +55,10 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	private org.generationcp.middleware.service.api.study.generation.ExperimentDesignService experimentDesignMiddlewareService;
 
 	@Resource
-	private ExperimentDesignTypeServiceFactory experimentDesignTypeServiceFactory;
+	private ExperimentalDesignTypeServiceFactory experimentalDesignTypeServiceFactory;
+
+	@Resource
+	private ExperimentalDesignTypeValidator experimentalDesignTypeValidator;
 
 	@Resource
 	private WorkbenchDataManager workbenchDataManager;
@@ -57,46 +67,75 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 	private DesignLicenseService designLicenseService;
 
 	@Override
-	public void generateAndSaveDesign(final String cropName, final int studyId, final ExperimentDesignInput experimentDesignInput) {
+	public void generateAndSaveDesign(final String cropName, final int studyId, final ExperimentalDesignInput experimentalDesignInput) {
+		this.studyValidator.validate(studyId, true);
+		final Integer designType = experimentalDesignInput.getDesignType();
+		this.experimentalDesignValidator.validateStudyExperimentalDesign(studyId, designType);
+		this.instanceValidator.validateForDesignGeneration(studyId, experimentalDesignInput.getTrialInstancesForDesignGeneration());
+
 		// Check license validity first and foremost( if applicable for design type)
 		// Raise an error right away if license is not valid
-		final ExperimentDesignTypeService experimentDesignTypeService =
-			this.experimentDesignTypeServiceFactory.lookup(experimentDesignInput.getDesignType());
-		if (experimentDesignTypeService.requiresLicenseCheck()) {
+		final ExperimentalDesignTypeService experimentalDesignTypeService =
+			this.experimentalDesignTypeServiceFactory.lookup(designType);
+		if (experimentalDesignTypeService.requiresLicenseCheck()) {
 			this.checkLicense();
 		}
 
-		this.studyValidator.validate(studyId, true);
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 
 		final String programUUID = this.studyService.getProgramUUID(studyId);
 		final List<StudyGermplasmDto> studyGermplasmDtoList = this.middlewareStudyService.getStudyGermplasmList(studyId);
 
+		this.experimentalDesignTypeValidator.validate(experimentalDesignInput, studyGermplasmDtoList);
 		final List<ObservationUnitRow> observationUnitRows =
-			experimentDesignTypeService.generateDesign(studyId, experimentDesignInput, programUUID, studyGermplasmDtoList);
-
+			experimentalDesignTypeService.generateDesign(studyId, experimentalDesignInput, programUUID, studyGermplasmDtoList);
 
 		final List<MeasurementVariable> measurementVariables =
-			experimentDesignTypeService.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
+			experimentalDesignTypeService.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 
-		this.experimentDesignMiddlewareService.deleteStudyExperimentDesign(studyId);
 		this.experimentDesignMiddlewareService
-			.saveExperimentDesign(cropType, studyId, measurementVariables, this.mapObservationUnitRow(observationUnitRows));
+			.saveExperimentDesign(cropType, studyId, measurementVariables,
+				this.createInstanceObservationUnitRowsMap(observationUnitRows));
 	}
 
 	@Override
 	public void deleteDesign(final int studyId) {
-		this.studyValidator.validate(studyId, true);
-		this.experimentDesignValidator.validateExperimentDesignExistence(studyId, true);
+		this.studyValidator.validate(studyId, true, false);
+		this.experimentalDesignValidator.validateExperimentalDesignExistence(studyId, true);
 		this.experimentDesignMiddlewareService.deleteStudyExperimentDesign(studyId);
 	}
 
-	List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> mapObservationUnitRow(
+	@Override
+	public List<ExperimentDesignType> getExperimentalDesignTypes() {
+		final List<ExperimentDesignType> designTypes = new ArrayList<>();
+
+		designTypes.add(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK);
+		designTypes.add(ExperimentDesignType.RESOLVABLE_INCOMPLETE_BLOCK);
+		designTypes.add(ExperimentDesignType.ROW_COL);
+		designTypes.add(ExperimentDesignType.AUGMENTED_RANDOMIZED_BLOCK);
+		designTypes.add(ExperimentDesignType.CUSTOM_IMPORT);
+		designTypes.add(ExperimentDesignType.ENTRY_LIST_ORDER);
+		designTypes.add(ExperimentDesignType.P_REP);
+
+		return designTypes;
+	}
+
+	@Override
+	public Optional<Integer> getStudyExperimentalDesignTypeTermId(final int studyId) {
+		final com.google.common.base.Optional<Integer> termIdOptional =
+			this.experimentDesignMiddlewareService.getStudyExperimentDesignTypeTermId(studyId);
+		if (termIdOptional.isPresent()) {
+			return Optional.of(termIdOptional.get());
+		}
+		return Optional.empty();
+	}
+
+	Map<Integer, List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow>> createInstanceObservationUnitRowsMap(
 		final List<ObservationUnitRow> observationUnitRows) {
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 
-		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> convertedRows = new ArrayList<>();
+		final Map<Integer, List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow>> instanceRowsMap = new HashMap<>();
 		for (final ObservationUnitRow row : observationUnitRows) {
 			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> variables = new HashMap<>();
 			final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> environmentVariables = new HashMap<>();
@@ -112,9 +151,12 @@ public class ExperimentDesignServiceImpl implements ExperimentDesignService {
 				observationUnitRowMapper.map(row, org.generationcp.middleware.service.api.dataset.ObservationUnitRow.class);
 			convertedRow.setVariables(variables);
 			convertedRow.setEnvironmentVariables(environmentVariables);
-			convertedRows.add(convertedRow);
+
+			final Integer trialInstance = row.getTrialInstance();
+			instanceRowsMap.putIfAbsent(trialInstance, new ArrayList<>());
+			instanceRowsMap.get(trialInstance).add(convertedRow);
 		}
-		return convertedRows;
+		return instanceRowsMap;
 	}
 
 	void checkLicense() {

@@ -14,6 +14,9 @@ public class StudyInstance {
 	private String customLocationAbbreviation;
 	private int instanceNumber;
 	private boolean hasFieldmap;
+	private Boolean hasExperimentalDesign;
+	private Boolean hasMeasurements;
+	private Boolean canBeDeleted;
 
 	public StudyInstance() {
 
@@ -68,14 +71,38 @@ public class StudyInstance {
 		this.customLocationAbbreviation = customLocationAbbreviation;
 	}
 
-	
+
 	public boolean getHasFieldmap() {
 		return hasFieldmap;
 	}
 
-	
+
 	public void setHasFieldmap(boolean hasFieldmap) {
 		this.hasFieldmap = hasFieldmap;
+	}
+
+	public Boolean isHasExperimentalDesign() {
+		return hasExperimentalDesign;
+	}
+
+	public void setHasExperimentalDesign(final Boolean hasExperimentalDesign) {
+		this.hasExperimentalDesign = hasExperimentalDesign;
+	}
+
+	public Boolean isHasMeasurements() {
+		return hasMeasurements;
+	}
+
+	public void setHasMeasurements(final Boolean hasMeasurements) {
+		this.hasMeasurements = hasMeasurements;
+	}
+
+	public Boolean getCanBeDeleted() {
+		return canBeDeleted;
+	}
+
+	public void setCanBeDeleted(final Boolean canBeDeleted) {
+		this.canBeDeleted = canBeDeleted;
 	}
 
 	@Override

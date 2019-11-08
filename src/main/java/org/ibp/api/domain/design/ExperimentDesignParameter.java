@@ -21,6 +21,14 @@ public class ExperimentDesignParameter implements Serializable {
 		this.value = value;
 	}
 
+	public ExperimentDesignParameter(final String name, final String value, final List<ListItem> items) {
+		this.name = name;
+		this.value = value;
+		if (items != null && !items.isEmpty()) {
+			this.setListItem(items);
+		}
+	}
+
 	@XmlAttribute
 	public String getName() {
 		return this.name;
