@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.mangofactory.swagger.annotations.ApiIgnore;
+import springfox.documentation.annotations.ApiIgnore;
 
 // **Important note for developers** : This class is central to the authentication framework of BMSAPI. Please do not alter it without a
 // good understanding of Spring Security in general and BMS X-Auth-Token based authentication workflow in particular, otherwise there will

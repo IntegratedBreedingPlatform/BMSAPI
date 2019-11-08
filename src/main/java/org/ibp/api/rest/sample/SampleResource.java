@@ -1,8 +1,8 @@
 package org.ibp.api.rest.sample;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.sample.SampleService;

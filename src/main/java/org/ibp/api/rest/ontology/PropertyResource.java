@@ -3,6 +3,8 @@ package org.ibp.api.rest.ontology;
 
 import java.util.List;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.java.ontology.PropertyService;
@@ -18,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.common.base.Strings;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
 
 @Api(value = "Ontology Property Service")
 @Controller

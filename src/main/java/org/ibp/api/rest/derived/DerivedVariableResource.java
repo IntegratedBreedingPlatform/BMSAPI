@@ -1,7 +1,7 @@
 package org.ibp.api.rest.derived;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.dms.VariableDatasetsDTO;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.ibp.api.exception.OverwriteDataException;

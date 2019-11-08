@@ -2,9 +2,9 @@ package org.ibp.api.brapi.v1.germplasm;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Lists;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -151,7 +151,7 @@ public class GermplasmResourceBrapi {
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<PedigreeDTO>> getPedigree(
 		@PathVariable final String crop,
-		@ApiParam(value = "the internal id of the germplasm")
+		@ApiParam(value = "the internal id of the germplasm", required = true)
 		@PathVariable(value = "germplasmDbId") final String germplasmDbId,
 		@ApiParam(value = "text representation of the pedigree <strong style='color: red'>(Not Implemented)</strong>", required = false)
 		@RequestParam(value = "notation", required = false) final String notation,
@@ -185,7 +185,7 @@ public class GermplasmResourceBrapi {
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<ProgenyDTO>> getProgeny(
 		@PathVariable final String crop,
-		@ApiParam(value = "the internal id of the germplasm")
+		@ApiParam(value = "the internal id of the germplasm", required = true)
 		@PathVariable(value = "germplasmDbId") final String germplasmDbId
 	) {
 
