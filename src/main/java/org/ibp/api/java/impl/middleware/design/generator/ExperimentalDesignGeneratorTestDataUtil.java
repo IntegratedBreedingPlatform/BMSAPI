@@ -60,8 +60,8 @@ public class ExperimentalDesignGeneratorTestDataUtil {
 		final String entry, final String plot) {
 		final Map<BreedingViewVariableParameter, String> bvVariablesMap = new LinkedHashMap<>();
 		bvVariablesMap.put(BreedingViewVariableParameter.BLOCK, block);
-		bvVariablesMap.put(BreedingViewVariableParameter.PLOT, plot);
 		bvVariablesMap.put(BreedingViewVariableParameter.ENTRY, entry);
+		bvVariablesMap.put(BreedingViewVariableParameter.PLOT, plot);
 
 		return bvVariablesMap;
 	}

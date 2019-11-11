@@ -122,6 +122,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImplTest {
 		final List<ObservationUnitRow> result =
 			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
+		Assert.assertEquals(replicationCount, experimentalDesignInput.getNumberOfBlocks().intValue());
 		assertSame(result, observationUnitRowList);
 	}
 
