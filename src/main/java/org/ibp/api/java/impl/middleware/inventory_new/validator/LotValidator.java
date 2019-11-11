@@ -41,7 +41,7 @@ public class LotValidator {
 
 	public void validate(final LotDto lotDto) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
-		locationValidator.validateLocationId(errors, lotDto.getLocationId());
+		locationValidator.validateSeedLocationId(errors, lotDto.getLocationId());
 		inventoryScaleValidator.validateInventoryScaleId(errors, lotDto.getScaleId());
 		germplasmValidator.validateGermplasmId(errors, lotDto.getGid());
 		validateStockId(lotDto.getStockId());
