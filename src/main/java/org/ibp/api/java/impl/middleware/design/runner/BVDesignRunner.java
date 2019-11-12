@@ -6,7 +6,7 @@ import org.ibp.api.domain.design.BVDesignOutput;
 import org.ibp.api.domain.design.MainDesign;
 import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.design.runner.ProcessRunner;
-import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewDesignParameter;
 import org.ibp.api.java.impl.middleware.design.util.ExperimentalDesignUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,8 @@ public class BVDesignRunner implements DesignRunner {
 		final BVDesignOutput output = new BVDesignOutput(returnCode);
 
 		if (returnCode == 0) {
-			output.setResults(this.outputReader.read(design.getDesign().getParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM)));
+			output.setResults(this.outputReader.read(design.getDesign().getParameterValue(
+				BreedingViewDesignParameter.OUTPUTFILE.getParameterName())));
 		}
 
 		return output;
@@ -78,8 +79,8 @@ public class BVDesignRunner implements DesignRunner {
 		final Long currentTimeMillis = System.currentTimeMillis();
 		final String outputFilePath = currentTimeMillis + BVDesignRunner.BV_PREFIX + BVDesignRunner.CSV_EXTENSION;
 
-		design.getDesign().setParameterValue(ExperimentDesignGenerator.OUTPUTFILE_PARAM, outputFilePath);
-		design.getDesign().setParameterValue(ExperimentDesignGenerator.SEED_PARAM, this.getSeedValue(currentTimeMillis));
+		design.getDesign().setParameterValue(BreedingViewDesignParameter.OUTPUTFILE.getParameterName(), outputFilePath);
+		design.getDesign().setParameterValue(BreedingViewDesignParameter.SEED.getParameterName(), this.getSeedValue(currentTimeMillis));
 
 		try {
 			xml = ExperimentalDesignUtil.getXmlStringForSetting(design);

@@ -2,28 +2,27 @@ package org.ibp.api.java.impl.middleware.design.validator;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
-import org.ibp.api.java.design.type.ExperimentDesignTypeService;
-import org.ibp.api.java.design.type.ExperimentDesignTypeServicePostProcessor;
-import org.ibp.api.java.impl.middleware.design.type.ExperimentDesignTypeServiceFactory;
+import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
+import org.ibp.api.java.design.type.ExperimentalDesignTypeServicePostProcessor;
+import org.ibp.api.java.impl.middleware.design.type.ExperimentalDesignTypeServiceFactory;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.context.annotation.Bean;
 
 import java.util.List;
 
-public class ExperimentDesignTypeServicePostProcessorTest {
+public class ExperimentalDesignTypeServicePostProcessorTest {
 
 	@Mock
-	private ExperimentDesignTypeServiceFactory serviceFactory;
+	private ExperimentalDesignTypeServiceFactory serviceFactory;
 
 	@InjectMocks
-	private ExperimentDesignTypeServicePostProcessor processor;
+	private ExperimentalDesignTypeServicePostProcessor processor;
 
 	@Before
 	public void init() {
@@ -32,10 +31,10 @@ public class ExperimentDesignTypeServicePostProcessorTest {
 
 	@Test
 	public void testRegisterDesignTypeService() {
-		final ExperimentDesignTypeService service = new ExperimentDesignTypeService() {
+		final ExperimentalDesignTypeService service = new ExperimentalDesignTypeService() {
 
 			@Override
-			public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
+			public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentDesignInput,
 				final String programUUID,
 				final List<StudyGermplasmDto> studyGermplasmDtoList) {
 				return null;
@@ -52,7 +51,7 @@ public class ExperimentDesignTypeServicePostProcessorTest {
 			}
 
 			@Override
-			public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentDesignInput experimentDesignInput,
+			public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentalDesignInput experimentDesignInput,
 				final String programUUID) {
 				return null;
 			}
