@@ -4,7 +4,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.fest.util.Collections;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
-import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +25,6 @@ public class InstanceValidator {
 
 	@Autowired
 	private StudyInstanceService studyInstanceService;
-
-	@Autowired
-	private StudyService middlewareStudyService;
 
 	private BindingResult errors;
 
@@ -64,16 +59,9 @@ public class InstanceValidator {
 		}
 
 		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
-		final List<Integer> restrictedInstances = new ArrayList<>();
-		final List<Integer> instancesWithDesign = new ArrayList<>();
-		for (final StudyInstance instance : studyInstances) {
-			if (BooleanUtils.isFalse(instance.getCanBeDeleted())) {
-				restrictedInstances.add(instance.getInstanceNumber());
-			}
-			if (BooleanUtils.isTrue(instance.isHasExperimentalDesign())) {
-				instancesWithDesign.add(instance.getInstanceNumber());
-			}
-		}
+		final List<Integer> restrictedInstances =
+			studyInstances.stream().filter(instance -> BooleanUtils.isFalse(instance.getCanBeDeleted()))
+				.map(instance -> instance.getInstanceNumber()).collect(Collectors.toList());
 
 		// Check that at least one instance is not restricted from design regeneration
 		if (restrictedInstances.containsAll(instanceNumbers)) {
@@ -81,14 +69,6 @@ public class InstanceValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		// If at least one instance is for regeneration, check that study has no advanced or crosses list
-		if (!instanceNumbers.stream()
-			.distinct()
-			.filter(instancesWithDesign::contains)
-			.collect(Collectors.toSet()).isEmpty() && this.middlewareStudyService.hasAdvancedOrCrossesList(studyId)) {
-			this.errors.reject("study.has.advance.or.cross.list");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
 	}
 
 }
