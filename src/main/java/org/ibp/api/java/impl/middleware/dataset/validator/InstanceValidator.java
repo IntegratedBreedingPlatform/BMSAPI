@@ -91,14 +91,4 @@ public class InstanceValidator {
 		}
 	}
 
-	public void checkStudyInstanceAlreadyExists(final Integer studyId, final int instanceNumber) {
-		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
-		final Map<String, Integer> instanceGeolocationIdMap = this.studyDataManager.getInstanceGeolocationIdsMap(studyId);
-		if (instanceGeolocationIdMap.keySet().contains(String.valueOf(instanceNumber))) {
-			this.errors.reject("instance.already.exists", new Object[] {instanceNumber}, "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-
-	}
-
 }

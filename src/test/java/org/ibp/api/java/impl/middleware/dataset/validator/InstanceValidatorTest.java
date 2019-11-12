@@ -229,39 +229,4 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 		this.instanceValidator.validateForDesignGeneration(studyId, new HashSet<>(Arrays.asList(1, 2)));
 	}
 
-	@Test
-	public void testCheckStudyInstanceAlreadyExistsSuccess() {
-
-		final int studyId = this.random.nextInt();
-		final int instanceNumber = this.random.nextInt();
-
-		final Map<String, Integer> instanceNumberGeolocationIdsMap = new HashMap<>();
-		when(this.studyDataManager.getInstanceGeolocationIdsMap(studyId)).thenReturn(instanceNumberGeolocationIdsMap);
-
-		try {
-			this.instanceValidator.checkStudyInstanceAlreadyExists(studyId, instanceNumber);
-		} catch (ApiRequestValidationException e) {
-			fail("Method should not throw an exception");
-		}
-
-	}
-
-	@Test
-	public void testCheckStudyInstanceAlreadyExistsFail() {
-
-		final int studyId = this.random.nextInt();
-		final int instanceNumber = this.random.nextInt();
-
-		final Map<String, Integer> instanceNumberGeolocationIdsMap = new HashMap<>();
-		instanceNumberGeolocationIdsMap.put(String.valueOf(instanceNumber), this.random.nextInt());
-		when(this.studyDataManager.getInstanceGeolocationIdsMap(studyId)).thenReturn(instanceNumberGeolocationIdsMap);
-
-		try {
-			this.instanceValidator.checkStudyInstanceAlreadyExists(studyId, instanceNumber);
-			fail("Method should throw an exception");
-		} catch (ApiRequestValidationException e) {
-			assertEquals("instance.already.exists", e.getErrors().get(0).getCode());
-		}
-	}
-
 }

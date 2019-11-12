@@ -39,7 +39,7 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 				BOUND),
 			instanceNumber,
 			RandomStringUtils.random(BOUND), false);
-		when(this.studyInstanceService.createStudyInstance(CropType.CropEnum.MAIZE.name().toLowerCase(), studyId, instanceNumber))
+		when(this.studyInstanceService.createStudyInstance(CropType.CropEnum.MAIZE.name().toLowerCase(), studyId))
 			.thenReturn(studyInstance);
 
 		this.mockMvc.perform(MockMvcRequestBuilders

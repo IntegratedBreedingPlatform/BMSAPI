@@ -68,12 +68,12 @@ public class StudyInstanceServiceImplTest {
 
 		final int studyId = this.random.nextInt(BOUND);
 		final int datasetId = this.random.nextInt(BOUND);
-		final int instanceNumber = this.random.nextInt(BOUND);
+		final int instanceNumber = 99;
 		final DatasetDTO summaryDataset = new DatasetDTO();
 		summaryDataset.setDatasetId(datasetId);
 		final List<DatasetDTO> datasets = Arrays.asList(summaryDataset);
 
-		final org.generationcp.middleware.service.impl.study.StudyInstance studyInstance =
+		final org.generationcp.middleware.service.impl.study.StudyInstance existingStudyInstance =
 			new StudyInstance(this.random.nextInt(BOUND), this.random.nextInt(BOUND), this.random.nextInt(BOUND),
 				RandomStringUtils.random(BOUND),
 				RandomStringUtils.random(
@@ -81,23 +81,32 @@ public class StudyInstanceServiceImplTest {
 				instanceNumber,
 				RandomStringUtils.random(BOUND), false);
 
+		final int nextInstanceNumber = existingStudyInstance.getInstanceNumber() + 1;
+		final org.generationcp.middleware.service.impl.study.StudyInstance newStudyInstance =
+			new StudyInstance(this.random.nextInt(BOUND), this.random.nextInt(BOUND), this.random.nextInt(BOUND),
+				RandomStringUtils.random(BOUND),
+				RandomStringUtils.random(
+					BOUND),
+				nextInstanceNumber,
+				RandomStringUtils.random(BOUND), false);
+
 		when(this.datasetService.getDatasets(studyId, Collections.set(DatasetTypeEnum.SUMMARY_DATA.getId()))).thenReturn(datasets);
-		when(this.studyInstanceMiddlewareService.createStudyInstance(this.maizeCropType, datasetId, instanceNumber))
-			.thenReturn(studyInstance);
+		when(this.studyInstanceMiddlewareService.createStudyInstance(this.maizeCropType, datasetId, nextInstanceNumber))
+			.thenReturn(newStudyInstance);
+		when(this.studyInstanceMiddlewareService.getStudyInstances(studyId)).thenReturn(Arrays.asList(existingStudyInstance));
 
 		final org.ibp.api.domain.study.StudyInstance
-			result = this.studyInstanceService.createStudyInstance(this.maizeCropType.getCropName(), studyId, instanceNumber);
+			result = this.studyInstanceService.createStudyInstance(this.maizeCropType.getCropName(), studyId);
 
 		verify(this.studyValidator).validate(studyId, true);
-		verify(this.instanceValidator).checkStudyInstanceAlreadyExists(studyId, instanceNumber);
 
-		assertEquals(result.getInstanceDbId(), studyInstance.getInstanceDbId());
-		assertEquals(result.getExperimentId(), studyInstance.getExperimentId());
-		assertEquals(result.getInstanceNumber(), studyInstance.getInstanceNumber());
-		assertEquals(result.getLocationName(), studyInstance.getLocationName());
-		assertEquals(result.getLocationAbbreviation(), studyInstance.getLocationAbbreviation());
-		assertEquals(result.getCustomLocationAbbreviation(), studyInstance.getCustomLocationAbbreviation());
-		assertEquals(result.getHasFieldmap(), studyInstance.isHasFieldmap());
+		assertEquals(result.getInstanceDbId(), newStudyInstance.getInstanceDbId());
+		assertEquals(result.getExperimentId(), newStudyInstance.getExperimentId());
+		assertEquals(nextInstanceNumber, newStudyInstance.getInstanceNumber());
+		assertEquals(result.getLocationName(), newStudyInstance.getLocationName());
+		assertEquals(result.getLocationAbbreviation(), newStudyInstance.getLocationAbbreviation());
+		assertEquals(result.getCustomLocationAbbreviation(), newStudyInstance.getCustomLocationAbbreviation());
+		assertEquals(result.getHasFieldmap(), newStudyInstance.isHasFieldmap());
 
 	}
 
@@ -105,15 +114,13 @@ public class StudyInstanceServiceImplTest {
 	public void testCreateStudyInstanceNoEnvironmentDataset() {
 
 		final int studyId = this.random.nextInt(BOUND);
-		final int instanceNumber = this.random.nextInt(BOUND);
 		when(this.datasetService.getDatasets(studyId, Collections.set(DatasetTypeEnum.SUMMARY_DATA.getId()))).thenReturn(new ArrayList<>());
 
 		try {
-			this.studyInstanceService.createStudyInstance(this.maizeCropType.getCropName(), studyId, instanceNumber);
+			this.studyInstanceService.createStudyInstance(this.maizeCropType.getCropName(), studyId);
 			fail("Method should throw an exception.");
 		} catch (final ApiRuntimeException e) {
 			verify(this.studyValidator).validate(studyId, true);
-			verify(this.instanceValidator).checkStudyInstanceAlreadyExists(studyId, instanceNumber);
 		}
 
 	}

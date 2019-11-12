@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,12 +46,12 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	private InstanceValidator instanceValidator;
 
 	@Override
-	public StudyInstance createStudyInstance(final String cropName, final int studyId, final int instanceNumber) {
+	public StudyInstance createStudyInstance(final String cropName, final int studyId) {
 
 		this.studyValidator.validate(studyId, true);
-		this.instanceValidator.checkStudyInstanceAlreadyExists(studyId, instanceNumber);
 
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
+		final int instanceNumber = this.getNextInstanceNumber(studyId);
 
 		final List<DatasetDTO> datasets = this.datasetService.getDatasets(studyId, Collections.set(DatasetTypeEnum.SUMMARY_DATA.getId()));
 		if (!datasets.isEmpty()) {
@@ -73,6 +75,20 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		return studyInstances.stream().map(o -> mapper.map(o, StudyInstance.class)).collect(Collectors.toList());
+	}
+
+	private int getNextInstanceNumber(final int studyId) {
+
+		final Optional<org.generationcp.middleware.service.impl.study.StudyInstance> maxStudyInstance =
+			this.studyInstanceMiddlewareService.getStudyInstances(studyId).stream().max(Comparator.comparing(
+				org.generationcp.middleware.service.impl.study.StudyInstance::getInstanceNumber));
+
+		if (maxStudyInstance.isPresent()) {
+			return maxStudyInstance.get().getInstanceNumber() + 1;
+		}
+
+		return 1;
+
 	}
 
 }
