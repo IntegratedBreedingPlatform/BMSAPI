@@ -17,9 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,13 +45,12 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		this.studyValidator.validate(studyId, true);
 
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
-		final int instanceNumber = this.getNextInstanceNumber(studyId);
 
 		final List<DatasetDTO> datasets = this.datasetService.getDatasets(studyId, Collections.set(DatasetTypeEnum.SUMMARY_DATA.getId()));
 		if (!datasets.isEmpty()) {
 			// Add Study Instance in Environment (Summary Data) Dataset
 			final org.generationcp.middleware.service.impl.study.StudyInstance studyInstance =
-				this.studyInstanceMiddlewareService.createStudyInstance(cropType, datasets.get(0).getDatasetId(), instanceNumber);
+				this.studyInstanceMiddlewareService.createStudyInstance(cropType, studyId, datasets.get(0).getDatasetId());
 			final ModelMapper mapper = new ModelMapper();
 			mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 			return mapper.map(studyInstance, StudyInstance.class);
@@ -71,20 +68,6 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 		return studyInstances.stream().map(o -> mapper.map(o, StudyInstance.class)).collect(Collectors.toList());
-	}
-
-	private int getNextInstanceNumber(final int studyId) {
-
-		final Optional<org.generationcp.middleware.service.impl.study.StudyInstance> maxStudyInstance =
-			this.studyInstanceMiddlewareService.getStudyInstances(studyId).stream().max(Comparator.comparing(
-				org.generationcp.middleware.service.impl.study.StudyInstance::getInstanceNumber));
-
-		if (maxStudyInstance.isPresent()) {
-			return maxStudyInstance.get().getInstanceNumber() + 1;
-		}
-
-		return 1;
-
 	}
 
 }

@@ -9,7 +9,6 @@ import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
-import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.study.StudyInstanceService;
 import org.ibp.api.rest.dataset.DatasetDTO;
@@ -48,9 +47,6 @@ public class StudyInstanceServiceImplTest {
 
 	@Mock
 	private DatasetValidator datasetValidator;
-
-	@Mock
-	private InstanceValidator instanceValidator;
 
 	@InjectMocks
 	private final StudyInstanceService studyInstanceService = new StudyInstanceServiceImpl();
@@ -91,9 +87,8 @@ public class StudyInstanceServiceImplTest {
 				RandomStringUtils.random(BOUND), false);
 
 		when(this.datasetService.getDatasets(studyId, Collections.set(DatasetTypeEnum.SUMMARY_DATA.getId()))).thenReturn(datasets);
-		when(this.studyInstanceMiddlewareService.createStudyInstance(this.maizeCropType, datasetId, nextInstanceNumber))
+		when(this.studyInstanceMiddlewareService.createStudyInstance(this.maizeCropType, studyId, datasetId))
 			.thenReturn(newStudyInstance);
-		when(this.studyInstanceMiddlewareService.getStudyInstances(studyId)).thenReturn(Arrays.asList(existingStudyInstance));
 
 		final org.ibp.api.domain.study.StudyInstance
 			result = this.studyInstanceService.createStudyInstance(this.maizeCropType.getCropName(), studyId);
