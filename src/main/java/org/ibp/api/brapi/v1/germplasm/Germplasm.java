@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@JsonInclude(JsonInclude.Include.ALWAYS)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @AutoProperty
 public class Germplasm {
 
@@ -86,6 +86,14 @@ public class Germplasm {
 	@JsonView(View.GermplasmBrapiV1_3.class)
 	private final static String documentationURL = null;
 
+	@JsonView(View.GermplasmBrapiV1_3.class)
+	private String studyDbId;
+
+	@JsonView(View.GermplasmBrapiV1_3.class)
+	private String trialName;
+
+	@JsonView(View.GermplasmBrapiV1_3.class)
+	private String entryNumber;
 
 	public Germplasm() {
 	}
@@ -300,6 +308,30 @@ public class Germplasm {
 
 	public void setAcquisitionDate(final Date acquisitionDate) {
 		this.acquisitionDate = acquisitionDate;
+	}
+
+	public String getStudyDbId() {
+		return this.studyDbId;
+	}
+
+	public void setStudyDbId(final String studyDbId) {
+		this.studyDbId = studyDbId;
+	}
+
+	public String getTrialName() {
+		return this.trialName;
+	}
+
+	public void setTrialName(final String trialName) {
+		this.trialName = trialName;
+	}
+
+	public String getEntryNumber() {
+		return this.entryNumber;
+	}
+
+	public void setEntryNumber(final String entryNumber) {
+		this.entryNumber = entryNumber;
 	}
 
 	@Override
