@@ -147,7 +147,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	
 	@Override
 	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
-		PedigreeDTO pedigreeDTO;
+		final PedigreeDTO pedigreeDTO;
 		try {
 			pedigreeDTO = this.germplasmDataManager.getPedigree(germplasmDbId, notation, includeSiblings);
 			if (pedigreeDTO != null) {
@@ -161,7 +161,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public ProgenyDTO getProgeny(final Integer germplasmDbId) {
-		ProgenyDTO progenyDTO;
+		final ProgenyDTO progenyDTO;
 		try {
 			progenyDTO = this.germplasmDataManager.getProgeny(germplasmDbId);
 		} catch (final MiddlewareQueryException e) {
@@ -279,6 +279,37 @@ public class GermplasmServiceImpl implements GermplasmService {
 			return this.germplasmDataManager.countGermplasmDTOs(germplasmSearchRequestDTO);
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("An error has occurred when trying to count germplasms", e);
+		}
+	}
+
+	@Override
+	public long countGermplasmByStudy(final Integer studyDbId) {
+		try {
+			return this.germplasmDataManager.countGermplasmByStudy(studyDbId);
+		} catch (final MiddlewareQueryException e) {
+			throw new ApiRuntimeException("An error has occurred when trying to count germplasms", e);
+		}
+	}
+
+	@Override
+	public List<GermplasmDTO> getGermplasmByStudy(final int studyDbId, final int pageSize, final int pageNumber) {
+		try {
+
+			final List<GermplasmDTO> germplasmDTOList = this.germplasmDataManager
+				.getGermplasmByStudy(studyDbId, pageNumber, pageSize);
+			if (germplasmDTOList != null) {
+				final Set<Integer> gids = germplasmDTOList.stream().map(germplasmDTO -> Integer.valueOf(germplasmDTO.getGermplasmDbId()))
+					.collect(Collectors.toSet());
+				final Map<Integer, String> crossExpansionsMap =
+					this.pedigreeService.getCrossExpansions(gids, null, this.crossExpansionProperties);
+				for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
+					germplasmDTO.setPedigree(crossExpansionsMap.get(Integer.valueOf(germplasmDTO.getGermplasmDbId())));
+					germplasmDTO.setStudyDbId(String.valueOf(studyDbId));
+				}
+			}
+			return germplasmDTOList;
+		} catch (final MiddlewareQueryException e) {
+			throw new ApiRuntimeException("An error has occurred when trying to search germplasms", e);
 		}
 	}
 
