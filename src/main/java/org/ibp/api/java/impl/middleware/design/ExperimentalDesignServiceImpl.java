@@ -102,7 +102,7 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 
 	@Override
 	public void deleteDesign(final int studyId) {
-		this.studyValidator.validate(studyId, true, false);
+		this.studyValidator.validate(studyId, true, true);
 		this.experimentalDesignValidator.validateExperimentalDesignExistence(studyId, true);
 		this.experimentDesignMiddlewareService.deleteStudyExperimentDesign(studyId);
 	}
