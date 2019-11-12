@@ -7,7 +7,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.dataset.DatasetService;
-import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.study.StudyInstanceService;
@@ -38,9 +37,6 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 
 	@Resource
 	private StudyValidator studyValidator;
-
-	@Resource
-	private DatasetValidator datasetValidator;
 
 	@Resource
 	private InstanceValidator instanceValidator;

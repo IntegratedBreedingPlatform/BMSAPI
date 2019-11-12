@@ -43,7 +43,7 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.thenReturn(studyInstance);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.put("/crops/{cropname}/studies/{studyId}/instances/{instanceNumber}", CropType.CropEnum.MAIZE.name().toLowerCase(), studyId,
+			.post("/crops/{cropname}/studies/{studyId}/instances/generation", CropType.CropEnum.MAIZE.name().toLowerCase(), studyId,
 				instanceNumber)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())

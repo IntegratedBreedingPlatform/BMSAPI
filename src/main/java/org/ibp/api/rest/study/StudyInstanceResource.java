@@ -25,7 +25,7 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "Create new study instance",
 		notes = "Create new study instance")
-	@RequestMapping(value = "/{cropname}/studies/{studyId}/instances", method = RequestMethod.PUT)
+	@RequestMapping(value = "/{cropname}/studies/{studyId}/instances/generation", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<StudyInstance> createStudyInstance(final @PathVariable String cropname,
 		@PathVariable final Integer studyId) {
