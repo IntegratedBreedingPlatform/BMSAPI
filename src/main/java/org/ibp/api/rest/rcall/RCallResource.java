@@ -1,6 +1,6 @@
 package org.ibp.api.rest.rcall;
 
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiOperation;
 import org.ibp.api.domain.rpackage.RCallDTO;
 import org.ibp.api.java.rpackage.RPackageService;
 import org.springframework.beans.factory.annotation.Autowired;
