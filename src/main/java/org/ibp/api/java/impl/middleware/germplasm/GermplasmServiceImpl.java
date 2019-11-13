@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import com.google.common.collect.Sets;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -11,6 +12,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
@@ -27,13 +29,17 @@ import org.ibp.api.domain.germplasm.GermplasmName;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.domain.germplasm.PedigreeTree;
 import org.ibp.api.domain.germplasm.PedigreeTreeNode;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,6 +66,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private GermplasmGroupingService germplasmGroupingService;
+
+	@Autowired
+	private StudyDataManager studyDataManager;
 
 	@Override
 	public List<GermplasmSummary> searchGermplasm(final String searchText, final int pageNumber, final int pageSize) {
@@ -295,6 +304,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public List<GermplasmDTO> getGermplasmByStudy(final int studyDbId, final int pageSize, final int pageNumber) {
 		try {
 
+			this.validateStudyDbId(studyDbId);
+
 			final List<GermplasmDTO> germplasmDTOList = this.germplasmDataManager
 				.getGermplasmByStudy(studyDbId, pageNumber, pageSize);
 			if (germplasmDTOList != null) {
@@ -310,6 +321,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 			return germplasmDTOList;
 		} catch (final MiddlewareQueryException e) {
 			throw new ApiRuntimeException("An error has occurred when trying to search germplasms", e);
+		}
+	}
+
+	private void validateStudyDbId(final int studyDbId) {
+		if (!this.studyDataManager.existInstances(Sets.newHashSet(studyDbId))) {
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			errors.reject("germplasm.search.invalid.instances", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 
