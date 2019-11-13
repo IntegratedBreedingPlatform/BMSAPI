@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory_new.LotDto;
+import org.generationcp.middleware.domain.inventory_new.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
@@ -106,7 +106,7 @@ public class LotResource {
 	public ResponseEntity<Integer> createLot(
 			@PathVariable final String cropName,
 			@ApiParam("Lot with one transaction to be created")
-			@RequestBody final LotDto lotDto) {
-		return new ResponseEntity<>(lotService.saveLot(lotDto), HttpStatus.CREATED);
+			@RequestBody final LotGeneratorInputDto lotGeneratorInputDto) {
+		return new ResponseEntity<>(lotService.saveLot(lotGeneratorInputDto), HttpStatus.CREATED);
 	}
 }

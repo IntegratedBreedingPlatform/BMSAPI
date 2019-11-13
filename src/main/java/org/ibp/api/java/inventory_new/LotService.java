@@ -1,7 +1,7 @@
 package org.ibp.api.java.inventory_new;
 
 import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory_new.LotDto;
+import org.generationcp.middleware.domain.inventory_new.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
 import org.springframework.data.domain.Pageable;
 
@@ -13,6 +13,6 @@ public interface LotService {
 
 	long countSearchLots(LotsSearchDto lotsSearchDto);
 
-	Integer saveLot(LotDto lotDto);
+	Integer saveLot(LotGeneratorInputDto lotGeneratorInputDto);
 
 }

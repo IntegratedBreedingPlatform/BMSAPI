@@ -1,9 +1,11 @@
 package org.ibp.api.java.impl.middleware.inventory_new;
 
 import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory_new.LotDto;
+import org.generationcp.middleware.domain.inventory_new.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
-import org.ibp.api.java.impl.middleware.inventory_new.validator.LotValidator;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.ibp.api.java.impl.middleware.inventory_new.validator.LotInputValidator;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.inventory_new.LotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +19,10 @@ import java.util.List;
 public class LotServiceImpl implements LotService {
 
 	@Autowired
-	private LotValidator lotValidator;
+	private LotInputValidator lotInputValidator;
+
+	@Autowired
+	private SecurityService securityService;
 
 	@Autowired
 	private org.generationcp.middleware.service.api.inventory.LotService lotService;
@@ -33,8 +38,10 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public Integer saveLot(final LotDto lotDto) {
-		lotValidator.validate(lotDto);
-		return lotService.saveLot(lotDto);
+	public Integer saveLot(final LotGeneratorInputDto lotGeneratorInputDto) {
+		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
+		lotGeneratorInputDto.setUserId(loggedInUser.getUserid());
+		lotInputValidator.validate(lotGeneratorInputDto);
+		return lotService.saveLot(lotGeneratorInputDto);
 	}
 }

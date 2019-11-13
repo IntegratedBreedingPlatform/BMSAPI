@@ -28,7 +28,7 @@ public class InventoryScaleValidator {
 		VariableDetails selectedInventoryScale = null;
 		if (!variables.isEmpty()) {
 			selectedInventoryScale = variables.stream()
-				.filter(inventoryScale -> inventoryScale.getId().equals(inventoryScaleId))
+				.filter(inventoryScale -> inventoryScale.getId().equals(String.valueOf(inventoryScaleId)))
 				.findAny()
 				.orElse(null);
 		}
