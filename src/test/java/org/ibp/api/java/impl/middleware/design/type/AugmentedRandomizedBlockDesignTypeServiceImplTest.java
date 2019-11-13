@@ -8,10 +8,12 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
-import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
+import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewVariableParameter;
+import org.ibp.api.java.impl.middleware.design.generator.AugmentedRandomizedBlockDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignProcessor;
+import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +22,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,23 +36,26 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.refEq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 
-	public static final String ENTRY_NO = "ENTRY_NO";
-	public static final String PLOT_NO = "PLOT_NO";
-	public static final String BLOCK_NO = "BLOCK_NO";
-	@Mock
-	public ExperimentDesignTypeValidator experimentDesignTypeValidator;
+	private static final String ENTRY_NO = RandomStringUtils.randomAlphabetic(10);
+	private static final String PLOT_NO = RandomStringUtils.randomAlphabetic(10);
+	private static final String BLOCK_NO = RandomStringUtils.randomAlphabetic(10);
 
 	@Mock
-	public ExperimentDesignGenerator experimentDesignGenerator;
+	private AugmentedRandomizedBlockDesignGenerator experimentDesignGenerator;
 
 	@Mock
-	public OntologyDataManager ontologyDataManager;
+	private MeasurementVariableGenerator measurementVariableGenerator;
+
+	@Mock
+	private ExperimentalDesignProcessor experimentalDesignProcessor;
+
+	@Mock
+	private OntologyDataManager ontologyDataManager;
 
 	@InjectMocks
 	private final AugmentedRandomizedBlockDesignTypeServiceImpl designTypeService = new AugmentedRandomizedBlockDesignTypeServiceImpl();
@@ -75,36 +83,35 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 		final int numberOfControls = 5;
 		final Integer numberOfBlocks = 5;
 		final Integer startingPlotNumber = 1;
-		final Integer numberOfTrials = 3;
 
 		final List<StudyGermplasmDto> studyGermplasmDtoList =
 			StudyGermplasmTestDataGenerator.createStudyGermplasmDtoList(numberOfTreatments, numberOfControls);
-		final ExperimentDesignInput experimentDesignInput = new ExperimentDesignInput();
-		experimentDesignInput.setNumberOfBlocks(numberOfBlocks);
-		experimentDesignInput.setStartingPlotNo(startingPlotNumber);
-		experimentDesignInput.setNoOfEnvironments(numberOfTrials);
+		final ExperimentalDesignInput experimentalDesignInput = new ExperimentalDesignInput();
+		experimentalDesignInput.setNumberOfBlocks(numberOfBlocks);
+		experimentalDesignInput.setStartingPlotNo(startingPlotNumber);
+		final Set<Integer> trialInstancesForDesignGeneration = new HashSet<>(Arrays.asList(1, 2, 3));
+		experimentalDesignInput.setTrialInstancesForDesignGeneration(trialInstancesForDesignGeneration);
 
+		final Map<BreedingViewVariableParameter, String> bvVariablesMap = new HashMap<>();
+		bvVariablesMap.put(BreedingViewVariableParameter.BLOCK, BLOCK_NO);
+		bvVariablesMap.put(BreedingViewVariableParameter.PLOT, PLOT_NO);
+		bvVariablesMap.put(BreedingViewVariableParameter.ENTRY, ENTRY_NO);
 		when(this.experimentDesignGenerator
-			.createAugmentedRandomizedBlockDesign(numberOfBlocks, numberOfTreatments, numberOfControls,
-				startingPlotNumber,
-				ENTRY_NO,
-				BLOCK_NO, PLOT_NO)).thenReturn(mainDesign);
-		when(this.experimentDesignGenerator
-			.constructMeasurementVariables(studyId, PROGRAM_UUID, AugmentedRandomizedBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
-				AugmentedRandomizedBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput))
+			.generate(experimentalDesignInput, bvVariablesMap, numberOfTreatments, numberOfControls, null)).thenReturn(mainDesign);
+		when(this.measurementVariableGenerator
+			.generateFromExperimentalDesignInput(studyId, PROGRAM_UUID, AugmentedRandomizedBlockDesignTypeServiceImpl.DESIGN_FACTOR_VARIABLES,
+				AugmentedRandomizedBlockDesignTypeServiceImpl.EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput))
 			.thenReturn(measurementVariables);
-		when(this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(eq(numberOfTrials), refEq(measurementVariables),
+		when(this.experimentalDesignProcessor
+			.generateObservationUnitRows(eq(trialInstancesForDesignGeneration), refEq(measurementVariables),
 				refEq(studyGermplasmDtoList), refEq(mainDesign),
 				eq(ENTRY_NO),
 				isNull(), any(Map.class))).thenReturn(observationUnitRowList);
 
 		final List<ObservationUnitRow> result =
-			this.designTypeService.generateDesign(studyId, experimentDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
+			this.designTypeService.generateDesign(studyId, experimentalDesignInput, PROGRAM_UUID, studyGermplasmDtoList);
 
 		assertSame(result, observationUnitRowList);
-		verify(this.experimentDesignTypeValidator).validateAugmentedDesign(experimentDesignInput, studyGermplasmDtoList);
-
 	}
 
 	@Test
@@ -166,7 +173,7 @@ public class AugmentedRandomizedBlockDesignTypeServiceImplTest {
 
 	}
 
-	List<StandardVariable> createTestStandardVariables() {
+	private List<StandardVariable> createTestStandardVariables() {
 		final List<StandardVariable> standardVariables = new ArrayList<>();
 		standardVariables.add(StandardVariableTestDataInitializer.createStandardVariable(TermId.ENTRY_NO.getId(), ENTRY_NO));
 		standardVariables.add(StandardVariableTestDataInitializer.createStandardVariable(TermId.BLOCK_NO.getId(), BLOCK_NO));

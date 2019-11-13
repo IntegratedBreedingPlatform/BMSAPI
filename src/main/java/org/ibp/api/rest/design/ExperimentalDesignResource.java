@@ -2,7 +2,7 @@ package org.ibp.api.rest.design;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.ibp.api.java.design.ExperimentDesignService;
+import org.ibp.api.java.design.ExperimentalDesignService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -13,31 +13,31 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
 
-@Api(value = "Experiment Design Service")
+@Api(value = "Experimental Design Service")
 @Controller
 @RequestMapping("/crops")
-public class ExperimentDesignResource {
+public class ExperimentalDesignResource {
 
 	@Resource
-	private ExperimentDesignService experimentDesignService;
+	private ExperimentalDesignService experimentalDesignService;
 
-	@ApiOperation(value = "Generate experiment design for study", notes = "Generate experiment design for study")
-	@RequestMapping(value = "/{crop}/studies/{studyId}/design", method = RequestMethod.POST)
+	@ApiOperation(value = "Generate experimental design for study", notes = "Generate experimental design for study")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/experimental-designs/generation", method = RequestMethod.POST)
 	public ResponseEntity generateStudyExperimentDesign(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
-		@RequestBody final ExperimentDesignInput experimentDesignInput) {
+		@RequestBody final ExperimentalDesignInput experimentalDesignInput) {
 
-		this.experimentDesignService.generateAndSaveDesign(crop, studyId, experimentDesignInput);
+		this.experimentalDesignService.generateAndSaveDesign(crop, studyId, experimentalDesignInput);
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 
-	@ApiOperation(value = "Delete experiment design of study", notes = "Delete experiment design of study")
-	@RequestMapping(value = "/{crop}/studies/{studyId}/design", method = RequestMethod.DELETE)
+	@ApiOperation(value = "Delete experimental design of study", notes = "Delete experimental design of study")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/experimental-designs", method = RequestMethod.DELETE)
 	public ResponseEntity generateStudyExperimentDesign(@PathVariable final String crop,
 		@PathVariable final Integer studyId) {
-		this.experimentDesignService.deleteDesign(studyId);
+		this.experimentalDesignService.deleteDesign(studyId);
 
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

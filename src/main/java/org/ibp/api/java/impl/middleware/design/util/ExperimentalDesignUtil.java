@@ -1,14 +1,16 @@
 package org.ibp.api.java.impl.middleware.design.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ibp.api.domain.design.ListItem;
 import org.ibp.api.domain.design.MainDesign;
-import org.ibp.api.rest.dataset.ObservationUnitData;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExperimentalDesignUtil {
 
@@ -31,22 +33,32 @@ public class ExperimentalDesignUtil {
 		return key;
 	}
 
-	public static void setReplatinGroups(final ExperimentDesignInput experimentDesignInput) {
-		if (experimentDesignInput.getUseLatenized() != null && experimentDesignInput.getUseLatenized() && experimentDesignInput.getReplicationsArrangement() != null) {
-			if (experimentDesignInput.getReplicationsArrangement() == 1) {
+	public static void setReplatinGroups(final ExperimentalDesignInput experimentalDesignInput) {
+		if (experimentalDesignInput.getUseLatenized() != null && experimentalDesignInput.getUseLatenized() && experimentalDesignInput.getReplicationsArrangement() != null) {
+			if (experimentalDesignInput.getReplicationsArrangement() == 1) {
 				// column
-				experimentDesignInput.setReplatinGroups(String.valueOf(experimentDesignInput.getReplicationsCount()));
-			} else if (experimentDesignInput.getReplicationsArrangement() == 2) {
+				experimentalDesignInput.setReplatinGroups(String.valueOf(experimentalDesignInput.getReplicationsCount()));
+			} else if (experimentalDesignInput.getReplicationsArrangement() == 2) {
 				// rows
 				final StringBuilder rowReplatingGroupStringBuilder = new StringBuilder();
-				for (int i = 0; i < experimentDesignInput.getReplicationsCount(); i++) {
+				for (int i = 0; i < experimentalDesignInput.getReplicationsCount(); i++) {
 					if (!StringUtils.isEmpty(rowReplatingGroupStringBuilder.toString())) {
 						rowReplatingGroupStringBuilder.append(",");
 					}
 					rowReplatingGroupStringBuilder.append("1");
 				}
-				experimentDesignInput.setReplatinGroups(rowReplatingGroupStringBuilder.toString());
+				experimentalDesignInput.setReplatinGroups(rowReplatingGroupStringBuilder.toString());
 			}
 		}
+	}
+
+	public static List<ListItem> convertToListItemList(final List<String> listString) {
+
+		final List<ListItem> listItemList = new ArrayList<>();
+		for (final String value : listString) {
+			listItemList.add(new ListItem(value));
+		}
+		return listItemList;
+
 	}
 }
