@@ -20,6 +20,7 @@ import org.generationcp.middleware.util.Debug;
 import org.ibp.api.java.design.runner.DesignRunner;
 import org.ibp.api.java.impl.middleware.design.runner.MockDesignRunnerImpl;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
+import org.ibp.api.java.study.StudyInstanceService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -56,11 +57,10 @@ import java.util.UUID;
 public abstract class ApiUnitTestBase {
 
 	protected final MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(),
-			Charset.forName("utf8"));
+		Charset.forName("utf8"));
 
 	protected final MediaType csvContentType = new MediaType(MediaType.TEXT_PLAIN.getType(), MediaType.TEXT_PLAIN.getSubtype(),
 		Charset.forName("utf8"));
-
 
 	protected final String cropName = "maize";
 	protected final String programUuid = UUID.randomUUID().toString();
@@ -76,9 +76,9 @@ public abstract class ApiUnitTestBase {
 	@Autowired
 	protected StudyDataManager studyDataManager;
 
-
 	@Autowired
 	protected ObjectMapper jsonMapper;
+
 
 	@Configuration
 	public static class TestConfiguration {
@@ -146,7 +146,7 @@ public abstract class ApiUnitTestBase {
 		@Bean
 		@Primary
 		public HttpServletRequest httpServletRequest() {
-            return Mockito.mock(HttpServletRequest.class);
+			return Mockito.mock(HttpServletRequest.class);
 		}
 
 		@Bean
@@ -172,6 +172,12 @@ public abstract class ApiUnitTestBase {
 		public DesignRunner getDesignRunner() {
 			return new MockDesignRunnerImpl();
 		}
+
+		@Bean
+		@Primary
+		public StudyInstanceService studyInstanceService() {
+			return Mockito.mock(StudyInstanceService.class);
+		}
 	}
 
 	@Before
@@ -196,7 +202,7 @@ public abstract class ApiUnitTestBase {
 	/**
 	 * This method load preAuthorized role to test services that PreAuthorize role is required.
 	 */
-	public void loadPreAuthorizedRole(){
+	public void loadPreAuthorizedRole() {
 		final List<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority("ADMIN"));
 		UsernamePasswordAuthenticationToken loggedInUser =

@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.study.StudyInstanceService;
 import org.ibp.api.java.study.StudyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,20 +49,6 @@ public class StudyResource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StudyResource.class);
 
-	@ApiOperation(value = "List all study instances with basic metadata.",
-			notes = "Returns list of all study instances with basic metadata.")
-	@RequestMapping(value = "/study/{cropname}/{studyId}/instances", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<List<StudyInstance>> listStudyInstances(final @PathVariable String cropname,
-			@PathVariable final Integer studyId) {
-		final List<StudyInstance> studyInstances = this.studyService.getStudyInstances(studyId);
-
-		if (studyInstances.isEmpty()) {
-			return new ResponseEntity(HttpStatus.NOT_FOUND);
-		}
-
-		return new ResponseEntity<List<StudyInstance>>(studyInstances, HttpStatus.OK);
-	}
 
 	@ApiOperation(value = "Check if a study is sampled.",
 			notes = "Returns boolean indicating if there are samples associated to the study.")

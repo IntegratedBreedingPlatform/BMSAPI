@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -22,6 +23,9 @@ public class StudyValidator {
 
 	@Autowired
 	private StudyDataManager studyDataManager;
+
+	@Autowired
+	private StudyService middlewareStudyService;
 
 	private BindingResult errors;
 
@@ -49,6 +53,15 @@ public class StudyValidator {
 			&& !loggedInUser.isSuperAdmin()) {
 			errors.reject("study.is.locked", "");
 			throw new ForbiddenException(errors.getAllErrors().get(0));
+		}
+	}
+
+	public void validate(final Integer studyId, final Boolean shouldBeUnlocked, final Boolean canHaveAdvanceOrCrossList) {
+		this.validate(studyId, shouldBeUnlocked);
+
+		if (!canHaveAdvanceOrCrossList && this.middlewareStudyService.hasAdvancedOrCrossesList(studyId)) {
+			this.errors.reject("study.has.advance.or.cross.list");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
