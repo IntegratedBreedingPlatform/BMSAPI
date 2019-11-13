@@ -72,6 +72,7 @@ import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.permission.PermissionServiceImpl;
 import org.generationcp.middleware.service.api.study.MeasurementVariableService;
+import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -86,6 +87,7 @@ import org.generationcp.middleware.service.impl.inventory.TransactionServiceImpl
 import org.generationcp.middleware.service.impl.study.MeasurementVariableServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
+import org.generationcp.middleware.service.impl.study.StudyInstanceServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentDesignServiceImpl;
 import org.generationcp.middleware.service.impl.user.UserServiceImpl;
@@ -462,6 +464,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public TransactionServiceImpl getTransactionService() {
 		return new TransactionServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public StudyInstanceService studyInstanceMiddlewareService() {
+		return new StudyInstanceServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {

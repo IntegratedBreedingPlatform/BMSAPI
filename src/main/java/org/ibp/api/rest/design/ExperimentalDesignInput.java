@@ -4,26 +4,23 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Map;
+import java.util.Set;
 
 @AutoProperty
-public class ExperimentDesignInput {
+public class ExperimentalDesignInput {
 
-	private Integer noOfEnvironments;
-	private Integer noOfEnvironmentsToAdd;
+	private Set<Integer> trialInstancesForDesignGeneration;
 	private Integer designType;
 	private Integer replicationsCount;
 	private Boolean useLatenized;
 	private Integer blockSize;
 	private Integer rowsPerReplications;
 	private Integer colsPerReplications;
-	private Map treatmentFactors;
 	private Map treatmentFactorsData;
-	private Integer totalGermplasmListCount;
 	private Integer nclatin;
 	private Integer nrlatin;
 	private Integer nblatin;
 	private String replatinGroups;
-	private boolean hasMeasurementData;
 	private Integer startingPlotNo;
 	private String fileName;
 	private Integer numberOfBlocks;
@@ -37,12 +34,12 @@ public class ExperimentDesignInput {
 	 */
 	private Integer replicationsArrangement;
 
-	public Integer getNoOfEnvironments() {
-		return this.noOfEnvironments;
+	public Set<Integer> getTrialInstancesForDesignGeneration() {
+		return trialInstancesForDesignGeneration;
 	}
 
-	public void setNoOfEnvironments(final Integer noOfEnvironments) {
-		this.noOfEnvironments = noOfEnvironments;
+	public void setTrialInstancesForDesignGeneration(final Set<Integer> trialInstancesForDesignGeneration) {
+		this.trialInstancesForDesignGeneration = trialInstancesForDesignGeneration;
 	}
 
 	public Integer getDesignType() {
@@ -93,28 +90,12 @@ public class ExperimentDesignInput {
 		this.colsPerReplications = colsPerReplications;
 	}
 
-	public Map getTreatmentFactors() {
-		return this.treatmentFactors;
-	}
-
-	public void setTreatmentFactors(final Map treatmentFactors) {
-		this.treatmentFactors = treatmentFactors;
-	}
-
 	public Map getTreatmentFactorsData() {
 		return this.treatmentFactorsData;
 	}
 
 	public void setTreatmentFactorsData(final Map treatmentFactorsData) {
 		this.treatmentFactorsData = treatmentFactorsData;
-	}
-
-	public Integer getTotalGermplasmListCount() {
-		return this.totalGermplasmListCount;
-	}
-
-	public void setTotalGermplasmListCount(final Integer totalGermplasmListCount) {
-		this.totalGermplasmListCount = totalGermplasmListCount;
 	}
 
 	public Integer getNclatin() {
@@ -155,22 +136,6 @@ public class ExperimentDesignInput {
 
 	public void setReplicationsArrangement(final Integer replicationsArrangement) {
 		this.replicationsArrangement = replicationsArrangement;
-	}
-
-	public Integer getNoOfEnvironmentsToAdd() {
-		return this.noOfEnvironmentsToAdd;
-	}
-
-	public void setNoOfEnvironmentsToAdd(final Integer noOfEnvironmentsToAdd) {
-		this.noOfEnvironmentsToAdd = noOfEnvironmentsToAdd;
-	}
-
-	public boolean isHasMeasurementData() {
-		return this.hasMeasurementData;
-	}
-
-	public void setHasMeasurementData(final boolean hasMeasurementData) {
-		this.hasMeasurementData = hasMeasurementData;
 	}
 
 	public Integer getStartingPlotNo() {
