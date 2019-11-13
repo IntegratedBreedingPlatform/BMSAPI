@@ -14,8 +14,6 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
-import org.generationcp.middleware.service.api.LotIDGenerator;
-import org.generationcp.middleware.service.impl.inventory.LotIDGeneratorImpl;
 import org.ibp.api.domain.inventory.GermplasmInventory;
 import org.ibp.api.domain.inventory.InventoryLocation;
 import org.ibp.api.domain.ontology.TermSummary;
@@ -42,8 +40,6 @@ public class InventoryServiceImpl implements InventoryService {
 
 	@Autowired
 	private LocationDataManager locationDataManager;
-
-	private LotIDGenerator lotIDGenerator;
 
 	@Resource
 	private ContextUtil contextUtil;
@@ -112,8 +108,8 @@ public class InventoryServiceImpl implements InventoryService {
 			lot.setScaleId(Integer.valueOf(germplasmInventory.getQuantityUnit().getId()));
 			lot.setComments(germplasmInventory.getComments());
 			lot.setStatus(LotStatus.ACTIVE.getIntValue());
-			this.lotIDGenerator = new LotIDGeneratorImpl();
-			this.lotIDGenerator.generateLotIds(this.contextUtil.getProjectInContext().getCropType(), Lists.newArrayList(lot));
+
+			this.inventoryDataManager.generateLotIds(this.contextUtil.getProjectInContext().getCropType(), Lists.newArrayList(lot));
 			this.inventoryDataManager.addLot(lot);
 			InventoryServiceImpl.LOGGER.debug("Lot created: LotId: " + lot.getId());
 
@@ -151,5 +147,4 @@ public class InventoryServiceImpl implements InventoryService {
 		InventoryServiceImpl.LOGGER.debug(germplasmId);
 		throw new UnsupportedOperationException("This operation has not yet been implemented.");
 	}
-
 }
