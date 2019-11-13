@@ -5,9 +5,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ExperimentDesignTypeServiceFactoryTest {
+public class ExperimentalDesignTypeServiceFactoryTest {
 
-	private final ExperimentDesignTypeServiceFactory factory = new ExperimentDesignTypeServiceFactory();
+	private final ExperimentalDesignTypeServiceFactory factory = new ExperimentalDesignTypeServiceFactory();
 
 	@Before
 	public void init() {

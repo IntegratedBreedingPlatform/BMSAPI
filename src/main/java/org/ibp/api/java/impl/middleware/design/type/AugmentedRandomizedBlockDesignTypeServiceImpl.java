@@ -8,11 +8,13 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.ibp.api.domain.design.MainDesign;
-import org.ibp.api.java.design.type.ExperimentDesignTypeService;
-import org.ibp.api.java.impl.middleware.design.generator.ExperimentDesignGenerator;
-import org.ibp.api.java.impl.middleware.design.validator.ExperimentDesignTypeValidator;
+import org.ibp.api.java.design.type.ExperimentalDesignTypeService;
+import org.ibp.api.java.impl.middleware.design.breedingview.BreedingViewVariableParameter;
+import org.ibp.api.java.impl.middleware.design.generator.AugmentedRandomizedBlockDesignGenerator;
+import org.ibp.api.java.impl.middleware.design.generator.ExperimentalDesignProcessor;
+import org.ibp.api.java.impl.middleware.design.generator.MeasurementVariableGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.ibp.api.rest.design.ExperimentDesignInput;
+import org.ibp.api.rest.design.ExperimentalDesignInput;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -25,7 +27,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-public class AugmentedRandomizedBlockDesignTypeServiceImpl implements ExperimentDesignTypeService {
+public class AugmentedRandomizedBlockDesignTypeServiceImpl implements ExperimentalDesignTypeService {
 
 	protected static final List<Integer> DESIGN_FACTOR_VARIABLES =
 		Arrays.asList(TermId.BLOCK_NO.getId(), TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId());
@@ -34,51 +36,56 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NBLKS.getId());
 
 	@Resource
-	public ExperimentDesignTypeValidator experimentDesignTypeValidator;
+	public AugmentedRandomizedBlockDesignGenerator experimentDesignGenerator;
 
 	@Resource
-	public ExperimentDesignGenerator experimentDesignGenerator;
+	public MeasurementVariableGenerator measurementVariableGenerator;
+
+	@Resource
+	private ExperimentalDesignProcessor experimentalDesignProcessor;
 
 	@Resource
 	public OntologyDataManager ontologyDataManager;
 
 	@Override
-	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentDesignInput experimentDesignInput,
+	public List<ObservationUnitRow> generateDesign(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID, final List<StudyGermplasmDto> studyGermplasmDtoList) {
 
-		this.experimentDesignTypeValidator.validateAugmentedDesign(experimentDesignInput, studyGermplasmDtoList);
-
+		// Generate experiment design parameters input to design runner
 		final Set<Integer> entryIdsOfChecks = this.getEntryIdsOfChecks(studyGermplasmDtoList);
-		final Set<Integer> entryIdsOfTestEntries = this.getEntryIdsOfTestEntries(studyGermplasmDtoList);
-
-		final Map<Integer, Integer> designExpectedEntriesMap =
-			this.createMapOfDesignExpectedEntriesToGermplasmEntriesInTrial(studyGermplasmDtoList,
-				entryIdsOfChecks, entryIdsOfTestEntries);
-
-		final Integer numberOfBlocks = experimentDesignInput.getNumberOfBlocks();
 		final Integer numberOfControls = entryIdsOfChecks.size();
 		final Integer numberOfTreatments = studyGermplasmDtoList.size() - numberOfControls;
-		final Integer startingPlotNumber = experimentDesignInput.getStartingPlotNo() == null? 1 : experimentDesignInput.getStartingPlotNo();
-
-		final int numberOfTrials = experimentDesignInput.getNoOfEnvironments();
 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
 				.collect(Collectors.toMap(StandardVariable::getId, standardVariable -> standardVariable));
 
+		final MainDesign mainDesign = this.experimentDesignGenerator
+			.generate(experimentalDesignInput, this.getBreedingViewVariablesMap(standardVariablesMap), numberOfTreatments, numberOfControls, null);
+
+		// Generate observation unit rows
+		final Set<Integer> entryIdsOfTestEntries = this.getEntryIdsOfTestEntries(studyGermplasmDtoList);
+		final Map<Integer, Integer> designExpectedEntriesMap =
+			this.createMapOfDesignExpectedEntriesToGermplasmEntriesInTrial(studyGermplasmDtoList,
+				entryIdsOfChecks, entryIdsOfTestEntries);
+		final String entryNumberName = standardVariablesMap.get(TermId.ENTRY_NO.getId()).getName();
+		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
+		return this.experimentalDesignProcessor
+			.generateObservationUnitRows(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables,
+				studyGermplasmDtoList, mainDesign, entryNumberName, null,
+				designExpectedEntriesMap);
+	}
+
+	private Map<BreedingViewVariableParameter, String> getBreedingViewVariablesMap(final Map<Integer, StandardVariable> standardVariablesMap) {
 		final String entryNumberName = standardVariablesMap.get(TermId.ENTRY_NO.getId()).getName();
 		final String blockNumberName = standardVariablesMap.get(TermId.BLOCK_NO.getId()).getName();
 		final String plotNumberName = standardVariablesMap.get(TermId.PLOT_NO.getId()).getName();
 
-		final MainDesign mainDesign = this.experimentDesignGenerator
-			.createAugmentedRandomizedBlockDesign(numberOfBlocks, numberOfTreatments, numberOfControls, startingPlotNumber, entryNumberName,
-				blockNumberName, plotNumberName);
-
-		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentDesignInput, programUUID);
-		return this.experimentDesignGenerator
-			.generateExperimentDesignMeasurements(numberOfTrials, measurementVariables,
-				studyGermplasmDtoList, mainDesign, entryNumberName, null,
-				designExpectedEntriesMap);
+		final Map<BreedingViewVariableParameter, String> map = new HashMap<>();
+		map.put(BreedingViewVariableParameter.ENTRY, entryNumberName);
+		map.put(BreedingViewVariableParameter.BLOCK, blockNumberName);
+		map.put(BreedingViewVariableParameter.PLOT, plotNumberName);
+		return map;
 	}
 
 	@Override
@@ -92,11 +99,10 @@ public class AugmentedRandomizedBlockDesignTypeServiceImpl implements Experiment
 	}
 
 	@Override
-	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentDesignInput experimentDesignInput,
+	public List<MeasurementVariable> getMeasurementVariables(final int studyId, final ExperimentalDesignInput experimentalDesignInput,
 		final String programUUID) {
-		return this.experimentDesignGenerator
-			.constructMeasurementVariables(studyId, programUUID, DESIGN_FACTOR_VARIABLES,
-				EXPERIMENT_DESIGN_VARIABLES, experimentDesignInput);
+		return this.measurementVariableGenerator.generateFromExperimentalDesignInput(studyId, programUUID, DESIGN_FACTOR_VARIABLES,
+				EXPERIMENT_DESIGN_VARIABLES, experimentalDesignInput);
 	}
 
 	Map<Integer, StandardVariable> convertStandardVariableListToMap(final List<StandardVariable> standardVariables) {
