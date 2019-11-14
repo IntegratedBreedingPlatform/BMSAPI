@@ -21,6 +21,9 @@ import java.util.stream.Collectors;
 public class InstanceValidator {
 
 	@Autowired
+	private org.generationcp.middleware.service.api.study.StudyService middlewareStudyService;
+
+	@Autowired
 	private StudyDataManager studyDataManager;
 
 	@Autowired
@@ -65,7 +68,8 @@ public class InstanceValidator {
 	}
 
 	public void validateInstanceDeletion(final Integer studyId, final Set<Integer> instanceIds, final Boolean enforceAllInstancesDeletable) {
-		this.validate(studyId, instanceIds);
+		final Integer environmentDatasetId = this.middlewareStudyService.getEnvironmentDatasetId(studyId);
+		this.validate(environmentDatasetId, instanceIds);
 
 		this.validateInstancesDeletability(studyId, instanceIds, enforceAllInstancesDeletable);
 

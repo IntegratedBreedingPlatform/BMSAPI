@@ -30,33 +30,37 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 	private final Random random = new Random();
 
 	@Mock
+	private org.generationcp.middleware.service.api.study.StudyService middlewareStudyService;
+
+	@Mock
 	private StudyInstanceService studyInstanceService;
 
 	@InjectMocks
 	private InstanceValidator instanceValidator;
 
+	private Integer datasetId;
 
 	@Before
 	public void init() {
-		when(this.studyDataManager.areAllInstancesExistInDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anySet()))
+		this.datasetId = random.nextInt();
+		Mockito.doReturn(datasetId).when(this.middlewareStudyService).getEnvironmentDatasetId(ArgumentMatchers.anyInt());
+		when(this.studyDataManager.areAllInstancesExistInDataset(ArgumentMatchers.eq(this.datasetId), ArgumentMatchers.anySet()))
 			.thenReturn(true);
 		when(this.studyDataManager.existInstances(ArgumentMatchers.anySet())).thenReturn(true);
 	}
 
 	@Test
 	public void testValidateInstanceIds_Success() {
-		final int datasetId = random.nextInt();
 		final int instanceId = random.nextInt();
-		this.instanceValidator.validate(datasetId, Sets.newHashSet(instanceId));
+		this.instanceValidator.validate(this.datasetId, Sets.newHashSet(instanceId));
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidateInstanceIds_Fail() {
-		final int datasetId = random.nextInt();
 		final int instanceId = random.nextInt();
 
-		when(this.studyDataManager.areAllInstancesExistInDataset(datasetId, Sets.newHashSet(instanceId))).thenReturn(false);
-		this.instanceValidator.validate(datasetId, Sets.newHashSet(instanceId));
+		when(this.studyDataManager.areAllInstancesExistInDataset(this.datasetId, Sets.newHashSet(instanceId))).thenReturn(false);
+		this.instanceValidator.validate(this.datasetId, Sets.newHashSet(instanceId));
 	}
 
 	@Test
@@ -72,11 +76,10 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 
 	@Test
 	public void testValidateInstanceDeletionFail_StudyHasNoInstances() {
-		final Integer datasetId = random.nextInt();
 		final HashSet<Integer> instanceIds = new HashSet<>(Arrays.asList(random.nextInt(), random.nextInt()));
-		when(this.studyDataManager.areAllInstancesExistInDataset(datasetId, instanceIds)).thenReturn(false);
+		when(this.studyDataManager.areAllInstancesExistInDataset(this.datasetId, instanceIds)).thenReturn(false);
 		try {
-			this.instanceValidator.validateInstanceDeletion(datasetId, instanceIds, random.nextBoolean());
+			this.instanceValidator.validateInstanceDeletion(this.datasetId, instanceIds, random.nextBoolean());
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
