@@ -32,6 +32,11 @@ public class InstanceValidator {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
+		if (Collections.isEmpty(instanceIds)) {
+			this.errors.reject("study.instances.required");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
 		if (!this.studyDataManager.existInstances(instanceIds)) {
 			this.errors.reject("dataset.non.existent.instances", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -43,28 +48,38 @@ public class InstanceValidator {
 		}
 	}
 
-	public void validateInstanceDeletion(final Integer studyId, final Set<Integer> instanceNumbers, final Boolean enforceAllInstancesDeletable) {
+	public void validateInstanceNumbers(final Integer studyId, final Set<Integer> instanceNumbers, final Boolean enforceAllInstancesDeletable) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		if (Collections.isEmpty(instanceNumbers)) {
-			this.errors.reject("study.instances.required");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
 		final Map<String, Integer> instanceGeolocationIdsMap = this.studyDataManager.getInstanceGeolocationIdsMap(studyId);
-		final List<String> instanceNumberStringList = instanceNumbers.stream().map(s -> s.toString()).collect(Collectors.toList());
-		if (instanceGeolocationIdsMap == null || instanceGeolocationIdsMap.isEmpty() || !instanceGeolocationIdsMap.keySet()
-			.containsAll(instanceNumberStringList)) {
+		final List<Integer> selectedInstanceIds =
+			instanceGeolocationIdsMap.entrySet().stream().filter(entry -> instanceNumbers.contains(Integer.valueOf(entry.getKey())))
+				.map(entry -> entry.getValue()).collect(Collectors.toList());
+
+		if (instanceNumbers.size() != selectedInstanceIds.size()) {
 			this.errors.reject("dataset.non.existent.instances");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
+		this.validateInstancesDeletability(studyId, instanceNumbers, enforceAllInstancesDeletable);
+	}
+
+	public void validateInstanceDeletion(final Integer studyId, final Set<Integer> instanceIds, final Boolean enforceAllInstancesDeletable) {
+		this.validate(studyId, instanceIds);
+
+		this.validateInstancesDeletability(studyId, instanceIds, enforceAllInstancesDeletable);
+
+	}
+
+	private void validateInstancesDeletability(final Integer studyId, final Set<Integer> instanceIds,
+		final Boolean enforceAllInstancesDeletable) {
 		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
 		final List<Integer> restrictedInstances =
 			studyInstances.stream().filter(instance -> BooleanUtils.isFalse(instance.getCanBeDeleted()))
-				.map(instance -> instance.getInstanceNumber()).collect(Collectors.toList());
+				.map(instance -> instance.getInstanceDbId()).collect(Collectors.toList());
 
 		// Raise error if any of the instances are not deletable when enforceAllInstancesDeletable = true
-		if (enforceAllInstancesDeletable && !instanceNumbers.stream()
+		if (enforceAllInstancesDeletable && !instanceIds.stream()
 			.distinct()
 			.filter(restrictedInstances::contains)
 			.collect(Collectors.toSet()).isEmpty()) {
@@ -73,11 +88,10 @@ public class InstanceValidator {
 		}
 
 		// Verify at least one instance can be re/generated
-		if (restrictedInstances.containsAll(instanceNumbers)) {
+		if (restrictedInstances.containsAll(instanceIds)) {
 			this.errors.reject("all.selected.instances.cannot.be.regenerated");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-
 	}
 
 }
