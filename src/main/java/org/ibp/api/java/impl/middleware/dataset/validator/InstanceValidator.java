@@ -43,7 +43,7 @@ public class InstanceValidator {
 		}
 	}
 
-	public void validateForDesignGeneration(final Integer studyId, final Set<Integer> instanceNumbers) {
+	public void validateInstanceDeletion(final Integer studyId, final Set<Integer> instanceNumbers, final Boolean enforceAllInstancesDeletable) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		if (Collections.isEmpty(instanceNumbers)) {
@@ -63,7 +63,16 @@ public class InstanceValidator {
 			studyInstances.stream().filter(instance -> BooleanUtils.isFalse(instance.getCanBeDeleted()))
 				.map(instance -> instance.getInstanceNumber()).collect(Collectors.toList());
 
-		// Check that at least one instance is not restricted from design regeneration
+		// Raise error if any of the instances are not deletable when enforceAllInstancesDeletable = true
+		if (enforceAllInstancesDeletable && !instanceNumbers.stream()
+			.distinct()
+			.filter(restrictedInstances::contains)
+			.collect(Collectors.toSet()).isEmpty()) {
+			this.errors.reject("at.least.one.instance.cannot.be.deleted");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		// Verify at least one instance can be re/generated
 		if (restrictedInstances.containsAll(instanceNumbers)) {
 			this.errors.reject("all.selected.instances.cannot.be.regenerated");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
