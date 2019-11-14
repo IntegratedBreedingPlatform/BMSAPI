@@ -7,6 +7,7 @@ import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.study.StudyInstanceService;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -30,8 +31,8 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testCreateStudyInstance() throws Exception {
 
-		final int studyId = 1;
-		final int instanceNumber = 1;
+		final int studyId = new Random().nextInt();
+		final int instanceNumber = 2;
 
 		final StudyInstance studyInstance = new StudyInstance(this.random.nextInt(BOUND), this.random.nextInt(BOUND),
 			RandomStringUtils.random(BOUND),
@@ -43,8 +44,7 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.thenReturn(studyInstance);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.post("/crops/{cropname}/studies/{studyId}/instances/generation", CropType.CropEnum.MAIZE.name().toLowerCase(), studyId,
-				instanceNumber)
+			.post("/crops/{cropname}/studies/{studyId}/instances/generation", CropType.CropEnum.MAIZE.name().toLowerCase(), studyId)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
@@ -61,7 +61,7 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testGetStudyInstances() throws Exception {
 
-		final int studyId = 1;
+		final int studyId = new Random().nextInt();
 		final int instanceNumber = 1;
 
 		final StudyInstance studyInstance = new StudyInstance(this.random.nextInt(BOUND), this.random.nextInt(BOUND),
@@ -85,6 +85,22 @@ public class StudyInstanceResourceTest extends ApiUnitTestBase {
 			.andExpect(jsonPath("$[0].locationAbbreviation", Matchers.is(studyInstance.getLocationAbbreviation())))
 			.andExpect(jsonPath("$[0].hasFieldmap", Matchers.is(studyInstance.getHasFieldmap())))
 			.andExpect(jsonPath("$[0].customLocationAbbreviation", Matchers.is(studyInstance.getCustomLocationAbbreviation())));
+
+	}
+
+	@Test
+	public void testDeleteStudyInstance() throws Exception {
+
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int instanceId = random.nextInt();
+
+		this.mockMvc.perform(MockMvcRequestBuilders
+			.delete("/crops/{cropname}/studies/{studyId}/instances/{instanceId}", CropType.CropEnum.MAIZE.name().toLowerCase(), studyId, instanceId)
+			.contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+		Mockito.verify(this.studyInstanceService).deleteStudyInstance(studyId, instanceId);
 
 	}
 
