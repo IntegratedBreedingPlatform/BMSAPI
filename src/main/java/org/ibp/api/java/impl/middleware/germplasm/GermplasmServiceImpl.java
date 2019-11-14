@@ -315,7 +315,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 					this.pedigreeService.getCrossExpansions(gids, null, this.crossExpansionProperties);
 				for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
 					germplasmDTO.setPedigree(crossExpansionsMap.get(Integer.valueOf(germplasmDTO.getGermplasmDbId())));
-					germplasmDTO.setStudyDbId(String.valueOf(studyDbId));
 				}
 			}
 			return germplasmDTOList;
