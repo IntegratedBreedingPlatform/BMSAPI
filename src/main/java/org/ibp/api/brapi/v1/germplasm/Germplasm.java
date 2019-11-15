@@ -87,12 +87,6 @@ public class Germplasm {
 	private final static String documentationURL = null;
 
 	@JsonView(View.GermplasmBrapiV1_3.class)
-	private String studyDbId;
-
-	@JsonView(View.GermplasmBrapiV1_3.class)
-	private String trialName;
-
-	@JsonView(View.GermplasmBrapiV1_3.class)
 	private String entryNumber;
 
 	public Germplasm() {
@@ -308,22 +302,6 @@ public class Germplasm {
 
 	public void setAcquisitionDate(final Date acquisitionDate) {
 		this.acquisitionDate = acquisitionDate;
-	}
-
-	public String getStudyDbId() {
-		return this.studyDbId;
-	}
-
-	public void setStudyDbId(final String studyDbId) {
-		this.studyDbId = studyDbId;
-	}
-
-	public String getTrialName() {
-		return this.trialName;
-	}
-
-	public void setTrialName(final String trialName) {
-		this.trialName = trialName;
 	}
 
 	public String getEntryNumber() {
