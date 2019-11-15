@@ -102,7 +102,7 @@ public class ExperimentalDesignServiceImplTest {
 		}
 		Mockito.verify(this.studyValidator).validate(STUDY_ID, true);
 		Mockito.verify(this.experimentalDesignValidator).validateStudyExperimentalDesign(STUDY_ID, this.designInput.getDesignType());
-		Mockito.verify(this.instanceValidator).validateForDesignGeneration(STUDY_ID, this.designInput.getTrialInstancesForDesignGeneration());
+		Mockito.verify(this.instanceValidator).validateInstanceNumbers(STUDY_ID, this.designInput.getTrialInstancesForDesignGeneration());
 		Mockito.verifyZeroInteractions(this.studyService);
 		Mockito.verifyZeroInteractions(this.middlewareStudyService);
 		Mockito.verifyZeroInteractions(this.workbenchDataManager);
@@ -113,7 +113,7 @@ public class ExperimentalDesignServiceImplTest {
 	@Test
 	public void testDeleteDesign() {
 		this.experimentDesignService.deleteDesign(STUDY_ID);
-		Mockito.verify(this.studyValidator).validate(STUDY_ID, true, false);
+		Mockito.verify(this.studyValidator).validate(STUDY_ID, true, true);
 		Mockito.verify(this.experimentalDesignValidator).validateExperimentalDesignExistence(STUDY_ID, true);
 		Mockito.verify(this.middlewareExperimentDesignService).deleteStudyExperimentDesign(STUDY_ID);
 	}
@@ -131,7 +131,7 @@ public class ExperimentalDesignServiceImplTest {
 		Mockito.verifyZeroInteractions(this.designLicenseService);
 		Mockito.verify(this.studyValidator).validate(STUDY_ID, true);
 		Mockito.verify(this.experimentalDesignValidator).validateStudyExperimentalDesign(STUDY_ID, this.designInput.getDesignType());
-		Mockito.verify(this.instanceValidator).validateForDesignGeneration(STUDY_ID, this.designInput.getTrialInstancesForDesignGeneration());
+		Mockito.verify(this.instanceValidator).validateInstanceNumbers(STUDY_ID, this.designInput.getTrialInstancesForDesignGeneration());
 		Mockito.verify(this.experimentalDesignTypeValidator).validate(this.designInput, this.studyList);
 		Mockito.verify(this.designTypeService).generateDesign(STUDY_ID, this.designInput, PROGRAM_UUID, this.studyList);
 		Mockito.verify(this.designTypeService).getMeasurementVariables(STUDY_ID, this.designInput, PROGRAM_UUID);
