@@ -11,6 +11,8 @@ import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -19,7 +21,6 @@ import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.germplasm.GermplasmService;
-import org.ibp.api.java.study.StudyService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -47,7 +48,7 @@ public class GermplasmResourceBrapi {
 	private SearchRequestService searchRequestService;
 
 	@Autowired
-	private StudyService studyService;
+	private StudyDataManager studyDataManager;
 
 	@ApiOperation(value = "Search germplasms", notes = "Search germplasms")
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm-search", method = RequestMethod.GET)
@@ -303,8 +304,8 @@ public class GermplasmResourceBrapi {
 
 				@Override
 				public List<GermplasmDTO> getResults(final PagedResult<GermplasmDTO> pagedResult) {
-					final Integer finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
-					final Integer finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
+					final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
+					final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
 					return GermplasmResourceBrapi.this.germplasmService
 						.getGermplasmByStudy(studyDbId, finalPageSize, finalPageNumber);
 				}
@@ -321,7 +322,11 @@ public class GermplasmResourceBrapi {
 			}
 		}
 
-		final GermplasmSummaryList germplasmSummaryList = new GermplasmSummaryList(germplasmList, String.valueOf(studyDbId), "ADD NAME HERE");
+		final StudyMetadata studyMetadataForGeolocationId = this.studyDataManager.getStudyMetadataForGeolocationId(studyDbId);
+		final GermplasmSummaryList germplasmSummaryList = new GermplasmSummaryList();
+		germplasmSummaryList.setData(germplasmList);
+		germplasmSummaryList.setTrialName(studyMetadataForGeolocationId.getTrialName());
+		germplasmSummaryList.setStudyDbId(String.valueOf(studyDbId));
 
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
