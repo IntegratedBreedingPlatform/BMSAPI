@@ -34,6 +34,16 @@ public class StudyInstanceResource {
 
 	}
 
+	@ApiOperation(value = "Delete study instance",
+		notes = "Delete study instance")
+	@RequestMapping(value = "/{cropname}/studies/{studyId}/instances/{instanceId}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity<Void> deleteStudyInstance(final @PathVariable String cropname,
+		@PathVariable final Integer studyId, @PathVariable final Integer instanceId) {
+		this.studyInstanceService.deleteStudyInstance(studyId, instanceId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 	@ApiOperation(value = "List all study instances with basic metadata.",
 		notes = "Returns list of all study instances with basic metadata.")
 	@RequestMapping(value = "/{cropname}/studies/{studyId}/instances", method = RequestMethod.GET)
