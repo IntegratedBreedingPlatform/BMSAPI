@@ -71,7 +71,7 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 		this.studyValidator.validate(studyId, true);
 		final Integer designType = experimentalDesignInput.getDesignType();
 		this.experimentalDesignValidator.validateStudyExperimentalDesign(studyId, designType);
-		this.instanceValidator.validateForDesignGeneration(studyId, experimentalDesignInput.getTrialInstancesForDesignGeneration());
+		this.instanceValidator.validateInstanceNumbers(studyId, experimentalDesignInput.getTrialInstancesForDesignGeneration());
 
 		// Check license validity first and foremost( if applicable for design type)
 		// Raise an error right away if license is not valid
@@ -102,7 +102,7 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 
 	@Override
 	public void deleteDesign(final int studyId) {
-		this.studyValidator.validate(studyId, true, false);
+		this.studyValidator.validate(studyId, true, true);
 		this.experimentalDesignValidator.validateExperimentalDesignExistence(studyId, true);
 		this.experimentDesignMiddlewareService.deleteStudyExperimentDesign(studyId);
 	}

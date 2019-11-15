@@ -8,7 +8,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRuntimeException;
 import org.ibp.api.java.dataset.DatasetService;
-import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.study.StudyInstanceService;
 import org.ibp.api.rest.dataset.DatasetDTO;
@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class StudyInstanceServiceImplTest {
 	private StudyValidator studyValidator;
 
 	@Mock
-	private DatasetValidator datasetValidator;
+	private InstanceValidator instanceValidator;
 
 	@InjectMocks
 	private final StudyInstanceService studyInstanceService = new StudyInstanceServiceImpl();
@@ -148,7 +149,19 @@ public class StudyInstanceServiceImplTest {
 		assertEquals(result.getLocationAbbreviation(), studyInstance.getLocationAbbreviation());
 		assertEquals(result.getCustomLocationAbbreviation(), studyInstance.getCustomLocationAbbreviation());
 		assertEquals(result.getHasFieldmap(), studyInstance.isHasFieldmap());
-
 	}
+
+	@Test
+	public void testDeleteStudyInstance() {
+		final int studyId = this.random.nextInt(BOUND);
+		final int instanceId = this.random.nextInt(BOUND);
+
+		this.studyInstanceService.deleteStudyInstance(studyId, instanceId);
+		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.instanceValidator).validateInstanceDeletion(studyId, Collections.set(instanceId), true);
+		Mockito.verify(this.studyInstanceMiddlewareService).deleteStudyInstance(studyId, instanceId);
+	}
+
+
 
 }

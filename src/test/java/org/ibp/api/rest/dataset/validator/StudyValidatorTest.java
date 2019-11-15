@@ -1,10 +1,11 @@
 package org.ibp.api.rest.dataset.validator;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -38,7 +39,7 @@ public class StudyValidatorTest {
 	private StudyDataManager studyDataManager;
 
 	@Mock
-	private StudyService middlewareStudyService;
+	private org.generationcp.middleware.service.api.study.StudyInstanceService studyInstanceMiddlewareService;
 
 	@InjectMocks
 	private StudyValidator studyValidator;
@@ -100,7 +101,7 @@ public class StudyValidatorTest {
 	}
 
 	@Test
-	public void testStudyCannotHaveAdvanceOrCrossList() {
+	public void testStudyAllInstancesMustBeDeletableButOneIsNot() {
 		final Random ran = new Random();
 		final int studyId = ran.nextInt();
 		final Study study = new Study();
@@ -109,18 +110,31 @@ public class StudyValidatorTest {
 		study.setCreatedBy("1");
 
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
-		Mockito.when(middlewareStudyService.hasAdvancedOrCrossesList(studyId)).thenReturn(true);
+		final StudyInstance studyInstance = new StudyInstance(ran.nextInt(), ran.nextInt(), ran.nextInt(),
+			RandomStringUtils.randomAlphabetic(10),
+			RandomStringUtils.randomAlphabetic(10),
+			1,
+			RandomStringUtils.randomAlphabetic(10), false);
+		studyInstance.setCanBeDeleted(false);
+		final StudyInstance studyInstance2 = new StudyInstance(ran.nextInt(), ran.nextInt(), ran.nextInt(),
+			RandomStringUtils.randomAlphabetic(10),
+			RandomStringUtils.randomAlphabetic(10),
+			1,
+			RandomStringUtils.randomAlphabetic(10), false);
+		studyInstance2.setCanBeDeleted(true);
+		Mockito.when(this.studyInstanceMiddlewareService.getStudyInstances(studyId))
+			.thenReturn(Arrays.asList(studyInstance, studyInstance2));
 		try {
-			studyValidator.validate(studyId, ran.nextBoolean(), false);
+			studyValidator.validate(studyId, ran.nextBoolean(), true);
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
-				hasItem("study.has.advance.or.cross.list"));
+				hasItem("at.least.one.instance.cannot.be.deleted"));
 		}
 	}
 
 	@Test
-	public void testStudyCanHaveAdvanceOrCrossList() {
+	public void testStudyAllInstancesMustBeDeletableSuccess() {
 		final Random ran = new Random();
 		final int studyId = ran.nextInt();
 		final Study study = new Study();
@@ -129,7 +143,39 @@ public class StudyValidatorTest {
 		study.setCreatedBy("1");
 
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
+		final StudyInstance studyInstance = new StudyInstance(ran.nextInt(), ran.nextInt(), ran.nextInt(),
+			RandomStringUtils.randomAlphabetic(10),
+			RandomStringUtils.randomAlphabetic(10),
+			1,
+			RandomStringUtils.randomAlphabetic(10), false);
+		studyInstance.setCanBeDeleted(true);
+		final StudyInstance studyInstance2 = new StudyInstance(ran.nextInt(), ran.nextInt(), ran.nextInt(),
+			RandomStringUtils.randomAlphabetic(10),
+			RandomStringUtils.randomAlphabetic(10),
+			1,
+			RandomStringUtils.randomAlphabetic(10), false);
+		studyInstance2.setCanBeDeleted(true);
+		Mockito.when(this.studyInstanceMiddlewareService.getStudyInstances(studyId))
+			.thenReturn(Arrays.asList(studyInstance, studyInstance2));
+
 		studyValidator.validate(studyId, ran.nextBoolean(), true);
 	}
+
+	@Test
+	public void testStudyNotAllInstancesMustBeDeletable() {
+		final Random ran = new Random();
+		final int studyId = ran.nextInt();
+		final Study study = new Study();
+		study.setId(studyId);
+		study.setLocked(false);
+		study.setCreatedBy("1");
+
+		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
+		studyValidator.validate(studyId, ran.nextBoolean(), false);
+		Mockito.verifyZeroInteractions(this.studyInstanceMiddlewareService);
+	}
+
+
+
 
 }
