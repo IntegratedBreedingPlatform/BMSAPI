@@ -71,7 +71,7 @@ public class ExperimentalDesignServiceImpl implements ExperimentalDesignService 
 		this.studyValidator.validate(studyId, true);
 		final Integer designType = experimentalDesignInput.getDesignType();
 		this.experimentalDesignValidator.validateStudyExperimentalDesign(studyId, designType);
-		this.instanceValidator.validateInstanceNumbers(studyId, experimentalDesignInput.getTrialInstancesForDesignGeneration(), false);
+		this.instanceValidator.validateInstanceNumbers(studyId, experimentalDesignInput.getTrialInstancesForDesignGeneration());
 
 		// Check license validity first and foremost( if applicable for design type)
 		// Raise an error right away if license is not valid

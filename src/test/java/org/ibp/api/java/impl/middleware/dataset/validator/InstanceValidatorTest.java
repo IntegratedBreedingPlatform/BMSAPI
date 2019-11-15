@@ -91,7 +91,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 	public void testValidateInstanceNumbersFail_StudyHasNoInstances() {
 		Mockito.doReturn(Collections.emptyMap()).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
 		try {
-			this.instanceValidator.validateInstanceNumbers(random.nextInt(), Collections.singleton(random.nextInt()), random.nextBoolean());
+			this.instanceValidator.validateInstanceNumbers(random.nextInt(), Collections.singleton(random.nextInt()));
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -107,7 +107,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 		instancesMap.put("3", 303);
 		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
 		try {
-			this.instanceValidator.validateInstanceNumbers(random.nextInt(), new HashSet<>(Arrays.asList(1, 102)), random.nextBoolean());
+			this.instanceValidator.validateInstanceNumbers(random.nextInt(), new HashSet<>(Arrays.asList(1, 102)));
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
@@ -126,7 +126,20 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 		final List<StudyInstance> instances = this.createTestInstances(2);
 		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
 
-		this.instanceValidator.validateInstanceNumbers(studyId, new HashSet<>(Arrays.asList(1, 2)), random.nextBoolean());
+		this.instanceValidator.validateInstanceNumbers(studyId, new HashSet<>(Arrays.asList(1, 2)));
+	}
+
+	@Test
+	public void testValidateInstanceNumbersSuccess_StudyHasOneInstance() {
+		final Map<String, Integer> instancesMap = new HashMap<>();
+		instancesMap.put("1", 101);
+		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
+
+		final int studyId = random.nextInt();
+		final List<StudyInstance> instances = this.createTestInstances(1);
+		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
+
+		this.instanceValidator.validateInstanceNumbers(studyId, Collections.singleton(1));
 	}
 
 	@Test
@@ -153,7 +166,7 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
 
 		try {
-			this.instanceValidator.validateInstanceDeletion(studyId, new HashSet<>(Collections.singletonList(101)), random.nextBoolean());
+			this.instanceValidator.validateInstanceDeletion(studyId, new HashSet<>(Collections.singletonList(101)), true);
 			Assert.fail("Expected validation exception to be thrown but was not.");
 		} catch (final ApiRequestValidationException e) {
 			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),

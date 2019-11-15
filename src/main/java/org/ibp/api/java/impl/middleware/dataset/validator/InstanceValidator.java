@@ -51,7 +51,7 @@ public class InstanceValidator {
 		}
 	}
 
-	public void validateInstanceNumbers(final Integer studyId, final Set<Integer> instanceNumbers, final Boolean enforceAllInstancesDeletable) {
+	public void validateInstanceNumbers(final Integer studyId, final Set<Integer> instanceNumbers) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		final Map<String, Integer> instanceGeolocationIdsMap = this.studyDataManager.getInstanceGeolocationIdsMap(studyId);
@@ -64,7 +64,7 @@ public class InstanceValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		this.validateInstancesDeletability(studyId, instanceNumbers, enforceAllInstancesDeletable);
+		this.validateInstancesDeletability(studyId, instanceNumbers, false);
 	}
 
 	public void validateInstanceDeletion(final Integer studyId, final Set<Integer> instanceIds, final Boolean enforceAllInstancesDeletable) {
@@ -80,7 +80,7 @@ public class InstanceValidator {
 		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
 
 		// Raise error if the environment to be deleted is the only remaining environment for study
-		if (studyInstances.size() < 2) {
+		if (enforceAllInstancesDeletable && studyInstances.size() < 2) {
 			this.errors.reject("cannot.delete.last.instance");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -98,7 +98,7 @@ public class InstanceValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		// Verify at least one instance can be re/generated
+		// Verify at least one instance can be re/generated or deleted
 		if (restrictedInstances.containsAll(instanceIds)) {
 			this.errors.reject("all.selected.instances.cannot.be.regenerated");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
