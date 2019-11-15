@@ -78,6 +78,13 @@ public class InstanceValidator {
 	private void validateInstancesDeletability(final Integer studyId, final Set<Integer> instanceIds,
 		final Boolean enforceAllInstancesDeletable) {
 		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
+
+		// Raise error if the environment to be deleted is the only remaining environment for study
+		if (studyInstances.size() < 2) {
+			this.errors.reject("cannot.delete.last.instance");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
 		final List<Integer> restrictedInstances =
 			studyInstances.stream().filter(instance -> BooleanUtils.isFalse(instance.getCanBeDeleted()))
 				.map(instance -> instance.getInstanceDbId()).collect(Collectors.toList());

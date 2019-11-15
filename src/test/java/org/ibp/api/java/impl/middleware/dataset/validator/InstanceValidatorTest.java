@@ -120,14 +120,13 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 		final Map<String, Integer> instancesMap = new HashMap<>();
 		instancesMap.put("1", 101);
 		instancesMap.put("2", 202);
-		instancesMap.put("3", 303);
 		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
 
 		final int studyId = random.nextInt();
-		final List<StudyInstance> instances = this.createTestInstances();
+		final List<StudyInstance> instances = this.createTestInstances(2);
 		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
 
-		this.instanceValidator.validateInstanceNumbers(studyId, new HashSet<>(Arrays.asList(1, 2, 3)), random.nextBoolean());
+		this.instanceValidator.validateInstanceNumbers(studyId, new HashSet<>(Arrays.asList(1, 2)), random.nextBoolean());
 	}
 
 	@Test
@@ -147,9 +146,28 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 		}
 	}
 
+	@Test
+	public void testValidateInstanceDeletionFail_OnlyOneStudyInstanceRemaining() {
+		final int studyId = random.nextInt();
+		final List<StudyInstance> instances = createTestInstances(1);
+		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
+
+		try {
+			this.instanceValidator.validateInstanceDeletion(studyId, new HashSet<>(Collections.singletonList(101)), random.nextBoolean());
+			Assert.fail("Expected validation exception to be thrown but was not.");
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("cannot.delete.last.instance"));
+		}
+	}
+
 	private List<StudyInstance> createTestInstances() {
+		return this.createTestInstances(3);
+	}
+
+	private List<StudyInstance> createTestInstances(final Integer count) {
 		final List<StudyInstance> instances = new ArrayList<>();
-		for (int i = 1; i <= 3; i++) {
+		for (int i = 1; i <= count; i++) {
 			final StudyInstance instance = new StudyInstance();
 			instance.setInstanceNumber(i);
 			instance.setInstanceDbId(100 + i);
