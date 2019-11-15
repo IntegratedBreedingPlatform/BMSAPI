@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.rpackage;
 
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.RCall;
 import org.generationcp.middleware.pojos.workbench.RCallParameter;
 import org.ibp.api.domain.rpackage.RCallDTO;
@@ -19,16 +18,16 @@ import java.util.Map;
 public class RPackageServiceImpl implements RPackageService {
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private org.generationcp.middleware.service.api.rpackage.RPackageService rPackageMiddlewareService;
 
 	@Override
 	public List<RCallDTO> getAllRCalls() {
-		return this.mapToDTO(this.workbenchDataManager.getAllRCalls());
+		return this.mapToDTO(this.rPackageMiddlewareService.getAllRCalls());
 	}
 
 	@Override
 	public List<RCallDTO> getRCallsByPackageId(final Integer packageId) {
-		return this.mapToDTO(this.workbenchDataManager.getRCallsByPackageId(packageId));
+		return this.mapToDTO(this.rPackageMiddlewareService.getRCallsByPackageId(packageId));
 	}
 
 	private List<RCallDTO> mapToDTO(final List<RCall> rCalls) {
