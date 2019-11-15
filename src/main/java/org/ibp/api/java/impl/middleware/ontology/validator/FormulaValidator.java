@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.service.impl.derived_variables.DerivedVariableServiceImpl;
 import org.ibp.api.java.impl.middleware.ontology.TermRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,9 +24,11 @@ import org.springframework.validation.Validator;
 
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -75,8 +78,8 @@ public class FormulaValidator implements Validator {
 			return;
 		}
 
-		if (!this.isTrait(targetTermId)) {
-			errors.reject("variable.formula.target.not.trait", new String[] {String.valueOf(targetTermId)}, "");
+		if (!this.isValidVariableTypeForFormula(targetTermId)) {
+			errors.reject("variable.formula.target.not.valid", new String[] {String.valueOf(targetTermId)}, "");
 		}
 
 		// Validate inputs and set ids
@@ -85,7 +88,7 @@ public class FormulaValidator implements Validator {
 		final Map<String, DataType> inputVariablesDataTypeMap = new HashMap<>();
 
 		for (final FormulaVariable input : formulaDto.getInputs()) {
-			final Term inputTerm = this.termDataManager.getTermByName(input.getName());
+			final Term inputTerm = this.termDataManager.getTermByNameAndCvId(input.getName(), CvId.VARIABLES.getId());
 			if (inputTerm == null) {
 				errors.reject("variable.input.not.exists", new Object[] {input.getName()}, "");
 			} else {
@@ -99,7 +102,7 @@ public class FormulaValidator implements Validator {
 				}
 
 				input.setId(id); // it will be used to save the input
-				if (!this.isTrait(id)) {
+				if (!this.isValidVariableTypeForFormula(id)) {
 					nonTraitInputs.add(inputTerm);
 				}
 			}
@@ -129,11 +132,17 @@ public class FormulaValidator implements Validator {
 
 		try {
 			String formula = formulaDto.getDefinition();
+			final List<String> aggregateFunctionInputVariables = this.getAggregateFunctionInputVariables(formula, inputVariablesDataTypeMap, errors);
+			if(errors.hasErrors()) {
+				return;
+			}
 			final Map<String, Object> parameters = DerivedVariableUtils.extractParameters(formula);
 
 			// Create mock data for each variable.
 			for (final Map.Entry<String, Object> termEntry : parameters.entrySet()) {
-				if (inputVariablesDataTypeMap.get(termEntry.getKey()) == DataType.DATE_TIME_VARIABLE) {
+				if (aggregateFunctionInputVariables.contains(termEntry.getKey())) {
+					termEntry.setValue(new ArrayList<>());
+				} else if (inputVariablesDataTypeMap.get(termEntry.getKey()) == DataType.DATE_TIME_VARIABLE){
 					termEntry.setValue(new Date());
 				} else {
 					termEntry.setValue(BigDecimal.ONE);
@@ -148,12 +157,33 @@ public class FormulaValidator implements Validator {
 		}
 	}
 
-	private boolean isTrait(final int id) {
+	List<String> getAggregateFunctionInputVariables(final String formula, final Map<String, DataType> inputVariablesDataTypeMap, final Errors errors) {
+		final List<String> inputVariables = new ArrayList<>();
+		final Map<String, List<String>> aggregateFunctionInputVariablesMap = DerivedVariableUtils.getAggregateFunctionInputVariablesMap(formula);
+		for(final String aggregateFunction: DerivedVariableUtils.AGGREGATE_FUNCTIONS) {
+			inputVariables.addAll(this.validateAggregateInputVariable(inputVariablesDataTypeMap, errors, aggregateFunction, aggregateFunctionInputVariablesMap.get(aggregateFunction)));
+		}
+		return inputVariables;
+	}
+
+	List<String> validateAggregateInputVariable(final Map<String, DataType> inputVariablesDataTypeMap, final Errors errors, final String aggregateFunction, final List<String> inputVariables) {
+		final List<String> aggregateInputVariable = new ArrayList<>();
+		for(final String inputVariable: inputVariables) {
+			if(DataType.NUMERIC_VARIABLE.getId() != inputVariablesDataTypeMap.get(inputVariable).getId()) {
+				errors.reject("variable.formula." + aggregateFunction + ".input.not.numeric", "");
+				return inputVariables;
+			}
+			aggregateInputVariable.add(inputVariable);
+		}
+		return aggregateInputVariable;
+	}
+
+	private boolean isValidVariableTypeForFormula(final int id) {
 		return Iterables.any(this.ontologyVariableDataManager.getVariableTypes(id), new Predicate<VariableType>() {
 
 			@Override
 			public boolean apply(@Nullable final VariableType variableType) {
-				return variableType.equals(VariableType.TRAIT);
+				return DerivedVariableServiceImpl.CALCULATED_VARIABLE_VARIABLE_TYPES.contains(variableType.getId());
 			}
 		});
 	}

@@ -15,9 +15,11 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FillPatternType;
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
@@ -25,6 +27,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -43,10 +46,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 
@@ -85,6 +88,12 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	@Resource
 	private DatasetTypeService datasetTypeService;
 
+	@Resource
+	private OntologyDataManager ontologyDataManager;
+
+	@Autowired
+	private ContextUtil contextUtil;
+
 	@Override
 	public File generateSingleInstanceFile(
 		final Integer studyId,
@@ -112,7 +121,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	@Override
 	public File generateMultiInstanceFile(
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
-		final String fileNameFullPath) throws IOException {
+		final String fileNameFullPath) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -121,24 +130,20 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		throw new UnsupportedOperationException();
 	}
 
-	private List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns) {
+	List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns) {
 		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
 		final List<MeasurementVariable> trait = new ArrayList<>();
 		final List<MeasurementVariable> selection = new ArrayList<>();
-		final List<Integer> discardColumns =
-			Arrays.asList(TermId.REP_NO.getId(), TermId.ROW.getId(), TermId.BLOCK_NO.getId(), TermId.COL.getId());
 
 		for (final MeasurementVariable measurementVariable : columns) {
 			if (TermId.OBS_UNIT_ID.getId() == measurementVariable.getTermId()) {
 				orderedColumns.add(0, measurementVariable);
-			} else if (!discardColumns.contains(measurementVariable.getTermId())) {
-				if (VariableType.TRAIT.getId().equals(measurementVariable.getVariableType().getId())) {
-					trait.add(measurementVariable);
-				} else if (VariableType.SELECTION_METHOD.getId().equals(measurementVariable.getVariableType().getId())) {
-					selection.add(measurementVariable);
-				} else {
-					orderedColumns.add(measurementVariable);
-				}
+			} else if (VariableType.TRAIT.getId().equals(measurementVariable.getVariableType().getId())) {
+				trait.add(measurementVariable);
+			} else if (VariableType.SELECTION_METHOD.getId().equals(measurementVariable.getVariableType().getId())) {
+				selection.add(measurementVariable);
+			} else {
+				orderedColumns.add(measurementVariable);
 			}
 		}
 
@@ -175,7 +180,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 					.isEmpty() && column.getTermId() != TermId.BREEDING_METHOD_VARIATE.getId()
 					&& column.getTermId() != TermId.BREEDING_METHOD_VARIATE_CODE.getId() && !column.getProperty()
 					.equals(DatasetExcelGenerator.BREEDING_METHOD_PROPERTY_NAME)) {
-					cell.setCellValue(this.getCategoricalCellValue(dataCell, column.getPossibleValues()));
+					cell.setCellValue(DatasetExcelGenerator.getCategoricalCellValue(dataCell, column.getPossibleValues()));
 				} else if (DatasetExcelGenerator.NUMERIC_DATA_TYPE.equalsIgnoreCase(column.getDataType())) {
 					if (!dataCell.isEmpty() && NumberUtils.isNumber(dataCell)) {
 						cell.setCellType(CellType.BLANK);
@@ -238,7 +243,8 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final List<MeasurementVariable> studyDetailsVariables =
 			this.datasetService.getMeasurementVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
-		final int environmentDatasetId = this.studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getId();
+		final int environmentDatasetId =
+			this.studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getId();
 		final int plotDatasetId;
 		if (dataSetDto.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			plotDatasetId = dataSetDto.getDatasetId();
@@ -365,32 +371,43 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		xlsSheet.setColumnWidth(8, 20 * PIXEL_SIZE);
 	}
 
-	private List<MeasurementVariable> getEnvironmentalDetails(
+	List<MeasurementVariable> getEnvironmentalDetails(
 		final int environmentDatasetId, final List<MeasurementVariable> environmentVariables, final StudyInstance instance) {
 		final List<MeasurementVariable> environmentDetails =
 			filterByVariableType(environmentVariables, VariableType.ENVIRONMENT_DETAIL);
 		final Map<Integer, String> geoLocationMap =
 			this.studyDataManager.getGeolocationByVariableId(environmentDatasetId, instance.getInstanceDbId());
-		for (final MeasurementVariable variable : environmentDetails) {
-			switch (variable.getTermId()) {
+
+		final ListIterator<MeasurementVariable> iterator = environmentDetails.listIterator();
+		while (iterator.hasNext()) {
+			final MeasurementVariable measurementVariable = iterator.next();
+			switch (measurementVariable.getTermId()) {
 				case 8170:
-					variable.setValue(String.valueOf(instance.getInstanceNumber()));
+					measurementVariable.setValue(String.valueOf(instance.getInstanceNumber()));
 					break;
 				case 8190:
-					variable.setValue(String.valueOf(instance.getLocationName()));
+					// Automatically add  LOCATION_NAME variable to environment details. So that both LOCATION_ID abd LOCATION_NAME variables are present
+					// in Description sheet of the exported Dataset Excel file. This is to make sure that the location name is processed properly
+					// when the file is imported in Dataset Importer.
+					iterator.add(this.createLocationNameVariable(measurementVariable.getAlias(), instance.getLocationName()));
+
+					// Rename the LOCATION_ID variable appropriately
+					measurementVariable.setAlias(TermId.LOCATION_ID.name());
+					measurementVariable.setValue(String.valueOf(instance.getLocationId()));
 					break;
 				default:
-					final String keyValue = geoLocationMap.get(variable.getTermId());
-					if (StringUtils.isBlank(variable.getValue()) && StringUtils.isNotBlank(keyValue)) {
-						variable.setValue(keyValue);
+					final String keyValue = geoLocationMap.get(measurementVariable.getTermId());
+					if (StringUtils.isBlank(measurementVariable.getValue()) && StringUtils.isNotBlank(keyValue)) {
+						measurementVariable.setValue(keyValue);
 					}
-					break;
 			}
+
 		}
+
 		return environmentDetails;
 	}
 
-	protected List<MeasurementVariable> getEnvironmentalConditions(
+	List<MeasurementVariable> getEnvironmentalConditions(
 		final int environmentDatasetId, final List<MeasurementVariable> environmentVariables, final StudyInstance instance) {
 		final List<MeasurementVariable> environmentConditions =
 			filterByVariableType(environmentVariables, VariableType.STUDY_CONDITION);
@@ -592,7 +609,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			}
 		}
 		// just in case an id was passed, but this won't be the case most of the time
-		if (idValue != null && NumberUtils.isNumber(idValue)) {
+		if (NumberUtils.isNumber(idValue)) {
 			for (final ValueReference ref : possibleValues) {
 				// Needs to convert to double to facilitate retrieving decimal value from categorical values
 				if (Double.valueOf(ref.getId()).equals(Double.valueOf(idValue))) {
@@ -614,10 +631,13 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		}
 	}
 
-	protected String convertPossibleValuesToString(final List<ValueReference> possibleValues, final String delimiter) {
+	private String convertPossibleValuesToString(final List<ValueReference> possibleValues, final String delimiter) {
+
+		if (possibleValues == null) {
+			return "";
+		}
 
 		final StringBuilder sb = new StringBuilder();
-
 		final Iterator<ValueReference> iterator = possibleValues.iterator();
 		while (iterator.hasNext()) {
 			sb.append(iterator.next().getName());
@@ -672,7 +692,27 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		return Lists.newArrayList(variablesByType);
 	}
 
-	protected void setMessageSource(final ResourceBundleMessageSource messageSource) {
+	MeasurementVariable createLocationNameVariable(final String variableAlias, final String locationName) {
+		final MeasurementVariable locationNameVariable = new MeasurementVariable();
+		final StandardVariable standardVariable =
+			this.ontologyDataManager.getStandardVariable(TermId.TRIAL_LOCATION.getId(), this.contextUtil.getCurrentProgramUUID());
+		locationNameVariable.setAlias(variableAlias);
+		locationNameVariable.setName(standardVariable.getName());
+		locationNameVariable.setDescription(standardVariable.getDescription());
+		locationNameVariable.setProperty(standardVariable.getProperty().getName());
+		locationNameVariable.setScale(standardVariable.getScale().getName());
+		locationNameVariable.setMethod(standardVariable.getMethod().getName());
+		locationNameVariable.setDataType(standardVariable.getDataType().getName());
+		locationNameVariable.setDataTypeId(standardVariable.getDataType().getId());
+		locationNameVariable.setValue(locationName);
+		locationNameVariable.setLabel(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0));
+		locationNameVariable.setTermId(TermId.TRIAL_LOCATION.getId());
+		locationNameVariable.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
+		locationNameVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		return locationNameVariable;
+	}
+
+	void setMessageSource(final ResourceBundleMessageSource messageSource) {
 		this.messageSource = messageSource;
 	}
 }

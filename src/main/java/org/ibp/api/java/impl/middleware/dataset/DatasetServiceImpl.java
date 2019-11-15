@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -46,8 +47,11 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,6 +60,8 @@ import java.util.TreeSet;
 @Service
 @Transactional
 public class DatasetServiceImpl implements DatasetService {
+
+	public static final String LOCATION_ID_VARIABLE_NAME = "LOCATION";
 
 	@Autowired
 	private org.generationcp.middleware.service.api.dataset.DatasetService middlewareDatasetService;
@@ -87,7 +93,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Autowired
 	private DatasetTypeService datasetTypeService;
 
-	private static String PLOT_DATASET_NAME = "Observations";
+	private static final String PLOT_DATASET_NAME = "Observations";
 
 	@Override
 	public List<MeasurementVariable> getObservationSetColumns(
@@ -281,7 +287,7 @@ public class DatasetServiceImpl implements DatasetService {
 			this.middlewareDatasetService.getInstanceIdToObservationUnitRowsMap(studyId, datasetId, instanceIds);
 		final ModelMapper observationUnitRowMapper = new ModelMapper();
 		observationUnitRowMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-		final Map<Integer, List<ObservationUnitRow>> map = new HashMap<>();
+		final Map<Integer, List<ObservationUnitRow>> map = new LinkedHashMap<>();
 		for (final Integer instanceNumber : observationUnitRowsMap.keySet()) {
 			final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
 				observationUnitRowsMap.get(instanceNumber);
@@ -455,7 +461,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public void acceptDraftDataAndSetOutOfBoundsToMissing(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
-		this.middlewareDatasetService.acceptDraftDataAndSetOutOfBoundsToMissing(datasetId);
+		this.middlewareDatasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId);
 	}
 
 	@Override
@@ -486,7 +492,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public void acceptAllDatasetDraftData(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId, false);
-		this.middlewareDatasetService.acceptAllDatasetDraftData(datasetId);
+		this.middlewareDatasetService.acceptAllDatasetDraftData(studyId, datasetId);
 	}
 
 	@Override
@@ -568,13 +574,96 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows,
 		final List<ObservationUnitRow> list) {
 		for (final org.generationcp.middleware.service.api.dataset.ObservationUnitRow dto : observationUnitRows) {
-			final Map<String, ObservationUnitData> datas = new HashMap<>();
+			final Map<String, ObservationUnitData> variables = new HashMap<>();
+			final Map<String, ObservationUnitData> environmentVariables = new HashMap<>();
 			for (final String data : dto.getVariables().keySet()) {
-				datas.put(data, observationUnitRowMapper.map(dto.getVariables().get(data), ObservationUnitData.class));
+				variables.put(data, observationUnitRowMapper.map(dto.getVariables().get(data), ObservationUnitData.class));
+			}
+			for (final String data : dto.getEnvironmentVariables().keySet()) {
+				environmentVariables.put(data, observationUnitRowMapper.map(dto.getEnvironmentVariables().get(data), ObservationUnitData.class));
 			}
 			final ObservationUnitRow observationUnitRow = observationUnitRowMapper.map(dto, ObservationUnitRow.class);
-			observationUnitRow.setVariables(datas);
+			observationUnitRow.setVariables(variables);
+			observationUnitRow.setEnvironmentVariables(environmentVariables);
 			list.add(observationUnitRow);
 		}
+	}
+
+	@Override
+	public List<MeasurementVariable> getAllDatasetVariables(final int studyId, final int datasetId) {
+
+		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(datasetId);
+		final List<Integer> subObsDatasetTypeIds = this.datasetTypeService.getSubObservationDatasetTypeIds();
+		final int environmentDatasetId =
+			this.studyDataManager.getDataSetsByType(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getId();
+		final int plotDatasetId;
+
+		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
+			plotDatasetId = datasetDTO.getDatasetId();
+		} else {
+			plotDatasetId = datasetDTO.getParentDatasetId();
+		}
+
+		final List<MeasurementVariable> studyVariables = this.middlewareDatasetService
+			.getObservationSetVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
+		final List<MeasurementVariable> environmentDetailAndConditionVariables = this.middlewareDatasetService
+			.getObservationSetVariables(environmentDatasetId, Lists.newArrayList(
+				VariableType.ENVIRONMENT_DETAIL.getId(),
+				VariableType.STUDY_CONDITION.getId()));
+		this.addLocationIdVariable(environmentDetailAndConditionVariables);
+		// Experimental Design variables have value at dataset level. Perform sorting to ensure that they come first
+		Collections.sort(environmentDetailAndConditionVariables, new Comparator<MeasurementVariable>() {
+
+			@Override
+			public int compare(final MeasurementVariable var1, final MeasurementVariable var2) {
+				final String value1 = var1.getValue();
+				final String value2 = var2.getValue();
+				if (value1 != null && value2 != null)
+					return value1.compareTo(value2);
+				return (value1 == null) ? 1 : -1;
+			}
+		});
+
+		final List<MeasurementVariable> plotDataSetColumns =
+			this.middlewareDatasetService
+				.getObservationSetVariables(
+					plotDatasetId,
+					Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
+						VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId()));
+		final List<MeasurementVariable> treatmentFactors =
+			this.middlewareDatasetService
+				.getObservationSetVariables(plotDatasetId, Lists.newArrayList(TermId.MULTIFACTORIAL_INFO.getId()));
+		plotDataSetColumns.removeAll(treatmentFactors);
+
+		final List<MeasurementVariable> traits =
+			this.middlewareDatasetService.getObservationSetVariables(datasetId, Lists.newArrayList(VariableType.TRAIT.getId()));
+		final List<MeasurementVariable> selectionVariables =
+			this.middlewareDatasetService.getObservationSetVariables(datasetId, Lists.newArrayList(VariableType.SELECTION_METHOD.getId()));
+		final List<MeasurementVariable> allVariables = new ArrayList<>();
+		allVariables.addAll(studyVariables);
+		allVariables.addAll(environmentDetailAndConditionVariables);
+		allVariables.addAll(treatmentFactors);
+		allVariables.addAll(plotDataSetColumns);
+
+		//Add variables that are specific to the sub-observation dataset types
+		if (Arrays.stream(subObsDatasetTypeIds.toArray()).anyMatch(datasetDTO.getDatasetTypeId()::equals)) {
+			final List<MeasurementVariable> subObservationSetColumns =
+				this.middlewareDatasetService
+					.getObservationSetVariables(datasetId, Lists.newArrayList(
+						VariableType.GERMPLASM_DESCRIPTOR.getId(),
+						VariableType.OBSERVATION_UNIT.getId()));
+			allVariables.addAll(subObservationSetColumns);
+
+		}
+		allVariables.addAll(traits);
+		allVariables.addAll(selectionVariables);
+		return allVariables;
+	}
+
+	private void addLocationIdVariable(final List<MeasurementVariable> environmentDetailAndConditionVariables) {
+		final MeasurementVariable locationIdVariable = new MeasurementVariable();
+		locationIdVariable.setAlias(TermId.LOCATION_ID.name());
+		locationIdVariable.setName(LOCATION_ID_VARIABLE_NAME);
+		environmentDetailAndConditionVariables.add(0, locationIdVariable);
 	}
 }

@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.io.Files;
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -25,7 +26,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,6 +62,9 @@ public abstract class AbstractDatasetExportService {
 
 	@Resource
 	protected DatasetTypeService datasetTypeService;
+
+	@Autowired
+	protected ContextUtil contextUtil;
 
 	private ZipUtil zipUtil = new ZipUtil();
 
@@ -157,7 +161,7 @@ public abstract class AbstractDatasetExportService {
 	}
 
 	Map<Integer, StudyInstance> getSelectedDatasetInstancesMap(final List<StudyInstance> studyInstances, final Set<Integer> instanceIds) {
-		final Map<Integer, StudyInstance> studyInstanceMap = new HashMap<>();
+		final Map<Integer, StudyInstance> studyInstanceMap = new LinkedHashMap<>();
 		for (final StudyInstance studyInstance : studyInstances) {
 			if (instanceIds.contains(studyInstance.getInstanceDbId())) {
 				studyInstanceMap.put(studyInstance.getInstanceDbId(), studyInstance);

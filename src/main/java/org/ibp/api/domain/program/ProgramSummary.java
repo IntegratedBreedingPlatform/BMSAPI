@@ -21,6 +21,14 @@ public class ProgramSummary {
 	public ProgramSummary() {
 	}
 
+	public ProgramSummary(
+		final String id, final String uniqueID, final String name, final String crop) {
+		this.id = id;
+		this.uniqueID = uniqueID;
+		this.name = name;
+		this.crop = crop;
+	}
+
 	public String getId() {
 		return this.id;
 	}

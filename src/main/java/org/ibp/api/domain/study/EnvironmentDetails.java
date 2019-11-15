@@ -1,12 +1,11 @@
 
 package org.ibp.api.domain.study;
 
-import java.util.ArrayList;
-import java.util.List;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.Valid;
-
-import com.wordnik.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EnvironmentDetails {
 

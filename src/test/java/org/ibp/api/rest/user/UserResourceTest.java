@@ -5,12 +5,10 @@ import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.ibp.api.domain.user.UserDetailDto;
-import org.ibp.api.java.user.UserService;
-import org.ibp.api.java.impl.middleware.user.UserServiceImpl;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
+import org.ibp.api.java.user.UserService;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -20,6 +18,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,14 +27,14 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	@Configuration
 	public static class TestConfiguration {
 
-		@Bean
+		@Bean(name = "userServiceAPI")
 		@Primary
 		public UserService userService() {
-			return Mockito.mock(UserServiceImpl.class);
+			return Mockito.mock(UserService.class);
 		}
 	}
 
-	@Autowired
+	@Resource(name = "userServiceAPI")
 	private UserService userService;
 
 	/**
@@ -79,7 +78,8 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	@Test
 	public void testListUsersByProjectUuid() throws Exception {
 		final List<UserDetailDto> users = UserTestDataGenerator.initializeListUserDetailDto();
-		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/projects/d8d59d89-f4ca-4b83-90e2-be2d82407146/users").build().encode();
+		final UriComponents uriComponents =
+			UriComponentsBuilder.newInstance().path("/projects/d8d59d89-f4ca-4b83-90e2-be2d82407146/users").build().encode();
 
 		Mockito.when(this.userService.getUsersByProjectUUID("d8d59d89-f4ca-4b83-90e2-be2d82407146")).thenReturn(users);
 
@@ -90,8 +90,8 @@ public class UserResourceTest  extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(users.get(0).getId())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].username", Matchers.is(users.get(0).getUsername())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].lastName", Matchers.is(users.get(0).getLastName())))
-			.andExpect(MockMvcResultMatchers.jsonPath("$[0].role.id", Matchers.is(users.get(0).getRole().getId())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].role.description", Matchers.is(users.get(0).getRole().getDescription())));
+			.andExpect(MockMvcResultMatchers
+				.jsonPath("$[0].userRoles[0].role.id", Matchers.is(users.get(0).getUserRoles().get(0).getRole().getId())));
 	}
 
 	/**
@@ -112,9 +112,9 @@ public class UserResourceTest  extends ApiUnitTestBase {
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(users.get(0).getId())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].username", Matchers.is(users.get(0).getUsername())))
 				.andExpect(MockMvcResultMatchers.jsonPath("$[0].lastName", Matchers.is(users.get(0).getLastName())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].role.id", Matchers.is(users.get(0).getRole().getId())))
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].role.description", Matchers.is(users.get(0).getRole().getDescription())));
-	}
+			.andExpect(
+				MockMvcResultMatchers.jsonPath("$[0].userRoles[0].role.id", Matchers.is(users.get(0).getUserRoles().get(0).getRole().getId())));
+;	}
 
 	/**
 	 * Should respond with 201 and return the id of the created user. * *
@@ -124,8 +124,8 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	@Test
 	public void testCreateUser() throws Exception {
 		final String id = "10";
-		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailDto();
-		final HashMap<String, Object> mapResponse = initializeResponse(id);
+		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
+		final HashMap<String, Object> mapResponse = this.initializeResponse(id);
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/users").build().encode();
 
 		Mockito.when(this.userService.createUser(Mockito.any(UserDetailDto.class))).thenReturn(mapResponse);
@@ -144,8 +144,8 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	 */
 	@Test
 	public void testCreateUserError() throws Exception {
-		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailDto();
-		final HashMap<String, Object> mapResponse = initializeResponseError("email", "exists");
+		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
+		final HashMap<String, Object> mapResponse = this.initializeResponseError("email", "exists");
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/users").build().encode();
 
@@ -168,8 +168,8 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	@Test
 	public void testUpdateUser() throws Exception {
 		final String id = "7";
-		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailDto();
-		final HashMap<String, Object> mapResponse = initializeResponse(id);
+		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
+		final HashMap<String, Object> mapResponse = this.initializeResponse(id);
 
 		Mockito.when(this.userService.updateUser(Mockito.any(UserDetailDto.class))).thenReturn(mapResponse);
 
@@ -188,8 +188,8 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	@Test
 	public void testUpdateUserError() throws Exception {
 		final String id = "7";
-		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailDto();
-		final HashMap<String, Object> mapResponse = initializeResponseError("username", "exists");
+		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
+		final HashMap<String, Object> mapResponse = this.initializeResponseError("username", "exists");
 		Mockito.when(this.userService.updateUser(Mockito.any(UserDetailDto.class))).thenReturn(mapResponse);
 
 		this.mockMvc

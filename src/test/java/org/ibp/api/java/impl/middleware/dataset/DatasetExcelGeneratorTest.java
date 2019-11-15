@@ -4,23 +4,26 @@ import com.google.common.collect.Lists;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.generationcp.commons.spring.util.ContextUtil;
+import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,28 +44,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DatasetExcelGeneratorTest {
 
-	public static final int INSTANCE_DB_ID = 1;
+	private static final int INSTANCE_DB_ID = 1;
 	private static final Integer STUDY_ID = 1;
 	private static final Integer ENVIRONMENT_DATASET_ID = 1;
 	private static final Integer PLOT_DATASET_ID = 1;
-	public static final String STUDY_DETAIL_TEST = "StudyDetailTest";
-	public static final String EXPERIMENTAL_DESIGN_TEST = "ExperimentalDesignTest";
-	public static final String ENVIRONMENTAL_DETAILS_TEST = "EnvironmentalDesignTest";
-	public static final String ENVIRONMENTAL_CONDITIONS_TEST = "EnvironmentalConditionsTest";
-	public static final String GERMPLASM_DESCRIPTORS_TEST = "GermplasmDescriptorsTest";
-	public static final String OBSERVATION_UNIT_TEST = "ObservationUnitTest";
-	public static final String TRAITS_TEST = "TraitsTest";
-	public static final String SELECTION_TEST = "SelectionTest";
+	private static final String STUDY_DETAIL_TEST = "StudyDetailTest";
+	private static final String EXPERIMENTAL_DESIGN_TEST = "ExperimentalDesignTest";
+	private static final String ENVIRONMENTAL_DETAILS_TEST = "EnvironmentalDesignTest";
+	private static final String ENVIRONMENTAL_CONDITIONS_TEST = "EnvironmentalConditionsTest";
+	private static final String GERMPLASM_DESCRIPTORS_TEST = "GermplasmDescriptorsTest";
+	private static final String OBSERVATION_UNIT_TEST = "ObservationUnitTest";
+	private static final String TRAITS_TEST = "TraitsTest";
+	private static final String SELECTION_TEST = "SelectionTest";
 	private static final String VARIABLE_NAME_1 = "VARIABLE_NAME_1";
 	private static final String VARIABLE_NAME_2 = "VARIABLE_NAME_2";
 	private static final String VARIABLE_VALUE_1 = "VARIABLE_VALUE_1";
 	private static final String VARIABLE_VALUE_2 = "VARIABLE_VALUE_2";
-	public static final int valueIndex = 7;
+	private static final int valueIndex = 7;
 
 	private List<ObservationUnitRow> observationUnitRows;
 
@@ -79,8 +83,16 @@ public class DatasetExcelGeneratorTest {
 	@Mock
 	private DatasetTypeService datasetTypeService;
 
+	@Mock
+	private OntologyDataManager ontologyDataManager;
+
+	@Mock
+	private ContextUtil contextUtil;
+
 	@InjectMocks
 	private DatasetExcelGenerator datasetExcelGenerator;
+
+	private Random random = new Random();
 
 	@Before
 	public void setUp() {
@@ -141,23 +153,23 @@ public class DatasetExcelGeneratorTest {
 		final StudyDetails studyDetails = new StudyDetails();
 		studyDetails.setStudyType(StudyTypeDto.getTrialDto());
 		final ObservationUnitData observationUnitData1 = new ObservationUnitData();
-		observationUnitData1.setValue(this.VARIABLE_VALUE_1);
+		observationUnitData1.setValue(DatasetExcelGeneratorTest.VARIABLE_VALUE_1);
 		final ObservationUnitData observationUnitData2 = new ObservationUnitData();
-		observationUnitData2.setValue(this.VARIABLE_VALUE_2);
+		observationUnitData2.setValue(DatasetExcelGeneratorTest.VARIABLE_VALUE_2);
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		final Map<String, ObservationUnitData> variables = new HashMap<>();
-		variables.put(this.VARIABLE_NAME_1, observationUnitData1);
-		variables.put(this.VARIABLE_NAME_2, observationUnitData2);
+		variables.put(DatasetExcelGeneratorTest.VARIABLE_NAME_1, observationUnitData1);
+		variables.put(DatasetExcelGeneratorTest.VARIABLE_NAME_2, observationUnitData2);
 		observationUnitRow.setVariables(variables);
 		this.observationUnitRows = Arrays.asList(observationUnitRow);
 
 		final MeasurementVariable measurementVariable1 = new MeasurementVariable();
-		measurementVariable1.setAlias(this.VARIABLE_NAME_1);
-		measurementVariable1.setName(this.VARIABLE_NAME_1);
+		measurementVariable1.setAlias(DatasetExcelGeneratorTest.VARIABLE_NAME_1);
+		measurementVariable1.setName(DatasetExcelGeneratorTest.VARIABLE_NAME_1);
 		measurementVariable1.setVariableType(VariableType.TRAIT);
 		final MeasurementVariable measurementVariable2 = new MeasurementVariable();
-		measurementVariable2.setAlias(this.VARIABLE_NAME_2);
-		measurementVariable2.setName(this.VARIABLE_NAME_2);
+		measurementVariable2.setAlias(DatasetExcelGeneratorTest.VARIABLE_NAME_2);
+		measurementVariable2.setName(DatasetExcelGeneratorTest.VARIABLE_NAME_2);
 		measurementVariable2.setVariableType(VariableType.TRAIT);
 		this.measurementVariables = Arrays.asList(measurementVariable1, measurementVariable2);
 
@@ -199,9 +211,9 @@ public class DatasetExcelGeneratorTest {
 		datasetDTO.setParentDatasetId(INSTANCE_DB_ID);
 		final File
 			file = this.datasetExcelGenerator
-			.generateSingleInstanceFile(DatasetExcelGeneratorTest.STUDY_ID, datasetDTO, new ArrayList<MeasurementVariable>(),
-				new ArrayList<ObservationUnitRow>(), filename, studyInstance);
-		Assert.assertEquals(filename, file.getName());
+			.generateSingleInstanceFile(DatasetExcelGeneratorTest.STUDY_ID, datasetDTO, new ArrayList<>(),
+				new ArrayList<>(), filename, studyInstance);
+		assertEquals(filename, file.getName());
 		Mockito.verify(this.studyDataManager).getStudyDetails(INSTANCE_DB_ID);
 		Mockito.verify(this.datasetService)
 			.getMeasurementVariables(DatasetExcelGeneratorTest.STUDY_ID, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
@@ -222,7 +234,7 @@ public class DatasetExcelGeneratorTest {
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
-	public void testGenerateMultiInstanceFile() throws IOException {
+	public void testGenerateMultiInstanceFile() {
 		final String filename = "filename";
 		final StudyInstance studyInstance = new StudyInstance();
 		studyInstance.setInstanceDbId(INSTANCE_DB_ID);
@@ -231,7 +243,7 @@ public class DatasetExcelGeneratorTest {
 		datasetDTO.setDatasetId(INSTANCE_DB_ID);
 		datasetDTO.setParentDatasetId(INSTANCE_DB_ID);
 		this.datasetExcelGenerator
-			.generateMultiInstanceFile(new HashMap<Integer, List<ObservationUnitRow>>(), new ArrayList<MeasurementVariable>(), filename);
+			.generateMultiInstanceFile(new HashMap<>(), new ArrayList<>(), filename);
 	}
 
 	@Test
@@ -253,18 +265,18 @@ public class DatasetExcelGeneratorTest {
 		final Workbook workbook = new HSSFWorkbook(inputStream);
 		final Sheet descriptionSheet = workbook.getSheetAt(0);
 		final Sheet observationSheet = workbook.getSheetAt(1);
-		Assert.assertEquals(STUDY_DETAIL_TEST, descriptionSheet.getRow(8).getCell(valueIndex).getStringCellValue());
-		Assert.assertEquals(EXPERIMENTAL_DESIGN_TEST, descriptionSheet.getRow(11).getCell(valueIndex).getStringCellValue());
-		Assert.assertEquals(ENVIRONMENTAL_DETAILS_TEST, descriptionSheet.getRow(14).getCell(valueIndex).getStringCellValue());
-		Assert.assertEquals(ENVIRONMENTAL_CONDITIONS_TEST, descriptionSheet.getRow(17).getCell(valueIndex).getStringCellValue());
-		Assert.assertEquals(GERMPLASM_DESCRIPTORS_TEST, descriptionSheet.getRow(20).getCell(valueIndex).getStringCellValue());
-		Assert.assertEquals(OBSERVATION_UNIT_TEST, descriptionSheet.getRow(23).getCell(valueIndex).getStringCellValue());
-		Assert.assertEquals(TRAITS_TEST, descriptionSheet.getRow(26).getCell(valueIndex).getStringCellValue());
-		Assert.assertEquals(SELECTION_TEST, descriptionSheet.getRow(29).getCell(valueIndex).getStringCellValue());
-		Assert.assertEquals(VARIABLE_NAME_1, observationSheet.getRow(0).getCell(0).getStringCellValue());
-		Assert.assertEquals(VARIABLE_NAME_2, observationSheet.getRow(0).getCell(1).getStringCellValue());
-		Assert.assertEquals(VARIABLE_VALUE_1, observationSheet.getRow(1).getCell(0).getStringCellValue());
-		Assert.assertEquals(VARIABLE_VALUE_2, observationSheet.getRow(1).getCell(1).getStringCellValue());
+		assertEquals(STUDY_DETAIL_TEST, descriptionSheet.getRow(8).getCell(valueIndex).getStringCellValue());
+		assertEquals(EXPERIMENTAL_DESIGN_TEST, descriptionSheet.getRow(11).getCell(valueIndex).getStringCellValue());
+		assertEquals(ENVIRONMENTAL_DETAILS_TEST, descriptionSheet.getRow(14).getCell(valueIndex).getStringCellValue());
+		assertEquals(ENVIRONMENTAL_CONDITIONS_TEST, descriptionSheet.getRow(17).getCell(valueIndex).getStringCellValue());
+		assertEquals(GERMPLASM_DESCRIPTORS_TEST, descriptionSheet.getRow(20).getCell(valueIndex).getStringCellValue());
+		assertEquals(OBSERVATION_UNIT_TEST, descriptionSheet.getRow(23).getCell(valueIndex).getStringCellValue());
+		assertEquals(TRAITS_TEST, descriptionSheet.getRow(26).getCell(valueIndex).getStringCellValue());
+		assertEquals(SELECTION_TEST, descriptionSheet.getRow(29).getCell(valueIndex).getStringCellValue());
+		assertEquals(VARIABLE_NAME_1, observationSheet.getRow(0).getCell(0).getStringCellValue());
+		assertEquals(VARIABLE_NAME_2, observationSheet.getRow(0).getCell(1).getStringCellValue());
+		assertEquals(VARIABLE_VALUE_1, observationSheet.getRow(1).getCell(0).getStringCellValue());
+		assertEquals(VARIABLE_VALUE_2, observationSheet.getRow(1).getCell(1).getStringCellValue());
 	}
 
 	@Test
@@ -297,9 +309,126 @@ public class DatasetExcelGeneratorTest {
 
 		final List<MeasurementVariable> result =
 			this.datasetExcelGenerator.getEnvironmentalConditions(environmentDatasetId, environmentVariables, studyInstance);
-		Assert.assertEquals(1, result.size());
-		Assert.assertEquals(studyConditionTermid, result.get(0).getTermId());
-		Assert.assertEquals(studyConditionValue, result.get(0).getValue());
+		assertEquals(1, result.size());
+		assertEquals(studyConditionTermid, result.get(0).getTermId());
+		assertEquals(studyConditionValue, result.get(0).getValue());
+
+	}
+
+	@Test
+	public void testGetEnvironmentalDetails() {
+
+		final int environmentDatasetId = this.random.nextInt();
+		final int instanceNumber = this.random.nextInt();
+		final int instanceDbId = this.random.nextInt();
+		final int locationId = this.random.nextInt();
+		final String locationName = "Some Location";
+		final StudyInstance studyInstance = new StudyInstance();
+		studyInstance.setLocationId(locationId);
+		studyInstance.setLocationName(locationName);
+		studyInstance.setInstanceNumber(instanceNumber);
+		studyInstance.setInstanceDbId(instanceDbId);
+
+		final MeasurementVariable trialInstanceVariable = new MeasurementVariable();
+		trialInstanceVariable.setTermId(TermId.TRIAL_INSTANCE_FACTOR.getId());
+		trialInstanceVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		trialInstanceVariable.setName("TRIAL_INSTANCE");
+
+		final MeasurementVariable locationVariable = new MeasurementVariable();
+		locationVariable.setTermId(TermId.LOCATION_ID.getId());
+		locationVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		locationVariable.setName(TermId.LOCATION_ID.name());
+		locationVariable.setAlias("LOCATION_NAME");
+
+		final int someVariableTermId = this.random.nextInt();
+		final String someVariableValue = "Value";
+		final MeasurementVariable someVariable = new MeasurementVariable();
+		someVariable.setTermId(someVariableTermId);
+		someVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+		someVariable.setName("SomeVariable");
+
+		final StandardVariable standardVariable =
+			StandardVariableTestDataInitializer.createStandardVariable(TermId.TRIAL_LOCATION.getId(), "LOCATION_NAME");
+		when(this.ontologyDataManager.getStandardVariable(TermId.TRIAL_LOCATION.getId(), this.contextUtil.getCurrentProgramUUID()))
+			.thenReturn(standardVariable);
+		final Map<Integer, String> geoLocationMap = new HashMap<>();
+		geoLocationMap.put(someVariableTermId, someVariableValue);
+		when(this.studyDataManager.getGeolocationByVariableId(environmentDatasetId, studyInstance.getInstanceDbId()))
+			.thenReturn(geoLocationMap);
+
+		final List<MeasurementVariable> result =
+			this.datasetExcelGenerator
+				.getEnvironmentalDetails(environmentDatasetId, Arrays.asList(trialInstanceVariable, locationVariable, someVariable),
+					studyInstance);
+
+		assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), result.get(0).getTermId());
+		assertEquals(instanceNumber, Integer.valueOf(result.get(0).getValue()).intValue());
+		assertEquals(TermId.LOCATION_ID.getId(), result.get(1).getTermId());
+		assertEquals(locationId, Integer.valueOf(result.get(1).getValue()).intValue());
+		assertEquals(TermId.TRIAL_LOCATION.getId(), result.get(2).getTermId());
+		assertEquals(locationName, result.get(2).getValue());
+		assertEquals(someVariableTermId, result.get(3).getTermId());
+		assertEquals(someVariableValue, result.get(3).getValue());
+
+	}
+
+	@Test
+	public void testCreateLocationNameVariable() {
+
+		final StandardVariable standardVariable =
+			StandardVariableTestDataInitializer.createStandardVariable(TermId.TRIAL_LOCATION.getId(), "LOCATION_NAME");
+		when(this.ontologyDataManager.getStandardVariable(TermId.TRIAL_LOCATION.getId(), this.contextUtil.getCurrentProgramUUID()))
+			.thenReturn(standardVariable);
+
+		final MeasurementVariable result = this.datasetExcelGenerator.createLocationNameVariable("Alias", "Philippines");
+		assertEquals("Alias", result.getAlias());
+		assertEquals("LOCATION_NAME", result.getName());
+		assertEquals("Philippines", result.getValue());
+		assertEquals(standardVariable.getDescription(), result.getDescription());
+		assertEquals(standardVariable.getProperty().getName(), result.getProperty());
+		assertEquals(standardVariable.getScale().getName(), result.getScale());
+		assertEquals(standardVariable.getMethod().getName(), result.getMethod());
+		assertEquals(standardVariable.getDataType().getName(), result.getDataType());
+		assertEquals(standardVariable.getDataType().getId(), result.getDataTypeId().intValue());
+		assertEquals(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0), result.getLabel());
+		assertEquals(TermId.TRIAL_LOCATION.getId(), result.getTermId());
+		assertEquals(PhenotypicType.TRIAL_ENVIRONMENT, result.getRole());
+		assertEquals(VariableType.ENVIRONMENT_DETAIL, result.getVariableType());
+
+	}
+
+	@Test
+	public void testOrderColumns() {
+		final List<MeasurementVariable> columns = new ArrayList<>();
+		final MeasurementVariable selectionVariable = new MeasurementVariable();
+		selectionVariable.setTermId(1003);
+		selectionVariable.setVariableType(VariableType.SELECTION_METHOD);
+		selectionVariable.setName("SELECTION");
+		columns.add(selectionVariable);
+
+		final MeasurementVariable traitVariable = new MeasurementVariable();
+		traitVariable.setTermId(1002);
+		traitVariable.setVariableType(VariableType.TRAIT);
+		traitVariable.setName("TRAIT");
+		columns.add(traitVariable);
+
+		final MeasurementVariable studyConditionVariable = new MeasurementVariable();
+		studyConditionVariable.setTermId(1001);
+		studyConditionVariable.setVariableType(VariableType.STUDY_CONDITION);
+		studyConditionVariable.setName("CONDITION");
+		columns.add(studyConditionVariable);
+
+		final MeasurementVariable observationUnitVariable = new MeasurementVariable();
+		observationUnitVariable.setTermId(TermId.OBS_UNIT_ID.getId());
+		observationUnitVariable.setVariableType(VariableType.GERMPLASM_DESCRIPTOR);
+		observationUnitVariable.setName("OBS_UNIT");
+		columns.add(observationUnitVariable);
+
+		final List<MeasurementVariable> orderedColumns = this.datasetExcelGenerator.orderColumns(columns);
+		assertEquals(observationUnitVariable, orderedColumns.get(0));
+		assertEquals(studyConditionVariable, orderedColumns.get(1));
+		assertEquals(traitVariable, orderedColumns.get(2));
+		assertEquals(selectionVariable, orderedColumns.get(3));
 
 	}
 }

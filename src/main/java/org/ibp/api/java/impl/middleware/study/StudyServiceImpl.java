@@ -3,8 +3,6 @@ package org.ibp.api.java.impl.middleware.study;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -43,7 +41,6 @@ import org.ibp.api.domain.study.StudyAttribute;
 import org.ibp.api.domain.study.StudyDetails;
 import org.ibp.api.domain.study.StudyFolder;
 import org.ibp.api.domain.study.StudyGermplasm;
-import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.domain.study.StudySummary;
 import org.ibp.api.domain.study.validators.ObservationValidator;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -52,7 +49,6 @@ import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
@@ -60,7 +56,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -81,9 +76,6 @@ public class StudyServiceImpl implements StudyService {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
-	private ConversionService conversionService;
-
-	@Autowired
 	private SecurityService securityService;
 
 	@Autowired
@@ -96,7 +88,8 @@ public class StudyServiceImpl implements StudyService {
 	private FieldMapService fieldMapService;
 
 	@Override
-	public List<StudySummary> search(final String programUniqueId, final String cropname, final String principalInvestigator, final String location, final String season) {
+	public List<StudySummary> search(final String programUniqueId, final String cropname, final String principalInvestigator,
+		final String location, final String season) {
 		final List<StudySummary> studySummaries = new ArrayList<>();
 		try {
 			final StudySearchParameters searchParameters = new StudySearchParameters();
@@ -105,7 +98,7 @@ public class StudyServiceImpl implements StudyService {
 			searchParameters.setLocation(location);
 			searchParameters.setSeason(season);
 			final List<org.generationcp.middleware.service.api.study.StudySummary> mwStudySummaries =
-					this.middlewareStudyService.search(searchParameters);
+				this.middlewareStudyService.search(searchParameters);
 
 			for (final org.generationcp.middleware.service.api.study.StudySummary mwStudySummary : mwStudySummaries) {
 				if (!this.securityService.isAccessible(mwStudySummary, cropname)) {
@@ -119,7 +112,7 @@ public class StudyServiceImpl implements StudyService {
 				summary.setStartDate(mwStudySummary.getStartDate());
 				summary.setEndDate(mwStudySummary.getEndDate());
 				summary.setType(mwStudySummary.getType()
-						.getName());
+					.getName());
 				summary.setPrincipalInvestigator(mwStudySummary.getPrincipalInvestigator());
 				summary.setLocation(mwStudySummary.getLocation());
 				summary.setSeason(mwStudySummary.getSeason());
@@ -138,9 +131,9 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public List<Observation> getObservations(final Integer studyId, final int instanceId, final int pageNumber, final int pageSize,
-			final String sortBy, final String sortOrder) {
+		final String sortBy, final String sortOrder) {
 		final List<ObservationDto> studyMeasurements =
-				this.middlewareStudyService.getObservations(studyId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
+			this.middlewareStudyService.getObservations(studyId, instanceId, pageNumber, pageSize, sortBy, sortOrder);
 		final List<Observation> observations = new ArrayList<>();
 		for (final ObservationDto measurement : studyMeasurements) {
 			observations.add(this.mapObservationDtoToObservation(measurement));
@@ -159,12 +152,13 @@ public class StudyServiceImpl implements StudyService {
 
 	private Observation mapObservationDtoToObservation(final ObservationDto measurement) {
 		return StudyMapper.getInstance()
-				.map(measurement, Observation.class);
+			.map(measurement, Observation.class);
 	}
 
 	@Override
 	public Observation updateObservation(final Integer studyIdentifier, final Observation observation) {
 		this.validationUtil.invokeValidation("StudyServiceImpl", new Command() {
+
 			@Override
 			public void execute(final Errors errors) {
 				StudyServiceImpl.this.observationValidator.validate(observation, errors);
@@ -197,10 +191,10 @@ public class StudyServiceImpl implements StudyService {
 				measurement.getMeasurementValue(), measurement.getValueStatus()));
 		}
 		final ObservationDto middlewareMeasurement =
-				new ObservationDto(observation.getUniqueIdentifier(), observation.getEnvironmentNumber(), observation.getEntryType(),
-						observation.getGermplasmId(), observation.getGermplasmDesignation(), observation.getEntryNumber(),
-						observation.getEntryCode(), observation.getReplicationNumber(), observation.getPlotNumber(),
-						observation.getBlockNumber(), traits);
+			new ObservationDto(observation.getUniqueIdentifier(), observation.getEnvironmentNumber(), observation.getEntryType(),
+				observation.getGermplasmId(), observation.getGermplasmDesignation(), observation.getEntryNumber(),
+				observation.getEntryCode(), observation.getReplicationNumber(), observation.getPlotNumber(),
+				observation.getBlockNumber(), traits);
 
 		return this.mapObservationDtoToObservation(this.middlewareStudyService.updataObservation(studyIdentifier, middlewareMeasurement));
 	}
@@ -210,6 +204,7 @@ public class StudyServiceImpl implements StudyService {
 		final List<Observation> returnList = new ArrayList<>();
 
 		this.validationUtil.invokeValidation("StudyServiceImpl", new Command() {
+
 			@Override
 			public void execute(final Errors errors) {
 				int counter = 0;
@@ -246,14 +241,14 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	private void validateMeasurementHasNotBeenCreated(final Observation observation, final Observation existingObservation,
-													  final List<ObjectError> errors) {
+		final List<ObjectError> errors) {
 		final List<Measurement> measurements = observation.getMeasurements();
 		int counter = 0;
 		for (final Measurement measurement : measurements) {
 			// Relies on the hash coded generated in the MeasurementIdentifier object
 			final Measurement existingMeasurement = existingObservation.getMeasurement(measurement.getMeasurementIdentifier());
 			if (existingMeasurement == null) {
-				final String []errorMessage = {"measurement.already.inserted"};
+				final String[] errorMessage = {"measurement.already.inserted"};
 				final List<String> object = new ArrayList<>();
 				final ObjectMapper objectMapper = new ObjectMapper();
 				try {
@@ -262,8 +257,8 @@ public class StudyServiceImpl implements StudyService {
 					throw new ApiRuntimeException("Error mapping measurement to JSON", e);
 				}
 				final FieldError objectError =
-						new FieldError("Observation", "Measurements [" + counter + "]", null, false, errorMessage, object.toArray(),
-								"Error processing measurement");
+					new FieldError("Observation", "Measurements [" + counter + "]", null, false, errorMessage, object.toArray(),
+						"Error processing measurement");
 				errors.add(objectError);
 				counter++;
 			}
@@ -271,11 +266,11 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	private void validateExistingObservation(final Integer studyIdentifier, final Observation observation, final List<ObjectError> errors) {
-		final String []errorKey = {"no.observation.found"};
-		final Object []erroyKeyArguments = {studyIdentifier, observation.getUniqueIdentifier()};
+		final String[] errorKey = {"no.observation.found"};
+		final Object[] erroyKeyArguments = {studyIdentifier, observation.getUniqueIdentifier()};
 		final FieldError observationIdentifierError =
-				new FieldError("Observation", "uniqueIdentifier", null, false, errorKey, erroyKeyArguments,
-						"Error retrieving observation");
+			new FieldError("Observation", "uniqueIdentifier", null, false, errorKey, erroyKeyArguments,
+				"Error retrieving observation");
 		errors.add(observationIdentifierError);
 	}
 
@@ -307,22 +302,22 @@ public class StudyServiceImpl implements StudyService {
 			studyDetails.setTitle(study.getDescription());
 			studyDetails.setObjective(study.getObjective());
 			studyDetails.setType(study.getType()
-					.getName());
+				.getName());
 			studyDetails.setStartDate(String.valueOf(study.getStartDate()));
 			studyDetails.setEndDate(String.valueOf(study.getEndDate()));
 
 			// Factors, Settings tab.
 			final List<Variable> conditions = study.getConditions()
-					.getVariables();
+				.getVariables();
 			final VariableTypeList factors = this.studyDataManager.getAllStudyFactors(studyIdentifier);
 			final List<DMSVariableType> factorDetails = factors.getVariableTypes();
 			for (final DMSVariableType factorDetail : factorDetails) {
 				String value = null;
 				for (final Variable condition : conditions) {
 					final String conditionName = condition.getVariableType()
-							.getLocalName();
+						.getLocalName();
 					if (factorDetail.getLocalName()
-							.equals(conditionName)) {
+						.equals(conditionName)) {
 						value = condition.getDisplayValue();
 					}
 				}
@@ -345,21 +340,22 @@ public class StudyServiceImpl implements StudyService {
 				final TermSummary trait = new TermSummary();
 				trait.setId(String.valueOf(variateDetail.getId()));
 				trait.setName(variateDetail.getStandardVariable()
-						.getName());
+					.getName());
 				trait.setDescription(variateDetail.getStandardVariable()
-						.getDescription());
+					.getDescription());
 				studyDetails.addTrait(trait);
 			}
 
 			final DataSet trialDataset =
 				this.studyDataManager.findOneDataSetByType(studyIdentifier, DatasetTypeEnum.SUMMARY_DATA.getId());
+
 			// Datasets
 			final List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(studyIdentifier);
 			if (datasetReferences != null && !datasetReferences.isEmpty()) {
 				for (final DatasetReference dsRef : datasetReferences) {
 					final DatasetSummary dsSummary = new DatasetSummary();
 					dsSummary.setId(dsRef.getId()
-							.toString());
+						.toString());
 					dsSummary.setName(dsRef.getName());
 					dsSummary.setDescription(dsRef.getDescription());
 					studyDetails.addDataSet(dsSummary);
@@ -383,11 +379,11 @@ public class StudyServiceImpl implements StudyService {
 							for (final Variable variable : variables) {
 								final StudyAttribute attr = new StudyAttribute();
 								attr.setId(String.valueOf(variable.getVariableType()
-										.getId()));
+									.getId()));
 								attr.setName(variable.getVariableType()
-										.getLocalName());
+									.getLocalName());
 								attr.setDescription(variable.getVariableType()
-										.getLocalDescription());
+									.getLocalDescription());
 								attr.setValue(variable.getDisplayValue());
 								env.addEnvironmentDetail(attr);
 							}
@@ -399,7 +395,7 @@ public class StudyServiceImpl implements StudyService {
 
 			// Germplasm
 			studyDetails.getGermplasm()
-					.addAll(this.getStudyGermplasmList(studyIdentifier));
+				.addAll(this.getStudyGermplasmList(studyIdentifier));
 			return studyDetails;
 		} catch (final NumberFormatException nfe) {
 			throw new ApiRuntimeException("Supplied study identifier [" + studyId + "] is not valid, it must be a numeric value.");
@@ -410,20 +406,7 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public Map<Integer, FieldMap> getFieldMap(final String studyId) {
-		return fieldMapService.getFieldMap(studyId);
-	}
-
-
-	private final <T, S> List<T> convert(final List<S> beanList, final Class<T> clazz) {
-		if (null == beanList) {
-			return Collections.emptyList();
-		}
-
-		final List<T> convertedList = new ArrayList<>();
-		for (final S s : beanList) {
-			convertedList.add(this.conversionService.convert(s, clazz));
-		}
-		return convertedList;
+		return this.fieldMapService.getFieldMap(studyId);
 	}
 
 	void setMiddlewareStudyService(final org.generationcp.middleware.service.api.study.StudyService middlewareStudyService) {
@@ -432,10 +415,6 @@ public class StudyServiceImpl implements StudyService {
 
 	void setStudyDataManager(final StudyDataManager studyDataManager) {
 		this.studyDataManager = studyDataManager;
-	}
-
-	void setConversionService(final ConversionService conversionService) {
-		this.conversionService = conversionService;
 	}
 
 	void setSecurityService(final SecurityService securityService) {
@@ -450,7 +429,6 @@ public class StudyServiceImpl implements StudyService {
 		this.observationValidator = observationValidator;
 	}
 
-
 	@Override
 	public List<StudyFolder> getAllStudyFolders() {
 		final List<StudyFolder> studyFolders = new ArrayList<>();
@@ -458,7 +436,7 @@ public class StudyServiceImpl implements StudyService {
 
 		for (final FolderReference folderRef : middlewareFolders) {
 			studyFolders.add(new StudyFolder(folderRef.getId(), folderRef.getName(), folderRef.getDescription(), folderRef
-					.getParentFolderId()));
+				.getParentFolderId()));
 		}
 
 		return studyFolders;
@@ -467,23 +445,6 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public String getProgramUUID(final Integer studyIdentifier) {
 		return this.middlewareStudyService.getProgramUUID(studyIdentifier);
-	}
-
-	@Override
-	public List<StudyInstance> getStudyInstances(final int studyId) {
-		final List<org.generationcp.middleware.service.impl.study.StudyInstance> studyInstancesMW =
-				this.middlewareStudyService.getStudyInstances(studyId);
-
-		final Function<org.generationcp.middleware.service.impl.study.StudyInstance, StudyInstance> transformer =
-				new Function<org.generationcp.middleware.service.impl.study.StudyInstance, StudyInstance>() {
-
-			@Override
-			public StudyInstance apply(final org.generationcp.middleware.service.impl.study.StudyInstance input) {
-				return new StudyInstance(input.getInstanceDbId(), input.getLocationName(), input.getLocationAbbreviation(),
-						input.getInstanceNumber(),input.getCustomLocationAbbreviation(), input.isHasFieldmap());
-			}
-		};
-		return Lists.transform(studyInstancesMW, transformer);
 	}
 
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
@@ -506,7 +467,8 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO) {
+	public List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber,
+		final PhenotypeSearchRequestDTO requestDTO) {
 		return this.middlewareStudyService.searchPhenotypes(pageSize, pageNumber, requestDTO);
 	}
 
@@ -541,8 +503,8 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<StudyTypeDto> getStudyTypes(){
-		try{
+	public List<StudyTypeDto> getStudyTypes() {
+		try {
 			return this.studyDataManager.getAllVisibleStudyTypes();
 		} catch (final MiddlewareException e) {
 			throw new ApiRuntimeException("an error happened when trying to check if a study is sampled", e);
@@ -550,7 +512,7 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public StudyReference getStudyReference(Integer studyId) {
+	public StudyReference getStudyReference(final Integer studyId) {
 		return this.studyDataManager.getStudyReference(studyId);
 	}
 

@@ -1,7 +1,7 @@
 package org.ibp.api.rest.study;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.user;
 
+import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.user.UserDetailDto;
 
 import java.util.List;
@@ -15,4 +16,6 @@ public interface UserService {
 	Map<String, Object> updateUser(final UserDetailDto user);
 
 	List<UserDetailDto> getUsersByProjectUUID(final String projectUUID);
+
+	UserDto getUserWithAuthorities(final String cropName, final String programUuid);
 }

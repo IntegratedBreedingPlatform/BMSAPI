@@ -9,15 +9,18 @@ import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Debug;
-import org.ibp.api.java.germplasm.GermplasmService;
+import org.ibp.api.java.design.runner.DesignRunner;
+import org.ibp.api.java.impl.middleware.design.runner.MockDesignRunnerImpl;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
+import org.ibp.api.java.study.StudyInstanceService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -29,6 +32,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,6 +44,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -48,11 +57,10 @@ import java.util.UUID;
 public abstract class ApiUnitTestBase {
 
 	protected final MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(),
-			Charset.forName("utf8"));
+		Charset.forName("utf8"));
 
 	protected final MediaType csvContentType = new MediaType(MediaType.TEXT_PLAIN.getType(), MediaType.TEXT_PLAIN.getSubtype(),
 		Charset.forName("utf8"));
-
 
 	protected final String cropName = "maize";
 	protected final String programUuid = UUID.randomUUID().toString();
@@ -69,10 +77,8 @@ public abstract class ApiUnitTestBase {
 	protected StudyDataManager studyDataManager;
 
 	@Autowired
-	protected UserDataManager userDataManager;
-
-	@Autowired
 	protected ObjectMapper jsonMapper;
+
 
 	@Configuration
 	public static class TestConfiguration {
@@ -94,11 +100,11 @@ public abstract class ApiUnitTestBase {
 		public StudyDataManager studyDataManager() {
 			return Mockito.mock(StudyDataManager.class);
 		}
-		
+
 		@Bean
 		@Primary
-		public UserDataManager userDataManager() {
-			return Mockito.mock(UserDataManager.class);
+		public UserService userService() {
+			return Mockito.mock(UserService.class);
 		}
 
 		@Bean
@@ -140,7 +146,7 @@ public abstract class ApiUnitTestBase {
 		@Bean
 		@Primary
 		public HttpServletRequest httpServletRequest() {
-            return Mockito.mock(HttpServletRequest.class);
+			return Mockito.mock(HttpServletRequest.class);
 		}
 
 		@Bean
@@ -155,6 +161,23 @@ public abstract class ApiUnitTestBase {
 			return Mockito.mock(SearchRequestService.class);
 		}
 
+		@Bean
+		@Primary
+		public DatasetTypeService datasetTypeService() {
+			return Mockito.mock(DatasetTypeService.class);
+		}
+
+		@Bean
+		@Primary
+		public DesignRunner getDesignRunner() {
+			return new MockDesignRunnerImpl();
+		}
+
+		@Bean
+		@Primary
+		public StudyInstanceService studyInstanceService() {
+			return Mockito.mock(StudyInstanceService.class);
+		}
 	}
 
 	@Before
@@ -162,6 +185,7 @@ public abstract class ApiUnitTestBase {
 		MockitoAnnotations.initMocks(this);
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
 		Mockito.doReturn(new CropType(this.cropName)).when(this.workbenchDataManager).getCropTypeByName(this.cropName);
+		this.loadPreAuthorizedRole();
 	}
 
 	@After
@@ -173,5 +197,16 @@ public abstract class ApiUnitTestBase {
 		final ObjectWriter ow = this.jsonMapper.writer().withDefaultPrettyPrinter();
 		Debug.println("Request:" + ow.writeValueAsString(object));
 		return ow.writeValueAsBytes(object);
+	}
+
+	/**
+	 * This method load preAuthorized role to test services that PreAuthorize role is required.
+	 */
+	public void loadPreAuthorizedRole() {
+		final List<GrantedAuthority> authorities = new ArrayList<>();
+		authorities.add(new SimpleGrantedAuthority("ADMIN"));
+		UsernamePasswordAuthenticationToken loggedInUser =
+			new UsernamePasswordAuthenticationToken("User", "Password@##@$@%$%$#^", authorities);
+		SecurityContextHolder.getContext().setAuthentication(loggedInUser);
 	}
 }

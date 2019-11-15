@@ -1,11 +1,13 @@
 package org.ibp.api.rest.derived;
 
 import org.apache.commons.lang.math.RandomUtils;
+import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.OverwriteDataException;
 import org.ibp.api.java.derived.DerivedVariableService;
 import org.ibp.api.java.impl.middleware.derived.DerivedVariableServiceImpl;
+import org.ibp.api.rest.dataset.DatasetDTO;
 import org.junit.Test;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +19,9 @@ import org.springframework.validation.ObjectError;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static org.hamcrest.core.Is.is;
@@ -61,6 +65,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 
 		verify(this.derivedVariableService)
 			.execute(100, 102, calculateVariableRequest.getVariableId(), calculateVariableRequest.getGeoLocationIds(),
+				calculateVariableRequest.getInputVariableDatasetMap(),
 				calculateVariableRequest.isOverwriteExistingData());
 
 	}
@@ -79,6 +84,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 
 		when(this.derivedVariableService
 			.execute(100, 102, calculateVariableRequest.getVariableId(), calculateVariableRequest.getGeoLocationIds(),
+				calculateVariableRequest.getInputVariableDatasetMap(),
 				calculateVariableRequest.isOverwriteExistingData())).thenThrow(exception);
 
 		this.mockMvc
@@ -107,6 +113,7 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 
 		when(this.derivedVariableService
 			.execute(100, 102, calculateVariableRequest.getVariableId(), calculateVariableRequest.getGeoLocationIds(),
+				calculateVariableRequest.getInputVariableDatasetMap(),
 				calculateVariableRequest.isOverwriteExistingData())).thenThrow(exception);
 
 		this.mockMvc
@@ -122,47 +129,52 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testDependencyVariables() throws Exception {
+	public void testGetMissingFormulaVariablesInStudy() throws Exception {
 
-		final Set<String> dependencies = new HashSet<>();
-		dependencies.add("VAR1");
-		dependencies.add("VAR2");
+		final Set<FormulaVariable> formulaVariables = new HashSet<>();
+		formulaVariables.add(new FormulaVariable(1, "VAR1", 3));
+		formulaVariables.add(new FormulaVariable(2, "VAR2", 3));
 
-		doReturn(dependencies).when(this.derivedVariableService)
-			.getDependencyVariables(100, 102);
+		doReturn(formulaVariables).when(this.derivedVariableService)
+			.getMissingFormulaVariablesInStudy(100, 101, 103);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.get(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/missing-dependencies", this.cropName, 100,
-					102)
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/formula-variables/missing",
+					this.cropName, 100, 101, 103)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(MockMvcResultMatchers.content().string("[\"VAR1\",\"VAR2\"]"));
+			.andExpect(MockMvcResultMatchers.content().string(
+				"[{\"id\":1,\"vocabularyId\":0,\"name\":\"VAR1\",\"definition\":null,\"obsolete\":false,\"dateCreated\":null,"
+					+ "\"dateLastModified\":null,\"targetTermId\":3},{\"id\":2,\"vocabularyId\":0,\"name\":\"VAR2\",\"definition\":null,"
+					+ "\"obsolete\":false,\"dateCreated\":null,\"dateLastModified\":null,\"targetTermId\":3}]"));
 
 	}
 
 	@Test
-	public void testDependencyVariablesForSpecificDerivedTrait() throws Exception {
+	public void testGetAllFormulaVariablesInStudy() throws Exception {
 
-		final Set<String> dependencies = new HashSet<>();
-		dependencies.add("VAR1");
-		dependencies.add("VAR2");
+		final Set<FormulaVariable> formulaVariables = new HashSet<>();
+		formulaVariables.add(new FormulaVariable(1, "VAR1", 3));
+		formulaVariables.add(new FormulaVariable(2, "VAR2", 3));
 
-		doReturn(dependencies).when(this.derivedVariableService)
-			.getDependencyVariables(100, 102, 103);
+		doReturn(formulaVariables).when(this.derivedVariableService)
+			.getFormulaVariablesInStudy(100, 101);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.get(
-					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/missing-dependencies",
-					this.cropName, 100,
-					102, 103)
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/formula-variables/",
+					this.cropName, 100, 101)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(MockMvcResultMatchers.content().string("[\"VAR1\",\"VAR2\"]"));
+			.andExpect(MockMvcResultMatchers.content().string(
+				"[{\"id\":1,\"vocabularyId\":0,\"name\":\"VAR1\",\"definition\":null,\"obsolete\":false,\"dateCreated\":null,"
+					+ "\"dateLastModified\":null,\"targetTermId\":3},{\"id\":2,\"vocabularyId\":0,\"name\":\"VAR2\",\"definition\":null,"
+					+ "\"obsolete\":false,\"dateCreated\":null,\"dateLastModified\":null,\"targetTermId\":3}]"));
 
 	}
 
@@ -175,11 +187,38 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.head("/crops/{crop}/studies/{studyId}/datasets/derived-variables", this.cropName, 100, 102)
+				.head("/crops/{crop}/studies/{studyId}/derived-variables", this.cropName, 100, 102)
 				.param("datasetIds", "1,2,3").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.header().string("X-Total-Count", String.valueOf(count)));
+	}
+
+	@Test
+	public void testGetFormulaVariableDatasetMap() throws Exception {
+
+		final int termId = 1;
+		final String variableName = "some name";
+		final Map<Integer, Map<String, Object>> formulaVariablesDatasetMap = new HashMap<>();
+		final Map<String, Object> values = new HashMap<>();
+		values.put("variableName", variableName);
+		values.put("datasets", Arrays.asList(new DatasetDTO()));
+		formulaVariablesDatasetMap.put(termId, values);
+
+		doReturn(formulaVariablesDatasetMap).when(this.derivedVariableService)
+			.getFormulaVariableDatasetsMap(100, 101, 103);
+
+		this.mockMvc
+			.perform(MockMvcRequestBuilders
+				.get(
+					"/crops/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/formula-variables/dataset-map",
+					this.cropName, 100, 101, 103)
+				.contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().string(
+				"{\"1\":{\"variableName\":\"some name\",\"datasets\":[{}]}}"));
+
 	}
 
 }

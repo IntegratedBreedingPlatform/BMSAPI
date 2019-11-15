@@ -1,11 +1,9 @@
 package org.ibp.api.rest.dataset;
 
 import com.google.common.base.Preconditions;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import org.generationcp.commons.ruleengine.naming.expression.ComponentPostProcessor;
-import org.generationcp.commons.ruleengine.provider.PropertyFileRuleConfigurationProvider;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -20,7 +18,6 @@ import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
-import org.ibp.api.java.ruleengine.RulesPostProcessor;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -369,5 +366,13 @@ public class DatasetResource {
 		@RequestBody final ObservationUnitsParamDTO paramDTO) {
 		this.studyDatasetService.setValueToVariable(studyId, datasetId, paramDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get all Dataset Variables", notes = "Get all Dataset Variables")
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/variables", method = RequestMethod.GET)
+	public ResponseEntity<List<MeasurementVariable>> getAllVariables(@PathVariable final String crop, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId) {
+		final List<MeasurementVariable> columns = this.studyDatasetService.getAllDatasetVariables(studyId, datasetId);
+		return new ResponseEntity<>(columns, HttpStatus.OK);
 	}
 }

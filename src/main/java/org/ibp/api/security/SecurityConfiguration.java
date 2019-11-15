@@ -1,4 +1,3 @@
-
 package org.ibp.api.security;
 
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -51,7 +50,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(final WebSecurity web) throws Exception {
-		web.ignoring().antMatchers("/static/**").antMatchers("/api-docs/**");
+		web.ignoring().antMatchers("/static/**").antMatchers("/v2/api-docs/**");
 	}
 
 	@Override
@@ -68,9 +67,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		.and()
 		.authorizeRequests()
 				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-				.antMatchers("/", "/api-docs/**", "/authenticate", "/brapi/**/token", "/breeding_view/**").permitAll()
-		//  TODO Retrieve roles from DB		
-		.anyRequest().hasAnyAuthority(Role.ADMIN, "BREEDER", "TECHNICIAN", "READONLY", Role.SUPERADMIN)
+				.antMatchers("/", "/v2/api-docs/**", "/authenticate", "/brapi/**/token", "/breeding_view/**").permitAll()
+			.anyRequest()
+			.authenticated()
 		.and()
 		.apply(this.securityConfigurerAdapter())
 		.and()

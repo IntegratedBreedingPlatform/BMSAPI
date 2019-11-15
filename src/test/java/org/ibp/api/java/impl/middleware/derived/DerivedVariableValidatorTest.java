@@ -2,28 +2,49 @@ package org.ibp.api.java.impl.middleware.derived;
 
 import com.google.common.base.Optional;
 import org.apache.commons.lang.math.RandomUtils;
+import org.fest.util.Collections;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
 import org.generationcp.middleware.domain.ontology.FormulaVariable;
-import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
+import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.rest.dataset.DatasetDTO;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DerivedVariableValidatorTest {
+
+	private static final Integer VARIABLE_ID = 29001;
+	private static final Integer STUDY_ID = 1001;
+	private static final Integer DATASET_ID = 1002;
+	private static final Integer SUBOBS_ID = 1003;
+	private static final List<Integer> SUBOBS_DATASET_TYPE_IDS = Arrays.asList(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(),
+		DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId(), DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId(),
+		DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId());
+
 
 	@Mock
 	private FormulaService formulaService;
@@ -31,8 +52,21 @@ public class DerivedVariableValidatorTest {
 	@Mock
 	private DatasetService datasetService;
 
+	@Mock
+	private DatasetTypeService datasetTypeService;
+
+	@Mock
+	private DerivedVariableService middlewareDerivedVariableService;
+
 	@InjectMocks
 	private final DerivedVariableValidator variableValidator = new DerivedVariableValidator();
+
+	@Before
+	public void setUo() {
+		Mockito.when(this.datasetTypeService.getSubObservationDatasetTypeIds()).
+			thenReturn(SUBOBS_DATASET_TYPE_IDS);
+		Mockito.when(this.formulaService.getByTargetId(VARIABLE_ID)).thenReturn(Optional.of(this.createFormulaDTO()));
+	}
 
 	@Test
 	public void testValidateInvalidRequest() {
@@ -74,8 +108,9 @@ public class DerivedVariableValidatorTest {
 	@Test
 	public void testVerifyMissingInputVariablesVariablesAreNotPresentInADataset() {
 
-		final Integer variableId = RandomUtils.nextInt();
-		final Integer datasetId = RandomUtils.nextInt();
+		final int studyId = RandomUtils.nextInt();
+		final int variableId = RandomUtils.nextInt();
+		final int datasetId = RandomUtils.nextInt();
 		final FormulaDto formulaDto = new FormulaDto();
 
 		// Create two input variables for the target variable.
@@ -88,16 +123,12 @@ public class DerivedVariableValidatorTest {
 		formulaDto.setInputs(Arrays.asList(formulaVariable1, formulaVariable2));
 		formulaDto.setTarget(targetVariable);
 
-		// Only the variable with formula is loaded in the dataset.
-		final MeasurementVariable targetMeasurementVariable = new MeasurementVariable();
-		targetMeasurementVariable.setTermId(variableId);
-
 		when(this.formulaService.getByTargetId(variableId)).thenReturn(Optional.of(formulaDto));
-		when(this.datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId())))
-			.thenReturn(Arrays.asList(targetMeasurementVariable));
+		when(this.middlewareDerivedVariableService.getMissingFormulaVariablesInStudy(studyId, datasetId, variableId))
+			.thenReturn(Collections.set(formulaVariable1, formulaVariable2));
 
 		try {
-			this.variableValidator.verifyMissingInputVariables(variableId, datasetId);
+			this.variableValidator.verifyInputVariablesArePresentInStudy(variableId, datasetId, studyId);
 			fail("Method should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertEquals(DerivedVariableValidator.STUDY_EXECUTE_CALCULATION_MISSING_VARIABLES, e.getErrors().get(0).getCode());
@@ -108,8 +139,9 @@ public class DerivedVariableValidatorTest {
 	@Test
 	public void testVerifyMissingInputVariablesVariablesArePresentInADataset() {
 
-		final Integer variableId = RandomUtils.nextInt();
-		final Integer datasetId = RandomUtils.nextInt();
+		final int studyId = RandomUtils.nextInt();
+		final int variableId = RandomUtils.nextInt();
+		final int datasetId = RandomUtils.nextInt();
 		final FormulaDto formulaDto = new FormulaDto();
 
 		// Create two input variables for the target variable.
@@ -131,15 +163,105 @@ public class DerivedVariableValidatorTest {
 		inputMeasurementVariable2.setTermId(formulaVariable2.getId());
 
 		when(this.formulaService.getByTargetId(variableId)).thenReturn(Optional.of(formulaDto));
-		when(this.datasetService.getMeasurementVariables(datasetId, Arrays.asList(VariableType.TRAIT.getId())))
-			.thenReturn(Arrays.asList(targetMeasurementVariable, inputMeasurementVariable1, inputMeasurementVariable2));
+		when(this.middlewareDerivedVariableService.getMissingFormulaVariablesInStudy(studyId, datasetId, variableId))
+			.thenReturn(new HashSet<>());
 
 		try {
-			this.variableValidator.verifyMissingInputVariables(variableId, datasetId);
+			this.variableValidator.verifyInputVariablesArePresentInStudy(variableId, datasetId, studyId);
 		} catch (final ApiRequestValidationException e) {
 			fail("Method should not throw an exception");
 		}
 
 	}
 
+	@Test
+	public void testValidateForAggregateFunctionsSuccess() {
+		final Map<Integer, Integer> inputVariableDatasetMap = new HashMap<>();
+		inputVariableDatasetMap.put(VARIABLE_ID, SUBOBS_ID);
+		try {
+			final DatasetDTO plotDataset = new DatasetDTO();
+			plotDataset.setDatasetId(DATASET_ID);
+			Mockito.when(this.datasetService.getDatasets(STUDY_ID, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))))
+				.thenReturn(Arrays.asList(plotDataset));
+
+			final DatasetDTO subobsDataset = new DatasetDTO();
+			subobsDataset.setDatasetId(SUBOBS_ID);
+			Mockito.when(this.datasetService.getDatasets(STUDY_ID, new HashSet<>(SUBOBS_DATASET_TYPE_IDS))).thenReturn(Arrays.asList(subobsDataset));
+			this.variableValidator.validateForAggregateFunctions(VARIABLE_ID, STUDY_ID, DATASET_ID, inputVariableDatasetMap);
+			Mockito.verify(this.datasetTypeService).getSubObservationDatasetTypeIds();
+			Mockito.verify(this.datasetService).getDatasets(STUDY_ID, new HashSet<>(SUBOBS_DATASET_TYPE_IDS));
+		} catch (final ApiRequestValidationException e) {
+			fail("Method should not throw an exception");
+		}
+	}
+
+	@Test
+	public void testValidateForAggregateFunctionsWithError() {
+		final Map<Integer, Integer> inputVariableDatasetMap = new HashMap<>();
+		inputVariableDatasetMap.put(VARIABLE_ID, SUBOBS_ID);
+
+		try {
+			final DatasetDTO plotDataset = new DatasetDTO();
+			plotDataset.setDatasetId(SUBOBS_ID);
+			Mockito.when(this.datasetService.getDatasets(STUDY_ID, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))))
+				.thenReturn(Arrays.asList(plotDataset));
+			this.variableValidator.validateForAggregateFunctions(VARIABLE_ID, STUDY_ID, DATASET_ID, inputVariableDatasetMap);
+			fail("Should throw an exception");
+		} catch (final ApiRequestValidationException e) {
+			assertEquals(DerivedVariableValidator.STUDY_EXECUTE_CALCULATION_INPUT_NOT_IN_SUBLEVEL, e.getErrors().get(0).getCode());
+			Mockito.verify(this.datasetTypeService).getSubObservationDatasetTypeIds();
+			Mockito.verify(this.datasetService).getDatasets(STUDY_ID, new HashSet<>(SUBOBS_DATASET_TYPE_IDS));
+		}
+	}
+
+	@Test
+	public void testVerifySubObservationsInputVariablesInAggregateFunction() {
+		final List<Integer> subobsIds = Arrays.asList(SUBOBS_ID);
+		final Map<Integer, Integer> inputVariableDatasetMap = new HashMap<>();
+		inputVariableDatasetMap.put(VARIABLE_ID, SUBOBS_ID);
+		final List<String> aggregateInputVariables = Arrays.asList(VARIABLE_ID.toString());
+		final Optional<FormulaDto> formula = Optional.of(this.createFormulaDTO());
+		try{
+			this.variableValidator.verifySubObservationsInputVariablesInAggregateFunction(subobsIds, inputVariableDatasetMap, formula, aggregateInputVariables);
+		} catch (final ApiRequestValidationException e) {
+			Assert.fail("Should not throw an exception.");
+		}
+
+		try{
+			this.variableValidator.verifySubObservationsInputVariablesInAggregateFunction(subobsIds, inputVariableDatasetMap, formula, new ArrayList<>());
+			Assert.fail("Should throw an exception.");
+		} catch (final ApiRequestValidationException e) {
+			assertEquals(DerivedVariableValidator.STUDY_EXECUTE_CALCULATION_NOT_AGGREGATE_FUNCTION, e.getErrors().get(0).getCode());
+		}
+	}
+
+	@Test
+	public void testVerifyAggregateInputVariablesInSubObsLevel() {
+		final List<Integer> subobsIds = Arrays.asList(SUBOBS_ID);
+		final Map<Integer, Integer> inputVariableDatasetMap = new HashMap<>();
+		inputVariableDatasetMap.put(VARIABLE_ID, SUBOBS_ID);
+		final List<String> aggregateInputVariables = Arrays.asList(VARIABLE_ID.toString());
+
+		try {
+			this.variableValidator.verifyAggregateInputVariablesInSubObsLevel(subobsIds, inputVariableDatasetMap, aggregateInputVariables);
+		}  catch (final ApiRequestValidationException e) {
+			Assert.fail("Should not throw an exception.");
+		}
+
+		try {
+			this.variableValidator.verifyAggregateInputVariablesInSubObsLevel(new ArrayList<>(), inputVariableDatasetMap, aggregateInputVariables);
+			Assert.fail("Should throw an exception.");
+		}  catch (final ApiRequestValidationException e) {
+			assertEquals(DerivedVariableValidator.STUDY_EXECUTE_CALCULATION_INPUT_NOT_IN_SUBLEVEL, e.getErrors().get(0).getCode());
+		}
+	}
+
+	private FormulaDto createFormulaDTO() {
+		final FormulaDto formulaDto = new FormulaDto();
+		formulaDto.setDefinition("avg({{29001}})");
+		final FormulaVariable formulaVariable = new FormulaVariable();
+		formulaVariable.setId(VARIABLE_ID);
+		formulaDto.setInputs(Arrays.asList(formulaVariable));
+		return formulaDto;
+	}
 }

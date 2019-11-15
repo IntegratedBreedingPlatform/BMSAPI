@@ -5,7 +5,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>bmsapi</artifactId>
 	<packaging>${packaging.type}</packaging>
-        <version>12.2</version>
+        <version>13.2</version>
 	<name>BMS API</name>
 
 	<properties>
@@ -147,11 +147,16 @@
 			<version>2.5.3</version>
 		</dependency>
 
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.6.0</version>
+		</dependency>
 
 		<dependency>
-			<groupId>com.mangofactory</groupId>
-			<artifactId>swagger-springmvc</artifactId>
-			<version>0.9.5</version>
+    		<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger-ui</artifactId>
+			<version>2.6.0</version>
 		</dependency>
 
 		<dependency>

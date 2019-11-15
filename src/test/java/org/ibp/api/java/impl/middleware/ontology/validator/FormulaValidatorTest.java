@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 import com.google.common.base.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.FormulaDto;
@@ -11,14 +12,21 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.ibp.api.java.impl.middleware.ontology.TermRequest;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
+import org.springframework.validation.MapBindingResult;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import static org.mockito.Matchers.any;
@@ -93,12 +101,12 @@ public class FormulaValidatorTest {
 
 		when(errors.hasErrors()).thenReturn(false);
 		when(ontologyVariableDataManager.getVariableTypes(formulaDto.getTarget().getId()))
-			.thenReturn(Arrays.asList(VariableType.ENVIRONMENT_DETAIL));
+			.thenReturn(Arrays.asList(VariableType.SELECTION_METHOD));
 
 		this.formulaValidator.validate(formulaDto, errors);
 
 		verify(termValidator).validate(any(TermRequest.class), any(Errors.class));
-		verify(errors).reject("variable.formula.target.not.trait", new String[] {String.valueOf(formulaDto.getTarget().getId())}, "");
+		verify(errors).reject("variable.formula.target.not.valid", new String[] {String.valueOf(formulaDto.getTarget().getId())}, "");
 
 	}
 
@@ -110,7 +118,7 @@ public class FormulaValidatorTest {
 
 		when(errors.hasErrors()).thenReturn(false);
 		when(ontologyVariableDataManager.getVariableTypes(formulaDto.getTarget().getId())).thenReturn(Arrays.asList(VariableType.TRAIT));
-		when(termDataManager.getTermByName(inputVariableName)).thenReturn(null);
+		when(termDataManager.getTermByNameAndCvId(inputVariableName, CvId.VARIABLES.getId())).thenReturn(null);
 
 		this.formulaValidator.validate(formulaDto, errors);
 
@@ -132,7 +140,7 @@ public class FormulaValidatorTest {
 
 		when(errors.hasErrors()).thenReturn(false);
 		when(ontologyVariableDataManager.getVariableTypes(formulaDto.getTarget().getId())).thenReturn(Arrays.asList(VariableType.TRAIT));
-		when(termDataManager.getTermByName(inputVariableName)).thenReturn(inputVariableTerm);
+		when(termDataManager.getTermByNameAndCvId(inputVariableName, CvId.VARIABLES.getId())).thenReturn(inputVariableTerm);
 		when(ontologyVariableDataManager.getDataType(inputVariableTermId)).thenReturn(Optional.of(DataType.NUMERIC_VARIABLE));
 
 		this.formulaValidator.validate(formulaDto, errors);
@@ -140,6 +148,41 @@ public class FormulaValidatorTest {
 		verify(termValidator).validate(any(TermRequest.class), any(Errors.class));
 		verify(errors, times(0)).reject("variable.input.not.exists", new String[] {inputVariableName}, "");
 
+	}
+
+	@Test
+	public void testGetAggregateFunctionInputVariables() {
+		final String formula = "FN:avg({{GW_M_g100grn}}, {{GW_M_g200grn}},{{GW_M_g1000grn}})";
+		final Map<String, DataType> inputVariablesDataTypeMap = new HashMap<>();
+		inputVariablesDataTypeMap.put("__GW_M_g100grn__", DataType.NUMERIC_VARIABLE);
+		inputVariablesDataTypeMap.put("__GW_M_g200grn__", DataType.NUMERIC_VARIABLE);
+		inputVariablesDataTypeMap.put("__GW_M_g1000grn__", DataType.NUMERIC_VARIABLE);
+		final BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), FormulaDto.class.getName());
+		final List<String> inputVariables = this.formulaValidator.getAggregateFunctionInputVariables(formula, inputVariablesDataTypeMap, bindingResult);
+		Assert.assertEquals(3, inputVariables.size());
+		Assert.assertFalse(bindingResult.hasErrors());
+	}
+
+	@Test
+	public void testGetAggregateFunctionInputVariablesForAverageWithErrors() {
+		final String formula = "FN:avg({{GW_M_g100grn}}, {{GW_M_g200grn}},{{Ant_Date_ddmmyyyy}})";
+		final Map<String, DataType> inputVariablesDataTypeMap = new HashMap<>();
+		inputVariablesDataTypeMap.put("__GW_M_g100grn__", DataType.NUMERIC_VARIABLE);
+		inputVariablesDataTypeMap.put("__GW_M_g200grn__", DataType.NUMERIC_VARIABLE);
+		inputVariablesDataTypeMap.put("__Ant_Date_ddmmyyyy__", DataType.DATE_TIME_VARIABLE);
+		this.formulaValidator.getAggregateFunctionInputVariables(formula, inputVariablesDataTypeMap, this.errors);
+		Mockito.verify(this.errors).reject("variable.formula.avg.input.not.numeric", "");
+	}
+
+	@Test
+	public void testGetAggregateFunctionInputVariablesForSumWithErrors() {
+		final String formula = "FN:sum({{GW_M_g100grn}}, {{GW_M_g200grn}},{{Ant_Date_ddmmyyyy}})";
+		final Map<String, DataType> inputVariablesDataTypeMap = new HashMap<>();
+		inputVariablesDataTypeMap.put("__GW_M_g100grn__", DataType.NUMERIC_VARIABLE);
+		inputVariablesDataTypeMap.put("__GW_M_g200grn__", DataType.NUMERIC_VARIABLE);
+		inputVariablesDataTypeMap.put("__Ant_Date_ddmmyyyy__", DataType.DATE_TIME_VARIABLE);
+		this.formulaValidator.getAggregateFunctionInputVariables(formula, inputVariablesDataTypeMap, this.errors);
+		Mockito.verify(this.errors).reject("variable.formula.sum.input.not.numeric", "");
 	}
 
 	@Test
@@ -155,8 +198,8 @@ public class FormulaValidatorTest {
 
 		when(errors.hasErrors()).thenReturn(false);
 		when(ontologyVariableDataManager.getVariableTypes(formulaDto.getTarget().getId())).thenReturn(Arrays.asList(VariableType.TRAIT));
-		when(ontologyVariableDataManager.getVariableTypes(inputVariableTermId)).thenReturn(Arrays.asList(VariableType.ENVIRONMENT_DETAIL));
-		when(termDataManager.getTermByName(inputVariableName)).thenReturn(inputVariableTerm);
+		when(ontologyVariableDataManager.getVariableTypes(inputVariableTermId)).thenReturn(Arrays.asList(VariableType.SELECTION_METHOD));
+		when(termDataManager.getTermByNameAndCvId(inputVariableName, CvId.VARIABLES.getId())).thenReturn(inputVariableTerm);
 		when(ontologyVariableDataManager.getDataType(inputVariableTermId)).thenReturn(Optional.of(DataType.NUMERIC_VARIABLE));
 
 		this.formulaValidator.validate(formulaDto, errors);
@@ -180,7 +223,7 @@ public class FormulaValidatorTest {
 
 		when(errors.hasErrors()).thenReturn(false);
 		when(ontologyVariableDataManager.getVariableTypes(formulaDto.getTarget().getId())).thenReturn(Arrays.asList(VariableType.TRAIT));
-		when(termDataManager.getTermByName(inputVariableName)).thenReturn(inputVariableTerm);
+		when(termDataManager.getTermByNameAndCvId(inputVariableName, CvId.VARIABLES.getId())).thenReturn(inputVariableTerm);
 		when(ontologyVariableDataManager.getDataType(inputVariableTermId)).thenReturn(Optional.of(DataType.NUMERIC_VARIABLE));
 
 		this.formulaValidator.validate(formulaDto, errors);
@@ -203,7 +246,7 @@ public class FormulaValidatorTest {
 
 		when(errors.hasErrors()).thenReturn(false);
 		when(ontologyVariableDataManager.getVariableTypes(formulaDto.getTarget().getId())).thenReturn(Arrays.asList(VariableType.TRAIT));
-		when(termDataManager.getTermByName(inputVariableName)).thenReturn(inputVariableTerm);
+		when(termDataManager.getTermByNameAndCvId(inputVariableName, CvId.VARIABLES.getId())).thenReturn(inputVariableTerm);
 		when(ontologyVariableDataManager.getDataType(inputVariableTermId)).thenReturn(Optional.of(DataType.NUMERIC_VARIABLE));
 
 		this.formulaValidator.validate(formulaDto, errors);
@@ -226,7 +269,7 @@ public class FormulaValidatorTest {
 
 		when(errors.hasErrors()).thenReturn(false);
 		when(ontologyVariableDataManager.getVariableTypes(formulaDto.getTarget().getId())).thenReturn(Arrays.asList(VariableType.TRAIT));
-		when(termDataManager.getTermByName(inputVariableName)).thenReturn(inputVariableTerm);
+		when(termDataManager.getTermByNameAndCvId(inputVariableName, CvId.VARIABLES.getId())).thenReturn(inputVariableTerm);
 		when(ontologyVariableDataManager.getDataType(inputVariableTermId)).thenReturn(Optional.of(DataType.NUMERIC_VARIABLE));
 		when(processor.evaluateFormula(anyString(), anyMapOf(String.class, Object.class))).thenThrow(RuntimeException.class);
 

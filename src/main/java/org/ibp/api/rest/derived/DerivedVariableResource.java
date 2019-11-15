@@ -1,7 +1,9 @@
 package org.ibp.api.rest.derived;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.domain.dms.VariableDatasetsDTO;
+import org.generationcp.middleware.domain.ontology.FormulaVariable;
 import org.ibp.api.exception.OverwriteDataException;
 import org.ibp.api.java.derived.DerivedVariableService;
 import org.ibp.api.java.impl.middleware.derived.DerivedVariableServiceImpl;
@@ -39,7 +41,8 @@ public class DerivedVariableResource {
 		try {
 			final Map<String, Object> result =
 				this.derivedVariableService
-					.execute(studyId, datasetId, request.getVariableId(), request.getGeoLocationIds(), request.isOverwriteExistingData());
+					.execute(studyId, datasetId, request.getVariableId(), request.getGeoLocationIds(), request.getInputVariableDatasetMap(),
+						request.isOverwriteExistingData());
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (final OverwriteDataException e2) {
 			final Map<String, Object> result = new HashMap<>();
@@ -49,34 +52,34 @@ public class DerivedVariableResource {
 
 	}
 
-	@ApiOperation(value = "Get Derived Traits Dependencies", notes =
-		"Gets the list of all formula dependencies of all derived traits in a dataset."
-			+ "This will only return the variables that are not yet added in the dataset.")
+	@ApiOperation(value = "Get Missing Formula Variables", notes =
+		"Gets the list of formula variables that are not yet added in study.")
 	@ResponseBody
-	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/missing-dependencies", method = RequestMethod.GET)
-	public ResponseEntity<Set<String>> dependencyVariablesForAllDerivedTraitsInDataset(
-		@PathVariable final String crop,
-		@PathVariable final Integer studyId,
-		@PathVariable final Integer datasetId) {
-		return new ResponseEntity<>(this.derivedVariableService.getDependencyVariables(studyId, datasetId), HttpStatus.OK);
-	}
-
-	@ApiOperation(value = "Get Derived Traits Dependencies of a Specific Trait", notes =
-		"Gets the list of all formula dependencies of a specific trait in a dataset."
-			+ "This will only return the variables that are not yet added in the dataset.")
-	@ResponseBody
-	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/missing-dependencies", method = RequestMethod.GET)
-	public ResponseEntity<Set<String>> dependencyVariablesForSpecificDerivedTrait(
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/formula-variables/missing", method = RequestMethod.GET)
+	public ResponseEntity<Set<FormulaVariable>> missingFormulaVariables(
 		@PathVariable final String crop,
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId,
 		@PathVariable final Integer variableId) {
-		return new ResponseEntity<>(this.derivedVariableService.getDependencyVariables(studyId, datasetId, variableId), HttpStatus.OK);
+		return new ResponseEntity<>(this.derivedVariableService.getMissingFormulaVariablesInStudy(studyId, datasetId, variableId),
+			HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get All Formula Variables", notes =
+		"Gets the list of formula variables in study.")
+	@ResponseBody
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/formula-variables", method = RequestMethod.GET)
+	public ResponseEntity<Set<FormulaVariable>> formulaVariables(
+		@PathVariable final String crop,
+		@PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId) {
+		return new ResponseEntity<>(this.derivedVariableService.getFormulaVariablesInStudy(studyId, datasetId),
+			HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Count Calculated Traits", notes = "Count the calculated traits (derived traits) in a specified dataset(s)")
 	@ResponseBody
-	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/derived-variables", method = RequestMethod.HEAD)
+	@RequestMapping(value = "/{crop}/studies/{studyId}/derived-variables", method = RequestMethod.HEAD)
 	public ResponseEntity<String> countCalculatedVariables(
 		@PathVariable final String crop,
 		@PathVariable final Integer studyId, @RequestParam(value = "datasetIds") final Set<Integer> datasetIds) {
@@ -86,6 +89,18 @@ public class DerivedVariableResource {
 		respHeaders.add("X-Total-Count", String.valueOf(count));
 
 		return new ResponseEntity<>("", respHeaders, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get a map of formula variables and dataset(s) from where they belong to", notes = "")
+	@ResponseBody
+	@RequestMapping(value = "/{crop}/studies/{studyId}/datasets/{datasetId}/derived-variables/{variableId}/formula-variables/dataset-map", method = RequestMethod.GET)
+	public ResponseEntity<Map<Integer, VariableDatasetsDTO>> getFormulaVariableDatasetMap(
+		@PathVariable final String crop,
+		@PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId,
+		@PathVariable final Integer variableId) {
+		return new ResponseEntity<>(this.derivedVariableService.getFormulaVariableDatasetsMap(studyId, datasetId, variableId),
+			HttpStatus.OK);
 	}
 
 }

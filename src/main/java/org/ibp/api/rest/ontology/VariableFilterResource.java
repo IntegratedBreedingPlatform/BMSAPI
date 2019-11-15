@@ -3,11 +3,15 @@ package org.ibp.api.rest.ontology;
 import java.util.List;
 import java.util.Set;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.ibp.api.Util;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,9 +21,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
 
 /**
  * This is temporary resource to test get variables using types of filter
@@ -37,7 +38,7 @@ public class VariableFilterResource {
 	@RequestMapping(value = "/{cropname}/filtervariables", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<VariableDetails>> listAllVariablesUsingFilter(
-			@ApiParam(value = "Use <code>GET /crop/list</code> service to retrieve possible crop name values that can be supplied here.")
+			@ApiParam(value = "Use <code>GET /crop/list</code> service to retrieve possible crop name values that can be supplied here.", required = true)
 			@PathVariable String cropname,
 
 			@ApiParam(value = "Use <code>GET /program/list</code> service to retrieve program uuid that can be supplied here.")

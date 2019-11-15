@@ -2,28 +2,22 @@
 package org.ibp.api.java.impl.middleware.security;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudySummary;
-import org.ibp.api.exception.ForbiddenException;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.ObjectError;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Service
 public class SecurityServiceImpl implements SecurityService {
-
-	public static final String CURRENT_USER_NOT_ADMIN_OR_SUPERADMIN = "current.user.not.admin.or.superadmin";
 
 	@Autowired
 	private HttpServletRequest request;
@@ -32,7 +26,7 @@ public class SecurityServiceImpl implements SecurityService {
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
-	private UserDataManager userDataManager;
+	private UserService userService;
 
 	@Override
 	public boolean isAccessible(final StudySummary study, final String cropname) {
@@ -51,32 +45,22 @@ public class SecurityServiceImpl implements SecurityService {
 			return true;
 		}
 
-		// User reference on the gerplasmList is a reference to the User record in crop DB which is created by copying the User record in
-		// Workbench db. The record ids might not be same but the user name must be the same.
-		final User cropDBListOwner = this.userDataManager.getUserById(germplasmList.getUserId());
-		final WorkbenchUser workbenchListOwner = this.workbenchDataManager.getUserByUsername(cropDBListOwner.getName());
+
+		final WorkbenchUser listOwner = this.userService.getUserById(germplasmList.getUserId());
 		final WorkbenchUser loggedInUser = this.getCurrentlyLoggedInUser();
 
-		if (loggedInUser.equals(workbenchListOwner)) {
+		if (loggedInUser.equals(listOwner)) {
 			return true;
 		}
 
 		return this.loggedInUserIsMemberOf(germplasmList.getProgramUUID(), cropname);
 	}
 
-	@Override
-	public void requireCurrentUserIsAdmin() {
-		if (!this.request.isUserInRole(Role.ADMIN) && !this.request.isUserInRole(Role.SUPERADMIN)) {
-			throw new ForbiddenException(
-				new ObjectError("", new String[] {CURRENT_USER_NOT_ADMIN_OR_SUPERADMIN}, null, ""));
-		}
-	}
-
 	private boolean loggedInUserIsMemberOf(final String programUniqueId, final String cropname) {
 		if (!StringUtils.isBlank(programUniqueId)) {
 			final WorkbenchUser loggedInUser = this.getCurrentlyLoggedInUser();
 			final Project program = this.workbenchDataManager.getProjectByUuidAndCrop(programUniqueId, cropname);
-			final List<WorkbenchUser> allProgramMembers = this.workbenchDataManager.getUsersByProjectId(program.getProjectId());
+			final List<WorkbenchUser> allProgramMembers = this.userService.getUsersByProjectId(program.getProjectId());
 			return allProgramMembers.contains(loggedInUser);
 		}
 		return false;
@@ -88,14 +72,11 @@ public class SecurityServiceImpl implements SecurityService {
 		if (authentication == null) {
 			throw new IllegalStateException("No authenticated user was found in security context.");
 		}
-		return this.workbenchDataManager.getUserByUsername(authentication.getName());
+		return this.userService.getUserByUsername(authentication.getName());
 	}
 
 	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}
 
-	public void setUserDataManager(final UserDataManager userDataManager) {
-		this.userDataManager = userDataManager;
-	}
 }

@@ -70,9 +70,9 @@ public class SearchRequestServiceImplTest {
 		searchRequest.setParameters("{\"preferredName\":\"ABC\"}");
 		Mockito.when(this.daoFactory.getSearchRequestDAO().getById(Mockito.anyInt())).thenReturn(searchRequest);
 
-		final Integer searchResultsDbid = 1;
+		final Integer searchResulstDbid = 1;
 		final GermplasmSearchRequestDto germplasmSearchRequestDTO =
-			(GermplasmSearchRequestDto) this.searchRequestServiceImpl.getSearchRequest(searchResultsDbid, GermplasmSearchRequestDto.class);
+			(GermplasmSearchRequestDto) this.searchRequestServiceImpl.getSearchRequest(searchResulstDbid, GermplasmSearchRequestDto.class);
 
 		Assert.assertTrue(germplasmSearchRequestDTO.getPreferredName().equalsIgnoreCase("ABC"));
 	}

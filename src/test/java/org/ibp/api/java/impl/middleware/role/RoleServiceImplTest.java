@@ -1,62 +1,219 @@
-
 package org.ibp.api.java.impl.middleware.role;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.RoleType;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.permission.PermissionService;
+import org.generationcp.middleware.service.api.user.RoleSearchDto;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.domain.role.RoleDto;
-import org.junit.Assert;
+import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ConflictException;
+import org.ibp.api.rest.role.RoleGeneratorInput;
+import org.ibp.api.rest.role.RoleValidator;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class RoleServiceImplTest extends ApiUnitTestBase {
-	
-	
+
+	public static final int RANDOM_COUNT = 10;
+
 	@Mock
-	private WorkbenchDataManager workbenchManager;
+	private PermissionService permissionService;
+
+	@Mock
+	private RoleValidator roleValidator;
+
+	@Mock
+	private UserService userService;
 
 	@InjectMocks
 	private RoleServiceImpl roleServiceImpl;
-	
+
 	private List<Role> allRoles;
 	private Role restrictedRole;
-	
-	@Before 
+
+	@Before
 	public void setup() {
 		this.createTestRoles();
 		final List<Role> assignableRoles = new ArrayList<>(this.allRoles);
 		assignableRoles.remove(this.restrictedRole);
-		Mockito.doReturn(assignableRoles).when(this.workbenchDataManager).getAssignableRoles();
-		Mockito.doReturn(this.allRoles).when(this.workbenchDataManager).getAllRoles();
+		Mockito.doReturn(assignableRoles).when(this.workbenchDataManager).getRoles(new RoleSearchDto(Boolean.TRUE, null, null));
 	}
-	
+
 	@Test
-	public void testGetAllRoles() throws Exception {
-		final List<RoleDto> allRoles = this.roleServiceImpl.getAllRoles();
-		Assert.assertEquals(this.allRoles.size(), allRoles.size());
+	public void testUpdateRole() {
+
+		final int roleId = 1;
+		final int roleTypeId = 2;
+		final int permissionId = 3;
+
+		final Permission permission = new Permission();
+		permission.setPermissionId(permissionId);
+
+		final Role role = this.createTestRole(roleId, roleTypeId, new ArrayList<>());
+
+		final RoleGeneratorInput roleGeneratorInput =
+			this.createRoleGeneratorInput(roleId, roleTypeId, Arrays.asList(permissionId));
+
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleGeneratorInput.class.getName());
+
+		when(this.roleValidator.validateRoleGeneratorInput(roleGeneratorInput, false)).thenReturn(errors);
+		when(this.workbenchDataManager.getRoleById(roleGeneratorInput.getId())).thenReturn(role);
+		when(this.userService.getUsersWithRole(roleGeneratorInput.getId())).thenReturn(new ArrayList<>());
+
+		when(this.permissionService.getPermissionsByIds(new HashSet<>(roleGeneratorInput.getPermissions())))
+			.thenReturn(Arrays.asList(permission));
+
+		this.roleServiceImpl.updateRole(roleGeneratorInput);
+
+		verify(this.roleValidator).validateRoleGeneratorInput(roleGeneratorInput, false);
+		verify(this.workbenchDataManager).saveRole(role);
+		assertEquals(roleGeneratorInput.getName(), role.getName());
+		assertEquals(roleGeneratorInput.getDescription(), role.getDescription());
+		assertEquals(permissionId, role.getPermissions().get(0).getPermissionId().intValue());
 	}
-	
+
+	@Test(expected = ApiRequestValidationException.class)
+	public void testUpdateRole_RoleGeneratorInputValidationError() {
+
+		final int roleId = 1;
+		final int roleTypeId = 2;
+		final RoleGeneratorInput roleGeneratorInput =
+			this.createRoleGeneratorInput(roleId, roleTypeId, new ArrayList<>());
+
+		final BindingResult errors = Mockito.mock(BindingResult.class);
+		when(errors.hasErrors()).thenReturn(true);
+		when(this.roleValidator.validateRoleGeneratorInput(roleGeneratorInput, false)).thenReturn(errors);
+
+		this.roleServiceImpl.updateRole(roleGeneratorInput);
+
+	}
+
 	@Test
-	public void testGetAssignableRoles() throws Exception {
-		final List<RoleDto> roles = this.roleServiceImpl.getAssignableRoles();
-		Mockito.verify(this.workbenchDataManager).getAssignableRoles();
-		Assert.assertEquals(this.allRoles.size() - 1, roles.size());
-		Assert.assertFalse(roles.contains(this.restrictedRole));
+	public void testUpdateRole_RoleTypeIsChanged() {
+
+		final int roleId = 1;
+		final int roleTypeId = 2;
+		final int permissionId = 3;
+
+		final Permission permission = new Permission();
+		permission.setPermissionId(permissionId);
+
+		final Role role = this.createTestRole(roleId, 99, new ArrayList<>());
+
+		final RoleGeneratorInput roleGeneratorInput =
+			this.createRoleGeneratorInput(roleId, roleTypeId, Arrays.asList(permissionId));
+
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleGeneratorInput.class.getName());
+
+		when(this.roleValidator.validateRoleGeneratorInput(roleGeneratorInput, false)).thenReturn(errors);
+		when(this.workbenchDataManager.getRoleById(roleGeneratorInput.getId())).thenReturn(role);
+		when(this.userService.getUsersWithRole(roleGeneratorInput.getId())).thenReturn(Arrays.asList(new WorkbenchUser()));
+
+		when(this.permissionService.getPermissionsByIds(new HashSet<>(roleGeneratorInput.getPermissions())))
+			.thenReturn(Arrays.asList(permission));
+
+		try {
+			this.roleServiceImpl.updateRole(roleGeneratorInput);
+			fail("Method should throw an error");
+		} catch (final ApiRequestValidationException e) {
+			// do nothing
+		}
+		verify(this.roleValidator).validateRoleGeneratorInput(roleGeneratorInput, false);
+		assertEquals("role.roletype.can.not.be.changed", errors.getAllErrors().get(0).getCode());
+	}
+
+	@Test
+	public void testUpdateRole_PermissionsAreChanged() {
+
+		final int roleId = 1;
+		final int roleTypeId = 2;
+		final int permissionId1 = 99;
+		final int permissionId2 = 100;
+
+		final Permission permission1 = new Permission();
+		permission1.setPermissionId(permissionId1);
+		final Permission permission2 = new Permission();
+		permission2.setPermissionId(permissionId2);
+
+		// Role to be retrieved from the database has one permission
+		final Role role = this.createTestRole(roleId, roleTypeId, Arrays.asList(permission1));
+
+		// Add new permission to the role.
+		final RoleGeneratorInput roleGeneratorInput =
+			this.createRoleGeneratorInput(roleId, roleTypeId, Arrays.asList(permissionId1, permissionId2));
+
+		// Set to true, to tell the system to detect permissions changes
+		roleGeneratorInput.setShowWarnings(true);
+
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleGeneratorInput.class.getName());
+
+		when(this.roleValidator.validateRoleGeneratorInput(roleGeneratorInput, false)).thenReturn(errors);
+		when(this.workbenchDataManager.getRoleById(roleGeneratorInput.getId())).thenReturn(role);
+		when(this.userService.getUsersWithRole(roleGeneratorInput.getId())).thenReturn(Arrays.asList(new WorkbenchUser()));
+		when(this.permissionService.getPermissionsByIds(new HashSet<>(roleGeneratorInput.getPermissions())))
+			.thenReturn(Arrays.asList(permission1, permission2));
+
+		try {
+			this.roleServiceImpl.updateRole(roleGeneratorInput);
+			fail("Method should throw an error");
+		} catch (final ConflictException e) {
+			// do nothing
+		}
+		verify(this.roleValidator).validateRoleGeneratorInput(roleGeneratorInput, false);
+		assertEquals("role.permissions.changed", errors.getAllErrors().get(0).getCode());
+	}
+
+	private Role createTestRole(final int roleId, final int roleTypeId, final List<Permission> pemissions) {
+		final Role role = new Role();
+		role.setId(roleId);
+		role.setPermissions(pemissions);
+		final RoleType roleType = new RoleType();
+		roleType.setId(roleTypeId);
+		role.setRoleType(roleType);
+		return role;
+	}
+
+	private RoleGeneratorInput createRoleGeneratorInput(final int roleId, final int roleTypeId,
+		final List<Integer> permissionIds) {
+		final String roleName = RandomStringUtils.randomAlphabetic(RANDOM_COUNT);
+		final String description = RandomStringUtils.randomAlphabetic(RANDOM_COUNT);
+		final RoleGeneratorInput roleGeneratorInput = new RoleGeneratorInput();
+		roleGeneratorInput.setId(roleId);
+		roleGeneratorInput.setName(roleName);
+		roleGeneratorInput.setDescription(description);
+		roleGeneratorInput.setShowWarnings(false);
+		roleGeneratorInput.setPermissions(permissionIds);
+		roleGeneratorInput.setRoleType(roleTypeId);
+		return roleGeneratorInput;
 	}
 
 	private void createTestRoles() {
 		this.allRoles = new ArrayList<>();
-		Role admin = new Role(1, "ADMIN");
-		Role breeder = new Role(2, "BREEDER");
-		Role technician = new Role(3, "TECHNICIAN");
+		final Role admin = new Role(1, "ADMIN");
+		final Role breeder = new Role(2, "BREEDER");
+		final Role technician = new Role(3, "TECHNICIAN");
 		this.restrictedRole = new Role(4, Role.SUPERADMIN);
-		
+
 		this.allRoles.add(admin);
 		this.allRoles.add(breeder);
 		this.allRoles.add(technician);

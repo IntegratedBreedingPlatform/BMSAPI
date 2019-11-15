@@ -1,38 +1,35 @@
 package org.ibp.api.rest.dataset.validator;
 
-import java.util.Random;
-
-import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.study.StudyService;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
 import org.ibp.api.java.impl.middleware.dataset.validator.StudyValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.Random;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.mockito.Mockito.doReturn;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StudyValidatorTest {
 
-	public static final int USER_ID = 10;
-
-	@Mock
-	private HttpServletRequest request;
+	private static final int USER_ID = 10;
 
 	@Mock
 	private SecurityService securityService;
@@ -41,16 +38,13 @@ public class StudyValidatorTest {
 	private StudyDataManager studyDataManager;
 
 	@Mock
-	private ContextUtil contextUtil;
+	private StudyService middlewareStudyService;
 
 	@InjectMocks
 	private StudyValidator studyValidator;
-	
+
 	@Before
 	public void setup() {
-		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(USER_ID);
-		doReturn(user).when(this.securityService).getCurrentlyLoggedInUser();
-		doReturn(USER_ID).when(this.contextUtil).getIbdbUserId(ArgumentMatchers.anyInt());
 	}
 
 	@Test (expected = ResourceNotFoundException.class)
@@ -63,17 +57,22 @@ public class StudyValidatorTest {
 
 	@Test (expected = ForbiddenException.class)
 	public void testStudyIsLocked() {
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(USER_ID, new Role(2, "Breeder"));
+		doReturn(user).when(this.securityService).getCurrentlyLoggedInUser();
 		final Random ran = new Random();
 		final Integer studyId = ran.nextInt();
 		final Study study = new Study();
 		study.setId(studyId);
 		study.setLocked(true);
+		study.setCreatedBy("1");
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
 		studyValidator.validate(studyId, true);
 	}
 
 	@Test
 	public void testStudyIsLockedButUserIsOwner() {
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(USER_ID, new Role(2, "Breeder"));
+		doReturn(user).when(this.securityService).getCurrentlyLoggedInUser();
 		final Random ran = new Random();
 		final int studyId = ran.nextInt();
 		final Study study = new Study();
@@ -82,20 +81,55 @@ public class StudyValidatorTest {
 		study.setCreatedBy(String.valueOf(USER_ID));
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
 		studyValidator.validate(studyId, true);
-		// no exceptions thrown
 	}
 
 	@Test
 	public void testStudyIsLockedButUserIsSuperAdmin() {
+		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(USER_ID, new Role(2, Role.SUPERADMIN));
+		doReturn(user).when(this.securityService).getCurrentlyLoggedInUser();
+
 		final Random ran = new Random();
 		final int studyId = ran.nextInt();
 		final Study study = new Study();
 		study.setId(studyId);
 		study.setLocked(true);
-		doReturn(true).when(this.request).isUserInRole(Role.SUPERADMIN);
+		study.setCreatedBy("1");
+
 		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
 		studyValidator.validate(studyId, true);
-		// no exceptions thrown
+	}
+
+	@Test
+	public void testStudyCannotHaveAdvanceOrCrossList() {
+		final Random ran = new Random();
+		final int studyId = ran.nextInt();
+		final Study study = new Study();
+		study.setId(studyId);
+		study.setLocked(false);
+		study.setCreatedBy("1");
+
+		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
+		Mockito.when(middlewareStudyService.hasAdvancedOrCrossesList(studyId)).thenReturn(true);
+		try {
+			studyValidator.validate(studyId, ran.nextBoolean(), false);
+			Assert.fail("Expected validation exception to be thrown but was not.");
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("study.has.advance.or.cross.list"));
+		}
+	}
+
+	@Test
+	public void testStudyCanHaveAdvanceOrCrossList() {
+		final Random ran = new Random();
+		final int studyId = ran.nextInt();
+		final Study study = new Study();
+		study.setId(studyId);
+		study.setLocked(false);
+		study.setCreatedBy("1");
+
+		Mockito.when(studyDataManager.getStudy(studyId)).thenReturn(study);
+		studyValidator.validate(studyId, ran.nextBoolean(), true);
 	}
 
 }

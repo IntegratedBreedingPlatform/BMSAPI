@@ -5,7 +5,9 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.hamcrest.Matchers;
+import org.hamcrest.collection.IsCollectionWithSize;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.impl.middleware.program.ProgramServiceImpl;
 import org.ibp.api.java.impl.middleware.security.SecurityServiceImpl;
@@ -24,85 +26,91 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class ProgramResourceTest extends ApiUnitTestBase {
 
-	private WorkbenchUser me;
-	private WorkbenchUser myBreedingBuddy;
+    private WorkbenchUser me;
+    private WorkbenchUser myBreedingBuddy;
 
-	@Autowired
-	private SecurityServiceImpl securityService;
+    @Autowired
+    private SecurityServiceImpl securityService;
 
-	@Before
-	public void beforeEachTest() {
+    @Autowired
+    private UserService userService;
 
-		this.me = new WorkbenchUser();
-		this.me.setName("Mr. Breeder");
-		this.me.setUserid(1);
-		this.me.setPassword("password");
+    @Before
+    public void beforeEachTest() {
 
-		this.myBreedingBuddy = new WorkbenchUser();
-		this.myBreedingBuddy.setName("My Breeding Buddy");
-		this.myBreedingBuddy.setUserid(2);
-		this.myBreedingBuddy.setPassword("password");
+        this.me = new WorkbenchUser();
+        this.me.setName("Mr. Breeder");
+        this.me.setUserid(1);
+        this.me.setPassword("password");
 
-		Mockito.when(this.workbenchDataManager.getUserById(this.me.getUserid())).thenReturn(this.me);
-		Mockito.when(this.workbenchDataManager.getUserById(this.myBreedingBuddy.getUserid())).thenReturn(this.myBreedingBuddy);
+        this.myBreedingBuddy = new WorkbenchUser();
+        this.myBreedingBuddy.setName("My Breeding Buddy");
+        this.myBreedingBuddy.setUserid(2);
+        this.myBreedingBuddy.setPassword("password");
 
-		Mockito.when(this.workbenchDataManager.getUserByUsername(this.me.getName())).thenReturn(this.me);
-		Mockito.when(this.workbenchDataManager.getUserByUsername(this.myBreedingBuddy.getName())).thenReturn(this.myBreedingBuddy);
-		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.me);
+        Mockito.when(this.userService.getUserById(this.me.getUserid())).thenReturn(this.me);
+        Mockito.when(this.userService.getUserById(this.myBreedingBuddy.getUserid())).thenReturn(this.myBreedingBuddy);
 
-	}
+        Mockito.when(this.userService.getUserByUsername(this.me.getName())).thenReturn(this.me);
+        Mockito.when(this.userService.getUserByUsername(this.myBreedingBuddy.getName())).thenReturn(this.myBreedingBuddy);
+        Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.me);
 
-	@Test
-	public void listAllMethods() throws Exception {
+    }
 
-		final CropType cropType = new CropType();
-		cropType.setCropName("MAIZE");
+    @Test
+    public void listProgramsByCropName() throws Exception {
+        final String cropName ="MAIZE";
+        final CropType cropType = new CropType();
+        cropType.setCropName(cropName);
 
-		final List<Project> programList = new ArrayList<>();
-		final Project program1 = new Project();
-		program1.setProjectId(1L);
-		program1.setProjectName("Program I Created");
-		program1.setCropType(cropType);
-		program1.setUniqueID("fb0783d2-dc82-4db6-a36e-7554d3740092");
-		program1.setUserId(this.me.getUserid());
-		final String program1Date = "2015-11-11";
-		program1.setStartDate(ProgramServiceImpl.DATE_FORMAT.parse(program1Date));
+        final List<Project> programList = new ArrayList<>();
+        final Project program1 =
+                new Project(1L, "fb0783d2-dc82-4db6-a36e-7554d3740092", "Program I Created", null,
+                        this.me.getUserid(), cropType, null);
 
-		programList.add(program1);
+        final String program1Date = "2015-11-11";
+        program1.setStartDate(ProgramServiceImpl.DATE_FORMAT.parse(program1Date));
 
-		final Project program2 = new Project();
-		program2.setProjectId(2L);
-		program2.setProjectName("Program I am member of");
-		program2.setCropType(cropType);
-		program2.setUniqueID("57b8f271-56db-448e-ad8d-528ac4d80f04");
-		program2.setUserId(this.myBreedingBuddy.getUserid());
-		final String program2Date = "2015-12-12";
-		program2.setStartDate(ProgramServiceImpl.DATE_FORMAT.parse(program2Date));
+        final Project program2 =
+                new Project(2L, "57b8f271-56db-448e-ad8d-528ac4d80f04", "Program I am member of", null, this.myBreedingBuddy.getUserid(),
+                        cropType, null);
 
-		programList.add(program2);
+        final String program2Date = "2015-12-12";
+        program2.setStartDate(ProgramServiceImpl.DATE_FORMAT.parse(program2Date));
 
-		Mockito.doReturn(programList).when(this.workbenchDataManager).getProjectsByUser(Mockito.eq(this.me));
+        final String cropName2 ="WHEAT";
+        final CropType cropType2 = new CropType();
+        cropType2.setCropName(cropName2);
 
-		Mockito.when(this.workbenchDataManager.getUsersByProjectId(program1.getProjectId())).thenReturn(Lists.newArrayList(this.me));
-		Mockito.when(this.workbenchDataManager.getUsersByProjectId(program2.getProjectId())).thenReturn(
-				Lists.newArrayList(this.me, this.myBreedingBuddy));
+        programList.add(program1);
+        programList.add(program2);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/program/list").contentType(this.contentType))
-				.andDo(MockMvcResultHandlers.print()).andExpect(status().isOk())
-				.andExpect(jsonPath("$[0].id", Matchers.is(String.valueOf(program1.getProjectId()))))
-				.andExpect(jsonPath("$[0].uniqueID", Matchers.is(program1.getUniqueID())))
-				.andExpect(jsonPath("$[0].name", Matchers.is(program1.getProjectName())))
-				.andExpect(jsonPath("$[0].members", Matchers.contains(this.me.getName())))
-				.andExpect(jsonPath("$[0].crop", Matchers.is(program1.getCropType().getCropName())))
-				.andExpect(jsonPath("$[0].startDate", Matchers.is(program1Date)))
-				.andExpect(jsonPath("$[0].createdBy", Matchers.is(this.me.getName())))
+        Mockito.doReturn(programList).when(this.workbenchDataManager).getProjectsByCropName(Mockito.eq(cropName));
+        Mockito.doReturn(this.me).when(this.userService).getUserById(program1.getProjectId().intValue());
+        Mockito.doReturn(this.myBreedingBuddy).when(this.userService).getUserById(program2.getProjectId().intValue());
 
-				.andExpect(jsonPath("$[1].id", Matchers.is(String.valueOf(program2.getProjectId()))))
-				.andExpect(jsonPath("$[1].uniqueID", Matchers.is(program2.getUniqueID())))
-				.andExpect(jsonPath("$[1].name", Matchers.is(program2.getProjectName())))
-				.andExpect(jsonPath("$[1].members", Matchers.contains(this.me.getName(), this.myBreedingBuddy.getName())))
-				.andExpect(jsonPath("$[1].crop", Matchers.is(program2.getCropType().getCropName())))
-				.andExpect(jsonPath("$[1].startDate", Matchers.is(program2Date)))
-				.andExpect(jsonPath("$[1].createdBy", Matchers.is(this.myBreedingBuddy.getName())));
-	}
+        Mockito.when(this.userService.getUsersByProjectId(program1.getProjectId()))
+                .thenReturn(Lists.newArrayList(this.me));
+        Mockito.when(this.userService.getUsersByProjectId(program2.getProjectId())).thenReturn(
+                Lists.newArrayList(this.me, this.myBreedingBuddy));
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/program").param("cropName",cropName).contentType(this.contentType))
+                .andDo(MockMvcResultHandlers.print()).andExpect(status().isOk())
+                .andExpect(jsonPath("$", IsCollectionWithSize.hasSize(2))) //
+                .andExpect(jsonPath("$[0].id", Matchers.is(String.valueOf(program1.getProjectId()))))
+                .andExpect(jsonPath("$[0].uniqueID", Matchers.is(program1.getUniqueID())))
+                .andExpect(jsonPath("$[0].name", Matchers.is(program1.getProjectName())))
+                .andExpect(jsonPath("$[0].members", Matchers.contains(this.me.getName())))
+                .andExpect(jsonPath("$[0].crop", Matchers.is(program1.getCropType().getCropName())))
+                .andExpect(jsonPath("$[0].startDate", Matchers.is(program1Date)))
+                .andExpect(jsonPath("$[0].createdBy", Matchers.is(this.me.getName())))
+
+                .andExpect(jsonPath("$[1].id", Matchers.is(String.valueOf(program2.getProjectId()))))
+                .andExpect(jsonPath("$[1].uniqueID", Matchers.is(program2.getUniqueID())))
+                .andExpect(jsonPath("$[1].name", Matchers.is(program2.getProjectName())))
+                .andExpect(jsonPath("$[1].members", Matchers.contains(this.me.getName(), this.myBreedingBuddy.getName())))
+                .andExpect(jsonPath("$[1].crop", Matchers.is(program2.getCropType().getCropName())))
+                .andExpect(jsonPath("$[1].startDate", Matchers.is(program2Date)))
+                .andExpect(jsonPath("$[1].createdBy", Matchers.is(this.myBreedingBuddy.getName())));
+    }
 }
