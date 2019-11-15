@@ -21,6 +21,9 @@ import java.util.stream.Collectors;
 public class InstanceValidator {
 
 	@Autowired
+	private org.generationcp.middleware.service.api.study.StudyService middlewareStudyService;
+
+	@Autowired
 	private StudyDataManager studyDataManager;
 
 	@Autowired
@@ -31,6 +34,11 @@ public class InstanceValidator {
 	public void validate(final Integer datasetId, final Set<Integer> instanceIds) {
 
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
+		if (Collections.isEmpty(instanceIds)) {
+			this.errors.reject("study.instances.required");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 
 		if (!this.studyDataManager.existInstances(instanceIds)) {
 			this.errors.reject("dataset.non.existent.instances", "");
@@ -43,32 +51,58 @@ public class InstanceValidator {
 		}
 	}
 
-	public void validateForDesignGeneration(final Integer studyId, final Set<Integer> instanceNumbers) {
+	public void validateInstanceNumbers(final Integer studyId, final Set<Integer> instanceNumbers) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		if (Collections.isEmpty(instanceNumbers)) {
-			this.errors.reject("study.instances.required");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
 		final Map<String, Integer> instanceGeolocationIdsMap = this.studyDataManager.getInstanceGeolocationIdsMap(studyId);
-		final List<String> instanceNumberStringList = instanceNumbers.stream().map(s -> s.toString()).collect(Collectors.toList());
-		if (instanceGeolocationIdsMap == null || instanceGeolocationIdsMap.isEmpty() || !instanceGeolocationIdsMap.keySet()
-			.containsAll(instanceNumberStringList)) {
+		final List<Integer> selectedInstanceIds =
+			instanceGeolocationIdsMap.entrySet().stream().filter(entry -> instanceNumbers.contains(Integer.valueOf(entry.getKey())))
+				.map(entry -> entry.getValue()).collect(Collectors.toList());
+
+		if (instanceNumbers.size() != selectedInstanceIds.size()) {
 			this.errors.reject("dataset.non.existent.instances");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
-		final List<Integer> restrictedInstances =
-			studyInstances.stream().filter(instance -> BooleanUtils.isFalse(instance.getCanBeDeleted()))
-				.map(instance -> instance.getInstanceNumber()).collect(Collectors.toList());
+		this.validateInstancesDeletability(studyId, instanceNumbers, false);
+	}
 
-		// Check that at least one instance is not restricted from design regeneration
-		if (restrictedInstances.containsAll(instanceNumbers)) {
-			this.errors.reject("all.selected.instances.cannot.be.regenerated");
+	public void validateInstanceDeletion(final Integer studyId, final Set<Integer> instanceIds, final Boolean enforceAllInstancesDeletable) {
+		final Integer environmentDatasetId = this.middlewareStudyService.getEnvironmentDatasetId(studyId);
+		this.validate(environmentDatasetId, instanceIds);
+
+		this.validateInstancesDeletability(studyId, instanceIds, enforceAllInstancesDeletable);
+
+	}
+
+	private void validateInstancesDeletability(final Integer studyId, final Set<Integer> instanceIds,
+		final Boolean enforceAllInstancesDeletable) {
+		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
+
+		// Raise error if the environment to be deleted is the only remaining environment for study
+		if (enforceAllInstancesDeletable && studyInstances.size() < 2) {
+			this.errors.reject("cannot.delete.last.instance");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
+		final List<Integer> restrictedInstances =
+			studyInstances.stream().filter(instance -> BooleanUtils.isFalse(instance.getCanBeDeleted()))
+				.map(instance -> instance.getInstanceDbId()).collect(Collectors.toList());
+
+		// Raise error if any of the instances are not deletable when enforceAllInstancesDeletable = true
+		if (enforceAllInstancesDeletable && !instanceIds.stream()
+			.distinct()
+			.filter(restrictedInstances::contains)
+			.collect(Collectors.toSet()).isEmpty()) {
+			this.errors.reject("at.least.one.instance.cannot.be.deleted");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		// Verify at least one instance can be re/generated or deleted
+		if (restrictedInstances.containsAll(instanceIds)) {
+			this.errors.reject("all.selected.instances.cannot.be.regenerated");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 }

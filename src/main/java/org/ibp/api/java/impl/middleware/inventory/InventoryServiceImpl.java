@@ -1,6 +1,8 @@
 
 package org.ibp.api.java.impl.middleware.inventory;
 
+import com.google.common.collect.Lists;
+import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -23,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,6 +40,9 @@ public class InventoryServiceImpl implements InventoryService {
 
 	@Autowired
 	private LocationDataManager locationDataManager;
+
+	@Resource
+	private ContextUtil contextUtil;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(InventoryService.class);
 
@@ -102,6 +108,8 @@ public class InventoryServiceImpl implements InventoryService {
 			lot.setScaleId(Integer.valueOf(germplasmInventory.getQuantityUnit().getId()));
 			lot.setComments(germplasmInventory.getComments());
 			lot.setStatus(LotStatus.ACTIVE.getIntValue());
+
+			this.inventoryDataManager.generateLotIds(this.contextUtil.getProjectInContext().getCropType(), Lists.newArrayList(lot));
 			this.inventoryDataManager.addLot(lot);
 			InventoryServiceImpl.LOGGER.debug("Lot created: LotId: " + lot.getId());
 
@@ -139,5 +147,4 @@ public class InventoryServiceImpl implements InventoryService {
 		InventoryServiceImpl.LOGGER.debug(germplasmId);
 		throw new UnsupportedOperationException("This operation has not yet been implemented.");
 	}
-
 }
