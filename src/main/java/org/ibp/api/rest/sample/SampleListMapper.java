@@ -31,7 +31,7 @@ public class SampleListMapper {
 
 			@Override
 			protected void configure() {
-				map().setCreatedBy(this.source.getCreatedBy().getName());
+				map().setCreatedBy(this.source.getCreatedBy());
 				using(new AbstractConverter<Date, String>() {
 
 					@Override
