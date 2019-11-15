@@ -283,7 +283,7 @@ public class GermplasmResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/germplasm", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(Germplasm.View.GermplasmBrapiV1_3.class)
-	public ResponseEntity<EntityListResponse<Germplasm>> searchGermplasmsByStudy(
+	public ResponseEntity<SingleEntityResponse<GermplasmSummaryList>> searchGermplasmsByStudy(
 		@PathVariable final String crop,
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false)
 		@RequestParam(value = "page",
@@ -321,14 +321,17 @@ public class GermplasmResourceBrapi {
 			}
 		}
 
-		final Result<Germplasm> results = new Result<Germplasm>().withData(germplasmList);
+		final GermplasmSummaryList germplasmSummaryList = new GermplasmSummaryList(germplasmList, String.valueOf(studyDbId), "ADD NAME HERE");
+
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
 
-		final EntityListResponse<Germplasm> entityListResponse = new EntityListResponse<>(metadata, results);
+		final SingleEntityResponse<GermplasmSummaryList> singleEntityResponse = new SingleEntityResponse<>();
+		singleEntityResponse.setMetadata(metadata);
+		singleEntityResponse.setResult(germplasmSummaryList);
 
-		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+		return new ResponseEntity<>(singleEntityResponse, HttpStatus.OK);
 	}
 }
