@@ -1,12 +1,17 @@
 package org.ibp.api.java.impl.middleware.rpackage;
 
+import com.google.common.base.Optional;
 import org.generationcp.middleware.pojos.workbench.RCall;
 import org.generationcp.middleware.pojos.workbench.RCallParameter;
+import org.generationcp.middleware.pojos.workbench.RPackage;
 import org.ibp.api.domain.rpackage.RCallDTO;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.rpackage.RPackageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +32,14 @@ public class RPackageServiceImpl implements RPackageService {
 
 	@Override
 	public List<RCallDTO> getRCallsByPackageId(final Integer packageId) {
+
+		final Optional<RPackage> rPackage = this.rPackageMiddlewareService.getRPackageById(packageId);
+		if (!rPackage.isPresent()) {
+			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			errors.reject("rpackage.does.not.exist", new Object[] {packageId}, "");
+			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
+		}
+
 		return this.mapToDTO(this.rPackageMiddlewareService.getRCallsByPackageId(packageId));
 	}
 
