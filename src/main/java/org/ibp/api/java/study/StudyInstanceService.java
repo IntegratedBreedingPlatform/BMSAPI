@@ -13,4 +13,6 @@ public interface StudyInstanceService {
 
 	void deleteStudyInstance(final Integer studyId, final Integer instanceId);
 
+	Optional<StudyInstance> getStudyInstance(int studyId, final Integer instanceId);
+
 }
