@@ -19,29 +19,10 @@ import java.util.Random;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-public class RCallResourceTest extends ApiUnitTestBase {
+class RPackageResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private RPackageService rPackageService;
-
-	@Test
-	public void testGetAllRCalls() throws Exception {
-
-		final RCallDTO rCallDTO = this.createTesttRCallDTO();
-
-		when(this.rPackageService.getAllRCalls()).thenReturn(Arrays.asList(rCallDTO));
-
-		this.mockMvc.perform(MockMvcRequestBuilders
-			.get("/rpackage/rcalls")
-			.contentType(this.contentType))
-			.andDo(MockMvcResultHandlers.print())
-			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(jsonPath("$[0].description", Matchers.is(rCallDTO.getDescription())))
-			.andExpect(jsonPath("$[0].endpoint", Matchers.is(rCallDTO.getEndpoint())))
-			.andExpect(jsonPath("$[0].parameters." + rCallDTO.getParameters().entrySet().iterator().next().getKey(),
-				Matchers.is(rCallDTO.getParameters().entrySet().iterator().next().getValue())));
-
-	}
 
 	@Test
 	public void testGetRCallsByPackageId() throws Exception {

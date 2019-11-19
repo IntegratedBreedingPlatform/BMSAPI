@@ -16,17 +16,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/rpackage")
-public class RCallResource {
+public class RPackageResource {
 
 	@Autowired
 	private RPackageService rPackageService;
-
-	@ApiOperation(value = "Get all R Calls", notes = "Get all R Calls")
-	@RequestMapping(value = "/rcalls", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<List<RCallDTO>> getAllRCalls() {
-		return new ResponseEntity<>(this.rPackageService.getAllRCalls(), HttpStatus.OK);
-	}
 
 	@ApiOperation(value = "Get R Calls by R Package", notes = "Get R Calls by R Package")
 	@RequestMapping(value = "/rcalls/{packageId}", method = RequestMethod.GET)
