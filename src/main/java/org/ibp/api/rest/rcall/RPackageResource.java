@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rpackage")
+@RequestMapping("/r-packages")
 public class RPackageResource {
 
 	@Autowired
 	private RPackageService rPackageService;
 
 	@ApiOperation(value = "Get R Calls by R Package", notes = "Get R Calls by R Package")
-	@RequestMapping(value = "/rcalls/{packageId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{packageId}/r-calls", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<RCallDTO>> getRCallsByPackageId(@PathVariable final Integer packageId) {
 		return new ResponseEntity<>(this.rPackageService.getRCallsByPackageId(packageId), HttpStatus.OK);

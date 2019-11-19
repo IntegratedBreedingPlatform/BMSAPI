@@ -33,7 +33,7 @@ public class RPackageResourceTest extends ApiUnitTestBase {
 		when(this.rPackageService.getRCallsByPackageId(packageId)).thenReturn(Arrays.asList(rCallDTO));
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.get("/rpackage/rcalls/{packageId}", packageId)
+			.get("/r-packages/{packageId}/r-calls", packageId)
 			.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
