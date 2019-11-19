@@ -75,14 +75,14 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	@Override
 	public void deleteStudyInstance(final Integer studyId, final Integer instanceId) {
 		this.studyValidator.validate(studyId, true);
-		this.instanceValidator.validateInstanceDeletion(studyId, Collections.singleton(instanceId), true);
+		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(instanceId), true);
 		this.studyInstanceMiddlewareService.deleteStudyInstance(studyId, instanceId);
 	}
 
 	@Override
 	public Optional<StudyInstance> getStudyInstance(final int studyId, final Integer instanceId) {
 		this.studyValidator.validate(studyId, false);
-		this.instanceValidator.validate(studyId, Collections.singleton(instanceId));
+		this.instanceValidator.validateStudyInstance(studyId, Collections.singleton(instanceId));
 		final com.google.common.base.Optional<org.generationcp.middleware.service.impl.study.StudyInstance> studyInstance =
 			this.studyInstanceMiddlewareService.getStudyInstance(studyId, instanceId);
 

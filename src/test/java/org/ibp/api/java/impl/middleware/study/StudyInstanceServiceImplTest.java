@@ -15,6 +15,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -219,6 +220,7 @@ public class StudyInstanceServiceImplTest {
 
 		Assert.assertFalse(this.studyInstanceService.getStudyInstance(studyId, 103).isPresent());
 		Mockito.verify(this.studyValidator, Mockito.times(3)).validate(studyId, false);
+		Mockito.verify(this.instanceValidator, Mockito.times(3)).validateStudyInstance(ArgumentMatchers.eq(studyId), ArgumentMatchers.anySet());
 	}
 
 	@Test
@@ -228,7 +230,7 @@ public class StudyInstanceServiceImplTest {
 
 		this.studyInstanceService.deleteStudyInstance(studyId, instanceId);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.instanceValidator).validateInstanceDeletion(studyId, Collections.singleton(instanceId), true);
+		Mockito.verify(this.instanceValidator).validateStudyInstance(studyId, Collections.singleton(instanceId), true);
 		Mockito.verify(this.studyInstanceMiddlewareService).deleteStudyInstance(studyId, instanceId);
 	}
 
