@@ -1,6 +1,5 @@
 package org.ibp.api.domain.rpackage;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class RCallDTO {

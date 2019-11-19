@@ -2,9 +2,8 @@ package org.ibp.api.java.impl.middleware.rpackage;
 
 import com.google.common.base.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.domain.rpackage.RPackageDTO;
 import org.generationcp.middleware.pojos.workbench.RCall;
-import org.generationcp.middleware.pojos.workbench.RCallParameter;
-import org.generationcp.middleware.pojos.workbench.RPackage;
 import org.ibp.api.domain.rpackage.RCallDTO;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.rpackage.RPackageService;
@@ -15,9 +14,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import static org.mockito.Mockito.times;
@@ -38,40 +38,21 @@ public class RPackageServiceImplTest {
 	private final Random random = new Random();
 
 	@Test
-	public void testGetAllRCalls() {
-
-		final RCall rCall = this.createTestRCall();
-
-		when(this.rPackageMiddlewareService.getAllRCalls()).thenReturn(Arrays.asList(rCall));
-
-		final List<RCallDTO> result = this.rPackageService.getAllRCalls();
-
-		final RCallDTO rCallDTO = result.get(0);
-
-		Assert.assertEquals(rCallDTO.getEndpoint(), rCall.getrPackage().getEndpoint());
-		Assert.assertEquals(rCallDTO.getDescription(), rCall.getDescription());
-		Assert.assertEquals(rCallDTO.getParameters().get(rCall.getrCallParameters().get(0).getKey()),
-			rCall.getrCallParameters().get(0).getValue());
-
-	}
-
-	@Test
 	public void testGetRCallsByPackageId() {
 
 		final int packageId = this.random.nextInt();
-		final RCall rCall = this.createTestRCall();
+		final org.generationcp.middleware.domain.rpackage.RCallDTO rCall = this.createTestRCallDTO();
 
-		when(this.rPackageMiddlewareService.getRPackageById(packageId)).thenReturn(Optional.of(new RPackage()));
+		when(this.rPackageMiddlewareService.getRPackageById(packageId)).thenReturn(Optional.of(new RPackageDTO()));
 		when(this.rPackageMiddlewareService.getRCallsByPackageId(packageId)).thenReturn(Arrays.asList(rCall));
 
 		final List<RCallDTO> result = this.rPackageService.getRCallsByPackageId(packageId);
 
 		final RCallDTO rCallDTO = result.get(0);
 
-		Assert.assertEquals(rCallDTO.getEndpoint(), rCall.getrPackage().getEndpoint());
+		Assert.assertEquals(rCallDTO.getEndpoint(), rCall.getEndpoint());
 		Assert.assertEquals(rCallDTO.getDescription(), rCall.getDescription());
-		Assert.assertEquals(rCallDTO.getParameters().get(rCall.getrCallParameters().get(0).getKey()),
-			rCall.getrCallParameters().get(0).getValue());
+		Assert.assertEquals(rCallDTO.getParameters(), rCall.getParameters());
 
 	}
 
@@ -91,16 +72,14 @@ public class RPackageServiceImplTest {
 
 	}
 
-	private RCall createTestRCall() {
+	private org.generationcp.middleware.domain.rpackage.RCallDTO createTestRCallDTO() {
 
-		final RCall rCall = new RCall();
-		rCall.setId(this.random.nextInt(BOUND));
+		final org.generationcp.middleware.domain.rpackage.RCallDTO rCall = new org.generationcp.middleware.domain.rpackage.RCallDTO();
 		rCall.setDescription(RandomStringUtils.randomAlphanumeric(BOUND));
-		final List<RCallParameter> rCallParameters = new ArrayList<>();
-		rCall.setrCallParameters(Arrays
-			.asList(new RCallParameter(this.random.nextInt(BOUND), RandomStringUtils.random(BOUND), RandomStringUtils.random(BOUND))));
-		rCall.setrPackage(new RPackage());
-		rCall.getrPackage().setEndpoint(RandomStringUtils.random(BOUND));
+		rCall.setEndpoint(RandomStringUtils.randomAlphanumeric(BOUND));
+		final Map<String, String> parameters = new HashMap<>();
+		parameters.put(RandomStringUtils.randomAlphanumeric(BOUND), RandomStringUtils.randomAlphanumeric(BOUND));
+		rCall.setParameters(parameters);
 
 		return rCall;
 

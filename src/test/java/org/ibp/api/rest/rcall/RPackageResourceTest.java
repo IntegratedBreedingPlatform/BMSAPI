@@ -19,7 +19,7 @@ import java.util.Random;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-class RPackageResourceTest extends ApiUnitTestBase {
+public class RPackageResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private RPackageService rPackageService;
