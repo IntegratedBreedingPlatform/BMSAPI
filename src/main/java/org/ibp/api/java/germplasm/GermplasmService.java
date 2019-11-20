@@ -1,15 +1,15 @@
 
 package org.ibp.api.java.germplasm;
 
-import java.util.List;
-
-import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
 import org.ibp.api.domain.germplasm.DescendantTree;
 import org.ibp.api.domain.germplasm.GermplasmSummary;
 import org.ibp.api.domain.germplasm.PedigreeTree;
+
+import java.util.List;
 
 public interface GermplasmService {
 
@@ -35,4 +35,7 @@ public interface GermplasmService {
 
 	long countGermplasmDTOs(GermplasmSearchRequestDto germplasmSearchRequestDTO);
 
+	long countGermplasmByStudy(final Integer studyDbId);
+
+	List<GermplasmDTO> getGermplasmByStudy(int studyDbId, int pageSize, int pageNumber);
 }
