@@ -82,8 +82,9 @@ public class LotInputValidator {
 				errors.reject("lot.stock.prefix.not.empty", "");
 			}
 		} else {
-			if (StringUtils.isEmpty(lotGeneratorInputDto.getStockPrefix())){
-				errors.reject("lot.stock.prefix.required", "");
+			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockPrefix()) && !lotGeneratorInputDto.getStockPrefix()
+				.matches("[a-zA-Z]+")) {
+				errors.reject("lot.stock.prefix.invalid", "");
 				return;
 			}
 			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockId())){

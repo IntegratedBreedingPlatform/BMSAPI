@@ -1,5 +1,7 @@
 package org.ibp.api.java.impl.middleware.inventory_new;
 
+
+import org.generationcp.commons.service.StockService;
 import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory_new.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory_new.LotsSearchDto;
@@ -27,6 +29,11 @@ public class LotServiceImpl implements LotService {
 	@Autowired
 	private org.generationcp.middleware.service.api.inventory.LotService lotService;
 
+	@Autowired
+	private StockService stockService;
+
+	private static final String DEFAULT_STOCKID_PREFIX = "SID";
+
 	@Override
 	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
 		return lotService.searchLots(lotsSearchDto, pageable);
@@ -42,6 +49,16 @@ public class LotServiceImpl implements LotService {
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 		lotGeneratorInputDto.setUserId(loggedInUser.getUserid());
 		lotInputValidator.validate(lotGeneratorInputDto);
+		final String nextStockIDPrefix;
+		if (lotGeneratorInputDto.getGenerateStock()) {
+			if (lotGeneratorInputDto.getStockPrefix() == null || lotGeneratorInputDto.getStockPrefix().isEmpty()) {
+				nextStockIDPrefix = this.stockService.calculateNextStockIDPrefix(DEFAULT_STOCKID_PREFIX, "-");
+			} else {
+				nextStockIDPrefix = this.stockService.calculateNextStockIDPrefix(lotGeneratorInputDto.getStockPrefix(), "-");
+			}
+			lotGeneratorInputDto.setStockId(nextStockIDPrefix + "1");
+		}
+
 		return lotService.saveLot(lotGeneratorInputDto);
 	}
 }

@@ -5,7 +5,7 @@
 rule-engine:
   ruleSequenceConfiguration:
     naming: ${naming.rules}
-    stock-id: ${stockid.rules}
+    stockid: ${stockid.rules}
 
 germplasm-naming-properties:
   germplasmOriginStudiesDefault: '${germplasm.origin.studies.default}'
