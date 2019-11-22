@@ -17,25 +17,23 @@ public class InventoryScaleValidator {
 	private VariableService variableService;
 
 	public void validateInventoryScaleId(final BindingResult errors, final Integer inventoryScaleId) {
-		if (inventoryScaleId == null) {
-			errors.reject("inventory.scale.required", "");
-			return;
-		}
-		final VariableFilter variableFilter = new VariableFilter();
-		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
-		List<VariableDetails> variables = this.variableService.getVariablesByFilter(variableFilter);
+		if (inventoryScaleId != null) {
 
-		VariableDetails selectedInventoryScale = null;
-		if (!variables.isEmpty()) {
-			selectedInventoryScale = variables.stream()
-				.filter(inventoryScale -> inventoryScale.getId().equals(String.valueOf(inventoryScaleId)))
-				.findAny()
-				.orElse(null);
-		}
+			final VariableFilter variableFilter = new VariableFilter();
+			variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
+			final List<VariableDetails> variables = this.variableService.getVariablesByFilter(variableFilter);
 
-		if (selectedInventoryScale == null) {
-			errors.reject("inventory.scale.invalid", "");
-		}
+			VariableDetails selectedInventoryScale = null;
+			if (!variables.isEmpty()) {
+				selectedInventoryScale = variables.stream()
+					.filter(inventoryScale -> inventoryScale.getId().equals(String.valueOf(inventoryScaleId)))
+					.findAny()
+					.orElse(null);
+			}
 
+			if (selectedInventoryScale == null) {
+				errors.reject("inventory.scale.invalid", "");
+			}
+		}
 	}
 }

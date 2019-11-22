@@ -40,55 +40,43 @@ public class LotInputValidator {
 
 	public void validate(final LotGeneratorInputDto lotGeneratorInputDto) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), LotDto.class.getName());
-		locationValidator.validateSeedLocationId(errors, lotGeneratorInputDto.getLocationId());
-		inventoryScaleValidator.validateInventoryScaleId(errors, lotGeneratorInputDto.getScaleId());
-		germplasmValidator.validateGermplasmId(errors, lotGeneratorInputDto.getGid());
-		validateStockId(lotGeneratorInputDto);
-		validateAmount(lotGeneratorInputDto.getInitialBalanceAmount());
-		if (errors.hasErrors()) {
+		this.locationValidator.validateSeedLocationId(this.errors, lotGeneratorInputDto.getLocationId());
+		this.inventoryScaleValidator.validateInventoryScaleId(this.errors, lotGeneratorInputDto.getScaleId());
+		this.germplasmValidator.validateGermplasmId(this.errors, lotGeneratorInputDto.getGid());
+		this.validateStockId(lotGeneratorInputDto);
+		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-	}
-
-	private void validateAmount(final Double amount) {
-		if (amount == null) {
-			errors.reject("lot.initial.amount.required", "");
-			return;
-		}
-		if (amount <=0 ) {
-			errors.reject("lot.initial.amount.positive.value", "");
-			return;
 		}
 	}
 
 	private void validateStockId(final LotGeneratorInputDto lotGeneratorInputDto) {
 		if (lotGeneratorInputDto.getGenerateStock() == null) {
-			errors.reject("lot.generate.stock.mandatory", "");
+			this.errors.reject("lot.generate.stock.mandatory", "");
 			return;
 		}
 		if (!lotGeneratorInputDto.getGenerateStock()) {
 			final String stockId = lotGeneratorInputDto.getStockId();
 			if (StringUtils.isEmpty(stockId)) {
-				errors.reject("lot.stock.id.required", "");
+				this.errors.reject("lot.stock.id.required", "");
 				return;
 			}
 			final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 			lotsSearchDto.setStockId(stockId);
-			final long lotsCount = lotService.countSearchLots(lotsSearchDto);
+			final long lotsCount = this.lotService.countSearchLots(lotsSearchDto);
 			if (lotsCount != 0) {
-				errors.reject("lot.stock.id.invalid", "");
+				this.errors.reject("lot.stock.id.invalid", "");
 			}
 			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockPrefix())){
-				errors.reject("lot.stock.prefix.not.empty", "");
+				this.errors.reject("lot.stock.prefix.not.empty", "");
 			}
 		} else {
 			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockPrefix()) && !lotGeneratorInputDto.getStockPrefix()
 				.matches("[a-zA-Z]+")) {
-				errors.reject("lot.stock.prefix.invalid", "");
+				this.errors.reject("lot.stock.prefix.invalid", "");
 				return;
 			}
 			if (!StringUtils.isEmpty(lotGeneratorInputDto.getStockId())){
-				errors.reject("lot.stock.id.not.empty", "");
+				this.errors.reject("lot.stock.id.not.empty", "");
 				return;
 			}
 		}
