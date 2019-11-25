@@ -1,6 +1,8 @@
 
 package org.ibp;
 
+import com.fasterxml.classmate.ResolvedType;
+import com.fasterxml.classmate.TypeResolver;
 import org.ibp.api.java.impl.middleware.common.validator.CropNameValidationInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +26,14 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.schema.AlternateTypeRule;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.io.File;
 
 import javax.annotation.PostConstruct;
 
@@ -99,13 +104,28 @@ public class Main extends WebMvcConfigurerAdapter {
 
 	@Bean
 	public Docket customImplementation() {
+
+		TypeResolver typeResolver = new TypeResolver();
+		final ResolvedType fileSystemResourceType =
+				typeResolver.resolve(
+						File.class);
+		final ResolvedType objectType =
+				typeResolver.resolve(
+						Object.class);
+
 		return new Docket(DocumentationType.SWAGGER_2)
-			.apiInfo(this.apiInfo())
-			.enable(this.enableSwagger)
-			.select()
-			.apis(RequestHandlerSelectors.any())
-			.paths(PathSelectors.any())
-			.build();
+				.alternateTypeRules(
+						new AlternateTypeRule(
+								fileSystemResourceType,
+								objectType)
+				)
+				.apiInfo(this.apiInfo())
+				.enable(this.enableSwagger)
+				.select()
+				.apis(RequestHandlerSelectors.any())
+				.paths(PathSelectors.any())
+				.build()
+				.forCodeGeneration(true);
 	}
 
 	@Bean
