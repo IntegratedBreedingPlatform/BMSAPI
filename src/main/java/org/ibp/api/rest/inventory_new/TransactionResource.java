@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.inventory_new.TransactionDto;
 import org.generationcp.middleware.domain.inventory_new.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
@@ -109,6 +110,6 @@ public class TransactionResource {
 		@ApiParam("Transaction to be created")
 		@RequestBody final TransactionDto transactionDto) {
 
-		return new ResponseEntity<>(this.transactionService.saveTransaction(transactionDto, lotId), HttpStatus.CREATED);
+		return new ResponseEntity<>(this.transactionService.saveTransaction(transactionDto, lotId, TransactionStatus.COMMITTED), HttpStatus.CREATED);
 	}
 }

@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.inventory_new;
 import org.generationcp.middleware.domain.inventory_new.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory_new.TransactionDto;
 import org.generationcp.middleware.domain.inventory_new.TransactionsSearchDto;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.ibp.api.java.impl.middleware.inventory_new.validator.TransactionInputValidator;
 import org.ibp.api.java.inventory_new.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +35,12 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public Integer saveTransaction(final TransactionDto transactionDto, final String lotId) {
+	public Integer saveTransaction(final TransactionDto transactionDto, final String lotId, final TransactionStatus transactionStatus) {
 		if (transactionDto.getLot() == null) {
 			transactionDto.setLot(new ExtendedLotDto());
 		}
 		transactionDto.getLot().setLotId(Integer.valueOf(lotId));
 		this.transactionInputValidator.validate(transactionDto);
-		return this.transactionService.saveTransaction(transactionDto);
+		return this.transactionService.saveTransaction(transactionDto, transactionStatus);
 	}
 }
