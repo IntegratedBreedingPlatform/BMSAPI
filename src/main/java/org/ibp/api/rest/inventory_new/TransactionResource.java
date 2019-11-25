@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.domain.inventory_new.TransactionDto;
 import org.generationcp.middleware.domain.inventory_new.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -99,4 +100,15 @@ public class TransactionResource {
 
 	}
 
+	@ApiOperation(value = "Create Transaction", notes = "Create a new transaction")
+	@RequestMapping(value = "/crops/{cropName}/lots/{lotId}/transactions", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Integer> createTransaction(
+		@PathVariable final String cropName,
+		@PathVariable final String lotId,
+		@ApiParam("Transaction to be created")
+		@RequestBody final TransactionDto transactionDto) {
+
+		return new ResponseEntity<>(this.transactionService.saveTransaction(transactionDto, lotId), HttpStatus.CREATED);
+	}
 }
