@@ -25,11 +25,11 @@ public class GermplasmListResource {
 	public GermplamListService germplamListService;
 
 	@ApiOperation(value = "Get germplasm lists given a tree parent node folder", notes = "Get germplasm lists given a tree parent node folder")
-	@RequestMapping(value = "/crops/{crop}/programs/{programUUID}/germplasm-lists/tree", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{crop}/germplasm-lists/tree", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<TreeNode>> getGermplasmListByParentFolderId(
 		@ApiParam("The crop type") @PathVariable final String crop,
-		@ApiParam("The program UUID") @PathVariable final String programUUID,
+		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
 		@ApiParam(value = "The id of the parent folder") @RequestParam(required = false) final String parentFolderId,
 		@ApiParam(value = "Only folders") @RequestParam(required = true) final Boolean onlyFolders) {
 		final List<TreeNode> children = this.germplamListService.getGermplasmListChildrenNodes(crop, programUUID, parentFolderId, onlyFolders);
