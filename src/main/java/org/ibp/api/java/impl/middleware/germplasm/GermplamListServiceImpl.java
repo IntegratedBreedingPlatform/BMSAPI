@@ -9,6 +9,7 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplamListService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,16 +95,15 @@ public class GermplamListServiceImpl implements GermplamListService {
 	}
 
 	private void validateParentId(final String parentId, final String programUUID) {
-		if (parentId != null && !parentId.equals(PROGRAM_LISTS) && !parentId.equals(CROP_LISTS) && !isInteger(parentId)) {
+		if (parentId != null && !parentId.equals(PROGRAM_LISTS) && !parentId.equals(CROP_LISTS) && !Util.isPositiveInteger(parentId)) {
 			this.errors.reject("germplasm.list.parent.id.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		if ((PROGRAM_LISTS.equals(parentId) || isInteger(parentId)) && programUUID == null) {
+		if ((PROGRAM_LISTS.equals(parentId) || Util.isPositiveInteger(parentId)) && programUUID == null) {
 			this.errors.reject("germplasm.list.project.mandatory", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-
 		//TODO Missing validation, when parentId is integer and programUUID is not null, then the parentId type must be FOLDER
 
 	}
@@ -113,16 +113,6 @@ public class GermplamListServiceImpl implements GermplamListService {
 			this.errors.reject("germplasm.list.folder.only", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-	}
-
-	private boolean isInteger(final String text) {
-		boolean valid = true;
-		try {
-			Integer.parseInt(text);
-		} catch (final NumberFormatException e) {
-			valid = false;
-		}
-		return valid;
 	}
 
 }
