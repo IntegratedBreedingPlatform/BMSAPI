@@ -8,6 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,7 +20,7 @@ public class LocationServiceImpl implements LocationService {
 	private static final int DEFAULT_SEED_STORAGE_LOCATION = 6000;
 
 	@Autowired
-	LocationDataManager locationDataManager;
+	private LocationDataManager locationDataManager;
 
 	@Override
 	public List<LocationDto> getLocations(final Set<Integer> locationTypes, final String programUUID, final boolean isFavoriteLocation) {
