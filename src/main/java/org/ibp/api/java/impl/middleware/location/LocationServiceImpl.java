@@ -23,7 +23,7 @@ public class LocationServiceImpl implements LocationService {
 	private LocationDataManager locationDataManager;
 
 	@Override
-	public List<LocationDto> getLocations(final Set<Integer> locationTypes, final String programUUID, final boolean isFavoriteLocation) {
+	public List<LocationDto> getLocations(final Set<Integer> locationTypes, final String programUUID, final boolean favoriteLocations) {
 		final List<org.generationcp.middleware.pojos.Location> locations;
 		final ModelMapper mapper = LocationMapper.getInstance();
 
