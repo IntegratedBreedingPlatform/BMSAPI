@@ -3,7 +3,9 @@ package org.ibp.api.java.dataset;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.search_request.ObservationUnitsSearchRequestDto;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitDto;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
@@ -278,4 +280,9 @@ public interface DatasetService {
 	void setValueToVariable(Integer studyId, Integer datasetId, ObservationUnitsParamDTO searchDTO);
 
 	List<MeasurementVariable> getAllDatasetVariables(final int studyId, final int datasetId);
+
+	long countObservationUnitDTOs(ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto);
+
+	List<ObservationUnitDto> searchObservationUnitDTOs(
+		ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto, Integer finalPageNumber, Integer finalPageSize);
 }

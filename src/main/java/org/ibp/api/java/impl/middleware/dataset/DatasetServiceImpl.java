@@ -10,11 +10,13 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.search_request.ObservationUnitsSearchRequestDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitDto;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
@@ -658,6 +660,20 @@ public class DatasetServiceImpl implements DatasetService {
 		allVariables.addAll(traits);
 		allVariables.addAll(selectionVariables);
 		return allVariables;
+	}
+
+	@Override
+	public long countObservationUnitDTOs(
+		final ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto) {
+		return this.middlewareDatasetService.countObservationUnitDTOs(observationUnitsSearchRequestDto);
+	}
+
+	@Override
+	public List<ObservationUnitDto> searchObservationUnitDTOs(
+		final ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto, final Integer finalPageNumber,
+		final Integer finalPageSize) {
+
+		return this.middlewareDatasetService.searchObservationUnitDTOs(observationUnitsSearchRequestDto, finalPageNumber, finalPageSize);
 	}
 
 	private void addLocationIdVariable(final List<MeasurementVariable> environmentDetailAndConditionVariables) {

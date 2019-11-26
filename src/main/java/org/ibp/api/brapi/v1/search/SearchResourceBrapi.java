@@ -3,6 +3,7 @@ package org.ibp.api.brapi.v1.search;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.search_request.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.ObservationUnitsSearchRequestDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.search.SearchDto;
@@ -35,6 +36,21 @@ public class SearchResourceBrapi {
 		final SingleEntityResponse<SearchDto> singleGermplasmResponse = new SingleEntityResponse<SearchDto>(searchDto);
 
 		return new ResponseEntity<SingleEntityResponse<SearchDto>>(singleGermplasmResponse, HttpStatus.OK);
+
+	}
+
+	@ApiOperation(value = "Post observation units search", notes = "Post observation units search")
+	@RequestMapping(value = "/{crop}/brapi/v1/search/observationunits", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchObservationUnits(
+		@PathVariable final String crop, @RequestBody final ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto) {
+		final String searchRequestId =
+			this.searchRequestService.saveSearchRequest(observationUnitsSearchRequestDto, ObservationUnitsSearchRequestDto.class).toString();
+
+		final SearchDto searchDto = new SearchDto(searchRequestId);
+		final SingleEntityResponse<SearchDto> singleObservationUnitsResponse = new SingleEntityResponse<SearchDto>(searchDto);
+
+		return new ResponseEntity<SingleEntityResponse<SearchDto>>(singleObservationUnitsResponse, HttpStatus.OK);
 
 	}
 }
