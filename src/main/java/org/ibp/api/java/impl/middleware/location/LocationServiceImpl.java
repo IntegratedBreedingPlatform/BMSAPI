@@ -26,13 +26,16 @@ public class LocationServiceImpl implements LocationService {
 	public List<LocationDto> getLocations(final Set<Integer> locationTypes, final String programUUID, final boolean favoriteLocations) {
 		final List<org.generationcp.middleware.pojos.Location> locations;
 		final ModelMapper mapper = LocationMapper.getInstance();
+		List<Integer> locationIds = null;
 
-		if (isFavoriteLocation) {
-			final List<Integer> locIds = locationDataManager.getFavoriteProjectLocationIds(programUUID);
-			locations = locationDataManager.getFavoriteLocationsByTypes(locationTypes, locIds);
-		} else {
-			locations = locationDataManager.getLocationsByTypes(locationTypes, programUUID);
+		if (favoriteLocations) {
+			locationIds = locationDataManager.getFavoriteProjectLocationIds(programUUID);
+		}
 
+		locations = locationDataManager.getFilteredLocations(locationTypes, locationIds, programUUID);
+
+		if(locations.isEmpty()){
+			return new ArrayList<>();
 		}
 
 		final List<LocationDto> locationList = locations.stream().map(o -> mapper.map(o, LocationDto.class)).collect(Collectors.toList());
