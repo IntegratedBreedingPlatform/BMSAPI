@@ -31,12 +31,12 @@ public class LocationResource {
 	public ResponseEntity<List<LocationDto>> listFavoriteLocations(
 		@PathVariable final String cropname,
 		@PathVariable final String programUUID,
-		@ApiParam(value = "list of location types", required = false)
+		@ApiParam(value = "list of location types")
 		@RequestParam final Set<Integer> locationTypes,
 		@ApiParam(value = "isFavoriteLocation", required = true)
-		@RequestParam final boolean isFavoriteLocation){
+		@RequestParam final boolean favoriteLocations){
 
-		final List<LocationDto> locations = locationService.getLocations(locationTypes, programUUID, isFavoriteLocation);
+		final List<LocationDto> locations = locationService.getLocations(locationTypes, programUUID, favoriteLocations);
 		return new ResponseEntity<>(locations, HttpStatus.OK);
 
 	}
