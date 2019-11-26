@@ -216,14 +216,13 @@ public class DatasetResource {
 	public ResponseEntity<List<Map<String, Object>>> getObservationUnitAsJSONTable(@PathVariable final String cropname, //
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId,
-		@RequestParam(required = true) final List<String> variables,
 		@RequestBody final ObservationUnitsSearchDTO searchDTO) {
 
 		Preconditions.checkNotNull(searchDTO, "params cannot be null");
 		final SortedPageRequest sortedRequest = searchDTO.getSortedRequest();
 		Preconditions.checkNotNull(sortedRequest, "sortedRequest inside params cannot be null");
 
-		return new ResponseEntity(this.studyDatasetService.getObservationUnitRowsAsListMap(studyId, datasetId, searchDTO, variables), HttpStatus.OK);
+		return new ResponseEntity(this.studyDatasetService.getObservationUnitRowsAsListMap(studyId, datasetId, searchDTO), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "It will retrieve a list of datasets", notes = "Retrieves the list of datasets for the specified study.")

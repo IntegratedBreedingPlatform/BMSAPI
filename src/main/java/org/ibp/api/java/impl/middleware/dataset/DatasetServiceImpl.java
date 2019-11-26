@@ -330,7 +330,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<Map<String, Object>> getObservationUnitRowsAsListMap(
-		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final List<String> variables) {
+		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
 
 		List<Integer> instanceIds = null;
 		if (searchDTO.getInstanceId() != null) {
@@ -338,7 +338,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds, false);
 
-		return this.middlewareDatasetService.getObservationUnitRowsAsListMap(studyId, datasetId, searchDTO, variables);
+		return this.middlewareDatasetService.getObservationUnitRowsAsListMap(studyId, datasetId, searchDTO);
 	}
 
 	@Override

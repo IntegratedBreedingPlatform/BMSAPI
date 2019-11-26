@@ -119,11 +119,10 @@ public interface DatasetService {
 	 * @param studyId Id of the study
 	 * @param datasetId Id of the dataset
 	 * @param searchDTO Search DTO
-	 * @param variables Variables (Columns) to be returned
 	 * @return List of Variable (Column) Name and Value Map
 	 */
 	List<Map<String, Object>> getObservationUnitRowsAsListMap(
-		int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO, List<String> variables);
+		int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO);
 
 	/**
 	 * Generates a sub-observation dataset for the indicated parent id
