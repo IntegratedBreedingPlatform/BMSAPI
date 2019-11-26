@@ -115,6 +115,17 @@ public interface DatasetService {
 	List<DatasetDTO> getDatasets(Integer studyId, Set<Integer> datasetTypeIds);
 
 	/**
+	 * Returns the list of observation unit rows (represented as List of HashMap) that matches the search param
+	 * @param studyId Id of the study
+	 * @param datasetId Id of the dataset
+	 * @param searchDTO Search DTO
+	 * @param variables Variables (Columns) to be returned
+	 * @return List of Variable (Column) Name and Value Map
+	 */
+	List<Map<String, Object>> getObservationUnitRowsAsListMap(
+		int studyId, int datasetId, ObservationUnitsSearchDTO searchDTO, List<String> variables);
+
+	/**
 	 * Generates a sub-observation dataset for the indicated parent id
 	 * @param cropName Crop name
 	 * @param studyId Id of the study

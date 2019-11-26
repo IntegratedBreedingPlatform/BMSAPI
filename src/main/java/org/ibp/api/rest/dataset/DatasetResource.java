@@ -34,8 +34,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Api(value = "Dataset Services")
@@ -205,6 +208,22 @@ public class DatasetResource {
 		observationUnitTable.setRecordsTotal((int) pageResult.getTotalResults());
 		observationUnitTable.setRecordsFiltered((int) pageResult.getFilteredResults());
 		return new ResponseEntity<>(observationUnitTable, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "It will retrieve all the observation units in a simple JSON array table format", notes = "It will retrieve all the observation units including observations and props values in a simple JSON Array table format.")
+	@RequestMapping(value = "/{cropname}/studies/{studyId}/datasets/{datasetId}/observationUnits/json", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<List<Map<String, Object>>> getObservationUnitAsJSONTable(@PathVariable final String cropname, //
+		@PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId,
+		@RequestParam(required = true) final List<String> variables,
+		@RequestBody final ObservationUnitsSearchDTO searchDTO) {
+
+		Preconditions.checkNotNull(searchDTO, "params cannot be null");
+		final SortedPageRequest sortedRequest = searchDTO.getSortedRequest();
+		Preconditions.checkNotNull(sortedRequest, "sortedRequest inside params cannot be null");
+
+		return new ResponseEntity(this.studyDatasetService.getObservationUnitRowsAsListMap(studyId, datasetId, searchDTO, variables), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "It will retrieve a list of datasets", notes = "Retrieves the list of datasets for the specified study.")

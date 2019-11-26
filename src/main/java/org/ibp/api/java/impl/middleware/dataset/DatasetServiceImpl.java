@@ -329,6 +329,19 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public List<Map<String, Object>> getObservationUnitRowsAsListMap(
+		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final List<String> variables) {
+
+		List<Integer> instanceIds = null;
+		if (searchDTO.getInstanceId() != null) {
+			instanceIds = Arrays.asList(searchDTO.getInstanceId());
+		}
+		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds, false);
+
+		return this.middlewareDatasetService.getObservationUnitRowsAsListMap(studyId, datasetId, searchDTO, variables);
+	}
+
+	@Override
 	public DatasetDTO generateSubObservationDataset(
 		final String cropName, final Integer studyId, final Integer parentId, final DatasetGeneratorInput datasetGeneratorInput) {
 
