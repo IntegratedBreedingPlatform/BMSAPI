@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class LocationServiceImpl implements LocationService {
 
 	private static final int SEED_STORAGE_LOCATION_TYPE = 1500;
-	private static final int SEED_STORAGE_LOCATION = 6000;
+	private static final int DEFAULT_SEED_STORAGE_LOCATION = 6000;
 
 	@Autowired
 	LocationDataManager locationDataManager;
@@ -36,7 +36,7 @@ public class LocationServiceImpl implements LocationService {
 
 		final List<LocationDto> locationList = locations.stream().map(o -> mapper.map(o, LocationDto.class)).collect(Collectors.toList());
 		locationList.forEach(location -> {
-			if (location.getId() == LocationServiceImpl.SEED_STORAGE_LOCATION && locationTypes != null && locationTypes
+			if (location.getId() == LocationServiceImpl.DEFAULT_SEED_STORAGE_LOCATION && locationTypes != null && locationTypes
 				.contains(LocationServiceImpl.SEED_STORAGE_LOCATION_TYPE)) {
 				location.setDefaultLocation(true);
 			}
