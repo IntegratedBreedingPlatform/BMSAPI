@@ -28,10 +28,10 @@ import java.util.Map;
 @Transactional
 public class GermplamListServiceImpl implements GermplamListService {
 
-	private static final String PROGRAM_LISTS = "LISTS";
-	private static final String CROP_LISTS = "CROPLISTS";
+	public static final String PROGRAM_LISTS = "LISTS";
+	public static final String CROP_LISTS = "CROPLISTS";
 	private static final String LEAD_CLASS = "lead";
-	private static final int BATCH_SIZE = 500;
+	public static final int BATCH_SIZE = 500;
 
 	@Autowired
 	private GermplasmListManager germplasmListManager;
@@ -115,4 +115,11 @@ public class GermplamListServiceImpl implements GermplamListService {
 		}
 	}
 
+	public void setGermplasmListManager(final GermplasmListManager germplasmListManager) {
+		this.germplasmListManager = germplasmListManager;
+	}
+
+	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
+		this.workbenchDataManager = workbenchDataManager;
+	}
 }
