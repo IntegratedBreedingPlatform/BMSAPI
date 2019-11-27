@@ -1,5 +1,6 @@
 package org.ibp.api.brapi.v1.phenotype;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
@@ -33,6 +34,7 @@ public class PhenotypeSearchResource {
 	@ApiOperation(value = "Phenotype search", notes = "Returns a list of observationUnit with the observed Phenotypes")
 	@RequestMapping(value = "/{crop}/brapi/v1/phenotypes-search", method = RequestMethod.POST)
 	@ResponseBody
+	@JsonView(PhenotypeSearchDTO.View.PhenotypeBrapiV1_2.class)
 	public ResponseEntity<PhenotypeSearchSummariesDto> searchPhenotypes(@PathVariable final String crop,
 		@RequestBody final PhenotypeSearchRequestDTO requestDTO) {
 
