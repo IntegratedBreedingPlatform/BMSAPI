@@ -14,7 +14,6 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplamListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -47,7 +46,7 @@ public class GermplamListServiceImpl implements GermplamListService {
 
 		errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 
-		this.validateProgramUUID(crop, programUUID, parentId);
+		this.validateProgramUUID(crop, programUUID);
 		this.validateParentId(parentId, programUUID);
 		this.validateFolderOnly(folderOnly);
 
@@ -84,7 +83,7 @@ public class GermplamListServiceImpl implements GermplamListService {
 		return treeNodes;
 	}
 
-	private void validateProgramUUID(final String crop, final String programUUID, final String parentId) {
+	private void validateProgramUUID(final String crop, final String programUUID) {
 		if (!StringUtils.isEmpty(programUUID)) {
 			final Project project = workbenchDataManager.getProjectByUuidAndCrop(programUUID, crop);
 			if (project == null) {
