@@ -69,7 +69,7 @@ public class ObservationUnitResourceBrapi {
 				new EntityListResponse<>(new Result<>(new ArrayList<PhenotypeSearchDTO>())).withMessage("no search request found"),
 				HttpStatus.NOT_FOUND);
 		}
-		PhenotypeSearchRequestDTO phenotypeSearchDTO = new PhenotypeSearchRequestDTO();
+		final PhenotypeSearchRequestDTO phenotypeSearchDTO = new PhenotypeSearchRequestDTO();
 		phenotypeSearchDTO.setGermplasmDbIds(observationUnitsSearchRequestDto.getGermplasmDbIds());
 		phenotypeSearchDTO.setLocationDbIds(observationUnitsSearchRequestDto.getLocationDbIds());
 		phenotypeSearchDTO.setObservationLevel(observationUnitsSearchRequestDto.getObservationLevel());

@@ -55,7 +55,7 @@ public class PhenotypeSearchResource {
 				}
 			});
 
-		List<PhenotypeSearchDTO> phenotypeSearchDTOS = resultPage.getPageResults();
+		final List<PhenotypeSearchDTO> phenotypeSearchDTOS = resultPage.getPageResults();
 
 		final Result<PhenotypeSearchDTO> results = new Result<PhenotypeSearchDTO>().withData(phenotypeSearchDTOS);
 		final Pagination pagination = new Pagination() //
