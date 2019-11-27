@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional(propagation = Propagation.NEVER)
+@Transactional
 public class GermplamListServiceImpl implements GermplamListService {
 
 	private static final String PROGRAM_LISTS = "LISTS";
