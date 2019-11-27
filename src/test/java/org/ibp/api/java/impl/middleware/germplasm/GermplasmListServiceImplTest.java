@@ -39,39 +39,39 @@ public class GermplasmListServiceImplTest {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testGetGermplasmListChildrenNodes_MissingFolderOnly() throws ApiRequestValidationException {
+	public void testGetGermplasmListChildrenNodes_MissingFolderOnly_ThrowsException() throws ApiRequestValidationException {
 		germplamListService.getGermplasmListChildrenNodes("maize", null, null, null);
 
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testGetGermplasmListChildrenNodes_InvalidParentId() throws ApiRequestValidationException {
+	public void testGetGermplasmListChildrenNodes_InvalidParentId_ThrowsException() throws ApiRequestValidationException {
 		germplamListService.getGermplasmListChildrenNodes("maize", null, "X", Boolean.TRUE);
 
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testGetGermplasmListChildrenNodes_ProgramRequired() throws ApiRequestValidationException {
+	public void testGetGermplasmListChildrenNodes_ProgramNotSpecified_ThrowsException() throws ApiRequestValidationException {
 		germplamListService.getGermplasmListChildrenNodes("maize", null, GermplamListServiceImpl.PROGRAM_LISTS, Boolean.FALSE);
 
 	}
 
 	@Test(expected = ResourceNotFoundException.class)
-	public void testGetGermplasmListChildrenNodes_ProgramInvalid() throws ApiRequestValidationException {
+	public void testGetGermplasmListChildrenNodes_ProgramInvalid_ThrowsException() throws ApiRequestValidationException {
 		final String program = RandomStringUtils.randomAlphabetic(3);
 		Mockito.when(workbenchDataManager.getProjectByUuidAndCrop(program, "maize")).thenReturn(null);
 		germplamListService.getGermplasmListChildrenNodes("maize", program, GermplamListServiceImpl.PROGRAM_LISTS, Boolean.FALSE);
 	}
 
 	@Test
-	public void testGetGermplasmListChildrenNodes_ReturnOnlyCropFolderWhenNoProgramIsSpecified() throws ApiRequestValidationException {
+	public void testGetGermplasmListChildrenNodes_NoProgramSpecified_ReturnOnlyCropFolder() throws ApiRequestValidationException {
 		final List<TreeNode> result = germplamListService.getGermplasmListChildrenNodes("maize", null, null, Boolean.FALSE);
 		Assert.assertEquals(result.size(), 1);
 		Assert.assertEquals(GermplamListServiceImpl.CROP_LISTS, result.get(0).getKey());
 	}
 
 	@Test
-	public void testGetGermplasmListChildrenNodes_ReturnCropAndProgramFolderWhenProgramIsSpecified() throws ApiRequestValidationException {
+	public void testGetGermplasmListChildrenNodes_ProgramIsSpecified_ReturnCropAndProgramFolder() throws ApiRequestValidationException {
 		final String program = RandomStringUtils.randomAlphabetic(3);
 		Mockito.when(workbenchDataManager.getProjectByUuidAndCrop(program, "maize")).thenReturn(new Project());
 
@@ -83,7 +83,7 @@ public class GermplasmListServiceImplTest {
 	}
 
 	@Test
-	public void testGetGermplasmListChildrenNodes_LoadCropGermplasmLists_WhenParentIsCropList() throws ApiRequestValidationException {
+	public void testGetGermplasmListChildrenNodes_ParentIsCropList_LoadCropGermplasmLists() throws ApiRequestValidationException {
 		final String program = RandomStringUtils.randomAlphabetic(3);
 		Mockito.when(workbenchDataManager.getProjectByUuidAndCrop(program, "maize")).thenReturn(new Project());
 		germplamListService.getGermplasmListChildrenNodes("maize", program, GermplamListServiceImpl.CROP_LISTS, Boolean.FALSE);
@@ -91,7 +91,7 @@ public class GermplasmListServiceImplTest {
 	}
 
 	@Test
-	public void testGetGermplasmListChildrenNodes_LoadProgramGermplasmLists_WhenParentIsProgramList() throws ApiRequestValidationException {
+	public void testGetGermplasmListChildrenNodes_ParentIsProgramList_LoadProgramGermplasmLists() throws ApiRequestValidationException {
 		final String program = RandomStringUtils.randomAlphabetic(3);
 		Mockito.when(workbenchDataManager.getProjectByUuidAndCrop(program, "maize")).thenReturn(new Project());
 		germplamListService.getGermplasmListChildrenNodes("maize", program, GermplamListServiceImpl.PROGRAM_LISTS, Boolean.FALSE);
@@ -99,7 +99,7 @@ public class GermplasmListServiceImplTest {
 	}
 
 	@Test
-	public void testGetGermplasmListChildrenNodes_LoadLists_WhenParentIsAFolder() throws ApiRequestValidationException {
+	public void testGetGermplasmListChildrenNodes_ParentIsAFolder_LoadLists() throws ApiRequestValidationException {
 		final String program = RandomStringUtils.randomAlphabetic(3);
 		Mockito.when(workbenchDataManager.getProjectByUuidAndCrop(program, "maize")).thenReturn(new Project());
 		germplamListService.getGermplasmListChildrenNodes("maize", program, "1", Boolean.FALSE);
