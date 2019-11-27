@@ -11,6 +11,7 @@ import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.ibp.api.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.germplasm.GermplamListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -88,7 +89,7 @@ public class GermplamListServiceImpl implements GermplamListService {
 			final Project project = workbenchDataManager.getProjectByUuidAndCrop(programUUID, crop);
 			if (project == null) {
 				this.errors.reject("germplasm.list.project.invalid", "");
-				throw new ApiRequestValidationException(this.errors.getAllErrors());
+				throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 			}
 		}
 	}
