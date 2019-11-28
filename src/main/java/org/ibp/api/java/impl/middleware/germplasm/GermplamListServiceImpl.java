@@ -73,7 +73,7 @@ public class GermplamListServiceImpl implements GermplamListService {
 
 			final List<TreeNode> childNodes = TreeViewUtil.convertGermplasmListToTreeView(rootLists, folderOnly);
 
-			final Map<Integer, ListMetadata> allListMetaData = this.germplasmListManager.getGermplasmListMetadataForAllElements(rootLists);
+			final Map<Integer, ListMetadata> allListMetaData = this.germplasmListManager.getGermplasmListMetadata(rootLists);
 
 			for (final TreeNode newNode : childNodes) {
 				final ListMetadata nodeMetaData = allListMetaData.get(Integer.parseInt(newNode.getKey()));
