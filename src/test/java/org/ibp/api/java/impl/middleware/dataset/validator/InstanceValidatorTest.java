@@ -116,10 +116,49 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 	}
 
 	@Test
+	public void testValidateInstanceNumbersFail_AllSelectedInstancesCantBeDeleted() {
+		final Map<String, Integer> instancesMap = new HashMap<>();
+		instancesMap.put("1", 101);
+		instancesMap.put("2", 102);
+		instancesMap.put("3", 103);
+		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
+
+		final int studyId = random.nextInt();
+		final List<StudyInstance> instances = this.createTestInstances();
+		instances.get(0).setCanBeDeleted(Boolean.FALSE);
+		instances.get(1).setCanBeDeleted(Boolean.FALSE);
+		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
+
+		try {
+			this.instanceValidator.validateInstanceNumbers(studyId, new HashSet<>(Arrays.asList(1, 2)));
+			Assert.fail("Expected validation exception to be thrown but was not.");
+		} catch (final ApiRequestValidationException e) {
+			Assert.assertThat(Arrays.asList(e.getErrors().get(0).getCodes()),
+				hasItem("all.selected.instances.cannot.be.regenerated"));
+		}
+	}
+
+	@Test
+	public void testValidateInstanceNumbersSuccess_SomeSelectedInstancesCantBeDeleted() {
+		final Map<String, Integer> instancesMap = new HashMap<>();
+		instancesMap.put("1", 101);
+		instancesMap.put("2", 102);
+		instancesMap.put("3", 103);
+		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
+
+		final int studyId = random.nextInt();
+		final List<StudyInstance> instances = this.createTestInstances(3);
+		instances.get(0).setCanBeDeleted(Boolean.FALSE);
+		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(studyId);
+
+		this.instanceValidator.validateInstanceNumbers(studyId, new HashSet<>(Arrays.asList(1, 2)));
+	}
+
+	@Test
 	public void testValidateInstanceNumbersSuccess_AllInstancesCanBeDeleted() {
 		final Map<String, Integer> instancesMap = new HashMap<>();
 		instancesMap.put("1", 101);
-		instancesMap.put("2", 202);
+		instancesMap.put("2", 102);
 		Mockito.doReturn(instancesMap).when(this.studyDataManager).getInstanceGeolocationIdsMap(ArgumentMatchers.anyInt());
 
 		final int studyId = random.nextInt();
