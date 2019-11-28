@@ -69,15 +69,24 @@ public class GermplamListServiceImpl implements GermplamListService {
 				rootLists = this.germplasmListManager.getGermplasmListByParentFolderIdBatched(Integer.parseInt(parentId), programUUID, GermplamListServiceImpl.BATCH_SIZE);
 			}
 
+			this.germplasmListManager.populateGermplasmListCreatedByName(rootLists);
+
 			final List<TreeNode> childNodes = TreeViewUtil.convertGermplasmListToTreeView(rootLists, folderOnly);
 
-			final Map<Integer, ListMetadata> allListMetaData = this.germplasmListManager.getGermplasmFolderMetadata(rootLists);
+			final Map<Integer, ListMetadata> allListMetaData = this.germplasmListManager.getGermplasmListMetadataForAllElements(rootLists);
 
 			for (final TreeNode newNode : childNodes) {
 				final ListMetadata nodeMetaData = allListMetaData.get(Integer.parseInt(newNode.getKey()));
-				if (nodeMetaData != null && nodeMetaData.getNumberOfChildren() > 0) {
-					newNode.setIsLazy(true);
+				if (nodeMetaData != null) {
+					if (nodeMetaData.getNumberOfChildren() > 0) {
+						newNode.setIsLazy(true);
+						newNode.setNumOfChildren(nodeMetaData.getNumberOfChildren());
+					}
+					if (!newNode.getIsFolder()) {
+						newNode.setNoOfEntries(nodeMetaData.getNumberOfEntries());
+					}
 				}
+				newNode.setParentId(parentId);
 			}
 			return childNodes;
 		}
